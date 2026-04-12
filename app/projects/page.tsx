@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { createClient } from "@supabase/supabase-js";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import ProjectsContent from "./ProjectsContent";
 import CategoryHero from "@/components/CategoryHero";
 
@@ -9,11 +9,6 @@ export const metadata: Metadata = {
   title: "Projekte — CineGenius",
   description: "Filmprojekte & Produktionen auf CineGenius — mit Suche, Filter und Crew-Übersicht.",
 };
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export default async function ProjectsPage() {
   const { data: projects } = await supabaseAdmin

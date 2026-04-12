@@ -1,11 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
+const admin = supabaseAdmin;
 import { NextRequest, NextResponse } from "next/server";
-
-const admin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 async function verifyOwner(companyId: string, userId: string) {
   const { data } = await admin

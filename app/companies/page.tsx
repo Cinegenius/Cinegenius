@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { createClient } from "@supabase/supabase-js";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import CompaniesContent from "./CompaniesContent";
 import ImageStrip from "@/components/ImageStrip";
 import CategoryHero from "@/components/CategoryHero";
@@ -15,11 +15,6 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = "force-dynamic";
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export default async function CompaniesPage() {
   const { data } = await supabaseAdmin

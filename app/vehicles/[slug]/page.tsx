@@ -1,7 +1,7 @@
 import Link from "next/link";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { createClient } from "@supabase/supabase-js";
 import {
   MapPin, CheckCircle, Star, Car, Calendar, Shield,
   Truck, ArrowRight, Zap, Info,
@@ -12,11 +12,6 @@ import ReviewsSection from "@/components/ReviewsSection";
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 async function getVehicle(slug: string) {
   const { data } = await supabaseAdmin

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
+const admin = supabaseAdmin;
 import type { Metadata } from "next";
-import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
 import ProfileView from "./ProfileView";
 import type { UserProfile, ProjectCredit } from "@/lib/profile-types";
@@ -8,11 +9,6 @@ import { getPresetForType, type ProfileModule } from "@/lib/profile-types";
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
-
-const admin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 // Stable base columns that always exist
 const BASE_FIELDS = "user_id, display_name, avatar_url, cover_image_url, role, positions, location, bio, tagline, slug, profile_type, verified, available, available_from, day_rate, languages, travel_ready, skills, filmography, profile_images, showreel_url, reel_url, awards, availability_config, modules, instagram_url, tiktok_url, youtube_url, vimeo_url, linkedin_url, website_url, video_links";

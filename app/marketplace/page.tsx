@@ -1,17 +1,12 @@
 import Link from "next/link";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import Image from "next/image";
-import { createClient } from "@supabase/supabase-js";
 import {
   Package, Car, Shirt, Wrench, Clapperboard, Sparkles, Lightbulb, Mic, Zap, Layers,
   ArrowRight, Search,
 } from "lucide-react";
 import CategoryHero from "@/components/CategoryHero";
 export const dynamic = "force-dynamic";
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 async function getMarketplaceData() {
   const [{ data: dbProps }, { data: dbVehicles }, { count: totalProps }, { count: totalVehicles }] = await Promise.all([

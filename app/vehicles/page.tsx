@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { createClient } from "@supabase/supabase-js";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import VehiclesContent from "./VehiclesContent";
 import ProviderProfiles from "@/components/ProviderProfiles";
 
@@ -14,11 +14,6 @@ export const metadata: Metadata = {
     description: "Klassiker, Stuntautos und Spezialfahrzeuge für deine Produktion.",
   },
 };
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export default async function VehiclesPage() {
   const { data } = await supabaseAdmin

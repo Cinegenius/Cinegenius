@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { createClient } from "@supabase/supabase-js";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import CreatorsContent, { type ServerCreator } from "./CreatorsContent";
 import CategoryHero from "@/components/CategoryHero";
 
@@ -14,11 +14,6 @@ export const metadata: Metadata = {
     description: "Kamera, Regie, Licht, Ton, Social Media, Fotografie — alle Gewerke auf einer Plattform.",
   },
 };
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 function parseCreatorDescription(raw: string): { skills: string[]; credits: string[] } {
   const skillsMatch = raw.match(/^Skills: (.+)$/m);
@@ -50,7 +45,6 @@ export default async function CreatorsPage() {
     .select("user_id, display_name, location, bio, skills, role, positions, available, avatar_url, portfolio_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline")
     .not("display_name", "is", null)
     .neq("display_name", "");
-
 
   const fromListings: ServerCreator[] = (listings ?? []).map((l: {
     id: string; title: string; city: string; price: number; category: string | null; description: string | null; image_url: string | null;

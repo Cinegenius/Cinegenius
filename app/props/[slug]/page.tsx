@@ -1,15 +1,10 @@
 import { notFound } from "next/navigation";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import type { Metadata } from "next";
-import { createClient } from "@supabase/supabase-js";
 import PropDetail from "@/components/PropDetail";
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 async function getProp(slug: string) {
   const { data } = await supabaseAdmin

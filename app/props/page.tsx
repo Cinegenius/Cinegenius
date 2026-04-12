@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { createClient } from "@supabase/supabase-js";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import PropsContent from "./PropsContent";
 import CategoryHero from "@/components/CategoryHero";
 import ProviderProfiles from "@/components/ProviderProfiles";
@@ -15,11 +15,6 @@ export const metadata: Metadata = {
     description: "Equipment für Film, Foto und Social Media — von Privatpersonen und Verleihfirmen.",
   },
 };
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export default async function PropsPage() {
   const { data } = await supabaseAdmin

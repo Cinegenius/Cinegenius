@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { createClient } from "@supabase/supabase-js";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import JobsContent from "./JobsContent";
 
 export const dynamic = "force-dynamic";
@@ -13,11 +13,6 @@ export const metadata: Metadata = {
     description: "Jobs in Film, Social Media und Fotografie — alle Gewerke, alle Städte.",
   },
 };
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export default async function JobsPage() {
   const { data } = await supabaseAdmin

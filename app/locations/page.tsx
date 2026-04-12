@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { createClient } from "@supabase/supabase-js";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import LocationsContent from "./LocationsContent";
 import CategoryHero from "@/components/CategoryHero";
 import ProviderProfiles from "@/components/ProviderProfiles";
@@ -15,11 +15,6 @@ export const metadata: Metadata = {
     description: "Die perfekte Location für dein nächstes Projekt — Innen, Außen & Speziallocation.",
   },
 };
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 // Geocode unique cities via Nominatim — deduplicated so each city is only fetched once
 async function geocodeCities(cities: string[]): Promise<Record<string, { lat: number; lng: number }>> {

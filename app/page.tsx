@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import Link from "next/link";
 import Image from "next/image";
-import { createClient } from "@supabase/supabase-js";
 
 export const metadata: Metadata = {
   title: "CineGenius — Locations, Crew & Equipment für Film, Foto und Content",
@@ -22,11 +22,6 @@ import {
 } from "lucide-react";
 import { stats } from "@/lib/data";
 import ImageStrip from "@/components/ImageStrip";
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 function fmtCount(n: number, fallback: string): string {
   if (n === 0) return fallback;

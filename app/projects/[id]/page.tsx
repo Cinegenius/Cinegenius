@@ -1,15 +1,10 @@
 import { notFound } from "next/navigation";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import type { Metadata } from "next";
-import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
 import ProjectDetail from "@/components/ProjectDetail";
 
 export const dynamic = "force-dynamic";
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 async function getProject(id: string) {
   const [{ data: project }, { data: credits }, { data: festivals }] = await Promise.all([
