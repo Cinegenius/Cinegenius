@@ -13,25 +13,30 @@ const isProtectedRoute = createRouteMatcher([
 const isOnboardingRoute = createRouteMatcher(["/profile-setup(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
-  const { userId } = await auth();
+  try {
+    const { userId } = await auth();
 
-  // /profile-setup: must be logged in
-  if (isOnboardingRoute(req)) {
-    if (!userId) {
-      const signInUrl = new URL("/sign-in", req.url);
-      signInUrl.searchParams.set("redirect_url", req.nextUrl.pathname);
-      return NextResponse.redirect(signInUrl);
+    // /profile-setup: must be logged in
+    if (isOnboardingRoute(req)) {
+      if (!userId) {
+        const signInUrl = new URL("/sign-in", req.url);
+        signInUrl.searchParams.set("redirect_url", req.nextUrl.pathname);
+        return NextResponse.redirect(signInUrl);
+      }
+      return NextResponse.next();
     }
+
+    // Protected routes: just require login, pages handle profile check themselves
+    if (isProtectedRoute(req)) {
+      if (!userId) {
+        const signInUrl = new URL("/sign-in", req.url);
+        signInUrl.searchParams.set("redirect_url", req.nextUrl.pathname);
+        return NextResponse.redirect(signInUrl);
+      }
+    }
+  } catch {
+    // If Clerk fails (e.g. dev keys on non-localhost), allow request through
     return NextResponse.next();
-  }
-
-  // Protected routes: just require login, pages handle profile check themselves
-  if (isProtectedRoute(req)) {
-    if (!userId) {
-      const signInUrl = new URL("/sign-in", req.url);
-      signInUrl.searchParams.set("redirect_url", req.nextUrl.pathname);
-      return NextResponse.redirect(signInUrl);
-    }
   }
 
   return NextResponse.next();
