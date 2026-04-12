@@ -19,15 +19,11 @@
 // );
 // CREATE INDEX bookings_user_id_idx ON bookings(user_id, created_at DESC);
 
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { createClient } from "@supabase/supabase-js";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { sendNewBookingEmail } from "@/lib/email";
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 function generateRef(): string {
   return "CG-" + Math.random().toString(36).slice(2, 8).toUpperCase();

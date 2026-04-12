@@ -15,14 +15,10 @@
 // CREATE INDEX applications_applicant_id_idx ON applications(applicant_id, created_at DESC);
 // CREATE UNIQUE INDEX applications_unique ON applications(job_id, applicant_id);
 
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 // POST /api/applications — submit a job application
 export async function POST(req: NextRequest) {

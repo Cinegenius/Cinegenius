@@ -14,14 +14,10 @@
 // ALTER TABLE favorites ENABLE ROW LEVEL SECURITY;
 // CREATE POLICY "users manage own favorites" ON favorites FOR ALL USING (auth.uid()::text = user_id);
 
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 // GET /api/favorites — list all favorites for current user
 // GET /api/favorites?id=xxx — check if specific listing is favorited
