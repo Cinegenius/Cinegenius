@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import JobsContent from "./JobsContent";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Film Jobs & Stellenanzeigen — Regie, Kamera, Produktion",

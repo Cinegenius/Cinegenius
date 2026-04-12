@@ -4,7 +4,7 @@ import LocationsContent from "./LocationsContent";
 import CategoryHero from "@/components/CategoryHero";
 import ProviderProfiles from "@/components/ProviderProfiles";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Drehorte mieten — Filmlocations in Deutschland",

@@ -4,7 +4,7 @@ import PropsContent from "./PropsContent";
 import CategoryHero from "@/components/CategoryHero";
 import ProviderProfiles from "@/components/ProviderProfiles";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Requisiten & Equipment mieten — Film, Foto, Social Media",

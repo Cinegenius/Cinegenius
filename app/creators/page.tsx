@@ -3,7 +3,7 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import CreatorsContent, { type ServerCreator } from "./CreatorsContent";
 import CategoryHero from "@/components/CategoryHero";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Filmcrew & Kreative finden — Kamera, Regie, Content Creator",
