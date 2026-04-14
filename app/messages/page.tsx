@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
-import { Send, ArrowLeft, MessageSquare, Loader2, User } from "lucide-react";
+import { Send, ArrowLeft, MessageSquare, Loader2, User, UserPlus, Check, X } from "lucide-react";
 import { Suspense } from "react";
 
 type Message = {
@@ -24,6 +24,13 @@ type Conversation = {
   messages: Message[];
   otherName?: string;
   otherAvatar?: string;
+};
+
+type FriendRequest = {
+  friendship_id: string;
+  user_id: string;
+  display_name: string;
+  avatar_url: string | null;
 };
 
 function formatTime(iso: string) {
@@ -52,6 +59,11 @@ function MessagesContent() {
   const [loadingRecipient, setLoadingRecipient] = useState(!!toParam);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  // Friend requests
+  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
+  const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
+
   // Mobile: true = zeige Chat, false = zeige Liste
   const showChat = !!(activeId || newConvRecipient);
 
@@ -75,10 +87,20 @@ function MessagesContent() {
     setLoading(false);
   }, [user?.id]);
 
+  const loadFriendRequests = useCallback(async () => {
+    try {
+      const res = await fetch("/api/friendships");
+      if (!res.ok) return;
+      const { incoming } = await res.json();
+      if (Array.isArray(incoming)) setFriendRequests(incoming);
+    } catch { /* ignore */ }
+  }, []);
+
   useEffect(() => {
     if (!user) return;
     loadConversations();
-  }, [user, loadConversations]);
+    loadFriendRequests();
+  }, [user, loadConversations, loadFriendRequests]);
 
   useEffect(() => {
     if (!toParam) return;
@@ -122,6 +144,26 @@ function MessagesContent() {
     setNewConvRecipient(null);
     setMessages([]);
   }
+
+  async function handleFriendRequest(friendshipId: string, action: "accepted" | "rejected") {
+    setProcessingIds(prev => new Set(prev).add(friendshipId));
+    try {
+      await fetch(`/api/friendships/${friendshipId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: action }),
+      });
+      setFriendRequests(prev => prev.filter(r => r.friendship_id !== friendshipId));
+    } catch { /* ignore */ } finally {
+      setProcessingIds(prev => { const s = new Set(prev); s.delete(friendshipId); return s; });
+    }
+  }
+
+  function dismissRequest(friendshipId: string) {
+    setDismissedIds(prev => new Set(prev).add(friendshipId));
+  }
+
+  const visibleRequests = friendRequests.filter(r => !dismissedIds.has(r.friendship_id));
 
   async function sendMessage() {
     if (!text.trim() || sending) return;
@@ -189,17 +231,74 @@ function MessagesContent() {
           <div className="flex-1 flex items-center justify-center">
             <Loader2 size={20} className="animate-spin text-text-muted" />
           </div>
-        ) : conversations.length === 0 && !isNewConv ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-            <MessageSquare size={32} className="text-text-muted mb-3 opacity-40" />
-            <p className="text-sm text-text-muted">Noch keine Nachrichten</p>
-          </div>
         ) : (
           <div className="flex-1 overflow-y-auto">
+
+            {/* ── Freundschaftsanfragen ── */}
+            {visibleRequests.length > 0 && (
+              <div className="border-b border-border">
+                <div className="px-4 py-2 bg-bg-elevated">
+                  <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider flex items-center gap-1.5">
+                    <UserPlus size={12} /> Anfragen · {visibleRequests.length}
+                  </p>
+                </div>
+                {visibleRequests.map(req => {
+                  const isProcessing = processingIds.has(req.friendship_id);
+                  return (
+                    <div key={req.friendship_id} className="flex items-center gap-3 px-4 py-3 border-b border-border last:border-b-0">
+                      <Link href={`/profile/${req.user_id}`} className="shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-bg-elevated border border-border flex items-center justify-center overflow-hidden">
+                          {req.avatar_url
+                            ? <img src={req.avatar_url} alt="" className="w-full h-full object-cover" />
+                            : <User size={16} className="text-text-muted" />}
+                        </div>
+                      </Link>
+                      <div className="flex-1 min-w-0">
+                        <Link href={`/profile/${req.user_id}`}>
+                          <p className="text-sm font-semibold text-text-primary truncate hover:text-gold transition-colors">
+                            {req.display_name}
+                          </p>
+                        </Link>
+                        <p className="text-xs text-text-muted">möchte sich vernetzen</p>
+                      </div>
+                      <div className="flex gap-1.5 shrink-0">
+                        {isProcessing ? (
+                          <Loader2 size={16} className="animate-spin text-text-muted" />
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => handleFriendRequest(req.friendship_id, "accepted")}
+                              title="Annehmen"
+                              className="w-8 h-8 rounded-full bg-gold/10 text-gold border border-gold/20 flex items-center justify-center hover:bg-gold hover:text-bg-primary transition-colors"
+                            >
+                              <Check size={14} />
+                            </button>
+                            <button
+                              onClick={() => handleFriendRequest(req.friendship_id, "rejected")}
+                              title="Ablehnen"
+                              className="w-8 h-8 rounded-full bg-bg-elevated border border-border flex items-center justify-center text-text-muted hover:text-red-400 hover:border-red-400/40 transition-colors"
+                            >
+                              <X size={14} />
+                            </button>
+                            <button
+                              onClick={() => dismissRequest(req.friendship_id)}
+                              title="Ausblenden"
+                              className="w-8 h-8 rounded-full bg-bg-elevated border border-border flex items-center justify-center text-text-muted hover:text-text-primary transition-colors text-[10px] font-bold"
+                            >
+                              –
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* ── Neue Konversation Placeholder ── */}
             {isNewConv && (
-              <button
-                className="w-full flex items-center gap-3 p-4 bg-gold/5 border-b border-gold/20 text-left"
-              >
+              <button className="w-full flex items-center gap-3 p-4 bg-gold/5 border-b border-gold/20 text-left">
                 <div className="w-10 h-10 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
                   <User size={16} className="text-gold" />
                 </div>
@@ -211,33 +310,42 @@ function MessagesContent() {
                 </div>
               </button>
             )}
-            {conversations.map(conv => {
-              const lastMsg = conv.messages?.[conv.messages.length - 1];
-              const unread = conv.messages?.filter(m => m.sender_id !== user?.id && !m.read_at).length ?? 0;
-              return (
-                <button
-                  key={conv.id}
-                  onClick={() => openConversation(conv)}
-                  className={`w-full flex items-center gap-3 p-4 border-b border-border text-left hover:bg-bg-elevated transition-colors ${activeId === conv.id ? "bg-bg-elevated" : ""}`}
-                >
-                  <div className="w-10 h-10 rounded-full bg-bg-elevated border border-border flex items-center justify-center shrink-0 overflow-hidden">
-                    {conv.otherAvatar
-                      ? <img src={conv.otherAvatar} alt="" className="w-full h-full object-cover" />
-                      : <User size={16} className="text-text-muted" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-semibold text-text-primary truncate">{conv.otherName}</p>
-                      {lastMsg && <span className="text-[10px] text-text-muted shrink-0 ml-1">{formatTime(lastMsg.created_at)}</span>}
+
+            {/* ── Konversationsliste ── */}
+            {conversations.length === 0 && !isNewConv && visibleRequests.length === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center min-h-[200px]">
+                <MessageSquare size={32} className="text-text-muted mb-3 opacity-40" />
+                <p className="text-sm text-text-muted">Noch keine Nachrichten</p>
+              </div>
+            ) : (
+              conversations.map(conv => {
+                const lastMsg = conv.messages?.[conv.messages.length - 1];
+                const unread = conv.messages?.filter(m => m.sender_id !== user?.id && !m.read_at).length ?? 0;
+                return (
+                  <button
+                    key={conv.id}
+                    onClick={() => openConversation(conv)}
+                    className={`w-full flex items-center gap-3 p-4 border-b border-border text-left hover:bg-bg-elevated transition-colors ${activeId === conv.id ? "bg-bg-elevated" : ""}`}
+                  >
+                    <div className="w-10 h-10 rounded-full bg-bg-elevated border border-border flex items-center justify-center shrink-0 overflow-hidden">
+                      {conv.otherAvatar
+                        ? <img src={conv.otherAvatar} alt="" className="w-full h-full object-cover" />
+                        : <User size={16} className="text-text-muted" />}
                     </div>
-                    <p className="text-xs text-text-muted truncate">{lastMsg?.content ?? "Keine Nachrichten"}</p>
-                  </div>
-                  {unread > 0 && (
-                    <span className="w-5 h-5 rounded-full bg-gold text-bg-primary text-[10px] font-bold flex items-center justify-center shrink-0">{unread}</span>
-                  )}
-                </button>
-              );
-            })}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-semibold text-text-primary truncate">{conv.otherName}</p>
+                        {lastMsg && <span className="text-[10px] text-text-muted shrink-0 ml-1">{formatTime(lastMsg.created_at)}</span>}
+                      </div>
+                      <p className="text-xs text-text-muted truncate">{lastMsg?.content ?? "Keine Nachrichten"}</p>
+                    </div>
+                    {unread > 0 && (
+                      <span className="w-5 h-5 rounded-full bg-gold text-bg-primary text-[10px] font-bold flex items-center justify-center shrink-0">{unread}</span>
+                    )}
+                  </button>
+                );
+              })
+            )}
           </div>
         )}
       </div>

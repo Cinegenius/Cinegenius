@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
     type: "friend_request",
     title: "Neue Freundschaftsanfrage",
     body: `${senderName} möchte sich mit dir vernetzen.`,
-    href: "/dashboard?tab=friends",
+    href: "/messages",
   });
 
   try {
