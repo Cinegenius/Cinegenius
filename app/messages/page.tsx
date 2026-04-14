@@ -52,12 +52,14 @@ function MessagesContent() {
   const [loadingRecipient, setLoadingRecipient] = useState(!!toParam);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  // Mobile: true = zeige Chat, false = zeige Liste
+  const showChat = !!(activeId || newConvRecipient);
+
   const loadConversations = useCallback(async () => {
     const res = await fetch("/api/conversations");
     const { data } = await res.json();
     if (!data) return;
 
-    // Enrich with other user's profile
     const enriched = await Promise.all(
       (data as Conversation[]).map(async (conv) => {
         const otherId = conv.sender_id === user?.id ? conv.receiver_id : conv.sender_id;
@@ -78,7 +80,6 @@ function MessagesContent() {
     loadConversations();
   }, [user, loadConversations]);
 
-  // Load recipient name if ?to= param
   useEffect(() => {
     if (!toParam) return;
     fetch(`/api/profile/by-id?id=${toParam}`)
@@ -90,18 +91,16 @@ function MessagesContent() {
       .catch(() => setLoadingRecipient(false));
   }, [toParam]);
 
-  // Open conversation when ?to= param and conversations loaded
   useEffect(() => {
     if (!toParam || loading) return;
     const existing = conversations.find(c =>
-      (c.sender_id === toParam || c.receiver_id === toParam)
+      c.sender_id === toParam || c.receiver_id === toParam
     );
     if (existing) {
       setActiveId(existing.id);
       setNewConvRecipient(null);
       loadMessages(existing.id);
     }
-    // else: stays in new conversation mode
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toParam, loading, conversations]);
 
@@ -118,13 +117,18 @@ function MessagesContent() {
     loadMessages(conv.id);
   }
 
+  function closeChat() {
+    setActiveId(null);
+    setNewConvRecipient(null);
+    setMessages([]);
+  }
+
   async function sendMessage() {
     if (!text.trim() || sending) return;
     setSending(true);
 
     try {
       if (newConvRecipient) {
-        // Start new conversation
         const res = await fetch("/api/conversations", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -158,116 +162,130 @@ function MessagesContent() {
 
   const activeConv = conversations.find(c => c.id === activeId);
   const isNewConv = !!newConvRecipient && !activeId;
+  const otherUserId = isNewConv
+    ? newConvRecipient
+    : activeConv
+      ? (activeConv.sender_id === user?.id ? activeConv.receiver_id : activeConv.sender_id)
+      : null;
 
   return (
-    <div className="min-h-screen bg-bg-primary pt-16 flex flex-col">
-      <div className="flex-1 max-w-5xl mx-auto w-full flex h-[calc(100vh-4rem)]">
+    <div className="fixed inset-0 top-16 bg-bg-primary flex flex-col overflow-hidden">
 
-        {/* Sidebar */}
-        <div className={`w-full sm:w-80 shrink-0 border-r border-border flex flex-col ${activeId || isNewConv ? "hidden sm:flex" : "flex"}`}>
-          <div className="p-4 border-b border-border">
-            <h1 className="font-display text-lg font-bold text-text-primary flex items-center gap-2">
-              <MessageSquare size={18} className="text-gold" /> Nachrichten
-            </h1>
-          </div>
-
-          {loading ? (
-            <div className="flex-1 flex items-center justify-center">
-              <Loader2 size={20} className="animate-spin text-text-muted" />
-            </div>
-          ) : conversations.length === 0 && !isNewConv ? (
-            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-              <MessageSquare size={32} className="text-text-muted mb-3 opacity-40" />
-              <p className="text-sm text-text-muted">Noch keine Nachrichten</p>
-            </div>
-          ) : (
-            <div className="flex-1 overflow-y-auto">
-              {/* New conversation entry at top */}
-              {isNewConv && (
-                <button
-                  onClick={() => {}}
-                  className="w-full flex items-center gap-3 p-4 bg-gold/5 border-b border-gold/20 text-left"
-                >
-                  <div className="w-10 h-10 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
-                    <User size={16} className="text-gold" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-text-primary truncate">
-                      {loadingRecipient ? "Lädt..." : recipientName}
-                    </p>
-                    <p className="text-xs text-gold">Neue Nachricht</p>
-                  </div>
-                </button>
-              )}
-              {conversations.map(conv => {
-                const lastMsg = conv.messages?.[conv.messages.length - 1];
-                const unread = conv.messages?.filter(m => m.sender_id !== user?.id && !m.read_at).length ?? 0;
-                return (
-                  <button
-                    key={conv.id}
-                    onClick={() => openConversation(conv)}
-                    className={`w-full flex items-center gap-3 p-4 border-b border-border text-left hover:bg-bg-elevated transition-colors ${activeId === conv.id ? "bg-bg-elevated" : ""}`}
-                  >
-                    <div className="w-10 h-10 rounded-full bg-bg-elevated border border-border flex items-center justify-center shrink-0 overflow-hidden">
-                      {conv.otherAvatar
-                        ? <img src={conv.otherAvatar} alt="" className="w-full h-full object-cover" />
-                        : <User size={16} className="text-text-muted" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-semibold text-text-primary truncate">{conv.otherName}</p>
-                        {lastMsg && <span className="text-[10px] text-text-muted shrink-0 ml-1">{formatTime(lastMsg.created_at)}</span>}
-                      </div>
-                      <p className="text-xs text-text-muted truncate">{lastMsg?.content ?? "Keine Nachrichten"}</p>
-                    </div>
-                    {unread > 0 && (
-                      <span className="w-5 h-5 rounded-full bg-gold text-bg-primary text-[10px] font-bold flex items-center justify-center shrink-0">{unread}</span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          )}
+      {/* ── KONVERSATIONSLISTE (Mobile: volle Breite, Desktop: linke Spalte) ── */}
+      <div className={`
+        absolute inset-0
+        sm:relative sm:w-80 sm:shrink-0 sm:border-r sm:border-border
+        flex flex-col bg-bg-primary
+        transition-transform duration-300 ease-out
+        ${showChat ? "-translate-x-full sm:translate-x-0" : "translate-x-0"}
+      `}>
+        <div className="px-4 py-4 border-b border-border shrink-0">
+          <h1 className="font-display text-lg font-bold text-text-primary flex items-center gap-2">
+            <MessageSquare size={18} className="text-gold" /> Nachrichten
+          </h1>
         </div>
 
-        {/* Chat area */}
-        {(activeId || isNewConv) ? (
-          <div className="flex-1 flex flex-col min-w-0">
-            {/* Header */}
-            <div className="p-4 border-b border-border flex items-center gap-3">
+        {loading ? (
+          <div className="flex-1 flex items-center justify-center">
+            <Loader2 size={20} className="animate-spin text-text-muted" />
+          </div>
+        ) : conversations.length === 0 && !isNewConv ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+            <MessageSquare size={32} className="text-text-muted mb-3 opacity-40" />
+            <p className="text-sm text-text-muted">Noch keine Nachrichten</p>
+          </div>
+        ) : (
+          <div className="flex-1 overflow-y-auto">
+            {isNewConv && (
               <button
-                onClick={() => { setActiveId(null); setNewConvRecipient(null); }}
-                className="sm:hidden p-1 text-text-muted hover:text-text-primary"
+                className="w-full flex items-center gap-3 p-4 bg-gold/5 border-b border-gold/20 text-left"
               >
-                <ArrowLeft size={18} />
+                <div className="w-10 h-10 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
+                  <User size={16} className="text-gold" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-text-primary truncate">
+                    {loadingRecipient ? "Lädt..." : recipientName}
+                  </p>
+                  <p className="text-xs text-gold">Neue Nachricht</p>
+                </div>
               </button>
-              <div className="w-8 h-8 rounded-full bg-bg-elevated border border-border flex items-center justify-center overflow-hidden">
+            )}
+            {conversations.map(conv => {
+              const lastMsg = conv.messages?.[conv.messages.length - 1];
+              const unread = conv.messages?.filter(m => m.sender_id !== user?.id && !m.read_at).length ?? 0;
+              return (
+                <button
+                  key={conv.id}
+                  onClick={() => openConversation(conv)}
+                  className={`w-full flex items-center gap-3 p-4 border-b border-border text-left hover:bg-bg-elevated transition-colors ${activeId === conv.id ? "bg-bg-elevated" : ""}`}
+                >
+                  <div className="w-10 h-10 rounded-full bg-bg-elevated border border-border flex items-center justify-center shrink-0 overflow-hidden">
+                    {conv.otherAvatar
+                      ? <img src={conv.otherAvatar} alt="" className="w-full h-full object-cover" />
+                      : <User size={16} className="text-text-muted" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-semibold text-text-primary truncate">{conv.otherName}</p>
+                      {lastMsg && <span className="text-[10px] text-text-muted shrink-0 ml-1">{formatTime(lastMsg.created_at)}</span>}
+                    </div>
+                    <p className="text-xs text-text-muted truncate">{lastMsg?.content ?? "Keine Nachrichten"}</p>
+                  </div>
+                  {unread > 0 && (
+                    <span className="w-5 h-5 rounded-full bg-gold text-bg-primary text-[10px] font-bold flex items-center justify-center shrink-0">{unread}</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ── CHAT-BEREICH (Mobile: volle Breite, Desktop: rechte Spalte) ── */}
+      <div className={`
+        absolute inset-0 sm:static sm:flex-1
+        flex flex-col bg-bg-primary
+        transition-transform duration-300 ease-out
+        ${showChat ? "translate-x-0" : "translate-x-full sm:translate-x-0"}
+      `}>
+        {showChat ? (
+          <>
+            {/* Header */}
+            <div className="px-4 py-3.5 border-b border-border flex items-center gap-3 shrink-0">
+              <button
+                onClick={closeChat}
+                className="p-1.5 -ml-1 text-text-muted hover:text-text-primary active:scale-95 transition-all"
+              >
+                <ArrowLeft size={20} />
+              </button>
+              <div className="w-9 h-9 rounded-full bg-bg-elevated border border-border flex items-center justify-center overflow-hidden shrink-0">
                 {activeConv?.otherAvatar
                   ? <img src={activeConv.otherAvatar} alt="" className="w-full h-full object-cover" />
-                  : <User size={14} className="text-text-muted" />}
+                  : <User size={15} className="text-text-muted" />}
               </div>
-              <div>
-                <p className="text-sm font-semibold text-text-primary">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-text-primary truncate">
                   {isNewConv ? (loadingRecipient ? "Lädt..." : recipientName) : (activeConv?.otherName ?? "Gespräch")}
                 </p>
                 {activeConv?.listing_title && (
-                  <p className="text-xs text-text-muted">{activeConv.listing_title}</p>
+                  <p className="text-xs text-text-muted truncate">{activeConv.listing_title}</p>
                 )}
               </div>
-              {(activeConv || isNewConv) && (
+              {otherUserId && (
                 <Link
-                  href={`/profile/${isNewConv ? newConvRecipient : (activeConv?.sender_id === user?.id ? activeConv?.receiver_id : activeConv?.sender_id)}`}
-                  className="ml-auto text-xs text-gold hover:text-gold-light transition-colors"
+                  href={`/profile/${otherUserId}`}
+                  className="shrink-0 text-xs text-gold hover:text-gold-light transition-colors"
                 >
-                  Profil ansehen
+                  Profil
                 </Link>
               )}
             </div>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            {/* Nachrichten */}
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
               {isNewConv && messages.length === 0 && (
-                <div className="text-center py-12">
+                <div className="text-center py-16">
                   <MessageSquare size={28} className="text-text-muted mx-auto mb-2 opacity-30" />
                   <p className="text-sm text-text-muted">Schreib deine erste Nachricht</p>
                 </div>
@@ -276,7 +294,7 @@ function MessagesContent() {
                 const isOwn = msg.sender_id === user?.id;
                 return (
                   <div key={msg.id} className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                    <div className={`max-w-[78%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                       isOwn
                         ? "bg-gold text-bg-primary rounded-br-sm"
                         : "bg-bg-elevated border border-border text-text-primary rounded-bl-sm"
@@ -292,8 +310,8 @@ function MessagesContent() {
               <div ref={bottomRef} />
             </div>
 
-            {/* Input */}
-            <div className="p-4 border-t border-border">
+            {/* Eingabe */}
+            <div className="px-4 py-3 border-t border-border shrink-0 safe-area-pb">
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -301,19 +319,20 @@ function MessagesContent() {
                   onChange={e => setText(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && !e.shiftKey && sendMessage()}
                   placeholder="Nachricht schreiben…"
-                  className="flex-1 bg-bg-elevated border border-border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors"
+                  className="flex-1 bg-bg-elevated border border-border rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-gold transition-colors"
                 />
                 <button
                   onClick={sendMessage}
                   disabled={!text.trim() || sending}
-                  className="p-2.5 bg-gold text-bg-primary rounded-xl hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-11 h-11 bg-gold text-bg-primary rounded-2xl flex items-center justify-center hover:bg-gold-light transition-colors disabled:opacity-40 shrink-0"
                 >
                   {sending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                 </button>
               </div>
             </div>
-          </div>
+          </>
         ) : (
+          /* Desktop: leerer Zustand wenn kein Gespräch offen */
           <div className="flex-1 hidden sm:flex items-center justify-center text-center p-8">
             <div>
               <MessageSquare size={40} className="text-text-muted mx-auto mb-3 opacity-20" />
