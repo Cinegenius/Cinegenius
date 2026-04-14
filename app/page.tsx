@@ -328,7 +328,7 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-3 sm:flex sm:flex-wrap items-center justify-center gap-y-4 gap-x-0 sm:gap-x-6 animate-fade-up delay-300">
+          <div className="flex flex-wrap items-center justify-center gap-y-4 gap-x-6 animate-fade-up delay-300">
             {liveStats.map((s, i) => (
               <div key={s.label} className="flex items-center">
                 <div className="text-center px-3 sm:px-0 w-full sm:w-auto">
@@ -675,7 +675,7 @@ export default async function HomePage() {
               Alle anzeigen <ArrowRight size={14} />
             </Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {companies.slice(0, 6).map((c) => (
               <Link key={c.id} href={`/firmen/${c.id}`} className="card-hover group flex flex-col items-center text-center p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 transition-all gap-3">
                 <div className="w-14 h-14 rounded-xl border border-border bg-bg-elevated overflow-hidden flex items-center justify-center shrink-0">

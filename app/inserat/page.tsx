@@ -489,12 +489,12 @@ export default function InseratPage() {
 
           {/* Main category tiles */}
           {!activeGroup && (
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {mainTiles.map((tile) => (
                 <button
                   key={tile.id}
                   onClick={() => setActiveGroup(tile.id)}
-                  className={`group flex flex-col items-start p-5 rounded-2xl border-2 transition-all text-left ${tile.bg} ${tile.border}`}
+                  className={`group flex sm:flex-col items-center sm:items-start gap-4 sm:gap-0 p-5 rounded-2xl border-2 transition-all text-left ${tile.bg} ${tile.border}`}
                 >
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 bg-bg-secondary`}>
                     <tile.icon size={20} className={tile.color} />
@@ -567,28 +567,28 @@ export default function InseratPage() {
             {/* ── VEHICLE FIELDS ── */}
             {isVehicle && (
               <div className="space-y-3">
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Marke *</label>
                     <input value={form.make} onChange={(e) => f("make", e.target.value)} placeholder="Ford"
-                      className="w-full px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Modell *</label>
                     <input value={form.model} onChange={(e) => f("model", e.target.value)} placeholder="Mustang"
-                      className="w-full px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Baujahr</label>
                     <input type="number" value={form.year} onChange={(e) => f("year", e.target.value)} placeholder="1969"
-                      className="w-full px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Kraftstoff</label>
                     <select value={form.fuel_type} onChange={(e) => f("fuel_type", e.target.value)}
-                      className="w-full px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm">
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm">
                       <option value="">Bitte wählen…</option>
                       {["Benzin", "Diesel", "Elektro", "Hybrid", "LPG", "Sonstiges"].map((o) => <option key={o} value={o}>{o}</option>)}
                     </select>
@@ -596,7 +596,7 @@ export default function InseratPage() {
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Führerscheinklasse</label>
                     <select value={form.license_class} onChange={(e) => f("license_class", e.target.value)}
-                      className="w-full px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm">
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm">
                       <option value="">Bitte wählen…</option>
                       {["B", "BE", "C", "CE", "D", "A", "Keine (stationär / Requisite)"].map((o) => <option key={o} value={o}>{o}</option>)}
                     </select>
@@ -608,16 +608,16 @@ export default function InseratPage() {
             {/* ── LOCATION FIELDS ── */}
             {isLocation && (
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Fläche (m²)</label>
                     <input type="number" value={form.sqm} onChange={(e) => f("sqm", e.target.value)} placeholder="120"
-                      className="w-full px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Parkplätze</label>
                     <input type="number" value={form.parking_spots} onChange={(e) => f("parking_spots", e.target.value)} placeholder="z.B. 5"
-                      className="w-full px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                 </div>
                 <div>
@@ -657,28 +657,28 @@ export default function InseratPage() {
                     options={dept ? dept.roles : FILM_DEPARTMENTS.flatMap((d) => d.roles)}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Produktion / Unternehmen</label>
                     <input value={form.company} onChange={(e) => f("company", e.target.value)} placeholder="Parallax Films"
-                      className="w-full px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Projekttyp</label>
                     <select value={form.projectType} onChange={(e) => f("projectType", e.target.value)}
-                      className="w-full px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm">
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm">
                       <option value="">Bitte wählen…</option>
                       {projectTypes.map((t) => <option key={t} value={t}>{t}</option>)}
                     </select>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
                       {dept?.id === "post" ? "Projektstart *" : "Drehstart *"}
                     </label>
                     <input type="date" value={form.shoot_start} onChange={(e) => f("shoot_start", e.target.value)}
-                      className="w-full px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm" />
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
@@ -686,7 +686,7 @@ export default function InseratPage() {
                     </label>
                     <input type="date" value={form.shoot_end} onChange={(e) => f("shoot_end", e.target.value)}
                       min={form.shoot_start || undefined}
-                      className="w-full px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm" />
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                 </div>
                 <div>
@@ -806,21 +806,21 @@ export default function InseratPage() {
                   <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Erfahrung</label>
                   <input value={form.experience} onChange={(e) => f("experience", e.target.value)}
                     placeholder="z.B. 5 Jahre, Kinofilm-Credits, Werbung"
-                    className="w-full px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
+                    className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                 </div>
               </div>
             )}
             {isCreator && !dept && (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Skills / Kenntnisse</label>
                   <input value={form.skills} onChange={(e) => f("skills", e.target.value)} placeholder="z.B. ARRI, Anamorphic, Low Light"
-                    className="w-full px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
+                    className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Erfahrung</label>
                   <input value={form.experience} onChange={(e) => f("experience", e.target.value)} placeholder="z.B. 5 Jahre, Kinofilm-Credits"
-                    className="w-full px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
+                    className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                 </div>
               </div>
             )}
@@ -839,16 +839,16 @@ export default function InseratPage() {
                     ))}
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Maße / Größe</label>
                     <input value={form.dimensions} onChange={(e) => f("dimensions", e.target.value)} placeholder="z.B. 80 × 60 × 40 cm"
-                      className="w-full px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Sicherheitshinweis</label>
                     <input value={form.safety_note} onChange={(e) => f("safety_note", e.target.value)} placeholder="z.B. Scharfe Kanten, nur mit PSA"
-                      className="w-full px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                 </div>
               </div>

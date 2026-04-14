@@ -885,7 +885,7 @@ export default function ProfilePage() {
                   </div>
 
                   {profileImages.length > 0 ? (
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                       {profileImages.map((img, i) => (
                         <div key={img.url + i} className="relative aspect-[3/4] rounded-xl overflow-hidden border border-border bg-bg-elevated">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
