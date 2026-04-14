@@ -203,20 +203,15 @@ export default function Navbar() {
         if (profile?.avatar_url)   setProfileAvatarUrl(profile.avatar_url);
       })
       .catch(() => {});
-    // Fetch unread message count
+    // Fetch unread message count (nur fremde, ungelesene Nachrichten)
     const fetchUnread = () => {
-      fetch("/api/conversations")
+      fetch("/api/unread-count")
         .then(r => r.json())
-        .then(({ data }) => {
-          if (!data) return;
-          const count = (data as { messages: { sender_id: string; read_at: string | null }[] }[])
-            .reduce((sum, conv) => sum + conv.messages.filter(m => m.read_at === null).length, 0);
-          setUnreadMessages(count);
-        })
+        .then(({ count }) => setUnreadMessages(count ?? 0))
         .catch(() => {});
     };
     fetchUnread();
-    const interval = setInterval(fetchUnread, 60000);
+    const interval = setInterval(fetchUnread, 30000);
     return () => clearInterval(interval);
   }, [isSignedIn]);
 
