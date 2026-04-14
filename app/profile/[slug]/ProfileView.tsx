@@ -3,10 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import ImageStrip from "@/components/ImageStrip";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useUser } from "@clerk/nextjs";
 import {
   MapPin, MessageSquare, Play, Award, ChevronDown, ChevronUp,
-  Pencil, ExternalLink, X, Check, Globe, Building2,
+  Pencil, ExternalLink, X, Check, Globe, Building2, UserPlus, UserCheck, Clock,
 } from "lucide-react";
 import type { UserProfile, ProfileModule, ProfileImage, FilmographyEntry, ProfileAward, PhysicalData, ProjectCredit } from "@/lib/profile-types";
 import { PROFILE_CATEGORY_MAP } from "@/lib/profile-types";
@@ -113,9 +114,58 @@ function CompanyBadge({ membership }: { membership: CompanyMembership }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function ActorProfile({ profile, isOwner, projectCredits, companyMembership }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership }) {
+  const { user } = useUser();
   const [lightbox, setLightbox] = useState<string | null>(null);
   const [showAllFilms, setShowAllFilms] = useState(false);
   const [expandedFilm, setExpandedFilm] = useState<number | null>(null);
+  const [friendStatus, setFriendStatus] = useState<null | "pending_sent" | "pending_received" | "friends">(null);
+  const [friendshipId, setFriendshipId] = useState<string | null>(null);
+  const [friendLoading, setFriendLoading] = useState(false);
+
+  // Fetch friendship status
+  useEffect(() => {
+    if (isOwner || !user) return;
+    fetch(`/api/friendships?userId=${profile.user_id}`)
+      .then(r => r.json())
+      .then(({ friendship }) => {
+        if (!friendship) return;
+        setFriendshipId(friendship.id);
+        if (friendship.status === "accepted") {
+          setFriendStatus("friends");
+        } else if (friendship.status === "pending") {
+          setFriendStatus(friendship.sender_id === user.id ? "pending_sent" : "pending_received");
+        }
+      })
+      .catch(() => {});
+  }, [isOwner, user, profile.user_id]);
+
+  async function handleFriendAction() {
+    if (friendLoading) return;
+    setFriendLoading(true);
+    try {
+      if (!friendStatus) {
+        // Send request
+        const res = await fetch("/api/friendships", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ receiver_id: profile.user_id }),
+        });
+        const { id } = await res.json();
+        setFriendshipId(id);
+        setFriendStatus("pending_sent");
+      } else if (friendStatus === "pending_received" && friendshipId) {
+        // Accept
+        await fetch(`/api/friendships/${friendshipId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "accepted" }),
+        });
+        setFriendStatus("friends");
+      }
+    } finally {
+      setFriendLoading(false);
+    }
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const p = (profile.physical ?? {}) as any;
@@ -224,6 +274,11 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership }: {
                       {(profile.positions ?? [profile.role]).filter(Boolean).join(" · ")}
                     </p>
                   )}
+                  {profile.tagline && (
+                    <p className="text-text-secondary text-sm mt-1 italic">
+                      {profile.tagline}
+                    </p>
+                  )}
                   {profile.location && (
                     <p className="text-text-muted/60 text-xs mt-1 flex items-center gap-1">
                       <MapPin size={10} /> {profile.location}
@@ -237,10 +292,25 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership }: {
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-text-primary text-bg-primary font-semibold rounded-lg hover:opacity-90 transition-opacity text-xs">
                         <MessageSquare size={12} /> Nachricht
                       </Link>
-                      <Link href={`/booking?profile=${profile.user_id}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-text-secondary rounded-lg hover:border-gold/50 hover:text-gold transition-all text-xs">
-                        Anfrage <ExternalLink size={11} />
-                      </Link>
+                      {friendStatus === "friends" ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-emerald-500/30 text-emerald-400 rounded-lg text-xs font-medium">
+                          <UserCheck size={12} /> Freunde
+                        </span>
+                      ) : friendStatus === "pending_sent" ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-text-muted rounded-lg text-xs">
+                          <Clock size={12} /> Anfrage gesendet
+                        </span>
+                      ) : friendStatus === "pending_received" ? (
+                        <button onClick={handleFriendAction} disabled={friendLoading}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors text-xs disabled:opacity-50">
+                          <Check size={12} /> Annehmen
+                        </button>
+                      ) : (
+                        <button onClick={handleFriendAction} disabled={friendLoading}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-text-secondary rounded-lg hover:border-gold/50 hover:text-gold transition-all text-xs disabled:opacity-50">
+                          <UserPlus size={12} /> Freund
+                        </button>
+                      )}
                     </>
                   ) : (
                     <Link href="/profile" className="flex items-center gap-1 text-xs text-text-muted hover:text-gold transition-colors">
@@ -313,6 +383,35 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership }: {
                 ))}
               </div>
             )}
+          </>
+        )}
+
+        {/* ── PORTFOLIO FOTOS ───────────────────────────────────────────── */}
+        {stripImages.length > 0 && (
+          <>
+            <Divider />
+            <SectionLabel>Portfolio</SectionLabel>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+              {stripImages.map((img, i) => (
+                <div
+                  key={i}
+                  className="relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer group bg-bg-elevated"
+                  onClick={() => setLightbox(img.url)}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={img.url}
+                    alt={img.caption ?? `Foto ${i + 1}`}
+                    className="w-full h-full object-cover object-top group-hover:scale-[1.04] transition-transform duration-500"
+                  />
+                  {img.caption && (
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <p className="text-white text-[10px] truncate">{img.caption}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </>
         )}
 
