@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 import {
   MapPin, Briefcase, ShoppingBag, Users,
@@ -120,21 +121,21 @@ async function getHomeData() {
     .filter((l: { image_url: string | null }) => l.image_url?.includes("supabase.co/storage"))
     .map((l: { id: string; title: string; image_url: string }) => ({ src: l.image_url, alt: l.title, href: `/locations/${l.id}` }));
 
-  function pickRandom(arr: Array<Record<string, string | null | undefined>>, fallback: string): string {
+  function pickRandom(arr: Array<Record<string, string | null | undefined>>): string | null {
     const urls = arr
       .map((x) => x.image_url ?? x.avatar_url)
-      .filter((u): u is string => !!u);
-    if (urls.length === 0) return fallback;
+      .filter((u): u is string => !!u && u.includes("supabase.co/storage"));
+    if (urls.length === 0) return null;
     return urls[Math.floor(Math.random() * urls.length)];
   }
 
   const pillarImages = {
-    location: pickRandom(locationImages ?? [], "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=85"),
-    crew: pickRandom(crewImages ?? [], "https://images.unsplash.com/photo-1524253482453-3fed8d2fe12b?w=600&q=85"),
-    equipment: pickRandom(equipmentImages ?? [], "https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?w=600&q=85"),
-    job: pickRandom(jobImages ?? [], "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=600&q=85"),
-    firma: pickRandom((liveCompanies ?? []).map((c) => ({ image_url: c.logo_url })), "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=85"),
-    projekt: pickRandom((liveProjects ?? []).filter((p) => p.poster_url?.includes("supabase.co/storage")).map((p) => ({ image_url: p.poster_url })), "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600&q=85"),
+    location: pickRandom(locationImages ?? []),
+    crew: pickRandom(crewImages ?? []),
+    equipment: pickRandom(equipmentImages ?? []),
+    job: pickRandom(jobImages ?? []),
+    firma: pickRandom((liveCompanies ?? []).map((c) => ({ image_url: c.logo_url }))),
+    projekt: pickRandom((liveProjects ?? []).filter((p) => p.poster_url?.includes("supabase.co/storage")).map((p) => ({ image_url: p.poster_url }))),
   };
 
   const companies = (liveCompanies ?? []).map((c: { id: string; name: string; logo_url: string | null; tagline: string | null; location: string | null }) => ({
@@ -266,6 +267,12 @@ const testimonials = [
 ];
 
 export default async function HomePage() {
+  const { userId } = await auth();
+  const isLoggedIn = !!userId;
+  // For logged-in users: send to dashboard instead of sign-up
+  const ctaHref = isLoggedIn ? "/dashboard" : "/sign-up";
+  const ctaLabel = isLoggedIn ? "Zum Dashboard" : "Kostenlos starten";
+
   const { liveStats, liveLocations, liveJobs, posterStrip, avatarStrip, locationStrip, pillarImages, companies, projects } = await getHomeData();
   return (
     <>
@@ -308,10 +315,10 @@ export default async function HomePage() {
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-12 animate-fade-up delay-200">
             <Link
-              href="/sign-up"
+              href={ctaHref}
               className="px-8 py-3.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors flex items-center justify-center gap-2 text-base"
             >
-              Jetzt starten <ArrowRight size={16} />
+              {isLoggedIn ? "Zum Dashboard" : "Jetzt starten"} <ArrowRight size={16} />
             </Link>
             <Link
               href="/inserat"
@@ -321,14 +328,14 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 animate-fade-up delay-300">
+          <div className="grid grid-cols-3 sm:flex sm:flex-wrap items-center justify-center gap-y-4 gap-x-0 sm:gap-x-6 animate-fade-up delay-300">
             {liveStats.map((s, i) => (
-              <div key={s.label} className="flex items-center gap-6">
-                <div className="text-center">
-                  <div className="hero-stat-val text-2xl font-bold font-display">{s.value}</div>
-                  <div className="hero-stat-lbl text-xs uppercase tracking-widest mt-0.5">{s.label}</div>
+              <div key={s.label} className="flex items-center">
+                <div className="text-center px-3 sm:px-0 w-full sm:w-auto">
+                  <div className="hero-stat-val text-xl sm:text-2xl font-bold font-display">{s.value}</div>
+                  <div className="hero-stat-lbl text-[10px] sm:text-xs uppercase tracking-widest mt-0.5">{s.label}</div>
                 </div>
-                {i < liveStats.length - 1 && <span className="hero-stat-lbl opacity-20 text-lg">·</span>}
+                {i < liveStats.length - 1 && <span className="hero-stat-lbl opacity-20 text-lg hidden sm:inline ml-6">·</span>}
               </div>
             ))}
           </div>
@@ -370,17 +377,19 @@ export default async function HomePage() {
             <Link
               key={href}
               href={href}
-              className="group relative rounded-2xl overflow-hidden aspect-[3/4] flex flex-col justify-end"
+              className="group relative rounded-2xl overflow-hidden aspect-[3/4] flex flex-col justify-end bg-bg-elevated border border-border"
             >
-              <Image
-                src={image}
-                alt={title}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                sizes="(max-width:640px) 50vw,(max-width:1024px) 33vw,16vw"
-              />
-              <div className={`absolute inset-0 bg-gradient-to-t ${accent} via-black/20 to-transparent`} />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/10" />
+              {image && (
+                <Image
+                  src={image}
+                  alt={title}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                  sizes="(max-width:640px) 50vw,(max-width:1024px) 33vw,16vw"
+                />
+              )}
+              <div className={`absolute inset-0 bg-gradient-to-t ${accent} ${image ? "via-black/20" : "via-black/60"} to-transparent`} />
+              {image && <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/10" />}
               <div className="relative p-4 pb-5">
                 <div className="w-7 h-7 rounded-lg bg-white/15 backdrop-blur-sm border border-white/20 flex items-center justify-center mb-2.5">
                   <Icon size={14} className="text-white" />
@@ -499,7 +508,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── CINEMATIC BREAK ── */}
-      <section className="relative overflow-hidden" style={{ height: "clamp(340px, 45vw, 560px)" }}>
+      <section className="relative overflow-hidden" style={{ minHeight: "clamp(340px, 45vw, 560px)" }}>
         <Image
           src="https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=1920&q=90"
           alt="Film set"
@@ -513,7 +522,7 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
 
         {/* Content */}
-        <div className="absolute inset-0 flex items-center">
+        <div className="relative z-10 flex items-center py-14 sm:py-0 sm:absolute sm:inset-0">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             <div className="max-w-2xl">
               <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-4 flex items-center gap-2">
@@ -529,10 +538,10 @@ export default async function HomePage() {
               </p>
               <div className="flex flex-wrap gap-3">
                 <Link
-                  href="/sign-up"
+                  href={ctaHref}
                   className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm"
                 >
-                  Kostenlos starten <ArrowRight size={15} />
+                  {ctaLabel} <ArrowRight size={15} />
                 </Link>
                 <Link
                   href="/locations"
@@ -569,8 +578,8 @@ export default async function HomePage() {
                 title: "Freelancer & Kreative",
                 desc: "Fotograf, DP, Editor, Social-Media-Creator — zeig was du kannst und werde gebucht.",
                 items: ["Profil mit Portfolio & Tagessatz", "Von Produktionen gefunden werden", "Projekte & Credits dokumentieren", "Netzwerk & Sichtbarkeit aufbauen"],
-                cta: "Profil erstellen",
-                href: "/sign-up",
+                cta: isLoggedIn ? "Zum Dashboard" : "Profil erstellen",
+                href: ctaHref,
                 highlight: false,
               },
               {
@@ -756,7 +765,7 @@ export default async function HomePage() {
         </div>
         <div className="mt-4 text-center">
           <Link
-            href="/sign-up"
+            href="/inserat"
             className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors"
           >
             Job ausschreiben <ArrowRight size={13} />
@@ -833,10 +842,10 @@ export default async function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
             <Link
-              href="/sign-up"
+              href={ctaHref}
               className="px-8 py-3.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors flex items-center justify-center gap-2"
             >
-              Kostenlos starten <ArrowRight size={16} />
+              {ctaLabel} <ArrowRight size={16} />
             </Link>
             <Link
               href="/locations"

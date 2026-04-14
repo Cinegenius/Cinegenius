@@ -128,9 +128,52 @@ function JobDeptPanel({
 
   return (
     <div className="border border-border rounded-xl overflow-hidden bg-bg-elevated">
-      <div className="flex" style={{ minHeight: 300 }}>
+      {/* Mobile: horizontal dept scroll + roles below */}
+      <div className="sm:hidden">
+        <div className="flex overflow-x-auto gap-1.5 p-3 border-b border-border bg-bg-secondary scrollbar-hide">
+          {FILM_DEPARTMENTS.map((dept) => {
+            const Icon = DEPT_ICON_MAP[dept.id] ?? Briefcase;
+            const isActive = dept.id === activeDeptId;
+            const isSelected = selectedDeptId === dept.id;
+            return (
+              <button key={dept.id}
+                onClick={() => { setActiveDeptId(dept.id); onSelectDept(dept.id); }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border shrink-0 transition-all ${
+                  isActive ? `${dept.bg} ${dept.color} border-transparent` : "border-border text-text-muted"
+                }`}>
+                <Icon size={11} className={isActive ? dept.color : "text-text-muted"} />
+                {dept.label}
+                {isSelected && <span className="w-3.5 h-3.5 rounded-full bg-gold text-bg-primary text-[8px] font-bold flex items-center justify-center">✓</span>}
+              </button>
+            );
+          })}
+        </div>
+        <div className="p-3">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className={`text-sm font-semibold ${activeDept.color}`}>{activeDept.label}</h3>
+            {selectedDeptId === activeDeptId && (
+              <button onClick={() => onSelectRole(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">Löschen</button>
+            )}
+          </div>
+          <div className="grid grid-cols-2 gap-1.5">
+            {activeDept.roles.map((role) => {
+              const isSelected = selectedDeptId === activeDeptId && selectedRoleId === role.id;
+              return (
+                <button key={role.id}
+                  onClick={() => { onSelectRole(activeDeptId, isSelected ? null : role.id); onClose(); }}
+                  className={`text-left px-3 py-2.5 rounded-lg text-xs border transition-all ${
+                    isSelected ? `${activeDept.bg} ${activeDept.color} font-semibold` : "border-border/60 text-text-muted"
+                  }`}>
+                  <div className="font-medium leading-tight">{role.label}</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
 
-        {/* Left: departments grouped by platform */}
+      {/* Desktop: two-panel */}
+      <div className="hidden sm:flex" style={{ minHeight: 300 }}>
         <div className="w-52 shrink-0 border-r border-border overflow-y-auto bg-bg-secondary">
           {PLATFORM_META.map(({ id: platform, label: platformLabel, Icon: PlatformIcon }) => {
             const depts = FILM_DEPARTMENTS.filter((d) => d.platform === platform);
@@ -157,9 +200,7 @@ function JobDeptPanel({
                         </span>
                         <span className={`truncate ${isActive ? dept.color : ""}`}>{dept.label}</span>
                       </div>
-                      {isSelected && (
-                        <span className="w-3.5 h-3.5 rounded-full bg-gold text-bg-primary text-[8px] font-bold flex items-center justify-center shrink-0">✓</span>
-                      )}
+                      {isSelected && <span className="w-3.5 h-3.5 rounded-full bg-gold text-bg-primary text-[8px] font-bold flex items-center justify-center shrink-0">✓</span>}
                     </button>
                   );
                 })}
@@ -167,15 +208,11 @@ function JobDeptPanel({
             );
           })}
         </div>
-
-        {/* Right: roles in active dept */}
         <div className="flex-1 p-4 overflow-y-auto">
           <div className="flex items-center justify-between mb-3">
             <h3 className={`text-sm font-semibold ${activeDept.color}`}>{activeDept.label}</h3>
             {selectedDeptId === activeDeptId && (
-              <button onClick={() => onSelectRole(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">
-                Auswahl löschen
-              </button>
+              <button onClick={() => onSelectRole(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">Auswahl löschen</button>
             )}
           </div>
           <div className="grid grid-cols-2 gap-1.5">
@@ -185,9 +222,7 @@ function JobDeptPanel({
                 <button key={role.id}
                   onClick={() => { onSelectRole(activeDeptId, isSelected ? null : role.id); onClose(); }}
                   className={`text-left px-3 py-2 rounded-lg text-xs border transition-all ${
-                    isSelected
-                      ? `${activeDept.bg} ${activeDept.color} font-semibold`
-                      : "border-border/60 text-text-muted hover:text-text-secondary hover:border-border hover:bg-white/[0.02]"
+                    isSelected ? `${activeDept.bg} ${activeDept.color} font-semibold` : "border-border/60 text-text-muted hover:text-text-secondary hover:border-border hover:bg-white/[0.02]"
                   }`}>
                   <div className="font-medium leading-tight">{role.label}</div>
                   {role.labelEn && <div className="text-[10px] opacity-50 mt-0.5">{role.labelEn}</div>}
@@ -367,33 +402,34 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
       <div className="bg-bg-secondary border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-3">
 
-          {/* Row 1: Search + sort + CTA */}
-          <div className="flex flex-wrap gap-2 items-center">
-            <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 flex-1 min-w-[180px] focus-within:border-gold/50 transition-colors">
-              <Search size={14} className="text-text-muted shrink-0" />
-              <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
-                placeholder="Rolle, Fähigkeit, Unternehmen oder Stichwort..."
-                className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
-              {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
+          {/* Row 1: Search */}
+          <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
+            <Search size={14} className="text-text-muted shrink-0" />
+            <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
+              placeholder="Rolle, Fähigkeit, Unternehmen oder Stichwort..."
+              className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none" />
+            {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
+          </div>
+
+          {/* Row 1b: Controls — horizontal scroll on mobile */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
+            <div className="relative flex items-center shrink-0">
+              <select value={sortKey} onChange={(e) => setSortKey(e.target.value)}
+                className="appearance-none text-xs py-2 pl-3 pr-7 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none focus:border-gold/50 transition-colors cursor-pointer">
+                <option value="newest">Neueste zuerst</option>
+                <option value="rate-desc">Gage (hoch → niedrig)</option>
+                <option value="urgent">Dringend zuerst</option>
+              </select>
+              <ChevronDown size={11} className="absolute right-2 text-text-muted pointer-events-none" />
             </div>
-            <div className="flex items-center gap-1.5 ml-auto shrink-0">
-              <div className="relative flex items-center">
-                <select value={sortKey} onChange={(e) => setSortKey(e.target.value)}
-                  className="appearance-none text-xs py-2 pl-3 pr-7 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none focus:border-gold/50 transition-colors cursor-pointer">
-                  <option value="newest">Neueste zuerst</option>
-                  <option value="rate-desc">Gage (hoch → niedrig)</option>
-                  <option value="urgent">Dringend zuerst</option>
-                </select>
-                <ChevronDown size={11} className="absolute right-2 text-text-muted pointer-events-none" />
-              </div>
-              <Link href="/inserat" className="hidden sm:flex px-3 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap">
-                + Job ausschreiben
-              </Link>
-            </div>
+            <Link href="/inserat" className="hidden sm:flex px-3 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
+              + Job ausschreiben
+            </Link>
           </div>
 
           {/* Row 2: Category picker + filters + toggles */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
 
             {/* Bereich & Rolle trigger */}
             <div ref={panelRef} className="relative shrink-0">

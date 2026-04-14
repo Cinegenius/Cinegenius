@@ -125,34 +125,34 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
       <div className="bg-bg-secondary border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-3">
 
-          {/* Row 1: Search + view + sort + CTA */}
-          <div className="flex flex-wrap gap-2 items-center">
-            <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 flex-1 min-w-[180px] focus-within:border-gold/50 transition-colors">
-              <Search size={14} className="text-text-muted shrink-0" />
-              <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
-                placeholder="Titel oder Regisseur suchen..."
-                className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
-              {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
+          {/* Row 1: Search */}
+          <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
+            <Search size={14} className="text-text-muted shrink-0" />
+            <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
+              placeholder="Titel oder Regisseur suchen..."
+              className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none" />
+            {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
+          </div>
+
+          {/* Row 2: Controls — horizontal scroll on mobile */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
+            <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
+              <button onClick={() => setView("list")} className={`p-2 transition-colors ${view === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutList size={13} /></button>
+              <button onClick={() => setView("grid")} className={`p-2 transition-colors border-l border-border ${view === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutGrid size={13} /></button>
             </div>
-            <div className="flex items-center gap-1.5 ml-auto shrink-0">
-              <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden">
-                <button onClick={() => setView("list")} className={`p-2 transition-colors ${view === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutList size={13} /></button>
-                <button onClick={() => setView("grid")} className={`p-2 transition-colors border-l border-border ${view === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutGrid size={13} /></button>
-              </div>
-              <div className="relative flex items-center">
-                <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)}
-                  className="appearance-none text-xs py-2 pl-3 pr-7 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none focus:border-gold/50 cursor-pointer">
-                  <option value="year_desc">Neueste zuerst</option>
-                  <option value="year_asc">Älteste zuerst</option>
-                  <option value="title_asc">A → Z</option>
-                  <option value="crew_desc">Meiste Crew</option>
-                </select>
-                <ChevronDown size={11} className="absolute right-2 text-text-muted pointer-events-none" />
-              </div>
-              <Link href="/dashboard/projects/new" className="hidden sm:flex px-3 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap">
-                + Projekt erstellen
-              </Link>
+            <div className="relative flex items-center shrink-0">
+              <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)}
+                className="appearance-none text-xs py-2 pl-3 pr-7 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none focus:border-gold/50 cursor-pointer">
+                <option value="year_desc">Neueste zuerst</option>
+                <option value="year_asc">Älteste zuerst</option>
+                <option value="title_asc">A → Z</option>
+                <option value="crew_desc">Meiste Crew</option>
+              </select>
+              <ChevronDown size={11} className="absolute right-2 text-text-muted pointer-events-none" />
             </div>
+            <Link href="/dashboard/projects/new" className="hidden sm:flex px-3 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
+              + Projekt erstellen
+            </Link>
           </div>
 
           {/* Row 2: Filters */}
@@ -220,55 +220,87 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
 
         {/* List view */}
         {view === "list" && filtered.length > 0 && (
-          <div className="bg-bg-secondary border border-border rounded-2xl overflow-hidden">
-            <div className="grid grid-cols-[2fr_80px_120px_1fr_64px] gap-4 px-5 py-3 border-b border-border bg-bg-elevated">
-              {[
-                { label: "Titel", key: "title_asc" as SortKey },
-                { label: "Jahr",  key: "year_desc" as SortKey },
-                { label: "Typ",   key: null },
-                { label: "Regie", key: null },
-                { label: "Crew",  key: "crew_desc" as SortKey },
-              ].map(({ label, key }) => (
-                <button key={label} onClick={() => key && setSort(key)}
-                  className={`text-[10px] uppercase tracking-widest font-semibold text-left transition-colors flex items-center gap-1 ${
-                    key && sort === key ? "text-gold" : "text-text-muted hover:text-text-secondary"
-                  } ${!key ? "cursor-default" : ""}`}>
-                  {label}
-                  {key && sort === key && (sort.endsWith("asc") ? <ChevronDown size={10} className="rotate-180" /> : <ChevronDown size={10} />)}
-                </button>
-              ))}
-            </div>
-            <div className="divide-y divide-border">
+          <>
+            {/* Mobile: simple card list */}
+            <div className="sm:hidden space-y-2">
               {filtered.map((project) => (
                 <Link key={project.id} href={`/projects/${project.id}`}
-                  className="grid grid-cols-[2fr_80px_120px_1fr_64px] gap-4 px-5 py-3.5 hover:bg-bg-elevated transition-colors group items-center">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-10 rounded shrink-0 bg-bg-elevated border border-border overflow-hidden flex items-center justify-center">
-                      {project.poster_url
-                        // eslint-disable-next-line @next/next/no-img-element
-                        ? <img src={project.poster_url} alt="" className="w-full h-full object-cover" />
-                        : <Clapperboard size={13} className="text-text-muted" />
-                      }
-                    </div>
-                    <span className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{project.title}</span>
-                  </div>
-                  <span className="text-sm text-text-secondary flex items-center gap-1">
-                    <Calendar size={12} className="text-text-muted shrink-0" />{project.year ?? "—"}
-                  </span>
-                  <div>
-                    {project.type
-                      ? <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${TYPE_COLORS[project.type] ?? "bg-gold/10 text-gold border-gold/20"}`}>{project.type}</span>
-                      : <span className="text-text-muted text-xs">—</span>
+                  className="flex items-center gap-3 p-4 bg-bg-secondary border border-border rounded-xl hover:border-gold/40 transition-colors group">
+                  <div className="w-10 h-13 rounded shrink-0 bg-bg-elevated border border-border overflow-hidden flex items-center justify-center">
+                    {project.poster_url
+                      // eslint-disable-next-line @next/next/no-img-element
+                      ? <img src={project.poster_url} alt="" className="w-full h-full object-cover" />
+                      : <Clapperboard size={14} className="text-text-muted" />
                     }
                   </div>
-                  <span className="text-sm text-text-secondary truncate">{project.director ?? "—"}</span>
-                  <span className="text-sm text-text-secondary flex items-center gap-1">
-                    <Users size={12} className="text-text-muted shrink-0" />{project.crew_count}
-                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{project.title}</p>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      {project.type && (
+                        <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${TYPE_COLORS[project.type] ?? "bg-gold/10 text-gold border-gold/20"}`}>{project.type}</span>
+                      )}
+                      {project.year && <span className="text-xs text-text-muted flex items-center gap-1"><Calendar size={10} />{project.year}</span>}
+                    </div>
+                    {project.director && <p className="text-xs text-text-muted mt-0.5 truncate">{project.director}</p>}
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <span className="text-xs text-text-muted flex items-center gap-1"><Users size={11} />{project.crew_count}</span>
+                  </div>
                 </Link>
               ))}
             </div>
-          </div>
+
+            {/* Desktop: full table */}
+            <div className="hidden sm:block bg-bg-secondary border border-border rounded-2xl overflow-hidden">
+              <div className="grid grid-cols-[2fr_80px_120px_1fr_64px] gap-4 px-5 py-3 border-b border-border bg-bg-elevated">
+                {[
+                  { label: "Titel", key: "title_asc" as SortKey },
+                  { label: "Jahr",  key: "year_desc" as SortKey },
+                  { label: "Typ",   key: null },
+                  { label: "Regie", key: null },
+                  { label: "Crew",  key: "crew_desc" as SortKey },
+                ].map(({ label, key }) => (
+                  <button key={label} onClick={() => key && setSort(key)}
+                    className={`text-[10px] uppercase tracking-widest font-semibold text-left transition-colors flex items-center gap-1 ${
+                      key && sort === key ? "text-gold" : "text-text-muted hover:text-text-secondary"
+                    } ${!key ? "cursor-default" : ""}`}>
+                    {label}
+                    {key && sort === key && (sort.endsWith("asc") ? <ChevronDown size={10} className="rotate-180" /> : <ChevronDown size={10} />)}
+                  </button>
+                ))}
+              </div>
+              <div className="divide-y divide-border">
+                {filtered.map((project) => (
+                  <Link key={project.id} href={`/projects/${project.id}`}
+                    className="grid grid-cols-[2fr_80px_120px_1fr_64px] gap-4 px-5 py-3.5 hover:bg-bg-elevated transition-colors group items-center">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-8 h-10 rounded shrink-0 bg-bg-elevated border border-border overflow-hidden flex items-center justify-center">
+                        {project.poster_url
+                          // eslint-disable-next-line @next/next/no-img-element
+                          ? <img src={project.poster_url} alt="" className="w-full h-full object-cover" />
+                          : <Clapperboard size={13} className="text-text-muted" />
+                        }
+                      </div>
+                      <span className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{project.title}</span>
+                    </div>
+                    <span className="text-sm text-text-secondary flex items-center gap-1">
+                      <Calendar size={12} className="text-text-muted shrink-0" />{project.year ?? "—"}
+                    </span>
+                    <div>
+                      {project.type
+                        ? <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${TYPE_COLORS[project.type] ?? "bg-gold/10 text-gold border-gold/20"}`}>{project.type}</span>
+                        : <span className="text-text-muted text-xs">—</span>
+                      }
+                    </div>
+                    <span className="text-sm text-text-secondary truncate">{project.director ?? "—"}</span>
+                    <span className="text-sm text-text-secondary flex items-center gap-1">
+                      <Users size={12} className="text-text-muted shrink-0" />{project.crew_count}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </>
         )}
 
         {/* Grid view */}

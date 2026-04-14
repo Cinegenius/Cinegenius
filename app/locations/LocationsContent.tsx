@@ -223,11 +223,13 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
   return (
     <div className="pt-16 min-h-screen flex flex-col h-screen">
       {/* ── TOP BAR ── */}
-      <div className="bg-bg-secondary border-b border-border py-4 px-4 shrink-0">
-        <div className="max-w-full mx-auto">
-          <div className="flex items-center gap-3 flex-wrap">
+      <div className="bg-bg-secondary border-b border-border py-3 px-4 shrink-0">
+        <div className="max-w-full mx-auto space-y-2">
+
+          {/* Row 1: Search + View toggle */}
+          <div className="flex items-center gap-2">
             {/* Search */}
-            <div className="flex-1 min-w-[200px] flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold transition-colors">
+            <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold transition-colors">
               <Search size={15} className="text-text-muted shrink-0" />
               <input
                 type="text"
@@ -243,18 +245,44 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
               )}
             </div>
 
+            {/* View toggle */}
+            <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
+              {([
+                { mode: "list" as ViewMode, icon: LayoutList, label: "Liste" },
+                { mode: "split" as ViewMode, icon: MapPin, label: "Karte+Liste", hideOnMobile: true },
+                { mode: "map" as ViewMode, icon: Map, label: "Karte" },
+              ]).map(({ mode, icon: Icon, label, hideOnMobile }) => (
+                <button
+                  key={mode}
+                  onClick={() => setViewMode(mode)}
+                  title={label}
+                  className={`${hideOnMobile ? "hidden sm:flex" : "flex"} items-center gap-1.5 px-2.5 py-2.5 text-xs font-medium transition-all border-r border-border last:border-r-0 ${
+                    viewMode === mode
+                      ? "bg-gold text-bg-primary"
+                      : "text-text-muted hover:text-text-primary hover:bg-bg-hover"
+                  }`}
+                >
+                  <Icon size={13} />
+                  <span className="hidden sm:inline">{label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Row 2: Action buttons — horizontal scroll on mobile */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
             {/* Locate me */}
             <button
               onClick={userLocation ? clearLocation : handleLocateMe}
               disabled={locating}
-              className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium border transition-all shrink-0 ${
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all shrink-0 ${
                 userLocation
                   ? "bg-gold text-bg-primary border-gold"
                   : "border-border text-text-secondary hover:border-gold hover:text-gold"
               }`}
             >
-              <Navigation size={14} className={locating ? "animate-spin" : ""} />
-              {locating ? "Suche..." : userLocation ? "In meiner Nähe ✓" : "In meiner Nähe"}
+              <Navigation size={13} className={locating ? "animate-spin" : ""} />
+              {locating ? "Suche..." : userLocation ? "Nähe ✓" : "In meiner Nähe"}
             </button>
 
             {/* Radius */}
@@ -276,16 +304,16 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
             {/* Filters toggle */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium border transition-all shrink-0 ${
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all shrink-0 ${
                 showFilters || hasActiveFilters
                   ? "border-gold text-gold"
                   : "border-border text-text-secondary hover:border-gold hover:text-gold"
               }`}
             >
-              <SlidersHorizontal size={14} />
+              <SlidersHorizontal size={13} />
               Filter
               {hasActiveFilters && (
-                <span className="w-4 h-4 bg-gold text-bg-primary text-xs rounded-full flex items-center justify-center font-bold">!</span>
+                <span className="w-4 h-4 bg-gold text-bg-primary text-[10px] rounded-full flex items-center justify-center font-bold">!</span>
               )}
             </button>
 
@@ -293,7 +321,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
             <button
               onClick={handleCopyLink}
               title="Copy shareable link"
-              className="flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium border border-border text-text-secondary hover:border-gold hover:text-gold transition-all shrink-0"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-border text-text-secondary hover:border-gold hover:text-gold transition-all shrink-0"
             >
               <Share2 size={13} /> {copied ? "Kopiert!" : "Teilen"}
             </button>
@@ -301,38 +329,15 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
             {/* Non-filmmaker CTA */}
             <Link
               href="/sign-up"
-              className="hidden lg:flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-xs font-medium border border-dashed border-border text-text-muted hover:border-gold hover:text-gold transition-all shrink-0"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-dashed border-border text-text-muted hover:border-gold hover:text-gold transition-all shrink-0"
             >
               <Film size={12} /> Location inserieren
             </Link>
-
-            {/* View toggle */}
-            <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
-              {([
-                { mode: "list" as ViewMode, icon: LayoutList, label: "Liste" },
-                { mode: "split" as ViewMode, icon: MapPin, label: "Geteilt" },
-                { mode: "map" as ViewMode, icon: Map, label: "Karte" },
-              ]).map(({ mode, icon: Icon, label }) => (
-                <button
-                  key={mode}
-                  onClick={() => setViewMode(mode)}
-                  title={label}
-                  className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-all border-r border-border last:border-r-0 ${
-                    viewMode === mode
-                      ? "bg-gold text-bg-primary"
-                      : "text-text-muted hover:text-text-primary hover:bg-bg-hover"
-                  }`}
-                >
-                  <Icon size={13} />
-                  <span className="hidden sm:inline">{label}</span>
-                </button>
-              ))}
-            </div>
           </div>
 
           {/* Expandable filters */}
           {showFilters && (
-            <div className="mt-3 pt-3 border-t border-border flex flex-wrap gap-3 items-center animate-fade-in">
+            <div className="pt-3 border-t border-border flex flex-wrap gap-3 items-center animate-fade-in">
               <div className="flex flex-wrap gap-1.5">
                 {locationTypes.map((t) => (
                   <button
@@ -349,12 +354,12 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                 ))}
               </div>
 
-              <div className="flex items-center gap-3 ml-auto flex-wrap">
+              <div className="flex items-center gap-3 flex-wrap">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs text-text-muted">$</span>
-                  <input type="number" placeholder="Min" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} className="text-xs py-1.5 px-2 w-20" />
+                  <span className="text-xs text-text-muted">€</span>
+                  <input type="number" placeholder="Min" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} className="text-xs py-1.5 px-2 w-20 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none" />
                   <span className="text-xs text-text-muted">–</span>
-                  <input type="number" placeholder="Max" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} className="text-xs py-1.5 px-2 w-20" />
+                  <input type="number" placeholder="Max" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} className="text-xs py-1.5 px-2 w-20 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none" />
                 </div>
 
                 <div className="flex items-center gap-1">
@@ -409,7 +414,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
         {viewMode !== "map" && (
           <div
             ref={listRef}
-            className={`overflow-y-auto ${viewMode === "split" ? "w-[420px] shrink-0 border-r border-border" : "flex-1"}`}
+            className={`overflow-y-auto ${viewMode === "split" ? "w-full sm:w-[420px] shrink-0 sm:border-r border-border" : "flex-1"}`}
           >
             <div className="sticky top-0 z-10 bg-bg-primary/90 backdrop-blur-nav border-b border-border px-4 py-2.5 flex items-center justify-between">
               <p className="text-xs text-text-muted">
@@ -528,7 +533,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
 
         {/* ── MAP PANEL ── */}
         {viewMode !== "list" && (
-          <div className="flex-1 p-3 bg-bg-primary">
+          <div className={`flex-1 p-3 bg-bg-primary ${viewMode === "split" ? "hidden sm:block" : ""}`}>
             <LocationMap
               locations={filtered}
               activeId={activeId}

@@ -207,7 +207,7 @@ export default function DashboardPage() {
     prop: "Marktplatz",
     vehicle: "Fahrzeug",
     job: "Job",
-    creator: "Crew / Profil",
+    creator: "Creator",
   };
 
   const typeHref = (l: { id: string; type: string }) => {
@@ -382,6 +382,16 @@ export default function DashboardPage() {
     }
   };
 
+  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
+
+  const bottomNavItems = [
+    { icon: LayoutDashboard, label: "Übersicht",   id: "overview" },
+    { icon: User,            label: "Profil",       id: "profil" },
+    { icon: MessageSquare,   label: "Nachrichten",  id: "messages" },
+    { icon: List,            label: "Inserate",     id: "listings" },
+  ];
+  const moreNavItems = navItems.filter(n => !bottomNavItems.some(b => b.id === n.id));
+
   const [conversations, setConversations] = useState<RealConversation[]>([]);
   const [convsLoading, setConvsLoading] = useState(false);
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
@@ -524,7 +534,7 @@ export default function DashboardPage() {
           {/* Profil-Buttons */}
           <div className="grid grid-cols-2 gap-1.5">
             <Link
-              href={user?.id ? `/creators/${user.id}` : "/creators"}
+              href={user?.id ? `/profile/${user.id}` : "/profile"}
               className="flex items-center justify-center gap-1 px-2 py-1.5 text-[11px] font-medium border border-border text-text-secondary rounded-md hover:border-gold hover:text-gold transition-all"
             >
               <Eye size={10} /> Ansehen
@@ -582,52 +592,18 @@ export default function DashboardPage() {
       {/* Hauptinhalt */}
       <div className="flex-1 lg:ml-60">
         {/* Top-Leiste */}
-        <div className="sticky top-16 z-30 bg-bg-primary/80 backdrop-blur-nav border-b border-border px-6 py-3 flex items-center justify-between">
-          <h1 className="font-display text-base font-bold text-text-primary">{tabTitle()}</h1>
-          <div className="flex items-center gap-3">
-            {unreadCount > 0 && (
-              <button onClick={() => setActiveTab("messages")} className="relative w-8 h-8 flex items-center justify-center text-text-secondary hover:text-gold transition-colors">
-                <MessageSquare size={16} />
-                <span className="absolute top-0.5 right-0.5 w-4 h-4 bg-gold text-bg-primary text-[9px] font-bold rounded-full flex items-center justify-center">{unreadCount}</span>
-              </button>
-            )}
-            <Link href="/inserat" className="px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg flex items-center gap-1.5 hover:bg-gold-light transition-colors">
-              <Plus size={13} /> Neues Inserat
+        <div className="sticky top-16 z-30 bg-bg-primary/80 backdrop-blur-nav border-b border-border px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+          <h1 className="font-display text-sm sm:text-base font-bold text-text-primary truncate">{tabTitle()}</h1>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link href="/inserat" className="px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg flex items-center gap-1.5 hover:bg-gold-light transition-colors whitespace-nowrap">
+              <Plus size={13} /> <span className="hidden sm:inline">Neues </span>Inserat
             </Link>
           </div>
         </div>
 
-        {/* Mobile Tab Bar */}
-        <div className="lg:hidden overflow-x-auto border-b border-border bg-bg-secondary">
-          <div className="flex gap-0.5 px-2 py-1.5 min-w-max">
-            {navItems.map(({ icon: Icon, label, id }) => (
-              <button
-                key={id}
-                onClick={() => setActiveTab(id)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
-                  activeTab === id
-                    ? "bg-gold-subtle text-gold"
-                    : "text-text-secondary hover:text-gold hover:bg-bg-elevated"
-                }`}
-              >
-                <Icon size={13} />
-                {label}
-                {id === "messages" && unreadCount > 0 && (
-                  <span className="w-4 h-4 bg-crimson text-white text-[10px] rounded-full flex items-center justify-center font-bold">
-                    {unreadCount}
-                  </span>
-                )}
-                {id === "friends" && friendsIncoming.length > 0 && (
-                  <span className="w-4 h-4 bg-gold text-bg-primary text-[10px] rounded-full flex items-center justify-center font-bold">
-                    {friendsIncoming.length}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* Mobile: no top tab bar — navigation is in the bottom nav below */}
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6 pb-24 lg:pb-6">
           {/* ── ÜBERSICHT ── */}
           {activeTab === "overview" && (
             <div className="space-y-8 max-w-4xl">
@@ -644,7 +620,7 @@ export default function DashboardPage() {
 
               {/* ── Stats-Kacheln ── */}
               {viewStats && (
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   <div className="p-4 rounded-xl border border-border bg-bg-secondary">
                     <p className="text-xs text-text-muted mb-1 flex items-center gap-1.5">
                       <Eye size={12} /> Profilaufrufe
@@ -1024,12 +1000,9 @@ export default function DashboardPage() {
                         <a href="/profile" className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">
                           <Pencil size={12} /> Profil bearbeiten
                         </a>
-                        <a href={user?.id ? `/profile/${user.id}` : "/creators"} target="_blank" rel="noopener noreferrer"
+                        <a href={user?.id ? `/profile/${user.id}` : "/profile"} target="_blank" rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-colors">
                           <ExternalLink size={12} /> Öffentlich ansehen
-                        </a>
-                        <a href="/creators" className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-colors">
-                          <Eye size={12} /> Im Crew-Verzeichnis
                         </a>
                       </div>
                     </div>
@@ -2430,6 +2403,93 @@ export default function DashboardPage() {
 
         </div>
       </div>
+
+      {/* ── Mobile Bottom Navigation ── */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-bg-secondary border-t border-border safe-area-pb">
+        <div className="flex items-stretch h-16">
+          {bottomNavItems.map(({ icon: Icon, label, id }) => (
+            <button
+              key={id}
+              onClick={() => { setActiveTab(id); setMobileMoreOpen(false); }}
+              className={`flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors relative ${
+                activeTab === id && !mobileMoreOpen ? "text-gold" : "text-text-muted"
+              }`}
+            >
+              <div className="relative">
+                <Icon size={20} />
+                {id === "messages" && unreadCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-crimson text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                    {unreadCount}
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] font-medium leading-none">{label}</span>
+              {activeTab === id && !mobileMoreOpen && (
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-gold rounded-full" />
+              )}
+            </button>
+          ))}
+          {/* Mehr Button */}
+          <button
+            onClick={() => setMobileMoreOpen(v => !v)}
+            className={`flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors relative ${
+              mobileMoreOpen ? "text-gold" : "text-text-muted"
+            }`}
+          >
+            <div className="relative">
+              <Settings size={20} />
+              {friendsIncoming.length > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-gold text-bg-primary text-[9px] font-bold rounded-full flex items-center justify-center">
+                  {friendsIncoming.length}
+                </span>
+              )}
+            </div>
+            <span className="text-[10px] font-medium leading-none">Mehr</span>
+            {mobileMoreOpen && (
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-gold rounded-full" />
+            )}
+          </button>
+        </div>
+      </nav>
+
+      {/* ── Mobile "Mehr" Drawer ── */}
+      {mobileMoreOpen && (
+        <>
+          <div
+            className="lg:hidden fixed inset-0 z-40 bg-black/50"
+            onClick={() => setMobileMoreOpen(false)}
+          />
+          <div className="lg:hidden fixed bottom-16 left-0 right-0 z-50 bg-bg-secondary border-t border-border rounded-t-2xl shadow-2xl safe-area-pb">
+            <div className="p-4">
+              <div className="w-10 h-1 bg-border rounded-full mx-auto mb-4" />
+              <div className="grid grid-cols-3 gap-2">
+                {moreNavItems.map(({ icon: Icon, label, id }) => (
+                  <button
+                    key={id}
+                    onClick={() => { setActiveTab(id); setMobileMoreOpen(false); }}
+                    className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all ${
+                      activeTab === id
+                        ? "border-gold bg-gold/10 text-gold"
+                        : "border-border bg-bg-elevated text-text-secondary"
+                    }`}
+                  >
+                    <div className="relative">
+                      <Icon size={20} />
+                      {id === "friends" && friendsIncoming.length > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-gold text-bg-primary text-[9px] font-bold rounded-full flex items-center justify-center">
+                          {friendsIncoming.length}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[11px] font-medium leading-tight text-center">{label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
     </div>
     </ProfileGuard>
   );

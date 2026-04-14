@@ -453,25 +453,25 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       <div className="bg-bg-secondary border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-3">
 
-          {/* Row 1: Text search + Location + Controls */}
-          <div className="flex flex-wrap gap-2 items-center">
-            {/* Search */}
-            <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 flex-1 min-w-[180px] focus-within:border-gold/50 transition-colors">
-              <Search size={14} className="text-text-muted shrink-0" />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Name, Skill suchen…"
-                className="bg-transparent border-none py-2 text-sm w-full focus:outline-none"
-              />
-              {query && (
-                <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors">
-                  <X size={12} />
-                </button>
-              )}
-            </div>
+          {/* Row 1: Search */}
+          <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
+            <Search size={14} className="text-text-muted shrink-0" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Name, Skill suchen…"
+              className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none"
+            />
+            {query && (
+              <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors">
+                <X size={12} />
+              </button>
+            )}
+          </div>
 
+          {/* Row 2: Controls — horizontal scroll on mobile */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
             {/* Available toggle */}
             <label className="flex items-center gap-1.5 text-xs text-text-muted cursor-pointer hover:text-text-secondary transition-colors select-none shrink-0">
               <div
@@ -483,34 +483,35 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               Verfügbar
             </label>
 
-            <div className="flex items-center gap-1.5 ml-auto shrink-0">
-              {/* View toggle */}
-              <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden">
-                <button onClick={() => setViewMode("grid")} className={`p-2 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
-                  <LayoutGrid size={13} />
-                </button>
-                <button onClick={() => setViewMode("list")} className={`p-2 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
-                  <List size={13} />
-                </button>
-              </div>
-              {/* Sort */}
-              <div className="relative flex items-center">
-                <select
-                  value={sortKey}
-                  onChange={(e) => setSortKey(e.target.value)}
-                  className="appearance-none text-xs py-2 pl-3 pr-7 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none focus:border-gold/50 transition-colors cursor-pointer"
-                >
-                  <option value="featured">Empfohlen</option>
-                  <option value="rating">Beste Bewertung</option>
-                  <option value="reviews">Meiste Bewertungen</option>
-                </select>
-                <ChevronDown size={11} className="absolute right-2 text-text-muted pointer-events-none" />
-              </div>
+            <div className="w-px h-4 bg-border shrink-0" />
+
+            {/* View toggle */}
+            <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
+              <button onClick={() => setViewMode("grid")} className={`p-2 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
+                <LayoutGrid size={13} />
+              </button>
+              <button onClick={() => setViewMode("list")} className={`p-2 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
+                <List size={13} />
+              </button>
+            </div>
+
+            {/* Sort */}
+            <div className="relative flex items-center shrink-0">
+              <select
+                value={sortKey}
+                onChange={(e) => setSortKey(e.target.value)}
+                className="appearance-none text-xs py-2 pl-3 pr-7 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none focus:border-gold/50 transition-colors cursor-pointer"
+              >
+                <option value="featured">Empfohlen</option>
+                <option value="rating">Beste Bewertung</option>
+                <option value="reviews">Meiste Bewertungen</option>
+              </select>
+              <ChevronDown size={11} className="absolute right-2 text-text-muted pointer-events-none" />
             </div>
           </div>
 
-          {/* Row 2: Filter */}
-          <div className="flex items-center gap-2 flex-wrap">
+          {/* Row 2: Filter — horizontal scroll on mobile */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
             <button
               onClick={() => setFilterOpen((v) => !v)}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all shrink-0 ${
@@ -565,7 +566,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                   setProfileTypeFilter(""); setHairFilter(""); setEyeFilter("");
                   setBodyFilter(""); setTravelFilter(""); setAgeMinFilter(""); setAgeMaxFilter("");
                 }}
-                className="text-[11px] text-text-muted hover:text-red-400 transition-colors ml-auto"
+                className="text-[11px] text-text-muted hover:text-red-400 transition-colors shrink-0"
               >
                 Alle löschen
               </button>
@@ -620,44 +621,52 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
           {/* Row 3: Department + Roles panel */}
           {filterOpen && (
             <div className="border border-border rounded-xl overflow-hidden bg-bg-elevated">
-              <div className="flex" style={{ minHeight: "260px" }}>
-                {/* Left: department list */}
+              {/* Mobile: horizontal dept scroll + roles below */}
+              <div className="sm:hidden">
+                <div className="flex overflow-x-auto gap-1.5 p-3 border-b border-border bg-bg-secondary" style={{ scrollbarWidth: "none" }}>
+                  {activeDepts.map((dept) => {
+                    const colors = deptColors(dept.color);
+                    const deptSelected = dept.roles.filter((r) => selectedRoles.has(r) && occupiedRoles.has(r)).length;
+                    const isActive = activeDept === dept.id;
+                    return (
+                      <button key={dept.id} onClick={() => setActiveDept(dept.id)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border shrink-0 transition-all ${
+                          isActive ? `${colors.bg} ${colors.text} border-transparent` : "border-border text-text-muted"
+                        }`}>
+                        {dept.emoji} {dept.label}
+                        {deptSelected > 0 && <span className={`w-3.5 h-3.5 rounded-full text-[8px] font-bold flex items-center justify-center ${colors.bg} ${colors.text}`}>{deptSelected}</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="p-3">
+                  <RolePanel dept={activeDeptData} selectedRoles={selectedRoles} occupiedRoles={occupiedRoles} onToggle={toggleRole} onClose={() => setFilterOpen(false)} />
+                </div>
+              </div>
+              {/* Desktop: two-panel */}
+              <div className="hidden sm:flex" style={{ minHeight: "260px" }}>
                 <div className="w-44 shrink-0 border-r border-border overflow-y-auto bg-bg-secondary">
                   {activeDepts.map((dept) => {
                     const colors = deptColors(dept.color);
                     const deptSelected = dept.roles.filter((r) => selectedRoles.has(r) && occupiedRoles.has(r)).length;
                     const isActive = activeDept === dept.id;
                     return (
-                      <button
-                        key={dept.id}
+                      <button key={dept.id}
                         onMouseEnter={() => setActiveDept(dept.id)}
                         onClick={() => setActiveDept(dept.id)}
                         className={`w-full flex items-center justify-between px-3 py-2 text-left text-xs transition-colors border-b border-border/40 last:border-0 ${
-                          isActive
-                            ? `${colors.bg} ${colors.text} font-semibold`
-                            : "text-text-muted hover:text-text-secondary hover:bg-white/[0.02]"
-                        }`}
-                      >
+                          isActive ? `${colors.bg} ${colors.text} font-semibold` : "text-text-muted hover:text-text-secondary hover:bg-white/[0.02]"
+                        }`}>
                         <span>{dept.label}</span>
                         {deptSelected > 0 && (
-                          <span className={`text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${colors.bg} border ${colors.border} ${colors.text}`}>
-                            {deptSelected}
-                          </span>
+                          <span className={`text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${colors.bg} border ${colors.border} ${colors.text}`}>{deptSelected}</span>
                         )}
                       </button>
                     );
                   })}
                 </div>
-
-                {/* Right: roles for active dept */}
                 <div className="flex-1 overflow-y-auto p-3">
-                  <RolePanel
-                    dept={activeDeptData}
-                    selectedRoles={selectedRoles}
-                    occupiedRoles={occupiedRoles}
-                    onToggle={toggleRole}
-                    onClose={() => setFilterOpen(false)}
-                  />
+                  <RolePanel dept={activeDeptData} selectedRoles={selectedRoles} occupiedRoles={occupiedRoles} onToggle={toggleRole} onClose={() => setFilterOpen(false)} />
                 </div>
               </div>
             </div>

@@ -106,8 +106,51 @@ function CategoryPanel({
 
   return (
     <div className="border border-border rounded-xl overflow-hidden bg-bg-elevated">
-      <div className="flex" style={{ minHeight: 260 }}>
-        {/* Left: department list */}
+      {/* Mobile */}
+      <div className="sm:hidden">
+        <div className="flex overflow-x-auto gap-1.5 p-3 border-b border-border bg-bg-secondary" style={{ scrollbarWidth: "none" }}>
+          {DEPARTMENTS.map((dept) => {
+            const Icon = ICON_MAP[dept.iconName] ?? Package;
+            const c = deptColors(dept.color);
+            const isActive = dept.id === activeDeptId;
+            const hasSelected = selectedGroup?.deptId === dept.id;
+            return (
+              <button key={dept.id} onClick={() => setActiveDeptId(dept.id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border shrink-0 transition-all ${
+                  isActive ? `${c.bg} ${c.text} border-transparent` : "border-border text-text-muted"
+                }`}>
+                <Icon size={11} className={isActive ? c.text : "text-text-muted"} />
+                {dept.label}
+                {hasSelected && <span className={`w-3 h-3 rounded-full flex items-center justify-center text-[8px] font-bold ${c.bg} ${c.text}`}>✓</span>}
+              </button>
+            );
+          })}
+        </div>
+        <div className="p-3">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className={`text-sm font-semibold ${colors.text}`}>{activeDept.label}</h3>
+            {selectedGroup?.deptId === activeDeptId && (
+              <button onClick={() => onSelectGroup(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400">Löschen</button>
+            )}
+          </div>
+          <div className="grid grid-cols-2 gap-1.5">
+            {activeDept.groups.map((group) => {
+              const isSelected = selectedGroup?.deptId === activeDeptId && selectedGroup.groupId === group.id;
+              return (
+                <button key={group.id} onClick={() => { onSelectGroup(activeDeptId, isSelected ? null : group.id); onClose(); }}
+                  className={`text-left px-3 py-2.5 rounded-lg text-xs border transition-all ${
+                    isSelected ? `${colors.bg} ${colors.border} ${colors.text} font-semibold` : "border-border/60 text-text-muted"
+                  }`}>
+                  <div className="font-medium">{group.label}</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop: two-panel */}
+      <div className="hidden sm:flex" style={{ minHeight: 260 }}>
         <div className="w-44 shrink-0 border-r border-border overflow-y-auto bg-bg-secondary">
           {DEPARTMENTS.map((dept) => {
             const Icon = ICON_MAP[dept.iconName] ?? Package;
@@ -115,56 +158,38 @@ function CategoryPanel({
             const isActive = dept.id === activeDeptId;
             const hasSelected = selectedGroup?.deptId === dept.id;
             return (
-              <button
-                key={dept.id}
+              <button key={dept.id}
                 onMouseEnter={() => setActiveDeptId(dept.id)}
                 onClick={() => setActiveDeptId(dept.id)}
                 className={`w-full flex items-center justify-between px-3 py-2.5 text-left text-xs transition-colors border-b border-border/40 last:border-0 ${
                   isActive ? `${c.bg} ${c.text} font-semibold` : "text-text-muted hover:text-text-secondary hover:bg-white/[0.02]"
-                }`}
-              >
+                }`}>
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span className={`w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isActive ? `${c.bg} ${c.border}` : "bg-bg-elevated border-border"}`}>
                     <Icon size={11} className={isActive ? c.text : "text-text-muted"} />
                   </span>
                   <span className="truncate">{dept.label}</span>
                 </div>
-                {hasSelected && (
-                  <span className={`text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${c.bg} border ${c.border} ${c.text}`}>
-                    ✓
-                  </span>
-                )}
+                {hasSelected && <span className={`text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${c.bg} border ${c.border} ${c.text}`}>✓</span>}
               </button>
             );
           })}
         </div>
-
-        {/* Right: sub-groups */}
         <div className="flex-1 p-4 overflow-y-auto">
           <div className="flex items-center justify-between mb-3">
             <h3 className={`text-sm font-semibold ${colors.text}`}>{activeDept.label}</h3>
             {selectedGroup?.deptId === activeDeptId && (
-              <button onClick={() => onSelectGroup(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">
-                Auswahl löschen
-              </button>
+              <button onClick={() => onSelectGroup(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">Auswahl löschen</button>
             )}
           </div>
           <div className="grid grid-cols-2 gap-2">
             {activeDept.groups.map((group) => {
               const isSelected = selectedGroup?.deptId === activeDeptId && selectedGroup.groupId === group.id;
               return (
-                <button
-                  key={group.id}
-                  onClick={() => {
-                    onSelectGroup(activeDeptId, isSelected ? null : group.id);
-                    onClose();
-                  }}
+                <button key={group.id} onClick={() => { onSelectGroup(activeDeptId, isSelected ? null : group.id); onClose(); }}
                   className={`text-left px-3 py-2.5 rounded-lg text-xs border transition-all ${
-                    isSelected
-                      ? `${colors.bg} ${colors.border} ${colors.text} font-semibold`
-                      : "border-border/60 text-text-muted hover:text-text-secondary hover:border-border hover:bg-white/[0.02]"
-                  }`}
-                >
+                    isSelected ? `${colors.bg} ${colors.border} ${colors.text} font-semibold` : "border-border/60 text-text-muted hover:text-text-secondary hover:border-border hover:bg-white/[0.02]"
+                  }`}>
                   <div className="font-medium mb-0.5">{group.label}</div>
                   <div className="text-[10px] opacity-60">{group.items.length} Typen</div>
                 </button>
@@ -378,16 +403,17 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
       <div className="bg-bg-secondary border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-3">
 
-          {/* Row 1: Search + controls */}
-          <div className="flex flex-wrap gap-2 items-center">
-            <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 flex-1 min-w-[180px] focus-within:border-gold/50 transition-colors">
-              <Search size={14} className="text-text-muted shrink-0" />
-              <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
-                placeholder="Kamera, Requisite, Kostüm suchen…"
-                className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
-              {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
-            </div>
+          {/* Row 1: Search */}
+          <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
+            <Search size={14} className="text-text-muted shrink-0" />
+            <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
+              placeholder="Kamera, Requisite, Kostüm suchen…"
+              className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none" />
+            {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
+          </div>
 
+          {/* Row 2: Controls — horizontal scroll on mobile */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
             {/* Delivery toggle */}
             <label className="flex items-center gap-1.5 text-xs text-text-muted cursor-pointer hover:text-text-secondary transition-colors select-none shrink-0">
               <div onClick={() => setDeliveryOnly((v) => !v)}
@@ -397,28 +423,32 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               Lieferung
             </label>
 
-            <div className="flex items-center gap-1.5 ml-auto shrink-0">
-              <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden">
-                <button onClick={() => setViewMode("grid")} className={`p-2 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutGrid size={13} /></button>
-                <button onClick={() => setViewMode("list")} className={`p-2 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><List size={13} /></button>
-              </div>
-              <div className="relative flex items-center">
-                <select value={sortKey} onChange={(e) => setSortKey(e.target.value)}
-                  className="appearance-none text-xs py-2 pl-3 pr-7 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none focus:border-gold/50 transition-colors cursor-pointer">
-                  <option value="featured">Empfohlen</option>
-                  <option value="price-asc">Preis ↑</option>
-                  <option value="price-desc">Preis ↓</option>
-                </select>
-                <ChevronDown size={11} className="absolute right-2 text-text-muted pointer-events-none" />
-              </div>
-              <Link href="/dashboard/new-listing" className="hidden sm:flex px-3 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap">
-                + Eintragen
-              </Link>
+            <div className="w-px h-4 bg-border shrink-0" />
+
+            {/* View toggle */}
+            <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
+              <button onClick={() => setViewMode("grid")} className={`p-2 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutGrid size={13} /></button>
+              <button onClick={() => setViewMode("list")} className={`p-2 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><List size={13} /></button>
             </div>
+
+            {/* Sort */}
+            <div className="relative flex items-center shrink-0">
+              <select value={sortKey} onChange={(e) => setSortKey(e.target.value)}
+                className="appearance-none text-xs py-2 pl-3 pr-7 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none focus:border-gold/50 transition-colors cursor-pointer">
+                <option value="featured">Empfohlen</option>
+                <option value="price-asc">Preis ↑</option>
+                <option value="price-desc">Preis ↓</option>
+              </select>
+              <ChevronDown size={11} className="absolute right-2 text-text-muted pointer-events-none" />
+            </div>
+
+            <Link href="/dashboard/new-listing" className="hidden sm:flex px-3 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
+              + Eintragen
+            </Link>
           </div>
 
-          {/* Row 2: Category button + dropdowns */}
-          <div className="flex items-center gap-2 flex-wrap">
+          {/* Row 2: Category button + dropdowns — horizontal scroll on mobile */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
 
             {/* Category & Type trigger */}
             <div ref={panelRef} className="relative shrink-0">

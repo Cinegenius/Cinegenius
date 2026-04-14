@@ -1,10 +1,10 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { createClient } from "@supabase/supabase-js";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
-  const { userId } = await auth();
+  const { userId, sessionClaims } = await auth();
   if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
 
   const { data } = await supabaseAdmin
@@ -13,7 +13,30 @@ export async function GET() {
     .eq("user_id", userId)
     .maybeSingle();
 
-  return NextResponse.json({ profile: data ?? null, exists: !!data });
+  // Back-fill Clerk metadata and set cookie for users who had a profile before this flag existed
+  if (data) {
+    const meta = sessionClaims?.metadata as Record<string, unknown> | undefined;
+    if (!meta?.profileComplete) {
+      try {
+        const clerk = await clerkClient();
+        await clerk.users.updateUserMetadata(userId, {
+          publicMetadata: { profileComplete: true },
+        });
+      } catch (e) {
+        console.error("[profile GET] failed to back-fill Clerk metadata:", e);
+      }
+    }
+    const res = NextResponse.json({ profile: data, exists: true });
+    res.cookies.set("cg_profile_ok", "1", {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30,
+    });
+    return res;
+  }
+
+  return NextResponse.json({ profile: null, exists: false });
 }
 
 export async function POST(req: NextRequest) {
@@ -70,7 +93,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ profile: data });
+  // Mark profile as complete in Clerk metadata (best-effort — JWT refresh takes ~60s)
+  try {
+    const clerk = await clerkClient();
+    await clerk.users.updateUserMetadata(userId, {
+      publicMetadata: { profileComplete: true },
+    });
+  } catch (e) {
+    console.error("[profile POST] failed to set Clerk metadata:", e);
+  }
+
+  // Set a cookie so the middleware can immediately pass the user through
+  // without waiting for the JWT to be re-issued with the new metadata.
+  const res = NextResponse.json({ profile: data });
+  res.cookies.set("cg_profile_ok", "1", {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+  });
+  return res;
 }
 
 // All known profile columns — any unknown key from the client is silently dropped

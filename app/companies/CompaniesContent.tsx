@@ -130,9 +130,57 @@ function CompanyCategoryPanel({
 
   return (
     <div className="border border-border rounded-xl overflow-hidden bg-bg-elevated">
-      <div className="flex" style={{ minHeight: 260 }}>
+      {/* Mobile: horizontal group scroll + categories below */}
+      <div className="sm:hidden">
+        <div className="flex overflow-x-auto gap-1.5 p-3 border-b border-border bg-bg-secondary" style={{ scrollbarWidth: "none" }}>
+          {COMPANY_GROUPS.map(({ id, label, Icon, categoryIds }) => {
+            const isActive = id === activeGroupId;
+            const hasSelected = categoryIds.includes(selectedCategoryId ?? "");
+            return (
+              <button key={id}
+                onClick={() => setActiveGroupId(id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border shrink-0 transition-all ${
+                  isActive ? "bg-gold/10 border-gold/30 text-gold" : "border-border text-text-muted"
+                }`}>
+                <Icon size={11} className={isActive ? "text-gold" : "text-text-muted"} />
+                {label}
+                {hasSelected && <span className="w-3 h-3 rounded-full bg-gold text-bg-primary text-[8px] font-bold flex items-center justify-center">✓</span>}
+              </button>
+            );
+          })}
+        </div>
+        <div className="p-3">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-semibold text-gold">{activeGroup.label}</h3>
+            {selectedInActiveGroup && selectedCategoryId && (
+              <button onClick={() => onSelectCategory(null)} className="text-[10px] text-text-muted hover:text-red-400">Löschen</button>
+            )}
+          </div>
+          <div className="grid grid-cols-2 gap-1.5">
+            {activeGroup.categoryIds.map((catId) => {
+              const cat = COMPANY_CATEGORY_BY_ID[catId];
+              if (!cat) return null;
+              const Icon = CATEGORY_ICONS[catId] ?? Building2;
+              const isSelected = selectedCategoryId === catId;
+              return (
+                <button key={catId}
+                  onClick={() => { onSelectCategory(isSelected ? null : catId); onClose(); }}
+                  className={`text-left px-3 py-2.5 rounded-lg text-xs border transition-all ${
+                    isSelected ? `${cat.bg} ${cat.color} font-semibold` : "border-border/60 text-text-muted"
+                  }`}>
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <Icon size={11} className={isSelected ? cat.color : "text-text-muted"} />
+                    <span className="font-medium leading-tight">{cat.label}</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
 
-        {/* Left: group list */}
+      {/* Desktop: two-panel */}
+      <div className="hidden sm:flex" style={{ minHeight: 260 }}>
         <div className="w-52 shrink-0 border-r border-border overflow-y-auto bg-bg-secondary">
           {COMPANY_GROUPS.map(({ id, label, Icon, categoryIds }) => {
             const isActive = id === activeGroupId;
@@ -150,22 +198,16 @@ function CompanyCategoryPanel({
                   </span>
                   <span className="truncate">{label}</span>
                 </div>
-                {hasSelected && (
-                  <span className="w-3.5 h-3.5 rounded-full bg-gold text-bg-primary text-[8px] font-bold flex items-center justify-center shrink-0">✓</span>
-                )}
+                {hasSelected && <span className="w-3.5 h-3.5 rounded-full bg-gold text-bg-primary text-[8px] font-bold flex items-center justify-center shrink-0">✓</span>}
               </button>
             );
           })}
         </div>
-
-        {/* Right: categories in active group */}
         <div className="flex-1 p-4 overflow-y-auto">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-gold">{activeGroup.label}</h3>
             {selectedInActiveGroup && selectedCategoryId && (
-              <button onClick={() => onSelectCategory(null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">
-                Auswahl löschen
-              </button>
+              <button onClick={() => onSelectCategory(null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">Auswahl löschen</button>
             )}
           </div>
           <div className="grid grid-cols-2 gap-1.5">
@@ -264,28 +306,28 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
       <div className="bg-bg-secondary border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-3">
 
-          {/* Row 1: Search + view mode + CTA */}
-          <div className="flex flex-wrap gap-2 items-center">
-            <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 flex-1 min-w-[180px] focus-within:border-gold/50 transition-colors">
-              <Search size={14} className="text-text-muted shrink-0" />
-              <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
-                placeholder="Firma, Leistung, Stichwort..."
-                className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
-              {search && <button onClick={() => setSearch("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
-            </div>
-            <div className="flex items-center gap-1.5 ml-auto shrink-0">
-              <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden">
-                <button onClick={() => setViewMode("grid")} className={`p-2 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutGrid size={13} /></button>
-                <button onClick={() => setViewMode("list")} className={`p-2 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutList size={13} /></button>
-              </div>
-              <Link href="/company-setup" className="hidden sm:flex px-3 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap">
-                + Firma eintragen
-              </Link>
-            </div>
+          {/* Row 1: Search */}
+          <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
+            <Search size={14} className="text-text-muted shrink-0" />
+            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+              placeholder="Firma, Leistung, Stichwort..."
+              className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none" />
+            {search && <button onClick={() => setSearch("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
           </div>
 
-          {/* Row 2: Category picker + dropdowns + verified toggle + clear */}
-          <div className="flex items-center gap-2 flex-wrap">
+          {/* Row 1b: Controls — horizontal scroll on mobile */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
+            <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
+              <button onClick={() => setViewMode("grid")} className={`p-2 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutGrid size={13} /></button>
+              <button onClick={() => setViewMode("list")} className={`p-2 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutList size={13} /></button>
+            </div>
+            <Link href="/company-setup" className="hidden sm:flex px-3 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
+              + Firma eintragen
+            </Link>
+          </div>
+
+          {/* Row 2: Category picker + dropdowns + verified toggle + clear — horizontal scroll on mobile */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
 
             {/* Kategorie trigger */}
             <div ref={panelRef} className="relative shrink-0">

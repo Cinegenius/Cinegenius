@@ -127,22 +127,6 @@ const deptMeta: Record<string, { icon: LucideIcon; color: string; bg: string }> 
 
 const groups: Group[] = [
   {
-    id: "crew",
-    label: "Crew & Profile",
-    desc: "Eigenes Profil als Crewmitglied oder Talent anlegen",
-    color: "text-gold",
-    border: "border-gold/30",
-    items: FILM_DEPARTMENTS.map((d) => ({
-      id: `crew_${d.id}`,
-      label: d.label,
-      icon: deptMeta[d.id]?.icon ?? Users,
-      type: "creator" as const,
-      category: d.label,
-      color: deptMeta[d.id]?.color ?? "text-text-secondary",
-      bg: deptMeta[d.id]?.bg ?? "bg-bg-elevated border-border",
-    })),
-  },
-  {
     id: "jobs",
     label: "Jobs",
     desc: "Stelle ausschreiben — für jedes Gewerk einzeln",

@@ -2,6 +2,14 @@ import type { Metadata } from "next";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import CreatorsContent, { type ServerCreator } from "./CreatorsContent";
 import CategoryHero from "@/components/CategoryHero";
+import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
+
+// All profile types that belong on the creators/talent/crew page (everything except vendor)
+const CREATOR_TYPES = new Set(
+  (Object.entries(PROFILE_CATEGORY_MAP) as [ProfileType, string][])
+    .filter(([, cat]) => cat !== "vendor")
+    .map(([type]) => type)
+);
 
 export const revalidate = 60;
 
@@ -46,12 +54,11 @@ export default async function CreatorsPage() {
     .not("display_name", "is", null)
     .neq("display_name", "");
 
-  const fromListings: ServerCreator[] = (listings ?? []).map((l: {
-    id: string; title: string; city: string; price: number; category: string | null; description: string | null; image_url: string | null;
-  }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const fromListings: ServerCreator[] = (listings ?? []).map((l: any) => {
     const { skills, credits } = parseCreatorDescription(l.description ?? "");
     return {
-      id: l.id,
+      id: `listing_${l.id}`,        // prefix to avoid collision with user IDs
       name: l.title,
       role: l.category ?? "Filmschaffende/r",
       positions: l.category ? [l.category] : [],
@@ -68,32 +75,37 @@ export default async function CreatorsPage() {
     };
   });
 
-  const listingUserIds = new Set(fromListings.map((c) => c.id));
+  // User IDs that already have a creator listing → suppress their profile card
+  const listingOwnerIds = new Set(
+    (listings ?? []).map((l: { user_id?: string }) => l.user_id).filter(Boolean)
+  );
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fromProfiles: ServerCreator[] = (profiles ?? [])
-    .filter((p: { user_id: string; positions: string[] | null; role: string | null; profile_types?: string[] | null }) => {
-      if (listingUserIds.has(p.user_id)) return false;
-      const types = p.profile_types ?? [];
-      // Explicitly set as crew → show
-      if (types.includes("crew")) return true;
-      // No type set yet (old profile) → show if they have positions/role (backwards compat)
+    .filter((p: any) => {
+      // Don't show a second card for users who already have a creator listing
+      if (listingOwnerIds.has(p.user_id)) return false;
+      const types: string[] = p.profile_types ?? [];
+      // Show if any profile type belongs on this page (talent / crew / creative)
+      if (types.some((t) => CREATOR_TYPES.has(t as ProfileType))) return true;
+      // Backwards compat: old profiles with no types but with positions / role
       if (types.length === 0) {
-        const hasPositions = Array.isArray(p.positions) && p.positions.length > 0;
-        const hasRole = !!p.role?.trim();
-        return hasPositions || hasRole;
+        return (Array.isArray(p.positions) && p.positions.length > 0) || !!p.role?.trim();
       }
-      // Has types but not crew → don't show on crew page
       return false;
     })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .map((p: any) => {
       const phys = p.physical ?? {};
       const avail = p.availability_config ?? {};
+      // Pick a human-readable role label from the profile types
+      const primaryType = (p.profile_types?.[0] ?? p.profile_type ?? "") as ProfileType;
+      const typeLabel = primaryType ? (PROFILE_TYPE_LABELS[primaryType] ?? "") : "";
       return {
         id: p.user_id,
         name: p.display_name ?? "Unbekannt",
-        role: p.role ?? (p.positions?.[0] ?? "Filmschaffende/r"),
-        positions: p.positions ?? (p.role ? [p.role] : []),
+        role: p.role ?? p.positions?.[0] ?? typeLabel ?? "Filmschaffende/r",
+        positions: p.positions?.length ? p.positions : (typeLabel ? [typeLabel] : []),
         location: p.location ?? "",
         image: p.avatar_url ?? "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
         rating: 0,
@@ -106,8 +118,7 @@ export default async function CreatorsPage() {
         languages: p.languages ?? [],
         verified: p.verified ?? false,
         isReal: true as const,
-        // Neue Felder
-        profile_type: p.profile_type ?? "",
+        profile_type: primaryType,
         hair_color: phys.hair_color ?? "",
         eye_color: phys.eye_color ?? "",
         body_type: phys.body_type ?? "",

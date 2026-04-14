@@ -9,9 +9,9 @@ import {
   Menu, X, Film, Sun, Moon, ChevronDown,
   Car, Shirt, Wrench, Clapperboard, Sparkles, Zap,
   Camera, Mic, Drama, Lightbulb, User, Users, Layers, Briefcase,
-  LayoutDashboard, Pencil, Eye, LogOut,
+  LayoutDashboard, Pencil, Eye, LogOut, MessageSquare,
   Home, Building2, TreePine, Coffee, Monitor,
-  Smartphone, ImageIcon, Video, Aperture,
+  Smartphone, ImageIcon, Video, Aperture, MapPin, ShoppingBag,
 } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 import NotificationCenter from "@/components/NotificationCenter";
@@ -169,6 +169,7 @@ export default function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [profileDisplayName, setProfileDisplayName] = useState("");
   const [profileAvatarUrl, setProfileAvatarUrl] = useState("");
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
   const { isSignedIn, isLoaded } = useAuth();
@@ -188,13 +189,11 @@ export default function Navbar() {
 
   useEffect(() => {
     if (!isSignedIn) {
-      // Clear stale profile data immediately on sign-out so another user
-      // never sees a previous user's name or avatar
       setProfileDisplayName("");
       setProfileAvatarUrl("");
+      setUnreadMessages(0);
       return;
     }
-    // Reset before fetching to avoid flash of previous user's data
     setProfileDisplayName("");
     setProfileAvatarUrl("");
     fetch("/api/profile")
@@ -204,6 +203,21 @@ export default function Navbar() {
         if (profile?.avatar_url)   setProfileAvatarUrl(profile.avatar_url);
       })
       .catch(() => {});
+    // Fetch unread message count
+    const fetchUnread = () => {
+      fetch("/api/conversations")
+        .then(r => r.json())
+        .then(({ data }) => {
+          if (!data) return;
+          const count = (data as { messages: { sender_id: string; read_at: string | null }[] }[])
+            .reduce((sum, conv) => sum + conv.messages.filter(m => m.read_at === null).length, 0);
+          setUnreadMessages(count);
+        })
+        .catch(() => {});
+    };
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 60000);
+    return () => clearInterval(interval);
   }, [isSignedIn]);
 
   useEffect(() => {
@@ -269,6 +283,20 @@ export default function Navbar() {
                 {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
               </button>
               <NotificationCenter />
+              {isLoaded && isSignedIn && (
+                <Link
+                  href="/messages"
+                  className="relative w-8 h-8 flex items-center justify-center rounded-md text-text-muted hover:text-gold hover:bg-bg-elevated transition-all"
+                  aria-label="Nachrichten"
+                >
+                  <MessageSquare size={17} />
+                  {unreadMessages > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-3.5 bg-crimson text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5">
+                      {unreadMessages > 9 ? "9+" : unreadMessages}
+                    </span>
+                  )}
+                </Link>
+              )}
               {isLoaded && !isSignedIn && (
                 <>
                   <Link
@@ -336,6 +364,19 @@ export default function Navbar() {
                             <LayoutDashboard size={15} className="text-text-muted shrink-0" /> Dashboard
                           </Link>
                           <Link
+                            href="/messages"
+                            onClick={() => setUserMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
+                          >
+                            <MessageSquare size={15} className="text-text-muted shrink-0" />
+                            <span>Nachrichten</span>
+                            {unreadMessages > 0 && (
+                              <span className="ml-auto min-w-[18px] h-4.5 bg-crimson text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                                {unreadMessages > 9 ? "9+" : unreadMessages}
+                              </span>
+                            )}
+                          </Link>
+                          <Link
                             href="/profile"
                             onClick={() => setUserMenuOpen(false)}
                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
@@ -343,7 +384,7 @@ export default function Navbar() {
                             <Pencil size={15} className="text-text-muted shrink-0" /> Profil bearbeiten
                           </Link>
                           <Link
-                            href={user?.id ? `/creators/${user.id}` : "/creators"}
+                            href={user?.id ? `/profile/${user.id}` : "/profile"}
                             onClick={() => setUserMenuOpen(false)}
                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
                           >
@@ -367,8 +408,22 @@ export default function Navbar() {
               })()}
             </div>
 
-            {/* Mobile: theme + menu */}
-            <div className="lg:hidden flex items-center gap-2">
+            {/* Mobile: messages + theme + menu */}
+            <div className="lg:hidden flex items-center gap-1">
+              {isLoaded && isSignedIn && (
+                <Link
+                  href="/messages"
+                  className="relative w-9 h-9 flex items-center justify-center rounded-md text-text-muted hover:text-gold transition-colors"
+                  aria-label="Nachrichten"
+                >
+                  <MessageSquare size={19} />
+                  {unreadMessages > 0 && (
+                    <span className="absolute top-1 right-1 min-w-[14px] h-3.5 bg-crimson text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5">
+                      {unreadMessages > 9 ? "9+" : unreadMessages}
+                    </span>
+                  )}
+                </Link>
+              )}
               <button
                 onClick={toggleTheme}
                 className="w-9 h-9 flex items-center justify-center rounded-md text-text-muted hover:text-gold transition-colors"
@@ -404,106 +459,63 @@ export default function Navbar() {
           </button>
         </div>
 
-        <nav className="px-3 py-4 overflow-y-auto h-[calc(100%-4rem)] space-y-5">
+        <nav className="px-4 py-5 overflow-y-auto h-[calc(100%-4rem)] flex flex-col gap-4">
 
           {/* Mobile search */}
           <GlobalSearch />
 
-          <div>
-            <Link href="/jobs" onClick={() => setOpen(false)} className="flex items-center justify-between px-3 py-1.5 mb-1">
-              <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold">Jobs</p>
-              <span className="text-xs text-gold">Alle →</span>
-            </Link>
-            {jobGroups.map((group) => (
-              <div key={group.heading}>
-                <p className="text-[10px] uppercase tracking-widest text-text-muted/60 font-semibold px-3 pt-2 pb-0.5">{group.heading}</p>
-                {group.items.map(({ icon: Icon, label, href, iconColor }) => (
-                  <Link key={href} href={href} onClick={() => setOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:bg-bg-elevated hover:text-text-primary transition-all">
-                    <Icon size={14} className={`${iconColor} opacity-70`} /> {label}
-                  </Link>
-                ))}
-              </div>
+          {/* Main nav links */}
+          <div className="space-y-1">
+            {[
+              { href: "/locations", label: "Drehorte",   icon: MapPin },
+              { href: "/creators",  label: "Crew",       icon: Users },
+              { href: "/props",     label: "Marktplatz", icon: ShoppingBag },
+              { href: "/jobs",      label: "Jobs",       icon: Briefcase },
+              { href: "/companies", label: "Firmen",     icon: Building2 },
+              { href: "/projects",  label: "Projekte",   icon: Film },
+              { href: "/messages",  label: "Nachrichten", icon: MessageSquare },
+            ].map(({ href, label, icon: Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                onClick={() => setOpen(false)}
+                className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-base font-medium transition-all ${
+                  isActive(href)
+                    ? "bg-gold/10 text-gold border border-gold/20"
+                    : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"
+                }`}
+              >
+                <Icon size={18} className={isActive(href) ? "text-gold" : "text-text-muted"} />
+                <span>{label}</span>
+                {href === "/messages" && unreadMessages > 0 ? (
+                  <span className="ml-auto min-w-[20px] h-5 bg-crimson text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                    {unreadMessages > 9 ? "9+" : unreadMessages}
+                  </span>
+                ) : (
+                  <ChevronDown size={14} className="ml-auto -rotate-90 text-text-muted/50" />
+                )}
+              </Link>
             ))}
           </div>
 
-          <div>
-            <Link href="/locations" onClick={() => setOpen(false)} className="flex items-center justify-between px-3 py-1.5 mb-1">
-              <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold">Drehorte</p>
-              <span className="text-xs text-gold">Alle →</span>
-            </Link>
-            {locationGroups.map((group) => (
-              <div key={group.heading}>
-                <p className="text-[10px] uppercase tracking-widest text-text-muted/60 font-semibold px-3 pt-2 pb-0.5">{group.heading}</p>
-                {group.items.map(({ icon: Icon, label, href, iconColor }) => (
-                  <Link key={href} href={href} onClick={() => setOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:bg-bg-elevated hover:text-text-primary transition-all">
-                    <Icon size={14} className={`${iconColor} opacity-70`} /> {label}
-                  </Link>
-                ))}
-              </div>
-            ))}
-          </div>
+          {/* Mein Bereich — nur wenn eingeloggt */}
+          {isLoaded && isSignedIn && (
+            <div className="space-y-1 border-t border-border pt-4">
+              <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted px-4 mb-2">Mein Bereich</p>
+              <Link href="/dashboard" onClick={() => setOpen(false)}
+                className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-base font-medium transition-all ${isActive("/dashboard") ? "bg-gold/10 text-gold border border-gold/20" : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"}`}>
+                <LayoutDashboard size={18} className={isActive("/dashboard") ? "text-gold" : "text-text-muted"} />
+                Dashboard
+              </Link>
+              <Link href="/profile" onClick={() => setOpen(false)}
+                className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-base font-medium transition-all ${isActive("/profile") ? "bg-gold/10 text-gold border border-gold/20" : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"}`}>
+                <Pencil size={18} className={isActive("/profile") ? "text-gold" : "text-text-muted"} />
+                Profil bearbeiten
+              </Link>
+            </div>
+          )}
 
-          <div>
-            <Link href="/creators" onClick={() => setOpen(false)} className="flex items-center justify-between px-3 py-1.5 mb-1">
-              <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold">Crew</p>
-              <span className="text-xs text-gold">Alle →</span>
-            </Link>
-            {crewGroups.map((group) => (
-              <div key={group.heading}>
-                <p className="text-[10px] uppercase tracking-widest text-text-muted/60 font-semibold px-3 pt-2 pb-0.5">{group.heading}</p>
-                {group.items.map(({ icon: Icon, label, href, iconColor }) => (
-                  <Link key={href} href={href} onClick={() => setOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:bg-bg-elevated hover:text-text-primary transition-all">
-                    <Icon size={14} className={`${iconColor} opacity-70`} /> {label}
-                  </Link>
-                ))}
-              </div>
-            ))}
-          </div>
-
-          <div>
-            <Link href="/marketplace" onClick={() => setOpen(false)} className="flex items-center justify-between px-3 py-1.5 mb-1">
-              <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold">Marktplatz</p>
-              <span className="text-xs text-gold">Alle →</span>
-            </Link>
-            {marketGroups.map((group) => (
-              <div key={group.heading}>
-                <p className="text-[10px] uppercase tracking-widest text-text-muted/60 font-semibold px-3 pt-2 pb-0.5">{group.heading}</p>
-                {group.items.map(({ icon: Icon, label, href, iconColor }) => (
-                  <Link key={href} href={href} onClick={() => setOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:bg-bg-elevated hover:text-text-primary transition-all">
-                    <Icon size={14} className={`${iconColor} opacity-70`} /> {label}
-                  </Link>
-                ))}
-              </div>
-            ))}
-          </div>
-
-          <div>
-            <Link href="/companies" onClick={() => setOpen(false)} className="flex items-center justify-between px-3 py-1.5 mb-1">
-              <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold">Firmen</p>
-              <span className="text-xs text-gold">Alle →</span>
-            </Link>
-            <Link href="/companies" onClick={() => setOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:bg-bg-elevated hover:text-text-primary transition-all">
-              <Building2 size={14} className="text-gold opacity-70" /> Firmenverzeichnis
-            </Link>
-            <Link href="/company-setup" onClick={() => setOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:bg-bg-elevated hover:text-text-primary transition-all">
-              <Sparkles size={14} className="text-gold opacity-70" /> Firma eintragen
-            </Link>
-            <Link href="/company-dashboard" onClick={() => setOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:bg-bg-elevated hover:text-text-primary transition-all">
-              <LayoutDashboard size={14} className="text-gold opacity-70" /> Firmen-Dashboard
-            </Link>
-          </div>
-
-          <div>
-            <Link href="/projects" onClick={() => setOpen(false)} className="flex items-center justify-between px-3 py-1.5 mb-1">
-              <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold">Projekte</p>
-              <span className="text-xs text-gold">Alle →</span>
-            </Link>
-            <Link href="/projects" onClick={() => setOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:bg-bg-elevated hover:text-text-primary transition-all">
-              <Clapperboard size={14} className="text-gold opacity-70" /> Projektverzeichnis
-            </Link>
-          </div>
-
-          <div className="pt-4 border-t border-border space-y-2">
+          <div className="mt-auto pt-4 border-t border-border space-y-2">
             {isLoaded && !isSignedIn && (
               <>
                 <Link href="/sign-in" onClick={() => setOpen(false)} className="block w-full py-2.5 px-3 text-sm text-center font-medium border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-all">
@@ -516,12 +528,6 @@ export default function Navbar() {
             )}
             {isLoaded && isSignedIn && (
               <>
-                <Link href="/dashboard" onClick={() => setOpen(false)} className="block w-full py-2.5 px-3 text-sm text-center font-semibold bg-gold text-bg-primary rounded-lg hover:bg-gold-light transition-colors">
-                  Dashboard
-                </Link>
-                <Link href="/profile" onClick={() => setOpen(false)} className="flex items-center gap-2 px-3 py-2.5 text-sm text-text-secondary hover:text-text-primary rounded-lg transition-colors">
-                  <Pencil size={14} className="text-text-muted" /> Profil bearbeiten
-                </Link>
                 <button
                   onClick={() => { setOpen(false); signOut(); }}
                   className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-text-secondary hover:text-red-400 rounded-lg transition-colors"
