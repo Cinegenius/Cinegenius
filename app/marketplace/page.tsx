@@ -39,7 +39,7 @@ async function getMarketplaceData() {
   const liveItems = (dbProps ?? []).map((r) => ({
     id: r.id,
     title: r.title,
-    image: r.image_url ?? "https://images.unsplash.com/photo-1481349518771-20055b2a7b24?w=600&q=80",
+    image: r.image_url ?? "",
     category: r.category ?? "Requisite",
     condition: "Gut",
     dailyRate: r.price,

@@ -91,7 +91,7 @@ export default async function LocationsPage() {
       priceUnit: "day" as const,
       rating: 0,
       reviews: 0,
-      image: l.image_url ?? "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
+      image: l.image_url ?? "",
       tags: ["Neu"],
       instantBook: false,
       verified: false,

@@ -52,7 +52,7 @@ export default async function PropsPage() {
     vendor: "Privatanbieter",
     location: l.city ?? "",
     dailyRate: l.price,
-    image: l.image_url ?? "https://images.unsplash.com/photo-1481349518771-20055b2a7b24?w=800&q=80",
+    image: l.image_url ?? "",
     condition: "Gut",
     era: null as string | null,
     delivery: false,

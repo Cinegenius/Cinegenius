@@ -36,7 +36,7 @@ async function getVehicle(slug: string) {
     location: data.city ?? "",
     vendor: "Privatanbieter",
     dailyRate: data.price,
-    image: data.image_url ?? "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800&q=80",
+    image: data.image_url ?? "",
     tags: ["Neu"] as string[],
     instantBook: false,
     verified: false,

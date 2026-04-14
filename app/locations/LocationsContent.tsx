@@ -447,8 +447,11 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                       }`}
                     >
                       <Link href={`/locations/${loc.id}`} className="flex gap-3 p-3 bg-bg-secondary hover:bg-bg-elevated transition-colors">
-                        <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0">
-                          <Image src={loc.image} alt={loc.title} fill className="object-cover group-hover:scale-110 transition-transform duration-500" sizes="300px" />
+                        <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-bg-elevated">
+                          {loc.image
+                            ? <Image src={loc.image} alt={loc.title} fill className="object-cover group-hover:scale-110 transition-transform duration-500" sizes="300px" />
+                            : <div className="w-full h-full flex items-center justify-center text-text-muted/30"><svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div>
+                          }
                           {loc.isReal && (
                             <div className="absolute top-1 left-1 bg-success text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
                               NEU
@@ -490,8 +493,11 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                       suppressHydrationWarning
                       className="card-hover group rounded-xl border border-border bg-bg-secondary overflow-hidden block"
                     >
-                      <div className="relative overflow-hidden aspect-video">
-                        <Image src={loc.image} alt={loc.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw" />
+                      <div className="relative overflow-hidden aspect-video bg-bg-elevated">
+                        {loc.image
+                          ? <Image src={loc.image} alt={loc.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw" />
+                          : <div className="w-full h-full flex items-center justify-center text-text-muted/20"><svg viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div>
+                        }
                         <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/70 to-transparent" />
                         <div className="absolute top-3 left-3 flex gap-1.5">
                           {loc.instantBook && <span className="px-2 py-0.5 bg-gold text-bg-primary text-xs font-semibold rounded">Instant</span>}

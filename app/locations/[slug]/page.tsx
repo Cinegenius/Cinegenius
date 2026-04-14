@@ -42,7 +42,7 @@ async function getLocation(slug: string) {
     priceUnit: "day" as const,
     rating: 0,
     reviews: 0,
-    image: data.image_url ?? "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
+    image: data.image_url ?? "",
     tags: ["Neu"],
     instantBook: false,
     verified: false,

@@ -62,7 +62,7 @@ export default async function VehiclesPage() {
     location: l.city ?? "",
     vendor: "Privatanbieter",
     dailyRate: l.price,
-    image: l.image_url ?? "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800&q=80",
+    image: l.image_url ?? "",
     tags: ["Neu"],
     instantBook: false,
     verified: false,

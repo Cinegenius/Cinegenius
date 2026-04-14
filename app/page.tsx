@@ -94,7 +94,7 @@ async function getHomeData() {
         city: (l.city ?? "") as string,
         price: (l.price ?? 0) as number,
         reviews: 0,
-        image: (l.image_url ?? "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80") as string,
+        image: (l.image_url ?? "") as string,
       }))
     : [];
 
@@ -247,21 +247,18 @@ const testimonials = [
     quote: "Unsere Location-Suche hat sich von 3 Wochen auf 2 Tage reduziert — und wir haben über CineGenius auch gleich den Kameramann und die Lichttechnik für den Shoot gefunden.",
     name: "Lena Hofmann",
     role: "Producerin, Parallax Films",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80",
     rating: 5,
   },
   {
     quote: "Als Fotografin bekomme ich über mein Profil regelmäßig Anfragen für Produkt- und Werbeshootings. Ich musste nie kalt akquirieren — die Kunden kommen zu mir.",
     name: "Sara Nkemdirim",
     role: "Fotografin & Content Creator",
-    image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=100&q=80",
     rating: 5,
   },
   {
     quote: "Ich hab einfach mein Loft inseriert — ich bin kein Filmprofi, hab keine Ahnung von der Branche. Trotzdem war die Location innerhalb einer Woche zum ersten Mal gebucht.",
     name: "Thomas Brauer",
     role: "Location-Anbieter, Berlin",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&q=80",
     rating: 5,
   },
 ];
@@ -641,8 +638,8 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {liveLocations.map((loc) => (
               <Link key={loc.id} href={`/locations/${loc.id}`} className="card-hover group rounded-xl border border-border bg-bg-elevated overflow-hidden block">
-                <div className="relative overflow-hidden aspect-video">
-                  <Image src={loc.image} alt={loc.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw" />
+                <div className="relative overflow-hidden aspect-video bg-bg-elevated">
+                  {loc.image && <Image src={loc.image} alt={loc.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw" />}
                   <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/70 to-transparent" />
                   <div className="absolute bottom-2 left-3 right-3">
                     <h3 className="font-semibold text-white text-sm leading-tight">{loc.title}</h3>
@@ -808,7 +805,9 @@ export default async function HomePage() {
               </div>
               <p className="text-sm text-text-secondary leading-relaxed flex-1">&ldquo;{t.quote}&rdquo;</p>
               <div className="flex items-center gap-3 pt-3 border-t border-border">
-                <Image src={t.image} alt={t.name} width={40} height={40} className="rounded-full object-cover border border-border" />
+                <div className="w-10 h-10 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0 text-sm font-bold text-gold">
+                  {t.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+                </div>
                 <div>
                   <p className="text-sm font-semibold text-text-primary">{t.name}</p>
                   <p className="text-xs text-text-muted">{t.role}</p>

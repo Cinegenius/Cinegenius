@@ -23,7 +23,7 @@ async function getProp(slug: string) {
     vendor: "Privatanbieter",
     location: data.city ?? "",
     dailyRate: data.price,
-    image: data.image_url ?? "https://images.unsplash.com/photo-1481349518771-20055b2a7b24?w=800&q=80",
+    image: data.image_url ?? "",
     condition: "Gut",
     era: null as string | null,
     delivery: false,
