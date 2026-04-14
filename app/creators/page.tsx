@@ -63,7 +63,8 @@ export default async function CreatorsPage() {
       role: l.category ?? "Filmschaffende/r",
       positions: l.category ? [l.category] : [],
       location: l.city ?? "",
-      image: l.image_url ?? "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
+      image: l.image_url ?? "",
+      avatar: l.image_url ?? "",
       rating: 0,
       reviews: 0,
       dayRate: l.price > 0 ? `${l.price} €/Tag` : "Nach Vereinbarung",
@@ -107,7 +108,11 @@ export default async function CreatorsPage() {
         role: p.role ?? p.positions?.[0] ?? typeLabel ?? "Filmschaffende/r",
         positions: p.positions?.length ? p.positions : (typeLabel ? [typeLabel] : []),
         location: p.location ?? "",
-        image: p.avatar_url ?? "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
+        // cover: prefer first portfolio image, fall back to avatar
+        image: (Array.isArray(p.portfolio_images) && p.portfolio_images.length > 0)
+          ? p.portfolio_images[0]
+          : (p.avatar_url ?? ""),
+        avatar: p.avatar_url ?? "",
         rating: 0,
         reviews: 0,
         dayRate: p.day_rate ? `${p.day_rate} €/Tag` : "Nach Vereinbarung",
@@ -131,10 +136,10 @@ export default async function CreatorsPage() {
 
   const serverCreators: ServerCreator[] = [...fromListings, ...fromProfiles];
 
-  // Avatar strip — only real user-uploaded photos (Supabase storage URLs), shuffled
+  // Avatar strip — only real user-uploaded avatars (Supabase storage URLs)
   const avatarImages = [...fromListings, ...fromProfiles]
-    .filter((c) => c.image?.includes("supabase.co/storage"))
-    .map((c) => ({ src: c.image, alt: c.name, href: `/creators/${c.id}` }))
+    .filter((c) => c.avatar?.includes("supabase.co/storage"))
+    .map((c) => ({ src: c.avatar, alt: c.name, href: `/creators/${c.id}` }))
     .sort((a, b) => a.alt.localeCompare(b.alt));
 
   return (
