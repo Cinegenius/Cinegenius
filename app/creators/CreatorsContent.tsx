@@ -268,6 +268,28 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
   const [languageFilter, setLanguageFilter] = useState("");
   const [availableOnly, setAvailableOnly] = useState(false);
 
+  // allCreators muss VOR den useMemo-Aufrufen deklariert sein
+  const [allCreators, setAllCreators] = useState<ServerCreator[]>(serverCreators);
+  const [apiPage, setApiPage] = useState(1);
+  const [hasMoreFromApi, setHasMoreFromApi] = useState(serverCreators.length >= 96);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  async function loadMoreFromApi() {
+    if (loadingMore || !hasMoreFromApi) return;
+    setLoadingMore(true);
+    try {
+      const res = await fetch(`/api/creators?page=${apiPage}`);
+      const { creators, hasMore } = await res.json();
+      if (creators?.length) {
+        setAllCreators(prev => [...prev, ...creators]);
+        setApiPage(p => p + 1);
+      }
+      setHasMoreFromApi(!!hasMore);
+    } catch { /* ignore */ } finally {
+      setLoadingMore(false);
+    }
+  }
+
   // Derive available filter options from real data only
   const { availableCities, availableCountries, availableLanguages } = useMemo(() => {
     const cities = new Set<string>();
@@ -335,28 +357,6 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
     european:"Europaweit", worldwide:"Weltweit",
   };
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-
-  // Server-side pagination: load more profiles from API
-  const [allCreators, setAllCreators] = useState<ServerCreator[]>(serverCreators);
-  const [apiPage, setApiPage] = useState(1);
-  const [hasMoreFromApi, setHasMoreFromApi] = useState(serverCreators.length >= 96);
-  const [loadingMore, setLoadingMore] = useState(false);
-
-  async function loadMoreFromApi() {
-    if (loadingMore || !hasMoreFromApi) return;
-    setLoadingMore(true);
-    try {
-      const res = await fetch(`/api/creators?page=${apiPage}`);
-      const { creators, hasMore } = await res.json();
-      if (creators?.length) {
-        setAllCreators(prev => [...prev, ...creators]);
-        setApiPage(p => p + 1);
-      }
-      setHasMoreFromApi(!!hasMore);
-    } catch { /* ignore */ } finally {
-      setLoadingMore(false);
-    }
-  }
 
   // Hierarchical filter state
   const [filterOpen, setFilterOpen] = useState(false);
