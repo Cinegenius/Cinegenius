@@ -791,9 +791,6 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                       ))}
                     </div>
                   )}
-                  <span className={`text-xs font-semibold shrink-0 ${c.available ? "text-success" : "text-text-muted"}`}>
-                    {c.available ? "Verfügbar" : "Gebucht"}
-                  </span>
                 </Link>
               );
             }
@@ -838,10 +835,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                       </p>
                     )}
                   </div>
-                  <div className="flex items-center justify-between pt-2 border-t border-border">
-                    <span className={`text-xs font-semibold ${c.available ? "text-success" : "text-text-muted"}`}>
-                      {c.available ? "✓ Verfügbar" : "Gebucht"}
-                    </span>
+                  <div className="flex items-center justify-end pt-2 border-t border-border">
                     <span className="text-xs text-gold font-semibold group-hover:text-gold-light transition-colors">
                       Anfragen →
                     </span>

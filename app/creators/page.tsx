@@ -11,7 +11,7 @@ const CREATOR_TYPES = new Set(
     .map(([type]) => type)
 );
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Filmcrew & Kreative finden — Kamera, Regie, Content Creator",
