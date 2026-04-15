@@ -231,7 +231,7 @@ const useCases = [
     desc: "Produktionsfirma, Verleih oder Studio? Präsentiere dich mit Logo, Services und Team.",
     image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=85",
     cta: "Firma eintragen",
-    href: "/firmen",
+    href: "/company-setup",
   },
   {
     title: "Filmprojekt dokumentieren",
@@ -585,7 +585,7 @@ export default async function HomePage() {
                 desc: "Werbeagentur, Studio, Verleih — präsentiere dich und gewinne neue Aufträge.",
                 items: ["Firmenprofil mit Logo & Team", "Services & Equipment listen", "Aufträge & Anfragen erhalten", "Verifiziertes Branchenprofil"],
                 cta: "Firma eintragen",
-                href: "/firmen",
+                href: "/company-setup",
                 highlight: false,
               },
               {

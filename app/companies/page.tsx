@@ -40,7 +40,7 @@ export default async function CompaniesPage() {
           imagePosition="center 30%"
           overlay="left"
           height="sm"
-          cta={{ label: "Firma eintragen", href: "/inserat" }}
+          cta={{ label: "Firma eintragen", href: "/company-setup" }}
         />
       </div>
       {logoImages.length >= 1 && (
