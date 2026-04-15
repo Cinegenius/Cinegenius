@@ -6,6 +6,7 @@ import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { Send, ArrowLeft, MessageSquare, Loader2, User, UserPlus, Check, X } from "lucide-react";
 import { Suspense } from "react";
+import { supabase } from "@/lib/supabase";
 
 type Message = {
   id: string;
@@ -71,21 +72,10 @@ function MessagesContent() {
     const res = await fetch("/api/conversations");
     const { data } = await res.json();
     if (!data) return;
-
-    const enriched = await Promise.all(
-      (data as Conversation[]).map(async (conv) => {
-        const otherId = conv.sender_id === user?.id ? conv.receiver_id : conv.sender_id;
-        const profileRes = await fetch(`/api/profile/by-id?id=${otherId}`).catch(() => null);
-        if (profileRes?.ok) {
-          const { profile } = await profileRes.json();
-          return { ...conv, otherName: profile?.display_name ?? "Unbekannt", otherAvatar: profile?.avatar_url };
-        }
-        return { ...conv, otherName: "Unbekannt" };
-      })
-    );
-    setConversations(enriched);
+    // Profiles are now pre-enriched server-side — no per-conversation fetches needed
+    setConversations(data as Conversation[]);
     setLoading(false);
-  }, [user?.id]);
+  }, []);
 
   const loadFriendRequests = useCallback(async () => {
     try {
@@ -132,6 +122,29 @@ function MessagesContent() {
     setMessages(msgs ?? []);
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   }
+
+  // Realtime: neue Nachrichten sofort empfangen wenn Gespräch offen
+  useEffect(() => {
+    if (!activeId) return;
+    const channel = supabase
+      .channel(`messages:${activeId}`)
+      .on("postgres_changes", {
+        event: "INSERT",
+        schema: "public",
+        table: "messages",
+        filter: `conversation_id=eq.${activeId}`,
+      }, (payload) => {
+        const newMsg = payload.new as Message;
+        setMessages(prev => {
+          // Eigene gesendete Nachrichten werden schon optimistisch hinzugefügt — nicht doppeln
+          if (prev.some(m => m.id === newMsg.id)) return prev;
+          return [...prev, newMsg];
+        });
+        setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [activeId]);
 
   function openConversation(conv: Conversation) {
     setActiveId(conv.id);

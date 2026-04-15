@@ -4,7 +4,7 @@ import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { sendNewMessageEmail } from "@/lib/email";
 
-// GET /api/conversations — alle Konversationen des eingeloggten Nutzers
+// GET /api/conversations — alle Konversationen des eingeloggten Nutzers (mit Profilen in einem Query)
 export async function GET() {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
@@ -19,7 +19,28 @@ export async function GET() {
     .order("updated_at", { ascending: false });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ data });
+
+  // Batch-fetch aller anderen Teilnehmer in einem einzigen Query (statt N einzelne Requests)
+  const otherIds = [...new Set(
+    (data ?? []).map((c) => c.sender_id === userId ? c.receiver_id : c.sender_id)
+  )];
+
+  let profileMap: Record<string, { display_name?: string; avatar_url?: string }> = {};
+  if (otherIds.length > 0) {
+    const { data: profiles } = await supabaseAdmin
+      .from("profiles")
+      .select("user_id, display_name, avatar_url")
+      .in("user_id", otherIds);
+    (profiles ?? []).forEach((p) => { profileMap[p.user_id] = p; });
+  }
+
+  const enriched = (data ?? []).map((c) => {
+    const otherId = c.sender_id === userId ? c.receiver_id : c.sender_id;
+    const p = profileMap[otherId] ?? {};
+    return { ...c, otherName: p.display_name ?? "Unbekannt", otherAvatar: p.avatar_url ?? null };
+  });
+
+  return NextResponse.json({ data: enriched });
 }
 
 // POST /api/conversations — neue Konversation starten + erste Nachricht

@@ -273,7 +273,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
     const cities = new Set<string>();
     const countries = new Set<string>();
     const langs = new Set<string>();
-    for (const c of serverCreators) {
+    for (const c of allCreators) {
       const { city, country } = parseLocation(c.location);
       if (city) cities.add(city);
       if (country) countries.add(country);
@@ -284,7 +284,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       availableCountries:  [...countries].sort(),
       availableLanguages:  [...langs].sort(),
     };
-  }, [serverCreators]);
+  }, [allCreators]);
   const [sortKey, setSortKey] = useState("featured");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
@@ -303,7 +303,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
     const hair  = new Set<string>();
     const eye   = new Set<string>();
     const body  = new Set<string>();
-    for (const c of serverCreators) {
+    for (const c of allCreators) {
       if (c.profile_type) types.add(c.profile_type);
       if (c.hair_color)   hair.add(c.hair_color);
       if (c.eye_color)    eye.add(c.eye_color);
@@ -315,7 +315,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       availableEyeColors:    [...eye].sort(),
       availableBodyTypes:    [...body].sort(),
     };
-  }, [serverCreators]);
+  }, [allCreators]);
 
   const PROFILE_TYPE_DE: Record<string, string> = {
     actor:"Schauspieler/in", model:"Model", extra:"Komparse", host:"Moderator/in",
@@ -336,6 +336,28 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
   };
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
+  // Server-side pagination: load more profiles from API
+  const [allCreators, setAllCreators] = useState<ServerCreator[]>(serverCreators);
+  const [apiPage, setApiPage] = useState(1);
+  const [hasMoreFromApi, setHasMoreFromApi] = useState(serverCreators.length >= 96);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  async function loadMoreFromApi() {
+    if (loadingMore || !hasMoreFromApi) return;
+    setLoadingMore(true);
+    try {
+      const res = await fetch(`/api/creators?page=${apiPage}`);
+      const { creators, hasMore } = await res.json();
+      if (creators?.length) {
+        setAllCreators(prev => [...prev, ...creators]);
+        setApiPage(p => p + 1);
+      }
+      setHasMoreFromApi(!!hasMore);
+    } catch { /* ignore */ } finally {
+      setLoadingMore(false);
+    }
+  }
+
   // Hierarchical filter state
   const [filterOpen, setFilterOpen] = useState(false);
   const [moreFiltersOpen, setMoreFiltersOpen] = useState(false);
@@ -344,7 +366,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
   // Which department roles actually have at least one creator
   const occupiedRoles = useMemo(() => {
     const set = new Set<string>();
-    for (const c of serverCreators) {
+    for (const c of allCreators) {
       for (const dept of departments) {
         for (const role of dept.roles) {
           if (!set.has(role) && matchesRole(c, role)) set.add(role);
@@ -352,7 +374,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       }
     }
     return set;
-  }, [serverCreators]);
+  }, [allCreators]);
 
   // Only show departments that have at least one occupied role
   const activeDepts = useMemo(
@@ -378,7 +400,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 
   // Filtered results
   const filtered = useMemo(() => {
-    let result = [...serverCreators];
+    let result = [...allCreators];
 
     if (query.trim()) {
       const q = query.toLowerCase();
@@ -434,7 +456,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
     return result;
   }, [query, selectedRoles, availableOnly, cityFilter, countryFilter, languageFilter,
       profileTypeFilter, hairFilter, eyeFilter, bodyFilter, travelFilter, ageMinFilter, ageMaxFilter,
-      sortKey, serverCreators]);
+      sortKey, allCreators]);
 
   useEffect(() => { setVisibleCount(PAGE_SIZE); }, [filtered]);
 
@@ -851,13 +873,26 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
           })}
         </div>
 
-        {filtered.length > visibleCount && (
+        {(filtered.length > visibleCount || hasMoreFromApi) && (
           <div className="mt-8 text-center">
             <button
-              onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}
-              className="px-8 py-3 border border-border text-sm font-semibold text-text-secondary hover:border-gold hover:text-gold rounded-xl transition-all"
+              onClick={() => {
+                if (filtered.length > visibleCount) {
+                  setVisibleCount((v) => v + PAGE_SIZE);
+                } else {
+                  // Alle gefilterten Profile sichtbar — nächste Seite vom Server laden
+                  loadMoreFromApi();
+                }
+              }}
+              disabled={loadingMore}
+              className="px-8 py-3 border border-border text-sm font-semibold text-text-secondary hover:border-gold hover:text-gold rounded-xl transition-all disabled:opacity-50 flex items-center gap-2 mx-auto"
             >
-              Mehr laden · {filtered.length - visibleCount} weitere Profile
+              {loadingMore
+                ? <><span className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin inline-block" /> Lädt…</>
+                : filtered.length > visibleCount
+                  ? `Mehr laden · ${filtered.length - visibleCount} weitere`
+                  : "Weitere Profile laden"
+              }
             </button>
           </div>
         )}

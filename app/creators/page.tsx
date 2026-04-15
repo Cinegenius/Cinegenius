@@ -47,12 +47,14 @@ export default async function CreatorsPage() {
     .eq("type", "creator")
     .order("created_at", { ascending: false });
 
-  // Fetch profiles
+  // Fetch profiles — limit initial load to 96 for fast page render
   const { data: profiles } = await supabaseAdmin
     .from("profiles")
     .select("user_id, display_name, location, bio, skills, role, positions, available, avatar_url, portfolio_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline")
     .not("display_name", "is", null)
-    .neq("display_name", "");
+    .neq("display_name", "")
+    .order("created_at", { ascending: false })
+    .limit(96);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fromListings: ServerCreator[] = (listings ?? []).map((l: any) => {

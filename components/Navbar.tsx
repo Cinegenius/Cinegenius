@@ -17,6 +17,7 @@ import { useTheme } from "@/components/ThemeProvider";
 import NotificationCenter from "@/components/NotificationCenter";
 import GlobalSearch from "@/components/GlobalSearch";
 import { Logo } from "@/components/Logo";
+import { supabase } from "@/lib/supabase";
 
 type NavItem = { icon: React.ElementType; label: string; desc: string; href: string; iconBg: string; iconColor: string };
 
@@ -203,16 +204,32 @@ export default function Navbar() {
         if (profile?.avatar_url)   setProfileAvatarUrl(profile.avatar_url);
       })
       .catch(() => {});
-    // Fetch unread message count (nur fremde, ungelesene Nachrichten)
-    const fetchUnread = () => {
-      fetch("/api/unread-count")
-        .then(r => r.json())
-        .then(({ count }) => setUnreadMessages(count ?? 0))
-        .catch(() => {});
-    };
-    fetchUnread();
-    const interval = setInterval(fetchUnread, 30000);
-    return () => clearInterval(interval);
+    // Unread count einmalig laden
+    fetch("/api/unread-count")
+      .then(r => r.json())
+      .then(({ count }) => setUnreadMessages(count ?? 0))
+      .catch(() => {});
+
+    // Realtime: Badge neu laden wenn neue Nachricht von jemand anderem ankommt
+    const currentUserId = user?.id;
+    if (!currentUserId) return;
+    const channel = supabase
+      .channel(`unread-nav:${currentUserId}`)
+      .on("postgres_changes", {
+        event: "INSERT",
+        schema: "public",
+        table: "messages",
+      }, (payload) => {
+        // Nur wenn die Nachricht nicht von mir selbst ist
+        if (payload.new?.sender_id !== currentUserId) {
+          fetch("/api/unread-count")
+            .then(r => r.json())
+            .then(({ count }) => setUnreadMessages(count ?? 0))
+            .catch(() => {});
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, [isSignedIn]);
 
   useEffect(() => {
