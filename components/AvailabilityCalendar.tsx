@@ -53,11 +53,12 @@ interface Props {
   dailyRate: number;
   currency?: string;
   onSelect: (start: Date, end: Date, days: number) => void;
+  blockedDates?: string[]; // ISO date strings "YYYY-MM-DD"
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function AvailabilityCalendar({ dailyRate, currency = "€", onSelect }: Props) {
+export default function AvailabilityCalendar({ dailyRate, currency = "€", onSelect, blockedDates }: Props) {
   const today = useMemo(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
@@ -70,10 +71,10 @@ export default function AvailabilityCalendar({ dailyRate, currency = "€", onSe
   const [end, setEnd]     = useState<Date | null>(null);
   const [hover, setHover] = useState<Date | null>(null);
 
-  const bookedKeys = useMemo(
-    () => getMockedBookedKeys(today.getFullYear(), today.getMonth()),
-    [today]
-  );
+  const bookedKeys = useMemo(() => {
+    if (blockedDates && blockedDates.length > 0) return new Set(blockedDates);
+    return getMockedBookedKeys(today.getFullYear(), today.getMonth());
+  }, [blockedDates, today]);
 
   const isBooked = (d: Date) => bookedKeys.has(toKey(d));
   const isPast   = (d: Date) => d.getTime() < today.getTime();

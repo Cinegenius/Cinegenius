@@ -217,6 +217,18 @@ export default function InseratPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [error, setError] = useState("");
 
+  // Location extras
+  const [locAmenities, setLocAmenities] = useState<string[]>([]);
+  const [locBlockedDates, setLocBlockedDates] = useState<string[]>([]);
+  const [locExtraImages, setLocExtraImages] = useState<string[]>([]);
+  const [locFloorPlanUrl, setLocFloorPlanUrl] = useState<string | null>(null);
+  const [locFloorPlanPreview, setLocFloorPlanPreview] = useState<string | null>(null);
+  const [locExtraUploading, setLocExtraUploading] = useState(false);
+  const [locFloorUploading, setLocFloorUploading] = useState(false);
+  // Calendar state for blocked dates
+  const [calYear, setCalYear] = useState(() => new Date().getFullYear());
+  const [calMonth, setCalMonth] = useState(() => new Date().getMonth());
+
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -231,8 +243,11 @@ export default function InseratPage() {
     condition: "",
     // location
     sqm: "",
+    ceiling_height: "",
+    max_crew: "",
     indoor_outdoor: "innen" as "innen" | "außen" | "beides",
     power_available: false,
+    power_details: "",
     parking_spots: "",
     // job
     company: "",
@@ -284,19 +299,26 @@ export default function InseratPage() {
     }
 
     if (type === "location") {
-      const lageLabel = form.indoor_outdoor === "beides" ? "Innen & Außen" : form.indoor_outdoor === "außen" ? "Außen" : "Innen";
       return {
         type,
         category,
         title: form.title,
-        description: [
-          form.sqm && `Fläche: ${form.sqm} m²`,
-          `Lage: ${lageLabel}`,
-          form.power_available && "Stromanschluss vorhanden",
-          form.parking_spots && `Parkplätze: ${form.parking_spots}`,
-        ].filter(Boolean).join(" · ") + (form.description ? `\n\n${form.description}` : ""),
+        description: form.description || "",
         price: parseFloat(form.price) || 0,
         city: form.city,
+        metadata: {
+          sqm: form.sqm ? parseFloat(form.sqm) : null,
+          ceiling_height_m: form.ceiling_height ? parseFloat(form.ceiling_height) : null,
+          max_crew: form.max_crew ? parseInt(form.max_crew) : null,
+          indoor_outdoor: form.indoor_outdoor,
+          power_available: form.power_available,
+          power_details: form.power_details || null,
+          parking_spots: form.parking_spots ? parseInt(form.parking_spots) : null,
+          amenities: locAmenities,
+        },
+        blocked_dates: locBlockedDates,
+        floor_plan_url: locFloorPlanUrl,
+        extra_images: locExtraImages,
       };
     }
 
@@ -607,40 +629,196 @@ export default function InseratPage() {
 
             {/* ── LOCATION FIELDS ── */}
             {isLocation && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-5">
+
+                {/* Grunddaten */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Fläche (m²)</label>
                     <input type="number" value={form.sqm} onChange={(e) => f("sqm", e.target.value)} placeholder="120"
                       className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                   <div>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Deckenhöhe (m)</label>
+                    <input type="number" step="0.1" value={form.ceiling_height} onChange={(e) => f("ceiling_height", e.target.value)} placeholder="3.5"
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Max. Crew</label>
+                    <input type="number" value={form.max_crew} onChange={(e) => f("max_crew", e.target.value)} placeholder="20"
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
+                  </div>
+                  <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Parkplätze</label>
-                    <input type="number" value={form.parking_spots} onChange={(e) => f("parking_spots", e.target.value)} placeholder="z.B. 5"
+                    <input type="number" value={form.parking_spots} onChange={(e) => f("parking_spots", e.target.value)} placeholder="5"
                       className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                 </div>
+
+                {/* Lage */}
                 <div>
                   <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Lage *</label>
                   <div className="flex rounded-xl border border-border overflow-hidden">
                     {(["innen", "außen", "beides"] as const).map((opt) => (
-                      <button key={opt} onClick={() => f("indoor_outdoor", opt)}
+                      <button key={opt} type="button" onClick={() => f("indoor_outdoor", opt)}
                         className={`flex-1 py-2.5 text-sm font-medium transition-colors capitalize ${form.indoor_outdoor === opt ? "bg-gold text-bg-primary" : "bg-bg-elevated text-text-muted hover:text-text-primary"}`}>
                         {opt.charAt(0).toUpperCase() + opt.slice(1)}
                       </button>
                     ))}
                   </div>
                 </div>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <div onClick={() => f("power_available", !form.power_available)}
-                    className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 cursor-pointer ${form.power_available ? "bg-gold" : "bg-bg-elevated border border-border"}`}>
-                    <div className={`w-4 h-4 rounded-full bg-white transition-transform ${form.power_available ? "translate-x-4" : ""}`} />
-                  </div>
-                  <div>
+
+                {/* Strom */}
+                <div>
+                  <label className="flex items-center gap-3 cursor-pointer mb-2">
+                    <div onClick={() => f("power_available", !form.power_available)}
+                      className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 cursor-pointer shrink-0 ${form.power_available ? "bg-gold" : "bg-bg-elevated border border-border"}`}>
+                      <div className={`w-4 h-4 rounded-full bg-white transition-transform ${form.power_available ? "translate-x-4" : ""}`} />
+                    </div>
                     <p className="text-sm font-medium text-text-primary">Stromanschluss vorhanden</p>
-                    <p className="text-xs text-text-muted">230V / 400V Anschluss für Equipment</p>
+                  </label>
+                  {form.power_available && (
+                    <input type="text" value={form.power_details} onChange={(e) => f("power_details", e.target.value)}
+                      placeholder="z.B. 2× 32A CEE, 1× 63A CEE 3-phasig, 230V Steckdosen"
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
+                  )}
+                </div>
+
+                {/* Ausstattung */}
+                <div>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">Ausstattung</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {[
+                      ["wifi", "Wi-Fi"], ["restrooms", "WC / Sanitär"], ["green_room", "Green Room"],
+                      ["loading_bay", "Laderampe"], ["kitchen", "Küche"], ["changing_room", "Umkleide"],
+                      ["generator", "Generator"], ["sound_insulated", "Schallisoliert"], ["ac", "Klimaanlage"],
+                      ["heating", "Heizung"], ["elevator", "Aufzug"], ["disabled_access", "Barrierefreiheit"],
+                    ].map(([id, label]) => {
+                      const active = locAmenities.includes(id);
+                      return (
+                        <button key={id} type="button"
+                          onClick={() => setLocAmenities(prev => active ? prev.filter(a => a !== id) : [...prev, id])}
+                          className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left text-xs font-medium transition-all ${active ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-elevated text-text-secondary hover:border-border-light"}`}>
+                          {active && <span className="text-gold">✓</span>} {label}
+                        </button>
+                      );
+                    })}
                   </div>
-                </label>
+                </div>
+
+                {/* Grundriss */}
+                <div>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Grundriss (optional)</label>
+                  {locFloorPlanPreview ? (
+                    <div className="relative w-full max-w-sm">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={locFloorPlanPreview} alt="Grundriss" className="w-full rounded-xl border border-border object-contain max-h-48" />
+                      <button type="button" onClick={() => { setLocFloorPlanUrl(null); setLocFloorPlanPreview(null); }}
+                        className="absolute top-2 right-2 w-6 h-6 bg-bg-primary/80 rounded-full flex items-center justify-center text-text-muted hover:text-crimson-light text-xs">✕</button>
+                    </div>
+                  ) : (
+                    <label className={`flex items-center gap-2 px-4 py-3 bg-bg-elevated border border-dashed border-border rounded-xl cursor-pointer hover:border-gold transition-colors text-sm text-text-muted w-fit ${locFloorUploading ? "opacity-60 pointer-events-none" : ""}`}>
+                      {locFloorUploading ? <span className="animate-spin text-gold">⟳</span> : <span>+</span>} Grundriss hochladen
+                      <input type="file" accept="image/*,.pdf" className="hidden" onChange={async (e) => {
+                        const file = e.target.files?.[0]; if (!file) return;
+                        setLocFloorPlanPreview(URL.createObjectURL(file));
+                        setLocFloorUploading(true);
+                        const fd = new FormData(); fd.append("file", file);
+                        const res = await fetch("/api/upload", { method: "POST", body: fd });
+                        const json = await res.json();
+                        setLocFloorUploading(false);
+                        if (json.url) setLocFloorPlanUrl(json.url);
+                      }} />
+                    </label>
+                  )}
+                </div>
+
+                {/* Weitere Fotos */}
+                <div>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Weitere Fotos</label>
+                  <div className="flex flex-wrap gap-2">
+                    {locExtraImages.map((url, i) => (
+                      <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden border border-border">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={url} alt="" className="w-full h-full object-cover" />
+                        <button type="button" onClick={() => setLocExtraImages(prev => prev.filter((_, j) => j !== i))}
+                          className="absolute top-0.5 right-0.5 w-5 h-5 bg-bg-primary/80 rounded-full flex items-center justify-center text-[10px] text-text-muted hover:text-crimson-light">✕</button>
+                      </div>
+                    ))}
+                    <label className={`w-20 h-20 flex flex-col items-center justify-center rounded-lg border border-dashed border-border cursor-pointer hover:border-gold transition-colors text-text-muted text-xs ${locExtraUploading ? "opacity-60 pointer-events-none" : ""}`}>
+                      {locExtraUploading ? <span className="animate-spin text-gold text-lg">⟳</span> : <><span className="text-2xl leading-none mb-1">+</span><span>Foto</span></>}
+                      <input type="file" accept="image/*" multiple className="hidden" onChange={async (e) => {
+                        const files = Array.from(e.target.files ?? []); if (!files.length) return;
+                        setLocExtraUploading(true);
+                        for (const file of files) {
+                          const fd = new FormData(); fd.append("file", file);
+                          const res = await fetch("/api/upload", { method: "POST", body: fd });
+                          const json = await res.json();
+                          if (json.url) setLocExtraImages(prev => [...prev, json.url]);
+                        }
+                        setLocExtraUploading(false);
+                        if (e.target) e.target.value = "";
+                      }} />
+                    </label>
+                  </div>
+                </div>
+
+                {/* Verfügbarkeit / Gesperrte Tage */}
+                <div>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-1">Gesperrte Tage</label>
+                  <p className="text-xs text-text-muted mb-3">Klicke auf Tage die nicht buchbar sind (rot = gesperrt)</p>
+                  {(() => {
+                    const today = new Date(); today.setHours(0,0,0,0);
+                    const monthNames = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+                    const firstDay = new Date(calYear, calMonth, 1);
+                    const startOffset = (firstDay.getDay() + 6) % 7;
+                    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+                    const cells: (number | null)[] = Array(startOffset).fill(null);
+                    for (let i = 1; i <= daysInMonth; i++) cells.push(i);
+                    while (cells.length % 7 !== 0) cells.push(null);
+                    const toggleDay = (day: number) => {
+                      const key = `${calYear}-${String(calMonth+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+                      setLocBlockedDates(prev => prev.includes(key) ? prev.filter(d => d !== key) : [...prev, key]);
+                    };
+                    return (
+                      <div className="bg-bg-elevated border border-border rounded-xl p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <button type="button" onClick={() => { if (calMonth === 0) { setCalYear(y => y-1); setCalMonth(11); } else setCalMonth(m => m-1); }}
+                            className="w-7 h-7 flex items-center justify-center text-text-muted hover:text-gold rounded-lg hover:bg-bg-secondary transition-all">‹</button>
+                          <span className="text-sm font-semibold text-text-primary">{monthNames[calMonth]} {calYear}</span>
+                          <button type="button" onClick={() => { if (calMonth === 11) { setCalYear(y => y+1); setCalMonth(0); } else setCalMonth(m => m+1); }}
+                            className="w-7 h-7 flex items-center justify-center text-text-muted hover:text-gold rounded-lg hover:bg-bg-secondary transition-all">›</button>
+                        </div>
+                        <div className="grid grid-cols-7 gap-1 mb-1">
+                          {["Mo","Di","Mi","Do","Fr","Sa","So"].map(d => <div key={d} className="text-center text-[10px] text-text-muted font-semibold py-1">{d}</div>)}
+                        </div>
+                        <div className="grid grid-cols-7 gap-1">
+                          {cells.map((day, i) => {
+                            if (!day) return <div key={i} />;
+                            const key = `${calYear}-${String(calMonth+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+                            const cellDate = new Date(calYear, calMonth, day);
+                            const isPast = cellDate < today;
+                            const isBlocked = locBlockedDates.includes(key);
+                            return (
+                              <button key={i} type="button" onClick={() => !isPast && toggleDay(day)}
+                                className={`aspect-square flex items-center justify-center text-xs rounded-full transition-all font-medium ${
+                                  isPast ? "text-text-muted/30 cursor-not-allowed" :
+                                  isBlocked ? "bg-crimson/20 text-crimson-light border border-crimson/40 cursor-pointer" :
+                                  "text-text-primary hover:bg-gold/20 cursor-pointer"
+                                }`}>
+                                {day}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {locBlockedDates.length > 0 && (
+                          <p className="text-xs text-text-muted mt-3">{locBlockedDates.length} Tag{locBlockedDates.length !== 1 ? "e" : ""} gesperrt</p>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+
               </div>
             )}
 
@@ -1016,7 +1194,8 @@ export default function InseratPage() {
               setDropdownId("");
               setImageUrl(null);
               setImagePreview(null);
-              setForm({ title: "", description: "", price: "", city: "", make: "", model: "", year: "", fuel_type: "", license_class: "", condition: "", sqm: "", indoor_outdoor: "innen", power_available: false, parking_spots: "", company: "", projectType: "", shoot_start: "", shoot_end: "", pay_type: "", role_label: "", urgent: false, content_nudity: false, content_violence: false, content_stunts: false, dimensions: "", safety_note: "", skills: "", experience: "" });
+              setForm({ title: "", description: "", price: "", city: "", make: "", model: "", year: "", fuel_type: "", license_class: "", condition: "", sqm: "", ceiling_height: "", max_crew: "", indoor_outdoor: "innen", power_available: false, power_details: "", parking_spots: "", company: "", projectType: "", shoot_start: "", shoot_end: "", pay_type: "", role_label: "", urgent: false, content_nudity: false, content_violence: false, content_stunts: false, dimensions: "", safety_note: "", skills: "", experience: "" });
+              setLocAmenities([]); setLocBlockedDates([]); setLocExtraImages([]); setLocFloorPlanUrl(null); setLocFloorPlanPreview(null);
             }}
             className="px-6 py-3 border border-border text-text-secondary rounded-xl hover:border-gold hover:text-gold transition-all text-sm font-medium"
           >

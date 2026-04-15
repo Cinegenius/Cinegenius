@@ -54,6 +54,10 @@ async function getLocation(slug: string) {
     ownerId: data.user_id ?? "",
     ownerName: "Anbieter",
     isReal: true,
+    metadata: data.metadata ?? null,
+    blocked_dates: data.blocked_dates ?? [],
+    floor_plan_url: data.floor_plan_url ?? null,
+    extra_images: data.extra_images ?? [],
   };
 }
 

@@ -48,7 +48,8 @@ export async function POST(req: Request) {
   }
 
   const body = await req.json();
-  const { type, title, description, price, city, category, image_url, company_id } = body;
+  const { type, title, description, price, city, category, image_url, company_id,
+          metadata, blocked_dates, floor_plan_url, extra_images } = body;
 
   if (!type || !title || !city) {
     return NextResponse.json({ error: "Pflichtfelder fehlen (type, title, city)" }, { status: 400 });
@@ -80,6 +81,10 @@ export async function POST(req: Request) {
       image_url: image_url ?? null,
       company_id: company_id ?? null,
       published: true,
+      ...(metadata !== undefined && { metadata }),
+      ...(blocked_dates !== undefined && { blocked_dates }),
+      ...(floor_plan_url !== undefined && { floor_plan_url }),
+      ...(extra_images !== undefined && { extra_images }),
     })
     .select()
     .single();
