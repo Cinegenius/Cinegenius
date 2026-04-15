@@ -62,6 +62,67 @@ function getCompletion(opts: {
   };
 }
 
+// ─── Accordion role picker (same as profile-setup) ───────────────────────────
+const ROLE_CATEGORIES = [
+  { id: "talent",   label: "Talent / Performance", emoji: "🎭", desc: "Schauspieler, Model, Creator …",
+    types: [["actor","Schauspieler/in"],["model","Model"],["extra","Komparse / Kleindarsteller"],["host","Moderator/in"],["dancer","Tänzer/in"],["stunt","Stunt Performer"],["voiceover","Synchronsprecher/in"],["creator","Influencer / Creator"]] },
+  { id: "crew",     label: "Filmcrew / Technik",   emoji: "🎥", desc: "Kamera, Licht, Ton, Regie …",
+    types: [["camera","Kamera"],["lighting","Licht / Gaffer"],["sound","Ton"],["director_of_photography","Director of Photography"],["director","Regie"],["production","Produktion"],["makeup","Maske"],["costume","Kostüm"],["postproduction","Postproduktion"],["vfx","VFX"],["sfx","SFX"],["art_department","Szenenbild"],["broadcast","Broadcast"]] },
+  { id: "kreativ",  label: "Kreativ",               emoji: "✍️", desc: "Fotograf, Editor, Art Director …",
+    types: [["filmmaker","Regisseur/in"],["writer","Autor/in"],["photographer","Fotograf/in"],["editor","Editor/in"],["motion_designer","Motion Designer"],["art_director","Art Director"]] },
+  { id: "anbieter", label: "Anbieter",              emoji: "🏢", desc: "Location, Equipment, Studio …",
+    types: [["location","Location"],["equipment","Equipment"],["vehicle","Fahrzeuge"],["studio","Studio"],["props","Requisiten"]] },
+] as const;
+
+function ProfileTypePicker({ selected, onSelect }: { selected: string; onSelect: (t: string) => void }) {
+  const [openCat, setOpenCat] = useState<string | null>(() =>
+    ROLE_CATEGORIES.find(c => c.types.some(([id]) => id === selected))?.id ?? null
+  );
+  return (
+    <div className="space-y-2">
+      {ROLE_CATEGORIES.map(cat => {
+        const isOpen = openCat === cat.id;
+        const selectedInCat = cat.types.find(([id]) => id === selected);
+        return (
+          <div key={cat.id} className="rounded-xl border border-border overflow-hidden">
+            <button type="button"
+              onClick={() => setOpenCat(isOpen ? null : cat.id)}
+              className={`w-full flex items-center gap-3 px-4 py-3.5 text-left transition-colors ${isOpen ? "bg-bg-elevated" : "bg-bg-secondary hover:bg-bg-elevated"}`}
+            >
+              <span className="text-xl leading-none">{cat.emoji}</span>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-text-primary text-sm">{cat.label}</p>
+                <p className="text-xs text-text-muted">
+                  {selectedInCat ? <span className="text-gold">{selectedInCat[1]} gewählt</span> : cat.desc}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                {selectedInCat && <CheckCircle size={14} className="text-gold" />}
+                <span className={`text-text-muted text-xs transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>▾</span>
+              </div>
+            </button>
+            {isOpen && (
+              <div className="border-t border-border px-3 py-3 grid grid-cols-2 gap-2 bg-bg-primary">
+                {cat.types.map(([id, label]) => (
+                  <button key={id} type="button"
+                    onClick={() => onSelect(id === selected ? "" : id)}
+                    className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left transition-all active:scale-95 text-xs font-medium ${
+                      selected === id ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-secondary text-text-secondary hover:border-border-light"
+                    }`}
+                  >
+                    <span className="leading-tight">{label}</span>
+                    {selected === id && <CheckCircle size={11} className="ml-auto shrink-0 text-gold" />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // Category derived from profile_type — single source of truth
 function getCategory(type: string): "talent" | "crew" | "creative" | "vendor" | null {
   const map: Record<string, "talent" | "crew" | "creative" | "vendor"> = {
@@ -792,48 +853,10 @@ export default function ProfilePage() {
                 <div className="p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-1">Ich bin …</h2>
                   <p className="text-xs text-text-muted mb-4">Dein Profiltyp bestimmt welche Felder sichtbar sind.</p>
-                  <div className="space-y-3">
-                    {([
-                      { cat: "Talent / Performance", types: [
-                        ["actor","Schauspieler/in"],["model","Model"],["extra","Komparse / Kleindarsteller"],
-                        ["host","Moderator/in"],["dancer","Tänzer/in"],["stunt","Stunt Performer"],
-                        ["voiceover","Synchronsprecher/in"],["creator","Influencer / Creator"],
-                      ]},
-                      { cat: "Filmcrew / Technik", types: [
-                        ["camera","Kamera"],["lighting","Licht / Gaffer"],["sound","Ton"],
-                        ["director_of_photography","Director of Photography"],["director","Regie"],
-                        ["production","Produktion"],["makeup","Maske"],["costume","Kostüm"],
-                        ["postproduction","Postproduktion"],["vfx","VFX"],["sfx","SFX"],
-                        ["art_department","Szenenbild"],["broadcast","Broadcast"],
-                      ]},
-                      { cat: "Kreativ", types: [
-                        ["filmmaker","Regisseur/in"],["writer","Autor/in"],["photographer","Fotograf/in"],
-                        ["editor","Editor/in"],["motion_designer","Motion Designer"],["art_director","Art Director"],
-                      ]},
-                      { cat: "Anbieter", types: [
-                        ["location","Location"],["equipment","Equipment"],["vehicle","Fahrzeuge"],
-                        ["studio","Studio"],["props","Requisiten"],
-                      ]},
-                    ] as { cat: string; types: string[][] }[]).map(({ cat, types }) => (
-                      <div key={cat}>
-                        <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-1.5">{cat}</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {types.map(([id, label]) => (
-                            <button key={id} type="button"
-                              onClick={() => setCurrentProfileType(id === currentProfileType ? "" : id)}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                                currentProfileType === id
-                                  ? "border-gold bg-gold/10 text-gold"
-                                  : "border-border bg-bg-elevated text-text-secondary hover:border-gold/40 hover:text-text-primary"
-                              }`}
-                            >
-                              {currentProfileType === id && "✓ "}{label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <ProfileTypePicker
+                    selected={currentProfileType}
+                    onSelect={setCurrentProfileType}
+                  />
                 </div>
 
                 {/* Avatar */}
