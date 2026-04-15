@@ -802,16 +802,16 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                 suppressHydrationWarning
                 className="card-hover group rounded-xl border border-border bg-bg-secondary overflow-hidden block"
               >
-                {/* Cover image — kein doppelter Avatar-Circle */}
-                <div className="h-32 overflow-hidden bg-bg-elevated">
+                {/* Cover image — festes 4:5 Seitenverhältnis, alle Karten gleich groß */}
+                <div className="aspect-[4/5] overflow-hidden bg-bg-elevated">
                   {c.image ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img src={c.image} alt={c.name} loading="lazy" decoding="async"
-                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300" />
                   ) : c.avatar ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img src={c.avatar} alt={c.name} loading="lazy" decoding="async"
-                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-text-muted/20">
                       <svg viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
