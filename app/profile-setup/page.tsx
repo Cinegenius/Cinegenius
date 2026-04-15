@@ -48,6 +48,114 @@ const VENDOR_ROLES: { type: ProfileType; label: string; emoji: string }[] = [
   { type: "props",       label: "Props",        emoji: "🪄" },
 ];
 
+// ─── Kategorien für 2-Stufen Auswahl ─────────────────────────────────────────
+
+const CATEGORIES = [
+  {
+    id: "talent",
+    label: "Talent",
+    emoji: "🎭",
+    desc: "Schauspieler, Model, Creator …",
+    types: ["actor","model","extra","host","dancer","stunt","voiceover","creator"],
+  },
+  {
+    id: "crew",
+    label: "Filmcrew",
+    emoji: "🎥",
+    desc: "Kamera, Licht, Ton, Regie …",
+    types: ["camera","director_of_photography","director","production","lighting","sound","makeup","costume","postproduction","vfx","sfx","art_department","broadcast"],
+  },
+  {
+    id: "kreativ",
+    label: "Kreativ",
+    emoji: "✍️",
+    desc: "Fotograf, Editor, Art Director …",
+    types: ["filmmaker","photographer","writer","editor","motion_designer","art_director"],
+  },
+  {
+    id: "anbieter",
+    label: "Anbieter",
+    emoji: "🏢",
+    desc: "Location, Equipment, Studio …",
+    types: ["location","equipment","studio","vehicle","props"],
+  },
+] as const;
+
+function RolePicker({
+  filmmakerroles,
+  vendorroles,
+  selected,
+  onSelect,
+}: {
+  filmmakerroles: { type: ProfileType; label: string; emoji: string }[];
+  vendorroles: { type: ProfileType; label: string; emoji: string }[];
+  selected: ProfileType | null;
+  onSelect: (t: ProfileType) => void;
+}) {
+  const allRoles = [...filmmakerroles, ...vendorroles];
+  const [openCat, setOpenCat] = useState<string | null>(() => {
+    if (!selected) return null;
+    return CATEGORIES.find(c => (c.types as readonly string[]).includes(selected))?.id ?? null;
+  });
+
+  return (
+    <div className="space-y-3">
+      {CATEGORIES.map(cat => {
+        const isOpen = openCat === cat.id;
+        const catRoles = allRoles.filter(r => (cat.types as readonly string[]).includes(r.type));
+        const selectedInCat = catRoles.find(r => r.type === selected);
+
+        return (
+          <div key={cat.id} className="rounded-2xl border border-border overflow-hidden">
+            {/* Kategorie-Header */}
+            <button
+              onClick={() => setOpenCat(isOpen ? null : cat.id)}
+              className={`w-full flex items-center gap-3 px-4 py-4 text-left transition-colors ${
+                isOpen ? "bg-bg-elevated" : "bg-bg-secondary hover:bg-bg-elevated"
+              }`}
+            >
+              <span className="text-2xl leading-none">{cat.emoji}</span>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-text-primary text-sm">{cat.label}</p>
+                <p className="text-xs text-text-muted">
+                  {selectedInCat ? <span className="text-gold">{selectedInCat.label} gewählt</span> : cat.desc}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                {selectedInCat && <CheckCircle size={16} className="text-gold" />}
+                <span className={`text-text-muted transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
+                  ▾
+                </span>
+              </div>
+            </button>
+
+            {/* Unterrollen */}
+            {isOpen && (
+              <div className="border-t border-border px-3 py-3 grid grid-cols-2 gap-2 bg-bg-primary">
+                {catRoles.map(r => (
+                  <button
+                    key={r.type}
+                    onClick={() => onSelect(r.type)}
+                    className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left transition-all active:scale-95 ${
+                      selected === r.type
+                        ? "border-gold bg-gold/10 text-gold"
+                        : "border-border bg-bg-secondary text-text-secondary hover:border-border-light"
+                    }`}
+                  >
+                    <span className="text-base leading-none">{r.emoji}</span>
+                    <span className="text-xs font-medium leading-tight">{r.label}</span>
+                    {selected === r.type && <CheckCircle size={12} className="ml-auto shrink-0 text-gold" />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ─── Hauptkomponente ──────────────────────────────────────────────────────────
 
 export default function ProfileSetupPage() {
@@ -177,58 +285,17 @@ export default function ProfileSetupPage() {
           <div>
             <div className="text-center mb-6">
               <h1 className="font-display text-2xl font-bold text-text-primary mb-1">
-                Was machst du?
+                Ich bin …
               </h1>
-              <p className="text-sm text-text-muted">Wähle deine Rolle — du kannst sie später ändern.</p>
+              <p className="text-sm text-text-muted">Wähle deine Kategorie — du kannst sie später ändern.</p>
             </div>
 
-            {/* Filmschaffende & Creator */}
-            <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted mb-2 px-1">
-              Filmschaffende & Creator
-            </p>
-            <div className="grid grid-cols-2 gap-2 mb-5">
-              {FILMMAKER_ROLES.map(r => (
-                <button
-                  key={r.type}
-                  onClick={() => setProfileType(r.type)}
-                  className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl border text-left transition-all active:scale-95 ${
-                    profileType === r.type
-                      ? "border-gold bg-gold/10 text-gold"
-                      : "border-border bg-bg-secondary text-text-secondary"
-                  }`}
-                >
-                  <span className="text-xl leading-none">{r.emoji}</span>
-                  <span className="text-sm font-medium leading-tight">{r.label}</span>
-                  {profileType === r.type && (
-                    <CheckCircle size={14} className="ml-auto shrink-0 text-gold" />
-                  )}
-                </button>
-              ))}
-            </div>
-
-            {/* Anbieter */}
-            <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted mb-2 px-1">
-              Ich vermiete / biete an
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              {VENDOR_ROLES.map(r => (
-                <button
-                  key={r.type}
-                  onClick={() => setProfileType(r.type)}
-                  className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl border text-left transition-all active:scale-95 ${
-                    profileType === r.type
-                      ? "border-gold bg-gold/10 text-gold"
-                      : "border-border bg-bg-secondary text-text-secondary"
-                  }`}
-                >
-                  <span className="text-xl leading-none">{r.emoji}</span>
-                  <span className="text-sm font-medium leading-tight">{r.label}</span>
-                  {profileType === r.type && (
-                    <CheckCircle size={14} className="ml-auto shrink-0 text-gold" />
-                  )}
-                </button>
-              ))}
-            </div>
+            <RolePicker
+              filmmakerroles={FILMMAKER_ROLES}
+              vendorroles={VENDOR_ROLES}
+              selected={profileType}
+              onSelect={setProfileType}
+            />
           </div>
         )}
 
