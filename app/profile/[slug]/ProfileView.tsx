@@ -567,6 +567,9 @@ function ModelProfile({ profile, isOwner, companyMembership }: { profile: UserPr
   const images: ProfileImage[] = profile.profile_images ?? [];
   const heroImg = images.find((i) => i.featured) ?? images[0];
   const galleryImgs = heroImg ? images.filter((i) => i !== heroImg) : images.slice(1);
+  // Best available cover: featured profile_image → first profile_image → first portfolio_image → avatar
+  const portfolioImages: string[] = (profile as unknown as { portfolio_images?: string[] }).portfolio_images ?? [];
+  const heroCoverUrl: string | null = heroImg?.url ?? portfolioImages[0] ?? null;
 
   const reelUrl = profile.showreel_url ?? profile.reel_url;
   const reelEmbed = reelUrl ? getVideoEmbed(reelUrl) : null;
@@ -579,26 +582,19 @@ function ModelProfile({ profile, isOwner, companyMembership }: { profile: UserPr
 
       {/* ── HERO (full editorial) ──────────────────────────────────────── */}
       <section className="relative h-[90vh] min-h-[560px] bg-black">
-        {heroImg ? (
+        {heroCoverUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={heroImg.url}
+            src={heroCoverUrl}
             alt={profile.display_name ?? ""}
-            className="absolute inset-0 w-full h-full object-cover object-top opacity-90"
-          />
-        ) : profile.avatar_url ? (
-          <Image
-            src={profile.avatar_url}
-            alt={profile.display_name ?? ""}
-            fill
-            className="object-cover object-top opacity-90"
+            className="absolute inset-0 w-full h-full object-cover object-center"
           />
         ) : (
-          <div className="absolute inset-0 bg-bg-elevated" />
+          <div className="absolute inset-0 bg-gradient-to-br from-bg-elevated via-bg-primary to-black" />
         )}
 
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80" />
+        {/* Gradient overlay — leichter damit das Bild sichtbar bleibt */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/70" />
 
         {/* Top bar */}
         <div className="absolute top-0 left-0 right-0 pt-20 px-6 sm:px-10 flex items-start justify-between">
