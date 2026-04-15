@@ -1,7 +1,8 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { createClient } from "@supabase/supabase-js";
+import { clerkClient } from "@clerk/nextjs/server";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { sendNewMessageEmail } from "@/lib/email";
 
 // GET /api/conversations/[id] — Nachrichten einer Konversation laden + als gelesen markieren
 export async function GET(
@@ -52,10 +53,10 @@ export async function POST(
 
   if (!content?.trim()) return NextResponse.json({ error: "Nachricht leer" }, { status: 400 });
 
-  // Zugriff prüfen
+  // Zugriff prüfen + Empfänger ermitteln
   const { data: conv } = await supabaseAdmin
     .from("conversations")
-    .select("id")
+    .select("id, sender_id, receiver_id")
     .eq("id", id)
     .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
     .single();
@@ -74,6 +75,28 @@ export async function POST(
     .from("conversations")
     .update({ updated_at: new Date().toISOString() })
     .eq("id", id);
+
+  // Email an Empfänger — nur wenn aktiviert
+  const receiverId = conv.sender_id === userId ? conv.receiver_id : conv.sender_id;
+  try {
+    const { data: receiverSettings } = await supabaseAdmin
+      .from("user_settings")
+      .select("email_new_message")
+      .eq("user_id", receiverId)
+      .maybeSingle();
+    const emailEnabled = receiverSettings?.email_new_message !== false;
+
+    if (emailEnabled) {
+      const [{ data: senderProfile }, clerk] = await Promise.all([
+        supabaseAdmin.from("profiles").select("display_name").eq("user_id", userId).maybeSingle(),
+        clerkClient(),
+      ]);
+      const senderName = senderProfile?.display_name ?? "Jemand";
+      const receiverUser = await clerk.users.getUser(receiverId);
+      const receiverEmail = receiverUser.emailAddresses[0]?.emailAddress;
+      if (receiverEmail) await sendNewMessageEmail(receiverEmail, senderName, content.trim(), id);
+    }
+  } catch { /* email is best-effort */ }
 
   return NextResponse.json({ message: msg });
 }

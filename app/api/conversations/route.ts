@@ -99,20 +99,22 @@ export async function POST(req: NextRequest) {
     .update({ updated_at: new Date().toISOString() })
     .eq("id", conversationId);
 
-  // Email the receiver on first contact (new conversation only)
+  // Email the receiver on first contact — only if they have email notifications enabled
   if (!existing) {
     try {
-      const { data: senderProfile } = await supabaseAdmin
-        .from("profiles")
-        .select("display_name")
-        .eq("user_id", userId)
-        .maybeSingle();
+      const [{ data: senderProfile }, { data: receiverSettings }] = await Promise.all([
+        supabaseAdmin.from("profiles").select("display_name").eq("user_id", userId).maybeSingle(),
+        supabaseAdmin.from("user_settings").select("email_new_message").eq("user_id", receiver_id).maybeSingle(),
+      ]);
       const senderName = senderProfile?.display_name ?? "Jemand";
+      const emailEnabled = receiverSettings?.email_new_message !== false; // default true
 
-      const clerk = await clerkClient();
-      const receiverUser = await clerk.users.getUser(receiver_id);
-      const receiverEmail = receiverUser.emailAddresses[0]?.emailAddress;
-      if (receiverEmail) await sendNewMessageEmail(receiverEmail, senderName, content.trim(), conversationId);
+      if (emailEnabled) {
+        const clerk = await clerkClient();
+        const receiverUser = await clerk.users.getUser(receiver_id);
+        const receiverEmail = receiverUser.emailAddresses[0]?.emailAddress;
+        if (receiverEmail) await sendNewMessageEmail(receiverEmail, senderName, content.trim(), conversationId);
+      }
     } catch { /* email is best-effort */ }
   }
 

@@ -10,7 +10,7 @@ export async function GET() {
 
   const { data, error } = await supabaseAdmin
     .from("user_settings")
-    .select("profile_visibility, message_permission")
+    .select("profile_visibility, message_permission, email_new_message")
     .eq("user_id", userId)
     .single();
 
@@ -19,7 +19,7 @@ export async function GET() {
   }
 
   return NextResponse.json({
-    settings: data ?? { profile_visibility: "public", message_permission: "everyone" },
+    settings: data ?? { profile_visibility: "public", message_permission: "everyone", email_new_message: true },
   });
 }
 
@@ -33,6 +33,7 @@ export async function PATCH(req: NextRequest) {
 
   if (body.profile_visibility !== undefined) update.profile_visibility = body.profile_visibility;
   if (body.message_permission !== undefined) update.message_permission = body.message_permission;
+  if (body.email_new_message !== undefined) update.email_new_message = body.email_new_message;
 
   const { error } = await supabaseAdmin
     .from("user_settings")

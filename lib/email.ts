@@ -90,7 +90,7 @@ export async function sendNewMessageEmail(to: string, fromName: string, preview:
       <blockquote style="margin:16px 0;padding:12px 16px;background:#1a1a1a;border-left:3px solid #d4a843;border-radius:4px;font-size:14px;color:#ccc;line-height:1.5">
         ${preview.slice(0, 200)}${preview.length > 200 ? "…" : ""}
       </blockquote>
-      ${btn("Antworten", `${BASE}/dashboard?tab=messages`)}
+      ${btn("Antworten", `${BASE}/messages`)}
     `)
   );
 }

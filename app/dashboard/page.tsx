@@ -354,9 +354,10 @@ export default function DashboardPage() {
   };
 
   // Privacy settings
-  const [privacySettings, setPrivacySettings] = useState<{ profile_visibility: string; message_permission: string }>({
+  const [privacySettings, setPrivacySettings] = useState<{ profile_visibility: string; message_permission: string; email_new_message: boolean }>({
     profile_visibility: "public",
     message_permission: "everyone",
+    email_new_message: true,
   });
   const [privacyLoading, setPrivacyLoading] = useState(false);
 
@@ -368,7 +369,7 @@ export default function DashboardPage() {
       .catch(() => {});
   }, [activeTab]);
 
-  const updatePrivacy = async (key: string, value: string) => {
+  const updatePrivacy = async (key: string, value: string | boolean) => {
     setPrivacySettings(prev => ({ ...prev, [key]: value }));
     setPrivacyLoading(true);
     try {
@@ -2116,22 +2117,31 @@ export default function DashboardPage() {
 
               {/* Benachrichtigungen */}
               <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                <h3 className="font-semibold text-text-primary mb-4">Benachrichtigungen</h3>
-                <div className="space-y-3">
-                  {[
-                    { label: "Neue Buchungsanfragen", desc: "Wenn jemand dein Inserat bucht" },
-                    { label: "Neue Nachrichten", desc: "Eingehende Anfragen und Antworten" },
-                    { label: "Bewertung erhalten", desc: "Nach einer abgeschlossenen Buchung" },
-                    { label: "Plattform-Updates", desc: "Neuigkeiten und neue Features" },
-                  ].map(({ label, desc }) => (
-                    <label key={label} className="flex items-center justify-between cursor-pointer gap-4 py-1">
-                      <div>
-                        <p className="text-sm text-text-secondary">{label}</p>
-                        <p className="text-[11px] text-text-muted">{desc}</p>
+                <h3 className="font-semibold text-text-primary mb-1">E-Mail Benachrichtigungen</h3>
+                <p className="text-xs text-text-muted mb-4">Wähle wann du eine E-Mail erhalten möchtest.</p>
+                <div className="space-y-4">
+                  <label className="flex items-start justify-between gap-4 cursor-pointer">
+                    <div className="flex items-start gap-3">
+                      <div className="mt-0.5">
+                        <MessageSquare size={16} className={privacySettings.email_new_message ? "text-gold" : "text-text-muted"} />
                       </div>
-                      <input type="checkbox" className="accent-gold shrink-0" defaultChecked />
-                    </label>
-                  ))}
+                      <div>
+                        <p className="text-sm text-text-secondary font-medium">Neue Nachrichten</p>
+                        <p className="text-xs text-text-muted mt-0.5">
+                          {privacySettings.email_new_message
+                            ? "Du erhältst eine E-Mail wenn dir jemand schreibt"
+                            : "Keine E-Mail bei neuen Nachrichten"}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => updatePrivacy("email_new_message", !privacySettings.email_new_message)}
+                      disabled={privacyLoading}
+                      className={`relative shrink-0 w-10 h-6 rounded-full transition-colors ${privacySettings.email_new_message ? "bg-gold" : "bg-bg-elevated border border-border"}`}
+                    >
+                      <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${privacySettings.email_new_message ? "translate-x-5" : "translate-x-1"}`} />
+                    </button>
+                  </label>
                 </div>
               </div>
 
