@@ -587,7 +587,7 @@ function ModelProfile({ profile, isOwner, companyMembership }: { profile: UserPr
           <img
             src={heroCoverUrl}
             alt={profile.display_name ?? ""}
-            className="absolute inset-0 w-full h-full object-cover object-center"
+            className="absolute inset-0 w-full h-full object-cover object-top"
           />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-bg-elevated via-bg-primary to-black" />
