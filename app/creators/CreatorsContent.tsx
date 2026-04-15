@@ -759,7 +759,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               return (
                 <Link
                   key={c.id}
-                  href={`/profile/${c.id}`}
+                  href={c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`}
                   suppressHydrationWarning
                   className="card-hover group flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:bg-bg-elevated transition-colors"
                 >
@@ -798,7 +798,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
             return (
               <Link
                 key={c.id}
-                href={`/profile/${c.id}`}
+                href={c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`}
                 suppressHydrationWarning
                 className="card-hover group rounded-xl border border-border bg-bg-secondary overflow-hidden block"
               >
