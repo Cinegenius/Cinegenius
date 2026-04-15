@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/contexts/ToastContext";
 import ProfileGuard from "@/components/ProfileGuard";
+import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 import { departments, deptColors } from "@/lib/departments";
 import {
   PROFILE_CATEGORY_MAP,
@@ -268,6 +269,8 @@ export default function ProfilePage() {
   const [coverImagePreview, setCoverImagePreview] = useState("");
   const [coverUploading, setCoverUploading] = useState(false);
   const coverRef = useRef<HTMLInputElement>(null);
+  const [focalPoint, setFocalPoint] = useState<FocalPoint>({ x: 50, y: 33 });
+  const [focalPickerImage, setFocalPickerImage] = useState<string | null>(null);
   const [instagramUrl, setInstagramUrl] = useState("");
   const [tiktokUrl, setTiktokUrl] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
@@ -351,6 +354,8 @@ export default function ProfilePage() {
             setCoverImageUrl(profile.cover_image_url);
             setCoverImagePreview(profile.cover_image_url);
           }
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          if ((profile as any).focal_point) setFocalPoint((profile as any).focal_point);
           setInstagramUrl(profile.instagram_url ?? "");
           setTiktokUrl(profile.tiktok_url ?? "");
           setYoutubeUrl(profile.youtube_url ?? "");
@@ -413,6 +418,8 @@ export default function ProfilePage() {
         body: JSON.stringify({ avatar_url: url }),
       });
       addToast("Profilfoto aktualisiert", "success");
+      // Fokuspunkt setzen
+      setFocalPickerImage(url);
     } catch {
       addToast("Upload fehlgeschlagen", "error");
       setAvatarPreview(avatarUrl); // revert
@@ -444,6 +451,8 @@ export default function ProfilePage() {
       if (error) throw new Error(error);
       setCoverImageUrl(url);
       addToast("Coverbild aktualisiert", "success");
+      // Fokuspunkt setzen
+      setFocalPickerImage(url);
     } catch {
       addToast("Upload fehlgeschlagen", "error");
       setCoverImagePreview(coverImageUrl);
@@ -671,8 +680,27 @@ export default function ProfilePage() {
   });
   const displayAvatarName = form.name || clerkEmail.split("@")[0] || "?";
 
+  async function saveFocalPoint(point: FocalPoint) {
+    setFocalPoint(point);
+    setFocalPickerImage(null);
+    await fetch("/api/profile", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ focal_point: point }),
+    });
+    addToast("Fokuspunkt gespeichert", "success");
+  }
+
   return (
     <ProfileGuard>
+    {focalPickerImage && (
+      <FocalPointPicker
+        imageUrl={focalPickerImage}
+        initial={focalPoint}
+        onSave={saveFocalPoint}
+        onClose={() => setFocalPickerImage(null)}
+      />
+    )}
     <div className="pt-16 min-h-screen">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
 

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useUser } from "@clerk/nextjs";
 import { Loader2, Camera, CheckCircle } from "lucide-react";
 import { getPresetForType, type ProfileType } from "@/lib/profile-types";
+import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 
 // ─── Rollenliste ──────────────────────────────────────────────────────────────
 
@@ -171,6 +172,8 @@ export default function ProfileSetupPage() {
   const [city, setCity] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [avatarPreview, setAvatarPreview] = useState("");
+  const [focalPoint, setFocalPoint] = useState<FocalPoint>({ x: 50, y: 33 });
+  const [focalPickerImage, setFocalPickerImage] = useState<string | null>(null);
 
   // Redirect wenn schon Profil vorhanden
   useEffect(() => {
@@ -203,6 +206,7 @@ export default function ProfileSetupPage() {
       const res = await fetch("/api/upload/avatar", { method: "POST", body: fd });
       const { url } = await res.json();
       setAvatarUrl(url);
+      setFocalPickerImage(url);
     } finally {
       setUploading(false);
     }
@@ -221,6 +225,7 @@ export default function ProfileSetupPage() {
           location: city.trim(),
           bio: "",
           avatar_url: avatarUrl || null,
+          focal_point: avatarUrl ? focalPoint : undefined,
           skills: [],
           positions: [],
           account_type: "person",
@@ -262,6 +267,14 @@ export default function ProfileSetupPage() {
 
   return (
     <div className="min-h-screen bg-bg-primary flex flex-col">
+      {focalPickerImage && (
+        <FocalPointPicker
+          imageUrl={focalPickerImage}
+          initial={focalPoint}
+          onSave={(pt) => { setFocalPoint(pt); setFocalPickerImage(null); }}
+          onClose={() => setFocalPickerImage(null)}
+        />
+      )}
 
       {/* Progress bar */}
       <div className="fixed top-0 left-0 right-0 z-50 h-0.5 bg-border">

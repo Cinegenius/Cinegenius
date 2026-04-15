@@ -587,7 +587,8 @@ function ModelProfile({ profile, isOwner, companyMembership }: { profile: UserPr
           <img
             src={heroCoverUrl}
             alt={profile.display_name ?? ""}
-            className="absolute inset-0 w-full h-full object-cover object-top"
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ objectPosition: (profile as any).focal_point ? `${(profile as any).focal_point.x}% ${(profile as any).focal_point.y}%` : "50% 33%" }}
           />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-bg-elevated via-bg-primary to-black" />

@@ -126,6 +126,7 @@ const ALLOWED_PATCH_KEYS = new Set([
   "day_rate", "filmography", "video_links",
   "account_type", "profile_types",
   "profile_type", "modules", "physical", "crew", "creative", "vendor",
+  "focal_point",
 ]);
 
 export async function PATCH(req: NextRequest) {
