@@ -14,6 +14,7 @@ import {
 import EmptyState from "@/components/EmptyState";
 import { DEPARTMENTS, SCENES, SEARCH_SYNONYMS, deptValues, groupValues } from "@/lib/marketplaceCategories";
 import { deptColors } from "@/lib/departments";
+import { PROP_CATEGORY_FIELDS } from "@/lib/propCategoryFields";
 
 // ── Icon maps ─────────────────────────────────────────────────────
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -33,7 +34,7 @@ type Prop = {
   id: string; title: string; category: string; vendor: string; location: string;
   dailyRate: number; image: string; condition: string; era: string | null;
   delivery: boolean; rentalType?: "miete" | "kauf"; description?: string; isReal?: boolean;
-  type?: string;
+  type?: string; meta?: Record<string, unknown> | null;
 };
 
 // ─── SortDropdown ────────────────────────────────────────────────
@@ -343,6 +344,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const [minRate, setMinRate] = useState("");
   const [maxRate, setMaxRate] = useState("");
   const [sortKey, setSortKey] = useState("featured");
+  const [catFilters, setCatFilters] = useState<Record<string, string>>({});
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
@@ -435,15 +437,24 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
     if (deliveryOnly) r = r.filter((p) => p.delivery);
     if (minRate) r = r.filter((p) => p.dailyRate >= Number(minRate));
     if (maxRate) r = r.filter((p) => p.dailyRate <= Number(maxRate));
+
+    // ── Kategorie-spezifische Metadaten-Filter ────────────────────────────────
+    Object.entries(catFilters).forEach(([key, value]) => {
+      if (value) {
+        r = r.filter((p) => (p.meta as Record<string, string> | null)?.[key] === value);
+      }
+    });
+
     if (sortKey === "price-asc") r.sort((a, b) => a.dailyRate - b.dailyRate);
     if (sortKey === "price-desc") r.sort((a, b) => b.dailyRate - a.dailyRate);
     return r;
-  }, [serverListings, selectedScene, selectedDept, selectedGroup, query, locationFilter, conditionFilter, deliveryOnly, minRate, maxRate, sortKey]);
+  }, [serverListings, selectedScene, selectedDept, selectedGroup, query, locationFilter, conditionFilter, deliveryOnly, minRate, maxRate, sortKey, catFilters]);
 
   useEffect(() => setVisibleCount(PAGE_SIZE), [filtered]);
 
   const handleSelectGroup = (deptId: string, groupId: string | null) => {
     setSelectedScene(null); // Szene aufheben wenn Kategorie gewählt
+    setCatFilters({});      // Kategorie-Filter zurücksetzen bei Kategoriewechsel
     if (groupId === null) {
       setSelectedGroup(null);
       setSelectedDept(deptId);
@@ -462,11 +473,13 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const clearAll = () => {
     clearCategory(); setSelectedScene(null); setQuery(""); setLocationFilter(""); setConditionFilter("");
     setDeliveryOnly(false); setMinRate(""); setMaxRate(""); setSortKey("featured");
-    setRentalTypeFilter("alle");
+    setRentalTypeFilter("alle"); setCatFilters({});
     router.replace("/props", { scroll: false });
   };
 
-  const hasAnyFilter = Boolean(selectedScene || selectedDept || selectedGroup || query || locationFilter || conditionFilter || deliveryOnly || minRate || maxRate || rentalTypeFilter !== "alle");
+  const activeCatFilterCount = Object.values(catFilters).filter(Boolean).length;
+
+  const hasAnyFilter = Boolean(selectedScene || selectedDept || selectedGroup || query || locationFilter || conditionFilter || deliveryOnly || minRate || maxRate || rentalTypeFilter !== "alle" || activeCatFilterCount > 0);
   const hasCategoryFilter = Boolean(selectedDept || selectedGroup);
 
   // Active category label + colors
@@ -488,7 +501,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
     !!(minRate || maxRate),
     rentalTypeFilter !== "alle",
     !!selectedScene,
-  ].filter(Boolean).length;
+  ].filter(Boolean).length + activeCatFilterCount;
 
   return (
     <div className="min-h-screen">
@@ -588,6 +601,45 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                   })}
                 </div>
               </div>
+
+              {/* Category-specific filters — shown only when a relevant dept is selected */}
+              {(() => {
+                const deptKey = selectedGroup?.deptId ?? selectedDept ?? "";
+                const config = PROP_CATEGORY_FIELDS[deptKey];
+                if (!config || config.fields.length === 0) return null;
+                const selectFields = config.fields.filter((f) => f.type === "select");
+                if (selectFields.length === 0) return null;
+                return (
+                  <>
+                    <div className="h-px bg-border" />
+                    <div>
+                      <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-3">
+                        {DEPARTMENTS.find((d) => d.id === deptKey)?.label ?? "Kategorie"} — Details
+                      </p>
+                      <div className="flex flex-wrap gap-x-6 gap-y-3">
+                        {selectFields.map((field) => (
+                          <div key={field.key}>
+                            <p className="text-[10px] text-text-muted mb-1.5">{field.label}</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {field.options!.map((opt) => (
+                                <button key={opt} type="button"
+                                  onClick={() => setCatFilters((prev) => ({ ...prev, [field.key]: prev[field.key] === opt ? "" : opt }))}
+                                  className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-all ${
+                                    catFilters[field.key] === opt
+                                      ? "bg-gold/12 border-gold/30 text-gold"
+                                      : "border-border text-text-muted hover:text-text-secondary"
+                                  }`}>
+                                  {opt}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
 
               <div className="h-px bg-border" />
 

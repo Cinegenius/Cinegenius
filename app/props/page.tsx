@@ -55,11 +55,12 @@ export default async function PropsPage() {
     location: l.city ?? "",
     dailyRate: l.price,
     image: l.image_url ?? "",
-    condition: "Gut",
+    condition: ((l.metadata as Record<string, unknown> | null)?.condition as string) ?? "Gut",
     era: null as string | null,
     delivery: ((l.metadata as Record<string, unknown> | null)?.delivery as boolean) ?? false,
     rentalType: (l.rental_type ?? "miete") as "miete" | "kauf",
     isReal: true,
+    meta: l.metadata ?? null,
   }));
 
   return (

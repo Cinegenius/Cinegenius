@@ -14,6 +14,7 @@ import {
   Smartphone, Video, Aperture,
 } from "lucide-react";
 import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
+import { PROP_CATEGORY_FIELDS } from "@/lib/propCategoryFields";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -212,6 +213,11 @@ export default function InseratPage() {
   const [selected, setSelected] = useState<CategoryItem | null>(null);
   const [activeGroup, setActiveGroup] = useState<string | null>(null); // null = main view
   const [dropdownId, setDropdownId] = useState("");
+  // Category-specific metadata (dynamic per prop category)
+  const [catMeta, setCatMeta] = useState<Record<string, string>>({});
+  const setCatField = (key: string, value: string) =>
+    setCatMeta((prev) => ({ ...prev, [key]: value }));
+
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -276,6 +282,7 @@ export default function InseratPage() {
 
   function handleSelect(item: CategoryItem) {
     setSelected(item);
+    setCatMeta({});
     setStep(2);
   }
 
@@ -372,6 +379,10 @@ export default function InseratPage() {
     }
 
     // prop
+    // Build category-specific metadata (only non-empty values)
+    const catMetaFiltered = Object.fromEntries(
+      Object.entries(catMeta).filter(([, v]) => v !== "")
+    );
     return {
       type,
       category,
@@ -385,6 +396,7 @@ export default function InseratPage() {
         delivery: form.delivery,
         dimensions: form.dimensions || null,
         safety_note: form.safety_note || null,
+        ...catMetaFiltered,
       },
     };
   }
@@ -1023,6 +1035,49 @@ export default function InseratPage() {
               </div>
             )}
 
+            {/* ── CATEGORY-SPECIFIC FIELDS (props only) ── */}
+            {type === "prop" && (() => {
+              const configKey = selected.id.replace("mk_", "");
+              const config = PROP_CATEGORY_FIELDS[configKey];
+              if (!config) return null;
+              return (
+                <div className="space-y-4 pb-2 border-b border-border/60">
+                  {config.fields.map((field) => {
+                    if (field.type === "select" && field.options) {
+                      return (
+                        <div key={field.key}>
+                          <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{field.label}</label>
+                          <div className="flex gap-2 flex-wrap">
+                            {field.options.map((opt) => (
+                              <button key={opt} type="button"
+                                onClick={() => setCatField(field.key, catMeta[field.key] === opt ? "" : opt)}
+                                className={`px-3 py-1.5 rounded-lg text-sm border transition-all ${catMeta[field.key] === opt ? "bg-gold text-bg-primary border-gold" : "border-border text-text-secondary hover:border-gold/40"}`}>
+                                {opt}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    }
+                    if (field.type === "text") {
+                      return (
+                        <div key={field.key}>
+                          <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{field.label}</label>
+                          <input
+                            value={catMeta[field.key] ?? ""}
+                            onChange={(e) => setCatField(field.key, e.target.value)}
+                            placeholder={field.placeholder}
+                            className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm"
+                          />
+                        </div>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+              );
+            })()}
+
             {/* ── CONDITION + EXTRAS (props only) ── */}
             {type === "prop" && (
               <div className="space-y-4">
@@ -1063,7 +1118,7 @@ export default function InseratPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Maße / Größe</label>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Maße / Abmessungen</label>
                     <input value={form.dimensions} onChange={(e) => f("dimensions", e.target.value)} placeholder="z.B. 80 × 60 × 40 cm"
                       className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
