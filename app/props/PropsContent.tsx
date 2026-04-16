@@ -128,11 +128,12 @@ function FilterDropdown({
 
 function CategoryPanel({
   activeDeptId, setActiveDeptId,
-  selectedGroup, onSelectGroup,
+  selectedDept, selectedGroup, onSelectGroup,
   onClose,
 }: {
   activeDeptId: string;
   setActiveDeptId: (id: string) => void;
+  selectedDept: string | null;
   selectedGroup: { deptId: string; groupId: string } | null;
   onSelectGroup: (deptId: string, groupId: string | null) => void;
   onClose: () => void;
@@ -149,15 +150,16 @@ function CategoryPanel({
             const Icon = ICON_MAP[dept.iconName] ?? Package;
             const c = deptColors(dept.color);
             const isActive = dept.id === activeDeptId;
-            const hasSelected = selectedGroup?.deptId === dept.id;
+            const isSelected = dept.id === selectedDept || selectedGroup?.deptId === dept.id;
             return (
-              <button key={dept.id} onClick={() => setActiveDeptId(dept.id)}
+              <button key={dept.id}
+                onClick={() => { setActiveDeptId(dept.id); onSelectGroup(dept.id, null); }}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border shrink-0 transition-all ${
-                  isActive ? `${c.bg} ${c.text} border-transparent` : "border-border text-text-muted"
+                  isSelected ? `${c.bg} ${c.text} border-transparent` : isActive ? `${c.bg} ${c.text} border-transparent` : "border-border text-text-muted"
                 }`}>
                 <Icon size={11} className={isActive ? c.text : "text-text-muted"} />
                 {dept.label}
-                {hasSelected && <span className={`w-3 h-3 rounded-full flex items-center justify-center text-[8px] font-bold ${c.bg} ${c.text}`}>✓</span>}
+                {isSelected && <span className={`w-3 h-3 rounded-full flex items-center justify-center text-[8px] font-bold ${c.bg} ${c.text}`}>✓</span>}
               </button>
             );
           })}
@@ -165,7 +167,7 @@ function CategoryPanel({
         <div className="p-3">
           <div className="flex items-center justify-between mb-2">
             <h3 className={`text-sm font-semibold ${colors.text}`}>{activeDept.label}</h3>
-            {selectedGroup?.deptId === activeDeptId && (
+            {(selectedGroup?.deptId === activeDeptId || selectedDept === activeDeptId) && (
               <button onClick={() => onSelectGroup(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400">Löschen</button>
             )}
           </div>
@@ -191,22 +193,22 @@ function CategoryPanel({
           {DEPARTMENTS.map((dept) => {
             const Icon = ICON_MAP[dept.iconName] ?? Package;
             const c = deptColors(dept.color);
-            const isActive = dept.id === activeDeptId;
-            const hasSelected = selectedGroup?.deptId === dept.id;
+            const isPreview = dept.id === activeDeptId;
+            const isSelected = dept.id === selectedDept || selectedGroup?.deptId === dept.id;
             return (
               <button key={dept.id}
                 onMouseEnter={() => setActiveDeptId(dept.id)}
-                onClick={() => setActiveDeptId(dept.id)}
+                onClick={() => { setActiveDeptId(dept.id); onSelectGroup(dept.id, null); }}
                 className={`w-full flex items-center justify-between px-3 py-2.5 text-left text-xs transition-colors border-b border-border/40 last:border-0 ${
-                  isActive ? `${c.bg} ${c.text} font-semibold` : "text-text-muted hover:text-text-secondary hover:bg-white/[0.02]"
+                  isPreview ? `${c.bg} ${c.text} font-semibold` : "text-text-muted hover:text-text-secondary hover:bg-white/[0.02]"
                 }`}>
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span className={`w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isActive ? `${c.bg} ${c.border}` : "bg-bg-elevated border-border"}`}>
-                    <Icon size={11} className={isActive ? c.text : "text-text-muted"} />
+                  <span className={`w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isPreview ? `${c.bg} ${c.border}` : "bg-bg-elevated border-border"}`}>
+                    <Icon size={11} className={isPreview ? c.text : "text-text-muted"} />
                   </span>
                   <span className="truncate">{dept.label}</span>
                 </div>
-                {hasSelected && <span className={`text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${c.bg} border ${c.border} ${c.text}`}>✓</span>}
+                {isSelected && <span className={`text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${c.bg} border ${c.border} ${c.text}`}>✓</span>}
               </button>
             );
           })}
@@ -214,7 +216,7 @@ function CategoryPanel({
         <div className="flex-1 p-4 overflow-y-auto">
           <div className="flex items-center justify-between mb-3">
             <h3 className={`text-sm font-semibold ${colors.text}`}>{activeDept.label}</h3>
-            {selectedGroup?.deptId === activeDeptId && (
+            {(selectedGroup?.deptId === activeDeptId || selectedDept === activeDeptId) && (
               <button onClick={() => onSelectGroup(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">Auswahl löschen</button>
             )}
           </div>
@@ -373,19 +375,24 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const filtered = useMemo(() => {
     let r = [...serverListings];
 
-    // Category filter
+    // Category filter — exact match only (case-insensitive)
     if (selectedGroup) {
       const dept = DEPARTMENTS.find((d) => d.id === selectedGroup.deptId);
       const group = dept?.groups.find((g) => g.id === selectedGroup.groupId);
       if (group) {
-        const vals = groupValues(group);
-        r = r.filter((p) => vals.some((v) => p.category?.toLowerCase() === v || p.category?.toLowerCase().includes(v)));
+        // group-level: match group item values OR the dept legacyValues as fallback
+        const groupVals = groupValues(group).map((v) => v.toLowerCase());
+        const legacyVals = (dept?.legacyValues ?? []).map((v) => v.toLowerCase());
+        r = r.filter((p) => {
+          const cat = p.category?.toLowerCase() ?? "";
+          return groupVals.includes(cat) || legacyVals.includes(cat);
+        });
       }
     } else if (selectedDept) {
       const dept = DEPARTMENTS.find((d) => d.id === selectedDept);
       if (dept) {
-        const vals = deptValues(dept);
-        r = r.filter((p) => vals.some((v) => p.category?.toLowerCase() === v || p.category?.toLowerCase().includes(v)));
+        const vals = deptValues(dept).map((v) => v.toLowerCase());
+        r = r.filter((p) => vals.includes(p.category?.toLowerCase() ?? ""));
       }
     }
 
@@ -562,6 +569,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
             <CategoryPanel
               activeDeptId={activePanelDept}
               setActiveDeptId={setActivePanelDept}
+              selectedDept={selectedDept}
               selectedGroup={selectedGroup}
               onSelectGroup={handleSelectGroup}
               onClose={() => setPanelOpen(false)}
