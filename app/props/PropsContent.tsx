@@ -553,7 +553,6 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                 + Eintragen
               </Link>
             </div>
-          </div>
 
           {/* Row 3: Two-panel category picker */}
           {panelOpen && (
