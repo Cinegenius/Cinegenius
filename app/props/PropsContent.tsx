@@ -345,17 +345,6 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const [sortKey, setSortKey] = useState("featured");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const filterRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!panelOpen) return;
-    const h = (e: MouseEvent) => {
-      if (panelRef.current && !panelRef.current.contains(e.target as Node)) setPanelOpen(false);
-    };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, [panelOpen]);
 
   // Sync URL
   useEffect(() => {
@@ -521,39 +510,25 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
             </div>
 
             {/* Kategorie & Typ */}
-            <div ref={panelRef} className="relative shrink-0">
-              <button
-                onClick={() => setPanelOpen((v) => !v)}
-                className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all ${
-                  panelOpen || hasCategoryFilter
-                    ? "bg-gold/12 border-gold/30 text-gold"
-                    : "border-border text-text-muted hover:text-text-secondary"
-                }`}
-              >
-                <Layers size={11} />
-                <span className="hidden sm:inline">Kategorie</span>
-                {hasCategoryFilter
-                  ? <span className="bg-gold text-bg-primary text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">✓</span>
-                  : <ChevronDown size={11} className={`transition-transform ${panelOpen ? "rotate-180" : ""}`} />
-                }
-              </button>
-              {panelOpen && (
-                <div className="hidden lg:block absolute top-full left-0 mt-2 z-50 w-[580px] max-w-[calc(100vw-2rem)]">
-                  <CategoryPanel
-                    activeDeptId={activePanelDept}
-                    setActiveDeptId={setActivePanelDept}
-                    selectedDept={selectedDept}
-                    selectedGroup={selectedGroup}
-                    onSelectGroup={handleSelectGroup}
-                    onClose={() => setPanelOpen(false)}
-                  />
-                </div>
-              )}
-            </div>
+            <button
+              onClick={() => { setPanelOpen((v) => !v); setFilterPanelOpen(false); }}
+              className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all shrink-0 ${
+                panelOpen || hasCategoryFilter
+                  ? "bg-gold/12 border-gold/30 text-gold"
+                  : "border-border text-text-muted hover:text-text-secondary"
+              }`}
+            >
+              <Layers size={11} />
+              <span className="hidden sm:inline">Kategorie</span>
+              {hasCategoryFilter
+                ? <span className="bg-gold text-bg-primary text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">✓</span>
+                : <ChevronDown size={11} className={`transition-transform ${panelOpen ? "rotate-180" : ""}`} />
+              }
+            </button>
 
             {/* Filter panel trigger */}
             <button
-              onClick={() => setFilterPanelOpen((v) => !v)}
+              onClick={() => { setFilterPanelOpen((v) => !v); setPanelOpen(false); }}
               className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all shrink-0 ${
                 filterPanelOpen || secondaryFilterCount > 0
                   ? "bg-gold/12 border-gold/30 text-gold"
@@ -579,18 +554,16 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
             </Link>
           </div>
 
-          {/* Mobile: category panel inline */}
+          {/* Category panel — inline on all screen sizes */}
           {panelOpen && (
-            <div className="lg:hidden">
-              <CategoryPanel
-                activeDeptId={activePanelDept}
-                setActiveDeptId={setActivePanelDept}
-                selectedDept={selectedDept}
-                selectedGroup={selectedGroup}
-                onSelectGroup={handleSelectGroup}
-                onClose={() => setPanelOpen(false)}
-              />
-            </div>
+            <CategoryPanel
+              activeDeptId={activePanelDept}
+              setActiveDeptId={setActivePanelDept}
+              selectedDept={selectedDept}
+              selectedGroup={selectedGroup}
+              onSelectGroup={handleSelectGroup}
+              onClose={() => setPanelOpen(false)}
+            />
           )}
 
           {/* Secondary filter panel */}
