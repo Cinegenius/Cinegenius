@@ -306,20 +306,15 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
       <div className="bg-bg-secondary border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 space-y-2">
 
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-          {/* Search */}
-          <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors sm:w-64 sm:shrink-0">
-            <Search size={14} className="text-text-muted shrink-0" />
-            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
-              placeholder="Firma, Leistung, Stichwort..."
-              className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
-            {search && <button onClick={() => setSearch("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
-          </div>
-
-          {/* Filters */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-0.5 sm:pb-0" style={{ scrollbarWidth: "none" }}>
-
-            {/* Grid / List Toggle */}
+          {/* Row 1: Search + View toggle */}
+          <div className="flex items-center gap-2">
+            <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
+              <Search size={14} className="text-text-muted shrink-0" />
+              <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+                placeholder="Firma, Leistung, Stichwort..."
+                className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
+              {search && <button onClick={() => setSearch("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
+            </div>
             <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
               <button onClick={() => setViewMode("grid")}
                 className={`flex items-center justify-center w-9 h-9 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
@@ -330,6 +325,10 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                 <LayoutList size={14} />
               </button>
             </div>
+          </div>
+
+          {/* Row 2: Filters */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
 
             <div className="w-px h-6 bg-border shrink-0" />
 
@@ -383,7 +382,6 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
               + Firma eintragen
             </Link>
           </div>
-          </div>{/* end flex flex-col sm:flex-row */}
 
           {/* Category panel */}
           {panelOpen && (

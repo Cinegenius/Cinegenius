@@ -444,20 +444,23 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
       <div className="bg-bg-secondary border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 space-y-2">
 
-          {/* Search + Controls */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-
-            {/* Search */}
-            <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors sm:w-64 sm:shrink-0">
+          {/* Row 1: Search + View toggle */}
+          <div className="flex items-center gap-2">
+            <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
               <Search size={14} className="text-text-muted shrink-0" />
               <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
                 placeholder="Kamera, Requisite, Kostüm…"
                 className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
               {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
             </div>
+            <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
+              <button onClick={() => setViewMode("grid")} className={`flex items-center justify-center w-9 h-9 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutGrid size={14} /></button>
+              <button onClick={() => setViewMode("list")} className={`flex items-center justify-center w-9 h-9 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><List size={14} /></button>
+            </div>
+          </div>
 
-            {/* Controls — horizontal scroll on mobile */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-0.5 sm:pb-0" style={{ scrollbarWidth: "none" }}>
+          {/* Row 2: Filters */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
 
               {/* Delivery toggle */}
               <label className="flex items-center gap-1.5 text-xs text-text-muted cursor-pointer hover:text-text-secondary transition-colors select-none shrink-0">
@@ -469,12 +472,6 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               </label>
 
               <div className="w-px h-4 bg-border shrink-0" />
-
-              {/* View toggle */}
-              <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
-                <button onClick={() => setViewMode("grid")} className={`p-2 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutGrid size={13} /></button>
-                <button onClick={() => setViewMode("list")} className={`p-2 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><List size={13} /></button>
-              </div>
 
               {/* Sort */}
               <SortDropdown
@@ -556,7 +553,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                 + Eintragen
               </Link>
             </div>
-          </div>{/* end flex flex-col sm:flex-row */}
+          </div>
 
           {/* Row 3: Two-panel category picker */}
           {panelOpen && (

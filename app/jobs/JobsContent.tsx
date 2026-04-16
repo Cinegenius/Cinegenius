@@ -437,19 +437,19 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
       <div className="bg-bg-secondary border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 space-y-2">
 
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-          {/* Search */}
-          <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors sm:w-64 sm:shrink-0">
-            <Search size={14} className="text-text-muted shrink-0" />
-            <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
-              placeholder="Rolle, Fähigkeit, Stichwort..."
-              className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
-            {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
+          {/* Row 1: Search */}
+          <div className="flex items-center gap-2">
+            <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
+              <Search size={14} className="text-text-muted shrink-0" />
+              <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
+                placeholder="Rolle, Fähigkeit, Stichwort..."
+                className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
+              {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
+            </div>
           </div>
 
-          {/* Filters */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-0.5 sm:pb-0"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+          {/* Row 2: Filters */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
             <SortDropdown
               value={sortKey}
               options={[
@@ -525,7 +525,6 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
               + Job ausschreiben
             </Link>
           </div>
-          </div>{/* end flex flex-col sm:flex-row */}
 
           {/* Dept panel */}
           {panelOpen && (

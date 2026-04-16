@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
-  MapPin, CheckCircle, Search, X, LayoutGrid, List, SlidersHorizontal, ChevronDown, Users, Globe, Languages,
+  MapPin, CheckCircle, Search, X, LayoutGrid, List, SlidersHorizontal, ChevronDown, Users, Globe, Languages, ArrowUpDown,
 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { departments, deptColors, type Department } from "@/lib/departments";
@@ -148,6 +148,37 @@ function FilterDropdown({
               }`}
             >
               {opt}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SortDropdown({ value, options, onChange }: { value: string; options: { value: string; label: string }[]; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+  const label = options.find((o) => o.value === value)?.label ?? "Sortierung";
+  return (
+    <div ref={ref} className="relative shrink-0">
+      <button onClick={() => setOpen((v) => !v)} className="flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border border-border text-text-muted hover:text-text-secondary transition-all bg-bg-elevated">
+        <ArrowUpDown size={11} />
+        {label}
+        <ChevronDown size={11} className={`transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 z-50 bg-bg-elevated border border-border rounded-xl shadow-xl overflow-hidden min-w-[160px]">
+          {options.map((o) => (
+            <button key={o.value} onClick={() => { onChange(o.value); setOpen(false); }}
+              className={`w-full text-left px-3 py-2 text-xs transition-colors hover:bg-white/[0.04] ${value === o.value ? "text-gold font-medium bg-gold/8" : "text-text-secondary"}`}>
+              {o.label}
             </button>
           ))}
         </div>
@@ -477,26 +508,35 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       <div className="bg-bg-secondary border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 space-y-2">
 
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-          {/* Search */}
-          <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors sm:w-64 sm:shrink-0">
-            <Search size={14} className="text-text-muted shrink-0" />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Name, Skill suchen…"
-              className="bg-transparent border-none py-2 text-sm w-full focus:outline-none"
-            />
-            {query && (
-              <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors">
-                <X size={12} />
+          {/* Row 1: Search + View toggle */}
+          <div className="flex items-center gap-2">
+            <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
+              <Search size={14} className="text-text-muted shrink-0" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Name, Skill suchen…"
+                className="bg-transparent border-none py-2 text-sm w-full focus:outline-none"
+              />
+              {query && (
+                <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors">
+                  <X size={12} />
+                </button>
+              )}
+            </div>
+            <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
+              <button onClick={() => setViewMode("grid")} className={`flex items-center justify-center w-9 h-9 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
+                <LayoutGrid size={14} />
               </button>
-            )}
+              <button onClick={() => setViewMode("list")} className={`flex items-center justify-center w-9 h-9 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
+                <List size={14} />
+              </button>
+            </div>
           </div>
 
-          {/* Filters */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-0.5 sm:pb-0" style={{ scrollbarWidth: "none" }}>
+          {/* Row 2: Filters */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
             {/* Available toggle */}
             <label className="flex items-center gap-1.5 text-xs text-text-muted cursor-pointer hover:text-text-secondary transition-colors select-none shrink-0">
               <div
@@ -510,29 +550,16 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 
             <div className="w-px h-5 bg-border shrink-0" />
 
-            {/* View toggle */}
-            <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
-              <button onClick={() => setViewMode("grid")} className={`flex items-center justify-center w-9 h-9 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
-                <LayoutGrid size={14} />
-              </button>
-              <button onClick={() => setViewMode("list")} className={`flex items-center justify-center w-9 h-9 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
-                <List size={14} />
-              </button>
-            </div>
-
             {/* Sort */}
-            <div className="relative flex items-center shrink-0">
-              <select
-                value={sortKey}
-                onChange={(e) => setSortKey(e.target.value)}
-                className="appearance-none text-xs h-9 pl-3 pr-7 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none focus:border-gold/50 transition-colors cursor-pointer"
-              >
-                <option value="featured">Empfohlen</option>
-                <option value="rating">Beste Bewertung</option>
-                <option value="reviews">Meiste Bewertungen</option>
-              </select>
-              <ChevronDown size={11} className="absolute right-2 text-text-muted pointer-events-none" />
-            </div>
+            <SortDropdown
+              value={sortKey}
+              options={[
+                { value: "featured", label: "Empfohlen" },
+                { value: "rating",   label: "Beste Bewertung" },
+                { value: "reviews",  label: "Meiste Bewertungen" },
+              ]}
+              onChange={setSortKey}
+            />
 
             <div className="w-px h-5 bg-border shrink-0" />
 
@@ -595,7 +622,6 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               </button>
             )}
           </div>
-          </div>{/* end flex flex-col sm:flex-row */}
 
           {/* Mehr Filter (ausgeklappt) */}
           {moreFiltersOpen && (
