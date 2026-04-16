@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import {
   Search, Package, X, SlidersHorizontal, Truck, MapPin, ChevronDown,
-  LayoutGrid, List, Euro, CheckCircle,
+  LayoutGrid, List, Euro, CheckCircle, ArrowUpDown,
   Camera, Lightbulb, Wrench, Mic, Shirt, Sparkles, Layers, Car, Zap,
   Monitor, Building2, Briefcase, Palette, Scissors,
 } from "lucide-react";
@@ -28,6 +28,41 @@ type Prop = {
   dailyRate: number; image: string; condition: string; era: string | null;
   delivery: boolean; rentalType?: "miete" | "kauf"; description?: string; isReal?: boolean;
 };
+
+// ─── SortDropdown ────────────────────────────────────────────────
+function SortDropdown({ value, options, onChange }: {
+  value: string; options: { value: string; label: string }[]; onChange: (v: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, [open]);
+  const label = options.find((o) => o.value === value)?.label ?? "Sortierung";
+  return (
+    <div ref={ref} className="relative shrink-0">
+      <button onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border border-border text-text-muted hover:text-text-secondary transition-all bg-bg-elevated">
+        <ArrowUpDown size={11} />
+        {label}
+        <ChevronDown size={11} className={`transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 z-50 bg-bg-elevated border border-border rounded-xl shadow-xl overflow-hidden min-w-[160px]">
+          {options.map((o) => (
+            <button key={o.value} onClick={() => { onChange(o.value); setOpen(false); }}
+              className={`w-full text-left px-3 py-2 text-xs transition-colors hover:bg-white/[0.04] ${value === o.value ? "text-gold font-medium" : "text-text-secondary"}`}>
+              {o.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ─── FilterDropdown (identical pattern to CreatorsContent) ────────
 
@@ -54,7 +89,7 @@ function FilterDropdown({
     <div ref={ref} className="relative shrink-0">
       <button
         onClick={() => setOpen((v) => !v)}
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+        className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all ${
           active
             ? "bg-gold/12 border-gold/30 text-gold"
             : open
@@ -407,101 +442,95 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
 
       {/* ── Filter Bar ───────────────────────────────────── */}
       <div className="bg-bg-secondary border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 space-y-2">
 
-          {/* Row 1: Search */}
-          <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
-            <Search size={14} className="text-text-muted shrink-0" />
-            <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
-              placeholder="Kamera, Requisite, Kostüm suchen…"
-              className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none" />
-            {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
-          </div>
+          {/* Search + Controls */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
 
-          {/* Row 2: Controls — horizontal scroll on mobile */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
-            {/* Delivery toggle */}
-            <label className="flex items-center gap-1.5 text-xs text-text-muted cursor-pointer hover:text-text-secondary transition-colors select-none shrink-0">
-              <div onClick={() => setDeliveryOnly((v) => !v)}
-                className={`w-7 h-4 rounded-full transition-colors relative cursor-pointer ${deliveryOnly ? "bg-gold" : "bg-border"}`}>
-                <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${deliveryOnly ? "left-3.5" : "left-0.5"}`} />
+            {/* Search */}
+            <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors sm:w-64 sm:shrink-0">
+              <Search size={14} className="text-text-muted shrink-0" />
+              <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
+                placeholder="Kamera, Requisite, Kostüm…"
+                className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
+              {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
+            </div>
+
+            {/* Controls — horizontal scroll on mobile */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-0.5 sm:pb-0" style={{ scrollbarWidth: "none" }}>
+
+              {/* Delivery toggle */}
+              <label className="flex items-center gap-1.5 text-xs text-text-muted cursor-pointer hover:text-text-secondary transition-colors select-none shrink-0">
+                <div onClick={() => setDeliveryOnly((v) => !v)}
+                  className={`w-7 h-4 rounded-full transition-colors relative cursor-pointer ${deliveryOnly ? "bg-gold" : "bg-border"}`}>
+                  <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${deliveryOnly ? "left-3.5" : "left-0.5"}`} />
+                </div>
+                Lieferung
+              </label>
+
+              <div className="w-px h-4 bg-border shrink-0" />
+
+              {/* View toggle */}
+              <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
+                <button onClick={() => setViewMode("grid")} className={`p-2 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutGrid size={13} /></button>
+                <button onClick={() => setViewMode("list")} className={`p-2 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><List size={13} /></button>
               </div>
-              Lieferung
-            </label>
 
-            <div className="w-px h-4 bg-border shrink-0" />
+              {/* Sort */}
+              <SortDropdown
+                value={sortKey}
+                options={[
+                  { value: "featured",   label: "Empfohlen" },
+                  { value: "price-asc",  label: "Preis ↑" },
+                  { value: "price-desc", label: "Preis ↓" },
+                ]}
+                onChange={setSortKey}
+              />
 
-            {/* View toggle */}
-            <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
-              <button onClick={() => setViewMode("grid")} className={`p-2 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutGrid size={13} /></button>
-              <button onClick={() => setViewMode("list")} className={`p-2 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><List size={13} /></button>
-            </div>
+              <div className="w-px h-5 bg-border shrink-0" />
 
-            {/* Sort */}
-            <div className="relative flex items-center shrink-0">
-              <select value={sortKey} onChange={(e) => setSortKey(e.target.value)}
-                className="appearance-none text-xs py-2 pl-3 pr-7 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none focus:border-gold/50 transition-colors cursor-pointer">
-                <option value="featured">Empfohlen</option>
-                <option value="price-asc">Preis ↑</option>
-                <option value="price-desc">Preis ↓</option>
-              </select>
-              <ChevronDown size={11} className="absolute right-2 text-text-muted pointer-events-none" />
-            </div>
+              {/* Category & Type trigger */}
+              <div ref={panelRef} className="relative shrink-0">
+                <button
+                  onClick={() => setPanelOpen((v) => !v)}
+                  className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all ${
+                    panelOpen || hasCategoryFilter
+                      ? "bg-gold/12 border-gold/30 text-gold"
+                      : "border-border text-text-muted hover:text-text-secondary hover:border-border"
+                  }`}
+                >
+                  <SlidersHorizontal size={11} />
+                  Kategorie & Typ
+                  {hasCategoryFilter && (
+                    <span className="bg-gold text-bg-primary text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">✓</span>
+                  )}
+                  <ChevronDown size={11} className={`transition-transform ${panelOpen ? "rotate-180" : ""}`} />
+                </button>
+              </div>
 
-            <Link href="/dashboard/new-listing" className="hidden sm:flex px-3 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
-              + Eintragen
-            </Link>
-          </div>
+              {/* Location */}
+              {availableLocations.length > 0 && (
+                <FilterDropdown icon={MapPin} label="Stadt" value={locationFilter} options={availableLocations} onChange={setLocationFilter} />
+              )}
 
-          {/* Row 2: Category button + dropdowns — horizontal scroll on mobile */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
+              {/* Condition */}
+              <FilterDropdown icon={CheckCircle} label="Zustand" value={conditionFilter} options={CONDITIONS} onChange={setConditionFilter} />
 
-            {/* Category & Type trigger */}
-            <div ref={panelRef} className="relative shrink-0">
-              <button
-                onClick={() => setPanelOpen((v) => !v)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                  panelOpen || hasCategoryFilter
-                    ? "bg-gold/12 border-gold/30 text-gold"
-                    : "border-border text-text-muted hover:text-text-secondary hover:border-border"
-                }`}
-              >
-                <SlidersHorizontal size={11} />
-                Kategorie & Typ
-                {hasCategoryFilter && (
-                  <span className="bg-gold text-bg-primary text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">✓</span>
-                )}
-                <ChevronDown size={11} className={`transition-transform ${panelOpen ? "rotate-180" : ""}`} />
-              </button>
-            </div>
+              {/* Price range */}
+              <FilterDropdown icon={Euro} label="Preis" value={minRate || maxRate ? `${minRate || "0"} – ${maxRate || "∞"} €` : ""}
+                options={["bis 50 €", "bis 100 €", "bis 250 €", "bis 500 €", "ab 500 €"]}
+                onChange={(v) => {
+                  if (v === "bis 50 €") { setMinRate(""); setMaxRate("50"); }
+                  else if (v === "bis 100 €") { setMinRate(""); setMaxRate("100"); }
+                  else if (v === "bis 250 €") { setMinRate(""); setMaxRate("250"); }
+                  else if (v === "bis 500 €") { setMinRate(""); setMaxRate("500"); }
+                  else if (v === "ab 500 €") { setMinRate("500"); setMaxRate(""); }
+                  else { setMinRate(""); setMaxRate(""); }
+                }}
+              />
 
-            {/* Divider */}
-            <div className="w-px h-5 bg-border shrink-0" />
-
-            {/* Location */}
-            {availableLocations.length > 0 && (
-              <FilterDropdown icon={MapPin} label="Stadt" value={locationFilter} options={availableLocations} onChange={setLocationFilter} />
-            )}
-
-            {/* Condition */}
-            <FilterDropdown icon={CheckCircle} label="Zustand" value={conditionFilter} options={CONDITIONS} onChange={setConditionFilter} />
-
-            {/* Price range */}
-            <FilterDropdown icon={Euro} label="Preis" value={minRate || maxRate ? `${minRate || "0"} – ${maxRate || "∞"} €` : ""}
-              options={["bis 50 €", "bis 100 €", "bis 250 €", "bis 500 €", "ab 500 €"]}
-              onChange={(v) => {
-                if (v === "bis 50 €") { setMinRate(""); setMaxRate("50"); }
-                else if (v === "bis 100 €") { setMinRate(""); setMaxRate("100"); }
-                else if (v === "bis 250 €") { setMinRate(""); setMaxRate("250"); }
-                else if (v === "bis 500 €") { setMinRate(""); setMaxRate("500"); }
-                else if (v === "ab 500 €") { setMinRate("500"); setMaxRate(""); }
-                else { setMinRate(""); setMaxRate(""); }
-              }}
-            />
-
-            {/* Miete / Kauf toggle + clear */}
-            <div className="flex items-center gap-1.5 shrink-0">
-              <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden">
+              {/* Miete / Kauf toggle */}
+              <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
                 {(["alle", "miete", "kauf"] as const).map((t) => (
                   <button
                     key={t}
@@ -516,13 +545,18 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                   </button>
                 ))}
               </div>
+
               {hasAnyFilter && (
-                <button onClick={clearAll} className="text-[10px] text-text-muted hover:text-red-400 transition-colors whitespace-nowrap">
+                <button onClick={clearAll} className="text-[10px] text-text-muted hover:text-red-400 transition-colors whitespace-nowrap shrink-0">
                   Alles löschen
                 </button>
               )}
+
+              <Link href="/dashboard/new-listing" className="hidden sm:flex items-center h-9 px-3 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
+                + Eintragen
+              </Link>
             </div>
-          </div>
+          </div>{/* end flex flex-col sm:flex-row */}
 
           {/* Row 3: Two-panel category picker */}
           {panelOpen && (

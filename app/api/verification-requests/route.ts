@@ -3,30 +3,40 @@ import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
-// GET /api/verification-requests — admin: list all requests with profile info
-export async function GET() {
+// GET /api/verification-requests — user: own status | admin: all requests
+export async function GET(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // Check admin
   const { data: profile } = await supabaseAdmin
     .from("profiles")
     .select("role")
     .eq("user_id", userId)
     .maybeSingle();
-  if (profile?.role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { data, error } = await supabaseAdmin
+  // Admin gets all
+  if (profile?.role === "admin") {
+    const { data, error } = await supabaseAdmin
+      .from("verification_requests")
+      .select("id, user_id, display_name, status, notes, submitted_at, reviewed_at")
+      .order("submitted_at", { ascending: false });
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ data: data ?? [] });
+  }
+
+  // Regular user gets own latest request
+  const { data } = await supabaseAdmin
     .from("verification_requests")
-    .select("id, user_id, display_name, status, notes, submitted_at, reviewed_at")
-    .order("submitted_at", { ascending: false });
+    .select("id, status, submitted_at, reviewed_at")
+    .eq("user_id", userId)
+    .order("submitted_at", { ascending: false })
+    .limit(1);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ data: data ?? [] });
 }
 
 // POST /api/verification-requests — user submits verification request
-export async function POST() {
+export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -45,6 +55,12 @@ export async function POST() {
     );
   }
 
+  let notes: string | null = null;
+  try {
+    const body = await req.json();
+    notes = body?.notes ?? null;
+  } catch { /* no body */ }
+
   const { data: p } = await supabaseAdmin
     .from("profiles")
     .select("display_name")
@@ -57,6 +73,7 @@ export async function POST() {
       user_id: userId,
       display_name: p?.display_name ?? null,
       status: "pending",
+      notes,
     })
     .select("id")
     .single();

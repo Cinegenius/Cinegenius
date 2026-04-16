@@ -89,8 +89,8 @@ function FilterDropdown({
   return (
     <div ref={ref} className="relative shrink-0">
       <button onClick={() => setOpen((v) => !v)}
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-          active ? "bg-gold/12 border-gold/30 text-gold" : open ? "bg-bg-elevated border-border text-text-secondary" : "border-border text-text-muted hover:text-text-secondary"
+        className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all ${
+          active ? "bg-gold/10 border-gold/30 text-gold" : open ? "bg-bg-elevated border-border text-text-secondary" : "border-border text-text-muted hover:text-text-secondary"
         }`}>
         <Icon size={11} />
         {active ? value : label}
@@ -304,45 +304,49 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
 
       {/* ── Filter Bar ───────────────────────────────────── */}
       <div className="bg-bg-secondary border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 space-y-2">
 
-          {/* Row 1: Search */}
-          <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+          {/* Search */}
+          <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors sm:w-64 sm:shrink-0">
             <Search size={14} className="text-text-muted shrink-0" />
             <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
               placeholder="Firma, Leistung, Stichwort..."
-              className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none" />
+              className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
             {search && <button onClick={() => setSearch("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
           </div>
 
-          {/* Row 1b: Controls — horizontal scroll on mobile */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
-            <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
-              <button onClick={() => setViewMode("grid")} className={`p-2 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutGrid size={13} /></button>
-              <button onClick={() => setViewMode("list")} className={`p-2 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutList size={13} /></button>
-            </div>
-            <Link href="/company-setup" className="hidden sm:flex px-3 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
-              + Firma eintragen
-            </Link>
-          </div>
+          {/* Filters */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5 sm:pb-0" style={{ scrollbarWidth: "none" }}>
 
-          {/* Row 2: Category picker + dropdowns + verified toggle + clear — horizontal scroll on mobile */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
+            {/* Grid / List Toggle */}
+            <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
+              <button onClick={() => setViewMode("grid")}
+                className={`flex items-center justify-center w-9 h-9 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
+                <LayoutGrid size={14} />
+              </button>
+              <button onClick={() => setViewMode("list")}
+                className={`flex items-center justify-center w-9 h-9 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
+                <LayoutList size={14} />
+              </button>
+            </div>
+
+            <div className="w-px h-6 bg-border shrink-0" />
 
             {/* Kategorie trigger */}
             <div ref={panelRef} className="relative shrink-0">
               <button onClick={() => setPanelOpen((v) => !v)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                  panelOpen || hasCatFilter ? "bg-gold/12 border-gold/30 text-gold" : "border-border text-text-muted hover:text-text-secondary"
+                className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all ${
+                  panelOpen || hasCatFilter ? "bg-gold/10 border-gold/30 text-gold" : "border-border text-text-muted hover:text-text-secondary hover:border-border"
                 }`}>
-                <SlidersHorizontal size={11} />
+                <SlidersHorizontal size={12} />
                 Kategorie
-                {hasCatFilter && <span className="bg-gold text-bg-primary text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">✓</span>}
-                <ChevronDown size={11} className={`transition-transform ${panelOpen ? "rotate-180" : ""}`} />
+                {hasCatFilter
+                  ? <span className="w-4 h-4 rounded-full bg-gold text-bg-primary text-[9px] font-bold flex items-center justify-center">✓</span>
+                  : <ChevronDown size={11} className={`transition-transform ${panelOpen ? "rotate-180" : ""}`} />
+                }
               </button>
             </div>
-
-            <div className="w-px h-5 bg-border shrink-0" />
 
             {/* Stadt */}
             {availableCities.length > 0 && (
@@ -353,23 +357,35 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
             <FilterDropdown icon={Globe} label="Land" value={countryFilter} options={["Deutschland", "Österreich", "Schweiz"]} onChange={setCountryFilter} />
 
             {/* Verifiziert toggle */}
-            <label className="flex items-center gap-1.5 text-xs text-text-muted cursor-pointer hover:text-text-secondary transition-colors select-none shrink-0">
-              <div onClick={() => setVerifiedOnly((v) => !v)}
-                className={`w-7 h-4 rounded-full transition-colors relative cursor-pointer ${verifiedOnly ? "bg-gold" : "bg-border"}`}>
+            <button
+              onClick={() => setVerifiedOnly((v) => !v)}
+              className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all shrink-0 ${
+                verifiedOnly ? "bg-gold/10 border-gold/30 text-gold" : "border-border text-text-muted hover:text-text-secondary"
+              }`}
+            >
+              <div className={`w-7 h-4 rounded-full transition-colors relative shrink-0 ${verifiedOnly ? "bg-gold" : "bg-border"}`}>
                 <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${verifiedOnly ? "left-3.5" : "left-0.5"}`} />
               </div>
-              <Zap size={10} className={verifiedOnly ? "text-gold" : ""} />
+              <Zap size={11} />
               Verifiziert
-            </label>
+            </button>
 
             {hasAnyFilter && (
-              <button onClick={clearAll} className="text-[10px] text-text-muted hover:text-red-400 transition-colors whitespace-nowrap">
-                Alles löschen
-              </button>
+              <>
+                <div className="w-px h-6 bg-border shrink-0" />
+                <button onClick={clearAll} className="h-9 px-3 text-xs text-text-muted hover:text-red-400 transition-colors whitespace-nowrap shrink-0 border border-border rounded-lg hover:border-red-400/40">
+                  Löschen
+                </button>
+              </>
             )}
-          </div>
 
-          {/* Row 3: Two-panel */}
+            <Link href="/company-setup" className="hidden sm:flex items-center h-9 px-3 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
+              + Firma eintragen
+            </Link>
+          </div>
+          </div>{/* end flex flex-col sm:flex-row */}
+
+          {/* Category panel */}
           {panelOpen && (
             <CompanyCategoryPanel
               activeGroupId={activeGroupId}

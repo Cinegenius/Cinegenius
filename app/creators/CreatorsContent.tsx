@@ -116,7 +116,7 @@ function FilterDropdown({
     <div ref={ref} className="relative shrink-0">
       <button
         onClick={() => setOpen((v) => !v)}
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+        className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all ${
           active
             ? "bg-gold/12 border-gold/30 text-gold"
             : open
@@ -475,17 +475,18 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 
       {/* ── Filter Bar ─────────────────────────────────────────────────────── */}
       <div className="bg-bg-secondary border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 space-y-2">
 
-          {/* Row 1: Search */}
-          <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+          {/* Search */}
+          <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors sm:w-64 sm:shrink-0">
             <Search size={14} className="text-text-muted shrink-0" />
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Name, Skill suchen…"
-              className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none"
+              className="bg-transparent border-none py-2 text-sm w-full focus:outline-none"
             />
             {query && (
               <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors">
@@ -494,8 +495,8 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
             )}
           </div>
 
-          {/* Row 2: Controls — horizontal scroll on mobile */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
+          {/* Filters */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5 sm:pb-0" style={{ scrollbarWidth: "none" }}>
             {/* Available toggle */}
             <label className="flex items-center gap-1.5 text-xs text-text-muted cursor-pointer hover:text-text-secondary transition-colors select-none shrink-0">
               <div
@@ -507,15 +508,15 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               Verfügbar
             </label>
 
-            <div className="w-px h-4 bg-border shrink-0" />
+            <div className="w-px h-5 bg-border shrink-0" />
 
             {/* View toggle */}
             <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
-              <button onClick={() => setViewMode("grid")} className={`p-2 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
-                <LayoutGrid size={13} />
+              <button onClick={() => setViewMode("grid")} className={`flex items-center justify-center w-9 h-9 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
+                <LayoutGrid size={14} />
               </button>
-              <button onClick={() => setViewMode("list")} className={`p-2 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
-                <List size={13} />
+              <button onClick={() => setViewMode("list")} className={`flex items-center justify-center w-9 h-9 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
+                <List size={14} />
               </button>
             </div>
 
@@ -524,7 +525,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               <select
                 value={sortKey}
                 onChange={(e) => setSortKey(e.target.value)}
-                className="appearance-none text-xs py-2 pl-3 pr-7 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none focus:border-gold/50 transition-colors cursor-pointer"
+                className="appearance-none text-xs h-9 pl-3 pr-7 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none focus:border-gold/50 transition-colors cursor-pointer"
               >
                 <option value="featured">Empfohlen</option>
                 <option value="rating">Beste Bewertung</option>
@@ -532,13 +533,13 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               </select>
               <ChevronDown size={11} className="absolute right-2 text-text-muted pointer-events-none" />
             </div>
-          </div>
 
-          {/* Row 2: Filter — horizontal scroll on mobile */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
+            <div className="w-px h-5 bg-border shrink-0" />
+
+            {/* Gewerk & Rollen */}
             <button
               onClick={() => setFilterOpen((v) => !v)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all shrink-0 ${
+              className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all shrink-0 ${
                 filterOpen || selectedRoles.size > 0
                   ? "bg-gold/12 border-gold/30 text-gold"
                   : "border-border text-text-muted hover:text-text-secondary hover:border-border-light"
@@ -554,8 +555,6 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               <ChevronDown size={11} className={`transition-transform ${filterOpen ? "rotate-180" : ""}`} />
             </button>
 
-            <div className="w-px h-5 bg-border shrink-0" />
-
             {availableCities.length > 0 && (
               <FilterDropdown icon={MapPin} label="Stadt" value={cityFilter} options={availableCities} onChange={setCityFilter} />
             )}
@@ -565,7 +564,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 
             <button
               onClick={() => setMoreFiltersOpen((v) => !v)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all shrink-0 ${
+              className={`flex items-center gap-1.5 h-9 px-3 rounded-lg text-xs font-medium border transition-all shrink-0 ${
                 moreFiltersOpen || [profileTypeFilter, hairFilter, eyeFilter, travelFilter, ageMinFilter, ageMaxFilter, countryFilter].some(Boolean)
                   ? "bg-gold/12 border-gold/30 text-gold"
                   : "border-border text-text-muted hover:text-text-secondary hover:border-border-light"
@@ -590,12 +589,13 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                   setProfileTypeFilter(""); setHairFilter(""); setEyeFilter("");
                   setBodyFilter(""); setTravelFilter(""); setAgeMinFilter(""); setAgeMaxFilter("");
                 }}
-                className="text-[11px] text-text-muted hover:text-red-400 transition-colors shrink-0"
+                className="h-9 px-3 text-xs text-text-muted hover:text-red-400 transition-colors whitespace-nowrap border border-border rounded-lg hover:border-red-400/40 shrink-0"
               >
-                Alle löschen
+                Löschen
               </button>
             )}
           </div>
+          </div>{/* end flex flex-col sm:flex-row */}
 
           {/* Mehr Filter (ausgeklappt) */}
           {moreFiltersOpen && (

@@ -326,9 +326,17 @@ function MessagesContent() {
 
             {/* ── Konversationsliste ── */}
             {conversations.length === 0 && !isNewConv && visibleRequests.length === 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center min-h-[200px]">
-                <MessageSquare size={32} className="text-text-muted mb-3 opacity-40" />
-                <p className="text-sm text-text-muted">Noch keine Nachrichten</p>
+              <div className="flex-1 flex flex-col items-center justify-center p-6 text-center min-h-[200px] gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center">
+                  <MessageSquare size={20} className="text-text-muted opacity-50" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-text-secondary mb-1">Keine Nachrichten</p>
+                  <p className="text-xs text-text-muted leading-relaxed">Schreibe Filmschaffenden oder Inserenten direkt an.</p>
+                </div>
+                <Link href="/creators" className="text-xs text-gold hover:text-gold-light transition-colors font-medium">
+                  Crew entdecken →
+                </Link>
               </div>
             ) : (
               conversations.map(conv => {
@@ -404,30 +412,67 @@ function MessagesContent() {
             </div>
 
             {/* Nachrichten */}
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
               {isNewConv && messages.length === 0 && (
                 <div className="text-center py-16">
-                  <MessageSquare size={28} className="text-text-muted mx-auto mb-2 opacity-30" />
-                  <p className="text-sm text-text-muted">Schreib deine erste Nachricht</p>
+                  <div className="w-14 h-14 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center mx-auto mb-3">
+                    <MessageSquare size={22} className="text-text-muted opacity-50" />
+                  </div>
+                  <p className="text-sm font-medium text-text-secondary mb-1">Neue Unterhaltung</p>
+                  <p className="text-xs text-text-muted">
+                    Schreib deine erste Nachricht an {loadingRecipient ? "…" : recipientName}.
+                  </p>
                 </div>
               )}
-              {messages.map(msg => {
-                const isOwn = msg.sender_id === user?.id;
-                return (
-                  <div key={msg.id} className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[78%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
-                      isOwn
-                        ? "bg-gold text-bg-primary rounded-br-sm"
-                        : "bg-bg-elevated border border-border text-text-primary rounded-bl-sm"
-                    }`}>
-                      {msg.content}
-                      <p className={`text-[10px] mt-1 ${isOwn ? "text-bg-primary/60" : "text-text-muted"}`}>
-                        {formatTime(msg.created_at)}
-                      </p>
+              {(() => {
+                let lastDateLabel = "";
+                return messages.map((msg, idx) => {
+                  const isOwn = msg.sender_id === user?.id;
+                  const msgDate = new Date(msg.created_at);
+                  const dateLabel = msgDate.toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" });
+                  const showDateSep = dateLabel !== lastDateLabel;
+                  if (showDateSep) lastDateLabel = dateLabel;
+
+                  // Is this the last own message and next is not own (= seen indicator)
+                  const isLastOwn = isOwn && (idx === messages.length - 1 || messages[idx + 1]?.sender_id !== user?.id);
+                  const isSeen = isOwn && !!msg.read_at;
+
+                  return (
+                    <div key={msg.id}>
+                      {showDateSep && (
+                        <div className="flex items-center gap-3 py-3">
+                          <div className="flex-1 h-px bg-border" />
+                          <span className="text-[10px] text-text-muted font-medium px-2 shrink-0">{dateLabel}</span>
+                          <div className="flex-1 h-px bg-border" />
+                        </div>
+                      )}
+                      <div className={`flex mb-1 ${isOwn ? "justify-end" : "justify-start"}`}>
+                        <div className={`max-w-[78%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                          isOwn
+                            ? "bg-gold text-bg-primary rounded-br-sm"
+                            : "bg-bg-elevated border border-border text-text-primary rounded-bl-sm"
+                        }`}>
+                          {msg.content}
+                          <p className={`text-[10px] mt-1 ${isOwn ? "text-bg-primary/60" : "text-text-muted"}`}>
+                            {formatTime(msg.created_at)}
+                          </p>
+                        </div>
+                      </div>
+                      {isLastOwn && (
+                        <div className="flex justify-end pr-1 pb-1">
+                          <span className={`text-[10px] flex items-center gap-1 ${isSeen ? "text-gold" : "text-text-muted/60"}`}>
+                            {isSeen ? (
+                              <><Check size={10} className="inline" /><Check size={10} className="-ml-1.5 inline" /> Gesehen</>
+                            ) : (
+                              <><Check size={10} className="inline" /> Gesendet</>
+                            )}
+                          </span>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                });
+              })()}
               <div ref={bottomRef} />
             </div>
 
@@ -454,10 +499,31 @@ function MessagesContent() {
           </>
         ) : (
           /* Desktop: leerer Zustand wenn kein Gespräch offen */
-          <div className="flex-1 hidden sm:flex items-center justify-center text-center p-8">
-            <div>
-              <MessageSquare size={40} className="text-text-muted mx-auto mb-3 opacity-20" />
-              <p className="text-text-muted text-sm">Wähle ein Gespräch aus</p>
+          <div className="flex-1 hidden sm:flex flex-col items-center justify-center text-center p-8">
+            <div className="max-w-sm">
+              <div className="relative w-20 h-20 mx-auto mb-5">
+                <div className="w-20 h-20 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center">
+                  <MessageSquare size={32} className="text-text-muted opacity-30" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center">
+                  <span className="text-[10px] text-gold font-bold">+</span>
+                </div>
+              </div>
+              <h3 className="font-display text-lg font-bold text-text-secondary mb-2">Wähle ein Gespräch</h3>
+              <p className="text-sm text-text-muted leading-relaxed mb-5">
+                Wähle links eine Konversation aus, oder starte direkt von einem Profil oder Inserat.
+              </p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                <Link href="/creators" className="px-3 py-1.5 text-xs border border-border rounded-lg text-text-secondary hover:border-gold/40 hover:text-gold transition-all">
+                  Crew entdecken
+                </Link>
+                <Link href="/locations" className="px-3 py-1.5 text-xs border border-border rounded-lg text-text-secondary hover:border-gold/40 hover:text-gold transition-all">
+                  Drehorte
+                </Link>
+                <Link href="/jobs" className="px-3 py-1.5 text-xs border border-border rounded-lg text-text-secondary hover:border-gold/40 hover:text-gold transition-all">
+                  Jobs
+                </Link>
+              </div>
             </div>
           </div>
         )}

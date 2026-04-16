@@ -123,7 +123,7 @@ export default function GlobalSearch() {
       } else if (query.trim()) {
         addRecentSearch(query);
         setOpen(false);
-        router.push(`/creators?q=${encodeURIComponent(query.trim())}`);
+        router.push(`/search?q=${encodeURIComponent(query.trim())}`);
       }
     }
   };
@@ -294,26 +294,22 @@ export default function GlobalSearch() {
           {query.length >= 2 && results.length > 0 && (
             <div className="px-4 py-3 border-t border-border flex items-center justify-between">
               <p className="text-xs text-text-muted">{results.length} Ergebnis{results.length !== 1 ? "se" : ""}</p>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => { addRecentSearch(query); setOpen(false); router.push(`/creators?q=${encodeURIComponent(query.trim())}`); }}
-                  className="flex items-center gap-1 text-xs text-text-muted hover:text-gold transition-colors"
-                >
-                  Crew <ArrowRight size={10} />
-                </button>
-                <button
-                  onClick={() => { addRecentSearch(query); setOpen(false); router.push(`/locations?q=${encodeURIComponent(query.trim())}`); }}
-                  className="flex items-center gap-1 text-xs text-text-muted hover:text-gold transition-colors"
-                >
-                  Drehorte <ArrowRight size={10} />
-                </button>
-                <button
-                  onClick={() => { addRecentSearch(query); setOpen(false); router.push(`/jobs?q=${encodeURIComponent(query.trim())}`); }}
-                  className="flex items-center gap-1 text-xs text-text-muted hover:text-gold transition-colors"
-                >
-                  Jobs <ArrowRight size={10} />
-                </button>
-              </div>
+              <button
+                onClick={() => { addRecentSearch(query); setOpen(false); router.push(`/search?q=${encodeURIComponent(query.trim())}`); }}
+                className="flex items-center gap-1.5 text-xs font-medium text-gold hover:text-gold-light transition-colors"
+              >
+                Alle Ergebnisse <ArrowRight size={11} />
+              </button>
+            </div>
+          )}
+          {query.length >= 2 && results.length === 0 && !loading && (
+            <div className="px-4 py-3 border-t border-border text-center">
+              <button
+                onClick={() => { setOpen(false); router.push(`/search?q=${encodeURIComponent(query.trim())}`); }}
+                className="text-xs text-text-muted hover:text-gold transition-colors"
+              >
+                Vollsuche öffnen <ArrowRight size={10} className="inline" />
+              </button>
             </div>
           )}
         </div>

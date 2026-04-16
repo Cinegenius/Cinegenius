@@ -9,7 +9,7 @@ import {
   Menu, X, Film, Sun, Moon, ChevronDown,
   Car, Shirt, Wrench, Clapperboard, Sparkles, Zap,
   Camera, Mic, Drama, Lightbulb, User, Users, Layers, Briefcase,
-  LayoutDashboard, Pencil, Eye, LogOut, MessageSquare,
+  LayoutDashboard, Pencil, Eye, LogOut, MessageSquare, Bell,
   Home, Building2, TreePine, Coffee, Monitor,
   Smartphone, ImageIcon, Video, Aperture, MapPin, ShoppingBag,
 } from "lucide-react";
@@ -295,20 +295,6 @@ export default function Navbar() {
                 {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
               </button>
               <NotificationCenter />
-              {isLoaded && isSignedIn && (
-                <Link
-                  href="/messages"
-                  className="relative w-8 h-8 flex items-center justify-center rounded-md text-text-muted hover:text-gold hover:bg-bg-elevated transition-all"
-                  aria-label="Nachrichten"
-                >
-                  <MessageSquare size={17} />
-                  {unreadMessages > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-3.5 bg-crimson text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5">
-                      {unreadMessages > 9 ? "9+" : unreadMessages}
-                    </span>
-                  )}
-                </Link>
-              )}
               {isLoaded && !isSignedIn && (
                 <>
                   <Link
@@ -420,21 +406,10 @@ export default function Navbar() {
               })()}
             </div>
 
-            {/* Mobile: messages + theme + menu */}
+            {/* Mobile: notifications + theme + menu */}
             <div className="lg:hidden flex items-center gap-1">
               {isLoaded && isSignedIn && (
-                <Link
-                  href="/messages"
-                  className="relative w-9 h-9 flex items-center justify-center rounded-md text-text-muted hover:text-gold transition-colors"
-                  aria-label="Nachrichten"
-                >
-                  <MessageSquare size={19} />
-                  {unreadMessages > 0 && (
-                    <span className="absolute top-1 right-1 min-w-[14px] h-3.5 bg-crimson text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5">
-                      {unreadMessages > 9 ? "9+" : unreadMessages}
-                    </span>
-                  )}
-                </Link>
+                <NotificationCenter />
               )}
               <button
                 onClick={toggleTheme}
@@ -523,6 +498,11 @@ export default function Navbar() {
                 className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-base font-medium transition-all ${isActive("/profile") ? "bg-gold/10 text-gold border border-gold/20" : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"}`}>
                 <Pencil size={18} className={isActive("/profile") ? "text-gold" : "text-text-muted"} />
                 Profil bearbeiten
+              </Link>
+              <Link href="/notifications" onClick={() => setOpen(false)}
+                className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-base font-medium transition-all ${isActive("/notifications") ? "bg-gold/10 text-gold border border-gold/20" : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"}`}>
+                <Bell size={18} className={isActive("/notifications") ? "text-gold" : "text-text-muted"} />
+                Benachrichtigungen
               </Link>
             </div>
           )}

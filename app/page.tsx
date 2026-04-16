@@ -20,6 +20,7 @@ import {
   MapPin, Briefcase, ShoppingBag, Users,
   ArrowRight, Star, CheckCircle, Zap, Shield, Clock,
   TrendingUp, Film, ChevronRight, Play, Building2, Clapperboard, Camera,
+  Percent,
 } from "lucide-react";
 import { stats } from "@/lib/data";
 import ImageStrip from "@/components/ImageStrip";
@@ -767,6 +768,31 @@ export default async function HomePage() {
           >
             Job ausschreiben <ArrowRight size={13} />
           </Link>
+        </div>
+      </section>
+
+      {/* ── PLATTFORM-PULSE ── */}
+      <section className="py-10 border-y border-border bg-bg-secondary overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {[
+              { value: "10 %", label: "Provision", sub: "nur bei Buchung", icon: Percent },
+              { value: "0 €", label: "Grundgebühr", sub: "kostenlos starten", icon: CheckCircle },
+              { value: "24 h", label: "Antwortzeit", sub: "Ø Reaktionszeit", icon: Clock },
+              { value: "DACH", label: "Region", sub: "DE · AT · CH", icon: TrendingUp },
+            ].map(({ value, label, sub, icon: Icon }) => (
+              <div key={label} className="flex items-center gap-3 p-4 rounded-xl bg-bg-elevated border border-border">
+                <div className="w-10 h-10 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
+                  <Icon size={16} className="text-gold" />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-display text-xl font-bold text-text-primary leading-none">{value}</p>
+                  <p className="text-xs font-medium text-text-secondary mt-0.5">{label}</p>
+                  <p className="text-[10px] text-text-muted">{sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

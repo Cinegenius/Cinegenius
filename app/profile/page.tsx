@@ -148,143 +148,178 @@ const tabs = [
   { id: "billing",        label: "Abrechnung",             icon: CreditCard  },
 ];
 
-// ─── Verification Tab (unchanged) ────────────────────────────────────────────
+// ─── Verification Tab ────────────────────────────────────────────────────────
 
-type VerifStep = "identity" | "business" | "review";
+type VerifStatus = "none" | "pending" | "approved" | "rejected" | "loading";
+
+function UploadZone({
+  label, hint, accept, file, uploading, onFile,
+}: {
+  label: string; hint: string; accept: string;
+  file: { name: string; url: string } | null;
+  uploading: boolean;
+  onFile: (f: File) => void;
+}) {
+  const ref = useRef<HTMLInputElement>(null);
+  return (
+    <div>
+      <p className="text-sm font-semibold text-text-primary mb-2">{label}</p>
+      <div
+        onClick={() => !uploading && ref.current?.click()}
+        className={`relative border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
+          file ? "border-success/40 bg-success/5" : "border-border hover:border-gold/40"
+        }`}
+      >
+        <input ref={ref} type="file" accept={accept} className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); }} />
+        {uploading ? (
+          <><Loader2 size={24} className="animate-spin text-gold mx-auto mb-2" /><p className="text-sm text-text-muted">Hochladen…</p></>
+        ) : file ? (
+          <><CheckCircle size={24} className="text-success mx-auto mb-2" /><p className="text-sm font-medium text-success truncate max-w-xs mx-auto">{file.name}</p></>
+        ) : (
+          <><Upload size={24} className="text-text-muted mx-auto mb-2" /><p className="text-sm text-text-muted">{hint}</p></>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function VerificationTab() {
-  const [step, setStep] = useState<VerifStep>("identity");
-  const [idUploaded, setIdUploaded] = useState(false);
-  const [selfieUploaded, setSelfieUploaded] = useState(false);
-  const [businessUploaded, setBusinessUploaded] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const { addToast } = useToast();
+  const [status, setStatus] = useState<VerifStatus>("loading");
+  const [submitting, setSubmitting] = useState(false);
+  const [idFile, setIdFile] = useState<{ name: string; url: string } | null>(null);
+  const [idUploading, setIdUploading] = useState(false);
 
-  const steps: { id: VerifStep; label: string; done: boolean }[] = [
-    { id: "identity", label: "Identität",   done: idUploaded && selfieUploaded },
-    { id: "business", label: "Unternehmen", done: businessUploaded },
-    { id: "review",   label: "Prüfung",     done: submitted },
-  ];
+  useEffect(() => {
+    fetch("/api/verification-requests")
+      .then(r => r.json())
+      .then(({ data }) => {
+        if (!data || data.length === 0) { setStatus("none"); return; }
+        const own = Array.isArray(data) ? data[0] : data;
+        setStatus((own?.status as VerifStatus) ?? "none");
+      })
+      .catch(() => setStatus("none"));
+  }, []);
 
-  if (submitted) {
+  async function handleIdFile(file: File) {
+    setIdUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const { url, error } = await res.json();
+      if (!res.ok || !url) { addToast(error ?? "Upload fehlgeschlagen", "error"); return; }
+      setIdFile({ name: file.name, url });
+    } finally {
+      setIdUploading(false);
+    }
+  }
+
+  async function handleSubmit() {
+    if (!idFile) return;
+    setSubmitting(true);
+    try {
+      const notes = JSON.stringify({ id_doc: idFile.url });
+      const res = await fetch("/api/verification-requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notes }),
+      });
+      const data = await res.json();
+      if (!res.ok) { addToast(data.error ?? "Fehler beim Einreichen", "error"); return; }
+      setStatus("pending");
+      addToast("Ausweis eingereicht", "success");
+    } catch {
+      addToast("Unbekannter Fehler", "error");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (status === "loading") {
+    return <div className="py-12 flex items-center justify-center"><Loader2 size={22} className="animate-spin text-gold" /></div>;
+  }
+
+  if (status === "approved") {
     return (
-      <div className="p-8 bg-bg-secondary border border-border rounded-xl text-center space-y-4">
-        <div className="w-16 h-16 bg-gold/10 border border-gold/20 rounded-full flex items-center justify-center mx-auto">
-          <Clock size={28} className="text-gold" />
+      <div className="p-8 bg-success/5 border border-success/20 rounded-xl text-center space-y-4">
+        <div className="w-16 h-16 bg-success/10 border border-success/20 rounded-full flex items-center justify-center mx-auto">
+          <ShieldCheck size={28} className="text-success" />
         </div>
-        <h3 className="font-display text-xl font-bold text-text-primary">Prüfung läuft</h3>
-        <p className="text-text-muted text-sm max-w-sm mx-auto leading-relaxed">
-          Wir prüfen deine Unterlagen innerhalb von <strong className="text-text-primary">1–2 Werktagen</strong>.
+        <h3 className="font-display text-xl font-bold text-text-primary">Identität verifiziert</h3>
+        <p className="text-sm text-text-muted max-w-sm mx-auto leading-relaxed">
+          Dein Profil trägt das verifizierte Badge.
         </p>
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-gold/10 border border-gold/20 rounded-full text-gold text-sm font-medium">
-          <Clock size={14} /> Verifizierung ausstehend
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-success/10 border border-success/20 rounded-full text-success text-sm font-medium">
+          <CheckCircle size={14} /> Verifiziert
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="space-y-6">
-      <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-start gap-3">
-        <AlertCircle size={18} className="text-amber-400 shrink-0 mt-0.5" />
-        <div>
-          <p className="text-sm font-semibold text-amber-400">Profil noch nicht verifiziert</p>
-          <p className="text-xs text-text-muted mt-0.5 leading-relaxed">
-            Verifizierte Profile erhalten bis zu 3× mehr Buchungsanfragen.
+  if (status === "pending") {
+    return (
+      <div className="p-8 bg-bg-secondary border border-border rounded-xl text-center space-y-4">
+        <div className="w-16 h-16 bg-gold/10 border border-gold/20 rounded-full flex items-center justify-center mx-auto">
+          <Clock size={28} className="text-gold" />
+        </div>
+        <h3 className="font-display text-xl font-bold text-text-primary">Wird geprüft</h3>
+        <p className="text-sm text-text-muted max-w-sm mx-auto leading-relaxed">
+          Wir prüfen deinen Ausweis innerhalb von <strong className="text-text-primary">1–2 Werktagen</strong>.
+        </p>
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-gold/10 border border-gold/20 rounded-full text-gold text-sm font-medium">
+          <Clock size={14} /> Ausstehend
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "rejected") {
+    return (
+      <div className="space-y-5">
+        <div className="p-6 bg-red-500/5 border border-red-500/20 rounded-xl text-center space-y-3">
+          <AlertCircle size={28} className="text-red-400 mx-auto" />
+          <h3 className="font-semibold text-text-primary">Prüfung fehlgeschlagen</h3>
+          <p className="text-sm text-text-muted max-w-sm mx-auto">
+            Dein Ausweis konnte nicht verifiziert werden. Bitte lade ein neues, gut lesbares Bild hoch.
           </p>
         </div>
+        <button
+          onClick={() => setStatus("none")}
+          className="w-full py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors"
+        >
+          Erneut versuchen
+        </button>
       </div>
-      <div className="flex items-center gap-0">
-        {steps.map((s, i) => (
-          <div key={s.id} className="flex items-center flex-1">
-            <button
-              onClick={() => setStep(s.id)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-all w-full ${
-                step === s.id ? "bg-gold/10 text-gold border border-gold/20" : "text-text-muted hover:text-text-secondary"
-              }`}
-            >
-              {s.done
-                ? <CheckCircle size={14} className="text-success shrink-0" />
-                : <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center text-[10px] shrink-0 ${step === s.id ? "border-gold text-gold" : "border-border text-text-muted"}`}>{i + 1}</span>
-              }
-              {s.label}
-            </button>
-            {i < steps.length - 1 && <div className="flex-1 h-px bg-border mx-1" />}
-          </div>
-        ))}
+    );
+  }
+
+  // status === "none"
+  return (
+    <div className="space-y-5">
+      <UploadZone
+        label="Personalausweis oder Reisepass"
+        hint="JPG, PNG oder WEBP · Vorder- und Rückseite · max. 10 MB"
+        accept="image/jpeg,image/png,image/webp"
+        file={idFile}
+        uploading={idUploading}
+        onFile={handleIdFile}
+      />
+
+      <div className="p-4 bg-bg-secondary border border-border rounded-xl flex items-start gap-2.5">
+        <ShieldCheck size={15} className="text-text-muted shrink-0 mt-0.5" />
+        <p className="text-xs text-text-muted leading-relaxed">
+          Dein Ausweis wird ausschließlich zur Identitätsprüfung verwendet und vertraulich behandelt. Er ist für andere Nutzer nicht sichtbar.
+        </p>
       </div>
-      {step === "identity" && (
-        <div className="p-6 bg-bg-secondary border border-border rounded-xl space-y-5">
-          <div>
-            <h3 className="font-semibold text-text-primary mb-1">Personalausweis oder Reisepass</h3>
-            <div onClick={() => setIdUploaded(true)} className={`relative border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${idUploaded ? "border-success/40 bg-success/5" : "border-border hover:border-gold/40"}`}>
-              {idUploaded ? <><CheckCircle size={28} className="text-success mx-auto mb-2" /><p className="text-sm font-medium text-success">ausweis.jpg hochgeladen</p></> : <><Upload size={24} className="text-text-muted mx-auto mb-2" /><p className="text-sm text-text-muted">JPG oder PNG · max. 20 MB</p></>}
-            </div>
-          </div>
-          <div>
-            <h3 className="font-semibold text-text-primary mb-1">Selfie mit Ausweis</h3>
-            <div onClick={() => setSelfieUploaded(true)} className={`relative border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${selfieUploaded ? "border-success/40 bg-success/5" : "border-border hover:border-gold/40"}`}>
-              {selfieUploaded ? <><CheckCircle size={28} className="text-success mx-auto mb-2" /><p className="text-sm font-medium text-success">selfie.jpg hochgeladen</p></> : <><Upload size={24} className="text-text-muted mx-auto mb-2" /><p className="text-sm text-text-muted">Halte den Ausweis neben dein Gesicht</p></>}
-            </div>
-          </div>
-          <button onClick={() => setStep("business")} className="w-full py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors">Weiter →</button>
-        </div>
-      )}
-      {step === "business" && (
-        <div className="p-6 bg-bg-secondary border border-border rounded-xl space-y-5">
-          <div>
-            <h3 className="font-semibold text-text-primary mb-1">Unternehmensangaben <span className="text-text-muted font-normal">(optional)</span></h3>
-            {[{ label: "Unternehmensname", placeholder: "Muster GmbH" }, { label: "Steuernummer", placeholder: "123/456/78901" }].map(({ label, placeholder }) => (
-              <div key={label} className="mb-3">
-                <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{label}</label>
-                <input type="text" placeholder={placeholder} className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
-              </div>
-            ))}
-          </div>
-          <div>
-            <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">Gewerbenachweis</label>
-            <div onClick={() => setBusinessUploaded(true)} className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${businessUploaded ? "border-success/40 bg-success/5" : "border-border hover:border-gold/40"}`}>
-              {businessUploaded ? <><CheckCircle size={28} className="text-success mx-auto mb-2" /><p className="text-sm font-medium text-success">nachweis.pdf hochgeladen</p></> : <><Upload size={24} className="text-text-muted mx-auto mb-2" /><p className="text-sm text-text-muted">PDF, JPG oder PNG · max. 20 MB</p></>}
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <button onClick={() => setStep("identity")} className="flex-1 py-2.5 border border-border text-text-secondary text-sm font-medium rounded-lg hover:border-gold hover:text-gold transition-all">← Zurück</button>
-            <button onClick={() => setStep("review")} className="flex-1 py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors">Weiter →</button>
-          </div>
-        </div>
-      )}
-      {step === "review" && (
-        <div className="p-6 bg-bg-secondary border border-border rounded-xl space-y-5">
-          <div>
-            <h3 className="font-semibold text-text-primary mb-1">Zusammenfassung & Einreichen</h3>
-            <p className="text-xs text-text-muted">Überprüfe deine Angaben und reiche den Antrag ein.</p>
-          </div>
-          <div className="space-y-3">
-            {[
-              { label: "Personalausweis", status: idUploaded ? "Hochgeladen" : "Fehlend", ok: idUploaded },
-              { label: "Selfie mit Ausweis", status: selfieUploaded ? "Hochgeladen" : "Fehlend", ok: selfieUploaded },
-              { label: "Unternehmensnachweis", status: businessUploaded ? "Hochgeladen" : "Übersprungen", ok: true },
-            ].map(({ label, status, ok }) => (
-              <div key={label} className="flex items-center justify-between p-3 bg-bg-elevated border border-border rounded-lg">
-                <span className="text-sm text-text-secondary">{label}</span>
-                <span className={`flex items-center gap-1 text-xs font-medium ${ok ? "text-success" : "text-crimson-light"}`}>
-                  {ok ? <CheckCircle size={12} /> : <AlertCircle size={12} />} {status}
-                </span>
-              </div>
-            ))}
-          </div>
-          <div className="p-4 bg-gold/5 border border-gold/20 rounded-xl flex items-start gap-2.5">
-            <ShieldCheck size={16} className="text-gold shrink-0 mt-0.5" />
-            <p className="text-xs text-text-muted leading-relaxed">Mit dem Einreichen bestätigst du, dass alle Angaben korrekt sind.</p>
-          </div>
-          <div className="flex gap-3">
-            <button onClick={() => setStep("business")} className="flex-1 py-2.5 border border-border text-text-secondary text-sm font-medium rounded-lg hover:border-gold hover:text-gold transition-all">← Zurück</button>
-            <button onClick={() => setSubmitted(true)} disabled={!idUploaded || !selfieUploaded}
-              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 ${idUploaded && selfieUploaded ? "bg-gold text-bg-primary hover:bg-gold-light" : "bg-border text-text-muted cursor-not-allowed"}`}>
-              <ShieldCheck size={15} /> Antrag einreichen
-            </button>
-          </div>
-        </div>
-      )}
+
+      <button
+        onClick={handleSubmit}
+        disabled={submitting || !idFile}
+        className="w-full py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      >
+        {submitting ? <><Loader2 size={15} className="animate-spin" /> Einreichen…</> : <><ShieldCheck size={15} /> Ausweis einreichen</>}
+      </button>
     </div>
   );
 }

@@ -8,7 +8,7 @@ import {
   MapPin, Briefcase, Clock, Search, ChevronRight, Zap, SlidersHorizontal,
   ChevronDown, X, Users2, Clapperboard, Video, Lightbulb, Wrench, Mic,
   Sparkles, Shirt, Palette, Monitor, Share2, Play, Camera, Scissors,
-  Film, Smartphone, Aperture, Globe,
+  Film, Smartphone, Aperture, Globe, ArrowUpDown,
 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { FILM_DEPARTMENTS, DEPT_KEYWORDS, ALL_ROLES } from "@/lib/filmRoles";
@@ -70,6 +70,41 @@ function parseJobDescription(raw: string): { roleLabel?: string; company?: strin
   return { roleLabel, company, projectType, shootDates, urgent, payType, description };
 }
 
+// ─── SortDropdown ────────────────────────────────────────────────
+function SortDropdown({ value, options, onChange }: {
+  value: string; options: { value: string; label: string }[]; onChange: (v: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, [open]);
+  const label = options.find((o) => o.value === value)?.label ?? "Sortierung";
+  return (
+    <div ref={ref} className="relative shrink-0">
+      <button onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border border-border text-text-muted hover:text-text-secondary transition-all bg-bg-elevated">
+        <ArrowUpDown size={11} />
+        {label}
+        <ChevronDown size={11} className={`transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 z-50 bg-bg-elevated border border-border rounded-xl shadow-xl overflow-hidden min-w-[180px]">
+          {options.map((o) => (
+            <button key={o.value} onClick={() => { onChange(o.value); setOpen(false); }}
+              className={`w-full text-left px-3 py-2 text-xs transition-colors hover:bg-white/[0.04] ${value === o.value ? "text-gold font-medium" : "text-text-secondary"}`}>
+              {o.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── FilterDropdown ───────────────────────────────────────────────
 function FilterDropdown({
   icon: Icon, label, value, options, onChange,
@@ -89,7 +124,7 @@ function FilterDropdown({
   return (
     <div ref={ref} className="relative shrink-0">
       <button onClick={() => setOpen((v) => !v)}
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+        className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all ${
           active ? "bg-gold/12 border-gold/30 text-gold" : open ? "bg-bg-elevated border-border text-text-secondary" : "border-border text-text-muted hover:text-text-secondary"
         }`}>
         <Icon size={11} />
@@ -400,41 +435,37 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
 
       {/* ── Filter Bar ───────────────────────────────────── */}
       <div className="bg-bg-secondary border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 space-y-2">
 
-          {/* Row 1: Search */}
-          <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+          {/* Search */}
+          <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors sm:w-64 sm:shrink-0">
             <Search size={14} className="text-text-muted shrink-0" />
             <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
-              placeholder="Rolle, Fähigkeit, Unternehmen oder Stichwort..."
-              className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none" />
+              placeholder="Rolle, Fähigkeit, Stichwort..."
+              className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
             {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
           </div>
 
-          {/* Row 1b: Controls — horizontal scroll on mobile */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
-            <div className="relative flex items-center shrink-0">
-              <select value={sortKey} onChange={(e) => setSortKey(e.target.value)}
-                className="appearance-none text-xs py-2 pl-3 pr-7 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none focus:border-gold/50 transition-colors cursor-pointer">
-                <option value="newest">Neueste zuerst</option>
-                <option value="rate-desc">Gage (hoch → niedrig)</option>
-                <option value="urgent">Dringend zuerst</option>
-              </select>
-              <ChevronDown size={11} className="absolute right-2 text-text-muted pointer-events-none" />
-            </div>
-            <Link href="/inserat" className="hidden sm:flex px-3 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
-              + Job ausschreiben
-            </Link>
-          </div>
-
-          {/* Row 2: Category picker + filters + toggles */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide"
+          {/* Filters */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5 sm:pb-0"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+            <SortDropdown
+              value={sortKey}
+              options={[
+                { value: "newest",    label: "Neueste zuerst" },
+                { value: "rate-desc", label: "Gage (hoch → niedrig)" },
+                { value: "urgent",    label: "Dringend zuerst" },
+              ]}
+              onChange={setSortKey}
+            />
+
+            <div className="w-px h-6 bg-border shrink-0" />
 
             {/* Bereich & Rolle trigger */}
             <div ref={panelRef} className="relative shrink-0">
               <button onClick={() => setPanelOpen((v) => !v)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all ${
                   panelOpen || hasDeptFilter
                     ? "bg-gold/12 border-gold/30 text-gold"
                     : "border-border text-text-muted hover:text-text-secondary"
@@ -472,27 +503,31 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
               Dringend
             </label>
 
-            {/* Job type toggle + Alles löschen */}
-            <div className="flex items-center gap-1.5 shrink-0">
-              <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden">
-                {(["alle", "freelance", "festanstellung", "praktikum"] as const).map((t) => (
-                  <button key={t} onClick={() => setJobTypeFilter(t)}
-                    className={`px-2.5 py-1 text-[11px] font-medium transition-all border-r border-border last:border-r-0 ${
-                      jobTypeFilter === t ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-secondary"
-                    }`}>
-                    {t === "alle" ? "Alle" : t === "freelance" ? "Freelance" : t === "festanstellung" ? "Festanstellung" : "Praktikum"}
-                  </button>
-                ))}
-              </div>
-              {hasAnyFilter && (
-                <button onClick={clearAll} className="text-[10px] text-text-muted hover:text-red-400 transition-colors whitespace-nowrap">
-                  Alles löschen
+            {/* Job type toggle */}
+            <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
+              {(["alle", "freelance", "festanstellung", "praktikum"] as const).map((t) => (
+                <button key={t} onClick={() => setJobTypeFilter(t)}
+                  className={`h-9 px-2.5 text-[11px] font-medium transition-all border-r border-border last:border-r-0 ${
+                    jobTypeFilter === t ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-secondary"
+                  }`}>
+                  {t === "alle" ? "Alle" : t === "freelance" ? "Freelance" : t === "festanstellung" ? "Festanstellung" : "Praktikum"}
                 </button>
-              )}
+              ))}
             </div>
-          </div>
 
-          {/* Row 3: Two-panel picker */}
+            {hasAnyFilter && (
+              <button onClick={clearAll} className="h-9 px-3 text-xs text-text-muted hover:text-red-400 transition-colors whitespace-nowrap border border-border rounded-lg hover:border-red-400/40 shrink-0">
+                Löschen
+              </button>
+            )}
+
+            <Link href="/inserat" className="hidden sm:flex items-center h-9 px-3 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
+              + Job ausschreiben
+            </Link>
+          </div>
+          </div>{/* end flex flex-col sm:flex-row */}
+
+          {/* Dept panel */}
           {panelOpen && (
             <JobDeptPanel
               activeDeptId={activePanelDept}

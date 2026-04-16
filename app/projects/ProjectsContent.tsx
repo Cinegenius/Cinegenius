@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   Search, Clapperboard, Calendar, Users, X, ChevronDown,
-  LayoutList, LayoutGrid, Film, MapPin,
+  LayoutList, LayoutGrid, Film, MapPin, ArrowUpDown,
 } from "lucide-react";
 
 type Project = {
@@ -29,6 +29,41 @@ const TYPE_COLORS: Record<string, string> = {
 
 type SortKey = "year_desc" | "year_asc" | "title_asc" | "crew_desc";
 
+// ─── SortDropdown ────────────────────────────────────────────────
+function SortDropdown({ value, options, onChange }: {
+  value: string; options: { value: string; label: string }[]; onChange: (v: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, [open]);
+  const label = options.find((o) => o.value === value)?.label ?? "Sortierung";
+  return (
+    <div ref={ref} className="relative shrink-0">
+      <button onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border border-border text-text-muted hover:text-text-secondary transition-all bg-bg-elevated">
+        <ArrowUpDown size={11} />
+        {label}
+        <ChevronDown size={11} className={`transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 z-50 bg-bg-elevated border border-border rounded-xl shadow-xl overflow-hidden min-w-[160px]">
+          {options.map((o) => (
+            <button key={o.value} onClick={() => { onChange(o.value); setOpen(false); }}
+              className={`w-full text-left px-3 py-2 text-xs transition-colors hover:bg-white/[0.04] ${value === o.value ? "text-gold font-medium" : "text-text-secondary"}`}>
+              {o.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── FilterDropdown ───────────────────────────────────────────────
 function FilterDropdown({
   icon: Icon, label, value, options, onChange,
@@ -48,7 +83,7 @@ function FilterDropdown({
   return (
     <div ref={ref} className="relative shrink-0">
       <button onClick={() => setOpen((v) => !v)}
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+        className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all ${
           active ? "bg-gold/12 border-gold/30 text-gold" : open ? "bg-bg-elevated border-border text-text-secondary" : "border-border text-text-muted hover:text-text-secondary"
         }`}>
         <Icon size={11} />
@@ -123,40 +158,40 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
 
       {/* ── Filter Bar ───────────────────────────────────── */}
       <div className="bg-bg-secondary border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 space-y-2">
 
-          {/* Row 1: Search */}
-          <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+          {/* Search */}
+          <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors sm:w-64 sm:shrink-0">
             <Search size={14} className="text-text-muted shrink-0" />
             <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
               placeholder="Titel oder Regisseur suchen..."
-              className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none" />
+              className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
             {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
           </div>
 
-          {/* Row 2: Controls — horizontal scroll on mobile */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
+          {/* Controls + Filters */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5 sm:pb-0" style={{ scrollbarWidth: "none" }}>
             <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
-              <button onClick={() => setView("list")} className={`p-2 transition-colors ${view === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutList size={13} /></button>
-              <button onClick={() => setView("grid")} className={`p-2 transition-colors border-l border-border ${view === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutGrid size={13} /></button>
+              <button onClick={() => setView("list")} className={`flex items-center justify-center w-9 h-9 transition-colors ${view === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutList size={14} /></button>
+              <button onClick={() => setView("grid")} className={`flex items-center justify-center w-9 h-9 transition-colors border-l border-border ${view === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutGrid size={14} /></button>
             </div>
-            <div className="relative flex items-center shrink-0">
-              <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)}
-                className="appearance-none text-xs py-2 pl-3 pr-7 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none focus:border-gold/50 cursor-pointer">
-                <option value="year_desc">Neueste zuerst</option>
-                <option value="year_asc">Älteste zuerst</option>
-                <option value="title_asc">A → Z</option>
-                <option value="crew_desc">Meiste Crew</option>
-              </select>
-              <ChevronDown size={11} className="absolute right-2 text-text-muted pointer-events-none" />
-            </div>
-            <Link href="/dashboard/projects/new" className="hidden sm:flex px-3 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
+            <SortDropdown
+              value={sort}
+              options={[
+                { value: "year_desc", label: "Neueste zuerst" },
+                { value: "year_asc",  label: "Älteste zuerst" },
+                { value: "title_asc", label: "A → Z" },
+                { value: "crew_desc", label: "Meiste Crew" },
+              ]}
+              onChange={(v) => setSort(v as SortKey)}
+            />
+            <Link href="/dashboard/projects/new" className="hidden sm:flex items-center h-9 px-3 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
               + Projekt erstellen
             </Link>
-          </div>
 
-          {/* Row 2: Filters */}
-          <div className="flex items-center gap-2 flex-wrap">
+            <div className="w-px h-6 bg-border shrink-0" />
+
             {availableTypes.length > 0 && (
               <FilterDropdown icon={Film} label="Projekttyp" value={typeFilter} options={availableTypes} onChange={setTypeFilter} />
             )}
@@ -167,13 +202,14 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
               <FilterDropdown icon={MapPin} label="Regie" value={directorFilter} options={availableDirectors} onChange={setDirectorFilter} />
             )}
             {hasAnyFilter && (
-              <button onClick={clearAll} className="text-[10px] text-text-muted hover:text-red-400 transition-colors whitespace-nowrap">
-                Alles löschen
+              <button onClick={clearAll} className="h-9 px-3 text-xs text-text-muted hover:text-red-400 transition-colors whitespace-nowrap border border-border rounded-lg hover:border-red-400/40 shrink-0">
+                Löschen
               </button>
             )}
           </div>
+          </div>{/* end flex flex-col sm:flex-row */}
 
-          {/* Row 3: Active chips */}
+          {/* Active chips */}
           {(typeFilter || yearFilter || directorFilter) && (
             <div className="flex flex-wrap gap-1.5 items-center">
               {typeFilter && (

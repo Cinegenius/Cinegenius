@@ -223,7 +223,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
   return (
     <div className="pt-16 min-h-screen flex flex-col h-screen">
       {/* ── TOP BAR ── */}
-      <div className="bg-bg-secondary border-b border-border py-3 px-4 shrink-0">
+      <div className="bg-bg-secondary border-b border-border py-2 px-4 shrink-0">
         <div className="max-w-full mx-auto space-y-2">
 
           {/* Row 1: Search + View toggle */}
@@ -256,7 +256,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                   key={mode}
                   onClick={() => setViewMode(mode)}
                   title={label}
-                  className={`${hideOnMobile ? "hidden sm:flex" : "flex"} items-center gap-1.5 px-2.5 py-2.5 text-xs font-medium transition-all border-r border-border last:border-r-0 ${
+                  className={`${hideOnMobile ? "hidden sm:flex" : "flex"} items-center gap-1.5 h-9 px-2.5 text-xs font-medium transition-all border-r border-border last:border-r-0 ${
                     viewMode === mode
                       ? "bg-gold text-bg-primary"
                       : "text-text-muted hover:text-text-primary hover:bg-bg-hover"
@@ -275,7 +275,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
             <button
               onClick={userLocation ? clearLocation : handleLocateMe}
               disabled={locating}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all shrink-0 ${
+              className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all shrink-0 ${
                 userLocation
                   ? "bg-gold text-bg-primary border-gold"
                   : "border-border text-text-secondary hover:border-gold hover:text-gold"
@@ -287,7 +287,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
 
             {/* Radius */}
             {userLocation && (
-              <div className="flex items-center gap-2 bg-bg-elevated border border-gold/30 rounded-lg px-3 py-1.5 shrink-0">
+              <div className="flex items-center gap-2 bg-bg-elevated border border-gold/30 rounded-lg h-9 px-3 shrink-0">
                 <span className="text-xs text-text-muted">Radius:</span>
                 <select
                   value={radiusKm}
@@ -304,7 +304,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
             {/* Filters toggle */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all shrink-0 ${
+              className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all shrink-0 ${
                 showFilters || hasActiveFilters
                   ? "border-gold text-gold"
                   : "border-border text-text-secondary hover:border-gold hover:text-gold"
@@ -321,7 +321,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
             <button
               onClick={handleCopyLink}
               title="Copy shareable link"
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-border text-text-secondary hover:border-gold hover:text-gold transition-all shrink-0"
+              className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-xs font-medium border border-border text-text-secondary hover:border-gold hover:text-gold transition-all shrink-0"
             >
               <Share2 size={13} /> {copied ? "Kopiert!" : "Teilen"}
             </button>
@@ -329,7 +329,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
             {/* Non-filmmaker CTA */}
             <Link
               href="/sign-up"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-dashed border-border text-text-muted hover:border-gold hover:text-gold transition-all shrink-0"
+              className="hidden sm:flex items-center gap-1.5 h-9 px-3 rounded-lg text-xs font-medium border border-dashed border-border text-text-muted hover:border-gold hover:text-gold transition-all shrink-0"
             >
               <Film size={12} /> Location inserieren
             </Link>

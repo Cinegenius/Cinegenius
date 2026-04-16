@@ -224,13 +224,20 @@ export default function NotificationCenter() {
           </div>
 
           {/* Footer */}
-          <div className="px-4 py-2.5 border-t border-border">
+          <div className="px-4 py-2.5 border-t border-border flex items-center justify-between">
             <Link
-              href="/dashboard"
+              href="/notifications"
               onClick={() => setOpen(false)}
               className="text-xs text-gold hover:text-gold-light transition-colors font-medium"
             >
-              Alle im Dashboard ansehen →
+              Alle Benachrichtigungen →
+            </Link>
+            <Link
+              href="/messages"
+              onClick={() => setOpen(false)}
+              className="text-xs text-text-muted hover:text-gold transition-colors"
+            >
+              Nachrichten
             </Link>
           </div>
         </div>

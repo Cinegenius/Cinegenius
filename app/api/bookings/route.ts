@@ -127,10 +127,23 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ id: booking.id, ref: booking.ref });
 }
 
-// GET /api/bookings — list bookings for current user
-export async function GET() {
+// GET /api/bookings — list bookings for current user, or single by ?ref=CG-XXXXX
+export async function GET(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ bookings: [] });
+
+  const ref = new URL(req.url).searchParams.get("ref");
+
+  if (ref) {
+    const { data } = await supabaseAdmin
+      .from("bookings")
+      .select("id, ref, listing_id, listing_title, listing_type, start_date, end_date, days, daily_rate, subtotal, platform_fee, total, notes, status, created_at")
+      .eq("user_id", userId)
+      .eq("ref", ref)
+      .maybeSingle();
+    if (!data) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json({ booking: data });
+  }
 
   const { data } = await supabaseAdmin
     .from("bookings")
