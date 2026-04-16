@@ -224,7 +224,7 @@ function MessagesContent() {
       : null;
 
   return (
-    <div className="fixed inset-0 top-16 bg-bg-primary flex flex-col overflow-hidden">
+    <div className="fixed inset-0 top-16 bottom-14 lg:bottom-0 bg-bg-primary flex flex-col overflow-hidden">
 
       {/* ── KONVERSATIONSLISTE (Mobile: volle Breite, Desktop: linke Spalte) ── */}
       <div className={`

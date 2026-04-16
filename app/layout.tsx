@@ -3,6 +3,7 @@ import { Playfair_Display, Inter, JetBrains_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import GlobalEffects from "@/components/GlobalEffects";
@@ -83,8 +84,9 @@ export default function RootLayout({
             <ToastProvider>
               <GlobalEffects />
               <Navbar />
-              <main className="flex-1">{children}</main>
+              <main className="flex-1 pb-14 lg:pb-0">{children}</main>
               <Footer />
+              <BottomNav />
             </ToastProvider>
           </ThemeProvider>
         </body>
