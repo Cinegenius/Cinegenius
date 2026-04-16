@@ -27,6 +27,7 @@ type Prop = {
   id: string; title: string; category: string; vendor: string; location: string;
   dailyRate: number; image: string; condition: string; era: string | null;
   delivery: boolean; rentalType?: "miete" | "kauf"; description?: string; isReal?: boolean;
+  type?: string;
 };
 
 // ─── SortDropdown ────────────────────────────────────────────────
@@ -240,9 +241,11 @@ function CategoryPanel({
 // ─── Prop card ────────────────────────────────────────────────────
 
 function PropCard({ p, list }: { p: Prop; list?: boolean }) {
+  const href = p.type === "vehicle" ? `/vehicles/${p.id}` : `/props/${p.id}`;
+
   if (list) {
     return (
-      <Link href={`/props/${p.id}`}
+      <Link href={href}
         suppressHydrationWarning
         className="card-hover group flex items-center gap-4 p-3 rounded-xl border border-border bg-bg-secondary"
         data-visible>
@@ -273,7 +276,7 @@ function PropCard({ p, list }: { p: Prop; list?: boolean }) {
   }
 
   return (
-    <Link href={`/props/${p.id}`}
+    <Link href={href}
       suppressHydrationWarning
       className="card-hover group rounded-xl border border-border bg-bg-secondary overflow-hidden block"
       data-visible>

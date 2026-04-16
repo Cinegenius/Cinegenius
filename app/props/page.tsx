@@ -21,7 +21,7 @@ export default async function PropsPage() {
     .from("listings")
     .select("*")
     .eq("published", true)
-    .eq("type", "prop")
+    .in("type", ["prop", "vehicle"])
     .order("created_at", { ascending: false });
 
   const { data: providerData } = await supabaseAdmin
@@ -44,18 +44,20 @@ export default async function PropsPage() {
 
   const serverListings = (data ?? []).map((l: {
     id: string; title: string; city: string; price: number; category: string | null;
-    image_url: string | null; rental_type?: string | null;
+    image_url: string | null; rental_type?: string | null; type: string;
+    metadata?: Record<string, unknown> | null;
   }) => ({
     id: l.id,
     title: l.title,
-    category: l.category ?? "Requisiten",
+    type: l.type,
+    category: l.type === "vehicle" ? (l.category ?? "Bild-Fahrzeug") : (l.category ?? "Requisiten"),
     vendor: "Privatanbieter",
     location: l.city ?? "",
     dailyRate: l.price,
     image: l.image_url ?? "",
     condition: "Gut",
     era: null as string | null,
-    delivery: false,
+    delivery: ((l.metadata as Record<string, unknown> | null)?.delivery as boolean) ?? false,
     rentalType: (l.rental_type ?? "miete") as "miete" | "kauf",
     isReal: true,
   }));
