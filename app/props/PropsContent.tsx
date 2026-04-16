@@ -335,6 +335,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const [selectedScene, setSelectedScene] = useState<string | null>(() => searchParams.get("scene") ?? null);
   const [activePanelDept, setActivePanelDept] = useState(DEPARTMENTS[0].id);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const [rentalTypeFilter, setRentalTypeFilter] = useState<"alle" | "miete" | "kauf">("alle");
   const [locationFilter, setLocationFilter] = useState("");
   const [conditionFilter, setConditionFilter] = useState("");
@@ -345,6 +346,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const panelRef = useRef<HTMLDivElement>(null);
+  const filterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!panelOpen) return;
@@ -489,137 +491,95 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
     : null;
   const chipColors = activeDeptData ? deptColors(activeDeptData.color) : null;
 
+  const secondaryFilterCount = [
+    deliveryOnly,
+    sortKey !== "featured",
+    !!locationFilter,
+    !!conditionFilter,
+    !!(minRate || maxRate),
+    rentalTypeFilter !== "alle",
+    !!selectedScene,
+  ].filter(Boolean).length;
+
   return (
     <div className="min-h-screen">
 
       {/* ── Filter Bar ───────────────────────────────────── */}
       <div className="bg-bg-secondary border-b border-border">
-        <div className="px-4 py-2 space-y-2">
+        <div className="px-4 py-3 space-y-3">
 
-          {/* Row 1: Search + View toggle */}
+          {/* Single main row */}
           <div className="flex items-center gap-2">
-            <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
+
+            {/* Search */}
+            <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors min-w-0">
               <Search size={14} className="text-text-muted shrink-0" />
               <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
                 placeholder="Kamera, Requisite, Kostüm…"
                 className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
-              {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
+              {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors shrink-0"><X size={12} /></button>}
             </div>
+
+            {/* Kategorie & Typ */}
+            <div ref={panelRef} className="relative shrink-0">
+              <button
+                onClick={() => setPanelOpen((v) => !v)}
+                className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all ${
+                  panelOpen || hasCategoryFilter
+                    ? "bg-gold/12 border-gold/30 text-gold"
+                    : "border-border text-text-muted hover:text-text-secondary"
+                }`}
+              >
+                <Layers size={11} />
+                <span className="hidden sm:inline">Kategorie</span>
+                {hasCategoryFilter
+                  ? <span className="bg-gold text-bg-primary text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">✓</span>
+                  : <ChevronDown size={11} className={`transition-transform ${panelOpen ? "rotate-180" : ""}`} />
+                }
+              </button>
+              {panelOpen && (
+                <div className="hidden lg:block absolute top-full left-0 mt-2 z-50 w-[580px] max-w-[calc(100vw-2rem)]">
+                  <CategoryPanel
+                    activeDeptId={activePanelDept}
+                    setActiveDeptId={setActivePanelDept}
+                    selectedDept={selectedDept}
+                    selectedGroup={selectedGroup}
+                    onSelectGroup={handleSelectGroup}
+                    onClose={() => setPanelOpen(false)}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Filter panel trigger */}
+            <button
+              onClick={() => setFilterPanelOpen((v) => !v)}
+              className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all shrink-0 ${
+                filterPanelOpen || secondaryFilterCount > 0
+                  ? "bg-gold/12 border-gold/30 text-gold"
+                  : "border-border text-text-muted hover:text-text-secondary"
+              }`}
+            >
+              <SlidersHorizontal size={11} />
+              <span className="hidden sm:inline">Filter</span>
+              {secondaryFilterCount > 0
+                ? <span className="bg-gold text-bg-primary text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{secondaryFilterCount}</span>
+                : <ChevronDown size={11} className={`transition-transform ${filterPanelOpen ? "rotate-180" : ""}`} />
+              }
+            </button>
+
+            {/* Grid / List toggle */}
             <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
               <button onClick={() => setViewMode("grid")} className={`flex items-center justify-center w-9 h-9 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutGrid size={14} /></button>
               <button onClick={() => setViewMode("list")} className={`flex items-center justify-center w-9 h-9 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><List size={14} /></button>
             </div>
+
+            <Link href="/dashboard/new-listing" className="hidden sm:flex items-center h-9 px-3 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
+              + Eintragen
+            </Link>
           </div>
 
-          {/* Row 2: Filters */}
-          <div className="flex items-center gap-2 overflow-x-auto lg:overflow-visible pb-0.5" style={{ scrollbarWidth: "none" }}>
-
-              {/* Delivery toggle */}
-              <label className="flex items-center gap-1.5 text-xs text-text-muted cursor-pointer hover:text-text-secondary transition-colors select-none shrink-0">
-                <div onClick={() => setDeliveryOnly((v) => !v)}
-                  className={`w-7 h-4 rounded-full transition-colors relative cursor-pointer ${deliveryOnly ? "bg-gold" : "bg-border"}`}>
-                  <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${deliveryOnly ? "left-3.5" : "left-0.5"}`} />
-                </div>
-                Lieferung
-              </label>
-
-              <div className="w-px h-4 bg-border shrink-0" />
-
-              {/* Sort */}
-              <SortDropdown
-                value={sortKey}
-                options={[
-                  { value: "featured",   label: "Empfohlen" },
-                  { value: "price-asc",  label: "Preis ↑" },
-                  { value: "price-desc", label: "Preis ↓" },
-                ]}
-                onChange={setSortKey}
-              />
-
-              <div className="w-px h-5 bg-border shrink-0" />
-
-              {/* Category & Type trigger — panel is absolute on lg, inline on mobile */}
-              <div ref={panelRef} className="relative shrink-0">
-                <button
-                  onClick={() => setPanelOpen((v) => !v)}
-                  className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all ${
-                    panelOpen || hasCategoryFilter
-                      ? "bg-gold/12 border-gold/30 text-gold"
-                      : "border-border text-text-muted hover:text-text-secondary hover:border-border"
-                  }`}
-                >
-                  <SlidersHorizontal size={11} />
-                  Kategorie & Typ
-                  {hasCategoryFilter && (
-                    <span className="bg-gold text-bg-primary text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">✓</span>
-                  )}
-                  <ChevronDown size={11} className={`transition-transform ${panelOpen ? "rotate-180" : ""}`} />
-                </button>
-                {/* On desktop: panel drops down absolutely from the button */}
-                {panelOpen && (
-                  <div className="hidden lg:block absolute top-full left-0 mt-2 z-50 w-[580px] max-w-[calc(100vw-2rem)]">
-                    <CategoryPanel
-                      activeDeptId={activePanelDept}
-                      setActiveDeptId={setActivePanelDept}
-                      selectedDept={selectedDept}
-                      selectedGroup={selectedGroup}
-                      onSelectGroup={handleSelectGroup}
-                      onClose={() => setPanelOpen(false)}
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Location */}
-              {availableLocations.length > 0 && (
-                <FilterDropdown icon={MapPin} label="Stadt" value={locationFilter} options={availableLocations} onChange={setLocationFilter} />
-              )}
-
-              {/* Condition */}
-              <FilterDropdown icon={CheckCircle} label="Zustand" value={conditionFilter} options={CONDITIONS} onChange={setConditionFilter} />
-
-              {/* Price range */}
-              <FilterDropdown icon={Euro} label="Preis" value={minRate || maxRate ? `${minRate || "0"} – ${maxRate || "∞"} €` : ""}
-                options={["bis 50 €", "bis 100 €", "bis 250 €", "bis 500 €", "ab 500 €"]}
-                onChange={(v) => {
-                  if (v === "bis 50 €") { setMinRate(""); setMaxRate("50"); }
-                  else if (v === "bis 100 €") { setMinRate(""); setMaxRate("100"); }
-                  else if (v === "bis 250 €") { setMinRate(""); setMaxRate("250"); }
-                  else if (v === "bis 500 €") { setMinRate(""); setMaxRate("500"); }
-                  else if (v === "ab 500 €") { setMinRate("500"); setMaxRate(""); }
-                  else { setMinRate(""); setMaxRate(""); }
-                }}
-              />
-
-              {/* Miete / Kauf toggle */}
-              <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
-                {(["alle", "miete", "kauf"] as const).map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setRentalTypeFilter(t)}
-                    className={`px-2.5 py-1 text-[11px] font-medium transition-all border-r border-border last:border-r-0 ${
-                      rentalTypeFilter === t
-                        ? "bg-gold text-bg-primary"
-                        : "text-text-muted hover:text-text-secondary"
-                    }`}
-                  >
-                    {t === "alle" ? "Alle" : t === "miete" ? "Mieten" : "Kaufen"}
-                  </button>
-                ))}
-              </div>
-
-              {hasAnyFilter && (
-                <button onClick={clearAll} className="text-[10px] text-text-muted hover:text-red-400 transition-colors whitespace-nowrap shrink-0">
-                  Alles löschen
-                </button>
-              )}
-
-              <Link href="/dashboard/new-listing" className="hidden sm:flex items-center h-9 px-3 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
-                + Eintragen
-              </Link>
-            </div>
-
-          {/* Row 3: Two-panel category picker (mobile only — desktop uses absolute dropdown above) */}
+          {/* Mobile: category panel inline */}
           {panelOpen && (
             <div className="lg:hidden">
               <CategoryPanel
@@ -633,7 +593,118 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
             </div>
           )}
 
-          {/* Row 4: Active filter chips */}
+          {/* Secondary filter panel */}
+          {filterPanelOpen && (
+            <div className="p-4 bg-bg-elevated border border-border rounded-xl space-y-4">
+
+              {/* Szenen */}
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Szene</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {SCENES.map((scene) => {
+                    const Icon = SCENE_ICON_MAP[scene.iconName] ?? Package;
+                    const isActive = selectedScene === scene.id;
+                    return (
+                      <button key={scene.id} onClick={() => handleSelectScene(isActive ? null : scene.id)} title={scene.description}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                          isActive ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted hover:border-gold/40 hover:text-text-secondary"
+                        }`}>
+                        <Icon size={11} />{scene.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="h-px bg-border" />
+
+              {/* Second row: Angebotstyp + Sortierung */}
+              <div className="flex flex-wrap gap-6">
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Angebotstyp</p>
+                  <div className="flex gap-1.5">
+                    {(["alle", "miete", "kauf"] as const).map((t) => (
+                      <button key={t} onClick={() => setRentalTypeFilter(t)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                          rentalTypeFilter === t ? "bg-gold/12 border-gold/30 text-gold" : "border-border text-text-muted hover:text-text-secondary"
+                        }`}>
+                        {t === "alle" ? "Alle" : t === "miete" ? "Mieten" : "Kaufen"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Sortierung</p>
+                  <div className="flex gap-1.5">
+                    {[{ value: "featured", label: "Empfohlen" }, { value: "price-asc", label: "Preis ↑" }, { value: "price-desc", label: "Preis ↓" }].map((o) => (
+                      <button key={o.value} onClick={() => setSortKey(o.value)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                          sortKey === o.value ? "bg-gold/12 border-gold/30 text-gold" : "border-border text-text-muted hover:text-text-secondary"
+                        }`}>
+                        {o.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="h-px bg-border" />
+
+              {/* Third row: Lieferung + Stadt + Zustand + Preis */}
+              <div className="flex flex-wrap gap-x-6 gap-y-3 items-end">
+                {/* Lieferung */}
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Lieferung</p>
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <div onClick={() => setDeliveryOnly((v) => !v)}
+                      className={`w-8 h-4.5 rounded-full transition-colors relative cursor-pointer ${deliveryOnly ? "bg-gold" : "bg-border"}`}>
+                      <span className={`absolute top-0.5 w-3.5 h-3.5 rounded-full bg-white transition-all ${deliveryOnly ? "left-4" : "left-0.5"}`} />
+                    </div>
+                    <span className="text-xs text-text-muted">Nur mit Lieferung</span>
+                  </label>
+                </div>
+
+                {/* Stadt */}
+                {availableLocations.length > 0 && (
+                  <div>
+                    <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Stadt</p>
+                    <FilterDropdown icon={MapPin} label="Alle Städte" value={locationFilter} options={availableLocations} onChange={setLocationFilter} />
+                  </div>
+                )}
+
+                {/* Zustand */}
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Zustand</p>
+                  <FilterDropdown icon={CheckCircle} label="Alle" value={conditionFilter} options={CONDITIONS} onChange={setConditionFilter} />
+                </div>
+
+                {/* Preis */}
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Preis / Tag</p>
+                  <FilterDropdown icon={Euro} label="Alle Preise"
+                    value={minRate || maxRate ? `${minRate || "0"} – ${maxRate || "∞"} €` : ""}
+                    options={["bis 50 €", "bis 100 €", "bis 250 €", "bis 500 €", "ab 500 €"]}
+                    onChange={(v) => {
+                      if (v === "bis 50 €") { setMinRate(""); setMaxRate("50"); }
+                      else if (v === "bis 100 €") { setMinRate(""); setMaxRate("100"); }
+                      else if (v === "bis 250 €") { setMinRate(""); setMaxRate("250"); }
+                      else if (v === "bis 500 €") { setMinRate(""); setMaxRate("500"); }
+                      else if (v === "ab 500 €") { setMinRate("500"); setMaxRate(""); }
+                      else { setMinRate(""); setMaxRate(""); }
+                    }}
+                  />
+                </div>
+              </div>
+
+              {secondaryFilterCount > 0 && (
+                <button onClick={clearAll} className="text-[11px] text-text-muted hover:text-red-400 transition-colors underline underline-offset-2">
+                  Alle Filter löschen
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Active filter chips */}
           {(hasCategoryFilter || selectedScene || conditionFilter || deliveryOnly || rentalTypeFilter !== "alle") && (
             <div className="flex flex-wrap gap-1.5 items-center">
               {selectedScene && (() => {
@@ -642,20 +713,20 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                 return scene ? (
                   <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-gold/10 border-gold/30 text-gold">
                     <SceneIcon size={9} /> {scene.label}
-                    <button onClick={() => handleSelectScene(null)} className="hover:opacity-70 transition-opacity ml-0.5"><X size={9} /></button>
+                    <button onClick={() => handleSelectScene(null)} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                   </span>
                 ) : null;
               })()}
               {activeDeptData && chipColors && !selectedScene && (
                 <span className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium ${chipColors.bg} ${chipColors.border} ${chipColors.text}`}>
                   {activeGroupData ? `${activeDeptData.label} › ${activeGroupData.label}` : activeDeptData.label}
-                  <button onClick={clearCategory} className="hover:opacity-70 transition-opacity ml-0.5"><X size={9} /></button>
+                  <button onClick={clearCategory} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               )}
               {conditionFilter && (
                 <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary">
                   {conditionFilter}
-                  <button onClick={() => setConditionFilter("")} className="hover:opacity-70 transition-opacity ml-0.5"><X size={9} /></button>
+                  <button onClick={() => setConditionFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               )}
               {rentalTypeFilter !== "alle" && (
@@ -675,35 +746,6 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               </button>
             </div>
           )}
-        </div>
-      </div>
-
-      {/* ── Szenen-Navigation ─────────────────────────────── */}
-      <div className="border-b border-border bg-bg-primary">
-        <div className="px-4 py-3">
-          <div className="flex items-center gap-2 overflow-x-auto lg:overflow-visible" style={{ scrollbarWidth: "none" }}>
-            <span className="text-[10px] uppercase tracking-widest text-text-muted font-semibold shrink-0 pr-1">Szene</span>
-            <div className="w-px h-4 bg-border shrink-0" />
-            {SCENES.map((scene) => {
-              const Icon = SCENE_ICON_MAP[scene.iconName] ?? Package;
-              const isActive = selectedScene === scene.id;
-              return (
-                <button
-                  key={scene.id}
-                  onClick={() => handleSelectScene(isActive ? null : scene.id)}
-                  title={scene.description}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border shrink-0 transition-all ${
-                    isActive
-                      ? "bg-gold text-bg-primary border-gold shadow-sm shadow-gold/20"
-                      : "border-border text-text-muted hover:border-gold/40 hover:text-text-secondary bg-bg-elevated"
-                  }`}
-                >
-                  <Icon size={11} />
-                  {scene.label}
-                </button>
-              );
-            })}
-          </div>
         </div>
       </div>
 
