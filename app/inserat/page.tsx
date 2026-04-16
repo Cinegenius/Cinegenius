@@ -261,7 +261,9 @@ export default function InseratPage() {
     content_nudity: false,
     content_violence: false,
     content_stunts: false,
-    // prop extras
+    // prop / vehicle extras
+    delivery: false,
+    rental_type: "miete" as "miete" | "kauf",
     dimensions: "",
     safety_note: "",
     // creator
@@ -286,16 +288,18 @@ export default function InseratPage() {
         type,
         category,
         title: form.title || `${form.make} ${form.model}${form.year ? ` (${form.year})` : ""}`.trim(),
-        description: [
-          form.make && `Marke: ${form.make}`,
-          form.model && `Modell: ${form.model}`,
-          form.year && `Baujahr: ${form.year}`,
-          form.fuel_type && `Kraftstoff: ${form.fuel_type}`,
-          form.license_class && `Führerschein: ${form.license_class}`,
-          form.condition && `Zustand: ${form.condition}`,
-        ].filter(Boolean).join(" · ") + (form.description ? `\n\n${form.description}` : ""),
+        description: form.description || "",
         price: parseFloat(form.price) || 0,
         city: form.city,
+        metadata: {
+          make: form.make || null,
+          model: form.model || null,
+          year: form.year ? parseInt(form.year) : null,
+          fuel_type: form.fuel_type || null,
+          license_class: form.license_class || null,
+          condition: form.condition || null,
+          delivery: form.delivery,
+        },
       };
     }
 
@@ -372,13 +376,16 @@ export default function InseratPage() {
       type,
       category,
       title: form.title,
-      description: [
-        form.condition && `Zustand: ${form.condition}`,
-        form.dimensions && `Maße: ${form.dimensions}`,
-        form.safety_note && `⚠ Sicherheitshinweis: ${form.safety_note}`,
-      ].filter(Boolean).join(" · ") + (form.description ? `\n\n${form.description}` : ""),
+      description: form.description || "",
       price: parseFloat(form.price) || 0,
       city: form.city,
+      rental_type: form.rental_type,
+      metadata: {
+        condition: form.condition || null,
+        delivery: form.delivery,
+        dimensions: form.dimensions || null,
+        safety_note: form.safety_note || null,
+      },
     };
   }
 
@@ -627,6 +634,16 @@ export default function InseratPage() {
                     </select>
                   </div>
                 </div>
+                <label className="flex items-center gap-3 cursor-pointer select-none">
+                  <div onClick={() => f("delivery", !form.delivery)}
+                    className={`w-10 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${form.delivery ? "bg-gold" : "bg-border"}`}>
+                    <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${form.delivery ? "left-5" : "left-1"}`} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-text-primary">Lieferung zum Set möglich</p>
+                    <p className="text-xs text-text-muted">Das Fahrzeug kann zum Drehort geliefert werden</p>
+                  </div>
+                </label>
               </div>
             )}
 
@@ -1020,6 +1037,30 @@ export default function InseratPage() {
                     ))}
                   </div>
                 </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Angebotsart</label>
+                  <div className="flex gap-2">
+                    {(["miete", "kauf"] as const).map((t) => (
+                      <button key={t} onClick={() => f("rental_type", t)}
+                        className={`px-4 py-2 rounded-lg text-sm border transition-all ${form.rental_type === t ? "bg-gold text-bg-primary border-gold" : "border-border text-text-secondary hover:border-gold/40"}`}>
+                        {t === "miete" ? "Verleih / Miete" : "Verkauf"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <label className="flex items-center gap-3 cursor-pointer select-none">
+                  <div onClick={() => f("delivery", !form.delivery)}
+                    className={`w-10 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${form.delivery ? "bg-gold" : "bg-border"}`}>
+                    <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${form.delivery ? "left-5" : "left-1"}`} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-text-primary">Lieferung möglich</p>
+                    <p className="text-xs text-text-muted">Ich kann den Artikel zum Set liefern</p>
+                  </div>
+                </label>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Maße / Größe</label>
@@ -1197,7 +1238,7 @@ export default function InseratPage() {
               setDropdownId("");
               setImageUrl(null);
               setImagePreview(null);
-              setForm({ title: "", description: "", price: "", city: "", make: "", model: "", year: "", fuel_type: "", license_class: "", condition: "", sqm: "", ceiling_height: "", max_crew: "", indoor_outdoor: "innen", power_available: false, power_details: "", parking_spots: "", company: "", projectType: "", shoot_start: "", shoot_end: "", pay_type: "", role_label: "", urgent: false, content_nudity: false, content_violence: false, content_stunts: false, dimensions: "", safety_note: "", skills: "", experience: "" });
+              setForm({ title: "", description: "", price: "", city: "", make: "", model: "", year: "", fuel_type: "", license_class: "", condition: "", sqm: "", ceiling_height: "", max_crew: "", indoor_outdoor: "innen", power_available: false, power_details: "", parking_spots: "", company: "", projectType: "", shoot_start: "", shoot_end: "", pay_type: "", role_label: "", urgent: false, content_nudity: false, content_violence: false, content_stunts: false, delivery: false, rental_type: "miete", dimensions: "", safety_note: "", skills: "", experience: "" });
               setLocAmenities([]); setLocBlockedDates([]); setLocExtraImages([]); setLocFloorPlanUrl(null); setLocFloorPlanPreview(null);
             }}
             className="px-6 py-3 border border-border text-text-secondary rounded-xl hover:border-gold hover:text-gold transition-all text-sm font-medium"
