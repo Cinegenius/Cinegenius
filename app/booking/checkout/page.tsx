@@ -14,13 +14,17 @@ function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const listingTitle = searchParams.get("title") ?? "Iron District Warehouse";
-  const listingPrice = Number(searchParams.get("price") ?? 1800);
+  const listingTitle = searchParams.get("title") ?? "";
+  const listingPrice = Number(searchParams.get("price") ?? 0);
   const listingType = searchParams.get("type") ?? "location";
 
-  const [days, setDays] = useState(1);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const urlStart = searchParams.get("startDate") ?? "";
+  const urlEnd   = searchParams.get("endDate") ?? "";
+  const urlDays  = Number(searchParams.get("days") ?? 1);
+
+  const [days, setDays] = useState(() => urlDays > 0 ? urlDays : 1);
+  const [startDate, setStartDate] = useState(urlStart);
+  const [endDate, setEndDate] = useState(urlEnd);
   const [notes, setNotes] = useState("");
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [loading, setLoading] = useState(false);

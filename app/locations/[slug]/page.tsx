@@ -31,7 +31,12 @@ async function getLocation(slug: string) {
 
   if (!data) return null;
 
-  const { lat, lng } = await geocodeCity(data.city ?? "");
+  const [{ lat, lng }, ownerRes] = await Promise.all([
+    geocodeCity(data.city ?? ""),
+    data.user_id
+      ? supabaseAdmin.from("profiles").select("display_name").eq("user_id", data.user_id).single()
+      : Promise.resolve({ data: null }),
+  ]);
 
   return {
     id: data.id,
@@ -52,7 +57,7 @@ async function getLocation(slug: string) {
     lng,
     description: data.description ?? "",
     ownerId: data.user_id ?? "",
-    ownerName: "Anbieter",
+    ownerName: (ownerRes as { data: { display_name: string | null } | null }).data?.display_name ?? "Anbieter",
     isReal: true,
     metadata: data.metadata ?? null,
     blocked_dates: data.blocked_dates ?? [],
