@@ -449,7 +449,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
           </div>
 
           {/* Row 2: Filters */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
+          <div className="flex items-center gap-2 overflow-x-auto lg:overflow-visible pb-0.5" style={{ scrollbarWidth: "none" }}>
             <SortDropdown
               value={sortKey}
               options={[

@@ -328,7 +328,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
           </div>
 
           {/* Row 2: Filters */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
+          <div className="flex items-center gap-2 overflow-x-auto lg:overflow-visible pb-0.5" style={{ scrollbarWidth: "none" }}>
 
             <div className="w-px h-6 bg-border shrink-0" />
 

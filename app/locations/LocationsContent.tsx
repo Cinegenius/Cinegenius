@@ -270,7 +270,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
           </div>
 
           {/* Row 2: Action buttons — horizontal scroll on mobile */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
+          <div className="flex items-center gap-2 overflow-x-auto lg:overflow-visible pb-0.5" style={{ scrollbarWidth: "none" }}>
             {/* Locate me */}
             <button
               onClick={userLocation ? clearLocation : handleLocateMe}

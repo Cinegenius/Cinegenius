@@ -536,7 +536,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
           </div>
 
           {/* Row 2: Filters */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
+          <div className="flex items-center gap-2 overflow-x-auto lg:overflow-visible pb-0.5" style={{ scrollbarWidth: "none" }}>
             {/* Available toggle */}
             <label className="flex items-center gap-1.5 text-xs text-text-muted cursor-pointer hover:text-text-secondary transition-colors select-none shrink-0">
               <div

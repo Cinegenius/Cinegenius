@@ -512,7 +512,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
           </div>
 
           {/* Row 2: Filters */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
+          <div className="flex items-center gap-2 overflow-x-auto lg:overflow-visible pb-0.5" style={{ scrollbarWidth: "none" }}>
 
               {/* Delivery toggle */}
               <label className="flex items-center gap-1.5 text-xs text-text-muted cursor-pointer hover:text-text-secondary transition-colors select-none shrink-0">
@@ -538,7 +538,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
 
               <div className="w-px h-5 bg-border shrink-0" />
 
-              {/* Category & Type trigger */}
+              {/* Category & Type trigger — panel is absolute on lg, inline on mobile */}
               <div ref={panelRef} className="relative shrink-0">
                 <button
                   onClick={() => setPanelOpen((v) => !v)}
@@ -555,6 +555,19 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                   )}
                   <ChevronDown size={11} className={`transition-transform ${panelOpen ? "rotate-180" : ""}`} />
                 </button>
+                {/* On desktop: panel drops down absolutely from the button */}
+                {panelOpen && (
+                  <div className="hidden lg:block absolute top-full left-0 mt-2 z-50 w-[580px] max-w-[calc(100vw-2rem)]">
+                    <CategoryPanel
+                      activeDeptId={activePanelDept}
+                      setActiveDeptId={setActivePanelDept}
+                      selectedDept={selectedDept}
+                      selectedGroup={selectedGroup}
+                      onSelectGroup={handleSelectGroup}
+                      onClose={() => setPanelOpen(false)}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Location */}
@@ -606,16 +619,18 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               </Link>
             </div>
 
-          {/* Row 3: Two-panel category picker */}
+          {/* Row 3: Two-panel category picker (mobile only — desktop uses absolute dropdown above) */}
           {panelOpen && (
-            <CategoryPanel
-              activeDeptId={activePanelDept}
-              setActiveDeptId={setActivePanelDept}
-              selectedDept={selectedDept}
-              selectedGroup={selectedGroup}
-              onSelectGroup={handleSelectGroup}
-              onClose={() => setPanelOpen(false)}
-            />
+            <div className="lg:hidden">
+              <CategoryPanel
+                activeDeptId={activePanelDept}
+                setActiveDeptId={setActivePanelDept}
+                selectedDept={selectedDept}
+                selectedGroup={selectedGroup}
+                onSelectGroup={handleSelectGroup}
+                onClose={() => setPanelOpen(false)}
+              />
+            </div>
           )}
 
           {/* Row 4: Active filter chips */}
@@ -666,7 +681,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
       {/* ── Szenen-Navigation ─────────────────────────────── */}
       <div className="border-b border-border bg-bg-primary">
         <div className="px-4 py-3">
-          <div className="flex items-center gap-2 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+          <div className="flex items-center gap-2 overflow-x-auto lg:overflow-visible" style={{ scrollbarWidth: "none" }}>
             <span className="text-[10px] uppercase tracking-widest text-text-muted font-semibold shrink-0 pr-1">Szene</span>
             <div className="w-px h-4 bg-border shrink-0" />
             {SCENES.map((scene) => {

@@ -176,7 +176,7 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
           </div>
 
           {/* Row 2: Filters */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
+          <div className="flex items-center gap-2 overflow-x-auto lg:overflow-visible pb-0.5" style={{ scrollbarWidth: "none" }}>
             <SortDropdown
               value={sort}
               options={[
