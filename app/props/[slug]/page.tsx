@@ -16,20 +16,25 @@ async function getProp(slug: string) {
 
   if (!data) return null;
 
+  const ownerRes = data.user_id
+    ? await supabaseAdmin.from("profiles").select("display_name").eq("user_id", data.user_id).single()
+    : { data: null };
+
   return {
     id: data.id,
     title: data.title,
-    category: "Requisiten",
-    vendor: "Privatanbieter",
+    category: data.category ?? "Requisiten",
+    vendor: (ownerRes as { data: { display_name: string | null } | null }).data?.display_name ?? "Privatanbieter",
     location: data.city ?? "",
     dailyRate: data.price,
     image: data.image_url ?? "",
-    condition: "Gut",
-    era: null as string | null,
-    delivery: false,
+    condition: (data.metadata as { condition?: string } | null)?.condition ?? "Gut",
+    era: (data.metadata as { era?: string } | null)?.era ?? null,
+    delivery: (data.metadata as { delivery?: boolean } | null)?.delivery ?? false,
     description: data.description ?? "",
     ownerId: data.user_id ?? "",
-    ownerName: "Anbieter",
+    ownerName: (ownerRes as { data: { display_name: string | null } | null }).data?.display_name ?? "Anbieter",
+    extra_images: data.extra_images ?? [],
   };
 }
 

@@ -23,27 +23,35 @@ async function getVehicle(slug: string) {
 
   if (!data) return null;
 
+  const ownerRes = data.user_id
+    ? await supabaseAdmin.from("profiles").select("display_name").eq("user_id", data.user_id).single()
+    : { data: null };
+  const ownerName = (ownerRes as { data: { display_name: string | null } | null }).data?.display_name ?? "Anbieter";
+
+  const meta = (data.metadata ?? {}) as Record<string, unknown>;
+
   return {
     id: data.id,
     title: data.title,
-    type: "Fahrzeug",
-    make: "Privatanbieter",
+    type: data.category ?? "Fahrzeug",
+    make: ownerName,
     model: data.title,
-    year: 0,
-    color: "",
-    era: null as string | null,
-    condition: "Gut",
+    year: (meta.year as number) ?? 0,
+    color: (meta.color as string) ?? "",
+    era: (meta.era as string) ?? null,
+    condition: (meta.condition as string) ?? "Gut",
     location: data.city ?? "",
-    vendor: "Privatanbieter",
+    vendor: ownerName,
     dailyRate: data.price,
     image: data.image_url ?? "",
     tags: ["Neu"] as string[],
     instantBook: false,
     verified: false,
-    delivery: false,
+    delivery: (meta.delivery as boolean) ?? false,
     description: data.description ?? "",
     ownerId: data.user_id ?? "",
-    ownerName: "Anbieter",
+    ownerName,
+    extra_images: data.extra_images ?? [],
   };
 }
 
