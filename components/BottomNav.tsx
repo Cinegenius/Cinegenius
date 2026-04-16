@@ -46,6 +46,9 @@ export default function BottomNav() {
     return () => { supabase.removeChannel(channel); };
   }, [isSignedIn, fetchCounts]);
 
+  // Dashboard has its own internal bottom nav — don't double up
+  if (pathname.startsWith("/dashboard")) return null;
+
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
