@@ -26,6 +26,15 @@ function CheckoutContent() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
 
+  const today = new Date().toISOString().split("T")[0];
+
+  // Auto-calculate days when both dates are set
+  const calcDays = (start: string, end: string) => {
+    if (!start || !end) return;
+    const diff = Math.round((new Date(end).getTime() - new Date(start).getTime()) / 86400000);
+    if (diff >= 1) setDays(diff);
+  };
+
   const subtotal = listingPrice * days;
   const platformFee = Math.round(subtotal * COMMISSION_RATE);
   const total = subtotal + platformFee;
@@ -123,7 +132,13 @@ function CheckoutContent() {
                       <input
                         type="date"
                         value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
+                        min={today}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setStartDate(val);
+                          if (endDate && endDate <= val) setEndDate("");
+                          else calcDays(val, endDate);
+                        }}
                         className="w-full py-2.5 px-3 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-gold transition-colors"
                       />
                     </div>
@@ -132,22 +147,21 @@ function CheckoutContent() {
                       <input
                         type="date"
                         value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
+                        min={startDate || today}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setEndDate(val);
+                          calcDays(startDate, val);
+                        }}
                         className="w-full py-2.5 px-3 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-gold transition-colors"
                       />
                     </div>
                   </div>
-                  <div>
-                    <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
-                      Anzahl Tage
-                    </label>
-                    <input
-                      type="number" min={1} max={30}
-                      value={days}
-                      onChange={(e) => setDays(Math.max(1, Number(e.target.value)))}
-                      className="w-full py-2.5 px-3 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-gold transition-colors"
-                    />
-                  </div>
+                  {startDate && endDate && (
+                    <p className="text-xs text-text-muted">
+                      <span className="text-gold font-semibold">{days} Tag{days !== 1 ? "e" : ""}</span> · {(listingPrice * days).toLocaleString()} € Netto
+                    </p>
+                  )}
                 </div>
 
                 <div className="p-6 rounded-2xl border border-border bg-bg-secondary">

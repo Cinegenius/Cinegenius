@@ -208,6 +208,7 @@ export default function InseratPage() {
   const { userId, isLoaded } = useAuth();
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [createdId, setCreatedId] = useState<string | null>(null);
   const [selected, setSelected] = useState<CategoryItem | null>(null);
   const [activeGroup, setActiveGroup] = useState<string | null>(null); // null = main view
   const [dropdownId, setDropdownId] = useState("");
@@ -422,16 +423,18 @@ export default function InseratPage() {
     setLoading(false);
 
     if (!res.ok) { setError(json.error ?? "Fehler beim Speichern"); return; }
+    setCreatedId(json.data?.id ?? null);
     setStep(3);
   }
 
-  const successHref = () => {
+  const successHref = (id?: string | null) => {
     if (!selected) return "/";
-    if (selected.type === "location") return "/locations";
-    if (selected.type === "vehicle") return "/vehicles";
-    if (selected.type === "job") return "/jobs";
-    if (selected.type === "creator") return "/creators";
-    return "/props";
+    const base = selected.type === "location" ? "/locations"
+      : selected.type === "vehicle" ? "/vehicles"
+      : selected.type === "job" ? "/jobs"
+      : selected.type === "creator" ? "/creators"
+      : "/props";
+    return id ? `${base}/${id}` : base;
   };
 
   const canSubmit = () => {
@@ -1201,7 +1204,7 @@ export default function InseratPage() {
           >
             Weiteres Inserat
           </button>
-          <a href={successHref()} className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm">
+          <a href={successHref(createdId)} className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm">
             Inserat ansehen
           </a>
         </div>
