@@ -250,7 +250,7 @@ export default function ProfileSetupPage() {
 
       // Hard redirect — das Cookie aus dem POST-Response wird mitgesendet,
       // Middleware lässt den User sofort durch ohne JWT-Wartezeit.
-      window.location.href = "/dashboard";
+      window.location.href = "/dashboard?welcome=1";
     } catch (e) {
       console.error("[profile-setup] save error:", e);
       setSaving(false);

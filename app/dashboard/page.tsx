@@ -619,6 +619,82 @@ export default function DashboardPage() {
                 </p>
               </div>
 
+              {/* ── Onboarding Checklist ── */}
+              {!onboardingDismissed && !listingsLoading && (isWelcome || (profileCompleteness < 70 && myListings.length === 0)) && (
+                <div className="rounded-2xl border border-gold/20 bg-gold/5 p-5">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <p className="font-display text-base font-bold text-text-primary">
+                        {isWelcome ? "Willkommen bei CineGenius! 🎬" : "Dein Profil ist fast fertig"}
+                      </p>
+                      <p className="text-xs text-text-muted mt-0.5">
+                        {[true, profileCompleteness >= 70, myListings.length > 0].filter(Boolean).length} von 3 Schritten erledigt
+                      </p>
+                    </div>
+                    <button onClick={() => setOnboardingDismissed(true)} className="text-text-muted hover:text-text-primary transition-colors p-1 shrink-0">
+                      <X size={14} />
+                    </button>
+                  </div>
+
+                  {/* Progress bar */}
+                  <div className="w-full h-1.5 bg-bg-elevated rounded-full overflow-hidden mb-4">
+                    <div
+                      className="h-full bg-gold rounded-full transition-all duration-700"
+                      style={{ width: `${Math.round(([true, profileCompleteness >= 70, myListings.length > 0].filter(Boolean).length / 3) * 100)}%` }}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    {[
+                      {
+                        done: true,
+                        label: "Account erstellt",
+                        desc: "Du bist dabei — kostenlos und sofort.",
+                        href: null as string | null,
+                        cta: null as string | null,
+                      },
+                      {
+                        done: profileCompleteness >= 70,
+                        label: "Profil vervollständigen",
+                        desc: "Foto, Bio und Fähigkeiten — damit du gefunden wirst.",
+                        href: "/profile" as string | null,
+                        cta: "Zum Profil",
+                      },
+                      {
+                        done: myListings.length > 0,
+                        label: profileRole && ["location","equipment","studio","vehicle","props"].includes(profileRole)
+                          ? "Erstes Inserat erstellen"
+                          : "Loslegen",
+                        desc: profileRole && ["location","equipment","studio","vehicle","props"].includes(profileRole)
+                          ? "Drehort, Equipment oder Fahrzeug — kostenlos inserieren."
+                          : "Durchstöbere Locations, Jobs & Crew — oder schreib selbst einen Job aus.",
+                        href: profileRole && ["location","equipment","studio","vehicle","props"].includes(profileRole)
+                          ? "/inserat"
+                          : "/locations",
+                        cta: profileRole && ["location","equipment","studio","vehicle","props"].includes(profileRole)
+                          ? "Inserat erstellen"
+                          : "Entdecken",
+                      },
+                    ].map((step, i) => (
+                      <div key={i} className={`flex items-center gap-3 p-3 rounded-xl ${step.done ? "" : "bg-bg-elevated border border-border"}`}>
+                        <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 border ${step.done ? "bg-success/15 border-success/30 text-success" : "border-border text-text-muted bg-bg-secondary"}`}>
+                          {step.done ? <CheckCircle size={14} /> : <span className="text-xs font-bold text-text-muted">{i + 1}</span>}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-sm font-semibold leading-tight ${step.done ? "line-through text-text-muted" : "text-text-primary"}`}>{step.label}</p>
+                          {!step.done && <p className="text-xs text-text-muted mt-0.5">{step.desc}</p>}
+                        </div>
+                        {!step.done && step.href && (
+                          <Link href={step.href} className="shrink-0 px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap">
+                            {step.cta}
+                          </Link>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* ── Stats-Kacheln ── */}
               {viewStats && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
