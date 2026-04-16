@@ -9,15 +9,21 @@ import {
   LayoutGrid, List, Euro, CheckCircle, ArrowUpDown,
   Camera, Lightbulb, Wrench, Mic, Shirt, Sparkles, Layers, Car, Zap,
   Monitor, Building2, Briefcase, Palette, Scissors,
+  Home, Utensils, Shield, Wine, FlaskConical, Hotel, ChefHat, HeartPulse,
 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
-import { DEPARTMENTS, deptValues, groupValues } from "@/lib/marketplaceCategories";
+import { DEPARTMENTS, SCENES, SEARCH_SYNONYMS, deptValues, groupValues } from "@/lib/marketplaceCategories";
 import { deptColors } from "@/lib/departments";
 
-// ── Icon map ──────────────────────────────────────────────────────
+// ── Icon maps ─────────────────────────────────────────────────────
 const ICON_MAP: Record<string, LucideIcon> = {
   Camera, Lightbulb, Wrench, Mic, Shirt, Sparkles, Layers, Car, Zap,
   Monitor, Building2, Briefcase, Palette, Scissors, Package,
+};
+
+const SCENE_ICON_MAP: Record<string, LucideIcon> = {
+  Home, Utensils, Shield, Wine, FlaskConical, Hotel, ChefHat, HeartPulse,
+  Car, Shirt, Briefcase, Package,
 };
 
 const PAGE_SIZE = 24;
@@ -326,6 +332,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
     const d = searchParams.get("dept"); const g = searchParams.get("group");
     return d && g ? { deptId: d, groupId: g } : null;
   });
+  const [selectedScene, setSelectedScene] = useState<string | null>(() => searchParams.get("scene") ?? null);
   const [activePanelDept, setActivePanelDept] = useState(DEPARTMENTS[0].id);
   const [panelOpen, setPanelOpen] = useState(false);
   const [rentalTypeFilter, setRentalTypeFilter] = useState<"alle" | "miete" | "kauf">("alle");
@@ -353,6 +360,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
     const t = setTimeout(() => {
       const p = new URLSearchParams();
       if (query) p.set("q", query);
+      if (selectedScene) p.set("scene", selectedScene);
       if (selectedGroup) { p.set("dept", selectedGroup.deptId); p.set("group", selectedGroup.groupId); }
       else if (selectedDept) p.set("dept", selectedDept);
       if (conditionFilter) p.set("cond", conditionFilter);
@@ -364,7 +372,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
       router.replace(qs ? `/props?${qs}` : "/props", { scroll: false });
     }, 300);
     return () => clearTimeout(t);
-  }, [query, selectedDept, selectedGroup, conditionFilter, deliveryOnly, minRate, maxRate, sortKey, router]);
+  }, [query, selectedScene, selectedDept, selectedGroup, conditionFilter, deliveryOnly, minRate, maxRate, sortKey, router]);
 
   // Available locations derived from real data
   const availableLocations = useMemo(() => {
@@ -375,34 +383,62 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const filtered = useMemo(() => {
     let r = [...serverListings];
 
-    // Category filter — exact match only (case-insensitive)
-    if (selectedGroup) {
-      const dept = DEPARTMENTS.find((d) => d.id === selectedGroup.deptId);
-      const group = dept?.groups.find((g) => g.id === selectedGroup.groupId);
-      if (group) {
-        // group-level: match group item values OR the dept legacyValues as fallback
-        const groupVals = groupValues(group).map((v) => v.toLowerCase());
-        const legacyVals = (dept?.legacyValues ?? []).map((v) => v.toLowerCase());
-        r = r.filter((p) => {
-          const cat = p.category?.toLowerCase() ?? "";
-          return groupVals.includes(cat) || legacyVals.includes(cat);
-        });
+    // ── Szenen-Filter ─────────────────────────────────────────────
+    if (selectedScene) {
+      const scene = SCENES.find((s) => s.id === selectedScene);
+      if (scene) {
+        const sceneVals = scene.keywords.map((k) => k.toLowerCase());
+        r = r.filter((p) => sceneVals.includes(p.category?.toLowerCase() ?? ""));
       }
-    } else if (selectedDept) {
-      const dept = DEPARTMENTS.find((d) => d.id === selectedDept);
-      if (dept) {
-        const vals = deptValues(dept).map((v) => v.toLowerCase());
-        r = r.filter((p) => vals.includes(p.category?.toLowerCase() ?? ""));
+    }
+
+    // ── Kategorie-Filter (dept / group) — exakter Match ──────────
+    if (!selectedScene) {
+      if (selectedGroup) {
+        const dept = DEPARTMENTS.find((d) => d.id === selectedGroup.deptId);
+        const group = dept?.groups.find((g) => g.id === selectedGroup.groupId);
+        if (group) {
+          const groupVals = groupValues(group).map((v) => v.toLowerCase());
+          const legacyVals = (dept?.legacyValues ?? []).map((v) => v.toLowerCase());
+          r = r.filter((p) => {
+            const cat = p.category?.toLowerCase() ?? "";
+            return groupVals.includes(cat) || legacyVals.includes(cat);
+          });
+        }
+      } else if (selectedDept) {
+        const dept = DEPARTMENTS.find((d) => d.id === selectedDept);
+        if (dept) {
+          const vals = deptValues(dept).map((v) => v.toLowerCase());
+          r = r.filter((p) => vals.includes(p.category?.toLowerCase() ?? ""));
+        }
       }
     }
 
     if (rentalTypeFilter !== "alle") {
       r = r.filter((p) => (p.rentalType ?? "miete") === rentalTypeFilter);
     }
+
+    // ── Suche mit Synonymen ───────────────────────────────────────
     if (query.trim()) {
-      const q = query.toLowerCase();
-      r = r.filter((p) => p.title.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q) || p.location?.toLowerCase().includes(q));
+      const q = query.toLowerCase().trim();
+      const words = q.split(/\s+/);
+      const synonymCats = words.flatMap((w) => SEARCH_SYNONYMS[w] ?? []);
+
+      r = r.filter((p) => {
+        const title = p.title.toLowerCase();
+        const cat = p.category?.toLowerCase() ?? "";
+        const loc = p.location?.toLowerCase() ?? "";
+
+        // Direkte Treffer
+        if (title.includes(q) || cat.includes(q) || loc.includes(q)) return true;
+
+        // Synonym-Treffer: Kategorie muss einem Synonym-Wert entsprechen
+        if (synonymCats.length > 0 && synonymCats.some((sc) => cat === sc)) return true;
+
+        return false;
+      });
     }
+
     if (locationFilter) r = r.filter((p) => p.location?.toLowerCase().includes(locationFilter.toLowerCase()));
     if (conditionFilter) r = r.filter((p) => p.condition === conditionFilter);
     if (deliveryOnly) r = r.filter((p) => p.delivery);
@@ -411,11 +447,12 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
     if (sortKey === "price-asc") r.sort((a, b) => a.dailyRate - b.dailyRate);
     if (sortKey === "price-desc") r.sort((a, b) => b.dailyRate - a.dailyRate);
     return r;
-  }, [serverListings, selectedDept, selectedGroup, query, locationFilter, conditionFilter, deliveryOnly, minRate, maxRate, sortKey]);
+  }, [serverListings, selectedScene, selectedDept, selectedGroup, query, locationFilter, conditionFilter, deliveryOnly, minRate, maxRate, sortKey]);
 
   useEffect(() => setVisibleCount(PAGE_SIZE), [filtered]);
 
   const handleSelectGroup = (deptId: string, groupId: string | null) => {
+    setSelectedScene(null); // Szene aufheben wenn Kategorie gewählt
     if (groupId === null) {
       setSelectedGroup(null);
       setSelectedDept(deptId);
@@ -425,15 +462,20 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
     }
   };
 
+  const handleSelectScene = (sceneId: string | null) => {
+    setSelectedScene(sceneId);
+    if (sceneId) { setSelectedDept(null); setSelectedGroup(null); } // Kategorie aufheben wenn Szene gewählt
+  };
+
   const clearCategory = () => { setSelectedDept(null); setSelectedGroup(null); };
   const clearAll = () => {
-    clearCategory(); setQuery(""); setLocationFilter(""); setConditionFilter("");
+    clearCategory(); setSelectedScene(null); setQuery(""); setLocationFilter(""); setConditionFilter("");
     setDeliveryOnly(false); setMinRate(""); setMaxRate(""); setSortKey("featured");
     setRentalTypeFilter("alle");
     router.replace("/props", { scroll: false });
   };
 
-  const hasAnyFilter = Boolean(selectedDept || selectedGroup || query || locationFilter || conditionFilter || deliveryOnly || minRate || maxRate || rentalTypeFilter !== "alle");
+  const hasAnyFilter = Boolean(selectedScene || selectedDept || selectedGroup || query || locationFilter || conditionFilter || deliveryOnly || minRate || maxRate || rentalTypeFilter !== "alle");
   const hasCategoryFilter = Boolean(selectedDept || selectedGroup);
 
   // Active category label + colors
@@ -577,9 +619,19 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
           )}
 
           {/* Row 4: Active filter chips */}
-          {(hasCategoryFilter || conditionFilter || deliveryOnly || rentalTypeFilter !== "alle") && (
+          {(hasCategoryFilter || selectedScene || conditionFilter || deliveryOnly || rentalTypeFilter !== "alle") && (
             <div className="flex flex-wrap gap-1.5 items-center">
-              {activeDeptData && chipColors && (
+              {selectedScene && (() => {
+                const scene = SCENES.find((s) => s.id === selectedScene);
+                const SceneIcon = scene ? (SCENE_ICON_MAP[scene.iconName] ?? Package) : Package;
+                return scene ? (
+                  <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-gold/10 border-gold/30 text-gold">
+                    <SceneIcon size={9} /> {scene.label}
+                    <button onClick={() => handleSelectScene(null)} className="hover:opacity-70 transition-opacity ml-0.5"><X size={9} /></button>
+                  </span>
+                ) : null;
+              })()}
+              {activeDeptData && chipColors && !selectedScene && (
                 <span className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium ${chipColors.bg} ${chipColors.border} ${chipColors.text}`}>
                   {activeGroupData ? `${activeDeptData.label} › ${activeGroupData.label}` : activeDeptData.label}
                   <button onClick={clearCategory} className="hover:opacity-70 transition-opacity ml-0.5"><X size={9} /></button>
@@ -611,16 +663,57 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
         </div>
       </div>
 
+      {/* ── Szenen-Navigation ─────────────────────────────── */}
+      <div className="border-b border-border bg-bg-primary">
+        <div className="px-4 py-3">
+          <div className="flex items-center gap-2 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+            <span className="text-[10px] uppercase tracking-widest text-text-muted font-semibold shrink-0 pr-1">Szene</span>
+            <div className="w-px h-4 bg-border shrink-0" />
+            {SCENES.map((scene) => {
+              const Icon = SCENE_ICON_MAP[scene.iconName] ?? Package;
+              const isActive = selectedScene === scene.id;
+              return (
+                <button
+                  key={scene.id}
+                  onClick={() => handleSelectScene(isActive ? null : scene.id)}
+                  title={scene.description}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border shrink-0 transition-all ${
+                    isActive
+                      ? "bg-gold text-bg-primary border-gold shadow-sm shadow-gold/20"
+                      : "border-border text-text-muted hover:border-gold/40 hover:text-text-secondary bg-bg-elevated"
+                  }`}
+                >
+                  <Icon size={11} />
+                  {scene.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
       {/* ── Results ──────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <p className="text-sm text-text-muted mb-5">
-          <span className="text-text-primary font-semibold">{filtered.length} {filtered.length !== 1 ? "Artikel" : "Artikel"}</span> gefunden
-          {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
-        </p>
+        <div className="flex items-center justify-between mb-5">
+          <p className="text-sm text-text-muted">
+            <span className="text-text-primary font-semibold">{filtered.length}</span> Artikel gefunden
+            {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
+            {selectedScene && (() => {
+              const scene = SCENES.find((s) => s.id === selectedScene);
+              return scene ? <span className="text-text-muted"> · Szene: {scene.label}</span> : null;
+            })()}
+          </p>
+          {hasAnyFilter && (
+            <button onClick={clearAll} className="text-xs text-text-muted hover:text-red-400 transition-colors flex items-center gap-1">
+              <X size={11} /> Alle Filter löschen
+            </button>
+          )}
+        </div>
 
         {filtered.length === 0 ? (
-          <EmptyState icon={Package} title="Keine Artikel gefunden"
-            description="Versuche eine andere Suche oder wähle eine andere Kategorie."
+          <EmptyState icon={Package}
+            title={selectedScene ? `Noch keine Artikel für Szene „${SCENES.find(s => s.id === selectedScene)?.label}"` : "Keine Artikel gefunden"}
+            description={selectedScene ? "Diese Szene füllt sich, sobald Anbieter Artikel mit passender Kategorie inserieren." : "Versuche eine andere Suche oder wähle eine andere Kategorie."}
             action={{ label: "Alles anzeigen", onClick: clearAll }} />
         ) : (
           <>

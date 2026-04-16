@@ -704,3 +704,176 @@ export function findDept(value: string): MarketplaceDept | undefined {
 
 /** Flat list of every category value across all departments */
 export const ALL_VALUES: string[] = DEPARTMENTS.flatMap(deptValues);
+
+// ── Szenen-Kategorien ─────────────────────────────────────────────
+// Production-designer Denkweise: "Ich brauche ein Büro aus den 80ern"
+// → statt durch Kategorien zu scrollen direkt Szene wählen
+
+export type Scene = {
+  id: string;
+  label: string;
+  iconName: string;
+  description: string;
+  /** category values + legacyValues that belong to this scene */
+  keywords: string[];
+};
+
+export const SCENES: Scene[] = [
+  {
+    id: "wohnzimmer",
+    label: "Wohnzimmer",
+    iconName: "Home",
+    description: "Sofas, Tische, Leuchten, Teppiche, Deko",
+    keywords: ["sofa", "tisch", "bett", "lampen", "teppich", "tv-prop", "bilder-spiegel", "regal", "stuhl", "deko-objekte", "vorhaenge"],
+  },
+  {
+    id: "buero",
+    label: "Büro",
+    iconName: "Briefcase",
+    description: "Schreibtische, Computer, Akten, Büroausstattung",
+    keywords: ["bueromoebel", "computer-prop", "phone-prop", "buroartikel", "stuhl", "tisch", "regal"],
+  },
+  {
+    id: "restaurant",
+    label: "Restaurant",
+    iconName: "Utensils",
+    description: "Tische, Stühle, Geschirr, Flaschen, Besteck",
+    keywords: ["kueche", "catering-props", "flaschen", "tisch", "stuhl"],
+  },
+  {
+    id: "krankenhaus",
+    label: "Krankenhaus",
+    iconName: "HeartPulse",
+    description: "OP-Instrumente, Betten, Monitore, Krankenwagen",
+    keywords: ["medical-props", "bett", "ambulance", "computer-prop"],
+  },
+  {
+    id: "militaer",
+    label: "Militär",
+    iconName: "Shield",
+    description: "Uniformen, Fahrzeuge, Waffen, Ausrüstung",
+    keywords: ["militaer-props", "militaer-fahr", "uniform", "waffen-fake", "stunt-car"],
+  },
+  {
+    id: "fahrzeuge",
+    label: "Fahrzeuge",
+    iconName: "Car",
+    description: "Oldtimer, Stuntcars, Militär, Spezialfahrzeuge",
+    keywords: ["oldtimer", "classic-car", "moderne-pkw", "luxus-fahr", "sportwagen", "militaer-fahr", "stunt-car", "motorrad", "bus", "truck", "rig-car", "auto-transporter", "bild-fahrzeug"],
+  },
+  {
+    id: "kueche",
+    label: "Küche",
+    iconName: "ChefHat",
+    description: "Küchenutensilien, Geschirr, Flaschen",
+    keywords: ["kueche", "catering-props", "flaschen", "werkzeug"],
+  },
+  {
+    id: "bar",
+    label: "Bar & Club",
+    iconName: "Wine",
+    description: "Flaschen, Neonlichter, Barhocker, Atmosphäre",
+    keywords: ["flaschen", "neon", "strobe", "stuhl", "effect-light"],
+  },
+  {
+    id: "hotel",
+    label: "Hotel",
+    iconName: "Hotel",
+    description: "Betten, Sofas, Deko, Empfang",
+    keywords: ["bett", "sofa", "lampen", "bilder-spiegel", "teppich", "regal"],
+  },
+  {
+    id: "kostuem",
+    label: "Kostüm",
+    iconName: "Shirt",
+    description: "Historische und moderne Kostüme, Uniformen",
+    keywords: ["alltagskleidung", "historisch-frueh", "historisch-spaet", "viktorianisch", "mittelalter", "fantasy-scifi", "uniform", "berufskleidung"],
+  },
+  {
+    id: "labor",
+    label: "Labor",
+    iconName: "FlaskConical",
+    description: "Laborgeräte, medizinische Requisiten",
+    keywords: ["medical-props", "computer-prop"],
+  },
+];
+
+// ── Synonyme / Semantische Suche ──────────────────────────────────
+// Mappt Nutzer-Suchbegriffe auf Kategorie-Werte der Taxonomie.
+// → "Löffel" findet Listings mit category="kueche" auch ohne Volltexttreffer
+
+export const SEARCH_SYNONYMS: Record<string, string[]> = {
+  // Küche / Essen
+  löffel:        ["kueche"],
+  gabel:         ["kueche"],
+  messer:        ["kueche"],
+  teller:        ["catering-props", "kueche"],
+  schüssel:      ["catering-props", "kueche"],
+  glas:          ["flaschen"],
+  flasche:       ["flaschen"],
+  besteck:       ["kueche"],
+  geschirr:      ["catering-props", "kueche"],
+  topf:          ["kueche"],
+  pfanne:        ["kueche"],
+  // Möbel
+  couch:         ["sofa"],
+  sessel:        ["stuhl", "sofa"],
+  schrank:       ["regal"],
+  regal:         ["regal"],
+  couchtisch:    ["tisch"],
+  esstisch:      ["tisch"],
+  schreibtisch:  ["bueromoebel", "tisch"],
+  // Licht / Deko
+  lampe:         ["lampen", "practical"],
+  leuchte:       ["lampen"],
+  licht:         ["lampen"],
+  spiegel:       ["bilder-spiegel"],
+  bild:          ["bilder-spiegel"],
+  teppich:       ["teppich"],
+  vorhang:       ["vorhaenge"],
+  // Elektronik
+  telefon:       ["phone-prop"],
+  handy:         ["phone-prop"],
+  festnetz:      ["phone-prop"],
+  computer:      ["computer-prop"],
+  laptop:        ["computer-prop"],
+  monitor:       ["computer-prop", "onset-monitor"],
+  fernseher:     ["tv-prop"],
+  tv:            ["tv-prop"],
+  radio:         ["vintage-elektronik"],
+  // Fahrzeuge
+  auto:          ["oldtimer", "classic-car", "moderne-pkw", "bild-fahrzeug"],
+  wagen:         ["oldtimer", "classic-car"],
+  fahrzeug:      ["bild-fahrzeug", "oldtimer"],
+  oldtimer:      ["oldtimer"],
+  sportwagen:    ["sportwagen"],
+  motorrad:      ["motorrad"],
+  panzer:        ["militaer-fahr"],
+  lkw:           ["truck"],
+  bus:           ["bus"],
+  krankenwagen:  ["ambulance"],
+  feuerwehr:     ["polizei-fahr"],
+  polizei:       ["polizei-fahr"],
+  // Militär
+  waffe:         ["waffen-fake"],
+  pistole:       ["waffen-fake"],
+  gewehr:        ["waffen-fake"],
+  schwert:       ["waffen-fake"],
+  uniform:       ["uniform"],
+  militär:       ["militaer-props", "militaer-fahr"],
+  soldat:        ["militaer-props", "uniform"],
+  // Medizin
+  arzt:          ["medical-props"],
+  krankenhaus:   ["medical-props"],
+  spritze:       ["medical-props"],
+  // Kostüm
+  kostüm:        ["alltagskleidung", "historisch-frueh"],
+  kleid:         ["alltagskleidung"],
+  anzug:         ["alltagskleidung"],
+  hut:           ["hut"],
+  schmuck:       ["schmuck"],
+  // Kamera / Licht-Equipment (Leihgeräte)
+  kamera:        ["arri", "red", "sony-cinema", "blackmagic", "dslr"],
+  stativ:        ["tripod"],
+  scheinwerfer:  ["led-panel", "fresnel", "hmi"],
+};
