@@ -23,7 +23,7 @@ export default function VehiclesContent({ serverVehicles }: { serverVehicles: Ve
   const [selectedEra, setSelectedEra] = useState("Alle");
   const [deliveryOnly, setDeliveryOnly] = useState(false);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
-  const [maxPrice, setMaxPrice] = useState(3000);
+  const [maxPrice, setMaxPrice] = useState(10000);
   const [showFilters, setShowFilters] = useState(false);
 
   const filtered = useMemo(() => {
@@ -33,7 +33,7 @@ export default function VehiclesContent({ serverVehicles }: { serverVehicles: Ve
       if (selectedEra !== "Alle" && v.era !== selectedEra) return false;
       if (deliveryOnly && !v.delivery) return false;
       if (verifiedOnly && !v.verified) return false;
-      if (v.dailyRate > maxPrice) return false;
+      if (maxPrice < 10000 && v.dailyRate > maxPrice) return false;
       return true;
     });
   }, [allVehicles, search, selectedType, selectedEra, deliveryOnly, verifiedOnly, maxPrice]);
@@ -45,7 +45,7 @@ export default function VehiclesContent({ serverVehicles }: { serverVehicles: Ve
 
   const activeFilterCount = [
     selectedType !== "Alle", selectedEra !== "Alle",
-    deliveryOnly, verifiedOnly, maxPrice < 3000,
+    deliveryOnly, verifiedOnly, maxPrice < 10000,
   ].filter(Boolean).length;
 
   return (
@@ -119,10 +119,10 @@ export default function VehiclesContent({ serverVehicles }: { serverVehicles: Ve
                 <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-2">
                   Max. Preis: <span className="text-gold">{maxPrice.toLocaleString()} €/Tag</span>
                 </p>
-                <input type="range" min={200} max={3000} step={100} value={maxPrice}
+                <input type="range" min={200} max={10000} step={100} value={maxPrice}
                   onChange={(e) => setMaxPrice(Number(e.target.value))} className="w-full accent-gold" />
                 <div className="flex justify-between text-xs text-text-muted mt-1">
-                  <span>200 €</span><span>3.000 €</span>
+                  <span>200 €</span><span>10.000 €</span>
                 </div>
               </div>
 
