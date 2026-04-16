@@ -42,32 +42,36 @@ export default async function VehiclesPage() {
     }));
 
   const serverVehicles = (data ?? []).map((l: {
-    id: string; title: string; city: string; price: number; image_url: string | null; description: string | null;
+    id: string; title: string; city: string; price: number; image_url: string | null;
+    description: string | null; category: string | null;
+    metadata: Record<string, unknown> | null;
   }) => {
+    const meta = (l.metadata ?? {}) as Record<string, unknown>;
+    // Support both new metadata format and legacy description-embedded format
     const desc = l.description ?? "";
-    const make = desc.match(/Marke: ([^·\n]+)/)?.[1]?.trim() ?? "";
-    const model = desc.match(/Modell: ([^·\n]+)/)?.[1]?.trim() ?? "";
-    const yearStr = desc.match(/Baujahr: ([^·\n]+)/)?.[1]?.trim();
-    const year = yearStr ? parseInt(yearStr) : 0;
+    const make = (meta.make as string) || desc.match(/Marke: ([^·\n]+)/)?.[1]?.trim() || "";
+    const model = (meta.model as string) || desc.match(/Modell: ([^·\n]+)/)?.[1]?.trim() || "";
+    const yearRaw = meta.year ?? desc.match(/Baujahr: ([^·\n]+)/)?.[1]?.trim();
+    const year = yearRaw ? parseInt(String(yearRaw)) : 0;
     return {
-    id: l.id,
-    title: l.title,
-    type: "Bild-Fahrzeug",
-    make: make || "Privatanbieter",
-    model: model || "",
-    year,
-    color: "",
-    era: "" as string,
-    condition: "Gut",
-    location: l.city ?? "",
-    vendor: "Privatanbieter",
-    dailyRate: l.price,
-    image: l.image_url ?? "",
-    tags: ["Neu"],
-    instantBook: false,
-    verified: false,
-    delivery: false,
-    isReal: true,
+      id: l.id,
+      title: l.title,
+      type: l.category ?? "Bild-Fahrzeug",
+      make: make || "",
+      model: model || "",
+      year,
+      color: (meta.color as string) ?? "",
+      era: (meta.era as string) ?? null,
+      condition: (meta.condition as string) ?? "Gut",
+      location: l.city ?? "",
+      vendor: "",
+      dailyRate: l.price,
+      image: l.image_url ?? "",
+      tags: ["Neu"],
+      instantBook: false,
+      verified: false,
+      delivery: (meta.delivery as boolean) ?? false,
+      isReal: true,
     };
   });
 
