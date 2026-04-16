@@ -178,28 +178,21 @@ export default async function VehicleDetailPage({
               </p>
             </div>
 
-            <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-              <h2 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
-                <Calendar size={16} className="text-gold" /> Buchungskonditionen
-              </h2>
-              <div className="space-y-3 text-sm text-text-secondary">
-                <div className="flex justify-between py-2 border-b border-border">
-                  <span>Mindestbuchungsdauer</span><span className="text-text-primary font-medium">1 Tag</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-border">
-                  <span>Stornierung bis 48h vorher</span><span className="text-success font-medium">Kostenlos</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-border">
-                  <span>Stornierung unter 48h</span><span className="text-crimson-light font-medium">50% Stornogebühr</span>
-                </div>
-                <div className="flex justify-between py-2">
-                  <span>Lieferung</span>
-                  <span className={vehicle.delivery ? "text-success font-medium" : "text-text-muted"}>
-                    {vehicle.delivery ? "Verfügbar" : "Selbstabholung"}
-                  </span>
+            {vehicle.delivery !== undefined && (
+              <div className="p-5 rounded-xl border border-border bg-bg-secondary">
+                <h2 className="font-semibold text-text-primary mb-3 flex items-center gap-2">
+                  <Calendar size={16} className="text-gold" /> Konditionen
+                </h2>
+                <div className="space-y-3 text-sm text-text-secondary">
+                  <div className="flex justify-between py-2">
+                    <span>Lieferung</span>
+                    <span className={vehicle.delivery ? "text-success font-medium" : "text-text-muted"}>
+                      {vehicle.delivery ? "Verfügbar" : "Selbstabholung"}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="lg:col-span-1">

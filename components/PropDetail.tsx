@@ -203,24 +203,6 @@ export default function PropDetail({ prop }: { prop: Prop }) {
               </ul>
             </div>
 
-            <div className="mb-8">
-              <h2 className="font-display text-xl font-bold text-text-primary mb-4">Mietbedingungen</h2>
-              <div className="space-y-2">
-                {[
-                  "Mindest-Mietdauer: 1 Tag",
-                  "Wochenpreis verfügbar (Anbieter kontaktieren)",
-                  "Kaution: 25% des Mietwerts, Rückgabe innerhalb von 5 Tagen",
-                  "Schäden müssen innerhalb von 4 Stunden nach Lieferung gemeldet werden",
-                  "Stornierung: volle Rückerstattung bei Stornierung 72h vor Beginn",
-                  "Der Mieter haftet für den Artikel während der Mietzeit",
-                ].map((t) => (
-                  <div key={t} className="flex items-start gap-2.5 text-sm text-text-secondary">
-                    <ChevronRight size={14} className="text-gold mt-0.5 shrink-0" />
-                    {t}
-                  </div>
-                ))}
-              </div>
-            </div>
 
             <div className="mb-8">
               <ReviewsSection
