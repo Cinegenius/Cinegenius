@@ -2,51 +2,58 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useUser } from "@clerk/nextjs";
-import { Loader2, Camera, CheckCircle } from "lucide-react";
+import {
+  Loader2, Camera, CheckCircle,
+  Drama, User, Users, Mic2, Music, Zap, Mic, Smartphone,
+  Film, Clapperboard, ClipboardList, Lightbulb, Sparkles, Shirt,
+  Monitor, Layers, Palette, Radio, Aperture, PenLine, Scissors,
+  MapPin, Wrench, Building2, Car, Package,
+} from "lucide-react";
+import type { ElementType } from "react";
 import { getPresetForType, type ProfileType } from "@/lib/profile-types";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 
 // ─── Rollenliste ──────────────────────────────────────────────────────────────
 
-const FILMMAKER_ROLES: { type: ProfileType; label: string; emoji: string }[] = [
+const FILMMAKER_ROLES: { type: ProfileType; label: string; icon: ElementType }[] = [
   // Talent
-  { type: "actor",       label: "Schauspieler",    emoji: "🎭" },
-  { type: "model",       label: "Model",            emoji: "📸" },
-  { type: "extra",       label: "Komparse",         emoji: "🎬" },
-  { type: "host",        label: "Moderator / Host", emoji: "🎤" },
-  { type: "dancer",      label: "Tänzer",           emoji: "💃" },
-  { type: "stunt",       label: "Stuntman/-frau",   emoji: "🔥" },
-  { type: "voiceover",   label: "Sprecher",         emoji: "🎙" },
-  { type: "creator",     label: "Content Creator",  emoji: "📱" },
+  { type: "actor",                  label: "Schauspieler",    icon: Drama },
+  { type: "model",                  label: "Model",            icon: User },
+  { type: "extra",                  label: "Komparse",         icon: Users },
+  { type: "host",                   label: "Moderator / Host", icon: Mic2 },
+  { type: "dancer",                 label: "Tänzer",           icon: Music },
+  { type: "stunt",                  label: "Stuntman/-frau",   icon: Zap },
+  { type: "voiceover",              label: "Sprecher",         icon: Mic },
+  { type: "creator",                label: "Content Creator",  icon: Smartphone },
   // Crew
-  { type: "camera",               label: "Kamera",         emoji: "🎥" },
-  { type: "director_of_photography", label: "DoP",         emoji: "🎞" },
-  { type: "director",             label: "Regisseur",      emoji: "🎬" },
-  { type: "production",           label: "Produktion",     emoji: "📋" },
-  { type: "lighting",             label: "Licht",          emoji: "💡" },
-  { type: "sound",                label: "Ton",            emoji: "🎚" },
-  { type: "makeup",               label: "Maske",          emoji: "💄" },
-  { type: "costume",              label: "Kostüm",         emoji: "👗" },
-  { type: "postproduction",       label: "Schnitt / Post", emoji: "🖥" },
-  { type: "vfx",                  label: "VFX",            emoji: "✨" },
-  { type: "sfx",                  label: "SFX",            emoji: "💥" },
-  { type: "art_department",       label: "Szenenbild",     emoji: "🏛" },
-  { type: "broadcast",            label: "Broadcast",      emoji: "📡" },
+  { type: "camera",                 label: "Kamera",           icon: Camera },
+  { type: "director_of_photography",label: "DoP",              icon: Film },
+  { type: "director",               label: "Regisseur",        icon: Clapperboard },
+  { type: "production",             label: "Produktion",       icon: ClipboardList },
+  { type: "lighting",               label: "Licht",            icon: Lightbulb },
+  { type: "sound",                  label: "Ton",              icon: Mic },
+  { type: "makeup",                 label: "Maske",            icon: Sparkles },
+  { type: "costume",                label: "Kostüm",           icon: Shirt },
+  { type: "postproduction",         label: "Schnitt / Post",   icon: Monitor },
+  { type: "vfx",                    label: "VFX",              icon: Layers },
+  { type: "sfx",                    label: "SFX",              icon: Zap },
+  { type: "art_department",         label: "Szenenbild",       icon: Palette },
+  { type: "broadcast",              label: "Broadcast",        icon: Radio },
   // Kreativ
-  { type: "filmmaker",      label: "Filmemacher",     emoji: "🎬" },
-  { type: "photographer",   label: "Fotograf",        emoji: "📷" },
-  { type: "writer",         label: "Autor / Texter",  emoji: "✍️" },
-  { type: "editor",         label: "Editor",          emoji: "✂️" },
-  { type: "motion_designer",label: "Motion Design",   emoji: "🎨" },
-  { type: "art_director",   label: "Art Director",    emoji: "🖌" },
+  { type: "filmmaker",              label: "Filmemacher",      icon: Clapperboard },
+  { type: "photographer",           label: "Fotograf",         icon: Aperture },
+  { type: "writer",                 label: "Autor / Texter",   icon: PenLine },
+  { type: "editor",                 label: "Editor",           icon: Scissors },
+  { type: "motion_designer",        label: "Motion Design",    icon: Layers },
+  { type: "art_director",           label: "Art Director",     icon: Palette },
 ];
 
-const VENDOR_ROLES: { type: ProfileType; label: string; emoji: string }[] = [
-  { type: "location",    label: "Location",     emoji: "📍" },
-  { type: "equipment",   label: "Equipment",    emoji: "🔧" },
-  { type: "studio",      label: "Studio",       emoji: "🏢" },
-  { type: "vehicle",     label: "Fahrzeuge",    emoji: "🚐" },
-  { type: "props",       label: "Props",        emoji: "🪄" },
+const VENDOR_ROLES: { type: ProfileType; label: string; icon: ElementType }[] = [
+  { type: "location",  label: "Location",   icon: MapPin },
+  { type: "equipment", label: "Equipment",  icon: Wrench },
+  { type: "studio",    label: "Studio",     icon: Building2 },
+  { type: "vehicle",   label: "Fahrzeuge",  icon: Car },
+  { type: "props",     label: "Props",      icon: Package },
 ];
 
 // ─── Kategorien für 2-Stufen Auswahl ─────────────────────────────────────────
@@ -55,28 +62,28 @@ const CATEGORIES = [
   {
     id: "talent",
     label: "Talent",
-    emoji: "🎭",
+    icon: Drama,
     desc: "Schauspieler, Model, Creator …",
     types: ["actor","model","extra","host","dancer","stunt","voiceover","creator"],
   },
   {
     id: "crew",
     label: "Filmcrew",
-    emoji: "🎥",
+    icon: Clapperboard,
     desc: "Kamera, Licht, Ton, Regie …",
     types: ["camera","director_of_photography","director","production","lighting","sound","makeup","costume","postproduction","vfx","sfx","art_department","broadcast"],
   },
   {
     id: "kreativ",
     label: "Kreativ",
-    emoji: "✍️",
+    icon: Palette,
     desc: "Fotograf, Editor, Art Director …",
     types: ["filmmaker","photographer","writer","editor","motion_designer","art_director"],
   },
   {
     id: "anbieter",
     label: "Anbieter",
-    emoji: "🏢",
+    icon: Building2,
     desc: "Location, Equipment, Studio …",
     types: ["location","equipment","studio","vehicle","props"],
   },
@@ -88,8 +95,8 @@ function RolePicker({
   selected,
   onSelect,
 }: {
-  filmmakerroles: { type: ProfileType; label: string; emoji: string }[];
-  vendorroles: { type: ProfileType; label: string; emoji: string }[];
+  filmmakerroles: { type: ProfileType; label: string; icon: ElementType }[];
+  vendorroles: { type: ProfileType; label: string; icon: ElementType }[];
   selected: ProfileType | null;
   onSelect: (t: ProfileType) => void;
 }) {
@@ -115,7 +122,7 @@ function RolePicker({
                 isOpen ? "bg-bg-elevated" : "bg-bg-secondary hover:bg-bg-elevated"
               }`}
             >
-              <span className="text-2xl leading-none">{cat.emoji}</span>
+              <cat.icon size={22} className="text-text-muted shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-text-primary text-sm">{cat.label}</p>
                 <p className="text-xs text-text-muted">
@@ -143,7 +150,7 @@ function RolePicker({
                         : "border-border bg-bg-secondary text-text-secondary hover:border-border-light"
                     }`}
                   >
-                    <span className="text-base leading-none">{r.emoji}</span>
+                    <r.icon size={14} className="shrink-0" />
                     <span className="text-xs font-medium leading-tight">{r.label}</span>
                     {selected === r.type && <CheckCircle size={12} className="ml-auto shrink-0 text-gold" />}
                   </button>

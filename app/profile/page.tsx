@@ -7,7 +7,9 @@ import {
   Camera, CheckCircle, User, Lock, Bell, CreditCard, MapPin, Film,
   Plus, X, Save, Wallet, Upload, ShieldCheck, Clock, AlertCircle, Loader2,
   Globe, Plane, Video, Euro, Clapperboard, Link2, AtSign, PlayCircle, ExternalLink,
+  Drama, Palette, Building2,
 } from "lucide-react";
+import type { ElementType } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import ProfileGuard from "@/components/ProfileGuard";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
@@ -63,16 +65,16 @@ function getCompletion(opts: {
 }
 
 // ─── Accordion role picker (same as profile-setup) ───────────────────────────
-const ROLE_CATEGORIES = [
-  { id: "talent",   label: "Talent / Performance", emoji: "🎭", desc: "Schauspieler, Model, Creator …",
+const ROLE_CATEGORIES: { id: string; label: string; icon: ElementType; desc: string; types: readonly (readonly [string, string])[] }[] = [
+  { id: "talent",   label: "Talent / Performance", icon: Drama,       desc: "Schauspieler, Model, Creator …",
     types: [["actor","Schauspieler/in"],["model","Model"],["extra","Komparse / Kleindarsteller"],["host","Moderator/in"],["dancer","Tänzer/in"],["stunt","Stunt Performer"],["voiceover","Synchronsprecher/in"],["creator","Influencer / Creator"]] },
-  { id: "crew",     label: "Filmcrew / Technik",   emoji: "🎥", desc: "Kamera, Licht, Ton, Regie …",
+  { id: "crew",     label: "Filmcrew / Technik",   icon: Clapperboard, desc: "Kamera, Licht, Ton, Regie …",
     types: [["camera","Kamera"],["lighting","Licht / Gaffer"],["sound","Ton"],["director_of_photography","Director of Photography"],["director","Regie"],["production","Produktion"],["makeup","Maske"],["costume","Kostüm"],["postproduction","Postproduktion"],["vfx","VFX"],["sfx","SFX"],["art_department","Szenenbild"],["broadcast","Broadcast"]] },
-  { id: "kreativ",  label: "Kreativ",               emoji: "✍️", desc: "Fotograf, Editor, Art Director …",
+  { id: "kreativ",  label: "Kreativ",               icon: Palette,     desc: "Fotograf, Editor, Art Director …",
     types: [["filmmaker","Regisseur/in"],["writer","Autor/in"],["photographer","Fotograf/in"],["editor","Editor/in"],["motion_designer","Motion Designer"],["art_director","Art Director"]] },
-  { id: "anbieter", label: "Anbieter",              emoji: "🏢", desc: "Location, Equipment, Studio …",
+  { id: "anbieter", label: "Anbieter",              icon: Building2,   desc: "Location, Equipment, Studio …",
     types: [["location","Location"],["equipment","Equipment"],["vehicle","Fahrzeuge"],["studio","Studio"],["props","Requisiten"]] },
-] as const;
+];
 
 function ProfileTypePicker({ selected, onSelect }: { selected: string; onSelect: (t: string) => void }) {
   const [openCat, setOpenCat] = useState<string | null>(() =>
@@ -89,7 +91,7 @@ function ProfileTypePicker({ selected, onSelect }: { selected: string; onSelect:
               onClick={() => setOpenCat(isOpen ? null : cat.id)}
               className={`w-full flex items-center gap-3 px-4 py-3.5 text-left transition-colors ${isOpen ? "bg-bg-elevated" : "bg-bg-secondary hover:bg-bg-elevated"}`}
             >
-              <span className="text-xl leading-none">{cat.emoji}</span>
+              <cat.icon size={20} className="text-text-muted shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-text-primary text-sm">{cat.label}</p>
                 <p className="text-xs text-text-muted">
