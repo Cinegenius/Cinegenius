@@ -54,6 +54,9 @@ export async function POST(req: NextRequest) {
   if (!receiver_id || !content?.trim()) {
     return NextResponse.json({ error: "Empfänger und Nachricht erforderlich" }, { status: 400 });
   }
+  if (content.length > 5000) {
+    return NextResponse.json({ error: "Nachricht zu lang (max. 5000 Zeichen)" }, { status: 400 });
+  }
 
   if (userId === receiver_id) {
     return NextResponse.json({ error: "Du kannst dir selbst keine Nachricht senden" }, { status: 400 });

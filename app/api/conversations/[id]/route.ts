@@ -3,6 +3,7 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { sendNewMessageEmail } from "@/lib/email";
+import { rateLimit } from "@/lib/rateLimit";
 
 // GET /api/conversations/[id] — Nachrichten einer Konversation laden + als gelesen markieren
 export async function GET(
@@ -48,10 +49,15 @@ export async function POST(
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
 
+  // Rate limit: 30 messages per user per minute
+  const { allowed } = await rateLimit(`msg:${userId}`, 30, 60);
+  if (!allowed) return NextResponse.json({ error: "Zu viele Nachrichten. Bitte kurz warten." }, { status: 429 });
+
   const { id } = await params;
   const { content } = await req.json();
 
   if (!content?.trim()) return NextResponse.json({ error: "Nachricht leer" }, { status: 400 });
+  if (content.length > 5000) return NextResponse.json({ error: "Nachricht zu lang (max. 5000 Zeichen)" }, { status: 400 });
 
   // Zugriff prüfen + Empfänger ermitteln
   const { data: conv } = await supabaseAdmin
