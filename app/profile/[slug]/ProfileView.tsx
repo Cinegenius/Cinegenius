@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import type { UserProfile, ProfileModule, ProfileImage, FilmographyEntry, ProfileAward, PhysicalData, ProjectCredit } from "@/lib/profile-types";
 import { PROFILE_CATEGORY_MAP } from "@/lib/profile-types";
+import { getPlatform, type ExternalProfileRow } from "@/lib/external-platforms";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -80,6 +81,47 @@ function Lightbox({ src, onClose }: { src: string; onClose: () => void }) {
   );
 }
 
+// ─── External Profiles Display ───────────────────────────────────────────────
+
+function ExternalProfilesDisplay({ profiles }: { profiles: ExternalProfileRow[] }) {
+  const visible = profiles.filter((p) => p.is_public);
+  if (!visible.length) return null;
+  return (
+    <div>
+      <SectionLabel>Externe Profile</SectionLabel>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {visible.map((entry) => {
+          const plat = getPlatform(entry.platform_type);
+          const displayName =
+            entry.platform_type === "other" && entry.platform_name
+              ? entry.platform_name
+              : plat.name;
+          return (
+            <a
+              key={entry.id}
+              href={entry.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 px-4 py-3 bg-bg-secondary border border-border rounded-xl hover:border-gold/30 transition-all group"
+            >
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 border ${plat.bgCls} ${plat.borderCls} ${plat.textCls}`}>
+                {plat.abbr}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-text-primary leading-tight">{displayName}</p>
+                {entry.custom_label && (
+                  <p className="text-xs text-text-muted">{entry.custom_label}</p>
+                )}
+              </div>
+              <ExternalLink size={12} className="text-text-muted group-hover:text-gold transition-colors shrink-0" />
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ─── Company badge ────────────────────────────────────────────────────────────
 
 type CompanyMembership = {
@@ -113,7 +155,7 @@ function CompanyBadge({ membership }: { membership: CompanyMembership }) {
 // ACTOR PROFILE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ActorProfile({ profile, isOwner, projectCredits, companyMembership }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership }) {
+function ActorProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[] }) {
   const { user } = useUser();
   const [lightbox, setLightbox] = useState<string | null>(null);
   const [showAllFilms, setShowAllFilms] = useState(false);
@@ -206,14 +248,6 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership }: {
     { label: "Vimeo",     url: safeLink((profile as unknown as {vimeo_url?: string}).vimeo_url) },
     { label: "LinkedIn",  url: safeLink(profile.linkedin_url) },
     { label: "Website",   url: safeLink(profile.website_url), icon: true },
-  ].filter(l => l.url);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const extProfiles = (profile.crew as any)?.external_profiles ?? {};
-  const externalProfileLinks = [
-    { label: "Crew United", url: safeLink(extProfiles.crew_united) },
-    { label: "IMDb",        url: safeLink((profile as unknown as {imdb_url?: string}).imdb_url) },
-    { label: "Spotlight",   url: safeLink(extProfiles.spotlight) },
   ].filter(l => l.url);
 
   return (
@@ -356,20 +390,6 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership }: {
                 </div>
               )}
 
-              {/* Externe Profile */}
-              {externalProfileLinks.length > 0 && (
-                <div>
-                  <p className="text-[9px] uppercase tracking-[0.15em] text-text-muted font-semibold mb-2">Externe Profile</p>
-                  <div className="flex gap-2 flex-wrap">
-                    {externalProfileLinks.map(({ label, url }) => (
-                      <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gold/8 border border-gold/20 rounded-lg text-xs text-gold hover:bg-gold/15 hover:border-gold/40 transition-all">
-                        <ExternalLink size={10} />{label}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -567,6 +587,13 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership }: {
           </>
         )}
 
+        {/* ── EXTERNE PROFILE ───────────────────────────────────────────── */}
+        {externalProfiles.length > 0 && (
+          <>
+            <Divider />
+            <ExternalProfilesDisplay profiles={externalProfiles} />
+          </>
+        )}
 
         <div className="h-16" />
       </div>
@@ -825,7 +852,7 @@ function ModelProfile({ profile, isOwner, companyMembership }: { profile: UserPr
 // GENERIC PROFILE (Crew, Creative, Vendor etc.)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function GenericProfile({ profile, isOwner, projectCredits, companyMembership }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership }) {
+function GenericProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[] }) {
   const [lightbox, setLightbox] = useState<string | null>(null);
   const [expandedFilm, setExpandedFilm] = useState<number | null>(null);
 
@@ -1003,30 +1030,6 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership }:
               );
             })()}
 
-            {/* Externe Profile */}
-            {(() => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const ext = (profile.crew as any)?.external_profiles ?? {};
-              const extLinks = [
-                { label: "Crew United", url: safeLink(ext.crew_united) },
-                { label: "IMDb",        url: safeLink((profile as unknown as {imdb_url?: string}).imdb_url) },
-                { label: "Spotlight",   url: safeLink(ext.spotlight) },
-              ].filter(l => l.url);
-              if (extLinks.length === 0) return null;
-              return (
-                <div>
-                  <p className="text-[9px] uppercase tracking-[0.15em] text-text-muted font-semibold mb-2">Externe Profile</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {extLinks.map(({ label, url }) => (
-                      <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-2.5 py-1 bg-gold/8 border border-gold/20 rounded-lg text-xs text-gold hover:bg-gold/15 transition-colors">
-                        <ExternalLink size={9} className="shrink-0" />{label}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              );
-            })()}
           </div>
         </div>
 
@@ -1157,6 +1160,13 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership }:
           </div>
         )}
 
+        {/* Externe Profile */}
+        {externalProfiles.length > 0 && (
+          <div className="mb-12">
+            <ExternalProfilesDisplay profiles={externalProfiles} />
+          </div>
+        )}
+
       </div>
 
       {/* Photo strip — full-bleed scrolling marquee */}
@@ -1184,11 +1194,13 @@ export default function ProfileView({
   isOwner,
   projectCredits = [],
   companyMembership = null,
+  externalProfiles = [],
 }: {
   profile: UserProfile;
   isOwner: boolean;
   projectCredits?: ProjectCredit[];
   companyMembership?: CompanyMembership;
+  externalProfiles?: ExternalProfileRow[];
 }) {
   const category = PROFILE_CATEGORY_MAP[profile.profile_type] ?? "crew";
 
@@ -1199,9 +1211,9 @@ export default function ProfileView({
 
   // Actor/talent types get casting-ready layout
   if (category === "talent") {
-    return <ActorProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} />;
+    return <ActorProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} />;
   }
 
   // Crew, creative, vendor get generic layout
-  return <GenericProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} />;
+  return <GenericProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} />;
 }

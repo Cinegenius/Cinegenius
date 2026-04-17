@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import type { ElementType } from "react";
 import LicensePicker from "@/components/LicensePicker";
+import ExternalProfilesSection from "@/components/ExternalProfilesSection";
 import { useToast } from "@/contexts/ToastContext";
 import ProfileGuard from "@/components/ProfileGuard";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
@@ -499,8 +500,6 @@ export default function ProfilePage() {
   const [videoLinks, setVideoLinks] = useState<string[]>([]);
   const [newVideoLink, setNewVideoLink] = useState("");
   const [crewCertificates, setCrewCertificates] = useState<string[]>([]);
-  const [crewUnitedUrl, setCrewUnitedUrl] = useState("");
-  const [spotlightUrl, setSpotlightUrl] = useState("");
 
   // Project credits (linked projects)
   type ProjectCredit = {
@@ -590,10 +589,6 @@ export default function ProfilePage() {
             setVideoLinks(storedLinks);
           }
           setCrewCertificates(profile.crew?.certificates ?? []);
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const extProfiles = (profile.crew as any)?.external_profiles ?? {};
-          setCrewUnitedUrl(extProfiles.crew_united ?? "");
-          setSpotlightUrl(extProfiles.spotlight ?? "");
           setCurrentProfileType(profile.profile_type ?? "");
           const phys = profile.physical ?? {};
           setPlayingAgeMin(phys.playing_age_min ? String(phys.playing_age_min) : "");
@@ -787,13 +782,7 @@ export default function ProfilePage() {
           day_rate:       dayRate ? parseInt(dayRate) : null,
           filmography,
           video_links:    videoLinks,
-          crew: {
-            certificates: crewCertificates,
-            external_profiles: {
-              crew_united: crewUnitedUrl.trim() || null,
-              spotlight: spotlightUrl.trim() || null,
-            },
-          },
+          crew: { certificates: crewCertificates },
         }),
       });
       const baseResult = await res.json();
@@ -1673,48 +1662,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Externe Profile */}
-                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
-                  <h2 className="font-semibold text-text-primary mb-1">Externe Profile</h2>
-                  <p className="text-xs text-text-muted mb-5">Verlinke deine Profile auf anderen Plattformen — keine Synchronisierung, nur Links.</p>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5 flex items-center gap-1.5">
-                        <ExternalLink size={11} /> Crew United
-                      </label>
-                      <input
-                        type="url"
-                        value={crewUnitedUrl}
-                        onChange={(e) => setCrewUnitedUrl(e.target.value)}
-                        placeholder="https://www.crew-united.com/profil/..."
-                        className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5 flex items-center gap-1.5">
-                        <ExternalLink size={11} /> IMDb
-                      </label>
-                      <input
-                        type="url"
-                        value={form.imdbUrl}
-                        onChange={(e) => setForm((p) => ({ ...p, imdbUrl: e.target.value }))}
-                        placeholder="https://www.imdb.com/name/nm..."
-                        className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5 flex items-center gap-1.5">
-                        <ExternalLink size={11} /> Spotlight
-                      </label>
-                      <input
-                        type="url"
-                        value={spotlightUrl}
-                        onChange={(e) => setSpotlightUrl(e.target.value)}
-                        placeholder="https://www.spotlight.com/..."
-                        className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors"
-                      />
-                    </div>
-                  </div>
-                </div>
+                <ExternalProfilesSection />
 
                 {/* Videos & Showreel */}
                 <div className="p-6 bg-bg-secondary border border-border rounded-xl">

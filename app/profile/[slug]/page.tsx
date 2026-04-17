@@ -6,6 +6,7 @@ import { auth } from "@clerk/nextjs/server";
 import ProfileView from "./ProfileView";
 import type { UserProfile, ProjectCredit } from "@/lib/profile-types";
 import { getPresetForType, type ProfileModule } from "@/lib/profile-types";
+import type { ExternalProfileRow } from "@/lib/external-platforms";
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
@@ -95,6 +96,16 @@ async function getProjectCredits(userId: string): Promise<ProjectCredit[]> {
   return data as any;
 }
 
+async function getExternalProfiles(userId: string): Promise<ExternalProfileRow[]> {
+  const { data } = await admin
+    .from("external_profiles")
+    .select("id, platform_type, platform_name, url, custom_label, sort_order, is_public")
+    .eq("user_id", userId)
+    .eq("is_public", true)
+    .order("sort_order", { ascending: true });
+  return (data ?? []) as ExternalProfileRow[];
+}
+
 async function getCompanyMembership(userId: string) {
   const { data } = await admin
     .from("company_members")
@@ -119,9 +130,10 @@ export default async function ProfilePage(
   if (!profile) notFound();
 
   const isOwner = userId === profile.user_id;
-  const [projectCredits, companyMembership] = await Promise.all([
+  const [projectCredits, companyMembership, externalProfiles] = await Promise.all([
     getProjectCredits(profile.user_id),
     getCompanyMembership(profile.user_id),
+    getExternalProfiles(profile.user_id),
   ]);
 
   return (
@@ -130,6 +142,7 @@ export default async function ProfilePage(
       isOwner={isOwner}
       projectCredits={projectCredits}
       companyMembership={companyMembership}
+      externalProfiles={externalProfiles}
     />
   );
 }
