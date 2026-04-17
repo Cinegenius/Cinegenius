@@ -155,7 +155,7 @@ const jobGroups: { heading: string; items: NavItem[] }[] = [
 const jobItems = jobGroups.flatMap((g) => g.items);
 
 const desktopNavLinks: { href: string; label: string }[] = [
-  { href: "/locations", label: "Drehorte"   },
+  { href: "/locations", label: "Locations"   },
   { href: "/creators",  label: "Crew"       },
   { href: "/props",     label: "Marktplatz" },
   { href: "/jobs",      label: "Jobs"       },
@@ -454,7 +454,7 @@ export default function Navbar() {
           {/* Main nav links */}
           <div className="space-y-1">
             {[
-              { href: "/locations", label: "Drehorte",   icon: MapPin },
+              { href: "/locations", label: "Locations",   icon: MapPin },
               { href: "/creators",  label: "Crew",       icon: Users },
               { href: "/props",     label: "Marktplatz", icon: ShoppingBag },
               { href: "/jobs",      label: "Jobs",       icon: Briefcase },

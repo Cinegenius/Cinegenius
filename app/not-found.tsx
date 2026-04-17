@@ -41,7 +41,7 @@ export default function NotFound() {
             href="/locations"
             className="px-6 py-3 border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-colors flex items-center justify-center gap-2"
           >
-            <Search size={16} /> Drehorte entdecken
+            <Search size={16} /> Locations entdecken
           </Link>
         </div>
 

@@ -1594,7 +1594,7 @@ export default function ProfilePage() {
                             className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
                         </div>
                         <div>
-                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Drehort</label>
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Location</label>
                           <input type="text" value={newProject.location}
                             onChange={(e) => setNewProject((p) => ({ ...p, location: e.target.value }))}
                             placeholder="München, Bayern"

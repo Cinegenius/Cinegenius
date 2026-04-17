@@ -80,7 +80,7 @@ export default function AdminPage() {
   };
 
   const typeLabel: Record<string, string> = {
-    location: "Drehort", prop: "Requisite", vehicle: "Fahrzeug", job: "Job", creator: "Crew",
+    location: "Location", prop: "Requisite", vehicle: "Fahrzeug", job: "Job", creator: "Crew",
   };
 
   const previewCalc = calculateCommission(previewAmount, tiers);
@@ -149,7 +149,7 @@ export default function AdminPage() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
                   { icon: List,      label: "Aktive Inserate",          value: listingsLoading ? "…" : String(listings.filter(l => l.published).length), sub: `${listings.length} gesamt`, color: "text-gold" },
-                  { icon: Film,      label: "Drehorte",                 value: listingsLoading ? "…" : String(listings.filter(l => l.type === "location").length), sub: "Inserate", color: "text-sky-400" },
+                  { icon: Film,      label: "Locations",                 value: listingsLoading ? "…" : String(listings.filter(l => l.type === "location").length), sub: "Inserate", color: "text-sky-400" },
                   { icon: Briefcase, label: "Jobs & Crew",              value: listingsLoading ? "…" : String(listings.filter(l => l.type === "job" || l.type === "creator").length), sub: "Inserate", color: "text-emerald-400" },
                   { icon: Package,   label: "Marktplatz",               value: listingsLoading ? "…" : String(listings.filter(l => l.type === "prop" || l.type === "vehicle").length), sub: "Inserate", color: "text-violet-400" },
                 ].map(({ icon: Icon, label, value, sub, color }) => (

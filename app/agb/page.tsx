@@ -31,7 +31,7 @@ export default function AgbPage() {
             <h2 className="text-base font-semibold text-text-primary mb-2">§ 2 Leistungsbeschreibung</h2>
             <p className="text-sm leading-relaxed">
               CineGenius ist ein Online-Marktplatz für die Film- und Medienbranche. Die Plattform ermöglicht das
-              Inserieren und Finden von Drehorte, Crew, Equipment, Fahrzeugen, Requisiten und Jobs.
+              Inserieren und Finden von Locations, Crew, Equipment, Fahrzeugen, Requisiten und Jobs.
               Der Betreiber ist nicht Vertragspartei der zwischen Nutzern geschlossenen Verträge.
             </p>
           </section>

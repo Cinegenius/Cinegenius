@@ -6,7 +6,7 @@ const columns = [
   {
     title: "Marktplatz",
     links: [
-      { label: "Drehorte", href: "/locations" },
+      { label: "Locations", href: "/locations" },
       { label: "Marktplatz", href: "/marketplace" },
       { label: "Fahrzeuge", href: "/vehicles" },
       { label: "Custom Requisiten", href: "/marketplace/commission" },
@@ -44,7 +44,7 @@ export default function Footer() {
             </div>
             <p className="text-text-secondary text-sm leading-relaxed max-w-xs">
               Der All-in-One-Marktplatz für Film- und Medienproduktion.
-              Drehorte, Crew, Requisiten, Equipment — alles an einem Ort.
+              Locations, Crew, Requisiten, Equipment — alles an einem Ort.
             </p>
             <div className="flex gap-4 mt-6">
               {[

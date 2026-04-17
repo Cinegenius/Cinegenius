@@ -19,7 +19,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Datei zu groß (max. 5 MB)" }, { status: 400 });
   }
 
-  const ext = file.name.split(".").pop() ?? "jpg";
+  const MIME_EXT: Record<string, string> = {
+    "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/heic": "heic",
+  };
+  const ext  = MIME_EXT[file.type] ?? "jpg";
   const path = `avatars/${userId}.${ext}`;
 
   const { error } = await supabaseAdmin.storage

@@ -418,7 +418,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
           >
             <div className="sticky top-0 z-10 bg-bg-primary/90 backdrop-blur-nav border-b border-border px-4 py-2.5 flex items-center justify-between">
               <p className="text-xs text-text-muted">
-                <span className="text-text-primary font-semibold">{filtered.length}</span> {filtered.length !== 1 ? "Drehorte" : "Drehort"}
+                <span className="text-text-primary font-semibold">{filtered.length}</span> {filtered.length !== 1 ? "Locations" : "Location"}
                 {userLocation && <span className="text-gold"> im Umkreis von {radiusKm} km</span>}
                 {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
               </p>
@@ -427,8 +427,8 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
             {filtered.length === 0 ? (
               <EmptyState
                 icon={Film}
-                title="Keine Drehorte gefunden"
-                description={userLocation ? "Keine Drehorte in diesem Umkreis — vergrößere den Radius oder entferne Filter." : "Versuche eine andere Suche oder entferne aktive Filter."}
+                title="Keine Locations gefunden"
+                description={userLocation ? "Keine Locations in diesem Umkreis — vergrößere den Radius oder entferne Filter." : "Versuche eine andere Suche oder entferne aktive Filter."}
                 action={{ label: "Filter zurücksetzen", onClick: resetFilters }}
               />
             ) : (
@@ -530,7 +530,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                   onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}
                   className="px-6 py-2.5 bg-bg-secondary border border-border rounded-lg text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors"
                 >
-                  Mehr laden · {filtered.length - visibleCount} weitere Drehorte
+                  Mehr laden · {filtered.length - visibleCount} weitere Locations
                 </button>
               </div>
             )}

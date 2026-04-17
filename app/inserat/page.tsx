@@ -173,7 +173,7 @@ const groups: Group[] = [
   },
   {
     id: "drehorte",
-    label: "Drehorte",
+    label: "Locations",
     desc: "Location für Film, Foto oder Werbung anbieten",
     color: "text-sky-400",
     border: "border-sky-500/30",
@@ -486,7 +486,7 @@ export default function InseratPage() {
     {
       id: "drehorte",
       label: "Location inserieren",
-      sub: "Drehorte · Fotostudios · Studios",
+      sub: "Locations · Fotostudios · Studios",
       icon: MapPin,
       color: "text-sky-400",
       border: "border-sky-500/30 hover:border-sky-400",
@@ -653,7 +653,7 @@ export default function InseratPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-text-primary">Lieferung zum Set möglich</p>
-                    <p className="text-xs text-text-muted">Das Fahrzeug kann zum Drehort geliefert werden</p>
+                    <p className="text-xs text-text-muted">Das Fahrzeug kann zur Location geliefert werden</p>
                   </div>
                 </label>
               </div>

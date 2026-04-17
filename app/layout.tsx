@@ -34,9 +34,9 @@ export const metadata: Metadata = {
     template: "%s | CineGenius",
   },
   description:
-    "Drehorte mieten, Filmcrew buchen, Equipment leihen, Jobs finden — der All-in-One-Marktplatz für Film- und Medienproduktion in Deutschland, Österreich und der Schweiz.",
+    "Locations mieten, Filmcrew buchen, Equipment leihen, Jobs finden — der All-in-One-Marktplatz für Film- und Medienproduktion in Deutschland, Österreich und der Schweiz.",
   keywords: [
-    "Drehorte mieten", "Filmcrew buchen", "Film Jobs Deutschland", "Requisiten mieten",
+    "Locations mieten", "Filmcrew buchen", "Film Jobs Deutschland", "Requisiten mieten",
     "Equipment Verleih Film", "Filmproduktion DACH", "Content Creator buchen", "Fotograf buchen",
   ],
   authors: [{ name: "CineGenius" }],
@@ -47,13 +47,13 @@ export const metadata: Metadata = {
     siteName: "CineGenius",
     title: "CineGenius — Marktplatz für Film, Social Media & Fotografie",
     description:
-      "Drehorte, Crew, Equipment und Jobs — alles für deine Produktion an einem Ort.",
+      "Locations, Crew, Equipment und Jobs — alles für deine Produktion an einem Ort.",
     images: [{ url: "/og-default.jpg", width: 1200, height: 630, alt: "CineGenius" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "CineGenius — Film & Medien Marktplatz",
-    description: "Drehorte mieten, Crew buchen, Equipment leihen — für Film, Social Media & Fotografie.",
+    description: "Locations mieten, Crew buchen, Equipment leihen — für Film, Social Media & Fotografie.",
     images: ["/og-default.jpg"],
   },
   robots: {

@@ -23,7 +23,7 @@ const typeConfig: Record<string, {
   href: (id: string) => string;
   color: string;
 }> = {
-  location: { label: "Drehorte",        icon: MapPin,    href: (id) => `/locations/${id}`,  color: "text-sky-400"     },
+  location: { label: "Locations",        icon: MapPin,    href: (id) => `/locations/${id}`,  color: "text-sky-400"     },
   vehicle:  { label: "Fahrzeuge",        icon: Car,       href: (id) => `/vehicles/${id}`,   color: "text-orange-400"  },
   prop:     { label: "Requisiten",       icon: Package,   href: (id) => `/props/${id}`,      color: "text-violet-400"  },
   job:      { label: "Jobs",             icon: Briefcase, href: (id) => `/jobs/${id}`,       color: "text-emerald-400" },
@@ -176,7 +176,7 @@ export default function GlobalSearch() {
             value={query}
             onChange={(e) => { setQuery(e.target.value); setSelectedIdx(-1); }}
             onKeyDown={handleKeyDown}
-            placeholder="Nutzer, Drehorte, Crew, Requisiten, Jobs…"
+            placeholder="Nutzer, Locations, Crew, Requisiten, Jobs…"
             className="flex-1 bg-transparent text-text-primary placeholder:text-text-muted text-base focus:outline-none"
           />
           <div className="flex items-center gap-2 shrink-0">
@@ -216,7 +216,7 @@ export default function GlobalSearch() {
           {/* Empty suggestion chips */}
           {!query && recent.length === 0 && (
             <div className="px-4 py-8 text-center space-y-4">
-              <p className="text-xs text-text-muted">Nutzer, Drehorte, Crew, Requisiten und Jobs durchsuchen</p>
+              <p className="text-xs text-text-muted">Nutzer, Locations, Crew, Requisiten und Jobs durchsuchen</p>
               <div className="flex flex-wrap justify-center gap-2">
                 {["Kameramann", "Warehouse Berlin", "Oldtimer", "Regie gesucht"].map((term) => (
                   <button key={term} onClick={() => setQuery(term)}

@@ -802,7 +802,7 @@ export default function ProjectDetail({
                   { lbl: "Regie",            val: project.director },
                   { lbl: "Produktionsfirma", val: project.production_company },
                   { lbl: "Co-Produzenten",   val: project.co_producers?.join(", ") },
-                  { lbl: "Drehorte",         val: project.shoot_locations?.join(", ") },
+                  { lbl: "Locations",         val: project.shoot_locations?.join(", ") },
                   { lbl: "Kinostart",        val: project.release_cinema },
                   { lbl: "Crew-Mitglieder",  val: `${credits.length} eingetragene Personen` },
                   { lbl: "Fotos",            val: `${project.images.length} Fotos` },

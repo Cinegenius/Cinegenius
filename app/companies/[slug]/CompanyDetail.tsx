@@ -88,7 +88,7 @@ const listingTypeIcons: Record<string, React.ElementType> = {
   job: Briefcase, prop: Package, vehicle: Car, location: Home, service: Clapperboard,
 };
 const listingTypeLabel: Record<string, string> = {
-  job: "Job", prop: "Requisite", vehicle: "Fahrzeug", location: "Drehort", service: "Service",
+  job: "Job", prop: "Requisite", vehicle: "Fahrzeug", location: "Location", service: "Service",
 };
 
 const INDUSTRY_COLORS: Record<string, string> = {

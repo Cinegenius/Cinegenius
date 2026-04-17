@@ -21,7 +21,7 @@ const typeConfig: Record<string, {
   href: (id: string) => string;
   color: string;
 }> = {
-  location: { label: "Drehort",    icon: MapPin,    href: (id) => `/locations/${id}`, color: "text-sky-400" },
+  location: { label: "Location",    icon: MapPin,    href: (id) => `/locations/${id}`, color: "text-sky-400" },
   vehicle:  { label: "Fahrzeug",   icon: Car,       href: (id) => `/vehicles/${id}`,  color: "text-orange-400" },
   prop:     { label: "Requisite",  icon: Package,   href: (id) => `/props/${id}`,     color: "text-violet-400" },
   job:      { label: "Job",        icon: Briefcase, href: (id) => `/jobs/${id}`,      color: "text-emerald-400" },
@@ -99,12 +99,12 @@ export default function FavoritesPage() {
             <div>
               <h2 className="font-semibold text-text-primary mb-1">Noch nichts gespeichert</h2>
               <p className="text-sm text-text-muted max-w-sm mx-auto">
-                Klicke das Herz-Symbol auf einer Detailseite, um Drehorte, Crew, Jobs und mehr zu speichern.
+                Klicke das Herz-Symbol auf einer Detailseite, um Locations, Crew, Jobs und mehr zu speichern.
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-3">
               <Link href="/locations" className="px-4 py-2 border border-border text-text-secondary text-sm rounded-lg hover:border-gold hover:text-gold transition-all">
-                Drehorte entdecken
+                Locations entdecken
               </Link>
               <Link href="/creators" className="px-4 py-2 border border-border text-text-secondary text-sm rounded-lg hover:border-gold hover:text-gold transition-all">
                 Filmschaffende finden

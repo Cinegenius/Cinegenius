@@ -211,7 +211,7 @@ export default function DashboardPage() {
   };
 
   const typeLabel: Record<string, string> = {
-    location: "Drehort",
+    location: "Location",
     prop: "Marktplatz",
     vehicle: "Fahrzeug",
     job: "Job",
@@ -306,7 +306,7 @@ export default function DashboardPage() {
   };
 
   const favTypeConfig: Record<string, { label: string; icon: React.ComponentType<{ size?: number; className?: string }>; href: (id: string) => string; color: string }> = {
-    location: { label: "Drehort",    icon: MapPin,    href: (id) => `/locations/${id}`, color: "text-sky-400" },
+    location: { label: "Location",    icon: MapPin,    href: (id) => `/locations/${id}`, color: "text-sky-400" },
     vehicle:  { label: "Fahrzeug",   icon: Car,       href: (id) => `/vehicles/${id}`,  color: "text-orange-400" },
     prop:     { label: "Requisite",  icon: Package,   href: (id) => `/props/${id}`,     color: "text-violet-400" },
     job:      { label: "Job",        icon: Briefcase, href: (id) => `/jobs/${id}`,      color: "text-emerald-400" },
@@ -733,7 +733,7 @@ export default function DashboardPage() {
                           ? "Erstes Inserat erstellen"
                           : "Loslegen",
                         desc: profileRole && ["location","equipment","studio","vehicle","props"].includes(profileRole)
-                          ? "Drehort, Equipment oder Fahrzeug — kostenlos inserieren."
+                          ? "Location, Equipment oder Fahrzeug — kostenlos inserieren."
                           : "Durchstöbere Locations, Jobs & Crew — oder schreib selbst einen Job aus.",
                         href: profileRole && ["location","equipment","studio","vehicle","props"].includes(profileRole)
                           ? "/inserat"
@@ -820,7 +820,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-display text-lg font-bold text-text-primary">Erstelle dein erstes Inserat</p>
-                    <p className="text-sm text-text-muted mt-0.5">Drehort, Job, Fahrzeug oder Equipment — kostenlos inserieren</p>
+                    <p className="text-sm text-text-muted mt-0.5">Location, Job, Fahrzeug oder Equipment — kostenlos inserieren</p>
                   </div>
                   <ChevronRight size={20} className="text-gold shrink-0 group-hover:translate-x-1 transition-transform" />
                 </Link>
@@ -1897,7 +1897,7 @@ export default function DashboardPage() {
                     <p className="text-text-muted text-sm">Noch keine Buchungen</p>
                     <p className="text-xs text-text-muted">Deine Buchungen erscheinen hier sobald du etwas gebucht hast.</p>
                     <div className="flex gap-2 justify-center pt-1">
-                      <Link href="/locations" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors">Drehorte</Link>
+                      <Link href="/locations" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors">Locations</Link>
                       <Link href="/vehicles" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors">Fahrzeuge</Link>
                       <Link href="/props" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors">Equipment</Link>
                     </div>
@@ -2638,7 +2638,7 @@ export default function DashboardPage() {
                     </p>
                   </div>
                   <div className="flex flex-wrap justify-center gap-2 pt-1">
-                    <Link href="/locations" className="px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-all">Drehorte</Link>
+                    <Link href="/locations" className="px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-all">Locations</Link>
                     <Link href="/creators" className="px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-all">Filmschaffende</Link>
                     <Link href="/jobs" className="px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-all">Jobs</Link>
                   </div>

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Search, MapPin } from "lucide-react";
 
 const tabs = [
-  { id: "locations", label: "Drehorte",  placeholder: "Wohnung, Studio, Industriehalle...", href: "/locations" },
+  { id: "locations", label: "Locations",  placeholder: "Wohnung, Studio, Industriehalle...", href: "/locations" },
   { id: "crew",      label: "Crew",      placeholder: "Kameramann, Regisseur, Editor...",  href: "/creators" },
   { id: "equipment", label: "Equipment", placeholder: "Kamera, Licht, Ton, Kostüme...",    href: "/props" },
   { id: "jobs",      label: "Jobs",      placeholder: "Kameraassistent, Cutter, DP...",    href: "/jobs" },

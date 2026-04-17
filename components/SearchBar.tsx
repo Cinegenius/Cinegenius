@@ -6,15 +6,15 @@ import { useRouter } from "next/navigation";
 
 const categories = [
   { label: "Alles",      href: "/locations",   icon: Search },
-  { label: "Drehorte",   href: "/locations",   icon: MapPin },
+  { label: "Locations",   href: "/locations",   icon: MapPin },
   { label: "Marktplatz", href: "/marketplace", icon: ShoppingBag },
   { label: "Jobs",       href: "/jobs",        icon: Briefcase },
   { label: "Crew",       href: "/creators",    icon: Users },
 ];
 
 const placeholders: Record<string, string> = {
-  "Alles":      "Drehorte, Requisiten, Jobs oder Crew suchen...",
-  "Drehorte":   "Lagerhallen, Anwesen, Studios in Berlin...",
+  "Alles":      "Locations, Requisiten, Jobs oder Crew suchen...",
+  "Locations":   "Lagerhallen, Anwesen, Studios in Berlin...",
   "Marktplatz": "Kamera, Kostüm, Fahrzeug, Requisite...",
   "Jobs":       "Kameramann, Gaffer, Cutter, Tonmeister...",
   "Crew":       "Regisseur, DP, Make-up-Artist, Editor...",

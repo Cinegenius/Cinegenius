@@ -11,7 +11,7 @@ const categories = [
     items: [
       {
         q: "Was ist CineGenius?",
-        a: "CineGenius ist der All-in-One-Marktplatz für die Film- und Medienbranche. Du kannst Drehorte finden, Crew und Talente buchen, Requisiten und Equipment mieten und Custom Props in Auftrag geben — alles an einem Ort, speziell für Produktionen entwickelt.",
+        a: "CineGenius ist der All-in-One-Marktplatz für die Film- und Medienbranche. Du kannst Locations finden, Crew und Talente buchen, Requisiten und Equipment mieten und Custom Props in Auftrag geben — alles an einem Ort, speziell für Produktionen entwickelt.",
       },
       {
         q: "Brauche ich ein Konto zum Stöbern?",
@@ -29,7 +29,7 @@ const categories = [
   },
   {
     icon: MapPin,
-    label: "Drehorte",
+    label: "Locations",
     items: [
       {
         q: "Wie werden Locations geprüft?",

@@ -165,7 +165,7 @@ async function getHomeData() {
 const featurePillars = [
   {
     icon: MapPin,
-    title: "Drehorte",
+    title: "Locations",
     desc: "Altbauten, Studios, Industriehallen — der perfekte Ort für jede Szene.",
     href: "/locations",
     pillarKey: "location",
@@ -215,7 +215,7 @@ const featurePillars = [
 
 const useCases = [
   {
-    title: "Wohnung als Drehort vermieten",
+    title: "Wohnung als Location vermieten",
     desc: "Dein Zuhause ist die perfekte Kulisse. Verdiene 300–800 € pro Drehtag.",
     image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=85",
     cta: "Location inserieren",
@@ -546,7 +546,7 @@ export default async function HomePage() {
                   href="/locations"
                   className="inline-flex items-center gap-2 px-6 py-3 border border-white/25 text-white/85 font-semibold rounded-xl hover:border-white/50 hover:text-white transition-all text-sm"
                 >
-                  Drehorte entdecken
+                  Locations entdecken
                 </Link>
               </div>
             </div>
@@ -631,7 +631,7 @@ export default async function HomePage() {
           <div className="flex items-end justify-between mb-6">
             <div>
               <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Neu & empfohlen</p>
-              <h2 className="font-display text-2xl font-bold text-text-primary">Ausgewählte Drehorte</h2>
+              <h2 className="font-display text-2xl font-bold text-text-primary">Ausgewählte Locations</h2>
             </div>
             <Link href="/locations" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light transition-colors font-medium">
               Alle anzeigen <ArrowRight size={14} />
@@ -880,7 +880,7 @@ export default async function HomePage() {
               href="/locations"
               className="px-8 py-3.5 border border-border text-text-primary font-semibold rounded-xl hover:border-gold hover:text-gold transition-all flex items-center justify-center gap-2"
             >
-              Drehorte entdecken
+              Locations entdecken
             </Link>
           </div>
           <p className="text-xs text-text-muted">

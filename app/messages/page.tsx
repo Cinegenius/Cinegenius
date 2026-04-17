@@ -513,7 +513,7 @@ function MessagesContent() {
                   Crew entdecken
                 </Link>
                 <Link href="/locations" className="px-3 py-1.5 text-xs border border-border rounded-lg text-text-secondary hover:border-gold/40 hover:text-gold transition-all">
-                  Drehorte
+                  Locations
                 </Link>
                 <Link href="/jobs" className="px-3 py-1.5 text-xs border border-border rounded-lg text-text-secondary hover:border-gold/40 hover:text-gold transition-all">
                   Jobs

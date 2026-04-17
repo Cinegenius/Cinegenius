@@ -17,7 +17,7 @@ const freeFeatures = [
 ];
 
 const categories = [
-  { icon: MapPin, name: "Drehorte" },
+  { icon: MapPin, name: "Locations" },
   { icon: Car, name: "Fahrzeuge" },
   { icon: Package, name: "Requisiten & Equipment" },
   { icon: Users, name: "Filmschaffende & Crew" },

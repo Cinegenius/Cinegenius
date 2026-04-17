@@ -80,7 +80,7 @@ function CheckoutContent() {
   };
 
   const typeLabels: Record<string, string> = {
-    location: "Drehort",
+    location: "Location",
     vehicle: "Fahrzeug",
     prop: "Requisite",
     creator: "Filmschaffende/r",

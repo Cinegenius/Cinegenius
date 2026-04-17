@@ -272,7 +272,7 @@ function BookingContent() {
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Beschreibe dein Projekt, die Rolle, besondere Anforderungen, Drehort usw."
+              placeholder="Beschreibe dein Projekt, die Rolle, besondere Anforderungen, Location usw."
               rows={5}
               className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors resize-none"
               required

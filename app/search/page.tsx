@@ -33,7 +33,7 @@ const typeConfig: Record<string, {
 }> = {
   profile:  { label: "Crew",        pluralLabel: "Crew",        icon: User,      href: (id) => `/creators/${id}`,  color: "text-gold",          bgColor: "bg-gold/10 border-gold/20"      },
   creator:  { label: "Crew",        pluralLabel: "Crew",        icon: Users,     href: (id) => `/creators/${id}`,  color: "text-gold",          bgColor: "bg-gold/10 border-gold/20"      },
-  location: { label: "Drehort",     pluralLabel: "Drehorte",    icon: MapPin,    href: (id) => `/locations/${id}`, color: "text-sky-400",        bgColor: "bg-sky-500/10 border-sky-500/20"   },
+  location: { label: "Location",     pluralLabel: "Locations",    icon: MapPin,    href: (id) => `/locations/${id}`, color: "text-sky-400",        bgColor: "bg-sky-500/10 border-sky-500/20"   },
   vehicle:  { label: "Fahrzeug",    pluralLabel: "Fahrzeuge",   icon: Car,       href: (id) => `/vehicles/${id}`,  color: "text-orange-400",    bgColor: "bg-orange-500/10 border-orange-500/20" },
   prop:     { label: "Requisite",   pluralLabel: "Requisiten",  icon: Package,   href: (id) => `/props/${id}`,     color: "text-violet-400",    bgColor: "bg-violet-500/10 border-violet-500/20" },
   job:      { label: "Job",         pluralLabel: "Jobs",        icon: Briefcase, href: (id) => `/jobs/${id}`,      color: "text-emerald-400",   bgColor: "bg-emerald-500/10 border-emerald-500/20" },
@@ -43,7 +43,7 @@ const typeConfig: Record<string, {
 const TABS = [
   { id: "all",      label: "Alle",       icon: Search   },
   { id: "profile",  label: "Crew",       icon: Users    },
-  { id: "location", label: "Drehorte",   icon: MapPin   },
+  { id: "location", label: "Locations",   icon: MapPin   },
   { id: "job",      label: "Jobs",       icon: Briefcase },
   { id: "vehicle",  label: "Fahrzeuge",  icon: Car      },
   { id: "prop",     label: "Requisiten", icon: Package  },
@@ -138,7 +138,7 @@ function EmptyState({ query }: { query: string }) {
       <p className="text-sm text-text-muted max-w-xs leading-relaxed">
         {query
           ? "Versuche einen anderen Begriff, eine Stadt oder eine Kategorie."
-          : "Tippe einen Suchbegriff oben ein — Crew, Drehorte, Jobs, Requisiten oder Fahrzeuge."}
+          : "Tippe einen Suchbegriff oben ein — Crew, Locations, Jobs, Requisiten oder Fahrzeuge."}
       </p>
     </div>
   );
@@ -263,7 +263,7 @@ function SearchContent() {
                   doSearch(inputValue.trim());
                 }
               }}
-              placeholder="Crew, Drehorte, Jobs, Requisiten, Fahrzeuge…"
+              placeholder="Crew, Locations, Jobs, Requisiten, Fahrzeuge…"
               className="w-full pl-11 pr-12 py-3.5 bg-bg-elevated border border-border rounded-xl text-base text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors"
               autoFocus={!initialQ}
             />
@@ -382,7 +382,7 @@ function SearchContent() {
                 <div className="flex flex-wrap gap-3">
                   {[
                     { href: `/creators?q=${encodeURIComponent(query)}`, label: "Alle Crew-Mitglieder", icon: Users },
-                    { href: `/locations?q=${encodeURIComponent(query)}`, label: "Alle Drehorte", icon: MapPin },
+                    { href: `/locations?q=${encodeURIComponent(query)}`, label: "Alle Locations", icon: MapPin },
                     { href: `/jobs?q=${encodeURIComponent(query)}`, label: "Alle Jobs", icon: Briefcase },
                     { href: `/props?q=${encodeURIComponent(query)}`, label: "Alle Requisiten", icon: Package },
                     { href: `/vehicles?q=${encodeURIComponent(query)}`, label: "Alle Fahrzeuge", icon: Car },

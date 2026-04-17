@@ -7,7 +7,7 @@ export const featuredProps: never[] = [];
 export const featuredVehicles: never[] = [];
 
 export const stats = [
-  { value: "0", label: "Drehorte" },
+  { value: "0", label: "Locations" },
   { value: "0", label: "Crew & Talente" },
   { value: "0", label: "Jobs" },
   { value: "0", label: "Marktplatz" },

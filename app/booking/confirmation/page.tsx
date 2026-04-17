@@ -6,7 +6,7 @@ import Link from "next/link";
 import { CheckCircle, Calendar, Share2, MessageSquare, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 
 const typeLabels: Record<string, string> = {
-  location: "Drehort",
+  location: "Location",
   vehicle: "Fahrzeug",
   prop: "Requisite",
   creator: "Filmschaffende/r",
@@ -195,7 +195,7 @@ function ConfirmationContent() {
             href="/locations"
             className="flex-1 text-center px-6 py-3 border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors font-medium"
           >
-            Weitere Drehorte entdecken
+            Weitere Locations entdecken
           </Link>
         </div>
       </div>

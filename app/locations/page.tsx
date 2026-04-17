@@ -7,11 +7,11 @@ import ProviderProfiles from "@/components/ProviderProfiles";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "Drehorte mieten — Filmlocations in Deutschland",
-  description: "Finde die perfekte Drehort für dein Filmprojekt: Apartments, Villen, Industriehallen, Studios, Außengeländen und mehr. Jetzt Locations durchsuchen.",
-  keywords: ["Drehort mieten", "Filmlocations Deutschland", "Location für Filmdreh", "Fotostudio mieten", "Außengelände Film"],
+  title: "Locations mieten — Filmlocations in Deutschland",
+  description: "Finde die perfekte Location für dein Filmprojekt: Apartments, Villen, Industriehallen, Studios, Außengeländen und mehr. Jetzt Locations durchsuchen.",
+  keywords: ["Location mieten", "Filmlocations Deutschland", "Location für Filmdreh", "Fotostudio mieten", "Außengelände Film"],
   openGraph: {
-    title: "Drehorte mieten — Filmlocations in Deutschland",
+    title: "Locations mieten — Filmlocations in Deutschland",
     description: "Die perfekte Location für dein nächstes Projekt — Innen, Außen & Speziallocation.",
   },
 };
@@ -67,7 +67,7 @@ export default async function LocationsPage() {
       city: (p.location ?? "").split(",")[0]?.trim() ?? "",
       bio: p.bio ?? "",
       avatar: p.avatar_url ?? null,
-      typeLabel: "Drehort-Anbieter",
+      typeLabel: "Location-Anbieter",
     }));
 
   const rows = data ?? [];
@@ -108,7 +108,7 @@ export default async function LocationsPage() {
     <>
       <div className="pt-16">
         <CategoryHero
-          badge="Drehorte & Locations"
+          badge="Locations"
           title="Die perfekte Location"
           titleHighlight="für dein Projekt"
           description="Apartments, Villen, Industriehallen, Studios, Außengelände — überall in Deutschland."
@@ -119,7 +119,7 @@ export default async function LocationsPage() {
           cta={{ label: "Location eintragen", href: "/inserat" }}
         />
       </div>
-      <ProviderProfiles profiles={locationProviders} heading="Drehort-Anbieter mit Profil" />
+      <ProviderProfiles profiles={locationProviders} heading="Location-Anbieter mit Profil" />
       <LocationsContent serverListings={serverListings} />
     </>
   );

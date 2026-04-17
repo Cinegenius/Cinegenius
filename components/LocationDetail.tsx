@@ -96,7 +96,7 @@ export default function LocationDetail({ location }: { location: Location }) {
       {/* Back */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <Link href="/locations" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors mb-4">
-          <ArrowLeft size={14} /> Zurück zu Drehorte
+          <ArrowLeft size={14} /> Zurück zu Locations
         </Link>
       </div>
 
@@ -194,7 +194,7 @@ export default function LocationDetail({ location }: { location: Location }) {
             {/* Description */}
             {location.description && (
               <div className="mb-8">
-                <h2 className="font-display text-xl font-bold text-text-primary mb-3">Über diesen Drehort</h2>
+                <h2 className="font-display text-xl font-bold text-text-primary mb-3">Über diese Location</h2>
                 <p className="text-text-secondary leading-relaxed whitespace-pre-line">{location.description}</p>
               </div>
             )}

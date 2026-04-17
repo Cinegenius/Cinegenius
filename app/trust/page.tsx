@@ -16,7 +16,7 @@ const sections = [
       },
       {
         heading: "Wann wird das Geld freigegeben?",
-        body: "Für Drehorte und Requisiten: 24 Stunden nach dem Enddatum der Buchung, sofern kein Streitfall gemeldet wurde. Für Crew-Buchungen: nach Bestätigung durch beide Parteien oder 48 Stunden nach dem letzten Drehtag.",
+        body: "Für Locations und Requisiten: 24 Stunden nach dem Enddatum der Buchung, sofern kein Streitfall gemeldet wurde. Für Crew-Buchungen: nach Bestätigung durch beide Parteien oder 48 Stunden nach dem letzten Drehtag.",
       },
       {
         heading: "Welche Zahlungsmethoden werden akzeptiert?",
