@@ -512,51 +512,31 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
           </>
         )}
 
-        {/* ── PROJEKTE (visual cards) ───────────────────────────────────── */}
+        {/* ── PROJEKTE (list) ──────────────────────────────────────────── */}
         {projectCredits.filter(c => c.projects).length > 0 && (
           <>
             <Divider />
             <SectionLabel>Projekte</SectionLabel>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="divide-y divide-border">
               {projectCredits.filter(c => c.projects).map((credit) => {
                 const proj = credit.projects!;
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const meta = (proj as any).metadata ?? {};
                 return (
-                  <Link
-                    key={credit.id}
-                    href={`/projects/${credit.project_id}`}
-                    className="flex gap-3 p-4 bg-bg-secondary border border-border rounded-xl hover:border-gold/40 transition-all group"
-                  >
-                    {proj.poster_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={proj.poster_url}
-                        alt={proj.title}
-                        className="w-14 h-20 object-cover rounded-lg border border-border shrink-0 group-hover:scale-[1.02] transition-transform"
-                      />
-                    ) : (
-                      <div className="w-14 h-20 bg-bg-elevated border border-border rounded-lg shrink-0 flex items-center justify-center text-xl font-bold text-text-muted/30">
-                        {proj.title[0]}
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <p className="text-sm font-semibold text-text-primary leading-snug group-hover:text-gold transition-colors">{proj.title}</p>
-                          {meta.also_on_crew_united && (
-                            <span className="shrink-0 text-[9px] px-1.5 py-0.5 bg-gold/10 border border-gold/20 text-gold rounded font-semibold">CU</span>
-                          )}
-                        </div>
-                        <p className="text-xs text-text-muted">{credit.role}</p>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {proj.year && <span className="text-[10px] font-bold text-text-muted tabular-nums">{proj.year}</span>}
-                        {proj.type && <span className="text-[10px] px-1.5 py-0.5 bg-bg-elevated border border-border text-text-muted rounded">{proj.type}</span>}
-                        {meta.genre && <span className="text-[10px] px-1.5 py-0.5 bg-bg-elevated border border-border text-text-muted rounded">{meta.genre}</span>}
-                      </div>
+                  <div key={credit.id} className="flex items-center gap-4 py-3">
+                    <span className="text-xs font-bold tabular-nums text-text-muted w-10 shrink-0">{proj.year}</span>
+                    <div className="flex-1 min-w-0">
+                      <Link href={`/projects/${credit.project_id}`}
+                        className="inline-flex items-center gap-1 text-sm font-medium text-text-primary hover:text-gold transition-colors">
+                        {proj.title} <ExternalLink size={10} className="shrink-0 text-text-muted" />
+                      </Link>
+                      {credit.role && <p className="text-xs text-text-muted">{credit.role}</p>}
                     </div>
-                  </Link>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {proj.type && <span className="text-[10px] px-1.5 py-0.5 bg-bg-elevated border border-border text-text-muted rounded">{proj.type}</span>}
+                      {meta.genre && <span className="text-[10px] px-1.5 py-0.5 bg-bg-elevated border border-border text-text-muted rounded">{meta.genre}</span>}
+                    </div>
+                  </div>
                 );
               })}
             </div>
@@ -1040,50 +1020,30 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           </div>
         </div>
 
-        {/* Projekte (visual cards) */}
+        {/* Projekte (list) */}
         {projectCredits.filter(c => c.projects).length > 0 && (
           <div className="mb-12">
             <SectionLabel>Projekte</SectionLabel>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="divide-y divide-border">
               {projectCredits.filter(c => c.projects).map((credit) => {
                 const proj = credit.projects!;
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const meta = (proj as any).metadata ?? {};
                 return (
-                  <Link
-                    key={credit.id}
-                    href={`/projects/${credit.project_id}`}
-                    className="flex gap-3 p-3 bg-bg-secondary border border-border rounded-xl hover:border-gold/40 transition-all group"
-                  >
-                    {proj.poster_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={proj.poster_url}
-                        alt={proj.title}
-                        className="w-12 h-16 object-cover rounded-md border border-border shrink-0"
-                      />
-                    ) : (
-                      <div className="w-12 h-16 bg-bg-elevated border border-border rounded-md shrink-0 flex items-center justify-center text-lg font-bold text-text-muted/30">
-                        {proj.title[0]}
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-start justify-between gap-1 mb-0.5">
-                          <p className="text-sm font-semibold text-text-primary leading-snug group-hover:text-gold transition-colors">{proj.title}</p>
-                          {meta.also_on_crew_united && (
-                            <span className="shrink-0 text-[9px] px-1.5 py-0.5 bg-gold/10 border border-gold/20 text-gold rounded font-semibold">CU</span>
-                          )}
-                        </div>
-                        <p className="text-xs text-text-muted">{credit.role}</p>
-                      </div>
-                      <div className="flex flex-wrap gap-1 mt-1.5">
-                        {proj.year && <span className="text-[10px] font-bold text-text-muted tabular-nums">{proj.year}</span>}
-                        {proj.type && <span className="text-[10px] px-1.5 py-0.5 bg-bg-elevated border border-border text-text-muted rounded">{proj.type}</span>}
-                        {meta.genre && <span className="text-[10px] px-1.5 py-0.5 bg-bg-elevated border border-border text-text-muted rounded">{meta.genre}</span>}
-                      </div>
+                  <div key={credit.id} className="flex items-center gap-4 py-3">
+                    <span className="text-xs font-bold tabular-nums text-text-muted w-10 shrink-0">{proj.year}</span>
+                    <div className="flex-1 min-w-0">
+                      <Link href={`/projects/${credit.project_id}`}
+                        className="inline-flex items-center gap-1 text-sm font-medium text-text-primary hover:text-gold transition-colors">
+                        {proj.title} <ExternalLink size={10} className="shrink-0 text-text-muted" />
+                      </Link>
+                      {credit.role && <p className="text-xs text-text-muted">{credit.role}</p>}
                     </div>
-                  </Link>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {proj.type && <span className="text-[10px] px-1.5 py-0.5 bg-bg-elevated border border-border text-text-muted rounded">{proj.type}</span>}
+                      {meta.genre && <span className="text-[10px] px-1.5 py-0.5 bg-bg-elevated border border-border text-text-muted rounded">{meta.genre}</span>}
+                    </div>
+                  </div>
                 );
               })}
             </div>
