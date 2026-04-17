@@ -1,9 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Keep groq-sdk (and other Node.js-only packages) out of the Edge bundle
-  // so they don't crash the Clerk middleware running on the Edge runtime.
-  serverExternalPackages: ["groq-sdk"],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
