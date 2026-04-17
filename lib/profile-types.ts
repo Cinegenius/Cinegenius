@@ -336,6 +336,15 @@ export interface FilmographyEntry {
 
 // ─── Project Credits ─────────────────────────────────────────────────────────
 
+export interface ProjectMetadata {
+  genre?: string | null;
+  production_company?: string | null;
+  location?: string | null;
+  equipment?: string | null;
+  link?: string | null;
+  also_on_crew_united?: boolean;
+}
+
 export interface ProjectCredit {
   id: string;
   role: string;
@@ -347,6 +356,7 @@ export interface ProjectCredit {
     type: string | null;
     director: string | null;
     poster_url: string | null;
+    metadata?: ProjectMetadata | null;
   } | null;
 }
 

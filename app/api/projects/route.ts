@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
   let query = supabaseAdmin
     .from("projects")
-    .select("id, title, year, type, director, poster_url")
+    .select("id, title, year, type, director, poster_url, metadata")
     .order("year", { ascending: false })
     .limit(limit);
 
@@ -30,27 +30,52 @@ export async function POST(req: NextRequest) {
   if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
 
   const body = await req.json();
-  const { title, year, type, description, director, poster_url, images, myRole } = body;
+  const { title, year, type, description, director, poster_url, images, myRole,
+          genre, productionCompany, location, equipment, link, alsoOnCrewUnited } = body;
 
   if (!title?.trim()) {
     return NextResponse.json({ error: "Titel ist Pflichtfeld" }, { status: 400 });
   }
 
-  // Create project
-  const { data: project, error: projError } = await supabaseAdmin
+  const metadata = {
+    genre: genre || null,
+    production_company: productionCompany || null,
+    location: location || null,
+    equipment: equipment || null,
+    link: link || null,
+    also_on_crew_united: alsoOnCrewUnited ?? false,
+  };
+
+  // Try insert with metadata; if column doesn't exist yet, retry without
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let insertPayload: any = {
+    title: title.trim(),
+    year: year ? parseInt(year) : null,
+    type: type || null,
+    description: description?.trim() || null,
+    director: director?.trim() || null,
+    poster_url: poster_url || null,
+    images: images ?? [],
+    created_by: userId,
+    metadata,
+  };
+
+  let { data: project, error: projError } = await supabaseAdmin
     .from("projects")
-    .insert({
-      title: title.trim(),
-      year: year ? parseInt(year) : null,
-      type: type || null,
-      description: description?.trim() || null,
-      director: director?.trim() || null,
-      poster_url: poster_url || null,
-      images: images ?? [],
-      created_by: userId,
-    })
+    .insert(insertPayload)
     .select()
     .single();
+
+  // Gracefully degrade if metadata column doesn't exist
+  if (projError?.code === "PGRST204" || (projError?.message ?? "").includes("metadata")) {
+    const { metadata: _m, ...withoutMeta } = insertPayload;
+    void _m;
+    ({ data: project, error: projError } = await supabaseAdmin
+      .from("projects")
+      .insert(withoutMeta)
+      .select()
+      .single());
+  }
 
   if (projError) return NextResponse.json({ error: projError.message }, { status: 500 });
 

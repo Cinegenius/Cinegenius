@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
 
   const { data: credits, error } = await supabaseAdmin
     .from("project_credits")
-    .select("id, role, created_at, project_id, projects(id, title, year, type, director, poster_url)")
+    .select("id, role, created_at, project_id, projects(id, title, year, type, director, poster_url, metadata)")
     .eq("user_id", user_id)
     .order("created_at", { ascending: false });
 

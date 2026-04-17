@@ -499,6 +499,8 @@ export default function ProfilePage() {
   const [videoLinks, setVideoLinks] = useState<string[]>([]);
   const [newVideoLink, setNewVideoLink] = useState("");
   const [crewCertificates, setCrewCertificates] = useState<string[]>([]);
+  const [crewUnitedUrl, setCrewUnitedUrl] = useState("");
+  const [spotlightUrl, setSpotlightUrl] = useState("");
 
   // Project credits (linked projects)
   type ProjectCredit = {
@@ -515,7 +517,7 @@ export default function ProfilePage() {
   const [joiningProjectId, setJoiningProjectId] = useState<string | null>(null);
   const [joiningRole, setJoiningRole] = useState(false);
   const [showNewProject, setShowNewProject] = useState(false);
-  const [newProject, setNewProject] = useState({ title: "", year: "", type: "", description: "", director: "", myRole: "", poster_url: "" });
+  const [newProject, setNewProject] = useState({ title: "", year: "", type: "", description: "", director: "", myRole: "", poster_url: "", genre: "", productionCompany: "", location: "", equipment: "", link: "", alsoOnCrewUnited: false });
   const [creatingProject, setCreatingProject] = useState(false);
   const [uploadingPoster, setUploadingPoster] = useState(false);
 
@@ -588,6 +590,10 @@ export default function ProfilePage() {
             setVideoLinks(storedLinks);
           }
           setCrewCertificates(profile.crew?.certificates ?? []);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const extProfiles = (profile.crew as any)?.external_profiles ?? {};
+          setCrewUnitedUrl(extProfiles.crew_united ?? "");
+          setSpotlightUrl(extProfiles.spotlight ?? "");
           setCurrentProfileType(profile.profile_type ?? "");
           const phys = profile.physical ?? {};
           setPlayingAgeMin(phys.playing_age_min ? String(phys.playing_age_min) : "");
@@ -737,7 +743,7 @@ export default function ProfilePage() {
       const d2 = await r2.json();
       setProjectCredits(d2.credits ?? []);
       setShowNewProject(false);
-      setNewProject({ title: "", year: "", type: "", description: "", director: "", myRole: "", poster_url: "" });
+      setNewProject({ title: "", year: "", type: "", description: "", director: "", myRole: "", poster_url: "", genre: "", productionCompany: "", location: "", equipment: "", link: "", alsoOnCrewUnited: false });
       addToast("Projekt erstellt!", "success");
     } finally {
       setCreatingProject(false);
@@ -777,10 +783,17 @@ export default function ProfilePage() {
           vimeo_url:      vimeoUrl || null,
           linkedin_url:   linkedinUrl || null,
           website_url:    safeLink(form.website) || null,
+          imdb_url:       safeLink(form.imdbUrl) || null,
           day_rate:       dayRate ? parseInt(dayRate) : null,
           filmography,
           video_links:    videoLinks,
-          crew: { certificates: crewCertificates },
+          crew: {
+            certificates: crewCertificates,
+            external_profiles: {
+              crew_united: crewUnitedUrl.trim() || null,
+              spotlight: spotlightUrl.trim() || null,
+            },
+          },
         }),
       });
       const baseResult = await res.json();
@@ -1575,6 +1588,48 @@ export default function ProfilePage() {
                             </label>
                           )}
                         </div>
+
+                        {/* Extended metadata */}
+                        <div>
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Genre</label>
+                          <input type="text" value={newProject.genre}
+                            onChange={(e) => setNewProject((p) => ({ ...p, genre: e.target.value }))}
+                            placeholder="Drama, Thriller…"
+                            className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
+                        </div>
+                        <div>
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Produktionsfirma</label>
+                          <input type="text" value={newProject.productionCompany}
+                            onChange={(e) => setNewProject((p) => ({ ...p, productionCompany: e.target.value }))}
+                            placeholder="XY Film GmbH"
+                            className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
+                        </div>
+                        <div>
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Drehort</label>
+                          <input type="text" value={newProject.location}
+                            onChange={(e) => setNewProject((p) => ({ ...p, location: e.target.value }))}
+                            placeholder="München, Bayern"
+                            className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
+                        </div>
+                        <div>
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Link (Trailer, Seite…)</label>
+                          <input type="url" value={newProject.link}
+                            onChange={(e) => setNewProject((p) => ({ ...p, link: e.target.value }))}
+                            placeholder="https://…"
+                            className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
+                        </div>
+                        <div className="col-span-2">
+                          <label className="flex items-center gap-3 cursor-pointer select-none">
+                            <div
+                              onClick={() => setNewProject((p) => ({ ...p, alsoOnCrewUnited: !p.alsoOnCrewUnited }))}
+                              className={`w-10 h-5 rounded-full relative transition-colors shrink-0 ${newProject.alsoOnCrewUnited ? "bg-gold" : "bg-bg-primary border border-border"}`}
+                            >
+                              <span className="absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all"
+                                style={{ left: newProject.alsoOnCrewUnited ? "calc(100% - 18px)" : "2px" }} />
+                            </div>
+                            <span className="text-xs text-text-secondary">Auch auf Crew United gelistet</span>
+                          </label>
+                        </div>
                       </div>
                       <button
                         type="button"
@@ -1614,6 +1669,50 @@ export default function ProfilePage() {
                         />
                       </div>
                     ))}
+                  </div>
+                </div>
+
+                {/* Externe Profile */}
+                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
+                  <h2 className="font-semibold text-text-primary mb-1">Externe Profile</h2>
+                  <p className="text-xs text-text-muted mb-5">Verlinke deine Profile auf anderen Plattformen — keine Synchronisierung, nur Links.</p>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5 flex items-center gap-1.5">
+                        <ExternalLink size={11} /> Crew United
+                      </label>
+                      <input
+                        type="url"
+                        value={crewUnitedUrl}
+                        onChange={(e) => setCrewUnitedUrl(e.target.value)}
+                        placeholder="https://www.crew-united.com/profil/..."
+                        className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5 flex items-center gap-1.5">
+                        <ExternalLink size={11} /> IMDb
+                      </label>
+                      <input
+                        type="url"
+                        value={form.imdbUrl}
+                        onChange={(e) => setForm((p) => ({ ...p, imdbUrl: e.target.value }))}
+                        placeholder="https://www.imdb.com/name/nm..."
+                        className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5 flex items-center gap-1.5">
+                        <ExternalLink size={11} /> Spotlight
+                      </label>
+                      <input
+                        type="url"
+                        value={spotlightUrl}
+                        onChange={(e) => setSpotlightUrl(e.target.value)}
+                        placeholder="https://www.spotlight.com/..."
+                        className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors"
+                      />
+                    </div>
                   </div>
                 </div>
 

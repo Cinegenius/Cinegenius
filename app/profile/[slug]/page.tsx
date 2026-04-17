@@ -86,7 +86,7 @@ export async function generateMetadata(
 async function getProjectCredits(userId: string): Promise<ProjectCredit[]> {
   const { data, error } = await admin
     .from("project_credits")
-    .select("id, role, project_id, projects(id, title, year, type, director, poster_url)")
+    .select("id, role, project_id, projects(id, title, year, type, director, poster_url, metadata)")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
