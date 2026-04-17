@@ -22,6 +22,7 @@ type Notification = {
 const typeIcons: Record<NotificationType, React.ComponentType<{ size?: number; className?: string }>> = {
   booking_confirmed:     BookOpen,
   booking_request:       BookOpen,
+  booking_rejected:      BookOpen,
   new_message:           MessageSquare,
   new_application:       Briefcase,
   application_sent:      Briefcase,
