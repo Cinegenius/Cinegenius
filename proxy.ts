@@ -32,7 +32,20 @@ export default clerkMiddleware(async (auth, request) => {
   res.headers.set("X-Frame-Options", "DENY");
   res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
-  // CSP temporarily removed — was blocking Clerk client-side initialization
+  res.headers.set(
+    "Content-Security-Policy",
+    [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://*.clerk.accounts.dev https://js.stripe.com",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: blob: https://*.supabase.co https://www.google.com https://images.unsplash.com https://upload.wikimedia.org https://img.clerk.com",
+      "font-src 'self' data:",
+      "connect-src 'self' https://*.supabase.co https://*.clerk.com https://api.clerk.com https://*.clerk.accounts.dev wss://*.supabase.co",
+      "frame-src https://js.stripe.com https://hooks.stripe.com https://*.clerk.com https://*.clerk.accounts.dev",
+      "worker-src 'self' blob:",
+      "frame-ancestors 'none'",
+    ].join("; ")
+  );
   return res;
 });
 
