@@ -368,7 +368,7 @@ export default async function HomePage() {
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-[220px]">
           {/* Large tile — Film */}
-          <div className="relative rounded-2xl overflow-hidden row-span-2 group">
+          <Link href="/projects" className="relative rounded-2xl overflow-hidden row-span-2 group block">
             <Image
               src="https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=85"
               alt="Film Set"
@@ -384,9 +384,9 @@ export default async function HomePage() {
               <p className="text-white font-semibold text-sm">Professionelle Filmsets</p>
               <p className="text-white/60 text-xs mt-0.5">Locations, Crew & Equipment</p>
             </div>
-          </div>
+          </Link>
           {/* Foto */}
-          <div className="relative rounded-2xl overflow-hidden group">
+          <Link href="/photo" className="relative rounded-2xl overflow-hidden group block">
             <Image
               src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=800&q=85"
               alt="Fotoshooting"
@@ -401,9 +401,9 @@ export default async function HomePage() {
               </span>
               <p className="text-white font-semibold text-sm">Shootings & Studios</p>
             </div>
-          </div>
+          </Link>
           {/* Social Media */}
-          <div className="relative rounded-2xl overflow-hidden group">
+          <Link href="/social-media" className="relative rounded-2xl overflow-hidden group block">
             <Image
               src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&q=85"
               alt="Social Media Content"
@@ -418,9 +418,9 @@ export default async function HomePage() {
               </span>
               <p className="text-white font-semibold text-sm">Content Creation</p>
             </div>
-          </div>
+          </Link>
           {/* Werbung */}
-          <div className="relative rounded-2xl overflow-hidden group">
+          <Link href="/companies" className="relative rounded-2xl overflow-hidden group block">
             <Image
               src="https://images.unsplash.com/photo-1574717024453-354056adb31b?w=800&q=85"
               alt="Werbeproduktion"
@@ -435,9 +435,9 @@ export default async function HomePage() {
               </span>
               <p className="text-white font-semibold text-sm">Werbe- & Industriefilm</p>
             </div>
-          </div>
-          {/* Music Video / Behind Scenes */}
-          <div className="relative rounded-2xl overflow-hidden group">
+          </Link>
+          {/* Behind the Scenes */}
+          <Link href="/bts" className="relative rounded-2xl overflow-hidden group block">
             <Image
               src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=85"
               alt="Behind the scenes"
@@ -452,7 +452,7 @@ export default async function HomePage() {
               </span>
               <p className="text-white font-semibold text-sm">Backstage & Crew</p>
             </div>
-          </div>
+          </Link>
         </div>
       </section>
 
