@@ -185,18 +185,10 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership }: {
     projectCredits.filter((c) => c.projects).map((c) => c.projects!.title.toLowerCase().trim())
   );
 
-  type FilmRow =
-    | { kind: "manual"; data: FilmographyEntry }
-    | { kind: "credit"; data: ProjectCredit };
-
-  const films: FilmRow[] = [
-    ...projectCredits.filter((c) => c.projects).map((c): FilmRow => ({ kind: "credit", data: c })),
-    ...manualFilms.filter((f) => !creditTitles.has(f.title.toLowerCase().trim())).map((f): FilmRow => ({ kind: "manual", data: f })),
-  ].sort((a, b) => {
-    const ya = a.kind === "credit" ? (a.data.projects?.year ?? 0) : (a.data.year ?? 0);
-    const yb = b.kind === "credit" ? (b.data.projects?.year ?? 0) : (b.data.year ?? 0);
-    return yb - ya;
-  });
+  // Filmografie shows only manual entries — linked project credits appear as visual cards in "Projekte"
+  const films: FilmographyEntry[] = manualFilms
+    .filter((f) => !creditTitles.has(f.title.toLowerCase().trim()))
+    .sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
 
   const visibleFilms = showAllFilms ? films : films.slice(0, 6);
   const awards: ProfileAward[] = profile.awards ?? [];
@@ -437,47 +429,13 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership }: {
           </>
         )}
 
-        {/* ── FILMOGRAFIE ───────────────────────────────────────────────── */}
+        {/* ── FILMOGRAFIE — manual entries only ────────────────────────── */}
         {films.length > 0 && (
           <>
             <Divider />
             <SectionLabel>Filmografie</SectionLabel>
             <div className="divide-y divide-border">
-              {visibleFilms.map((row, i) => {
-                if (row.kind === "credit") {
-                  const credit = row.data;
-                  const proj = credit.projects!;
-                  const isOpen = expandedFilm === i;
-                  const hasDetails = !!(proj.director || proj.type);
-                  return (
-                    <div key={`credit-${credit.id}`}>
-                      <div className="flex items-center gap-4 py-3">
-                        <span className="text-xs font-bold tabular-nums text-text-muted w-10 shrink-0">{proj.year ?? "—"}</span>
-                        <div className="flex-1 min-w-0">
-                          <Link href={`/projects/${credit.project_id}`}
-                            className="inline-flex items-center gap-1 text-sm font-medium text-text-primary hover:text-gold transition-colors">
-                            {proj.title}
-                          </Link>
-                          {credit.role && <p className="text-xs text-text-muted">{credit.role}</p>}
-                        </div>
-                        {proj.type && <span className="text-[10px] px-2 py-0.5 bg-bg-secondary border border-border text-text-muted rounded font-medium shrink-0">{proj.type}</span>}
-                        {hasDetails && (
-                          <button type="button" onClick={() => setExpandedFilm(isOpen ? null : i)}
-                            className="shrink-0 p-1 text-text-muted hover:text-text-primary transition-colors">
-                            <ChevronDown size={13} className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
-                          </button>
-                        )}
-                      </div>
-                      {isOpen && hasDetails && (
-                        <div className="pb-3 pl-14 flex flex-wrap gap-x-6 gap-y-1">
-                          {proj.type && <span className="text-xs text-text-muted">Typ: <span className="text-text-secondary">{proj.type}</span></span>}
-                          {proj.director && <span className="text-xs text-text-muted">Regie: <span className="text-text-secondary">{proj.director}</span></span>}
-                        </div>
-                      )}
-                    </div>
-                  );
-                }
-                const film = row.data;
+              {visibleFilms.map((film, i) => {
                 const isOpen = expandedFilm === i;
                 const hasDetails = !!(film.director || film.festival || film.type || film.production);
                 return (
@@ -518,7 +476,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership }: {
             {films.length > 6 && (
               <button onClick={() => setShowAllFilms(!showAllFilms)}
                 className="mt-4 flex items-center gap-1.5 text-xs text-text-muted hover:text-gold transition-colors">
-                {showAllFilms ? <><ChevronUp size={13} /> Weniger</> : <><ChevronDown size={13} /> Alle {films.length} Projekte</>}
+                {showAllFilms ? <><ChevronUp size={13} /> Weniger</> : <><ChevronDown size={13} /> Alle {films.length} Einträge</>}
               </button>
             )}
           </>
@@ -882,30 +840,14 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership }:
   const software: string[] = profile.crew?.software ?? [];
   const bgImage = profile.cover_image_url ?? (images.find((i) => i.featured)?.url);
 
-  // Merge manual filmography + linked project credits into one unified list
-  type FilmRow =
-    | { kind: "manual"; data: FilmographyEntry }
-    | { kind: "credit"; data: ProjectCredit };
-
-  // Build unified list: linked credits first, then manual entries that aren't already covered
+  // Filmografie shows only manual entries — linked project credits appear as visual cards in "Projekte"
   const creditTitles = new Set(
-    projectCredits
-      .filter((c) => c.projects)
-      .map((c) => c.projects!.title.toLowerCase().trim())
+    projectCredits.filter((c) => c.projects).map((c) => c.projects!.title.toLowerCase().trim())
   );
 
-  const filmRows: FilmRow[] = [
-    ...projectCredits
-      .filter((c) => c.projects)
-      .map((c): FilmRow => ({ kind: "credit", data: c })),
-    ...films
-      .filter((f) => !creditTitles.has(f.title.toLowerCase().trim()))
-      .map((f): FilmRow => ({ kind: "manual", data: f })),
-  ].sort((a, b) => {
-    const yearA = a.kind === "credit" ? (a.data.projects?.year ?? 0) : (a.data.year ?? 0);
-    const yearB = b.kind === "credit" ? (b.data.projects?.year ?? 0) : (b.data.year ?? 0);
-    return yearB - yearA;
-  });
+  const filmRows: FilmographyEntry[] = films
+    .filter((f) => !creditTitles.has(f.title.toLowerCase().trim()))
+    .sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
 
   return (
     <div className="min-h-screen bg-bg-primary text-text-primary">
@@ -1138,50 +1080,12 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership }:
           </div>
         )}
 
-        {/* Filmografie */}
+        {/* Filmografie — manual entries only */}
         {filmRows.length > 0 && (
           <div className="mb-12">
             <SectionLabel>Filmografie</SectionLabel>
             <div className="divide-y divide-border">
-              {filmRows.map((row, i) => {
-                if (row.kind === "credit") {
-                  const credit = row.data;
-                  const proj = credit.projects!;
-                  const isOpen = expandedFilm === i;
-                  const hasDetails = !!(proj.director || proj.type);
-                  return (
-                    <div key={`credit-${credit.id}`}>
-                      <div className="flex items-center gap-4 py-3">
-                        <span className="text-xs font-bold tabular-nums text-text-muted w-10 shrink-0">{proj.year ?? "—"}</span>
-                        <div className="flex-1 min-w-0">
-                          <Link href={`/projects/${credit.project_id}`}
-                            className="inline-flex items-center gap-1 text-sm font-medium text-text-primary hover:text-gold transition-colors">
-                            {proj.title}
-                          </Link>
-                          {credit.role && <p className="text-xs text-text-muted">{credit.role}</p>}
-                        </div>
-                        {proj.type && (
-                          <span className="text-[10px] px-2 py-0.5 bg-bg-secondary border border-border text-text-muted rounded font-medium shrink-0">{proj.type}</span>
-                        )}
-                        {hasDetails && (
-                          <button type="button" onClick={() => setExpandedFilm(isOpen ? null : i)}
-                            className="shrink-0 p-1 text-text-muted hover:text-text-primary transition-colors">
-                            <ChevronDown size={13} className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
-                          </button>
-                        )}
-                      </div>
-                      {isOpen && hasDetails && (
-                        <div className="pb-3 pl-14 flex flex-wrap gap-x-6 gap-y-1">
-                          {proj.type && <span className="text-xs text-text-muted">Typ: <span className="text-text-secondary">{proj.type}</span></span>}
-                          {proj.director && <span className="text-xs text-text-muted">Regie: <span className="text-text-secondary">{proj.director}</span></span>}
-                        </div>
-                      )}
-                    </div>
-                  );
-                }
-
-                // Manual filmography entry
-                const film = row.data;
+              {filmRows.map((film, i) => {
                 const isOpen = expandedFilm === i;
                 const hasDetails = !!(film.director || film.festival || film.type || film.production);
                 return (
