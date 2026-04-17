@@ -13,14 +13,15 @@ export default async function CompanyPage({
   const { slug } = await params;
   const { userId } = await auth();
 
+  // Fetch by slug without published filter first — owners must always see their own page
   const { data: company } = await supabaseAdmin
     .from("companies")
     .select("*")
     .eq("slug", slug)
-    .eq("published", true)
-    .single();
+    .maybeSingle();
 
-  if (!company) notFound();
+  // Non-owners only see published companies
+  if (!company || (company.published === false && userId !== company.owner_user_id)) notFound();
 
   const isOwner = userId === company.owner_user_id;
 
