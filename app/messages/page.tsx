@@ -224,15 +224,12 @@ function MessagesContent() {
       : null;
 
   return (
-    <div className="fixed inset-0 top-16 bottom-14 lg:bottom-0 bg-bg-primary flex flex-col overflow-hidden">
+    <div className="fixed inset-0 top-16 bottom-14 lg:bottom-0 bg-bg-primary flex overflow-hidden">
 
-      {/* ── KONVERSATIONSLISTE (Mobile: volle Breite, Desktop: linke Spalte) ── */}
+      {/* ── KONVERSATIONSLISTE ── */}
       <div className={`
-        absolute inset-0
-        sm:relative sm:w-80 sm:shrink-0 sm:border-r sm:border-border
-        flex flex-col bg-bg-primary
-        transition-transform duration-300 ease-out
-        ${showChat ? "-translate-x-full sm:translate-x-0" : "translate-x-0"}
+        ${showChat ? "hidden sm:flex" : "flex"}
+        flex-col w-full sm:w-80 sm:shrink-0 border-r border-border bg-bg-primary
       `}>
         <div className="px-4 py-4 border-b border-border shrink-0">
           <h1 className="font-display text-lg font-bold text-text-primary flex items-center gap-2">
@@ -371,12 +368,10 @@ function MessagesContent() {
         )}
       </div>
 
-      {/* ── CHAT-BEREICH (Mobile: volle Breite, Desktop: rechte Spalte) ── */}
+      {/* ── CHAT-BEREICH ── */}
       <div className={`
-        absolute inset-0 sm:static sm:flex-1
-        flex flex-col bg-bg-primary
-        transition-transform duration-300 ease-out
-        ${showChat ? "translate-x-0" : "translate-x-full sm:translate-x-0"}
+        ${showChat ? "flex" : "hidden sm:flex"}
+        flex-col flex-1 bg-bg-primary
       `}>
         {showChat ? (
           <>
