@@ -75,9 +75,24 @@ export default async function CompanyPage({
     myMembership = mm ?? null;
   }
 
+  // Normalise JSONB arrays that Supabase types as Json
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const normalised = {
+    ...company,
+    portfolio_images: Array.isArray(company.portfolio_images) ? company.portfolio_images as string[] : [],
+    categories:       Array.isArray(company.categories)       ? company.categories       as string[] : [],
+    services:         Array.isArray(company.services)         ? company.services         as string[] : [],
+    countries:        Array.isArray(company.countries)        ? company.countries        as string[] : [],
+    industry_focus:   Array.isArray(company.industry_focus)   ? company.industry_focus   as string[] : [],
+    social_links:     (company.social_links && typeof company.social_links === "object" && !Array.isArray(company.social_links))
+                        ? company.social_links as Record<string, string>
+                        : {},
+  };
+
   return (
     <CompanyDetail
-      company={company}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      company={normalised as any}
       listings={listingsRes.data ?? []}
       members={membersRes}
       services={servicesRes.data ?? []}
