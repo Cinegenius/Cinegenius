@@ -1,9 +1,13 @@
 import Groq from "groq-sdk";
 import { NextRequest } from "next/server";
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
 export async function POST(req: NextRequest) {
+  if (!process.env.GROQ_API_KEY) {
+    return new Response(JSON.stringify({ error: "KI noch nicht eingerichtet (GROQ_API_KEY fehlt)." }), { status: 503 });
+  }
+
+  const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
   const { prompt } = await req.json();
 
   if (!prompt || typeof prompt !== "string" || prompt.trim().length < 3) {
