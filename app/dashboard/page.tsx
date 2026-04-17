@@ -236,6 +236,9 @@ export default function DashboardPage() {
 
   const [applications, setApplications] = useState<{ id: string; job_id: string; job_title: string; status: string; day_rate: string | null; created_at: string }[]>([]);
   const [applicationsLoading, setApplicationsLoading] = useState(false);
+  const [incomingApplications, setIncomingApplications] = useState<{ id: string; job_id: string; job_title: string; applicant_id: string; applicant_name: string; applicant_avatar: string | null; message: string; portfolio_url: string | null; day_rate: string | null; status: string; created_at: string }[]>([]);
+  const [incomingAppsLoading, setIncomingAppsLoading] = useState(false);
+  const [respondingApp, setRespondingApp] = useState<string | null>(null);
 
   // Company
   type MyCompany = {
@@ -448,7 +451,7 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    if (activeTab !== "bookings") return;
+    if (activeTab !== "bookings" && activeTab !== "jobs") return;
     setApplicationsLoading(true);
     fetch("/api/applications")
       .then(r => r.json())
@@ -456,6 +459,30 @@ export default function DashboardPage() {
       .catch(() => {})
       .finally(() => setApplicationsLoading(false));
   }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab !== "jobs") return;
+    setIncomingAppsLoading(true);
+    fetch("/api/applications?incoming=true")
+      .then(r => r.json())
+      .then(({ applications: data }) => setIncomingApplications(data ?? []))
+      .catch(() => {})
+      .finally(() => setIncomingAppsLoading(false));
+  }, [activeTab]);
+
+  const respondApplication = async (id: string, status: "accepted" | "rejected") => {
+    setRespondingApp(id);
+    try {
+      await fetch(`/api/applications/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      setIncomingApplications(prev => prev.map(a => a.id === id ? { ...a, status } : a));
+    } finally {
+      setRespondingApp(null);
+    }
+  };
 
   useEffect(() => {
     if (activeTab !== "messages" && activeTab !== "overview" && activeTab !== "analytics" && activeTab !== "bookings") return;
@@ -1388,15 +1415,82 @@ export default function DashboardPage() {
                 </div>
               ))}
 
-              {/* Bewerbungen auf eigene Jobs */}
+              {/* Eingegangene Bewerbungen */}
               <div className="rounded-xl border border-border bg-bg-secondary overflow-hidden mt-6">
                 <div className="px-5 py-4 border-b border-border flex items-center justify-between">
                   <h3 className="font-semibold text-text-primary text-sm">Eingegangene Bewerbungen</h3>
+                  {incomingApplications.filter(a => a.status === "pending").length > 0 && (
+                    <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-gold/15 text-gold border border-gold/30">
+                      {incomingApplications.filter(a => a.status === "pending").length} neu
+                    </span>
+                  )}
                 </div>
-                <div className="p-8 text-center space-y-2">
-                  <FileText size={24} className="mx-auto text-text-muted opacity-20" />
-                  <p className="text-sm text-text-muted">Bewerbungen auf deine Jobs erscheinen hier</p>
-                  <p className="text-xs text-text-muted">Feature folgt demnächst</p>
+                {incomingAppsLoading && <div className="p-8 text-center text-xs text-text-muted">Laden...</div>}
+                {!incomingAppsLoading && incomingApplications.length === 0 && (
+                  <div className="p-8 text-center space-y-2">
+                    <FileText size={24} className="mx-auto text-text-muted opacity-20" />
+                    <p className="text-sm text-text-muted">Noch keine Bewerbungen eingegangen</p>
+                  </div>
+                )}
+                <div className="divide-y divide-border">
+                  {incomingApplications.map((a) => (
+                    <div key={a.id} className="p-5 space-y-3">
+                      <div className="flex items-start gap-3">
+                        {a.applicant_avatar ? (
+                          <img src={a.applicant_avatar} alt="" className="w-9 h-9 rounded-full object-cover border border-border shrink-0" />
+                        ) : (
+                          <div className="w-9 h-9 rounded-full bg-bg-elevated border border-border flex items-center justify-center shrink-0">
+                            <span className="text-xs font-bold text-text-muted">{a.applicant_name[0]?.toUpperCase()}</span>
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <Link href={`/profile/${a.applicant_id}`} className="text-sm font-semibold text-text-primary hover:text-gold transition-colors">
+                              {a.applicant_name}
+                            </Link>
+                            <span className="text-xs text-text-muted">für</span>
+                            <Link href={`/jobs/${a.job_id}`} className="text-xs text-gold hover:text-gold-light transition-colors truncate max-w-[160px]">
+                              {a.job_title}
+                            </Link>
+                            {a.day_rate && <span className="text-xs text-text-muted">· {a.day_rate}</span>}
+                          </div>
+                          <p className="text-xs text-text-muted mt-1">{new Date(a.created_at).toLocaleDateString("de-DE")}</p>
+                        </div>
+                        <div className="shrink-0">
+                          {a.status === "pending" ? (
+                            <div className="flex gap-1.5">
+                              <button
+                                onClick={() => respondApplication(a.id, "accepted")}
+                                disabled={respondingApp === a.id}
+                                className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-success/15 text-success border border-success/30 hover:bg-success/25 transition-colors disabled:opacity-50"
+                              >
+                                <Check size={11} /> Annehmen
+                              </button>
+                              <button
+                                onClick={() => respondApplication(a.id, "rejected")}
+                                disabled={respondingApp === a.id}
+                                className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-crimson/10 text-crimson-light border border-crimson/30 hover:bg-crimson/20 transition-colors disabled:opacity-50"
+                              >
+                                <X size={11} /> Ablehnen
+                              </button>
+                            </div>
+                          ) : (
+                            <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${
+                              a.status === "accepted" ? "border-success/30 bg-success/10 text-success" : "border-crimson/30 bg-crimson/10 text-crimson-light"
+                            }`}>
+                              {a.status === "accepted" ? "Angenommen" : "Abgelehnt"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-xs text-text-secondary leading-relaxed line-clamp-3 pl-12">{a.message}</p>
+                      {a.portfolio_url && (
+                        <a href={a.portfolio_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-gold hover:text-gold-light transition-colors pl-12">
+                          <ExternalLink size={10} /> Portfolio ansehen
+                        </a>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

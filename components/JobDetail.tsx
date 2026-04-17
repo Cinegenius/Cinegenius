@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import { ArrowLeft, MapPin, Clock, Briefcase, CheckCircle, Users, Calendar, Shield, AlertTriangle, DollarSign } from "lucide-react";
-import InquiryForm from "@/components/InquiryForm";
 import FavoriteButton from "@/components/FavoriteButton";
 
 type Job = {
@@ -182,22 +181,19 @@ export default function JobDetail({ job }: { job: Job }) {
           <div className="lg:w-[340px] shrink-0">
             <div className="sticky top-20">
               <div className="bg-bg-secondary border border-border rounded-xl p-6">
-                {job.ownerId ? (
-                  <InquiryForm
-                    listingId={job.id}
-                    listingTitle={job.title}
-                    listingType="job"
-                    ownerId={job.ownerId}
-                    ownerName={job.ownerName ?? job.company}
-                  />
-                ) : (
-                  <>
-                <h2 className="font-display text-xl font-bold text-text-primary mb-1">Auf diese Stelle bewerben</h2>
-                <p className="text-xs text-success flex items-center gap-1 mb-4">
-                  <CheckCircle size={11} /> Kostenlos bewerben — keine Gebühren für Bewerbungen
-                </p>
-
-                {submitted ? (
+                {!userId ? (
+                  <div className="text-center py-4 space-y-3">
+                    <p className="text-sm text-text-muted">Melde dich an, um dich zu bewerben.</p>
+                    <Link href="/sign-in" className="block w-full py-2.5 bg-gold text-bg-primary font-semibold rounded-lg text-sm text-center hover:bg-gold-light transition-colors">
+                      Anmelden
+                    </Link>
+                  </div>
+                ) : userId === job.ownerId ? (
+                  <div className="text-center py-4 space-y-2">
+                    <Briefcase size={24} className="mx-auto text-text-muted opacity-30" />
+                    <p className="text-sm text-text-muted">Das ist deine eigene Stellenausschreibung.</p>
+                  </div>
+                ) : submitted ? (
                   <div className="text-center py-6">
                     <div className="w-14 h-14 bg-success/10 border border-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
                       <CheckCircle size={28} className="text-success" />
@@ -211,63 +207,67 @@ export default function JobDetail({ job }: { job: Job }) {
                     </Link>
                   </div>
                 ) : (
-                  <form onSubmit={handleApply} className="space-y-4">
-                    <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
-                        Anschreiben
-                      </label>
-                      <textarea
-                        rows={5}
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        placeholder={`Erkläre ${job.company}, warum du die/der richtige ${job.title} für dieses Projekt bist...`}
-                        className="w-full bg-bg-elevated border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold transition-colors resize-none"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
-                        Portfolio / Showreel URL
-                      </label>
-                      <input
-                        type="url"
-                        value={portfolio}
-                        onChange={(e) => setPortfolio(e.target.value)}
-                        placeholder="https://vimeo.com/deinshowreel"
-                        className="w-full bg-bg-elevated border border-border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
-                        Tagesgage (optional)
-                      </label>
-                      <input
-                        type="text"
-                        value={dayRate}
-                        onChange={(e) => setDayRate(e.target.value)}
-                        placeholder="z. B. 750 €/Tag"
-                        className="w-full bg-bg-elevated border border-border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors"
-                      />
-                    </div>
-                    {submitError && (
-                      <p className="text-xs text-crimson-light">{submitError}</p>
-                    )}
-                    <button
-                      type="submit"
-                      disabled={submitting}
-                      className="w-full py-3 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    >
-                      {submitting ? (
-                        <><div className="w-4 h-4 border-2 border-bg-primary/40 border-t-bg-primary rounded-full animate-spin" /> Wird gesendet...</>
-                      ) : (
-                        "Bewerbung absenden"
-                      )}
-                    </button>
-                    <p className="text-center text-xs text-text-muted flex items-center justify-center gap-1">
-                      <Shield size={11} /> Deine Kontaktdaten bleiben privat
+                  <>
+                    <h2 className="font-display text-xl font-bold text-text-primary mb-1">Auf diese Stelle bewerben</h2>
+                    <p className="text-xs text-success flex items-center gap-1 mb-4">
+                      <CheckCircle size={11} /> Kostenlos bewerben — keine Gebühren
                     </p>
-                  </form>
-                )}
+                    <form onSubmit={handleApply} className="space-y-4">
+                      <div>
+                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
+                          Anschreiben *
+                        </label>
+                        <textarea
+                          rows={5}
+                          value={message}
+                          onChange={(e) => setMessage(e.target.value)}
+                          placeholder={`Erkläre ${job.company}, warum du die/der richtige ${job.title} für dieses Projekt bist...`}
+                          className="w-full bg-bg-elevated border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gold transition-colors resize-none"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
+                          Portfolio / Showreel URL
+                        </label>
+                        <input
+                          type="url"
+                          value={portfolio}
+                          onChange={(e) => setPortfolio(e.target.value)}
+                          placeholder="https://vimeo.com/deinshowreel"
+                          className="w-full bg-bg-elevated border border-border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
+                          Tagesgage (optional)
+                        </label>
+                        <input
+                          type="text"
+                          value={dayRate}
+                          onChange={(e) => setDayRate(e.target.value)}
+                          placeholder="z. B. 750 €/Tag"
+                          className="w-full bg-bg-elevated border border-border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors"
+                        />
+                      </div>
+                      {submitError && (
+                        <p className="text-xs text-crimson-light">{submitError}</p>
+                      )}
+                      <button
+                        type="submit"
+                        disabled={submitting || !message.trim()}
+                        className="w-full py-3 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {submitting ? (
+                          <><div className="w-4 h-4 border-2 border-bg-primary/40 border-t-bg-primary rounded-full animate-spin" /> Wird gesendet...</>
+                        ) : (
+                          "Bewerbung absenden"
+                        )}
+                      </button>
+                      <p className="text-center text-xs text-text-muted flex items-center justify-center gap-1">
+                        <Shield size={11} /> Deine Kontaktdaten bleiben privat
+                      </p>
+                    </form>
                   </>
                 )}
               </div>

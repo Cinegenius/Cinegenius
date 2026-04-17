@@ -113,10 +113,43 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ success: true });
 }
 
-// GET /api/applications — list applications for current user (as applicant or owner)
-export async function GET() {
+// GET /api/applications — list applications for current user
+// ?incoming=true → applications received on jobs I own
+export async function GET(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ applications: [] });
+
+  const incoming = new URL(req.url).searchParams.get("incoming") === "true";
+
+  if (incoming) {
+    const { data } = await supabaseAdmin
+      .from("applications")
+      .select("id, job_id, job_title, applicant_id, message, portfolio_url, day_rate, status, created_at")
+      .eq("owner_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(100);
+
+    // Enrich with applicant display_name
+    const applicantIds = [...new Set((data ?? []).map((a) => a.applicant_id))];
+    let nameMap: Record<string, { name: string; avatar: string | null }> = {};
+    if (applicantIds.length > 0) {
+      const { data: profiles } = await supabaseAdmin
+        .from("profiles")
+        .select("user_id, display_name, avatar_url")
+        .in("user_id", applicantIds);
+      (profiles ?? []).forEach((p) => {
+        nameMap[p.user_id] = { name: p.display_name ?? "Unbekannt", avatar: p.avatar_url ?? null };
+      });
+    }
+
+    const enriched = (data ?? []).map((a) => ({
+      ...a,
+      applicant_name: nameMap[a.applicant_id]?.name ?? "Unbekannt",
+      applicant_avatar: nameMap[a.applicant_id]?.avatar ?? null,
+    }));
+
+    return NextResponse.json({ applications: enriched });
+  }
 
   const { data } = await supabaseAdmin
     .from("applications")
