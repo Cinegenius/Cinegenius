@@ -898,6 +898,67 @@ export default function ProfilePage() {
                   />
                 </div>
 
+                {/* ── Beruf & Positionen (early, right after type) ── */}
+                {showCrewSections && (
+                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
+                  <h2 className="font-semibold text-text-primary mb-1">Beruf & Positionen <span className="text-crimson-light">*</span></h2>
+                  <p className="text-xs text-text-muted mb-5">Wähle alle Positionen aus die auf dich zutreffen. Du kannst mehrere auswählen.</p>
+
+                  {positions.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-5">
+                      {positions.map((p) => (
+                        <span key={p} className="flex items-center gap-1.5 px-3 py-1.5 bg-gold-subtle border border-gold/20 rounded-full text-xs text-gold font-medium">
+                          {p}
+                          <button type="button" onClick={() => setPositions((prev) => prev.filter((x) => x !== p))} className="hover:text-crimson-light transition-colors">
+                            <X size={11} />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="space-y-4">
+                    {departments.map((dept) => {
+                      const colors = deptColors(dept.color);
+                      const deptSelectedCount = dept.roles.filter((r) => positions.includes(r)).length;
+                      return (
+                        <div key={dept.id}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <p className={`text-[10px] uppercase tracking-widest font-semibold ${colors.text}`}>{dept.label}</p>
+                            {deptSelectedCount > 0 && (
+                              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${colors.bg} ${colors.border} ${colors.text}`}>
+                                {deptSelectedCount}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {dept.roles.map((job) => {
+                              const selected = positions.includes(job);
+                              return (
+                                <button
+                                  key={job}
+                                  type="button"
+                                  onClick={() => setPositions((prev) =>
+                                    selected ? prev.filter((x) => x !== job) : [...prev, job]
+                                  )}
+                                  className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+                                    selected
+                                      ? `${colors.bg} ${colors.border} ${colors.text}`
+                                      : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"
+                                  }`}
+                                >
+                                  {job}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                )}
+
                 {/* Avatar */}
                 <div className="p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-5">Profilfoto</h2>
@@ -1210,65 +1271,6 @@ export default function ProfilePage() {
 
                 {/* ── Crew / Creative sections ─────────────────────────── */}
                 {showCrewSections && <>
-
-                {/* Beruf & Positionen */}
-                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
-                  <h2 className="font-semibold text-text-primary mb-1">Beruf & Positionen <span className="text-crimson-light">*</span></h2>
-                  <p className="text-xs text-text-muted mb-5">Wähle alle Positionen aus die auf dich zutreffen. Du kannst mehrere auswählen.</p>
-
-                  {positions.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-5">
-                      {positions.map((p) => (
-                        <span key={p} className="flex items-center gap-1.5 px-3 py-1.5 bg-gold-subtle border border-gold/20 rounded-full text-xs text-gold font-medium">
-                          {p}
-                          <button type="button" onClick={() => setPositions((prev) => prev.filter((x) => x !== p))} className="hover:text-crimson-light transition-colors">
-                            <X size={11} />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="space-y-4">
-                    {departments.map((dept) => {
-                      const colors = deptColors(dept.color);
-                      const deptSelectedCount = dept.roles.filter((r) => positions.includes(r)).length;
-                      return (
-                        <div key={dept.id}>
-                          <div className="flex items-center gap-2 mb-2">
-                            <p className={`text-[10px] uppercase tracking-widest font-semibold ${colors.text}`}>{dept.label}</p>
-                            {deptSelectedCount > 0 && (
-                              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${colors.bg} ${colors.border} ${colors.text}`}>
-                                {deptSelectedCount}
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex flex-wrap gap-1.5">
-                            {dept.roles.map((job) => {
-                              const selected = positions.includes(job);
-                              return (
-                                <button
-                                  key={job}
-                                  type="button"
-                                  onClick={() => setPositions((prev) =>
-                                    selected ? prev.filter((x) => x !== job) : [...prev, job]
-                                  )}
-                                  className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
-                                    selected
-                                      ? `${colors.bg} ${colors.border} ${colors.text}`
-                                      : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"
-                                  }`}
-                                >
-                                  {job}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
 
                 {/* Filmografie — verknüpfte Projekte */}
                 <div className="p-6 bg-bg-secondary border border-border rounded-xl">
