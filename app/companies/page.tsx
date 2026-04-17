@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import CompaniesContent from "./CompaniesContent";
-import ImageStrip from "@/components/ImageStrip";
 import CategoryHero from "@/components/CategoryHero";
 
 export const metadata: Metadata = {
@@ -23,11 +22,6 @@ export default async function CompaniesPage() {
     .eq("published", true)
     .order("created_at", { ascending: false });
 
-  const logoImages = (data ?? [])
-    .filter((c: { logo_url: string | null }) => c.logo_url?.includes("supabase.co/storage"))
-    .map((c: { slug: string; name: string; logo_url: string }) => ({ src: c.logo_url, alt: c.name, href: `/companies/${c.slug}` }))
-    .sort((a, b) => a.alt.localeCompare(b.alt));
-
   return (
     <>
       <div className="pt-16">
@@ -43,12 +37,6 @@ export default async function CompaniesPage() {
           cta={{ label: "Firma eintragen", href: "/company-setup" }}
         />
       </div>
-      {logoImages.length >= 1 && (
-        <div className="relative">
-          <ImageStrip images={logoImages} aspectRatio="wide" height={100} speed="slow" />
-          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-bg-primary to-transparent pointer-events-none" />
-        </div>
-      )}
       <CompaniesContent initialCompanies={data ?? []} />
     </>
   );
