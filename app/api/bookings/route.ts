@@ -35,34 +35,46 @@ export async function POST(req: NextRequest) {
   if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
 
   const body = await req.json();
-  const {
-    listingId,
-    listingTitle,
-    listingType,
-    startDate,
-    endDate,
-    days,
-    dailyRate,
-    notes,
-  } = body;
+  const { listingId, startDate, endDate, notes } = body;
 
-  if (!listingTitle || !listingType || !startDate || !endDate || !days || !dailyRate) {
+  if (!listingId || !startDate || !endDate) {
     return NextResponse.json({ error: "Fehlende Pflichtfelder" }, { status: 400 });
   }
 
-  const subtotal = dailyRate * days;
+  // SECURITY: read price and title server-side from DB — never trust client
+  const { data: listing } = await supabaseAdmin
+    .from("listings")
+    .select("id, title, type, price, user_id, published")
+    .eq("id", listingId)
+    .eq("published", true)
+    .maybeSingle();
+
+  if (!listing) return NextResponse.json({ error: "Inserat nicht gefunden" }, { status: 404 });
+  if (listing.user_id === userId) return NextResponse.json({ error: "Eigenes Inserat kann nicht gebucht werden" }, { status: 400 });
+
+  // Compute days server-side
+  const start = new Date(startDate);
+  const end   = new Date(endDate);
+  if (isNaN(start.getTime()) || isNaN(end.getTime()) || end < start) {
+    return NextResponse.json({ error: "Ungültige Datumsangaben" }, { status: 400 });
+  }
+  const days         = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / 86_400_000));
+  const listingTitle = listing.title;
+  const listingType  = listing.type;
+  const dailyRate    = Number(listing.price) || 0;
+  const subtotal  = dailyRate * days;
   const platformFee = 0;
-  const total = subtotal;
-  const ref = generateRef();
+  const total     = subtotal;
+  const ref       = generateRef();
 
   const { data: booking, error } = await supabaseAdmin
     .from("bookings")
     .insert({
       ref,
       user_id: userId,
-      listing_id: listingId ?? null,
-      listing_title: listingTitle,
-      listing_type: listingType,
+      listing_id: listing.id,
+      listing_title: listing.title,
+      listing_type: listing.type,
       start_date: startDate,
       end_date: endDate,
       days,
@@ -70,7 +82,7 @@ export async function POST(req: NextRequest) {
       subtotal,
       platform_fee: platformFee,
       total,
-      notes: notes ?? null,
+      notes: typeof notes === "string" ? notes.slice(0, 1000) : null,
       status: "confirmed",
     })
     .select("id, ref")

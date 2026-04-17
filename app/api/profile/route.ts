@@ -117,7 +117,8 @@ export async function POST(req: NextRequest) {
 
 // All known profile columns — any unknown key from the client is silently dropped
 const ALLOWED_PATCH_KEYS = new Set([
-  "display_name", "display_name_alias", "slug", "phone", "location", "bio", "role",
+  // SECURITY: "role", "verified", "account_type" deliberately excluded — set by admin only
+  "display_name", "display_name_alias", "slug", "phone", "location", "bio",
   "available", "available_from", "travel_ready",
   "avatar_url", "cover_image_url", "portfolio_url", "website_url",
   "skills", "positions", "languages", "portfolio_images", "profile_images", "experience",

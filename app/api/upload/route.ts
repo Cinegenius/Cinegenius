@@ -20,8 +20,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Datei zu groß (max. 10 MB)" }, { status: 400 });
   }
 
-  const ext = file.name.split(".").pop() ?? "jpg";
-  const path = `${userId}/${Date.now()}.${ext}`;
+  // SECURITY: derive extension from verified MIME type, not user-supplied filename
+  const MIME_EXT: Record<string, string> = {
+    "image/jpeg": "jpg",
+    "image/png":  "png",
+    "image/webp": "webp",
+    "image/heic": "heic",
+  };
+  const ext  = MIME_EXT[file.type] ?? "jpg";
+  const rand = crypto.randomUUID().replace(/-/g, "");
+  const path = `${userId}/${rand}.${ext}`;
 
   const { error } = await supabaseAdmin.storage
     .from("listing-images")

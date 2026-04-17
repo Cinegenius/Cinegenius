@@ -39,6 +39,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Bewertung muss zwischen 1 und 5 liegen" }, { status: 400 });
   }
 
+  // SECURITY: nur nach echter abgeschlossener Buchung bewerten
+  if (target_type === "listing") {
+    const { data: completedBooking } = await supabaseAdmin
+      .from("bookings")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("listing_id", target_id)
+      .eq("status", "confirmed")
+      .maybeSingle();
+    if (!completedBooking) {
+      return NextResponse.json({ error: "Nur nach einer Buchung bewertbar" }, { status: 403 });
+    }
+  }
+
   // Doppelbewertung verhindern
   const { data: existing } = await supabaseAdmin
     .from("reviews")
