@@ -48,6 +48,14 @@ type Booking = {
   created_at: string;
 };
 
+type IncomingBooking = Booking & {
+  user_id: string;
+  listing_id: string;
+  daily_rate: number;
+  notes: string | null;
+  booker_name: string;
+};
+
 const navItems = [
   { icon: LayoutDashboard, label: "Übersicht",      id: "overview" },
   { icon: User,            label: "Mein Profil",    id: "profil" },
@@ -222,6 +230,9 @@ export default function DashboardPage() {
 
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [bookingsLoading, setBookingsLoading] = useState(false);
+  const [incomingBookings, setIncomingBookings] = useState<IncomingBooking[]>([]);
+  const [incomingLoading, setIncomingLoading] = useState(false);
+  const [respondingBooking, setRespondingBooking] = useState<string | null>(null);
 
   const [applications, setApplications] = useState<{ id: string; job_id: string; job_title: string; status: string; day_rate: string | null; created_at: string }[]>([]);
   const [applicationsLoading, setApplicationsLoading] = useState(false);
@@ -413,6 +424,30 @@ export default function DashboardPage() {
   }, [activeTab]);
 
   useEffect(() => {
+    if (activeTab !== "bookings" && activeTab !== "overview") return;
+    setIncomingLoading(true);
+    fetch("/api/bookings?incoming=true")
+      .then(r => r.json())
+      .then(({ bookings: data }) => setIncomingBookings(data ?? []))
+      .catch(() => {})
+      .finally(() => setIncomingLoading(false));
+  }, [activeTab]);
+
+  const respondBooking = async (id: string, status: "confirmed" | "rejected") => {
+    setRespondingBooking(id);
+    try {
+      await fetch(`/api/bookings/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      setIncomingBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b));
+    } finally {
+      setRespondingBooking(null);
+    }
+  };
+
+  useEffect(() => {
     if (activeTab !== "bookings") return;
     setApplicationsLoading(true);
     fetch("/api/applications")
@@ -566,6 +601,11 @@ export default function DashboardPage() {
               {id === "messages" && unreadCount > 0 && (
                 <span className="ml-auto w-5 h-5 bg-crimson text-white text-xs rounded-full flex items-center justify-center">
                   {unreadCount}
+                </span>
+              )}
+              {id === "bookings" && incomingBookings.filter(b => b.status === "pending").length > 0 && (
+                <span className="ml-auto w-5 h-5 bg-gold text-bg-primary text-xs rounded-full flex items-center justify-center">
+                  {incomingBookings.filter(b => b.status === "pending").length}
                 </span>
               )}
               {id === "favorites" && favorites.length > 0 && (
@@ -1662,18 +1702,84 @@ export default function DashboardPage() {
           {activeTab === "bookings" && (
             <div className="space-y-6">
               {/* Stats row */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {[
-                  { label: "Buchungen gesamt", value: bookingsLoading ? "…" : String(bookings.length) },
+                  { label: "Meine Buchungen", value: bookingsLoading ? "…" : String(bookings.length) },
                   { label: "Bestätigt", value: bookingsLoading ? "…" : String(bookings.filter(b => b.status === "confirmed").length) },
-                  { label: "Ausgaben gesamt", value: bookingsLoading ? "…" : bookings.reduce((s, b) => s + b.total, 0).toLocaleString() + " €" },
-                ].map(({ label, value }) => (
-                  <div key={label} className="p-4 rounded-xl border border-border bg-bg-secondary">
+                  { label: "Anfragen erhalten", value: incomingLoading ? "…" : String(incomingBookings.length) },
+                  { label: "Ausstehend", value: incomingLoading ? "…" : String(incomingBookings.filter(b => b.status === "pending").length), highlight: incomingBookings.filter(b => b.status === "pending").length > 0 },
+                ].map(({ label, value, highlight }) => (
+                  <div key={label} className={`p-4 rounded-xl border bg-bg-secondary ${highlight ? "border-gold/40 bg-gold/5" : "border-border"}`}>
                     <p className="text-xs text-text-muted uppercase tracking-widest mb-1">{label}</p>
-                    <p className="text-xl font-bold font-display text-text-primary">{value}</p>
+                    <p className={`text-xl font-bold font-display ${highlight ? "text-gold" : "text-text-primary"}`}>{value}</p>
                   </div>
                 ))}
               </div>
+
+              {/* ── Eingehende Buchungsanfragen ── */}
+              {(incomingLoading || incomingBookings.length > 0) && (
+                <div className="rounded-xl border border-border bg-bg-secondary overflow-hidden">
+                  <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+                    <h2 className="font-semibold text-text-primary">Buchungsanfragen für deine Inserate</h2>
+                    {incomingBookings.filter(b => b.status === "pending").length > 0 && (
+                      <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-gold/15 text-gold border border-gold/30">
+                        {incomingBookings.filter(b => b.status === "pending").length} ausstehend
+                      </span>
+                    )}
+                  </div>
+                  {incomingLoading && <div className="p-8 text-center text-xs text-text-muted">Laden...</div>}
+                  <div className="divide-y divide-border">
+                    {incomingBookings.map((b) => (
+                      <div key={b.id} className="flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4">
+                        <div className="w-10 h-10 rounded-lg bg-bg-elevated border border-border flex items-center justify-center shrink-0 text-lg">
+                          {b.listing_type === "location" ? "📍" : b.listing_type === "vehicle" ? "🚗" : b.listing_type === "creator" ? "🎬" : b.listing_type === "job" ? "💼" : "📦"}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-text-primary truncate">{b.listing_title}</p>
+                          <p className="text-xs text-text-muted">
+                            Von <span className="text-text-secondary font-medium">{b.booker_name}</span>
+                            {" · "}
+                            {new Date(b.start_date).toLocaleDateString("de-DE", { day: "numeric", month: "short" })}
+                            {" – "}
+                            {new Date(b.end_date).toLocaleDateString("de-DE", { day: "numeric", month: "short", year: "numeric" })}
+                            {" · "}{b.days} Tag{b.days !== 1 ? "e" : ""}
+                          </p>
+                          {b.notes && <p className="text-xs text-text-muted mt-1 italic line-clamp-1">„{b.notes}"</p>}
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <p className="text-sm font-semibold text-text-primary mr-1">{b.total.toLocaleString()} €</p>
+                          {b.status === "pending" ? (
+                            <>
+                              <button
+                                onClick={() => respondBooking(b.id, "confirmed")}
+                                disabled={respondingBooking === b.id}
+                                className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-success/15 text-success border border-success/30 hover:bg-success/25 transition-colors disabled:opacity-50"
+                              >
+                                <Check size={12} /> Annehmen
+                              </button>
+                              <button
+                                onClick={() => respondBooking(b.id, "rejected")}
+                                disabled={respondingBooking === b.id}
+                                className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-crimson/10 text-crimson-light border border-crimson/30 hover:bg-crimson/20 transition-colors disabled:opacity-50"
+                              >
+                                <X size={12} /> Ablehnen
+                              </button>
+                            </>
+                          ) : (
+                            <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${
+                              b.status === "confirmed"
+                                ? "border-success/30 bg-success/10 text-success"
+                                : "border-crimson/30 bg-crimson/10 text-crimson-light"
+                            }`}>
+                              {b.status === "confirmed" ? "Angenommen" : "Abgelehnt"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Bookings list */}
               <div className="rounded-xl border border-border bg-bg-secondary overflow-hidden">
@@ -1712,8 +1818,12 @@ export default function DashboardPage() {
                       </div>
                       <div className="text-right shrink-0 space-y-1">
                         <p className="text-sm font-semibold text-text-primary">{b.total.toLocaleString()} €</p>
-                        <span className="inline-block px-2 py-0.5 text-[10px] font-semibold rounded-full border border-success/30 bg-success/10 text-success">
-                          {b.status === "confirmed" ? "Bestätigt" : b.status}
+                        <span className={`inline-block px-2 py-0.5 text-[10px] font-semibold rounded-full border ${
+                          b.status === "confirmed" ? "border-success/30 bg-success/10 text-success" :
+                          b.status === "rejected" ? "border-crimson/30 bg-crimson/10 text-crimson-light" :
+                          "border-gold/30 bg-gold/10 text-gold"
+                        }`}>
+                          {b.status === "confirmed" ? "Bestätigt" : b.status === "rejected" ? "Abgelehnt" : "Ausstehend"}
                         </span>
                       </div>
                       <p className="text-[10px] text-text-muted font-mono shrink-0 hidden sm:block">{b.ref}</p>

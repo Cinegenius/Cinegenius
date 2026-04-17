@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
       platform_fee: platformFee,
       total,
       notes: typeof notes === "string" ? notes.slice(0, 1000) : null,
-      status: "confirmed",
+      status: "pending",
     })
     .select("id, ref")
     .single();
@@ -96,9 +96,9 @@ export async function POST(req: NextRequest) {
   // In-app notification for the buyer
   await supabaseAdmin.from("notifications").insert({
     user_id: userId,
-    type: "booking_confirmed",
-    title: "Buchung bestätigt",
-    body: `Deine Buchung für „${listingTitle}" wurde bestätigt. Referenz: ${ref}`,
+    type: "booking_request",
+    title: "Buchungsanfrage gesendet",
+    body: `Deine Anfrage für „${listingTitle}" wurde gesendet. Referenz: ${ref}`,
     href: `/dashboard?tab=bookings`,
   });
 
@@ -139,11 +139,14 @@ export async function POST(req: NextRequest) {
 }
 
 // GET /api/bookings — list bookings for current user, or single by ?ref=CG-XXXXX
+// ?incoming=true → requests for listings owned by the current user
 export async function GET(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ bookings: [] });
 
-  const ref = new URL(req.url).searchParams.get("ref");
+  const searchParams = new URL(req.url).searchParams;
+  const ref      = searchParams.get("ref");
+  const incoming = searchParams.get("incoming") === "true";
 
   if (ref) {
     const { data } = await supabaseAdmin
@@ -154,6 +157,37 @@ export async function GET(req: NextRequest) {
       .maybeSingle();
     if (!data) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ booking: data });
+  }
+
+  if (incoming) {
+    // Get listing IDs owned by this user
+    const { data: ownedListings } = await supabaseAdmin
+      .from("listings")
+      .select("id")
+      .eq("user_id", userId);
+    const ownedIds = (ownedListings ?? []).map((l) => l.id);
+    if (ownedIds.length === 0) return NextResponse.json({ bookings: [] });
+
+    const { data } = await supabaseAdmin
+      .from("bookings")
+      .select("id, ref, user_id, listing_id, listing_title, listing_type, start_date, end_date, days, daily_rate, total, notes, status, created_at")
+      .in("listing_id", ownedIds)
+      .order("created_at", { ascending: false })
+      .limit(100);
+
+    // Enrich with booker display_name
+    const bookerIds = [...new Set((data ?? []).map((b) => b.user_id))];
+    let nameMap: Record<string, string> = {};
+    if (bookerIds.length > 0) {
+      const { data: profiles } = await supabaseAdmin
+        .from("profiles")
+        .select("user_id, display_name")
+        .in("user_id", bookerIds);
+      (profiles ?? []).forEach((p) => { nameMap[p.user_id] = p.display_name ?? "Unbekannt"; });
+    }
+
+    const enriched = (data ?? []).map((b) => ({ ...b, booker_name: nameMap[b.user_id] ?? "Unbekannt" }));
+    return NextResponse.json({ bookings: enriched });
   }
 
   const { data } = await supabaseAdmin

@@ -37,6 +37,7 @@ const typeConfig: Record<string, {
   vehicle:  { label: "Fahrzeug",    pluralLabel: "Fahrzeuge",   icon: Car,       href: (id) => `/vehicles/${id}`,  color: "text-orange-400",    bgColor: "bg-orange-500/10 border-orange-500/20" },
   prop:     { label: "Requisite",   pluralLabel: "Requisiten",  icon: Package,   href: (id) => `/props/${id}`,     color: "text-violet-400",    bgColor: "bg-violet-500/10 border-violet-500/20" },
   job:      { label: "Job",         pluralLabel: "Jobs",        icon: Briefcase, href: (id) => `/jobs/${id}`,      color: "text-emerald-400",   bgColor: "bg-emerald-500/10 border-emerald-500/20" },
+  company:  { label: "Firma",       pluralLabel: "Firmen",      icon: Building2, href: (id) => `/companies/${id}`, color: "text-blue-400",      bgColor: "bg-blue-500/10 border-blue-500/20" },
 };
 
 const TABS = [
@@ -46,6 +47,7 @@ const TABS = [
   { id: "job",      label: "Jobs",       icon: Briefcase },
   { id: "vehicle",  label: "Fahrzeuge",  icon: Car      },
   { id: "prop",     label: "Requisiten", icon: Package  },
+  { id: "company",  label: "Firmen",     icon: Building2 },
 ] as const;
 
 // ─── Suggestion chips ──────────────────────────────────────────────────────────
@@ -160,12 +162,13 @@ function SearchContent() {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const doSearch = useCallback(async (q: string) => {
+  const doSearch = useCallback(async (q: string, tab?: string) => {
     if (q.length < 2) { setResults([]); setLoading(false); return; }
     setLoading(true);
     setHasSearched(true);
+    const t = tab ?? activeTab;
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}${t !== "all" ? `&type=${t}` : ""}`);
       const { results: data } = await res.json();
       setResults(data ?? []);
     } catch {
@@ -173,7 +176,8 @@ function SearchContent() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
 
   // Run initial search if query from URL
   useEffect(() => {
@@ -204,12 +208,13 @@ function SearchContent() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputValue]);
 
-  // Update URL on tab change
+  // Re-search and update URL on tab change
   useEffect(() => {
     const params = new URLSearchParams();
     if (query) params.set("q", query);
     if (activeTab !== "all") params.set("type", activeTab);
     router.replace(`/search?${params.toString()}`, { scroll: false });
+    if (query.length >= 2) doSearch(query, activeTab);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
