@@ -10,6 +10,7 @@ import {
   Drama, Palette, Building2,
 } from "lucide-react";
 import type { ElementType } from "react";
+import LicensePicker from "@/components/LicensePicker";
 import { useToast } from "@/contexts/ToastContext";
 import ProfileGuard from "@/components/ProfileGuard";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
@@ -382,7 +383,6 @@ export default function ProfilePage() {
   const [videoLinks, setVideoLinks] = useState<string[]>([]);
   const [newVideoLink, setNewVideoLink] = useState("");
   const [crewCertificates, setCrewCertificates] = useState<string[]>([]);
-  const [newCertificate, setNewCertificate] = useState("");
 
   // Project credits (linked projects)
   type ProjectCredit = {
@@ -1670,37 +1670,11 @@ export default function ProfilePage() {
                 {/* Lizenzen & Führerscheine */}
                 <div className="p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-1">Lizenzen & Führerscheine</h2>
-                  <p className="text-xs text-text-muted mb-5">z.B. Führerschein B, Drohnenlizenzen, Zertifikate…</p>
-                  {crewCertificates.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {crewCertificates.map((c) => (
-                        <span key={c} className="flex items-center gap-1.5 px-3 py-1.5 bg-gold-subtle border border-gold/20 rounded-full text-xs text-gold">
-                          {c}
-                          <button onClick={() => setCrewCertificates((p) => p.filter((x) => x !== c))}
-                            className="hover:text-crimson-light transition-colors"><X size={11} /></button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  <div className="flex gap-2">
-                    <input type="text" placeholder="Lizenz hinzufügen…" value={newCertificate}
-                      onChange={(e) => setNewCertificate(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && newCertificate.trim()) {
-                          setCrewCertificates((p) => [...p, newCertificate.trim()]);
-                          setNewCertificate("");
-                        }
-                      }}
-                      className="flex-1 bg-bg-elevated border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold transition-colors" />
-                    <button onClick={() => {
-                      if (newCertificate.trim()) {
-                        setCrewCertificates((p) => [...p, newCertificate.trim()]);
-                        setNewCertificate("");
-                      }
-                    }} className="px-3 py-2 bg-gold/10 border border-gold/20 text-gold rounded-lg hover:bg-gold/20 transition-colors">
-                      <Plus size={15} />
-                    </button>
-                  </div>
+                  <p className="text-xs text-text-muted mb-4">Führerscheine, Drohnenlizenzen, Set-Zertifikate & mehr.</p>
+                  <LicensePicker
+                    selected={crewCertificates}
+                    onChange={setCrewCertificates}
+                  />
                 </div>
 
                 </> /* end crew-only */}
