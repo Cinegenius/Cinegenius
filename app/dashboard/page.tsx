@@ -10,7 +10,7 @@ import {
   User, Wallet, ArrowDownCircle, Receipt, Send,
   Pencil, Save, Loader2, Heart, MapPin, Car, Package, Trash2,
   Users, UserPlus, Check, X, Globe, Lock, Clock,
-  Building2, AlertCircle, FileText,
+  Building2, AlertCircle, FileText, ArrowLeft,
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import ProfileGuard from "@/components/ProfileGuard";
@@ -1655,7 +1655,7 @@ export default function DashboardPage() {
           {activeTab === "messages" && (
             <div className="rounded-xl border border-border bg-bg-secondary overflow-hidden flex h-[680px]">
               {/* Conversation list */}
-              <div className="w-72 shrink-0 border-r border-border flex flex-col">
+              <div className={`w-full sm:w-72 shrink-0 border-r border-border flex-col ${selectedConversation ? "hidden sm:flex" : "flex"}`}>
                 <div className="p-3 border-b border-border flex items-center justify-between">
                   <p className="text-xs uppercase tracking-widest text-text-muted font-semibold">Nachrichten</p>
                   {unreadCount > 0 && (
@@ -1719,7 +1719,7 @@ export default function DashboardPage() {
 
               {/* Right panel */}
               {!selectedConversation ? (
-                <div className="flex-1 flex items-center justify-center text-text-muted text-sm">
+                <div className="flex-1 hidden sm:flex items-center justify-center text-text-muted text-sm">
                   <div className="text-center">
                     <MessageSquare size={32} className="mx-auto mb-2 opacity-20" />
                     Wähle eine Unterhaltung aus
@@ -1731,13 +1731,21 @@ export default function DashboardPage() {
                 return (
                   <div className="flex-1 flex flex-col min-w-0">
                     {/* Header */}
-                    <div className="px-4 py-3 border-b border-border bg-bg-elevated">
-                      <p className="text-sm font-semibold text-text-primary leading-tight">
-                        {conv.listing_title ?? "Konversation"}
-                      </p>
-                      {conv.listing_type && (
-                        <p className="text-xs text-text-muted mt-0.5">{conv.listing_type}</p>
-                      )}
+                    <div className="px-4 py-3 border-b border-border bg-bg-elevated flex items-center gap-3">
+                      <button
+                        onClick={() => setSelectedConversation(null)}
+                        className="sm:hidden flex items-center justify-center w-7 h-7 rounded-lg hover:bg-bg-secondary transition-colors shrink-0"
+                      >
+                        <ArrowLeft size={16} className="text-text-muted" />
+                      </button>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-text-primary leading-tight truncate">
+                          {conv.listing_title ?? "Konversation"}
+                        </p>
+                        {conv.listing_type && (
+                          <p className="text-xs text-text-muted mt-0.5">{conv.listing_type}</p>
+                        )}
+                      </div>
                     </div>
 
                     {/* Messages */}
