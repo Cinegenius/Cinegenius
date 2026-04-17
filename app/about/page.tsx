@@ -77,7 +77,7 @@ export default function AboutPage() {
           <div className="mt-8 space-y-3 text-left">
             {[
               "Locations, Crew, Equipment und Jobs an einem Ort",
-              "Direkte Kommunikation — keine Agentur, keine Provision",
+              "Direkte Kommunikation — keine Agentur, keine Gebühren",
               "Sicher bezahlen über Treuhand — erst nach Abschluss",
               "Kostenlos inserieren und gefunden werden",
             ].map((point) => (

@@ -1939,7 +1939,7 @@ export default function ProfilePage() {
                     </h2>
                   </div>
                   <p className="text-xs text-text-muted mb-5 leading-relaxed">
-                    Nach Abschluss einer Buchung wird deine Auszahlung (Buchungsbetrag minus Provision) auf dieses Konto überwiesen.
+                    Nach Abschluss einer Buchung wird deine Auszahlung auf dieses Konto überwiesen.
                   </p>
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="sm:col-span-2">
@@ -1996,7 +1996,7 @@ export default function ProfilePage() {
                     </span>
                   </div>
                   <p className="text-sm text-text-muted leading-relaxed">
-                    CineGenius ist komplett kostenlos. Du zahlst nur eine gestaffelte Provision bei erfolgreichen Buchungen — kein Abo, keine Grundgebühr.
+                    CineGenius ist komplett kostenlos — keine Provision, keine Gebühren, kein Abo.
                   </p>
                 </div>
               </div>

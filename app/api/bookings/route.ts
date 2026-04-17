@@ -50,10 +50,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Fehlende Pflichtfelder" }, { status: 400 });
   }
 
-  const COMMISSION_RATE = 0.10;
   const subtotal = dailyRate * days;
-  const platformFee = Math.round(subtotal * COMMISSION_RATE);
-  const total = subtotal + platformFee;
+  const platformFee = 0;
+  const total = subtotal;
   const ref = generateRef();
 
   const { data: booking, error } = await supabaseAdmin

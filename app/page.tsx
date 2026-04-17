@@ -20,7 +20,6 @@ import {
   MapPin, Briefcase, ShoppingBag, Users,
   ArrowRight, Star, CheckCircle, Zap, Shield, Clock,
   TrendingUp, Film, ChevronRight, Play, Building2, Clapperboard, Camera,
-  Percent,
 } from "lucide-react";
 import { stats } from "@/lib/data";
 import ImageStrip from "@/components/ImageStrip";
@@ -476,7 +475,7 @@ export default async function HomePage() {
               step: "01",
               icon: Film,
               title: "Kostenlos registrieren",
-              desc: "Kein Abo, keine Grundgebühr. Erstelle in Minuten ein Profil — als Kreativer, Anbieter oder Firma.",
+              desc: "Komplett kostenlos — keine Gebühren, keine Provision. Erstelle in Minuten ein Profil — als Kreativer, Anbieter oder Firma.",
             },
             {
               step: "02",
@@ -776,8 +775,8 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
-              { value: "10 %", label: "Provision", sub: "nur bei Buchung", icon: Percent },
-              { value: "0 €", label: "Grundgebühr", sub: "kostenlos starten", icon: CheckCircle },
+              { value: "0 €", label: "Gebühren", sub: "komplett kostenlos", icon: CheckCircle },
+              { value: "0 %", label: "Provision", sub: "keine Transaktionsgebühr", icon: CheckCircle },
               { value: "24 h", label: "Antwortzeit", sub: "Ø Reaktionszeit", icon: Clock },
               { value: "DACH", label: "Region", sub: "DE · AT · CH", icon: TrendingUp },
             ].map(({ value, label, sub, icon: Icon }) => (
@@ -808,7 +807,7 @@ export default async function HomePage() {
           {[
             { icon: Shield, title: "Sichere Zahlung", desc: "Stripe-Treuhand — Geld wird erst nach erfolgreichem Abschluss freigegeben." },
             { icon: CheckCircle, title: "Verifizierte Anbieter", desc: "Geprüfte Profile und Identitäten für maximale Sicherheit auf beiden Seiten." },
-            { icon: Zap, title: "Kostenlos starten", desc: "Kein Abo, keine Grundgebühr. 10% Provision nur bei erfolgreicher Buchung." },
+            { icon: Zap, title: "Komplett kostenlos", desc: "Kein Abo, keine Grundgebühr, keine Provision. Einfach registrieren und loslegen." },
           ].map(({ icon: Icon, title, desc }) => (
             <div key={title} className="flex flex-col items-center text-center p-6 rounded-2xl border border-border bg-bg-secondary">
               <div className="w-12 h-12 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center mb-4">

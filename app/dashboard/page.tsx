@@ -585,7 +585,7 @@ export default function DashboardPage() {
             <p className="text-xs font-semibold text-success mb-1 flex items-center gap-1">
               <CheckCircle size={11} /> Kostenlos nutzen
             </p>
-            <p className="text-xs text-text-muted">10% Provision nur bei Erfolg</p>
+            <p className="text-xs text-text-muted">Immer kostenlos</p>
           </div>
         </div>
       </aside>
@@ -1783,7 +1783,7 @@ export default function DashboardPage() {
                     {
                       label: "Ausgaben gesamt",
                       value: bookingsLoading ? "…" : totalSpent.toLocaleString() + " €",
-                      sub: "inkl. Plattformgebühr (10%)",
+                      sub: "Buchungsbetrag gesamt",
                       color: confirmedBookings.length > 0 ? "text-gold" : "text-text-muted",
                     },
                     {
@@ -1892,7 +1892,6 @@ export default function DashboardPage() {
           {/* ── TRANSAKTIONEN ── */}
           {activeTab === "transactions" && (() => {
             const confirmed = bookings.filter(b => b.status === "confirmed");
-            const totalFees = confirmed.reduce((s, b) => s + Math.round(b.total / 11), 0); // approx 10% of subtotal
             const totalPaid = confirmed.reduce((s, b) => s + b.total, 0);
             return (
               <div className="space-y-4">
@@ -1900,7 +1899,6 @@ export default function DashboardPage() {
                   {[
                     { label: "Abgeschlossen", value: bookingsLoading ? "…" : String(confirmed.length), color: confirmed.length > 0 ? "text-success" : "text-text-muted" },
                     { label: "Ausstehend", value: bookingsLoading ? "…" : "0", color: "text-text-muted" },
-                    { label: "Gebühren gesamt", value: bookingsLoading ? "…" : totalFees.toLocaleString() + " €", color: "text-text-muted" },
                     { label: "Bezahlt gesamt", value: bookingsLoading ? "…" : totalPaid.toLocaleString() + " €", color: totalPaid > 0 ? "text-gold" : "text-text-muted" },
                   ].map(({ label, value, color }) => (
                     <div key={label} className="p-3 rounded-lg border border-border bg-bg-secondary text-center">

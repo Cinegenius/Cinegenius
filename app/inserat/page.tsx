@@ -1242,10 +1242,10 @@ export default function InseratPage() {
               )}
             </div>
 
-            {/* ── PROVISION HINT ── */}
+            {/* ── HINT ── */}
             <div className="p-4 bg-bg-secondary border border-border rounded-xl text-sm text-text-muted">
               <p className="font-semibold text-text-secondary mb-1">Kostenlos inserieren</p>
-              <p>Erst bei einer Buchung behalten wir 10 % — du bekommst 90 % des vereinbarten Preises.</p>
+              <p>CineGenius ist vollständig kostenlos — keine Provision, keine Gebühren.</p>
             </div>
 
             {error && (

@@ -50,7 +50,6 @@ export default function PropDetail({ prop }: { prop: Prop }) {
 
   const subtotal = prop.dailyRate * days;
   const deposit = Math.round(subtotal * 0.25);
-  const serviceFee = Math.round(subtotal * 0.1);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -314,16 +313,12 @@ export default function PropDetail({ prop }: { prop: Prop }) {
                         <span className="text-text-primary">{subtotal.toLocaleString()} €</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-text-muted">Servicegebühr (10%)</span>
-                        <span className="text-text-primary">{serviceFee.toLocaleString()} €</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
                         <span className="text-text-muted">Kaution (25%)</span>
                         <span className="text-text-primary">{deposit.toLocaleString()} €</span>
                       </div>
                       <div className="flex justify-between font-semibold text-text-primary pt-2 border-t border-border">
                         <span>Heute fällig</span>
-                        <span className="text-gold font-display text-lg">{(deposit + serviceFee).toLocaleString()} €</span>
+                        <span className="text-gold font-display text-lg">{deposit.toLocaleString()} €</span>
                       </div>
                       <p className="text-xs text-text-muted">
                         Verbleibende {(subtotal - deposit).toLocaleString()} € bei Abholung fällig.

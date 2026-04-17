@@ -8,7 +8,7 @@ import {
   ChevronRight, CheckCircle, ArrowLeft, AlertCircle,
 } from "lucide-react";
 
-const COMMISSION_RATE = 0.10;
+const COMMISSION_RATE = 0;
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
@@ -40,9 +40,7 @@ function CheckoutContent() {
   };
 
   const subtotal = listingPrice * days;
-  const platformFee = Math.round(subtotal * COMMISSION_RATE);
-  const total = subtotal + platformFee;
-  const providerPayout = subtotal - Math.round(subtotal * COMMISSION_RATE);
+  const total = subtotal;
 
   const canProceedStep1 = startDate && endDate && days >= 1;
   const canProceedStep2 = agreeTerms;
@@ -253,7 +251,7 @@ function CheckoutContent() {
                       { step: "1", text: "Du zahlst den Gesamtbetrag sicher über CineGenius." },
                       { step: "2", text: "Das Geld wird von der Plattform treuhänderisch gehalten." },
                       { step: "3", text: "Zahlung wird nach erfolgreicher Nutzung freigegeben." },
-                      { step: "4", text: "Anbieter erhält 90% — CineGenius behält 10% Provision." },
+                      { step: "4", text: "Zahlung wird nach Abschluss an den Anbieter freigegeben." },
                     ].map(({ step: s, text }) => (
                       <div key={s} className="flex items-start gap-3">
                         <span className="w-5 h-5 rounded-full bg-gold/10 border border-gold/30 text-gold text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5">
@@ -335,40 +333,16 @@ function CheckoutContent() {
                     <span className="text-text-muted">{listingPrice.toLocaleString()} € × {days} Tag{days > 1 ? "e" : ""}</span>
                     <span className="text-text-primary">{subtotal.toLocaleString()} €</span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-text-muted flex items-center gap-1">
-                      Plattformgebühr (10%)
-                      <span className="text-[10px] px-1.5 py-0.5 bg-bg-elevated rounded border border-border ml-1">inkl.</span>
-                    </span>
-                    <span className="text-text-primary">{platformFee.toLocaleString()} €</span>
-                  </div>
                   <div className="flex justify-between text-sm font-bold text-text-primary pt-3 border-t border-border">
                     <span>Gesamtbetrag</span>
                     <span className="text-gold font-display text-lg">{total.toLocaleString()} €</span>
                   </div>
                 </div>
 
-                {/* Auszahlungs-Transparenz */}
-                <div className="p-3 bg-bg-elevated rounded-lg border border-border mb-4">
-                  <p className="text-xs text-text-muted font-semibold uppercase tracking-widest mb-2">Auszahlung an Anbieter</p>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-text-secondary">Buchungsbetrag</span>
-                    <span className="text-text-primary">{subtotal.toLocaleString()} €</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-text-muted">− CineGenius (10%)</span>
-                    <span className="text-crimson-light">−{Math.round(subtotal * COMMISSION_RATE).toLocaleString()} €</span>
-                  </div>
-                  <div className="flex justify-between text-sm font-semibold text-success pt-2 border-t border-border mt-2">
-                    <span>Anbieter erhält</span>
-                    <span>{providerPayout.toLocaleString()} €</span>
-                  </div>
-                </div>
-
                 {/* Trust badges */}
                 <div className="space-y-2 text-xs text-text-muted">
                   {[
-                    { icon: Shield, text: "Geld in Treuhand bis zur Bestätigung" },
+                    { icon: Shield, text: "Sichere Buchungsabwicklung" },
                     { icon: CheckCircle, text: "Kostenlose Stornierung bis 48h vorher" },
                     { icon: AlertCircle, text: "Stripe-Zahlung kommt in einem Update" },
                   ].map(({ icon: Icon, text }) => (

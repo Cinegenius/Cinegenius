@@ -3,8 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, Calendar, Share2, MessageSquare, ArrowRight, Wallet, Loader2, AlertCircle } from "lucide-react";
-import { calculateCommission } from "@/lib/commission";
+import { CheckCircle, Calendar, Share2, MessageSquare, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 
 const typeLabels: Record<string, string> = {
   location: "Drehort",
@@ -79,8 +78,6 @@ function ConfirmationContent() {
     );
   }
 
-  const commission = calculateCommission(booking.subtotal);
-
   const steps = [
     { label: "Buchung bestätigt", done: true, desc: `Referenz: ${booking.ref}` },
     { label: "Zahlung eingegangen", done: true, desc: "Betrag gesichert — Freigabe nach Durchführung" },
@@ -142,20 +139,9 @@ function ConfirmationContent() {
                 <span className="text-text-muted">{booking.daily_rate.toLocaleString()} € × {booking.days} Tag{booking.days !== 1 ? "e" : ""}</span>
                 <span className="text-text-primary">{booking.subtotal.toLocaleString()} €</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-text-muted">Plattformgebühr ({commission.rate} %)</span>
-                <span className="text-text-primary">{booking.platform_fee.toLocaleString()} €</span>
-              </div>
               <div className="flex justify-between font-bold text-base pt-2 border-t border-border">
                 <span className="text-text-primary">Gesamtbetrag</span>
                 <span className="text-gold font-display text-lg">{booking.total.toLocaleString()} €</span>
-              </div>
-              <div className="mt-3 p-3 bg-success/10 border border-success/20 rounded-lg flex items-center gap-2">
-                <Wallet size={14} className="text-success shrink-0" />
-                <div className="flex-1 flex justify-between items-center">
-                  <span className="text-xs font-semibold text-success">Auszahlung an Anbieter</span>
-                  <span className="text-sm font-bold text-success">{commission.payout.toLocaleString()} €</span>
-                </div>
               </div>
             </div>
           </div>
