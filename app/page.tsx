@@ -74,7 +74,7 @@ async function getHomeData() {
     supabaseAdmin.from("profiles").select("avatar_url").not("avatar_url", "is", null).not("display_name", "is", null).limit(20),
     supabaseAdmin.from("listings").select("image_url").in("type", ["prop", "vehicle"]).eq("published", true).not("image_url", "is", null).limit(20),
     supabaseAdmin.from("listings").select("image_url").eq("type", "job").eq("published", true).not("image_url", "is", null).limit(20),
-    supabaseAdmin.from("companies").select("id,slug,name,logo_url,tagline,city").eq("published", true).not("logo_url", "is", null).order("created_at", { ascending: false }).limit(12),
+    supabaseAdmin.from("companies").select("id,slug,name,logo_url,city").not("logo_url", "is", null).order("created_at", { ascending: false }).limit(12),
     supabaseAdmin.from("projects").select("id,title,poster_url,year,type,director").not("poster_url", "is", null).order("created_at", { ascending: false }).limit(8),
   ]);
 
@@ -138,12 +138,12 @@ async function getHomeData() {
     projekt: pickRandom((liveProjects ?? []).filter((p) => p.poster_url?.includes("supabase.co/storage")).map((p) => ({ image_url: p.poster_url }))),
   };
 
-  const companies = (liveCompanies ?? []).map((c: { id: string; slug: string | null; name: string; logo_url: string | null; tagline: string | null; city: string | null }) => ({
+  const companies = (liveCompanies ?? []).map((c: { id: string; slug: string | null; name: string; logo_url: string | null; city: string | null }) => ({
     id: c.id,
     slug: c.slug,
     name: c.name,
     logo: c.logo_url,
-    tagline: c.tagline ?? "",
+    tagline: "",
     city: (c.city ?? "").split(",")[0]?.trim() ?? "",
   }));
 
