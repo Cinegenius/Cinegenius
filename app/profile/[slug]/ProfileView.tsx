@@ -89,31 +89,36 @@ function ExternalProfilesDisplay({ profiles }: { profiles: ExternalProfileRow[] 
   return (
     <div>
       <SectionLabel>Externe Profile</SectionLabel>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <div className="flex flex-wrap gap-2">
         {visible.map((entry) => {
           const plat = getPlatform(entry.platform_type);
           const displayName =
             entry.platform_type === "other" && entry.platform_name
               ? entry.platform_name
               : plat.name;
+          const faviconDomain = plat.urlHints[0] ?? null;
           return (
             <a
               key={entry.id}
               href={entry.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 px-4 py-3 bg-bg-secondary border border-border rounded-xl hover:border-gold/30 transition-all group"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-bg-elevated border border-border rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-all group"
             >
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 border ${plat.bgCls} ${plat.borderCls} ${plat.textCls}`}>
-                {plat.abbr}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-text-primary leading-tight">{displayName}</p>
-                {entry.custom_label && (
-                  <p className="text-xs text-text-muted">{entry.custom_label}</p>
-                )}
-              </div>
-              <ExternalLink size={12} className="text-text-muted group-hover:text-gold transition-colors shrink-0" />
+              {faviconDomain ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={`https://www.google.com/s2/favicons?domain=${faviconDomain}&sz=32`}
+                  alt=""
+                  width={14}
+                  height={14}
+                  className="w-3.5 h-3.5 rounded-sm shrink-0 opacity-80 group-hover:opacity-100"
+                />
+              ) : (
+                <span className={`text-[10px] font-bold shrink-0 ${plat.textCls}`}>{plat.abbr}</span>
+              )}
+              <span>{displayName}{entry.custom_label ? ` · ${entry.custom_label}` : ""}</span>
+              <ExternalLink size={9} className="shrink-0 opacity-40 group-hover:opacity-70" />
             </a>
           );
         })}
