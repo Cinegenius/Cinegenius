@@ -1,6 +1,7 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 
@@ -100,6 +101,16 @@ export async function POST(req: Request) {
     console.error("[listings POST]", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  // Revalidate the relevant listing page so the new entry shows up immediately
+  const pathMap: Record<string, string> = {
+    job: "/jobs",
+    location: "/locations",
+    prop: "/props",
+    vehicle: "/vehicles",
+    creator: "/creators",
+  };
+  if (pathMap[type]) revalidatePath(pathMap[type]);
 
   return NextResponse.json({ data });
 }
