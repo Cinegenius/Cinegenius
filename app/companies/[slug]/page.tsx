@@ -25,33 +25,17 @@ export default async function CompanyPage({
 
   const isOwner = userId === company.owner_user_id;
 
-  const [listingsRes, membersRes, servicesRes, equipmentRes] = await Promise.all([
+  const [listingsRes, rawMembersRes, servicesRes, equipmentRes] = await Promise.all([
     supabaseAdmin
       .from("listings")
       .select("id, title, type, category, price, city, image_url, created_at")
       .eq("company_id", company.id)
-      .eq("published", true)
       .order("created_at", { ascending: false }),
     supabaseAdmin
       .from("company_members")
       .select("id, user_id, role, title, status, created_at")
       .eq("company_id", company.id)
-      .order("created_at", { ascending: true })
-      .then(async ({ data: rawMembers }) => {
-        const visible = isOwner
-          ? (rawMembers ?? [])
-          : (rawMembers ?? []).filter((m) => m.status === "accepted");
-        if (!visible.length) return [];
-        const userIds = visible.map((m) => m.user_id);
-        const { data: profiles } = await supabaseAdmin
-          .from("profiles")
-          .select("user_id, display_name, avatar_url, slug, role")
-          .in("user_id", userIds);
-        const profileMap = Object.fromEntries(
-          (profiles ?? []).map((p) => [p.user_id, p])
-        );
-        return visible.map((m) => ({ ...m, profile: profileMap[m.user_id] ?? null }));
-      }),
+      .order("created_at", { ascending: true }),
     supabaseAdmin
       .from("company_services")
       .select("*")
@@ -61,9 +45,23 @@ export default async function CompanyPage({
       .from("company_equipment")
       .select("*")
       .eq("company_id", company.id)
-      .eq("published", true)
       .order("created_at", { ascending: false }),
   ]);
+
+  // Enrich members with profiles
+  const rawMembers = rawMembersRes.data ?? [];
+  const visible = isOwner ? rawMembers : rawMembers.filter((m) => m.status === "accepted");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let membersRes: any[] = [];
+  if (visible.length > 0) {
+    const userIds = visible.map((m) => m.user_id);
+    const { data: profiles } = await supabaseAdmin
+      .from("profiles")
+      .select("user_id, display_name, avatar_url, slug, role")
+      .in("user_id", userIds);
+    const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, p]));
+    membersRes = visible.map((m) => ({ ...m, profile: profileMap[m.user_id] ?? null }));
+  }
 
   // Check if current user has already requested to join
   let myMembership: { id: string; status: string } | null = null;
