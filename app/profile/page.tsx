@@ -65,14 +65,14 @@ function getCompletion(opts: {
 }
 
 // ─── Accordion role picker (same as profile-setup) ───────────────────────────
-const ROLE_CATEGORIES: { id: string; label: string; icon: ElementType; desc: string; types: readonly (readonly [string, string])[] }[] = [
-  { id: "talent",   label: "Talent / Performance", icon: Drama,       desc: "Schauspieler, Model, Creator …",
+const ROLE_CATEGORIES: { id: string; label: string; icon: ElementType; color: string; bg: string; desc: string; types: readonly (readonly [string, string])[] }[] = [
+  { id: "talent",   label: "Talent / Performance", icon: Drama,        color: "text-rose-400",    bg: "bg-rose-500/15",    desc: "Schauspieler, Model, Creator …",
     types: [["actor","Schauspieler/in"],["model","Model"],["extra","Komparse / Kleindarsteller"],["host","Moderator/in"],["dancer","Tänzer/in"],["stunt","Stunt Performer"],["voiceover","Synchronsprecher/in"],["creator","Influencer / Creator"]] },
-  { id: "crew",     label: "Filmcrew / Technik",   icon: Clapperboard, desc: "Kamera, Licht, Ton, Regie …",
+  { id: "crew",     label: "Filmcrew / Technik",   icon: Clapperboard,  color: "text-sky-400",     bg: "bg-sky-500/15",     desc: "Kamera, Licht, Ton, Regie …",
     types: [["camera","Kamera"],["lighting","Licht / Gaffer"],["sound","Ton"],["director_of_photography","Director of Photography"],["director","Regie"],["production","Produktion"],["makeup","Maske"],["costume","Kostüm"],["postproduction","Postproduktion"],["vfx","VFX"],["sfx","SFX"],["art_department","Szenenbild"],["broadcast","Broadcast"]] },
-  { id: "kreativ",  label: "Kreativ",               icon: Palette,     desc: "Fotograf, Editor, Art Director …",
+  { id: "kreativ",  label: "Kreativ",               icon: Palette,       color: "text-violet-400",  bg: "bg-violet-500/15",  desc: "Fotograf, Editor, Art Director …",
     types: [["filmmaker","Regisseur/in"],["writer","Autor/in"],["photographer","Fotograf/in"],["editor","Editor/in"],["motion_designer","Motion Designer"],["art_director","Art Director"]] },
-  { id: "anbieter", label: "Anbieter",              icon: Building2,   desc: "Location, Equipment, Studio …",
+  { id: "anbieter", label: "Anbieter",              icon: Building2,     color: "text-amber-400",   bg: "bg-amber-500/15",   desc: "Location, Equipment, Studio …",
     types: [["location","Location"],["equipment","Equipment"],["vehicle","Fahrzeuge"],["studio","Studio"],["props","Requisiten"]] },
 ];
 
@@ -91,7 +91,9 @@ function ProfileTypePicker({ selected, onSelect }: { selected: string; onSelect:
               onClick={() => setOpenCat(isOpen ? null : cat.id)}
               className={`w-full flex items-center gap-3 px-4 py-3.5 text-left transition-colors ${isOpen ? "bg-bg-elevated" : "bg-bg-secondary hover:bg-bg-elevated"}`}
             >
-              <cat.icon size={20} className="text-text-muted shrink-0" />
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${cat.bg}`}>
+                <cat.icon size={18} className={cat.color} />
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-text-primary text-sm">{cat.label}</p>
                 <p className="text-xs text-text-muted">

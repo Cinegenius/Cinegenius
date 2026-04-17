@@ -59,34 +59,10 @@ const VENDOR_ROLES: { type: ProfileType; label: string; icon: ElementType }[] = 
 // ─── Kategorien für 2-Stufen Auswahl ─────────────────────────────────────────
 
 const CATEGORIES = [
-  {
-    id: "talent",
-    label: "Talent",
-    icon: Drama,
-    desc: "Schauspieler, Model, Creator …",
-    types: ["actor","model","extra","host","dancer","stunt","voiceover","creator"],
-  },
-  {
-    id: "crew",
-    label: "Filmcrew",
-    icon: Clapperboard,
-    desc: "Kamera, Licht, Ton, Regie …",
-    types: ["camera","director_of_photography","director","production","lighting","sound","makeup","costume","postproduction","vfx","sfx","art_department","broadcast"],
-  },
-  {
-    id: "kreativ",
-    label: "Kreativ",
-    icon: Palette,
-    desc: "Fotograf, Editor, Art Director …",
-    types: ["filmmaker","photographer","writer","editor","motion_designer","art_director"],
-  },
-  {
-    id: "anbieter",
-    label: "Anbieter",
-    icon: Building2,
-    desc: "Location, Equipment, Studio …",
-    types: ["location","equipment","studio","vehicle","props"],
-  },
+  { id: "talent",   label: "Talent",    icon: Drama,       color: "text-rose-400",   bg: "bg-rose-500/15",   desc: "Schauspieler, Model, Creator …",          types: ["actor","model","extra","host","dancer","stunt","voiceover","creator"] },
+  { id: "crew",     label: "Filmcrew",  icon: Clapperboard, color: "text-sky-400",    bg: "bg-sky-500/15",    desc: "Kamera, Licht, Ton, Regie …",             types: ["camera","director_of_photography","director","production","lighting","sound","makeup","costume","postproduction","vfx","sfx","art_department","broadcast"] },
+  { id: "kreativ",  label: "Kreativ",   icon: Palette,      color: "text-violet-400", bg: "bg-violet-500/15", desc: "Fotograf, Editor, Art Director …",         types: ["filmmaker","photographer","writer","editor","motion_designer","art_director"] },
+  { id: "anbieter", label: "Anbieter",  icon: Building2,    color: "text-amber-400",  bg: "bg-amber-500/15",  desc: "Location, Equipment, Studio …",           types: ["location","equipment","studio","vehicle","props"] },
 ] as const;
 
 function RolePicker({
@@ -122,7 +98,9 @@ function RolePicker({
                 isOpen ? "bg-bg-elevated" : "bg-bg-secondary hover:bg-bg-elevated"
               }`}
             >
-              <cat.icon size={22} className="text-text-muted shrink-0" />
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${cat.bg}`}>
+                <cat.icon size={20} className={cat.color} />
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-text-primary text-sm">{cat.label}</p>
                 <p className="text-xs text-text-muted">
