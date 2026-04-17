@@ -55,6 +55,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Pflichtfelder fehlen (type, title, city)" }, { status: 400 });
   }
 
+  // SECURITY: input length limits and price sanitization
+  if (title.length > 200) return NextResponse.json({ error: "Titel zu lang (max. 200 Zeichen)" }, { status: 400 });
+  if (city.length > 100) return NextResponse.json({ error: "Stadt zu lang (max. 100 Zeichen)" }, { status: 400 });
+  if (description && description.length > 5000) return NextResponse.json({ error: "Beschreibung zu lang (max. 5000 Zeichen)" }, { status: 400 });
+  const safePrice = Math.max(0, Math.min(Number(price) || 0, 1_000_000));
+
   // If company_id is provided, verify the current user owns that company
   if (company_id) {
     const { data: company } = await supabaseAdmin
@@ -76,7 +82,7 @@ export async function POST(req: Request) {
       category: category ?? null,
       title,
       description: description ?? "",
-      price: price ?? 0,
+      price: safePrice,
       city,
       image_url: image_url ?? null,
       company_id: company_id ?? null,

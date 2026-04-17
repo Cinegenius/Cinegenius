@@ -24,10 +24,21 @@ export async function PATCH(
 
   if (!existing) return NextResponse.json({ error: "Nicht gefunden oder kein Zugriff" }, { status: 404 });
 
+  // SECURITY: input length limits
+  if (body.title !== undefined && body.title.length > 200)
+    return NextResponse.json({ error: "Titel zu lang (max. 200 Zeichen)" }, { status: 400 });
+  if (body.city !== undefined && body.city.length > 100)
+    return NextResponse.json({ error: "Stadt zu lang (max. 100 Zeichen)" }, { status: 400 });
+  if (body.description !== undefined && body.description.length > 5000)
+    return NextResponse.json({ error: "Beschreibung zu lang (max. 5000 Zeichen)" }, { status: 400 });
+
   const allowed = ["published", "title", "description", "price", "city", "category", "image_url"];
   const updates: Record<string, unknown> = {};
   for (const key of allowed) {
     if (key in body) updates[key] = body[key];
+  }
+  if ("price" in updates) {
+    updates["price"] = Math.max(0, Math.min(Number(updates["price"]) || 0, 1_000_000));
   }
 
   if (Object.keys(updates).length === 0) {
