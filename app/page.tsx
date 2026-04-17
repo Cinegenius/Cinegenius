@@ -264,6 +264,39 @@ const testimonials = [
   },
 ];
 
+const heroMosaicImages = [
+  {
+    src: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=700&q=85",
+    label: "Film",
+    tall: true,
+  },
+  {
+    src: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=700&q=85",
+    label: "Fotografie",
+    tall: false,
+  },
+  {
+    src: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=700&q=85",
+    label: "Content",
+    tall: false,
+  },
+  {
+    src: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=700&q=85",
+    label: "Portrait",
+    tall: false,
+  },
+  {
+    src: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=700&q=85",
+    label: "Video",
+    tall: true,
+  },
+  {
+    src: "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=700&q=85",
+    label: "Social",
+    tall: false,
+  },
+];
+
 export default async function HomePage() {
   const { userId } = await auth();
   const isLoggedIn = !!userId;
@@ -272,10 +305,12 @@ export default async function HomePage() {
   const ctaLabel = isLoggedIn ? "Zum Dashboard" : "Kostenlos starten";
 
   const { liveStats, liveLocations, liveJobs, posterStrip, avatarStrip, locationStrip, pillarImages, companies, projects } = await getHomeData();
+  const hasStrips = posterStrip.length >= 1 || avatarStrip.length >= 1 || locationStrip.length >= 1;
+
   return (
     <>
       {/* ── HERO ── */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pb-[270px]">
+      <section className={`relative min-h-screen flex items-center overflow-hidden ${hasStrips ? "pb-[270px]" : "pb-0"}`}>
         {/* Theme-aware background image (CSS class in globals.css) */}
         <div className="hero-bg absolute inset-0 bg-cover bg-no-repeat" />
 
@@ -296,51 +331,149 @@ export default async function HomePage() {
           style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E\")" }}
         />
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-20">
-          <div className="hero-badge inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold uppercase tracking-widest mb-8 animate-fade-in">
-            <Zap size={12} /> Film · Foto · Content · Werbung
-          </div>
+        {/* Split layout: text left, mosaic right */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
-          <h1 className="hero-title font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6 animate-fade-up">
-            Alles, was dein Projekt<br />
-            <span className="text-gradient-gold">zum Leben braucht.</span>
-          </h1>
-
-          <p className="hero-sub text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-up">
-            Egal ob Kurzfilm, Werbespot, Fotoshooting oder YouTube-Produktion —
-            CineGenius verbindet Kreative mit Locations, Crew, Equipment und Jobs.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-12 animate-fade-up delay-200">
-            <Link
-              href={ctaHref}
-              className="px-8 py-3.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors flex items-center justify-center gap-2 text-base"
-            >
-              {isLoggedIn ? "Zum Dashboard" : "Jetzt starten"} <ArrowRight size={16} />
-            </Link>
-            <Link
-              href="/inserat"
-              className="px-8 py-3.5 border border-white/30 text-white font-semibold rounded-xl hover:border-white/60 hover:bg-white/5 transition-all flex items-center justify-center gap-2 text-base"
-            >
-              Inserat erstellen
-            </Link>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-y-4 gap-x-6 animate-fade-up delay-300">
-            {liveStats.map((s, i) => (
-              <div key={s.label} className="flex items-center">
-                <div className="text-center px-3 sm:px-0 w-full sm:w-auto">
-                  <div className="hero-stat-val text-xl sm:text-2xl font-bold font-display">{s.value}</div>
-                  <div className="hero-stat-lbl text-[10px] sm:text-xs uppercase tracking-widest mt-0.5">{s.label}</div>
-                </div>
-                {i < liveStats.length - 1 && <span className="hero-stat-lbl opacity-20 text-lg hidden sm:inline ml-6">·</span>}
+            {/* ── LEFT: text ── */}
+            <div className="text-center lg:text-left">
+              <div className="hero-badge inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold uppercase tracking-widest mb-8 animate-fade-in">
+                <Zap size={12} /> Film · Foto · Content · Werbung
               </div>
-            ))}
+
+              <h1 className="hero-title font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6 animate-fade-up">
+                Alles, was dein Projekt<br />
+                <span className="text-gradient-gold">zum Leben braucht.</span>
+              </h1>
+
+              <p className="hero-sub text-lg sm:text-xl max-w-2xl lg:max-w-none mx-auto mb-10 leading-relaxed animate-fade-up">
+                Egal ob Kurzfilm, Werbespot, Fotoshooting oder YouTube-Produktion —
+                CineGenius verbindet Kreative mit Locations, Crew, Equipment und Jobs.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-12 animate-fade-up delay-200">
+                <Link
+                  href={ctaHref}
+                  className="px-8 py-3.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors flex items-center justify-center gap-2 text-base"
+                >
+                  {isLoggedIn ? "Zum Dashboard" : "Jetzt starten"} <ArrowRight size={16} />
+                </Link>
+                <Link
+                  href="/inserat"
+                  className="px-8 py-3.5 border border-white/30 text-white font-semibold rounded-xl hover:border-white/60 hover:bg-white/5 transition-all flex items-center justify-center gap-2 text-base"
+                >
+                  Inserat erstellen
+                </Link>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-y-4 gap-x-6 animate-fade-up delay-300">
+                {liveStats.map((s, i) => (
+                  <div key={s.label} className="flex items-center">
+                    <div className="text-center lg:text-left px-3 sm:px-0 w-full sm:w-auto">
+                      <div className="hero-stat-val text-xl sm:text-2xl font-bold font-display">{s.value}</div>
+                      <div className="hero-stat-lbl text-[10px] sm:text-xs uppercase tracking-widest mt-0.5">{s.label}</div>
+                    </div>
+                    {i < liveStats.length - 1 && <span className="hero-stat-lbl opacity-20 text-lg hidden sm:inline ml-6">·</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── RIGHT: Image mosaic (desktop only) ── */}
+            <div className="hidden lg:flex gap-3 h-[600px] overflow-hidden relative">
+              {/* Fade left edge into dark background */}
+              <div className="absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-black/60 to-transparent z-10 pointer-events-none" />
+              {/* Fade right edge */}
+              <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-black/40 to-transparent z-10 pointer-events-none" />
+              {/* Fade bottom edge into strips */}
+              <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/60 to-transparent z-10 pointer-events-none" />
+
+              {/* Column 1 */}
+              <div className="flex-1 flex flex-col gap-3">
+                {/* tall */}
+                <div className="relative rounded-2xl overflow-hidden flex-[1.6] group">
+                  <Image
+                    src={heroMosaicImages[0].src}
+                    alt={heroMosaicImages[0].label}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                    sizes="25vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <span className="absolute bottom-2 left-3 text-[10px] font-bold text-white/80 uppercase tracking-widest">{heroMosaicImages[0].label}</span>
+                </div>
+                {/* short */}
+                <div className="relative rounded-2xl overflow-hidden flex-1 group">
+                  <Image
+                    src={heroMosaicImages[1].src}
+                    alt={heroMosaicImages[1].label}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                    sizes="25vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <span className="absolute bottom-2 left-3 text-[10px] font-bold text-white/80 uppercase tracking-widest">{heroMosaicImages[1].label}</span>
+                </div>
+                {/* short */}
+                <div className="relative rounded-2xl overflow-hidden flex-1 group">
+                  <Image
+                    src={heroMosaicImages[2].src}
+                    alt={heroMosaicImages[2].label}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                    sizes="25vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <span className="absolute bottom-2 left-3 text-[10px] font-bold text-white/80 uppercase tracking-widest">{heroMosaicImages[2].label}</span>
+                </div>
+              </div>
+
+              {/* Column 2 — offset downward */}
+              <div className="flex-1 flex flex-col gap-3 pt-10">
+                {/* short */}
+                <div className="relative rounded-2xl overflow-hidden flex-1 group">
+                  <Image
+                    src={heroMosaicImages[3].src}
+                    alt={heroMosaicImages[3].label}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                    sizes="25vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <span className="absolute bottom-2 left-3 text-[10px] font-bold text-white/80 uppercase tracking-widest">{heroMosaicImages[3].label}</span>
+                </div>
+                {/* tall */}
+                <div className="relative rounded-2xl overflow-hidden flex-[1.6] group">
+                  <Image
+                    src={heroMosaicImages[4].src}
+                    alt={heroMosaicImages[4].label}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                    sizes="25vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <span className="absolute bottom-2 left-3 text-[10px] font-bold text-white/80 uppercase tracking-widest">{heroMosaicImages[4].label}</span>
+                </div>
+                {/* short */}
+                <div className="relative rounded-2xl overflow-hidden flex-1 group">
+                  <Image
+                    src={heroMosaicImages[5].src}
+                    alt={heroMosaicImages[5].label}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                    sizes="25vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <span className="absolute bottom-2 left-3 text-[10px] font-bold text-white/80 uppercase tracking-widest">{heroMosaicImages[5].label}</span>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
         {/* ── LIVE STRIPS — anchored to bottom of hero ── */}
-        {(posterStrip.length >= 1 || avatarStrip.length >= 1 || locationStrip.length >= 1) && (
+        {hasStrips && (
           <div className="absolute bottom-0 left-0 right-0 z-20" style={{ display: "flex", flexDirection: "column", gap: 0 }}>
             {posterStrip.length >= 1 && (
               <ImageStrip images={posterStrip} aspectRatio="wide" height={90} durationOverride={35} direction="left" overlay={false} stripId="top" />
@@ -459,6 +592,82 @@ export default async function HomePage() {
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ── KATEGORIE INSPIRATION ── */}
+      <section className="py-16 overflow-hidden bg-bg-primary">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 text-center">
+          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">Von Film bis Social Media</p>
+          <h2 className="font-display text-3xl sm:text-4xl font-bold text-text-primary">
+            Für jede Art von Kreativarbeit
+          </h2>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          {[
+            {
+              src: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=600&q=85",
+              label: "Kinofilm & TV",
+              tag: "Film",
+              href: "/locations",
+            },
+            {
+              src: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&q=85",
+              label: "Fotoshooting",
+              tag: "Foto",
+              href: "/creators",
+            },
+            {
+              src: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&q=85",
+              label: "Content Creation",
+              tag: "Content",
+              href: "/jobs",
+            },
+            {
+              src: "https://images.unsplash.com/photo-1579444741963-5ae219cfe27c?w=600&q=85",
+              label: "Werbung & Kampagne",
+              tag: "Werbung",
+              href: "/companies",
+            },
+            {
+              src: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=600&q=85",
+              label: "Portrait & Mode",
+              tag: "Portrait",
+              href: "/creators",
+            },
+            {
+              src: "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=600&q=85",
+              label: "Social Media",
+              tag: "Social",
+              href: "/jobs",
+            },
+          ].map(({ src, label, tag, href }) => (
+            <Link
+              key={label}
+              href={href}
+              className="group relative rounded-2xl overflow-hidden aspect-[3/4] block"
+            >
+              <Image
+                src={src}
+                alt={label}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                sizes="(max-width:640px) 50vw,(max-width:1024px) 33vw,16vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              <div className="absolute top-3 left-3">
+                <span className="px-2 py-0.5 bg-black/50 backdrop-blur-sm border border-white/15 rounded-full text-[10px] text-white/80 font-semibold uppercase tracking-widest">
+                  {tag}
+                </span>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <p className="text-sm font-bold text-white leading-tight">{label}</p>
+                <p className="text-[10px] text-white/55 mt-0.5 flex items-center gap-1 group-hover:text-white/80 transition-colors">
+                  Entdecken <ChevronRight size={9} />
+                </p>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 
