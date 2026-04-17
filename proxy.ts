@@ -36,12 +36,12 @@ export default clerkMiddleware(async (auth, request) => {
     "Content-Security-Policy",
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://*.clerk.accounts.dev https://js.stripe.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://*.clerk.accounts.dev https://*.cinegenius.co https://js.stripe.com",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://*.supabase.co https://www.google.com https://images.unsplash.com https://upload.wikimedia.org https://img.clerk.com",
+      "img-src 'self' data: blob: https://*.supabase.co https://www.google.com https://images.unsplash.com https://upload.wikimedia.org https://img.clerk.com https://*.cinegenius.co",
       "font-src 'self' data:",
-      "connect-src 'self' https://*.supabase.co https://*.clerk.com https://api.clerk.com https://*.clerk.accounts.dev wss://*.supabase.co",
-      "frame-src https://js.stripe.com https://hooks.stripe.com https://*.clerk.com https://*.clerk.accounts.dev",
+      "connect-src 'self' https://*.supabase.co https://*.clerk.com https://api.clerk.com https://*.clerk.accounts.dev https://*.cinegenius.co wss://*.supabase.co",
+      "frame-src https://js.stripe.com https://hooks.stripe.com https://*.clerk.com https://*.clerk.accounts.dev https://*.cinegenius.co",
       "worker-src 'self' blob:",
       "frame-ancestors 'none'",
     ].join("; ")
