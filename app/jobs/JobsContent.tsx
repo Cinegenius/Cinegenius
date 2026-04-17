@@ -430,7 +430,6 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
         imagePosition="center 35%"
         overlay="left"
         height="sm"
-        cta={{ label: "Job ausschreiben", href: "/inserat" }}
       />
 
       {/* ── Filter Bar ───────────────────────────────────── */}

@@ -515,7 +515,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                         <p className="text-xs text-text-muted mb-3 flex items-center gap-1"><MapPin size={11} /> {loc.city}</p>
                         <div className="flex items-center justify-between pt-3 border-t border-border">
                           <span className="text-xs text-text-muted">{loc.type}</span>
-                          <span className="text-sm font-bold text-gold">${loc.price.toLocaleString()}<span className="text-text-muted font-normal text-xs">/{loc.priceUnit}</span></span>
+                          <span className="text-sm font-bold text-gold">{loc.price.toLocaleString()} €<span className="text-text-muted font-normal text-xs">/{loc.priceUnit}</span></span>
                         </div>
                       </div>
                     </Link>

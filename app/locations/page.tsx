@@ -116,10 +116,8 @@ export default async function LocationsPage() {
           imagePosition="center 60%"
           overlay="left"
           height="sm"
-          cta={{ label: "Location eintragen", href: "/inserat" }}
         />
       </div>
-      <ProviderProfiles profiles={locationProviders} heading="Location-Anbieter mit Profil" />
       <LocationsContent serverListings={serverListings} />
     </>
   );
