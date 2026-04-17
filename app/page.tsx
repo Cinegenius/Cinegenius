@@ -197,7 +197,7 @@ const featurePillars = [
     icon: Building2,
     title: "Firmen",
     desc: "Produktionsfirmen, Verleiher, Studios — entdecke Branchenpartner.",
-    href: "/firmen",
+    href: "/companies",
     pillarKey: "firma",
     accent: "from-emerald-900/70",
   },
