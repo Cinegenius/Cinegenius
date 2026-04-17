@@ -27,6 +27,7 @@ type Notification = {
 const typeIcons: Record<NotificationType, React.ComponentType<{ size?: number; className?: string }>> = {
   booking_confirmed:     BookOpen,
   booking_request:       BookOpen,
+  booking_rejected:      BookOpen,
   new_message:           MessageSquare,
   new_application:       Briefcase,
   application_sent:      Briefcase,
@@ -52,7 +53,7 @@ type FilterId = typeof FILTER_TABS[number]["id"];
 
 function matchesFilter(type: NotificationType, filter: FilterId): boolean {
   if (filter === "all") return true;
-  if (filter === "booking") return type === "booking_confirmed" || type === "booking_request";
+  if (filter === "booking") return type === "booking_confirmed" || type === "booking_request" || type === "booking_rejected";
   if (filter === "message") return type === "new_message";
   if (filter === "job") return type === "new_application" || type === "application_sent";
   if (filter === "money") return type === "payout_ready";

@@ -78,11 +78,11 @@ function ConfirmationContent() {
     );
   }
 
+  const isPending = booking.status === "pending";
   const steps = [
-    { label: "Buchung bestätigt", done: true, desc: `Referenz: ${booking.ref}` },
-    { label: "Zahlung eingegangen", done: true, desc: "Betrag gesichert — Freigabe nach Durchführung" },
-    { label: "Anbieter meldet sich", done: false, desc: "Der Anbieter meldet sich innerhalb von 24 Stunden" },
-    { label: "Drehtag", done: false, desc: booking.start_date ? `Ab ${formatDateDE(booking.start_date)}` : "Termin vereinbaren" },
+    { label: "Anfrage gesendet", done: true, desc: `Referenz: ${booking.ref}` },
+    { label: "Anbieter bestätigt", done: !isPending, desc: isPending ? "Warte auf Bestätigung durch den Anbieter" : "Anbieter hat die Anfrage bestätigt" },
+    { label: "Drehtag", done: false, desc: booking.start_date ? `Ab ${formatDateDE(booking.start_date)}` : "Termin nach Bestätigung" },
   ];
 
   return (
@@ -94,13 +94,13 @@ function ConfirmationContent() {
             <CheckCircle size={38} className="text-success" />
           </div>
           <h1 className="font-display text-3xl font-bold text-text-primary mb-2">
-            Buchung bestätigt!
+            {isPending ? "Anfrage gesendet!" : "Buchung bestätigt!"}
           </h1>
           <p className="text-text-muted mb-1">
             Referenz: <span className="text-gold font-mono font-semibold">{booking.ref}</span>
           </p>
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-success/10 border border-success/20 rounded-full text-success text-xs font-semibold mt-1">
-            <CheckCircle size={11} /> Zahlung gesichert — Auszahlung nach Abschluss
+          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mt-1 ${isPending ? "bg-gold/10 border border-gold/30 text-gold" : "bg-success/10 border border-success/20 text-success"}`}>
+            <CheckCircle size={11} /> {isPending ? "Warte auf Bestätigung des Anbieters" : "Buchung bestätigt"}
           </div>
         </div>
 

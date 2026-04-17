@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
@@ -40,6 +41,7 @@ const conditionColors: Record<string, string> = {
 };
 
 export default function PropDetail({ prop }: { prop: Prop }) {
+  const router = useRouter();
   const [days, setDays] = useState(1);
   const [startDate, setStartDate] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -53,8 +55,15 @@ export default function PropDetail({ prop }: { prop: Prop }) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    addToast(`Mietanfrage an ${prop.vendor} gesendet!`, "success");
+    const today = new Date();
+    const start = startDate || today.toISOString().split("T")[0];
+    const end = new Date(new Date(start).getTime() + days * 86_400_000).toISOString().split("T")[0];
+    router.push(
+      `/booking/checkout?type=prop&id=${prop.id}` +
+      `&title=${encodeURIComponent(prop.title)}` +
+      `&price=${prop.dailyRate}&days=${days}` +
+      `&startDate=${start}&endDate=${end}`
+    );
   };
 
   return (
