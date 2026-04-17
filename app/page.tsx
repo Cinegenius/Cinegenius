@@ -355,6 +355,107 @@ export default async function HomePage() {
         )}
       </section>
 
+      {/* ── VISUAL SHOWCASE ── */}
+      <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-10">
+          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">Für jeden Shoot</p>
+          <h2 className="font-display text-3xl sm:text-4xl font-bold text-text-primary">
+            Film · Foto · Content · Werbung
+          </h2>
+          <p className="text-text-muted text-sm mt-3 max-w-xl mx-auto">
+            Ob Spielfilm, Instagram-Shooting, YouTube-Produktion oder TV-Werbung — CineGenius ist die Plattform für jede Art von Kreativproduktion.
+          </p>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-[220px]">
+          {/* Large tile — Film */}
+          <div className="relative rounded-2xl overflow-hidden row-span-2 group">
+            <Image
+              src="https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=85"
+              alt="Film Set"
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+              sizes="(max-width:1024px) 50vw,33vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            <div className="absolute bottom-5 left-5">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold mb-2">
+                <Film size={10} /> Film & Kino
+              </span>
+              <p className="text-white font-semibold text-sm">Professionelle Filmsets</p>
+              <p className="text-white/60 text-xs mt-0.5">Locations, Crew & Equipment</p>
+            </div>
+          </div>
+          {/* Foto */}
+          <div className="relative rounded-2xl overflow-hidden group">
+            <Image
+              src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=800&q=85"
+              alt="Fotoshooting"
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+              sizes="(max-width:1024px) 50vw,33vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
+                <Camera size={10} /> Fotografie
+              </span>
+              <p className="text-white font-semibold text-sm">Shootings & Studios</p>
+            </div>
+          </div>
+          {/* Social Media */}
+          <div className="relative rounded-2xl overflow-hidden group">
+            <Image
+              src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&q=85"
+              alt="Social Media Content"
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+              sizes="(max-width:1024px) 50vw,33vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
+                <Zap size={10} /> Social Media
+              </span>
+              <p className="text-white font-semibold text-sm">Content Creation</p>
+            </div>
+          </div>
+          {/* Werbung */}
+          <div className="relative rounded-2xl overflow-hidden group">
+            <Image
+              src="https://images.unsplash.com/photo-1574717024453-354056adb31b?w=800&q=85"
+              alt="Werbeproduktion"
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+              sizes="(max-width:1024px) 50vw,33vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
+                <TrendingUp size={10} /> Werbung
+              </span>
+              <p className="text-white font-semibold text-sm">Werbe- & Industriefilm</p>
+            </div>
+          </div>
+          {/* Music Video / Behind Scenes */}
+          <div className="relative rounded-2xl overflow-hidden group">
+            <Image
+              src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=85"
+              alt="Behind the scenes"
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+              sizes="(max-width:1024px) 50vw,33vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
+                <Play size={10} /> Behind the Scenes
+              </span>
+              <p className="text-white font-semibold text-sm">Backstage & Crew</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── ALLES AUF EINER PLATTFORM ── */}
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
