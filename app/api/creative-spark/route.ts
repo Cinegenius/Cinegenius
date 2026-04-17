@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 import Groq from "groq-sdk";
 import { NextRequest } from "next/server";
 
