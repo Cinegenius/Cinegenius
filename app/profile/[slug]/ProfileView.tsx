@@ -390,6 +390,11 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                 </div>
               )}
 
+              {/* Externe Profile */}
+              {externalProfiles.length > 0 && (
+                <ExternalProfilesDisplay profiles={externalProfiles} />
+              )}
+
             </div>
           </div>
         </div>
@@ -584,14 +589,6 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                 </div>
               ))}
             </div>
-          </>
-        )}
-
-        {/* ── EXTERNE PROFILE ───────────────────────────────────────────── */}
-        {externalProfiles.length > 0 && (
-          <>
-            <Divider />
-            <ExternalProfilesDisplay profiles={externalProfiles} />
           </>
         )}
 
@@ -1030,6 +1027,11 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
               );
             })()}
 
+            {/* Externe Profile */}
+            {externalProfiles.length > 0 && (
+              <ExternalProfilesDisplay profiles={externalProfiles} />
+            )}
+
           </div>
         </div>
 
@@ -1157,13 +1159,6 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 </div>
               ))}
             </div>
-          </div>
-        )}
-
-        {/* Externe Profile */}
-        {externalProfiles.length > 0 && (
-          <div className="mb-12">
-            <ExternalProfilesDisplay profiles={externalProfiles} />
           </div>
         )}
 
