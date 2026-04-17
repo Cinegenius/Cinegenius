@@ -74,7 +74,7 @@ async function getHomeData() {
     supabaseAdmin.from("profiles").select("avatar_url").not("avatar_url", "is", null).not("display_name", "is", null).limit(20),
     supabaseAdmin.from("listings").select("image_url").in("type", ["prop", "vehicle"]).eq("published", true).not("image_url", "is", null).limit(20),
     supabaseAdmin.from("listings").select("image_url").eq("type", "job").eq("published", true).not("image_url", "is", null).limit(20),
-    supabaseAdmin.from("companies").select("id,name,logo_url,tagline,location").eq("published", true).not("logo_url", "is", null).order("created_at", { ascending: false }).limit(12),
+    supabaseAdmin.from("companies").select("id,slug,name,logo_url,tagline,location").eq("published", true).not("logo_url", "is", null).order("created_at", { ascending: false }).limit(12),
     supabaseAdmin.from("projects").select("id,title,poster_url,year,type,director").not("poster_url", "is", null).order("created_at", { ascending: false }).limit(8),
   ]);
 
@@ -138,8 +138,9 @@ async function getHomeData() {
     projekt: pickRandom((liveProjects ?? []).filter((p) => p.poster_url?.includes("supabase.co/storage")).map((p) => ({ image_url: p.poster_url }))),
   };
 
-  const companies = (liveCompanies ?? []).map((c: { id: string; name: string; logo_url: string | null; tagline: string | null; location: string | null }) => ({
+  const companies = (liveCompanies ?? []).map((c: { id: string; slug: string | null; name: string; logo_url: string | null; tagline: string | null; location: string | null }) => ({
     id: c.id,
+    slug: c.slug,
     name: c.name,
     logo: c.logo_url,
     tagline: c.tagline ?? "",
@@ -668,13 +669,13 @@ export default async function HomePage() {
               <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Branchenpartner</p>
               <h2 className="font-display text-2xl font-bold text-text-primary">Firmen & Studios</h2>
             </div>
-            <Link href="/firmen" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light transition-colors font-medium">
+            <Link href="/companies" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light transition-colors font-medium">
               Alle anzeigen <ArrowRight size={14} />
             </Link>
           </div>
           <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {companies.slice(0, 6).map((c) => (
-              <Link key={c.id} href={`/firmen/${c.id}`} className="card-hover group flex flex-col items-center text-center p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 transition-all gap-3">
+              <Link key={c.id} href={`/companies/${c.slug ?? c.id}`} className="card-hover group flex flex-col items-center text-center p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 transition-all gap-3">
                 <div className="w-14 h-14 rounded-xl border border-border bg-bg-elevated overflow-hidden flex items-center justify-center shrink-0">
                   {c.logo ? (
                     <Image src={c.logo} alt={c.name} width={56} height={56} className="object-contain w-full h-full" />
