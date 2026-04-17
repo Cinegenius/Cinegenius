@@ -2,6 +2,7 @@ import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import JsonLd from "@/components/JsonLd";
 import {
   MapPin, CheckCircle, Star, Car, Calendar, Shield,
   Truck, ArrowRight, Zap, Info,
@@ -91,8 +92,25 @@ export default async function VehicleDetailPage({
   const platformFee = Math.round(vehicle.dailyRate * commission);
   const providerPayout = vehicle.dailyRate - platformFee;
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": vehicle.title,
+    "description": vehicle.description || `${vehicle.type} für Filmproduktionen mieten`,
+    "image": vehicle.image,
+    "category": vehicle.type,
+    "offers": {
+      "@type": "Offer",
+      "price": vehicle.dailyRate,
+      "priceCurrency": "EUR",
+      "availability": "https://schema.org/InStock",
+      "seller": { "@type": "Person", "name": vehicle.ownerName },
+    },
+  };
+
   return (
     <div className="pt-16 min-h-screen">
+      <JsonLd data={jsonLd} />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center gap-2 text-xs text-text-muted mb-6">
           <Link href="/" className="hover:text-gold transition-colors">Home</Link>

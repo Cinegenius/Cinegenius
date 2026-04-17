@@ -1,9 +1,40 @@
 import { notFound } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { auth } from "@clerk/nextjs/server";
+import type { Metadata } from "next";
 import CompanyDetail from "./CompanyDetail";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const { data: company } = await supabaseAdmin
+    .from("companies")
+    .select("name, description, city, logo_url, categories")
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (!company) return {};
+
+  const cats = Array.isArray(company.categories) ? (company.categories as string[]).join(", ") : "";
+  const description = company.description
+    ? company.description.slice(0, 155)
+    : `${company.name}${company.city ? ` in ${company.city}` : ""}${cats ? ` — ${cats}` : ""} auf CineGenius.`;
+
+  return {
+    title: company.name,
+    description,
+    openGraph: {
+      title: `${company.name} | CineGenius`,
+      description,
+      images: company.logo_url ? [{ url: company.logo_url, width: 400, height: 400, alt: company.name }] : [],
+    },
+  };
+}
 
 export default async function CompanyPage({
   params,

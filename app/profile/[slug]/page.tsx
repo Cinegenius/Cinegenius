@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import JsonLd from "@/components/JsonLd";
 const admin = supabaseAdmin;
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
@@ -136,13 +137,27 @@ export default async function ProfilePage(
     getExternalProfiles(profile.user_id),
   ]);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": profile.display_name ?? "",
+    "description": profile.bio ?? "",
+    "image": profile.avatar_url ?? "",
+    "jobTitle": profile.role ?? (profile.positions?.[0] ?? ""),
+    "address": profile.location ? { "@type": "PostalAddress", "addressLocality": profile.location } : undefined,
+    "url": `https://cinegenius.com/profile/${slug}`,
+  };
+
   return (
-    <ProfileView
-      profile={profile}
-      isOwner={isOwner}
-      projectCredits={projectCredits}
-      companyMembership={companyMembership}
-      externalProfiles={externalProfiles}
-    />
+    <>
+      <JsonLd data={jsonLd} />
+      <ProfileView
+        profile={profile}
+        isOwner={isOwner}
+        projectCredits={projectCredits}
+        companyMembership={companyMembership}
+        externalProfiles={externalProfiles}
+      />
+    </>
   );
 }
