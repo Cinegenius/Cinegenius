@@ -23,7 +23,6 @@ import {
 } from "lucide-react";
 import { stats } from "@/lib/data";
 import ImageStrip from "@/components/ImageStrip";
-import CreativeSpark from "@/components/CreativeSpark";
 
 function fmtCount(n: number, fallback: string): string {
   if (n === 0) return fallback;
@@ -844,9 +843,6 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
-
-      {/* ── KREATIVER FUNKE ── */}
-      <CreativeSpark />
 
       {/* ── FINAL CTA ── */}
       <section className="py-24 relative overflow-hidden">
