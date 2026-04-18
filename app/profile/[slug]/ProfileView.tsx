@@ -96,8 +96,8 @@ function ListingsSection({ listings }: { listings: PublicListing[] }) {
                   <Link key={l.id} href={meta.href(l.id)}
                     className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
                     <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{l.title}</span>
-                    {l.category && <span className="text-[10px] text-text-muted shrink-0 hidden sm:inline">{l.category}</span>}
-                    {l.city && <span className="text-[10px] text-text-muted shrink-0">{l.city}</span>}
+                    {l.category && <span className="text-[10px] text-text-primary shrink-0 hidden sm:inline">{l.category}</span>}
+                    {l.city && <span className="text-[10px] text-text-primary shrink-0">{l.city}</span>}
                     {l.price != null && l.price > 0 && (
                       <span className="text-[10px] text-gold font-semibold shrink-0">{l.price.toLocaleString("de-DE")} €</span>
                     )}
