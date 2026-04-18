@@ -536,7 +536,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                         )}
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        {film.role && <span className="text-[10px] text-text-muted truncate max-w-[120px]">{film.role}</span>}
+                        {film.role && <span className="text-[10px] text-text-secondary truncate max-w-[120px]">{film.role}</span>}
                         {film.festival && <span className="text-[10px] text-gold">★</span>}
                         {hasDetails && (
                           <button type="button" onClick={() => setExpandedFilm(isOpen ? null : i)}
@@ -591,7 +591,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                             className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{proj.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</span>
-                            {credit.role && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[30%]">{credit.role}</span>}
+                            {credit.role && <span className="text-[10px] text-text-secondary shrink-0 truncate max-w-[30%]">{credit.role}</span>}
                           </Link>
                         );
                       })}
@@ -1107,7 +1107,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                             className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{proj.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</span>
-                            {credit.role && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[30%]">{credit.role}</span>}
+                            {credit.role && <span className="text-[10px] text-text-secondary shrink-0 truncate max-w-[30%]">{credit.role}</span>}
                           </Link>
                         );
                       })}
@@ -1142,7 +1142,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                         )}
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        {film.role && <span className="text-[10px] text-text-muted truncate max-w-[120px]">{film.role}</span>}
+                        {film.role && <span className="text-[10px] text-text-secondary truncate max-w-[120px]">{film.role}</span>}
                         {film.festival && <span className="text-[10px] text-gold">★</span>}
                         {hasDetails && (
                           <button type="button" onClick={() => setExpandedFilm(isOpen ? null : i)}

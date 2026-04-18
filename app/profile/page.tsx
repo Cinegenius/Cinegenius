@@ -1382,7 +1382,7 @@ export default function ProfilePage() {
                             <div className="flex items-center gap-3 px-3 py-1.5">
                               <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{film.year || "—"}</span>
                               <span className="text-xs text-text-primary truncate flex-1">{film.title}</span>
-                              {film.role && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[30%]">{film.role}</span>}
+                              {film.role && <span className="text-[10px] text-text-secondary shrink-0 truncate max-w-[30%]">{film.role}</span>}
                               <div className="flex items-center gap-1 shrink-0 ml-1">
                                 <div className="flex items-center gap-1 bg-bg-primary border border-border rounded px-1.5 focus-within:border-gold transition-colors">
                                   <ExternalLink size={9} className="text-text-muted shrink-0" />
@@ -1415,7 +1415,7 @@ export default function ProfilePage() {
                           <div key={credit.id} className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-secondary transition-colors">
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{credit.projects?.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1">{credit.projects?.title}</span>
-                            {credit.role && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[30%]">{credit.role}</span>}
+                            {credit.role && <span className="text-[10px] text-text-secondary shrink-0 truncate max-w-[30%]">{credit.role}</span>}
                             <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                               <a href={`/projects/${credit.project_id}`} className="text-[10px] text-text-muted hover:text-gold transition-colors" target="_blank" rel="noopener noreferrer">→</a>
                               <button type="button" onClick={() => leaveProject(credit.project_id)} className="text-text-muted hover:text-crimson-light transition-colors">
