@@ -79,27 +79,24 @@ function ListingsSection({ listings }: { listings: PublicListing[] }) {
     <>
       <Divider />
       <SectionLabel>Inserate</SectionLabel>
-      <div className="space-y-5">
+      <div className="space-y-3">
         {Object.entries(grouped).map(([type, items]) => {
           const meta = LISTING_TYPE_META[type] ?? { label: type, color: "text-text-muted", href: (id: string) => `/${type}/${id}` };
           return (
             <div key={type}>
-              <p className={`text-[10px] font-bold uppercase tracking-widest mb-2 ${meta.color}`}>{meta.label}</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <p className={`text-[9px] font-bold uppercase tracking-widest mb-1.5 ${meta.color}`}>{meta.label}</p>
+              <div className="divide-y divide-border border border-border rounded-lg overflow-hidden">
                 {items.map((l) => (
                   <Link key={l.id} href={meta.href(l.id)}
-                    className="group flex items-center gap-3 p-3 bg-bg-secondary border border-border rounded-xl hover:border-gold/40 transition-colors">
-                    <div className="w-12 h-12 rounded-lg bg-bg-elevated border border-border overflow-hidden shrink-0">
-                      {l.image_url
-                        ? <img src={l.image_url} alt={l.title} className="w-full h-full object-cover" />
-                        : <div className="w-full h-full flex items-center justify-center text-text-muted text-xs">—</div>
-                      }
+                    className="group flex items-center gap-2.5 px-3 py-2 bg-bg-secondary hover:bg-bg-elevated transition-colors">
+                    <div className="flex-1 min-w-0 flex items-center gap-2">
+                      <p className="text-xs font-medium text-text-primary truncate group-hover:text-gold transition-colors">{l.title}</p>
+                      {l.category && <span className="text-[10px] text-text-muted shrink-0 hidden sm:inline">· {l.category}</span>}
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-text-primary truncate group-hover:text-gold transition-colors">{l.title}</p>
-                      <p className="text-xs text-text-muted mt-0.5 truncate">{[l.category, l.city].filter(Boolean).join(" · ")}</p>
+                    <div className="flex items-center gap-2 shrink-0 text-[10px] text-text-muted">
+                      {l.city && <span>{l.city}</span>}
                       {l.price != null && l.price > 0 && (
-                        <p className="text-xs text-gold font-semibold mt-0.5">{l.price.toLocaleString("de-DE")} €<span className="text-text-muted font-normal"> / Tag</span></p>
+                        <span className="text-gold font-semibold">{l.price.toLocaleString("de-DE")} €</span>
                       )}
                     </div>
                   </Link>
@@ -518,46 +515,41 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
           <>
             <Divider />
             <SectionLabel>Filmografie</SectionLabel>
-            <div className="space-y-2">
+            <div className="border border-border rounded-lg overflow-hidden">
               {visibleFilms.map((film, i) => {
                 const isOpen = expandedFilm === i;
                 const hasDetails = !!(film.director || film.festival || film.type || film.production);
                 return (
-                  <div key={`film-${i}`} className="bg-bg-secondary border border-border rounded-xl overflow-hidden">
-                    <div className="flex items-center gap-4 p-3">
-                      <span className="text-xs font-bold tabular-nums text-gold bg-gold/10 border border-gold/20 rounded-lg px-2 py-1 shrink-0 w-14 text-center">
-                        {film.year || "—"}
-                      </span>
+                  <div key={`film-${i}`} className="border-b border-border last:border-b-0">
+                    <div className="flex items-center gap-2.5 px-3 py-2 hover:bg-bg-elevated transition-colors">
+                      <span className="text-[10px] font-bold tabular-nums text-gold shrink-0 w-8">{film.year || "—"}</span>
                       <div className="flex-1 min-w-0">
                         {film.imdb_url ? (
                           <a href={film.imdb_url} target="_blank" rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-sm font-semibold text-text-primary hover:text-gold transition-colors">
-                            {film.title} <ExternalLink size={10} className="shrink-0 text-text-muted" />
+                            className="inline-flex items-center gap-1 text-xs font-medium text-text-primary hover:text-gold transition-colors">
+                            {film.title} <ExternalLink size={9} className="shrink-0 text-text-muted" />
                           </a>
                         ) : (
-                          <span className="text-sm font-semibold text-text-primary">{film.title}</span>
+                          <span className="text-xs font-medium text-text-primary">{film.title}</span>
                         )}
-                        {film.role && <p className="text-xs text-text-muted mt-0.5">{film.role}</p>}
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
-                        {film.festival && <span className="text-[10px] px-2 py-0.5 bg-gold/10 border border-gold/20 text-gold rounded-full font-medium">★ {film.festival}</span>}
-                        {film.type && !film.festival && (
-                          <span className="text-[10px] px-2 py-0.5 bg-lime/10 border border-lime/25 text-lime rounded-full font-medium">{film.type}</span>
-                        )}
+                        {film.role && <span className="text-[10px] text-text-muted hidden sm:inline">{film.role}</span>}
+                        {film.festival && <span className="text-[10px] text-gold">★</span>}
                         {hasDetails && (
                           <button type="button" onClick={() => setExpandedFilm(isOpen ? null : i)}
-                            className="p-1 text-text-muted hover:text-text-primary transition-colors">
-                            <ChevronDown size={13} className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+                            className="text-text-muted hover:text-text-primary transition-colors">
+                            <ChevronDown size={11} className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
                           </button>
                         )}
                       </div>
                     </div>
                     {isOpen && hasDetails && (
-                      <div className="px-3 pb-3 pl-[4.5rem] flex flex-wrap gap-x-6 gap-y-1 border-t border-border pt-2">
-                        {film.type && <span className="text-xs text-text-muted">Typ: <span className="text-text-secondary">{film.type}</span></span>}
-                        {film.director && <span className="text-xs text-text-muted">Regie: <span className="text-text-secondary">{film.director}</span></span>}
-                        {film.production && <span className="text-xs text-text-muted">Produktion: <span className="text-text-secondary">{film.production}</span></span>}
-                        {film.festival && <span className="text-xs text-text-muted">Festival: <span className="text-gold">{film.festival}</span></span>}
+                      <div className="px-3 pb-2 pl-[3.5rem] flex flex-wrap gap-x-4 gap-y-0.5 border-t border-border pt-1.5">
+                        {film.type && <span className="text-[10px] text-text-muted">Typ: <span className="text-text-secondary">{film.type}</span></span>}
+                        {film.director && <span className="text-[10px] text-text-muted">Regie: <span className="text-text-secondary">{film.director}</span></span>}
+                        {film.production && <span className="text-[10px] text-text-muted">Prod.: <span className="text-text-secondary">{film.production}</span></span>}
+                        {film.festival && <span className="text-[10px] text-gold">★ {film.festival}</span>}
                       </div>
                     )}
                   </div>
@@ -589,26 +581,15 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                 {Object.entries(grouped).map(([type, group]) => (
                   <div key={type}>
                     <p className="text-[10px] font-bold uppercase tracking-widest text-lime mb-2">{type}</p>
-                    <div className="space-y-2">
+                    <div className="divide-y divide-border border border-border rounded-lg overflow-hidden">
                       {group.map((credit) => {
                         const proj = credit.projects!;
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        const meta = (proj as any).metadata ?? {};
                         return (
                           <Link key={credit.id} href={`/projects/${credit.project_id}`}
-                            className="group flex items-center gap-4 p-3 bg-bg-secondary border border-border rounded-xl hover:border-gold/40 transition-colors">
-                            <span className="text-xs font-bold tabular-nums text-gold bg-gold/10 border border-gold/20 rounded-lg px-2 py-1 shrink-0 w-14 text-center">
-                              {proj.year ?? "—"}
-                            </span>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold text-text-primary truncate group-hover:text-gold transition-colors">{proj.title}</p>
-                              {credit.role && <p className="text-xs text-text-muted mt-0.5">{credit.role}</p>}
-                            </div>
-                            {meta.genre && (
-                              <span className="text-[10px] px-2 py-0.5 bg-bg-elevated border border-border text-text-secondary rounded-full shrink-0 whitespace-nowrap">
-                                {meta.genre}
-                              </span>
-                            )}
+                            className="group flex items-center gap-2.5 px-3 py-2 bg-bg-secondary hover:bg-bg-elevated transition-colors">
+                            <span className="text-[10px] font-bold tabular-nums text-gold shrink-0 w-8">{proj.year ?? "—"}</span>
+                            <p className="text-xs font-medium text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</p>
+                            {credit.role && <span className="text-[10px] text-text-muted shrink-0 hidden sm:inline">{credit.role}</span>}
                           </Link>
                         );
                       })}
@@ -1153,12 +1134,12 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
         {filmRows.length > 0 && (
           <div className="mb-12">
             <SectionLabel>Filmografie</SectionLabel>
-            <div className="space-y-2">
+            <div className="border border-border rounded-lg overflow-hidden bg-bg-secondary">
               {filmRows.map((film, i) => {
                 const isOpen = expandedFilm === i;
                 const hasDetails = !!(film.director || film.festival || film.type || film.production);
                 return (
-                  <div key={`film-${i}`} className="bg-bg-secondary border border-border rounded-xl overflow-hidden">
+                  <div key={`film-${i}`} className="border-b border-border last:border-b-0">
                     <div className="flex items-center gap-4 p-3 group">
                       <span className="text-xs font-bold tabular-nums text-gold bg-gold/10 border border-gold/20 rounded-lg px-2 py-1 shrink-0 w-14 text-center">
                         {film.year || "—"}
