@@ -3,6 +3,9 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import ProjectDetail from "@/components/ProjectDetail";
+import { departments } from "@/lib/departments";
+
+const ALL_CREW_ROLES = departments.flatMap((d) => d.roles);
 
 export const dynamic = "force-dynamic";
 
@@ -83,6 +86,11 @@ export default async function ProjectPage({
     userPositions = (prof?.positions as string[] | null) ?? [];
   }
 
+  // If user has positions, show them first, then remaining roles; otherwise full list
+  const roleOptions = userPositions.length > 0
+    ? [...userPositions, ...ALL_CREW_ROLES.filter((r) => !userPositions.includes(r))]
+    : ALL_CREW_ROLES;
+
   return (
     <ProjectDetail
       project={data.project}
@@ -90,7 +98,7 @@ export default async function ProjectPage({
       festivals={data.festivals}
       currentUserId={userId ?? null}
       myCredit={myCredit}
-      userPositions={userPositions}
+      userPositions={roleOptions}
     />
   );
 }

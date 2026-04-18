@@ -585,11 +585,7 @@ export default function ProjectDetail({
             <p className="text-sm font-semibold text-text-primary">Deine Rolle bei &quot;{project.title}&quot;</p>
             <div className="grid sm:grid-cols-3 gap-3">
               <div>{label("Tätigkeit / Rolle *")}
-                {userPositions.length > 0 ? (
-                  <RoleDropdown value={joinRole} onChange={setJoinRole} options={userPositions} />
-                ) : (
-                  <input type="text" value={joinRole} onChange={(e) => setJoinRole(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleJoin()} placeholder="z.B. Hauptdarsteller, Gaffer..." className={inp} autoFocus />
-                )}
+                <RoleDropdown value={joinRole} onChange={setJoinRole} options={userPositions} />
               </div>
               <div>{label("Figur", true)}<input type="text" value={joinCharacter} onChange={(e) => setJoinCharacter(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleJoin()} placeholder="z.B. Max Mustermann..." className={inp} /></div>
               <div>{label("Anmerkung", true)}<input type="text" value={joinNote} onChange={(e) => setJoinNote(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleJoin()} placeholder="z.B. nur Ibiza-Drehtage..." className={inp} /></div>

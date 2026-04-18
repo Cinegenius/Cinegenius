@@ -17,6 +17,8 @@ import ProfileGuard from "@/components/ProfileGuard";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 import { departments, deptColors } from "@/lib/departments";
 import RoleDropdown from "@/components/RoleDropdown";
+
+const ALL_CREW_ROLES = departments.flatMap((d) => d.roles);
 import {
   PROFILE_CATEGORY_MAP,
   type ProfileImage,
@@ -1466,7 +1468,7 @@ export default function ProfilePage() {
                                 </div>
                                 {joiningProjectId === proj.id ? (
                                   <div className="flex items-center gap-2">
-                                    <RoleDropdown value={joinRole} onChange={setJoinRole} options={positions} className="w-48" />
+                                    <RoleDropdown value={joinRole} onChange={setJoinRole} options={positions.length > 0 ? [...positions, ...ALL_CREW_ROLES.filter(r => !positions.includes(r))] : ALL_CREW_ROLES} className="w-48" />
                                     <button
                                       type="button"
                                       onClick={() => joinProject(proj.id)}
@@ -1547,7 +1549,7 @@ export default function ProfilePage() {
                         </div>
                         <div>
                           <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Meine Rolle *</label>
-                          <RoleDropdown value={newProject.myRole} onChange={(v) => setNewProject((p) => ({ ...p, myRole: v }))} options={positions} />
+                          <RoleDropdown value={newProject.myRole} onChange={(v) => setNewProject((p) => ({ ...p, myRole: v }))} options={positions.length > 0 ? [...positions, ...ALL_CREW_ROLES.filter(r => !positions.includes(r))] : ALL_CREW_ROLES} />
                         </div>
                         <div className="col-span-2">
                           <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Kurzbeschreibung</label>
