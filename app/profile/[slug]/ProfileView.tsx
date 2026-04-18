@@ -567,49 +567,53 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
           </>
         )}
 
-        {/* ── PROJEKTE — grouped by credit role, ordered by profile positions ── */}
+        {/* ── PROJEKTE — grouped by profile position, rest in Sonstiges ── */}
         {projectCredits.filter(c => c.projects).length > 0 && (() => {
           const credits = projectCredits.filter(c => c.projects);
           const positions: string[] = profile.positions ?? [];
-          const grouped = credits.reduce<Record<string, typeof credits>>((acc, c) => {
-            const key = c.role?.trim() || "Sonstiges";
-            (acc[key] = acc[key] ?? []).push(c);
-            return acc;
-          }, {});
-          const sortedKeys = Object.keys(grouped).sort((a, b) => {
-            const ia = positions.findIndex(p => p.toLowerCase() === a.toLowerCase());
-            const ib = positions.findIndex(p => p.toLowerCase() === b.toLowerCase());
-            if (ia === -1 && ib === -1) return a.localeCompare(b);
-            if (ia === -1) return 1;
-            if (ib === -1) return -1;
-            return ia - ib;
-          });
+          // Matched = role matches a profile position (case-insensitive)
+          const matched: Record<string, typeof credits> = {};
+          const unmatched: typeof credits = [];
+          for (const c of credits) {
+            const role = c.role?.trim() ?? "";
+            const posIdx = positions.findIndex(p => p.toLowerCase() === role.toLowerCase());
+            if (posIdx !== -1) {
+              const key = positions[posIdx]; // use canonical casing from positions
+              (matched[key] = matched[key] ?? []).push(c);
+            } else {
+              unmatched.push(c);
+            }
+          }
+          // Groups: positions in order (only those with credits), then Sonstiges if any unmatched
+          const groups: { label: string; items: typeof credits; isPosition: boolean }[] = [
+            ...positions.filter(p => matched[p]?.length).map(p => ({ label: p, items: matched[p], isPosition: true })),
+            ...(unmatched.length ? [{ label: "Weitere", items: unmatched, isPosition: false }] : []),
+          ];
+          if (!groups.length) return null;
           return (
             <>
               <Divider />
               <SectionLabel>Projekte</SectionLabel>
               <div className="space-y-5">
-                {sortedKeys.map((type) => {
-                  const group = grouped[type];
-                  return (
-                  <div key={type}>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-lime mb-2">{type}</p>
+                {groups.map(({ label, items }) => (
+                  <div key={label}>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-lime mb-2">{label}</p>
                     <div className="border border-border rounded-lg overflow-hidden">
-                      {[...group].sort((a, b) => (b.projects?.year ?? 0) - (a.projects?.year ?? 0)).map((credit) => {
+                      {[...items].sort((a, b) => (b.projects?.year ?? 0) - (a.projects?.year ?? 0)).map((credit) => {
                         const proj = credit.projects!;
                         return (
                           <Link key={credit.id} href={`/projects/${credit.project_id}`}
                             className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{proj.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</span>
-                            {credit.role && <span className="text-[10px] text-text-primary shrink-0 truncate max-w-[30%]">{credit.role}</span>}
+                            {proj.type && <span className="text-[10px] text-text-muted shrink-0 hidden sm:inline">{proj.type}</span>}
+                            {credit.role && <span className="text-[10px] text-text-primary shrink-0 truncate max-w-[28%]">{credit.role}</span>}
                           </Link>
                         );
                       })}
                     </div>
                   </div>
-                  );
-                })}
+                ))}
               </div>
             </>
           );
@@ -1096,48 +1100,50 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           </div>
         </div>
 
-        {/* Projekte — grouped by credit role, ordered by profile positions */}
+        {/* Projekte — grouped by profile position, rest in Weitere */}
         {projectCredits.filter(c => c.projects).length > 0 && (() => {
           const credits = projectCredits.filter(c => c.projects);
           const positions: string[] = profile.positions ?? [];
-          const grouped = credits.reduce<Record<string, typeof credits>>((acc, c) => {
-            const key = c.role?.trim() || "Sonstiges";
-            (acc[key] = acc[key] ?? []).push(c);
-            return acc;
-          }, {});
-          const sortedKeys = Object.keys(grouped).sort((a, b) => {
-            const ia = positions.findIndex(p => p.toLowerCase() === a.toLowerCase());
-            const ib = positions.findIndex(p => p.toLowerCase() === b.toLowerCase());
-            if (ia === -1 && ib === -1) return a.localeCompare(b);
-            if (ia === -1) return 1;
-            if (ib === -1) return -1;
-            return ia - ib;
-          });
+          const matched: Record<string, typeof credits> = {};
+          const unmatched: typeof credits = [];
+          for (const c of credits) {
+            const role = c.role?.trim() ?? "";
+            const posIdx = positions.findIndex(p => p.toLowerCase() === role.toLowerCase());
+            if (posIdx !== -1) {
+              const key = positions[posIdx];
+              (matched[key] = matched[key] ?? []).push(c);
+            } else {
+              unmatched.push(c);
+            }
+          }
+          const groups: { label: string; items: typeof credits }[] = [
+            ...positions.filter(p => matched[p]?.length).map(p => ({ label: p, items: matched[p] })),
+            ...(unmatched.length ? [{ label: "Weitere", items: unmatched }] : []),
+          ];
+          if (!groups.length) return null;
           return (
             <div className="mb-12">
               <SectionLabel>Projekte</SectionLabel>
               <div className="space-y-5">
-                {sortedKeys.map((type) => {
-                  const group = grouped[type];
-                  return (
-                  <div key={type}>
-                    <p className="text-[9px] font-bold uppercase tracking-widest text-lime mb-1.5">{type}</p>
+                {groups.map(({ label, items }) => (
+                  <div key={label}>
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-lime mb-1.5">{label}</p>
                     <div className="border border-border rounded-lg overflow-hidden bg-bg-secondary">
-                      {[...group].sort((a, b) => (b.projects?.year ?? 0) - (a.projects?.year ?? 0)).map((credit) => {
+                      {[...items].sort((a, b) => (b.projects?.year ?? 0) - (a.projects?.year ?? 0)).map((credit) => {
                         const proj = credit.projects!;
                         return (
                           <Link key={credit.id} href={`/projects/${credit.project_id}`}
                             className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{proj.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</span>
-                            {credit.role && <span className="text-[10px] text-text-primary shrink-0 truncate max-w-[30%]">{credit.role}</span>}
+                            {proj.type && <span className="text-[10px] text-text-muted shrink-0 hidden sm:inline">{proj.type}</span>}
+                            {credit.role && <span className="text-[10px] text-text-primary shrink-0 truncate max-w-[28%]">{credit.role}</span>}
                           </Link>
                         );
                       })}
                     </div>
                   </div>
-                  );
-                })}
+                ))}
               </div>
             </div>
           );
