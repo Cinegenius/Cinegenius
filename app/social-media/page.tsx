@@ -57,7 +57,19 @@ export default async function SocialMediaPage() {
     }));
 
   return (
-    <>
+    <div
+      className="relative min-h-screen"
+      style={{
+        backgroundImage: `url('https://images.unsplash.com/photo-1696251503133-d3ccd4aee3e5?q=80&w=2064&auto=format&fit=crop')`,
+        backgroundSize: "cover",
+        backgroundPosition: "center top",
+        backgroundAttachment: "fixed",
+      }}
+    >
+      {/* Dark overlay for readability */}
+      <div className="absolute inset-0 bg-black/70 pointer-events-none" />
+      <div className="relative z-10">
+
       {/* Hero */}
       <section className="pt-28 pb-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold/20 bg-gold/5 text-gold text-xs font-semibold mb-6">
@@ -187,6 +199,7 @@ export default async function SocialMediaPage() {
           </Link>
         </section>
       )}
-    </>
+      </div>
+    </div>
   );
 }
