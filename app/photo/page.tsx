@@ -74,7 +74,7 @@ export default async function PhotoPage() {
   return (
     <div className="relative min-h-screen">
       <Image
-        src="https://plus.unsplash.com/premium_photo-1698371217616-69581e44570d?q=80&w=1740&auto=format&fit=crop"
+        src="https://plus.unsplash.com/premium_photo-1698371217616-69581e44570d?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         alt=""
         fill
         priority
