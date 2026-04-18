@@ -5,7 +5,19 @@ import Link from "next/link";
 import {
   Search, Clapperboard, Calendar, Users, X, ChevronDown,
   LayoutList, LayoutGrid, Film, MapPin, ArrowUpDown,
+  Camera, Zap, Music, FileVideo, Building2, Radio, Tv,
 } from "lucide-react";
+
+const CATEGORY_CHIPS = [
+  { label: "Film & Serie",    href: "/projects/film",          icon: Film },
+  { label: "Werbung",         href: "/projects/werbung",       icon: Tv },
+  { label: "Foto & Shooting", href: "/projects/foto",          icon: Camera },
+  { label: "Social Media",    href: "/projects/social-media",  icon: Zap },
+  { label: "Musikvideo",      href: "/projects/musikvideo",    icon: Music },
+  { label: "Dokumentation",   href: "/projects/dokumentation", icon: FileVideo },
+  { label: "Corporate",       href: "/projects/corporate",     icon: Building2 },
+  { label: "Event & Live",    href: "/projects/event",         icon: Radio },
+];
 
 type Project = {
   id: string;
@@ -155,6 +167,22 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
 
   return (
     <div className="min-h-screen bg-bg-primary">
+
+      {/* ── Category Chips ───────────────────────────────── */}
+      <div className="bg-bg-secondary border-b border-border px-4 py-3">
+        <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
+          {CATEGORY_CHIPS.map(({ label, href, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-bg-elevated text-text-muted hover:border-gold/50 hover:text-gold hover:bg-gold/5 transition-all text-xs font-semibold whitespace-nowrap"
+            >
+              <Icon size={11} />
+              {label}
+            </Link>
+          ))}
+        </div>
+      </div>
 
       {/* ── Filter Bar ───────────────────────────────────── */}
       <div className="bg-bg-secondary border-b border-border">
