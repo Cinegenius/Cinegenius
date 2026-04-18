@@ -1465,15 +1465,15 @@ export default function ProfilePage() {
                                 </div>
                                 {joiningProjectId === proj.id ? (
                                   <div className="flex items-center gap-2">
-                                    <input
-                                      type="text"
+                                    <select
                                       value={joinRole}
                                       onChange={(e) => setJoinRole(e.target.value)}
-                                      onKeyDown={(e) => e.key === "Enter" && joinProject(proj.id)}
-                                      placeholder="Deine Rolle"
                                       autoFocus
-                                      className="bg-bg-elevated border border-border rounded px-2 py-1 text-xs focus:outline-none focus:border-gold w-36"
-                                    />
+                                      className="bg-bg-elevated border border-border rounded px-2 py-1 text-xs focus:outline-none focus:border-gold w-40 text-text-primary"
+                                    >
+                                      <option value="">Rolle wählen…</option>
+                                      {positions.map((p) => <option key={p} value={p}>{p}</option>)}
+                                    </select>
                                     <button
                                       type="button"
                                       onClick={() => joinProject(proj.id)}
@@ -1554,10 +1554,12 @@ export default function ProfilePage() {
                         </div>
                         <div>
                           <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Meine Rolle *</label>
-                          <input type="text" value={newProject.myRole}
+                          <select value={newProject.myRole}
                             onChange={(e) => setNewProject((p) => ({ ...p, myRole: e.target.value }))}
-                            placeholder="Oberbeleuchter"
-                            className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
+                            className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold text-text-primary">
+                            <option value="">Rolle wählen…</option>
+                            {positions.map((pos) => <option key={pos} value={pos}>{pos}</option>)}
+                          </select>
                         </div>
                         <div className="col-span-2">
                           <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Kurzbeschreibung</label>
