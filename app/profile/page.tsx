@@ -1954,27 +1954,31 @@ export default function ProfilePage() {
                       <Plus size={14} /> Erstes Projekt eintragen
                     </Link>
                   </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {myProjects.map((p) => (
-                      <Link key={p.id} href={`/projects/${p.id}`}
-                        className="group flex items-center gap-3 p-3 bg-bg-secondary border border-border rounded-xl hover:border-gold/40 transition-colors">
-                        <div className="w-14 h-14 rounded-lg bg-bg-elevated border border-border overflow-hidden shrink-0">
-                          {p.poster_url
-                            ? <img src={p.poster_url} alt={p.title} className="w-full h-full object-cover" />
-                            : <div className="w-full h-full flex items-center justify-center"><Clapperboard size={18} className="text-text-muted" /></div>
-                          }
+                ) : (() => {
+                  const grouped = myProjects.reduce<Record<string, MyProject[]>>((acc, p) => {
+                    const key = p.type ?? "Sonstiges";
+                    (acc[key] = acc[key] ?? []).push(p);
+                    return acc;
+                  }, {});
+                  return (
+                    <div className="space-y-3">
+                      {Object.entries(grouped).map(([type, items]) => (
+                        <div key={type}>
+                          <p className="text-[9px] font-bold uppercase tracking-widest text-lime mb-1.5">{type}</p>
+                          <div className="border border-border rounded-lg overflow-hidden bg-bg-secondary">
+                            {items.map((p) => (
+                              <Link key={p.id} href={`/projects/${p.id}`}
+                                className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
+                                <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{p.year ?? "—"}</span>
+                                <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{p.title}</span>
+                              </Link>
+                            ))}
+                          </div>
                         </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-semibold text-text-primary truncate group-hover:text-gold transition-colors">{p.title}</p>
-                          <p className="text-xs text-text-muted mt-0.5">
-                            {[p.type, p.year].filter(Boolean).join(" · ")}
-                          </p>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  );
+                })()}
               </div>
             )}
 
@@ -2014,38 +2018,31 @@ export default function ProfilePage() {
                       </Link>
                     </div>
                   ) : (
-                    Object.entries(grouped).map(([type, items]) => {
-                      const meta = TYPE_META[type] ?? { label: type, href: "/inserat", color: "text-text-muted" };
-                      return (
-                        <div key={type}>
-                          <div className="flex items-center justify-between mb-2">
-                            <p className={`text-xs font-bold uppercase tracking-widest ${meta.color}`}>{meta.label}</p>
-                            <span className="text-xs text-text-muted">{items.length} Inserat{items.length !== 1 ? "e" : ""}</span>
-                          </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            {items.map((l) => (
-                              <div key={l.id} className="flex items-center gap-3 p-3 bg-bg-secondary border border-border rounded-xl hover:border-gold/30 transition-colors">
-                                <div className="w-12 h-12 rounded-lg bg-bg-elevated border border-border overflow-hidden shrink-0">
-                                  {l.image_url
-                                    ? <img src={l.image_url} alt={l.title} className="w-full h-full object-cover" />
-                                    : <div className="w-full h-full flex items-center justify-center"><Film size={15} className="text-text-muted" /></div>
-                                  }
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <p className="text-sm font-semibold text-text-primary truncate">{l.title}</p>
-                                  <p className="text-xs text-text-muted mt-0.5 truncate">
-                                    {[l.category, l.city].filter(Boolean).join(" · ")}
-                                  </p>
+                    <div className="space-y-3">
+                      {Object.entries(grouped).map(([type, items]) => {
+                        const meta = TYPE_META[type] ?? { label: type, href: "/inserat", color: "text-text-muted" };
+                        return (
+                          <div key={type}>
+                            <div className="flex items-center justify-between mb-1.5">
+                              <p className={`text-[9px] font-bold uppercase tracking-widest ${meta.color}`}>{meta.label}</p>
+                              <span className="text-[10px] text-text-muted">{items.length}</span>
+                            </div>
+                            <div className="border border-border rounded-lg overflow-hidden bg-bg-secondary">
+                              {items.map((l) => (
+                                <div key={l.id} className="flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
+                                  <span className="text-xs text-text-primary truncate flex-1">{l.title}</span>
+                                  {l.category && <span className="text-[10px] text-text-muted shrink-0 hidden sm:inline">{l.category}</span>}
+                                  {l.city && <span className="text-[10px] text-text-muted shrink-0">{l.city}</span>}
                                   {l.price != null && l.price > 0 && (
-                                    <p className="text-xs text-gold font-semibold mt-0.5">{l.price.toLocaleString("de-DE")} €<span className="text-text-muted font-normal"> / Tag</span></p>
+                                    <span className="text-[10px] text-gold font-semibold shrink-0">{l.price.toLocaleString("de-DE")} €</span>
                                   )}
                                 </div>
-                              </div>
-                            ))}
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })
+                        );
+                      })}
+                    </div>
                   )}
                 </div>
               );
