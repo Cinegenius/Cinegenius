@@ -264,6 +264,8 @@ function getCategory(type: string): "talent" | "crew" | "creative" | "vendor" | 
 
 const tabs = [
   { id: "profile",        label: "Profil",                icon: User        },
+  { id: "projekte",       label: "Projekte",               icon: Clapperboard },
+  { id: "inserate",       label: "Inserate",               icon: Film        },
   { id: "verification",   label: "Verifizierung",          icon: CheckCircle },
   { id: "security",       label: "Sicherheit",             icon: Lock        },
   { id: "notifications",  label: "Benachrichtigungen",     icon: Bell        },
@@ -461,6 +463,16 @@ export default function ProfilePage() {
   const [payoutSaving, setPayoutSaving] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
 
+  // My projects & listings
+  type MyProject = { id: string; title: string; year: number | null; type: string | null; poster_url: string | null };
+  type MyListing = { id: string; title: string; type: string; price: number | null; city: string; image_url: string | null; category: string | null };
+  const [myProjects, setMyProjects] = useState<MyProject[]>([]);
+  const [myListings, setMyListings] = useState<MyListing[]>([]);
+  const [myProjectsLoading, setMyProjectsLoading] = useState(false);
+  const [myListingsLoading, setMyListingsLoading] = useState(false);
+  const myProjectsFetched = useRef(false);
+  const myListingsFetched = useRef(false);
+
   const [form, setForm] = useState({
     name: "",
     city: "",
@@ -539,6 +551,26 @@ export default function ProfilePage() {
   const [beard, setBeard] = useState(false);
   const [tattoos, setTattoos] = useState(false);
   const [tattoosCoverable, setTattoosCoverable] = useState(false);
+
+  // ── Lazy-load my projects & listings ───────────────────────────────────────
+  useEffect(() => {
+    if (activeTab === "projekte" && !myProjectsFetched.current) {
+      myProjectsFetched.current = true;
+      setMyProjectsLoading(true);
+      fetch("/api/projects?mine=true")
+        .then((r) => r.json())
+        .then(({ projects }) => setMyProjects(projects ?? []))
+        .finally(() => setMyProjectsLoading(false));
+    }
+    if (activeTab === "inserate" && !myListingsFetched.current) {
+      myListingsFetched.current = true;
+      setMyListingsLoading(true);
+      fetch("/api/listings?mine=true")
+        .then((r) => r.json())
+        .then(({ data }) => setMyListings(data ?? []))
+        .finally(() => setMyListingsLoading(false));
+    }
+  }, [activeTab]);
 
   // ── Load profile from Supabase ──────────────────────────────────────────────
   useEffect(() => {
@@ -1898,6 +1930,99 @@ export default function ProfilePage() {
                   {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
                   {saving ? "Wird gespeichert..." : "Änderungen speichern"}
                 </button>
+              </div>
+            )}
+
+            {/* ── PROJEKTE ── */}
+            {activeTab === "projekte" && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-semibold text-text-primary">Meine Projekte</h2>
+                  <Link href="/dashboard/projects/new"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">
+                    <Plus size={12} /> Projekt eintragen
+                  </Link>
+                </div>
+                {myProjectsLoading ? (
+                  <div className="flex justify-center py-12"><Loader2 size={20} className="animate-spin text-text-muted" /></div>
+                ) : myProjects.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 border border-dashed border-border rounded-xl text-center">
+                    <Clapperboard size={32} className="text-text-muted mb-3" />
+                    <p className="text-text-muted text-sm mb-4">Noch keine Projekte eingetragen</p>
+                    <Link href="/dashboard/projects/new"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors">
+                      <Plus size={14} /> Erstes Projekt eintragen
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {myProjects.map((p) => (
+                      <Link key={p.id} href={`/projects/${p.id}`}
+                        className="group flex items-center gap-3 p-3 bg-bg-secondary border border-border rounded-xl hover:border-gold/40 transition-colors">
+                        <div className="w-14 h-14 rounded-lg bg-bg-elevated border border-border overflow-hidden shrink-0">
+                          {p.poster_url
+                            ? <img src={p.poster_url} alt={p.title} className="w-full h-full object-cover" />
+                            : <div className="w-full h-full flex items-center justify-center"><Clapperboard size={18} className="text-text-muted" /></div>
+                          }
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-text-primary truncate group-hover:text-gold transition-colors">{p.title}</p>
+                          <p className="text-xs text-text-muted mt-0.5">
+                            {[p.type, p.year].filter(Boolean).join(" · ")}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── INSERATE ── */}
+            {activeTab === "inserate" && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-semibold text-text-primary">Meine Inserate</h2>
+                  <Link href="/inserat"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">
+                    <Plus size={12} /> Inserat erstellen
+                  </Link>
+                </div>
+                {myListingsLoading ? (
+                  <div className="flex justify-center py-12"><Loader2 size={20} className="animate-spin text-text-muted" /></div>
+                ) : myListings.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 border border-dashed border-border rounded-xl text-center">
+                    <Film size={32} className="text-text-muted mb-3" />
+                    <p className="text-text-muted text-sm mb-4">Noch keine Inserate erstellt</p>
+                    <Link href="/inserat"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors">
+                      <Plus size={14} /> Erstes Inserat erstellen
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {myListings.map((l) => (
+                      <div key={l.id}
+                        className="flex items-center gap-3 p-3 bg-bg-secondary border border-border rounded-xl">
+                        <div className="w-14 h-14 rounded-lg bg-bg-elevated border border-border overflow-hidden shrink-0">
+                          {l.image_url
+                            ? <img src={l.image_url} alt={l.title} className="w-full h-full object-cover" />
+                            : <div className="w-full h-full flex items-center justify-center"><Film size={18} className="text-text-muted" /></div>
+                          }
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-semibold text-text-primary truncate">{l.title}</p>
+                          <p className="text-xs text-text-muted mt-0.5">
+                            {[l.category ?? l.type, l.city].filter(Boolean).join(" · ")}
+                          </p>
+                          {l.price != null && l.price > 0 && (
+                            <p className="text-xs text-gold font-semibold mt-0.5">{l.price.toLocaleString("de-DE")} €</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 

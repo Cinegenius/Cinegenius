@@ -3,11 +3,24 @@ import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
-// GET /api/projects?q=titel&limit=10
+// GET /api/projects?q=titel&limit=10&mine=true
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q") ?? "";
   const limit = Math.min(parseInt(searchParams.get("limit") ?? "20"), 50);
+  const mine = searchParams.get("mine") === "true";
+
+  if (mine) {
+    const { userId } = await auth();
+    if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+    const { data, error } = await supabaseAdmin
+      .from("projects")
+      .select("id, title, year, type, director, poster_url, metadata")
+      .eq("created_by", userId)
+      .order("created_at", { ascending: false });
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ projects: data ?? [] });
+  }
 
   let query = supabaseAdmin
     .from("projects")
