@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import {
   ArrowLeft, Clapperboard, CheckCircle, Loader2, X, Plus,
-  Search, Building2, MapPin, Users,
+  Search, Building2, MapPin, Users, ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -224,6 +224,13 @@ export default function NewProjectPage() {
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [typeOpen, setTypeOpen] = useState(false);
+  const typeRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const h = (e: MouseEvent) => { if (typeRef.current && !typeRef.current.contains(e.target as Node)) setTypeOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
 
   // Debounced company search
   const companyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -336,11 +343,32 @@ export default function NewProjectPage() {
           {/* Produktionsart */}
           <div>
             <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">Produktionsart</label>
-            <select value={form.type} onChange={(e) => set("type", e.target.value)}
-              className={inputCls + " appearance-none"}>
-              <option value="">Bitte wählen</option>
-              {PROJECT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
-            </select>
+            <div ref={typeRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setTypeOpen((o) => !o)}
+                className={inputCls + " flex items-center justify-between text-left"}
+              >
+                <span className={form.type ? "text-text-primary" : "text-text-muted"}>
+                  {form.type || "Bitte wählen"}
+                </span>
+                <ChevronDown size={15} className={`text-text-muted transition-transform duration-200 ${typeOpen ? "rotate-180" : ""}`} />
+              </button>
+              {typeOpen && (
+                <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-bg-elevated border border-border rounded-xl shadow-2xl overflow-hidden">
+                  {PROJECT_TYPES.map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => { set("type", t); setTypeOpen(false); }}
+                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-bg-hover ${form.type === t ? "text-gold bg-gold/8" : "text-text-primary"}`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Titel + Jahr */}
