@@ -224,6 +224,17 @@ input, select, textarea { color: inherit; }
   background-image: url('/hero-bg.jpg');
   background-position: center 30%;
 }
+/* Mobile: show full width of the landscape group photo */
+@media (max-width: 640px) {
+  .hero-bg {
+    background-size: 100% auto;
+    background-position: center top;
+  }
+  [data-theme="light"] .hero-bg {
+    background-size: 100% auto;
+    background-position: center top;
+  }
+}
 
 /* Overlays */
 .hero-overlay-dark  { display: block; }
