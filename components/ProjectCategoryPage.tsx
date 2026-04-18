@@ -50,7 +50,8 @@ export default async function ProjectCategoryPage({ config }: { config: Category
     <div className="pt-16 min-h-screen bg-bg-primary">
 
       {/* ── Hero ── */}
-      <div className="relative overflow-hidden h-[300px] sm:h-[380px] flex items-center">
+      {/* Height scales with viewport: narrow on mobile, taller on desktop so the image isn't a thin strip */}
+      <div className="relative overflow-hidden h-[300px] sm:h-[400px] md:h-[460px] lg:h-[520px] xl:h-[580px]">
         <Image
           src={config.image}
           alt={config.label}
@@ -64,23 +65,25 @@ export default async function ProjectCategoryPage({ config }: { config: Category
         <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-black/20" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
-        <div className="relative z-10 w-full px-4 sm:px-8 lg:px-12">
-          <Link
-            href="/projects"
-            className="inline-flex items-center gap-1.5 text-white/60 hover:text-white text-xs mb-5 transition-colors"
-          >
-            <ArrowLeft size={12} /> Alle Projekte
-          </Link>
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/12 backdrop-blur-sm border border-white/20 rounded-full mb-4">
-            <span className="text-[11px] text-white/90 font-bold uppercase tracking-widest">{config.badge}</span>
+        <div className="absolute inset-0 z-10 flex items-center px-4 sm:px-8 lg:px-12">
+          <div className="w-full">
+            <Link
+              href="/projects"
+              className="inline-flex items-center gap-1.5 text-white/60 hover:text-white text-xs mb-5 transition-colors"
+            >
+              <ArrowLeft size={12} /> Alle Projekte
+            </Link>
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/12 backdrop-blur-sm border border-white/20 rounded-full mb-4">
+              <span className="text-[11px] text-white/90 font-bold uppercase tracking-widest">{config.badge}</span>
+            </div>
+            <h1 className="font-display text-3xl sm:text-5xl font-bold text-white leading-tight mb-3">
+              {config.headline}<br />
+              <span className="text-gradient-gold">{config.highlight}</span>
+            </h1>
+            <p className="text-white/65 text-sm sm:text-base max-w-xl leading-relaxed">
+              {config.description}
+            </p>
           </div>
-          <h1 className="font-display text-3xl sm:text-5xl font-bold text-white leading-tight mb-3">
-            {config.headline}<br />
-            <span className="text-gradient-gold">{config.highlight}</span>
-          </h1>
-          <p className="text-white/65 text-sm sm:text-base max-w-xl leading-relaxed">
-            {config.description}
-          </p>
         </div>
       </div>
 
