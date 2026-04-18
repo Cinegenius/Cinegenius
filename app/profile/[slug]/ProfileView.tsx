@@ -567,20 +567,31 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
           </>
         )}
 
-        {/* ── PROJEKTE — grouped by type ───────────────────────────────── */}
+        {/* ── PROJEKTE — grouped by credit role, ordered by profile positions ── */}
         {projectCredits.filter(c => c.projects).length > 0 && (() => {
           const credits = projectCredits.filter(c => c.projects);
+          const positions: string[] = profile.positions ?? [];
           const grouped = credits.reduce<Record<string, typeof credits>>((acc, c) => {
-            const key = c.projects!.type ?? "Sonstiges";
+            const key = c.role?.trim() || "Sonstiges";
             (acc[key] = acc[key] ?? []).push(c);
             return acc;
           }, {});
+          const sortedKeys = Object.keys(grouped).sort((a, b) => {
+            const ia = positions.findIndex(p => p.toLowerCase() === a.toLowerCase());
+            const ib = positions.findIndex(p => p.toLowerCase() === b.toLowerCase());
+            if (ia === -1 && ib === -1) return a.localeCompare(b);
+            if (ia === -1) return 1;
+            if (ib === -1) return -1;
+            return ia - ib;
+          });
           return (
             <>
               <Divider />
               <SectionLabel>Projekte</SectionLabel>
               <div className="space-y-5">
-                {Object.entries(grouped).map(([type, group]) => (
+                {sortedKeys.map((type) => {
+                  const group = grouped[type];
+                  return (
                   <div key={type}>
                     <p className="text-[10px] font-bold uppercase tracking-widest text-lime mb-2">{type}</p>
                     <div className="border border-border rounded-lg overflow-hidden">
@@ -597,7 +608,8 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                       })}
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </>
           );
@@ -1084,19 +1096,30 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           </div>
         </div>
 
-        {/* Projekte — grouped by type */}
+        {/* Projekte — grouped by credit role, ordered by profile positions */}
         {projectCredits.filter(c => c.projects).length > 0 && (() => {
           const credits = projectCredits.filter(c => c.projects);
+          const positions: string[] = profile.positions ?? [];
           const grouped = credits.reduce<Record<string, typeof credits>>((acc, c) => {
-            const key = c.projects!.type ?? "Sonstiges";
+            const key = c.role?.trim() || "Sonstiges";
             (acc[key] = acc[key] ?? []).push(c);
             return acc;
           }, {});
+          const sortedKeys = Object.keys(grouped).sort((a, b) => {
+            const ia = positions.findIndex(p => p.toLowerCase() === a.toLowerCase());
+            const ib = positions.findIndex(p => p.toLowerCase() === b.toLowerCase());
+            if (ia === -1 && ib === -1) return a.localeCompare(b);
+            if (ia === -1) return 1;
+            if (ib === -1) return -1;
+            return ia - ib;
+          });
           return (
             <div className="mb-12">
               <SectionLabel>Projekte</SectionLabel>
               <div className="space-y-5">
-                {Object.entries(grouped).map(([type, group]) => (
+                {sortedKeys.map((type) => {
+                  const group = grouped[type];
+                  return (
                   <div key={type}>
                     <p className="text-[9px] font-bold uppercase tracking-widest text-lime mb-1.5">{type}</p>
                     <div className="border border-border rounded-lg overflow-hidden bg-bg-secondary">
@@ -1113,7 +1136,8 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                       })}
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           );
