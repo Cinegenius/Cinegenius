@@ -31,7 +31,8 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json();
   const { title, year, type, description, director, poster_url, images, myRole,
-          genre, productionCompany, location, equipment, link, alsoOnCrewUnited } = body;
+          genre, productionCompany, location, equipment, link, alsoOnCrewUnited,
+          linked_companies, linked_locations, crew_entries } = body;
 
   if (!title?.trim()) {
     return NextResponse.json({ error: "Titel ist Pflichtfeld" }, { status: 400 });
@@ -44,6 +45,9 @@ export async function POST(req: NextRequest) {
     equipment: equipment || null,
     link: link || null,
     also_on_crew_united: alsoOnCrewUnited ?? false,
+    linked_companies: linked_companies ?? [],
+    linked_locations: linked_locations ?? [],
+    crew_entries: crew_entries ?? [],
   };
 
   // Try insert with metadata; if column doesn't exist yet, retry without
