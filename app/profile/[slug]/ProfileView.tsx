@@ -536,7 +536,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                         )}
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        {film.role && <span className="text-[10px] text-text-secondary truncate max-w-[120px]">{film.role}</span>}
+                        {film.role && <span className="text-[10px] text-text-primary truncate max-w-[120px]">{film.role}</span>}
                         {film.festival && <span className="text-[10px] text-gold">★</span>}
                         {hasDetails && (
                           <button type="button" onClick={() => setExpandedFilm(isOpen ? null : i)}
@@ -584,14 +584,14 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                   <div key={type}>
                     <p className="text-[10px] font-bold uppercase tracking-widest text-lime mb-2">{type}</p>
                     <div className="border border-border rounded-lg overflow-hidden">
-                      {group.map((credit) => {
+                      {[...group].sort((a, b) => (b.projects?.year ?? 0) - (a.projects?.year ?? 0)).map((credit) => {
                         const proj = credit.projects!;
                         return (
                           <Link key={credit.id} href={`/projects/${credit.project_id}`}
                             className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{proj.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</span>
-                            {credit.role && <span className="text-[10px] text-text-secondary shrink-0 truncate max-w-[30%]">{credit.role}</span>}
+                            {credit.role && <span className="text-[10px] text-text-primary shrink-0 truncate max-w-[30%]">{credit.role}</span>}
                           </Link>
                         );
                       })}
@@ -1100,14 +1100,14 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                   <div key={type}>
                     <p className="text-[9px] font-bold uppercase tracking-widest text-lime mb-1.5">{type}</p>
                     <div className="border border-border rounded-lg overflow-hidden bg-bg-secondary">
-                      {group.map((credit) => {
+                      {[...group].sort((a, b) => (b.projects?.year ?? 0) - (a.projects?.year ?? 0)).map((credit) => {
                         const proj = credit.projects!;
                         return (
                           <Link key={credit.id} href={`/projects/${credit.project_id}`}
                             className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{proj.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</span>
-                            {credit.role && <span className="text-[10px] text-text-secondary shrink-0 truncate max-w-[30%]">{credit.role}</span>}
+                            {credit.role && <span className="text-[10px] text-text-primary shrink-0 truncate max-w-[30%]">{credit.role}</span>}
                           </Link>
                         );
                       })}
@@ -1142,7 +1142,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                         )}
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        {film.role && <span className="text-[10px] text-text-secondary truncate max-w-[120px]">{film.role}</span>}
+                        {film.role && <span className="text-[10px] text-text-primary truncate max-w-[120px]">{film.role}</span>}
                         {film.festival && <span className="text-[10px] text-gold">★</span>}
                         {hasDetails && (
                           <button type="button" onClick={() => setExpandedFilm(isOpen ? null : i)}

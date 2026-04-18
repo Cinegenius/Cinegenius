@@ -1415,7 +1415,7 @@ export default function ProfilePage() {
                           <div key={credit.id} className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-secondary transition-colors">
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{credit.projects?.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1">{credit.projects?.title}</span>
-                            {credit.role && <span className="text-[10px] text-text-secondary shrink-0 truncate max-w-[30%]">{credit.role}</span>}
+                            {credit.role && <span className="text-[10px] text-text-primary shrink-0 truncate max-w-[30%]">{credit.role}</span>}
                             <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                               <a href={`/projects/${credit.project_id}`} className="text-[10px] text-text-muted hover:text-gold transition-colors" target="_blank" rel="noopener noreferrer">→</a>
                               <button type="button" onClick={() => leaveProject(credit.project_id)} className="text-text-muted hover:text-crimson-light transition-colors">
@@ -1954,7 +1954,7 @@ export default function ProfilePage() {
                         <div key={type}>
                           <p className="text-[9px] font-bold uppercase tracking-widest text-lime mb-1.5">{type}</p>
                           <div className="border border-border rounded-lg overflow-hidden bg-bg-secondary">
-                            {items.map((p) => (
+                            {[...items].sort((a, b) => (b.year ?? 0) - (a.year ?? 0)).map((p) => (
                               <Link key={p.id} href={`/projects/${p.id}`}
                                 className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
                                 <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{p.year ?? "—"}</span>
