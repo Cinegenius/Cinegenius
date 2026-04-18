@@ -17,7 +17,7 @@ export default function WerbungPage() {
       headline: "Werbefilm &",
       highlight: "Commercial",
       description: "TV-Spots, Online-Ads, Imagefilme — Werbeprojekte von Agenturen und Produktionsfirmen im DACH-Raum.",
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=90",
+      image: "https://images.unsplash.com/photo-1535223289827-42f1e9919769?w=1600&q=90",
       imagePosition: "center 50%",
       typeKeywords: ["werbefilm", "werbung", "commercial", "spot", "imagefilm"],
     }} />

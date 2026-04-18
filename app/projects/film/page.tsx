@@ -17,8 +17,8 @@ export default function FilmPage() {
       headline: "Spielfilm, Kurzfilm",
       highlight: "& Serie",
       description: "Von Kurzfilm bis Spielfilm, von Indie-Produktion bis zur Streaming-Serie — Filmprojekte aus der DACH-Region.",
-      image: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=1600&q=90",
-      imagePosition: "center 50%",
+      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=1600&q=90",
+      imagePosition: "center 40%",
       typeKeywords: ["spielfilm", "kurzfilm", "serie", "film"],
     }} />
   );

@@ -17,8 +17,8 @@ export default function EventPage() {
       headline: "Event &",
       highlight: "Live Production",
       description: "Konzerte, Festivals, Konferenzen, Sportevents — Live-Mitschnitte und Event-Dokumentationen.",
-      image: "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=1600&q=90",
-      imagePosition: "center 50%",
+      image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600&q=90",
+      imagePosition: "center 40%",
       typeKeywords: ["event", "live", "konzert", "festival", "sport", "konferenz", "messe"],
     }} />
   );

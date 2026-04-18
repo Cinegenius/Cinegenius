@@ -17,8 +17,8 @@ export default function FotoPage() {
       headline: "Fotografie &",
       highlight: "Shooting",
       description: "Editorial, Portrait, Commercial Shooting, Kampagnen — Fotoprojekte von Fotografen aus Deutschland, Österreich und der Schweiz.",
-      image: "https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=1600&q=90",
-      imagePosition: "center 30%",
+      image: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=1600&q=90",
+      imagePosition: "center 35%",
       typeKeywords: ["foto", "shooting", "fotografie", "editorial", "portrait", "kampagne"],
     }} />
   );

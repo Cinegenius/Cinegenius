@@ -17,7 +17,7 @@ export default function CorporatePage() {
       headline: "Corporate Film &",
       highlight: "Business Content",
       description: "Imagefilme, Unternehmensporträts, Erklärvideos, Employer Branding — professionelle Business-Produktionen.",
-      image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1600&q=90",
+      image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=90",
       imagePosition: "center 40%",
       typeKeywords: ["corporate", "business", "imagevideo", "imagefilm", "erklärvideo", "employer", "unternehmen"],
     }} />
