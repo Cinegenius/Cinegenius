@@ -213,12 +213,14 @@ export default function ProjectDetail({
   festivals: initialFestivals,
   currentUserId,
   myCredit: initialMyCredit,
+  userPositions = [],
 }: {
   project: Project;
   credits: Credit[];
   festivals: FestivalEntry[];
   currentUserId: string | null;
   myCredit: Credit | null;
+  userPositions?: string[];
 }) {
   const [project, setProject] = useState(initialProject);
   const [credits, setCredits] = useState(initialCredits);
@@ -580,7 +582,16 @@ export default function ProjectDetail({
           <div className="mb-8 p-5 bg-bg-secondary border border-gold/20 rounded-2xl space-y-3">
             <p className="text-sm font-semibold text-text-primary">Deine Rolle bei &quot;{project.title}&quot;</p>
             <div className="grid sm:grid-cols-3 gap-3">
-              <div>{label("Tätigkeit / Rolle *")}<input type="text" value={joinRole} onChange={(e) => setJoinRole(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleJoin()} placeholder="z.B. Hauptdarsteller, Gaffer..." className={inp} autoFocus /></div>
+              <div>{label("Tätigkeit / Rolle *")}
+                {userPositions.length > 0 ? (
+                  <select value={joinRole} onChange={(e) => setJoinRole(e.target.value)} autoFocus className={inp + " cursor-pointer"}>
+                    <option value="">Rolle wählen…</option>
+                    {userPositions.map((p) => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                ) : (
+                  <input type="text" value={joinRole} onChange={(e) => setJoinRole(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleJoin()} placeholder="z.B. Hauptdarsteller, Gaffer..." className={inp} autoFocus />
+                )}
+              </div>
               <div>{label("Figur", true)}<input type="text" value={joinCharacter} onChange={(e) => setJoinCharacter(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleJoin()} placeholder="z.B. Max Mustermann..." className={inp} /></div>
               <div>{label("Anmerkung", true)}<input type="text" value={joinNote} onChange={(e) => setJoinNote(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleJoin()} placeholder="z.B. nur Ibiza-Drehtage..." className={inp} /></div>
             </div>

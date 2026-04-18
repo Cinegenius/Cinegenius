@@ -73,6 +73,16 @@ export default async function ProjectPage({
   const { userId } = await auth();
   const myCredit = data.credits.find((c) => c.user_id === userId) ?? null;
 
+  let userPositions: string[] = [];
+  if (userId) {
+    const { data: prof } = await supabaseAdmin
+      .from("profiles")
+      .select("positions")
+      .eq("user_id", userId)
+      .maybeSingle();
+    userPositions = (prof?.positions as string[] | null) ?? [];
+  }
+
   return (
     <ProjectDetail
       project={data.project}
@@ -80,6 +90,7 @@ export default async function ProjectPage({
       festivals={data.festivals}
       currentUserId={userId ?? null}
       myCredit={myCredit}
+      userPositions={userPositions}
     />
   );
 }
