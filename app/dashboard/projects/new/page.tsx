@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
-import { ArrowLeft, Clapperboard, CheckCircle, Loader2, Upload, X } from "lucide-react";
+import { ArrowLeft, Clapperboard, CheckCircle, Loader2, X } from "lucide-react";
 import Link from "next/link";
 
 const PROJECT_TYPES = [
@@ -11,6 +11,194 @@ const PROJECT_TYPES = [
   "Werbefilm / Commercial", "Corporate Film", "Event / Live", "Foto / Shooting",
   "Social Media Content", "Imagefilm", "Sonstiges",
 ];
+
+type TypeConfig = {
+  rolePlaceholder: string;
+  directorLabel: string;
+  directorPlaceholder: string;
+  genreLabel: string;
+  genrePlaceholder: string;
+  locationLabel: string;
+  locationPlaceholder: string;
+  companyLabel: string;
+  companyPlaceholder: string;
+  linkPlaceholder: string;
+  descPlaceholder: string;
+  titlePlaceholder: string;
+};
+
+const TYPE_CONFIG: Record<string, TypeConfig> = {
+  "Spielfilm": {
+    rolePlaceholder: "z. B. Regisseur, Kameramann, Produzent",
+    directorLabel: "Regie",
+    directorPlaceholder: "Name des Regisseurs",
+    genreLabel: "Genre",
+    genrePlaceholder: "Drama, Thriller, Komödie …",
+    locationLabel: "Drehort / Region",
+    locationPlaceholder: "z. B. Berlin, Hamburg, Wien",
+    companyLabel: "Produktionsfirma",
+    companyPlaceholder: "z. B. X Filme, UFA",
+    linkPlaceholder: "IMDb, Vimeo, YouTube …",
+    descPlaceholder: "Worum geht es in diesem Film?",
+    titlePlaceholder: "z. B. Der letzte Sommer",
+  },
+  "Kurzfilm": {
+    rolePlaceholder: "z. B. Regisseur, Kameramann, Cutter",
+    directorLabel: "Regie",
+    directorPlaceholder: "Name des Regisseurs",
+    genreLabel: "Genre",
+    genrePlaceholder: "Drama, Komödie, Horror …",
+    locationLabel: "Drehort / Region",
+    locationPlaceholder: "z. B. München, Leipzig",
+    companyLabel: "Hochschule / Produktionsfirma",
+    companyPlaceholder: "z. B. HFF München, unabhängig",
+    linkPlaceholder: "Vimeo, YouTube, Kurzfilmtage …",
+    descPlaceholder: "Worum geht es in diesem Kurzfilm?",
+    titlePlaceholder: "z. B. Stille Wasser",
+  },
+  "Serie": {
+    rolePlaceholder: "z. B. Regisseur, Showrunner, DOP",
+    directorLabel: "Regie / Showrunner",
+    directorPlaceholder: "Name des Showrunners oder Regisseurs",
+    genreLabel: "Genre",
+    genrePlaceholder: "Drama, Krimi, Comedy …",
+    locationLabel: "Drehort / Region",
+    locationPlaceholder: "z. B. Köln, Berlin, Wien",
+    companyLabel: "Produktionsfirma / Sender",
+    companyPlaceholder: "z. B. Wiedemann & Berg, ARD",
+    linkPlaceholder: "IMDb, Streaming-Link …",
+    descPlaceholder: "Worum geht es in dieser Serie?",
+    titlePlaceholder: "z. B. Dark Horizons",
+  },
+  "Dokumentation": {
+    rolePlaceholder: "z. B. Regisseur, Kameramann, Cutter",
+    directorLabel: "Regie",
+    directorPlaceholder: "Name des Regisseurs",
+    genreLabel: "Thema",
+    genrePlaceholder: "Gesellschaft, Natur, Geschichte, Sport …",
+    locationLabel: "Drehort / Region",
+    locationPlaceholder: "z. B. weltweit, DACH, Berlin",
+    companyLabel: "Produktionsfirma / Sender",
+    companyPlaceholder: "z. B. NDR, ZDF, unabhängig",
+    linkPlaceholder: "Mediathek, Vimeo, YouTube …",
+    descPlaceholder: "Was ist das Thema dieser Dokumentation?",
+    titlePlaceholder: "z. B. Am Rande der Welt",
+  },
+  "Musikvideo": {
+    rolePlaceholder: "z. B. Regisseur, Kameramann, Colorist",
+    directorLabel: "Regie",
+    directorPlaceholder: "Name des Regisseurs",
+    genreLabel: "Musikgenre",
+    genrePlaceholder: "Pop, Hip-Hop, Rock, Electronic …",
+    locationLabel: "Drehort / Region",
+    locationPlaceholder: "z. B. Berlin, Studio, On Location",
+    companyLabel: "Label / Künstler",
+    companyPlaceholder: "z. B. Universal, Sony, Indie",
+    linkPlaceholder: "YouTube, Vimeo, Spotify …",
+    descPlaceholder: "Für welchen Künstler und Song wurde das Video gedreht?",
+    titlePlaceholder: "z. B. Midnight Run – Max Mustermann",
+  },
+  "Werbefilm / Commercial": {
+    rolePlaceholder: "z. B. Regisseur, Kameramann, Art Director",
+    directorLabel: "Regie",
+    directorPlaceholder: "Name des Regisseurs",
+    genreLabel: "Format",
+    genrePlaceholder: "TV-Spot, Online-Ad, Imagefilm, Product …",
+    locationLabel: "Drehort / Region",
+    locationPlaceholder: "z. B. Studio Berlin, München",
+    companyLabel: "Agentur / Auftraggeber",
+    companyPlaceholder: "z. B. BBDO, Jung von Matt, Markenname",
+    linkPlaceholder: "YouTube, Vimeo, Agentur-Link …",
+    descPlaceholder: "Für welches Produkt oder welche Marke wurde der Spot gedreht?",
+    titlePlaceholder: "z. B. BMW Frühjahrs-Kampagne 2024",
+  },
+  "Corporate Film": {
+    rolePlaceholder: "z. B. Kameramann, Produzent, Cutter",
+    directorLabel: "Projektleitung",
+    directorPlaceholder: "Verantwortliche Person oder Agentur",
+    genreLabel: "Art des Films",
+    genrePlaceholder: "Imagefilm, Employer Branding, Erklärfilm …",
+    locationLabel: "Drehort / Unternehmen",
+    locationPlaceholder: "z. B. Frankfurt, Hamburg, On Location",
+    companyLabel: "Auftraggeber / Unternehmen",
+    companyPlaceholder: "z. B. Siemens AG, Startup GmbH",
+    linkPlaceholder: "Unternehmenswebsite, Vimeo, YouTube …",
+    descPlaceholder: "Welches Unternehmen wurde porträtiert und was war das Ziel?",
+    titlePlaceholder: "z. B. Imagefilm Muster GmbH",
+  },
+  "Event / Live": {
+    rolePlaceholder: "z. B. Kameramann, Live-Cutter, Tonmeister",
+    directorLabel: "Veranstaltungsort",
+    directorPlaceholder: "z. B. Olympiastadion, Messe Hamburg",
+    genreLabel: "Art des Events",
+    genrePlaceholder: "Konzert, Festival, Konferenz, Messe …",
+    locationLabel: "Stadt / Region",
+    locationPlaceholder: "z. B. Berlin, München, Wien",
+    companyLabel: "Veranstalter / Auftraggeber",
+    companyPlaceholder: "z. B. Live Nation, Eventfirma",
+    linkPlaceholder: "YouTube, Instagram, Event-Website …",
+    descPlaceholder: "Welches Event wurde gefilmt? Was war besonders daran?",
+    titlePlaceholder: "z. B. Rock am Ring 2024 – Backstage",
+  },
+  "Foto / Shooting": {
+    rolePlaceholder: "z. B. Fotograf, Art Director, Stylist",
+    directorLabel: "Art Direction",
+    directorPlaceholder: "Name des Art Directors oder Stylisten",
+    genreLabel: "Art des Shootings",
+    genrePlaceholder: "Fashion, Portrait, Editorial, Werbung, Beauty …",
+    locationLabel: "Location / Studio",
+    locationPlaceholder: "z. B. Studio Berlin, On Location, Paris",
+    companyLabel: "Agentur / Auftraggeber",
+    companyPlaceholder: "z. B. Magazin, Marke, Modelagentur",
+    linkPlaceholder: "Portfolio, Instagram, Behance …",
+    descPlaceholder: "Worum ging es bei diesem Shooting? Wer war involviert?",
+    titlePlaceholder: "z. B. Editorial Vogue DE Herbst 2024",
+  },
+  "Social Media Content": {
+    rolePlaceholder: "z. B. Creator, Videograf, Editor",
+    directorLabel: "Plattform / Kanal",
+    directorPlaceholder: "z. B. @username auf TikTok, YouTube-Kanal",
+    genreLabel: "Content-Art",
+    genrePlaceholder: "TikTok, Reels, YouTube, Podcast, Story …",
+    locationLabel: "Drehort / Setting",
+    locationPlaceholder: "z. B. Homeoffice, On Location, Studio",
+    companyLabel: "Brand Deal / Auftraggeber",
+    companyPlaceholder: "z. B. Nike, eigener Kanal",
+    linkPlaceholder: "TikTok, YouTube, Instagram …",
+    descPlaceholder: "Was ist das Thema dieses Projekts? Für welche Plattform?",
+    titlePlaceholder: "z. B. Travel-Serie Südostasien",
+  },
+  "Imagefilm": {
+    rolePlaceholder: "z. B. Regisseur, Kameramann, Produzent",
+    directorLabel: "Regie / Projektleitung",
+    directorPlaceholder: "Verantwortliche Person",
+    genreLabel: "Zielgruppe / Format",
+    genrePlaceholder: "B2B, Employer Branding, Produktvideo …",
+    locationLabel: "Drehort / Region",
+    locationPlaceholder: "z. B. Köln, Hamburg, Zürich",
+    companyLabel: "Auftraggeber",
+    companyPlaceholder: "z. B. Unternehmensname, Agentur",
+    linkPlaceholder: "Vimeo, Unternehmenswebsite …",
+    descPlaceholder: "Welches Unternehmen oder Produkt wurde präsentiert?",
+    titlePlaceholder: "z. B. Imagevideo Musterfirma AG",
+  },
+  "Sonstiges": {
+    rolePlaceholder: "z. B. Regisseur, Kameramann, Produzent",
+    directorLabel: "Regie / Verantwortlich",
+    directorPlaceholder: "Name der verantwortlichen Person",
+    genreLabel: "Kategorie / Thema",
+    genrePlaceholder: "Beliebige Kategorie",
+    locationLabel: "Drehort / Region",
+    locationPlaceholder: "z. B. Berlin, Wien, Zürich",
+    companyLabel: "Auftraggeber / Firma",
+    companyPlaceholder: "Auftraggeber oder Produktionsfirma",
+    linkPlaceholder: "Website, YouTube, Vimeo …",
+    descPlaceholder: "Beschreib dein Projekt.",
+    titlePlaceholder: "Projekttitel eingeben",
+  },
+};
+
+const DEFAULT_CONFIG: TypeConfig = TYPE_CONFIG["Spielfilm"];
 
 export default function NewProjectPage() {
   const router = useRouter();
@@ -39,6 +227,8 @@ export default function NewProjectPage() {
       </div>
     );
   }
+
+  const cfg: TypeConfig = form.type ? (TYPE_CONFIG[form.type] ?? DEFAULT_CONFIG) : DEFAULT_CONFIG;
 
   function set(key: string, val: string) {
     setForm((f) => ({ ...f, [key]: val }));
@@ -97,37 +287,37 @@ export default function NewProjectPage() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
 
-          {/* Titel */}
+          {/* Produktionsart first — drives all other labels */}
           <div>
             <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">
-              Projekttitel <span className="text-gold">*</span>
+              Produktionsart
             </label>
-            <input
-              type="text"
-              placeholder="z. B. Der letzte Sommer"
-              value={form.title}
-              onChange={(e) => set("title", e.target.value)}
-              className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder-text-muted focus:outline-none focus:border-gold transition-colors"
-              required
-            />
+            <select
+              value={form.type}
+              onChange={(e) => set("type", e.target.value)}
+              className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary focus:outline-none focus:border-gold transition-colors appearance-none"
+            >
+              <option value="">Bitte wählen</option>
+              {PROJECT_TYPES.map((t) => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
           </div>
 
-          {/* Type + Year */}
+          {/* Titel + Jahr */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">
-                Produktionsart
+                Projekttitel <span className="text-gold">*</span>
               </label>
-              <select
-                value={form.type}
-                onChange={(e) => set("type", e.target.value)}
-                className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary focus:outline-none focus:border-gold transition-colors appearance-none"
-              >
-                <option value="">Bitte wählen</option>
-                {PROJECT_TYPES.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
+              <input
+                type="text"
+                placeholder={cfg.titlePlaceholder}
+                value={form.title}
+                onChange={(e) => set("title", e.target.value)}
+                className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder-text-muted focus:outline-none focus:border-gold transition-colors"
+                required
+              />
             </div>
             <div>
               <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">
@@ -145,7 +335,7 @@ export default function NewProjectPage() {
             </div>
           </div>
 
-          {/* Meine Rolle + Regie */}
+          {/* Meine Rolle + Regie/Art Direction/Plattform */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">
@@ -153,7 +343,7 @@ export default function NewProjectPage() {
               </label>
               <input
                 type="text"
-                placeholder="z. B. Kameramann, Regisseur"
+                placeholder={cfg.rolePlaceholder}
                 value={form.myRole}
                 onChange={(e) => set("myRole", e.target.value)}
                 className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder-text-muted focus:outline-none focus:border-gold transition-colors"
@@ -161,11 +351,11 @@ export default function NewProjectPage() {
             </div>
             <div>
               <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">
-                Regie
+                {cfg.directorLabel}
               </label>
               <input
                 type="text"
-                placeholder="Name des Regisseurs"
+                placeholder={cfg.directorPlaceholder}
                 value={form.director}
                 onChange={(e) => set("director", e.target.value)}
                 className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder-text-muted focus:outline-none focus:border-gold transition-colors"
@@ -173,15 +363,15 @@ export default function NewProjectPage() {
             </div>
           </div>
 
-          {/* Genre + Produktionsfirma */}
+          {/* Genre/Thema + Auftraggeber/Firma */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">
-                Genre
+                {cfg.genreLabel}
               </label>
               <input
                 type="text"
-                placeholder="Drama, Komödie, Thriller …"
+                placeholder={cfg.genrePlaceholder}
                 value={form.genre}
                 onChange={(e) => set("genre", e.target.value)}
                 className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder-text-muted focus:outline-none focus:border-gold transition-colors"
@@ -189,11 +379,11 @@ export default function NewProjectPage() {
             </div>
             <div>
               <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">
-                Produktionsfirma
+                {cfg.companyLabel}
               </label>
               <input
                 type="text"
-                placeholder="Firma oder Auftraggeber"
+                placeholder={cfg.companyPlaceholder}
                 value={form.productionCompany}
                 onChange={(e) => set("productionCompany", e.target.value)}
                 className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder-text-muted focus:outline-none focus:border-gold transition-colors"
@@ -201,14 +391,14 @@ export default function NewProjectPage() {
             </div>
           </div>
 
-          {/* Drehort */}
+          {/* Drehort/Location */}
           <div>
             <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">
-              Drehort / Region
+              {cfg.locationLabel}
             </label>
             <input
               type="text"
-              placeholder="z. B. Berlin, Wien, München"
+              placeholder={cfg.locationPlaceholder}
               value={form.location}
               onChange={(e) => set("location", e.target.value)}
               className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder-text-muted focus:outline-none focus:border-gold transition-colors"
@@ -222,7 +412,7 @@ export default function NewProjectPage() {
             </label>
             <textarea
               rows={4}
-              placeholder="Worum geht es in diesem Projekt?"
+              placeholder={cfg.descPlaceholder}
               value={form.description}
               onChange={(e) => set("description", e.target.value)}
               className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder-text-muted focus:outline-none focus:border-gold transition-colors resize-none"
@@ -246,11 +436,11 @@ export default function NewProjectPage() {
           {/* Link */}
           <div>
             <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">
-              Link (IMDb, YouTube, Vimeo …)
+              Link
             </label>
             <input
               type="url"
-              placeholder="https://..."
+              placeholder={cfg.linkPlaceholder}
               value={form.link}
               onChange={(e) => set("link", e.target.value)}
               className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder-text-muted focus:outline-none focus:border-gold transition-colors"
