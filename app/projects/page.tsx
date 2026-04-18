@@ -19,7 +19,7 @@ const CATEGORIES = [
     href: "/projects/film",
     icon: Film,
     image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=80",
-    accent: "#a855f7",
+    accent: "#c8f135",
   },
   {
     label: "Werbung",
@@ -27,7 +27,7 @@ const CATEGORIES = [
     href: "/projects/werbung",
     icon: Tv,
     image: "https://images.unsplash.com/photo-1535223289827-42f1e9919769?w=800&q=80",
-    accent: "#ec4899",
+    accent: "#c8f135",
   },
   {
     label: "Foto & Shooting",
@@ -35,7 +35,7 @@ const CATEGORIES = [
     href: "/projects/foto",
     icon: Camera,
     image: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=800&q=80",
-    accent: "#38bdf8",
+    accent: "#c8f135",
   },
   {
     label: "Social Media",
@@ -43,7 +43,7 @@ const CATEGORIES = [
     href: "/projects/social-media",
     icon: Zap,
     image: "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80",
-    accent: "#8b5cf6",
+    accent: "#c8f135",
   },
   {
     label: "Musikvideo",
@@ -51,7 +51,7 @@ const CATEGORIES = [
     href: "/projects/musikvideo",
     icon: Music,
     image: "https://images.unsplash.com/photo-1501612780327-45045538702b?w=800&q=80",
-    accent: "#ef4444",
+    accent: "#c8f135",
   },
   {
     label: "Dokumentation",
@@ -59,7 +59,7 @@ const CATEGORIES = [
     href: "/projects/dokumentation",
     icon: FileVideo,
     image: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80",
-    accent: "#f59e0b",
+    accent: "#c8f135",
   },
   {
     label: "Corporate",
@@ -67,7 +67,7 @@ const CATEGORIES = [
     href: "/projects/corporate",
     icon: Building2,
     image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
-    accent: "#06b6d4",
+    accent: "#c8f135",
   },
   {
     label: "Event & Live",
@@ -75,7 +75,7 @@ const CATEGORIES = [
     href: "/projects/event",
     icon: Radio,
     image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80",
-    accent: "#f97316",
+    accent: "#c8f135",
   },
 ];
 
