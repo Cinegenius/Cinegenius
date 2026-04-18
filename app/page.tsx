@@ -297,18 +297,20 @@ export default async function HomePage() {
         />
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-20">
-          <div className="hero-badge inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold uppercase tracking-widest mb-8 animate-fade-in">
-            <Zap size={12} /> Film · Foto · Content · Werbung
-          </div>
-
-          <h1 className="hero-title font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6 animate-fade-up">
-            Alles, was dein Projekt<br />
-            <span className="text-gradient-gold">zum Leben braucht.</span>
+          <h1 className="hero-title font-display text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mb-4 animate-fade-in tracking-tight uppercase">
+            Create. Connect. Get Discovered.
           </h1>
 
-          <p className="hero-sub text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-up">
-            Egal ob Kurzfilm, Werbespot, Fotoshooting oder YouTube-Produktion —
-            CineGenius verbindet Kreative mit Locations, Crew, Equipment und Jobs.
+          <p className="hero-sub text-lg sm:text-xl max-w-2xl mx-auto mb-3 leading-relaxed animate-fade-up font-medium">
+            The platform for creatives.
+          </p>
+
+          <p className="hero-sub text-base sm:text-lg max-w-2xl mx-auto mb-6 leading-relaxed animate-fade-up opacity-80">
+            Photo, Film, Social Media & Models — All in One Place.
+          </p>
+
+          <p className="hero-sub text-sm sm:text-base max-w-xl mx-auto mb-10 leading-relaxed animate-fade-up opacity-60">
+            Inserate für Jobs, Locations, Equipment & mehr — alles was du für deine nächste Produktion brauchst, an einem Ort.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-12 animate-fade-up delay-200">
