@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Film, Tv, Camera, Zap, Music, FileVideo, Building2, Radio, ArrowRight, Clapperboard,
+  Film, Tv, Camera, Zap, Music, FileVideo, Building2, Radio, ArrowRight,
 } from "lucide-react";
 
 export const revalidate = 300;
@@ -83,19 +83,10 @@ export default function ProjectsPage() {
   return (
     <div className="pt-16 min-h-screen bg-bg-primary">
 
-      {/* Header — no image, clean dark */}
-      <div className="px-6 sm:px-10 lg:px-16 pt-12 pb-8">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-2xl bg-gold/15 border border-gold/25 flex items-center justify-center">
-            <Clapperboard size={20} className="text-gold" />
-          </div>
-          <span className="text-xs font-bold uppercase tracking-widest text-text-muted">CineGenius</span>
-        </div>
-        <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-bold text-text-primary leading-none mb-4">
-          Projekte
-        </h1>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
-          <p className="text-text-muted text-base max-w-lg">
+      {/* Header — compact */}
+      <div className="px-4 sm:px-6 lg:px-8 pt-6 pb-5 max-w-7xl mx-auto">
+        <div className="flex items-center justify-between gap-4">
+          <p className="text-text-muted text-sm">
             Entdecke Produktionen aus der DACH-Region — von Spielfilm bis Social Media Content.
           </p>
           <Link
@@ -106,9 +97,6 @@ export default function ProjectsPage() {
           </Link>
         </div>
       </div>
-
-      {/* Divider */}
-      <div className="h-px bg-border mx-6 sm:mx-10 lg:mx-16 mb-8" />
 
       {/* Category Grid */}
       <div className="px-4 sm:px-6 lg:px-8 pb-16">
