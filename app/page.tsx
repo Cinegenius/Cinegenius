@@ -422,7 +422,7 @@ export default async function HomePage() {
           {/* Werbung */}
           <Link href="/companies" className="relative rounded-2xl overflow-hidden group block">
             <Image
-              src="https://images.unsplash.com/photo-1574717024453-354056adb31b?w=800&q=85"
+              src="https://images.unsplash.com/photo-1557858310-9052820906f7?w=800&q=85"
               alt="Werbeproduktion"
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
