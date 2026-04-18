@@ -59,6 +59,60 @@ function Divider() {
   return <div className="h-px bg-border my-12" />;
 }
 
+// ─── Inserate Section ─────────────────────────────────────────────────────────
+
+const LISTING_TYPE_META: Record<string, { label: string; color: string; href: (id: string) => string }> = {
+  job:      { label: "Job",        color: "text-gold",         href: (id) => `/jobs/${id}` },
+  prop:     { label: "Marktplatz", color: "text-violet-400",   href: (id) => `/props/${id}` },
+  location: { label: "Location",   color: "text-emerald-400",  href: (id) => `/locations/${id}` },
+  vehicle:  { label: "Fahrzeug",   color: "text-sky-400",      href: (id) => `/vehicles/${id}` },
+  creator:  { label: "Creator",    color: "text-rose-400",     href: (id) => `/creators/${id}` },
+};
+
+function ListingsSection({ listings }: { listings: PublicListing[] }) {
+  if (!listings.length) return null;
+  const grouped = listings.reduce<Record<string, PublicListing[]>>((acc, l) => {
+    (acc[l.type] = acc[l.type] ?? []).push(l);
+    return acc;
+  }, {});
+  return (
+    <>
+      <Divider />
+      <SectionLabel>Inserate</SectionLabel>
+      <div className="space-y-5">
+        {Object.entries(grouped).map(([type, items]) => {
+          const meta = LISTING_TYPE_META[type] ?? { label: type, color: "text-text-muted", href: (id: string) => `/${type}/${id}` };
+          return (
+            <div key={type}>
+              <p className={`text-[10px] font-bold uppercase tracking-widest mb-2 ${meta.color}`}>{meta.label}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {items.map((l) => (
+                  <Link key={l.id} href={meta.href(l.id)}
+                    className="group flex items-center gap-3 p-3 bg-bg-secondary border border-border rounded-xl hover:border-gold/40 transition-colors">
+                    <div className="w-12 h-12 rounded-lg bg-bg-elevated border border-border overflow-hidden shrink-0">
+                      {l.image_url
+                        ? <img src={l.image_url} alt={l.title} className="w-full h-full object-cover" />
+                        : <div className="w-full h-full flex items-center justify-center text-text-muted text-xs">—</div>
+                      }
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-text-primary truncate group-hover:text-gold transition-colors">{l.title}</p>
+                      <p className="text-xs text-text-muted mt-0.5 truncate">{[l.category, l.city].filter(Boolean).join(" · ")}</p>
+                      {l.price != null && l.price > 0 && (
+                        <p className="text-xs text-gold font-semibold mt-0.5">{l.price.toLocaleString("de-DE")} €<span className="text-text-muted font-normal"> / Tag</span></p>
+                      )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
 // ─── Lightbox ─────────────────────────────────────────────────────────────────
 
 function Lightbox({ src, onClose }: { src: string; onClose: () => void }) {
@@ -160,7 +214,7 @@ function CompanyBadge({ membership }: { membership: CompanyMembership }) {
 // ACTOR PROFILE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ActorProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[] }) {
+function ActorProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [] }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[] }) {
   const { user } = useUser();
   const [lightbox, setLightbox] = useState<string | null>(null);
   const [showAllFilms, setShowAllFilms] = useState(false);
@@ -600,6 +654,8 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
           </>
         )}
 
+        <ListingsSection listings={listings} />
+
         <div className="h-16" />
       </div>
 
@@ -622,7 +678,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
 // MODEL PROFILE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ModelProfile({ profile, isOwner, companyMembership }: { profile: UserProfile; isOwner: boolean; companyMembership: CompanyMembership }) {
+function ModelProfile({ profile, isOwner, companyMembership, listings = [] }: { profile: UserProfile; isOwner: boolean; companyMembership: CompanyMembership; listings?: PublicListing[] }) {
   const [lightbox, setLightbox] = useState<string | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -847,6 +903,8 @@ function ModelProfile({ profile, isOwner, companyMembership }: { profile: UserPr
           );
         })()}
 
+        <ListingsSection listings={listings} />
+
         <div className="h-16" />
       </div>
     </div>
@@ -857,7 +915,7 @@ function ModelProfile({ profile, isOwner, companyMembership }: { profile: UserPr
 // GENERIC PROFILE (Crew, Creative, Vendor etc.)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function GenericProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[] }) {
+function GenericProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [] }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[] }) {
   const [lightbox, setLightbox] = useState<string | null>(null);
   const [expandedFilm, setExpandedFilm] = useState<number | null>(null);
 
@@ -1175,6 +1233,8 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           </div>
         )}
 
+        <ListingsSection listings={listings} />
+
       </div>
 
       {/* Photo strip — full-bleed scrolling marquee */}
@@ -1197,31 +1257,35 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 // MAIN — type-based routing
 // ═══════════════════════════════════════════════════════════════════════════════
 
+type PublicListing = { id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null };
+
 export default function ProfileView({
   profile,
   isOwner,
   projectCredits = [],
   companyMembership = null,
   externalProfiles = [],
+  listings = [],
 }: {
   profile: UserProfile;
   isOwner: boolean;
   projectCredits?: ProjectCredit[];
   companyMembership?: CompanyMembership;
   externalProfiles?: ExternalProfileRow[];
+  listings?: PublicListing[];
 }) {
   const category = PROFILE_CATEGORY_MAP[profile.profile_type] ?? "crew";
 
   // Model types get editorial layout
   if (profile.profile_type === "model") {
-    return <ModelProfile profile={profile} isOwner={isOwner} companyMembership={companyMembership} />;
+    return <ModelProfile profile={profile} isOwner={isOwner} companyMembership={companyMembership} listings={listings} />;
   }
 
   // Actor/talent types get casting-ready layout
   if (category === "talent") {
-    return <ActorProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} />;
+    return <ActorProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} />;
   }
 
   // Crew, creative, vendor get generic layout
-  return <GenericProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} />;
+  return <GenericProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} />;
 }

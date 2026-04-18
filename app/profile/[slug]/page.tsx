@@ -107,6 +107,16 @@ async function getExternalProfiles(userId: string): Promise<ExternalProfileRow[]
   return (data ?? []) as ExternalProfileRow[];
 }
 
+async function getPublicListings(userId: string) {
+  const { data } = await admin
+    .from("listings")
+    .select("id, type, title, category, price, city, image_url")
+    .eq("user_id", userId)
+    .eq("published", true)
+    .order("created_at", { ascending: false });
+  return (data ?? []) as { id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null }[];
+}
+
 async function getCompanyMembership(userId: string) {
   const { data } = await admin
     .from("company_members")
@@ -131,10 +141,11 @@ export default async function ProfilePage(
   if (!profile) notFound();
 
   const isOwner = userId === profile.user_id;
-  const [projectCredits, companyMembership, externalProfiles] = await Promise.all([
+  const [projectCredits, companyMembership, externalProfiles, listings] = await Promise.all([
     getProjectCredits(profile.user_id),
     getCompanyMembership(profile.user_id),
     getExternalProfiles(profile.user_id),
+    getPublicListings(profile.user_id),
   ]);
 
   const jsonLd = {
@@ -157,6 +168,7 @@ export default async function ProfilePage(
         projectCredits={projectCredits}
         companyMembership={companyMembership}
         externalProfiles={externalProfiles}
+        listings={listings}
       />
     </>
   );
