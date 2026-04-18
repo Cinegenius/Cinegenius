@@ -8,6 +8,7 @@ import { useUser } from "@clerk/nextjs";
 import {
   MapPin, MessageSquare, Play, Award, ChevronDown, ChevronUp,
   Pencil, ExternalLink, X, Check, Globe, Building2, UserPlus, UserCheck, Clock,
+  ChevronRight, Clapperboard, Film, Briefcase, Package, Car,
 } from "lucide-react";
 import type { UserProfile, ProfileModule, ProfileImage, FilmographyEntry, ProfileAward, PhysicalData, ProjectCredit } from "@/lib/profile-types";
 import { PROFILE_CATEGORY_MAP } from "@/lib/profile-types";
@@ -69,6 +70,10 @@ const LISTING_TYPE_META: Record<string, { label: string; color: string; href: (i
   creator:  { label: "Creator",    color: "text-rose-400",     href: (id) => `/creators/${id}` },
 };
 
+const LISTING_TYPE_ICON: Record<string, React.ElementType> = {
+  job: Briefcase, prop: Package, location: MapPin, vehicle: Car, creator: Film,
+};
+
 function ListingsSection({ listings }: { listings: PublicListing[] }) {
   if (!listings.length) return null;
   const grouped = listings.reduce<Record<string, PublicListing[]>>((acc, l) => {
@@ -82,23 +87,30 @@ function ListingsSection({ listings }: { listings: PublicListing[] }) {
       <div className="space-y-3">
         {Object.entries(grouped).map(([type, items]) => {
           const meta = LISTING_TYPE_META[type] ?? { label: type, color: "text-text-muted", href: (id: string) => `/${type}/${id}` };
+          const Icon = LISTING_TYPE_ICON[type] ?? Briefcase;
           return (
             <div key={type}>
-              <p className={`text-[9px] font-bold uppercase tracking-widest mb-1.5 ${meta.color}`}>{meta.label}</p>
-              <div className="divide-y divide-border border border-border rounded-lg overflow-hidden">
+              <p className={`text-[9px] font-bold uppercase tracking-widest mb-2 ${meta.color}`}>{meta.label}</p>
+              <div className="space-y-2">
                 {items.map((l) => (
                   <Link key={l.id} href={meta.href(l.id)}
-                    className="group flex items-center gap-2.5 px-3 py-2 bg-bg-secondary hover:bg-bg-elevated transition-colors">
-                    <div className="flex-1 min-w-0 flex items-center gap-2">
-                      <p className="text-xs font-medium text-text-primary truncate group-hover:text-gold transition-colors">{l.title}</p>
-                      {l.category && <span className="text-[10px] text-text-muted shrink-0 hidden sm:inline">· {l.category}</span>}
+                    className="group flex gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:bg-bg-elevated transition-colors">
+                    <div className="w-10 h-10 rounded-lg bg-bg-elevated border border-border flex items-center justify-center shrink-0 mt-0.5">
+                      <Icon size={16} className="text-text-muted group-hover:text-gold transition-colors" />
                     </div>
-                    <div className="flex items-center gap-2 shrink-0 text-[10px] text-text-muted">
-                      {l.city && <span>{l.city}</span>}
-                      {l.price != null && l.price > 0 && (
-                        <span className="text-gold font-semibold">{l.price.toLocaleString("de-DE")} €</span>
-                      )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <h3 className="font-semibold text-sm text-text-primary group-hover:text-gold transition-colors leading-snug">{l.title}</h3>
+                        {l.price != null && l.price > 0 && (
+                          <span className="text-gold font-semibold text-xs shrink-0">{l.price.toLocaleString("de-DE")} €</span>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-text-muted">
+                        {l.category && <span className="px-2 py-0.5 bg-bg-elevated border border-border rounded font-medium">{l.category}</span>}
+                        {l.city && <span className="flex items-center gap-1"><MapPin size={9} />{l.city}</span>}
+                      </div>
                     </div>
+                    <ChevronRight size={14} className="text-text-muted group-hover:text-gold transition-colors shrink-0 self-center" />
                   </Link>
                 ))}
               </div>
@@ -515,42 +527,38 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
           <>
             <Divider />
             <SectionLabel>Filmografie</SectionLabel>
-            <div className="border border-border rounded-lg overflow-hidden">
+            <div className="space-y-2">
               {visibleFilms.map((film, i) => {
                 const isOpen = expandedFilm === i;
                 const hasDetails = !!(film.director || film.festival || film.type || film.production);
                 return (
-                  <div key={`film-${i}`} className="border-b border-border last:border-b-0">
-                    <div className="flex items-center gap-2.5 px-3 py-2 hover:bg-bg-elevated transition-colors">
-                      <span className="text-[10px] font-bold tabular-nums text-gold shrink-0 w-8">{film.year || "—"}</span>
-                      <div className="flex-1 min-w-0">
+                  <div key={`film-${i}`} className="group flex gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:bg-bg-elevated transition-colors">
+                    <div className="w-10 h-10 rounded-lg bg-bg-elevated border border-border flex items-center justify-center shrink-0 mt-0.5">
+                      <Film size={16} className="text-text-muted group-hover:text-gold transition-colors" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2 mb-1">
                         {film.imdb_url ? (
                           <a href={film.imdb_url} target="_blank" rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-xs font-medium text-text-primary hover:text-gold transition-colors">
-                            {film.title} <ExternalLink size={9} className="shrink-0 text-text-muted" />
+                            className="font-semibold text-sm text-text-primary hover:text-gold transition-colors leading-snug inline-flex items-center gap-1">
+                            {film.title} <ExternalLink size={10} className="text-text-muted shrink-0" />
                           </a>
                         ) : (
-                          <span className="text-xs font-medium text-text-primary">{film.title}</span>
+                          <h3 className="font-semibold text-sm text-text-primary group-hover:text-gold transition-colors leading-snug">{film.title}</h3>
                         )}
+                        {film.year && <span className="text-gold font-semibold text-xs shrink-0">{film.year}</span>}
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {film.role && <span className="text-[10px] text-text-muted hidden sm:inline">{film.role}</span>}
-                        {film.festival && <span className="text-[10px] text-gold">★</span>}
-                        {hasDetails && (
-                          <button type="button" onClick={() => setExpandedFilm(isOpen ? null : i)}
-                            className="text-text-muted hover:text-text-primary transition-colors">
-                            <ChevronDown size={11} className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
-                          </button>
-                        )}
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {film.role && <span className="px-2 py-0.5 bg-bg-elevated border border-border text-text-muted text-[10px] rounded font-medium">{film.role}</span>}
+                        {film.festival && <span className="px-2 py-0.5 bg-gold/10 border border-gold/20 text-gold text-[10px] rounded font-medium">★ {film.festival}</span>}
+                        {film.director && <span className="text-[10px] text-text-muted">Regie: {film.director}</span>}
                       </div>
                     </div>
-                    {isOpen && hasDetails && (
-                      <div className="px-3 pb-2 pl-[3.5rem] flex flex-wrap gap-x-4 gap-y-0.5 border-t border-border pt-1.5">
-                        {film.type && <span className="text-[10px] text-text-muted">Typ: <span className="text-text-secondary">{film.type}</span></span>}
-                        {film.director && <span className="text-[10px] text-text-muted">Regie: <span className="text-text-secondary">{film.director}</span></span>}
-                        {film.production && <span className="text-[10px] text-text-muted">Prod.: <span className="text-text-secondary">{film.production}</span></span>}
-                        {film.festival && <span className="text-[10px] text-gold">★ {film.festival}</span>}
-                      </div>
+                    {hasDetails && (
+                      <button type="button" onClick={() => setExpandedFilm(isOpen ? null : i)}
+                        className="text-text-muted hover:text-text-primary transition-colors shrink-0 self-center">
+                        <ChevronDown size={14} className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+                      </button>
                     )}
                   </div>
                 );
@@ -581,15 +589,25 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                 {Object.entries(grouped).map(([type, group]) => (
                   <div key={type}>
                     <p className="text-[10px] font-bold uppercase tracking-widest text-lime mb-2">{type}</p>
-                    <div className="divide-y divide-border border border-border rounded-lg overflow-hidden">
+                    <div className="space-y-2">
                       {group.map((credit) => {
                         const proj = credit.projects!;
                         return (
                           <Link key={credit.id} href={`/projects/${credit.project_id}`}
-                            className="group flex items-center gap-2.5 px-3 py-2 bg-bg-secondary hover:bg-bg-elevated transition-colors">
-                            <span className="text-[10px] font-bold tabular-nums text-gold shrink-0 w-8">{proj.year ?? "—"}</span>
-                            <p className="text-xs font-medium text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</p>
-                            {credit.role && <span className="text-[10px] text-text-muted shrink-0 hidden sm:inline">{credit.role}</span>}
+                            className="group flex gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:bg-bg-elevated transition-colors">
+                            <div className="w-10 h-10 rounded-lg bg-bg-elevated border border-border flex items-center justify-center shrink-0 mt-0.5">
+                              <Clapperboard size={16} className="text-text-muted group-hover:text-gold transition-colors" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between gap-2 mb-1">
+                                <h3 className="font-semibold text-sm text-text-primary group-hover:text-gold transition-colors leading-snug">{proj.title}</h3>
+                                {proj.year && <span className="text-gold font-semibold text-xs shrink-0">{proj.year}</span>}
+                              </div>
+                              {credit.role && (
+                                <span className="px-2 py-0.5 bg-bg-elevated border border-border text-text-muted text-[10px] rounded font-medium">{credit.role}</span>
+                              )}
+                            </div>
+                            <ChevronRight size={14} className="text-text-muted group-hover:text-gold transition-colors shrink-0 self-center" />
                           </Link>
                         );
                       })}
@@ -1134,7 +1152,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
         {filmRows.length > 0 && (
           <div className="mb-12">
             <SectionLabel>Filmografie</SectionLabel>
-            <div className="border border-border rounded-lg overflow-hidden bg-bg-secondary">
+            <div className="space-y-2">
               {filmRows.map((film, i) => {
                 const isOpen = expandedFilm === i;
                 const hasDetails = !!(film.director || film.festival || film.type || film.production);
