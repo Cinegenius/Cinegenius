@@ -26,7 +26,7 @@ const CATEGORIES = [
     desc: "TV-Spots, Commercials, Online-Ads",
     href: "/projects/werbung",
     icon: Tv,
-    image: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1557858310-9052820906f7?w=800&q=80",
     accent: "#c8f135",
   },
   {
