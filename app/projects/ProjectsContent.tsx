@@ -9,14 +9,14 @@ import {
 } from "lucide-react";
 
 const CATEGORY_CHIPS = [
-  { label: "Film & Serie",    href: "/projects/film",          icon: Film },
-  { label: "Werbung",         href: "/projects/werbung",       icon: Tv },
-  { label: "Foto & Shooting", href: "/projects/foto",          icon: Camera },
-  { label: "Social Media",    href: "/projects/social-media",  icon: Zap },
-  { label: "Musikvideo",      href: "/projects/musikvideo",    icon: Music },
-  { label: "Dokumentation",   href: "/projects/dokumentation", icon: FileVideo },
-  { label: "Corporate",       href: "/projects/corporate",     icon: Building2 },
-  { label: "Event & Live",    href: "/projects/event",         icon: Radio },
+  { label: "Film & Serie",    keywords: ["spielfilm", "kurzfilm", "serie", "film"],                                               icon: Film },
+  { label: "Werbung",         keywords: ["werbefilm", "werbung", "commercial", "spot", "imagefilm"],                              icon: Tv },
+  { label: "Foto & Shooting", keywords: ["foto", "shooting", "fotografie", "editorial", "portrait", "kampagne"],                 icon: Camera },
+  { label: "Social Media",    keywords: ["social", "tiktok", "instagram", "reel", "youtube", "content", "podcast", "influencer"],icon: Zap },
+  { label: "Musikvideo",      keywords: ["musikvideo", "musik", "konzert", "band", "artist"],                                    icon: Music },
+  { label: "Dokumentation",   keywords: ["dokumentation", "dokumentar", "reportage", "doku"],                                    icon: FileVideo },
+  { label: "Corporate",       keywords: ["corporate", "business", "imagevideo", "erklärvideo", "employer", "unternehmen"],       icon: Building2 },
+  { label: "Event & Live",    keywords: ["event", "live", "festival", "sport", "konferenz", "messe"],                            icon: Radio },
 ];
 
 type Project = {
@@ -121,6 +121,7 @@ function FilterDropdown({
 // ─── Main ─────────────────────────────────────────────────────────
 export default function ProjectsContent({ projects: allProjects }: { projects: Project[] }) {
   const [query, setQuery] = useState("");
+  const [categoryChip, setCategoryChip] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState("");
   const [yearFilter, setYearFilter] = useState("");
   const [directorFilter, setDirectorFilter] = useState("");
@@ -145,6 +146,14 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
 
   const filtered = useMemo(() => {
     let list = allProjects;
+    if (categoryChip) {
+      const chip = CATEGORY_CHIPS.find((c) => c.label === categoryChip);
+      if (chip) {
+        list = list.filter((p) =>
+          chip.keywords.some((kw) => (p.type ?? "").toLowerCase().includes(kw))
+        );
+      }
+    }
     if (query.trim()) {
       const q = query.toLowerCase();
       list = list.filter((p) => p.title.toLowerCase().includes(q) || (p.director ?? "").toLowerCase().includes(q));
@@ -162,8 +171,8 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
     return list;
   }, [allProjects, query, typeFilter, yearFilter, directorFilter, sort]);
 
-  const clearAll = () => { setQuery(""); setTypeFilter(""); setYearFilter(""); setDirectorFilter(""); };
-  const hasAnyFilter = Boolean(query || typeFilter || yearFilter || directorFilter);
+  const clearAll = () => { setQuery(""); setCategoryChip(null); setTypeFilter(""); setYearFilter(""); setDirectorFilter(""); };
+  const hasAnyFilter = Boolean(query || categoryChip || typeFilter || yearFilter || directorFilter);
 
   return (
     <div className="min-h-screen bg-bg-primary">
@@ -171,16 +180,23 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
       {/* ── Category Chips ───────────────────────────────── */}
       <div className="bg-bg-secondary border-b border-border px-4 py-3">
         <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
-          {CATEGORY_CHIPS.map(({ label, href, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gold/30 bg-gold/10 text-gold hover:bg-gold/20 hover:border-gold/60 transition-all text-xs font-semibold whitespace-nowrap"
-            >
-              <Icon size={11} />
-              {label}
-            </Link>
-          ))}
+          {CATEGORY_CHIPS.map(({ label, icon: Icon }) => {
+            const active = categoryChip === label;
+            return (
+              <button
+                key={label}
+                onClick={() => setCategoryChip(active ? null : label)}
+                className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all text-xs font-semibold whitespace-nowrap ${
+                  active
+                    ? "bg-gold border-gold text-bg-primary shadow-sm"
+                    : "border-gold/30 bg-gold/10 text-gold hover:bg-gold/20 hover:border-gold/60"
+                }`}
+              >
+                <Icon size={11} />
+                {label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
