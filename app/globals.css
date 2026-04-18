@@ -216,13 +216,13 @@ input, select, textarea { color: inherit; }
 
 /* Dark mode hero */
 .hero-bg {
-  background-image: url('https://images.unsplash.com/photo-1485846234645-a62644f84728?w=1920&q=90');
-  background-position: center 50%;
+  background-image: url('/hero-bg.jpg');
+  background-position: center 30%;
 }
-/* Light mode: bright daylight film set */
+/* Light mode: same image, lighter overlay handles the rest */
 [data-theme="light"] .hero-bg {
-  background-image: url('https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=1920&q=90');
-  background-position: center 40%;
+  background-image: url('/hero-bg.jpg');
+  background-position: center 30%;
 }
 
 /* Overlays */
