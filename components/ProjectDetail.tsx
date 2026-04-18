@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import {
   ArrowLeft, Clapperboard, Calendar, Users, Upload,
@@ -9,10 +9,11 @@ import {
   UserRound, Megaphone, BookOpen, Briefcase, Video,
   Lightbulb, Wrench, Mic, Monitor, Shirt, Palette,
   Zap, Music2, Camera, Truck, Globe, Tv, Send, Star,
-  Play, MapPin,
+  Play, MapPin, ChevronDown, Search,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Lightbox from "@/components/Lightbox";
+import RoleDropdown from "@/components/RoleDropdown";
 
 type Credit = {
   id: string;
@@ -206,6 +207,7 @@ type Tab = "stab" | "fotos" | "uebersicht" | "timeline" | "festivals" | "distrib
 const EMPTY_FESTIVAL_FORM = { festival_name: "", year: String(new Date().getFullYear()), section: "", status: "offiziell", award_name: "", notes: "" };
 const EMPTY_STREAMING_FORM = { platform: "Netflix", date: "", url: "", territory: "" };
 const EMPTY_TV_FORM        = { channel: "", date: "", territory: "", notes: "" };
+
 
 export default function ProjectDetail({
   project: initialProject,
@@ -584,10 +586,7 @@ export default function ProjectDetail({
             <div className="grid sm:grid-cols-3 gap-3">
               <div>{label("Tätigkeit / Rolle *")}
                 {userPositions.length > 0 ? (
-                  <select value={joinRole} onChange={(e) => setJoinRole(e.target.value)} autoFocus className={inp + " cursor-pointer"}>
-                    <option value="">Rolle wählen…</option>
-                    {userPositions.map((p) => <option key={p} value={p}>{p}</option>)}
-                  </select>
+                  <RoleDropdown value={joinRole} onChange={setJoinRole} options={userPositions} />
                 ) : (
                   <input type="text" value={joinRole} onChange={(e) => setJoinRole(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleJoin()} placeholder="z.B. Hauptdarsteller, Gaffer..." className={inp} autoFocus />
                 )}

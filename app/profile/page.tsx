@@ -16,6 +16,7 @@ import { useToast } from "@/contexts/ToastContext";
 import ProfileGuard from "@/components/ProfileGuard";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 import { departments, deptColors } from "@/lib/departments";
+import RoleDropdown from "@/components/RoleDropdown";
 import {
   PROFILE_CATEGORY_MAP,
   type ProfileImage,
@@ -1465,15 +1466,7 @@ export default function ProfilePage() {
                                 </div>
                                 {joiningProjectId === proj.id ? (
                                   <div className="flex items-center gap-2">
-                                    <select
-                                      value={joinRole}
-                                      onChange={(e) => setJoinRole(e.target.value)}
-                                      autoFocus
-                                      className="bg-bg-elevated border border-border rounded px-2 py-1 text-xs focus:outline-none focus:border-gold w-40 text-text-primary"
-                                    >
-                                      <option value="">Rolle wählen…</option>
-                                      {positions.map((p) => <option key={p} value={p}>{p}</option>)}
-                                    </select>
+                                    <RoleDropdown value={joinRole} onChange={setJoinRole} options={positions} className="w-48" />
                                     <button
                                       type="button"
                                       onClick={() => joinProject(proj.id)}
@@ -1554,12 +1547,7 @@ export default function ProfilePage() {
                         </div>
                         <div>
                           <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Meine Rolle *</label>
-                          <select value={newProject.myRole}
-                            onChange={(e) => setNewProject((p) => ({ ...p, myRole: e.target.value }))}
-                            className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold text-text-primary">
-                            <option value="">Rolle wählen…</option>
-                            {positions.map((pos) => <option key={pos} value={pos}>{pos}</option>)}
-                          </select>
+                          <RoleDropdown value={newProject.myRole} onChange={(v) => setNewProject((p) => ({ ...p, myRole: v }))} options={positions} />
                         </div>
                         <div className="col-span-2">
                           <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Kurzbeschreibung</label>
