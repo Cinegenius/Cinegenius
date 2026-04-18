@@ -87,9 +87,7 @@ export default async function ProjectPage({
   }
 
   // If user has positions, show them first, then remaining roles; otherwise full list
-  const roleOptions = userPositions.length > 0
-    ? [...userPositions, ...ALL_CREW_ROLES.filter((r) => !userPositions.includes(r))]
-    : ALL_CREW_ROLES;
+  const roleOptions = [...new Set([...userPositions, ...ALL_CREW_ROLES])];
 
   return (
     <ProjectDetail
