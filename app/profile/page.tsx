@@ -1979,52 +1979,77 @@ export default function ProfilePage() {
             )}
 
             {/* ── INSERATE ── */}
-            {activeTab === "inserate" && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="font-semibold text-text-primary">Meine Inserate</h2>
-                  <Link href="/inserat"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">
-                    <Plus size={12} /> Inserat erstellen
-                  </Link>
-                </div>
-                {myListingsLoading ? (
-                  <div className="flex justify-center py-12"><Loader2 size={20} className="animate-spin text-text-muted" /></div>
-                ) : myListings.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-16 border border-dashed border-border rounded-xl text-center">
-                    <Film size={32} className="text-text-muted mb-3" />
-                    <p className="text-text-muted text-sm mb-4">Noch keine Inserate erstellt</p>
+            {activeTab === "inserate" && (() => {
+              const TYPE_META: Record<string, { label: string; href: string; color: string }> = {
+                job:      { label: "Jobs & Stellenangebote", href: "/jobs",      color: "text-gold" },
+                prop:     { label: "Marktplatz",             href: "/props",     color: "text-violet-400" },
+                location: { label: "Locations",              href: "/locations", color: "text-emerald-400" },
+                vehicle:  { label: "Fahrzeuge",              href: "/vehicles",  color: "text-sky-400" },
+                creator:  { label: "Creator / Talent",       href: "/creators",  color: "text-rose-400" },
+              };
+              const grouped = myListings.reduce<Record<string, MyListing[]>>((acc, l) => {
+                (acc[l.type] = acc[l.type] ?? []).push(l);
+                return acc;
+              }, {});
+
+              return (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-semibold text-text-primary">Meine Inserate</h2>
                     <Link href="/inserat"
-                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors">
-                      <Plus size={14} /> Erstes Inserat erstellen
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">
+                      <Plus size={12} /> Inserat erstellen
                     </Link>
                   </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {myListings.map((l) => (
-                      <div key={l.id}
-                        className="flex items-center gap-3 p-3 bg-bg-secondary border border-border rounded-xl">
-                        <div className="w-14 h-14 rounded-lg bg-bg-elevated border border-border overflow-hidden shrink-0">
-                          {l.image_url
-                            ? <img src={l.image_url} alt={l.title} className="w-full h-full object-cover" />
-                            : <div className="w-full h-full flex items-center justify-center"><Film size={18} className="text-text-muted" /></div>
-                          }
+
+                  {myListingsLoading ? (
+                    <div className="flex justify-center py-12"><Loader2 size={20} className="animate-spin text-text-muted" /></div>
+                  ) : myListings.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-16 border border-dashed border-border rounded-xl text-center">
+                      <Film size={32} className="text-text-muted mb-3" />
+                      <p className="text-text-muted text-sm mb-4">Noch keine Inserate erstellt</p>
+                      <Link href="/inserat"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors">
+                        <Plus size={14} /> Erstes Inserat erstellen
+                      </Link>
+                    </div>
+                  ) : (
+                    Object.entries(grouped).map(([type, items]) => {
+                      const meta = TYPE_META[type] ?? { label: type, href: "/inserat", color: "text-text-muted" };
+                      return (
+                        <div key={type}>
+                          <div className="flex items-center justify-between mb-2">
+                            <p className={`text-xs font-bold uppercase tracking-widest ${meta.color}`}>{meta.label}</p>
+                            <span className="text-xs text-text-muted">{items.length} Inserat{items.length !== 1 ? "e" : ""}</span>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {items.map((l) => (
+                              <div key={l.id} className="flex items-center gap-3 p-3 bg-bg-secondary border border-border rounded-xl hover:border-gold/30 transition-colors">
+                                <div className="w-12 h-12 rounded-lg bg-bg-elevated border border-border overflow-hidden shrink-0">
+                                  {l.image_url
+                                    ? <img src={l.image_url} alt={l.title} className="w-full h-full object-cover" />
+                                    : <div className="w-full h-full flex items-center justify-center"><Film size={15} className="text-text-muted" /></div>
+                                  }
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-sm font-semibold text-text-primary truncate">{l.title}</p>
+                                  <p className="text-xs text-text-muted mt-0.5 truncate">
+                                    {[l.category, l.city].filter(Boolean).join(" · ")}
+                                  </p>
+                                  {l.price != null && l.price > 0 && (
+                                    <p className="text-xs text-gold font-semibold mt-0.5">{l.price.toLocaleString("de-DE")} €<span className="text-text-muted font-normal"> / Tag</span></p>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-semibold text-text-primary truncate">{l.title}</p>
-                          <p className="text-xs text-text-muted mt-0.5">
-                            {[l.category ?? l.type, l.city].filter(Boolean).join(" · ")}
-                          </p>
-                          {l.price != null && l.price > 0 && (
-                            <p className="text-xs text-gold font-semibold mt-0.5">{l.price.toLocaleString("de-DE")} €</p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+                      );
+                    })
+                  )}
+                </div>
+              );
+            })()}
 
             {/* ── VERIFIZIERUNG ── */}
             {activeTab === "verification" && <VerificationTab />}
