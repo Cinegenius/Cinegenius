@@ -75,6 +75,12 @@ export async function POST(req: Request) {
     }
   }
 
+  // rental_type column doesn't exist — store it inside metadata
+  const mergedMetadata = {
+    ...(metadata ?? {}),
+    ...(rental_type !== undefined && { rental_type }),
+  };
+
   const { data, error } = await supabaseAdmin
     .from("listings")
     .insert({
@@ -88,8 +94,7 @@ export async function POST(req: Request) {
       image_url: image_url ?? null,
       company_id: company_id ?? null,
       published: true,
-      ...(rental_type !== undefined && { rental_type }),
-      ...(metadata !== undefined && { metadata }),
+      metadata: mergedMetadata,
       ...(blocked_dates !== undefined && { blocked_dates }),
       ...(floor_plan_url !== undefined && { floor_plan_url }),
       ...(extra_images !== undefined && { extra_images }),
