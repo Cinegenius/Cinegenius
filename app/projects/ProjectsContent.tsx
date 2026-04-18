@@ -177,28 +177,6 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
   return (
     <div className="min-h-screen bg-bg-primary">
 
-      {/* ── Category Chips ───────────────────────────────── */}
-      <div className="bg-bg-secondary border-b border-border px-4 py-3">
-        <div className="flex items-center gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
-          {CATEGORY_CHIPS.map(({ label, icon: Icon }) => {
-            const active = categoryChip === label;
-            return (
-              <button
-                key={label}
-                onClick={() => setCategoryChip(active ? null : label)}
-                className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all text-xs font-semibold whitespace-nowrap ${
-                  active
-                    ? "bg-gold border-gold text-bg-primary shadow-sm"
-                    : "border-gold/30 bg-gold/10 text-gold hover:bg-gold/20 hover:border-gold/60"
-                }`}
-              >
-                <Icon size={11} />
-                {label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
 
       {/* ── Filter Bar ───────────────────────────────────── */}
       <div className="bg-bg-secondary border-b border-border">
