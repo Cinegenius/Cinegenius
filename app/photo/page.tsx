@@ -72,7 +72,18 @@ export default async function PhotoPage() {
   }
 
   return (
-    <>
+    <div
+      className="relative min-h-screen"
+      style={{
+        backgroundImage: `url('https://plus.unsplash.com/premium_photo-1698371217616-69581e44570d?q=80&w=1740&auto=format&fit=crop')`,
+        backgroundSize: "cover",
+        backgroundPosition: "center top",
+        backgroundAttachment: "fixed",
+      }}
+    >
+      <div className="absolute inset-0 bg-black/72 pointer-events-none" />
+      <div className="relative z-10">
+
       {/* Hero */}
       <section className="pt-28 pb-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold/20 bg-gold/5 text-gold text-xs font-semibold mb-6">
@@ -143,6 +154,7 @@ export default async function PhotoPage() {
           </Link>
         </section>
       )}
-    </>
+      </div>
+    </div>
   );
 }
