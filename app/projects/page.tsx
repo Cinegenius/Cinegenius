@@ -42,7 +42,7 @@ const CATEGORIES = [
     desc: "TikTok, Instagram Reels, YouTube",
     href: "/projects/social-media",
     icon: Zap,
-    image: "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1611605698335-8b1569810432?w=800&q=80",
     accent: "#c8f135",
   },
   {
