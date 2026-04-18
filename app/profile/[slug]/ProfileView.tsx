@@ -1098,29 +1098,16 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
               <div className="space-y-5">
                 {Object.entries(grouped).map(([type, group]) => (
                   <div key={type}>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-lime mb-2">{type}</p>
-                    <div className="space-y-2">
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-lime mb-1.5">{type}</p>
+                    <div className="border border-border rounded-lg overflow-hidden bg-bg-secondary">
                       {group.map((credit) => {
                         const proj = credit.projects!;
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        const meta = (proj as any).metadata ?? {};
                         return (
                           <Link key={credit.id} href={`/projects/${credit.project_id}`}
-                            className="group flex items-center gap-4 p-3 bg-bg-secondary border border-border rounded-xl hover:border-gold/40 transition-colors">
-                            <span className="text-xs font-bold tabular-nums text-gold bg-gold/10 border border-gold/20 rounded-lg px-2 py-1 shrink-0 w-14 text-center">
-                              {proj.year ?? "—"}
-                            </span>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold text-text-primary truncate group-hover:text-gold transition-colors">
-                                {proj.title}
-                              </p>
-                              {credit.role && <p className="text-xs text-text-muted mt-0.5">{credit.role}</p>}
-                            </div>
-                            {meta.genre && (
-                              <span className="text-[10px] px-2 py-0.5 bg-bg-elevated border border-border text-text-secondary rounded-full shrink-0">
-                                {meta.genre}
-                              </span>
-                            )}
+                            className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
+                            <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{proj.year ?? "—"}</span>
+                            <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</span>
+                            {credit.role && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[30%]">{credit.role}</span>}
                           </Link>
                         );
                       })}
@@ -1142,42 +1129,35 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 const hasDetails = !!(film.director || film.festival || film.type || film.production);
                 return (
                   <div key={`film-${i}`} className="border-b border-border last:border-b-0">
-                    <div className="flex items-center gap-4 p-3 group">
-                      <span className="text-xs font-bold tabular-nums text-gold bg-gold/10 border border-gold/20 rounded-lg px-2 py-1 shrink-0 w-14 text-center">
-                        {film.year || "—"}
-                      </span>
+                    <div className="flex items-center gap-3 px-3 py-1.5 hover:bg-bg-elevated transition-colors">
+                      <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{film.year || "—"}</span>
                       <div className="flex-1 min-w-0">
                         {film.imdb_url ? (
                           <a href={film.imdb_url} target="_blank" rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-sm font-semibold text-text-primary hover:text-gold transition-colors">
-                            {film.title} <ExternalLink size={10} className="shrink-0 text-text-muted" />
+                            className="text-xs text-text-primary hover:text-gold transition-colors inline-flex items-center gap-1">
+                            {film.title} <ExternalLink size={9} className="text-text-muted shrink-0" />
                           </a>
                         ) : (
-                          <span className="text-sm font-semibold text-text-primary">{film.title}</span>
+                          <span className="text-xs text-text-primary">{film.title}</span>
                         )}
-                        {film.role && <p className="text-xs text-text-muted mt-0.5">{film.role}</p>}
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {film.festival && (
-                          <span className="text-[10px] px-2 py-0.5 bg-gold/10 border border-gold/20 text-gold rounded-full font-medium">★ {film.festival}</span>
-                        )}
-                        {film.type && !film.festival && (
-                          <span className="text-[10px] px-2 py-0.5 bg-lime/10 border border-lime/25 text-lime rounded-full font-medium">{film.type}</span>
-                        )}
+                      <div className="flex items-center gap-2 shrink-0">
+                        {film.role && <span className="text-[10px] text-text-muted truncate max-w-[120px]">{film.role}</span>}
+                        {film.festival && <span className="text-[10px] text-gold">★</span>}
                         {hasDetails && (
                           <button type="button" onClick={() => setExpandedFilm(isOpen ? null : i)}
-                            className="p-1 text-text-muted hover:text-text-primary transition-colors">
-                            <ChevronDown size={13} className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+                            className="text-text-muted hover:text-text-primary transition-colors">
+                            <ChevronDown size={11} className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
                           </button>
                         )}
                       </div>
                     </div>
                     {isOpen && hasDetails && (
-                      <div className="px-3 pb-3 pl-[4.5rem] flex flex-wrap gap-x-6 gap-y-1 border-t border-border pt-2">
-                        {film.type && <span className="text-xs text-text-muted">Typ: <span className="text-text-secondary">{film.type}</span></span>}
-                        {film.director && <span className="text-xs text-text-muted">Regie: <span className="text-text-secondary">{film.director}</span></span>}
-                        {film.production && <span className="text-xs text-text-muted">Produktion: <span className="text-text-secondary">{film.production}</span></span>}
-                        {film.festival && <span className="text-xs text-text-muted">Festival: <span className="text-gold">{film.festival}</span></span>}
+                      <div className="px-3 pb-1.5 pl-14 flex flex-wrap gap-x-4 gap-y-0.5 text-[10px] text-text-muted border-t border-border pt-1">
+                        {film.type && <span>Typ: <span className="text-text-secondary">{film.type}</span></span>}
+                        {film.director && <span>Regie: <span className="text-text-secondary">{film.director}</span></span>}
+                        {film.production && <span>Prod.: <span className="text-text-secondary">{film.production}</span></span>}
+                        {film.festival && <span className="text-gold">★ {film.festival}</span>}
                       </div>
                     )}
                   </div>

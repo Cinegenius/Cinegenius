@@ -1374,69 +1374,57 @@ export default function ProfilePage() {
 
                   {/* Manuelle Filmografie-Einträge (mit Link-Feld) */}
                   {filmography.length > 0 && (
-                    <div className="space-y-2 mb-5">
-                      <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold">Manuell eingetragen</p>
-                      {filmography.map((film, idx) => (
-                        <div key={idx} className="p-3 bg-bg-elevated border border-border rounded-lg space-y-2">
-                          <div className="flex items-start gap-2">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-text-primary truncate">{film.title}</p>
-                              <p className="text-xs text-text-muted">{film.year}{film.role ? ` · ${film.role}` : ""}</p>
+                    <div className="mb-5">
+                      <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-1.5">Manuell eingetragen</p>
+                      <div className="border border-border rounded-lg overflow-hidden bg-bg-elevated">
+                        {filmography.map((film, idx) => (
+                          <div key={idx} className="border-b border-border last:border-b-0">
+                            <div className="flex items-center gap-3 px-3 py-1.5">
+                              <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{film.year || "—"}</span>
+                              <span className="text-xs text-text-primary truncate flex-1">{film.title}</span>
+                              {film.role && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[30%]">{film.role}</span>}
+                              <div className="flex items-center gap-1 shrink-0 ml-1">
+                                <div className="flex items-center gap-1 bg-bg-primary border border-border rounded px-1.5 focus-within:border-gold transition-colors">
+                                  <ExternalLink size={9} className="text-text-muted shrink-0" />
+                                  <input
+                                    type="url"
+                                    value={film.imdb_url ?? ""}
+                                    onChange={(e) => setFilmography((p) => p.map((f, i) => i === idx ? { ...f, imdb_url: e.target.value } : f))}
+                                    placeholder="Link…"
+                                    className="w-20 bg-transparent border-none py-1 text-[10px] focus:outline-none"
+                                  />
+                                </div>
+                                <button type="button"
+                                  onClick={() => setFilmography((p) => p.filter((_, i) => i !== idx))}
+                                  className="text-text-muted hover:text-crimson-light transition-colors">
+                                  <X size={12} />
+                                </button>
+                              </div>
                             </div>
-                            <button type="button"
-                              onClick={() => setFilmography((p) => p.filter((_, i) => i !== idx))}
-                              className="text-text-muted hover:text-crimson-light transition-colors shrink-0 mt-0.5">
-                              <X size={13} />
-                            </button>
                           </div>
-                          <div className="flex items-center gap-2 bg-bg-primary border border-border rounded px-2 focus-within:border-gold transition-colors">
-                            <ExternalLink size={11} className="text-text-muted shrink-0" />
-                            <input
-                              type="url"
-                              value={film.imdb_url ?? ""}
-                              onChange={(e) => setFilmography((p) => p.map((f, i) => i === idx ? { ...f, imdb_url: e.target.value } : f))}
-                              placeholder="Link (IMDb, Projektseite…)"
-                              className="flex-1 bg-transparent border-none py-1.5 text-xs focus:outline-none"
-                            />
-                          </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   )}
 
                   {/* Existing credits */}
                   {projectCredits.length > 0 && (
-                    <div className="space-y-2 mb-5">
-                      {projectCredits.map((credit) => (
-                        <div key={credit.id} className="flex items-center gap-3 p-3 bg-bg-elevated border border-border rounded-lg group">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              {credit.projects?.year && <span className="text-xs font-bold text-gold">{credit.projects.year}</span>}
-                              <span className="text-sm font-semibold text-text-primary truncate">{credit.projects?.title}</span>
-                              {credit.projects?.type && (
-                                <span className="px-1.5 py-0.5 bg-gold/10 border border-gold/20 text-[10px] text-gold rounded font-medium">{credit.projects.type}</span>
-                              )}
+                    <div className="mb-5">
+                      <div className="border border-border rounded-lg overflow-hidden bg-bg-elevated">
+                        {projectCredits.map((credit) => (
+                          <div key={credit.id} className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-secondary transition-colors">
+                            <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{credit.projects?.year ?? "—"}</span>
+                            <span className="text-xs text-text-primary truncate flex-1">{credit.projects?.title}</span>
+                            {credit.role && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[30%]">{credit.role}</span>}
+                            <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <a href={`/projects/${credit.project_id}`} className="text-[10px] text-text-muted hover:text-gold transition-colors" target="_blank" rel="noopener noreferrer">→</a>
+                              <button type="button" onClick={() => leaveProject(credit.project_id)} className="text-text-muted hover:text-crimson-light transition-colors">
+                                <X size={12} />
+                              </button>
                             </div>
-                            <p className="text-xs text-text-secondary mt-0.5">{credit.role}{credit.projects?.director ? ` · Regie: ${credit.projects.director}` : ""}</p>
                           </div>
-                          <div className="flex items-center gap-2 shrink-0">
-                            <a
-                              href={`/projects/${credit.project_id}`}
-                              className="text-[11px] text-text-muted hover:text-gold transition-colors"
-                              target="_blank" rel="noopener noreferrer"
-                            >
-                              Ansehen →
-                            </a>
-                            <button
-                              type="button"
-                              onClick={() => leaveProject(credit.project_id)}
-                              className="text-text-muted hover:text-crimson-light transition-colors opacity-0 group-hover:opacity-100"
-                            >
-                              <X size={13} />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   )}
 
