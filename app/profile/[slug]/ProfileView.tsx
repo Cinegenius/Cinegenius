@@ -519,51 +519,52 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
           </>
         )}
 
-        {/* ── PROJEKTE (cards) ─────────────────────────────────────────── */}
-        {projectCredits.filter(c => c.projects).length > 0 && (
-          <>
-            <Divider />
-            <SectionLabel>Projekte</SectionLabel>
-            <div className="space-y-2">
-              {projectCredits.filter(c => c.projects).map((credit) => {
-                const proj = credit.projects!;
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const meta = (proj as any).metadata ?? {};
-                return (
-                  <Link key={credit.id} href={`/projects/${credit.project_id}`}
-                    className="group flex items-center gap-4 p-3 bg-bg-secondary border border-border rounded-xl hover:border-gold/40 transition-colors">
-                    {/* Year pill */}
-                    <span className="text-xs font-bold tabular-nums text-gold bg-gold/10 border border-gold/20 rounded-lg px-2 py-1 shrink-0 w-14 text-center">
-                      {proj.year ?? "—"}
-                    </span>
-                    {/* Title + role */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-text-primary truncate group-hover:text-gold transition-colors">
-                        {proj.title}
-                      </p>
-                      {credit.role && (
-                        <p className="text-xs text-text-muted mt-0.5">{credit.role}</p>
-                      )}
+        {/* ── PROJEKTE — grouped by type ───────────────────────────────── */}
+        {projectCredits.filter(c => c.projects).length > 0 && (() => {
+          const credits = projectCredits.filter(c => c.projects);
+          const grouped = credits.reduce<Record<string, typeof credits>>((acc, c) => {
+            const key = c.projects!.type ?? "Sonstiges";
+            (acc[key] = acc[key] ?? []).push(c);
+            return acc;
+          }, {});
+          return (
+            <>
+              <Divider />
+              <SectionLabel>Projekte</SectionLabel>
+              <div className="space-y-5">
+                {Object.entries(grouped).map(([type, group]) => (
+                  <div key={type}>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-lime mb-2">{type}</p>
+                    <div className="space-y-2">
+                      {group.map((credit) => {
+                        const proj = credit.projects!;
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        const meta = (proj as any).metadata ?? {};
+                        return (
+                          <Link key={credit.id} href={`/projects/${credit.project_id}`}
+                            className="group flex items-center gap-4 p-3 bg-bg-secondary border border-border rounded-xl hover:border-gold/40 transition-colors">
+                            <span className="text-xs font-bold tabular-nums text-gold bg-gold/10 border border-gold/20 rounded-lg px-2 py-1 shrink-0 w-14 text-center">
+                              {proj.year ?? "—"}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-text-primary truncate group-hover:text-gold transition-colors">{proj.title}</p>
+                              {credit.role && <p className="text-xs text-text-muted mt-0.5">{credit.role}</p>}
+                            </div>
+                            {meta.genre && (
+                              <span className="text-[10px] px-2 py-0.5 bg-bg-elevated border border-border text-text-secondary rounded-full shrink-0 whitespace-nowrap">
+                                {meta.genre}
+                              </span>
+                            )}
+                          </Link>
+                        );
+                      })}
                     </div>
-                    {/* Badges */}
-                    <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end max-w-[40%]">
-                      {proj.type && (
-                        <span className="text-[10px] px-2 py-0.5 bg-lime/10 border border-lime/25 text-lime rounded-full font-medium whitespace-nowrap">
-                          {proj.type}
-                        </span>
-                      )}
-                      {meta.genre && (
-                        <span className="text-[10px] px-2 py-0.5 bg-bg-elevated border border-border text-text-secondary rounded-full whitespace-nowrap">
-                          {meta.genre}
-                        </span>
-                      )}
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </>
-        )}
+                  </div>
+                ))}
+              </div>
+            </>
+          );
+        })()}
 
         {/* ── SKILLS ────────────────────────────────────────────────────── */}
         {skills.length > 0 && (
@@ -1042,35 +1043,53 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           </div>
         </div>
 
-        {/* Projekte (list) */}
-        {projectCredits.filter(c => c.projects).length > 0 && (
-          <div className="mb-12">
-            <SectionLabel>Projekte</SectionLabel>
-            <div className="divide-y divide-border">
-              {projectCredits.filter(c => c.projects).map((credit) => {
-                const proj = credit.projects!;
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const meta = (proj as any).metadata ?? {};
-                return (
-                  <div key={credit.id} className="flex items-center gap-4 py-3">
-                    <span className="text-xs font-bold tabular-nums text-text-muted w-10 shrink-0">{proj.year}</span>
-                    <div className="flex-1 min-w-0">
-                      <Link href={`/projects/${credit.project_id}`}
-                        className="inline-flex items-center gap-1 text-sm font-medium text-text-primary hover:text-gold transition-colors">
-                        {proj.title} <ExternalLink size={10} className="shrink-0 text-text-muted" />
-                      </Link>
-                      {credit.role && <p className="text-xs text-text-muted">{credit.role}</p>}
-                    </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      {proj.type && <span className="text-[10px] px-1.5 py-0.5 bg-bg-elevated border border-border text-text-muted rounded">{proj.type}</span>}
-                      {meta.genre && <span className="text-[10px] px-1.5 py-0.5 bg-bg-elevated border border-border text-text-muted rounded">{meta.genre}</span>}
+        {/* Projekte — grouped by type */}
+        {projectCredits.filter(c => c.projects).length > 0 && (() => {
+          const credits = projectCredits.filter(c => c.projects);
+          const grouped = credits.reduce<Record<string, typeof credits>>((acc, c) => {
+            const key = c.projects!.type ?? "Sonstiges";
+            (acc[key] = acc[key] ?? []).push(c);
+            return acc;
+          }, {});
+          return (
+            <div className="mb-12">
+              <SectionLabel>Projekte</SectionLabel>
+              <div className="space-y-5">
+                {Object.entries(grouped).map(([type, group]) => (
+                  <div key={type}>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-lime mb-2">{type}</p>
+                    <div className="space-y-2">
+                      {group.map((credit) => {
+                        const proj = credit.projects!;
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        const meta = (proj as any).metadata ?? {};
+                        return (
+                          <Link key={credit.id} href={`/projects/${credit.project_id}`}
+                            className="group flex items-center gap-4 p-3 bg-bg-secondary border border-border rounded-xl hover:border-gold/40 transition-colors">
+                            <span className="text-xs font-bold tabular-nums text-gold bg-gold/10 border border-gold/20 rounded-lg px-2 py-1 shrink-0 w-14 text-center">
+                              {proj.year ?? "—"}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-text-primary truncate group-hover:text-gold transition-colors">
+                                {proj.title}
+                              </p>
+                              {credit.role && <p className="text-xs text-text-muted mt-0.5">{credit.role}</p>}
+                            </div>
+                            {meta.genre && (
+                              <span className="text-[10px] px-2 py-0.5 bg-bg-elevated border border-border text-text-secondary rounded-full shrink-0">
+                                {meta.genre}
+                              </span>
+                            )}
+                          </Link>
+                        );
+                      })}
                     </div>
                   </div>
-                );
-              })}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Filmografie — manual entries only */}
         {filmRows.length > 0 && (
