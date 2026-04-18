@@ -140,6 +140,10 @@ export default function DashboardClient({ company }: { company: Company }) {
 
 function OverviewTab({ company, setTab }: { company: Company; setTab: (t: Tab) => void }) {
   const [stats, setStats] = useState({ services: 0, equipment: 0, members: 0 });
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   useEffect(() => {
     Promise.all([
@@ -236,6 +240,82 @@ function OverviewTab({ company, setTab }: { company: Company; setTab: (t: Tab) =
           <ExternalLink size={14} /> Öffentliches Profil
         </Link>
       </div>
+
+      {/* Danger zone */}
+      <div className="border border-red-500/20 rounded-xl p-4 bg-red-500/5">
+        <p className="text-sm font-semibold text-red-400 mb-1">Gefahrenzone</p>
+        <p className="text-xs text-text-muted mb-3">
+          Firma dauerhaft löschen — alle Services, Equipment und Teammitglieder werden entfernt. Diese Aktion kann nicht rückgängig gemacht werden.
+        </p>
+        <button
+          onClick={() => { setDeleteModal(true); setDeleteConfirm(""); setDeleteError(""); }}
+          className="flex items-center gap-2 px-3 py-2 border border-red-500/30 text-red-400 rounded-lg text-xs font-semibold hover:bg-red-500/10 transition-colors"
+        >
+          <Trash2 size={13} /> Firma löschen
+        </button>
+      </div>
+
+      {/* Delete confirmation modal */}
+      {deleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-bg-secondary border border-border rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-red-500/15 border border-red-500/25 flex items-center justify-center">
+                <Trash2 size={18} className="text-red-400" />
+              </div>
+              <div>
+                <h3 className="font-bold text-text-primary">Firma löschen?</h3>
+                <p className="text-xs text-text-muted">Nicht rückgängig zu machen</p>
+              </div>
+            </div>
+            <p className="text-sm text-text-muted mb-4">
+              Tippe <span className="font-bold text-text-primary">{company.name}</span> ein um zu bestätigen:
+            </p>
+            <input
+              type="text"
+              value={deleteConfirm}
+              onChange={(e) => setDeleteConfirm(e.target.value)}
+              placeholder={company.name}
+              className="w-full px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder-text-muted focus:outline-none focus:border-red-500/50 transition-colors mb-3"
+            />
+            {deleteError && (
+              <p className="text-xs text-red-400 mb-3">{deleteError}</p>
+            )}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setDeleteModal(false)}
+                className="flex-1 px-3 py-2.5 border border-border text-text-secondary rounded-xl text-sm hover:border-border-hover transition-colors"
+              >
+                Abbrechen
+              </button>
+              <button
+                disabled={deleteConfirm !== company.name || deleting}
+                onClick={async () => {
+                  setDeleting(true);
+                  setDeleteError("");
+                  try {
+                    const res = await fetch("/api/companies", {
+                      method: "DELETE",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ id: company.id }),
+                    });
+                    const json = await res.json();
+                    if (!res.ok) throw new Error(json.error ?? "Fehler beim Löschen");
+                    window.location.href = "/dashboard";
+                  } catch (err: unknown) {
+                    setDeleteError(err instanceof Error ? err.message : "Unbekannter Fehler");
+                    setDeleting(false);
+                  }
+                }}
+                className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                {deleting ? "Löschen …" : "Endgültig löschen"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -48,6 +48,35 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ data: data ?? [] });
 }
 
+// DELETE — delete own company
+export async function DELETE(req: NextRequest) {
+  const { userId } = await auth();
+  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+
+  const { id } = await req.json();
+  if (!id) return NextResponse.json({ error: "id fehlt" }, { status: 400 });
+
+  // Verify ownership
+  const { data: company } = await supabaseAdmin
+    .from("companies")
+    .select("id")
+    .eq("id", id)
+    .eq("owner_user_id", userId)
+    .single();
+
+  if (!company) return NextResponse.json({ error: "Firma nicht gefunden oder keine Berechtigung" }, { status: 403 });
+
+  // Delete related data first
+  await supabaseAdmin.from("company_members").delete().eq("company_id", id);
+  await supabaseAdmin.from("company_equipment").delete().eq("company_id", id);
+  await supabaseAdmin.from("company_services").delete().eq("company_id", id);
+
+  const { error } = await supabaseAdmin.from("companies").delete().eq("id", id);
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  return NextResponse.json({ success: true });
+}
+
 // POST — create or update company
 export async function POST(req: NextRequest) {
   const { userId } = await auth();
