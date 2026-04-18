@@ -57,17 +57,16 @@ export default async function SocialMediaPage() {
     }));
 
   return (
-    <div
-      className="relative min-h-screen"
-      style={{
-        backgroundImage: `url('https://images.unsplash.com/photo-1696251503133-d3ccd4aee3e5?q=80&w=2064&auto=format&fit=crop')`,
-        backgroundSize: "cover",
-        backgroundPosition: "center top",
-        backgroundAttachment: "fixed",
-      }}
-    >
-      {/* Dark overlay for readability */}
-      <div className="absolute inset-0 bg-black/70 pointer-events-none" />
+    <div className="relative min-h-screen">
+      <div
+        className="fixed inset-0 -z-10"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1696251503133-d3ccd4aee3e5?q=80&w=2064&auto=format&fit=crop')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center top",
+        }}
+      />
+      <div className="fixed inset-0 -z-10 bg-black/70" />
       <div className="relative z-10">
 
       {/* Hero */}

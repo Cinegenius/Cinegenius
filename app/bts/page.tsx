@@ -69,17 +69,16 @@ export default async function BTSPage() {
   }
 
   return (
-    <div
-      className="relative min-h-screen"
-      style={{
-        backgroundImage: `url('https://images.unsplash.com/photo-1490971774356-7fac993cc438?q=80&w=1740&auto=format&fit=crop')`,
-        backgroundSize: "cover",
-        backgroundPosition: "center top",
-        backgroundAttachment: "fixed",
-      }}
-    >
-      {/* Dark overlay for readability */}
-      <div className="absolute inset-0 bg-black/72 pointer-events-none" />
+    <div className="relative min-h-screen">
+      <div
+        className="fixed inset-0 -z-10"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1490971774356-7fac993cc438?q=80&w=1740&auto=format&fit=crop')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center top",
+        }}
+      />
+      <div className="fixed inset-0 -z-10 bg-black/72" />
       <div className="relative z-10">
 
       {/* Hero */}
