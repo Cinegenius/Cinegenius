@@ -576,7 +576,8 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
           const unmatched: typeof credits = [];
           for (const c of credits) {
             const role = c.role?.trim() ?? "";
-            const posIdx = positions.findIndex(p => p.toLowerCase() === role.toLowerCase());
+            const rl = role.toLowerCase();
+            const posIdx = positions.findIndex(p => { const pl = p.toLowerCase(); return pl === rl || pl.includes(rl) || rl.includes(pl); });
             if (posIdx !== -1) {
               const key = positions[posIdx]; // use canonical casing from positions
               (matched[key] = matched[key] ?? []).push(c);
@@ -1108,7 +1109,8 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           const unmatched: typeof credits = [];
           for (const c of credits) {
             const role = c.role?.trim() ?? "";
-            const posIdx = positions.findIndex(p => p.toLowerCase() === role.toLowerCase());
+            const rl = role.toLowerCase();
+            const posIdx = positions.findIndex(p => { const pl = p.toLowerCase(); return pl === rl || pl.includes(rl) || rl.includes(pl); });
             if (posIdx !== -1) {
               const key = positions[posIdx];
               (matched[key] = matched[key] ?? []).push(c);
