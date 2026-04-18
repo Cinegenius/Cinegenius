@@ -73,17 +73,15 @@ export default async function PhotoPage() {
 
   return (
     <div className="relative min-h-screen">
-      {/* Background image */}
-      <div
-        className="fixed inset-0 -z-10"
-        style={{
-          backgroundImage: `url('https://plus.unsplash.com/premium_photo-1698371217616-69581e44570d?q=80&w=1740&auto=format&fit=crop')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center top",
-        }}
+      <Image
+        src="https://plus.unsplash.com/premium_photo-1698371217616-69581e44570d?q=80&w=1740&auto=format&fit=crop"
+        alt=""
+        fill
+        priority
+        unoptimized
+        className="object-cover object-top"
       />
-      {/* Dark overlay */}
-      <div className="fixed inset-0 -z-10 bg-black/70" />
+      <div className="absolute inset-0 bg-black/70" />
       <div className="relative z-10">
 
       {/* Hero */}
