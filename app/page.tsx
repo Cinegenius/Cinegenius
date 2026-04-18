@@ -439,7 +439,7 @@ export default async function HomePage() {
           {/* Behind the Scenes */}
           <Link href="/bts" className="relative rounded-2xl overflow-hidden group block">
             <Image
-              src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=85"
+              src="https://plus.unsplash.com/premium_photo-1682001110037-50545d73acfa?w=800&q=85"
               alt="Behind the scenes"
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
