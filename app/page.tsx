@@ -405,7 +405,7 @@ export default async function HomePage() {
           {/* Social Media */}
           <Link href="/social-media" className="relative rounded-2xl overflow-hidden group block">
             <Image
-              src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&q=85"
+              src="https://images.unsplash.com/photo-1683721003111-070bcc053d8b?w=800&q=85"
               alt="Social Media Content"
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
