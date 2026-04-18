@@ -197,7 +197,7 @@ const projectTypes = [
   // Social
   "Instagram / Reels", "TikTok", "YouTube", "UGC Content", "Brand Content",
   // Foto
-  "Fashion Shooting", "Produkt-Shooting", "Event-Fotografie", "Portrait-Shooting", "Werbe-Fotografie",
+  "Fashion Shooting", "Produkt-Shooting", "Event-Fotografie", "Hochzeits-Fotografie", "Portrait-Shooting", "Werbe-Fotografie",
   "Sonstiges",
 ];
 const conditionOptions = ["Neuwertig", "Sehr gut", "Gut", "Akzeptabel"];

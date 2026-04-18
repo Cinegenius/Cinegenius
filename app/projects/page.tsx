@@ -71,7 +71,7 @@ const CATEGORIES = [
   },
   {
     label: "Event & Live",
-    desc: "Konzerte, Festivals, Konferenzen",
+    desc: "Konzerte, Festivals, Hochzeiten",
     href: "/projects/event",
     icon: Radio,
     image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80",

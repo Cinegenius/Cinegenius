@@ -441,7 +441,7 @@ export default function CompanySetupPage() {
               <div className="flex flex-wrap gap-2">
                 {[
                   "Film", "Werbung", "Serie", "Musikvideo", "Social Content",
-                  "Dokumentarfilm", "Event", "Theater", "Animation", "VFX / Post",
+                  "Dokumentarfilm", "Event", "Hochzeit", "Theater", "Animation", "VFX / Post",
                   "Fotografie", "Corporate Video",
                 ].map((focus) => {
                   const active = industryFocus.includes(focus);

@@ -16,10 +16,10 @@ export default function EventPage() {
       badge: "Event & Live",
       headline: "Event &",
       highlight: "Live Production",
-      description: "Konzerte, Festivals, Konferenzen, Sportevents — Live-Mitschnitte und Event-Dokumentationen.",
+      description: "Konzerte, Festivals, Hochzeiten, Sportevents — Live-Mitschnitte, Hochzeitsfilme und Event-Dokumentationen.",
       image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600&q=90",
       imagePosition: "center 40%",
-      typeKeywords: ["event", "live", "konzert", "festival", "sport", "konferenz", "messe"],
+      typeKeywords: ["event", "live", "konzert", "festival", "sport", "konferenz", "messe", "hochzeit", "wedding", "feier", "standesamt", "trauung"],
     }} />
   );
 }

@@ -25,6 +25,7 @@ export const COMPANY_CATEGORIES: CompanyCategory[] = [
   { id: "location-agentur",   label: "Location-Agentur",     color: "text-cyan-400",    bg: "bg-cyan-500/10 border-cyan-500/20",     examples: "Objekte, Außengelände, Studios" },
   { id: "vfx-studio",         label: "VFX-Studio",           color: "text-indigo-400",  bg: "bg-indigo-500/10 border-indigo-500/20", examples: "CGI, Compositing, Motion" },
   { id: "fotostudio",         label: "Fotostudio",           color: "text-lime-400",    bg: "bg-lime-500/10 border-lime-500/20",     examples: "Daylight, Zyklore, Sets" },
+  { id: "hochzeit",           label: "Hochzeit & Event",     color: "text-rose-300",    bg: "bg-rose-400/10 border-rose-400/20",     examples: "Hochzeitsfilm, Foto, Styling" },
   { id: "werbeagentur",       label: "Werbe-/Contentagentur",color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/20", examples: "TVC, Social, Brand Content" },
   { id: "fahrzeugverleih",    label: "Fahrzeugverleih",      color: "text-yellow-400",  bg: "bg-yellow-500/10 border-yellow-500/20", examples: "Bild-Fahrzeuge, Stunt, Oldtimer" },
 ];
