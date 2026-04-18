@@ -175,7 +175,7 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
             <Link
               key={href}
               href={href}
-              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-bg-elevated text-text-muted hover:border-gold/50 hover:text-gold hover:bg-gold/5 transition-all text-xs font-semibold whitespace-nowrap"
+              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gold/30 bg-gold/10 text-gold hover:bg-gold/20 hover:border-gold/60 transition-all text-xs font-semibold whitespace-nowrap"
             >
               <Icon size={11} />
               {label}
