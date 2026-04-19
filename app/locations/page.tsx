@@ -50,12 +50,14 @@ export default async function LocationsPage() {
     .select("*")
     .eq("published", true)
     .eq("type", "location")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(300);
 
   const { data: providerData } = await supabaseAdmin
     .from("profiles")
     .select("user_id, display_name, location, bio, avatar_url, profile_types")
-    .not("display_name", "is", null);
+    .not("display_name", "is", null)
+    .limit(200);
 
   const locationProviders = (providerData ?? [])
     .filter((p: { profile_types?: string[] | null }) =>

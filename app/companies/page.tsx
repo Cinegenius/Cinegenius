@@ -20,7 +20,8 @@ export default async function CompaniesPage() {
     .from("companies")
     .select("*")
     .eq("published", true)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(200);
 
   return (
     <>

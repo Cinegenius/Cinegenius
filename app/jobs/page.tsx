@@ -20,7 +20,8 @@ export default async function JobsPage() {
     .select("*")
     .eq("published", true)
     .eq("type", "job")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(200);
 
   const serverJobs = (data ?? []).map((l: {
     id: string; title: string; city: string;
