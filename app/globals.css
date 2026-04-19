@@ -224,15 +224,15 @@ input, select, textarea { color: inherit; }
   background-image: url('/hero-bg.jpg');
   background-position: center 30%;
 }
-/* Mobile: show full width of the landscape group photo */
+/* Mobile: cover fills the full hero, shift left to show more of the group */
 @media (max-width: 640px) {
   .hero-bg {
-    background-size: 100% auto;
-    background-position: center top;
+    background-size: cover;
+    background-position: 30% 20%;
   }
   [data-theme="light"] .hero-bg {
-    background-size: 100% auto;
-    background-position: center top;
+    background-size: cover;
+    background-position: 30% 20%;
   }
 }
 
