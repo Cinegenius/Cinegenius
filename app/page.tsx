@@ -275,76 +275,65 @@ export default async function HomePage() {
   return (
     <>
       {/* ── HERO ── */}
-      <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden pb-[180px] sm:pb-[270px]">
-        {/* Theme-aware background image (CSS class in globals.css) */}
+      <section className="relative min-h-[100svh] flex flex-col overflow-hidden">
+        {/* Background */}
         <div className="hero-bg absolute inset-0 bg-cover bg-no-repeat" />
 
-        {/* Dark mode overlay */}
-        <div className="hero-overlay-dark absolute inset-0 bg-gradient-to-b from-black/30 via-black/45 to-black/80" />
-        {/* Dark mode vignette */}
-        <div className="hero-overlay-dark absolute inset-0" style={{ background: "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.40) 100%)" }} />
-
-        {/* Light mode overlay — bright fade to page bg */}
-        <div className="hero-overlay-light absolute inset-0 bg-gradient-to-b from-white/15 via-white/35 to-[#D9D4CB]/95" />
-
-        {/* Always: strong top gradient so navbar text is readable over any image */}
-        <div className="absolute top-0 left-0 right-0 h-28 bg-gradient-to-b from-black/75 to-transparent" />
-
-        {/* Grain — dark mode only, animated */}
+        {/* ── Overlays ── */}
+        {/* Dark: top is heaviest (sky = text area), fades in middle, darkens at bottom for strips */}
+        <div className="hero-overlay-dark absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black/70" />
+        {/* Dark: subtle left-edge depth so content has a "stage" */}
+        <div className="hero-overlay-dark absolute inset-0" style={{ background: "linear-gradient(105deg, rgba(0,0,0,0.45) 0%, transparent 55%)" }} />
+        {/* Light mode */}
+        <div className="hero-overlay-light absolute inset-0 bg-gradient-to-b from-white/25 via-white/20 to-[#D9D4CB]/95" />
+        {/* Grain */}
         <div
-          className="grain hero-overlay-dark absolute inset-0 opacity-[0.12]"
+          className="grain hero-overlay-dark absolute inset-0 opacity-[0.09]"
           style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E\")" }}
         />
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-16 sm:pt-20">
-          <div className="hero-badge inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold uppercase tracking-widest mb-4 sm:mb-8 animate-fade-in">
-            <Zap size={12} /> Film · Foto · Content · Werbung
+        {/* ── Content block — sits in upper sky area ── */}
+        <div className="relative z-10 flex flex-col items-center text-center px-5 sm:px-8 pt-32 sm:pt-40 lg:pt-44">
+
+          {/* Badge */}
+          <div className="hero-badge inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-[10px] sm:text-xs font-semibold uppercase tracking-[0.18em] mb-6 sm:mb-8 animate-fade-in">
+            <Zap size={10} /> Film · Foto · Content · Werbung
           </div>
 
-          <h1 className="hero-title font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-4 sm:mb-6 animate-fade-up">
+          {/* Headline */}
+          <h1 className="hero-title font-display text-[2.75rem] sm:text-6xl lg:text-[5.5rem] font-bold leading-[1.05] tracking-tight mb-5 sm:mb-6 animate-fade-up">
             Create. Connect.<br />
             <span className="text-gradient-gold">Get Discovered.</span>
           </h1>
 
-          <p className="hero-sub text-base sm:text-xl max-w-2xl mx-auto mb-2 sm:mb-3 leading-relaxed animate-fade-up">
-            The platform for creatives — Photo, Film, Social Media &amp; Models. All in One Place.
+          {/* Subtext — narrow & punchy */}
+          <p className="hero-sub text-base sm:text-lg max-w-xs sm:max-w-md mx-auto mb-8 sm:mb-10 leading-relaxed animate-fade-up" style={{ opacity: 0.85 }}>
+            The platform for creatives — Photo, Film,<br className="hidden sm:block" /> Social Media &amp; Models. All in One Place.
           </p>
 
-          <p className="hero-sub text-sm sm:text-base max-w-xl mx-auto mb-6 sm:mb-10 leading-relaxed animate-fade-up opacity-70">
-            Jobs, Locations, Equipment &amp; mehr — alles für deine nächste Produktion an einem Ort.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center mb-6 sm:mb-12 animate-fade-up delay-200">
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row items-center gap-3 animate-fade-up delay-200">
             <Link
               href={ctaHref}
-              className="px-8 py-3 sm:py-3.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-gold text-bg-primary font-bold rounded-full hover:bg-gold-light active:scale-[0.98] transition-all text-sm tracking-wide shadow-lg shadow-gold/25"
             >
-              {isLoggedIn ? "Zum Dashboard" : "Jetzt starten"} <ArrowRight size={16} />
+              {isLoggedIn ? "Zum Dashboard" : "Jetzt starten"} <ArrowRight size={15} />
             </Link>
             <Link
               href="/inserat"
-              className="px-8 py-3 sm:py-3.5 border border-white/30 text-white font-semibold rounded-xl hover:border-white/60 hover:bg-white/5 transition-all flex items-center justify-center gap-2 text-sm sm:text-base"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold hover:bg-white/18 hover:border-white/35 active:scale-[0.98] transition-all text-sm tracking-wide"
             >
               Inserat erstellen
             </Link>
           </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-y-2 gap-x-4 sm:gap-y-4 sm:gap-x-6 animate-fade-up delay-300">
-            {liveStats.map((s, i) => (
-              <div key={s.label} className="flex items-center">
-                <div className="text-center px-2 sm:px-0 w-full sm:w-auto">
-                  <div className="hero-stat-val text-lg sm:text-2xl font-bold font-display">{s.value}</div>
-                  <div className="hero-stat-lbl text-[9px] sm:text-xs uppercase tracking-widest mt-0.5">{s.label}</div>
-                </div>
-                {i < liveStats.length - 1 && <span className="hero-stat-lbl opacity-20 text-lg hidden sm:inline ml-6">·</span>}
-              </div>
-            ))}
-          </div>
         </div>
 
-        {/* ── LIVE STRIPS — anchored to bottom of hero ── */}
+        {/* Spacer — people/action area of image is visible here */}
+        <div className="flex-1" />
+
+        {/* ── LIVE STRIPS — anchored to bottom ── */}
         {(posterStrip.length >= 1 || avatarStrip.length >= 1 || locationStrip.length >= 1) && (
-          <div className="absolute bottom-0 left-0 right-0 z-20" style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+          <div className="absolute bottom-0 left-0 right-0 z-20 flex flex-col">
             {posterStrip.length >= 1 && (
               <ImageStrip images={posterStrip} aspectRatio="wide" height={60} durationOverride={35} direction="left" overlay={false} stripId="top" />
             )}
@@ -357,6 +346,25 @@ export default async function HomePage() {
           </div>
         )}
       </section>
+
+      {/* ── STATS BAR — clean break below hero ── */}
+      <div className="border-y border-border bg-bg-secondary">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-5">
+          <div className="flex flex-wrap items-center justify-center gap-y-3 gap-x-0">
+            {liveStats.map((s, i) => (
+              <div key={s.label} className="flex items-center">
+                <div className="text-center px-5 sm:px-8">
+                  <div className="hero-stat-val text-xl sm:text-2xl font-bold font-display leading-none">{s.value}</div>
+                  <div className="hero-stat-lbl text-[9px] sm:text-[10px] uppercase tracking-widest mt-1 opacity-55">{s.label}</div>
+                </div>
+                {i < liveStats.length - 1 && (
+                  <span className="hero-stat-lbl opacity-15 text-xl hidden sm:inline">|</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* ── VISUAL SHOWCASE ── */}
       <section className="py-8 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
