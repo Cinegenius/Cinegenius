@@ -12,10 +12,7 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Fehler an Sentry melden
-    import("@sentry/nextjs").then(({ captureException }) => {
-      captureException(error);
-    });
+    console.error("[app error]", error);
   }, [error]);
 
   return (

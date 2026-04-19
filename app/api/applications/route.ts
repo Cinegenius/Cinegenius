@@ -18,7 +18,9 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
+import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { sendNewApplicationEmail } from "@/lib/email";
 
 // POST /api/applications — submit a job application
 export async function POST(req: NextRequest) {
@@ -109,6 +111,18 @@ export async function POST(req: NextRequest) {
       content: body,
     });
   }
+
+  // Email notification to job owner
+  try {
+    const [{ data: applicantProfile }, clerk] = await Promise.all([
+      supabaseAdmin.from("profiles").select("display_name").eq("user_id", userId).maybeSingle(),
+      clerkClient(),
+    ]);
+    const applicantName = applicantProfile?.display_name ?? "Jemand";
+    const ownerUser = await clerk.users.getUser(ownerId);
+    const ownerEmail = ownerUser.emailAddresses[0]?.emailAddress;
+    if (ownerEmail) await sendNewApplicationEmail(ownerEmail, applicantName, jobTitle);
+  } catch { /* email is best-effort */ }
 
   return NextResponse.json({ success: true });
 }

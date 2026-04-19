@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import {
   LayoutDashboard, DollarSign, Percent, Users, List, BarChart2,
-  TrendingUp, CheckCircle, Eye,
+  CheckCircle, Eye, Search,
   Save, Shield, Settings, ChevronRight, ArrowDownCircle,
   Plus, Minus, Wallet, ShieldCheck,
   Activity, Film, Package,
-  Briefcase, FileCheck,
+  Briefcase, BadgeCheck,
 } from "lucide-react";
 import {
   defaultTiers, CommissionTier, calculateCommission,
@@ -27,9 +27,7 @@ const navItems = [
 
 type RealListing = { id: string; type: string; title: string; city: string; price: number; published: boolean; created_at: string };
 type VerifRequest = { id: string; user_id: string; display_name: string | null; status: string; notes: string | null; submitted_at: string; reviewed_at: string | null };
-
-
-
+type AdminUser = { user_id: string; display_name: string | null; location: string | null; avatar_url: string | null; profile_types: string[] | null; verified: boolean; created_at: string; tagline: string | null };
 
 
 
@@ -44,6 +42,13 @@ export default function AdminPage() {
   const [verifRequests, setVerifRequests] = useState<VerifRequest[]>([]);
   const [verifLoading, setVerifLoading] = useState(false);
   const [verifActing, setVerifActing] = useState<string | null>(null);
+
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [usersTotal, setUsersTotal] = useState(0);
+  const [usersSearch, setUsersSearch] = useState("");
+  const [usersPage, setUsersPage] = useState(1);
+  const [verifyActing, setVerifyActing] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/listings")
@@ -63,6 +68,34 @@ export default function AdminPage() {
       .finally(() => setVerifLoading(false));
   }, [activeTab]);
 
+  useEffect(() => {
+    if (activeTab !== "users") return;
+    setUsersLoading(true);
+    const params = new URLSearchParams({ page: String(usersPage) });
+    if (usersSearch) params.set("search", usersSearch);
+    fetch(`/api/admin/users?${params}`)
+      .then((r) => r.json())
+      .then(({ users, total }) => { setAdminUsers(users ?? []); setUsersTotal(total ?? 0); })
+      .catch(() => {})
+      .finally(() => setUsersLoading(false));
+  }, [activeTab, usersPage, usersSearch]);
+
+  const handleToggleVerify = async (targetUserId: string, currentlyVerified: boolean) => {
+    setVerifyActing(targetUserId);
+    try {
+      await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetUserId, verified: !currentlyVerified }),
+      });
+      setAdminUsers((prev) =>
+        prev.map((u) => u.user_id === targetUserId ? { ...u, verified: !currentlyVerified } : u)
+      );
+    } finally {
+      setVerifyActing(null);
+    }
+  };
+
   const handleVerifAction = async (requestId: string, action: "approve" | "reject") => {
     setVerifActing(requestId);
     try {
@@ -76,6 +109,39 @@ export default function AdminPage() {
       );
     } finally {
       setVerifActing(null);
+    }
+  };
+
+  const [listingActing, setListingActing] = useState<string | null>(null);
+
+  const handleToggleListing = async (listingId: string, currentlyPublished: boolean) => {
+    setListingActing(listingId);
+    try {
+      await fetch("/api/admin/listings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listingId, published: !currentlyPublished }),
+      });
+      setListings((prev) =>
+        prev.map((l) => l.id === listingId ? { ...l, published: !currentlyPublished } : l)
+      );
+    } finally {
+      setListingActing(null);
+    }
+  };
+
+  const handleDeleteListing = async (listingId: string) => {
+    if (!confirm("Inserat wirklich löschen?")) return;
+    setListingActing(listingId);
+    try {
+      await fetch("/api/admin/listings", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listingId }),
+      });
+      setListings((prev) => prev.filter((l) => l.id !== listingId));
+    } finally {
+      setListingActing(null);
     }
   };
 
@@ -492,13 +558,100 @@ export default function AdminPage() {
 
           {/* ── BENUTZER ── */}
           {activeTab === "users" && (
-            <div className="text-center py-20 border border-dashed border-border rounded-2xl space-y-3">
-              <Users size={32} className="text-text-muted mx-auto opacity-30" />
-              <p className="font-semibold text-text-primary">Benutzerverwaltung</p>
-              <p className="text-sm text-text-muted max-w-sm mx-auto">
-                Die Benutzerliste wird über die Clerk-Dashboard-Integration bereitgestellt.
-                Nutzerdetails, Sperren und Rollenmanagement sind direkt im Clerk Admin verfügbar.
-              </p>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="relative flex-1 max-w-xs">
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
+                  <input
+                    type="text"
+                    placeholder="Name suchen…"
+                    value={usersSearch}
+                    onChange={(e) => { setUsersSearch(e.target.value); setUsersPage(1); }}
+                    className="w-full pl-9 pr-4 py-2 bg-bg-secondary border border-border rounded-xl text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors"
+                  />
+                </div>
+                <p className="text-sm text-text-muted">
+                  {usersLoading ? "Laden…" : <><span className="text-text-primary font-semibold">{usersTotal}</span> Nutzer</>}
+                </p>
+              </div>
+
+              {usersLoading && (
+                <div className="text-center py-16 text-xs text-text-muted">Laden…</div>
+              )}
+
+              {!usersLoading && adminUsers.length === 0 && (
+                <div className="text-center py-20 border border-dashed border-border rounded-2xl space-y-3">
+                  <Users size={32} className="text-text-muted mx-auto opacity-30" />
+                  <p className="font-semibold text-text-primary">Keine Nutzer gefunden</p>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                {adminUsers.map((u) => (
+                  <div key={u.user_id} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:bg-bg-elevated transition-colors">
+                    {u.avatar_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={u.avatar_url} alt={u.display_name ?? ""} className="w-9 h-9 rounded-full object-cover border border-border shrink-0" />
+                    ) : (
+                      <div className="w-9 h-9 rounded-full bg-bg-elevated border border-border flex items-center justify-center shrink-0">
+                        <Users size={14} className="text-text-muted" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium text-text-primary truncate">{u.display_name ?? "Kein Name"}</p>
+                        {u.verified && <BadgeCheck size={13} className="text-gold shrink-0" />}
+                      </div>
+                      <p className="text-xs text-text-muted truncate">
+                        {u.location ?? "—"}{u.profile_types?.length ? ` · ${u.profile_types[0]}` : ""}
+                        {" · "}seit {new Date(u.created_at).toLocaleDateString("de-DE", { month: "short", year: "numeric" })}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <a
+                        href={`/profile/${u.user_id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="px-2.5 py-1.5 text-xs border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-all flex items-center gap-1"
+                      >
+                        <Eye size={11} /> Profil
+                      </a>
+                      <button
+                        onClick={() => handleToggleVerify(u.user_id, u.verified)}
+                        disabled={verifyActing === u.user_id}
+                        className={`px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-all disabled:opacity-50 ${
+                          u.verified
+                            ? "border-gold/30 text-gold bg-gold/10 hover:bg-gold/5"
+                            : "border-border text-text-muted hover:border-gold hover:text-gold"
+                        }`}
+                      >
+                        {verifyActing === u.user_id ? "…" : u.verified ? "Verifiziert" : "Verifizieren"}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {usersTotal > 50 && (
+                <div className="flex items-center justify-between pt-2">
+                  <button
+                    onClick={() => setUsersPage((p) => Math.max(1, p - 1))}
+                    disabled={usersPage === 1}
+                    className="px-4 py-2 text-xs border border-border rounded-lg text-text-secondary hover:border-gold hover:text-gold disabled:opacity-40 transition-all"
+                  >
+                    Zurück
+                  </button>
+                  <p className="text-xs text-text-muted">Seite {usersPage} · {Math.ceil(usersTotal / 50)} gesamt</p>
+                  <button
+                    onClick={() => setUsersPage((p) => p + 1)}
+                    disabled={usersPage >= Math.ceil(usersTotal / 50)}
+                    className="px-4 py-2 text-xs border border-border rounded-lg text-text-secondary hover:border-gold hover:text-gold disabled:opacity-40 transition-all"
+                  >
+                    Weiter
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -535,10 +688,21 @@ export default function AdminPage() {
                         href={`/${l.type === "location" ? "locations" : l.type === "prop" ? "props" : l.type === "vehicle" ? "vehicles" : l.type === "job" ? "jobs" : "creators"}/${l.id}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="px-3 py-1.5 text-xs font-medium border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-all flex items-center gap-1"
+                        className="px-2.5 py-1.5 text-xs font-medium border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-all flex items-center gap-1"
                       >
-                        <Eye size={12} /> Ansehen
+                        <Eye size={11} /> Ansehen
                       </a>
+                      <button
+                        onClick={() => handleToggleListing(l.id, l.published)}
+                        disabled={listingActing === l.id}
+                        className={`px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-all disabled:opacity-50 ${
+                          l.published
+                            ? "border-border text-text-muted hover:border-crimson/40 hover:text-crimson-light"
+                            : "border-success/30 text-success bg-success/10 hover:bg-success/5"
+                        }`}
+                      >
+                        {listingActing === l.id ? "…" : l.published ? "Deaktivieren" : "Aktivieren"}
+                      </button>
                     </div>
                   </div>
                 ))}

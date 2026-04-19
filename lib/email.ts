@@ -95,6 +95,19 @@ export async function sendNewMessageEmail(to: string, fromName: string, preview:
   );
 }
 
+export async function sendNewApplicationEmail(to: string, applicantName: string, jobTitle: string) {
+  await send(
+    to,
+    `Neue Bewerbung für „${jobTitle}"`,
+    wrap(`
+      ${h1("Neue Bewerbung erhalten")}
+      ${p(`<strong style="color:#f0f0f0">${applicantName}</strong> hat sich auf dein Inserat beworben:`)}
+      <p style="margin:16px 0;padding:12px 16px;background:#1a1a1a;border:1px solid #222;border-radius:8px;font-size:14px;color:#d4a843;font-weight:600">${jobTitle}</p>
+      ${btn("Bewerbung ansehen", `${BASE}/dashboard?tab=messages`)}
+    `)
+  );
+}
+
 export async function sendNewBookingEmail(to: string, listingTitle: string, guestName: string) {
   await send(
     to,
