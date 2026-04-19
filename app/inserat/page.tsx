@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { compressImage } from "@/lib/compressImage";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import ProfileGuard from "@/components/ProfileGuard";
@@ -409,8 +410,9 @@ export default function InseratPage() {
     setUploading(true);
     setError("");
 
+    const compressed = await compressImage(file, { maxWidth: 1920, quality: 0.85 });
     const fd = new FormData();
-    fd.append("file", file);
+    fd.append("file", compressed);
     const res = await fetch("/api/upload", { method: "POST", body: fd });
     const json = await res.json();
     setUploading(false);

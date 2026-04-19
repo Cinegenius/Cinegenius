@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { compressAvatar } from "@/lib/compressImage";
 import { useUser } from "@clerk/nextjs";
 import {
   Loader2, Camera, CheckCircle,
@@ -186,8 +187,9 @@ export default function ProfileSetupPage() {
     setAvatarPreview(URL.createObjectURL(file));
     setUploading(true);
     try {
+      const compressed = await compressAvatar(file);
       const fd = new FormData();
-      fd.append("file", file);
+      fd.append("file", compressed);
       const res = await fetch("/api/upload/avatar", { method: "POST", body: fd });
       const { url } = await res.json();
       setAvatarUrl(url);

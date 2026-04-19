@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
+import { compressImage, compressAvatar } from "@/lib/compressImage";
 import {
   Camera, CheckCircle, User, Lock, Bell, CreditCard, MapPin, Film,
   Plus, X, Save, Wallet, Upload, ShieldCheck, Clock, AlertCircle, Loader2,
@@ -658,8 +659,9 @@ export default function ProfilePage() {
     setAvatarPreview(preview);
     setAvatarUploading(true);
     try {
+      const compressed = await compressAvatar(file);
       const fd = new FormData();
-      fd.append("file", file);
+      fd.append("file", compressed);
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       const { url, error } = await res.json();
       if (error) throw new Error(error);
@@ -696,8 +698,9 @@ export default function ProfilePage() {
     setCoverImagePreview(URL.createObjectURL(file));
     setCoverUploading(true);
     try {
+      const compressed = await compressImage(file, { maxWidth: 1920, maxHeight: 1080, quality: 0.85 });
       const fd = new FormData();
-      fd.append("file", file);
+      fd.append("file", compressed);
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       const { url, error } = await res.json();
       if (error) throw new Error(error);
@@ -875,8 +878,9 @@ export default function ProfilePage() {
     try {
       const uploaded: ProfileImage[] = [];
       for (const file of files) {
+        const compressed = await compressImage(file, { maxWidth: 1600, quality: 0.82 });
         const fd = new FormData();
-        fd.append("file", file);
+        fd.append("file", compressed);
         const res = await fetch("/api/upload", { method: "POST", body: fd });
         const data = await res.json();
         if (!res.ok || data.error) throw new Error(data.error ?? `HTTP ${res.status}`);

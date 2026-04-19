@@ -16,8 +16,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Nur JPG, PNG, WEBP oder HEIC erlaubt" }, { status: 400 });
   }
 
-  if (file.size > 10 * 1024 * 1024) {
-    return NextResponse.json({ error: "Datei zu groß (max. 10 MB)" }, { status: 400 });
+  // Client compresses to WebP ~200–500 KB before upload; 5 MB is a generous fallback
+  if (file.size > 5 * 1024 * 1024) {
+    return NextResponse.json({ error: "Datei zu groß (max. 5 MB)" }, { status: 400 });
   }
 
   // SECURITY: derive extension from verified MIME type, not user-supplied filename
