@@ -278,17 +278,17 @@ export default async function HomePage() {
               Der Marktplatz für Kreative — Locations, Crew &amp; Equipment für Film, Foto und Content.
             </p>
 
-            {/* Buttons — left aligned, green primary */}
-            <div className="flex flex-col sm:flex-row items-start gap-4 animate-fade-up">
+            {/* Buttons — full-width on mobile, natural width on sm+ */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-3 sm:gap-4 animate-fade-up">
               <Link
                 href={ctaHref}
-                className="inline-flex items-center gap-2 px-7 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl active:scale-[0.98] transition-all text-sm tracking-wide shadow-lg shadow-emerald-500/25"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl active:scale-[0.98] transition-all text-sm tracking-wide shadow-lg shadow-emerald-500/25"
               >
                 {ctaLabel} <ArrowRight size={15} />
               </Link>
               <Link
                 href="/inserat"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl border border-white/25 bg-black/20 backdrop-blur-sm text-white/80 font-semibold hover:border-white/45 hover:text-white active:scale-[0.98] transition-all text-sm"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl border border-white/25 bg-black/20 backdrop-blur-sm text-white/80 font-semibold hover:border-white/45 hover:text-white active:scale-[0.98] transition-all text-sm"
               >
                 Inserat erstellen
               </Link>
@@ -301,14 +301,11 @@ export default async function HomePage() {
 
         {/* Stats — anchored to bottom, left-aligned */}
         <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pb-10 sm:pb-14">
-          <div className="flex flex-wrap items-center gap-6 sm:gap-10">
-            {liveStats.slice(0, 4).map((s, i) => (
-              <div key={s.label} className="flex items-center gap-6">
-                <div>
-                  <div className="text-xl sm:text-2xl font-bold text-white font-display leading-none">{s.value}</div>
-                  <div className="text-[10px] uppercase tracking-widest text-white/50 mt-1">{s.label}</div>
-                </div>
-                {i < 3 && <span className="text-white/15 text-lg hidden sm:inline">|</span>}
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center gap-y-4 gap-x-8 sm:gap-10">
+            {liveStats.slice(0, 4).map((s) => (
+              <div key={s.label}>
+                <div className="text-xl sm:text-2xl font-bold text-white font-display leading-none">{s.value}</div>
+                <div className="text-[10px] uppercase tracking-widest text-white/50 mt-1">{s.label}</div>
               </div>
             ))}
           </div>
@@ -442,7 +439,7 @@ export default async function HomePage() {
                   className="group flex flex-col rounded-2xl overflow-hidden border border-border bg-bg-elevated hover:border-gold/30 transition-all duration-300"
                 >
                   {/* Image area */}
-                  <div className="relative h-48 overflow-hidden bg-bg-elevated">
+                  <div className="relative h-36 sm:h-48 overflow-hidden bg-bg-elevated">
                     {image ? (
                       <Image
                         src={image}
@@ -720,7 +717,7 @@ export default async function HomePage() {
               Alle anzeigen <ArrowRight size={14} />
             </Link>
           </div>
-          <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {companies.slice(0, 6).map((c) => (
               <Link key={c.id} href={`/companies/${c.slug ?? c.id}`} className="card-hover group flex flex-col items-center text-center p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 transition-all gap-3">
                 <div className="w-14 h-14 rounded-xl border border-border bg-bg-elevated overflow-hidden flex items-center justify-center shrink-0">
@@ -756,8 +753,12 @@ export default async function HomePage() {
               </Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-              {projects.slice(0, 8).map((p) => (
-                <Link key={p.id} href={`/projects/${p.id}`} className="card-hover group rounded-xl overflow-hidden border border-border bg-bg-elevated block">
+              {projects.slice(0, 8).map((p, i) => (
+                <Link
+                  key={p.id}
+                  href={`/projects/${p.id}`}
+                  className={`card-hover group rounded-xl overflow-hidden border border-border bg-bg-elevated block${i >= 4 ? " hidden sm:block" : ""}`}
+                >
                   <div className="relative aspect-[2/3] overflow-hidden">
                     <Image src={p.poster} alt={p.title} fill className="object-cover object-top group-hover:scale-105 transition-transform duration-500" sizes="(max-width:640px) 50vw,12vw" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
