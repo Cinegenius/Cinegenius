@@ -275,7 +275,7 @@ export default async function HomePage() {
   return (
     <>
       {/* ── HERO ── */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pb-[270px]">
+      <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden pb-[180px] sm:pb-[270px]">
         {/* Theme-aware background image (CSS class in globals.css) */}
         <div className="hero-bg absolute inset-0 bg-cover bg-no-repeat" />
 
@@ -296,45 +296,45 @@ export default async function HomePage() {
           style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E\")" }}
         />
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-20">
-          <div className="hero-badge inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold uppercase tracking-widest mb-8 animate-fade-in">
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-16 sm:pt-20">
+          <div className="hero-badge inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold uppercase tracking-widest mb-4 sm:mb-8 animate-fade-in">
             <Zap size={12} /> Film · Foto · Content · Werbung
           </div>
 
-          <h1 className="hero-title font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6 animate-fade-up">
+          <h1 className="hero-title font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-4 sm:mb-6 animate-fade-up">
             Create. Connect.<br />
             <span className="text-gradient-gold">Get Discovered.</span>
           </h1>
 
-          <p className="hero-sub text-lg sm:text-xl max-w-2xl mx-auto mb-3 leading-relaxed animate-fade-up">
+          <p className="hero-sub text-base sm:text-xl max-w-2xl mx-auto mb-2 sm:mb-3 leading-relaxed animate-fade-up">
             The platform for creatives — Photo, Film, Social Media &amp; Models. All in One Place.
           </p>
 
-          <p className="hero-sub text-sm sm:text-base max-w-xl mx-auto mb-10 leading-relaxed animate-fade-up opacity-70">
+          <p className="hero-sub text-sm sm:text-base max-w-xl mx-auto mb-6 sm:mb-10 leading-relaxed animate-fade-up opacity-70">
             Jobs, Locations, Equipment &amp; mehr — alles für deine nächste Produktion an einem Ort.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-12 animate-fade-up delay-200">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center mb-6 sm:mb-12 animate-fade-up delay-200">
             <Link
               href={ctaHref}
-              className="px-8 py-3.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors flex items-center justify-center gap-2 text-base"
+              className="px-8 py-3 sm:py-3.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
             >
               {isLoggedIn ? "Zum Dashboard" : "Jetzt starten"} <ArrowRight size={16} />
             </Link>
             <Link
               href="/inserat"
-              className="px-8 py-3.5 border border-white/30 text-white font-semibold rounded-xl hover:border-white/60 hover:bg-white/5 transition-all flex items-center justify-center gap-2 text-base"
+              className="px-8 py-3 sm:py-3.5 border border-white/30 text-white font-semibold rounded-xl hover:border-white/60 hover:bg-white/5 transition-all flex items-center justify-center gap-2 text-sm sm:text-base"
             >
               Inserat erstellen
             </Link>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-y-4 gap-x-6 animate-fade-up delay-300">
+          <div className="flex flex-wrap items-center justify-center gap-y-2 gap-x-4 sm:gap-y-4 sm:gap-x-6 animate-fade-up delay-300">
             {liveStats.map((s, i) => (
               <div key={s.label} className="flex items-center">
-                <div className="text-center px-3 sm:px-0 w-full sm:w-auto">
-                  <div className="hero-stat-val text-xl sm:text-2xl font-bold font-display">{s.value}</div>
-                  <div className="hero-stat-lbl text-[10px] sm:text-xs uppercase tracking-widest mt-0.5">{s.label}</div>
+                <div className="text-center px-2 sm:px-0 w-full sm:w-auto">
+                  <div className="hero-stat-val text-lg sm:text-2xl font-bold font-display">{s.value}</div>
+                  <div className="hero-stat-lbl text-[9px] sm:text-xs uppercase tracking-widest mt-0.5">{s.label}</div>
                 </div>
                 {i < liveStats.length - 1 && <span className="hero-stat-lbl opacity-20 text-lg hidden sm:inline ml-6">·</span>}
               </div>
@@ -346,21 +346,21 @@ export default async function HomePage() {
         {(posterStrip.length >= 1 || avatarStrip.length >= 1 || locationStrip.length >= 1) && (
           <div className="absolute bottom-0 left-0 right-0 z-20" style={{ display: "flex", flexDirection: "column", gap: 0 }}>
             {posterStrip.length >= 1 && (
-              <ImageStrip images={posterStrip} aspectRatio="wide" height={90} durationOverride={35} direction="left" overlay={false} stripId="top" />
+              <ImageStrip images={posterStrip} aspectRatio="wide" height={60} durationOverride={35} direction="left" overlay={false} stripId="top" />
             )}
             {avatarStrip.length >= 1 && (
-              <ImageStrip images={avatarStrip} aspectRatio="square" height={90} durationOverride={45} direction="right" overlay={false} stripId="mid" startOffset={0.33} />
+              <ImageStrip images={avatarStrip} aspectRatio="square" height={60} durationOverride={45} direction="right" overlay={false} stripId="mid" startOffset={0.33} />
             )}
             {locationStrip.length >= 1 && (
-              <ImageStrip images={locationStrip} aspectRatio="wide" height={90} durationOverride={90} direction="left" overlay={false} stripId="bot" startOffset={0.5} />
+              <ImageStrip images={locationStrip} aspectRatio="wide" height={60} durationOverride={90} direction="left" overlay={false} stripId="bot" startOffset={0.5} />
             )}
           </div>
         )}
       </section>
 
       {/* ── VISUAL SHOWCASE ── */}
-      <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10">
+      <section className="py-8 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-6 sm:mb-10">
           <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">Für jeden Shoot</p>
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-text-primary">
             Film · Foto · Content · Werbung
@@ -460,8 +460,8 @@ export default async function HomePage() {
       </section>
 
       {/* ── ALLES AUF EINER PLATTFORM ── */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
+      <section className="py-8 sm:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-6 sm:mb-12">
           <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">Alles auf einer Plattform</p>
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-text-primary mb-4">
             Der Marktplatz für Kreative
@@ -509,9 +509,9 @@ export default async function HomePage() {
       </section>
 
       {/* ── USE CASES ── */}
-      <section className="py-20 bg-bg-secondary border-y border-border">
+      <section className="py-8 sm:py-20 bg-bg-secondary border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div className="text-center mb-6 sm:mb-12">
             <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">Konkrete Beispiele</p>
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-text-primary">
               Was du mit CineGenius machen kannst
@@ -567,8 +567,8 @@ export default async function HomePage() {
       </section>
 
       {/* ── WIE ES FUNKTIONIERT ── */}
-      <section className="py-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-14">
+      <section className="py-8 sm:py-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-8 sm:mb-14">
           <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">Einfach & schnell</p>
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-text-primary">In 3 Schritten dabei sein</h2>
         </div>
@@ -658,9 +658,9 @@ export default async function HomePage() {
       </section>
 
       {/* ── FÜR WEN ── */}
-      <section className="py-16 bg-bg-secondary border-y border-border">
+      <section className="py-8 sm:py-16 bg-bg-secondary border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div className="text-center mb-6 sm:mb-12">
             <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">Vor und hinter der Kamera</p>
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-text-primary">CineGenius ist für dich — <span className="text-gradient-gold">ganz egal wer du bist.</span></h2>
           </div>
@@ -729,7 +729,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── FEATURED LOCATIONS ── */}
-      <section className="py-12 bg-bg-secondary border-y border-border">
+      <section className="py-6 sm:py-12 bg-bg-secondary border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between mb-6">
             <div>
@@ -767,7 +767,7 @@ export default async function HomePage() {
 
       {/* ── FIRMEN ── */}
       {companies.length > 0 && (
-        <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-6 sm:py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between mb-6">
             <div>
               <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Branchenpartner</p>
@@ -799,7 +799,7 @@ export default async function HomePage() {
 
       {/* ── PROJEKTE ── */}
       {projects.length > 0 && (
-        <section className="py-12 bg-bg-secondary border-y border-border">
+        <section className="py-6 sm:py-12 bg-bg-secondary border-y border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-end justify-between mb-6">
               <div>
@@ -829,7 +829,7 @@ export default async function HomePage() {
       )}
 
       {/* ── AKTUELLE JOBS ── */}
-      <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-6 sm:py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between mb-6">
           <div>
             <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Jetzt gesucht</p>
@@ -876,7 +876,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── PLATTFORM-PULSE ── */}
-      <section className="py-10 border-y border-border bg-bg-secondary overflow-hidden">
+      <section className="py-6 sm:py-10 border-y border-border bg-bg-secondary overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
@@ -901,14 +901,14 @@ export default async function HomePage() {
       </section>
 
       {/* ── VERTRAUEN + TESTIMONIALS ── */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-14">
+      <section className="py-8 sm:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-6 sm:mb-14">
           <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">Vertrauen & Sicherheit</p>
           <h2 className="font-display text-3xl font-bold text-text-primary">Warum CineGenius?</h2>
         </div>
 
         {/* Trust pillars */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 sm:mb-16">
           {[
             { icon: Shield, title: "Sichere Zahlung", desc: "Stripe-Treuhand — Geld wird erst nach erfolgreichem Abschluss freigegeben." },
             { icon: CheckCircle, title: "Verifizierte Anbieter", desc: "Geprüfte Profile und Identitäten für maximale Sicherheit auf beiden Seiten." },
@@ -949,7 +949,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── FINAL CTA ── */}
-      <section className="py-24 relative overflow-hidden">
+      <section className="py-12 sm:py-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-gold-subtle via-bg-primary to-bg-primary" />
         <div className="absolute inset-0 border-t border-b border-gold/10" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-gold/5 rounded-full blur-3xl pointer-events-none" />
