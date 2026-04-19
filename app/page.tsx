@@ -19,7 +19,7 @@ export const revalidate = 60;
 import {
   MapPin, Briefcase, ShoppingBag, Users,
   ArrowRight, Star, CheckCircle, Zap, Shield, Clock,
-  TrendingUp, Film, ChevronRight, Play, Building2, Clapperboard, Camera,
+  TrendingUp, Film, Play, Building2, Clapperboard, Camera,
 } from "lucide-react";
 import { stats } from "@/lib/data";
 import ImageStrip from "@/components/ImageStrip";
@@ -93,7 +93,6 @@ async function getHomeData() {
         title: l.title as string,
         city: (l.city ?? "") as string,
         price: (l.price ?? 0) as number,
-        reviews: 0,
         image: (l.image_url ?? "") as string,
       }))
     : [];
@@ -143,7 +142,6 @@ async function getHomeData() {
     slug: c.slug,
     name: c.name,
     logo: c.logo_url,
-    tagline: "",
     city: (c.city ?? "").split(",")[0]?.trim() ?? "",
   }));
 
@@ -154,62 +152,18 @@ async function getHomeData() {
       title: p.title,
       poster: p.poster_url,
       year: p.year,
-      type: p.type,
-      director: p.director,
     }));
 
   return { liveStats, liveLocations, liveJobs, posterStrip, avatarStrip, locationStrip, pillarImages, companies, projects };
 }
 
 const featurePillars = [
-  {
-    icon: MapPin,
-    title: "Locations",
-    desc: "Altbauten, Studios, Industriehallen — der perfekte Ort für jede Szene.",
-    href: "/locations",
-    pillarKey: "location",
-    accent: "from-sky-900/70",
-  },
-  {
-    icon: Users,
-    title: "Crew & Talente",
-    desc: "DPs, Regisseure, Schauspieler, Maskenbildner — direkt buchbar.",
-    href: "/creators",
-    pillarKey: "crew",
-    accent: "from-violet-900/70",
-  },
-  {
-    icon: ShoppingBag,
-    title: "Marktplatz",
-    desc: "Kameras, Kostüme, Requisiten, Fahrzeuge — kaufen oder mieten.",
-    href: "/props",
-    pillarKey: "equipment",
-    accent: "from-slate-900/70",
-  },
-  {
-    icon: Briefcase,
-    title: "Jobs & Aufträge",
-    desc: "Ausschreiben oder bewerben — für jeden Dreh, jedes Budget.",
-    href: "/jobs",
-    pillarKey: "job",
-    accent: "from-zinc-900/70",
-  },
-  {
-    icon: Building2,
-    title: "Firmen",
-    desc: "Produktionsfirmen, Verleiher, Studios — entdecke Branchenpartner.",
-    href: "/companies",
-    pillarKey: "firma",
-    accent: "from-emerald-900/70",
-  },
-  {
-    icon: Clapperboard,
-    title: "Projekte",
-    desc: "Dokumentiere deine Arbeit, zeig dein Team und deine Produktionen.",
-    href: "/projects",
-    pillarKey: "projekt",
-    accent: "from-rose-900/70",
-  },
+  { icon: MapPin,    title: "Locations",     desc: "Altbauten, Studios, Industriehallen — der perfekte Ort für jede Szene.",               href: "/locations", pillarKey: "location",  accent: "from-sky-900/70" },
+  { icon: Users,     title: "Crew & Talente", desc: "DPs, Regisseure, Schauspieler, Maskenbildner — direkt buchbar.",                       href: "/creators",  pillarKey: "crew",      accent: "from-violet-900/70" },
+  { icon: ShoppingBag, title: "Marktplatz",  desc: "Kameras, Kostüme, Requisiten, Fahrzeuge — kaufen oder mieten.",                         href: "/props",     pillarKey: "equipment", accent: "from-slate-900/70" },
+  { icon: Briefcase, title: "Jobs & Aufträge", desc: "Ausschreiben oder bewerben — für jeden Dreh, jedes Budget.",                          href: "/jobs",      pillarKey: "job",       accent: "from-zinc-900/70" },
+  { icon: Building2, title: "Firmen",        desc: "Produktionsfirmen, Verleiher, Studios — entdecke Branchenpartner.",                     href: "/companies", pillarKey: "firma",     accent: "from-emerald-900/70" },
+  { icon: Clapperboard, title: "Projekte",   desc: "Dokumentiere deine Arbeit, zeig dein Team und deine Produktionen.",                     href: "/projects",  pillarKey: "projekt",   accent: "from-rose-900/70" },
 ];
 
 const useCases = [
@@ -267,93 +221,127 @@ const testimonials = [
 export default async function HomePage() {
   const { userId } = await auth();
   const isLoggedIn = !!userId;
-  // For logged-in users: send to dashboard instead of sign-up
   const ctaHref = isLoggedIn ? "/dashboard" : "/sign-up";
   const ctaLabel = isLoggedIn ? "Zum Dashboard" : "Kostenlos starten";
 
   const { liveStats, liveLocations, liveJobs, posterStrip, avatarStrip, locationStrip, pillarImages, companies, projects } = await getHomeData();
+
   return (
     <>
-      {/* ── HERO ── */}
+      {/* ══════════════════════════════════════════════
+          HERO — left-aligned, content max-680px
+      ══════════════════════════════════════════════ */}
       <section className="relative min-h-[100svh] flex flex-col overflow-hidden">
-        {/* Background */}
+        {/* Background image */}
         <div className="hero-bg absolute inset-0 bg-cover bg-no-repeat" />
 
-        {/* ── Overlays ── */}
-        {/* Dark: top is heaviest (sky = text area), fades in middle, darkens at bottom for strips */}
-        <div className="hero-overlay-dark absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black/70" />
-        {/* Dark: subtle left-edge depth so content has a "stage" */}
-        <div className="hero-overlay-dark absolute inset-0" style={{ background: "linear-gradient(105deg, rgba(0,0,0,0.45) 0%, transparent 55%)" }} />
+        {/* Required side-gradient overlay — left heavy, fades right */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.2) 70%, rgba(0,0,0,0.35) 100%)",
+          }}
+        />
+        {/* Top darkening for nav legibility */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/40" />
         {/* Light mode */}
         <div className="hero-overlay-light absolute inset-0 bg-gradient-to-b from-white/25 via-white/20 to-[#D9D4CB]/95" />
         {/* Grain */}
         <div
-          className="grain hero-overlay-dark absolute inset-0 opacity-[0.09]"
+          className="grain hero-overlay-dark absolute inset-0 opacity-[0.07]"
           style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E\")" }}
         />
 
-        {/* ── Content block — sits in upper sky area ── */}
-        <div className="relative z-10 flex flex-col items-center text-center px-5 sm:px-8 pt-32 sm:pt-40 lg:pt-44">
+        {/* ── Content — left aligned, upper area ── */}
+        <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pt-[140px] sm:pt-[160px] lg:pt-[180px]">
+          <div className="max-w-[680px]">
+            {/* Badge */}
+            <div className="hero-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-semibold uppercase tracking-[0.18em] mb-6 animate-fade-in">
+              <Zap size={10} /> Film · Foto · Content · Werbung
+            </div>
 
-          {/* Badge */}
-          <div className="hero-badge inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-[10px] sm:text-xs font-semibold uppercase tracking-[0.18em] mb-6 sm:mb-8 animate-fade-in">
-            <Zap size={10} /> Film · Foto · Content · Werbung
-          </div>
-
-          {/* Headline */}
-          <h1 className="hero-title font-display text-[2.75rem] sm:text-6xl lg:text-[5.5rem] font-bold leading-[1.05] tracking-tight mb-5 sm:mb-6 animate-fade-up">
-            Create. Connect.<br />
-            <span className="text-gradient-gold">Get Discovered.</span>
-          </h1>
-
-          {/* Subtext — narrow & punchy */}
-          <p className="hero-sub text-base sm:text-lg max-w-xs sm:max-w-md mx-auto mb-8 sm:mb-10 leading-relaxed animate-fade-up" style={{ opacity: 0.85 }}>
-            The platform for creatives — Photo, Film,<br className="hidden sm:block" /> Social Media &amp; Models. All in One Place.
-          </p>
-
-          {/* Buttons */}
-          <div className="flex flex-col sm:flex-row items-center gap-3 animate-fade-up delay-200">
-            <Link
-              href={ctaHref}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-gold text-bg-primary font-bold rounded-full hover:bg-gold-light active:scale-[0.98] transition-all text-sm tracking-wide shadow-lg shadow-gold/25"
+            {/* Headline — line-height 0.9, tight and commanding */}
+            <h1
+              className="hero-title font-display text-[3rem] sm:text-[4.5rem] lg:text-[5.5rem] font-bold tracking-tight mb-8 sm:mb-10 animate-fade-up"
+              style={{ lineHeight: "0.9" }}
             >
-              {isLoggedIn ? "Zum Dashboard" : "Jetzt starten"} <ArrowRight size={15} />
-            </Link>
-            <Link
-              href="/inserat"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold hover:bg-white/18 hover:border-white/35 active:scale-[0.98] transition-all text-sm tracking-wide"
+              Create. Connect.<br />
+              <span className="text-gradient-gold">Get Discovered.</span>
+            </h1>
+
+            {/* Subtext — 1 sentence, max-width 560px */}
+            <p
+              className="hero-sub text-base sm:text-lg mb-8 sm:mb-10 leading-relaxed animate-fade-up max-w-[560px]"
+              style={{ opacity: 0.82 }}
             >
-              Inserat erstellen
-            </Link>
+              Der Marktplatz für Kreative — Locations, Crew &amp; Equipment für Film, Foto und Content.
+            </p>
+
+            {/* Buttons — left aligned, green primary */}
+            <div className="flex flex-col sm:flex-row items-start gap-4 animate-fade-up">
+              <Link
+                href={ctaHref}
+                className="inline-flex items-center gap-2 px-7 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl active:scale-[0.98] transition-all text-sm tracking-wide shadow-lg shadow-emerald-500/25"
+              >
+                {ctaLabel} <ArrowRight size={15} />
+              </Link>
+              <Link
+                href="/inserat"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl border border-white/25 bg-black/20 backdrop-blur-sm text-white/80 font-semibold hover:border-white/45 hover:text-white active:scale-[0.98] transition-all text-sm"
+              >
+                Inserat erstellen
+              </Link>
+            </div>
           </div>
         </div>
 
-        {/* Spacer — people/action area of image is visible here */}
+        {/* Spacer — exposes the people/action area of the photo */}
         <div className="flex-1" />
 
-        {/* ── LIVE STRIPS — anchored to bottom ── */}
+        {/* Stats — anchored to bottom, left-aligned */}
+        <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pb-10 sm:pb-14">
+          <div className="flex flex-wrap items-center gap-6 sm:gap-10">
+            {liveStats.slice(0, 4).map((s, i) => (
+              <div key={s.label} className="flex items-center gap-6">
+                <div>
+                  <div className="text-xl sm:text-2xl font-bold text-white font-display leading-none">{s.value}</div>
+                  <div className="text-[10px] uppercase tracking-widest text-white/50 mt-1">{s.label}</div>
+                </div>
+                {i < 3 && <span className="text-white/15 text-lg hidden sm:inline">|</span>}
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
-      {/* ── STATS BAR — clean break below hero ── */}
-      <div className="border-b border-border bg-bg-secondary">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-5">
-          <div className="flex flex-wrap items-center justify-center gap-y-3 gap-x-0">
-            {liveStats.map((s, i) => (
-              <div key={s.label} className="flex items-center">
-                <div className="text-center px-5 sm:px-8">
-                  <div className="hero-stat-val text-xl sm:text-2xl font-bold font-display leading-none">{s.value}</div>
-                  <div className="hero-stat-lbl text-[9px] sm:text-[10px] uppercase tracking-widest mt-1 opacity-55">{s.label}</div>
+      {/* ══════════════════════════════════════════════
+          TRUST BAR — immediately after hero
+      ══════════════════════════════════════════════ */}
+      <div className="bg-bg-secondary border-b border-border">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
+          <div className="flex flex-wrap items-center justify-center sm:justify-between gap-5">
+            {[
+              { icon: Shield,       text: "Sichere Zahlung",      sub: "Stripe Treuhand" },
+              { icon: CheckCircle,  text: "Verifizierte Anbieter", sub: "Geprüfte Profile" },
+              { icon: Zap,          text: "100% kostenlos",       sub: "Keine Provision" },
+              { icon: Clock,        text: "DACH-Region",          sub: "DE · AT · CH" },
+            ].map(({ icon: Icon, text, sub }) => (
+              <div key={text} className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+                  <Icon size={13} className="text-emerald-500" />
                 </div>
-                {i < liveStats.length - 1 && (
-                  <span className="hero-stat-lbl opacity-15 text-xl hidden sm:inline">|</span>
-                )}
+                <div>
+                  <p className="text-xs font-semibold text-text-primary leading-tight">{text}</p>
+                  <p className="text-[10px] text-text-muted">{sub}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* ── LIVE STRIPS — below stats bar ── */}
+      {/* ── IMAGE STRIPS ── */}
       {(posterStrip.length >= 1 || avatarStrip.length >= 1 || locationStrip.length >= 1) && (
         <div className="flex flex-col border-b border-border overflow-hidden">
           {posterStrip.length >= 1 && (
@@ -368,318 +356,184 @@ export default async function HomePage() {
         </div>
       )}
 
-      {/* ── VISUAL SHOWCASE ── */}
-      <section className="py-8 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-6 sm:mb-10">
-          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">Für jeden Shoot</p>
-          <h2 className="font-display text-3xl sm:text-4xl font-bold text-text-primary">
-            Film · Foto · Content · Werbung
-          </h2>
-          <p className="text-text-muted text-sm mt-3 max-w-xl mx-auto">
-            Ob Spielfilm, Instagram-Shooting, YouTube-Produktion oder TV-Werbung — CineGenius ist die Plattform für jede Art von Kreativproduktion.
-          </p>
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-[220px]">
-          {/* Large tile — Film */}
-          <Link href="/projects" className="relative rounded-2xl overflow-hidden row-span-2 group block">
-            <Image
-              src="https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=85"
-              alt="Film Set"
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-              sizes="(max-width:1024px) 50vw,33vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-            <div className="absolute bottom-5 left-5">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold mb-2">
-                <Film size={10} /> Film & Kino
-              </span>
-              <p className="text-white font-semibold text-sm">Professionelle Filmsets</p>
-              <p className="text-white/60 text-xs mt-0.5">Locations, Crew & Equipment</p>
-            </div>
-          </Link>
-          {/* Foto */}
-          <Link href="/photo" className="relative rounded-2xl overflow-hidden group block">
-            <Image
-              src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=800&q=85"
-              alt="Fotoshooting"
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-              sizes="(max-width:1024px) 50vw,33vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
-            <div className="absolute bottom-4 left-4">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
-                <Camera size={10} /> Fotografie
-              </span>
-              <p className="text-white font-semibold text-sm">Shootings & Studios</p>
-            </div>
-          </Link>
-          {/* Social Media */}
-          <Link href="/social-media" className="relative rounded-2xl overflow-hidden group block">
-            <Image
-              src="https://images.unsplash.com/photo-1683721003111-070bcc053d8b?w=800&q=85"
-              alt="Social Media Content"
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-              sizes="(max-width:1024px) 50vw,33vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
-            <div className="absolute bottom-4 left-4">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
-                <Zap size={10} /> Social Media
-              </span>
-              <p className="text-white font-semibold text-sm">Content Creation</p>
-            </div>
-          </Link>
-          {/* Werbung */}
-          <Link href="/companies" className="relative rounded-2xl overflow-hidden group block">
-            <Image
-              src="https://images.unsplash.com/photo-1557858310-9052820906f7?w=800&q=85"
-              alt="Werbeproduktion"
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-              sizes="(max-width:1024px) 50vw,33vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
-            <div className="absolute bottom-4 left-4">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
-                <TrendingUp size={10} /> Werbung
-              </span>
-              <p className="text-white font-semibold text-sm">Werbe- & Industriefilm</p>
-            </div>
-          </Link>
-          {/* Behind the Scenes */}
-          <Link href="/bts" className="relative rounded-2xl overflow-hidden group block">
-            <Image
-              src="https://plus.unsplash.com/premium_photo-1682001110037-50545d73acfa?w=800&q=85"
-              alt="Behind the scenes"
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-              sizes="(max-width:1024px) 50vw,33vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
-            <div className="absolute bottom-4 left-4">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
-                <Play size={10} /> Behind the Scenes
-              </span>
-              <p className="text-white font-semibold text-sm">Backstage & Crew</p>
-            </div>
-          </Link>
-        </div>
-      </section>
-
-      {/* ── ALLES AUF EINER PLATTFORM ── */}
-      <section className="py-8 sm:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-6 sm:mb-12">
-          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">Alles auf einer Plattform</p>
-          <h2 className="font-display text-3xl sm:text-4xl font-bold text-text-primary mb-4">
-            Der Marktplatz für Kreative
-          </h2>
-          <p className="text-text-secondary max-w-xl mx-auto leading-relaxed">
-            Locations, Crew, Equipment, Jobs, Firmen und Projekte — für Film, Foto, Content und Werbung.
-          </p>
-        </div>
-
-        {/* Cinematic 6-pillar grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {featurePillars.map(({ icon: Icon, title, desc, href, pillarKey, accent }) => {
-            const image = pillarImages[pillarKey as keyof typeof pillarImages];
-            return (
-            <Link
-              key={href}
-              href={href}
-              className="group relative rounded-2xl overflow-hidden aspect-[3/4] flex flex-col justify-end bg-bg-elevated border border-border"
-            >
-              {image && (
-                <Image
-                  src={image}
-                  alt={title}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                  sizes="(max-width:640px) 50vw,(max-width:1024px) 33vw,16vw"
-                />
-              )}
-              <div className={`absolute inset-0 bg-gradient-to-t ${accent} ${image ? "via-black/20" : "via-black/60"} to-transparent`} />
-              {image && <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/10" />}
-              <div className="relative p-4 pb-5">
-                <div className="w-7 h-7 rounded-lg bg-white/15 backdrop-blur-sm border border-white/20 flex items-center justify-center mb-2.5">
-                  <Icon size={14} className="text-white" />
-                </div>
-                <h3 className="font-display text-sm font-bold text-white mb-1 leading-tight">{title}</h3>
-                <p className="text-[11px] text-white/60 leading-relaxed mb-2.5 line-clamp-2 hidden sm:block">{desc}</p>
-                <span className="inline-flex items-center gap-1 text-[11px] text-white/75 font-semibold group-hover:text-white transition-colors">
-                  Entdecken <ChevronRight size={10} />
-                </span>
-              </div>
-            </Link>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ── USE CASES ── */}
-      <section className="py-8 sm:py-20 bg-bg-secondary border-y border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-6 sm:mb-12">
-            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">Konkrete Beispiele</p>
-            <h2 className="font-display text-3xl sm:text-4xl font-bold text-text-primary">
-              Was du mit CineGenius machen kannst
+      {/* ══════════════════════════════════════════════
+          PLATFORM EXPLANATION — 3 steps, left header
+      ══════════════════════════════════════════════ */}
+      <section className="py-12 sm:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-10 lg:gap-16 items-start">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">Einfach & schnell</p>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary mb-5 leading-tight">
+              In 3 Schritten<br />dabei sein
             </h2>
+            <p className="text-sm text-text-muted leading-relaxed mb-6">
+              Kostenlos, ohne Agentur — du behältst die Kontrolle.
+            </p>
+            <Link
+              href={ctaHref}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white font-semibold rounded-xl transition-all text-sm"
+            >
+              {ctaLabel} <ArrowRight size={14} />
+            </Link>
           </div>
 
-          {/* 2-column asymmetric grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-            {/* Large featured card */}
-            <Link
-              href={useCases[0].href}
-              className="group relative rounded-2xl overflow-hidden"
-              style={{ minHeight: "420px" }}
-            >
-              <Image src={useCases[0].image} alt={useCases[0].title} fill
-                className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                sizes="(max-width:1024px) 100vw,50vw" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-8">
-                <h3 className="font-display text-2xl font-bold text-white mb-2">{useCases[0].title}</h3>
-                <p className="text-white/65 text-sm mb-4">{useCases[0].desc}</p>
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/15 backdrop-blur-sm border border-white/20 rounded-lg text-white text-xs font-semibold group-hover:bg-white/25 transition-colors">
-                  {useCases[0].cta} <ArrowRight size={12} />
-                </span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              {
+                step: "01",
+                icon: Film,
+                title: "Kostenlos registrieren",
+                desc: "Kein Abo, keine Grundgebühr. Profil erstellen und sofort loslegen — als Kreativer, Anbieter oder Firma.",
+              },
+              {
+                step: "02",
+                icon: MapPin,
+                title: "Anbieten oder suchen",
+                desc: "Inseriere deine Location, dein Equipment oder dich selbst — oder finde genau das, was du brauchst.",
+              },
+              {
+                step: "03",
+                icon: Shield,
+                title: "Direkt loslegen",
+                desc: "Schreib direkt, keine Agentur dazwischen. Zahlung sicher über Treuhand — erst nach Abschluss.",
+              },
+            ].map(({ step, icon: Icon, title, desc }) => (
+              <div key={step} className="flex flex-col p-5 rounded-2xl border border-border bg-bg-secondary">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0 relative">
+                    <Icon size={18} className="text-gold" />
+                    <span className="absolute -top-2 -right-2 w-5 h-5 bg-gold text-bg-primary text-[9px] font-bold rounded-full flex items-center justify-center">
+                      {step}
+                    </span>
+                  </div>
+                  <h3 className="font-display text-sm font-bold text-text-primary leading-tight">{title}</h3>
+                </div>
+                <p className="text-xs text-text-muted leading-relaxed">{desc}</p>
               </div>
-            </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            {/* 3 stacked cards */}
-            <div className="grid grid-rows-3 gap-4">
-              {useCases.slice(1).map(({ title, desc, image, cta, href }) => (
-                <Link key={href + title} href={href}
-                  className="group relative rounded-2xl overflow-hidden flex items-end"
-                  style={{ minHeight: "120px" }}
+      {/* ══════════════════════════════════════════════
+          PLATFORM PILLARS — full cards with image + text + CTA
+      ══════════════════════════════════════════════ */}
+      <section className="py-8 sm:py-16 bg-bg-secondary border-y border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-8 sm:mb-10">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Alles auf einer Plattform</p>
+              <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg">
+                Der Marktplatz für Kreative
+              </h2>
+            </div>
+            <Link href="/creators" className="hidden sm:flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium shrink-0">
+              Alles entdecken <ArrowRight size={14} />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {featurePillars.map(({ icon: Icon, title, desc, href, pillarKey, accent }) => {
+              const image = pillarImages[pillarKey as keyof typeof pillarImages];
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className="group flex flex-col rounded-2xl overflow-hidden border border-border bg-bg-elevated hover:border-gold/30 transition-all duration-300"
                 >
-                  <Image src={image} alt={title} fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                    sizes="(max-width:1024px) 100vw,50vw" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-transparent" />
-                  <div className="relative p-5 flex items-center gap-4 w-full">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-white text-sm leading-snug mb-0.5">{title}</h3>
-                      <p className="text-white/55 text-xs truncate">{desc}</p>
+                  {/* Image area */}
+                  <div className="relative h-48 overflow-hidden bg-bg-elevated">
+                    {image ? (
+                      <Image
+                        src={image}
+                        alt={title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                        sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw"
+                      />
+                    ) : (
+                      <div className={`absolute inset-0 bg-gradient-to-br ${accent} to-bg-elevated`} />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-bg-elevated/80 via-transparent to-transparent" />
+                  </div>
+                  {/* Content area */}
+                  <div className="p-5 flex flex-col flex-1">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-8 h-8 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
+                        <Icon size={14} className="text-gold" />
+                      </div>
+                      <h3 className="font-display text-base font-bold text-text-primary">{title}</h3>
                     </div>
-                    <span className="shrink-0 inline-flex items-center gap-1 text-xs text-white/75 font-medium group-hover:text-white transition-colors">
-                      {cta} <ArrowRight size={11} />
+                    <p className="text-sm text-text-muted leading-relaxed mb-4 flex-1">{desc}</p>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold group-hover:gap-3 transition-all duration-200">
+                      Entdecken <ArrowRight size={12} />
                     </span>
                   </div>
                 </Link>
-              ))}
-            </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* ── WIE ES FUNKTIONIERT ── */}
-      <section className="py-8 sm:py-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8 sm:mb-14">
-          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">Einfach & schnell</p>
-          <h2 className="font-display text-3xl sm:text-4xl font-bold text-text-primary">In 3 Schritten dabei sein</h2>
+      {/* ══════════════════════════════════════════════
+          USE CASES — 4 equal image cards
+      ══════════════════════════════════════════════ */}
+      <section className="py-8 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 sm:mb-10">
+          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Konkrete Beispiele</p>
+          <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg">
+            Was du mit CineGenius machen kannst
+          </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-          <div className="hidden md:block absolute top-9 left-[calc(16.6%+28px)] right-[calc(16.6%+28px)] h-px bg-gradient-to-r from-transparent via-gold/25 to-transparent" />
-          {[
-            {
-              step: "01",
-              icon: Film,
-              title: "Kostenlos registrieren",
-              desc: "Komplett kostenlos — keine Gebühren, keine Provision. Erstelle in Minuten ein Profil — als Kreativer, Anbieter oder Firma.",
-            },
-            {
-              step: "02",
-              icon: MapPin,
-              title: "Anbieten oder suchen",
-              desc: "Inseriere deine Location, dein Equipment oder dich selbst — oder finde genau das, was du brauchst.",
-            },
-            {
-              step: "03",
-              icon: Shield,
-              title: "Direkt loslegen",
-              desc: "Schreib direkt, keine Agentur dazwischen. Zahlung sicher über Treuhand — erst nach Abschluss.",
-            },
-          ].map(({ step, icon: Icon, title, desc }) => (
-            <div key={step} className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center mb-5 relative">
-                <Icon size={26} className="text-gold" />
-                <span className="absolute -top-2.5 -right-2.5 w-6 h-6 bg-gold text-bg-primary text-[10px] font-bold rounded-full flex items-center justify-center">
-                  {step}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {useCases.map(({ title, desc, image, cta, href }) => (
+            <Link
+              key={href + title}
+              href={href}
+              className="group relative rounded-2xl overflow-hidden border border-border block"
+              style={{ minHeight: "280px" }}
+            >
+              <Image
+                src={image}
+                alt={title}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                sizes="(max-width:640px) 100vw,50vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/25 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6">
+                <h3 className="font-display text-lg font-bold text-white mb-1.5 leading-tight">{title}</h3>
+                <p className="text-white/65 text-sm mb-4 leading-relaxed">{desc}</p>
+                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/15 backdrop-blur-sm border border-white/20 rounded-lg text-white text-xs font-semibold group-hover:bg-white/25 transition-colors">
+                  {cta} <ArrowRight size={12} />
                 </span>
               </div>
-              <h3 className="font-display text-lg font-bold text-text-primary mb-2">{title}</h3>
-              <p className="text-sm text-text-muted leading-relaxed">{desc}</p>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
 
-      {/* ── CINEMATIC BREAK ── */}
-      <section className="relative overflow-hidden" style={{ minHeight: "clamp(340px, 45vw, 560px)" }}>
-        <Image
-          src="https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=1920&q=90"
-          alt="Film set"
-          fill
-          className="object-cover object-center"
-          sizes="100vw"
-          priority={false}
-        />
-        {/* Layered cinematic overlays */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-black/30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-
-        {/* Content */}
-        <div className="relative z-10 flex items-center py-14 sm:py-0 sm:absolute sm:inset-0">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <div className="max-w-2xl">
-              <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-4 flex items-center gap-2">
-                <span className="w-6 h-px bg-gold inline-block" />
-                Film · Foto · Content · Werbung
-              </p>
-              <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-5">
-                Jedes Projekt<br />
-                <span className="text-gradient-gold">beginnt hier.</span>
-              </h2>
-              <p className="text-white/65 text-lg leading-relaxed mb-8 max-w-lg">
-                Von der ersten Location-Anfrage bis zum letzten Credit — CineGenius verbindet alle, die etwas erschaffen.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  href={ctaHref}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm"
-                >
-                  {ctaLabel} <ArrowRight size={15} />
-                </Link>
-                <Link
-                  href="/locations"
-                  className="inline-flex items-center gap-2 px-6 py-3 border border-white/25 text-white/85 font-semibold rounded-xl hover:border-white/50 hover:text-white transition-all text-sm"
-                >
-                  Locations entdecken
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── FÜR WEN ── */}
+      {/* ══════════════════════════════════════════════
+          TARGET AUDIENCES — who is this for
+      ══════════════════════════════════════════════ */}
       <section className="py-8 sm:py-16 bg-bg-secondary border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-6 sm:mb-12">
-            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">Vor und hinter der Kamera</p>
-            <h2 className="font-display text-3xl sm:text-4xl font-bold text-text-primary">CineGenius ist für dich — <span className="text-gradient-gold">ganz egal wer du bist.</span></h2>
+          <div className="mb-8 sm:mb-10">
+            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Vor und hinter der Kamera</p>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-xl">
+              CineGenius ist für dich —{" "}
+              <span className="text-gradient-gold">ganz egal wer du bist.</span>
+            </h2>
           </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               {
                 icon: Film,
                 title: "Film, Foto & Content",
-                desc: "Du drehst, fotografierst oder produzierst Content — hier findest du alles dafür.",
+                desc: "Du drehst, fotografierst oder produzierst — hier findest du alles dafür.",
                 items: ["Locations in Minuten finden", "Crew & Talente direkt anfragen", "Equipment tagesweise mieten", "Jobs & Aufträge ausschreiben"],
                 cta: "Jetzt entdecken",
                 href: "/locations",
@@ -705,24 +559,25 @@ export default async function HomePage() {
               },
               {
                 icon: TrendingUp,
-                title: "Du brauchst keine Kamera",
-                desc: "Schöne Wohnung? Industriehalle? Oldtimer? Du kannst hier Geld verdienen — ohne selbst zu produzieren.",
-                items: ["300–800 € pro Drehtag mit deiner Location", "Equipment & Fahrzeuge vermieten", "Keine Branchenerfahrung nötig", "Kostenlos inserieren, sicher bezahlt werden"],
+                title: "Keine Kamera nötig",
+                desc: "Schöne Wohnung? Industriehalle? Oldtimer? Du kannst hier Geld verdienen.",
+                items: ["300–800 € pro Drehtag", "Equipment & Fahrzeuge vermieten", "Keine Branchenerfahrung nötig", "Kostenlos inserieren, sicher bezahlt"],
                 cta: "Inserat erstellen",
                 href: "/inserat",
                 highlight: true,
               },
             ].map(({ icon: Icon, title, desc, items, cta, href, highlight }) => (
-              <div key={title} className={`rounded-2xl border p-6 flex flex-col ${highlight ? "border-gold/20 bg-gold-subtle" : "border-border bg-bg-elevated"}`}>
+              <div key={title} className={`rounded-2xl border p-6 flex flex-col ${highlight ? "border-gold/25 bg-gold-subtle" : "border-border bg-bg-elevated"}`}>
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${highlight ? "bg-gold/10 border border-gold/20" : "bg-bg-hover border border-border-light"}`}>
                   <Icon size={18} className={highlight ? "text-gold" : "text-text-secondary"} />
                 </div>
-                <h3 className="font-display text-base font-bold text-text-primary mb-1">{title}</h3>
+                <h3 className="font-display text-base font-bold text-text-primary mb-1.5">{title}</h3>
                 <p className="text-xs text-text-muted mb-4 leading-relaxed">{desc}</p>
                 <ul className="space-y-2 mb-6 flex-1">
                   {items.map((item) => (
                     <li key={item} className="flex items-start gap-2 text-xs text-text-secondary">
-                      <CheckCircle size={12} className={`shrink-0 mt-0.5 ${highlight ? "text-gold" : "text-success"}`} /> {item}
+                      <CheckCircle size={12} className={`shrink-0 mt-0.5 ${highlight ? "text-gold" : "text-emerald-500"}`} />
+                      {item}
                     </li>
                   ))}
                 </ul>
@@ -738,52 +593,130 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── FEATURED LOCATIONS ── */}
-      <section className="py-6 sm:py-12 bg-bg-secondary border-y border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-6">
-            <div>
-              <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Neu & empfohlen</p>
-              <h2 className="font-display text-2xl font-bold text-text-primary">Ausgewählte Locations</h2>
+      {/* ══════════════════════════════════════════════
+          VISUAL SHOWCASE — use-case grid
+      ══════════════════════════════════════════════ */}
+      <section className="py-8 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 sm:mb-10">
+          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Für jeden Shoot</p>
+          <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg">
+            Film · Foto · Content · Werbung
+          </h2>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-[200px]">
+          <Link href="/projects" className="relative rounded-2xl overflow-hidden row-span-2 group block">
+            <Image src="https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=85" alt="Film Set" fill
+              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            <div className="absolute bottom-5 left-5">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold mb-2">
+                <Film size={10} /> Film & Kino
+              </span>
+              <p className="text-white font-semibold text-sm">Professionelle Filmsets</p>
+              <p className="text-white/60 text-xs mt-0.5">Locations, Crew & Equipment</p>
             </div>
-            <Link href="/locations" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light transition-colors font-medium">
-              Alle anzeigen <ArrowRight size={14} />
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {liveLocations.map((loc) => (
-              <Link key={loc.id} href={`/locations/${loc.id}`} className="card-hover group rounded-xl border border-border bg-bg-elevated overflow-hidden block">
-                <div className="relative overflow-hidden aspect-video bg-bg-elevated">
-                  {loc.image && <Image src={loc.image} alt={loc.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw" />}
-                  <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/70 to-transparent" />
-                  <div className="absolute bottom-2 left-3 right-3">
-                    <h3 className="font-semibold text-white text-sm leading-tight">{loc.title}</h3>
-                    <p className="text-xs text-white/70 flex items-center gap-1 mt-0.5">
-                      <MapPin size={10} /> {loc.city}
-                    </p>
-                  </div>
-                </div>
-                <div className="px-4 py-3 flex items-center justify-between">
-                  <span className="text-xs text-text-muted">Neu</span>
-                  <span className="text-sm font-semibold text-gold">
-                    {loc.price.toLocaleString()} €<span className="text-[11px] text-text-muted font-normal">/Tag</span>
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
+          </Link>
+          <Link href="/photo" className="relative rounded-2xl overflow-hidden group block">
+            <Image src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=800&q=85" alt="Fotoshooting" fill
+              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
+                <Camera size={10} /> Fotografie
+              </span>
+              <p className="text-white font-semibold text-sm">Shootings & Studios</p>
+            </div>
+          </Link>
+          <Link href="/social-media" className="relative rounded-2xl overflow-hidden group block">
+            <Image src="https://images.unsplash.com/photo-1683721003111-070bcc053d8b?w=800&q=85" alt="Social Media" fill
+              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
+                <Zap size={10} /> Social Media
+              </span>
+              <p className="text-white font-semibold text-sm">Content Creation</p>
+            </div>
+          </Link>
+          <Link href="/companies" className="relative rounded-2xl overflow-hidden group block">
+            <Image src="https://images.unsplash.com/photo-1557858310-9052820906f7?w=800&q=85" alt="Werbung" fill
+              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
+                <TrendingUp size={10} /> Werbung
+              </span>
+              <p className="text-white font-semibold text-sm">Werbe- & Industriefilm</p>
+            </div>
+          </Link>
+          <Link href="/bts" className="relative rounded-2xl overflow-hidden group block">
+            <Image src="https://plus.unsplash.com/premium_photo-1682001110037-50545d73acfa?w=800&q=85" alt="Behind the scenes" fill
+              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
+                <Play size={10} /> Behind the Scenes
+              </span>
+              <p className="text-white font-semibold text-sm">Backstage & Crew</p>
+            </div>
+          </Link>
         </div>
       </section>
 
-      {/* ── FIRMEN ── */}
+      {/* ══════════════════════════════════════════════
+          FEATURED LOCATIONS
+      ══════════════════════════════════════════════ */}
+      {liveLocations.length > 0 && (
+        <section className="py-8 sm:py-12 bg-bg-secondary border-y border-border">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-end justify-between mb-6">
+              <div>
+                <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Neu & empfohlen</p>
+                <h2 className="font-display text-2xl font-bold text-text-primary">Ausgewählte Locations</h2>
+              </div>
+              <Link href="/locations" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium">
+                Alle anzeigen <ArrowRight size={14} />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {liveLocations.map((loc) => (
+                <Link key={loc.id} href={`/locations/${loc.id}`} className="card-hover group rounded-xl border border-border bg-bg-elevated overflow-hidden block">
+                  <div className="relative overflow-hidden aspect-video bg-bg-elevated">
+                    {loc.image && (
+                      <Image src={loc.image} alt={loc.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw" />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/70 to-transparent" />
+                    <div className="absolute bottom-2 left-3 right-3">
+                      <h3 className="font-semibold text-white text-sm leading-tight">{loc.title}</h3>
+                      <p className="text-xs text-white/70 flex items-center gap-1 mt-0.5">
+                        <MapPin size={10} /> {loc.city}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="px-4 py-3 flex items-center justify-between">
+                    <span className="text-xs text-text-muted">Neu</span>
+                    <span className="text-sm font-semibold text-gold">
+                      {loc.price.toLocaleString()} €<span className="text-[11px] text-text-muted font-normal">/Tag</span>
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ══════════════════════════════════════════════
+          COMPANIES
+      ══════════════════════════════════════════════ */}
       {companies.length > 0 && (
-        <section className="py-6 sm:py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-8 sm:py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between mb-6">
             <div>
               <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Branchenpartner</p>
               <h2 className="font-display text-2xl font-bold text-text-primary">Firmen & Studios</h2>
             </div>
-            <Link href="/companies" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light transition-colors font-medium">
+            <Link href="/companies" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium">
               Alle anzeigen <ArrowRight size={14} />
             </Link>
           </div>
@@ -807,16 +740,18 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── PROJEKTE ── */}
+      {/* ══════════════════════════════════════════════
+          PROJECTS
+      ══════════════════════════════════════════════ */}
       {projects.length > 0 && (
-        <section className="py-6 sm:py-12 bg-bg-secondary border-y border-border">
+        <section className="py-8 sm:py-12 bg-bg-secondary border-y border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-end justify-between mb-6">
               <div>
                 <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Neu eingetragen</p>
                 <h2 className="font-display text-2xl font-bold text-text-primary">Aktuelle Filmprojekte</h2>
               </div>
-              <Link href="/projects" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light transition-colors font-medium">
+              <Link href="/projects" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium">
                 Alle Projekte <ArrowRight size={14} />
               </Link>
             </div>
@@ -838,14 +773,16 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── AKTUELLE JOBS ── */}
-      <section className="py-6 sm:py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* ══════════════════════════════════════════════
+          JOBS
+      ══════════════════════════════════════════════ */}
+      <section className="py-8 sm:py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between mb-6">
           <div>
             <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Jetzt gesucht</p>
             <h2 className="font-display text-2xl font-bold text-text-primary">Aktuelle Jobs</h2>
           </div>
-          <Link href="/jobs" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light transition-colors font-medium">
+          <Link href="/jobs" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium">
             Alle anzeigen <ArrowRight size={14} />
           </Link>
         </div>
@@ -856,14 +793,7 @@ export default async function HomePage() {
                 <Briefcase size={16} className="text-gold" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <h3 className="font-semibold text-text-primary text-sm truncate">{job.title}</h3>
-                  {job.urgent && (
-                    <span className="px-1.5 py-0.5 bg-crimson/20 border border-crimson/40 text-crimson-light text-[10px] font-semibold rounded shrink-0">
-                      Dringend
-                    </span>
-                  )}
-                </div>
+                <h3 className="font-semibold text-text-primary text-sm truncate">{job.title}</h3>
                 <p className="text-xs text-text-muted truncate">{job.location}</p>
               </div>
               <div className="text-right shrink-0">
@@ -876,33 +806,38 @@ export default async function HomePage() {
           ))}
         </div>
         <div className="mt-4 text-center">
-          <Link
-            href="/inserat"
-            className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors"
-          >
+          <Link href="/inserat" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors">
             Job ausschreiben <ArrowRight size={13} />
           </Link>
         </div>
       </section>
 
-      {/* ── PLATTFORM-PULSE ── */}
-      <section className="py-6 sm:py-10 border-y border-border bg-bg-secondary overflow-hidden">
+      {/* ══════════════════════════════════════════════
+          TESTIMONIALS
+      ══════════════════════════════════════════════ */}
+      <section className="py-8 sm:py-20 bg-bg-secondary border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {[
-              { value: "0 €", label: "Gebühren", sub: "komplett kostenlos", icon: CheckCircle },
-              { value: "0 %", label: "Provision", sub: "keine Transaktionsgebühr", icon: CheckCircle },
-              { value: "24 h", label: "Antwortzeit", sub: "Ø Reaktionszeit", icon: Clock },
-              { value: "DACH", label: "Region", sub: "DE · AT · CH", icon: TrendingUp },
-            ].map(({ value, label, sub, icon: Icon }) => (
-              <div key={label} className="flex items-center gap-3 p-4 rounded-xl bg-bg-elevated border border-border">
-                <div className="w-10 h-10 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
-                  <Icon size={16} className="text-gold" />
+          <div className="mb-8 sm:mb-14">
+            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Stimmen</p>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg">Warum CineGenius?</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {testimonials.map((t) => (
+              <div key={t.name} className="p-6 rounded-2xl border border-border bg-bg-elevated flex flex-col gap-4">
+                <div className="flex gap-0.5">
+                  {Array.from({ length: t.rating }).map((_, i) => (
+                    <Star key={i} size={14} className="text-gold fill-gold" />
+                  ))}
                 </div>
-                <div className="min-w-0">
-                  <p className="font-display text-xl font-bold text-text-primary leading-none">{value}</p>
-                  <p className="text-xs font-medium text-text-secondary mt-0.5">{label}</p>
-                  <p className="text-[10px] text-text-muted">{sub}</p>
+                <p className="text-sm text-text-secondary leading-relaxed flex-1">&ldquo;{t.quote}&rdquo;</p>
+                <div className="flex items-center gap-3 pt-3 border-t border-border">
+                  <div className="w-10 h-10 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0 text-sm font-bold text-gold">
+                    {t.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-text-primary">{t.name}</p>
+                    <p className="text-xs text-text-muted">{t.role}</p>
+                  </div>
                 </div>
               </div>
             ))}
@@ -910,92 +845,46 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── VERTRAUEN + TESTIMONIALS ── */}
-      <section className="py-8 sm:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-6 sm:mb-14">
-          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">Vertrauen & Sicherheit</p>
-          <h2 className="font-display text-3xl font-bold text-text-primary">Warum CineGenius?</h2>
-        </div>
-
-        {/* Trust pillars */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 sm:mb-16">
-          {[
-            { icon: Shield, title: "Sichere Zahlung", desc: "Stripe-Treuhand — Geld wird erst nach erfolgreichem Abschluss freigegeben." },
-            { icon: CheckCircle, title: "Verifizierte Anbieter", desc: "Geprüfte Profile und Identitäten für maximale Sicherheit auf beiden Seiten." },
-            { icon: Zap, title: "Komplett kostenlos", desc: "Kein Abo, keine Grundgebühr, keine Provision. Einfach registrieren und loslegen." },
-          ].map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="flex flex-col items-center text-center p-6 rounded-2xl border border-border bg-bg-secondary">
-              <div className="w-12 h-12 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center mb-4">
-                <Icon size={20} className="text-gold" />
-              </div>
-              <h3 className="font-semibold text-text-primary mb-2">{title}</h3>
-              <p className="text-sm text-text-muted leading-relaxed">{desc}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Testimonials */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {testimonials.map((t) => (
-            <div key={t.name} className="p-6 rounded-2xl border border-border bg-bg-secondary flex flex-col gap-4">
-              <div className="flex gap-0.5">
-                {Array.from({ length: t.rating }).map((_, i) => (
-                  <Star key={i} size={14} className="text-gold fill-gold" />
-                ))}
-              </div>
-              <p className="text-sm text-text-secondary leading-relaxed flex-1">&ldquo;{t.quote}&rdquo;</p>
-              <div className="flex items-center gap-3 pt-3 border-t border-border">
-                <div className="w-10 h-10 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0 text-sm font-bold text-gold">
-                  {t.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-text-primary">{t.name}</p>
-                  <p className="text-xs text-text-muted">{t.role}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── FINAL CTA ── */}
+      {/* ══════════════════════════════════════════════
+          FINAL CTA
+      ══════════════════════════════════════════════ */}
       <section className="py-12 sm:py-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-gold-subtle via-bg-primary to-bg-primary" />
         <div className="absolute inset-0 border-t border-b border-gold/10" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-gold/5 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative max-w-2xl mx-auto px-4 sm:px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold/20 bg-gold/5 text-gold text-xs font-semibold mb-6">
-            <Play size={10} className="fill-gold" /> Bereit loszulegen?
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold/20 bg-gold/5 text-gold text-xs font-semibold mb-5">
+                <Play size={10} className="fill-gold" /> Bereit loszulegen?
+              </div>
+              <h2 className="font-display text-3xl sm:text-4xl font-bold text-text-primary mb-3 leading-tight">
+                Dein nächstes Projekt<br />
+                <span className="text-gradient-gold">wartet schon.</span>
+              </h2>
+              <p className="text-text-muted text-sm leading-relaxed max-w-sm">
+                Kostenlos registrieren, sofort loslegen. Keine Kreditkarte nötig.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 shrink-0">
+              <Link
+                href={ctaHref}
+                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl transition-all text-sm shadow-lg shadow-emerald-500/20"
+              >
+                {ctaLabel} <ArrowRight size={15} />
+              </Link>
+              <Link
+                href="/inserat"
+                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 border border-border text-text-primary font-semibold rounded-xl hover:border-gold hover:text-gold transition-all text-sm"
+              >
+                Inserat erstellen
+              </Link>
+              <p className="text-[11px] text-text-muted text-center">
+                Keine Kreditkarte · Keine Provision · Jederzeit kündbar
+              </p>
+            </div>
           </div>
-          <h2 className="font-display text-4xl sm:text-5xl font-bold text-text-primary mb-4">
-            Dein nächstes Projekt<br />
-            <span className="text-gradient-gold">wartet schon.</span>
-          </h2>
-          <p className="text-text-secondary mb-5 leading-relaxed">
-            Kostenlos registrieren. Sofort loslegen.<br />
-            Für Kreative, Produzenten, Fotografen — und alle, die einfach verdienen wollen.
-          </p>
-          <p className="text-xs text-text-muted mb-7">
-            Keine Kamera? Kein Problem — vermiete deine Location, dein Equipment oder dein Fahrzeug.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
-            <Link
-              href={ctaHref}
-              className="px-8 py-3.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors flex items-center justify-center gap-2"
-            >
-              {ctaLabel} <ArrowRight size={16} />
-            </Link>
-            <Link
-              href="/locations"
-              className="px-8 py-3.5 border border-border text-text-primary font-semibold rounded-xl hover:border-gold hover:text-gold transition-all flex items-center justify-center gap-2"
-            >
-              Locations entdecken
-            </Link>
-          </div>
-          <p className="text-xs text-text-muted">
-            Keine Kreditkarte erforderlich · Sofort einsatzbereit · Jederzeit kündbar
-          </p>
         </div>
       </section>
     </>
