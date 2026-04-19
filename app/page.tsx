@@ -332,23 +332,10 @@ export default async function HomePage() {
         <div className="flex-1" />
 
         {/* ── LIVE STRIPS — anchored to bottom ── */}
-        {(posterStrip.length >= 1 || avatarStrip.length >= 1 || locationStrip.length >= 1) && (
-          <div className="absolute bottom-0 left-0 right-0 z-20 flex flex-col">
-            {posterStrip.length >= 1 && (
-              <ImageStrip images={posterStrip} aspectRatio="wide" height={60} durationOverride={35} direction="left" overlay={false} stripId="top" />
-            )}
-            {avatarStrip.length >= 1 && (
-              <ImageStrip images={avatarStrip} aspectRatio="square" height={60} durationOverride={45} direction="right" overlay={false} stripId="mid" startOffset={0.33} />
-            )}
-            {locationStrip.length >= 1 && (
-              <ImageStrip images={locationStrip} aspectRatio="wide" height={60} durationOverride={90} direction="left" overlay={false} stripId="bot" startOffset={0.5} />
-            )}
-          </div>
-        )}
       </section>
 
       {/* ── STATS BAR — clean break below hero ── */}
-      <div className="border-y border-border bg-bg-secondary">
+      <div className="border-b border-border bg-bg-secondary">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-5">
           <div className="flex flex-wrap items-center justify-center gap-y-3 gap-x-0">
             {liveStats.map((s, i) => (
@@ -365,6 +352,21 @@ export default async function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* ── LIVE STRIPS — below stats bar ── */}
+      {(posterStrip.length >= 1 || avatarStrip.length >= 1 || locationStrip.length >= 1) && (
+        <div className="flex flex-col border-b border-border overflow-hidden">
+          {posterStrip.length >= 1 && (
+            <ImageStrip images={posterStrip} aspectRatio="wide" height={60} durationOverride={35} direction="left" overlay={false} stripId="top" />
+          )}
+          {avatarStrip.length >= 1 && (
+            <ImageStrip images={avatarStrip} aspectRatio="square" height={60} durationOverride={45} direction="right" overlay={false} stripId="mid" startOffset={0.33} />
+          )}
+          {locationStrip.length >= 1 && (
+            <ImageStrip images={locationStrip} aspectRatio="wide" height={60} durationOverride={90} direction="left" overlay={false} stripId="bot" startOffset={0.5} />
+          )}
+        </div>
+      )}
 
       {/* ── VISUAL SHOWCASE ── */}
       <section className="py-8 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
