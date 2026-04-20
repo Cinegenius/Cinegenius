@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { compressAvatar } from "@/lib/compressImage";
 import { useUser } from "@clerk/nextjs";
 import {
@@ -147,6 +148,7 @@ function RolePicker({
 
 export default function ProfileSetupPage() {
   const { user, isLoaded } = useUser();
+  const searchParams = useSearchParams();
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [step, setStep] = useState<0 | 1>(0);
@@ -167,7 +169,8 @@ export default function ProfileSetupPage() {
     fetch("/api/profile").then(r => r.json()).then(({ exists }) => {
       if (exists) {
         // GET-Handler setzt das Cookie — hard redirect damit Middleware sofort durchlässt
-        window.location.replace("/dashboard");
+        const redirectTo = searchParams.get("redirect") || "/dashboard";
+        window.location.replace(redirectTo);
       }
     });
   }, [isLoaded, user]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -237,7 +240,8 @@ export default function ProfileSetupPage() {
 
       // Hard redirect — das Cookie aus dem POST-Response wird mitgesendet,
       // Middleware lässt den User sofort durch ohne JWT-Wartezeit.
-      window.location.href = "/dashboard?welcome=1";
+      const redirectTo = searchParams.get("redirect") || "/dashboard?welcome=1";
+      window.location.href = redirectTo;
     } catch (e) {
       console.error("[profile-setup] save error:", e);
       setSaving(false);

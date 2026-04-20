@@ -20,7 +20,8 @@ export default function ProfileGuard({ children }: { children: React.ReactNode }
     if (!isLoaded) return;
 
     if (!user) {
-      router.replace("/sign-in");
+      const redirect = window.location.pathname + window.location.search;
+      router.replace(`/sign-in?redirect=${encodeURIComponent(redirect)}`);
       return;
     }
 
@@ -28,7 +29,8 @@ export default function ProfileGuard({ children }: { children: React.ReactNode }
       .then((r) => r.json())
       .then(({ exists }) => {
         if (!exists) {
-          router.replace("/profile-setup");
+          const redirect = window.location.pathname + window.location.search;
+          router.replace(`/profile-setup?redirect=${encodeURIComponent(redirect)}`);
         } else {
           setReady(true);
         }
