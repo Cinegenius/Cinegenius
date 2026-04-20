@@ -286,7 +286,7 @@ export default async function HomePage() {
               className="hero-sub text-sm sm:text-lg mb-7 sm:mb-10 leading-[1.6] animate-fade-up max-w-[340px] sm:max-w-[560px] mx-auto sm:mx-0"
               style={{ opacity: 0.75 }}
             >
-              Der Marktplatz für Locations, Crew &amp; Equipment.
+              Der Marktplatz für Kreative — Locations, Crew &amp; Equipment für Film, Foto und Content.
             </p>
 
             {/* Hero Search */}
