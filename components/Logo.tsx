@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 // Open chevron mark — the universal "play / forward / action" symbol.
 // Two clean strokes forming ›, rendered sharp on dark or light backgrounds.
@@ -24,10 +27,19 @@ function ChevronMark({ size = 26 }: { size?: number }) {
 }
 
 export function Logo({ href = "/", onClick }: { href?: string; onClick?: () => void }) {
+  const pathname = usePathname();
+
+  function handleClick() {
+    onClick?.();
+    if (pathname === href) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
+
   return (
     <Link
       href={href}
-      onClick={onClick}
+      onClick={handleClick}
       className="flex items-center gap-2 shrink-0 group"
       aria-label="CineGenius"
     >
