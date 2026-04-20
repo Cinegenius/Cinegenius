@@ -238,12 +238,20 @@ export default async function HomePage() {
         {/* Background image */}
         <div className="hero-bg absolute inset-0 bg-cover bg-no-repeat" />
 
-        {/* Required side-gradient overlay — left heavy, fades right */}
+        {/* Desktop: side-gradient overlay — left heavy, fades right */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 hidden sm:block"
           style={{
             background:
               "linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.2) 70%, rgba(0,0,0,0.35) 100%)",
+          }}
+        />
+        {/* Mobile: strong top-to-bottom gradient — content zone dark, faces visible at bottom */}
+        <div
+          className="absolute inset-0 sm:hidden"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.75) 45%, rgba(0,0,0,0.45) 70%, rgba(0,0,0,0.2) 100%)",
           }}
         />
         {/* Top darkening for nav legibility */}
