@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { fetchRatings } from "@/lib/ratings";
 import LocationsContent from "./LocationsContent";
 import CategoryHero from "@/components/CategoryHero";
 import ProviderProfiles from "@/components/ProviderProfiles";
@@ -74,8 +75,11 @@ export default async function LocationsPage() {
 
   const rows = data ?? [];
 
-  // Geocode all unique cities in parallel
-  const coords = await geocodeCities(rows.map((l) => l.city ?? ""));
+  // Fetch ratings + geocode in parallel
+  const [ratingsMap, coords] = await Promise.all([
+    fetchRatings(rows.map((l) => l.id), "location"),
+    geocodeCities(rows.map((l) => l.city ?? "")),
+  ]);
 
   const FALLBACK = { lat: 48.1351, lng: 11.5820 };
 
@@ -91,8 +95,8 @@ export default async function LocationsPage() {
       city: l.city ?? "",
       price: l.price,
       priceUnit: "day" as const,
-      rating: 0,
-      reviews: 0,
+      rating: ratingsMap[l.id]?.rating ?? 0,
+      reviews: ratingsMap[l.id]?.reviews ?? 0,
       image: l.image_url ?? "",
       tags: ["Neu"],
       instantBook: false,

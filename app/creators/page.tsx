@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { fetchRatings } from "@/lib/ratings";
 import CreatorsContent, { type ServerCreator } from "./CreatorsContent";
 import CategoryHero from "@/components/CategoryHero";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
@@ -137,7 +138,15 @@ export default async function CreatorsPage() {
       };
     });
 
-  const serverCreators: ServerCreator[] = [...fromListings, ...fromProfiles];
+  // Fetch ratings for all creators in parallel
+  const allIds = [...fromListings.map((c) => c.id), ...fromProfiles.map((c) => c.id)];
+  const ratingsMap = await fetchRatings(allIds, "creator");
+
+  const serverCreators: ServerCreator[] = [...fromListings, ...fromProfiles].map((c) => ({
+    ...c,
+    rating: ratingsMap[c.id]?.rating ?? 0,
+    reviews: ratingsMap[c.id]?.reviews ?? 0,
+  }));
 
   // Avatar strip — only real user-uploaded avatars (Supabase storage URLs)
   const avatarImages = [...fromListings, ...fromProfiles]
