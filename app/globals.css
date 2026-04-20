@@ -226,13 +226,13 @@ input, select, textarea { color: inherit; }
   background-position: center 40%;
   background-size: cover;
 }
-/* Mobile: slight shift so subject is well placed */
+/* Mobile: center image so faces are visible */
 @media (max-width: 640px) {
   .hero-bg {
-    background-position: 35% 30%;
+    background-position: 60% 20%;
   }
   [data-theme="light"] .hero-bg {
-    background-position: 35% 30%;
+    background-position: 60% 20%;
   }
 }
 
