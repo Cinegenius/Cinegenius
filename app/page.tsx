@@ -253,42 +253,42 @@ export default async function HomePage() {
           style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E\")" }}
         />
 
-        {/* ── Content — left aligned, upper area ── */}
-        <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pt-[140px] sm:pt-[160px] lg:pt-[180px]">
-          <div className="max-w-[680px]">
+        {/* ── Content — centered on mobile, left on desktop ── */}
+        <div className="relative z-10 px-6 sm:px-10 lg:px-[100px] pt-24 sm:pt-[160px] lg:pt-[180px]">
+          <div className="max-w-[680px] mx-auto sm:mx-0 text-center sm:text-left">
             {/* Badge */}
-            <div className="hero-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-semibold uppercase tracking-[0.18em] mb-6 animate-fade-in">
+            <div className="hero-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-semibold uppercase tracking-[0.18em] mb-5 animate-fade-in">
               <Zap size={10} /> Film · Foto · Content · Werbung
             </div>
 
-            {/* Headline — line-height 0.9, tight and commanding */}
+            {/* Headline — 36px mobile, tight line-height */}
             <h1
-              className="hero-title font-display text-[3rem] sm:text-[4.5rem] lg:text-[5.5rem] font-bold tracking-tight mb-8 sm:mb-10 animate-fade-up"
-              style={{ lineHeight: "0.9" }}
+              className="hero-title font-display text-[2.25rem] sm:text-[4.5rem] lg:text-[5.5rem] font-bold tracking-tight mb-5 sm:mb-8 animate-fade-up"
+              style={{ lineHeight: "1.05" }}
             >
               Create. Connect.<br />
-              <span className="text-gradient-gold">Get Discovered.</span>
+              <span className="text-gradient-gold" style={{ lineHeight: "1.15" }}>Get Discovered.</span>
             </h1>
 
-            {/* Subtext — 1 sentence, max-width 560px */}
+            {/* Subtext — centered mobile, max 2 lines */}
             <p
-              className="hero-sub text-base sm:text-lg mb-8 sm:mb-10 leading-relaxed animate-fade-up max-w-[560px]"
+              className="hero-sub text-base sm:text-lg mb-7 sm:mb-10 leading-[1.5] animate-fade-up max-w-[420px] sm:max-w-[560px] mx-auto sm:mx-0"
               style={{ opacity: 0.82 }}
             >
               Der Marktplatz für Kreative — Locations, Crew &amp; Equipment für Film, Foto und Content.
             </p>
 
-            {/* Buttons — full-width on mobile, natural width on sm+ */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-3 sm:gap-4 animate-fade-up">
+            {/* Buttons — stacked, full width on mobile */}
+            <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-start sm:gap-4 animate-fade-up max-w-[360px] sm:max-w-none mx-auto sm:mx-0">
               <Link
                 href={ctaHref}
-                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-gold hover:bg-gold-light text-bg-primary font-bold rounded-xl active:scale-[0.98] transition-all text-sm tracking-wide shadow-lg shadow-gold/25"
+                className="inline-flex items-center justify-center gap-2 px-7 py-[14px] bg-gold hover:bg-gold-light text-bg-primary font-bold rounded-xl active:scale-[0.98] transition-all text-[15px] tracking-wide shadow-lg shadow-gold/25"
               >
                 {ctaLabel} <ArrowRight size={15} />
               </Link>
               <Link
                 href="/inserat"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl border border-white/25 bg-black/20 backdrop-blur-sm text-white/80 font-semibold hover:border-white/45 hover:text-white active:scale-[0.98] transition-all text-sm"
+                className="inline-flex items-center justify-center gap-2 px-7 py-[14px] rounded-xl border border-white/25 bg-black/20 backdrop-blur-sm text-white/80 font-semibold hover:border-white/45 hover:text-white active:scale-[0.98] transition-all text-[15px]"
               >
                 Inserat erstellen
               </Link>
@@ -296,12 +296,12 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Spacer — exposes the people/action area of the photo */}
+        {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Stats — anchored to bottom, left-aligned */}
-        <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pb-10 sm:pb-14">
-          <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center gap-y-4 gap-x-8 sm:gap-10">
+        {/* Stats — 2×2 on mobile, row on desktop */}
+        <div className="relative z-10 px-6 sm:px-10 lg:px-[100px] pb-8 sm:pb-14">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center gap-y-4 gap-x-6 sm:gap-10 max-w-[360px] sm:max-w-none mx-auto sm:mx-0">
             {liveStats.slice(0, 4).map((s) => (
               <div key={s.label}>
                 <div className="text-xl sm:text-2xl font-bold text-white font-display leading-none">{s.value}</div>
@@ -316,13 +316,13 @@ export default async function HomePage() {
           TRUST BAR — immediately after hero
       ══════════════════════════════════════════════ */}
       <div className="bg-bg-secondary border-b border-border">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
-          <div className="flex flex-wrap items-center justify-center sm:justify-between gap-5">
+        <div className="max-w-5xl mx-auto px-6 sm:px-6 py-5">
+          <div className="grid grid-cols-2 gap-4 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-5">
             {[
-              { icon: Shield,       text: "Sichere Zahlung",      sub: "Stripe Treuhand" },
+              { icon: Shield,       text: "Sichere Zahlung",       sub: "Stripe Treuhand" },
               { icon: CheckCircle,  text: "Verifizierte Anbieter", sub: "Geprüfte Profile" },
-              { icon: Zap,          text: "100% kostenlos",       sub: "Keine Provision" },
-              { icon: Clock,        text: "DACH-Region",          sub: "DE · AT · CH" },
+              { icon: Zap,          text: "100% kostenlos",        sub: "Keine Provision" },
+              { icon: Clock,        text: "DACH-Region",           sub: "DE · AT · CH" },
             ].map(({ icon: Icon, text, sub }) => (
               <div key={text} className="flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
@@ -356,9 +356,16 @@ export default async function HomePage() {
       {/* ══════════════════════════════════════════════
           PLATFORM EXPLANATION — 3 steps, left header
       ══════════════════════════════════════════════ */}
-      <section className="py-12 sm:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-10 lg:gap-16 items-start">
-          <div>
+      <section className="py-16 sm:py-20 max-w-7xl mx-auto px-6 sm:px-6 lg:px-8">
+        {/* Mobile: centered header. Desktop: left column */}
+        <div className="text-center sm:text-left mb-8 sm:hidden">
+          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Einfach & schnell</p>
+          <h2 className="font-display text-2xl font-bold text-text-primary">In 3 Schritten dabei sein</h2>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6 lg:gap-16 items-start">
+          {/* Left col — desktop only */}
+          <div className="hidden sm:block">
             <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">Einfach & schnell</p>
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary mb-5 leading-tight">
               In 3 Schritten<br />dabei sein
@@ -374,38 +381,26 @@ export default async function HomePage() {
             </Link>
           </div>
 
+          {/* Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
-              {
-                step: "01",
-                icon: Film,
-                title: "Kostenlos registrieren",
-                desc: "Kein Abo, keine Grundgebühr. Profil erstellen und sofort loslegen — als Kreativer, Anbieter oder Firma.",
-              },
-              {
-                step: "02",
-                icon: MapPin,
-                title: "Anbieten oder suchen",
-                desc: "Inseriere deine Location, dein Equipment oder dich selbst — oder finde genau das, was du brauchst.",
-              },
-              {
-                step: "03",
-                icon: Shield,
-                title: "Direkt loslegen",
-                desc: "Schreib direkt, keine Agentur dazwischen. Zahlung sicher über Treuhand — erst nach Abschluss.",
-              },
+              { step: "01", icon: Film,   title: "Kostenlos registrieren", desc: "Kein Abo, keine Gebühren. Profil erstellen und sofort loslegen." },
+              { step: "02", icon: MapPin, title: "Anbieten oder suchen",   desc: "Location inserieren, Crew buchen oder Job ausschreiben." },
+              { step: "03", icon: Shield, title: "Direkt loslegen",        desc: "Direkte Kontaktaufnahme, keine Agentur. Zahlung über Treuhand." },
             ].map(({ step, icon: Icon, title, desc }) => (
-              <div key={step} className="flex flex-col p-5 rounded-2xl border border-border bg-bg-secondary">
-                <div className="flex items-center gap-3 mb-3">
+              <div key={step} className="flex gap-4 p-5 rounded-2xl border border-border bg-bg-secondary sm:flex-col sm:gap-0">
+                <div className="flex items-center gap-3 sm:mb-3 shrink-0">
                   <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0 relative">
                     <Icon size={18} className="text-gold" />
                     <span className="absolute -top-2 -right-2 w-5 h-5 bg-gold text-bg-primary text-[9px] font-bold rounded-full flex items-center justify-center">
                       {step}
                     </span>
                   </div>
-                  <h3 className="font-display text-sm font-bold text-text-primary leading-tight">{title}</h3>
                 </div>
-                <p className="text-xs text-text-muted leading-relaxed">{desc}</p>
+                <div>
+                  <h3 className="font-display text-sm font-bold text-text-primary leading-tight mb-1.5">{title}</h3>
+                  <p className="text-xs text-text-muted leading-relaxed">{desc}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -417,7 +412,7 @@ export default async function HomePage() {
       ══════════════════════════════════════════════ */}
       <section className="py-8 sm:py-16 bg-bg-secondary border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-8 sm:mb-10">
+          <div className="flex flex-col items-center sm:flex-row sm:items-end sm:justify-between mb-8 sm:mb-10 text-center sm:text-left">
             <div>
               <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Alles auf einer Plattform</p>
               <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg">
@@ -477,9 +472,9 @@ export default async function HomePage() {
           USE CASES — 4 equal image cards
       ══════════════════════════════════════════════ */}
       <section className="py-8 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 sm:mb-10">
+        <div className="mb-8 sm:mb-10 text-center sm:text-left">
           <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Konkrete Beispiele</p>
-          <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg">
+          <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg mx-auto sm:mx-0">
             Was du mit CineGenius machen kannst
           </h2>
         </div>
@@ -517,16 +512,16 @@ export default async function HomePage() {
       ══════════════════════════════════════════════ */}
       <section className="py-8 sm:py-16 bg-bg-secondary border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8 sm:mb-10">
+          <div className="mb-8 sm:mb-10 text-center sm:text-left">
             <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Vor und hinter der Kamera</p>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-xl">
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-xl mx-auto sm:mx-0">
               CineGenius ist für dich —{" "}
               <span className="text-gradient-gold">ganz egal wer du bist.</span>
             </h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
+            {([
               {
                 icon: Film,
                 title: "Film, Foto & Content",
@@ -563,8 +558,8 @@ export default async function HomePage() {
                 href: "/inserat",
                 highlight: true,
               },
-            ].map(({ icon: Icon, title, desc, items, cta, href, highlight }) => (
-              <div key={title} className={`rounded-2xl border p-6 flex flex-col ${highlight ? "border-gold/25 bg-gold-subtle" : "border-border bg-bg-elevated"}`}>
+            ] as const).map(({ icon: Icon, title, desc, items, cta, href, highlight }, idx) => (
+              <div key={title} className={`rounded-2xl border p-6 flex flex-col ${highlight ? "border-gold/25 bg-gold-subtle" : "border-border bg-bg-elevated"}${idx >= 2 ? " hidden sm:flex" : ""}`}>
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${highlight ? "bg-gold/10 border border-gold/20" : "bg-bg-hover border border-border-light"}`}>
                   <Icon size={18} className={highlight ? "text-gold" : "text-text-secondary"} />
                 </div>
@@ -593,7 +588,7 @@ export default async function HomePage() {
       {/* ══════════════════════════════════════════════
           VISUAL SHOWCASE — use-case grid
       ══════════════════════════════════════════════ */}
-      <section className="py-8 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="hidden sm:block py-8 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8 sm:mb-10">
           <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Für jeden Shoot</p>
           <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg">
@@ -666,12 +661,12 @@ export default async function HomePage() {
       {liveLocations.length > 0 && (
         <section className="py-8 sm:py-12 bg-bg-secondary border-y border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-end justify-between mb-6">
+            <div className="flex flex-col items-center sm:flex-row sm:items-end sm:justify-between mb-6 text-center sm:text-left">
               <div>
                 <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Neu & empfohlen</p>
                 <h2 className="font-display text-2xl font-bold text-text-primary">Ausgewählte Locations</h2>
               </div>
-              <Link href="/locations" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium">
+              <Link href="/locations" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium mt-2 sm:mt-0">
                 Alle anzeigen <ArrowRight size={14} />
               </Link>
             </div>
@@ -708,12 +703,12 @@ export default async function HomePage() {
       ══════════════════════════════════════════════ */}
       {companies.length > 0 && (
         <section className="py-8 sm:py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-6">
+          <div className="flex flex-col items-center sm:flex-row sm:items-end sm:justify-between mb-6 text-center sm:text-left">
             <div>
               <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Branchenpartner</p>
               <h2 className="font-display text-2xl font-bold text-text-primary">Firmen & Studios</h2>
             </div>
-            <Link href="/companies" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium">
+            <Link href="/companies" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium mt-2 sm:mt-0">
               Alle anzeigen <ArrowRight size={14} />
             </Link>
           </div>
@@ -743,12 +738,12 @@ export default async function HomePage() {
       {projects.length > 0 && (
         <section className="py-8 sm:py-12 bg-bg-secondary border-y border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-end justify-between mb-6">
+            <div className="flex flex-col items-center sm:flex-row sm:items-end sm:justify-between mb-6 text-center sm:text-left">
               <div>
                 <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Neu eingetragen</p>
                 <h2 className="font-display text-2xl font-bold text-text-primary">Aktuelle Filmprojekte</h2>
               </div>
-              <Link href="/projects" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium">
+              <Link href="/projects" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium mt-2 sm:mt-0">
                 Alle Projekte <ArrowRight size={14} />
               </Link>
             </div>
@@ -778,12 +773,12 @@ export default async function HomePage() {
           JOBS
       ══════════════════════════════════════════════ */}
       <section className="py-8 sm:py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-end justify-between mb-6">
+        <div className="flex flex-col items-center sm:flex-row sm:items-end sm:justify-between mb-6 text-center sm:text-left">
           <div>
             <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Jetzt gesucht</p>
             <h2 className="font-display text-2xl font-bold text-text-primary">Aktuelle Jobs</h2>
           </div>
-          <Link href="/jobs" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium">
+          <Link href="/jobs" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium mt-2 sm:mt-0">
             Alle anzeigen <ArrowRight size={14} />
           </Link>
         </div>
@@ -818,9 +813,9 @@ export default async function HomePage() {
       ══════════════════════════════════════════════ */}
       <section className="py-8 sm:py-20 bg-bg-secondary border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8 sm:mb-14">
+          <div className="mb-8 sm:mb-14 text-center sm:text-left">
             <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Stimmen</p>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg">Warum CineGenius?</h2>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg mx-auto sm:mx-0">Warum CineGenius?</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {testimonials.map((t) => (
@@ -856,7 +851,7 @@ export default async function HomePage() {
 
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
-            <div>
+            <div className="text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold/20 bg-gold/5 text-gold text-xs font-semibold mb-5">
                 <Play size={10} className="fill-gold" /> Bereit loszulegen?
               </div>
@@ -864,11 +859,11 @@ export default async function HomePage() {
                 Dein nächstes Projekt<br />
                 <span className="text-gradient-gold">wartet schon.</span>
               </h2>
-              <p className="text-text-muted text-sm leading-relaxed max-w-sm">
+              <p className="text-text-muted text-sm leading-relaxed max-w-sm mx-auto lg:mx-0">
                 Kostenlos registrieren, sofort loslegen. Keine Kreditkarte nötig.
               </p>
             </div>
-            <div className="flex flex-col gap-3 shrink-0">
+            <div className="flex flex-col items-stretch lg:items-start gap-3 shrink-0 max-w-[320px] mx-auto lg:mx-0 w-full lg:w-auto">
               <Link
                 href={ctaHref}
                 className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-gold hover:bg-gold-light text-bg-primary font-bold rounded-xl transition-all text-sm shadow-lg shadow-gold/20"
