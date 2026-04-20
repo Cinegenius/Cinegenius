@@ -265,17 +265,17 @@ export default async function HomePage() {
         />
 
         {/* ── Content — centered on mobile, left on desktop ── */}
-        <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pt-20 sm:pt-[160px] lg:pt-[180px]">
+        <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pt-24 sm:pt-[160px] lg:pt-[180px]">
           <div className="max-w-[680px] mx-auto sm:mx-0 text-center sm:text-left">
             {/* Badge */}
-            <div className="hero-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[9px] font-semibold uppercase tracking-[0.18em] mb-4 animate-fade-in">
+            <div className="hero-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[9px] font-semibold uppercase tracking-[0.18em] mb-5 animate-fade-in">
               <Zap size={9} /> Film · Foto · Content · Werbung
             </div>
 
             {/* Headline */}
             <h1
-              className="hero-title font-display text-[2rem] sm:text-[4.5rem] lg:text-[5.5rem] font-bold tracking-tight mb-3 sm:mb-8 animate-fade-up"
-              style={{ lineHeight: "1.05" }}
+              className="hero-title font-display text-[2.1rem] sm:text-[4.5rem] lg:text-[5.5rem] font-bold tracking-tight mb-5 sm:mb-8 animate-fade-up"
+              style={{ lineHeight: "1.08" }}
             >
               Create. Connect.<br />
               <span className="text-gradient-gold" style={{ lineHeight: "1.15" }}>Get Discovered.</span>
@@ -283,28 +283,28 @@ export default async function HomePage() {
 
             {/* Subtext */}
             <p
-              className="hero-sub text-sm sm:text-lg mb-5 sm:mb-10 leading-[1.5] animate-fade-up max-w-[340px] sm:max-w-[560px] mx-auto sm:mx-0"
+              className="hero-sub text-sm sm:text-lg mb-7 sm:mb-10 leading-[1.6] animate-fade-up max-w-[340px] sm:max-w-[560px] mx-auto sm:mx-0"
               style={{ opacity: 0.75 }}
             >
-              Der Marktplatz für Kreative — Locations, Crew &amp; Equipment für Film, Foto und Content.
+              Der Marktplatz für Locations, Crew &amp; Equipment.
             </p>
 
             {/* Hero Search */}
-            <div className="w-full max-w-[560px] mb-4 sm:mb-8 animate-fade-up">
+            <div className="w-full max-w-[560px] mb-6 sm:mb-8 animate-fade-up">
               <HeroSearch />
             </div>
 
             {/* Buttons */}
-            <div className="flex flex-row items-center gap-2 animate-fade-up">
+            <div className="flex flex-row items-center gap-2.5 animate-fade-up">
               <Link
                 href={ctaHref}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-md active:scale-[0.98] transition-all text-xs sm:text-sm"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-md active:scale-[0.98] transition-all text-xs sm:text-sm"
               >
                 {ctaLabel} <ArrowRight size={12} />
               </Link>
               <Link
                 href="/inserat"
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md border border-white/20 text-white/60 font-medium hover:border-white/35 hover:text-white/90 active:scale-[0.98] transition-all text-xs sm:text-sm"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md border border-white/20 text-white/60 font-medium hover:border-white/35 hover:text-white/90 active:scale-[0.98] transition-all text-xs sm:text-sm"
               >
                 Inserat erstellen
               </Link>
