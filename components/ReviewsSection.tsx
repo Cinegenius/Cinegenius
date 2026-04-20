@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Star, MessageSquare } from "lucide-react";
+import { Star, MessageSquare, ShieldCheck } from "lucide-react";
 import ReviewForm from "@/components/ReviewForm";
+import { useUser } from "@clerk/nextjs";
 
 type Review = {
   id: string;
@@ -21,9 +22,12 @@ interface Props {
 }
 
 export default function ReviewsSection({ targetId, targetType, targetName }: Props) {
+  const { user } = useUser();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
+  const [canReview, setCanReview] = useState(false);
+  const [alreadyReviewed, setAlreadyReviewed] = useState(false);
 
   useEffect(() => {
     fetch(`/api/reviews?target_id=${targetId}&target_type=${targetType}`)
@@ -32,6 +36,18 @@ export default function ReviewsSection({ targetId, targetType, targetName }: Pro
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [targetId, targetType]);
+
+  // Check if current user is eligible to review (confirmed booking or accepted application)
+  useEffect(() => {
+    if (!user) return;
+    fetch(`/api/reviews/eligible?target_id=${targetId}&target_type=${targetType}`)
+      .then((r) => r.json())
+      .then(({ eligible, already_reviewed }) => {
+        setCanReview(!!eligible);
+        setAlreadyReviewed(!!already_reviewed);
+      })
+      .catch(() => {});
+  }, [user, targetId, targetType]);
 
   const avgRating = reviews.length
     ? Math.round((reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) * 10) / 10
@@ -94,13 +110,20 @@ export default function ReviewsSection({ targetId, targetType, targetName }: Pro
         </div>
       )}
 
-      {/* Write review button */}
-      <button
-        onClick={() => setFormOpen(true)}
-        className="mt-5 flex items-center gap-2 px-4 py-2.5 border border-border text-text-secondary text-sm rounded-lg hover:border-gold hover:text-gold transition-all"
-      >
-        <MessageSquare size={14} /> Eigene Bewertung schreiben
-      </button>
+      {/* Write review button — only shown if eligible */}
+      {user && canReview && !alreadyReviewed && (
+        <button
+          onClick={() => setFormOpen(true)}
+          className="mt-5 flex items-center gap-2 px-4 py-2.5 border border-gold/30 text-gold text-sm rounded-lg hover:border-gold hover:bg-gold/5 transition-all"
+        >
+          <ShieldCheck size={14} /> Verifizierte Bewertung schreiben
+        </button>
+      )}
+      {user && alreadyReviewed && (
+        <p className="mt-5 text-xs text-text-muted flex items-center gap-1.5">
+          <ShieldCheck size={13} className="text-success" /> Du hast bereits eine Bewertung abgegeben.
+        </p>
+      )}
 
       {/* Review modal */}
       {formOpen && (
