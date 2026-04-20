@@ -55,10 +55,31 @@ export default function AgbPage() {
               <li>Rechtswidrige, beleidigende oder diskriminierende Inhalte einzustellen</li>
               <li>Urheberrechtlich geschütztes Material ohne Erlaubnis zu verwenden</li>
               <li>Spam oder automatisierte Masseneintragungen vorzunehmen</li>
+              <li>Inhalte einzustellen, die Gewalt verherrlichen oder zu Straftaten auffordern</li>
+              <li>Sexuell explizite Inhalte ohne entsprechende Altersfreigabe zu veröffentlichen</li>
             </ul>
             <p className="text-sm leading-relaxed mt-3">
               Mit dem Einstellen von Inhalten räumst du dem Betreiber ein nicht-exklusives, kostenloses Nutzungsrecht
               zur Darstellung auf der Plattform ein.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-base font-semibold text-text-primary mb-2">§ 4a Gewalt, FSK & jugendschutzrelevante Inhalte</h2>
+            <p className="text-sm leading-relaxed">
+              CineGenius wird für professionelle Film-, Foto- und Medienproduktionen genutzt, die auch Inhalte
+              mit Altersfreigabe (FSK 16 / FSK 18) umfassen können. Für solche Produktionen gelten folgende Regeln:
+            </p>
+            <ul className="text-sm leading-relaxed mt-2 space-y-1 list-disc list-inside">
+              <li>Bei Produktionen mit FSK-16- oder FSK-18-Inhalt sind ausschließlich volljährige Darsteller einzusetzen. Der Auftraggeber ist für die Einhaltung verantwortlich.</li>
+              <li>Gewalt- oder Intimszenen dürfen ausschließlich im Rahmen professioneller, einvernehmlicher Filmproduktionen ausgeschrieben werden.</li>
+              <li>Die Ausschreibung von Inhalten, die unter § 131 StGB (Gewaltdarstellung) oder § 184 StGB (Verbreitung pornografischer Schriften) fallen, ist verboten.</li>
+              <li>Kinderdarsteller (unter 18 Jahren) dürfen nicht für Produktionen mit jugendgefährdenden Inhalten gebucht oder vermittelt werden.</li>
+              <li>Inserate für Produktionen mit expliziten Inhalten müssen als solche gekennzeichnet werden. Der Betreiber behält sich vor, ungekennzeichnete Inserate zu entfernen.</li>
+            </ul>
+            <p className="text-sm leading-relaxed mt-3">
+              Der Betreiber kooperiert mit Behörden bei Verdacht auf strafbare Handlungen und ist berechtigt,
+              entsprechende Inhalte unverzüglich zu entfernen und betroffene Accounts zu sperren.
             </p>
           </section>
 
