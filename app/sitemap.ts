@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
 
-const BASE = "https://cinegenius.com";
+const BASE = "https://cinegenius.co";
 
 const typeToPath: Record<string, string> = {
   location: "locations",

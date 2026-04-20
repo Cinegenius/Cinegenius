@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Private areas
+Disallow: /dashboard
+Disallow: /profile-setup
+Disallow: /admin
+Disallow: /api/
+Disallow: /sign-in
+Disallow: /sign-up
+Disallow: /booking/checkout
+Disallow: /invoices
+
+Sitemap: https://cinegenius.co/sitemap.xml
