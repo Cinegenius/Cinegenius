@@ -47,47 +47,44 @@ export default function HeroSearch() {
         ))}
       </div>
 
-      {/* Search bar — compact, refined */}
+      {/* Search bar — always inline, compact */}
       <form
         onSubmit={handleSearch}
-        className="flex flex-col sm:flex-row items-stretch sm:items-center bg-white/92 backdrop-blur-md rounded-xl overflow-hidden shadow-lg border border-white/10"
+        className="flex items-center bg-white/92 backdrop-blur-md rounded-lg overflow-hidden border border-white/10 shadow-md"
       >
         {/* Query */}
-        <div className="flex items-center gap-2 flex-1 px-3.5 border-b border-gray-100 sm:border-b-0">
-          <Search size={14} className="text-gray-400 shrink-0" />
+        <div className="flex items-center gap-2 flex-1 px-3">
+          <Search size={13} className="text-gray-400 shrink-0" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={tab.placeholder}
             style={{ color: "#1f2937" }}
-            className="w-full py-2.5 text-[13px] bg-transparent focus:outline-none placeholder:text-gray-400"
+            className="w-full py-2 text-[12px] sm:text-[13px] bg-transparent focus:outline-none placeholder:text-gray-400 min-w-0"
           />
         </div>
 
-        {/* Divider — desktop only */}
-        <div className="hidden sm:block w-px h-6 bg-gray-200 shrink-0" />
-
-        {/* City */}
-        <div className="flex items-center gap-2 px-3.5 sm:w-36">
-          <MapPin size={13} className="text-gray-400 shrink-0" />
+        {/* City — hidden on mobile */}
+        <div className="hidden sm:flex items-center gap-1.5 px-3 w-36 border-l border-gray-200">
+          <MapPin size={12} className="text-gray-400 shrink-0" />
           <input
             type="text"
             value={city}
             onChange={(e) => setCity(e.target.value)}
             placeholder="Stadt"
             style={{ color: "#1f2937" }}
-            className="w-full py-2.5 text-[13px] bg-transparent focus:outline-none placeholder:text-gray-400"
+            className="w-full py-2 text-[13px] bg-transparent focus:outline-none placeholder:text-gray-400"
           />
         </div>
 
-        {/* Button — compact, dark */}
+        {/* Button */}
         <button
           type="submit"
-          className="m-1.5 px-4 py-2 bg-bg-primary hover:bg-bg-elevated text-white font-semibold text-[13px] rounded-lg transition-colors shrink-0 flex items-center justify-center gap-1.5"
+          className="m-1 px-3 py-1.5 bg-bg-primary hover:bg-bg-elevated text-white font-medium text-[12px] sm:text-[13px] rounded-md transition-colors shrink-0 flex items-center gap-1"
         >
-          <Search size={13} />
-          Suchen
+          <Search size={12} />
+          <span className="hidden sm:inline">Suchen</span>
         </button>
       </form>
     </div>
