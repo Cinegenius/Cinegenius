@@ -246,12 +246,12 @@ export default async function HomePage() {
               "linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.2) 70%, rgba(0,0,0,0.35) 100%)",
           }}
         />
-        {/* Mobile: strong top-to-bottom gradient — content zone dark, faces visible at bottom */}
+        {/* Mobile: dark top + dark bottom, transparent middle so faces show */}
         <div
           className="absolute inset-0 sm:hidden"
           style={{
             background:
-              "linear-gradient(180deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.75) 45%, rgba(0,0,0,0.45) 70%, rgba(0,0,0,0.2) 100%)",
+              "linear-gradient(180deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.80) 28%, rgba(0,0,0,0.15) 48%, rgba(0,0,0,0.15) 62%, rgba(0,0,0,0.78) 78%, rgba(0,0,0,0.88) 100%)",
           }}
         />
         {/* Top darkening for nav legibility */}
@@ -264,17 +264,17 @@ export default async function HomePage() {
           style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E\")" }}
         />
 
-        {/* ── Content — centered on mobile, left on desktop ── */}
+        {/* ── Top content: badge + headline + subtext ── */}
         <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pt-20 sm:pt-[160px] lg:pt-[180px]">
           <div className="max-w-[680px] mx-auto sm:mx-0 text-center sm:text-left">
             {/* Badge */}
-            <div className="hero-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[9px] font-semibold uppercase tracking-[0.18em] mb-4 animate-fade-in">
+            <div className="hero-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[9px] font-semibold uppercase tracking-[0.18em] mb-3 sm:mb-4 animate-fade-in">
               <Zap size={9} /> Film · Foto · Content · Werbung
             </div>
 
             {/* Headline */}
             <h1
-              className="hero-title font-display text-[2rem] sm:text-[4.5rem] lg:text-[5.5rem] font-bold tracking-tight mb-3 sm:mb-8 animate-fade-up"
+              className="hero-title font-display text-[1.85rem] sm:text-[4.5rem] lg:text-[5.5rem] font-bold tracking-tight mb-2 sm:mb-8 animate-fade-up"
               style={{ lineHeight: "1.05" }}
             >
               Create. Connect.<br />
@@ -283,37 +283,58 @@ export default async function HomePage() {
 
             {/* Subtext */}
             <p
-              className="hero-sub text-sm sm:text-lg mb-5 sm:mb-10 leading-[1.5] animate-fade-up max-w-[340px] sm:max-w-[560px] mx-auto sm:mx-0"
-              style={{ opacity: 0.75 }}
+              className="hero-sub text-xs sm:text-lg mb-0 sm:mb-10 leading-[1.5] animate-fade-up max-w-[280px] sm:max-w-[560px] mx-auto sm:mx-0"
+              style={{ opacity: 0.70 }}
             >
-              Der Marktplatz für Kreative — Locations, Crew &amp; Equipment für Film, Foto und Content.
+              Der Marktplatz für Film, Foto &amp; Content.
             </p>
 
-            {/* Hero Search */}
-            <div className="w-full max-w-[560px] mb-4 sm:mb-8 animate-fade-up">
-              <HeroSearch />
-            </div>
-
-            {/* Buttons */}
-            <div className="flex flex-row items-center gap-2 animate-fade-up">
-              <Link
-                href={ctaHref}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-md active:scale-[0.98] transition-all text-xs sm:text-sm"
-              >
-                {ctaLabel} <ArrowRight size={12} />
-              </Link>
-              <Link
-                href="/inserat"
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md border border-white/20 text-white/60 font-medium hover:border-white/35 hover:text-white/90 active:scale-[0.98] transition-all text-xs sm:text-sm"
-              >
-                Inserat erstellen
-              </Link>
+            {/* Desktop-only: search + buttons inline with headline */}
+            <div className="hidden sm:block">
+              <div className="w-full max-w-[560px] mb-4 sm:mb-8 animate-fade-up mt-8">
+                <HeroSearch />
+              </div>
+              <div className="flex flex-row items-center gap-2 animate-fade-up">
+                <Link
+                  href={ctaHref}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-md active:scale-[0.98] transition-all text-sm"
+                >
+                  {ctaLabel} <ArrowRight size={12} />
+                </Link>
+                <Link
+                  href="/inserat"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md border border-white/20 text-white/60 font-medium hover:border-white/35 hover:text-white/90 active:scale-[0.98] transition-all text-sm"
+                >
+                  Inserat erstellen
+                </Link>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Spacer */}
+        {/* Spacer — faces visible here on mobile */}
         <div className="flex-1" />
+
+        {/* Mobile-only: search + buttons pinned above stats */}
+        <div className="relative z-10 px-5 pb-4 sm:hidden">
+          <div className="w-full max-w-[560px] mb-3 mx-auto animate-fade-up">
+            <HeroSearch />
+          </div>
+          <div className="flex flex-row items-center justify-center gap-2 animate-fade-up">
+            <Link
+              href={ctaHref}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-md active:scale-[0.98] transition-all text-xs"
+            >
+              {ctaLabel} <ArrowRight size={12} />
+            </Link>
+            <Link
+              href="/inserat"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md border border-white/20 text-white/60 font-medium hover:border-white/35 hover:text-white/90 active:scale-[0.98] transition-all text-xs"
+            >
+              Inserat erstellen
+            </Link>
+          </div>
+        </div>
 
         {/* Stats — 2×2 on mobile, row on desktop */}
         <div className="relative z-10 px-6 sm:px-10 lg:px-[100px] pb-8 sm:pb-14">
