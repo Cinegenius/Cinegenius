@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     display_name, bio, location, avatar_url, skills, portfolio_url, positions,
     portfolio_images, experience, account_type, profile_types,
     cover_image_url, instagram_url, tiktok_url, youtube_url, vimeo_url, linkedin_url, website_url,
-    day_rate, filmography, video_links,
+    day_rate, filmography, video_links, focal_point,
   } = body;
 
   if (!display_name?.trim()) {
@@ -81,6 +81,7 @@ export async function POST(req: NextRequest) {
         day_rate: day_rate ?? null,
         filmography: filmography ?? [],
         video_links: video_links ?? [],
+        focal_point: focal_point ?? null,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "user_id" }

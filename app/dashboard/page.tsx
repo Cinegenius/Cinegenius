@@ -104,7 +104,8 @@ export default function DashboardPage() {
     // Profile + Completeness
     fetch("/api/profile")
       .then((r) => r.json())
-      .then(({ profile }) => {
+      .then(({ profile, exists }) => {
+        if (!exists) { window.location.replace("/profile-setup"); return; }
         if (profile?.display_name) setProfileDisplayName(profile.display_name);
         if (profile?.avatar_url) setProfileAvatarUrl(profile.avatar_url);
         if (profile?.role) setProfileRole(profile.role);
