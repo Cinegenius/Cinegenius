@@ -226,13 +226,13 @@ input, select, textarea { color: inherit; }
   background-position: center 40%;
   background-size: cover;
 }
-/* Mobile: center image so faces appear in the middle zone */
+/* Mobile: push image to bottom so faces don't sit behind content */
 @media (max-width: 640px) {
   .hero-bg {
-    background-position: 65% 50%;
+    background-position: 65% 100%;
   }
   [data-theme="light"] .hero-bg {
-    background-position: 65% 50%;
+    background-position: 65% 100%;
   }
 }
 
