@@ -192,11 +192,11 @@ const useCases = [
     href: "/company-setup",
   },
   {
-    title: "Filmprojekt dokumentieren",
-    desc: "Trag dein Projekt ein, füge Credits hinzu und zeig was du gemacht hast.",
-    image: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&q=85",
-    cta: "Projekt anlegen",
-    href: "/projects",
+    title: "Auto & Oldtimer vermieten",
+    desc: "Sportwagen, Oldtimer, Transporter — für Werbespots, Musikvideos und Filmszenen.",
+    image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=85",
+    cta: "Fahrzeug inserieren",
+    href: "/inserat",
   },
 ];
 
@@ -575,7 +575,7 @@ export default async function HomePage() {
                 highlight: true,
               },
             ] as const).map(({ icon: Icon, title, desc, items, cta, href, highlight }, idx) => (
-              <div key={title} className={`rounded-2xl border p-6 flex flex-col ${highlight ? "border-gold/25 bg-gold-subtle" : "border-border bg-bg-elevated"}${idx >= 2 ? " hidden sm:flex" : ""}`}>
+              <div key={title} className={`rounded-2xl border p-6 flex flex-col ${highlight ? "border-gold/25 bg-gold-subtle" : "border-border bg-bg-elevated"}${idx >= 2 && !highlight ? " hidden sm:flex" : ""}`}>
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${highlight ? "bg-gold/10 border border-gold/20" : "bg-bg-hover border border-border-light"}`}>
                   <Icon size={18} className={highlight ? "text-gold" : "text-text-secondary"} />
                 </div>
