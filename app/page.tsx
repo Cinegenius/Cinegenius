@@ -282,7 +282,7 @@ export default async function HomePage() {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-3 sm:gap-4 animate-fade-up">
               <Link
                 href={ctaHref}
-                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl active:scale-[0.98] transition-all text-sm tracking-wide shadow-lg shadow-emerald-500/25"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-gold hover:bg-gold-light text-bg-primary font-bold rounded-xl active:scale-[0.98] transition-all text-sm tracking-wide shadow-lg shadow-gold/25"
               >
                 {ctaLabel} <ArrowRight size={15} />
               </Link>
@@ -325,8 +325,8 @@ export default async function HomePage() {
               { icon: Clock,        text: "DACH-Region",          sub: "DE · AT · CH" },
             ].map(({ icon: Icon, text, sub }) => (
               <div key={text} className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
-                  <Icon size={13} className="text-emerald-500" />
+                <div className="w-7 h-7 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
+                  <Icon size={13} className="text-gold" />
                 </div>
                 <div>
                   <p className="text-xs font-semibold text-text-primary leading-tight">{text}</p>
@@ -368,7 +368,7 @@ export default async function HomePage() {
             </p>
             <Link
               href={ctaHref}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white font-semibold rounded-xl transition-all text-sm"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-xl transition-all text-sm"
             >
               {ctaLabel} <ArrowRight size={14} />
             </Link>
@@ -573,7 +573,7 @@ export default async function HomePage() {
                 <ul className="space-y-2 mb-6 flex-1">
                   {items.map((item) => (
                     <li key={item} className="flex items-start gap-2 text-xs text-text-secondary">
-                      <CheckCircle size={12} className={`shrink-0 mt-0.5 ${highlight ? "text-gold" : "text-emerald-500"}`} />
+                      <CheckCircle size={12} className={`shrink-0 mt-0.5 ${highlight ? "text-gold" : "text-success"}`} />
                       {item}
                     </li>
                   ))}
@@ -871,7 +871,7 @@ export default async function HomePage() {
             <div className="flex flex-col gap-3 shrink-0">
               <Link
                 href={ctaHref}
-                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl transition-all text-sm shadow-lg shadow-emerald-500/20"
+                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-gold hover:bg-gold-light text-bg-primary font-bold rounded-xl transition-all text-sm shadow-lg shadow-gold/20"
               >
                 {ctaLabel} <ArrowRight size={15} />
               </Link>
