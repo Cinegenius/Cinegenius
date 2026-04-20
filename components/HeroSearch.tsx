@@ -31,12 +31,12 @@ export default function HeroSearch() {
   return (
     <div className="w-full">
       {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-black/30 backdrop-blur-sm border border-white/15 rounded-xl mb-2 w-fit mx-auto">
+      <div className="flex flex-wrap gap-1 p-1 bg-black/30 backdrop-blur-sm border border-white/15 rounded-xl mb-2 w-fit">
         {tabs.map((t) => (
           <button
             key={t.id}
             onClick={() => { setActiveTab(t.id); setQuery(""); setCity(""); }}
-            className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+            className={`px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all ${
               activeTab === t.id
                 ? "bg-gold text-bg-primary shadow-sm"
                 : "text-white/70 hover:text-white"
@@ -50,10 +50,10 @@ export default function HeroSearch() {
       {/* Search bar */}
       <form
         onSubmit={handleSearch}
-        className="flex items-center gap-0 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden border border-white/20"
+        className="flex flex-col sm:flex-row items-stretch sm:items-center gap-0 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden border border-white/20"
       >
         {/* Query */}
-        <div className="flex items-center gap-2.5 flex-1 px-4">
+        <div className="flex items-center gap-2.5 flex-1 px-4 border-b sm:border-b-0">
           <Search size={17} className="text-gray-400 shrink-0" />
           <input
             type="text"
@@ -61,15 +61,15 @@ export default function HeroSearch() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder={tab.placeholder}
             style={{ color: "#1f2937" }}
-            className="w-full py-4 text-sm bg-transparent focus:outline-none placeholder:text-gray-400"
+            className="w-full py-3.5 text-sm bg-transparent focus:outline-none placeholder:text-gray-400"
           />
         </div>
 
-        {/* Divider */}
-        <div className="w-px h-8 bg-gray-200 shrink-0" />
+        {/* Divider — desktop only */}
+        <div className="hidden sm:block w-px h-8 bg-gray-200 shrink-0" />
 
         {/* City */}
-        <div className="flex items-center gap-2 px-4 w-44">
+        <div className="flex items-center gap-2 px-4 sm:w-40">
           <MapPin size={15} className="text-gray-400 shrink-0" />
           <input
             type="text"
@@ -77,14 +77,14 @@ export default function HeroSearch() {
             onChange={(e) => setCity(e.target.value)}
             placeholder="Stadt"
             style={{ color: "#1f2937" }}
-            className="w-full py-4 text-sm bg-transparent focus:outline-none placeholder:text-gray-400"
+            className="w-full py-3.5 text-sm bg-transparent focus:outline-none placeholder:text-gray-400"
           />
         </div>
 
         {/* Button */}
         <button
           type="submit"
-          className="m-1.5 px-5 py-3 bg-gold hover:bg-gold-light text-bg-primary font-bold text-sm rounded-xl transition-colors shrink-0 flex items-center gap-2"
+          className="m-2 px-5 py-3 bg-gold hover:bg-gold-light text-bg-primary font-bold text-sm rounded-xl transition-colors shrink-0 flex items-center justify-center gap-2"
         >
           <Search size={15} />
           Suchen

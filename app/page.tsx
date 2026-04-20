@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { stats } from "@/lib/data";
 import ImageStrip from "@/components/ImageStrip";
+import HeroSearch from "@/components/HeroSearch";
 
 function fmtCount(n: number, fallback: string): string {
   if (n === 0) return fallback;
@@ -279,6 +280,11 @@ export default async function HomePage() {
             >
               Der Marktplatz für Kreative — Locations, Crew &amp; Equipment für Film, Foto und Content.
             </p>
+
+            {/* Hero Search */}
+            <div className="w-full max-w-[560px] mb-6 sm:mb-8 animate-fade-up">
+              <HeroSearch />
+            </div>
 
             {/* Buttons — stacked, full width on mobile */}
             <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-start sm:gap-4 animate-fade-up max-w-[360px] sm:max-w-none mx-auto sm:mx-0">
