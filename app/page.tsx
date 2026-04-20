@@ -65,7 +65,7 @@ async function getHomeData() {
     supabaseAdmin.from("listings").select("*", { count: "exact", head: true }).in("type", ["prop", "vehicle"]).eq("published", true),
     supabaseAdmin.from("projects").select("*", { count: "exact", head: true }),
     supabaseAdmin.from("companies").select("*", { count: "exact", head: true }).eq("published", true),
-    supabaseAdmin.from("listings").select("id,title,city,price,image_url,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(3),
+    supabaseAdmin.from("listings").select("id,title,city,price,image_url,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(3), // created_at used for "Neu" badge
     supabaseAdmin.from("listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
     supabaseAdmin.from("projects").select("id,title,poster_url").not("poster_url", "is", null).order("created_at", { ascending: false }).limit(50),
     supabaseAdmin.from("profiles").select("user_id,display_name,avatar_url").not("avatar_url", "is", null).order("updated_at", { ascending: false }).limit(50),
@@ -94,6 +94,8 @@ async function getHomeData() {
         city: (l.city ?? "") as string,
         price: (l.price ?? 0) as number,
         image: (l.image_url ?? "") as string,
+        isNew: l.created_at ? (Date.now() - new Date(l.created_at as string).getTime()) < 3 * 24 * 60 * 60 * 1000 : false,
+        created_at: (l.created_at ?? "") as string,
       }))
     : [];
 
@@ -686,7 +688,11 @@ export default async function HomePage() {
                     </div>
                   </div>
                   <div className="px-4 py-3 flex items-center justify-between">
-                    <span className="text-xs text-text-muted">Neu</span>
+                    {loc.isNew ? (
+                      <span className="text-xs font-semibold text-gold">Neu</span>
+                    ) : (
+                      <span className="text-xs text-text-muted">{relativeDate(loc.created_at ?? "")}</span>
+                    )}
                     <span className="text-sm font-semibold text-gold">
                       {loc.price.toLocaleString()} €<span className="text-[11px] text-text-muted font-normal">/Tag</span>
                     </span>
