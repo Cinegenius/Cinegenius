@@ -287,16 +287,16 @@ export default async function HomePage() {
             </div>
 
             {/* Buttons — stacked, full width on mobile */}
-            <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-start sm:gap-4 animate-fade-up max-w-[360px] sm:max-w-none mx-auto sm:mx-0">
+            <div className="flex flex-row items-center gap-2.5 animate-fade-up">
               <Link
                 href={ctaHref}
-                className="inline-flex items-center justify-center gap-2 px-7 py-3 sm:py-[14px] bg-gold hover:bg-gold-light text-bg-primary font-bold rounded-xl active:scale-[0.98] transition-all text-[15px] tracking-wide shadow-lg shadow-gold/25"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-lg active:scale-[0.98] transition-all text-sm"
               >
-                {ctaLabel} <ArrowRight size={15} />
+                {ctaLabel} <ArrowRight size={13} />
               </Link>
               <Link
                 href="/inserat"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3 sm:py-[14px] rounded-xl border border-white/25 bg-black/20 backdrop-blur-sm text-white/80 font-semibold hover:border-white/45 hover:text-white active:scale-[0.98] transition-all text-[15px]"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-white/20 bg-white/5 backdrop-blur-sm text-white/70 font-medium hover:border-white/35 hover:text-white active:scale-[0.98] transition-all text-sm"
               >
                 Inserat erstellen
               </Link>
