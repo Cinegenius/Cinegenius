@@ -5,6 +5,7 @@ import JsonLd from "@/components/JsonLd";
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import ProfileView from "./ProfileView";
+import { getBlockStatus } from "@/lib/trust";
 import type { UserProfile, ProjectCredit } from "@/lib/profile-types";
 import { getPresetForType, type ProfileModule } from "@/lib/profile-types";
 import type { ExternalProfileRow } from "@/lib/external-platforms";
@@ -158,11 +159,12 @@ export default async function ProfilePage(
   if (!profile) notFound();
 
   const isOwner = userId === profile.user_id;
-  const [projectCredits, companyMembership, externalProfiles, listings] = await Promise.all([
+  const [projectCredits, companyMembership, externalProfiles, listings, blockStatus] = await Promise.all([
     getProjectCredits(profile.user_id),
     getCompanyMembership(profile.user_id),
     getExternalProfiles(profile.user_id),
     getPublicListings(profile.user_id),
+    userId && !isOwner ? getBlockStatus(userId, profile.user_id) : Promise.resolve(null),
   ]);
 
   const jsonLd = {
@@ -186,6 +188,7 @@ export default async function ProfilePage(
         companyMembership={companyMembership}
         externalProfiles={externalProfiles}
         listings={listings}
+        blockStatus={blockStatus}
       />
     </>
   );

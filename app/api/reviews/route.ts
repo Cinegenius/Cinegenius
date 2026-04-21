@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
+import { anyBlockExists } from "@/lib/trust";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -52,6 +53,11 @@ export async function POST(req: NextRequest) {
     if (!completedBooking) {
       return NextResponse.json({ error: "Nur nach einer Buchung bewertbar" }, { status: 403 });
     }
+  }
+
+  // Block check — if either party blocked the other, prevent review
+  if (await anyBlockExists(userId, target_id)) {
+    return NextResponse.json({ error: "Bewertung nicht möglich" }, { status: 403 });
   }
 
   // Doppelbewertung verhindern

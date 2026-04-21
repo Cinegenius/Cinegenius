@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
+import { anyBlockExists } from "@/lib/trust";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { sendNewMessageEmail } from "@/lib/email";
@@ -71,6 +72,12 @@ export async function POST(
 
   if (!conv) return NextResponse.json({ error: "Kein Zugriff" }, { status: 403 });
 
+  // Block check — deny if either party has blocked the other
+  const receiverId = conv.sender_id === userId ? conv.receiver_id : conv.sender_id;
+  if (await anyBlockExists(userId, receiverId)) {
+    return NextResponse.json({ error: "Nachrichten an diesen Nutzer sind nicht möglich" }, { status: 403 });
+  }
+
   const { data: msg, error } = await db
     .from("messages")
     .insert({ conversation_id: id, sender_id: userId, content: content.trim() })
@@ -85,7 +92,7 @@ export async function POST(
     .eq("id", id);
 
   // Email an Empfänger — nur wenn aktiviert
-  const receiverId = conv.sender_id === userId ? conv.receiver_id : conv.sender_id;
+  // receiverId is already computed above for the block check
   try {
     const { data: receiverSettings } = await db
       .from("user_settings")

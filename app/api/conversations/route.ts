@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
+import { anyBlockExists } from "@/lib/trust";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { sendNewMessageEmail } from "@/lib/email";
@@ -63,6 +64,11 @@ export async function POST(req: NextRequest) {
 
   if (userId === receiver_id) {
     return NextResponse.json({ error: "Du kannst dir selbst keine Nachricht senden" }, { status: 400 });
+  }
+
+  // Block check — deny if either party has blocked the other
+  if (await anyBlockExists(userId, receiver_id)) {
+    return NextResponse.json({ error: "Nachrichten an diesen Nutzer sind nicht möglich" }, { status: 403 });
   }
 
   // Prüfen ob Konversation bereits existiert
