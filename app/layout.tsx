@@ -27,8 +27,14 @@ const jetbrains = JetBrains_Mono({
   weight: ["400", "500"],
 });
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover", // enables safe-area-inset on iPhone
+};
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://cinegenius.com"),
+  metadataBase: new URL("https://cinegenius.co"),
   title: {
     default: "CineGenius — Marktplatz für Film, Social Media & Fotografie",
     template: "%s | CineGenius",
@@ -84,7 +90,7 @@ export default function RootLayout({
             <ToastProvider>
               <GlobalEffects />
               <Navbar />
-              <main className="flex-1 pb-14 lg:pb-0">{children}</main>
+              <main className="flex-1 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">{children}</main>
               <Footer />
               <BottomNav />
             </ToastProvider>
