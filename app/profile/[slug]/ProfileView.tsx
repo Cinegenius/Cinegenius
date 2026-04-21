@@ -11,6 +11,7 @@ import {
   ChevronRight, Clapperboard, Film, Briefcase, Package, Car,
 } from "lucide-react";
 import type { UserProfile, ProfileModule, ProfileImage, FilmographyEntry, ProfileAward, PhysicalData, ProjectCredit } from "@/lib/profile-types";
+import ReviewsSection from "@/components/ReviewsSection";
 import { PROFILE_CATEGORY_MAP } from "@/lib/profile-types";
 import { getPlatform, type ExternalProfileRow } from "@/lib/external-platforms";
 
@@ -379,6 +380,10 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                 <div className="shrink-0 flex items-center gap-2 mt-1">
                   {!isOwner ? (
                     <>
+                      <Link href={`/booking?profile=${profile.user_id}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors text-xs">
+                        Anfrage
+                      </Link>
                       <Link href={`/messages?to=${profile.user_id}`}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-text-primary text-bg-primary font-semibold rounded-lg hover:opacity-90 transition-opacity text-xs">
                         <MessageSquare size={12} /> Nachricht
@@ -656,6 +661,13 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
 
         <ListingsSection listings={listings} />
 
+        <Divider />
+        <ReviewsSection
+          targetId={profile.user_id}
+          targetType="profile"
+          targetName={profile.display_name ?? "Profil"}
+        />
+
         <div className="h-16" />
       </div>
 
@@ -904,6 +916,14 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [] }: { 
         })()}
 
         <ListingsSection listings={listings} />
+
+        <div className="py-12">
+          <ReviewsSection
+            targetId={profile.user_id}
+            targetType="profile"
+            targetName={profile.display_name ?? "Profil"}
+          />
+        </div>
 
         <div className="h-16" />
       </div>
@@ -1229,6 +1249,14 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
         )}
 
         <ListingsSection listings={listings} />
+
+        <div className="mt-12 mb-8">
+          <ReviewsSection
+            targetId={profile.user_id}
+            targetType="profile"
+            targetName={profile.display_name ?? "Profil"}
+          />
+        </div>
 
       </div>
 

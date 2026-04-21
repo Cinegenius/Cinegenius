@@ -182,7 +182,7 @@ export default function LocationDetail({ location }: { location: Location }) {
                 meta.max_crew && { label: "Max. Crew", value: `${meta.max_crew} Personen` },
                 meta.parking_spots != null && { label: "Parkplätze", value: String(meta.parking_spots) },
                 lageLabel && { label: "Lage", value: lageLabel },
-                { label: "Preis", value: `${location.price.toLocaleString()} €/Tag` },
+                location.price > 0 && { label: "Preis", value: `${location.price.toLocaleString()} €/Tag` },
               ].filter((x): x is { label: string; value: string } => !!x).map(({ label, value }) => (
                 <div key={label} className="p-4 bg-bg-secondary border border-border rounded-xl text-center">
                   <div className="text-xs uppercase tracking-widest text-text-muted mb-1">{label}</div>
@@ -249,8 +249,10 @@ export default function LocationDetail({ location }: { location: Location }) {
             <div className="sticky top-20 space-y-4">
               <div className="bg-bg-secondary border border-border rounded-xl p-5">
                 <div className="flex items-end gap-1 mb-1">
-                  <span className="text-3xl font-bold font-display text-text-primary">{location.price.toLocaleString()} €</span>
-                  <span className="text-text-muted mb-1">/{location.priceUnit}</span>
+                  <span className="text-3xl font-bold font-display text-text-primary">
+                    {location.price > 0 ? `${location.price.toLocaleString()} €` : "Auf Anfrage"}
+                  </span>
+                  {location.price > 0 && <span className="text-text-muted mb-1">/{location.priceUnit}</span>}
                 </div>
                 <div className="flex items-center gap-1.5 mb-5">
                   <Star size={13} className="text-gold fill-gold" />

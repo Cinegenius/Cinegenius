@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Film, Tv, Camera, Zap, Music, FileVideo, Building2, Radio, ArrowRight,
+  Film, Tv, Camera, Zap, Music, FileVideo, Building2, Radio, ArrowRight, Plus,
 } from "lucide-react";
 
 export const revalidate = 300;
@@ -89,12 +89,20 @@ export default function ProjectsPage() {
           <p className="text-text-muted text-sm">
             Entdecke Produktionen aus der DACH-Region — von Spielfilm bis Social Media Content.
           </p>
-          <Link
-            href="/projects/alle"
-            className="shrink-0 inline-flex items-center gap-2 px-4 py-2 border border-border text-text-muted rounded-xl hover:border-gold/40 hover:text-gold transition-all text-sm whitespace-nowrap"
-          >
-            Alle durchsuchen <ArrowRight size={13} />
-          </Link>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              href="/projects/alle"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-border text-text-muted rounded-xl hover:border-gold/40 hover:text-gold transition-all text-sm whitespace-nowrap"
+            >
+              Alle durchsuchen <ArrowRight size={13} />
+            </Link>
+            <Link
+              href="/projects/neu"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm whitespace-nowrap"
+            >
+              <Plus size={13} /> Projekt eintragen
+            </Link>
+          </div>
         </div>
       </div>
 

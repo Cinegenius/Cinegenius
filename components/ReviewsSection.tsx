@@ -13,7 +13,7 @@ type Review = {
   created_at: string;
 };
 
-type TargetType = "location" | "creator" | "prop" | "vehicle";
+type TargetType = "location" | "creator" | "prop" | "vehicle" | "profile";
 
 interface Props {
   targetId: string;
