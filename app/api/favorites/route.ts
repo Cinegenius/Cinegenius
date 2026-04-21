@@ -14,7 +14,7 @@
 // ALTER TABLE favorites ENABLE ROW LEVEL SECURITY;
 // CREATE POLICY "users manage own favorites" ON favorites FOR ALL USING (auth.uid()::text = user_id);
 
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { getCurrentUser, requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
   const id = req.nextUrl.searchParams.get("id");
 
   if (id) {
-    const { data } = await supabaseAdmin
+    const { data } = await db
       .from("favorites")
       .select("id")
       .eq("user_id", userId)
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ isFavorited: !!data });
   }
 
-  const { data } = await supabaseAdmin
+  const { data } = await db
     .from("favorites")
     .select("*")
     .eq("user_id", userId)
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Check if already favorited
-  const { data: existing } = await supabaseAdmin
+  const { data: existing } = await db
     .from("favorites")
     .select("id")
     .eq("user_id", userId)
@@ -70,12 +70,12 @@ export async function POST(req: NextRequest) {
 
   if (existing) {
     // Remove
-    await supabaseAdmin.from("favorites").delete().eq("id", existing.id);
+    await db.from("favorites").delete().eq("id", existing.id);
     return NextResponse.json({ isFavorited: false });
   }
 
   // Add
-  await supabaseAdmin.from("favorites").insert({
+  await db.from("favorites").insert({
     user_id: userId,
     listing_id,
     listing_type,

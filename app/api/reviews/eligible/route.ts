@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
   }
 
   // Check if already reviewed
-  const { data: existing } = await supabaseAdmin
+  const { data: existing } = await db
     .from("reviews")
     .select("id")
     .eq("target_id", target_id)
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
 
   if (target_type === "location" || target_type === "prop" || target_type === "vehicle") {
     // Eligible if user has a confirmed booking for this listing
-    const { data } = await supabaseAdmin
+    const { data } = await db
       .from("bookings")
       .select("id")
       .eq("user_id", userId)
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
     eligible = !!data;
   } else if (target_type === "creator") {
     // Eligible if user owns a job where this creator had an accepted application
-    const { data: ownedJobs } = await supabaseAdmin
+    const { data: ownedJobs } = await db
       .from("listings")
       .select("id")
       .eq("user_id", userId)
@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
 
     const jobIds = (ownedJobs ?? []).map((j) => j.id);
     if (jobIds.length > 0) {
-      const { data } = await supabaseAdmin
+      const { data } = await db
         .from("applications")
         .select("id")
         .eq("applicant_id", target_id)
@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
 
     // Also eligible if creator was booked (for crew bookings)
     if (!eligible) {
-      const { data } = await supabaseAdmin
+      const { data } = await db
         .from("bookings")
         .select("id")
         .eq("user_id", userId)
@@ -75,14 +75,14 @@ export async function GET(req: NextRequest) {
   } else if (target_type === "profile") {
     // target_id is the profile owner's user_id
     // Eligible if current user booked a listing owned by this person
-    const { data: theirListings } = await supabaseAdmin
+    const { data: theirListings } = await db
       .from("listings")
       .select("id")
       .eq("user_id", target_id);
 
     const listingIds = (theirListings ?? []).map((l) => l.id);
     if (listingIds.length > 0) {
-      const { data } = await supabaseAdmin
+      const { data } = await db
         .from("bookings")
         .select("id")
         .eq("user_id", userId)
@@ -94,14 +94,14 @@ export async function GET(req: NextRequest) {
 
     // Also eligible if current user posted a job where this person had an accepted application
     if (!eligible) {
-      const { data: ownedJobs } = await supabaseAdmin
+      const { data: ownedJobs } = await db
         .from("listings")
         .select("id")
         .eq("user_id", userId)
         .eq("type", "job");
       const jobIds = (ownedJobs ?? []).map((j) => j.id);
       if (jobIds.length > 0) {
-        const { data } = await supabaseAdmin
+        const { data } = await db
           .from("applications")
           .select("id")
           .eq("applicant_id", target_id)

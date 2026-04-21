@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import Image from "next/image";
 import Link from "next/link";
 import { Camera, ArrowRight, MapPin } from "lucide-react";
@@ -26,7 +26,7 @@ interface GridItem {
 const ASPECT_CYCLE = ["aspect-square", "aspect-[3/4]", "aspect-[4/3]", "aspect-[3/4]", "aspect-square", "aspect-[4/3]"];
 
 export default async function PhotoPage() {
-  const { data: profiles } = await supabaseAdmin
+  const { data: profiles } = await db
     .from("profiles")
     .select("user_id, display_name, tagline, location, avatar_url, profile_images, profile_type, profile_types, verified")
     .not("display_name", "is", null)

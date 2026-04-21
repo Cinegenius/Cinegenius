@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
 import CreatorsContent, { type ServerCreator } from "./CreatorsContent";
 import CategoryHero from "@/components/CategoryHero";
@@ -41,7 +41,7 @@ function parseCreatorDescription(raw: string): { skills: string[]; credits: stri
 
 export default async function CreatorsPage() {
   // Fetch creator listings
-  const { data: listings } = await supabaseAdmin
+  const { data: listings } = await db
     .from("listings")
     .select("*")
     .eq("published", true)
@@ -49,7 +49,7 @@ export default async function CreatorsPage() {
     .order("created_at", { ascending: false });
 
   // Fetch profiles — limit initial load to 96 for fast page render
-  const { data: profiles } = await supabaseAdmin
+  const { data: profiles } = await db
     .from("profiles")
     .select("user_id, display_name, location, bio, skills, role, positions, available, avatar_url, portfolio_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point")
     .not("display_name", "is", null)

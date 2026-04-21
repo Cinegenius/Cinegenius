@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     if (authResult instanceof NextResponse) return authResult;
     const { userId } = authResult;
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await db
       .from("listings")
       .select("*")
       .eq("user_id", userId)
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ data });
   }
 
-  let query = supabaseAdmin
+  let query = db
     .from("listings")
     .select("*")
     .eq("published", true)
@@ -63,7 +63,7 @@ export async function POST(req: Request) {
 
   // If company_id is provided, verify the current user owns that company
   if (company_id) {
-    const { data: company } = await supabaseAdmin
+    const { data: company } = await db
       .from("companies")
       .select("id")
       .eq("id", company_id)
@@ -80,7 +80,7 @@ export async function POST(req: Request) {
     ...(rental_type !== undefined && { rental_type }),
   };
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from("listings")
     .insert({
       user_id: userId,
@@ -128,7 +128,7 @@ export async function DELETE(req: NextRequest) {
   if (!id) return NextResponse.json({ error: "ID fehlt" }, { status: 400 });
 
   // Only allow deleting own listings
-  const { error } = await supabaseAdmin
+  const { error } = await db
     .from("listings")
     .delete()
     .eq("id", id)

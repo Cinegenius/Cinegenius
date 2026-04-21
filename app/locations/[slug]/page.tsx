@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import type { Metadata } from "next";
 import LocationDetail from "@/components/LocationDetail";
 
@@ -22,7 +22,7 @@ async function geocodeCity(city: string): Promise<{ lat: number; lng: number }> 
 }
 
 async function getLocation(slug: string) {
-  const { data } = await supabaseAdmin
+  const { data } = await db
     .from("listings")
     .select("*")
     .eq("id", slug)
@@ -34,7 +34,7 @@ async function getLocation(slug: string) {
   const [{ lat, lng }, ownerRes] = await Promise.all([
     geocodeCity(data.city ?? ""),
     data.user_id
-      ? supabaseAdmin.from("profiles").select("display_name").eq("user_id", data.user_id).single()
+      ? db.from("profiles").select("display_name").eq("user_id", data.user_id).single()
       : Promise.resolve({ data: null }),
   ]);
 

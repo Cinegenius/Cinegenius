@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import Image from "next/image";
 import Link from "next/link";
 import { Aperture, ArrowRight, MapPin } from "lucide-react";
@@ -27,7 +27,7 @@ const CREW_TYPES = new Set(["camera", "lighting", "sound", "director_of_photogra
   "production", "makeup", "costume", "filmmaker", "photographer", "editor"]);
 
 export default async function BTSPage() {
-  const { data: profiles } = await supabaseAdmin
+  const { data: profiles } = await db
     .from("profiles")
     .select("user_id, display_name, tagline, location, avatar_url, profile_images, profile_type, profile_types")
     .not("display_name", "is", null)

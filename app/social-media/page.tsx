@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import Image from "next/image";
 import Link from "next/link";
 import { Zap, ArrowRight, MapPin, ExternalLink, Link2, Play } from "lucide-react";
@@ -29,7 +29,7 @@ interface CreatorCard {
 }
 
 export default async function SocialMediaPage() {
-  const { data: profiles } = await supabaseAdmin
+  const { data: profiles } = await db
     .from("profiles")
     .select("user_id, display_name, tagline, location, avatar_url, profile_type, profile_types, instagram_url, youtube_url, tiktok_url, website_url, day_rate, available, verified")
     .not("display_name", "is", null)

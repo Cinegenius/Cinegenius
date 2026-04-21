@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/guards";
 import { validateUpload, buildStoragePath } from "@/lib/uploadGuard";
 import { NextRequest, NextResponse } from "next/server";
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   const path = buildStoragePath(userId, ext, "avatars");
 
   // 5. Upload — upsert: false, no overwriting
-  const { error: uploadError } = await supabaseAdmin.storage
+  const { error: uploadError } = await db.storage
     .from("listing-images")
     .upload(path, buffer, {
       contentType: mime,
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: uploadError.message }, { status: 500 });
   }
 
-  const { data: urlData } = supabaseAdmin.storage
+  const { data: urlData } = db.storage
     .from("listing-images")
     .getPublicUrl(path);
 

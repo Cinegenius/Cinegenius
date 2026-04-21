@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth, isAdminSession } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -12,7 +12,7 @@ export async function GET() {
 
   // Admin gets all
   if (isAdmin) {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await db
       .from("verification_requests")
       .select("id, user_id, display_name, status, notes, submitted_at, reviewed_at")
       .order("submitted_at", { ascending: false });
@@ -21,7 +21,7 @@ export async function GET() {
   }
 
   // Regular user gets own latest request
-  const { data } = await supabaseAdmin
+  const { data } = await db
     .from("verification_requests")
     .select("id, status, submitted_at, reviewed_at")
     .eq("user_id", userId)
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   const { userId } = authResult;
 
   // Check for existing pending request
-  const { data: existing } = await supabaseAdmin
+  const { data: existing } = await db
     .from("verification_requests")
     .select("id, status")
     .eq("user_id", userId)
@@ -58,13 +58,13 @@ export async function POST(req: NextRequest) {
     notes = body?.notes ?? null;
   } catch { /* no body */ }
 
-  const { data: p } = await supabaseAdmin
+  const { data: p } = await db
     .from("profiles")
     .select("display_name")
     .eq("user_id", userId)
     .maybeSingle();
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from("verification_requests")
     .insert({
       user_id: userId,
@@ -93,7 +93,7 @@ export async function PATCH(req: NextRequest) {
 
   const status = action === "approve" ? "approved" : "rejected";
 
-  const { data: request } = await supabaseAdmin
+  const { data: request } = await db
     .from("verification_requests")
     .update({ status, notes: notes ?? null, reviewed_at: new Date().toISOString(), reviewed_by: userId })
     .eq("id", requestId)
@@ -104,7 +104,7 @@ export async function PATCH(req: NextRequest) {
 
   // If approved, set verified on profile
   if (action === "approve") {
-    await supabaseAdmin
+    await db
       .from("profiles")
       .update({ verified: true })
       .eq("user_id", request.user_id);

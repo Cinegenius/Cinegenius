@@ -1,8 +1,8 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
-const admin = supabaseAdmin;
+const admin = db;
 
 async function verifyOwner(companyId: string, userId: string) {
   const { data } = await admin

@@ -1,8 +1,8 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { getCurrentUser, requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
-const admin = supabaseAdmin;
+const admin = db;
 
 // GET /api/company-members?company_id=xxx  → members of a company
 // GET /api/company-members?user_id=xxx     → company of a specific user

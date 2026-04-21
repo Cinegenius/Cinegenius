@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
 import LocationsContent from "./LocationsContent";
 import CategoryHero from "@/components/CategoryHero";
@@ -46,7 +46,7 @@ async function geocodeCities(cities: string[]): Promise<Record<string, { lat: nu
 }
 
 export default async function LocationsPage() {
-  const { data } = await supabaseAdmin
+  const { data } = await db
     .from("listings")
     .select("*")
     .eq("published", true)
@@ -54,7 +54,7 @@ export default async function LocationsPage() {
     .order("created_at", { ascending: false })
     .limit(300);
 
-  const { data: providerData } = await supabaseAdmin
+  const { data: providerData } = await db
     .from("profiles")
     .select("user_id, display_name, location, bio, avatar_url, profile_types")
     .not("display_name", "is", null)

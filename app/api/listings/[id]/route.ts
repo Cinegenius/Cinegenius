@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth, assertOwner } from "@/lib/guards";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -14,7 +14,7 @@ export async function PATCH(
   const { id } = await params;
 
   // Fetch resource first — never trust client on ownership
-  const { data: existing } = await supabaseAdmin
+  const { data: existing } = await db
     .from("listings")
     .select("id, user_id")
     .eq("id", id)
@@ -52,7 +52,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Keine gültigen Felder" }, { status: 400 });
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from("listings")
     .update(updates)
     .eq("id", id)
@@ -77,7 +77,7 @@ export async function DELETE(
   // Pre-fetch to verify existence and ownership before deleting.
   // Without this, a DELETE on a non-existent or foreign row would
   // silently return success (Supabase deletes 0 rows, no error).
-  const { data: existing } = await supabaseAdmin
+  const { data: existing } = await db
     .from("listings")
     .select("id, user_id")
     .eq("id", id)
@@ -86,7 +86,7 @@ export async function DELETE(
   const ownershipError = assertOwner(existing?.user_id, userId);
   if (ownershipError) return ownershipError;
 
-  const { error } = await supabaseAdmin
+  const { error } = await db
     .from("listings")
     .delete()
     .eq("id", id);

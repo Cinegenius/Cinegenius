@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -8,7 +8,7 @@ export async function GET() {
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from("user_settings")
     .select("profile_visibility, message_permission, email_new_message")
     .eq("user_id", userId)
@@ -36,7 +36,7 @@ export async function PATCH(req: NextRequest) {
   if (body.message_permission !== undefined) update.message_permission = body.message_permission;
   if (body.email_new_message !== undefined) update.email_new_message = body.email_new_message;
 
-  const { error } = await supabaseAdmin
+  const { error } = await db
     .from("user_settings")
     .upsert(update, { onConflict: "user_id" });
 

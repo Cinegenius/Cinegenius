@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth, assertOwner } from "@/lib/guards";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -9,7 +9,7 @@ export async function GET(
 ) {
   const { id } = await params;
 
-  const { data: project, error } = await supabaseAdmin
+  const { data: project, error } = await db
     .from("projects")
     .select("*")
     .eq("id", id)
@@ -19,7 +19,7 @@ export async function GET(
     return NextResponse.json({ error: "Projekt nicht gefunden" }, { status: 404 });
   }
 
-  const { data: credits } = await supabaseAdmin
+  const { data: credits } = await db
     .from("project_credits")
     .select("id, user_id, role, created_at")
     .eq("project_id", id)
@@ -29,7 +29,7 @@ export async function GET(
   let profiles: Record<string, { display_name: string; avatar_url: string | null; role: string | null }> = {};
 
   if (userIds.length > 0) {
-    const { data: profileData } = await supabaseAdmin
+    const { data: profileData } = await db
       .from("profiles")
       .select("user_id, display_name, avatar_url, role")
       .in("user_id", userIds);
@@ -59,7 +59,7 @@ export async function PATCH(
   const { id } = await params;
 
   // Fetch project — never trust client on ownership
-  const { data: project } = await supabaseAdmin
+  const { data: project } = await db
     .from("projects")
     .select("id, created_by")
     .eq("id", id)
@@ -87,7 +87,7 @@ export async function PATCH(
 
   updates["updated_at"] = new Date().toISOString();
 
-  const { error } = await supabaseAdmin
+  const { error } = await db
     .from("projects")
     .update(updates)
     .eq("id", id);
@@ -108,7 +108,7 @@ export async function DELETE(
   const { id } = await params;
 
   // Pre-fetch to verify existence and ownership
-  const { data: project } = await supabaseAdmin
+  const { data: project } = await db
     .from("projects")
     .select("id, created_by")
     .eq("id", id)
@@ -118,10 +118,10 @@ export async function DELETE(
   if (ownershipError) return ownershipError;
 
   // Delete credits first (referential integrity)
-  await supabaseAdmin.from("project_credits").delete().eq("project_id", id);
-  await supabaseAdmin.from("project_festivals").delete().eq("project_id", id);
+  await db.from("project_credits").delete().eq("project_id", id);
+  await db.from("project_festivals").delete().eq("project_id", id);
 
-  const { error } = await supabaseAdmin
+  const { error } = await db
     .from("projects")
     .delete()
     .eq("id", id);

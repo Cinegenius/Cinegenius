@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
@@ -20,7 +20,7 @@ function parseCreatorDescription(raw: string): { skills: string[]; credits: stri
 
 async function getCreator(slug: string) {
   // Try listings first
-  const { data: listing } = await supabaseAdmin
+  const { data: listing } = await db
     .from("listings")
     .select("*")
     .eq("id", slug)
@@ -32,7 +32,7 @@ async function getCreator(slug: string) {
     // Check if the listing owner is verified
     let verified = false;
     if (listing.user_id) {
-      const { data: ownerProfile } = await supabaseAdmin
+      const { data: ownerProfile } = await db
         .from("profiles")
         .select("verified")
         .eq("user_id", listing.user_id)
@@ -59,7 +59,7 @@ async function getCreator(slug: string) {
   }
 
   // Fall back to profiles table (slug = user_id) → redirect to /profile page
-  const { data: profile } = await supabaseAdmin
+  const { data: profile } = await db
     .from("profiles")
     .select("user_id, slug")
     .eq("user_id", slug)
@@ -107,14 +107,14 @@ export default async function CreatorProfilePage({
 
   // Profilaufruf tracken (nicht eigenes Profil, fire-and-forget)
   if (creator.ownerId && userId !== creator.ownerId) {
-    void supabaseAdmin.from("profile_views").insert({
+    void db.from("profile_views").insert({
       profile_id: creator.ownerId,
       viewer_id: userId ?? null,
     });
   }
 
   // Fetch creator's privacy settings
-  const { data: settings } = await supabaseAdmin
+  const { data: settings } = await db
     .from("user_settings")
     .select("profile_visibility, message_permission")
     .eq("user_id", creator.ownerId)
@@ -127,7 +127,7 @@ export default async function CreatorProfilePage({
   let friendshipData: { id: string; status: string; sender_id: string } | null = null;
 
   if (userId && creator.ownerId && userId !== creator.ownerId) {
-    const { data: fs } = await supabaseAdmin
+    const { data: fs } = await db
       .from("friendships")
       .select("id, sender_id, status")
       .or(

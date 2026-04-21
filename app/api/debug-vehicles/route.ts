@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
@@ -7,7 +7,7 @@ export async function GET() {
   const authResult = await requireAdmin();
   if (authResult instanceof NextResponse) return authResult;
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from("listings")
     .select("id, title, type, category, published, price, city, metadata, created_at")
     .eq("type", "vehicle")

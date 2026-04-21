@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import VehiclesContent from "./VehiclesContent";
 import ProviderProfiles from "@/components/ProviderProfiles";
 
@@ -16,14 +16,14 @@ export const metadata: Metadata = {
 };
 
 export default async function VehiclesPage() {
-  const { data } = await supabaseAdmin
+  const { data } = await db
     .from("listings")
     .select("*")
     .eq("published", true)
     .eq("type", "vehicle")
     .order("created_at", { ascending: false });
 
-  const { data: providerData } = await supabaseAdmin
+  const { data: providerData } = await db
     .from("profiles")
     .select("user_id, display_name, location, bio, avatar_url, profile_types")
     .not("display_name", "is", null);

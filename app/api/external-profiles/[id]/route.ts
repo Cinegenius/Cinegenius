@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -27,7 +27,7 @@ export async function PATCH(
   if (body.sort_order !== undefined) patch.sort_order = body.sort_order;
   if (body.is_public !== undefined) patch.is_public = body.is_public;
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from("external_profiles")
     .update(patch)
     .eq("id", id)
@@ -51,7 +51,7 @@ export async function DELETE(
 
   const { id } = await params;
 
-  const { error } = await supabaseAdmin
+  const { error } = await db
     .from("external_profiles")
     .delete()
     .eq("id", id)

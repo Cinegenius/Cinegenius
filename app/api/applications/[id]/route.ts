@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth, assertOwner } from "@/lib/guards";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -20,7 +20,7 @@ export async function PATCH(
   }
 
   // Fetch application — owner_id is stored in DB, never read from client
-  const { data: application } = await supabaseAdmin
+  const { data: application } = await db
     .from("applications")
     .select("id, applicant_id, job_title, owner_id, status")
     .eq("id", id)
@@ -33,7 +33,7 @@ export async function PATCH(
   // Type narrowing: application is defined after ownership check passes
   const app = application!;
 
-  const { error } = await supabaseAdmin
+  const { error } = await db
     .from("applications")
     .update({ status })
     .eq("id", id);
@@ -41,7 +41,7 @@ export async function PATCH(
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   // Notify the applicant
-  await supabaseAdmin.from("notifications").insert({
+  await db.from("notifications").insert({
     user_id: app.applicant_id,
     type: status === "accepted" ? "new_application" : "application_sent",
     title: status === "accepted" ? "Bewerbung angenommen!" : "Bewerbung abgelehnt",

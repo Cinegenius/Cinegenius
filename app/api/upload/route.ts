@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/guards";
 import { validateUpload, buildStoragePath } from "@/lib/uploadGuard";
 import { NextRequest, NextResponse } from "next/server";
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
   // 5. Upload to Supabase Storage.
   //    upsert: false — never overwrite an existing file at the same path.
   //    (UUID makes collision effectively impossible, but we enforce it anyway.)
-  const { error: uploadError } = await supabaseAdmin.storage
+  const { error: uploadError } = await db.storage
     .from("listing-images")
     .upload(path, buffer, {
       contentType: mime,
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: uploadError.message }, { status: 500 });
   }
 
-  const { data: urlData } = supabaseAdmin.storage
+  const { data: urlData } = db.storage
     .from("listing-images")
     .getPublicUrl(path);
 

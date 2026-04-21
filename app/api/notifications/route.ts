@@ -13,7 +13,7 @@
 // CREATE POLICY "users manage own notifications" ON notifications FOR ALL USING (auth.uid()::text = user_id);
 // CREATE INDEX notifications_user_id_idx ON notifications(user_id, created_at DESC);
 
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { getCurrentUser, requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -22,7 +22,7 @@ export async function GET() {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ notifications: [] });
 
-  const { data } = await supabaseAdmin
+  const { data } = await db
     .from("notifications")
     .select("id, type, title, body, href, read, created_at")
     .eq("user_id", user.userId)
@@ -38,7 +38,7 @@ export async function PATCH() {
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
-  await supabaseAdmin
+  await db
     .from("notifications")
     .update({ read: true })
     .eq("user_id", userId)
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
   const { id } = await req.json();
   if (!id) return NextResponse.json({ error: "id fehlt" }, { status: 400 });
 
-  await supabaseAdmin
+  await db
     .from("notifications")
     .update({ read: true })
     .eq("id", id)

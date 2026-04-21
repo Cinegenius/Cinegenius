@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth, assertOwner } from "@/lib/guards";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -11,7 +11,7 @@ export async function GET(
   const { slug } = await params;
   const preview = req.nextUrl.searchParams.get("preview") === "true";
 
-  let query = supabaseAdmin
+  let query = db
     .from("companies")
     .select("*")
     .eq("slug", slug);
@@ -33,7 +33,7 @@ export async function GET(
     if (ownershipError) return ownershipError;
   }
 
-  const { data: listings } = await supabaseAdmin
+  const { data: listings } = await db
     .from("listings")
     .select("id, title, type, category, price, city, image_url, created_at")
     .eq("company_id", company.id)
@@ -55,7 +55,7 @@ export async function DELETE(
   const { slug } = await params;
 
   // Fetch company to verify existence and ownership
-  const { data: company } = await supabaseAdmin
+  const { data: company } = await db
     .from("companies")
     .select("id, owner_user_id")
     .eq("slug", slug)
@@ -64,7 +64,7 @@ export async function DELETE(
   const ownershipError = assertOwner(company?.owner_user_id, userId);
   if (ownershipError) return ownershipError;
 
-  const { error } = await supabaseAdmin
+  const { error } = await db
     .from("companies")
     .delete()
     .eq("id", company!.id);

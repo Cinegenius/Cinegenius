@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -14,7 +14,7 @@ export async function DELETE(
   const { id } = await params;
 
   // Verify ownership via project
-  const { data: entry } = await supabaseAdmin
+  const { data: entry } = await db
     .from("project_festivals")
     .select("project_id, projects(created_by)")
     .eq("id", id)
@@ -26,7 +26,7 @@ export async function DELETE(
     return NextResponse.json({ error: "Keine Berechtigung" }, { status: 403 });
   }
 
-  const { error } = await supabaseAdmin
+  const { error } = await db
     .from("project_festivals")
     .delete()
     .eq("id", id);

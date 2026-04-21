@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 
 /** Fetch avg rating + review count for a list of target IDs in one query */
 export async function fetchRatings(
@@ -7,7 +7,7 @@ export async function fetchRatings(
 ): Promise<Record<string, { rating: number; reviews: number }>> {
   if (targetIds.length === 0) return {};
 
-  const { data } = await supabaseAdmin
+  const { data } = await db
     .from("reviews")
     .select("target_id, rating")
     .eq("target_type", targetType)

@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
   const pageSize = 50;
 
-  let query = supabaseAdmin
+  let query = db
     .from("profiles")
     .select("user_id, display_name, location, avatar_url, profile_types, verified, created_at, tagline", { count: "exact" })
     .order("created_at", { ascending: false })
@@ -38,7 +38,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Ungültige Parameter" }, { status: 400 });
   }
 
-  const { error } = await supabaseAdmin
+  const { error } = await db
     .from("profiles")
     .update({ verified })
     .eq("user_id", targetUserId);

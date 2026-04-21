@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -17,7 +17,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "Ungültiger Status" }, { status: 400 });
   }
 
-  const { data: friendship } = await supabaseAdmin
+  const { data: friendship } = await db
     .from("friendships")
     .select("id, sender_id, receiver_id")
     .eq("id", id)
@@ -28,7 +28,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "Keine Berechtigung" }, { status: 403 });
   }
 
-  const { error } = await supabaseAdmin
+  const { error } = await db
     .from("friendships")
     .update({ status, updated_at: new Date().toISOString() })
     .eq("id", id);
@@ -37,14 +37,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   // Notify the original sender when accepted (in-app + email)
   if (status === "accepted") {
-    const { data: accepterProfile } = await supabaseAdmin
+    const { data: accepterProfile } = await db
       .from("profiles")
       .select("display_name")
       .eq("user_id", userId)
       .maybeSingle();
     const accepterName = accepterProfile?.display_name ?? "Jemand";
 
-    await supabaseAdmin.from("notifications").insert({
+    await db.from("notifications").insert({
       user_id: friendship.sender_id,
       type: "friend_accepted",
       title: "Freundschaftsanfrage angenommen",
@@ -71,7 +71,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 
   const { id } = await params;
 
-  const { data: friendship } = await supabaseAdmin
+  const { data: friendship } = await db
     .from("friendships")
     .select("id, sender_id, receiver_id")
     .eq("id", id)
@@ -82,7 +82,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: "Keine Berechtigung" }, { status: 403 });
   }
 
-  const { error } = await supabaseAdmin.from("friendships").delete().eq("id", id);
+  const { error } = await db.from("friendships").delete().eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
 }

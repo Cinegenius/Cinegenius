@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -9,7 +9,7 @@ export async function GET() {
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
-  const { data } = await supabaseAdmin
+  const { data } = await db
     .from("profiles")
     .select("*")
     .eq("user_id", userId)
@@ -60,14 +60,14 @@ export async function POST(req: NextRequest) {
   }
 
   // Check if this is a brand-new profile
-  const { data: existing } = await supabaseAdmin
+  const { data: existing } = await db
     .from("profiles")
     .select("user_id")
     .eq("user_id", userId)
     .maybeSingle();
   const isNewProfile = !existing;
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from("profiles")
     .upsert(
       {
@@ -172,7 +172,7 @@ export async function PATCH(req: NextRequest) {
 
     // Retry: if PostgREST reports an unknown column, extract name from message and strip it
     for (let attempt = 0; attempt < 20; attempt++) {
-      const { error } = await supabaseAdmin
+      const { error } = await db
         .from("profiles")
         .update(payload)
         .eq("user_id", userId);

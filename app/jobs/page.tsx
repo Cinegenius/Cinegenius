@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import JobsContent from "./JobsContent";
 
 export const revalidate = 60;
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 export default async function JobsPage() {
-  const { data } = await supabaseAdmin
+  const { data } = await db
     .from("listings")
     .select("*")
     .eq("published", true)

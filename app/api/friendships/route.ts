@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   const targetId = searchParams.get("userId");
 
   if (targetId) {
-    const { data } = await supabaseAdmin
+    const { data } = await db
       .from("friendships")
       .select("id, sender_id, receiver_id, status")
       .or(
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
   }
 
   // All friendships
-  const { data: friendships, error } = await supabaseAdmin
+  const { data: friendships, error } = await db
     .from("friendships")
     .select("id, sender_id, receiver_id, status, created_at")
     .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
   let profileMap: Record<string, { display_name?: string; avatar_url?: string; role?: string; positions?: string[] }> = {};
 
   if (otherIds.length > 0) {
-    const { data: profiles } = await supabaseAdmin
+    const { data: profiles } = await db
       .from("profiles")
       .select("user_id, display_name, avatar_url, role, positions")
       .in("user_id", otherIds);
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
   if (receiver_id === userId) return NextResponse.json({ error: "Kann sich selbst nicht hinzufügen" }, { status: 400 });
 
   // Check for existing record
-  const { data: existing } = await supabaseAdmin
+  const { data: existing } = await db
     .from("friendships")
     .select("id, status")
     .or(
@@ -91,10 +91,10 @@ export async function POST(req: NextRequest) {
     if (existing.status === "accepted") return NextResponse.json({ error: "Ihr seid bereits Freunde" }, { status: 409 });
     if (existing.status === "pending")  return NextResponse.json({ error: "Anfrage bereits vorhanden" }, { status: 409 });
     // rejected → delete and re-send
-    await supabaseAdmin.from("friendships").delete().eq("id", existing.id);
+    await db.from("friendships").delete().eq("id", existing.id);
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from("friendships")
     .insert({ sender_id: userId, receiver_id, status: "pending" })
     .select()
@@ -103,14 +103,14 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   // Notify the receiver (in-app + email) — fire-and-forget
-  const { data: senderProfile } = await supabaseAdmin
+  const { data: senderProfile } = await db
     .from("profiles")
     .select("display_name")
     .eq("user_id", userId)
     .maybeSingle();
   const senderName = senderProfile?.display_name ?? "Jemand";
 
-  await supabaseAdmin.from("notifications").insert({
+  await db.from("notifications").insert({
     user_id: receiver_id,
     type: "friend_request",
     title: "Neue Freundschaftsanfrage",

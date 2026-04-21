@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import type { Metadata } from "next";
 import PropDetail from "@/components/PropDetail";
 
@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 
 async function getProp(slug: string) {
-  const { data } = await supabaseAdmin
+  const { data } = await db
     .from("listings")
     .select("*")
     .eq("id", slug)
@@ -17,7 +17,7 @@ async function getProp(slug: string) {
   if (!data) return null;
 
   const ownerRes = data.user_id
-    ? await supabaseAdmin.from("profiles").select("display_name").eq("user_id", data.user_id).single()
+    ? await db.from("profiles").select("display_name").eq("user_id", data.user_id).single()
     : { data: null };
 
   return {

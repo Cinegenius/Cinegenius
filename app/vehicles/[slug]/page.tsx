@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import JsonLd from "@/components/JsonLd";
@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 
 async function getVehicle(slug: string) {
-  const { data } = await supabaseAdmin
+  const { data } = await db
     .from("listings")
     .select("*")
     .eq("id", slug)
@@ -25,7 +25,7 @@ async function getVehicle(slug: string) {
   if (!data) return null;
 
   const ownerRes = data.user_id
-    ? await supabaseAdmin.from("profiles").select("display_name").eq("user_id", data.user_id).single()
+    ? await db.from("profiles").select("display_name").eq("user_id", data.user_id).single()
     : { data: null };
   const ownerName = (ownerRes as { data: { display_name: string | null } | null }).data?.display_name ?? "Anbieter";
 

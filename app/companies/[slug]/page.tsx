@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
 import CompanyDetail from "./CompanyDetail";
@@ -12,7 +12,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const { data: company } = await supabaseAdmin
+  const { data: company } = await db
     .from("companies")
     .select("name, description, city, logo_url, categories")
     .eq("slug", slug)
@@ -45,7 +45,7 @@ export default async function CompanyPage({
   const { userId } = await auth();
 
   // Fetch by slug without published filter first — owners must always see their own page
-  const { data: company } = await supabaseAdmin
+  const { data: company } = await db
     .from("companies")
     .select("*")
     .eq("slug", slug)
@@ -57,22 +57,22 @@ export default async function CompanyPage({
   const isOwner = userId === company.owner_user_id;
 
   const [listingsRes, rawMembersRes, servicesRes, equipmentRes] = await Promise.all([
-    supabaseAdmin
+    db
       .from("listings")
       .select("id, title, type, category, price, city, image_url, created_at")
       .eq("company_id", company.id)
       .order("created_at", { ascending: false }),
-    supabaseAdmin
+    db
       .from("company_members")
       .select("id, user_id, role, title, status, created_at")
       .eq("company_id", company.id)
       .order("created_at", { ascending: true }),
-    supabaseAdmin
+    db
       .from("company_services")
       .select("*")
       .eq("company_id", company.id)
       .order("order", { ascending: true }),
-    supabaseAdmin
+    db
       .from("company_equipment")
       .select("*")
       .eq("company_id", company.id)
@@ -86,7 +86,7 @@ export default async function CompanyPage({
   let membersRes: any[] = [];
   if (visible.length > 0) {
     const userIds = visible.map((m) => m.user_id);
-    const { data: profiles } = await supabaseAdmin
+    const { data: profiles } = await db
       .from("profiles")
       .select("user_id, display_name, avatar_url, slug, role")
       .in("user_id", userIds);
@@ -97,7 +97,7 @@ export default async function CompanyPage({
   // Check if current user has already requested to join
   let myMembership: { id: string; status: string } | null = null;
   if (userId && !isOwner) {
-    const { data: mm } = await supabaseAdmin
+    const { data: mm } = await db
       .from("company_members")
       .select("id, status")
       .eq("company_id", company.id)

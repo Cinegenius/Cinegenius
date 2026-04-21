@@ -10,12 +10,15 @@ const nextConfig: NextConfig = {
     ],
     formats: ["image/avif", "image/webp"],
   },
-  // Provide build-time fallbacks so module-level Supabase clients don't throw
-  // during static analysis. Real values come from environment variables at runtime.
+  // Build-time fallbacks for the two public vars so static analysis doesn't fail
+  // when env vars are not available (e.g. CI without secrets).
+  // SUPABASE_SERVICE_ROLE_KEY is intentionally NOT listed here — the `env` block
+  // inlines values into the client-side bundle. The service role key must never
+  // reach the browser. The admin client is lazy so it never reads the key at
+  // build time anyway.
   env: {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || "https://build-placeholder.supabase.co",
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiJ9.build.placeholder",
-    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiJ9.build.placeholder",
   },
 };
 

@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth, assertOwner } from "@/lib/guards";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -22,7 +22,7 @@ export async function PATCH(
   }
 
   // Fetch booking — never trust client on what booking this is
-  const { data: booking } = await supabaseAdmin
+  const { data: booking } = await db
     .from("bookings")
     .select("id, ref, user_id, listing_id, listing_title, status")
     .eq("id", id)
@@ -41,7 +41,7 @@ export async function PATCH(
 
   // Verify the caller owns the listing that was booked.
   // Ownership lives on the listing, not the booking — fetch from DB.
-  const { data: listing } = await supabaseAdmin
+  const { data: listing } = await db
     .from("listings")
     .select("user_id, title")
     .eq("id", booking.listing_id)
@@ -51,7 +51,7 @@ export async function PATCH(
   if (ownershipError) return ownershipError;
 
   // Update booking status
-  const { error } = await supabaseAdmin
+  const { error } = await db
     .from("bookings")
     .update({ status })
     .eq("id", id);
@@ -59,7 +59,7 @@ export async function PATCH(
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   // Notify the booker
-  await supabaseAdmin.from("notifications").insert({
+  await db.from("notifications").insert({
     user_id: booking.user_id,
     type: status === "confirmed" ? "booking_confirmed" : "booking_rejected",
     title: status === "confirmed" ? "Buchung bestätigt" : "Buchung abgelehnt",
@@ -73,7 +73,7 @@ export async function PATCH(
   // Email to booker (best-effort, never fail the request)
   try {
     const [{ data: ownerProfile }, clerk] = await Promise.all([
-      supabaseAdmin.from("profiles").select("display_name").eq("user_id", userId).maybeSingle(),
+      db.from("profiles").select("display_name").eq("user_id", userId).maybeSingle(),
       clerkClient(),
     ]);
     const ownerName = ownerProfile?.display_name ?? "Der Anbieter";

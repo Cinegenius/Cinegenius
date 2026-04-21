@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -16,7 +16,7 @@ export async function PATCH(req: NextRequest) {
     console.log("[physical PATCH] physical:", JSON.stringify(physical));
 
     // First verify the row exists
-    const { data: existing } = await supabaseAdmin
+    const { data: existing } = await db
       .from("profiles")
       .select("user_id, profile_type, physical")
       .eq("user_id", userId)
@@ -28,7 +28,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Profil nicht gefunden" }, { status: 404 });
     }
 
-    const { error, data } = await supabaseAdmin.rpc("update_profile_physical", {
+    const { error, data } = await db.rpc("update_profile_physical", {
       p_user_id:      userId,
       p_profile_type: profile_type ?? null,
       p_physical:     physical ?? null,
@@ -42,7 +42,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     // Verify the update worked
-    const { data: after } = await supabaseAdmin
+    const { data: after } = await db
       .from("profiles")
       .select("physical, profile_type")
       .eq("user_id", userId)

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import ProjectDetail from "@/components/ProjectDetail";
@@ -11,9 +11,9 @@ export const dynamic = "force-dynamic";
 
 async function getProject(id: string) {
   const [{ data: project }, { data: credits }, { data: festivals }] = await Promise.all([
-    supabaseAdmin.from("projects").select("*").eq("id", id).single(),
-    supabaseAdmin.from("project_credits").select("id, user_id, role, created_at").eq("project_id", id).order("created_at", { ascending: true }),
-    supabaseAdmin.from("project_festivals").select("*").eq("project_id", id).order("year", { ascending: false }),
+    db.from("projects").select("*").eq("id", id).single(),
+    db.from("project_credits").select("id, user_id, role, created_at").eq("project_id", id).order("created_at", { ascending: true }),
+    db.from("project_festivals").select("*").eq("project_id", id).order("year", { ascending: false }),
   ]);
 
   if (!project) return null;
@@ -22,7 +22,7 @@ async function getProject(id: string) {
   let profiles: Record<string, { display_name: string; avatar_url: string | null; role: string | null }> = {};
 
   if (userIds.length > 0) {
-    const { data: profileData } = await supabaseAdmin
+    const { data: profileData } = await db
       .from("profiles")
       .select("user_id, display_name, avatar_url, role")
       .in("user_id", userIds);
@@ -78,7 +78,7 @@ export default async function ProjectPage({
 
   let userPositions: string[] = [];
   if (userId) {
-    const { data: prof } = await supabaseAdmin
+    const { data: prof } = await db
       .from("profiles")
       .select("positions")
       .eq("user_id", userId)

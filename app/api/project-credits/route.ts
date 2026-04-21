@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "project_id und role sind Pflichtfelder" }, { status: 400 });
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from("project_credits")
     .insert({ project_id, user_id: userId, role: role.trim() })
     .select()
@@ -39,7 +39,7 @@ export async function DELETE(req: NextRequest) {
   const project_id = searchParams.get("project_id");
   if (!project_id) return NextResponse.json({ error: "project_id fehlt" }, { status: 400 });
 
-  const { error } = await supabaseAdmin
+  const { error } = await db
     .from("project_credits")
     .delete()
     .eq("project_id", project_id)
@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
   const user_id = searchParams.get("user_id");
   if (!user_id) return NextResponse.json({ error: "user_id fehlt" }, { status: 400 });
 
-  const { data: credits, error } = await supabaseAdmin
+  const { data: credits, error } = await db
     .from("project_credits")
     .select("id, role, created_at, project_id, projects(id, title, year, type, director, poster_url, metadata)")
     .eq("user_id", user_id)

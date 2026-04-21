@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import ProjectsContent from "@/app/projects/ProjectsContent";
 import CategoryHero from "@/components/CategoryHero";
 
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AlleProjectsPage() {
-  const { data: projects } = await supabaseAdmin
+  const { data: projects } = await db
     .from("projects")
     .select("id, title, year, type, director, poster_url")
     .order("year", { ascending: false })
@@ -20,7 +20,7 @@ export default async function AlleProjectsPage() {
   const ids = (projects ?? []).map((p: { id: string }) => p.id);
   let creditCounts: Record<string, number> = {};
   if (ids.length > 0) {
-    const { data: counts } = await supabaseAdmin
+    const { data: counts } = await db
       .from("project_credits")
       .select("project_id")
       .in("project_id", ids);

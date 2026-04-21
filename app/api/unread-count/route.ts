@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
@@ -10,7 +10,7 @@ export async function GET() {
   const { userId } = user;
 
   // Alle Konversationen des Nutzers holen
-  const { data: convs } = await supabaseAdmin
+  const { data: convs } = await db
     .from("conversations")
     .select("id")
     .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`);
@@ -19,7 +19,7 @@ export async function GET() {
   if (convIds.length === 0) return NextResponse.json({ count: 0 });
 
   // Ungelesene Nachrichten vom jeweils anderen zählen
-  const { count } = await supabaseAdmin
+  const { count } = await db
     .from("messages")
     .select("id", { count: "exact", head: true })
     .is("read_at", null)

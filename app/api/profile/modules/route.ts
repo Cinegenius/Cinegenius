@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -12,7 +12,7 @@ export async function PATCH(req: NextRequest) {
     const { profile_type, modules } = body;
     console.log("[modules PATCH] profile_type:", profile_type, "modules count:", modules?.length);
 
-    const { error } = await supabaseAdmin.rpc("update_profile_modules", {
+    const { error } = await db.rpc("update_profile_modules", {
       p_user_id: userId,
       p_profile_type: profile_type,
       p_modules: modules,

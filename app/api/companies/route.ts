@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
     if (authResult instanceof NextResponse) return authResult;
     const { userId } = authResult;
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await db
       .from("companies")
       .select("*")
       .eq("owner_user_id", userId)
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ data: data ?? [] });
   }
 
-  let query = supabaseAdmin
+  let query = db
     .from("companies")
     .select("*")
     .eq("published", true)
@@ -58,7 +58,7 @@ export async function DELETE(req: NextRequest) {
   if (!id) return NextResponse.json({ error: "id fehlt" }, { status: 400 });
 
   // Verify ownership
-  const { data: company } = await supabaseAdmin
+  const { data: company } = await db
     .from("companies")
     .select("id")
     .eq("id", id)
@@ -68,11 +68,11 @@ export async function DELETE(req: NextRequest) {
   if (!company) return NextResponse.json({ error: "Firma nicht gefunden oder keine Berechtigung" }, { status: 403 });
 
   // Delete related data first
-  await supabaseAdmin.from("company_members").delete().eq("company_id", id);
-  await supabaseAdmin.from("company_equipment").delete().eq("company_id", id);
-  await supabaseAdmin.from("company_services").delete().eq("company_id", id);
+  await db.from("company_members").delete().eq("company_id", id);
+  await db.from("company_equipment").delete().eq("company_id", id);
+  await db.from("company_services").delete().eq("company_id", id);
 
-  const { error } = await supabaseAdmin.from("companies").delete().eq("id", id);
+  const { error } = await db.from("companies").delete().eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json({ success: true });
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
 
   // Update existing
   if (id) {
-    const { data: existing } = await supabaseAdmin
+    const { data: existing } = await db
       .from("companies")
       .select("id")
       .eq("id", id)
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
 
     if (!existing) return NextResponse.json({ error: "Firma nicht gefunden oder keine Berechtigung" }, { status: 403 });
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await db
       .from("companies")
       .update({
         name: name.trim(),
@@ -139,7 +139,7 @@ export async function POST(req: NextRequest) {
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
     // Keep owner's company_members entry in sync (upsert with their title)
-    await supabaseAdmin
+    await db
       .from("company_members")
       .upsert(
         { company_id: id, user_id: userId, role: "owner", status: "accepted", title: owner_title?.trim() || null },
@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
 
   // Create new — generate unique slug
   const baseSlug = generateSlug(name.trim());
-  const { data: existing } = await supabaseAdmin
+  const { data: existing } = await db
     .from("companies")
     .select("slug")
     .ilike("slug", `${baseSlug}%`);
@@ -163,7 +163,7 @@ export async function POST(req: NextRequest) {
     while (taken.has(slug)) { slug = `${baseSlug}-${n++}`; }
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from("companies")
     .insert({
       owner_user_id: userId,
@@ -195,7 +195,7 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   // Auto-add owner to company_members as owner/accepted
-  await supabaseAdmin
+  await db
     .from("company_members")
     .upsert(
       { company_id: data.id, user_id: userId, role: "owner", status: "accepted", title: owner_title?.trim() || null },
@@ -203,7 +203,7 @@ export async function POST(req: NextRequest) {
     );
 
   // Also mark profile as company type
-  await supabaseAdmin
+  await db
     .from("profiles")
     .update({ account_type: "company", updated_at: new Date().toISOString() })
     .eq("user_id", userId);

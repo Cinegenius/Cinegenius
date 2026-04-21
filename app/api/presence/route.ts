@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
@@ -7,7 +7,7 @@ export async function POST() {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ ok: false });
 
-  await supabaseAdmin
+  await db
     .from("profiles")
     .update({ last_seen_at: new Date().toISOString() })
     .eq("user_id", user.userId);

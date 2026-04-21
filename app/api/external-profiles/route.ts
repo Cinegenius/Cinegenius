@@ -13,7 +13,7 @@
 // );
 // CREATE INDEX external_profiles_user_idx ON external_profiles(user_id, sort_order);
 
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -23,7 +23,7 @@ export async function GET() {
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from("external_profiles")
     .select("id, platform_type, platform_name, url, custom_label, sort_order, is_public")
     .eq("user_id", userId)
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
   // Normalise URL — add https:// if missing scheme
   const normUrl = url.trim().startsWith("http") ? url.trim() : `https://${url.trim()}`;
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from("external_profiles")
     .insert({
       user_id: userId,

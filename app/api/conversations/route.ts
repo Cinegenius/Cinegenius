@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -10,7 +10,7 @@ export async function GET() {
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from("conversations")
     .select(`
       id, listing_id, listing_title, listing_type, sender_id, receiver_id, created_at, updated_at,
@@ -28,7 +28,7 @@ export async function GET() {
 
   let profileMap: Record<string, { display_name?: string; avatar_url?: string }> = {};
   if (otherIds.length > 0) {
-    const { data: profiles } = await supabaseAdmin
+    const { data: profiles } = await db
       .from("profiles")
       .select("user_id, display_name, avatar_url")
       .in("user_id", otherIds);
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Prüfen ob Konversation bereits existiert
-  let existingQuery = supabaseAdmin
+  let existingQuery = db
     .from("conversations")
     .select("id")
     .eq("sender_id", userId)
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
   let conversationId = existing?.id;
 
   if (!conversationId) {
-    const { data: conv, error: convError } = await supabaseAdmin
+    const { data: conv, error: convError } = await db
       .from("conversations")
       .insert({ listing_id, listing_title, listing_type, sender_id: userId, receiver_id })
       .select("id")
@@ -92,14 +92,14 @@ export async function POST(req: NextRequest) {
     conversationId = conv.id;
   }
 
-  const { error: msgError } = await supabaseAdmin
+  const { error: msgError } = await db
     .from("messages")
     .insert({ conversation_id: conversationId, sender_id: userId, content: content.trim() });
 
   if (msgError) return NextResponse.json({ error: msgError.message }, { status: 500 });
 
   // updated_at aktualisieren
-  await supabaseAdmin
+  await db
     .from("conversations")
     .update({ updated_at: new Date().toISOString() })
     .eq("id", conversationId);
@@ -108,8 +108,8 @@ export async function POST(req: NextRequest) {
   if (!existing) {
     try {
       const [{ data: senderProfile }, { data: receiverSettings }] = await Promise.all([
-        supabaseAdmin.from("profiles").select("display_name").eq("user_id", userId).maybeSingle(),
-        supabaseAdmin.from("user_settings").select("email_new_message").eq("user_id", receiver_id).maybeSingle(),
+        db.from("profiles").select("display_name").eq("user_id", userId).maybeSingle(),
+        db.from("user_settings").select("email_new_message").eq("user_id", receiver_id).maybeSingle(),
       ]);
       const senderName = senderProfile?.display_name ?? "Jemand";
       const emailEnabled = receiverSettings?.email_new_message !== false; // default true

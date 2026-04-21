@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
-const admin = supabaseAdmin;
+import { db } from "@/lib/db";
+const admin = db;
 import { redirect } from "next/navigation";
 import DashboardClient from "./DashboardClient";
 

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import type { Metadata } from "next";
 import JobDetail from "@/components/JobDetail";
 
@@ -24,7 +24,7 @@ function parseJobDescription(raw: string) {
 }
 
 async function getJob(slug: string) {
-  const { data } = await supabaseAdmin
+  const { data } = await db
     .from("listings")
     .select("*")
     .eq("id", slug)

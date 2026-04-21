@@ -19,7 +19,7 @@
 // );
 // CREATE INDEX bookings_user_id_idx ON bookings(user_id, created_at DESC);
 
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth, getCurrentUser } from "@/lib/auth";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
   }
 
   // SECURITY: read price and title server-side from DB — never trust client
-  const { data: listing } = await supabaseAdmin
+  const { data: listing } = await db
     .from("listings")
     .select("id, title, type, price, user_id, published")
     .eq("id", listingId)
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
   const total     = subtotal;
   const ref       = generateRef();
 
-  const { data: booking, error } = await supabaseAdmin
+  const { data: booking, error } = await db
     .from("bookings")
     .insert({
       ref,
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
   }
 
   // In-app notification for the buyer
-  await supabaseAdmin.from("notifications").insert({
+  await db.from("notifications").insert({
     user_id: userId,
     type: "booking_request",
     title: "Buchungsanfrage gesendet",
@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
 
   // Notify + email the listing owner (fire-and-forget)
   try {
-    const { data: senderProfile } = await supabaseAdmin
+    const { data: senderProfile } = await db
       .from("profiles")
       .select("display_name")
       .eq("user_id", userId)
@@ -113,14 +113,14 @@ export async function POST(req: NextRequest) {
     const guestName = senderProfile?.display_name ?? "Jemand";
 
     if (listingId) {
-      const { data: listingData } = await supabaseAdmin
+      const { data: listingData } = await db
         .from("listings")
         .select("user_id")
         .eq("id", listingId)
         .maybeSingle();
 
       if (listingData?.user_id && listingData.user_id !== userId) {
-        await supabaseAdmin.from("notifications").insert({
+        await db.from("notifications").insert({
           user_id: listingData.user_id,
           type: "booking_request",
           title: "Neue Buchungsanfrage",
@@ -151,7 +151,7 @@ export async function GET(req: NextRequest) {
   const incoming = searchParams.get("incoming") === "true";
 
   if (ref) {
-    const { data } = await supabaseAdmin
+    const { data } = await db
       .from("bookings")
       .select("id, ref, listing_id, listing_title, listing_type, start_date, end_date, days, daily_rate, subtotal, platform_fee, total, notes, status, created_at")
       .eq("user_id", userId)
@@ -163,14 +163,14 @@ export async function GET(req: NextRequest) {
 
   if (incoming) {
     // Get listing IDs owned by this user
-    const { data: ownedListings } = await supabaseAdmin
+    const { data: ownedListings } = await db
       .from("listings")
       .select("id")
       .eq("user_id", userId);
     const ownedIds = (ownedListings ?? []).map((l) => l.id);
     if (ownedIds.length === 0) return NextResponse.json({ bookings: [] });
 
-    const { data } = await supabaseAdmin
+    const { data } = await db
       .from("bookings")
       .select("id, ref, user_id, listing_id, listing_title, listing_type, start_date, end_date, days, daily_rate, total, notes, status, created_at")
       .in("listing_id", ownedIds)
@@ -181,7 +181,7 @@ export async function GET(req: NextRequest) {
     const bookerIds = [...new Set((data ?? []).map((b) => b.user_id))];
     let nameMap: Record<string, string> = {};
     if (bookerIds.length > 0) {
-      const { data: profiles } = await supabaseAdmin
+      const { data: profiles } = await db
         .from("profiles")
         .select("user_id, display_name")
         .in("user_id", bookerIds);
@@ -192,7 +192,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ bookings: enriched });
   }
 
-  const { data } = await supabaseAdmin
+  const { data } = await db
     .from("bookings")
     .select("id, ref, listing_title, listing_type, start_date, end_date, days, total, status, created_at")
     .eq("user_id", userId)

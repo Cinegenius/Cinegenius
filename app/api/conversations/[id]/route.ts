@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -16,7 +16,7 @@ export async function GET(
 
   const { id } = await params;
 
-  const { data: conv, error: convError } = await supabaseAdmin
+  const { data: conv, error: convError } = await db
     .from("conversations")
     .select("*")
     .eq("id", id)
@@ -25,14 +25,14 @@ export async function GET(
 
   if (convError || !conv) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 });
 
-  const { data: messages } = await supabaseAdmin
+  const { data: messages } = await db
     .from("messages")
     .select("*")
     .eq("conversation_id", id)
     .order("created_at", { ascending: true });
 
   // Ungelesene Nachrichten des anderen als gelesen markieren
-  await supabaseAdmin
+  await db
     .from("messages")
     .update({ read_at: new Date().toISOString() })
     .eq("conversation_id", id)
@@ -62,7 +62,7 @@ export async function POST(
   if (content.length > 5000) return NextResponse.json({ error: "Nachricht zu lang (max. 5000 Zeichen)" }, { status: 400 });
 
   // Zugriff prüfen + Empfänger ermitteln
-  const { data: conv } = await supabaseAdmin
+  const { data: conv } = await db
     .from("conversations")
     .select("id, sender_id, receiver_id")
     .eq("id", id)
@@ -71,7 +71,7 @@ export async function POST(
 
   if (!conv) return NextResponse.json({ error: "Kein Zugriff" }, { status: 403 });
 
-  const { data: msg, error } = await supabaseAdmin
+  const { data: msg, error } = await db
     .from("messages")
     .insert({ conversation_id: id, sender_id: userId, content: content.trim() })
     .select()
@@ -79,7 +79,7 @@ export async function POST(
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  await supabaseAdmin
+  await db
     .from("conversations")
     .update({ updated_at: new Date().toISOString() })
     .eq("id", id);
@@ -87,7 +87,7 @@ export async function POST(
   // Email an Empfänger — nur wenn aktiviert
   const receiverId = conv.sender_id === userId ? conv.receiver_id : conv.sender_id;
   try {
-    const { data: receiverSettings } = await supabaseAdmin
+    const { data: receiverSettings } = await db
       .from("user_settings")
       .select("email_new_message")
       .eq("user_id", receiverId)
@@ -96,7 +96,7 @@ export async function POST(
 
     if (emailEnabled) {
       const [{ data: senderProfile }, clerk] = await Promise.all([
-        supabaseAdmin.from("profiles").select("display_name").eq("user_id", userId).maybeSingle(),
+        db.from("profiles").select("display_name").eq("user_id", userId).maybeSingle(),
         clerkClient(),
       ]);
       const senderName = senderProfile?.display_name ?? "Jemand";

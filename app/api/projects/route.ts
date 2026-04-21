@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     if (authResult instanceof NextResponse) return authResult;
     const { userId } = authResult;
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await db
       .from("projects")
       .select("id, title, year, type, director, poster_url, metadata")
       .eq("created_by", userId)
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ projects: data ?? [] });
   }
 
-  let query = supabaseAdmin
+  let query = db
     .from("projects")
     .select("id, title, year, type, director, poster_url, metadata")
     .order("year", { ascending: false })
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
     metadata,
   };
 
-  let { data: project, error: projError } = await supabaseAdmin
+  let { data: project, error: projError } = await db
     .from("projects")
     .insert(insertPayload)
     .select()
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
   if (projError?.code === "PGRST204" || (projError?.message ?? "").includes("metadata")) {
     const { metadata: _m, ...withoutMeta } = insertPayload;
     void _m;
-    ({ data: project, error: projError } = await supabaseAdmin
+    ({ data: project, error: projError } = await db
       .from("projects")
       .insert(withoutMeta)
       .select()
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
 
   // Auto-add creator with their role
   if (myRole?.trim()) {
-    await supabaseAdmin.from("project_credits").insert({
+    await db.from("project_credits").insert({
       project_id: project.id,
       user_id: userId,
       role: myRole.trim(),

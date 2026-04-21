@@ -15,7 +15,7 @@
 // CREATE INDEX applications_applicant_id_idx ON applications(applicant_id, created_at DESC);
 // CREATE UNIQUE INDEX applications_unique ON applications(job_id, applicant_id);
 
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
 import { clerkClient } from "@clerk/nextjs/server";
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Fetch job from DB — never trust client-supplied title or ownerId
-  const { data: job } = await supabaseAdmin
+  const { data: job } = await db
     .from("listings")
     .select("id, title, user_id, published, type")
     .eq("id", jobId)
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Upsert so re-applying updates the message rather than throwing a conflict
-  const { error } = await supabaseAdmin
+  const { error } = await db
     .from("applications")
     .upsert({
       job_id: jobId,
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Notification for the job owner
-  await supabaseAdmin.from("notifications").insert({
+  await db.from("notifications").insert({
     user_id: ownerId,
     type: "new_application",
     title: "Neue Bewerbung",
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
   });
 
   // Notification for the applicant
-  await supabaseAdmin.from("notifications").insert({
+  await db.from("notifications").insert({
     user_id: userId,
     type: "application_sent",
     title: "Bewerbung abgesendet",
@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
   });
 
   // Also open a conversation thread so the job poster can reply via messages
-  const { data: existing } = await supabaseAdmin
+  const { data: existing } = await db
     .from("conversations")
     .select("id")
     .eq("listing_id", jobId)
@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
 
   let conversationId = existing?.id;
   if (!conversationId) {
-    const { data: conv } = await supabaseAdmin
+    const { data: conv } = await db
       .from("conversations")
       .insert({
         listing_id: jobId,
@@ -123,7 +123,7 @@ export async function POST(req: NextRequest) {
       dayRate?.trim() ? `Tagesgage: ${dayRate.trim()}` : null,
     ].filter(Boolean).join("\n\n");
 
-    await supabaseAdmin.from("messages").insert({
+    await db.from("messages").insert({
       conversation_id: conversationId,
       sender_id: userId,
       content: body,
@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
   // Email notification to job owner
   try {
     const [{ data: applicantProfile }, clerk] = await Promise.all([
-      supabaseAdmin.from("profiles").select("display_name").eq("user_id", userId).maybeSingle(),
+      db.from("profiles").select("display_name").eq("user_id", userId).maybeSingle(),
       clerkClient(),
     ]);
     const applicantName = applicantProfile?.display_name ?? "Jemand";
@@ -154,7 +154,7 @@ export async function GET(req: NextRequest) {
   const incoming = new URL(req.url).searchParams.get("incoming") === "true";
 
   if (incoming) {
-    const { data } = await supabaseAdmin
+    const { data } = await db
       .from("applications")
       .select("id, job_id, job_title, applicant_id, message, portfolio_url, day_rate, status, created_at")
       .eq("owner_id", userId)
@@ -165,7 +165,7 @@ export async function GET(req: NextRequest) {
     const applicantIds = [...new Set((data ?? []).map((a) => a.applicant_id))];
     let nameMap: Record<string, { name: string; avatar: string | null }> = {};
     if (applicantIds.length > 0) {
-      const { data: profiles } = await supabaseAdmin
+      const { data: profiles } = await db
         .from("profiles")
         .select("user_id, display_name, avatar_url")
         .in("user_id", applicantIds);
@@ -183,7 +183,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ applications: enriched });
   }
 
-  const { data } = await supabaseAdmin
+  const { data } = await db
     .from("applications")
     .select("id, job_id, job_title, status, day_rate, created_at")
     .eq("applicant_id", userId)

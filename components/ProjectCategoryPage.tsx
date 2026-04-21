@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Clapperboard } from "lucide-react";
@@ -34,7 +34,7 @@ function typeColor(type: string): string {
 }
 
 export default async function ProjectCategoryPage({ config }: { config: CategoryConfig }) {
-  const { data: allProjects } = await supabaseAdmin
+  const { data: allProjects } = await db
     .from("projects")
     .select("id, title, year, type, director, poster_url")
     .order("year", { ascending: false })

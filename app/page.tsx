@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import Image from "next/image";
@@ -60,23 +60,23 @@ async function getHomeData() {
     { data: liveCompanies },
     { data: liveProjects },
   ] = await Promise.all([
-    supabaseAdmin.from("listings").select("*", { count: "exact", head: true }).eq("type", "location").eq("published", true),
-    supabaseAdmin.from("listings").select("*", { count: "exact", head: true }).eq("type", "job").eq("published", true),
-    supabaseAdmin.from("profiles").select("*", { count: "exact", head: true }).not("display_name", "is", null),
-    supabaseAdmin.from("listings").select("*", { count: "exact", head: true }).in("type", ["prop", "vehicle"]).eq("published", true),
-    supabaseAdmin.from("projects").select("*", { count: "exact", head: true }),
-    supabaseAdmin.from("companies").select("*", { count: "exact", head: true }).eq("published", true),
-    supabaseAdmin.from("listings").select("id,title,city,price,image_url,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(3), // created_at used for "Neu" badge
-    supabaseAdmin.from("listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
-    supabaseAdmin.from("projects").select("id,title,poster_url").not("poster_url", "is", null).order("created_at", { ascending: false }).limit(50),
-    supabaseAdmin.from("profiles").select("user_id,display_name,avatar_url").not("avatar_url", "is", null).order("updated_at", { ascending: false }).limit(50),
-    supabaseAdmin.from("listings").select("id,title,image_url").eq("type", "location").eq("published", true).not("image_url", "is", null).order("created_at", { ascending: false }).limit(50),
-    supabaseAdmin.from("listings").select("image_url").eq("type", "location").eq("published", true).not("image_url", "is", null).limit(20),
-    supabaseAdmin.from("profiles").select("avatar_url").not("avatar_url", "is", null).not("display_name", "is", null).limit(20),
-    supabaseAdmin.from("listings").select("image_url").in("type", ["prop", "vehicle"]).eq("published", true).not("image_url", "is", null).limit(20),
-    supabaseAdmin.from("listings").select("image_url").eq("type", "job").eq("published", true).not("image_url", "is", null).limit(20),
-    supabaseAdmin.from("companies").select("id,slug,name,logo_url,city").not("logo_url", "is", null).order("created_at", { ascending: false }).limit(12),
-    supabaseAdmin.from("projects").select("id,title,poster_url,year,type,director").not("poster_url", "is", null).order("created_at", { ascending: false }).limit(8),
+    db.from("listings").select("*", { count: "exact", head: true }).eq("type", "location").eq("published", true),
+    db.from("listings").select("*", { count: "exact", head: true }).eq("type", "job").eq("published", true),
+    db.from("profiles").select("*", { count: "exact", head: true }).not("display_name", "is", null),
+    db.from("listings").select("*", { count: "exact", head: true }).in("type", ["prop", "vehicle"]).eq("published", true),
+    db.from("projects").select("*", { count: "exact", head: true }),
+    db.from("companies").select("*", { count: "exact", head: true }).eq("published", true),
+    db.from("listings").select("id,title,city,price,image_url,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(3), // created_at used for "Neu" badge
+    db.from("listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
+    db.from("projects").select("id,title,poster_url").not("poster_url", "is", null).order("created_at", { ascending: false }).limit(50),
+    db.from("profiles").select("user_id,display_name,avatar_url").not("avatar_url", "is", null).order("updated_at", { ascending: false }).limit(50),
+    db.from("listings").select("id,title,image_url").eq("type", "location").eq("published", true).not("image_url", "is", null).order("created_at", { ascending: false }).limit(50),
+    db.from("listings").select("image_url").eq("type", "location").eq("published", true).not("image_url", "is", null).limit(20),
+    db.from("profiles").select("avatar_url").not("avatar_url", "is", null).not("display_name", "is", null).limit(20),
+    db.from("listings").select("image_url").in("type", ["prop", "vehicle"]).eq("published", true).not("image_url", "is", null).limit(20),
+    db.from("listings").select("image_url").eq("type", "job").eq("published", true).not("image_url", "is", null).limit(20),
+    db.from("companies").select("id,slug,name,logo_url,city").not("logo_url", "is", null).order("created_at", { ascending: false }).limit(12),
+    db.from("projects").select("id,title,poster_url,year,type,director").not("poster_url", "is", null).order("created_at", { ascending: false }).limit(8),
   ]);
 
   const liveStats = [

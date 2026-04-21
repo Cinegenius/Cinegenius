@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import CompaniesContent from "./CompaniesContent";
 import CategoryHero from "@/components/CategoryHero";
 
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 export default async function CompaniesPage() {
-  const { data } = await supabaseAdmin
+  const { data } = await db
     .from("companies")
     .select("*")
     .eq("published", true)

@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   const [listingsRes, profilesRes, companiesRes] = await Promise.all([
     wantListings
       ? (() => {
-          let q2 = supabaseAdmin
+          let q2 = db
             .from("listings")
             .select("id, title, city, type, category, price, image_url")
             .eq("published", true)
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
       : Promise.resolve({ data: [] }),
 
     wantProfiles
-      ? supabaseAdmin
+      ? db
           .from("profiles")
           .select("user_id, display_name, location, role, positions, avatar_url, available")
           .or(`display_name.ilike.${like},role.ilike.${like},location.ilike.${like},bio.ilike.${like}`)
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
       : Promise.resolve({ data: [] }),
 
     wantCompanies
-      ? supabaseAdmin
+      ? db
           .from("companies")
           .select("id, slug, name, city, logo_url, categories")
           .or(`name.ilike.${like},city.ilike.${like},description.ilike.${like}`)

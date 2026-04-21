@@ -10,7 +10,7 @@
  * );
  */
 
-import { supabaseAdmin } from "./supabaseAdmin";
+import { db } from "./db";
 
 interface RateLimitResult {
   allowed: boolean;
@@ -32,7 +32,7 @@ export async function rateLimit(
     const windowEnd = new Date(now.getTime() + windowS * 1000);
 
     // Upsert: if window expired reset count, otherwise increment
-    const { data, error } = await supabaseAdmin.rpc("upsert_rate_limit", {
+    const { data, error } = await db.rpc("upsert_rate_limit", {
       p_key: key,
       p_limit: limit,
       p_window_end: windowEnd.toISOString(),

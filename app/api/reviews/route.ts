@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "target_id und target_type erforderlich" }, { status: 400 });
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from("reviews")
     .select("id, reviewer_name, rating, text, aspect_ratings, created_at")
     .eq("target_id", target_id)
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
 
   // SECURITY: nur nach echter abgeschlossener Buchung bewerten
   if (target_type === "listing") {
-    const { data: completedBooking } = await supabaseAdmin
+    const { data: completedBooking } = await db
       .from("bookings")
       .select("id")
       .eq("user_id", userId)
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Doppelbewertung verhindern
-  const { data: existing } = await supabaseAdmin
+  const { data: existing } = await db
     .from("reviews")
     .select("id")
     .eq("target_id", target_id)
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
       ? `${user.firstName} ${user.lastName[0]}.`
       : user?.firstName ?? "Anonym";
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from("reviews")
     .insert({ target_id, target_type, reviewer_id: userId, reviewer_name, rating, text: text.trim(), aspect_ratings })
     .select()

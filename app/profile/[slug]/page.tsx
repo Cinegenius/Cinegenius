@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import JsonLd from "@/components/JsonLd";
-const admin = supabaseAdmin;
+const admin = db;
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import ProfileView from "./ProfileView";

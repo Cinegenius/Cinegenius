@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   const recipientId = req.nextUrl.searchParams.get("userId");
   if (!recipientId) return NextResponse.json({ recommendations: [] });
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from("recommendations")
     .select("id, author_id, content, author_role, project, created_at")
     .eq("recipient_id", recipientId)
@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 
   // Autoren-Profile nachladen
   const authorIds = [...new Set(data.map((r) => r.author_id))];
-  const { data: profiles } = await supabaseAdmin
+  const { data: profiles } = await db
     .from("profiles")
     .select("user_id, display_name, avatar_url")
     .in("user_id", authorIds);
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Nur eine Empfehlung pro Person erlaubt
-  const { data: existing } = await supabaseAdmin
+  const { data: existing } = await db
     .from("recommendations")
     .select("id")
     .eq("author_id", userId)
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Du hast bereits eine Empfehlung für diese Person geschrieben" }, { status: 400 });
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from("recommendations")
     .insert({
       author_id: userId,
@@ -85,14 +85,14 @@ export async function POST(req: NextRequest) {
 
   // In-App-Benachrichtigung für den Empfänger
   try {
-    const { data: authorProfile } = await supabaseAdmin
+    const { data: authorProfile } = await db
       .from("profiles")
       .select("display_name")
       .eq("user_id", userId)
       .maybeSingle();
     const authorName = authorProfile?.display_name ?? "Jemand";
 
-    await supabaseAdmin.from("notifications").insert({
+    await db.from("notifications").insert({
       user_id: recipient_id,
       type: "friend_accepted", // nutzt success-Farbe
       title: "Neue Empfehlung",
@@ -113,7 +113,7 @@ export async function DELETE(req: NextRequest) {
   const id = req.nextUrl.searchParams.get("id");
   if (!id) return NextResponse.json({ error: "ID fehlt" }, { status: 400 });
 
-  const { error } = await supabaseAdmin
+  const { error } = await db
     .from("recommendations")
     .delete()
     .eq("id", id)

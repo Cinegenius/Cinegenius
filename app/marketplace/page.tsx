@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import Image from "next/image";
 import {
   Package, Car, Shirt, Wrench, Clapperboard, Sparkles, Lightbulb, Mic, Zap, Layers,
@@ -10,26 +10,26 @@ export const dynamic = "force-dynamic";
 
 async function getMarketplaceData() {
   const [{ data: dbProps }, { data: dbVehicles }, { count: totalProps }, { count: totalVehicles }] = await Promise.all([
-    supabaseAdmin
+    db
       .from("listings")
       .select("id, title, price, category, image_url, city")
       .in("type", ["prop", "vehicle"])
       .eq("published", true)
       .order("created_at", { ascending: false })
       .limit(8),
-    supabaseAdmin
+    db
       .from("listings")
       .select("id, title, price, category, image_url, city")
       .eq("type", "vehicle")
       .eq("published", true)
       .order("created_at", { ascending: false })
       .limit(4),
-    supabaseAdmin
+    db
       .from("listings")
       .select("*", { count: "exact", head: true })
       .eq("type", "prop")
       .eq("published", true),
-    supabaseAdmin
+    db
       .from("listings")
       .select("*", { count: "exact", head: true })
       .eq("type", "vehicle")

@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -12,7 +12,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Ungültige Parameter" }, { status: 400 });
   }
 
-  const { error } = await supabaseAdmin
+  const { error } = await db
     .from("listings")
     .update({ published })
     .eq("id", listingId);
@@ -30,7 +30,7 @@ export async function DELETE(req: NextRequest) {
   const { listingId } = await req.json();
   if (!listingId) return NextResponse.json({ error: "Kein Inserat" }, { status: 400 });
 
-  const { error } = await supabaseAdmin
+  const { error } = await db
     .from("listings")
     .delete()
     .eq("id", listingId);

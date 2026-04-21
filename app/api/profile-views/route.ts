@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
@@ -12,7 +12,7 @@ export async function GET() {
   const d7  = new Date(now.getTime() - 7  * 24 * 60 * 60 * 1000).toISOString();
   const d14 = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString();
 
-  const { data } = await supabaseAdmin
+  const { data } = await db
     .from("profile_views")
     .select("viewed_at")
     .eq("profile_id", userId)

@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   const project_id = searchParams.get("project_id");
   if (!project_id) return NextResponse.json({ error: "project_id fehlt" }, { status: 400 });
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from("project_festivals")
     .select("*")
     .eq("project_id", project_id)
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Verify the user owns this project
-  const { data: project } = await supabaseAdmin
+  const { data: project } = await db
     .from("projects")
     .select("created_by")
     .eq("id", project_id)
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Keine Berechtigung" }, { status: 403 });
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from("project_festivals")
     .insert({
       project_id,
