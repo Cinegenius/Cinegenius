@@ -27,11 +27,29 @@ export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
 
-  const { jobId, jobTitle, ownerId, message, portfolioUrl, dayRate } = await req.json();
+  // NOTE: jobTitle and ownerId from the client body are intentionally ignored below.
+  // We fetch the authoritative values from the DB to prevent spoofing.
+  const { jobId, message, portfolioUrl, dayRate } = await req.json();
 
-  if (!jobId || !jobTitle || !ownerId || !message?.trim()) {
+  if (!jobId || !message?.trim()) {
     return NextResponse.json({ error: "Fehlende Pflichtfelder" }, { status: 400 });
   }
+
+  // Fetch job from DB — never trust client-supplied title or ownerId
+  const { data: job } = await supabaseAdmin
+    .from("listings")
+    .select("id, title, user_id, published, type")
+    .eq("id", jobId)
+    .eq("type", "job")
+    .maybeSingle();
+
+  if (!job || !job.published) {
+    return NextResponse.json({ error: "Stellenausschreibung nicht gefunden" }, { status: 404 });
+  }
+
+  const ownerId = job.user_id;      // authoritative owner from DB
+  const jobTitle = job.title;       // authoritative title from DB
+
   if (ownerId === userId) {
     return NextResponse.json({ error: "Du kannst dich nicht auf eigene Stellenausschreibungen bewerben" }, { status: 400 });
   }

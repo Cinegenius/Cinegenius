@@ -1,9 +1,9 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { createClient } from "@supabase/supabase-js";
-import { auth } from "@clerk/nextjs/server";
+import { requireAuth, assertOwner } from "@/lib/guards";
 import { NextRequest, NextResponse } from "next/server";
 
-// GET /api/companies/[slug] — fetch single company + its listings
+// GET /api/companies/[slug] — fetch company + its published listings
+// ?preview=true allows the owner to view their unpublished company
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
@@ -19,14 +19,18 @@ export async function GET(
   if (!preview) query = query.eq("published", true);
 
   const { data: company, error } = await query.single();
-  if (error || !company) return NextResponse.json({ error: "Firma nicht gefunden" }, { status: 404 });
+  if (error || !company) {
+    return NextResponse.json({ error: "Firma nicht gefunden" }, { status: 404 });
+  }
 
-  // If preview mode, verify ownership
+  // Preview mode requires ownership — fetch auth and verify server-side
   if (preview) {
-    const { userId } = await auth();
-    if (!userId || userId !== company.owner_user_id) {
-      return NextResponse.json({ error: "Keine Berechtigung" }, { status: 403 });
-    }
+    const authResult = await requireAuth();
+    if (authResult instanceof NextResponse) return authResult;
+    const { userId } = authResult;
+
+    const ownershipError = assertOwner(company.owner_user_id, userId);
+    if (ownershipError) return ownershipError;
   }
 
   const { data: listings } = await supabaseAdmin
@@ -41,27 +45,29 @@ export async function GET(
 
 // DELETE /api/companies/[slug] — delete own company
 export async function DELETE(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
   const { slug } = await params;
 
+  // Fetch company to verify existence and ownership
   const { data: company } = await supabaseAdmin
     .from("companies")
-    .select("id")
+    .select("id, owner_user_id")
     .eq("slug", slug)
-    .eq("owner_user_id", userId)
-    .single();
+    .maybeSingle();
 
-  if (!company) return NextResponse.json({ error: "Firma nicht gefunden oder keine Berechtigung" }, { status: 403 });
+  const ownershipError = assertOwner(company?.owner_user_id, userId);
+  if (ownershipError) return ownershipError;
 
   const { error } = await supabaseAdmin
     .from("companies")
     .delete()
-    .eq("id", company.id);
+    .eq("id", company!.id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });

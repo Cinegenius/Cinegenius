@@ -1,42 +1,49 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { createClient } from "@supabase/supabase-js";
-import { auth } from "@clerk/nextjs/server";
+import { requireAuth, assertOwner } from "@/lib/guards";
 import { NextRequest, NextResponse } from "next/server";
 
-// PATCH /api/listings/[id] — Inserat aktualisieren (z.B. published toggle)
+// PATCH /api/listings/[id] — update own listing fields
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
   const { id } = await params;
-  const body = await req.json();
 
-  // Nur eigene Inserate dürfen bearbeitet werden
+  // Fetch resource first — never trust client on ownership
   const { data: existing } = await supabaseAdmin
     .from("listings")
-    .select("id")
+    .select("id, user_id")
     .eq("id", id)
-    .eq("user_id", userId)
-    .single();
+    .maybeSingle();
 
-  if (!existing) return NextResponse.json({ error: "Nicht gefunden oder kein Zugriff" }, { status: 404 });
+  const ownershipError = assertOwner(existing?.user_id, userId);
+  if (ownershipError) return ownershipError;
 
-  // SECURITY: input length limits
-  if (body.title !== undefined && body.title.length > 200)
+  const body = await req.json();
+
+  // Input length limits
+  if (body.title !== undefined && String(body.title).length > 200)
     return NextResponse.json({ error: "Titel zu lang (max. 200 Zeichen)" }, { status: 400 });
-  if (body.city !== undefined && body.city.length > 100)
+  if (body.city !== undefined && String(body.city).length > 100)
     return NextResponse.json({ error: "Stadt zu lang (max. 100 Zeichen)" }, { status: 400 });
-  if (body.description !== undefined && body.description.length > 5000)
+  if (body.description !== undefined && String(body.description).length > 5000)
     return NextResponse.json({ error: "Beschreibung zu lang (max. 5000 Zeichen)" }, { status: 400 });
 
-  const allowed = ["published", "title", "description", "price", "city", "category", "image_url"];
+  // Explicit allowlist — no client-controlled columns can be injected
+  const ALLOWED_KEYS = [
+    "published", "title", "description", "price", "city",
+    "category", "image_url", "images", "lat", "lng",
+  ] as const;
+
   const updates: Record<string, unknown> = {};
-  for (const key of allowed) {
+  for (const key of ALLOWED_KEYS) {
     if (key in body) updates[key] = body[key];
   }
+
   if ("price" in updates) {
     updates["price"] = Math.max(0, Math.min(Number(updates["price"]) || 0, 1_000_000));
   }
@@ -56,21 +63,33 @@ export async function PATCH(
   return NextResponse.json({ data });
 }
 
-// DELETE /api/listings/[id]
+// DELETE /api/listings/[id] — delete own listing
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
   const { id } = await params;
+
+  // Pre-fetch to verify existence and ownership before deleting.
+  // Without this, a DELETE on a non-existent or foreign row would
+  // silently return success (Supabase deletes 0 rows, no error).
+  const { data: existing } = await supabaseAdmin
+    .from("listings")
+    .select("id, user_id")
+    .eq("id", id)
+    .maybeSingle();
+
+  const ownershipError = assertOwner(existing?.user_id, userId);
+  if (ownershipError) return ownershipError;
 
   const { error } = await supabaseAdmin
     .from("listings")
     .delete()
-    .eq("id", id)
-    .eq("user_id", userId);
+    .eq("id", id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
