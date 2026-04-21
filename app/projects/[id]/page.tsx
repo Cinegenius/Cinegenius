@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
+import { unstable_cache } from "next/cache";
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import ProjectDetail from "@/components/ProjectDetail";
@@ -7,9 +8,9 @@ import { departments } from "@/lib/departments";
 
 const ALL_CREW_ROLES = departments.flatMap((d) => d.roles);
 
-export const dynamic = "force-dynamic";
+// Dynamic because of auth(), but project data is cached
 
-async function getProject(id: string) {
+async function _getProject(id: string) {
   const [{ data: project }, { data: credits }, { data: festivals }] = await Promise.all([
     db.from("projects").select("*").eq("id", id).single(),
     db.from("project_credits").select("id, user_id, role, created_at").eq("project_id", id).order("created_at", { ascending: true }),
@@ -39,6 +40,8 @@ async function getProject(id: string) {
 
   return { project, credits: creditsWithProfiles, festivals: festivals ?? [] };
 }
+
+const getProject = unstable_cache(_getProject, ["project"], { revalidate: 300, tags: ["projects"] });
 
 export async function generateStaticParams() {
   return [];

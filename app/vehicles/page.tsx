@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import VehiclesContent from "./VehiclesContent";
 import ProviderProfiles from "@/components/ProviderProfiles";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Bildfahrzeuge & Stuntautos mieten — Film & Werbung",

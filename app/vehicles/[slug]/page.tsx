@@ -11,7 +11,7 @@ import InquiryForm from "@/components/InquiryForm";
 import FavoriteButton from "@/components/FavoriteButton";
 import ReviewsSection from "@/components/ReviewsSection";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 export const dynamicParams = true;
 
 async function getVehicle(slug: string) {

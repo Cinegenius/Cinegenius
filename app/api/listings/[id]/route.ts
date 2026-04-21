@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { requireAuth, assertOwner } from "@/lib/guards";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 // PATCH /api/listings/[id] — update own listing fields
@@ -60,6 +61,7 @@ export async function PATCH(
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  revalidateTag("listings", "max");
   return NextResponse.json({ data });
 }
 
@@ -92,5 +94,6 @@ export async function DELETE(
     .eq("id", id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  revalidateTag("listings", "max");
   return NextResponse.json({ success: true });
 }

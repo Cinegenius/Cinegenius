@@ -6,7 +6,7 @@ import {
   ArrowRight, Search,
 } from "lucide-react";
 import CategoryHero from "@/components/CategoryHero";
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 async function getMarketplaceData() {
   const [{ data: dbProps }, { data: dbVehicles }, { count: totalProps }, { count: totalVehicles }] = await Promise.all([

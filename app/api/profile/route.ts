@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { auth, clerkClient } from "@clerk/nextjs/server";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { sendWelcomeEmail } from "@/lib/email";
 
@@ -125,6 +126,8 @@ export async function POST(req: NextRequest) {
     console.error("[profile POST] failed to set Clerk metadata:", e);
   }
 
+  revalidateTag("profiles", "max");
+
   // Set a cookie so the middleware can immediately pass the user through
   // without waiting for the JWT to be re-issued with the new metadata.
   const res = NextResponse.json({ profile: data });
@@ -177,7 +180,10 @@ export async function PATCH(req: NextRequest) {
         .update(payload)
         .eq("user_id", userId);
 
-      if (!error) return NextResponse.json({ success: true });
+      if (!error) {
+        revalidateTag("profiles", "max");
+        return NextResponse.json({ success: true });
+      }
 
       if (error.code === "PGRST204") {
         const match = error.message.match(/Could not find the '(\w+)' column/);

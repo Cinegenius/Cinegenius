@@ -1,12 +1,13 @@
 import { notFound, redirect } from "next/navigation";
 import { db } from "@/lib/db";
+import { unstable_cache } from "next/cache";
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { Lock, ArrowLeft } from "lucide-react";
 import CreatorDetail from "@/components/CreatorDetail";
 
-export const dynamic = "force-dynamic";
+// Dynamic because of auth(), but creator data is cached
 export const dynamicParams = true;
 
 function parseCreatorDescription(raw: string): { skills: string[]; credits: string[] } {
@@ -18,7 +19,7 @@ function parseCreatorDescription(raw: string): { skills: string[]; credits: stri
   };
 }
 
-async function getCreator(slug: string) {
+async function _getCreator(slug: string) {
   // Try listings first
   const { data: listing } = await db
     .from("listings")
@@ -70,6 +71,8 @@ async function getCreator(slug: string) {
   // Profiles now use the modular /profile/[slug] page
   redirect(`/profile/${profile.slug ?? profile.user_id}`);
 }
+
+const getCreator = unstable_cache(_getCreator, ["creator"], { revalidate: 300, tags: ["listings", "profiles"] });
 
 export async function generateStaticParams() {
   return [];

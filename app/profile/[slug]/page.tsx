@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
+import { unstable_cache } from "next/cache";
 import JsonLd from "@/components/JsonLd";
-const admin = db;
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import ProfileView from "./ProfileView";
@@ -9,7 +9,7 @@ import type { UserProfile, ProjectCredit } from "@/lib/profile-types";
 import { getPresetForType, type ProfileModule } from "@/lib/profile-types";
 import type { ExternalProfileRow } from "@/lib/external-platforms";
 
-export const dynamic = "force-dynamic";
+// Page is dynamic because of auth(), but data fetches are cached with tags
 export const dynamicParams = true;
 
 // Stable base columns that always exist
@@ -17,11 +17,11 @@ const BASE_FIELDS = "user_id, display_name, avatar_url, cover_image_url, role, p
 // Newer columns — fetched separately so a missing column doesn't break the whole query
 const EXTRA_FIELDS = "physical, crew, creative, vendor, agency";
 
-async function getProfile(slug: string): Promise<UserProfile | null> {
+async function _getProfile(slug: string): Promise<UserProfile | null> {
   const orClause = `slug.eq.${slug},user_id.eq.${slug}`;
 
   // 1. Always load the stable base columns
-  const { data: base, error: baseErr } = await admin
+  const { data: base, error: baseErr } = await db
     .from("profiles")
     .select(BASE_FIELDS)
     .or(orClause)
@@ -31,7 +31,7 @@ async function getProfile(slug: string): Promise<UserProfile | null> {
 
   // 2. Try loading newer columns separately — silently ignore if they don't exist yet
   let extra: Record<string, unknown> = {};
-  const { data: extraData, error: extraErr } = await admin
+  const { data: extraData, error: extraErr } = await db
     .from("profiles")
     .select(EXTRA_FIELDS)
     .or(orClause)
@@ -67,6 +67,8 @@ async function getProfile(slug: string): Promise<UserProfile | null> {
   return { ...data, profile_type: type, modules } as UserProfile;
 }
 
+const getProfile = unstable_cache(_getProfile, ["profile"], { revalidate: 300, tags: ["profiles"] });
+
 export async function generateMetadata(
   { params }: { params: Promise<{ slug: string }> }
 ): Promise<Metadata> {
@@ -85,49 +87,64 @@ export async function generateMetadata(
   };
 }
 
-async function getProjectCredits(userId: string): Promise<ProjectCredit[]> {
-  const { data, error } = await admin
-    .from("project_credits")
-    .select("id, role, project_id, projects(id, title, year, type, director, poster_url, metadata)")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false });
+const getProjectCredits = unstable_cache(
+  async (userId: string): Promise<ProjectCredit[]> => {
+    const { data, error } = await db
+      .from("project_credits")
+      .select("id, role, project_id, projects(id, title, year, type, director, poster_url, metadata)")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+    if (error || !data) return [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return data as any;
+  },
+  ["profile-credits"],
+  { revalidate: 300, tags: ["profiles"] }
+);
 
-  if (error || !data) return [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return data as any;
-}
+const getExternalProfiles = unstable_cache(
+  async (userId: string): Promise<ExternalProfileRow[]> => {
+    const { data } = await db
+      .from("external_profiles")
+      .select("id, platform_type, platform_name, url, custom_label, sort_order, is_public")
+      .eq("user_id", userId)
+      .eq("is_public", true)
+      .order("sort_order", { ascending: true });
+    return (data ?? []) as ExternalProfileRow[];
+  },
+  ["profile-external"],
+  { revalidate: 300, tags: ["profiles"] }
+);
 
-async function getExternalProfiles(userId: string): Promise<ExternalProfileRow[]> {
-  const { data } = await admin
-    .from("external_profiles")
-    .select("id, platform_type, platform_name, url, custom_label, sort_order, is_public")
-    .eq("user_id", userId)
-    .eq("is_public", true)
-    .order("sort_order", { ascending: true });
-  return (data ?? []) as ExternalProfileRow[];
-}
+const getPublicListings = unstable_cache(
+  async (userId: string) => {
+    const { data } = await db
+      .from("listings")
+      .select("id, type, title, category, price, city, image_url")
+      .eq("user_id", userId)
+      .eq("published", true)
+      .order("created_at", { ascending: false });
+    return (data ?? []) as { id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null }[];
+  },
+  ["profile-listings"],
+  { revalidate: 300, tags: ["profiles", "listings"] }
+);
 
-async function getPublicListings(userId: string) {
-  const { data } = await admin
-    .from("listings")
-    .select("id, type, title, category, price, city, image_url")
-    .eq("user_id", userId)
-    .eq("published", true)
-    .order("created_at", { ascending: false });
-  return (data ?? []) as { id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null }[];
-}
-
-async function getCompanyMembership(userId: string) {
-  const { data } = await admin
-    .from("company_members")
-    .select("id, role, title, status, company_id, companies(id, slug, name, logo_url)")
-    .eq("user_id", userId)
-    .eq("status", "accepted")
-    .limit(1)
-    .maybeSingle();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return data as any ?? null;
-}
+const getCompanyMembership = unstable_cache(
+  async (userId: string) => {
+    const { data } = await db
+      .from("company_members")
+      .select("id, role, title, status, company_id, companies(id, slug, name, logo_url)")
+      .eq("user_id", userId)
+      .eq("status", "accepted")
+      .limit(1)
+      .maybeSingle();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return data as any ?? null;
+  },
+  ["profile-company"],
+  { revalidate: 300, tags: ["profiles"] }
+);
 
 export default async function ProfilePage(
   { params }: { params: Promise<{ slug: string }> }

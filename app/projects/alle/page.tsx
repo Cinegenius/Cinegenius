@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import ProjectsContent from "@/app/projects/ProjectsContent";
 import CategoryHero from "@/components/CategoryHero";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Alle Projekte — CineGenius",

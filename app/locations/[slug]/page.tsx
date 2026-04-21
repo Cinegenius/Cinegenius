@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import type { Metadata } from "next";
 import LocationDetail from "@/components/LocationDetail";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 export const dynamicParams = true;
 
 async function geocodeCity(city: string): Promise<{ lat: number; lng: number }> {

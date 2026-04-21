@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import type { Metadata } from "next";
 import JobDetail from "@/components/JobDetail";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 export const dynamicParams = true;
 
 function parseJobDescription(raw: string) {

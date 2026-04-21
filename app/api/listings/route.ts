@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 
@@ -115,6 +115,7 @@ export async function POST(req: Request) {
     creator: "/creators",
   };
   if (pathMap[type]) revalidatePath(pathMap[type]);
+  revalidateTag("listings", "max");
 
   return NextResponse.json({ data });
 }
@@ -138,5 +139,6 @@ export async function DELETE(req: NextRequest) {
     console.error("[listings DELETE]", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+  revalidateTag("listings", "max");
   return NextResponse.json({ success: true });
 }
