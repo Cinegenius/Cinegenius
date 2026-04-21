@@ -1,13 +1,14 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { auth } from "@clerk/nextjs/server";
+import { getCurrentUser } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET /api/reviews/eligible?target_id=xxx&target_type=xxx
 // Returns whether the current user can leave a review for this target
 export async function GET(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ eligible: false });
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ eligible: false });
 
+  const { userId } = user;
   const { searchParams } = new URL(req.url);
   const target_id = searchParams.get("target_id");
   const target_type = searchParams.get("target_type");

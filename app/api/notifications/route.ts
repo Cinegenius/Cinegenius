@@ -14,19 +14,18 @@
 // CREATE INDEX notifications_user_id_idx ON notifications(user_id, created_at DESC);
 
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { createClient } from "@supabase/supabase-js";
-import { auth } from "@clerk/nextjs/server";
+import { getCurrentUser, requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET /api/notifications — list notifications for current user
 export async function GET() {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ notifications: [] });
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ notifications: [] });
 
   const { data } = await supabaseAdmin
     .from("notifications")
     .select("id, type, title, body, href, read, created_at")
-    .eq("user_id", userId)
+    .eq("user_id", user.userId)
     .order("created_at", { ascending: false })
     .limit(30);
 
@@ -35,8 +34,9 @@ export async function GET() {
 
 // PATCH /api/notifications — mark all as read
 export async function PATCH() {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
   await supabaseAdmin
     .from("notifications")
@@ -49,8 +49,9 @@ export async function PATCH() {
 
 // POST /api/notifications — mark single as read
 export async function POST(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
   const { id } = await req.json();
   if (!id) return NextResponse.json({ error: "id fehlt" }, { status: 400 });

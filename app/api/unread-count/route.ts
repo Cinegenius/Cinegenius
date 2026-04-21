@@ -1,12 +1,13 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { createClient } from "@supabase/supabase-js";
-import { auth } from "@clerk/nextjs/server";
+import { getCurrentUser } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
 // GET /api/unread-count — Anzahl ungelesener Nachrichten des eingeloggten Nutzers
 export async function GET() {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ count: 0 });
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ count: 0 });
+
+  const { userId } = user;
 
   // Alle Konversationen des Nutzers holen
   const { data: convs } = await supabaseAdmin

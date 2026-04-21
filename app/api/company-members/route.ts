@@ -1,7 +1,8 @@
-import { auth } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-const admin = supabaseAdmin;
+import { getCurrentUser, requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
+
+const admin = supabaseAdmin;
 
 // GET /api/company-members?company_id=xxx  → members of a company
 // GET /api/company-members?user_id=xxx     → company of a specific user
@@ -10,17 +11,17 @@ export async function GET(req: NextRequest) {
   const userId    = req.nextUrl.searchParams.get("user_id");
 
   if (companyId) {
-    const { userId: callerId } = await auth();
+    const caller = await getCurrentUser();
 
     // Check if caller is owner (owners see pending too)
     let isOwner = false;
-    if (callerId) {
+    if (caller) {
       const { data: co } = await admin
         .from("companies")
         .select("owner_user_id")
         .eq("id", companyId)
         .single();
-      isOwner = co?.owner_user_id === callerId;
+      isOwner = co?.owner_user_id === caller.userId;
     }
 
     let query = admin
@@ -76,8 +77,9 @@ export async function GET(req: NextRequest) {
 
 // POST /api/company-members  { company_id, title? }  → user requests to join
 export async function POST(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
   const { company_id, title } = await req.json();
   if (!company_id) return NextResponse.json({ error: "company_id fehlt" }, { status: 400 });
@@ -111,8 +113,9 @@ export async function POST(req: NextRequest) {
 
 // PATCH /api/company-members  { id, status?, title?, role? }  → owner manages member
 export async function PATCH(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
   const { id, status, title, role } = await req.json();
   if (!id) return NextResponse.json({ error: "id fehlt" }, { status: 400 });
@@ -158,8 +161,9 @@ export async function PATCH(req: NextRequest) {
 
 // DELETE /api/company-members?id=xxx  → leave (self) or owner removes member
 export async function DELETE(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
   const id = req.nextUrl.searchParams.get("id");
   if (!id) return NextResponse.json({ error: "id fehlt" }, { status: 400 });

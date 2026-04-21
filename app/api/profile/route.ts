@@ -1,12 +1,13 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { createClient } from "@supabase/supabase-js";
+import { requireAuth } from "@/lib/auth";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { sendWelcomeEmail } from "@/lib/email";
 
 export async function GET() {
-  const { userId, sessionClaims } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
   const { data } = await supabaseAdmin
     .from("profiles")
@@ -16,6 +17,7 @@ export async function GET() {
 
   // Back-fill Clerk metadata and set cookie for users who had a profile before this flag existed
   if (data) {
+    const { sessionClaims } = await auth();
     const meta = sessionClaims?.metadata as Record<string, unknown> | undefined;
     if (!meta?.profileComplete) {
       try {
@@ -41,8 +43,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
   const body = await req.json();
   const {
@@ -151,8 +154,9 @@ const ALLOWED_PATCH_KEYS = new Set([
 
 export async function PATCH(req: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+    const authResult = await requireAuth();
+    if (authResult instanceof NextResponse) return authResult;
+    const { userId } = authResult;
 
     const body = await req.json();
     console.log("[profile PATCH] body keys:", Object.keys(body));

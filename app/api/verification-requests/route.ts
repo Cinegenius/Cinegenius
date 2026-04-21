@@ -1,21 +1,17 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { createClient } from "@supabase/supabase-js";
-import { auth } from "@clerk/nextjs/server";
+import { requireAuth, isAdminSession } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET /api/verification-requests — user: own status | admin: all requests
-export async function GET(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export async function GET() {
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
-  const { data: profile } = await supabaseAdmin
-    .from("profiles")
-    .select("role")
-    .eq("user_id", userId)
-    .maybeSingle();
+  const isAdmin = await isAdminSession();
 
   // Admin gets all
-  if (profile?.role === "admin") {
+  if (isAdmin) {
     const { data, error } = await supabaseAdmin
       .from("verification_requests")
       .select("id, user_id, display_name, status, notes, submitted_at, reviewed_at")
@@ -37,8 +33,9 @@ export async function GET(req: NextRequest) {
 
 // POST /api/verification-requests — user submits verification request
 export async function POST(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
   // Check for existing pending request
   const { data: existing } = await supabaseAdmin
@@ -84,15 +81,12 @@ export async function POST(req: NextRequest) {
 
 // PATCH /api/verification-requests — admin approves or rejects
 export async function PATCH(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
-  const { data: adminProfile } = await supabaseAdmin
-    .from("profiles")
-    .select("role")
-    .eq("user_id", userId)
-    .maybeSingle();
-  if (adminProfile?.role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const isAdmin = await isAdminSession();
+  if (!isAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { requestId, action, notes } = await req.json() as { requestId: string; action: "approve" | "reject"; notes?: string };
   if (!requestId || !action) return NextResponse.json({ error: "Missing params" }, { status: 400 });

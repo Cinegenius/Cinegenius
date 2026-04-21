@@ -1,13 +1,14 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { createClient } from "@supabase/supabase-js";
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { requireAuth } from "@/lib/auth";
+import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { sendNewMessageEmail } from "@/lib/email";
 
 // GET /api/conversations — alle Konversationen des eingeloggten Nutzers (mit Profilen in einem Query)
 export async function GET() {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
   const { data, error } = await supabaseAdmin
     .from("conversations")
@@ -45,8 +46,9 @@ export async function GET() {
 
 // POST /api/conversations — neue Konversation starten + erste Nachricht
 export async function POST(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
   const body = await req.json();
   const { listing_id, listing_title, listing_type, receiver_id, content } = body;

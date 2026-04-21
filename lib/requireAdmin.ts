@@ -1,5 +1,5 @@
 /**
- * Re-exports from lib/guards.ts for backwards compatibility.
- * All new code should import directly from "@/lib/guards".
+ * Re-exports from lib/auth for backwards compatibility.
+ * All new code should import directly from "@/lib/auth".
  */
-export { requireAdmin, isAdminSession } from "@/lib/guards";
+export { requireAdmin, isAdminSession } from "@/lib/auth";

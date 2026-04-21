@@ -1,13 +1,13 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { createClient } from "@supabase/supabase-js";
-import { auth } from "@clerk/nextjs/server";
+import { getCurrentUser } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
 // GET /api/profile-views — Aufrufe des eigenen Profils
 export async function GET() {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ views7: 0, views14: 0, trend: 0, daily: [] });
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ views7: 0, views14: 0, trend: 0, daily: [] });
 
+  const { userId } = user;
   const now = new Date();
   const d7  = new Date(now.getTime() - 7  * 24 * 60 * 60 * 1000).toISOString();
   const d14 = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString();

@@ -1,6 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { createClient } from "@supabase/supabase-js";
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET /api/recommendations?userId=xxx — alle Empfehlungen für einen Nutzer
@@ -43,8 +42,9 @@ export async function GET(req: NextRequest) {
 
 // POST /api/recommendations — Empfehlung schreiben
 export async function POST(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
   const body = await req.json();
   const { recipient_id, content, author_role, project } = body;
@@ -106,8 +106,9 @@ export async function POST(req: NextRequest) {
 
 // DELETE /api/recommendations?id=xxx — eigene Empfehlung löschen
 export async function DELETE(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
   const id = req.nextUrl.searchParams.get("id");
   if (!id) return NextResponse.json({ error: "ID fehlt" }, { status: 400 });

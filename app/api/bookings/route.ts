@@ -20,8 +20,8 @@
 // CREATE INDEX bookings_user_id_idx ON bookings(user_id, created_at DESC);
 
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { createClient } from "@supabase/supabase-js";
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { requireAuth, getCurrentUser } from "@/lib/auth";
+import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { sendNewBookingEmail } from "@/lib/email";
 
@@ -31,8 +31,9 @@ function generateRef(): string {
 
 // POST /api/bookings — create a booking
 export async function POST(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
   const body = await req.json();
   const { listingId, startDate, endDate, notes } = body;
@@ -112,15 +113,15 @@ export async function POST(req: NextRequest) {
     const guestName = senderProfile?.display_name ?? "Jemand";
 
     if (listingId) {
-      const { data: listing } = await supabaseAdmin
+      const { data: listingData } = await supabaseAdmin
         .from("listings")
         .select("user_id")
         .eq("id", listingId)
         .maybeSingle();
 
-      if (listing?.user_id && listing.user_id !== userId) {
+      if (listingData?.user_id && listingData.user_id !== userId) {
         await supabaseAdmin.from("notifications").insert({
-          user_id: listing.user_id,
+          user_id: listingData.user_id,
           type: "booking_request",
           title: "Neue Buchungsanfrage",
           body: `${guestName} hat „${listingTitle}" gebucht.`,
@@ -128,7 +129,7 @@ export async function POST(req: NextRequest) {
         });
 
         const clerk = await clerkClient();
-        const ownerUser = await clerk.users.getUser(listing.user_id);
+        const ownerUser = await clerk.users.getUser(listingData.user_id);
         const ownerEmail = ownerUser.emailAddresses[0]?.emailAddress;
         if (ownerEmail) await sendNewBookingEmail(ownerEmail, listingTitle, guestName);
       }
@@ -141,8 +142,9 @@ export async function POST(req: NextRequest) {
 // GET /api/bookings — list bookings for current user, or single by ?ref=CG-XXXXX
 // ?incoming=true → requests for listings owned by the current user
 export async function GET(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ bookings: [] });
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ bookings: [] });
+  const { userId } = user;
 
   const searchParams = new URL(req.url).searchParams;
   const ref      = searchParams.get("ref");

@@ -1,6 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { createClient } from "@supabase/supabase-js";
-import { auth } from "@clerk/nextjs/server";
+import { requireAuth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
@@ -10,8 +9,9 @@ export async function GET(req: NextRequest) {
   const mine = req.nextUrl.searchParams.get("mine") === "true";
 
   if (mine) {
-    const { userId } = await auth();
-    if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+    const authResult = await requireAuth();
+    if (authResult instanceof NextResponse) return authResult;
+    const { userId } = authResult;
 
     const { data, error } = await supabaseAdmin
       .from("listings")
@@ -43,10 +43,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: Request) {
-  const { userId } = await auth();
-  if (!userId) {
-    return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
-  }
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
   const body = await req.json();
   const { type, title, description, price, city, category, image_url, company_id,
@@ -121,8 +120,9 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
   const id = req.nextUrl.searchParams.get("id");
   if (!id) return NextResponse.json({ error: "ID fehlt" }, { status: 400 });
