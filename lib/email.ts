@@ -5,8 +5,8 @@ const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
 
-const FROM = "CineGenius <noreply@cinegenius.com>";
-const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "https://cinegenius.com";
+const FROM = "CineGenius <noreply@cinegenius.co>";
+const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "https://cinegenius.co";
 
 // Send an email — silently skips if Resend is not configured
 async function send(to: string, subject: string, html: string) {
@@ -104,6 +104,35 @@ export async function sendNewApplicationEmail(to: string, applicantName: string,
       ${p(`<strong style="color:#f0f0f0">${applicantName}</strong> hat sich auf dein Inserat beworben:`)}
       <p style="margin:16px 0;padding:12px 16px;background:#1a1a1a;border:1px solid #222;border-radius:8px;font-size:14px;color:#d4a843;font-weight:600">${jobTitle}</p>
       ${btn("Bewerbung ansehen", `${BASE}/dashboard?tab=messages`)}
+    `)
+  );
+}
+
+export async function sendWelcomeEmail(to: string, displayName: string) {
+  await send(
+    to,
+    "Willkommen bei CineGenius 🎬",
+    wrap(`
+      ${h1(`Hallo ${displayName} — schön, dass du dabei bist!`)}
+      ${p("CineGenius ist der Marktplatz für Film, Foto und Content — Locations, Crew, Equipment und Jobs.")}
+      ${p("Hier sind deine nächsten Schritte:")}
+      <table style="margin:20px 0;width:100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="padding:12px 16px;background:#1a1a1a;border:1px solid #222;border-radius:8px;margin-bottom:8px;display:block">
+            <span style="font-size:13px;color:#f0f0f0;font-weight:600">1. Profil vervollständigen</span><br/>
+            <span style="font-size:12px;color:#666">Foto, Bio und Fähigkeiten — damit du gefunden wirst.</span>
+          </td>
+        </tr>
+        <tr><td style="height:8px"></td></tr>
+        <tr>
+          <td style="padding:12px 16px;background:#1a1a1a;border:1px solid #222;border-radius:8px">
+            <span style="font-size:13px;color:#f0f0f0;font-weight:600">2. Inserat erstellen oder Crew entdecken</span><br/>
+            <span style="font-size:12px;color:#666">Location, Equipment oder Fahrzeug inserieren — oder direkt Crew und Jobs durchsuchen.</span>
+          </td>
+        </tr>
+      </table>
+      ${btn("Zum Dashboard", `${BASE}/dashboard?welcome=1`)}
+      <p style="margin-top:24px;font-size:12px;color:#555">Fragen? Antworte einfach auf diese E-Mail.</p>
     `)
   );
 }

@@ -2,6 +2,7 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { createClient } from "@supabase/supabase-js";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export async function GET() {
   const { userId, sessionClaims } = await auth();
@@ -55,6 +56,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Name ist ein Pflichtfeld" }, { status: 400 });
   }
 
+  // Check if this is a brand-new profile
+  const { data: existing } = await supabaseAdmin
+    .from("profiles")
+    .select("user_id")
+    .eq("user_id", userId)
+    .maybeSingle();
+  const isNewProfile = !existing;
+
   const { data, error } = await supabaseAdmin
     .from("profiles")
     .upsert(
@@ -100,6 +109,15 @@ export async function POST(req: NextRequest) {
     await clerk.users.updateUserMetadata(userId, {
       publicMetadata: { profileComplete: true },
     });
+
+    // Send welcome email only for brand-new profiles
+    if (isNewProfile) {
+      const clerkUser = await clerk.users.getUser(userId);
+      const email = clerkUser.emailAddresses[0]?.emailAddress;
+      if (email) {
+        sendWelcomeEmail(email, display_name.trim()).catch(() => {});
+      }
+    }
   } catch (e) {
     console.error("[profile POST] failed to set Clerk metadata:", e);
   }
