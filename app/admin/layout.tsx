@@ -1,12 +1,13 @@
-import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { isAdminSession } from "@/lib/requireAdmin";
 
-const ADMIN_IDS = (process.env.ADMIN_USER_IDS ?? "").split(",").map((s) => s.trim()).filter(Boolean);
-
+/**
+ * Server-side layout guard for all /admin pages.
+ * The middleware.ts already blocks non-admins before this runs,
+ * but this acts as a defence-in-depth second layer.
+ */
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { userId } = await auth();
-  if (!userId || !ADMIN_IDS.includes(userId)) {
-    redirect("/");
-  }
+  const admin = await isAdminSession();
+  if (!admin) redirect("/");
   return <>{children}</>;
 }

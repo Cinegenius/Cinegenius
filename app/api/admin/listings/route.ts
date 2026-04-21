@@ -1,19 +1,11 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { auth } from "@clerk/nextjs/server";
+import { requireAdmin } from "@/lib/requireAdmin";
 import { NextRequest, NextResponse } from "next/server";
 
-const ADMIN_IDS = (process.env.ADMIN_USER_IDS ?? "").split(",").map((s) => s.trim()).filter(Boolean);
-
-function isAdmin(userId: string) {
-  return ADMIN_IDS.includes(userId);
-}
-
-// PATCH /api/admin/listings — toggle published flag or delete
+// PATCH /api/admin/listings — toggle published flag
 export async function PATCH(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId || !isAdmin(userId)) {
-    return NextResponse.json({ error: "Kein Zugriff" }, { status: 403 });
-  }
+  const guard = await requireAdmin();
+  if (guard instanceof NextResponse) return guard;
 
   const { listingId, published } = await req.json();
   if (!listingId || typeof published !== "boolean") {
@@ -32,10 +24,8 @@ export async function PATCH(req: NextRequest) {
 
 // DELETE /api/admin/listings — remove a listing
 export async function DELETE(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId || !isAdmin(userId)) {
-    return NextResponse.json({ error: "Kein Zugriff" }, { status: 403 });
-  }
+  const guard = await requireAdmin();
+  if (guard instanceof NextResponse) return guard;
 
   const { listingId } = await req.json();
   if (!listingId) return NextResponse.json({ error: "Kein Inserat" }, { status: 400 });

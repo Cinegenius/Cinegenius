@@ -96,7 +96,7 @@ export default function NeuesProjektPage() {
               <input
                 value={form.title}
                 onChange={(e) => set("title", e.target.value)}
-                placeholder="z. B. „Der letzte Schnitt""
+                placeholder='z. B. "Der letzte Schnitt"'
                 className="w-full px-4 py-3 bg-bg-secondary border border-border rounded-xl text-text-primary placeholder-text-muted focus:outline-none focus:border-gold transition-colors"
               />
             </div>
