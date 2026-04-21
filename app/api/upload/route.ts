@@ -1,44 +1,51 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { createClient } from "@supabase/supabase-js";
-import { auth } from "@clerk/nextjs/server";
+import { requireAuth } from "@/lib/guards";
+import { validateUpload, buildStoragePath } from "@/lib/uploadGuard";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  // 1. Auth
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
 
+  // 2. Parse form data
   const formData = await req.formData();
-  const file = formData.get("file") as File | null;
-  if (!file) return NextResponse.json({ error: "Keine Datei" }, { status: 400 });
+  const file = formData.get("file");
 
-  const allowed = ["image/jpeg", "image/png", "image/webp", "image/heic"];
-  if (!allowed.includes(file.type)) {
-    return NextResponse.json({ error: "Nur JPG, PNG, WEBP oder HEIC erlaubt" }, { status: 400 });
+  if (!(file instanceof File)) {
+    return NextResponse.json({ error: "Keine Datei" }, { status: 400 });
   }
 
-  // Client compresses to WebP ~200–500 KB before upload; 5 MB is a generous fallback
-  if (file.size > 5 * 1024 * 1024) {
-    return NextResponse.json({ error: "Datei zu groß (max. 5 MB)" }, { status: 400 });
+  // 3. Validate — magic bytes, size, allowed types.
+  //    Returns { buffer, mime, ext } or { error, status }.
+  //    The buffer is used below to avoid reading the file twice.
+  const validation = await validateUpload(file);
+  if ("error" in validation) {
+    return NextResponse.json({ error: validation.error }, { status: validation.status });
   }
+  const { buffer, mime, ext } = validation;
 
-  // SECURITY: derive extension from verified MIME type, not user-supplied filename
-  const MIME_EXT: Record<string, string> = {
-    "image/jpeg": "jpg",
-    "image/png":  "png",
-    "image/webp": "webp",
-    "image/heic": "heic",
-  };
-  const ext  = MIME_EXT[file.type] ?? "jpg";
-  const rand = crypto.randomUUID().replace(/-/g, "");
-  const path = `${userId}/${rand}.${ext}`;
+  // 4. Build a user-scoped, UUID-based path.
+  //    Format: {userId}/{uuid}.{ext}
+  //    - User-scoped: prevents cross-user overwrite
+  //    - UUID: prevents collision and enumeration
+  //    - Extension from magic bytes: not from client filename or Content-Type
+  const path = buildStoragePath(userId, ext);
 
-  const { error } = await supabaseAdmin.storage
+  // 5. Upload to Supabase Storage.
+  //    upsert: false — never overwrite an existing file at the same path.
+  //    (UUID makes collision effectively impossible, but we enforce it anyway.)
+  const { error: uploadError } = await supabaseAdmin.storage
     .from("listing-images")
-    .upload(path, file, { contentType: file.type, upsert: false });
+    .upload(path, buffer, {
+      contentType: mime,
+      upsert: false,
+    });
 
-  if (error) {
-    console.error("[upload]", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (uploadError) {
+    console.error("[upload]", uploadError);
+    return NextResponse.json({ error: uploadError.message }, { status: 500 });
   }
 
   const { data: urlData } = supabaseAdmin.storage
