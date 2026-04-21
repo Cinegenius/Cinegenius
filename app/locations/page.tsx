@@ -48,7 +48,7 @@ async function geocodeCities(cities: string[]): Promise<Record<string, { lat: nu
 export default async function LocationsPage() {
   const { data } = await db
     .from("listings")
-    .select("*")
+    .select("id, title, city, price, image_url, category, description")
     .eq("published", true)
     .eq("type", "location")
     .order("created_at", { ascending: false })

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export default async function JobsPage() {
   const { data } = await db
     .from("listings")
-    .select("*")
+    .select("id, title, city, price, description, created_at")
     .eq("published", true)
     .eq("type", "job")
     .order("created_at", { ascending: false })

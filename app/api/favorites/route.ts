@@ -39,9 +39,10 @@ export async function GET(req: NextRequest) {
 
   const { data } = await db
     .from("favorites")
-    .select("*")
+    .select("id, listing_id, listing_type, listing_title, listing_city, listing_price, listing_image, created_at")
     .eq("user_id", userId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(200);
 
   return NextResponse.json({ favorites: data ?? [] });
 }

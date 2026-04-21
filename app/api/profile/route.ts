@@ -5,6 +5,21 @@ import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { sendWelcomeEmail } from "@/lib/email";
 
+// All profile columns needed by the edit form.
+// Update if new columns are added to the profiles table.
+const PROFILE_COLS = [
+  "user_id", "display_name", "display_name_alias", "slug", "phone",
+  "avatar_url", "cover_image_url", "role", "positions", "location", "bio",
+  "tagline", "profile_type", "profile_types", "account_type",
+  "verified", "available", "available_from", "day_rate", "languages",
+  "travel_ready", "skills", "filmography", "portfolio_url", "portfolio_images",
+  "profile_images", "showreel_url", "reel_url", "awards", "availability_config",
+  "modules", "instagram_url", "tiktok_url", "youtube_url", "vimeo_url",
+  "linkedin_url", "website_url", "video_links",
+  "physical", "crew", "creative", "vendor", "agency", "focal_point",
+  "experience", "updated_at", "created_at",
+].join(", ");
+
 export async function GET() {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
@@ -12,7 +27,7 @@ export async function GET() {
 
   const { data } = await db
     .from("profiles")
-    .select("*")
+    .select(PROFILE_COLS)
     .eq("user_id", userId)
     .maybeSingle();
 

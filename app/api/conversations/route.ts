@@ -17,7 +17,8 @@ export async function GET() {
       messages(id, sender_id, content, read_at, created_at)
     `)
     .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
-    .order("updated_at", { ascending: false });
+    .order("updated_at", { ascending: false })
+    .limit(50);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 

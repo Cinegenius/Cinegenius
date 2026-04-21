@@ -43,10 +43,11 @@ export default async function CreatorsPage() {
   // Fetch creator listings
   const { data: listings } = await db
     .from("listings")
-    .select("*")
+    .select("id, user_id, title, category, city, price, image_url, description")
     .eq("published", true)
     .eq("type", "creator")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(300);
 
   // Fetch profiles — limit initial load to 96 for fast page render
   const { data: profiles } = await db

@@ -166,7 +166,8 @@ export async function GET(req: NextRequest) {
     const { data: ownedListings } = await db
       .from("listings")
       .select("id")
-      .eq("user_id", userId);
+      .eq("user_id", userId)
+      .limit(500);
     const ownedIds = (ownedListings ?? []).map((l) => l.id);
     if (ownedIds.length === 0) return NextResponse.json({ bookings: [] });
 

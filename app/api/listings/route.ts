@@ -4,9 +4,20 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 
+// Explicit column list — avoids SELECT * sending unused data over the wire.
+// Update this list if new listing columns are added.
+const LISTING_COLS =
+  "id, user_id, type, category, title, description, price, city, " +
+  "image_url, company_id, published, metadata, blocked_dates, " +
+  "floor_plan_url, extra_images, created_at";
+
 export async function GET(req: NextRequest) {
-  const type = req.nextUrl.searchParams.get("type");
-  const mine = req.nextUrl.searchParams.get("mine") === "true";
+  const type  = req.nextUrl.searchParams.get("type");
+  const mine  = req.nextUrl.searchParams.get("mine") === "true";
+  const page  = Math.max(1, parseInt(req.nextUrl.searchParams.get("page")  ?? "1",  10));
+  const limit = Math.min(100, Math.max(1, parseInt(req.nextUrl.searchParams.get("limit") ?? "50", 10)));
+  const from  = (page - 1) * limit;
+  const to    = from + limit - 1;
 
   if (mine) {
     const authResult = await requireAuth();
@@ -15,9 +26,10 @@ export async function GET(req: NextRequest) {
 
     const { data, error } = await db
       .from("listings")
-      .select("*")
+      .select(LISTING_COLS)
       .eq("user_id", userId)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(200);           // safety cap — dashboard doesn't need more
 
     if (error) {
       console.error("[listings GET mine]", error);
@@ -28,9 +40,10 @@ export async function GET(req: NextRequest) {
 
   let query = db
     .from("listings")
-    .select("*")
+    .select(LISTING_COLS)
     .eq("published", true)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(from, to);
 
   if (type) query = query.eq("type", type);
 
@@ -39,7 +52,7 @@ export async function GET(req: NextRequest) {
     console.error("[listings GET]", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  return NextResponse.json({ data });
+  return NextResponse.json({ data, page, limit });
 }
 
 export async function POST(req: Request) {

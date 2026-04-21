@@ -11,12 +11,28 @@ function generateSlug(name: string): string {
     .substring(0, 60);
 }
 
+// Full company data — needed for the company editor/dashboard.
+const COMPANY_COLS_FULL =
+  "id, slug, owner_user_id, name, logo_url, description, city, website, email, phone, " +
+  "categories, services, portfolio_images, tagline, bio_short, usp, founded_year, " +
+  "legal_form, hq_address, countries, industry_focus, social_links, published, " +
+  "created_at, updated_at";
+
+// Lighter set for public directory listings.
+const COMPANY_COLS_PUBLIC =
+  "id, slug, name, logo_url, description, city, categories, services, tagline, " +
+  "founded_year, published, created_at";
+
 // GET — list published companies (with optional filters)
 export async function GET(req: NextRequest) {
-  const mine = req.nextUrl.searchParams.get("mine") === "true";
+  const mine     = req.nextUrl.searchParams.get("mine") === "true";
   const category = req.nextUrl.searchParams.get("category");
-  const city = req.nextUrl.searchParams.get("city");
-  const q = req.nextUrl.searchParams.get("q");
+  const city     = req.nextUrl.searchParams.get("city");
+  const q        = req.nextUrl.searchParams.get("q");
+  const page     = Math.max(1, parseInt(req.nextUrl.searchParams.get("page")  ?? "1",  10));
+  const limit    = Math.min(100, Math.max(1, parseInt(req.nextUrl.searchParams.get("limit") ?? "24", 10)));
+  const from     = (page - 1) * limit;
+  const to       = from + limit - 1;
 
   if (mine) {
     const authResult = await requireAuth();
@@ -25,9 +41,10 @@ export async function GET(req: NextRequest) {
 
     const { data, error } = await db
       .from("companies")
-      .select("*")
+      .select(COMPANY_COLS_FULL)
       .eq("owner_user_id", userId)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(50);           // a user realistically owns < 50 companies
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ data: data ?? [] });
@@ -35,17 +52,18 @@ export async function GET(req: NextRequest) {
 
   let query = db
     .from("companies")
-    .select("*")
+    .select(COMPANY_COLS_PUBLIC)
     .eq("published", true)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(from, to);
 
   if (category) query = query.contains("categories", [category]);
-  if (city) query = query.ilike("city", `%${city}%`);
-  if (q) query = query.or(`name.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%`);
+  if (city)     query = query.ilike("city", `%${city}%`);
+  if (q)        query = query.or(`name.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%`);
 
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ data: data ?? [] });
+  return NextResponse.json({ data: data ?? [], page, limit });
 }
 
 // DELETE — delete own company

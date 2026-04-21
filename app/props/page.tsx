@@ -19,15 +19,17 @@ export const metadata: Metadata = {
 export default async function PropsPage() {
   const { data } = await db
     .from("listings")
-    .select("*")
+    .select("id, user_id, type, title, category, city, price, image_url, description, metadata")
     .eq("published", true)
     .in("type", ["prop", "vehicle"])
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(300);
 
   const { data: providerData } = await db
     .from("profiles")
     .select("user_id, display_name, location, bio, avatar_url, profile_types")
-    .not("display_name", "is", null);
+    .not("display_name", "is", null)
+    .limit(200);
 
   const equipmentProviders = (providerData ?? [])
     .filter((p: { profile_types?: string[] | null }) =>

@@ -11,7 +11,8 @@ export async function GET(req: NextRequest) {
     .from("recommendations")
     .select("id, author_id, content, author_role, project, created_at")
     .eq("recipient_id", recipientId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(50);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
