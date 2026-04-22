@@ -91,27 +91,29 @@ export async function POST(
     .update({ updated_at: new Date().toISOString() })
     .eq("id", id);
 
-  // Email an Empfänger — nur wenn aktiviert
-  // receiverId is already computed above for the block check
+  // In-app notification + email — fire-and-forget
   try {
-    const { data: receiverSettings } = await db
-      .from("user_settings")
-      .select("email_new_message")
-      .eq("user_id", receiverId)
-      .maybeSingle();
-    const emailEnabled = receiverSettings?.email_new_message !== false;
+    const [{ data: senderProfile }, { data: receiverSettings }] = await Promise.all([
+      db.from("profiles").select("display_name").eq("user_id", userId).maybeSingle(),
+      db.from("user_settings").select("email_new_message").eq("user_id", receiverId).maybeSingle(),
+    ]);
+    const senderName = senderProfile?.display_name ?? "Jemand";
 
-    if (emailEnabled) {
-      const [{ data: senderProfile }, clerk] = await Promise.all([
-        db.from("profiles").select("display_name").eq("user_id", userId).maybeSingle(),
-        clerkClient(),
-      ]);
-      const senderName = senderProfile?.display_name ?? "Jemand";
+    await db.from("notifications").insert({
+      user_id: receiverId,
+      type: "new_message",
+      title: `Neue Nachricht von ${senderName}`,
+      body: content.trim().slice(0, 120),
+      href: `/messages?conv=${id}`,
+    });
+
+    if (receiverSettings?.email_new_message !== false) {
+      const clerk = await clerkClient();
       const receiverUser = await clerk.users.getUser(receiverId);
       const receiverEmail = receiverUser.emailAddresses[0]?.emailAddress;
       if (receiverEmail) await sendNewMessageEmail(receiverEmail, senderName, content.trim(), id);
     }
-  } catch { /* email is best-effort */ }
+  } catch { /* best-effort */ }
 
   return NextResponse.json({ message: msg });
 }

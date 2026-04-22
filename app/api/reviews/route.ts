@@ -86,5 +86,37 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // Notify the reviewed user / listing owner — fire-and-forget
+  try {
+    let notifyUserId: string | null = null;
+    let href = "/dashboard";
+
+    if (target_type === "listing") {
+      const { data: listing } = await db
+        .from("listings")
+        .select("user_id, title")
+        .eq("id", target_id)
+        .maybeSingle();
+      if (listing) {
+        notifyUserId = listing.user_id;
+        href = `/listings/${target_id}`;
+      }
+    } else if (target_type === "user") {
+      notifyUserId = target_id;
+      href = `/profile/${target_id}`;
+    }
+
+    if (notifyUserId && notifyUserId !== userId) {
+      await db.from("notifications").insert({
+        user_id: notifyUserId,
+        type: "review_request",
+        title: `Neue Bewertung von ${reviewer_name}`,
+        body: `${rating} ★ — ${text.trim().slice(0, 100)}`,
+        href,
+      });
+    }
+  } catch { /* best-effort */ }
+
   return NextResponse.json({ review: data }, { status: 201 });
 }

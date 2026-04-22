@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
     .update({ updated_at: new Date().toISOString() })
     .eq("id", conversationId);
 
-  // Email the receiver on first contact — only if they have email notifications enabled
+  // In-app notification + email (first contact only) — fire-and-forget
   if (!existing) {
     try {
       const [{ data: senderProfile }, { data: receiverSettings }] = await Promise.all([
@@ -119,15 +119,22 @@ export async function POST(req: NextRequest) {
         db.from("user_settings").select("email_new_message").eq("user_id", receiver_id).maybeSingle(),
       ]);
       const senderName = senderProfile?.display_name ?? "Jemand";
-      const emailEnabled = receiverSettings?.email_new_message !== false; // default true
 
-      if (emailEnabled) {
+      await db.from("notifications").insert({
+        user_id: receiver_id,
+        type: "new_message",
+        title: `Neue Nachricht von ${senderName}`,
+        body: content.trim().slice(0, 120),
+        href: `/messages?conv=${conversationId}`,
+      });
+
+      if (receiverSettings?.email_new_message !== false) {
         const clerk = await clerkClient();
         const receiverUser = await clerk.users.getUser(receiver_id);
         const receiverEmail = receiverUser.emailAddresses[0]?.emailAddress;
         if (receiverEmail) await sendNewMessageEmail(receiverEmail, senderName, content.trim(), conversationId);
       }
-    } catch { /* email is best-effort */ }
+    } catch { /* best-effort */ }
   }
 
   return NextResponse.json({ conversationId });
