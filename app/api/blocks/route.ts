@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { requireAuth, getCurrentUser } from "@/lib/auth";
+import { rateLimit } from "@/lib/rateLimit";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET /api/blocks — list the IDs I have blocked
@@ -25,6 +26,10 @@ export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
+
+  // Per-user rate limit: 20 block toggles per minute
+  const { allowed } = await rateLimit(`block:${userId}`, 20, 60);
+  if (!allowed) return NextResponse.json({ error: "Zu viele Anfragen. Bitte kurz warten." }, { status: 429 });
 
   const { blocked_id } = await req.json();
   if (!blocked_id || typeof blocked_id !== "string") {

@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/guards";
 import { validateUpload, buildStoragePath } from "@/lib/uploadGuard";
+import { rateLimit } from "@/lib/rateLimit";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -9,7 +10,11 @@ export async function POST(req: NextRequest) {
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
-  // 2. Parse form data
+  // 2. Per-user rate limit: 10 uploads per minute
+  const { allowed } = await rateLimit(`upload:${userId}`, 10, 60);
+  if (!allowed) return NextResponse.json({ error: "Zu viele Uploads. Bitte kurz warten." }, { status: 429 });
+
+  // 3. Parse form data
   const formData = await req.formData();
   const file = formData.get("file");
 
@@ -17,7 +22,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Keine Datei" }, { status: 400 });
   }
 
-  // 3. Validate — magic bytes, size, allowed types.
+  // 4. Validate — magic bytes, size, allowed types.
   //    Returns { buffer, mime, ext } or { error, status }.
   //    The buffer is used below to avoid reading the file twice.
   const validation = await validateUpload(file);
@@ -26,14 +31,14 @@ export async function POST(req: NextRequest) {
   }
   const { buffer, mime, ext } = validation;
 
-  // 4. Build a user-scoped, UUID-based path.
+  // 5. Build a user-scoped, UUID-based path.
   //    Format: {userId}/{uuid}.{ext}
   //    - User-scoped: prevents cross-user overwrite
   //    - UUID: prevents collision and enumeration
   //    - Extension from magic bytes: not from client filename or Content-Type
   const path = buildStoragePath(userId, ext);
 
-  // 5. Upload to Supabase Storage.
+  // 6. Upload to Supabase Storage.
   //    upsert: false — never overwrite an existing file at the same path.
   //    (UUID makes collision effectively impossible, but we enforce it anyway.)
   const { error: uploadError } = await db.storage

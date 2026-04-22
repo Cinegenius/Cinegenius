@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { anyBlockExists } from "@/lib/trust";
+import { rateLimit } from "@/lib/rateLimit";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -35,6 +36,10 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json();
   const { target_id, target_type, rating, text, aspect_ratings } = body;
+
+  // Per-user rate limit: 5 reviews per minute
+  const { allowed } = await rateLimit(`review:${userId}`, 5, 60);
+  if (!allowed) return NextResponse.json({ error: "Zu viele Anfragen. Bitte kurz warten." }, { status: 429 });
 
   // ── Input validation ──────────────────────────────────────────────────────
   if (!VALID_TARGET_TYPES.has(target_type)) {

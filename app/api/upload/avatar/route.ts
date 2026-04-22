@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/guards";
 import { validateUpload, buildStoragePath } from "@/lib/uploadGuard";
+import { rateLimit } from "@/lib/rateLimit";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -9,7 +10,11 @@ export async function POST(req: NextRequest) {
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
-  // 2. Parse form data
+  // 2. Per-user rate limit: 3 avatar uploads per minute
+  const { allowed } = await rateLimit(`avatar:${userId}`, 3, 60);
+  if (!allowed) return NextResponse.json({ error: "Zu viele Uploads. Bitte kurz warten." }, { status: 429 });
+
+  // 3. Parse form data
   const formData = await req.formData();
   const file = formData.get("file");
 

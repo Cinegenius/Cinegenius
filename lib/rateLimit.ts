@@ -1,13 +1,13 @@
 /**
- * Lightweight server-side rate limiter using Supabase as backing store.
- * Falls back gracefully if the table doesn't exist yet.
+ * Server-side rate limiter backed by Supabase (rate_limit_buckets table).
+ * Per-user or per-IP keyed sliding-window counters.
  *
- * Required SQL (run once in Supabase):
- * CREATE TABLE IF NOT EXISTS rate_limit_buckets (
- *   key        text PRIMARY KEY,
- *   count      integer NOT NULL DEFAULT 1,
- *   window_end timestamptz NOT NULL
- * );
+ * IMPORTANT: fails CLOSED — if the backend is unavailable the request is
+ * denied (429). This is intentional: a limiter that fails open provides
+ * no protection at all.
+ *
+ * Schema required (see supabase/migrations/rate_limit.sql):
+ *   rate_limit_buckets table + upsert_rate_limit() function
  */
 
 import { db } from "./db";
@@ -18,36 +18,31 @@ interface RateLimitResult {
 }
 
 /**
- * @param key     Unique key, e.g. `msg:user_abc123` or `upload:ip_1.2.3.4`
- * @param limit   Max requests per window
- * @param windowS Window size in seconds
+ * @param key     Unique bucket key — include entity type + ID to avoid
+ *                collisions, e.g. `review:user_abc123` or `upload:user_xyz`.
+ * @param limit   Max requests allowed within the window.
+ * @param windowS Window duration in seconds.
  */
 export async function rateLimit(
   key: string,
   limit: number,
   windowS: number
 ): Promise<RateLimitResult> {
-  try {
-    const now = new Date();
-    const windowEnd = new Date(now.getTime() + windowS * 1000);
+  const windowEnd = new Date(Date.now() + windowS * 1000);
 
-    // Upsert: if window expired reset count, otherwise increment
-    const { data, error } = await db.rpc("upsert_rate_limit", {
-      p_key: key,
-      p_limit: limit,
-      p_window_end: windowEnd.toISOString(),
-    });
+  const { data, error } = await db.rpc("upsert_rate_limit", {
+    p_key:        key,
+    p_limit:      limit,
+    p_window_end: windowEnd.toISOString(),
+  });
 
-    if (error) {
-      // Table or function doesn't exist yet — fail open (don't block users)
-      console.warn("[rateLimit] skipped:", error.message);
-      return { allowed: true, remaining: limit };
-    }
-
-    const count: number = data ?? 1;
-    return { allowed: count <= limit, remaining: Math.max(0, limit - count) };
-  } catch {
-    // Always fail open — better to allow than break the app
-    return { allowed: true, remaining: limit };
+  if (error) {
+    // Backend unavailable — deny the request rather than silently allow it.
+    // Apply migration supabase/migrations/rate_limit.sql if this fires on startup.
+    console.error("[rateLimit] backend error — denying request:", error.message);
+    return { allowed: false, remaining: 0 };
   }
+
+  const count = (data as number) ?? 1;
+  return { allowed: count <= limit, remaining: Math.max(0, limit - count) };
 }

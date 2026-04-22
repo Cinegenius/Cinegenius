@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { anyBlockExists } from "@/lib/trust";
+import { rateLimit } from "@/lib/rateLimit";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { sendNewMessageEmail } from "@/lib/email";
@@ -51,6 +52,10 @@ export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
+
+  // Per-user rate limit: 20 new conversations per minute
+  const { allowed } = await rateLimit(`conv:${userId}`, 20, 60);
+  if (!allowed) return NextResponse.json({ error: "Zu viele Anfragen. Bitte kurz warten." }, { status: 429 });
 
   const body = await req.json();
   const { listing_id, listing_title, listing_type, receiver_id, content } = body;

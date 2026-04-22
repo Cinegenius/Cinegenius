@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
-import { requireAuth } from "@/lib/auth";
+import { requireAuth, requireAdmin } from "@/lib/auth";
+import { rateLimit } from "@/lib/rateLimit";
 import { NextRequest, NextResponse } from "next/server";
 
 const VALID_TARGET_TYPES = new Set(["user", "listing", "review"]);
@@ -19,6 +20,10 @@ export async function POST(req: NextRequest) {
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
+  // Per-user rate limit: 5 reports per minute
+  const { allowed } = await rateLimit(`report:${userId}`, 5, 60);
+  if (!allowed) return NextResponse.json({ error: "Zu viele Meldungen. Bitte kurz warten." }, { status: 429 });
+
   const body = await req.json();
   const { target_type, target_id, reason, details } = body;
 
@@ -34,7 +39,6 @@ export async function POST(req: NextRequest) {
   if (details && String(details).length > 1000) {
     return NextResponse.json({ error: "Details zu lang (max. 1000 Zeichen)" }, { status: 400 });
   }
-  // Can't report yourself
   if (target_type === "user" && target_id === userId) {
     return NextResponse.json({ error: "Du kannst dich nicht selbst melden" }, { status: 400 });
   }
@@ -71,16 +75,8 @@ export async function POST(req: NextRequest) {
 
 // GET /api/reports — admin only: list pending reports
 export async function GET(req: NextRequest) {
-  const authResult = await requireAuth();
+  const authResult = await requireAdmin();
   if (authResult instanceof NextResponse) return authResult;
-  const { userId } = authResult;
-
-  const adminIds = new Set(
-    (process.env.ADMIN_USER_IDS ?? "").split(",").map((s) => s.trim()).filter(Boolean)
-  );
-  if (!adminIds.has(userId)) {
-    return NextResponse.json({ error: "Kein Zugriff" }, { status: 403 });
-  }
 
   const status = req.nextUrl.searchParams.get("status") ?? "pending";
   const page   = Math.max(1, parseInt(req.nextUrl.searchParams.get("page") ?? "1", 10));
@@ -101,16 +97,8 @@ export async function GET(req: NextRequest) {
 
 // PATCH /api/reports — admin only: update report status
 export async function PATCH(req: NextRequest) {
-  const authResult = await requireAuth();
+  const authResult = await requireAdmin();
   if (authResult instanceof NextResponse) return authResult;
-  const { userId } = authResult;
-
-  const adminIds = new Set(
-    (process.env.ADMIN_USER_IDS ?? "").split(",").map((s) => s.trim()).filter(Boolean)
-  );
-  if (!adminIds.has(userId)) {
-    return NextResponse.json({ error: "Kein Zugriff" }, { status: 403 });
-  }
 
   const { id, status } = await req.json();
   if (!id || !["reviewed", "resolved", "dismissed"].includes(status)) {

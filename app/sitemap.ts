@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { createClient } from "@supabase/supabase-js";
+import { db } from "@/lib/db";
 
 const BASE = "https://cinegenius.co";
 
@@ -32,20 +32,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/impressum`,         lastModified: now, changeFrequency: "yearly",  priority: 0.3 },
   ];
 
-  // Real DB listings
   let dynamicListings: MetadataRoute.Sitemap = [];
   let profilePages: MetadataRoute.Sitemap = [];
 
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const [{ data: listings }, { data: profiles }, { data: companies }] = await Promise.all([
+      db.from("listings")
+        .select("id, type, updated_at")
+        .eq("published", true),
 
-    const { data: listings } = await supabase
-      .from("listings")
-      .select("id, type, updated_at")
-      .eq("published", true);
+      db.from("profiles")
+        .select("user_id, updated_at")
+        .not("positions", "is", null)
+        .neq("positions", "{}"),
+
+      db.from("companies")
+        .select("slug, updated_at")
+        .eq("published", true),
+    ]);
 
     dynamicListings = (listings ?? [])
       .filter((l: { id: string; type: string; updated_at: string }) => typeToPath[l.type])
@@ -56,25 +60,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: l.type === "job" ? 0.7 : 0.8,
       }));
 
-    // Creator profiles (users who have set positions)
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("user_id, updated_at")
-      .not("positions", "is", null)
-      .neq("positions", "{}");
-
     profilePages = (profiles ?? []).map((p: { user_id: string; updated_at: string }) => ({
       url: `${BASE}/creators/${p.user_id}`,
       lastModified: p.updated_at ?? now,
       changeFrequency: "weekly" as const,
       priority: 0.7,
     }));
-
-    // Company profiles
-    const { data: companies } = await supabase
-      .from("companies")
-      .select("slug, updated_at")
-      .eq("published", true);
 
     const companyPages: MetadataRoute.Sitemap = (companies ?? []).map(
       (c: { slug: string; updated_at: string }) => ({
@@ -87,7 +78,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     return [...staticPages, ...dynamicListings, ...profilePages, ...companyPages];
   } catch {
-    // Supabase not available at build time — skip dynamic entries
+    // DB not available at build time — return static pages only
   }
 
   return [...staticPages, ...dynamicListings, ...profilePages];
