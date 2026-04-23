@@ -289,14 +289,11 @@ export default async function HomePage() {
               Kostenlos vermieten, buchen und inserieren — für Film, Foto und Content. Für Profis und Einsteiger.
             </p>
 
-            {/* Hero Search */}
-            <div className="w-full max-w-[580px] mb-6 sm:mb-10 animate-fade-up">
+            {/* Hero Search + Buttons — desktop only; mobile version lives below stats */}
+            <div className="hidden sm:block w-full max-w-[580px] mb-6 sm:mb-10 animate-fade-up">
               <HeroSearch />
             </div>
-
-            {/* Buttons */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 animate-fade-up max-w-[360px] mx-auto sm:mx-0 sm:max-w-none">
-              {/* "Zum Dashboard" is redundant on mobile — bottom nav already has it */}
+            <div className="hidden sm:flex sm:flex-row items-center gap-3 animate-fade-up">
               <Link
                 href={ctaHref}
                 className={`inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-lg active:scale-[0.98] transition-all text-sm ${isLoggedIn ? "hidden sm:inline-flex" : ""}`}
@@ -330,6 +327,27 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Mobile: Search + CTA below stats */}
+      <div className="sm:hidden px-5 py-5 border-b border-border">
+        <div className="mb-4">
+          <HeroSearch />
+        </div>
+        <div className="flex flex-col gap-3">
+          <Link
+            href={ctaHref}
+            className={`inline-flex items-center justify-center gap-1.5 px-5 py-3.5 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-lg active:scale-[0.98] transition-all text-sm ${isLoggedIn ? "hidden" : ""}`}
+          >
+            {ctaLabel} <ArrowRight size={13} />
+          </Link>
+          <Link
+            href="/inserat"
+            className="inline-flex items-center justify-center gap-1.5 px-5 py-3.5 rounded-lg border border-border text-text-secondary font-medium hover:border-gold/40 hover:text-gold active:scale-[0.98] transition-all text-sm"
+          >
+            Inserat erstellen
+          </Link>
         </div>
       </div>
 
