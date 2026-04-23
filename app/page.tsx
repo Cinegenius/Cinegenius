@@ -265,7 +265,7 @@ export default async function HomePage() {
         />
 
         {/* ── Content — centered on mobile, left on desktop ── */}
-        <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pt-24 sm:pt-[160px] lg:pt-[180px]">
+        <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pt-28 sm:pt-[160px] lg:pt-[180px]">
           <div className="max-w-[680px] mx-auto sm:mx-0 text-center sm:text-left">
             {/* Badge */}
             <div className="hero-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[9px] font-semibold uppercase tracking-[0.18em] mb-5 animate-fade-in">
@@ -274,7 +274,7 @@ export default async function HomePage() {
 
             {/* Headline */}
             <h1
-              className="hero-title font-display text-[2.1rem] sm:text-[4.5rem] lg:text-[5.5rem] font-bold tracking-tight mb-5 sm:mb-8 animate-fade-up"
+              className="hero-title font-display text-[2.1rem] sm:text-[4.5rem] lg:text-[5.5rem] font-bold tracking-tight mb-4 sm:mb-8 animate-fade-up"
               style={{ lineHeight: "1.08" }}
             >
               Create. Connect.<br />
@@ -283,28 +283,28 @@ export default async function HomePage() {
 
             {/* Subtext */}
             <p
-              className="hero-sub text-sm sm:text-lg mb-7 sm:mb-10 leading-[1.6] animate-fade-up max-w-[340px] sm:max-w-[560px] mx-auto sm:mx-0"
+              className="hero-sub text-sm sm:text-lg mb-8 sm:mb-10 leading-[1.6] animate-fade-up max-w-[340px] sm:max-w-[560px] mx-auto sm:mx-0"
               style={{ opacity: 0.75 }}
             >
               Der Marktplatz für Kreative — Locations, Crew &amp; Equipment für Film, Foto und Content.
             </p>
 
             {/* Hero Search */}
-            <div className="w-full max-w-[560px] mb-6 sm:mb-8 animate-fade-up">
+            <div className="w-full max-w-[560px] mb-5 sm:mb-8 animate-fade-up">
               <HeroSearch />
             </div>
 
             {/* Buttons */}
-            <div className="flex flex-row items-center gap-2.5 animate-fade-up">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 animate-fade-up max-w-[360px] mx-auto sm:mx-0 sm:max-w-none">
               <Link
                 href={ctaHref}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-md active:scale-[0.98] transition-all text-xs sm:text-sm"
+                className="inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-lg active:scale-[0.98] transition-all text-sm"
               >
-                {ctaLabel} <ArrowRight size={12} />
+                {ctaLabel} <ArrowRight size={13} />
               </Link>
               <Link
                 href="/inserat"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md border border-white/20 text-white/60 font-medium hover:border-white/35 hover:text-white/90 active:scale-[0.98] transition-all text-xs sm:text-sm"
+                className="inline-flex items-center justify-center gap-1.5 px-5 py-3 rounded-lg border border-white/25 text-white/70 font-medium hover:border-white/40 hover:text-white active:scale-[0.98] transition-all text-sm"
               >
                 Inserat erstellen
               </Link>

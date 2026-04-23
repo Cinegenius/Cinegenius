@@ -31,12 +31,12 @@ export default function HeroSearch() {
   return (
     <div className="w-full">
       {/* Tabs — subtle pill style */}
-      <div className="flex flex-wrap gap-0.5 mb-2.5">
+      <div className="flex gap-1 mb-3">
         {tabs.map((t) => (
           <button
             key={t.id}
             onClick={() => { setActiveTab(t.id); setQuery(""); setCity(""); }}
-            className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
               activeTab === t.id
                 ? "bg-white/20 text-white"
                 : "text-white/50 hover:text-white/80"
