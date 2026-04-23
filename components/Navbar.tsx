@@ -9,7 +9,7 @@ import {
   Menu, X, Film, Sun, Moon, ChevronDown,
   Car, Shirt, Wrench, Clapperboard, Sparkles, Zap,
   Camera, Mic, Drama, Lightbulb, User, Users, Layers, Briefcase,
-  LayoutDashboard, Pencil, Eye, LogOut, MessageSquare, Bell,
+  LayoutDashboard, LogOut, MessageSquare, Bell,
   Home, Building2, TreePine, Coffee, Monitor,
   Smartphone, ImageIcon, Video, Aperture, MapPin, ShoppingBag,
 } from "lucide-react";
@@ -375,18 +375,11 @@ export default function Navbar() {
                             )}
                           </Link>
                           <Link
-                            href="/profile"
-                            onClick={() => setUserMenuOpen(false)}
-                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
-                          >
-                            <Pencil size={15} className="text-text-muted shrink-0" /> Profil bearbeiten
-                          </Link>
-                          <Link
                             href={user?.id ? `/profile/${user.id}` : "/profile"}
                             onClick={() => setUserMenuOpen(false)}
                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
                           >
-                            <Eye size={15} className="text-text-muted shrink-0" /> Profil ansehen
+                            <User size={15} className="text-text-muted shrink-0" /> Mein Profil
                           </Link>
                         </div>
 
@@ -494,10 +487,10 @@ export default function Navbar() {
                 <LayoutDashboard size={18} className={isActive("/dashboard") ? "text-gold" : "text-text-muted"} />
                 Dashboard
               </Link>
-              <Link href="/profile" onClick={() => setOpen(false)}
-                className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-base font-medium transition-all ${isActive("/profile") ? "bg-gold/10 text-gold border border-gold/20" : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"}`}>
-                <Pencil size={18} className={isActive("/profile") ? "text-gold" : "text-text-muted"} />
-                Profil bearbeiten
+              <Link href={user?.id ? `/profile/${user.id}` : "/creators"}  onClick={() => setOpen(false)}
+                className="flex items-center gap-4 px-4 py-3.5 rounded-xl text-base font-medium transition-all text-text-secondary hover:bg-bg-elevated hover:text-text-primary">
+                <User size={18} className="text-text-muted" />
+                Mein Profil
               </Link>
               <Link href="/notifications" onClick={() => setOpen(false)}
                 className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-base font-medium transition-all ${isActive("/notifications") ? "bg-gold/10 text-gold border border-gold/20" : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"}`}>
