@@ -211,7 +211,11 @@ export default function ProfileSetupPage() {
         {/* ── STEP 0: Intent selection ── */}
         {step === 0 && (
           <div>
-            <div className="text-center mb-8">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center gap-1.5 bg-gold/10 border border-gold/20 rounded-full px-3 py-1 mb-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                <span className="text-[11px] font-semibold text-gold uppercase tracking-widest">Schritt 1 von 2</span>
+              </div>
               <h1 className="font-display text-2xl font-bold text-text-primary mb-2">
                 Was möchtest du mit CineGenius machen?
               </h1>
@@ -220,36 +224,58 @@ export default function ProfileSetupPage() {
               </p>
             </div>
 
-            <div className="space-y-3">
-              {INTENTS.map((intent) => {
+            <div className="space-y-2.5">
+              {INTENTS.map((intent, i) => {
                 const Icon = intent.icon;
                 const isSelected = selectedIntent?.id === intent.id;
                 return (
                   <button
                     key={intent.id}
                     onClick={() => setSelectedIntent(intent)}
-                    className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl border text-left transition-all active:scale-[0.99] ${
+                    className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.985] ${
                       isSelected
-                        ? "border-gold bg-gold/10"
-                        : "border-border bg-bg-secondary hover:border-border-light hover:bg-bg-elevated"
+                        ? "border-gold bg-gold/10 shadow-[0_0_0_1px_rgba(194,241,53,0.25),0_4px_20px_rgba(194,241,53,0.08)]"
+                        : "border-border bg-bg-secondary hover:border-gold/30 hover:bg-bg-elevated"
                     }`}
                   >
-                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
-                      isSelected ? "bg-gold/20 border border-gold/40" : "bg-bg-elevated border border-border"
+                    {/* Number badge */}
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold ${
+                      isSelected ? "bg-gold text-bg-primary" : "bg-bg-elevated border border-border text-text-muted"
                     }`}>
-                      <Icon size={20} className={isSelected ? "text-gold" : "text-text-muted"} />
+                      {i + 1}
                     </div>
+
+                    {/* Icon */}
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all ${
+                      isSelected
+                        ? "bg-gold/20 border border-gold/40"
+                        : "bg-bg-elevated border border-border group-hover:border-gold/20"
+                    }`}>
+                      <Icon size={18} className={isSelected ? "text-gold" : "text-text-secondary"} />
+                    </div>
+
+                    {/* Text */}
                     <div className="flex-1 min-w-0">
                       <p className={`font-semibold text-sm leading-tight ${isSelected ? "text-gold" : "text-text-primary"}`}>
                         {intent.label}
                       </p>
-                      <p className="text-xs text-text-muted mt-0.5 leading-relaxed">
+                      <p className={`text-xs mt-0.5 leading-relaxed ${isSelected ? "text-gold/60" : "text-text-muted"}`}>
                         {intent.desc}
                       </p>
                     </div>
-                    {isSelected && (
-                      <CheckCircle size={18} className="text-gold shrink-0" />
-                    )}
+
+                    {/* Check */}
+                    <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-all ${
+                      isSelected
+                        ? "bg-gold border-gold"
+                        : "border-border"
+                    }`}>
+                      {isSelected && (
+                        <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                          <path d="M1 4l2.5 2.5L9 1" stroke="#0A0A0A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </div>
                   </button>
                 );
               })}
