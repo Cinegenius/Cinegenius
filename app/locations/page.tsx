@@ -94,8 +94,7 @@ export default async function LocationsPage() {
 
   return (
     <>
-      <div className="pt-16">
-        <CategoryHero
+      <CategoryHero
           badge="Locations"
           title={t("heroTitle")}
           titleHighlight={t("heroTitleHighlight")}
@@ -106,7 +105,6 @@ export default async function LocationsPage() {
           height="sm"
           cta={{ label: t("heroCta"), href: "/inserat?group=drehorte" }}
         />
-      </div>
       <LocationsContent serverListings={serverListings} />
     </>
   );

@@ -164,8 +164,7 @@ export default async function CreatorsPage() {
 
   return (
     <>
-      <div className="pt-16">
-        <CategoryHero
+      <CategoryHero
           badge="Crew"
           title={t("heroTitle")}
           titleHighlight={t("heroTitleHighlight")}
@@ -176,7 +175,6 @@ export default async function CreatorsPage() {
           height="sm"
           cta={{ label: t("heroCta"), href: "/profile" }}
         />
-      </div>
       <CreatorsContent serverCreators={serverCreators} hasStrip={true} />
     </>
   );

@@ -41,7 +41,7 @@ export default async function AlleProjectsPage() {
   );
 
   return (
-    <div className="pt-16">
+    <div>
       <CategoryHero
         badge="Alle Projekte"
         title="Filmprojekte"

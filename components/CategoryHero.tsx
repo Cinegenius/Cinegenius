@@ -48,7 +48,7 @@ export default function CategoryHero({
   height = "md",
 }: Props) {
   return (
-    <div className={`relative overflow-hidden ${heights[height]} flex items-center`}>
+    <div className={`relative mt-16 overflow-hidden ${heights[height]} flex items-center`}>
       {/* Background image */}
       <Image
         src={image}
@@ -71,8 +71,7 @@ export default function CategoryHero({
         style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }}
       />
 
-      {/* Content — pt-16 pushes text below the fixed navbar on mobile */}
-      <div className={`relative z-10 w-full px-4 sm:px-8 lg:px-12 pt-16 sm:pt-0 flex flex-col ${contentAlign[overlay]}`}>
+      <div className={`relative z-10 w-full px-4 sm:px-8 lg:px-12 pt-5 sm:pt-6 flex flex-col ${contentAlign[overlay]}`}>
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/12 backdrop-blur-sm border border-white/20 rounded-full mb-4">
           <span className="text-[11px] text-white/90 font-bold uppercase tracking-widest">{badge}</span>

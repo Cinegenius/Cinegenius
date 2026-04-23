@@ -25,8 +25,7 @@ export default async function CompaniesPage() {
 
   return (
     <>
-      <div className="pt-16">
-        <CategoryHero
+      <CategoryHero
           badge="Firmen & Dienstleister"
           title="Studios, Verleiher"
           titleHighlight="& Agenturen"
@@ -36,7 +35,6 @@ export default async function CompaniesPage() {
           overlay="left"
           height="sm"
         />
-      </div>
       <CompaniesContent initialCompanies={data ?? []} />
     </>
   );

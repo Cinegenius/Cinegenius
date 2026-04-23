@@ -49,8 +49,7 @@ export default async function PropsPage() {
 
   return (
     <>
-      <div className="pt-16">
-        <CategoryHero
+      <CategoryHero
           badge={t("heroBadge")}
           title={t("heroTitle")}
           titleHighlight={t("heroTitleHighlight")}
@@ -61,7 +60,6 @@ export default async function PropsPage() {
           height="sm"
           cta={{ label: t("heroCta"), href: "/inserat" }}
         />
-      </div>
       <PropsContent serverListings={serverListings} />
     </>
   );

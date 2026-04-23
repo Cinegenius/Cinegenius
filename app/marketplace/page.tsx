@@ -169,7 +169,7 @@ export default async function MarketplacePage() {
   const { liveItems, propCount, vehicleCount } = await getMarketplaceData();
 
   return (
-    <div className="pt-16 min-h-screen">
+    <div className="min-h-screen">
       <CategoryHero
         badge="Marktplatz"
         title="Kostüme, Kameras, Licht,"
