@@ -200,26 +200,6 @@ const useCases = [
   },
 ];
 
-const testimonials = [
-  {
-    quote: "Unsere Location-Suche hat sich von 3 Wochen auf 2 Tage reduziert — und wir haben über CineGenius auch gleich den Kameramann und die Lichttechnik für den Shoot gefunden.",
-    name: "Lena Hofmann",
-    role: "Producerin, Parallax Films",
-    rating: 5,
-  },
-  {
-    quote: "Als Fotografin bekomme ich über mein Profil regelmäßig Anfragen für Produkt- und Werbeshootings. Ich musste nie kalt akquirieren — die Kunden kommen zu mir.",
-    name: "Sara Nkemdirim",
-    role: "Fotografin & Content Creator",
-    rating: 5,
-  },
-  {
-    quote: "Ich hab einfach mein Loft inseriert — ich bin kein Filmprofi, hab keine Ahnung von der Branche. Trotzdem war die Location innerhalb einer Woche zum ersten Mal gebucht.",
-    name: "Thomas Brauer",
-    role: "Location-Anbieter, Berlin",
-    rating: 5,
-  },
-];
 
 export default async function HomePage() {
   const { userId } = await auth();
@@ -867,26 +847,22 @@ export default async function HomePage() {
             <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Stimmen</p>
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg mx-auto sm:mx-0">Warum CineGenius?</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {testimonials.map((t) => (
-              <div key={t.name} className="p-6 rounded-2xl border border-border bg-bg-elevated flex flex-col gap-4">
-                <div className="flex gap-0.5">
-                  {Array.from({ length: t.rating }).map((_, i) => (
-                    <Star key={i} size={14} className="text-gold fill-gold" />
-                  ))}
-                </div>
-                <p className="text-sm text-text-secondary leading-relaxed flex-1">&ldquo;{t.quote}&rdquo;</p>
-                <div className="flex items-center gap-3 pt-3 border-t border-border">
-                  <div className="w-10 h-10 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0 text-sm font-bold text-gold">
-                    {t.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-text-primary">{t.name}</p>
-                    <p className="text-xs text-text-muted">{t.role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
+            <div className="flex gap-1 mb-1">
+              {[0,1,2,3,4].map((i) => (
+                <Star key={i} size={22} className="text-border fill-border" />
+              ))}
+            </div>
+            <p className="text-text-primary font-semibold text-lg">Noch keine Bewertungen</p>
+            <p className="text-text-muted text-sm max-w-xs leading-relaxed">
+              Sei der Erste, der CineGenius bewertet — buche oder inseriere jetzt und teile deine Erfahrung.
+            </p>
+            <Link
+              href="/sign-up"
+              className="mt-2 inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm"
+            >
+              Jetzt starten <ArrowRight size={14} />
+            </Link>
           </div>
         </div>
       </section>
