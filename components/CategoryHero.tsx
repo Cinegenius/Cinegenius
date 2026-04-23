@@ -112,7 +112,7 @@ export default function CategoryHero({
             {cta && (
               <Link
                 href={cta.href}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm"
+                className="inline-flex items-center gap-2 px-5 py-3 sm:py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm"
               >
                 {cta.label} <ArrowRight size={14} />
               </Link>
@@ -120,7 +120,7 @@ export default function CategoryHero({
             {ctaSecondary && (
               <Link
                 href={ctaSecondary.href}
-                className="inline-flex items-center gap-2 px-5 py-2.5 border border-white/25 text-white/85 font-semibold rounded-xl hover:border-white/50 hover:text-white transition-all text-sm"
+                className="inline-flex items-center gap-2 px-5 py-3 sm:py-2.5 border border-white/25 text-white/85 font-semibold rounded-xl hover:border-white/50 hover:text-white transition-all text-sm"
               >
                 {ctaSecondary.label}
               </Link>

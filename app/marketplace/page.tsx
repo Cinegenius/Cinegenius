@@ -241,17 +241,17 @@ export default async function MarketplacePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             {liveItems.map((item) => (
               <Link key={item.id} href={item.href} className="card-hover group rounded-xl border border-border bg-bg-elevated overflow-hidden block">
                 <div className="relative aspect-square overflow-hidden">
                   <Image src={item.image} alt={item.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width:640px) 50vw,25vw" />
                 </div>
-                <div className="p-4">
+                <div className="p-3 sm:p-4">
                   <p className="text-xs text-text-muted mb-1">{item.category}</p>
                   <h3 className="font-semibold text-text-primary text-sm mb-1 truncate">{item.title}</h3>
                   <div className="flex items-center justify-between pt-2 border-t border-border">
-                    <span className="text-xs text-text-muted">{item.condition}</span>
+                    <span className="text-xs text-text-muted hidden sm:inline">{item.condition}</span>
                     <span className="text-sm font-semibold text-gold">{item.dailyRate.toLocaleString()} € <span className="text-xs font-normal text-text-muted">/Tag</span></span>
                   </div>
                 </div>
