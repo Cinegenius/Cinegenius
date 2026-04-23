@@ -5,17 +5,21 @@ import { useRouter } from "next/navigation";
 import { Globe, Check } from "lucide-react";
 
 const LANGUAGES = [
-  { code: "de", label: "Deutsch",    flag: "🇩🇪" },
-  { code: "en", label: "English",    flag: "🇬🇧" },
-  { code: "es", label: "Español",    flag: "🇪🇸" },
-  { code: "it", label: "Italiano",   flag: "🇮🇹" },
-  { code: "cs", label: "Čeština",    flag: "🇨🇿" },
-  { code: "hu", label: "Magyar",     flag: "🇭🇺" },
+  { code: "de", label: "Deutsch",  flag: "🇩🇪" },
+  { code: "en", label: "English",  flag: "🇬🇧" },
+  { code: "es", label: "Español",  flag: "🇪🇸" },
+  { code: "it", label: "Italiano", flag: "🇮🇹" },
+  { code: "cs", label: "Čeština",  flag: "🇨🇿" },
+  { code: "hu", label: "Magyar",   flag: "🇭🇺" },
 ];
 
 function getStoredLocale(): string {
   if (typeof document === "undefined") return "de";
   return document.cookie.match(/cg_locale=([^;]+)/)?.[1] ?? "de";
+}
+
+function setCookieDirect(code: string) {
+  document.cookie = `cg_locale=${code}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
 }
 
 export default function LanguageSwitcher() {
@@ -41,12 +45,22 @@ export default function LanguageSwitcher() {
     if (code === current || loading) return;
     setLoading(true);
     setOpen(false);
-    await fetch("/api/locale", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ locale: code }),
-    });
+
+    // Set cookie directly in the browser first — works even without network
+    setCookieDirect(code);
     setCurrent(code);
+
+    // Sync to server in the background (best-effort)
+    try {
+      await fetch("/api/locale", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ locale: code }),
+      });
+    } catch {
+      // API unreachable — cookie is already set via document.cookie above
+    }
+
     setLoading(false);
     router.refresh();
   };
@@ -59,6 +73,7 @@ export default function LanguageSwitcher() {
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-text-muted hover:text-gold hover:bg-bg-elevated transition-all text-sm"
         aria-label="Sprache wählen"
+        disabled={loading}
       >
         <Globe size={15} />
         <span className="hidden sm:inline font-medium">{currentLang?.flag} {currentLang?.label}</span>
