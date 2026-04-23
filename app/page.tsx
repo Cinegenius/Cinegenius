@@ -182,7 +182,7 @@ export default async function HomePage() {
 
   const useCases = [
     { title: t("usecase1Title"), desc: t("usecase1Desc"), image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=85", cta: t("usecase1Cta"), href: "/inserat" },
-    { title: t("usecase2Title"), desc: t("usecase2Desc"), image: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&q=85", cta: t("usecase2Cta"), href: "/creators" },
+    { title: t("usecase2Title"), desc: t("usecase2Desc"), image: "https://images.unsplash.com/photo-1625690303837-654c9666d2d0?q=80&w=1740&auto=format&fit=crop", cta: t("usecase2Cta"), href: "/creators" },
     { title: t("usecase3Title"), desc: t("usecase3Desc"), image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=85", cta: t("usecase3Cta"), href: "/company-setup" },
     { title: t("usecase4Title"), desc: t("usecase4Desc"), image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=85", cta: t("usecase4Cta"), href: "/inserat" },
   ];
