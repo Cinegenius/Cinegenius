@@ -430,6 +430,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
         imagePosition="center 35%"
         overlay="left"
         height="sm"
+        cta={{ label: "Job ausschreiben", href: "/inserat" }}
       />
 
       {/* ── Filter Bar ───────────────────────────────────── */}
@@ -520,9 +521,6 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
               </button>
             )}
 
-            <Link href="/inserat" className="hidden sm:flex items-center h-9 px-3 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
-              + Job ausschreiben
-            </Link>
           </div>
 
           {/* Dept panel */}
