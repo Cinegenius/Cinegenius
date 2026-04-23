@@ -8,7 +8,7 @@ import {
   Camera, CheckCircle, User, Lock, Bell, CreditCard, MapPin, Film,
   Plus, X, Save, Wallet, Upload, ShieldCheck, Clock, AlertCircle, Loader2,
   Globe, Plane, Video, Euro, Clapperboard, Link2, AtSign, PlayCircle, ExternalLink,
-  Drama, Palette, Building2,
+  Drama, Palette, Building2, Users2, Eye, EyeOff,
 } from "lucide-react";
 import type { ElementType } from "react";
 import LicensePicker from "@/components/LicensePicker";
@@ -270,6 +270,7 @@ const tabs = [
   { id: "profile",        label: "Profil",                icon: User        },
   { id: "projekte",       label: "Projekte",               icon: Clapperboard },
   { id: "inserate",       label: "Inserate",               icon: Film        },
+  { id: "netzwerk",       label: "Netzwerk",               icon: Users2      },
   { id: "verification",   label: "Verifizierung",          icon: CheckCircle },
   { id: "security",       label: "Sicherheit",             icon: Lock        },
   { id: "notifications",  label: "Benachrichtigungen",     icon: Bell        },
@@ -477,6 +478,13 @@ export default function ProfilePage() {
   const myProjectsFetched = useRef(false);
   const myListingsFetched = useRef(false);
 
+  // Netzwerk / Collaborations
+  type FriendCollab = { friendship_id: string; user_id: string; display_name: string; avatar_url: string | null; role: string; collab_label: string | null; collab_public: boolean };
+  const [friends, setFriends] = useState<FriendCollab[]>([]);
+  const [friendsLoading, setFriendsLoading] = useState(false);
+  const [collabEdits, setCollabEdits] = useState<Record<string, { label: string; is_public: boolean; saving: boolean }>>({});
+  const friendsFetched = useRef(false);
+
   const [form, setForm] = useState({
     name: "",
     city: "",
@@ -556,7 +564,7 @@ export default function ProfilePage() {
   const [tattoos, setTattoos] = useState(false);
   const [tattoosCoverable, setTattoosCoverable] = useState(false);
 
-  // ── Lazy-load my projects & listings ───────────────────────────────────────
+  // ── Lazy-load my projects, listings & friends ──────────────────────────────
   useEffect(() => {
     if (activeTab === "projekte" && !myProjectsFetched.current) {
       myProjectsFetched.current = true;
@@ -573,6 +581,22 @@ export default function ProfilePage() {
         .then((r) => r.json())
         .then(({ data }) => setMyListings(data ?? []))
         .finally(() => setMyListingsLoading(false));
+    }
+    if (activeTab === "netzwerk" && !friendsFetched.current) {
+      friendsFetched.current = true;
+      setFriendsLoading(true);
+      fetch("/api/friendships")
+        .then((r) => r.json())
+        .then(({ friends: list }) => {
+          const f: FriendCollab[] = list ?? [];
+          setFriends(f);
+          const edits: Record<string, { label: string; is_public: boolean; saving: boolean }> = {};
+          f.forEach((fr) => {
+            edits[fr.friendship_id] = { label: fr.collab_label ?? "", is_public: fr.collab_public ?? false, saving: false };
+          });
+          setCollabEdits(edits);
+        })
+        .finally(() => setFriendsLoading(false));
     }
   }, [activeTab]);
 
@@ -2031,6 +2055,102 @@ export default function ProfilePage() {
                 </div>
               );
             })()}
+
+            {/* ── NETZWERK ── */}
+            {activeTab === "netzwerk" && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="font-semibold text-text-primary">Mein Netzwerk</h2>
+                  <p className="text-xs text-text-muted mt-1">
+                    Markiere Verbindungen als Zusammenarbeit und wähle, ob sie auf deinem öffentlichen Profil erscheinen sollen.
+                  </p>
+                </div>
+
+                {friendsLoading ? (
+                  <div className="flex justify-center py-12"><Loader2 size={20} className="animate-spin text-text-muted" /></div>
+                ) : friends.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 border border-dashed border-border rounded-xl text-center">
+                    <Users2 size={32} className="text-text-muted mb-3" />
+                    <p className="text-text-muted text-sm mb-2">Noch keine Verbindungen</p>
+                    <p className="text-xs text-text-muted">Verbinde dich mit anderen Mitgliedern über ihr Profil.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {friends.map((fr) => {
+                      const edit = collabEdits[fr.friendship_id] ?? { label: "", is_public: false, saving: false };
+                      return (
+                        <div key={fr.friendship_id} className="p-4 bg-bg-secondary border border-border rounded-xl">
+                          <div className="flex items-center gap-3 mb-3">
+                            {fr.avatar_url ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={fr.avatar_url} alt={fr.display_name} className="w-10 h-10 rounded-full object-cover border border-border shrink-0" />
+                            ) : (
+                              <div className="w-10 h-10 rounded-full bg-bg-elevated border border-border flex items-center justify-center shrink-0">
+                                <Users2 size={16} className="text-text-muted" />
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-text-primary truncate">{fr.display_name}</p>
+                              <p className="text-xs text-text-muted truncate">{fr.role}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row gap-2">
+                            <input
+                              type="text"
+                              value={edit.label}
+                              onChange={(e) => setCollabEdits((prev) => ({ ...prev, [fr.friendship_id]: { ...edit, label: e.target.value } }))}
+                              placeholder="Rolle / Bezeichnung (z.B. Oberbeleuchter)"
+                              className="flex-1 bg-bg-elevated border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold transition-colors placeholder:text-text-muted"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setCollabEdits((prev) => ({ ...prev, [fr.friendship_id]: { ...edit, is_public: !edit.is_public } }))}
+                              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border transition-colors shrink-0 ${
+                                edit.is_public
+                                  ? "bg-gold/10 border-gold/30 text-gold"
+                                  : "bg-bg-elevated border-border text-text-muted hover:border-gold/30 hover:text-gold"
+                              }`}
+                            >
+                              {edit.is_public ? <Eye size={12} /> : <EyeOff size={12} />}
+                              {edit.is_public ? "Sichtbar" : "Versteckt"}
+                            </button>
+                            <button
+                              type="button"
+                              disabled={edit.saving}
+                              onClick={async () => {
+                                setCollabEdits((prev) => ({ ...prev, [fr.friendship_id]: { ...edit, saving: true } }));
+                                try {
+                                  await fetch(`/api/friendships/${fr.friendship_id}`, {
+                                    method: "PATCH",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ action: "collab", label: edit.label || null, is_public: edit.is_public }),
+                                  });
+                                  addToast("Gespeichert", "success");
+                                } catch {
+                                  addToast("Fehler beim Speichern", "error");
+                                } finally {
+                                  setCollabEdits((prev) => ({ ...prev, [fr.friendship_id]: { ...edit, saving: false } }));
+                                }
+                              }}
+                              className="flex items-center gap-1.5 px-3 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-60 shrink-0"
+                            >
+                              {edit.saving ? <Loader2 size={11} className="animate-spin" /> : <Save size={11} />}
+                              Speichern
+                            </button>
+                          </div>
+                          {edit.label && edit.is_public && (
+                            <p className="text-[10px] text-text-muted mt-2">
+                              Erscheint auf deinem Profil: <span className="text-gold">{fr.display_name}</span> · {edit.label}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* ── VERIFIZIERUNG ── */}
             {activeTab === "verification" && <VerificationTab />}

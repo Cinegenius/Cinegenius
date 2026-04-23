@@ -8,7 +8,7 @@ import { useUser } from "@clerk/nextjs";
 import {
   MapPin, MessageSquare, Play, Award, ChevronDown, ChevronUp,
   Pencil, ExternalLink, X, Check, Globe, Building2, UserPlus, UserCheck, Clock,
-  ChevronRight, Clapperboard, Film, Briefcase, Package, Car, Ban, Flag,
+  ChevronRight, Clapperboard, Film, Briefcase, Package, Car, Ban, Flag, Users2,
 } from "lucide-react";
 import type { UserProfile, ProfileModule, ProfileImage, FilmographyEntry, ProfileAward, PhysicalData, ProjectCredit } from "@/lib/profile-types";
 import ReviewsSection from "@/components/ReviewsSection";
@@ -159,6 +159,49 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
         )}
       </div>
     </div>
+  );
+}
+
+// ─── Collaborations Section ───────────────────────────────────────────────────
+
+type PublicCollab = { user_id: string; label: string; display_name: string; avatar_url: string | null; slug: string; role: string | null };
+
+function CollaborationsSection({ collaborations }: { collaborations: PublicCollab[] }) {
+  if (!collaborations.length) return null;
+  return (
+    <>
+      <Divider />
+      <SectionLabel>Zusammenarbeit</SectionLabel>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+        {collaborations.map((c) => (
+          <Link
+            key={c.user_id}
+            href={`/profile/${c.slug}`}
+            className="group flex flex-col items-center gap-2 p-4 bg-bg-secondary border border-border rounded-xl hover:border-gold/40 hover:bg-bg-elevated transition-all text-center"
+          >
+            {c.avatar_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={c.avatar_url}
+                alt={c.display_name}
+                className="w-12 h-12 rounded-full object-cover border-2 border-border group-hover:border-gold/40 transition-colors shrink-0"
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-bg-elevated border-2 border-border flex items-center justify-center shrink-0">
+                <Users2 size={18} className="text-text-muted" />
+              </div>
+            )}
+            <div className="min-w-0 w-full">
+              <p className="text-xs font-semibold text-text-primary truncate group-hover:text-gold transition-colors">
+                {c.display_name}
+              </p>
+              <p className="text-[10px] text-gold font-medium truncate mt-0.5">{c.label}</p>
+              {c.role && <p className="text-[10px] text-text-muted truncate">{c.role}</p>}
+            </div>
+          </Link>
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -315,7 +358,7 @@ function CompanyBadge({ membership }: { membership: CompanyMembership }) {
 // ACTOR PROFILE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ActorProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null }) {
+function ActorProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [] }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[] }) {
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const { user } = useUser();
   const [lightbox, setLightbox] = useState<string | null>(null);
@@ -766,6 +809,8 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
           </>
         )}
 
+        <CollaborationsSection collaborations={collaborations} />
+
         <ListingsSection listings={listings} />
 
         <Divider />
@@ -797,7 +842,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
 // MODEL PROFILE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ModelProfile({ profile, isOwner, companyMembership, listings = [], blockStatus = null }: { profile: UserProfile; isOwner: boolean; companyMembership: CompanyMembership; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null }) {
+function ModelProfile({ profile, isOwner, companyMembership, listings = [], blockStatus = null, collaborations = [] }: { profile: UserProfile; isOwner: boolean; companyMembership: CompanyMembership; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[] }) {
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const [lightbox, setLightbox] = useState<string | null>(null);
 
@@ -1028,6 +1073,8 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
           );
         })()}
 
+        <CollaborationsSection collaborations={collaborations} />
+
         <ListingsSection listings={listings} />
 
         <div className="py-12">
@@ -1048,7 +1095,7 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
 // GENERIC PROFILE (Crew, Creative, Vendor etc.)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function GenericProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null }) {
+function GenericProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [] }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[] }) {
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const [lightbox, setLightbox] = useState<string | null>(null);
   const [expandedFilm, setExpandedFilm] = useState<number | null>(null);
@@ -1367,6 +1414,8 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           </div>
         )}
 
+        <CollaborationsSection collaborations={collaborations} />
+
         <ListingsSection listings={listings} />
 
         <div className="mt-12 mb-8">
@@ -1409,6 +1458,7 @@ export default function ProfileView({
   externalProfiles = [],
   listings = [],
   blockStatus = null,
+  collaborations = [],
 }: {
   profile: UserProfile;
   isOwner: boolean;
@@ -1417,19 +1467,20 @@ export default function ProfileView({
   externalProfiles?: ExternalProfileRow[];
   listings?: PublicListing[];
   blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null;
+  collaborations?: PublicCollab[];
 }) {
   const category = PROFILE_CATEGORY_MAP[profile.profile_type] ?? "crew";
 
   // Model types get editorial layout
   if (profile.profile_type === "model") {
-    return <ModelProfile profile={profile} isOwner={isOwner} companyMembership={companyMembership} listings={listings} blockStatus={blockStatus} />;
+    return <ModelProfile profile={profile} isOwner={isOwner} companyMembership={companyMembership} listings={listings} blockStatus={blockStatus} collaborations={collaborations} />;
   }
 
   // Actor/talent types get casting-ready layout
   if (category === "talent") {
-    return <ActorProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} />;
+    return <ActorProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} />;
   }
 
   // Crew, creative, vendor get generic layout
-  return <GenericProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} />;
+  return <GenericProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} />;
 }

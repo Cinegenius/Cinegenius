@@ -4,14 +4,43 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { sendFriendAcceptedEmail } from "@/lib/email";
 
-// PATCH /api/friendships/[id]  → accept or reject (receiver only)
+// PATCH /api/friendships/[id]
+// action: "accepted" | "rejected"  → receiver only, changes status
+// action: "collab"                  → either party, sets their own collab_label + collab_public
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
   const { id } = await params;
-  const { status } = await req.json();
+  const body = await req.json();
+
+  // ── Collaboration label/visibility update ───────────────────────────────────
+  if (body.action === "collab") {
+    const { data: friendship } = await db
+      .from("friendships")
+      .select("id, sender_id, receiver_id, status")
+      .eq("id", id)
+      .single();
+
+    if (!friendship) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 });
+    if (friendship.status !== "accepted") return NextResponse.json({ error: "Keine aktive Verbindung" }, { status: 400 });
+    if (friendship.sender_id !== userId && friendship.receiver_id !== userId) {
+      return NextResponse.json({ error: "Keine Berechtigung" }, { status: 403 });
+    }
+
+    const isSender = friendship.sender_id === userId;
+    const update = isSender
+      ? { sender_collab_label: body.label ?? null, sender_collab_public: !!body.is_public }
+      : { receiver_collab_label: body.label ?? null, receiver_collab_public: !!body.is_public };
+
+    const { error } = await db.from("friendships").update(update).eq("id", id);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ success: true });
+  }
+
+  // ── Accept / reject ─────────────────────────────────────────────────────────
+  const { status } = body;
 
   if (!["accepted", "rejected"].includes(status)) {
     return NextResponse.json({ error: "Ungültiger Status" }, { status: 400 });

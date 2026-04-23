@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
   // All friendships
   const { data: friendships, error } = await db
     .from("friendships")
-    .select("id, sender_id, receiver_id, status, created_at")
+    .select("id, sender_id, receiver_id, status, created_at, sender_collab_label, sender_collab_public, receiver_collab_label, receiver_collab_public")
     .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
     .order("created_at", { ascending: false });
 
@@ -48,8 +48,9 @@ export async function GET(req: NextRequest) {
     (profiles ?? []).forEach((p) => { profileMap[p.user_id] = p; });
   }
 
-  const enrich = (f: { id: string; sender_id: string; receiver_id: string; status: string; created_at: string }) => {
-    const otherId = f.sender_id === userId ? f.receiver_id : f.sender_id;
+  const enrich = (f: { id: string; sender_id: string; receiver_id: string; status: string; created_at: string; sender_collab_label?: string | null; sender_collab_public?: boolean | null; receiver_collab_label?: string | null; receiver_collab_public?: boolean | null }) => {
+    const isSender = f.sender_id === userId;
+    const otherId = isSender ? f.receiver_id : f.sender_id;
     const p = profileMap[otherId] ?? {};
     return {
       friendship_id: f.id,
@@ -58,6 +59,8 @@ export async function GET(req: NextRequest) {
       avatar_url: p.avatar_url ?? null,
       role: p.role ?? p.positions?.[0] ?? "CineGenius Mitglied",
       created_at: f.created_at,
+      collab_label: (isSender ? f.sender_collab_label : f.receiver_collab_label) ?? null,
+      collab_public: (isSender ? f.sender_collab_public : f.receiver_collab_public) ?? false,
     };
   };
 
