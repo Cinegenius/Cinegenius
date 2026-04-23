@@ -2432,6 +2432,33 @@ export default function DashboardPage() {
                 </div>
               </div>
 
+              {/* ── DANGER ZONE ── */}
+              <div className="p-5 rounded-xl border border-red-500/30 bg-red-500/5">
+                <h3 className="font-semibold text-red-400 mb-1 text-sm flex items-center gap-2">
+                  <AlertCircle size={15} /> Konto löschen
+                </h3>
+                <p className="text-xs text-text-muted mb-4 leading-relaxed">
+                  Löscht dein Profil, alle Inserate, Nachrichten und Daten dauerhaft. Diese Aktion kann nicht rückgängig gemacht werden.
+                </p>
+                <button
+                  onClick={async () => {
+                    const confirmed = window.confirm(
+                      "Konto wirklich löschen?\n\nDies löscht dein Profil, alle Inserate, Nachrichten und Daten dauerhaft.\n\nDiese Aktion kann nicht rückgängig gemacht werden."
+                    );
+                    if (!confirmed) return;
+                    const res = await fetch("/api/account", { method: "DELETE" });
+                    if (res.ok) {
+                      window.location.href = "/";
+                    } else {
+                      alert("Fehler beim Löschen. Bitte versuche es erneut.");
+                    }
+                  }}
+                  className="px-4 py-2 text-xs font-semibold border border-red-500/40 text-red-400 hover:bg-red-500/15 rounded-lg transition-colors"
+                >
+                  Konto dauerhaft löschen
+                </button>
+              </div>
+
             </div>
           )}
           {/* ── FREUNDE ── */}
