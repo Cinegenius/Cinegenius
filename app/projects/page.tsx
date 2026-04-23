@@ -81,10 +81,23 @@ const CATEGORIES = [
 
 export default function ProjectsPage() {
   return (
-    <div className="pt-16 min-h-screen bg-bg-primary">
+    <div className="pt-16 min-h-screen bg-bg-primary relative overflow-hidden">
+
+      {/* Background image */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=1740&auto=format&fit=crop"
+          alt=""
+          fill
+          unoptimized
+          priority
+          className="object-cover opacity-20"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/60 via-bg-primary/40 to-bg-primary/80" />
+      </div>
 
       {/* Header */}
-      <div className="px-4 sm:px-6 lg:px-8 pt-6 pb-5 max-w-7xl mx-auto">
+      <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-6 pb-5 max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <p className="text-text-muted text-sm">
             Entdecke Produktionen aus der DACH-Region — von Spielfilm bis Social Media Content.
@@ -107,7 +120,7 @@ export default function ProjectsPage() {
       </div>
 
       {/* Category Grid */}
-      <div className="px-4 sm:px-6 lg:px-8 pb-16">
+      <div className="relative z-10 px-4 sm:px-6 lg:px-8 pb-16">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-7xl mx-auto">
           {CATEGORIES.map(({ label, desc, href, icon: Icon, image, accent }) => (
             <Link
