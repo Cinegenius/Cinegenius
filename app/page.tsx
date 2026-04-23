@@ -314,23 +314,7 @@ export default async function HomePage() {
         <div className="flex-1" />
       </section>
 
-      {/* ══════════════════════════════════════════════
-          STATS BAR — own section, below hero
-      ══════════════════════════════════════════════ */}
-      <div className="border-b border-border/60">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-4 sm:py-5">
-          <div className="flex items-center justify-between sm:justify-start sm:gap-12">
-            {liveStats.slice(0, 4).map((s) => (
-              <div key={s.label} className="text-center sm:text-left">
-                <div className="text-base sm:text-lg font-medium text-text-secondary leading-none">{s.value}</div>
-                <div className="text-[9px] sm:text-[10px] uppercase tracking-widest text-text-muted mt-1">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile: Search + CTA below stats */}
+      {/* Mobile: Search + CTA above stats */}
       <div className="sm:hidden px-5 py-5 border-b border-border">
         <div className="mb-4">
           <HeroSearch />
@@ -348,6 +332,22 @@ export default async function HomePage() {
           >
             Inserat erstellen
           </Link>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════
+          STATS BAR — below search on mobile
+      ══════════════════════════════════════════════ */}
+      <div className="border-b border-border/60">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-4 sm:py-5">
+          <div className="flex items-center justify-between sm:justify-start sm:gap-12">
+            {liveStats.slice(0, 4).map((s) => (
+              <div key={s.label} className="text-center sm:text-left">
+                <div className="text-base sm:text-lg font-medium text-text-secondary leading-none">{s.value}</div>
+                <div className="text-[9px] sm:text-[10px] uppercase tracking-widest text-text-muted mt-1">{s.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
