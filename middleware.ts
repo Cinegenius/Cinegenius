@@ -1,5 +1,9 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
+const isPublicRoute = createRouteMatcher([
+  "/api/webhooks/(.*)", // Stripe webhooks must bypass Clerk auth
+]);
+
 const isProtectedRoute = createRouteMatcher([
   "/dashboard(.*)",
   "/messages(.*)",
@@ -16,6 +20,7 @@ const isProtectedRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware((auth, req) => {
+  if (isPublicRoute(req)) return;
   if (isProtectedRoute(req)) auth.protect();
 });
 
