@@ -44,6 +44,7 @@ export default function DatenschutzPage() {
               <p><strong className="text-text-primary">Clerk (Authentifizierung):</strong> Clerk Inc., USA. Datenübertragung in die USA auf Basis von Standardvertragsklauseln (SCC). Datenschutz: clerk.com/privacy</p>
               <p><strong className="text-text-primary">Supabase (Datenbank & Storage):</strong> Supabase Inc. — Server in der EU (Frankfurt). Datenschutz: supabase.com/privacy</p>
               <p><strong className="text-text-primary">Vercel (Hosting):</strong> Vercel Inc., USA. Datenübertragung auf Basis von SCC. Datenschutz: vercel.com/legal/privacy-policy</p>
+              <p><strong className="text-text-primary">Stripe (Zahlungsabwicklung):</strong> Stripe Inc., USA. Stripe verarbeitet Zahlungsdaten im Auftrag. Datenübertragung in die USA auf Basis von SCC. Datenschutz: stripe.com/de/privacy</p>
             </div>
           </section>
 

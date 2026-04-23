@@ -9,6 +9,7 @@ import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import GlobalEffects from "@/components/GlobalEffects";
+import CookieBanner from "@/components/CookieBanner";
 import { ToastProvider } from "@/contexts/ToastContext";
 
 const playfair = Playfair_Display({
@@ -113,6 +114,7 @@ export default async function RootLayout({
               <Navbar />
               <main className="flex-1 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">{children}</main>
               <Footer />
+              <CookieBanner />
               <BottomNav />
             </ToastProvider>
           </ThemeProvider>
