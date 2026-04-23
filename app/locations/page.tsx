@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
 import LocationsContent from "./LocationsContent";
 import CategoryHero from "@/components/CategoryHero";
+import { getTranslations } from "next-intl/server";
 
 export const revalidate = 60;
 
@@ -45,6 +46,7 @@ async function geocodeCities(cities: string[]): Promise<Record<string, { lat: nu
 }
 
 export default async function LocationsPage() {
+  const t = await getTranslations("locations");
   const { data } = await db
     .from("listings")
     .select("id, title, city, price, image_url, category, description")
@@ -95,14 +97,14 @@ export default async function LocationsPage() {
       <div className="pt-16">
         <CategoryHero
           badge="Locations"
-          title="Die perfekte Location"
-          titleHighlight="für dein Projekt"
-          description="Apartments, Villen, Industriehallen, Studios, Außengelände — überall in Deutschland."
+          title={t("heroTitle")}
+          titleHighlight={t("heroTitleHighlight")}
+          description={t("heroDesc")}
           image="https://images.unsplash.com/photo-1657184925977-30a2d89fe72f?w=1600&q=90"
           imagePosition="center 60%"
           overlay="left"
           height="sm"
-          cta={{ label: "Location eintragen", href: "/inserat?group=drehorte" }}
+          cta={{ label: t("heroCta"), href: "/inserat?group=drehorte" }}
         />
       </div>
       <LocationsContent serverListings={serverListings} />

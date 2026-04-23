@@ -4,6 +4,7 @@ import { fetchRatings } from "@/lib/ratings";
 import CreatorsContent, { type ServerCreator } from "./CreatorsContent";
 import CategoryHero from "@/components/CategoryHero";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
+import { getTranslations } from "next-intl/server";
 
 // All profile types shown on this page (crew, talent, creative + vendors/renters)
 const CREATOR_TYPES = new Set(
@@ -44,6 +45,7 @@ function parseCreatorDescription(raw: string): { skills: string[]; credits: stri
 }
 
 export default async function CreatorsPage() {
+  const t = await getTranslations("creators");
   // Fetch creator listings
   const { data: listings } = await db
     .from("listings")
@@ -164,15 +166,15 @@ export default async function CreatorsPage() {
     <>
       <div className="pt-16">
         <CategoryHero
-          badge="Crew & Talente"
-          title="Filmschaffende, Creator"
-          titleHighlight="& Fotografen"
-          description="Kameraleute, Regisseure, Schauspieler, Maskenbildner, Content Creator — direkt buchbar, ohne Agentur."
+          badge="Crew"
+          title={t("heroTitle")}
+          titleHighlight={t("heroTitleHighlight")}
+          description={t("heroDesc")}
           image="https://images.unsplash.com/photo-1601506521937-0121a7fc2a6b?w=1600&q=90"
           imagePosition="center 40%"
           overlay="left"
           height="sm"
-          cta={{ label: "Profil anlegen", href: "/profile" }}
+          cta={{ label: t("heroCta"), href: "/profile" }}
         />
       </div>
       <CreatorsContent serverCreators={serverCreators} hasStrip={true} />

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import JobsContent from "./JobsContent";
+import { getTranslations } from "next-intl/server";
 
 export const revalidate = 60;
 
@@ -15,6 +16,8 @@ export const metadata: Metadata = {
 };
 
 export default async function JobsPage() {
+  const tc = await getTranslations("common");
+
   const { data } = await db
     .from("listings")
     .select("id, title, city, price, description, created_at")
@@ -33,12 +36,12 @@ export default async function JobsPage() {
     company: "",
     projectType: "Film",
     location: l.city ?? "",
-    rate: l.price > 0 ? `${l.price} €/Tag` : "Nach Vereinbarung",
+    rate: l.price > 0 ? `${l.price} €${tc("perDay")}` : tc("onRequest"),
     union: "Non-Union",
-    shootDates: "Auf Anfrage",
+    shootDates: tc("onRequest"),
     urgent: false,
-    tags: ["Neu"],
-    posted: "Aktuell",
+    tags: [tc("newBadge")],
+    posted: tc("today"),
     description: l.description ?? "",
     isReal: true,
     jobType: (l.job_type ?? "freelance") as "freelance" | "festanstellung" | "praktikum",

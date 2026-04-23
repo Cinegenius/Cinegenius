@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: "CineGenius — Locations, Crew & Equipment für Film, Foto und Content",
@@ -31,15 +32,6 @@ function fmtCount(n: number, fallback: string): string {
   return `${n}+`;
 }
 
-function relativeDate(iso: string): string {
-  const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
-  if (diff === 0) return "Heute";
-  if (diff === 1) return "Gestern";
-  if (diff < 7) return `Vor ${diff} Tagen`;
-  if (diff < 14) return "Vor 1 Woche";
-  return `Vor ${Math.floor(diff / 7)} Wochen`;
-}
-
 async function getHomeData() {
   const [
     { count: locationCount },
@@ -66,7 +58,7 @@ async function getHomeData() {
     db.from("listings").select("*", { count: "exact", head: true }).in("type", ["prop", "vehicle"]).eq("published", true),
     db.from("projects").select("*", { count: "exact", head: true }),
     db.from("companies").select("*", { count: "exact", head: true }).eq("published", true),
-    db.from("listings").select("id,title,city,price,image_url,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(3), // created_at used for "Neu" badge
+    db.from("listings").select("id,title,city,price,image_url,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(3),
     db.from("listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
     db.from("projects").select("id,title,poster_url").not("poster_url", "is", null).order("created_at", { ascending: false }).limit(50),
     db.from("profiles").select("user_id,display_name,avatar_url").not("avatar_url", "is", null).order("updated_at", { ascending: false }).limit(50),
@@ -105,9 +97,8 @@ async function getHomeData() {
         id: j.id as string,
         title: j.title as string,
         location: (j.city ?? "") as string,
-        rate: j.price ? `${(j.price as number).toLocaleString()} €/Tag` : "Auf Anfrage",
-        urgent: false,
-        posted: relativeDate(j.created_at as string),
+        rawPrice: j.price as number | null,
+        created_at: (j.created_at ?? "") as string,
       }))
     : [];
 
@@ -160,121 +151,87 @@ async function getHomeData() {
   return { liveStats, liveLocations, liveJobs, posterStrip, avatarStrip, locationStrip, pillarImages, companies, projects };
 }
 
-const featurePillars = [
-  { icon: MapPin,    title: "Locations",      desc: "Altbauten, Studios, Industriehallen — der perfekte Ort für jede Szene.",        href: "/locations", pillarKey: "location",  accent: "from-sky-900/70",     insertHref: "/inserat?group=drehorte",  insertLabel: "Location eintragen" },
-  { icon: Users,     title: "Crew & Talente", desc: "DPs, Regisseure, Schauspieler, Maskenbildner — direkt buchbar.",                href: "/creators",  pillarKey: "crew",      accent: "from-violet-900/70",  insertHref: "/profile",                 insertLabel: "Profil anlegen" },
-  { icon: ShoppingBag, title: "Marktplatz",   desc: "Kameras, Kostüme, Requisiten, Fahrzeuge — kaufen oder mieten.",                href: "/props",     pillarKey: "equipment", accent: "from-slate-900/70",   insertHref: "/inserat?group=marktplatz",insertLabel: "Artikel anbieten" },
-  { icon: Briefcase, title: "Jobs & Aufträge",desc: "Ausschreiben oder bewerben — für jeden Dreh, jedes Budget.",                   href: "/jobs",      pillarKey: "job",       accent: "from-zinc-900/70",    insertHref: "/inserat?group=jobs",      insertLabel: "Job ausschreiben" },
-  { icon: Building2, title: "Firmen",         desc: "Produktionsfirmen, Verleiher, Studios — entdecke Branchenpartner.",            href: "/companies", pillarKey: "firma",     accent: "from-emerald-900/70", insertHref: "/company-setup",           insertLabel: "Firma eintragen" },
-  { icon: Clapperboard, title: "Projekte",    desc: "Dokumentiere deine Arbeit, zeig dein Team und deine Produktionen.",           href: "/projects",  pillarKey: "projekt",   accent: "from-rose-900/70",    insertHref: "/projects",                insertLabel: "Projekt erstellen" },
-];
-
-const useCases = [
-  {
-    title: "Wohnung als Location vermieten",
-    desc: "Dein Zuhause ist die perfekte Kulisse. Verdiene bis zu einer Monatsmiete pro Tag.",
-    image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=85",
-    cta: "Location inserieren",
-    href: "/inserat",
-  },
-  {
-    title: "Kameramann für Werbespot buchen",
-    desc: "Erfahrene DPs mit Showreel — direkt anfragen, ohne Agentur.",
-    image: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&q=85",
-    cta: "Crew durchsuchen",
-    href: "/creators",
-  },
-  {
-    title: "Firma eintragen & Kunden gewinnen",
-    desc: "Produktionsfirma, Verleih oder Studio? Präsentiere dich mit Logo, Services und Team.",
-    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=85",
-    cta: "Firma eintragen",
-    href: "/company-setup",
-  },
-  {
-    title: "Auto & Oldtimer vermieten",
-    desc: "Sportwagen, Oldtimer, Transporter — für Werbespots, Musikvideos und Filmszenen.",
-    image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=85",
-    cta: "Fahrzeug inserieren",
-    href: "/inserat",
-  },
-];
-
-
 export default async function HomePage() {
   const { userId } = await auth();
   const isLoggedIn = !!userId;
   const ctaHref = isLoggedIn ? "/dashboard" : "/sign-up";
-  const ctaLabel = isLoggedIn ? "Zum Dashboard" : "Kostenlos starten";
+
+  const t = await getTranslations("home");
+  const tc = await getTranslations("common");
+
+  const ctaLabel = isLoggedIn ? t("ctaDashboard") : t("ctaSignup");
+
+  function formatDate(iso: string): string {
+    if (!iso) return "";
+    const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+    if (diff === 0) return tc("today");
+    if (diff === 1) return tc("yesterday");
+    if (diff < 7) return tc("daysAgo", { days: diff });
+    if (diff < 14) return tc("weekAgo");
+    return tc("weeksAgo", { weeks: Math.floor(diff / 7) });
+  }
+
+  const featurePillars = [
+    { icon: MapPin,       title: t("pillarLocationsTitle"),  desc: t("pillarLocationsDesc"),  href: "/locations", pillarKey: "location",  accent: "from-sky-900/70",     insertHref: "/inserat?group=drehorte",   insertLabel: t("pillarLocationsCta") },
+    { icon: Users,        title: t("pillarCrewTitle"),        desc: t("pillarCrewDesc"),        href: "/creators",  pillarKey: "crew",      accent: "from-violet-900/70",  insertHref: "/profile",                  insertLabel: t("pillarCrewCta") },
+    { icon: ShoppingBag,  title: t("pillarMarketplaceTitle"), desc: t("pillarMarketplaceDesc"), href: "/props",     pillarKey: "equipment", accent: "from-slate-900/70",   insertHref: "/inserat?group=marktplatz", insertLabel: t("pillarMarketplaceCta") },
+    { icon: Briefcase,    title: t("pillarJobsTitle"),        desc: t("pillarJobsDesc"),        href: "/jobs",      pillarKey: "job",       accent: "from-zinc-900/70",    insertHref: "/inserat?group=jobs",       insertLabel: t("pillarJobsCta") },
+    { icon: Building2,    title: t("pillarCompaniesTitle"),   desc: t("pillarCompaniesDesc"),   href: "/companies", pillarKey: "firma",     accent: "from-emerald-900/70", insertHref: "/company-setup",            insertLabel: t("pillarCompaniesCta") },
+    { icon: Clapperboard, title: t("pillarProjectsTitle"),    desc: t("pillarProjectsDesc"),    href: "/projects",  pillarKey: "projekt",   accent: "from-rose-900/70",    insertHref: "/projects",                 insertLabel: t("pillarProjectsCta") },
+  ];
+
+  const useCases = [
+    { title: t("usecase1Title"), desc: t("usecase1Desc"), image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=85", cta: t("usecase1Cta"), href: "/inserat" },
+    { title: t("usecase2Title"), desc: t("usecase2Desc"), image: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&q=85", cta: t("usecase2Cta"), href: "/creators" },
+    { title: t("usecase3Title"), desc: t("usecase3Desc"), image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=85", cta: t("usecase3Cta"), href: "/company-setup" },
+    { title: t("usecase4Title"), desc: t("usecase4Desc"), image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=85", cta: t("usecase4Cta"), href: "/inserat" },
+  ];
 
   const { liveStats, liveLocations, liveJobs, posterStrip, avatarStrip, locationStrip, pillarImages, companies, projects } = await getHomeData();
 
   return (
     <>
       {/* ══════════════════════════════════════════════
-          HERO — left-aligned, content max-680px
+          HERO
       ══════════════════════════════════════════════ */}
       <section className="relative min-h-[85svh] sm:min-h-[100svh] flex flex-col overflow-hidden">
-        {/* Background image */}
         <div className="hero-bg absolute inset-0 bg-cover bg-no-repeat" />
-
-        {/* Desktop: side-gradient overlay — left heavy, fades right */}
         <div
           className="absolute inset-0 hidden sm:block"
-          style={{
-            background:
-              "linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.2) 70%, rgba(0,0,0,0.35) 100%)",
-          }}
+          style={{ background: "linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.2) 70%, rgba(0,0,0,0.35) 100%)" }}
         />
-        {/* Mobile: strong top-to-bottom gradient — content zone dark, faces visible at bottom */}
         <div
           className="absolute inset-0 sm:hidden"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.75) 45%, rgba(0,0,0,0.45) 70%, rgba(0,0,0,0.2) 100%)",
-          }}
+          style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.75) 45%, rgba(0,0,0,0.45) 70%, rgba(0,0,0,0.2) 100%)" }}
         />
-        {/* Top darkening for nav legibility */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/40" />
-        {/* Light mode */}
         <div className="hero-overlay-light absolute inset-0 bg-gradient-to-b from-white/25 via-white/20 to-[#D9D4CB]/95" />
-        {/* Grain */}
         <div
           className="grain hero-overlay-dark absolute inset-0 opacity-[0.07]"
           style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E\")" }}
         />
 
-        {/* ── Content — centered on mobile, left on desktop ── */}
         <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pt-24 sm:pt-[160px] lg:pt-[180px]">
           <div className="max-w-[680px] mx-auto sm:mx-0 text-center sm:text-left">
-            {/* Badge */}
             <div className="hero-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[9px] font-semibold uppercase tracking-[0.18em] mb-7 sm:mb-5 animate-fade-in">
-              <Zap size={9} /> Film · Foto · Content · Werbung
+              <Zap size={9} /> {t("badgeHero")}
             </div>
-
-            {/* Headline */}
             <h1
               className="hero-title font-display text-[2.75rem] sm:text-[4rem] lg:text-[5rem] font-bold tracking-tight mb-5 sm:mb-6 animate-fade-up"
               style={{ lineHeight: "1.08" }}
             >
-              Locations, Crew &<br />
-              <span className="text-gradient-gold" style={{ lineHeight: "1.15" }}>Equipment finden.</span>
+              {t("heroTitle1")}<br />
+              <span className="text-gradient-gold" style={{ lineHeight: "1.15" }}>{t("heroTitle2")}</span>
             </h1>
-
-            {/* Subtext */}
             <p
               className="hero-sub text-base sm:text-lg mb-8 sm:mb-10 leading-[1.6] animate-fade-up max-w-[340px] sm:max-w-[500px] mx-auto sm:mx-0 line-clamp-2 sm:line-clamp-none"
               style={{ opacity: 0.75 }}
             >
-              Kostenlos vermieten, buchen und inserieren — für Film, Foto und Content. Für Profis und Einsteiger.
+              {t("heroSubtitle")}
             </p>
-
-            {/* Hero Search — desktop only; mobile version pinned to bottom of hero */}
             <div className="hidden sm:block w-full max-w-[580px] mb-6 sm:mb-10 animate-fade-up">
               <HeroSearch />
             </div>
-
-            {/* Buttons — desktop only */}
             <div className="hidden sm:flex sm:flex-row items-center gap-3 animate-fade-up">
               <Link
                 href={ctaHref}
@@ -286,16 +243,14 @@ export default async function HomePage() {
                 href="/inserat"
                 className="inline-flex items-center justify-center gap-1.5 px-5 py-3 rounded-lg border border-white/25 text-white/70 font-medium hover:border-white/40 hover:text-white active:scale-[0.98] transition-all text-sm"
               >
-                Inserat erstellen
+                {t("ctaCreateListing")}
               </Link>
             </div>
           </div>
         </div>
 
-        {/* Spacer pushes mobile search to bottom of hero */}
         <div className="flex-1" />
 
-        {/* Mobile: Search + CTAs pinned to bottom of hero, at the red line */}
         <div className="sm:hidden relative z-10 px-5 pb-6">
           <div className="mb-3">
             <HeroSearch />
@@ -311,14 +266,14 @@ export default async function HomePage() {
               href="/inserat"
               className="inline-flex items-center justify-center gap-1.5 px-5 py-3.5 rounded-lg border border-white/25 text-white/70 font-medium hover:border-white/40 hover:text-white active:scale-[0.98] transition-all text-sm"
             >
-              Inserat erstellen
+              {t("ctaCreateListing")}
             </Link>
           </div>
         </div>
       </section>
 
       {/* ══════════════════════════════════════════════
-          STATS BAR — own section, below hero
+          STATS BAR
       ══════════════════════════════════════════════ */}
       <div className="border-b border-border/60">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-4 sm:py-5">
@@ -334,16 +289,16 @@ export default async function HomePage() {
       </div>
 
       {/* ══════════════════════════════════════════════
-          TRUST BAR — immediately after stats
+          TRUST BAR
       ══════════════════════════════════════════════ */}
       <div className="bg-bg-secondary border-b border-border">
         <div className="max-w-5xl mx-auto px-6 sm:px-6 py-5">
           <div className="grid grid-cols-2 gap-4 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-5">
             {[
-              { icon: Shield,       text: "Sichere Zahlung",       sub: "Stripe Treuhand" },
-              { icon: CheckCircle,  text: "Verifizierte Anbieter", sub: "Geprüfte Profile" },
-              { icon: Zap,          text: "100% kostenlos",        sub: "Keine Provision" },
-              { icon: Clock,        text: "DACH-Region",           sub: "DE · AT · CH" },
+              { icon: Shield,      text: t("trustPayment"),  sub: t("trustPaymentSub") },
+              { icon: CheckCircle, text: t("trustVerified"), sub: t("trustVerifiedSub") },
+              { icon: Zap,         text: t("trustFree"),     sub: t("trustFreeSub") },
+              { icon: Clock,       text: t("trustRegion"),   sub: t("trustRegionSub") },
             ].map(({ icon: Icon, text, sub }) => (
               <div key={text} className="flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
@@ -375,25 +330,21 @@ export default async function HomePage() {
       )}
 
       {/* ══════════════════════════════════════════════
-          PLATFORM EXPLANATION — 3 steps, left header
+          3-STEP SECTION
       ══════════════════════════════════════════════ */}
       <section className="py-16 sm:py-20 max-w-7xl mx-auto px-6 sm:px-6 lg:px-8">
-        {/* Mobile: centered header. Desktop: left column */}
         <div className="text-center sm:text-left mb-8 sm:hidden">
-          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Einfach & schnell</p>
-          <h2 className="font-display text-2xl font-bold text-text-primary">In 3 Schritten dabei sein</h2>
+          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">{t("stepsLabel")}</p>
+          <h2 className="font-display text-2xl font-bold text-text-primary">{t("stepsTitle")}</h2>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6 lg:gap-16 items-start">
-          {/* Left col — desktop only */}
           <div className="hidden sm:block">
-            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">Einfach & schnell</p>
+            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">{t("stepsLabel")}</p>
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary mb-5 leading-tight">
-              In 3 Schritten<br />dabei sein
+              {t("stepsTitle")}
             </h2>
-            <p className="text-sm text-text-muted leading-relaxed mb-6">
-              Kostenlos, ohne Agentur — du behältst die Kontrolle.
-            </p>
+            <p className="text-sm text-text-muted leading-relaxed mb-6">{t("stepsDesc")}</p>
             <Link
               href={ctaHref}
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-xl transition-all text-sm"
@@ -402,12 +353,11 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {/* Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
-              { step: "01", icon: Film,   title: "Kostenlos registrieren", desc: "Kein Abo, keine Gebühren. Profil erstellen und sofort loslegen." },
-              { step: "02", icon: MapPin, title: "Anbieten oder suchen",   desc: "Location inserieren, Crew buchen oder Job ausschreiben." },
-              { step: "03", icon: Shield, title: "Direkt loslegen",        desc: "Direkte Kontaktaufnahme, keine Agentur. Zahlung über Treuhand." },
+              { step: "01", icon: Film,   title: t("step1Title"), desc: t("step1Desc") },
+              { step: "02", icon: MapPin, title: t("step2Title"), desc: t("step2Desc") },
+              { step: "03", icon: Shield, title: t("step3Title"), desc: t("step3Desc") },
             ].map(({ step, icon: Icon, title, desc }) => (
               <div key={step} className="flex gap-4 p-5 rounded-2xl border border-border bg-bg-secondary sm:flex-col sm:gap-0">
                 <div className="flex items-center gap-3 sm:mb-3 shrink-0">
@@ -429,19 +379,19 @@ export default async function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════
-          PLATFORM PILLARS — full cards with image + text + CTA
+          PLATFORM PILLARS
       ══════════════════════════════════════════════ */}
       <section className="py-8 sm:py-16 bg-bg-secondary border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center sm:flex-row sm:items-end sm:justify-between mb-8 sm:mb-10 text-center sm:text-left">
             <div>
-              <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Alles auf einer Plattform</p>
+              <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">{t("platformLabel")}</p>
               <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg">
-                Der Marktplatz für Kreative
+                {t("platformTitle")}
               </h2>
             </div>
             <Link href="/creators" className="hidden sm:flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium shrink-0">
-              Alles entdecken <ArrowRight size={14} />
+              {t("platformDiscoverAll")} <ArrowRight size={14} />
             </Link>
           </div>
 
@@ -454,7 +404,6 @@ export default async function HomePage() {
                   href={image ? href : insertHref}
                   className="group flex flex-col rounded-2xl overflow-hidden border border-border bg-bg-elevated hover:border-gold/30 transition-all duration-300"
                 >
-                  {/* Image area */}
                   <div className="relative h-36 sm:h-48 overflow-hidden bg-bg-elevated">
                     {image ? (
                       <Image
@@ -466,7 +415,7 @@ export default async function HomePage() {
                       />
                     ) : (
                       <div className={`absolute inset-0 bg-gradient-to-br ${accent} to-bg-elevated flex flex-col items-center justify-center gap-3`}>
-                        <p className="text-xs text-white/40 font-medium">Noch keine Einträge</p>
+                        <p className="text-xs text-white/40 font-medium">{t("pillarEmpty")}</p>
                         <span className="px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg group-hover:bg-[#D6F96A] transition-colors">
                           {insertLabel} →
                         </span>
@@ -474,7 +423,6 @@ export default async function HomePage() {
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-bg-elevated/80 via-transparent to-transparent" />
                   </div>
-                  {/* Content area */}
                   <div className="p-5 flex flex-col flex-1">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-8 h-8 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
@@ -484,7 +432,7 @@ export default async function HomePage() {
                     </div>
                     <p className="text-sm text-text-muted leading-relaxed mb-4 flex-1">{desc}</p>
                     <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold group-hover:gap-3 transition-all duration-200">
-                      Entdecken <ArrowRight size={12} />
+                      {t("pillarDiscover")} <ArrowRight size={12} />
                     </span>
                   </div>
                 </Link>
@@ -495,13 +443,13 @@ export default async function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════
-          USE CASES — 4 equal image cards
+          USE CASES
       ══════════════════════════════════════════════ */}
       <section className="py-8 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8 sm:mb-10 text-center sm:text-left">
-          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Konkrete Beispiele</p>
+          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">{t("examplesLabel")}</p>
           <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg mx-auto sm:mx-0">
-            Was du mit CineGenius machen kannst
+            {t("examplesTitle")}
           </h2>
         </div>
 
@@ -534,15 +482,15 @@ export default async function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════
-          TARGET AUDIENCES — who is this for
+          TARGET AUDIENCES
       ══════════════════════════════════════════════ */}
       <section className="py-8 sm:py-16 bg-bg-secondary border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8 sm:mb-10 text-center sm:text-left">
-            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Vor und hinter der Kamera</p>
+            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">{t("audienceLabel")}</p>
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-xl mx-auto sm:mx-0">
-              CineGenius ist für dich —{" "}
-              <span className="text-gradient-gold">ganz egal wer du bist.</span>
+              {t("audienceTitle")}{" "}
+              <span className="text-gradient-gold">{t("audienceTitleHighlight")}</span>
             </h2>
           </div>
 
@@ -550,37 +498,37 @@ export default async function HomePage() {
             {([
               {
                 icon: Film,
-                title: "Film, Foto & Content",
-                desc: "Du drehst, fotografierst oder produzierst — hier findest du alles dafür.",
-                items: ["Locations in Minuten finden", "Crew & Talente direkt anfragen", "Equipment tagesweise mieten", "Jobs & Aufträge ausschreiben"],
-                cta: "Jetzt entdecken",
+                title: t("audienceFilmTitle"),
+                desc: t("audienceFilmDesc"),
+                items: [t("audienceFilmItem1"), t("audienceFilmItem2"), t("audienceFilmItem3"), t("audienceFilmItem4")],
+                cta: t("audienceFilmCta"),
                 href: "/locations",
                 highlight: false,
               },
               {
                 icon: Camera,
-                title: "Freelancer & Kreative",
-                desc: "Fotograf, DP, Editor, Social-Media-Creator — zeig was du kannst und werde gebucht.",
-                items: ["Profil mit Portfolio & Tagessatz", "Von Produktionen gefunden werden", "Projekte & Credits dokumentieren", "Netzwerk & Sichtbarkeit aufbauen"],
-                cta: isLoggedIn ? "Zum Dashboard" : "Profil erstellen",
+                title: t("audienceFreelanceTitle"),
+                desc: t("audienceFreelanceDesc"),
+                items: [t("audienceFreelanceItem1"), t("audienceFreelanceItem2"), t("audienceFreelanceItem3"), t("audienceFreelanceItem4")],
+                cta: isLoggedIn ? t("ctaDashboard") : t("audienceFreelanceCta"),
                 href: ctaHref,
                 highlight: false,
               },
               {
                 icon: Building2,
-                title: "Firmen & Agenturen",
-                desc: "Werbeagentur, Studio, Verleih — präsentiere dich und gewinne neue Aufträge.",
-                items: ["Firmenprofil mit Logo & Team", "Services & Equipment listen", "Aufträge & Anfragen erhalten", "Verifiziertes Branchenprofil"],
-                cta: "Firma eintragen",
+                title: t("audienceCompanyTitle"),
+                desc: t("audienceCompanyDesc"),
+                items: [t("audienceCompanyItem1"), t("audienceCompanyItem2"), t("audienceCompanyItem3"), t("audienceCompanyItem4")],
+                cta: t("audienceCompanyCta"),
                 href: "/company-setup",
                 highlight: false,
               },
               {
                 icon: TrendingUp,
-                title: "Keine Kamera nötig",
-                desc: "Schöne Wohnung? Industriehalle? Oldtimer? Du kannst hier Geld verdienen.",
-                items: ["300–800 € pro Drehtag", "Equipment & Fahrzeuge vermieten", "Keine Branchenerfahrung nötig", "Kostenlos inserieren, sicher bezahlt"],
-                cta: "Inserat erstellen",
+                title: t("audiencePassiveTitle"),
+                desc: t("audiencePassiveDesc"),
+                items: [t("audiencePassiveItem1"), t("audiencePassiveItem2"), t("audiencePassiveItem3"), t("audiencePassiveItem4")],
+                cta: t("audiencePassiveCta"),
                 href: "/inserat",
                 highlight: true,
               },
@@ -612,13 +560,13 @@ export default async function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════
-          VISUAL SHOWCASE — use-case grid
+          VISUAL SHOWCASE
       ══════════════════════════════════════════════ */}
       <section className="hidden sm:block py-8 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8 sm:mb-10">
-          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Für jeden Shoot</p>
+          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">{t("showcaseLabel")}</p>
           <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg">
-            Film · Foto · Content · Werbung
+            {t("showcaseTitle")}
           </h2>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-[200px]">
@@ -628,10 +576,10 @@ export default async function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
             <div className="absolute bottom-5 left-5">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold mb-2">
-                <Film size={10} /> Film & Kino
+                <Film size={10} /> {t("showcaseFilm")}
               </span>
-              <p className="text-white font-semibold text-sm">Professionelle Filmsets</p>
-              <p className="text-white/60 text-xs mt-0.5">Locations, Crew & Equipment</p>
+              <p className="text-white font-semibold text-sm">{t("showcaseFilmDesc")}</p>
+              <p className="text-white/60 text-xs mt-0.5">{t("showcaseFilmSub")}</p>
             </div>
           </Link>
           <Link href="/photo" className="relative rounded-2xl overflow-hidden group block">
@@ -640,9 +588,9 @@ export default async function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
-                <Camera size={10} /> Fotografie
+                <Camera size={10} /> {t("showcasePhoto")}
               </span>
-              <p className="text-white font-semibold text-sm">Shootings & Studios</p>
+              <p className="text-white font-semibold text-sm">{t("showcasePhotoDesc")}</p>
             </div>
           </Link>
           <Link href="/social-media" className="relative rounded-2xl overflow-hidden group block">
@@ -651,9 +599,9 @@ export default async function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
-                <Zap size={10} /> Social Media
+                <Zap size={10} /> {t("showcaseSocial")}
               </span>
-              <p className="text-white font-semibold text-sm">Content Creation</p>
+              <p className="text-white font-semibold text-sm">{t("showcaseSocialDesc")}</p>
             </div>
           </Link>
           <Link href="/companies" className="relative rounded-2xl overflow-hidden group block">
@@ -662,9 +610,9 @@ export default async function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
-                <TrendingUp size={10} /> Werbung
+                <TrendingUp size={10} /> {t("showcaseAds")}
               </span>
-              <p className="text-white font-semibold text-sm">Werbe- & Industriefilm</p>
+              <p className="text-white font-semibold text-sm">{t("showcaseAdsDesc")}</p>
             </div>
           </Link>
           <Link href="/bts" className="relative rounded-2xl overflow-hidden group block">
@@ -673,9 +621,9 @@ export default async function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
-                <Play size={10} /> Behind the Scenes
+                <Play size={10} /> {t("showcaseBts")}
               </span>
-              <p className="text-white font-semibold text-sm">Backstage & Crew</p>
+              <p className="text-white font-semibold text-sm">{t("showcaseBtsDesc")}</p>
             </div>
           </Link>
         </div>
@@ -689,11 +637,11 @@ export default async function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col items-center sm:flex-row sm:items-end sm:justify-between mb-6 text-center sm:text-left">
               <div>
-                <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Neu & empfohlen</p>
-                <h2 className="font-display text-2xl font-bold text-text-primary">Ausgewählte Locations</h2>
+                <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("locationsLabel")}</p>
+                <h2 className="font-display text-2xl font-bold text-text-primary">{t("locationsTitle")}</h2>
               </div>
               <Link href="/locations" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium mt-2 sm:mt-0">
-                Alle anzeigen <ArrowRight size={14} />
+                {tc("viewAll")} <ArrowRight size={14} />
               </Link>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -713,12 +661,12 @@ export default async function HomePage() {
                   </div>
                   <div className="px-4 py-3 flex items-center justify-between">
                     {loc.isNew ? (
-                      <span className="text-xs font-semibold text-gold">Neu</span>
+                      <span className="text-xs font-semibold text-gold">{tc("newBadge")}</span>
                     ) : (
-                      <span className="text-xs text-text-muted">{relativeDate(loc.created_at ?? "")}</span>
+                      <span className="text-xs text-text-muted">{formatDate(loc.created_at)}</span>
                     )}
                     <span className="text-sm font-semibold text-gold">
-                      {loc.price.toLocaleString()} €<span className="text-[11px] text-text-muted font-normal">/Tag</span>
+                      {loc.price.toLocaleString()} €<span className="text-[11px] text-text-muted font-normal">{tc("perDay")}</span>
                     </span>
                   </div>
                 </Link>
@@ -735,11 +683,11 @@ export default async function HomePage() {
         <section className="py-8 sm:py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center sm:flex-row sm:items-end sm:justify-between mb-6 text-center sm:text-left">
             <div>
-              <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Branchenpartner</p>
-              <h2 className="font-display text-2xl font-bold text-text-primary">Firmen & Studios</h2>
+              <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("companiesLabel")}</p>
+              <h2 className="font-display text-2xl font-bold text-text-primary">{t("companiesTitle")}</h2>
             </div>
             <Link href="/companies" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium mt-2 sm:mt-0">
-              Alle anzeigen <ArrowRight size={14} />
+              {tc("viewAll")} <ArrowRight size={14} />
             </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -770,11 +718,11 @@ export default async function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col items-center sm:flex-row sm:items-end sm:justify-between mb-6 text-center sm:text-left">
               <div>
-                <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Neu eingetragen</p>
-                <h2 className="font-display text-2xl font-bold text-text-primary">Aktuelle Filmprojekte</h2>
+                <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("projectsLabel")}</p>
+                <h2 className="font-display text-2xl font-bold text-text-primary">{t("projectsTitle")}</h2>
               </div>
               <Link href="/projects" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium mt-2 sm:mt-0">
-                Alle Projekte <ArrowRight size={14} />
+                {tc("allProjects")} <ArrowRight size={14} />
               </Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
@@ -805,11 +753,11 @@ export default async function HomePage() {
       <section className="py-8 sm:py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center sm:flex-row sm:items-end sm:justify-between mb-6 text-center sm:text-left">
           <div>
-            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Jetzt gesucht</p>
-            <h2 className="font-display text-2xl font-bold text-text-primary">Aktuelle Jobs</h2>
+            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("jobsLabel")}</p>
+            <h2 className="font-display text-2xl font-bold text-text-primary">{t("jobsTitle")}</h2>
           </div>
           <Link href="/jobs" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium mt-2 sm:mt-0">
-            Alle anzeigen <ArrowRight size={14} />
+            {tc("viewAll")} <ArrowRight size={14} />
           </Link>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -823,9 +771,11 @@ export default async function HomePage() {
                 <p className="text-xs text-text-muted truncate">{job.location}</p>
               </div>
               <div className="text-right shrink-0">
-                <p className="text-sm font-semibold text-gold">{job.rate}</p>
+                <p className="text-sm font-semibold text-gold">
+                  {job.rawPrice ? `${job.rawPrice.toLocaleString()} €${tc("perDay")}` : tc("onRequest")}
+                </p>
                 <p className="text-[11px] text-text-muted flex items-center gap-1 mt-0.5 justify-end">
-                  <Clock size={9} /> {job.posted}
+                  <Clock size={9} /> {formatDate(job.created_at)}
                 </p>
               </div>
             </Link>
@@ -833,7 +783,7 @@ export default async function HomePage() {
         </div>
         <div className="mt-4 text-center">
           <Link href="/inserat" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors">
-            Job ausschreiben <ArrowRight size={13} />
+            {tc("postJob")} <ArrowRight size={13} />
           </Link>
         </div>
       </section>
@@ -844,8 +794,8 @@ export default async function HomePage() {
       <section className="py-8 sm:py-20 bg-bg-secondary border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8 sm:mb-14 text-center sm:text-left">
-            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Stimmen</p>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg mx-auto sm:mx-0">Warum CineGenius?</h2>
+            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">{t("reviewsLabel")}</p>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg mx-auto sm:mx-0">{t("reviewsTitle")}</h2>
           </div>
           <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
             <div className="flex gap-1 mb-1">
@@ -853,15 +803,13 @@ export default async function HomePage() {
                 <Star key={i} size={22} className="text-border fill-border" />
               ))}
             </div>
-            <p className="text-text-primary font-semibold text-lg">Noch keine Bewertungen</p>
-            <p className="text-text-muted text-sm max-w-xs leading-relaxed">
-              Sei der Erste, der CineGenius bewertet — buche oder inseriere jetzt und teile deine Erfahrung.
-            </p>
+            <p className="text-text-primary font-semibold text-lg">{t("reviewsEmpty")}</p>
+            <p className="text-text-muted text-sm max-w-xs leading-relaxed">{t("reviewsEmptyDesc")}</p>
             <Link
               href="/sign-up"
               className="mt-2 inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm"
             >
-              Jetzt starten <ArrowRight size={14} />
+              {tc("startNow")} <ArrowRight size={14} />
             </Link>
           </div>
         </div>
@@ -879,14 +827,14 @@ export default async function HomePage() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
             <div className="text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold/20 bg-gold/5 text-gold text-xs font-semibold mb-5">
-                <Play size={10} className="fill-gold" /> Bereit loszulegen?
+                <Play size={10} className="fill-gold" /> {t("ctaBadge")}
               </div>
               <h2 className="font-display text-3xl sm:text-4xl font-bold text-text-primary mb-3 leading-tight">
-                Dein nächstes Projekt<br />
-                <span className="text-gradient-gold">wartet schon.</span>
+                {t("ctaTitle")}<br />
+                <span className="text-gradient-gold">{t("ctaTitleHighlight")}</span>
               </h2>
               <p className="text-text-muted text-sm leading-relaxed max-w-sm mx-auto lg:mx-0">
-                Kostenlos registrieren, sofort loslegen. Keine Kreditkarte nötig.
+                {t("ctaDesc")}
               </p>
             </div>
             <div className="flex flex-col items-stretch lg:items-start gap-3 shrink-0 max-w-[320px] mx-auto lg:mx-0 w-full lg:w-auto">
@@ -894,16 +842,16 @@ export default async function HomePage() {
                 href={ctaHref}
                 className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-gold hover:bg-gold-light text-bg-primary font-bold rounded-xl transition-all text-sm shadow-lg shadow-gold/20"
               >
-                {ctaLabel} <ArrowRight size={15} />
+                {t("ctaPrimary")} <ArrowRight size={15} />
               </Link>
               <Link
                 href="/inserat"
                 className="inline-flex items-center justify-center gap-2 px-8 py-3.5 border border-border text-text-primary font-semibold rounded-xl hover:border-gold hover:text-gold transition-all text-sm"
               >
-                Inserat erstellen
+                {t("ctaSecondary")}
               </Link>
               <p className="text-[11px] text-text-muted text-center">
-                Keine Kreditkarte · Keine Provision · Jederzeit kündbar
+                {t("ctaFootnote")}
               </p>
             </div>
           </div>

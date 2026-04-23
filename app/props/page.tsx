@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import PropsContent from "./PropsContent";
 import CategoryHero from "@/components/CategoryHero";
+import { getTranslations } from "next-intl/server";
 
 export const revalidate = 60;
 
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PropsPage() {
+  const t = await getTranslations("props");
   const { data } = await db
     .from("listings")
     .select("id, user_id, type, title, category, city, price, image_url, description, metadata")
@@ -33,7 +35,7 @@ export default async function PropsPage() {
     title: l.title,
     type: l.type,
     category: l.type === "vehicle" ? (l.category ?? "Bild-Fahrzeug") : (l.category ?? "Requisiten"),
-    vendor: "Privatanbieter",
+    vendor: t("vendorPrivate"),
     location: l.city ?? "",
     dailyRate: l.price,
     image: l.image_url ?? "",
@@ -49,15 +51,15 @@ export default async function PropsPage() {
     <>
       <div className="pt-16">
         <CategoryHero
-          badge="Marktplatz"
-          title="Requisiten, Kameras,"
-          titleHighlight="Licht & Equipment"
-          description="Von Privatpersonen und Verleihfirmen — alles für Film, Fotografie und Social Media Produktion."
+          badge={t("heroBadge")}
+          title={t("heroTitle")}
+          titleHighlight={t("heroTitleHighlight")}
+          description={t("heroDesc")}
           image="https://images.unsplash.com/photo-1431068799455-80bae0caf685?w=1600&q=90"
           imagePosition="center 50%"
           overlay="left"
           height="sm"
-          cta={{ label: "Inserat erstellen", href: "/inserat" }}
+          cta={{ label: t("heroCta"), href: "/inserat" }}
         />
       </div>
       <PropsContent serverListings={serverListings} />
