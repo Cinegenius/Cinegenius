@@ -59,13 +59,11 @@ export const metadata: Metadata = {
     title: "CineGenius — Marktplatz für Film, Social Media & Fotografie",
     description:
       "Locations, Crew, Equipment und Jobs — alles für deine Produktion an einem Ort.",
-    images: [{ url: "/og-default.jpg", width: 1200, height: 630, alt: "CineGenius" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "CineGenius — Film & Medien Marktplatz",
     description: "Locations mieten, Crew buchen, Equipment leihen — für Film, Social Media & Fotografie.",
-    images: ["/og-default.jpg"],
   },
   robots: {
     index: true,
