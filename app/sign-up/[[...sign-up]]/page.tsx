@@ -12,13 +12,14 @@ export default function SignUpPage() {
           forceRedirectUrl="/profile-setup"
           appearance={{
             variables: {
-              colorPrimary: "#0EA5E9",
+              colorPrimary: "#C2F135",
+              colorTextOnPrimaryBackground: "#0A0A0A",
               colorBackground: "#1A1A1A",
-              colorInputBackground: "#2A2A2A",
+              colorInputBackground: "#141414",
               colorInputText: "#EFEFEF",
               colorText: "#EFEFEF",
-              colorTextSecondary: "#BBBBBB",
-              colorNeutral: "#888888",
+              colorTextSecondary: "#AAAAAA",
+              colorNeutral: "#666666",
               borderRadius: "0.75rem",
               fontFamily: "Inter, system-ui, sans-serif",
             },

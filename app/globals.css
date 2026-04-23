@@ -456,3 +456,14 @@ input, select, textarea { color: inherit; }
 [data-theme="light"] .hover\:bg-bg-hover:hover {
   background-color: #EDEEED;
 }
+
+/* ── Browser autofill override (Clerk inputs) ────────────────────────────── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 60px #141414 inset !important;
+  -webkit-text-fill-color: #EFEFEF !important;
+  caret-color: #EFEFEF;
+  transition: background-color 9999s ease-in-out 0s;
+}
