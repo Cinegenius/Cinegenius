@@ -213,18 +213,18 @@ export default async function HomePage() {
 
         <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pt-24 sm:pt-[160px] lg:pt-[180px]">
           <div className="max-w-[680px] mx-auto sm:mx-0 text-center sm:text-left">
-            <div className="hero-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[9px] font-semibold uppercase tracking-[0.18em] mb-7 sm:mb-5 animate-fade-in">
+            <div className="hero-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[9px] font-semibold uppercase tracking-[0.18em] mb-3 sm:mb-5 animate-fade-in">
               <Zap size={9} /> {t("badgeHero")}
             </div>
             <h1
-              className="hero-title font-display text-[2.75rem] sm:text-[4rem] lg:text-[5rem] font-bold tracking-tight mb-5 sm:mb-6 animate-fade-up"
-              style={{ lineHeight: "1.08" }}
+              className="hero-title font-display text-[2rem] sm:text-[3.5rem] lg:text-[5rem] font-bold tracking-tight mb-3 sm:mb-6 animate-fade-up"
+              style={{ lineHeight: "1.1" }}
             >
               {t("heroTitle1")}<br />
               <span className="text-gradient-gold" style={{ lineHeight: "1.15" }}>{t("heroTitle2")}</span>
             </h1>
             <p
-              className="hero-sub text-base sm:text-lg mb-8 sm:mb-10 leading-[1.6] animate-fade-up max-w-[340px] sm:max-w-[500px] mx-auto sm:mx-0 line-clamp-2 sm:line-clamp-none"
+              className="hero-sub text-sm sm:text-lg mb-4 sm:mb-10 leading-[1.55] animate-fade-up max-w-[440px] sm:max-w-[500px] mx-auto sm:mx-0"
               style={{ opacity: 0.75 }}
             >
               {t("heroSubtitle")}
@@ -251,20 +251,20 @@ export default async function HomePage() {
 
         <div className="flex-1" />
 
-        <div className="sm:hidden relative z-10 px-5 pb-6">
-          <div className="mb-3">
+        <div className="sm:hidden relative z-10 px-5 pb-5">
+          <div className="mb-2.5">
             <HeroSearch />
           </div>
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-2">
             <Link
               href={ctaHref}
-              className={`inline-flex items-center justify-center gap-1.5 px-5 py-3.5 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-lg active:scale-[0.98] transition-all text-sm ${isLoggedIn ? "hidden" : ""}`}
+              className={`inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-lg active:scale-[0.98] transition-all text-sm ${isLoggedIn ? "hidden" : ""}`}
             >
               {ctaLabel} <ArrowRight size={13} />
             </Link>
             <Link
               href="/inserat"
-              className="inline-flex items-center justify-center gap-1.5 px-5 py-3.5 rounded-lg border border-white/25 text-white/70 font-medium hover:border-white/40 hover:text-white active:scale-[0.98] transition-all text-sm"
+              className="inline-flex items-center justify-center gap-1.5 px-5 py-3 rounded-lg border border-white/25 text-white/70 font-medium hover:border-white/40 hover:text-white active:scale-[0.98] transition-all text-sm"
             >
               {t("ctaCreateListing")}
             </Link>

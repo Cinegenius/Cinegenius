@@ -70,6 +70,9 @@ body {
 ::-webkit-scrollbar-thumb { background: #2C2C2C; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #C2F135; }
 
+.scrollbar-none { scrollbar-width: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }
+
 /* ═══════════════════════════════════════════════════════════════════════════
    SELECTION
    ═══════════════════════════════════════════════════════════════════════════ */

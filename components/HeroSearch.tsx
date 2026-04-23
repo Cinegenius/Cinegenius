@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import { Search, MapPin } from "lucide-react";
 
 const tabs = [
-  { id: "locations", label: "Locations",  placeholder: "Was suchst du? Locations, Equipment oder Jobs…", href: "/locations" },
-  { id: "crew",      label: "Crew",      placeholder: "Fotograf, Kameramann, Editor…",                   href: "/creators" },
-  { id: "equipment", label: "Equipment", placeholder: "Kamera, Licht, Ton, Kostüme…",                    href: "/props" },
-  { id: "jobs",      label: "Jobs",      placeholder: "Job oder Auftrag suchen…",                        href: "/jobs" },
+  { id: "locations", label: "Locations", placeholder: "Location suchen…",    href: "/locations" },
+  { id: "crew",      label: "Crew",      placeholder: "Fotograf, Kameramann…", href: "/creators" },
+  { id: "equipment", label: "Equipment", placeholder: "Kamera, Licht, Ton…",   href: "/props" },
+  { id: "jobs",      label: "Jobs",      placeholder: "Job oder Auftrag…",      href: "/jobs" },
 ];
 
 export default function HeroSearch() {
@@ -30,13 +30,13 @@ export default function HeroSearch() {
 
   return (
     <div className="w-full">
-      {/* Tabs */}
-      <div className="flex gap-1 mb-3">
+      {/* Tabs — overflow-x-auto so they never clip on tiny screens */}
+      <div className="flex gap-1 mb-2.5 overflow-x-auto scrollbar-none">
         {tabs.map((t) => (
           <button
             key={t.id}
             onClick={() => { setActiveTab(t.id); setQuery(""); setCity(""); }}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${
               activeTab === t.id
                 ? "bg-white/25 text-white shadow-sm"
                 : "text-white/55 hover:text-white/85 hover:bg-white/10"
@@ -50,18 +50,18 @@ export default function HeroSearch() {
       {/* Search bar */}
       <form
         onSubmit={handleSearch}
-        className="flex items-center bg-white rounded-full sm:rounded-xl overflow-hidden border-2 border-white/30 shadow-2xl sm:shadow-xl transition-all focus-within:border-[#C2F135]/70 focus-within:shadow-[0_0_0_3px_rgba(194,241,53,0.25),0_8px_32px_rgba(0,0,0,0.3)] min-h-[64px] sm:min-h-0"
+        className="flex items-center bg-white rounded-full sm:rounded-xl overflow-hidden border-2 border-white/30 shadow-2xl sm:shadow-xl transition-all focus-within:border-[#C2F135]/70 focus-within:shadow-[0_0_0_3px_rgba(194,241,53,0.25),0_8px_32px_rgba(0,0,0,0.3)] min-h-[52px] sm:min-h-0"
       >
         {/* Query */}
-        <div className="flex items-center gap-2.5 flex-1 px-5 sm:px-4">
-          <Search size={18} className="text-gray-400 shrink-0 sm:w-4 sm:h-4" />
+        <div className="flex items-center gap-2 flex-1 px-4 sm:px-4">
+          <Search size={15} className="text-gray-400 shrink-0" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={tab.placeholder}
             style={{ color: "#111827" }}
-            className="w-full py-5 sm:py-4 text-sm sm:text-base bg-transparent focus:outline-none placeholder:text-gray-400 min-w-0 font-medium"
+            className="w-full py-3.5 sm:py-4 text-sm bg-transparent focus:outline-none placeholder:text-gray-400 min-w-0 font-medium"
           />
         </div>
 
@@ -81,9 +81,9 @@ export default function HeroSearch() {
         {/* Button */}
         <button
           type="submit"
-          className="m-2 sm:m-1.5 px-4 sm:px-4 py-3.5 sm:py-2.5 bg-[#C2F135] hover:bg-[#D6F96A] text-[#0A0A0A] font-bold text-sm rounded-full sm:rounded-lg transition-colors shrink-0 flex items-center gap-1.5"
+          className="m-1.5 px-3.5 sm:px-4 py-2.5 bg-[#C2F135] hover:bg-[#D6F96A] text-[#0A0A0A] font-bold text-sm rounded-full sm:rounded-lg transition-colors shrink-0 flex items-center gap-1.5"
         >
-          <Search size={16} className="sm:w-3.5 sm:h-3.5" />
+          <Search size={15} className="sm:w-3.5 sm:h-3.5" />
           <span className="hidden sm:inline">Suchen</span>
         </button>
       </form>
