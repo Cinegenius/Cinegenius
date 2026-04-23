@@ -313,24 +313,28 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Spacer */}
+        {/* Spacer keeps hero at full height */}
         <div className="flex-1" />
+      </section>
 
-        {/* Stats — 2×2 on mobile, row on desktop */}
-        <div className="relative z-10 px-6 sm:px-10 lg:px-[100px] pb-8 sm:pb-14">
-          <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center gap-y-4 gap-x-6 sm:gap-10 max-w-[360px] sm:max-w-none mx-auto sm:mx-0">
+      {/* ══════════════════════════════════════════════
+          STATS BAR — own section, below hero
+      ══════════════════════════════════════════════ */}
+      <div className="border-b border-border/60">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-4 sm:py-5">
+          <div className="flex items-center justify-between sm:justify-start sm:gap-12">
             {liveStats.slice(0, 4).map((s) => (
-              <div key={s.label}>
-                <div className="text-xl sm:text-2xl font-bold text-white font-display leading-none">{s.value}</div>
-                <div className="text-[10px] uppercase tracking-widest text-white/50 mt-1">{s.label}</div>
+              <div key={s.label} className="text-center sm:text-left">
+                <div className="text-base sm:text-lg font-medium text-text-secondary leading-none">{s.value}</div>
+                <div className="text-[9px] sm:text-[10px] uppercase tracking-widest text-text-muted mt-1">{s.label}</div>
               </div>
             ))}
           </div>
         </div>
-      </section>
+      </div>
 
       {/* ══════════════════════════════════════════════
-          TRUST BAR — immediately after hero
+          TRUST BAR — immediately after stats
       ══════════════════════════════════════════════ */}
       <div className="bg-bg-secondary border-b border-border">
         <div className="max-w-5xl mx-auto px-6 sm:px-6 py-5">
