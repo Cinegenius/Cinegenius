@@ -265,16 +265,16 @@ export default async function HomePage() {
         />
 
         {/* ── Content — centered on mobile, left on desktop ── */}
-        <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pt-20 sm:pt-[160px] lg:pt-[180px]">
+        <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pt-24 sm:pt-[160px] lg:pt-[180px]">
           <div className="max-w-[680px] mx-auto sm:mx-0 text-center sm:text-left">
             {/* Badge */}
-            <div className="hero-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[9px] font-semibold uppercase tracking-[0.18em] mb-5 animate-fade-in">
+            <div className="hero-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[9px] font-semibold uppercase tracking-[0.18em] mb-7 sm:mb-5 animate-fade-in">
               <Zap size={9} /> Film · Foto · Content · Werbung
             </div>
 
             {/* Headline */}
             <h1
-              className="hero-title font-display text-[2.1rem] sm:text-[4rem] lg:text-[5rem] font-bold tracking-tight mb-4 sm:mb-6 animate-fade-up"
+              className="hero-title font-display text-[2.75rem] sm:text-[4rem] lg:text-[5rem] font-bold tracking-tight mb-5 sm:mb-6 animate-fade-up"
               style={{ lineHeight: "1.08" }}
             >
               Locations, Crew &<br />
@@ -283,7 +283,7 @@ export default async function HomePage() {
 
             {/* Subtext */}
             <p
-              className="hero-sub text-sm sm:text-lg mb-8 sm:mb-10 leading-[1.6] animate-fade-up max-w-[340px] sm:max-w-[500px] mx-auto sm:mx-0 line-clamp-2 sm:line-clamp-none"
+              className="hero-sub text-base sm:text-lg mb-8 sm:mb-10 leading-[1.6] animate-fade-up max-w-[340px] sm:max-w-[500px] mx-auto sm:mx-0 line-clamp-2 sm:line-clamp-none"
               style={{ opacity: 0.75 }}
             >
               Kostenlos vermieten, buchen und inserieren — für Film, Foto und Content. Für Profis und Einsteiger.
