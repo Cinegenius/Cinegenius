@@ -24,16 +24,8 @@ export default function SignUpPage() {
               fontFamily: "Inter, system-ui, sans-serif",
             },
             elements: {
-              card: "bg-bg-elevated border border-border shadow-deep",
               headerTitle: "hidden",
               headerSubtitle: "hidden",
-              socialButtonsBlockButton: "border-border text-text-secondary hover:border-gold/40 hover:text-text-primary transition-all",
-              dividerLine: "bg-border",
-              dividerText: "text-text-muted",
-              formFieldLabel: "text-text-secondary text-sm",
-              formFieldInput: "bg-bg-hover border-border text-text-primary focus:border-gold",
-              footerActionLink: "text-gold hover:text-gold-light",
-              formButtonPrimary: "bg-gold hover:bg-gold-light text-bg-primary font-semibold transition-colors",
             },
           }}
         />

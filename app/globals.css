@@ -457,12 +457,66 @@ input, select, textarea { color: inherit; }
   background-color: #EDEEED;
 }
 
-/* ── Browser autofill override (Clerk inputs) ────────────────────────────── */
+/* ── Clerk auth form overrides ───────────────────────────────────────────── */
+.cl-card {
+  background-color: #1A1A1A !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.6) !important;
+}
+.cl-formFieldInput,
+.cl-input {
+  background-color: #0F0F0F !important;
+  color: #EFEFEF !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+}
+.cl-formFieldInput:focus,
+.cl-input:focus {
+  border-color: #C2F135 !important;
+  box-shadow: 0 0 0 2px rgba(194,241,53,0.2) !important;
+}
+.cl-formFieldInput::placeholder,
+.cl-input::placeholder {
+  color: #555555 !important;
+}
+.cl-formFieldLabel {
+  color: #AAAAAA !important;
+}
+.cl-socialButtonsBlockButton {
+  background-color: transparent !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  color: #EFEFEF !important;
+}
+.cl-socialButtonsBlockButton:hover {
+  border-color: rgba(194,241,53,0.4) !important;
+  background-color: rgba(255,255,255,0.04) !important;
+}
+.cl-dividerLine { background-color: rgba(255,255,255,0.08) !important; }
+.cl-dividerText { color: #555555 !important; }
+.cl-footerActionLink {
+  color: #C2F135 !important;
+}
+.cl-footerActionLink:hover { color: #D6F96A !important; }
+.cl-formButtonPrimary {
+  background-color: #C2F135 !important;
+  color: #0A0A0A !important;
+  font-weight: 600 !important;
+}
+.cl-formButtonPrimary:hover { background-color: #D6F96A !important; }
+.cl-identityPreviewText,
+.cl-identityPreviewEditButton { color: #AAAAAA !important; }
+.cl-otpCodeFieldInput {
+  background-color: #0F0F0F !important;
+  color: #EFEFEF !important;
+  border-color: rgba(255,255,255,0.12) !important;
+}
+.cl-internal-b3fm6y { color: #AAAAAA !important; }
+
+/* ── Browser autofill override ───────────────────────────────────────────── */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 60px #141414 inset !important;
+  -webkit-box-shadow: 0 0 0 60px #0F0F0F inset !important;
   -webkit-text-fill-color: #EFEFEF !important;
   caret-color: #EFEFEF;
   transition: background-color 9999s ease-in-out 0s;
