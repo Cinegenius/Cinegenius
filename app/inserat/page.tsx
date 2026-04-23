@@ -505,6 +505,16 @@ export default function InseratPage() {
       bg: "bg-violet-500/5",
       activeBorder: "border-violet-400",
     },
+    {
+      id: "firma",
+      label: "Firma eintragen",
+      sub: "Produktionsfirma · Agentur · Studio",
+      icon: Building2,
+      color: "text-gold",
+      border: "border-gold/20 hover:border-gold/60",
+      bg: "bg-gold/5",
+      activeBorder: "border-gold",
+    },
   ];
 
   const currentGroup = activeGroup ? groups.find((g) => g.id === activeGroup) ?? null : null;
@@ -535,18 +545,23 @@ export default function InseratPage() {
 
           {/* Main category tiles */}
           {!activeGroup && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {mainTiles.map((tile) => (
                 <button
                   key={tile.id}
-                  onClick={() => setActiveGroup(tile.id)}
-                  className={`group flex sm:flex-col items-center sm:items-start gap-4 sm:gap-0 p-5 rounded-2xl border-2 transition-all text-left ${tile.bg} ${tile.border}`}
+                  onClick={() => {
+                    if (tile.id === "firma") { router.push("/dashboard?tab=firma"); return; }
+                    setActiveGroup(tile.id);
+                  }}
+                  className={`group flex items-start gap-4 p-5 rounded-2xl border-2 transition-all text-left ${tile.bg} ${tile.border}`}
                 >
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 bg-bg-secondary`}>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-bg-secondary`}>
                     <tile.icon size={20} className={tile.color} />
                   </div>
-                  <p className="font-semibold text-text-primary text-sm mb-0.5">{tile.label}</p>
-                  <p className="text-xs text-text-muted leading-relaxed">{tile.sub}</p>
+                  <div>
+                    <p className="font-semibold text-text-primary text-sm mb-0.5">{tile.label}</p>
+                    <p className="text-xs text-text-muted leading-relaxed">{tile.sub}</p>
+                  </div>
                 </button>
               ))}
             </div>
