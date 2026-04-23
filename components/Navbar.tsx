@@ -444,82 +444,69 @@ export default function Navbar() {
           {/* Mobile search */}
           <GlobalSearch />
 
-          {/* Main nav links */}
-          <div className="space-y-1">
-            {[
-              { href: "/locations", label: "Locations",   icon: MapPin },
-              { href: "/creators",  label: "Crew",       icon: Users },
-              { href: "/props",     label: "Marktplatz", icon: ShoppingBag },
-              { href: "/jobs",      label: "Jobs",        icon: Briefcase },
-              { href: "/messages",  label: "Nachrichten", icon: MessageSquare },
-            ].map(({ href, label, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => setOpen(false)}
-                className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-base font-medium transition-all ${
-                  isActive(href)
-                    ? "bg-gold/10 text-gold border border-gold/20"
-                    : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"
-                }`}
-              >
-                <Icon size={18} className={isActive(href) ? "text-gold" : "text-text-muted"} />
-                <span>{label}</span>
-                {href === "/messages" && unreadMessages > 0 ? (
-                  <span className="ml-auto min-w-[20px] h-5 bg-crimson text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
-                    {unreadMessages > 9 ? "9+" : unreadMessages}
-                  </span>
-                ) : (
-                  <ChevronDown size={14} className="ml-auto -rotate-90 text-text-muted/50" />
-                )}
-              </Link>
-            ))}
-          </div>
+          {isLoaded && isSignedIn ? (
+            <>
+              {/* Account links */}
+              <div className="space-y-1">
+                {[
+                  { href: "/dashboard",     icon: LayoutDashboard, label: "Dashboard"          },
+                  { href: "/dashboard",     icon: Film,            label: "Meine Einträge"     },
+                  { href: "/messages",      icon: MessageSquare,   label: "Nachrichten"        },
+                  { href: "/notifications", icon: Bell,            label: "Benachrichtigungen" },
+                  { href: user?.id ? `/profile/${user.id}` : "/profile", icon: User, label: "Mein Profil" },
+                ].map(({ href, icon: Icon, label }) => (
+                  <Link
+                    key={label}
+                    href={href}
+                    onClick={() => setOpen(false)}
+                    className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-base font-medium transition-all ${
+                      isActive(href)
+                        ? "bg-gold/10 text-gold border border-gold/20"
+                        : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"
+                    }`}
+                  >
+                    <Icon size={18} className={isActive(href) ? "text-gold" : "text-text-muted"} />
+                    <span>{label}</span>
+                    {label === "Nachrichten" && unreadMessages > 0 && (
+                      <span className="ml-auto min-w-[20px] h-5 bg-crimson text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                        {unreadMessages > 9 ? "9+" : unreadMessages}
+                      </span>
+                    )}
+                  </Link>
+                ))}
+              </div>
 
-          {/* Mein Bereich — nur wenn eingeloggt */}
-          {isLoaded && isSignedIn && (
-            <div className="space-y-1 border-t border-border pt-4">
-              <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted px-4 mb-2">Mein Bereich</p>
-              <Link href="/dashboard" onClick={() => setOpen(false)}
-                className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-base font-medium transition-all ${isActive("/dashboard") ? "bg-gold/10 text-gold border border-gold/20" : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"}`}>
-                <LayoutDashboard size={18} className={isActive("/dashboard") ? "text-gold" : "text-text-muted"} />
-                Dashboard
-              </Link>
-              <Link href={user?.id ? `/profile/${user.id}` : "/creators"}  onClick={() => setOpen(false)}
-                className="flex items-center gap-4 px-4 py-3.5 rounded-xl text-base font-medium transition-all text-text-secondary hover:bg-bg-elevated hover:text-text-primary">
-                <User size={18} className="text-text-muted" />
-                Mein Profil
-              </Link>
-              <Link href="/notifications" onClick={() => setOpen(false)}
-                className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-base font-medium transition-all ${isActive("/notifications") ? "bg-gold/10 text-gold border border-gold/20" : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"}`}>
-                <Bell size={18} className={isActive("/notifications") ? "text-gold" : "text-text-muted"} />
-                Benachrichtigungen
-              </Link>
-            </div>
-          )}
+              {/* CTA */}
+              <div className="pt-2 border-t border-border">
+                <Link
+                  href="/inserat"
+                  onClick={() => setOpen(false)}
+                  className="block w-full py-3 px-4 text-sm text-center font-semibold bg-gold text-bg-primary rounded-xl hover:bg-gold-light transition-colors"
+                >
+                  + Inserat erstellen
+                </Link>
+              </div>
 
-          <div className="mt-auto pt-4 border-t border-border space-y-2">
-            {isLoaded && !isSignedIn && (
-              <>
-                <Link href="/sign-in" onClick={() => setOpen(false)} className="block w-full py-2.5 px-3 text-sm text-center font-medium border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-all">
-                  Anmelden
-                </Link>
-                <Link href="/sign-up" onClick={() => setOpen(false)} className="block w-full py-2.5 px-3 text-sm text-center font-semibold bg-gold text-bg-primary rounded-lg hover:bg-gold-light transition-colors">
-                  Kostenlos starten
-                </Link>
-              </>
-            )}
-            {isLoaded && isSignedIn && (
-              <>
+              {/* Sign out */}
+              <div className="mt-auto pt-4 border-t border-border">
                 <button
                   onClick={() => { setOpen(false); signOut(); }}
                   className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-text-secondary hover:text-red-400 rounded-lg transition-colors"
                 >
                   <LogOut size={14} /> Abmelden
                 </button>
-              </>
-            )}
-          </div>
+              </div>
+            </>
+          ) : (
+            <div className="mt-auto pt-4 border-t border-border space-y-2">
+              <Link href="/sign-in" onClick={() => setOpen(false)} className="block w-full py-2.5 px-3 text-sm text-center font-medium border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-all">
+                Anmelden
+              </Link>
+              <Link href="/sign-up" onClick={() => setOpen(false)} className="block w-full py-2.5 px-3 text-sm text-center font-semibold bg-gold text-bg-primary rounded-lg hover:bg-gold-light transition-colors">
+                Kostenlos starten
+              </Link>
+            </div>
+          )}
         </nav>
       </div>
     </>
