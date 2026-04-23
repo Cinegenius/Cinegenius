@@ -8,7 +8,8 @@ import { departments } from "@/lib/departments";
 
 const ALL_CREW_ROLES = departments.flatMap((d) => d.roles);
 
-// Dynamic because of auth(), but project data is cached
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
 
 async function _getProject(id: string) {
   const [{ data: project }, { data: credits }, { data: festivals }] = await Promise.all([
@@ -42,10 +43,6 @@ async function _getProject(id: string) {
 }
 
 const getProject = unstable_cache(_getProject, ["project"], { revalidate: 300, tags: ["projects"] });
-
-export async function generateStaticParams() {
-  return [];
-}
 
 export async function generateMetadata({
   params,
