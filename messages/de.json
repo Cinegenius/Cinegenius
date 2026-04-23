@@ -1,0 +1,32 @@
+{
+  "nav": {
+    "locations": "Locations",
+    "crew": "Crew",
+    "marketplace": "Marktplatz",
+    "jobs": "Jobs",
+    "companies": "Firmen",
+    "projects": "Projekte",
+    "signIn": "Anmelden",
+    "signUp": "Kostenlos starten",
+    "dashboard": "Dashboard",
+    "messages": "Nachrichten",
+    "myProfile": "Mein Profil",
+    "myListings": "Meine Einträge",
+    "notifications": "Benachrichtigungen",
+    "signOut": "Abmelden",
+    "createListing": "Inserat erstellen",
+    "openMenu": "Menü öffnen"
+  },
+  "footer": {
+    "tagline": "Der All-in-One-Marktplatz für Film- und Medienproduktion. Locations, Crew, Requisiten, Equipment — alles an einem Ort.",
+    "col1": "Marktplatz",
+    "col2": "Community",
+    "col3": "Unternehmen",
+    "rights": "Alle Rechte vorbehalten."
+  },
+  "cookie": {
+    "text": "Diese Seite nutzt ausschließlich technisch notwendige Cookies für Login und Spracheinstellung — keine Tracking- oder Werbe-Cookies.",
+    "link": "Datenschutzerklärung",
+    "cta": "Verstanden"
+  }
+}

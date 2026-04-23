@@ -1,0 +1,32 @@
+{
+  "nav": {
+    "locations": "Lokace",
+    "crew": "Štáb",
+    "marketplace": "Tržiště",
+    "jobs": "Práce",
+    "companies": "Firmy",
+    "projects": "Projekty",
+    "signIn": "Přihlásit se",
+    "signUp": "Začít zdarma",
+    "dashboard": "Přehled",
+    "messages": "Zprávy",
+    "myProfile": "Můj Profil",
+    "myListings": "Moje Inzeráty",
+    "notifications": "Oznámení",
+    "signOut": "Odhlásit se",
+    "createListing": "Vytvořit inzerát",
+    "openMenu": "Otevřít menu"
+  },
+  "footer": {
+    "tagline": "Komplexní tržiště pro filmovou a mediální produkci. Lokace, štáb, rekvizity, vybavení — vše na jednom místě.",
+    "col1": "Tržiště",
+    "col2": "Komunita",
+    "col3": "Společnost",
+    "rights": "Všechna práva vyhrazena."
+  },
+  "cookie": {
+    "text": "Tato stránka používá pouze technicky nezbytné cookies pro přihlášení a jazykové nastavení — žádné sledovací ani reklamní cookies.",
+    "link": "Zásady ochrany osobních údajů",
+    "cta": "Rozumím"
+  }
+}

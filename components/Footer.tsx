@@ -4,10 +4,11 @@ import Link from "next/link";
 import { Globe, X, Link2, Film } from "lucide-react";
 import { Logo } from "./Logo";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const columns = [
   {
-    title: "Marktplatz",
+    titleKey: "col1",
     links: [
       { label: "Locations", href: "/locations" },
       { label: "Marktplatz", href: "/marketplace" },
@@ -16,7 +17,7 @@ const columns = [
     ],
   },
   {
-    title: "Community",
+    titleKey: "col2",
     links: [
       { label: "Film Jobs", href: "/jobs" },
       { label: "Crew & Talente", href: "/creators" },
@@ -25,7 +26,7 @@ const columns = [
     ],
   },
   {
-    title: "Unternehmen",
+    titleKey: "col3",
     links: [
       { label: "Über CineGenius", href: "/about" },
       { label: "Wie es funktioniert", href: "/pricing" },
@@ -37,8 +38,7 @@ const columns = [
 
 export default function Footer() {
   const pathname = usePathname();
-  // Dashboard has its own fixed sidebar — footer would render full-width
-  // underneath it and appear misaligned. Hide it on dashboard routes.
+  const tf = useTranslations("footer");
   if (pathname?.startsWith("/dashboard")) return null;
 
   return (
@@ -51,8 +51,7 @@ export default function Footer() {
               <Logo />
             </div>
             <p className="text-text-secondary text-sm leading-relaxed max-w-xs">
-              Der All-in-One-Marktplatz für Film- und Medienproduktion.
-              Locations, Crew, Requisiten, Equipment — alles an einem Ort.
+              {tf("tagline")}
             </p>
             <div className="flex gap-4 mt-6">
               {[
@@ -74,9 +73,9 @@ export default function Footer() {
 
           {/* Link-Spalten */}
           {columns.map((col) => (
-            <div key={col.title}>
+            <div key={col.titleKey}>
               <h4 className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-4">
-                {col.title}
+                {tf(col.titleKey as "col1" | "col2" | "col3")}
               </h4>
               <ul className="flex flex-col gap-2">
                 {col.links.map((link) => (
@@ -97,7 +96,7 @@ export default function Footer() {
         {/* Unterzeile */}
         <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-text-muted">
-            © {new Date().getFullYear()} CineGenius. Alle Rechte vorbehalten.
+            © {new Date().getFullYear()} CineGenius. {tf("rights")}
           </p>
           <div className="flex gap-6">
             {[

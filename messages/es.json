@@ -1,0 +1,32 @@
+{
+  "nav": {
+    "locations": "Locaciones",
+    "crew": "Equipo",
+    "marketplace": "Mercado",
+    "jobs": "Empleos",
+    "companies": "Empresas",
+    "projects": "Proyectos",
+    "signIn": "Iniciar sesión",
+    "signUp": "Comenzar gratis",
+    "dashboard": "Panel",
+    "messages": "Mensajes",
+    "myProfile": "Mi Perfil",
+    "myListings": "Mis Anuncios",
+    "notifications": "Notificaciones",
+    "signOut": "Cerrar sesión",
+    "createListing": "Crear anuncio",
+    "openMenu": "Abrir menú"
+  },
+  "footer": {
+    "tagline": "El mercado todo en uno para producción de cine y medios. Locaciones, equipo, utilería — todo en un lugar.",
+    "col1": "Mercado",
+    "col2": "Comunidad",
+    "col3": "Empresa",
+    "rights": "Todos los derechos reservados."
+  },
+  "cookie": {
+    "text": "Este sitio usa únicamente cookies técnicamente necesarias para el inicio de sesión y configuración de idioma — sin cookies de seguimiento ni publicidad.",
+    "link": "Política de Privacidad",
+    "cta": "Entendido"
+  }
+}

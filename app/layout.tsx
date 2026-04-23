@@ -3,6 +3,8 @@ import { Playfair_Display, Inter, JetBrains_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { deDE, enUS, esES, csCZ, huHU, itIT } from "@clerk/localizations";
 import { cookies } from "next/headers";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
@@ -94,6 +96,7 @@ export default async function RootLayout({
   const locale = cookieStore.get("cg_locale")?.value ?? "de";
   const clerkLocalization = CLERK_LOCALIZATIONS[locale] ?? deDE;
   const htmlLang = HTML_LANG[locale] ?? "de";
+  const messages = await getMessages();
 
   return (
     <ClerkProvider
@@ -108,6 +111,7 @@ export default async function RootLayout({
         className={`${playfair.variable} ${inter.variable} ${jetbrains.variable}`}
       >
         <body className="min-h-screen flex flex-col bg-bg-primary text-text-primary font-sans">
+          <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
             <ToastProvider>
               <GlobalEffects />
@@ -118,6 +122,7 @@ export default async function RootLayout({
               <BottomNav />
             </ToastProvider>
           </ThemeProvider>
+          </NextIntlClientProvider>
         </body>
       </html>
     </ClerkProvider>

@@ -1,0 +1,32 @@
+{
+  "nav": {
+    "locations": "Locations",
+    "crew": "Crew",
+    "marketplace": "Marketplace",
+    "jobs": "Jobs",
+    "companies": "Companies",
+    "projects": "Projects",
+    "signIn": "Sign in",
+    "signUp": "Get started free",
+    "dashboard": "Dashboard",
+    "messages": "Messages",
+    "myProfile": "My Profile",
+    "myListings": "My Listings",
+    "notifications": "Notifications",
+    "signOut": "Sign out",
+    "createListing": "Create listing",
+    "openMenu": "Open menu"
+  },
+  "footer": {
+    "tagline": "The all-in-one marketplace for film and media production. Locations, crew, props, equipment — all in one place.",
+    "col1": "Marketplace",
+    "col2": "Community",
+    "col3": "Company",
+    "rights": "All rights reserved."
+  },
+  "cookie": {
+    "text": "This site uses only technically necessary cookies for login and language settings — no tracking or advertising cookies.",
+    "link": "Privacy Policy",
+    "cta": "Got it"
+  }
+}

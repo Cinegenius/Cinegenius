@@ -1,0 +1,32 @@
+{
+  "nav": {
+    "locations": "Location",
+    "crew": "Crew",
+    "marketplace": "Mercato",
+    "jobs": "Lavori",
+    "companies": "Aziende",
+    "projects": "Progetti",
+    "signIn": "Accedi",
+    "signUp": "Inizia gratis",
+    "dashboard": "Dashboard",
+    "messages": "Messaggi",
+    "myProfile": "Il mio Profilo",
+    "myListings": "I miei Annunci",
+    "notifications": "Notifiche",
+    "signOut": "Esci",
+    "createListing": "Crea annuncio",
+    "openMenu": "Apri menu"
+  },
+  "footer": {
+    "tagline": "Il marketplace all-in-one per la produzione cinematografica e multimediale. Location, crew, attrezzatura — tutto in un posto.",
+    "col1": "Mercato",
+    "col2": "Community",
+    "col3": "Azienda",
+    "rights": "Tutti i diritti riservati."
+  },
+  "cookie": {
+    "text": "Questo sito utilizza solo cookie tecnicamente necessari per il login e le impostazioni della lingua — nessun cookie di tracciamento o pubblicitario.",
+    "link": "Informativa sulla Privacy",
+    "cta": "Capito"
+  }
+}

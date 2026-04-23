@@ -1,0 +1,32 @@
+{
+  "nav": {
+    "locations": "Helyszínek",
+    "crew": "Stáb",
+    "marketplace": "Piac",
+    "jobs": "Állások",
+    "companies": "Cégek",
+    "projects": "Projektek",
+    "signIn": "Bejelentkezés",
+    "signUp": "Kezdj ingyen",
+    "dashboard": "Irányítópult",
+    "messages": "Üzenetek",
+    "myProfile": "Profilom",
+    "myListings": "Hirdetéseim",
+    "notifications": "Értesítések",
+    "signOut": "Kijelentkezés",
+    "createListing": "Hirdetés létrehozása",
+    "openMenu": "Menü megnyitása"
+  },
+  "footer": {
+    "tagline": "Az all-in-one piactér film- és médiaprodukcióhoz. Helyszínek, stáb, kellékek, felszerelés — minden egy helyen.",
+    "col1": "Piac",
+    "col2": "Közösség",
+    "col3": "Vállalat",
+    "rights": "Minden jog fenntartva."
+  },
+  "cookie": {
+    "text": "Ez az oldal kizárólag technikailag szükséges sütiket használ a bejelentkezéshez és a nyelvi beállításokhoz — nem tartalmaz nyomkövetési vagy reklám sütiket.",
+    "link": "Adatvédelmi irányelvek",
+    "cta": "Értem"
+  }
+}

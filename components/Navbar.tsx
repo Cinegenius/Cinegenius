@@ -6,19 +6,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth, useUser, useClerk } from "@clerk/nextjs";
 import {
-  Menu, X, Film, Sun, Moon, ChevronDown,
+  Menu, X, Film, ChevronDown,
   Car, Shirt, Wrench, Clapperboard, Sparkles, Zap,
   Camera, Mic, Drama, Lightbulb, User, Users, Layers, Briefcase,
   LayoutDashboard, LogOut, MessageSquare, Bell,
   Home, Building2, TreePine, Coffee, Monitor,
   Smartphone, ImageIcon, Video, Aperture, MapPin, ShoppingBag,
 } from "lucide-react";
-import { useTheme } from "@/components/ThemeProvider";
 import NotificationCenter from "@/components/NotificationCenter";
 import GlobalSearch from "@/components/GlobalSearch";
 import { Logo } from "@/components/Logo";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { supabase } from "@/lib/supabase";
+import { useTranslations } from "next-intl";
 
 type NavItem = { icon: React.ElementType; label: string; desc: string; href: string; iconBg: string; iconColor: string };
 
@@ -155,17 +155,18 @@ const jobGroups: { heading: string; items: NavItem[] }[] = [
 
 const jobItems = jobGroups.flatMap((g) => g.items);
 
-const desktopNavLinks: { href: string; label: string }[] = [
-  { href: "/locations", label: "Locations"   },
-  { href: "/creators",  label: "Crew"       },
-  { href: "/props",     label: "Marktplatz" },
-  { href: "/jobs",      label: "Jobs"       },
-  { href: "/companies", label: "Firmen"     },
-  { href: "/projects",  label: "Projekte"   },
-];
+const desktopNavHrefs = [
+  { href: "/locations", key: "locations" },
+  { href: "/creators",  key: "crew"      },
+  { href: "/props",     key: "marketplace" },
+  { href: "/jobs",      key: "jobs"      },
+  { href: "/companies", key: "companies" },
+  { href: "/projects",  key: "projects"  },
+] as const;
 
 
 export default function Navbar() {
+  const t = useTranslations("nav");
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -173,7 +174,6 @@ export default function Navbar() {
   const [profileAvatarUrl, setProfileAvatarUrl] = useState("");
   const [unreadMessages, setUnreadMessages] = useState(0);
   const pathname = usePathname();
-  const { theme, toggleTheme } = useTheme();
   const { isSignedIn, isLoaded } = useAuth();
   const { user } = useUser();
   const { signOut } = useClerk();
@@ -271,7 +271,7 @@ export default function Navbar() {
 
             {/* Desktop nav */}
             <nav className="hidden lg:flex items-center gap-1">
-              {desktopNavLinks.map(({ href, label }) => {
+              {desktopNavHrefs.map(({ href, key }) => {
                 const basePath = href.split("?")[0] ?? href;
                 return (
                   <Link
@@ -279,7 +279,7 @@ export default function Navbar() {
                     href={href}
                     className={`px-3 py-2 text-sm font-medium transition-colors uppercase tracking-widest rounded-md ${isActive(basePath) ? navActive : navBase}`}
                   >
-                    {label}
+                    {t(key)}
                   </Link>
                 );
               })}
@@ -289,13 +289,6 @@ export default function Navbar() {
             <div className="hidden lg:flex items-center gap-2">
               <GlobalSearch />
               <LanguageSwitcher />
-              <button
-                onClick={toggleTheme}
-                className="w-8 h-8 flex items-center justify-center rounded-md text-text-muted hover:text-gold hover:bg-bg-elevated transition-all"
-                aria-label="Design wechseln"
-              >
-                {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-              </button>
               <NotificationCenter />
               {isLoaded && !isSignedIn && (
                 <>
@@ -303,13 +296,13 @@ export default function Navbar() {
                     href="/sign-in"
                     className="px-4 py-2 text-sm font-semibold border border-border text-text-secondary hover:border-gold hover:text-gold rounded-md transition-all"
                   >
-                    Anmelden
+                    {t("signIn")}
                   </Link>
                   <Link
                     href="/sign-up"
                     className="px-4 py-2 text-sm font-semibold bg-gold text-bg-primary rounded-md hover:bg-gold-light transition-colors"
                   >
-                    Kostenlos starten
+                    {t("signUp")}
                   </Link>
                 </>
               )}
@@ -361,7 +354,7 @@ export default function Navbar() {
                             onClick={() => setUserMenuOpen(false)}
                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
                           >
-                            <LayoutDashboard size={15} className="text-text-muted shrink-0" /> Dashboard
+                            <LayoutDashboard size={15} className="text-text-muted shrink-0" /> {t("dashboard")}
                           </Link>
                           <Link
                             href="/messages"
@@ -369,7 +362,7 @@ export default function Navbar() {
                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
                           >
                             <MessageSquare size={15} className="text-text-muted shrink-0" />
-                            <span>Nachrichten</span>
+                            <span>{t("messages")}</span>
                             {unreadMessages > 0 && (
                               <span className="ml-auto min-w-[18px] h-4.5 bg-crimson text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
                                 {unreadMessages > 9 ? "9+" : unreadMessages}
@@ -381,7 +374,7 @@ export default function Navbar() {
                             onClick={() => setUserMenuOpen(false)}
                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
                           >
-                            <User size={15} className="text-text-muted shrink-0" /> Mein Profil
+                            <User size={15} className="text-text-muted shrink-0" /> {t("myProfile")}
                           </Link>
                         </div>
 
@@ -391,7 +384,7 @@ export default function Navbar() {
                             onClick={() => { setUserMenuOpen(false); signOut(); }}
                             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-red-400 hover:bg-red-500/5 transition-colors"
                           >
-                            <LogOut size={15} className="shrink-0" /> Abmelden
+                            <LogOut size={15} className="shrink-0" /> {t("signOut")}
                           </button>
                         </div>
                       </div>
@@ -408,15 +401,9 @@ export default function Navbar() {
               )}
               <LanguageSwitcher />
               <button
-                onClick={toggleTheme}
-                className="w-9 h-9 flex items-center justify-center rounded-md text-text-muted hover:text-gold transition-colors"
-              >
-                {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
-              </button>
-              <button
                 className="w-9 h-9 flex items-center justify-center text-text-secondary hover:text-gold transition-colors"
                 onClick={() => setOpen(!open)}
-                aria-label="Menü öffnen"
+                aria-label={t("openMenu")}
               >
                 {open ? <X size={22} /> : <Menu size={22} />}
               </button>
@@ -452,11 +439,11 @@ export default function Navbar() {
               {/* Account links */}
               <div className="space-y-1">
                 {[
-                  { href: "/dashboard",     icon: LayoutDashboard, label: "Dashboard"          },
-                  { href: "/dashboard",     icon: Film,            label: "Meine Einträge"     },
-                  { href: "/messages",      icon: MessageSquare,   label: "Nachrichten"        },
-                  { href: "/notifications", icon: Bell,            label: "Benachrichtigungen" },
-                  { href: user?.id ? `/profile/${user.id}` : "/profile", icon: User, label: "Mein Profil" },
+                  { href: "/dashboard",     icon: LayoutDashboard, label: t("dashboard")      },
+                  { href: "/dashboard",     icon: Film,            label: t("myListings")      },
+                  { href: "/messages",      icon: MessageSquare,   label: t("messages")        },
+                  { href: "/notifications", icon: Bell,            label: t("notifications")   },
+                  { href: user?.id ? `/profile/${user.id}` : "/profile", icon: User, label: t("myProfile") },
                 ].map(({ href, icon: Icon, label }) => (
                   <Link
                     key={label}
@@ -486,7 +473,7 @@ export default function Navbar() {
                   onClick={() => setOpen(false)}
                   className="block w-full py-3 px-4 text-sm text-center font-semibold bg-gold text-bg-primary rounded-xl hover:bg-gold-light transition-colors"
                 >
-                  + Inserat erstellen
+                  + {t("createListing")}
                 </Link>
               </div>
 
@@ -496,17 +483,17 @@ export default function Navbar() {
                   onClick={() => { setOpen(false); signOut(); }}
                   className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-text-secondary hover:text-red-400 rounded-lg transition-colors"
                 >
-                  <LogOut size={14} /> Abmelden
+                  <LogOut size={14} /> {t("signOut")}
                 </button>
               </div>
             </>
           ) : (
             <div className="mt-auto pt-4 border-t border-border space-y-2">
               <Link href="/sign-in" onClick={() => setOpen(false)} className="block w-full py-2.5 px-3 text-sm text-center font-medium border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-all">
-                Anmelden
+                {t("signIn")}
               </Link>
               <Link href="/sign-up" onClick={() => setOpen(false)} className="block w-full py-2.5 px-3 text-sm text-center font-semibold bg-gold text-bg-primary rounded-lg hover:bg-gold-light transition-colors">
-                Kostenlos starten
+                {t("signUp")}
               </Link>
             </div>
           )}
