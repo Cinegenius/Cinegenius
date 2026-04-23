@@ -49,7 +49,7 @@ export default function VehiclesContent({ serverVehicles }: { serverVehicles: Ve
   ].filter(Boolean).length;
 
   return (
-    <div className="pt-16 min-h-screen">
+    <div className="min-h-screen">
       <div className="relative py-16 border-b border-border bg-bg-secondary overflow-hidden">
         <div className="absolute inset-0 opacity-5"
           style={{ backgroundImage: "url('https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=1920&q=40')", backgroundSize: "cover", backgroundPosition: "center" }} />

@@ -506,7 +506,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
   );
 
   return (
-    <div className={`${hasStrip ? "" : "pt-16 "}min-h-screen`}>
+    <div className="min-h-screen">
 
       {/* ── Filter Bar ─────────────────────────────────────────────────────── */}
       <div className="bg-bg-secondary border-b border-border">

@@ -420,7 +420,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   const activeRoleData = selectedRoleId ? ALL_ROLES.find((r) => r.id === selectedRoleId) : null;
 
   return (
-    <div className="pt-16 min-h-screen">
+    <div className="min-h-screen">
       <CategoryHero
         badge="Jobs & Ausschreibungen"
         title="Jobs in Film, Social Media"
@@ -601,9 +601,12 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
         </div>
 
         {filtered.length === 0 && (
-          <EmptyState icon={Briefcase} title="Keine Jobs gefunden"
-            description="Versuche einen anderen Suchbegriff oder entferne aktive Filter."
-            action={{ label: "Filter zurücksetzen", onClick: clearAll }} />
+          <EmptyState
+            icon={Briefcase}
+            title={allJobs.length === 0 ? "Noch keine Jobs ausgeschrieben" : "Keine Jobs gefunden"}
+            description={allJobs.length === 0 ? "Sei der Erste! Schreibe einen Job aus und finde deine Crew." : "Versuche einen anderen Suchbegriff oder entferne aktive Filter."}
+            action={allJobs.length === 0 ? { label: "Job ausschreiben", onClick: () => window.location.href = "/inserat?group=jobs" } : { label: "Filter zurücksetzen", onClick: clearAll }}
+          />
         )}
 
         <div className="space-y-2">
