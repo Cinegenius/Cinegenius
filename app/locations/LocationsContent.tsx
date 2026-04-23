@@ -221,7 +221,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
   const hasActiveFilters = query || activeType !== "All Types" || instantOnly || verifiedOnly || minPrice || maxPrice || userLocation || lageFilter !== "Alle" || powerOnly;
 
   return (
-    <div className="pt-16 min-h-screen flex flex-col h-screen">
+    <div className="min-h-screen flex flex-col h-screen">
       {/* ── TOP BAR ── */}
       <div className="bg-bg-secondary border-b border-border py-2 px-4 shrink-0">
         <div className="max-w-full mx-auto space-y-2">
