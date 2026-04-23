@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { Globe, Check } from "lucide-react";
 
 const LANGUAGES = [
@@ -27,7 +26,6 @@ export default function LanguageSwitcher() {
   const [current, setCurrent] = useState("de");
   const [loading, setLoading] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
   useEffect(() => {
     setCurrent(getStoredLocale());
@@ -61,8 +59,10 @@ export default function LanguageSwitcher() {
       // API unreachable — cookie is already set via document.cookie above
     }
 
-    setLoading(false);
-    router.refresh();
+    // Hard reload so the server reads the new cookie and re-renders with the correct locale.
+    // router.refresh() is not sufficient — next-intl's getRequestConfig may be cached
+    // at the request level and won't pick up the new cookie without a full navigation.
+    window.location.reload();
   };
 
   const currentLang = LANGUAGES.find((l) => l.code === current);
