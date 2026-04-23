@@ -427,9 +427,9 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
             {filtered.length === 0 ? (
               <EmptyState
                 icon={Film}
-                title="Keine Locations gefunden"
-                description={userLocation ? "Keine Locations in diesem Umkreis — vergrößere den Radius oder entferne Filter." : "Versuche eine andere Suche oder entferne aktive Filter."}
-                action={{ label: "Filter zurücksetzen", onClick: resetFilters }}
+                title={allLocations.length === 0 ? "Noch keine Locations" : "Keine Locations gefunden"}
+                description={allLocations.length === 0 ? "Sei der Erste! Trage deine Location ein und werde von Produktionen gefunden." : userLocation ? "Keine Locations in diesem Umkreis — vergrößere den Radius oder entferne Filter." : "Versuche eine andere Suche oder entferne aktive Filter."}
+                action={allLocations.length === 0 ? { label: "Location eintragen", onClick: () => window.location.href = "/inserat?group=drehorte" } : { label: "Filter zurücksetzen", onClick: resetFilters }}
               />
             ) : (
               <div className={`p-3 ${viewMode === "list" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-6" : "space-y-2"}`}>

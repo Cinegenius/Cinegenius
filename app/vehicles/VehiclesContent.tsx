@@ -155,7 +155,12 @@ export default function VehiclesContent({ serverVehicles }: { serverVehicles: Ve
             </div>
 
             {filtered.length === 0 ? (
-              <EmptyState icon={Car} title="Keine Fahrzeuge gefunden" description="Passe die Filter an oder setze sie zurück." action={{ label: "Filter zurücksetzen", onClick: clearFilters }} />
+              <EmptyState
+                icon={Car}
+                title={allVehicles.length === 0 ? "Noch keine Fahrzeuge eingetragen" : "Keine Fahrzeuge gefunden"}
+                description={allVehicles.length === 0 ? "Sei der Erste! Biete dein Auto, Motorrad oder Fahrzeug für Produktionen an." : "Passe die Filter an oder setze sie zurück."}
+                action={allVehicles.length === 0 ? { label: "Fahrzeug eintragen", onClick: () => window.location.href = "/inserat?group=marktplatz" } : { label: "Filter zurücksetzen", onClick: clearFilters }}
+              />
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
                 {filtered.map((v) => (

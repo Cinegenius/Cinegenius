@@ -39,6 +39,7 @@ export type ServerCreator = {
   height_cm?: number | null;
   travel?: string;
   focal_point?: { x: number; y: number };
+  isVendor?: boolean;
 };
 
 function parseLocation(loc: string): { city: string; country: string } {
@@ -390,6 +391,8 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
   };
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
+  const [vendorOnly, setVendorOnly] = useState(false);
+
   // Hierarchical filter state
   const [filterOpen, setFilterOpen] = useState(false);
   const [moreFiltersOpen, setMoreFiltersOpen] = useState(false);
@@ -451,6 +454,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       );
     }
 
+    if (vendorOnly) result = result.filter((c) => c.isVendor === true);
     if (availableOnly) result = result.filter((c) => c.available);
 
     if (cityFilter) {
@@ -486,7 +490,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
     if (sortKey === "reviews") result.sort((a, b) => b.reviews - a.reviews);
 
     return result;
-  }, [query, selectedRoles, availableOnly, cityFilter, countryFilter, languageFilter,
+  }, [query, selectedRoles, availableOnly, vendorOnly, cityFilter, countryFilter, languageFilter,
       profileTypeFilter, hairFilter, eyeFilter, bodyFilter, travelFilter, ageMinFilter, ageMaxFilter,
       sortKey, allCreators]);
 
@@ -560,6 +564,20 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               ]}
               onChange={setSortKey}
             />
+
+            <div className="w-px h-5 bg-border shrink-0" />
+
+            {/* Anbieter & Vermieter */}
+            <button
+              onClick={() => setVendorOnly((v) => !v)}
+              className={`flex items-center gap-1.5 h-9 px-3 rounded-lg text-xs font-medium border transition-all shrink-0 ${
+                vendorOnly
+                  ? "bg-gold/12 border-gold/30 text-gold"
+                  : "border-border text-text-muted hover:text-text-secondary hover:border-border-light"
+              }`}
+            >
+              Anbieter & Vermieter
+            </button>
 
             <div className="w-px h-5 bg-border shrink-0" />
 
@@ -768,12 +786,12 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
         {filtered.length === 0 && (
           <EmptyState
             icon={Users}
-            title="Keine Profile gefunden"
-            description="Versuche andere Rollen, einen anderen Namen oder eine andere Stadt."
-            action={{
-              label: "Filter zurücksetzen",
-              onClick: () => { setQuery(""); clearAll(); setAvailableOnly(false); setCityFilter(""); setCountryFilter(""); setLanguageFilter(""); },
-            }}
+            title={allCreators.length === 0 ? "Noch keine Profile" : "Keine Profile gefunden"}
+            description={allCreators.length === 0 ? "Sei der Erste! Erstelle dein Profil und werde von Produktionen gefunden." : "Versuche andere Rollen, einen anderen Namen oder eine andere Stadt."}
+            action={allCreators.length === 0
+              ? { label: "Profil anlegen", onClick: () => window.location.href = "/profile" }
+              : { label: "Filter zurücksetzen", onClick: () => { setQuery(""); clearAll(); setAvailableOnly(false); setVendorOnly(false); setCityFilter(""); setCountryFilter(""); setLanguageFilter(""); } }
+            }
           />
         )}
 

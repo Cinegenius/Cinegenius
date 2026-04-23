@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import VehiclesContent from "./VehiclesContent";
-import ProviderProfiles from "@/components/ProviderProfiles";
 
 export const revalidate = 60;
 
@@ -23,25 +22,6 @@ export default async function VehiclesPage() {
     .eq("type", "vehicle")
     .order("created_at", { ascending: false })
     .limit(300);
-
-  const { data: providerData } = await db
-    .from("profiles")
-    .select("user_id, display_name, location, bio, avatar_url, profile_types")
-    .not("display_name", "is", null)
-    .limit(200);
-
-  const equipmentProviders = (providerData ?? [])
-    .filter((p: { profile_types?: string[] | null }) =>
-      (p.profile_types ?? []).includes("vehicle")
-    )
-    .map((p: { user_id: string; display_name: string | null; location: string | null; bio: string | null; avatar_url: string | null }) => ({
-      id: p.user_id,
-      name: p.display_name ?? "Anbieter",
-      city: (p.location ?? "").split(",")[0]?.trim() ?? "",
-      bio: p.bio ?? "",
-      avatar: p.avatar_url ?? null,
-      typeLabel: "Fahrzeug-Anbieter",
-    }));
 
   const serverVehicles = (data ?? []).map((l: {
     id: string; title: string; city: string; price: number; image_url: string | null;
@@ -77,10 +57,5 @@ export default async function VehiclesPage() {
     };
   });
 
-  return (
-    <>
-      <ProviderProfiles profiles={equipmentProviders} heading="Fahrzeug-Anbieter mit Profil" />
-      <VehiclesContent serverVehicles={serverVehicles} />
-    </>
-  );
+  return <VehiclesContent serverVehicles={serverVehicles} />;
 }

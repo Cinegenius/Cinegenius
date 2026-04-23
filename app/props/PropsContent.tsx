@@ -794,9 +794,9 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
 
         {filtered.length === 0 ? (
           <EmptyState icon={Package}
-            title={selectedScene ? `Noch keine Artikel für Szene „${SCENES.find(s => s.id === selectedScene)?.label}"` : "Keine Artikel gefunden"}
-            description={selectedScene ? "Diese Szene füllt sich, sobald Anbieter Artikel mit passender Kategorie inserieren." : "Versuche eine andere Suche oder wähle eine andere Kategorie."}
-            action={{ label: "Alles anzeigen", onClick: clearAll }} />
+            title={serverListings.length === 0 ? "Noch keine Artikel eingetragen" : selectedScene ? `Noch keine Artikel für Szene „${SCENES.find(s => s.id === selectedScene)?.label}"` : "Keine Artikel gefunden"}
+            description={serverListings.length === 0 ? "Sei der Erste! Biete Equipment, Requisiten oder Kostüme an." : selectedScene ? "Diese Szene füllt sich, sobald Anbieter Artikel mit passender Kategorie inserieren." : "Versuche eine andere Suche oder wähle eine andere Kategorie."}
+            action={serverListings.length === 0 ? { label: "Jetzt inserieren", onClick: () => window.location.href = "/inserat?group=marktplatz" } : { label: "Alles anzeigen", onClick: clearAll }} />
         ) : (
           <>
             <div className={viewMode === "grid"

@@ -3,7 +3,6 @@ import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
 import LocationsContent from "./LocationsContent";
 import CategoryHero from "@/components/CategoryHero";
-import ProviderProfiles from "@/components/ProviderProfiles";
 
 export const revalidate = 60;
 
@@ -54,26 +53,6 @@ export default async function LocationsPage() {
     .order("created_at", { ascending: false })
     .limit(300);
 
-  const { data: providerData } = await db
-    .from("profiles")
-    .select("user_id, display_name, location, bio, avatar_url, profile_types")
-    .not("display_name", "is", null)
-    .limit(200);
-
-  const locationProviders = (providerData ?? [])
-    .filter((p: { profile_types?: string[] | null }) => {
-      const types = p.profile_types ?? [];
-      return types.includes("location") || types.includes("studio");
-    })
-    .map((p: { user_id: string; display_name: string | null; location: string | null; bio: string | null; avatar_url: string | null; profile_types?: string[] | null }) => ({
-      id: p.user_id,
-      name: p.display_name ?? "Anbieter",
-      city: (p.location ?? "").split(",")[0]?.trim() ?? "",
-      bio: p.bio ?? "",
-      avatar: p.avatar_url ?? null,
-      typeLabel: (p.profile_types ?? []).includes("studio") ? "Studio-Anbieter" : "Location-Anbieter",
-    }));
-
   const rows = data ?? [];
 
   // Fetch ratings + geocode in parallel
@@ -123,9 +102,9 @@ export default async function LocationsPage() {
           imagePosition="center 60%"
           overlay="left"
           height="sm"
+          cta={{ label: "Location eintragen", href: "/inserat?group=drehorte" }}
         />
       </div>
-      <ProviderProfiles profiles={locationProviders} heading="Location- & Studio-Anbieter mit Profil" />
       <LocationsContent serverListings={serverListings} />
     </>
   );

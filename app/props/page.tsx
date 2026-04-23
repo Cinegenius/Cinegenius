@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import PropsContent from "./PropsContent";
 import CategoryHero from "@/components/CategoryHero";
-import ProviderProfiles from "@/components/ProviderProfiles";
 
 export const revalidate = 60;
 
@@ -24,26 +23,6 @@ export default async function PropsPage() {
     .in("type", ["prop", "vehicle"])
     .order("created_at", { ascending: false })
     .limit(300);
-
-  const { data: providerData } = await db
-    .from("profiles")
-    .select("user_id, display_name, location, bio, avatar_url, profile_types")
-    .not("display_name", "is", null)
-    .limit(200);
-
-  const equipmentProviders = (providerData ?? [])
-    .filter((p: { profile_types?: string[] | null }) => {
-      const types = p.profile_types ?? [];
-      return types.includes("equipment") || types.includes("props");
-    })
-    .map((p: { user_id: string; display_name: string | null; location: string | null; bio: string | null; avatar_url: string | null; profile_types?: string[] | null }) => ({
-      id: p.user_id,
-      name: p.display_name ?? "Anbieter",
-      city: (p.location ?? "").split(",")[0]?.trim() ?? "",
-      bio: p.bio ?? "",
-      avatar: p.avatar_url ?? null,
-      typeLabel: (p.profile_types ?? []).includes("props") ? "Requisiten-Anbieter" : "Equipment-Anbieter",
-    }));
 
   const serverListings = (data ?? []).map((l: {
     id: string; title: string; city: string; price: number; category: string | null;
@@ -81,7 +60,6 @@ export default async function PropsPage() {
           cta={{ label: "Inserat erstellen", href: "/inserat" }}
         />
       </div>
-      <ProviderProfiles profiles={equipmentProviders} heading="Equipment- & Requisiten-Anbieter mit Profil" />
       <PropsContent serverListings={serverListings} />
     </>
   );

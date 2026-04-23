@@ -5,10 +5,14 @@ import CreatorsContent, { type ServerCreator } from "./CreatorsContent";
 import CategoryHero from "@/components/CategoryHero";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
 
-// All profile types that belong on the creators/talent/crew page (everything except vendor)
+// All profile types shown on this page (crew, talent, creative + vendors/renters)
 const CREATOR_TYPES = new Set(
+  (Object.entries(PROFILE_CATEGORY_MAP) as [ProfileType, string][]).map(([type]) => type)
+);
+
+const VENDOR_TYPES = new Set(
   (Object.entries(PROFILE_CATEGORY_MAP) as [ProfileType, string][])
-    .filter(([, cat]) => cat !== "vendor")
+    .filter(([, cat]) => cat === "vendor")
     .map(([type]) => type)
 );
 
@@ -128,6 +132,7 @@ export default async function CreatorsPage() {
         verified: p.verified ?? false,
         isReal: true as const,
         profile_type: primaryType,
+        isVendor: VENDOR_TYPES.has(primaryType),
         hair_color: phys.hair_color ?? "",
         eye_color: phys.eye_color ?? "",
         body_type: phys.body_type ?? "",
