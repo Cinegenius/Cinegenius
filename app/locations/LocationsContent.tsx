@@ -326,13 +326,6 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
               <Share2 size={13} /> {copied ? "Kopiert!" : "Teilen"}
             </button>
 
-            {/* CTA */}
-            <Link
-              href="/inserat?group=drehorte"
-              className="hidden sm:flex items-center gap-1.5 h-9 px-3 rounded-lg text-xs font-semibold bg-gold text-bg-primary hover:bg-gold-light transition-colors shrink-0"
-            >
-              + Location eintragen
-            </Link>
           </div>
 
           {/* Expandable filters */}

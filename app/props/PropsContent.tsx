@@ -562,9 +562,6 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               <button onClick={() => setViewMode("list")} className={`flex items-center justify-center w-9 h-9 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><List size={14} /></button>
             </div>
 
-            <Link href="/inserat?group=marktplatz" className="hidden sm:flex items-center h-9 px-3 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
-              + Artikel anbieten
-            </Link>
           </div>
 
           {/* Category panel — inline on all screen sizes */}
