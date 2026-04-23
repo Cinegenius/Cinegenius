@@ -230,7 +230,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
           <div className="flex items-center gap-2">
             {/* Search */}
             <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold transition-colors">
-              <Search size={15} className="text-text-muted shrink-0" />
+              <Search size={14} className="text-text-muted shrink-0" />
               <input
                 type="text"
                 value={query}
@@ -326,12 +326,12 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
               <Share2 size={13} /> {copied ? "Kopiert!" : "Teilen"}
             </button>
 
-            {/* Non-filmmaker CTA */}
+            {/* CTA */}
             <Link
-              href="/sign-up"
-              className="hidden sm:flex items-center gap-1.5 h-9 px-3 rounded-lg text-xs font-medium border border-dashed border-border text-text-muted hover:border-gold hover:text-gold transition-all shrink-0"
+              href="/inserat?group=drehorte"
+              className="hidden sm:flex items-center gap-1.5 h-9 px-3 rounded-lg text-xs font-semibold bg-gold text-bg-primary hover:bg-gold-light transition-colors shrink-0"
             >
-              <Film size={12} /> Location inserieren
+              + Location eintragen
             </Link>
           </div>
 

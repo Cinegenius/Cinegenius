@@ -508,7 +508,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
 
       {/* ── Filter Bar ───────────────────────────────────── */}
       <div className="bg-bg-secondary border-b border-border">
-        <div className="px-4 py-3 space-y-3">
+        <div className="px-4 py-2 space-y-2">
 
           {/* Single main row */}
           <div className="flex items-center gap-2">
@@ -518,7 +518,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               <Search size={14} className="text-text-muted shrink-0" />
               <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
                 placeholder="Kamera, Requisite, Kostüm…"
-                className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
+                className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none" />
               {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors shrink-0"><X size={12} /></button>}
             </div>
 
@@ -528,7 +528,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all shrink-0 ${
                 panelOpen || hasCategoryFilter
                   ? "bg-gold/12 border-gold/30 text-gold"
-                  : "border-border text-text-muted hover:text-text-secondary"
+                  : "border-border text-text-muted hover:border-gold/40 hover:text-gold"
               }`}
             >
               <Layers size={11} />
@@ -545,7 +545,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all shrink-0 ${
                 filterPanelOpen || secondaryFilterCount > 0
                   ? "bg-gold/12 border-gold/30 text-gold"
-                  : "border-border text-text-muted hover:text-text-secondary"
+                  : "border-border text-text-muted hover:border-gold/40 hover:text-gold"
               }`}
             >
               <SlidersHorizontal size={11} />
@@ -562,8 +562,8 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               <button onClick={() => setViewMode("list")} className={`flex items-center justify-center w-9 h-9 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><List size={14} /></button>
             </div>
 
-            <Link href="/dashboard/new-listing" className="hidden sm:flex items-center h-9 px-3 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
-              + Eintragen
+            <Link href="/inserat?group=marktplatz" className="hidden sm:flex items-center h-9 px-3 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
+              + Artikel anbieten
             </Link>
           </div>
 

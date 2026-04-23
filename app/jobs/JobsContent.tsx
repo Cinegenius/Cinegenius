@@ -125,7 +125,7 @@ function FilterDropdown({
     <div ref={ref} className="relative shrink-0">
       <button onClick={() => setOpen((v) => !v)}
         className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all ${
-          active ? "bg-gold/12 border-gold/30 text-gold" : open ? "bg-bg-elevated border-border text-text-secondary" : "border-border text-text-muted hover:text-text-secondary"
+          active ? "bg-gold/12 border-gold/30 text-gold" : open ? "bg-bg-elevated border-border text-text-secondary" : "border-border text-text-muted hover:border-gold/40 hover:text-gold"
         }`}>
         <Icon size={11} />
         {active ? value : label}
@@ -425,7 +425,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
         badge="Jobs & Ausschreibungen"
         title="Jobs in Film, Social Media"
         titleHighlight="& Fotografie"
-        description={`${allJobs.length} offene Stellen — von der Kameraassistenz bis zum Social Media Manager.`}
+        description={allJobs.length > 0 ? `${allJobs.length} offene Stellen — von der Kameraassistenz bis zum Social Media Manager.` : "Jobs ausschreiben und die passende Crew finden — kostenlos und ohne Provision."}
         image="https://images.unsplash.com/photo-1616469829941-c7200edec809?w=1600&q=90"
         imagePosition="center 35%"
         overlay="left"
@@ -442,7 +442,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
               <Search size={14} className="text-text-muted shrink-0" />
               <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
                 placeholder="Rolle, Fähigkeit, Stichwort..."
-                className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
+                className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none" />
               {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
             </div>
           </div>
@@ -467,7 +467,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
                 className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all ${
                   panelOpen || hasDeptFilter
                     ? "bg-gold/12 border-gold/30 text-gold"
-                    : "border-border text-text-muted hover:text-text-secondary"
+                    : "border-border text-text-muted hover:border-gold/40 hover:text-gold"
                 }`}>
                 <SlidersHorizontal size={11} />
                 Bereich & Rolle
