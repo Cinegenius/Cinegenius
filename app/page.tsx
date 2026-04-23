@@ -161,12 +161,12 @@ async function getHomeData() {
 }
 
 const featurePillars = [
-  { icon: MapPin,    title: "Locations",     desc: "Altbauten, Studios, Industriehallen — der perfekte Ort für jede Szene.",               href: "/locations", pillarKey: "location",  accent: "from-sky-900/70" },
-  { icon: Users,     title: "Crew & Talente", desc: "DPs, Regisseure, Schauspieler, Maskenbildner — direkt buchbar.",                       href: "/creators",  pillarKey: "crew",      accent: "from-violet-900/70" },
-  { icon: ShoppingBag, title: "Marktplatz",  desc: "Kameras, Kostüme, Requisiten, Fahrzeuge — kaufen oder mieten.",                         href: "/props",     pillarKey: "equipment", accent: "from-slate-900/70" },
-  { icon: Briefcase, title: "Jobs & Aufträge", desc: "Ausschreiben oder bewerben — für jeden Dreh, jedes Budget.",                          href: "/jobs",      pillarKey: "job",       accent: "from-zinc-900/70" },
-  { icon: Building2, title: "Firmen",        desc: "Produktionsfirmen, Verleiher, Studios — entdecke Branchenpartner.",                     href: "/companies", pillarKey: "firma",     accent: "from-emerald-900/70" },
-  { icon: Clapperboard, title: "Projekte",   desc: "Dokumentiere deine Arbeit, zeig dein Team und deine Produktionen.",                     href: "/projects",  pillarKey: "projekt",   accent: "from-rose-900/70" },
+  { icon: MapPin,    title: "Locations",      desc: "Altbauten, Studios, Industriehallen — der perfekte Ort für jede Szene.",        href: "/locations", pillarKey: "location",  accent: "from-sky-900/70",     insertHref: "/inserat?group=drehorte",  insertLabel: "Location eintragen" },
+  { icon: Users,     title: "Crew & Talente", desc: "DPs, Regisseure, Schauspieler, Maskenbildner — direkt buchbar.",                href: "/creators",  pillarKey: "crew",      accent: "from-violet-900/70",  insertHref: "/profile",                 insertLabel: "Profil anlegen" },
+  { icon: ShoppingBag, title: "Marktplatz",   desc: "Kameras, Kostüme, Requisiten, Fahrzeuge — kaufen oder mieten.",                href: "/props",     pillarKey: "equipment", accent: "from-slate-900/70",   insertHref: "/inserat?group=marktplatz",insertLabel: "Artikel anbieten" },
+  { icon: Briefcase, title: "Jobs & Aufträge",desc: "Ausschreiben oder bewerben — für jeden Dreh, jedes Budget.",                   href: "/jobs",      pillarKey: "job",       accent: "from-zinc-900/70",    insertHref: "/inserat?group=jobs",      insertLabel: "Job ausschreiben" },
+  { icon: Building2, title: "Firmen",         desc: "Produktionsfirmen, Verleiher, Studios — entdecke Branchenpartner.",            href: "/companies", pillarKey: "firma",     accent: "from-emerald-900/70", insertHref: "/company-setup",           insertLabel: "Firma eintragen" },
+  { icon: Clapperboard, title: "Projekte",    desc: "Dokumentiere deine Arbeit, zeig dein Team und deine Produktionen.",           href: "/projects",  pillarKey: "projekt",   accent: "from-rose-900/70",    insertHref: "/projects",                insertLabel: "Projekt erstellen" },
 ];
 
 const useCases = [
@@ -442,7 +442,7 @@ export default async function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {featurePillars.map(({ icon: Icon, title, desc, href, pillarKey, accent }) => {
+            {featurePillars.map(({ icon: Icon, title, desc, href, pillarKey, accent, insertHref, insertLabel }) => {
               const image = pillarImages[pillarKey as keyof typeof pillarImages];
               return (
                 <Link
@@ -461,9 +461,18 @@ export default async function HomePage() {
                         sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw"
                       />
                     ) : (
-                      <div className={`absolute inset-0 bg-gradient-to-br ${accent} to-bg-elevated`} />
+                      <div className={`absolute inset-0 bg-gradient-to-br ${accent} to-bg-elevated flex flex-col items-center justify-center gap-3`}>
+                        <p className="text-xs text-white/40 font-medium">Noch keine Einträge</p>
+                        <Link
+                          href={insertHref}
+                          onClick={(e) => e.stopPropagation()}
+                          className="px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-[#D6F96A] transition-colors"
+                        >
+                          {insertLabel} →
+                        </Link>
+                      </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-bg-elevated/80 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-bg-elevated/80 via-transparent to-transparent pointer-events-none" />
                   </div>
                   {/* Content area */}
                   <div className="p-5 flex flex-col flex-1">
