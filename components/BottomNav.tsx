@@ -10,6 +10,9 @@ export default function BottomNav() {
   const t = useTranslations("nav");
 
   if (pathname.startsWith("/dashboard")) return null;
+  if (pathname.startsWith("/profile-setup")) return null;
+  if (pathname.startsWith("/sign-in")) return null;
+  if (pathname.startsWith("/sign-up")) return null;
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
