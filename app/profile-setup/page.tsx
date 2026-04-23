@@ -6,143 +6,66 @@ import { compressAvatar } from "@/lib/compressImage";
 import { useUser } from "@clerk/nextjs";
 import {
   Loader2, Camera, CheckCircle,
-  Drama, User, Users, Mic2, Music, Zap, Mic, Smartphone,
-  Film, Clapperboard, ClipboardList, Lightbulb, Sparkles, Shirt,
-  Monitor, Layers, Palette, Radio, Aperture, PenLine, Scissors,
-  MapPin, Wrench, Building2, Car, Package,
+  MapPin, Wrench, Users, Briefcase, ShoppingBag, ArrowRight,
 } from "lucide-react";
 import type { ElementType } from "react";
 import { getPresetForType, type ProfileType } from "@/lib/profile-types";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
+import Link from "next/link";
 
-// ─── Rollenliste ──────────────────────────────────────────────────────────────
+// ─── Intent → ProfileType mapping ────────────────────────────────────────────
 
-const FILMMAKER_ROLES: { type: ProfileType; label: string; icon: ElementType }[] = [
-  // Talent
-  { type: "actor",                  label: "Schauspieler",    icon: Drama },
-  { type: "model",                  label: "Model",            icon: User },
-  { type: "extra",                  label: "Komparse",         icon: Users },
-  { type: "host",                   label: "Moderator / Host", icon: Mic2 },
-  { type: "dancer",                 label: "Tänzer",           icon: Music },
-  { type: "stunt",                  label: "Stuntman/-frau",   icon: Zap },
-  { type: "voiceover",              label: "Sprecher",         icon: Mic },
-  { type: "creator",                label: "Content Creator",  icon: Smartphone },
-  // Crew
-  { type: "camera",                 label: "Kamera",           icon: Camera },
-  { type: "director_of_photography",label: "DoP",              icon: Film },
-  { type: "director",               label: "Regisseur",        icon: Clapperboard },
-  { type: "production",             label: "Produktion",       icon: ClipboardList },
-  { type: "lighting",               label: "Licht",            icon: Lightbulb },
-  { type: "sound",                  label: "Ton",              icon: Mic },
-  { type: "makeup",                 label: "Maske",            icon: Sparkles },
-  { type: "costume",                label: "Kostüm",           icon: Shirt },
-  { type: "postproduction",         label: "Schnitt / Post",   icon: Monitor },
-  { type: "vfx",                    label: "VFX",              icon: Layers },
-  { type: "sfx",                    label: "SFX",              icon: Zap },
-  { type: "art_department",         label: "Szenenbild",       icon: Palette },
-  { type: "broadcast",              label: "Broadcast",        icon: Radio },
-  // Kreativ
-  { type: "filmmaker",              label: "Filmemacher",      icon: Clapperboard },
-  { type: "photographer",           label: "Fotograf",         icon: Aperture },
-  { type: "writer",                 label: "Autor / Texter",   icon: PenLine },
-  { type: "editor",                 label: "Editor",           icon: Scissors },
-  { type: "motion_designer",        label: "Motion Design",    icon: Layers },
-  { type: "art_director",           label: "Art Director",     icon: Palette },
+type Intent = {
+  id: string;
+  label: string;
+  desc: string;
+  icon: ElementType;
+  profileType: ProfileType;
+  browseHref: string;      // where "Angebote durchsuchen" links for this intent
+};
+
+const INTENTS: Intent[] = [
+  {
+    id: "location",
+    label: "Meine Location vermieten",
+    desc: "Wohnung, Loft, Halle, Studio — für Foto-, Video- oder Filmaufnahmen.",
+    icon: MapPin,
+    profileType: "location",
+    browseHref: "/locations",
+  },
+  {
+    id: "creative",
+    label: "Aufträge finden (Foto / Video / Content)",
+    desc: "Du fotografierst, filmst oder erstellst Content und suchst Kunden.",
+    icon: Camera,
+    profileType: "creator",
+    browseHref: "/jobs",
+  },
+  {
+    id: "crew",
+    label: "Bei Filmprojekten mitarbeiten",
+    desc: "Kamera, Licht, Ton, Regie, Schnitt — du willst Teil einer Produktion sein.",
+    icon: Users,
+    profileType: "camera",
+    browseHref: "/jobs",
+  },
+  {
+    id: "equipment",
+    label: "Equipment vermieten",
+    desc: "Kameras, Licht, Ton, Requisiten oder Fahrzeuge — tageweise vermieten.",
+    icon: Wrench,
+    profileType: "equipment",
+    browseHref: "/props",
+  },
+  {
+    id: "booker",
+    label: "Etwas mieten oder buchen",
+    desc: "Du suchst eine Location, Crew, Equipment oder Jobs für dein Projekt.",
+    icon: ShoppingBag,
+    profileType: "production",
+    browseHref: "/locations",
+  },
 ];
-
-const VENDOR_ROLES: { type: ProfileType; label: string; icon: ElementType }[] = [
-  { type: "location",  label: "Location",   icon: MapPin },
-  { type: "equipment", label: "Equipment",  icon: Wrench },
-  { type: "studio",    label: "Studio",     icon: Building2 },
-  { type: "vehicle",   label: "Fahrzeuge",  icon: Car },
-  { type: "props",     label: "Props",      icon: Package },
-];
-
-// ─── Kategorien für 2-Stufen Auswahl ─────────────────────────────────────────
-
-const CATEGORIES = [
-  { id: "talent",   label: "Talent",    icon: Drama,       color: "text-rose-400",   bg: "bg-rose-500/15",   desc: "Schauspieler, Model, Creator …",          types: ["actor","model","extra","host","dancer","stunt","voiceover","creator"] },
-  { id: "crew",     label: "Filmcrew",  icon: Clapperboard, color: "text-sky-400",    bg: "bg-sky-500/15",    desc: "Kamera, Licht, Ton, Regie …",             types: ["camera","director_of_photography","director","production","lighting","sound","makeup","costume","postproduction","vfx","sfx","art_department","broadcast"] },
-  { id: "kreativ",  label: "Kreativ",   icon: Palette,      color: "text-violet-400", bg: "bg-violet-500/15", desc: "Fotograf, Editor, Art Director …",         types: ["filmmaker","photographer","writer","editor","motion_designer","art_director"] },
-  { id: "anbieter", label: "Anbieter",  icon: Building2,    color: "text-amber-400",  bg: "bg-amber-500/15",  desc: "Location, Equipment, Studio …",           types: ["location","equipment","studio","vehicle","props"] },
-] as const;
-
-function RolePicker({
-  filmmakerroles,
-  vendorroles,
-  selected,
-  onSelect,
-}: {
-  filmmakerroles: { type: ProfileType; label: string; icon: ElementType }[];
-  vendorroles: { type: ProfileType; label: string; icon: ElementType }[];
-  selected: ProfileType | null;
-  onSelect: (t: ProfileType) => void;
-}) {
-  const allRoles = [...filmmakerroles, ...vendorroles];
-  const [openCat, setOpenCat] = useState<string | null>(() => {
-    if (!selected) return null;
-    return CATEGORIES.find(c => (c.types as readonly string[]).includes(selected))?.id ?? null;
-  });
-
-  return (
-    <div className="space-y-3">
-      {CATEGORIES.map(cat => {
-        const isOpen = openCat === cat.id;
-        const catRoles = allRoles.filter(r => (cat.types as readonly string[]).includes(r.type));
-        const selectedInCat = catRoles.find(r => r.type === selected);
-
-        return (
-          <div key={cat.id} className="rounded-2xl border border-border overflow-hidden">
-            {/* Kategorie-Header */}
-            <button
-              onClick={() => setOpenCat(isOpen ? null : cat.id)}
-              className={`w-full flex items-center gap-3 px-4 py-4 text-left transition-colors ${
-                isOpen ? "bg-bg-elevated" : "bg-bg-secondary hover:bg-bg-elevated"
-              }`}
-            >
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${cat.bg}`}>
-                <cat.icon size={20} className={cat.color} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-text-primary text-sm">{cat.label}</p>
-                <p className="text-xs text-text-muted">
-                  {selectedInCat ? <span className="text-gold">{selectedInCat.label} gewählt</span> : cat.desc}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                {selectedInCat && <CheckCircle size={16} className="text-gold" />}
-                <span className={`text-text-muted transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
-                  ▾
-                </span>
-              </div>
-            </button>
-
-            {/* Unterrollen */}
-            {isOpen && (
-              <div className="border-t border-border px-3 py-3 grid grid-cols-2 gap-2 bg-bg-primary">
-                {catRoles.map(r => (
-                  <button
-                    key={r.type}
-                    onClick={() => onSelect(r.type)}
-                    className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left transition-all active:scale-95 ${
-                      selected === r.type
-                        ? "border-gold bg-gold/10 text-gold"
-                        : "border-border bg-bg-secondary text-text-secondary hover:border-border-light"
-                    }`}
-                  >
-                    <r.icon size={14} className="shrink-0" />
-                    <span className="text-xs font-medium leading-tight">{r.label}</span>
-                    {selected === r.type && <CheckCircle size={12} className="ml-auto shrink-0 text-gold" />}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
 
 // ─── Hauptkomponente ──────────────────────────────────────────────────────────
 
@@ -151,11 +74,11 @@ export default function ProfileSetupPage() {
   const searchParams = useSearchParams();
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const [step, setStep] = useState<0 | 1>(0);
+  const [step, setStep] = useState<0 | 1 | 2>(0);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  const [profileType, setProfileType] = useState<ProfileType | null>(null);
+  const [selectedIntent, setSelectedIntent] = useState<Intent | null>(null);
   const [displayName, setDisplayName] = useState("");
   const [city, setCity] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
@@ -163,19 +86,18 @@ export default function ProfileSetupPage() {
   const [focalPoint, setFocalPoint] = useState<FocalPoint>({ x: 50, y: 33 });
   const [focalPickerImage, setFocalPickerImage] = useState<string | null>(null);
 
-  // Redirect wenn schon Profil vorhanden
+  // Redirect if profile already exists
   useEffect(() => {
     if (!isLoaded || !user) return;
     fetch("/api/profile").then(r => r.json()).then(({ exists }) => {
       if (exists) {
-        // GET-Handler setzt das Cookie — hard redirect damit Middleware sofort durchlässt
         const redirectTo = searchParams.get("redirect") || "/dashboard";
         window.location.replace(redirectTo);
       }
     });
   }, [isLoaded, user]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Name aus Clerk vorausfüllen
+  // Pre-fill name from Clerk
   useEffect(() => {
     if (isLoaded && user) {
       const full = [user.firstName, user.lastName].filter(Boolean).join(" ");
@@ -183,7 +105,7 @@ export default function ProfileSetupPage() {
     }
   }, [isLoaded, user]);
 
-  // ── Avatar Upload ────────────────────────────────────────────────────────
+  // ── Avatar Upload ─────────────────────────────────────────────────────────
   async function handleAvatar(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -202,11 +124,12 @@ export default function ProfileSetupPage() {
     }
   }
 
-  // ── Speichern ────────────────────────────────────────────────────────────
+  // ── Save profile + advance to step 2 ─────────────────────────────────────
   async function handleSave() {
-    if (!profileType || !displayName.trim() || !city.trim()) return;
+    if (!selectedIntent || !displayName.trim() || !city.trim()) return;
     setSaving(true);
     try {
+      const profileType = selectedIntent.profileType;
       const res = await fetch("/api/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -230,7 +153,7 @@ export default function ProfileSetupPage() {
         return;
       }
 
-      // Modules im Hintergrund — nicht blockierend
+      // Modules in background — non-blocking
       const modules = getPresetForType(profileType);
       fetch("/api/profile/modules", {
         method: "PATCH",
@@ -238,10 +161,7 @@ export default function ProfileSetupPage() {
         body: JSON.stringify({ profile_type: profileType, modules }),
       }).catch(() => {});
 
-      // Hard redirect — das Cookie aus dem POST-Response wird mitgesendet,
-      // Middleware lässt den User sofort durch ohne JWT-Wartezeit.
-      const redirectTo = searchParams.get("redirect") || "/dashboard?welcome=1";
-      window.location.href = redirectTo;
+      setStep(2);
     } catch (e) {
       console.error("[profile-setup] save error:", e);
       setSaving(false);
@@ -255,6 +175,8 @@ export default function ProfileSetupPage() {
       </div>
     );
   }
+
+  const redirectTo = searchParams.get("redirect");
 
   return (
     <div className="min-h-screen bg-bg-primary flex flex-col">
@@ -271,46 +193,83 @@ export default function ProfileSetupPage() {
       <div className="fixed top-0 left-0 right-0 z-50 h-0.5 bg-border">
         <div
           className="h-full bg-gold transition-all duration-500"
-          style={{ width: step === 0 ? "50%" : "100%" }}
+          style={{ width: step === 0 ? "33%" : step === 1 ? "66%" : "100%" }}
         />
       </div>
 
       {/* Logo */}
       <div className="pt-8 pb-4 text-center">
         <span className="font-display font-bold text-lg text-gold tracking-tight">CineGenius</span>
-        <p className="text-xs text-text-muted mt-1">Schritt {step + 1} von 2</p>
+        {step < 2 && (
+          <p className="text-xs text-text-muted mt-1">Schritt {step + 1} von 2</p>
+        )}
       </div>
 
       {/* Content */}
       <div className="flex-1 px-4 pb-32 max-w-lg mx-auto w-full">
 
-        {/* ── STEP 0: Rolle wählen ── */}
+        {/* ── STEP 0: Intent selection ── */}
         {step === 0 && (
           <div>
-            <div className="text-center mb-6">
-              <h1 className="font-display text-2xl font-bold text-text-primary mb-1">
-                Ich bin …
+            <div className="text-center mb-8">
+              <h1 className="font-display text-2xl font-bold text-text-primary mb-2">
+                Was möchtest du mit CineGenius machen?
               </h1>
-              <p className="text-sm text-text-muted">Wähle deine Kategorie — du kannst sie später ändern.</p>
+              <p className="text-sm text-text-muted">
+                Wähle das aus, das am besten zu dir passt — du kannst das später jederzeit ändern.
+              </p>
             </div>
 
-            <RolePicker
-              filmmakerroles={FILMMAKER_ROLES}
-              vendorroles={VENDOR_ROLES}
-              selected={profileType}
-              onSelect={setProfileType}
-            />
+            <div className="space-y-3">
+              {INTENTS.map((intent) => {
+                const Icon = intent.icon;
+                const isSelected = selectedIntent?.id === intent.id;
+                return (
+                  <button
+                    key={intent.id}
+                    onClick={() => setSelectedIntent(intent)}
+                    className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl border text-left transition-all active:scale-[0.99] ${
+                      isSelected
+                        ? "border-gold bg-gold/10"
+                        : "border-border bg-bg-secondary hover:border-border-light hover:bg-bg-elevated"
+                    }`}
+                  >
+                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
+                      isSelected ? "bg-gold/20 border border-gold/40" : "bg-bg-elevated border border-border"
+                    }`}>
+                      <Icon size={20} className={isSelected ? "text-gold" : "text-text-muted"} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`font-semibold text-sm leading-tight ${isSelected ? "text-gold" : "text-text-primary"}`}>
+                        {intent.label}
+                      </p>
+                      <p className="text-xs text-text-muted mt-0.5 leading-relaxed">
+                        {intent.desc}
+                      </p>
+                    </div>
+                    {isSelected && (
+                      <CheckCircle size={18} className="text-gold shrink-0" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
 
-        {/* ── STEP 1: Name & Foto ── */}
+        {/* ── STEP 1: Name, city, avatar ── */}
         {step === 1 && (
           <div className="space-y-5">
             <div className="text-center mb-6">
+              <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">
+                Fast geschafft
+              </p>
               <h1 className="font-display text-2xl font-bold text-text-primary mb-1">
-                Dein Profil
+                Dein Profil dauert weniger als 1 Minute
               </h1>
-              <p className="text-sm text-text-muted">Kurz und fertig — alles andere später.</p>
+              <p className="text-sm text-text-muted">
+                Nur das Nötigste — alles andere kannst du später ergänzen.
+              </p>
             </div>
 
             {/* Avatar */}
@@ -340,36 +299,26 @@ export default function ProfileSetupPage() {
                 )}
               </button>
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatar} />
-              <p className="text-xs text-text-muted">optional</p>
+              <p className="text-xs text-text-muted">Profilfoto — optional</p>
             </div>
 
             {/* Name */}
             <div>
               <label className="text-xs font-semibold text-text-muted uppercase tracking-widest block mb-1.5">
-                {profileType && VENDOR_ROLES.some(r => r.type === profileType) ? "Name / Firmenname *" : "Name / Künstlername *"}
+                Dein Name *
               </label>
               <input
                 value={displayName}
                 onChange={e => setDisplayName(e.target.value)}
-                placeholder={profileType && VENDOR_ROLES.some(r => r.type === profileType) ? "z.B. Studio Müller GmbH" : "Dein Anzeigename"}
+                placeholder="Wie sollen andere dich nennen?"
                 className="w-full bg-bg-secondary border border-border rounded-2xl px-4 py-3.5 text-base text-text-primary focus:outline-none focus:border-gold transition-colors"
               />
             </div>
 
-            {/* Vendor hint */}
-            {profileType && VENDOR_ROLES.some(r => r.type === profileType) && (
-              <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-gold/5 border border-gold/20">
-                <span className="text-lg leading-none mt-0.5">💡</span>
-                <p className="text-xs text-text-secondary leading-relaxed">
-                  Nach der Registrierung kannst du im Dashboard ein Inserat erstellen — damit erscheinst du im Marktplatz.
-                </p>
-              </div>
-            )}
-
             {/* Stadt */}
             <div>
               <label className="text-xs font-semibold text-text-muted uppercase tracking-widest block mb-1.5">
-                Stadt *
+                Deine Stadt *
               </label>
               <input
                 value={city}
@@ -378,47 +327,110 @@ export default function ProfileSetupPage() {
                 className="w-full bg-bg-secondary border border-border rounded-2xl px-4 py-3.5 text-base text-text-primary focus:outline-none focus:border-gold transition-colors"
               />
             </div>
+
+            {/* Intent summary */}
+            {selectedIntent && (
+              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gold/5 border border-gold/20">
+                <CheckCircle size={14} className="text-gold shrink-0" />
+                <p className="text-xs text-text-secondary leading-relaxed">
+                  Dein Profil wird als <span className="text-gold font-medium">{selectedIntent.label}</span> angelegt.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── STEP 2: What next ── */}
+        {step === 2 && (
+          <div className="flex flex-col items-center text-center gap-6 pt-4">
+            <div className="w-16 h-16 rounded-full bg-gold/15 border-2 border-gold/30 flex items-center justify-center">
+              <CheckCircle size={30} className="text-gold" />
+            </div>
+
+            <div>
+              <h1 className="font-display text-2xl font-bold text-text-primary mb-2">
+                Dein Profil ist fertig!
+              </h1>
+              <p className="text-sm text-text-muted max-w-xs mx-auto leading-relaxed">
+                Was möchtest du als Nächstes tun?
+              </p>
+            </div>
+
+            <div className="w-full space-y-3 max-w-sm">
+              <Link
+                href="/inserat"
+                className="flex items-center justify-between w-full px-5 py-4 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-2xl transition-colors"
+              >
+                <span>Angebot erstellen</span>
+                <ArrowRight size={16} />
+              </Link>
+
+              <Link
+                href="/profile"
+                className="flex items-center justify-between w-full px-5 py-4 border border-border bg-bg-secondary hover:border-gold/40 hover:bg-bg-elevated text-text-primary font-medium rounded-2xl transition-all"
+              >
+                <span>Profil vervollständigen</span>
+                <ArrowRight size={16} className="text-text-muted" />
+              </Link>
+
+              <Link
+                href={selectedIntent?.browseHref ?? "/locations"}
+                className="flex items-center justify-between w-full px-5 py-4 border border-border bg-bg-secondary hover:border-gold/40 hover:bg-bg-elevated text-text-primary font-medium rounded-2xl transition-all"
+              >
+                <span>Angebote durchsuchen</span>
+                <ArrowRight size={16} className="text-text-muted" />
+              </Link>
+
+              <Link
+                href={redirectTo ?? "/dashboard"}
+                className="block text-xs text-text-muted hover:text-gold transition-colors text-center pt-2"
+              >
+                Zum Dashboard →
+              </Link>
+            </div>
           </div>
         )}
       </div>
 
-      {/* Fixed bottom nav */}
-      <div className="fixed bottom-0 left-0 right-0 bg-bg-primary border-t border-border px-4 py-4 safe-area-pb">
-        <div className="max-w-lg mx-auto flex gap-3">
-          {step === 1 && (
-            <button
-              onClick={() => setStep(0)}
-              className="px-5 py-3.5 rounded-2xl border border-border text-text-secondary text-sm font-semibold"
-            >
-              Zurück
-            </button>
-          )}
+      {/* Fixed bottom nav — hidden on step 2 */}
+      {step < 2 && (
+        <div className="fixed bottom-0 left-0 right-0 bg-bg-primary border-t border-border px-4 py-4 safe-area-pb">
+          <div className="max-w-lg mx-auto flex gap-3">
+            {step === 1 && (
+              <button
+                onClick={() => setStep(0)}
+                className="px-5 py-3.5 rounded-2xl border border-border text-text-secondary text-sm font-semibold"
+              >
+                Zurück
+              </button>
+            )}
 
-          {step === 0 && (
-            <button
-              onClick={() => setStep(1)}
-              disabled={!profileType}
-              className="flex-1 py-3.5 rounded-2xl bg-gold text-bg-primary font-bold text-base disabled:opacity-30 transition-opacity active:scale-95"
-            >
-              Weiter
-            </button>
-          )}
+            {step === 0 && (
+              <button
+                onClick={() => setStep(1)}
+                disabled={!selectedIntent}
+                className="flex-1 py-3.5 rounded-2xl bg-gold text-bg-primary font-bold text-base disabled:opacity-30 transition-opacity active:scale-95"
+              >
+                Weiter
+              </button>
+            )}
 
-          {step === 1 && (
-            <button
-              onClick={handleSave}
-              disabled={!displayName.trim() || !city.trim() || saving || uploading}
-              className="flex-1 py-3.5 rounded-2xl bg-gold text-bg-primary font-bold text-base disabled:opacity-30 flex items-center justify-center gap-2 active:scale-95"
-            >
-              {saving ? (
-                <><Loader2 size={18} className="animate-spin" /> Speichern…</>
-              ) : (
-                "Profil erstellen"
-              )}
-            </button>
-          )}
+            {step === 1 && (
+              <button
+                onClick={handleSave}
+                disabled={!displayName.trim() || !city.trim() || saving || uploading}
+                className="flex-1 py-3.5 rounded-2xl bg-gold text-bg-primary font-bold text-base disabled:opacity-30 flex items-center justify-center gap-2 active:scale-95"
+              >
+                {saving ? (
+                  <><Loader2 size={18} className="animate-spin" /> Speichern…</>
+                ) : (
+                  "Profil erstellen"
+                )}
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
