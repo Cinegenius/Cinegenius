@@ -61,16 +61,17 @@ export default async function LocationsPage() {
     .limit(200);
 
   const locationProviders = (providerData ?? [])
-    .filter((p: { profile_types?: string[] | null }) =>
-      (p.profile_types ?? []).includes("location")
-    )
-    .map((p: { user_id: string; display_name: string | null; location: string | null; bio: string | null; avatar_url: string | null }) => ({
+    .filter((p: { profile_types?: string[] | null }) => {
+      const types = p.profile_types ?? [];
+      return types.includes("location") || types.includes("studio");
+    })
+    .map((p: { user_id: string; display_name: string | null; location: string | null; bio: string | null; avatar_url: string | null; profile_types?: string[] | null }) => ({
       id: p.user_id,
       name: p.display_name ?? "Anbieter",
       city: (p.location ?? "").split(",")[0]?.trim() ?? "",
       bio: p.bio ?? "",
       avatar: p.avatar_url ?? null,
-      typeLabel: "Location-Anbieter",
+      typeLabel: (p.profile_types ?? []).includes("studio") ? "Studio-Anbieter" : "Location-Anbieter",
     }));
 
   const rows = data ?? [];
@@ -124,6 +125,7 @@ export default async function LocationsPage() {
           height="sm"
         />
       </div>
+      <ProviderProfiles profiles={locationProviders} heading="Location- & Studio-Anbieter mit Profil" />
       <LocationsContent serverListings={serverListings} />
     </>
   );

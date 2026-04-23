@@ -32,7 +32,7 @@ export default async function VehiclesPage() {
 
   const equipmentProviders = (providerData ?? [])
     .filter((p: { profile_types?: string[] | null }) =>
-      (p.profile_types ?? []).includes("equipment")
+      (p.profile_types ?? []).includes("vehicle")
     )
     .map((p: { user_id: string; display_name: string | null; location: string | null; bio: string | null; avatar_url: string | null }) => ({
       id: p.user_id,
@@ -40,7 +40,7 @@ export default async function VehiclesPage() {
       city: (p.location ?? "").split(",")[0]?.trim() ?? "",
       bio: p.bio ?? "",
       avatar: p.avatar_url ?? null,
-      typeLabel: "Equipment & Fahrzeuge",
+      typeLabel: "Fahrzeug-Anbieter",
     }));
 
   const serverVehicles = (data ?? []).map((l: {
@@ -79,7 +79,7 @@ export default async function VehiclesPage() {
 
   return (
     <>
-      <ProviderProfiles profiles={equipmentProviders} heading="Equipment-Anbieter mit Profil" />
+      <ProviderProfiles profiles={equipmentProviders} heading="Fahrzeug-Anbieter mit Profil" />
       <VehiclesContent serverVehicles={serverVehicles} />
     </>
   );

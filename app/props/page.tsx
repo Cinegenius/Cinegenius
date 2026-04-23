@@ -32,16 +32,17 @@ export default async function PropsPage() {
     .limit(200);
 
   const equipmentProviders = (providerData ?? [])
-    .filter((p: { profile_types?: string[] | null }) =>
-      (p.profile_types ?? []).includes("equipment")
-    )
-    .map((p: { user_id: string; display_name: string | null; location: string | null; bio: string | null; avatar_url: string | null }) => ({
+    .filter((p: { profile_types?: string[] | null }) => {
+      const types = p.profile_types ?? [];
+      return types.includes("equipment") || types.includes("props");
+    })
+    .map((p: { user_id: string; display_name: string | null; location: string | null; bio: string | null; avatar_url: string | null; profile_types?: string[] | null }) => ({
       id: p.user_id,
       name: p.display_name ?? "Anbieter",
       city: (p.location ?? "").split(",")[0]?.trim() ?? "",
       bio: p.bio ?? "",
       avatar: p.avatar_url ?? null,
-      typeLabel: "Equipment & Fahrzeuge",
+      typeLabel: (p.profile_types ?? []).includes("props") ? "Requisiten-Anbieter" : "Equipment-Anbieter",
     }));
 
   const serverListings = (data ?? []).map((l: {
@@ -80,7 +81,7 @@ export default async function PropsPage() {
           cta={{ label: "Inserat erstellen", href: "/inserat" }}
         />
       </div>
-      <ProviderProfiles profiles={equipmentProviders} heading="Equipment-Anbieter mit Profil" />
+      <ProviderProfiles profiles={equipmentProviders} heading="Equipment- & Requisiten-Anbieter mit Profil" />
       <PropsContent serverListings={serverListings} />
     </>
   );
