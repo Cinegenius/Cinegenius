@@ -38,7 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const [{ data: listings }, { data: profiles }, { data: companies }] = await Promise.all([
       db.from("listings")
-        .select("id, type, updated_at")
+        .select("id, type, created_at")
         .eq("published", true),
 
       db.from("profiles")
@@ -52,10 +52,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ]);
 
     dynamicListings = (listings ?? [])
-      .filter((l: { id: string; type: string; updated_at: string }) => typeToPath[l.type])
-      .map((l: { id: string; type: string; updated_at: string }) => ({
+      .filter((l: { id: string; type: string; created_at: string }) => typeToPath[l.type])
+      .map((l: { id: string; type: string; created_at: string }) => ({
         url: `${BASE}/${typeToPath[l.type]}/${l.id}`,
-        lastModified: l.updated_at ?? now,
+        lastModified: l.created_at ?? now,
         changeFrequency: (l.type === "job" ? "daily" : "weekly") as "daily" | "weekly",
         priority: l.type === "job" ? 0.7 : 0.8,
       }));
