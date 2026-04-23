@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { Globe, X, Link2, Film } from "lucide-react";
 import { Logo } from "./Logo";
+import { usePathname } from "next/navigation";
 
 const columns = [
   {
@@ -33,6 +36,11 @@ const columns = [
 ];
 
 export default function Footer() {
+  const pathname = usePathname();
+  // Dashboard has its own fixed sidebar — footer would render full-width
+  // underneath it and appear misaligned. Hide it on dashboard routes.
+  if (pathname?.startsWith("/dashboard")) return null;
+
   return (
     <footer className="border-t border-border bg-bg-secondary mt-20 pb-14 lg:pb-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
