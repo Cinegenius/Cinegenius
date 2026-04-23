@@ -17,6 +17,7 @@ import { useTheme } from "@/components/ThemeProvider";
 import NotificationCenter from "@/components/NotificationCenter";
 import GlobalSearch from "@/components/GlobalSearch";
 import { Logo } from "@/components/Logo";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { supabase } from "@/lib/supabase";
 
 type NavItem = { icon: React.ElementType; label: string; desc: string; href: string; iconBg: string; iconColor: string };
@@ -287,6 +288,7 @@ export default function Navbar() {
             {/* Desktop CTA */}
             <div className="hidden lg:flex items-center gap-2">
               <GlobalSearch />
+              <LanguageSwitcher />
               <button
                 onClick={toggleTheme}
                 className="w-8 h-8 flex items-center justify-center rounded-md text-text-muted hover:text-gold hover:bg-bg-elevated transition-all"
@@ -399,11 +401,12 @@ export default function Navbar() {
               })()}
             </div>
 
-            {/* Mobile: notifications + theme + menu */}
+            {/* Mobile: notifications + language + theme + menu */}
             <div className="lg:hidden flex items-center gap-1">
               {isLoaded && isSignedIn && (
                 <NotificationCenter />
               )}
+              <LanguageSwitcher />
               <button
                 onClick={toggleTheme}
                 className="w-9 h-9 flex items-center justify-center rounded-md text-text-muted hover:text-gold transition-colors"

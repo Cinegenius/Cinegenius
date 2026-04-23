@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter, JetBrains_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { deDE, enUS, esES, csCZ, huHU, itIT } from "@clerk/localizations";
+import { cookies } from "next/headers";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
@@ -69,18 +71,37 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+const CLERK_LOCALIZATIONS: Record<string, typeof deDE> = {
+  de: deDE,
+  en: enUS,
+  es: esES,
+  cs: csCZ,
+  hu: huHU,
+  it: itIT,
+};
+
+const HTML_LANG: Record<string, string> = {
+  de: "de", en: "en", es: "es", cs: "cs", hu: "hu", it: "it",
+};
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const locale = cookieStore.get("cg_locale")?.value ?? "de";
+  const clerkLocalization = CLERK_LOCALIZATIONS[locale] ?? deDE;
+  const htmlLang = HTML_LANG[locale] ?? "de";
+
   return (
     <ClerkProvider
+      localization={clerkLocalization}
       signUpForceRedirectUrl="/profile-setup"
       signInFallbackRedirectUrl="/dashboard"
     >
       <html
-        lang="de"
+        lang={htmlLang}
         data-theme="dark"
         suppressHydrationWarning
         className={`${playfair.variable} ${inter.variable} ${jetbrains.variable}`}

@@ -10,6 +10,7 @@
     "deploy": "git add -A && git commit -m \"update\" && git push && npx vercel --prod"
   },
   "dependencies": {
+    "@clerk/localizations": "^4.5.3",
     "@clerk/nextjs": "^7.0.12",
     "@sentry/nextjs": "^10.48.0",
     "@supabase/supabase-js": "^2.103.0",
