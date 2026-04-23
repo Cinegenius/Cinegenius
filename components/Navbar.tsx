@@ -450,9 +450,7 @@ export default function Navbar() {
               { href: "/locations", label: "Locations",   icon: MapPin },
               { href: "/creators",  label: "Crew",       icon: Users },
               { href: "/props",     label: "Marktplatz", icon: ShoppingBag },
-              { href: "/jobs",      label: "Jobs",       icon: Briefcase },
-              { href: "/companies", label: "Firmen",     icon: Building2 },
-              { href: "/projects",  label: "Projekte",   icon: Film },
+              { href: "/jobs",      label: "Jobs",        icon: Briefcase },
               { href: "/messages",  label: "Nachrichten", icon: MessageSquare },
             ].map(({ href, label, icon: Icon }) => (
               <Link

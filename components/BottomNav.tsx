@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, MapPin, Users, Briefcase, ShoppingBag } from "lucide-react";
+import { MapPin, Users, Briefcase, ShoppingBag, Film, Building2 } from "lucide-react";
 
 export default function BottomNav() {
   const pathname = usePathname();
@@ -14,11 +14,12 @@ export default function BottomNav() {
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   const items = [
-    { href: "/",          icon: Home,        label: "Start"      },
-    { href: "/locations", icon: MapPin,       label: "Locations"  },
-    { href: "/creators",  icon: Users,        label: "Crew"       },
-    { href: "/jobs",      icon: Briefcase,    label: "Jobs"       },
-    { href: "/props",     icon: ShoppingBag,  label: "Marktplatz" },
+    { href: "/locations", icon: MapPin,      label: "Locations"  },
+    { href: "/creators",  icon: Users,       label: "Crew"       },
+    { href: "/jobs",      icon: Briefcase,   label: "Jobs"       },
+    { href: "/props",     icon: ShoppingBag, label: "Marktplatz" },
+    { href: "/projects",  icon: Film,        label: "Projekte"   },
+    { href: "/companies", icon: Building2,   label: "Firmen"     },
   ];
 
   return (
@@ -34,8 +35,8 @@ export default function BottomNav() {
                 active ? "text-gold" : "text-text-muted hover:text-text-secondary"
               }`}
             >
-              <Icon size={20} strokeWidth={active ? 2.2 : 1.8} />
-              <span className={`text-[10px] font-medium leading-none ${active ? "text-gold" : ""}`}>
+              <Icon size={18} strokeWidth={active ? 2.2 : 1.8} />
+              <span className={`text-[9px] font-medium leading-none ${active ? "text-gold" : ""}`}>
                 {label}
               </span>
               {active && (
