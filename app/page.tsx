@@ -172,7 +172,7 @@ const featurePillars = [
 const useCases = [
   {
     title: "Wohnung als Location vermieten",
-    desc: "Dein Zuhause ist die perfekte Kulisse. Verdiene 300–800 € pro Drehtag.",
+    desc: "Dein Zuhause ist die perfekte Kulisse. Verdiene bis zu einer Monatsmiete pro Tag — 300–800 € pro Drehtag.",
     image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=85",
     cta: "Location inserieren",
     href: "/inserat",
