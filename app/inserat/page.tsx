@@ -24,6 +24,7 @@ type LucideIcon = React.ElementType;
 type CategoryItem = {
   id: string;
   label: string;
+  sub?: string;
   icon: LucideIcon;
   type: "creator" | "job" | "prop" | "vehicle" | "location";
   category: string;
@@ -156,20 +157,20 @@ const groups: Group[] = [
     border: "border-violet-500/30",
     items: [
       // Film Equipment
-      { id: "mk_kostuem",        label: "Kostüme & Garderobe",    icon: Shirt,       type: "prop",    category: "Kostüme",              color: "text-rose-400",    bg: "bg-rose-500/10 border-rose-500/20" },
-      { id: "mk_requisiten",     label: "Requisiten",             icon: Package,     type: "prop",    category: "Requisiten",           color: "text-violet-400",  bg: "bg-violet-500/10 border-violet-500/20" },
-      { id: "mk_fahrzeuge",      label: "Bild-Fahrzeuge",         icon: Car,         type: "vehicle", category: "Bild-Fahrzeug",        color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/20" },
-      { id: "mk_moebel",         label: "Möbel & Szenenbild",     icon: Layers,      type: "prop",    category: "Möbel / Szenenbild",   color: "text-indigo-400",  bg: "bg-indigo-500/10 border-indigo-500/20" },
-      { id: "mk_kamera",         label: "Kameraequipment",        icon: Camera,      type: "prop",    category: "Kameraequipment",      color: "text-sky-400",     bg: "bg-sky-500/10 border-sky-500/20" },
-      { id: "mk_licht",          label: "Lichttechnik",           icon: Lightbulb,   type: "prop",    category: "Lichttechnik",         color: "text-amber-400",   bg: "bg-amber-500/10 border-amber-500/20" },
-      { id: "mk_ton",            label: "Ton & Audio",            icon: Mic,         type: "prop",    category: "Ton & Audio",          color: "text-teal-400",    bg: "bg-teal-500/10 border-teal-500/20" },
-      { id: "mk_grip",           label: "Grip & Rigging",         icon: Wrench,      type: "prop",    category: "Grip & Rigging",       color: "text-slate-400",   bg: "bg-slate-500/10 border-slate-500/20" },
-      { id: "mk_produktion",     label: "Produktionsausstattung", icon: Box,         type: "prop",    category: "Produktionsausstattung",color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
+      { id: "mk_fahrzeuge",      label: "Fahrzeug vermieten",     sub: "Auto, Motorrad, Oldtimer, Transporter…",   icon: Car,         type: "vehicle", category: "Bild-Fahrzeug",        color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/20" },
+      { id: "mk_kostuem",        label: "Kostüme & Kleidung",     sub: "Verkleidungen, Uniformen, Zeitgeist…",     icon: Shirt,       type: "prop",    category: "Kostüme",              color: "text-rose-400",    bg: "bg-rose-500/10 border-rose-500/20" },
+      { id: "mk_requisiten",     label: "Objekte & Dekoration",   sub: "Alltagsgegenstände, Kunstwerke, Deko…",    icon: Package,     type: "prop",    category: "Requisiten",           color: "text-violet-400",  bg: "bg-violet-500/10 border-violet-500/20" },
+      { id: "mk_moebel",         label: "Möbel & Einrichtung",    sub: "Sofas, Lampen, Tische, Wanddeko…",         icon: Layers,      type: "prop",    category: "Möbel / Szenenbild",   color: "text-indigo-400",  bg: "bg-indigo-500/10 border-indigo-500/20" },
+      { id: "mk_kamera",         label: "Kamera & Zubehör",       sub: "Kameras, Objektive, Gimbal, Monitor…",     icon: Camera,      type: "prop",    category: "Kameraequipment",      color: "text-sky-400",     bg: "bg-sky-500/10 border-sky-500/20" },
+      { id: "mk_licht",          label: "Licht & Beleuchtung",    sub: "LED-Panels, Scheinwerfer, Softboxen…",     icon: Lightbulb,   type: "prop",    category: "Lichttechnik",         color: "text-amber-400",   bg: "bg-amber-500/10 border-amber-500/20" },
+      { id: "mk_ton",            label: "Ton & Audio",            sub: "Mikrofone, Recorder, Funksysteme…",        icon: Mic,         type: "prop",    category: "Ton & Audio",          color: "text-teal-400",    bg: "bg-teal-500/10 border-teal-500/20" },
+      { id: "mk_grip",           label: "Stative & Träger",       sub: "Stative, Dolly, Schienen, Slider…",        icon: Wrench,      type: "prop",    category: "Grip & Rigging",       color: "text-slate-400",   bg: "bg-slate-500/10 border-slate-500/20" },
+      { id: "mk_produktion",     label: "Diverses & Zubehör",     sub: "Cases, Monitore, Akkus, Kabel…",           icon: Box,         type: "prop",    category: "Produktionsausstattung",color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
       // Foto Equipment
-      { id: "mk_fotoequipment",  label: "Fotoequipment",          icon: Aperture,    type: "prop",    category: "Fotoequipment",        color: "text-cyan-400",    bg: "bg-cyan-500/10 border-cyan-500/20" },
-      { id: "mk_backdrops",      label: "Backdrops & Hintergründe",icon: ImageIcon,  type: "prop",    category: "Backdrops",            color: "text-lime-400",    bg: "bg-lime-500/10 border-lime-500/20" },
+      { id: "mk_fotoequipment",  label: "Foto-Equipment",         sub: "Kameras, Blitze, Objektive, Studiosets…",  icon: Aperture,    type: "prop",    category: "Fotoequipment",        color: "text-cyan-400",    bg: "bg-cyan-500/10 border-cyan-500/20" },
+      { id: "mk_backdrops",      label: "Hintergründe & Stoffe",  sub: "Backdrops, Chroma Key, Vorhänge…",         icon: ImageIcon,   type: "prop",    category: "Backdrops",            color: "text-lime-400",    bg: "bg-lime-500/10 border-lime-500/20" },
       // Creator / Social
-      { id: "mk_contentsets",    label: "Content Sets",           icon: Smartphone,  type: "prop",    category: "Content Sets",         color: "text-purple-400",  bg: "bg-purple-500/10 border-purple-500/20" },
+      { id: "mk_contentsets",    label: "Content-Studio / Set",   sub: "Ring Light, Greenscreen, Creator-Zubehör…",icon: Smartphone,  type: "prop",    category: "Content Sets",         color: "text-purple-400",  bg: "bg-purple-500/10 border-purple-500/20" },
     ],
   },
   {
@@ -569,19 +570,24 @@ export default function InseratPage() {
 
           {/* Sub-category grid */}
           {activeGroup && currentGroup && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {currentGroup.items.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => handleSelect(item)}
-                  className={`group flex flex-col items-center gap-2.5 p-4 rounded-xl border border-border bg-bg-secondary hover:bg-bg-elevated hover:border-current transition-all text-center ${item.color}`}
+                  className={`group flex items-center gap-3.5 p-4 rounded-xl border border-border bg-bg-secondary hover:bg-bg-elevated hover:border-current transition-all text-left ${item.color}`}
                 >
-                  <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${item.bg}`}>
+                  <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${item.bg}`}>
                     <item.icon size={18} className={item.color} />
                   </div>
-                  <span className="text-xs font-semibold text-text-primary leading-snug group-hover:text-current transition-colors">
-                    {item.label}
-                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-text-primary leading-snug group-hover:text-current transition-colors">
+                      {item.label}
+                    </p>
+                    {item.sub && (
+                      <p className="text-xs text-text-muted mt-0.5 leading-relaxed truncate">{item.sub}</p>
+                    )}
+                  </div>
                 </button>
               ))}
             </div>
