@@ -296,9 +296,10 @@ export default async function HomePage() {
 
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 animate-fade-up max-w-[360px] mx-auto sm:mx-0 sm:max-w-none">
+              {/* "Zum Dashboard" is redundant on mobile — bottom nav already has it */}
               <Link
                 href={ctaHref}
-                className="inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-lg active:scale-[0.98] transition-all text-sm"
+                className={`inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-lg active:scale-[0.98] transition-all text-sm ${isLoggedIn ? "hidden sm:inline-flex" : ""}`}
               >
                 {ctaLabel} <ArrowRight size={13} />
               </Link>
