@@ -274,23 +274,23 @@ export default async function HomePage() {
 
             {/* Headline */}
             <h1
-              className="hero-title font-display text-[2.1rem] sm:text-[4.5rem] lg:text-[5.5rem] font-bold tracking-tight mb-4 sm:mb-8 animate-fade-up"
+              className="hero-title font-display text-[2.1rem] sm:text-[4rem] lg:text-[5rem] font-bold tracking-tight mb-4 sm:mb-6 animate-fade-up"
               style={{ lineHeight: "1.08" }}
             >
-              Create. Connect.<br />
-              <span className="text-gradient-gold" style={{ lineHeight: "1.15" }}>Get Discovered.</span>
+              Locations, Crew &<br />
+              <span className="text-gradient-gold" style={{ lineHeight: "1.15" }}>Equipment finden.</span>
             </h1>
 
             {/* Subtext */}
             <p
-              className="hero-sub text-sm sm:text-lg mb-8 sm:mb-10 leading-[1.6] animate-fade-up max-w-[340px] sm:max-w-[560px] mx-auto sm:mx-0"
+              className="hero-sub text-sm sm:text-lg mb-8 sm:mb-10 leading-[1.6] animate-fade-up max-w-[340px] sm:max-w-[500px] mx-auto sm:mx-0"
               style={{ opacity: 0.75 }}
             >
-              Der Marktplatz für Kreative — Locations, Crew &amp; Equipment für Film, Foto und Content.
+              Kostenlos vermieten, buchen und inserieren — für Film, Foto und Content. Für Profis und Einsteiger.
             </p>
 
             {/* Hero Search */}
-            <div className="w-full max-w-[560px] mb-5 sm:mb-8 animate-fade-up">
+            <div className="w-full max-w-[580px] mb-6 sm:mb-10 animate-fade-up">
               <HeroSearch />
             </div>
 
