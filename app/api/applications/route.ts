@@ -16,16 +16,20 @@
 // CREATE UNIQUE INDEX applications_unique ON applications(job_id, applicant_id);
 
 import { db } from "@/lib/db";
-import { createClient } from "@supabase/supabase-js";
-import { auth } from "@clerk/nextjs/server";
+import { requireAuth, getCurrentUser } from "@/lib/auth";
+import { rateLimit } from "@/lib/rateLimit";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { sendNewApplicationEmail } from "@/lib/email";
 
 // POST /api/applications — submit a job application
 export async function POST(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
+
+  const { allowed } = await rateLimit(`application:${userId}`, 10, 60);
+  if (!allowed) return NextResponse.json({ error: "Zu viele Anfragen. Bitte kurz warten." }, { status: 429 });
 
   // NOTE: jobTitle and ownerId from the client body are intentionally ignored below.
   // We fetch the authoritative values from the DB to prevent spoofing.
@@ -148,8 +152,9 @@ export async function POST(req: NextRequest) {
 // GET /api/applications — list applications for current user
 // ?incoming=true → applications received on jobs I own
 export async function GET(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ applications: [] });
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ applications: [] });
+  const { userId } = user;
 
   const incoming = new URL(req.url).searchParams.get("incoming") === "true";
 
