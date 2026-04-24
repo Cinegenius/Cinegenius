@@ -121,7 +121,7 @@ const categories = [
       },
       {
         q: "Wie melde ich ein betrügerisches Inserat?",
-        a: "Nutze den 'Melden'-Button bei jedem Inserat oder schreibe an trust@cinegenius.com. Wir untersuchen alle Meldungen innerhalb von 24 Stunden und entfernen betrügerische Inserate sofort.",
+        a: "Nutze den 'Melden'-Button bei jedem Inserat oder schreibe an trust@cinegenius.co. Wir untersuchen alle Meldungen innerhalb von 24 Stunden und entfernen betrügerische Inserate sofort.",
       },
     ],
   },
@@ -264,7 +264,7 @@ export default function HelpPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
-              href="mailto:support@cinegenius.com"
+              href="mailto:support@cinegenius.co"
               className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors flex items-center justify-center gap-2"
             >
               <Mail size={15} /> E-Mail Support
