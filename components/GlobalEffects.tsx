@@ -61,8 +61,16 @@ export default function GlobalEffects() {
       mo.observe(document.body, { childList: true, subtree: true });
     }, 350);
 
+    // Fallback: force-reveal any cards the observer missed after 1.4s
+    const fallback = setTimeout(() => {
+      document.querySelectorAll(".card-hover:not([data-visible])").forEach((el) => {
+        el.setAttribute("data-visible", "1");
+      });
+    }, 1400);
+
     return () => {
       clearTimeout(timer);
+      clearTimeout(fallback);
       document.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseout", onOut);
       io.disconnect();

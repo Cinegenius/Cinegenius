@@ -7,10 +7,10 @@
 
 @theme {
   /* ── Backgrounds ─────────────────────────────────────────────────────── */
-  --color-bg-primary:   #0A0A0A;   /* Cinema-Black */
-  --color-bg-secondary: #111111;   /* Elevated surface */
-  --color-bg-elevated:  #1A1A1A;   /* Cards, Panels */
-  --color-bg-hover:     #212121;   /* Hover state */
+  --color-bg-primary:   #0E1016;   /* Cinema-Dark */
+  --color-bg-secondary: #161A23;   /* Elevated surface */
+  --color-bg-elevated:  #1E2330;   /* Cards, Panels */
+  --color-bg-hover:     #262C3C;   /* Hover state */
 
   /* ── Accent · Electric Lime ──────────────────────────────────────────── */
   --color-gold:        #C2F135;    /* Electric Lime — sharp, unoccupied in film space */
@@ -23,13 +23,13 @@
   --color-crimson-light: #B83030;
 
   /* ── Borders ─────────────────────────────────────────────────────────── */
-  --color-border:       #212121;   /* Primary border — subtle */
-  --color-border-light: #2C2C2C;   /* Secondary border */
+  --color-border:       #2A3248;   /* Primary border — visible */
+  --color-border-light: #38435E;   /* Secondary border */
 
   /* ── Text ────────────────────────────────────────────────────────────── */
-  --color-text-primary:   #EFEFEF;  /* Clean white — crisp contrast */
-  --color-text-secondary: #888888;  /* Mid-grey — supporting copy */
-  --color-text-muted:     #505050;  /* Disabled / hint text */
+  --color-text-primary:   #F0F2F5;  /* Clean white — crisp contrast */
+  --color-text-secondary: #9AA4B4;  /* Mid-grey — supporting copy */
+  --color-text-muted:     #64707E;  /* Disabled / hint text */
 
   /* ── State ───────────────────────────────────────────────────────────── */
   --color-success: #3A9E68;
@@ -55,8 +55,8 @@ html { scroll-behavior: smooth; }
 }
 
 body {
-  background-color: #0A0A0A;
-  color: #EFEFEF;
+  background-color: #0E1016;
+  color: #F0F2F5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: "kern" 1, "liga" 1;
@@ -66,8 +66,8 @@ body {
    SCROLLBAR
    ═══════════════════════════════════════════════════════════════════════════ */
 ::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: #0A0A0A; }
-::-webkit-scrollbar-thumb { background: #2C2C2C; border-radius: 3px; }
+::-webkit-scrollbar-track { background: #0E1016; }
+::-webkit-scrollbar-thumb { background: #38435E; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #C2F135; }
 
 .scrollbar-none { scrollbar-width: none; }
@@ -145,8 +145,8 @@ body {
 .backdrop-blur-nav {
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  background-color: rgba(10, 10, 10, 0.88);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  background-color: rgba(14, 16, 22, 0.90);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -208,7 +208,7 @@ body {
    SKELETON SHIMMER
    ═══════════════════════════════════════════════════════════════════════════ */
 .skeleton-shimmer {
-  background: linear-gradient(90deg, #1A1A1A 25%, #242424 50%, #1A1A1A 75%);
+  background: linear-gradient(90deg, #1E2330 25%, #262C3C 50%, #1E2330 75%);
   background-size: 800px 100%;
   animation: shimmer 1.4s infinite linear;
 }
@@ -462,15 +462,15 @@ input, select, textarea { color: inherit; }
 
 /* ── Clerk auth form overrides ───────────────────────────────────────────── */
 .cl-card {
-  background-color: #1A1A1A !important;
-  border: 1px solid rgba(255,255,255,0.08) !important;
+  background-color: #1E2330 !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
   box-shadow: 0 24px 64px rgba(0,0,0,0.6) !important;
 }
 .cl-formFieldInput,
 .cl-input {
-  background-color: #0F0F0F !important;
-  color: #EFEFEF !important;
-  border: 1px solid rgba(255,255,255,0.12) !important;
+  background-color: #161A23 !important;
+  color: #F0F2F5 !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
 }
 .cl-formFieldInput:focus,
 .cl-input:focus {
@@ -519,8 +519,8 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 60px #0F0F0F inset !important;
-  -webkit-text-fill-color: #EFEFEF !important;
+  -webkit-box-shadow: 0 0 0 60px #161A23 inset !important;
+  -webkit-text-fill-color: #F0F2F5 !important;
   caret-color: #EFEFEF;
   transition: background-color 9999s ease-in-out 0s;
 }
