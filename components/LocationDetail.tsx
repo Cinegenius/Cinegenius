@@ -16,6 +16,7 @@ import AvailabilityCalendar from "@/components/AvailabilityCalendar";
 import ReviewsSection from "@/components/ReviewsSection";
 import InquiryForm from "@/components/InquiryForm";
 import FavoriteButton from "@/components/FavoriteButton";
+import ReportButton from "@/components/ReportButton";
 
 const Lightbox = dynamic(() => import("@/components/Lightbox"), { ssr: false });
 
@@ -159,8 +160,11 @@ export default function LocationDetail({ location }: { location: Location }) {
                   <MapPin size={14} className="text-gold" /> {location.city} &middot; {location.type}
                 </p>
               </div>
-              <FavoriteButton listingId={location.id} listingType="location" listingTitle={location.title}
-                listingCity={location.city} listingPrice={location.price} listingImage={location.image} />
+              <div className="flex items-center gap-1">
+                <FavoriteButton listingId={location.id} listingType="location" listingTitle={location.title}
+                  listingCity={location.city} listingPrice={location.price} listingImage={location.image} />
+                <ReportButton listingId={location.id} />
+              </div>
             </div>
 
             {/* Rating */}

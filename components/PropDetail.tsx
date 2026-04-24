@@ -15,6 +15,7 @@ const Lightbox = dynamic(() => import("@/components/Lightbox"), { ssr: false });
 import InquiryForm from "@/components/InquiryForm";
 import FavoriteButton from "@/components/FavoriteButton";
 import ReviewsSection from "@/components/ReviewsSection";
+import ReportButton from "@/components/ReportButton";
 
 type Prop = {
   id: string;
@@ -152,15 +153,17 @@ export default function PropDetail({ prop }: { prop: Prop }) {
               <h1 className="font-display text-3xl sm:text-4xl font-bold text-text-primary">
                 {prop.title}
               </h1>
-              <FavoriteButton
-                listingId={prop.id}
-                listingType="prop"
-                listingTitle={prop.title}
-                listingCity={prop.location}
-                listingPrice={prop.dailyRate}
-                listingImage={prop.image}
-                className="shrink-0 mt-1"
-              />
+              <div className="flex items-center gap-1 shrink-0 mt-1">
+                <FavoriteButton
+                  listingId={prop.id}
+                  listingType="prop"
+                  listingTitle={prop.title}
+                  listingCity={prop.location}
+                  listingPrice={prop.dailyRate}
+                  listingImage={prop.image}
+                />
+                <ReportButton listingId={prop.id} />
+              </div>
             </div>
 
             <div className="flex items-center gap-3 text-sm text-text-muted mb-6">

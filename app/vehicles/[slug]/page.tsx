@@ -10,6 +10,7 @@ import {
 import InquiryForm from "@/components/InquiryForm";
 import FavoriteButton from "@/components/FavoriteButton";
 import ReviewsSection from "@/components/ReviewsSection";
+import ReportButton from "@/components/ReportButton";
 
 export const revalidate = 300;
 export const dynamicParams = true;
@@ -151,6 +152,7 @@ export default async function VehicleDetailPage({
                     listingPrice={vehicle.dailyRate}
                     listingImage={vehicle.image}
                   />
+                  <ReportButton listingId={vehicle.id} />
                 </div>
               </div>
               <p className="text-text-muted flex items-center gap-1 mb-4">

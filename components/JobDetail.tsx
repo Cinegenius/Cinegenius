@@ -5,6 +5,7 @@ import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import { ArrowLeft, MapPin, Clock, Briefcase, CheckCircle, Users, Calendar, Shield, AlertTriangle, DollarSign } from "lucide-react";
 import FavoriteButton from "@/components/FavoriteButton";
+import ReportButton from "@/components/ReportButton";
 
 type Job = {
   id: string;
@@ -87,13 +88,15 @@ export default function JobDetail({ job }: { job: Job }) {
                 </div>
                 <p className="text-text-secondary">{job.company} &middot; {job.projectType}</p>
               </div>
-              <FavoriteButton
-                listingId={job.id}
-                listingType="job"
-                listingTitle={job.title}
-                listingCity={job.location}
-                className="shrink-0"
-              />
+              <div className="flex items-center gap-1 shrink-0">
+                <FavoriteButton
+                  listingId={job.id}
+                  listingType="job"
+                  listingTitle={job.title}
+                  listingCity={job.location}
+                />
+                <ReportButton listingId={job.id} />
+              </div>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
