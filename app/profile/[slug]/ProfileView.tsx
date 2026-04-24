@@ -878,8 +878,8 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
           <div className="absolute inset-0 bg-gradient-to-br from-bg-elevated via-bg-primary to-black" />
         )}
 
-        {/* Gradient overlay — leichter damit das Bild sichtbar bleibt */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/70" />
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/75" />
 
         {/* Top bar */}
         <div className="absolute top-0 left-0 right-0 pt-20 px-6 sm:px-10 flex items-start justify-between">
@@ -1129,8 +1129,8 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
         {bgImage ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
-            <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/40 via-bg-primary/70 to-bg-primary" />
+            <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-90" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-bg-primary" />
           </>
         ) : (
           <div className="absolute inset-0 bg-gradient-to-b from-bg-elevated to-bg-primary" />
@@ -1139,16 +1139,16 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-10">
           <div className="flex items-start gap-4">
             <div className="flex-1 min-w-0">
-              <h1 className="font-display text-3xl sm:text-4xl font-bold text-text-primary leading-tight">
+              <h1 className="font-display text-3xl sm:text-4xl font-bold text-white leading-tight drop-shadow-lg">
                 {profile.display_name ?? "Unbekannt"}
               </h1>
               {(profile.positions?.[0] ?? profile.role) && (
-                <p className="text-text-muted text-sm mt-1">
+                <p className="text-white/75 text-sm mt-1 drop-shadow">
                   {(profile.positions ?? [profile.role]).filter(Boolean).join(" · ")}
                 </p>
               )}
               {profile.location && (
-                <p className="text-text-muted text-xs mt-1.5 flex items-center gap-1">
+                <p className="text-white/60 text-xs mt-1.5 flex items-center gap-1 drop-shadow">
                   <MapPin size={10} />{profile.location}
                 </p>
               )}
