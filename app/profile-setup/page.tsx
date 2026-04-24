@@ -78,7 +78,7 @@ export default function ProfileSetupPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  const [selectedIntent, setSelectedIntent] = useState<Intent | null>(null);
+  const [selectedIntents, setSelectedIntents] = useState<Intent[]>([]);
   const [displayName, setDisplayName] = useState("");
   const [city, setCity] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
@@ -126,10 +126,11 @@ export default function ProfileSetupPage() {
 
   // ── Save profile + advance to step 2 ─────────────────────────────────────
   async function handleSave() {
-    if (!selectedIntent || !displayName.trim() || !city.trim()) return;
+    if (selectedIntents.length === 0 || !displayName.trim() || !city.trim()) return;
     setSaving(true);
     try {
-      const profileType = selectedIntent.profileType;
+      const profileTypes = selectedIntents.map((i) => i.profileType);
+      const primaryType = profileTypes[0];
       const res = await fetch("/api/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -142,7 +143,7 @@ export default function ProfileSetupPage() {
           skills: [],
           positions: [],
           account_type: "person",
-          profile_types: [profileType],
+          profile_types: profileTypes,
         }),
       });
 
@@ -154,11 +155,11 @@ export default function ProfileSetupPage() {
       }
 
       // Modules in background — non-blocking
-      const modules = getPresetForType(profileType);
+      const modules = getPresetForType(primaryType);
       fetch("/api/profile/modules", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profile_type: profileType, modules }),
+        body: JSON.stringify({ profile_type: primaryType, modules }),
       }).catch(() => {});
 
       setStep(2);
@@ -227,11 +228,13 @@ export default function ProfileSetupPage() {
             <div className="space-y-2.5">
               {INTENTS.map((intent, i) => {
                 const Icon = intent.icon;
-                const isSelected = selectedIntent?.id === intent.id;
+                const isSelected = selectedIntents.some((s) => s.id === intent.id);
                 return (
                   <button
                     key={intent.id}
-                    onClick={() => setSelectedIntent(intent)}
+                    onClick={() => setSelectedIntents((prev) =>
+                      isSelected ? prev.filter((s) => s.id !== intent.id) : [...prev, intent]
+                    )}
                     className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl border text-left transition-all duration-150 active:scale-[0.985] ${
                       isSelected
                         ? "border-gold bg-gold/10 shadow-[0_0_0_1px_rgba(194,241,53,0.25),0_4px_20px_rgba(194,241,53,0.08)]"
@@ -355,11 +358,13 @@ export default function ProfileSetupPage() {
             </div>
 
             {/* Intent summary */}
-            {selectedIntent && (
-              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gold/5 border border-gold/20">
-                <CheckCircle size={14} className="text-gold shrink-0" />
+            {selectedIntents.length > 0 && (
+              <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-gold/5 border border-gold/20">
+                <CheckCircle size={14} className="text-gold shrink-0 mt-0.5" />
                 <p className="text-xs text-text-secondary leading-relaxed">
-                  Dein Profil wird als <span className="text-gold font-medium">{selectedIntent.label}</span> angelegt.
+                  {selectedIntents.map((s, i) => (
+                    <span key={s.id}><span className="text-gold font-medium">{s.label}</span>{i < selectedIntents.length - 1 ? ", " : ""}</span>
+                  ))}
                 </p>
               </div>
             )}
@@ -400,7 +405,7 @@ export default function ProfileSetupPage() {
               </Link>
 
               <Link
-                href={selectedIntent?.browseHref ?? "/locations"}
+                href={selectedIntents[0]?.browseHref ?? "/locations"}
                 className="flex items-center justify-between w-full px-5 py-4 border border-border bg-bg-secondary hover:border-gold/40 hover:bg-bg-elevated text-text-primary font-medium rounded-2xl transition-all"
               >
                 <span>Angebote durchsuchen</span>
@@ -434,10 +439,10 @@ export default function ProfileSetupPage() {
             {step === 0 && (
               <button
                 onClick={() => setStep(1)}
-                disabled={!selectedIntent}
+                disabled={selectedIntents.length === 0}
                 className="flex-1 py-3.5 rounded-2xl bg-gold text-bg-primary font-bold text-base disabled:opacity-30 transition-opacity active:scale-95"
               >
-                Weiter
+                Weiter {selectedIntents.length > 1 ? `(${selectedIntents.length})` : ""}
               </button>
             )}
 
