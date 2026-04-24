@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Globe, X, Link2, Film } from "lucide-react";
 import { Logo } from "./Logo";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -53,22 +52,6 @@ export default function Footer() {
             <p className="text-text-secondary text-sm leading-relaxed max-w-xs">
               {tf("tagline")}
             </p>
-            <div className="flex gap-4 mt-6">
-              {[
-                { Icon: Globe, href: "#" },
-                { Icon: X, href: "#" },
-                { Icon: Link2, href: "#" },
-                { Icon: Film, href: "#" },
-              ].map(({ Icon, href }, i) => (
-                <a
-                  key={i}
-                  href={href}
-                  className="w-9 h-9 border border-border rounded-md flex items-center justify-center text-text-secondary hover:border-gold hover:text-gold transition-all"
-                >
-                  <Icon size={16} />
-                </a>
-              ))}
-            </div>
           </div>
 
           {/* Link-Spalten */}

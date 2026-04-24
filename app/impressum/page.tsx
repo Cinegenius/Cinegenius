@@ -32,7 +32,7 @@ export default function ImpressumPage() {
             <h2 className="text-base font-semibold text-text-primary mb-2">Kontakt</h2>
             <p className="text-sm leading-relaxed">
               Telefon: <a href="tel:+4901713866624" className="text-gold hover:underline">+49 171 3866624</a><br />
-              E-Mail: <a href="mailto:m.mller.business@gmail.com" className="text-gold hover:underline">m.mller.business@gmail.com</a>
+              E-Mail: <a href="mailto:support@cinegenius.co" className="text-gold hover:underline">support@cinegenius.co</a>
             </p>
           </section>
 

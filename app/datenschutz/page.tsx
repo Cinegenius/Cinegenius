@@ -24,7 +24,7 @@ export default function DatenschutzPage() {
             <p>
               Markus Müller<br />
               Plinganserstrasse 19, 81369 München<br />
-              E-Mail: <a href="mailto:m.mller.business@gmail.com" className="text-gold hover:underline">m.mller.business@gmail.com</a><br />
+              E-Mail: <a href="mailto:support@cinegenius.co" className="text-gold hover:underline">support@cinegenius.co</a><br />
               Tel: <a href="tel:+4901713866624" className="text-gold hover:underline">+49 171 3866624</a>
             </p>
           </section>
@@ -221,7 +221,7 @@ export default function DatenschutzPage() {
             </ul>
             <p className="mt-3">
               Konto und alle Daten löschen: <strong className="text-text-primary">Dashboard → Einstellungen → Konto löschen.</strong><br />
-              Alle anderen Anfragen an: <a href="mailto:m.mller.business@gmail.com" className="text-gold hover:underline">m.mller.business@gmail.com</a>
+              Alle anderen Anfragen an: <a href="mailto:support@cinegenius.co" className="text-gold hover:underline">support@cinegenius.co</a>
             </p>
             <p className="mt-3">
               Du hast das Recht, dich bei einer Datenschutzaufsichtsbehörde zu beschweren. Zuständig für Bayern:<br />
@@ -234,7 +234,7 @@ export default function DatenschutzPage() {
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">18. Minderjährige</h2>
             <p>
-              CineGenius richtet sich ausschließlich an Personen ab 18 Jahren. Wir erheben wissentlich keine Daten von Minderjährigen. Solltest du Kenntnis davon haben, dass ein Minderjähriger ein Konto erstellt hat, melde dies bitte unter <a href="mailto:m.mller.business@gmail.com" className="text-gold hover:underline">m.mller.business@gmail.com</a>.
+              CineGenius richtet sich ausschließlich an Personen ab 18 Jahren. Wir erheben wissentlich keine Daten von Minderjährigen. Solltest du Kenntnis davon haben, dass ein Minderjähriger ein Konto erstellt hat, melde dies bitte unter <a href="mailto:support@cinegenius.co" className="text-gold hover:underline">support@cinegenius.co</a>.
             </p>
           </section>
 
@@ -250,7 +250,7 @@ export default function DatenschutzPage() {
             <p>
               Markus Müller<br />
               Plinganserstrasse 19, 81369 München<br />
-              <a href="mailto:m.mller.business@gmail.com" className="text-gold hover:underline">m.mller.business@gmail.com</a>
+              <a href="mailto:support@cinegenius.co" className="text-gold hover:underline">support@cinegenius.co</a>
             </p>
           </section>
 
