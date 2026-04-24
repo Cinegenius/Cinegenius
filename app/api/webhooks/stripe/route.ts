@@ -11,6 +11,8 @@
 
 import { getStripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
+import { sendNewBookingEmail, sendBookingConfirmedEmail } from "@/lib/email";
+import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
 
@@ -54,10 +56,82 @@ export async function POST(req: NextRequest) {
       const pi = event.data.object as Stripe.PaymentIntent;
       const bookingRef = pi.metadata?.booking_ref;
       if (bookingRef) {
+        const { data: booking } = await db
+          .from("bookings")
+          .select("id, listing_title, listing_type, user_id, listing_id, daily_rate, start_date, end_date, days, total")
+          .eq("ref", bookingRef)
+          .maybeSingle();
+
         await db
           .from("bookings")
           .update({ status: "confirmed", stripe_payment_intent_id: pi.id })
           .eq("ref", bookingRef);
+
+        if (booking) {
+          // Fire-and-forget: notifications + emails
+          (async () => {
+            try {
+              const listingTitle = booking.listing_title ?? "Inserat";
+
+              // Get listing owner (host)
+              let hostUserId: string | null = null;
+              if (booking.listing_id) {
+                const { data: listing } = await db
+                  .from("listings")
+                  .select("user_id")
+                  .eq("id", booking.listing_id)
+                  .maybeSingle();
+                hostUserId = listing?.user_id ?? null;
+              }
+
+              // Guest profile
+              const { data: guestProfile } = await db
+                .from("profiles")
+                .select("display_name")
+                .eq("user_id", booking.user_id)
+                .maybeSingle();
+              const guestName = guestProfile?.display_name ?? "Ein Nutzer";
+
+              // Notify guest: booking confirmed
+              await db.from("notifications").insert({
+                user_id: booking.user_id,
+                type: "booking_confirmed",
+                title: `Buchung bestätigt: ${listingTitle}`,
+                body: `Deine Zahlung wurde erfolgreich verarbeitet. Buchungsreferenz: ${bookingRef}`,
+                href: `/dashboard?tab=bookings`,
+              });
+
+              // Notify host: new booking received
+              if (hostUserId) {
+                await db.from("notifications").insert({
+                  user_id: hostUserId,
+                  type: "booking_request",
+                  title: `Neue Buchung: ${listingTitle}`,
+                  body: `${guestName} hat dein Inserat für ${booking.days ?? 1} Tag(e) gebucht.`,
+                  href: `/dashboard?tab=bookings`,
+                });
+              }
+
+              const clerk = await clerkClient();
+
+              // Booking confirmed email to guest
+              const guestUser = await clerk.users.getUser(booking.user_id);
+              const guestEmail = guestUser.emailAddresses[0]?.emailAddress;
+              if (guestEmail) {
+                await sendBookingConfirmedEmail(guestEmail, listingTitle, bookingRef);
+              }
+
+              // New booking notification email to host
+              if (hostUserId) {
+                const hostUser = await clerk.users.getUser(hostUserId);
+                const hostEmail = hostUser.emailAddresses[0]?.emailAddress;
+                if (hostEmail) {
+                  await sendNewBookingEmail(hostEmail, listingTitle, guestName);
+                }
+              }
+            } catch { /* best-effort */ }
+          })();
+        }
       }
       break;
     }

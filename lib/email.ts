@@ -140,12 +140,27 @@ export async function sendWelcomeEmail(to: string, displayName: string) {
 export async function sendNewBookingEmail(to: string, listingTitle: string, guestName: string) {
   await send(
     to,
-    `Neue Buchungsanfrage für „${listingTitle}"`,
+    `Neue Buchung: „${listingTitle}"`,
     wrap(`
-      ${h1("Neue Buchungsanfrage")}
-      ${p(`<strong style="color:#f0f0f0">${guestName}</strong> hat eine Buchungsanfrage für dein Inserat gesendet:`)}
+      ${h1("Neue Buchung erhalten")}
+      ${p(`<strong style="color:#f0f0f0">${guestName}</strong> hat dein Inserat gebucht:`)}
       <p style="margin:16px 0;padding:12px 16px;background:#1a1a1a;border:1px solid #222;border-radius:8px;font-size:14px;color:#d4a843;font-weight:600">${listingTitle}</p>
-      ${btn("Anfrage ansehen", `${BASE}/dashboard?tab=bookings`)}
+      ${btn("Buchung ansehen", `${BASE}/dashboard?tab=bookings`)}
+    `)
+  );
+}
+
+export async function sendBookingConfirmedEmail(to: string, listingTitle: string, bookingRef: string) {
+  await send(
+    to,
+    `Buchung bestätigt: „${listingTitle}"`,
+    wrap(`
+      ${h1("Deine Buchung ist bestätigt!")}
+      ${p("Deine Zahlung wurde erfolgreich verarbeitet. Hier sind deine Buchungsdetails:")}
+      <p style="margin:16px 0;padding:12px 16px;background:#1a1a1a;border:1px solid #222;border-radius:8px;font-size:14px;color:#d4a843;font-weight:600">${listingTitle}</p>
+      <p style="margin:0 0 16px;font-size:13px;color:#888">Buchungsreferenz: <strong style="color:#f0f0f0">${bookingRef}</strong></p>
+      ${btn("Buchung ansehen", `${BASE}/dashboard?tab=bookings`)}
+      <p style="margin-top:24px;font-size:12px;color:#555">Fragen? Kontaktiere den Anbieter direkt über die Nachrichtenfunktion.</p>
     `)
   );
 }

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter, JetBrains_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { deDE, enUS, esES, csCZ, huHU, itIT } from "@clerk/localizations";
 import { cookies } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
@@ -118,6 +120,8 @@ export default async function RootLayout({
               <Footer />
               <CookieBanner />
               <BottomNav />
+              <Analytics />
+              <SpeedInsights />
             </ToastProvider>
           </ThemeProvider>
           </NextIntlClientProvider>
