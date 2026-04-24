@@ -1097,8 +1097,41 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
 
 function GenericProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [] }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[] }) {
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
+  const { user } = useUser();
   const [lightbox, setLightbox] = useState<string | null>(null);
   const [expandedFilm, setExpandedFilm] = useState<number | null>(null);
+  const [friendStatus, setFriendStatus] = useState<null | "pending_sent" | "pending_received" | "friends">(null);
+  const [friendshipId, setFriendshipId] = useState<string | null>(null);
+  const [friendLoading, setFriendLoading] = useState(false);
+
+  useEffect(() => {
+    if (isOwner || !user) return;
+    fetch(`/api/friendships?userId=${profile.user_id}`)
+      .then(r => r.json())
+      .then(({ friendship }) => {
+        if (!friendship) return;
+        setFriendshipId(friendship.id);
+        if (friendship.status === "accepted") setFriendStatus("friends");
+        else if (friendship.status === "pending")
+          setFriendStatus(friendship.sender_id === user.id ? "pending_sent" : "pending_received");
+      }).catch(() => {});
+  }, [isOwner, user, profile.user_id]);
+
+  async function handleFriendAction() {
+    if (friendLoading) return;
+    setFriendLoading(true);
+    try {
+      if (!friendStatus) {
+        const res = await fetch("/api/friendships", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ receiver_id: profile.user_id }) });
+        const { id } = await res.json();
+        setFriendshipId(id);
+        setFriendStatus("pending_sent");
+      } else if (friendStatus === "pending_received" && friendshipId) {
+        await fetch(`/api/friendships/${friendshipId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "accepted" }) });
+        setFriendStatus("friends");
+      }
+    } finally { setFriendLoading(false); }
+  }
 
   const images: ProfileImage[] = profile.profile_images ?? [];
   const reelUrl = profile.showreel_url ?? profile.reel_url;
@@ -1153,17 +1186,21 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 </p>
               )}
             </div>
-            <div className="shrink-0 flex items-center gap-2 mt-1">
+            <div className="shrink-0 flex items-center gap-2 mt-1 flex-wrap">
               {!isOwner ? (
                 <>
                   {canContact && (
                     <>
                       <Link href={`/messages?to=${profile.user_id}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-text-primary text-bg-primary font-semibold rounded-lg hover:opacity-90 transition-opacity text-xs">
+                        className="inline-flex items-center gap-1.5 px-3 py-2 bg-white text-black font-semibold rounded-lg hover:bg-white/90 transition-colors text-xs shadow">
                         <MessageSquare size={12} /> Nachricht
                       </Link>
+                      <button onClick={handleFriendAction} disabled={friendLoading}
+                        className="inline-flex items-center gap-1.5 px-3 py-2 bg-white/15 backdrop-blur-md border border-white/30 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
+                        {friendStatus === "friends" ? <><Check size={11} /> Vernetzt</> : friendStatus === "pending_sent" ? "Anfrage gesendet" : friendStatus === "pending_received" ? <><UserPlus size={11} /> Annehmen</> : <><UserPlus size={11} /> Vernetzen</>}
+                      </button>
                       <Link href={`/booking?profile=${profile.user_id}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-text-secondary rounded-lg hover:border-gold/50 hover:text-gold transition-all text-xs">
+                        className="inline-flex items-center gap-1.5 px-3 py-2 bg-white/15 backdrop-blur-md border border-white/30 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
                         Anfrage <ExternalLink size={11} />
                       </Link>
                     </>
@@ -1171,7 +1208,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                   <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
                 </>
               ) : (
-                <Link href="/profile" className="flex items-center gap-1.5 px-3 py-1.5 border border-border text-text-muted rounded-lg hover:border-gold/50 text-xs transition-colors">
+                <Link href="/profile" className="inline-flex items-center gap-1.5 px-3 py-2 bg-white/15 backdrop-blur-md border border-white/30 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
                   <Pencil size={11} /> Bearbeiten
                 </Link>
               )}
