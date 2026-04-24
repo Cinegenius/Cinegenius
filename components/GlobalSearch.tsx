@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Search, X, MapPin, Car, Package, Briefcase, Users,
-  Loader2, Clock, ArrowRight, User,
+  Loader2, Clock, ArrowRight, User, Building2,
 } from "lucide-react";
 
 type Result = {
@@ -29,10 +29,11 @@ const typeConfig: Record<string, {
   job:      { label: "Jobs",             icon: Briefcase, href: (id) => `/jobs/${id}`,       color: "text-emerald-400" },
   creator:  { label: "Filmschaffende",   icon: Users,     href: (id) => `/profile/${id}`,    color: "text-gold"        },
   profile:  { label: "Filmschaffende",   icon: User,      href: (id) => `/profile/${id}`,    color: "text-gold"        },
+  company:  { label: "Firmen",           icon: Building2, href: (id) => `/companies/${id}`,  color: "text-blue-400"    },
 };
 
 // Type order for display
-const TYPE_ORDER = ["profile", "creator", "job", "location", "vehicle", "prop"];
+const TYPE_ORDER = ["profile", "creator", "job", "location", "vehicle", "prop", "company"];
 
 const RECENT_KEY = "cg_recent_searches";
 const MAX_RECENT = 5;
