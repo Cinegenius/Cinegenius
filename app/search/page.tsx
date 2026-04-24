@@ -31,8 +31,8 @@ const typeConfig: Record<string, {
   color: string;
   bgColor: string;
 }> = {
-  profile:  { label: "Crew",        pluralLabel: "Crew",        icon: User,      href: (id) => `/creators/${id}`,  color: "text-gold",          bgColor: "bg-gold/10 border-gold/20"      },
-  creator:  { label: "Crew",        pluralLabel: "Crew",        icon: Users,     href: (id) => `/creators/${id}`,  color: "text-gold",          bgColor: "bg-gold/10 border-gold/20"      },
+  profile:  { label: "Crew",        pluralLabel: "Crew",        icon: User,      href: (id) => `/profile/${id}`,   color: "text-gold",          bgColor: "bg-gold/10 border-gold/20"      },
+  creator:  { label: "Crew",        pluralLabel: "Crew",        icon: Users,     href: (id) => `/profile/${id}`,   color: "text-gold",          bgColor: "bg-gold/10 border-gold/20"      },
   location: { label: "Location",     pluralLabel: "Locations",    icon: MapPin,    href: (id) => `/locations/${id}`, color: "text-sky-400",        bgColor: "bg-sky-500/10 border-sky-500/20"   },
   vehicle:  { label: "Fahrzeug",    pluralLabel: "Fahrzeuge",   icon: Car,       href: (id) => `/vehicles/${id}`,  color: "text-orange-400",    bgColor: "bg-orange-500/10 border-orange-500/20" },
   prop:     { label: "Requisite",   pluralLabel: "Requisiten",  icon: Package,   href: (id) => `/props/${id}`,     color: "text-violet-400",    bgColor: "bg-violet-500/10 border-violet-500/20" },

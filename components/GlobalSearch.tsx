@@ -27,8 +27,8 @@ const typeConfig: Record<string, {
   vehicle:  { label: "Fahrzeuge",        icon: Car,       href: (id) => `/vehicles/${id}`,   color: "text-orange-400"  },
   prop:     { label: "Requisiten",       icon: Package,   href: (id) => `/props/${id}`,      color: "text-violet-400"  },
   job:      { label: "Jobs",             icon: Briefcase, href: (id) => `/jobs/${id}`,       color: "text-emerald-400" },
-  creator:  { label: "Filmschaffende",   icon: Users,     href: (id) => `/creators/${id}`,   color: "text-gold"        },
-  profile:  { label: "Filmschaffende",   icon: User,      href: (id) => `/creators/${id}`,   color: "text-gold"        },
+  creator:  { label: "Filmschaffende",   icon: Users,     href: (id) => `/profile/${id}`,    color: "text-gold"        },
+  profile:  { label: "Filmschaffende",   icon: User,      href: (id) => `/profile/${id}`,    color: "text-gold"        },
 };
 
 // Type order for display

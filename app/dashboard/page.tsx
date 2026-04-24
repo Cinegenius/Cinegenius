@@ -311,7 +311,7 @@ export default function DashboardPage() {
     vehicle:  { label: "Fahrzeug",   icon: Car,       href: (id) => `/vehicles/${id}`,  color: "text-orange-400" },
     prop:     { label: "Requisite",  icon: Package,   href: (id) => `/props/${id}`,     color: "text-violet-400" },
     job:      { label: "Job",        icon: Briefcase, href: (id) => `/jobs/${id}`,      color: "text-emerald-400" },
-    creator:  { label: "Filmschaffende/r", icon: User, href: (id) => `/creators/${id}`, color: "text-gold" },
+    creator:  { label: "Filmschaffende/r", icon: User, href: (id) => `/profile/${id}`, color: "text-gold" },
   };
 
   // Friends
@@ -2316,7 +2316,7 @@ export default function DashboardPage() {
                       <Pencil size={12} /> Profil bearbeiten
                     </Link>
                     <Link
-                      href={user?.id ? `/creators/${user.id}` : "/creators"}
+                      href={user?.id ? `/profile/${user.id}` : "/profile"}
                       className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-colors"
                     >
                       <ExternalLink size={12} /> Öffentlich ansehen
@@ -2572,7 +2572,7 @@ export default function DashboardPage() {
                             <p className="text-xs text-text-muted truncate">{f.role}</p>
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
-                            <Link href={`/creators/${f.user_id}`} className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all">
+                            <Link href={`/profile/${f.user_id}`} className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all">
                               Profil
                             </Link>
                             <button onClick={() => removeFriendEntry(f.friendship_id)}

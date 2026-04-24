@@ -25,7 +25,7 @@ const typeConfig: Record<string, {
   vehicle:  { label: "Fahrzeug",   icon: Car,       href: (id) => `/vehicles/${id}`,  color: "text-orange-400" },
   prop:     { label: "Requisite",  icon: Package,   href: (id) => `/props/${id}`,     color: "text-violet-400" },
   job:      { label: "Job",        icon: Briefcase, href: (id) => `/jobs/${id}`,      color: "text-emerald-400" },
-  creator:  { label: "Filmschaffende/r", icon: Users, href: (id) => `/creators/${id}`, color: "text-gold" },
+  creator:  { label: "Filmschaffende/r", icon: Users, href: (id) => `/profile/${id}`, color: "text-gold" },
 };
 
 export default function FavoritesPage() {

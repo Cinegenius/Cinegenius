@@ -108,7 +108,7 @@ async function getHomeData() {
 
   const avatarStrip = (recentProfiles ?? [])
     .filter((p: { avatar_url: string | null }) => p.avatar_url?.includes("supabase.co/storage"))
-    .map((p: { user_id: string; display_name: string | null; avatar_url: string }) => ({ src: p.avatar_url, alt: p.display_name ?? "Crew", href: `/creators/${p.user_id}` }));
+    .map((p: { user_id: string; display_name: string | null; avatar_url: string }) => ({ src: p.avatar_url, alt: p.display_name ?? "Crew", href: `/profile/${p.user_id}` }));
 
   const locationStrip = (recentLocationsStrip ?? [])
     .filter((l: { image_url: string | null }) => l.image_url?.includes("supabase.co/storage"))

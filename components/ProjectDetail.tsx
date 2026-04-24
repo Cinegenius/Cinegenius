@@ -659,7 +659,7 @@ export default function ProjectDetail({
                             ? <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border shrink-0 w-8 text-center ${badge.cls}`}>{badge.text}</span>
                             : <span className="text-[10px] text-text-muted shrink-0 w-8 truncate text-center" title={roleLabel}>{roleLabel?.substring(0, 3).toUpperCase()}</span>
                           }
-                          <Link href={`/creators/${credit.user_id}`} className="flex items-center gap-2 min-w-0 flex-1 group/link">
+                          <Link href={`/profile/${credit.user_id}`} className="flex items-center gap-2 min-w-0 flex-1 group/link">
                             <div className="w-6 h-6 rounded-full overflow-hidden bg-bg-elevated border border-border shrink-0">
                               {credit.profile?.avatar_url
                                 // eslint-disable-next-line @next/next/no-img-element
@@ -703,7 +703,7 @@ export default function ProjectDetail({
                             return (
                               <div key={credit.id} className="grid grid-cols-[1fr_1.5fr_1fr] px-5 py-2.5 border-t border-border/30 hover:bg-bg-elevated/40 transition-colors items-center">
                                 <span className="text-xs text-text-muted truncate pr-4">{roleLabel}</span>
-                                <Link href={`/creators/${credit.user_id}`} className="flex items-center gap-2.5 min-w-0 group/link">
+                                <Link href={`/profile/${credit.user_id}`} className="flex items-center gap-2.5 min-w-0 group/link">
                                   <div className="w-6 h-6 rounded-full overflow-hidden bg-bg-elevated border border-border shrink-0">
                                     {credit.profile?.avatar_url
                                       // eslint-disable-next-line @next/next/no-img-element
