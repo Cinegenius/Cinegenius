@@ -1,8 +1,18 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   CheckCircle, Zap, Shield, Users, MapPin, Car, Package, Briefcase, Sparkles, ArrowRight,
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+
+export const metadata: Metadata = {
+  title: "Preise — CineGenius",
+  description: "CineGenius ist kostenlos für alle. Keine versteckten Gebühren — nur eine kleine Plattformgebühr bei Buchungen. Locations, Crew, Equipment und Jobs finden und inserieren.",
+  openGraph: {
+    title: "Preise & Konditionen — CineGenius",
+    description: "Kostenlos mitmachen — kleine Plattformgebühr nur bei erfolgreichen Buchungen.",
+  },
+};
 
 export default async function PricingPage() {
   const t = await getTranslations("pricing");

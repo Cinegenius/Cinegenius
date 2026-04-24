@@ -219,6 +219,11 @@ export default async function ProfilePage(
     getPublicCollaborations(profile.user_id),
   ]);
 
+  // Track profile view (fire-and-forget, skip own profile)
+  if (userId && userId !== profile.user_id) {
+    void db.from("profile_views").insert({ profile_id: profile.user_id, viewer_id: userId });
+  }
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
@@ -227,7 +232,7 @@ export default async function ProfilePage(
     "image": profile.avatar_url ?? "",
     "jobTitle": profile.role ?? (profile.positions?.[0] ?? ""),
     "address": profile.location ? { "@type": "PostalAddress", "addressLocality": profile.location } : undefined,
-    "url": `https://cinegenius.com/profile/${slug}`,
+    "url": `https://cinegenius.co/profile/${slug}`,
   };
 
   return (
