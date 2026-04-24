@@ -50,8 +50,12 @@ export async function POST(req: Request) {
       await resend.emails.send({
         from: "CineGenius <willkommen@cinegenius.co>",
         to: primaryEmail,
-        subject: "Willkommen bei CineGenius",
+        subject: firstName ? `${firstName}, dein CineGenius-Account ist bereit` : "Dein CineGenius-Account ist bereit",
         html: buildWelcomeEmail(firstName),
+        headers: {
+          "X-Entity-Ref-ID": `welcome-${Date.now()}`,
+          "Precedence": "bulk",
+        },
       });
     }
   }
