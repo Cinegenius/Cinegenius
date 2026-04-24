@@ -9,7 +9,7 @@ import {
   Briefcase, CheckCircle, ChevronRight, ExternalLink,
   User, Wallet, ArrowDownCircle, Receipt, Send,
   Pencil, Save, Loader2, Heart, MapPin, Car, Package, Trash2,
-  Users, UserPlus, Check, X, Globe, Lock, Clock,
+  Users, UserPlus, Check, X, Globe, Lock, Clock, ShieldCheck,
   Building2, AlertCircle, FileText, ArrowLeft,
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
@@ -376,12 +376,29 @@ export default function DashboardPage() {
   });
   const [privacyLoading, setPrivacyLoading] = useState(false);
 
+  // Verification request state
+  const [verifStatus, setVerifStatus] = useState<"none" | "pending" | "approved">("none");
+  const [verifLoading, setVerifLoading] = useState(false);
+  const [verifSubmitting, setVerifSubmitting] = useState(false);
+
   useEffect(() => {
     if (activeTab !== "settings") return;
     fetch("/api/user-settings")
       .then(r => r.json())
       .then(({ settings }) => { if (settings) setPrivacySettings(settings); })
       .catch(() => {});
+    // Load verification status
+    setVerifLoading(true);
+    fetch("/api/verification-requests")
+      .then(r => r.json())
+      .then(({ data }) => {
+        const latest = data?.[0];
+        if (!latest) setVerifStatus("none");
+        else if (latest.status === "approved") setVerifStatus("approved");
+        else setVerifStatus("pending");
+      })
+      .catch(() => {})
+      .finally(() => setVerifLoading(false));
   }, [activeTab]);
 
   const updatePrivacy = async (key: string, value: string | boolean) => {
@@ -2430,6 +2447,45 @@ export default function DashboardPage() {
                     </button>
                   </label>
                 </div>
+              </div>
+
+              {/* Verifizierung */}
+              <div className="p-5 rounded-xl border border-border bg-bg-secondary">
+                <h3 className="font-semibold text-text-primary mb-1 flex items-center gap-2">
+                  <ShieldCheck size={16} className={verifStatus === "approved" ? "text-success" : "text-text-muted"} />
+                  Profil verifizieren
+                </h3>
+                <p className="text-xs text-text-muted mb-4 leading-relaxed">
+                  Verifizierte Profile erhalten ein blaues Häkchen und werden von anderen Nutzern als vertrauenswürdig eingestuft.
+                </p>
+                {verifLoading ? (
+                  <Loader2 size={16} className="animate-spin text-text-muted" />
+                ) : verifStatus === "approved" ? (
+                  <div className="flex items-center gap-2 text-success text-sm font-medium">
+                    <CheckCircle size={16} /> Profil ist verifiziert
+                  </div>
+                ) : verifStatus === "pending" ? (
+                  <div className="flex items-center gap-2 text-gold text-sm">
+                    <Clock size={16} /> Anfrage in Bearbeitung — wir melden uns bald.
+                  </div>
+                ) : (
+                  <button
+                    disabled={verifSubmitting}
+                    onClick={async () => {
+                      setVerifSubmitting(true);
+                      try {
+                        const res = await fetch("/api/verification-requests", { method: "POST" });
+                        if (res.ok) setVerifStatus("pending");
+                      } finally {
+                        setVerifSubmitting(false);
+                      }
+                    }}
+                    className="px-4 py-2 text-xs font-semibold border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors flex items-center gap-1.5 disabled:opacity-40"
+                  >
+                    {verifSubmitting ? <Loader2 size={13} className="animate-spin" /> : <ShieldCheck size={13} />}
+                    Verifizierung beantragen
+                  </button>
+                )}
               </div>
 
               {/* ── DANGER ZONE ── */}
