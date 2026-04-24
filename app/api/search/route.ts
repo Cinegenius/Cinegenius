@@ -2,10 +2,13 @@ import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
-  const q    = req.nextUrl.searchParams.get("q")?.trim() ?? "";
+  const raw  = req.nextUrl.searchParams.get("q")?.trim() ?? "";
   const type = req.nextUrl.searchParams.get("type")?.trim() ?? "all";
-  if (q.length < 2) return NextResponse.json({ results: [] });
+  if (raw.length < 2) return NextResponse.json({ results: [] });
+  if (raw.length > 100) return NextResponse.json({ results: [] });
 
+  // Strip PostgREST filter-syntax chars that could break the .or() string structure
+  const q    = raw.replace(/[(),]/g, " ").trim();
   const like = `%${q}%`;
 
   const wantListings = type === "all" || ["location", "vehicle", "prop", "job", "creator"].includes(type);

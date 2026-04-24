@@ -27,6 +27,10 @@ const RATE_LIMITS: Record<string, { limit: number; windowMs: number }> = {
   "/api/reviews":        { limit: 10, windowMs: 60_000 },
   "/api/reports":        { limit: 10, windowMs: 60_000 },
   "/api/blocks":         { limit: 20, windowMs: 60_000 },
+  "/api/search":         { limit: 30, windowMs: 60_000 },
+  "/api/notifications":  { limit: 60, windowMs: 60_000 },
+  "/api/unread-count":   { limit: 60, windowMs: 60_000 },
+  "/api/favorites":      { limit: 30, windowMs: 60_000 },
 };
 
 function ipRateLimit(req: NextRequest): NextResponse | null {
