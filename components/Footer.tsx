@@ -29,9 +29,9 @@ const columns = [
     titleKey: "col3",
     links: [
       { label: "Über CineGenius", href: "/about" },
-      { label: "Wie es funktioniert", href: "/pricing" },
+      { label: "Hilfe & FAQ", href: "/help" },
       { label: "Trust & Safety", href: "/trust" },
-      { label: "Impressum", href: "/impressum" },
+      { label: "Preise", href: "/pricing" },
     ],
   },
 ];

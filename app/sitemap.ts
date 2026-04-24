@@ -61,7 +61,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }));
 
     profilePages = (profiles ?? []).map((p: { user_id: string; updated_at: string }) => ({
-      url: `${BASE}/creators/${p.user_id}`,
+      url: `${BASE}/profile/${p.user_id}`,
       lastModified: p.updated_at ?? now,
       changeFrequency: "weekly" as const,
       priority: 0.7,

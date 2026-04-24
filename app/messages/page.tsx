@@ -48,6 +48,7 @@ function MessagesContent() {
   const { user } = useUser();
   const searchParams = useSearchParams();
   const toParam = searchParams.get("to");
+  const convParam = searchParams.get("conv");
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -115,6 +116,18 @@ function MessagesContent() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toParam, loading, conversations]);
+
+  // Open a specific conversation by ID (from notification links: ?conv=...)
+  useEffect(() => {
+    if (!convParam || loading) return;
+    const existing = conversations.find(c => c.id === convParam);
+    if (existing) {
+      setActiveId(existing.id);
+      setNewConvRecipient(null);
+      loadMessages(existing.id);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [convParam, loading, conversations]);
 
   async function loadMessages(convId: string) {
     const res = await fetch(`/api/conversations/${convId}`);

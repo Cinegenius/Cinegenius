@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/dashboard", "/admin", "/booking/checkout", "/booking/confirmation", "/profile", "/auth"],
       },
     ],
-    sitemap: "https://cinegenius.com/sitemap.xml",
+    sitemap: "https://cinegenius.co/sitemap.xml",
   };
 }

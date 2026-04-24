@@ -33,7 +33,7 @@ function wrap(content: string) {
         </td></tr>
         <tr><td style="padding:32px">${content}</td></tr>
         <tr><td style="padding:16px 32px;border-top:1px solid #222">
-          <p style="margin:0;font-size:11px;color:#555">Du erhältst diese E-Mail, weil du Mitglied auf CineGenius bist. <a href="${BASE}" style="color:#d4a843;text-decoration:none">cinegenius.com</a></p>
+          <p style="margin:0;font-size:11px;color:#555">Du erhältst diese E-Mail, weil du Mitglied auf CineGenius bist. <a href="${BASE}" style="color:#d4a843;text-decoration:none">cinegenius.co</a></p>
         </td></tr>
       </table>
     </td></tr>
