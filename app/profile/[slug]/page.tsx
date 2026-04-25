@@ -236,10 +236,10 @@ export default async function ProfilePage(
     getPublicCollaborations(profile.user_id),
   ]);
 
-  // Track profile view (fire-and-forget, skip own profile)
+  // Track profile view — awaited so serverless doesn't drop it before .then() runs
   if (userId && userId !== profile.user_id) {
-    db.from("profile_views").insert({ profile_id: profile.user_id, viewer_id: userId })
-      .then(({ error }) => { if (error) console.error("[profile_views]", error.message); });
+    const { error: viewErr } = await db.from("profile_views").insert({ profile_id: profile.user_id, viewer_id: userId });
+    if (viewErr) console.error("[profile_views]", viewErr.message);
   }
 
   const jsonLd = {
