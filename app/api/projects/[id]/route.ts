@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { requireAuth, assertOwner } from "@/lib/guards";
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 
 // GET /api/projects/[id] — public project detail (no auth required)
 export async function GET(
@@ -127,5 +128,7 @@ export async function DELETE(
     .eq("id", id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  revalidateTag("profiles");
+  revalidateTag("projects");
   return NextResponse.json({ success: true });
 }
