@@ -210,6 +210,57 @@ export default function InseratPage() {
   const router = useRouter();
   const { userId, isLoaded } = useAuth();
 
+  const LOCATION_ROOMS: Record<string, [string, string][]> = {
+    "Wohnen": [
+      ["living_room", "Wohnzimmer"], ["bedroom", "Schlafzimmer"], ["dining_room", "Esszimmer"],
+      ["kitchen_room", "Küche"], ["bathroom", "Badezimmer"], ["home_office", "Arbeitszimmer"],
+      ["garden", "Garten"], ["garage", "Garage"], ["basement", "Keller"],
+      ["attic", "Dachboden"], ["balcony", "Balkon / Terrasse"], ["pool", "Pool"],
+    ],
+    "Villa": [
+      ["living_room", "Wohnzimmer"], ["bedroom", "Schlafzimmer"], ["dining_room", "Esszimmer"],
+      ["kitchen_room", "Küche"], ["bathroom", "Badezimmer"], ["garden", "Garten"],
+      ["garage", "Garage"], ["pool", "Pool / Swimmingpool"], ["spa", "Sauna / Spa"],
+      ["home_cinema", "Heimkino"], ["wine_cellar", "Weinkeller"], ["library", "Bibliothek"],
+      ["balcony", "Balkon / Terrasse"], ["rooftop", "Rooftop"],
+    ],
+    "Büro": [
+      ["open_space", "Open Space"], ["conference_room", "Konferenzraum"], ["meeting_room", "Besprechungsraum"],
+      ["reception", "Empfang / Lobby"], ["kitchen_room", "Teeküche"], ["coworking", "Coworking-Bereich"],
+      ["server_room", "Serverraum"], ["archive", "Archiv"], ["terrace", "Dachterrasse"],
+    ],
+    "Industrie": [
+      ["warehouse", "Lagerhalle"], ["production", "Produktion / Werkstatt"], ["office_area", "Bürobereich"],
+      ["changing_room_area", "Umkleide"], ["loading_area", "Verladebereich"], ["cold_storage", "Kühlraum"],
+      ["rooftop", "Dach / Außenbereich"], ["showroom", "Showroom"],
+    ],
+    "Natur": [
+      ["forest", "Wald"], ["meadow", "Wiese / Feld"], ["lake", "See / Gewässer"],
+      ["beach", "Strand"], ["mountain", "Berg / Hügel"], ["park", "Park / Gartenanlage"],
+      ["farm", "Bauernhof / Hof"], ["ruins", "Ruine / Lost Place"],
+    ],
+    "Gastronomie": [
+      ["restaurant_area", "Restaurantbereich"], ["bar_area", "Bar / Theke"], ["terrace", "Terrasse / Außenbereich"],
+      ["private_room", "Privatraum / VIP"], ["kitchen_room", "Profiküche"], ["storage", "Lager"],
+      ["rooftop", "Rooftop"],
+    ],
+    "Studio": [
+      ["main_stage", "Hauptstage"], ["green_room_area", "Green Room"], ["makeup_room", "Maske / Make-up"],
+      ["control_room", "Regieraum"], ["prop_storage", "Requisitenlager"], ["changing_room_area", "Umkleide"],
+      ["office_area", "Bürobereich"], ["outdoor_set", "Außenset"],
+    ],
+    "Fotostudio": [
+      ["shooting_area", "Shootingfläche"], ["cyclorama", "Cyclorama / Hohlkehle"], ["makeup_room", "Maske / Make-up"],
+      ["changing_room_area", "Umkleide"], ["lounge", "Lounge / Wartebereich"], ["storage", "Fundus / Lager"],
+      ["office_area", "Bürobereich"],
+    ],
+    "Speziallocation": [
+      ["main_area", "Hauptbereich"], ["garden", "Garten / Außenbereich"], ["basement", "Keller / UG"],
+      ["rooftop", "Dach / Rooftop"], ["terrace", "Terrasse"], ["private_room", "Nebenraum"],
+      ["storage", "Lager"],
+    ],
+  };
+
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [createdId, setCreatedId] = useState<string | null>(null);
   const [selected, setSelected] = useState<CategoryItem | null>(null);
@@ -228,6 +279,7 @@ export default function InseratPage() {
 
   // Location extras
   const [locAmenities, setLocAmenities] = useState<string[]>([]);
+  const [locRooms, setLocRooms] = useState<string[]>([]);
   const [locBlockedDates, setLocBlockedDates] = useState<string[]>([]);
   const [locExtraImages, setLocExtraImages] = useState<string[]>([]);
   const [locFloorPlanUrl, setLocFloorPlanUrl] = useState<string | null>(null);
@@ -329,6 +381,7 @@ export default function InseratPage() {
           power_details: form.power_details || null,
           parking_spots: form.parking_spots ? parseInt(form.parking_spots) : null,
           amenities: locAmenities,
+          rooms: locRooms,
         },
         blocked_dates: locBlockedDates,
         floor_plan_url: locFloorPlanUrl,
@@ -738,6 +791,25 @@ export default function InseratPage() {
                       className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   )}
                 </div>
+
+                {/* Räume — kategoriespezifisch */}
+                {selected?.category && LOCATION_ROOMS[selected.category] && (
+                  <div>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">Räume & Bereiche</label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {LOCATION_ROOMS[selected.category].map(([id, label]) => {
+                        const active = locRooms.includes(id);
+                        return (
+                          <button key={id} type="button"
+                            onClick={() => setLocRooms(prev => active ? prev.filter(r => r !== id) : [...prev, id])}
+                            className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left text-xs font-medium transition-all ${active ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-elevated text-text-secondary hover:border-border-light"}`}>
+                            {active && <span className="text-gold">✓</span>} {label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 {/* Ausstattung */}
                 <div>
