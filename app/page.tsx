@@ -172,12 +172,12 @@ export default async function HomePage() {
   }
 
   const featurePillars = [
-    { icon: MapPin,       title: t("pillarLocationsTitle"),  desc: t("pillarLocationsDesc"),  href: "/locations", pillarKey: "location",  accent: "from-sky-900/70",     insertHref: "/inserat?group=drehorte",   insertLabel: t("pillarLocationsCta") },
-    { icon: Users,        title: t("pillarCrewTitle"),        desc: t("pillarCrewDesc"),        href: "/creators",  pillarKey: "crew",      accent: "from-violet-900/70",  insertHref: "/profile",                  insertLabel: t("pillarCrewCta") },
-    { icon: ShoppingBag,  title: t("pillarMarketplaceTitle"), desc: t("pillarMarketplaceDesc"), href: "/props",     pillarKey: "equipment", accent: "from-slate-900/70",   insertHref: "/inserat?group=marktplatz", insertLabel: t("pillarMarketplaceCta") },
-    { icon: Briefcase,    title: t("pillarJobsTitle"),        desc: t("pillarJobsDesc"),        href: "/jobs",      pillarKey: "job",       accent: "from-zinc-900/70",    insertHref: "/inserat?group=jobs",       insertLabel: t("pillarJobsCta") },
-    { icon: Building2,    title: t("pillarCompaniesTitle"),   desc: t("pillarCompaniesDesc"),   href: "/companies", pillarKey: "firma",     accent: "from-emerald-900/70", insertHref: "/company-setup",            insertLabel: t("pillarCompaniesCta") },
-    { icon: Clapperboard, title: t("pillarProjectsTitle"),    desc: t("pillarProjectsDesc"),    href: "/projects",  pillarKey: "projekt",   accent: "from-rose-900/70",    insertHref: "/projects",                 insertLabel: t("pillarProjectsCta") },
+    { icon: MapPin,       title: t("pillarLocationsTitle"),  desc: t("pillarLocationsDesc"),  href: "/locations", pillarKey: "location",  accent: "from-sky-900/70",     insertHref: "/inserat?group=drehorte",   insertLabel: t("pillarLocationsCta"),  imgPos: "50% 50%" },
+    { icon: Users,        title: t("pillarCrewTitle"),        desc: t("pillarCrewDesc"),        href: "/creators",  pillarKey: "crew",      accent: "from-violet-900/70",  insertHref: "/profile",                  insertLabel: t("pillarCrewCta"),       imgPos: "50% 20%" },
+    { icon: ShoppingBag,  title: t("pillarMarketplaceTitle"), desc: t("pillarMarketplaceDesc"), href: "/props",     pillarKey: "equipment", accent: "from-slate-900/70",   insertHref: "/inserat?group=marktplatz", insertLabel: t("pillarMarketplaceCta"), imgPos: "50% 66%" },
+    { icon: Briefcase,    title: t("pillarJobsTitle"),        desc: t("pillarJobsDesc"),        href: "/jobs",      pillarKey: "job",       accent: "from-zinc-900/70",    insertHref: "/inserat?group=jobs",       insertLabel: t("pillarJobsCta"),       imgPos: "50% 50%" },
+    { icon: Building2,    title: t("pillarCompaniesTitle"),   desc: t("pillarCompaniesDesc"),   href: "/companies", pillarKey: "firma",     accent: "from-emerald-900/70", insertHref: "/company-setup",            insertLabel: t("pillarCompaniesCta"), imgPos: "50% 50%" },
+    { icon: Clapperboard, title: t("pillarProjectsTitle"),    desc: t("pillarProjectsDesc"),    href: "/projects",  pillarKey: "projekt",   accent: "from-rose-900/70",    insertHref: "/projects",                 insertLabel: t("pillarProjectsCta"),  imgPos: "50% 50%" },
   ];
 
   const useCases = [
@@ -396,7 +396,7 @@ export default async function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {featurePillars.map(({ icon: Icon, title, desc, href, pillarKey, accent, insertHref, insertLabel }) => {
+            {featurePillars.map(({ icon: Icon, title, desc, href, pillarKey, accent, insertHref, insertLabel, imgPos }) => {
               const image = pillarImages[pillarKey as keyof typeof pillarImages];
               return (
                 <Link
@@ -411,6 +411,7 @@ export default async function HomePage() {
                         alt={title}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                        style={{ objectPosition: imgPos }}
                         sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw"
                       />
                     ) : (
