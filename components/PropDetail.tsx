@@ -232,14 +232,8 @@ export default function PropDetail({ prop }: { prop: Prop }) {
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-text-primary">{prop.vendor}</p>
                 <p className="text-xs text-text-muted flex items-center gap-1 mt-0.5">
-                  <MapPin size={11} /> {prop.location} · Mitglied seit 2023
+                  <MapPin size={11} /> {prop.location}
                 </p>
-                <div className="flex items-center gap-1 mt-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={11} className={i < 4 ? "text-gold fill-gold" : "text-border"} />
-                  ))}
-                  <span className="text-xs text-text-muted ml-1">4,8 · 34 Bewertungen</span>
-                </div>
               </div>
               <button className="px-3 py-1.5 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-all shrink-0 flex items-center gap-1.5">
                 <Phone size={12} /> Kontakt

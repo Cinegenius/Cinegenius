@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import JsonLd from "@/components/JsonLd";
 import {
-  MapPin, CheckCircle, Star, Car, Calendar, Shield,
-  Truck, ArrowRight, Zap, Info,
+  MapPin, CheckCircle, Car, Calendar, Shield,
+  ArrowRight, Zap, Info,
 } from "lucide-react";
 import InquiryForm from "@/components/InquiryForm";
 import FavoriteButton from "@/components/FavoriteButton";
@@ -277,15 +277,9 @@ export default async function VehicleDetailPage({
                   </div>
                   <div>
                     <p className="text-sm font-medium text-text-primary">{vehicle.vendor}</p>
-                    <div className="flex items-center gap-1">
-                      <Star size={11} className="text-gold fill-gold" />
-                      <span className="text-xs text-text-muted">4.8 (24 Bewertungen)</span>
-                    </div>
+                    <p className="text-xs text-text-muted">Inserat-Anbieter</p>
                   </div>
                 </div>
-                <p className="text-xs text-text-muted leading-relaxed">
-                  Professioneller Fahrzeug-Verleiher, spezialisiert auf Film- und TV-Produktionen. Antwortet in der Regel innerhalb von 2 Stunden.
-                </p>
               </div>
             </div>
           </div>

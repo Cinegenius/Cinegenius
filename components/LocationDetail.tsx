@@ -292,7 +292,7 @@ export default function LocationDetail({ location }: { location: Location }) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-text-primary">Frage an den Anbieter?</p>
-                    <p className="text-xs text-text-muted">Antwortet in der Regel in &lt;2h</p>
+                    <p className="text-xs text-text-muted">Konditionen privat verhandeln</p>
                   </div>
                 </div>
               )}
