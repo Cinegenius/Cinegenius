@@ -1366,13 +1366,13 @@ export default function InseratPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
-                  {isJob ? "Gage / Tag (€) — 0 = Auf Anfrage" : isCreator ? "Tagesrate (€)" : "Preis / Tag (€) *"}
+                  {isJob ? "Gage / Tag (€) — 0 = Auf Anfrage" : isCreator ? "Tagesrate (€)" : form.rental_type === "kauf" ? "Kaufpreis (€) *" : "Preis / Tag (€) *"}
                 </label>
                 <input
                   type="number" min="0"
                   value={form.price}
                   onChange={(e) => f("price", e.target.value)}
-                  placeholder={isJob || isCreator ? "z.B. 500" : "z.B. 800"}
+                  placeholder={isJob || isCreator ? "z.B. 500" : form.rental_type === "kauf" ? "z.B. 1200" : "z.B. 800"}
                   className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors"
                 />
               </div>
