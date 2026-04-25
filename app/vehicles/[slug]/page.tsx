@@ -17,14 +17,15 @@ export const dynamicParams = true;
 
 async function getVehicle(slug: string) {
   try {
-    const { data } = await db
+    const { data, error } = await db
       .from("listings")
       .select("*")
       .eq("id", slug)
-      .eq("type", "vehicle")
       .single();
 
-    if (!data) return null;
+    if (error) console.error("[getVehicle] db error:", error.message, "slug:", slug);
+    if (!data) { console.error("[getVehicle] no listing found for slug:", slug); return null; }
+    if (data.type !== "vehicle") { console.error("[getVehicle] wrong type:", data.type, "slug:", slug); return null; }
 
   const ownerRes = data.user_id
     ? await db.from("profiles").select("display_name").eq("user_id", data.user_id).single()
