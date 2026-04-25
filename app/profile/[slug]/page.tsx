@@ -88,20 +88,16 @@ export async function generateMetadata(
   };
 }
 
-const getProjectCredits = unstable_cache(
-  async (userId: string): Promise<ProjectCredit[]> => {
-    const { data, error } = await db
-      .from("project_credits")
-      .select("id, role, project_id, projects(id, title, year, type, director, poster_url, metadata)")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false });
-    if (error || !data) return [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return data as any;
-  },
-  ["profile-credits"],
-  { revalidate: 300, tags: ["profiles"] }
-);
+async function getProjectCredits(userId: string): Promise<ProjectCredit[]> {
+  const { data, error } = await db
+    .from("project_credits")
+    .select("id, role, project_id, projects(id, title, year, type, director, poster_url, metadata)")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+  if (error || !data) return [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return data as any;
+}
 
 const getExternalProfiles = unstable_cache(
   async (userId: string): Promise<ExternalProfileRow[]> => {
