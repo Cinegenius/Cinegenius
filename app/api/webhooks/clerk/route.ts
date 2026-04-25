@@ -33,6 +33,25 @@ export async function POST(req: Request) {
     return new Response("Invalid signature", { status: 400 });
   }
 
+  // Clerk verification/invitation emails — fired when "Delivered by Clerk" is OFF
+  if (event.type === "email.created") {
+    const e = event.data as {
+      to_email_address?: string;
+      subject?: string;
+      body?: string;
+      from_email_name?: string;
+    };
+    if (e.to_email_address && e.subject && e.body) {
+      await resend.emails.send({
+        from: "CineGenius <noreply@cinegenius.co>",
+        to: e.to_email_address,
+        subject: e.subject,
+        html: e.body,
+      });
+    }
+    return new Response("OK", { status: 200 });
+  }
+
   if (event.type === "user.created") {
     const user = event.data as {
       email_addresses?: { email_address: string; id: string }[];
