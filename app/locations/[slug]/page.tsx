@@ -22,48 +22,52 @@ async function geocodeCity(city: string): Promise<{ lat: number; lng: number }> 
 }
 
 async function getLocation(slug: string) {
-  const { data } = await db
-    .from("listings")
-    .select("*")
-    .eq("id", slug)
-    .eq("type", "location")
-    .single();
+  try {
+    const { data } = await db
+      .from("listings")
+      .select("*")
+      .eq("id", slug)
+      .eq("type", "location")
+      .single();
 
-  if (!data) return null;
+    if (!data) return null;
 
-  const [{ lat, lng }, ownerRes] = await Promise.all([
-    geocodeCity(data.city ?? ""),
-    data.user_id
-      ? db.from("profiles").select("display_name").eq("user_id", data.user_id).single()
-      : Promise.resolve({ data: null }),
-  ]);
+    const [{ lat, lng }, ownerRes] = await Promise.all([
+      geocodeCity(data.city ?? ""),
+      data.user_id
+        ? db.from("profiles").select("display_name").eq("user_id", data.user_id).single()
+        : Promise.resolve({ data: null }),
+    ]);
 
-  return {
-    id: data.id,
-    title: data.title,
-    type: data.category ?? "Speziallocation",
-    city: data.city ?? "",
-    price: data.price ?? 0,
-    priceUnit: "day" as const,
-    rating: 0,
-    reviews: 0,
-    image: data.image_url ?? "",
-    tags: ["Neu"],
-    instantBook: false,
-    verified: false,
-    sqft: 0,
-    capacity: 0,
-    lat,
-    lng,
-    description: data.description ?? "",
-    ownerId: data.user_id ?? "",
-    ownerName: (ownerRes as { data: { display_name: string | null } | null }).data?.display_name ?? "Anbieter",
-    isReal: true,
-    metadata: data.metadata ?? null,
-    blocked_dates: data.blocked_dates ?? [],
-    floor_plan_url: data.floor_plan_url ?? null,
-    extra_images: data.extra_images ?? [],
-  };
+    return {
+      id: data.id,
+      title: data.title ?? "Location",
+      type: data.category ?? "Speziallocation",
+      city: data.city ?? "",
+      price: data.price ?? 0,
+      priceUnit: "day" as const,
+      rating: 0,
+      reviews: 0,
+      image: data.image_url ?? "",
+      tags: ["Neu"],
+      instantBook: false,
+      verified: false,
+      sqft: 0,
+      capacity: 0,
+      lat,
+      lng,
+      description: data.description ?? "",
+      ownerId: data.user_id ?? "",
+      ownerName: (ownerRes as { data: { display_name: string | null } | null }).data?.display_name ?? "Anbieter",
+      isReal: true,
+      metadata: data.metadata ?? null,
+      blocked_dates: data.blocked_dates ?? [],
+      floor_plan_url: data.floor_plan_url ?? null,
+      extra_images: data.extra_images ?? [],
+    };
+  } catch {
+    return null;
+  }
 }
 
 export async function generateStaticParams() {
@@ -84,7 +88,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${location.title} | CineGenius`,
       description: `${location.type} in ${location.city} — jetzt für Film & Foto buchen.`,
-      images: [{ url: location.image, width: 800, height: 600, alt: location.title }],
+      ...(location.image ? { images: [{ url: location.image, width: 800, height: 600, alt: location.title }] } : {}),
     },
   };
 }
@@ -108,7 +112,7 @@ export default async function LocationPage({
       "addressLocality": location.city,
       "addressCountry": "DE",
     },
-    "image": location.image,
+    "image": location.image || undefined,
     "offers": {
       "@type": "Offer",
       "price": location.price,

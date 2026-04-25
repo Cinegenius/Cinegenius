@@ -20,56 +20,60 @@ function parseCreatorDescription(raw: string): { skills: string[]; credits: stri
 }
 
 async function _getCreator(slug: string) {
-  // Try listings first
-  const { data: listing } = await db
-    .from("listings")
-    .select("*")
-    .eq("id", slug)
-    .eq("type", "creator")
-    .single();
+  try {
+    // Try listings first
+    const { data: listing } = await db
+      .from("listings")
+      .select("*")
+      .eq("id", slug)
+      .eq("type", "creator")
+      .single();
 
-  if (listing) {
-    const { skills, credits } = parseCreatorDescription(listing.description ?? "");
-    // Check if the listing owner is verified
-    let verified = false;
-    if (listing.user_id) {
-      const { data: ownerProfile } = await db
-        .from("profiles")
-        .select("verified")
-        .eq("user_id", listing.user_id)
-        .maybeSingle();
-      verified = ownerProfile?.verified ?? false;
+    if (listing) {
+      const { skills, credits } = parseCreatorDescription(listing.description ?? "");
+      // Check if the listing owner is verified
+      let verified = false;
+      if (listing.user_id) {
+        const { data: ownerProfile } = await db
+          .from("profiles")
+          .select("verified")
+          .eq("user_id", listing.user_id)
+          .maybeSingle();
+        verified = ownerProfile?.verified ?? false;
+      }
+      return {
+        id: listing.id,
+        name: listing.title ?? "Creator",
+        role: listing.category ?? "Filmschaffende/r",
+        location: listing.city ?? "",
+        image: listing.image_url ?? "",
+        avatar: listing.image_url ?? "",
+        rating: 0,
+        reviews: 0,
+        dayRate: (listing.price ?? 0) > 0 ? `${listing.price} €/Tag` : "Nach Vereinbarung",
+        available: true,
+        credits,
+        skills,
+        verified,
+        ownerId: listing.user_id ?? "",
+        isReal: true,
+      };
     }
-    return {
-      id: listing.id,
-      name: listing.title,
-      role: listing.category ?? "Filmschaffende/r",
-      location: listing.city ?? "",
-      image: listing.image_url ?? "",
-      avatar: listing.image_url ?? "",
-      rating: 0,
-      reviews: 0,
-      dayRate: listing.price > 0 ? `${listing.price} €/Tag` : "Nach Vereinbarung",
-      available: true,
-      credits,
-      skills,
-      verified,
-      ownerId: listing.user_id ?? "",
-      isReal: true,
-    };
+
+    // Fall back to profiles table (slug = user_id) → redirect to /profile page
+    const { data: profile } = await db
+      .from("profiles")
+      .select("user_id, slug")
+      .eq("user_id", slug)
+      .maybeSingle();
+
+    if (!profile) return null;
+
+    // Profiles now use the modular /profile/[slug] page
+    redirect(`/profile/${profile.slug ?? profile.user_id}`);
+  } catch {
+    return null;
   }
-
-  // Fall back to profiles table (slug = user_id) → redirect to /profile page
-  const { data: profile } = await db
-    .from("profiles")
-    .select("user_id, slug")
-    .eq("user_id", slug)
-    .maybeSingle();
-
-  if (!profile) return null;
-
-  // Profiles now use the modular /profile/[slug] page
-  redirect(`/profile/${profile.slug ?? profile.user_id}`);
 }
 
 const getCreator = unstable_cache(_getCreator, ["creator"], { revalidate: 300, tags: ["listings", "profiles"] });
@@ -92,7 +96,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${creator.name} | CineGenius`,
       description: `${creator.role} · ${creator.location}`,
-      images: [{ url: creator.image, width: 400, height: 400, alt: creator.name }],
+      ...(creator.image ? { images: [{ url: creator.image, width: 400, height: 400, alt: creator.name }] } : {}),
     },
   };
 }

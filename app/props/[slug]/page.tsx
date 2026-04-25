@@ -7,35 +7,39 @@ export const revalidate = 300;
 export const dynamicParams = true;
 
 async function getProp(slug: string) {
-  const { data } = await db
-    .from("listings")
-    .select("*")
-    .eq("id", slug)
-    .eq("type", "prop")
-    .single();
+  try {
+    const { data } = await db
+      .from("listings")
+      .select("*")
+      .eq("id", slug)
+      .eq("type", "prop")
+      .single();
 
-  if (!data) return null;
+    if (!data) return null;
 
-  const ownerRes = data.user_id
-    ? await db.from("profiles").select("display_name").eq("user_id", data.user_id).single()
-    : { data: null };
+    const ownerRes = data.user_id
+      ? await db.from("profiles").select("display_name").eq("user_id", data.user_id).single()
+      : { data: null };
 
-  return {
-    id: data.id,
-    title: data.title,
-    category: data.category ?? "Requisiten",
-    vendor: (ownerRes as { data: { display_name: string | null } | null }).data?.display_name ?? "Privatanbieter",
-    location: data.city ?? "",
-    dailyRate: data.price ?? 0,
-    image: data.image_url ?? "",
-    condition: (data.metadata as { condition?: string } | null)?.condition ?? "Gut",
-    era: (data.metadata as { era?: string } | null)?.era ?? null,
-    delivery: (data.metadata as { delivery?: boolean } | null)?.delivery ?? false,
-    description: data.description ?? "",
-    ownerId: data.user_id ?? "",
-    ownerName: (ownerRes as { data: { display_name: string | null } | null }).data?.display_name ?? "Anbieter",
-    extra_images: data.extra_images ?? [],
-  };
+    return {
+      id: data.id,
+      title: data.title ?? "Requisite",
+      category: data.category ?? "Requisiten",
+      vendor: (ownerRes as { data: { display_name: string | null } | null }).data?.display_name ?? "Privatanbieter",
+      location: data.city ?? "",
+      dailyRate: data.price ?? 0,
+      image: data.image_url ?? "",
+      condition: (data.metadata as { condition?: string } | null)?.condition ?? "Gut",
+      era: (data.metadata as { era?: string } | null)?.era ?? null,
+      delivery: (data.metadata as { delivery?: boolean } | null)?.delivery ?? false,
+      description: data.description ?? "",
+      ownerId: data.user_id ?? "",
+      ownerName: (ownerRes as { data: { display_name: string | null } | null }).data?.display_name ?? "Anbieter",
+      extra_images: data.extra_images ?? [],
+    };
+  } catch {
+    return null;
+  }
 }
 
 export async function generateStaticParams() {
@@ -56,7 +60,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${prop.title} | CineGenius Verleih`,
       description: `${prop.category} · ${prop.condition} · ${prop.dailyRate} €/Tag`,
-      images: [{ url: prop.image, width: 800, height: 600, alt: prop.title }],
+      ...(prop.image ? { images: [{ url: prop.image, width: 800, height: 600, alt: prop.title }] } : {}),
     },
   };
 }
@@ -77,7 +81,7 @@ export default async function PropDetailPage({
     "description": ("description" in prop && prop.description)
       ? String(prop.description)
       : `${prop.category} zum Verleih — ${prop.condition} — ${prop.location}`,
-    "image": prop.image,
+    "image": prop.image || undefined,
     "brand": {
       "@type": "Brand",
       "name": prop.vendor,

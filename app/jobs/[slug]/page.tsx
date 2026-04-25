@@ -24,36 +24,40 @@ function parseJobDescription(raw: string) {
 }
 
 async function getJob(slug: string) {
-  const { data } = await db
-    .from("listings")
-    .select("*")
-    .eq("id", slug)
-    .eq("type", "job")
-    .single();
+  try {
+    const { data } = await db
+      .from("listings")
+      .select("*")
+      .eq("id", slug)
+      .eq("type", "job")
+      .single();
 
-  if (!data) return null;
+    if (!data) return null;
 
-  const parsed = parseJobDescription(data.description ?? "");
+    const parsed = parseJobDescription(data.description ?? "");
 
-  return {
-    id: data.id,
-    title: data.title,
-    company: parsed.company ?? "Privatanbieter",
-    projectType: parsed.projectType ?? "Film",
-    location: data.city ?? "",
-    rate: data.price > 0 ? `${data.price} €/Tag` : "Nach Vereinbarung",
-    union: "Non-Union",
-    shootDates: parsed.shootDates ?? "Auf Anfrage",
-    urgent: parsed.urgent,
-    payType: parsed.payType,
-    contentWarnings: parsed.contentWarnings,
-    tags: ["Neu"],
-    posted: "Aktuell",
-    description: parsed.description,
-    ownerId: data.user_id ?? "",
-    ownerName: parsed.company ?? "Anbieter",
-    isReal: true,
-  };
+    return {
+      id: data.id,
+      title: data.title ?? "Job",
+      company: parsed.company ?? "Privatanbieter",
+      projectType: parsed.projectType ?? "Film",
+      location: data.city ?? "",
+      rate: (data.price ?? 0) > 0 ? `${data.price} €/Tag` : "Nach Vereinbarung",
+      union: "Non-Union",
+      shootDates: parsed.shootDates ?? "Auf Anfrage",
+      urgent: parsed.urgent,
+      payType: parsed.payType,
+      contentWarnings: parsed.contentWarnings,
+      tags: ["Neu"],
+      posted: "Aktuell",
+      description: parsed.description,
+      ownerId: data.user_id ?? "",
+      ownerName: parsed.company ?? "Anbieter",
+      isReal: true,
+    };
+  } catch {
+    return null;
+  }
 }
 
 export async function generateStaticParams() {
