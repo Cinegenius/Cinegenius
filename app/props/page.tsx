@@ -43,6 +43,7 @@ export default async function PropsPage() {
     era: null as string | null,
     delivery: ((l.metadata as Record<string, unknown> | null)?.delivery as boolean) ?? false,
     rentalType: (l.rental_type ?? "miete") as "miete" | "kauf",
+    focalPoint: ((l.metadata as Record<string, unknown> | null)?.focal_point as { x: number; y: number } | null) ?? null,
     isReal: true,
     meta: l.metadata ?? null,
   }));

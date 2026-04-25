@@ -28,6 +28,7 @@ type Prop = {
   condition: string;
   era: string | null;
   delivery: boolean;
+  focalPoint?: { x: number; y: number } | null;
   description?: string;
   ownerId?: string;
   ownerName?: string;
@@ -85,6 +86,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
               alt={prop.title}
               fill
               className="object-cover hover:scale-105 transition-transform duration-500"
+              style={{ objectPosition: prop.focalPoint ? `${prop.focalPoint.x}% ${prop.focalPoint.y}%` : "50% 66%" }}
               sizes="50vw"
               priority
             />

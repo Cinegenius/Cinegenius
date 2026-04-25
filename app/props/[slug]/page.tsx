@@ -29,6 +29,7 @@ async function getProp(slug: string) {
       condition: (data.metadata as { condition?: string } | null)?.condition ?? "Gut",
       era: (data.metadata as { era?: string } | null)?.era ?? null,
       delivery: (data.metadata as { delivery?: boolean } | null)?.delivery ?? false,
+      focalPoint: (data.metadata as { focal_point?: { x: number; y: number } | null } | null)?.focal_point ?? null,
       description: data.description ?? "",
       ownerId: data.user_id ?? "",
       ownerName: (ownerRes as { data: { display_name: string | null } | null }).data?.display_name ?? "Anbieter",

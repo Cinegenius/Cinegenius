@@ -49,7 +49,7 @@ export default async function LocationsPage() {
   const t = await getTranslations("locations");
   const { data } = await db
     .from("listings")
-    .select("id, title, city, price, image_url, category, description")
+    .select("id, title, city, price, image_url, category, description, metadata")
     .eq("published", true)
     .eq("type", "location")
     .order("created_at", { ascending: false })
@@ -68,6 +68,7 @@ export default async function LocationsPage() {
   const serverListings = rows.map((l: {
     id: string; title: string; city: string;
     price: number; description: string; category: string | null; image_url: string | null;
+    metadata?: Record<string, unknown> | null;
   }) => {
     const { lat, lng } = coords[l.city] ?? FALLBACK;
     return {
@@ -87,6 +88,7 @@ export default async function LocationsPage() {
       capacity: 0,
       lat,
       lng,
+      focalPoint: ((l.metadata ?? {}) as Record<string, unknown>).focal_point as { x: number; y: number } | null ?? null,
       isReal: true,
       description: l.description ?? "",
     };

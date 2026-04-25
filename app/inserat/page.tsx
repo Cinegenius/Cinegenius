@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
 import { PROP_CATEGORY_FIELDS } from "@/lib/propCategoryFields";
+import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -275,6 +276,8 @@ export default function InseratPage() {
   const [uploading, setUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [focalPoint, setFocalPoint] = useState<FocalPoint | null>(null);
+  const [showFocalPicker, setShowFocalPicker] = useState(false);
   const [error, setError] = useState("");
 
   // Location extras
@@ -360,6 +363,7 @@ export default function InseratPage() {
           license_class: form.license_class || null,
           condition: form.condition || null,
           delivery: form.delivery,
+          focal_point: focalPoint ?? null,
         },
       };
     }
@@ -382,6 +386,7 @@ export default function InseratPage() {
           parking_spots: form.parking_spots ? parseInt(form.parking_spots) : null,
           amenities: locAmenities,
           rooms: locRooms,
+          focal_point: focalPoint ?? null,
         },
         blocked_dates: locBlockedDates,
         floor_plan_url: locFloorPlanUrl,
@@ -452,6 +457,7 @@ export default function InseratPage() {
         dimensions: form.dimensions || null,
         safety_note: form.safety_note || null,
         ...catMetaFiltered,
+        focal_point: focalPoint ?? null,
       },
     };
   }
@@ -1297,25 +1303,42 @@ export default function InseratPage() {
                 Titelbild
               </label>
               {imagePreview ? (
-                <div className="relative rounded-xl overflow-hidden border border-border aspect-video w-full">
-                  <img src={imagePreview} alt="Vorschau" className="w-full h-full object-cover" />
-                  {uploading && (
-                    <div className="absolute inset-0 bg-bg-primary/70 flex items-center justify-center">
-                      <Loader2 size={24} className="animate-spin text-gold" />
-                    </div>
-                  )}
-                  {!uploading && (
-                    <button
-                      onClick={removeImage}
-                      className="absolute top-2 right-2 w-7 h-7 bg-bg-primary/80 rounded-full flex items-center justify-center hover:bg-crimson transition-colors"
-                    >
-                      <X size={14} className="text-white" />
-                    </button>
-                  )}
+                <div className="space-y-2">
+                  <div className="relative rounded-xl overflow-hidden border border-border aspect-video w-full">
+                    <img
+                      src={imagePreview}
+                      alt="Vorschau"
+                      className="w-full h-full object-cover"
+                      style={{ objectPosition: focalPoint ? `${focalPoint.x}% ${focalPoint.y}%` : "50% 50%" }}
+                    />
+                    {uploading && (
+                      <div className="absolute inset-0 bg-bg-primary/70 flex items-center justify-center">
+                        <Loader2 size={24} className="animate-spin text-gold" />
+                      </div>
+                    )}
+                    {!uploading && (
+                      <button
+                        onClick={removeImage}
+                        className="absolute top-2 right-2 w-7 h-7 bg-bg-primary/80 rounded-full flex items-center justify-center hover:bg-crimson transition-colors"
+                      >
+                        <X size={14} className="text-white" />
+                      </button>
+                    )}
+                    {imageUrl && (
+                      <div className="absolute bottom-2 left-2 flex items-center gap-1.5 bg-success/20 border border-success/30 text-success text-xs px-2 py-1 rounded-full">
+                        <CheckCircle size={11} /> Hochgeladen
+                      </div>
+                    )}
+                  </div>
                   {imageUrl && (
-                    <div className="absolute bottom-2 left-2 flex items-center gap-1.5 bg-success/20 border border-success/30 text-success text-xs px-2 py-1 rounded-full">
-                      <CheckCircle size={11} /> Hochgeladen
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowFocalPicker(true)}
+                      className="flex items-center gap-2 text-xs text-gold hover:text-gold-light border border-gold/30 hover:border-gold px-3 py-1.5 rounded-lg transition-colors w-fit"
+                    >
+                      <ImageIcon size={12} />
+                      {focalPoint ? "Fokuspunkt ändern" : "Fokuspunkt setzen"} — wo soll das Hauptmotiv sichtbar sein?
+                    </button>
                   )}
                 </div>
               ) : (
@@ -1365,6 +1388,14 @@ export default function InseratPage() {
           </div>
         </div>
       </div>
+    {showFocalPicker && imageUrl && (
+      <FocalPointPicker
+        imageUrl={imageUrl}
+        initial={focalPoint ?? undefined}
+        onSave={(pt) => { setFocalPoint(pt); setShowFocalPicker(false); }}
+        onClose={() => setShowFocalPicker(false)}
+      />
+    )}
     </ProfileGuard>);
   }
 

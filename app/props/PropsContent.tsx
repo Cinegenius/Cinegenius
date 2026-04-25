@@ -33,8 +33,8 @@ const CONDITIONS = ["Neuwertig", "Sehr gut", "Gut", "Akzeptabel"];
 type Prop = {
   id: string; title: string; category: string; vendor: string; location: string;
   dailyRate: number; image: string; condition: string; era: string | null;
-  delivery: boolean; rentalType?: "miete" | "kauf"; description?: string; isReal?: boolean;
-  type?: string; meta?: Record<string, unknown> | null;
+  delivery: boolean; rentalType?: "miete" | "kauf"; focalPoint?: { x: number; y: number } | null;
+  description?: string; isReal?: boolean; type?: string; meta?: Record<string, unknown> | null;
 };
 
 // ─── SortDropdown ────────────────────────────────────────────────
@@ -260,7 +260,7 @@ function PropCard({ p, list }: { p: Prop; list?: boolean }) {
         data-visible>
         <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-bg-elevated border border-border">
           {p.image
-            ? <img src={p.image} alt={p.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            ? <img src={p.image} alt={p.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} />
             : <div className="w-full h-full flex items-center justify-center text-text-muted/30"><svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></div>
           }
           {p.isReal && <div className="absolute top-1 left-1 bg-gold text-bg-primary text-[9px] font-bold px-1.5 py-0.5 rounded">NEU</div>}
@@ -291,7 +291,7 @@ function PropCard({ p, list }: { p: Prop; list?: boolean }) {
       data-visible>
       <div className="relative aspect-[4/3] overflow-hidden bg-bg-elevated">
         {p.image
-          ? <img src={p.image} alt={p.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+          ? <img src={p.image} alt={p.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} />
           : <div className="w-full h-full flex items-center justify-center text-text-muted/20"><svg viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></div>
         }
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent" />

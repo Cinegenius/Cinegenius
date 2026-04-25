@@ -57,6 +57,7 @@ async function getLocation(slug: string) {
       ownerId: data.user_id ?? "",
       ownerName: (ownerRes as { data: { display_name: string | null } | null }).data?.display_name ?? "Anbieter",
       isReal: true,
+      focalPoint: (data.metadata as { focal_point?: { x: number; y: number } | null } | null)?.focal_point ?? null,
       metadata: data.metadata ?? null,
       blocked_dates: data.blocked_dates ?? [],
       floor_plan_url: data.floor_plan_url ?? null,

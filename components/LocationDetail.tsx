@@ -41,6 +41,7 @@ type Location = {
   blocked_dates?: string[];
   floor_plan_url?: string | null;
   extra_images?: string[];
+  focalPoint?: { x: number; y: number } | null;
   // Legacy fields
   sqft?: number; capacity?: number;
 };
@@ -107,7 +108,7 @@ export default function LocationDetail({ location }: { location: Location }) {
           <div className={`${allImages.length > 1 ? "col-span-2 row-span-2" : "col-span-4"} relative overflow-hidden cursor-pointer`}
             onClick={() => { setActiveImg(0); setLightboxOpen(true); }}>
             {allImages[0] ? (
-              <Image src={allImages[0]} alt={location.title} fill className="object-cover hover:scale-105 transition-transform duration-500" sizes="50vw" priority />
+              <Image src={allImages[0]} alt={location.title} fill className="object-cover hover:scale-105 transition-transform duration-500" style={{ objectPosition: location.focalPoint ? `${location.focalPoint.x}% ${location.focalPoint.y}%` : "50% 50%" }} sizes="50vw" priority />
             ) : (
               <div className="w-full h-full bg-bg-elevated flex items-center justify-center text-text-muted/20">
                 <MapPin size={48} />

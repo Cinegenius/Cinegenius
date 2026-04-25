@@ -49,6 +49,7 @@ async function getVehicle(slug: string) {
     instantBook: false,
     verified: false,
     delivery: (meta.delivery as boolean) ?? false,
+    focalPoint: (meta.focal_point as { x: number; y: number } | null) ?? null,
     description: data.description ?? "",
     ownerId: data.user_id ?? "",
     ownerName,
@@ -128,7 +129,7 @@ export default async function VehicleDetailPage({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <div className="relative rounded-2xl overflow-hidden aspect-video bg-bg-elevated">
-              <img src={vehicle.image} alt={vehicle.title} className="w-full h-full object-cover" />
+              <img src={vehicle.image} alt={vehicle.title} className="w-full h-full object-cover" style={{ objectPosition: vehicle.focalPoint ? `${vehicle.focalPoint.x}% ${vehicle.focalPoint.y}%` : "50% 66%" }} />
               <div className="absolute top-4 left-4 flex gap-2">
                 {vehicle.instantBook && (
                   <span className="px-3 py-1 bg-gold text-bg-primary text-xs font-semibold rounded-full flex items-center gap-1">

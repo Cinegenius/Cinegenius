@@ -53,6 +53,7 @@ export default async function VehiclesPage() {
       instantBook: false,
       verified: false,
       delivery: (meta.delivery as boolean) ?? false,
+      focalPoint: (meta.focal_point as { x: number; y: number } | null) ?? null,
       isReal: true,
     };
   });
