@@ -80,12 +80,15 @@ const REPORT_REASONS: Record<string, string> = {
 function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; initialYouBlocked: boolean }) {
   const [youBlocked, setYouBlocked] = useState(initialYouBlocked);
   const [blockLoading, setBlockLoading] = useState(false);
+  const [blockError, setBlockError] = useState("");
   const [reportOpen, setReportOpen] = useState(false);
   const [reportReason, setReportReason] = useState("");
   const [reportSent, setReportSent] = useState(false);
+  const [reportError, setReportError] = useState("");
 
   async function toggleBlock() {
     setBlockLoading(true);
+    setBlockError("");
     try {
       const res = await fetch("/api/blocks", {
         method: "POST",
@@ -95,7 +98,11 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
       if (res.ok) {
         const data = await res.json();
         setYouBlocked(data.blocked);
+      } else {
+        setBlockError("Aktion fehlgeschlagen. Bitte erneut versuchen.");
       }
+    } catch {
+      setBlockError("Netzwerkfehler. Bitte erneut versuchen.");
     } finally {
       setBlockLoading(false);
     }
@@ -103,6 +110,7 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
 
   async function submitReport() {
     if (!reportReason) return;
+    setReportError("");
     const res = await fetch("/api/reports", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -111,60 +119,66 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
     if (res.ok) {
       setReportSent(true);
       setReportOpen(false);
+    } else {
+      setReportError("Meldung fehlgeschlagen. Bitte erneut versuchen.");
     }
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <button
-        onClick={toggleBlock}
-        disabled={blockLoading}
-        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all disabled:opacity-50 ${
-          youBlocked
-            ? "bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20"
-            : "border border-border text-text-muted hover:border-red-500/40 hover:text-red-400"
-        }`}
-      >
-        <Ban size={11} /> {youBlocked ? "Entblockieren" : "Blockieren"}
-      </button>
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center gap-2">
+        <button
+          onClick={toggleBlock}
+          disabled={blockLoading}
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all disabled:opacity-50 ${
+            youBlocked
+              ? "bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20"
+              : "border border-border text-text-muted hover:border-red-500/40 hover:text-red-400"
+          }`}
+        >
+          <Ban size={11} /> {youBlocked ? "Entblockieren" : "Blockieren"}
+        </button>
 
-      <div className="relative">
-        {reportSent ? (
-          <span className="text-xs text-emerald-400 px-2">Gemeldet</span>
-        ) : (
-          <>
-            <button
-              onClick={() => setReportOpen((o) => !o)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-text-muted rounded-lg hover:border-yellow-500/40 hover:text-yellow-400 transition-all text-xs font-medium"
-            >
-              <Flag size={11} /> Melden
-            </button>
-            {reportOpen && (
-              <div className="absolute right-0 top-9 z-50 bg-bg-elevated border border-border rounded-xl shadow-2xl p-4 w-52">
-                <p className="text-xs font-semibold text-text-primary mb-2">Grund wählen</p>
-                {Object.entries(REPORT_REASONS).map(([value, label]) => (
+        <div className="relative">
+          {reportSent ? (
+            <span className="text-xs text-emerald-400 px-2">Gemeldet</span>
+          ) : (
+            <>
+              <button
+                onClick={() => setReportOpen((o) => !o)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-text-muted rounded-lg hover:border-yellow-500/40 hover:text-yellow-400 transition-all text-xs font-medium"
+              >
+                <Flag size={11} /> Melden
+              </button>
+              {reportOpen && (
+                <div className="absolute right-0 top-9 z-50 bg-bg-elevated border border-border rounded-xl shadow-2xl p-4 w-52">
+                  <p className="text-xs font-semibold text-text-primary mb-2">Grund wählen</p>
+                  {Object.entries(REPORT_REASONS).map(([value, label]) => (
+                    <button
+                      key={value}
+                      onClick={() => setReportReason(value)}
+                      className={`w-full text-left px-2 py-1.5 text-xs rounded-lg mb-0.5 transition-colors ${
+                        reportReason === value ? "bg-gold/20 text-gold" : "text-text-secondary hover:bg-bg-primary"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                  {reportError && <p className="text-xs text-red-400 mt-1">{reportError}</p>}
                   <button
-                    key={value}
-                    onClick={() => setReportReason(value)}
-                    className={`w-full text-left px-2 py-1.5 text-xs rounded-lg mb-0.5 transition-colors ${
-                      reportReason === value ? "bg-gold/20 text-gold" : "text-text-secondary hover:bg-bg-primary"
-                    }`}
+                    onClick={submitReport}
+                    disabled={!reportReason}
+                    className="w-full mt-2 px-3 py-1.5 bg-gold text-bg-primary font-semibold rounded-lg text-xs hover:bg-gold-light disabled:opacity-40 transition-colors"
                   >
-                    {label}
+                    Abschicken
                   </button>
-                ))}
-                <button
-                  onClick={submitReport}
-                  disabled={!reportReason}
-                  className="w-full mt-2 px-3 py-1.5 bg-gold text-bg-primary font-semibold rounded-lg text-xs hover:bg-gold-light disabled:opacity-40 transition-colors"
-                >
-                  Abschicken
-                </button>
-              </div>
-            )}
-          </>
-        )}
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
+      {blockError && <p className="text-xs text-red-400">{blockError}</p>}
     </div>
   );
 }

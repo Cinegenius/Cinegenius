@@ -1,6 +1,12 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
+function generateNonce(): string {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return btoa(String.fromCharCode(...bytes));
+}
+
 // ── Admin ID lookup (mirrors lib/auth/index.ts — duplicated intentionally
 //    because middleware cannot import server-only modules) ────────────────────
 function getAdminIds(): Set<string> {
@@ -161,7 +167,14 @@ export default clerkMiddleware(async (auth, request) => {
   }
 
   // 4. Security headers on every response
-  const res = NextResponse.next();
+  // Nonce enables strict-dynamic: modern browsers treat unsafe-inline as ignored
+  // when strict-dynamic is present, giving nonce-level protection while keeping
+  // unsafe-inline as a fallback for legacy browsers and Clerk's UI scripts.
+  const nonce = generateNonce();
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("X-Nonce", nonce); // Clerk v7 reads this automatically
+
+  const res = NextResponse.next({ request: { headers: requestHeaders } });
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("X-Frame-Options", "DENY");
   res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
@@ -170,7 +183,7 @@ export default clerkMiddleware(async (auth, request) => {
     "Content-Security-Policy",
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://*.clerk.com https://*.clerk.accounts.dev https://*.cinegenius.co https://js.stripe.com",
+      `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' https://*.clerk.com https://*.clerk.accounts.dev https://*.cinegenius.co https://js.stripe.com`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://*.supabase.co https://www.google.com https://images.unsplash.com https://plus.unsplash.com https://upload.wikimedia.org https://img.clerk.com https://*.cinegenius.co",
       "font-src 'self' data:",
