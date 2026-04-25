@@ -19,7 +19,7 @@ const categories = [
       },
       {
         q: "Ist CineGenius kostenlos?",
-        a: "Ja — vollständig kostenlos. Registrierung, Profilerstellung, Inserate schalten und Angebote durchsuchen sind ohne Zeitlimit kostenlos. CineGenius verdient ausschließlich durch eine Provision von 10% auf erfolgreiche Transaktionen. Du zahlst nur, wenn du verdienst.",
+        a: "Ja — vollständig kostenlos. Registrierung, Profilerstellung, Inserate schalten und Angebote durchsuchen sind ohne Zeitlimit kostenlos. Keine versteckten Gebühren.",
       },
       {
         q: "Was ist der Unterschied zwischen Anbieter- und Produktionskonto?",
@@ -81,7 +81,7 @@ const categories = [
       },
       {
         q: "Können Produktionen Jobs kostenlos ausschreiben?",
-        a: "Ja — vollständig kostenlos und ohne Limit. Alle Stellenausschreibungen, Crew-Suche und Bewerbungen sind kostenlos. CineGenius verdient nur durch Provision auf erfolgreiche Buchungen und Transaktionen.",
+        a: "Ja — vollständig kostenlos und ohne Limit. Alle Stellenausschreibungen, Crew-Suche und Bewerbungen sind kostenlos.",
       },
     ],
   },
@@ -103,7 +103,7 @@ const categories = [
       },
       {
         q: "Wie werden Anbieter bezahlt?",
-        a: "Anbieter-Auszahlungen werden innerhalb von 2 Werktagen nach Buchungsbestätigung verarbeitet. Gelder werden per Banküberweisung auf dein hinterlegtes Konto überwiesen. CineGenius behält eine Plattformgebühr von 10%.",
+        a: "Anbieter-Auszahlungen werden innerhalb von 2 Werktagen nach Buchungsbestätigung verarbeitet. Gelder werden per Banküberweisung auf dein hinterlegtes Konto überwiesen.",
       },
     ],
   },

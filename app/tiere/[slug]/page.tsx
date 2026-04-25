@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  MapPin, PawPrint, Users, Truck, Calendar, Shield, ArrowRight, Info,
+  MapPin, PawPrint, Users, Truck, Calendar, Shield, ArrowRight,
 } from "lucide-react";
 import InquiryForm from "@/components/InquiryForm";
 import FavoriteButton from "@/components/FavoriteButton";
@@ -83,10 +83,6 @@ export default async function AnimalDetailPage({
   const { slug } = await params;
   const animal = await getAnimal(slug);
   if (!animal) notFound();
-
-  const commission = 0.10;
-  const platformFee = Math.round(animal.dailyRate * commission);
-  const providerPayout = animal.dailyRate - platformFee;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -213,24 +209,6 @@ export default async function AnimalDetailPage({
                   </span>
                   {animal.dailyRate > 0 && <span className="text-text-muted text-sm"> / Tag</span>}
                 </div>
-
-                {animal.dailyRate > 0 && (
-                  <div className="p-3 rounded-lg bg-bg-elevated border border-border mb-5 text-xs space-y-2">
-                    <p className="text-text-muted font-semibold uppercase tracking-widest flex items-center gap-1">
-                      <Info size={11} /> Preistransparenz
-                    </p>
-                    <div className="flex justify-between text-text-secondary">
-                      <span>Tagesrate</span><span>{animal.dailyRate.toLocaleString()} €</span>
-                    </div>
-                    <div className="flex justify-between text-text-muted">
-                      <span>Plattformgebühr (10%)</span><span>−{platformFee} €</span>
-                    </div>
-                    <div className="flex justify-between font-semibold text-success pt-1 border-t border-border">
-                      <span>Anbieter erhält</span><span>{providerPayout} €</span>
-                    </div>
-                    <p className="text-text-muted text-[10px] pt-1">Kostenlos inserieren — wir verdienen nur, wenn du verdienst.</p>
-                  </div>
-                )}
 
                 {animal.dailyRate > 0 && (
                   <Link

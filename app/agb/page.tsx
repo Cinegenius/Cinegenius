@@ -137,17 +137,15 @@ export default function AgbPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-2">§ 6 Provisionsregelung</h2>
+            <h2 className="text-base font-semibold text-text-primary mb-2">§ 6 Servicegebühren</h2>
             <p className="text-sm leading-relaxed">
-              Bei erfolgreicher Vermittlung eines Vertrags zwischen Anbieter und Nachfrager über die
-              Plattform erhebt der Betreiber eine Serviceprovision in Höhe von <strong className="text-text-primary">10 % des Nettobuchungswertes</strong> (zzgl. etwaiger gesetzlicher Mehrwertsteuer).
-              Die Provision wird vom Gesamtbetrag der Transaktion einbehalten und mit der Auszahlung
-              an den Anbieter verrechnet.
+              Die Nutzung der Plattform — einschließlich Registrierung, Profilerstellung, Inseratsschaltung
+              und Suche — ist derzeit kostenlos. Der Betreiber behält sich vor, zukünftig Servicegebühren
+              einzuführen. Nutzer werden über Änderungen der Gebührenstruktur mindestens 30 Tage im Voraus
+              per E-Mail informiert.
             </p>
             <p className="text-sm leading-relaxed mt-3">
-              Die Provision entsteht mit Vertragsschluss zwischen den Nutzern, unabhängig davon, ob
-              die Leistung tatsächlich erbracht wird. Bei Stornierungen gilt § 8 dieser AGB.
-              Eine Umgehung der Provision durch Direktkontakt oder außerhalb der Plattform
+              Eine Umgehung etwaiger zukünftiger Gebühren durch Direktkontakt oder außerhalb der Plattform
               abgewickelte Buchungen, die über die Plattform angebahnt wurden, ist verboten und
               berechtigt den Betreiber zur Sperrung des Accounts.
             </p>
@@ -192,7 +190,7 @@ export default function AgbPage() {
               <div className="text-sm leading-relaxed bg-bg-elevated rounded-lg p-4">
                 <p className="font-medium text-text-primary mb-1">Stornierung durch den Nachfrager</p>
                 <ul className="space-y-1 list-disc list-inside">
-                  <li>Bis <strong>72 Stunden vor</strong> dem vereinbarten Termin: vollständige Erstattung des Buchungsbetrags (exkl. Plattformgebühren)</li>
+                  <li>Bis <strong>72 Stunden vor</strong> dem vereinbarten Termin: vollständige Erstattung des Buchungsbetrags</li>
                   <li>Weniger als 72 Stunden vor dem Termin: keine Erstattung, es sei denn, der Anbieter stimmt einer Rückerstattung ausdrücklich zu</li>
                   <li>Höhere Gewalt (z. B. Naturkatastrophen, behördliche Verbote): Die Plattform vermittelt auf Anfrage eine Lösung; ein gesetzlicher Anspruch besteht nur nach Maßgabe des BGB</li>
                 </ul>

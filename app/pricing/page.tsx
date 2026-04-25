@@ -7,10 +7,10 @@ import { getTranslations } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: "Preise — CineGenius",
-  description: "CineGenius ist kostenlos für alle. Keine versteckten Gebühren — nur eine kleine Plattformgebühr bei Buchungen. Locations, Crew, Equipment und Jobs finden und inserieren.",
+  description: "CineGenius ist kostenlos für alle. Keine versteckten Gebühren. Locations, Crew, Equipment und Jobs finden und inserieren.",
   openGraph: {
     title: "Preise & Konditionen — CineGenius",
-    description: "Kostenlos mitmachen — kleine Plattformgebühr nur bei erfolgreichen Buchungen.",
+    description: "Kostenlos mitmachen — keine versteckten Gebühren.",
   },
 };
 

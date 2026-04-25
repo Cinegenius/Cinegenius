@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import JsonLd from "@/components/JsonLd";
 import {
   MapPin, CheckCircle, Car, Calendar, Shield,
-  ArrowRight, Zap, Info,
+  ArrowRight, Zap,
 } from "lucide-react";
 import InquiryForm from "@/components/InquiryForm";
 import FavoriteButton from "@/components/FavoriteButton";
@@ -93,10 +93,6 @@ export default async function VehicleDetailPage({
   const { slug } = await params;
   const vehicle = await getVehicle(slug);
   if (!vehicle) notFound();
-
-  const commission = 0.10;
-  const platformFee = Math.round(vehicle.dailyRate * commission);
-  const providerPayout = vehicle.dailyRate - platformFee;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -226,22 +222,6 @@ export default async function VehicleDetailPage({
                 <div className="mb-5">
                   <span className="font-display text-3xl font-bold text-gold">{vehicle.dailyRate.toLocaleString()} €</span>
                   <span className="text-text-muted text-sm"> / Tag</span>
-                </div>
-
-                <div className="p-3 rounded-lg bg-bg-elevated border border-border mb-5 text-xs space-y-2">
-                  <p className="text-text-muted font-semibold uppercase tracking-widest flex items-center gap-1">
-                    <Info size={11} /> Preistransparenz
-                  </p>
-                  <div className="flex justify-between text-text-secondary">
-                    <span>Tagesrate</span><span>{vehicle.dailyRate.toLocaleString()} €</span>
-                  </div>
-                  <div className="flex justify-between text-text-muted">
-                    <span>Plattformgebühr (10%)</span><span>−{platformFee} €</span>
-                  </div>
-                  <div className="flex justify-between font-semibold text-success pt-1 border-t border-border">
-                    <span>Anbieter erhält</span><span>{providerPayout} €</span>
-                  </div>
-                  <p className="text-text-muted text-[10px] pt-1">Kostenlos inserieren — wir verdienen nur, wenn du verdienst.</p>
                 </div>
 
                 <Link

@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight, Info } from "lucide-react";
-import { calculateCommission } from "@/lib/commission";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -145,7 +144,6 @@ export default function AvailabilityCalendar({ dailyRate, currency = "€", onSe
 
   const selectedDays = start && end ? diffDays(start, end) : 0;
   const subtotal = selectedDays * dailyRate;
-  const commission = selectedDays > 0 ? calculateCommission(subtotal) : null;
 
   const monthNames = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
   const dayHeaders = ["Mo","Di","Mi","Do","Fr","Sa","So"];
@@ -274,7 +272,7 @@ export default function AvailabilityCalendar({ dailyRate, currency = "€", onSe
       )}
 
       {/* Summary */}
-      {start && end && commission && (
+      {start && end && selectedDays > 0 && (
         <div className="bg-bg-elevated border border-gold/20 rounded-xl p-4 space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-text-muted">
@@ -288,15 +286,9 @@ export default function AvailabilityCalendar({ dailyRate, currency = "€", onSe
             <span className="text-text-muted">{dailyRate.toLocaleString()} {currency} × {selectedDays} Tage</span>
             <span className="text-text-primary">{subtotal.toLocaleString()} {currency}</span>
           </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-text-muted flex items-center gap-1">
-              <Info size={11} /> Plattformgebühr ({commission.rate} %)
-            </span>
-            <span className="text-text-primary">{commission.commission.toLocaleString()} {currency}</span>
-          </div>
           <div className="flex justify-between font-bold text-base pt-2 border-t border-border">
             <span className="text-text-primary">Gesamt</span>
-            <span className="text-gold font-display">{(subtotal + commission.commission).toLocaleString()} {currency}</span>
+            <span className="text-gold font-display">{subtotal.toLocaleString()} {currency}</span>
           </div>
           <button
             onClick={() => {
