@@ -103,6 +103,7 @@ export default async function RootLayout({
       localization={clerkLocalization}
       signUpForceRedirectUrl="/profile-setup"
       signInFallbackRedirectUrl="/dashboard"
+      signInForceRedirectUrl="/dashboard"
     >
       <html
         lang={htmlLang}

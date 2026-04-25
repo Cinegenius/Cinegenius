@@ -9,7 +9,7 @@ export default function SignInPage() {
           <h1 className="font-display text-3xl font-bold text-text-primary">Anmelden</h1>
         </div>
         <SignIn
-          fallbackRedirectUrl="/dashboard"
+          forceRedirectUrl="/dashboard"
           appearance={{
             variables: {
               colorPrimary: "#C2F135",
