@@ -79,6 +79,30 @@ function ipRateLimit(req: NextRequest): NextResponse | null {
   return null;
 }
 
+// ── CSRF: Origin/Referer check for mutating API requests ─────────────────────
+const SAFE_ORIGINS = new Set([
+  "https://cinegenius.co",
+  "https://www.cinegenius.co",
+  ...(process.env.NODE_ENV !== "production" ? ["http://localhost:3000"] : []),
+]);
+
+function csrfCheck(request: NextRequest): NextResponse | null {
+  if (!["POST", "PUT", "PATCH", "DELETE"].includes(request.method)) return null;
+  if (!request.nextUrl.pathname.startsWith("/api/")) return null;
+  if (request.nextUrl.pathname.startsWith("/api/webhooks/")) return null;
+
+  const origin  = request.headers.get("origin");
+  const referer = request.headers.get("referer");
+
+  const originOk  = origin  && SAFE_ORIGINS.has(origin);
+  const refererOk = referer && SAFE_ORIGINS.has(new URL(referer).origin);
+
+  if (!originOk && !refererOk) {
+    return NextResponse.json({ error: "CSRF check failed" }, { status: 403 });
+  }
+  return null;
+}
+
 // ── Route matchers ────────────────────────────────────────────────────────────
 
 // Admin routes — require both a valid session AND admin role.
@@ -131,6 +155,10 @@ export default clerkMiddleware(async (auth, request) => {
   // 1. IP-based rate limiting — runs before auth to reject floods cheaply
   const rateLimitRes = ipRateLimit(request);
   if (rateLimitRes) return rateLimitRes;
+
+  // 1b. CSRF check — reject mutating API requests from unknown origins
+  const csrfRes = csrfCheck(request);
+  if (csrfRes) return csrfRes;
 
   const isApi = request.nextUrl.pathname.startsWith("/api/");
 

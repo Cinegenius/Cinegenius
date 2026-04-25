@@ -64,8 +64,14 @@ export async function POST(req: Request) {
   const { type, title, description, price, city, category, image_url, company_id,
           metadata, blocked_dates, floor_plan_url, extra_images, rental_type } = body;
 
+  const VALID_LISTING_TYPES = new Set(["job", "location", "prop", "vehicle", "creator", "animal"]);
+
   if (!type || !title || !city) {
     return NextResponse.json({ error: "Pflichtfelder fehlen (type, title, city)" }, { status: 400 });
+  }
+
+  if (!VALID_LISTING_TYPES.has(type)) {
+    return NextResponse.json({ error: "Ungültiger Inserat-Typ" }, { status: 400 });
   }
 
   // SECURITY: input length limits and price sanitization

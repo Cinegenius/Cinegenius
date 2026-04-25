@@ -48,17 +48,17 @@ export async function GET(req: NextRequest) {
 }
 
 // POST /api/favorites — toggle favorite
-// Body: { listing_id, listing_type, listing_title, listing_city, listing_price, listing_image }
+// Body: { listing_id }
 export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
   const body = await req.json();
-  const { listing_id, listing_type, listing_title, listing_city, listing_price, listing_image } = body;
+  const { listing_id } = body;
 
-  if (!listing_id || !listing_type) {
-    return NextResponse.json({ error: "listing_id und listing_type sind erforderlich" }, { status: 400 });
+  if (!listing_id) {
+    return NextResponse.json({ error: "listing_id ist erforderlich" }, { status: 400 });
   }
 
   // Check if already favorited
@@ -75,15 +75,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ isFavorited: false });
   }
 
-  // Add
+  // Fetch listing data from DB — never trust client-supplied metadata
+  const { data: listing } = await db
+    .from("listings")
+    .select("type, title, city, price, image_url")
+    .eq("id", listing_id)
+    .maybeSingle();
+
+  if (!listing) {
+    return NextResponse.json({ error: "Inserat nicht gefunden" }, { status: 404 });
+  }
+
   await db.from("favorites").insert({
     user_id: userId,
     listing_id,
-    listing_type,
-    listing_title: listing_title ?? null,
-    listing_city: listing_city ?? null,
-    listing_price: listing_price ?? null,
-    listing_image: listing_image ?? null,
+    listing_type: listing.type,
+    listing_title: listing.title ?? null,
+    listing_city: listing.city ?? null,
+    listing_price: listing.price ?? null,
+    listing_image: listing.image_url ?? null,
   });
 
   return NextResponse.json({ isFavorited: true });

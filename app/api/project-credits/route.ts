@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
+import { rateLimit } from "@/lib/rateLimit";
 import { NextRequest, NextResponse } from "next/server";
 
 // POST /api/project-credits — add yourself to a project
@@ -8,10 +9,25 @@ export async function POST(req: NextRequest) {
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
-  const { project_id, role } = await req.json();
+  const { allowed } = await rateLimit(`credits:${userId}`, 10, 60);
+  if (!allowed) return NextResponse.json({ error: "Zu viele Anfragen" }, { status: 429 });
+
+  const body = await req.json().catch(() => null);
+  if (!body) return NextResponse.json({ error: "Ungültige Anfrage" }, { status: 400 });
+  const { project_id, role } = body;
+
   if (!project_id || !role?.trim()) {
     return NextResponse.json({ error: "project_id und role sind Pflichtfelder" }, { status: 400 });
   }
+
+  // Verify project exists before allowing self-claim
+  const { data: project } = await db
+    .from("projects")
+    .select("id, created_by")
+    .eq("id", project_id)
+    .maybeSingle();
+
+  if (!project) return NextResponse.json({ error: "Projekt nicht gefunden" }, { status: 404 });
 
   const { data, error } = await db
     .from("project_credits")

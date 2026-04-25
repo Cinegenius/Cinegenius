@@ -132,10 +132,13 @@ function MessagesContent() {
   }, [convParam, loading, conversations]);
 
   async function loadMessages(convId: string) {
-    const res = await fetch(`/api/conversations/${convId}`);
-    const { messages: msgs } = await res.json();
-    setMessages(msgs ?? []);
-    setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+    try {
+      const res = await fetch(`/api/conversations/${convId}`);
+      if (!res.ok) return;
+      const { messages: msgs } = await res.json();
+      setMessages(msgs ?? []);
+      setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+    } catch { /* silent */ }
   }
 
   // Realtime: neue Nachrichten sofort empfangen wenn Gespräch offen

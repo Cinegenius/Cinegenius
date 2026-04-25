@@ -17,41 +17,27 @@ export async function isBlockedBy(blockedId: string, blockerId: string): Promise
 
 /**
  * Returns true if either party has blocked the other.
- * Used for messaging: block in either direction prevents contact.
+ * Uses two safe .eq() queries instead of .or() interpolation.
  */
 export async function anyBlockExists(userA: string, userB: string): Promise<boolean> {
-  const { data } = await db
-    .from("blocks")
-    .select("id")
-    .or(
-      `and(blocker_id.eq.${userA},blocked_id.eq.${userB}),` +
-      `and(blocker_id.eq.${userB},blocked_id.eq.${userA})`
-    )
-    .limit(1)
-    .maybeSingle();
-  return !!data;
+  const [ab, ba] = await Promise.all([
+    db.from("blocks").select("id").eq("blocker_id", userA).eq("blocked_id", userB).maybeSingle(),
+    db.from("blocks").select("id").eq("blocker_id", userB).eq("blocked_id", userA).maybeSingle(),
+  ]);
+  return !!(ab.data ?? ba.data);
 }
 
 /**
  * Returns both directions for the profile page.
- * youBlocked  — current user blocked the profile owner
- * theyBlocked — profile owner blocked the current user
+ * Uses two safe .eq() queries instead of .or() interpolation.
  */
 export async function getBlockStatus(
   userId: string,
   otherId: string
 ): Promise<{ youBlocked: boolean; theyBlocked: boolean }> {
-  const { data } = await db
-    .from("blocks")
-    .select("blocker_id")
-    .or(
-      `and(blocker_id.eq.${userId},blocked_id.eq.${otherId}),` +
-      `and(blocker_id.eq.${otherId},blocked_id.eq.${userId})`
-    );
-
-  const rows = data ?? [];
-  return {
-    youBlocked:  rows.some((r: { blocker_id: string }) => r.blocker_id === userId),
-    theyBlocked: rows.some((r: { blocker_id: string }) => r.blocker_id === otherId),
-  };
+  const [you, they] = await Promise.all([
+    db.from("blocks").select("id").eq("blocker_id", userId).eq("blocked_id", otherId).maybeSingle(),
+    db.from("blocks").select("id").eq("blocker_id", otherId).eq("blocked_id", userId).maybeSingle(),
+  ]);
+  return { youBlocked: !!you.data, theyBlocked: !!they.data };
 }

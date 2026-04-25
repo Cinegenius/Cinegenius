@@ -17,6 +17,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "target_id und target_type erforderlich" }, { status: 400 });
   }
 
+  if (!VALID_TARGET_TYPES.has(target_type)) {
+    return NextResponse.json({ error: "Ungültiger target_type" }, { status: 400 });
+  }
+
   const { data, error } = await db
     .from("reviews")
     .select("id, reviewer_name, rating, text, aspect_ratings, verified, verified_via, created_at")
