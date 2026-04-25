@@ -27,6 +27,29 @@ Priorisiere: 🔴 Kritisch > 🟠 Hoch > 🟡 Mittel > 🟢 Niedrig
 - Vercel Deployment
 
 ---
+
+## BEREITS BEHOBEN — bitte nicht nochmal melden
+
+Die folgenden Punkte wurden bereits in vorherigen Audit-Runden gefixt:
+
+- **Open Redirect in profile-setup**: `safeRedirect()` ist implementiert und wird an allen Stellen verwendet
+- **`/api/conversations/[id]`**: Route existiert — GET lädt Nachrichten + markiert als gelesen, POST sendet Nachricht mit Block-Check, Notification und Rate Limit
+- **`/api/notifications`**: Route existiert — GET, POST (einzeln lesen), PATCH (alle lesen), immer mit `.eq("user_id", userId)` gefiltert
+- **`/api/unread-count`**: Route existiert — zählt nur Nachrichten aus eigenen Conversations
+- **`/api/reviews/eligible`**: Route existiert — prüft bestätigte Bookings und akzeptierte Applications
+- **`/api/project-festivals`** + **`/api/project-festivals/[id]`**: Beide Routes existieren mit Ownership-Check
+- **`created_by` in public Project-GET**: Wurde entfernt
+- **Conversation-Dedupe**: Bidirektionale OR-Suche ist implementiert
+- **`genre` in PATCH**: Wird korrekt in `metadata.genre` gemergt, nicht als eigene Spalte
+- **`account_type` self-elevation**: Aus `ALLOWED_PATCH_KEYS` entfernt, im Client nicht mehr gesendet
+- **Avatar-Upload `res.ok`-Check**: Vorhanden, inkl. URL-Guard
+- **`patchDistribution` / `removePhoto` Fehlerbehandlung**: State-Update nur bei `res.ok`
+- **Profile-GET DB-Fehler**: Werden jetzt als 500 weitergegeben statt `exists: false`
+- **Project-PATCH Allowlist**: Enthält jetzt alle Felder die ProjectDetail sendet (status, logline, production_company, runtime_minutes, trailer_url, timeline-Felder, release-Felder)
+- **`app/api/messages/route.ts`**: Diese Route wird nicht gebraucht — die Messages-Seite nutzt `/api/conversations` und `/api/conversations/[id]`
+- **`projects`-Tabelle hat keine `published`-Spalte**: Projekte sind by Design immer öffentlich (kein Draft-Konzept). Ein `.eq("published", true)` Filter würde alle Projektseiten brechen.
+
+---
 '
 
 write_file() {
