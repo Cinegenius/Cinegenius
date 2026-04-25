@@ -6,7 +6,7 @@ import { useAuth } from "@clerk/nextjs";
 import {
   Bell, CheckCheck, BookOpen, MessageSquare, Star,
   Wallet, ShieldCheck, FileCheck, Briefcase, UserPlus, Users,
-  ArrowLeft, Inbox, ExternalLink, Circle,
+  ArrowLeft, Inbox, ExternalLink, Circle, Check, X, Loader2,
 } from "lucide-react";
 import { timeAgo, notificationMeta, type NotificationType } from "@/lib/notifications";
 
@@ -67,9 +67,17 @@ function matchesFilter(type: NotificationType, filter: FilterId): boolean {
 function NotifRow({
   notif,
   onRead,
+  friendRequest,
+  onAccept,
+  onReject,
+  isProcessing,
 }: {
   notif: Notification;
   onRead: (id: string) => void;
+  friendRequest?: FriendRequest;
+  onAccept?: (id: string) => void;
+  onReject?: (id: string) => void;
+  isProcessing?: boolean;
 }) {
   const Icon = typeIcons[notif.type] ?? Bell;
   const meta = notificationMeta[notif.type];
@@ -108,14 +116,37 @@ function NotifRow({
 
         {/* Actions */}
         <div className="flex items-center gap-3 mt-2.5">
-          {notif.href && notif.href !== "/dashboard" && (
-            <Link
-              href={notif.href}
-              onClick={() => { if (!notif.read) onRead(notif.id); }}
-              className="flex items-center gap-1 text-xs text-gold hover:text-gold-light font-medium transition-colors"
-            >
-              Ansehen <ExternalLink size={10} />
-            </Link>
+          {notif.type === "friend_request" && friendRequest && onAccept && onReject ? (
+            isProcessing ? (
+              <Loader2 size={14} className="animate-spin text-text-muted" />
+            ) : (
+              <>
+                <button
+                  onClick={() => { onAccept(friendRequest.friendship_id); if (!notif.read) onRead(notif.id); }}
+                  className="flex items-center gap-1 px-3 py-1 bg-success/10 border border-success/20 text-success text-xs font-medium rounded-lg hover:bg-success/20 transition-colors"
+                >
+                  <Check size={11} /> Annehmen
+                </button>
+                <button
+                  onClick={() => { onReject(friendRequest.friendship_id); if (!notif.read) onRead(notif.id); }}
+                  className="flex items-center gap-1 px-3 py-1 border border-border text-text-muted text-xs rounded-lg hover:border-red-400 hover:text-red-400 transition-colors"
+                >
+                  <X size={11} /> Ablehnen
+                </button>
+              </>
+            )
+          ) : (
+            <>
+              {notif.href && notif.href !== "/dashboard" && (
+                <Link
+                  href={notif.href}
+                  onClick={() => { if (!notif.read) onRead(notif.id); }}
+                  className="flex items-center gap-1 text-xs text-gold hover:text-gold-light font-medium transition-colors"
+                >
+                  Ansehen <ExternalLink size={10} />
+                </Link>
+              )}
+            </>
           )}
           {!notif.read && (
             <button
@@ -133,12 +164,16 @@ function NotifRow({
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
+type FriendRequest = { friendship_id: string; user_id: string; display_name: string };
+
 export default function NotificationsPage() {
   const { isSignedIn, isLoaded } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<FilterId>("all");
   const [markingAll, setMarkingAll] = useState(false);
+  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
+  const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
 
   const fetchNotifications = useCallback(async () => {
     try {
@@ -154,7 +189,25 @@ export default function NotificationsPage() {
   useEffect(() => {
     if (!isLoaded || !isSignedIn) { setLoading(false); return; }
     fetchNotifications();
+    fetch("/api/friendships")
+      .then(r => r.json())
+      .then(({ incoming }) => setFriendRequests(incoming ?? []))
+      .catch(() => {});
   }, [isLoaded, isSignedIn, fetchNotifications]);
+
+  const handleFriendRequest = async (friendshipId: string, action: "accepted" | "rejected") => {
+    setProcessingIds(prev => new Set(prev).add(friendshipId));
+    try {
+      const res = await fetch(`/api/friendships/${friendshipId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: action }),
+      });
+      if (res.ok) setFriendRequests(prev => prev.filter(r => r.friendship_id !== friendshipId));
+    } finally {
+      setProcessingIds(prev => { const s = new Set(prev); s.delete(friendshipId); return s; });
+    }
+  };
 
   const markAsRead = async (id: string) => {
     setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, read: true } : n));
@@ -291,9 +344,22 @@ export default function NotificationsPage() {
                       Neu · {unreadFiltered}
                     </p>
                   </div>
-                  {filtered.filter((n) => !n.read).map((n) => (
-                    <NotifRow key={n.id} notif={n} onRead={markAsRead} />
-                  ))}
+                  {filtered.filter((n) => !n.read).map((n) => {
+                    const fr = n.type === "friend_request"
+                      ? friendRequests.find(r => n.body.startsWith(r.display_name))
+                      : undefined;
+                    return (
+                      <NotifRow
+                        key={n.id}
+                        notif={n}
+                        onRead={markAsRead}
+                        friendRequest={fr}
+                        onAccept={(id) => handleFriendRequest(id, "accepted")}
+                        onReject={(id) => handleFriendRequest(id, "rejected")}
+                        isProcessing={!!fr && processingIds.has(fr.friendship_id)}
+                      />
+                    );
+                  })}
                 </>
               )}
 
@@ -305,9 +371,22 @@ export default function NotificationsPage() {
                       Frühere
                     </p>
                   </div>
-                  {filtered.filter((n) => n.read).map((n) => (
-                    <NotifRow key={n.id} notif={n} onRead={markAsRead} />
-                  ))}
+                  {filtered.filter((n) => n.read).map((n) => {
+                    const fr = n.type === "friend_request"
+                      ? friendRequests.find(r => n.body.startsWith(r.display_name))
+                      : undefined;
+                    return (
+                      <NotifRow
+                        key={n.id}
+                        notif={n}
+                        onRead={markAsRead}
+                        friendRequest={fr}
+                        onAccept={(id) => handleFriendRequest(id, "accepted")}
+                        onReject={(id) => handleFriendRequest(id, "rejected")}
+                        isProcessing={!!fr && processingIds.has(fr.friendship_id)}
+                      />
+                    );
+                  })}
                 </>
               )}
             </>

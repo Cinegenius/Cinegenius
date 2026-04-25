@@ -174,13 +174,20 @@ function MessagesContent() {
   async function handleFriendRequest(friendshipId: string, action: "accepted" | "rejected") {
     setProcessingIds(prev => new Set(prev).add(friendshipId));
     try {
-      await fetch(`/api/friendships/${friendshipId}`, {
+      const res = await fetch(`/api/friendships/${friendshipId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: action }),
       });
+      if (!res.ok) {
+        const { error } = await res.json().catch(() => ({ error: "Fehler" }));
+        console.error("[handleFriendRequest]", res.status, error);
+        return;
+      }
       setFriendRequests(prev => prev.filter(r => r.friendship_id !== friendshipId));
-    } catch { /* ignore */ } finally {
+    } catch (e) {
+      console.error("[handleFriendRequest] network error", e);
+    } finally {
       setProcessingIds(prev => { const s = new Set(prev); s.delete(friendshipId); return s; });
     }
   }
