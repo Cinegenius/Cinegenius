@@ -8,7 +8,7 @@ import { useUser } from "@clerk/nextjs";
 import {
   MapPin, MessageSquare, Award, ChevronDown, ChevronUp,
   Pencil, ExternalLink, X, Check, Globe, Building2, UserPlus, UserCheck, Clock,
-  ChevronRight, Clapperboard, Film, Briefcase, Package, Car, Ban, Flag, Users2,
+  Film, Briefcase, Package, Car, Ban, Flag, Users2,
 } from "lucide-react";
 import type { UserProfile, ProfileModule, ProfileImage, FilmographyEntry, ProfileAward, ProjectCredit } from "@/lib/profile-types";
 import ReviewsSection from "@/components/ReviewsSection";
@@ -21,9 +21,10 @@ import { getPlatform, type ExternalProfileRow } from "@/lib/external-platforms";
 function safeLink(url: string | null | undefined): string | null {
   if (!url?.trim()) return null;
   try {
-    const u = new URL(url);
+    const normalized = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+    const u = new URL(normalized);
     if (!["http:", "https:"].includes(u.protocol)) return null;
-    return url;
+    return normalized;
   } catch { return null; }
 }
 
@@ -381,8 +382,9 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
     if (isOwner || !user) return;
     const controller = new AbortController();
     fetch(`/api/friendships?userId=${profile.user_id}`, { signal: controller.signal })
-      .then(r => r.json())
-      .then(({ friendship }) => {
+      .then(r => r.ok ? r.json() : null)
+      .then((data) => {
+        const friendship = data?.friendship;
         if (!friendship) return;
         setFriendshipId(friendship.id);
         if (friendship.status === "accepted") {
@@ -1117,8 +1119,9 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
     if (isOwner || !user) return;
     const controller = new AbortController();
     fetch(`/api/friendships?userId=${profile.user_id}`, { signal: controller.signal })
-      .then(r => r.json())
-      .then(({ friendship }) => {
+      .then(r => r.ok ? r.json() : null)
+      .then((data) => {
+        const friendship = data?.friendship;
         if (!friendship) return;
         setFriendshipId(friendship.id);
         if (friendship.status === "accepted") setFriendStatus("friends");

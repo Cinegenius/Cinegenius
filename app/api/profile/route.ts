@@ -63,7 +63,8 @@ export async function POST(req: NextRequest) {
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
-  const body = await req.json();
+  const body = await req.json().catch(() => null);
+  if (!body) return NextResponse.json({ error: "Ungültiger Request-Body" }, { status: 400 });
   const {
     display_name, bio, location, avatar_url, skills, portfolio_url, positions,
     portfolio_images, experience, account_type, profile_types,
@@ -176,7 +177,8 @@ export async function PATCH(req: NextRequest) {
     if (authResult instanceof NextResponse) return authResult;
     const { userId } = authResult;
 
-    const body = await req.json();
+    const body = await req.json().catch(() => null);
+    if (!body) return NextResponse.json({ error: "Ungültiger Request-Body" }, { status: 400 });
     console.log("[profile PATCH] body keys:", Object.keys(body));
 
     // Only pass known columns to Supabase to avoid "column does not exist" errors

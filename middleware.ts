@@ -107,6 +107,10 @@ const isPublicRoute = createRouteMatcher([
   "/marketplace(.*)",
 ]);
 
+// Webhook routes — completely bypass Clerk auth; each handler must verify
+// the provider signature (Stripe, Clerk, etc.) independently.
+const isWebhookRoute = createRouteMatcher(["/api/webhooks/(.*)"]);
+
 // API routes where GET is public — mutations (POST/PATCH/PUT/DELETE) require auth.
 // This prevents a missed requireAuth() in a handler from opening write access.
 const isPublicApiGet = createRouteMatcher([
@@ -114,7 +118,6 @@ const isPublicApiGet = createRouteMatcher([
   "/api/reviews(.*)",
   "/api/search(.*)",
   "/api/external-profiles(.*)",
-  "/api/webhooks/(.*)",
   "/api/projects(.*)",
 ]);
 
@@ -146,12 +149,14 @@ export default clerkMiddleware(async (auth, request) => {
     }
 
     // Verified admin — fall through to security headers
+  } else if (isWebhookRoute(request)) {
+    // 3a. Webhook routes — skip Clerk auth entirely; signature verified per-handler
   } else if (isPublicApiGet(request)) {
-    // 3a. Public-GET API — only protect mutations so a missed handler check
+    // 3b. Public-GET API — only protect mutations so a missed handler check
     //     doesn't silently open write access to unauthenticated callers.
     if (request.method !== "GET") await auth.protect();
   } else if (!isPublicRoute(request)) {
-    // 3b. Session-only protection for all other non-public routes
+    // 3c. Session-only protection for all other non-public routes
     await auth.protect();
   }
 
