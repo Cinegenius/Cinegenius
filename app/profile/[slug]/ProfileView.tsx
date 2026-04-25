@@ -495,8 +495,8 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
             <div className="lg:col-span-3 flex flex-col gap-5 lg:pt-1">
 
               {/* Top bar: availability + name + CTAs */}
-              <div className="flex items-start gap-3">
-                <div className="flex-1 min-w-0">
+              <div className="flex flex-col sm:flex-row items-start gap-3">
+                <div className="flex-1 min-w-0 w-full">
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`w-2 h-2 rounded-full shrink-0 ${profile.available ? "bg-emerald-400" : "bg-red-400"}`} />
                     <span className="text-xs font-medium text-text-muted">
@@ -522,7 +522,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                     </p>
                   )}
                 </div>
-                <div className="shrink-0 flex items-center gap-2 mt-1">
+                <div className="flex items-center gap-2 flex-wrap sm:shrink-0 sm:mt-1">
                   {!isOwner ? (
                     <>
                       {canContact && (
@@ -1170,8 +1170,8 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
         )}
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-10">
-          <div className="flex items-start gap-4">
-            <div className="flex-1 min-w-0">
+          <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+            <div className="flex-1 min-w-0 w-full">
               <h1 className="font-display text-3xl sm:text-4xl font-bold text-white leading-tight drop-shadow-lg">
                 {profile.display_name ?? "Unbekannt"}
               </h1>
@@ -1186,7 +1186,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 </p>
               )}
             </div>
-            <div className="shrink-0 flex items-center gap-2 mt-1 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap sm:shrink-0 sm:mt-1">
               {!isOwner ? (
                 <>
                   {canContact && (
