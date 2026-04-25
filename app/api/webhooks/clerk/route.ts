@@ -40,13 +40,31 @@ export async function POST(req: Request) {
       subject?: string;
       body?: string;
       from_email_name?: string;
+      slug?: string;
+      data?: Record<string, unknown>;
     };
-    if (e.to_email_address && e.subject && e.body) {
+
+    if (e.to_email_address && e.subject) {
+      let html = e.body ?? "";
+
+      if (e.slug === "verification_code" || e.slug === "reset_password_code") {
+        const otp =
+          (e.data?.otp_code as string) ??
+          (e.data?.code as string) ??
+          extractOtp(e.body ?? "");
+        if (otp) {
+          html =
+            e.slug === "reset_password_code"
+              ? buildOtpEmail(otp, "password")
+              : buildOtpEmail(otp, "verification");
+        }
+      }
+
       await resend.emails.send({
         from: "CineGenius <noreply@cinegenius.co>",
         to: e.to_email_address,
         subject: e.subject,
-        html: e.body,
+        html,
       });
     }
     return new Response("OK", { status: 200 });
@@ -80,6 +98,120 @@ export async function POST(req: Request) {
   }
 
   return new Response("OK", { status: 200 });
+}
+
+function extractOtp(body: string): string | null {
+  const match = body.match(/(?<!\d)(\d{6})(?!\d)/);
+  return match?.[1] ?? null;
+}
+
+function buildOtpEmail(otp: string, type: "verification" | "password"): string {
+  const isPassword = type === "password";
+  const label = isPassword ? "Passwort" : "Sicherheit";
+  const headline = isPassword ? "Passwort zurücksetzen" : "Dein Bestätigungscode";
+  const subline = isPassword
+    ? "Gib diesen Code ein, um dein Passwort zurückzusetzen. Er ist <strong style=\"color:#EFEFEF;\">10 Minuten</strong> gültig."
+    : "Gib diesen Code ein, um deine Anmeldung zu bestätigen. Er ist <strong style=\"color:#EFEFEF;\">10 Minuten</strong> gültig.";
+
+  return `<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${headline}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#0D0D0D;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0D0D0D;padding:48px 16px;">
+    <tr>
+      <td align="center">
+        <table width="560" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;width:100%;">
+
+          <!-- Logo -->
+          <tr>
+            <td style="padding-bottom:40px;text-align:center;">
+              <table cellpadding="0" cellspacing="0" border="0" style="display:inline-table;">
+                <tr>
+                  <td style="background:#C2F135;border-radius:8px;width:32px;height:32px;text-align:center;vertical-align:middle;font-size:16px;line-height:32px;">
+                    &#9654;
+                  </td>
+                  <td style="padding-left:10px;font-size:20px;font-weight:700;color:#FFFFFF;letter-spacing:-0.3px;vertical-align:middle;">
+                    Cine<span style="color:#C2F135;">Genius</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Main card -->
+          <tr>
+            <td style="background-color:#141414;border-radius:20px;border:1px solid #222222;overflow:hidden;">
+
+              <!-- Top accent bar -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="height:3px;background:linear-gradient(90deg,#C2F135 0%,#8fbf00 100%);font-size:0;line-height:0;">&nbsp;</td>
+                </tr>
+              </table>
+
+              <!-- Body -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="padding:44px 44px 40px;">
+
+                    <!-- Label -->
+                    <p style="margin:0 0 20px;font-size:11px;font-weight:700;color:#C2F135;text-transform:uppercase;letter-spacing:3px;">${label}</p>
+
+                    <!-- Headline -->
+                    <h1 style="margin:0 0 14px;font-size:32px;font-weight:800;color:#FFFFFF;line-height:1.15;letter-spacing:-0.8px;">
+                      ${headline}
+                    </h1>
+
+                    <!-- Subline -->
+                    <p style="margin:0 0 36px;font-size:15px;color:#777777;line-height:1.7;">
+                      ${subline}
+                    </p>
+
+                    <!-- OTP Box -->
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:32px;">
+                      <tr>
+                        <td style="background:#0D0D0D;border:1.5px solid #C2F135;border-radius:14px;padding:30px 20px;text-align:center;">
+                          <span style="font-size:48px;font-weight:800;color:#C2F135;letter-spacing:14px;font-family:'Courier New',Courier,monospace;display:inline-block;padding-left:14px;">${otp}</span>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- Divider -->
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
+                      <tr><td style="height:1px;background:#1E1E1E;font-size:0;line-height:0;">&nbsp;</td></tr>
+                    </table>
+
+                    <!-- Security note -->
+                    <p style="margin:0;font-size:13px;color:#444444;line-height:1.65;">
+                      Falls du diese Anfrage nicht gestellt hast, kannst du diese E-Mail ignorieren. Dein Konto ist sicher.
+                    </p>
+
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding-top:32px;text-align:center;">
+              <p style="margin:0;font-size:12px;color:#333333;line-height:1.7;">
+                CineGenius &middot; Marktplatz für Film &amp; Medien<br/>
+                <a href="https://cinegenius.co" style="color:#444444;text-decoration:none;">cinegenius.co</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
 }
 
 function buildWelcomeEmail(firstName: string): string {
