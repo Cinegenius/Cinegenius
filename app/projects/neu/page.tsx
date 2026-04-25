@@ -190,7 +190,7 @@ export default function NeuesProjektPage() {
                             {p.title}
                           </span>
                           {p.verified && (
-                            <ShieldCheck size={12} className="text-emerald-400 shrink-0" title="Verifiziert" />
+                            <ShieldCheck size={12} className="text-emerald-400 shrink-0" aria-label="Verifiziert" />
                           )}
                         </div>
                         <span className="text-xs text-text-muted">
@@ -217,7 +217,7 @@ export default function NeuesProjektPage() {
                     <RoleDropdown
                       value={joinRole}
                       onChange={setJoinRole}
-                      roles={ALL_ROLES}
+                      options={ALL_ROLES}
                       placeholder="Rolle eingeben oder wählen…"
                     />
                   </div>
@@ -348,7 +348,7 @@ export default function NeuesProjektPage() {
                   <RoleDropdown
                     value={form.myRole}
                     onChange={(v) => setForm((f) => ({ ...f, myRole: v }))}
-                    roles={ALL_ROLES}
+                    options={ALL_ROLES}
                     placeholder="Rolle eingeben oder wählen…"
                   />
                 </div>

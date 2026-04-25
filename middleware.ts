@@ -43,7 +43,10 @@ function ipRateLimit(req: NextRequest): NextResponse | null {
     req.headers.get("x-real-ip") ??
     "unknown";
 
-  const key = `${ip}:${path}`;
+  // Use matched prefix as key so sub-paths like /api/upload/avatar all count
+  // against the same bucket — prevents bypass via different sub-routes
+  const prefix = Object.keys(RATE_LIMITS).find((p) => path.startsWith(p))!;
+  const key = `${ip}:${prefix}`;
   const now = Date.now();
   const entry = rateLimitMap.get(key);
 

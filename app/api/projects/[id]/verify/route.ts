@@ -21,7 +21,7 @@ export async function POST(
     .eq("id", id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  revalidateTag("profiles");
-  revalidateTag("projects");
+  revalidateTag("profiles", "max");
+  revalidateTag("projects", "max");
   return NextResponse.json({ success: true, verified });
 }

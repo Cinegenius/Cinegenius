@@ -7,11 +7,13 @@ export default function RoleDropdown({
   value,
   onChange,
   options,
+  placeholder = "Rolle wählen…",
   className = "",
 }: {
   value: string;
   onChange: (v: string) => void;
   options: string[];
+  placeholder?: string;
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -35,7 +37,7 @@ export default function RoleDropdown({
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm hover:border-gold/50 focus:outline-none focus:border-gold transition-colors"
       >
-        <span className={value ? "text-text-primary" : "text-text-muted"}>{value || "Rolle wählen…"}</span>
+        <span className={value ? "text-text-primary" : "text-text-muted"}>{value || placeholder}</span>
         <ChevronDown size={13} className={`shrink-0 text-text-muted transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (

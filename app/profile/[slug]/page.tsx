@@ -19,14 +19,19 @@ const BASE_FIELDS = "user_id, display_name, avatar_url, cover_image_url, role, p
 const EXTRA_FIELDS = "physical, crew, creative, vendor, agency";
 
 async function _getProfile(slug: string): Promise<UserProfile | null> {
-  const orClause = `slug.eq.${slug},user_id.eq.${slug}`;
+  // Validate slug to prevent PostgREST filter injection — allow only slug chars or UUID chars
+  if (!/^[a-zA-Z0-9_-]{1,128}$/.test(slug)) return null;
 
-  // 1. Always load the stable base columns
-  const { data: base, error: baseErr } = await db
+  // Try slug first, then user_id (two separate queries avoids .or() injection surface)
+  const { data: bySlug } = await db
     .from("profiles")
     .select(BASE_FIELDS)
-    .or(orClause)
+    .eq("slug", slug)
     .maybeSingle();
+
+  const { data: base, error: baseErr } = bySlug
+    ? { data: bySlug, error: null }
+    : await db.from("profiles").select(BASE_FIELDS).eq("user_id", slug).maybeSingle();
 
   if (baseErr || !base) return null;
 
@@ -35,7 +40,7 @@ async function _getProfile(slug: string): Promise<UserProfile | null> {
   const { data: extraData, error: extraErr } = await db
     .from("profiles")
     .select(EXTRA_FIELDS)
-    .or(orClause)
+    .eq("user_id", base.user_id)
     .maybeSingle();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -68,7 +73,13 @@ async function _getProfile(slug: string): Promise<UserProfile | null> {
   return { ...data, profile_type: type, modules } as UserProfile;
 }
 
-const getProfile = unstable_cache(_getProfile, ["profile"], { revalidate: 300, tags: ["profiles"] });
+function getProfile(slug: string): Promise<UserProfile | null> {
+  return unstable_cache(
+    () => _getProfile(slug),
+    ["profile", slug],
+    { revalidate: 300, tags: ["profiles"] }
+  )();
+}
 
 export async function generateMetadata(
   { params }: { params: Promise<{ slug: string }> }
@@ -99,100 +110,109 @@ async function getProjectCredits(userId: string): Promise<ProjectCredit[]> {
   return data as any;
 }
 
-const getExternalProfiles = unstable_cache(
-  async (userId: string): Promise<ExternalProfileRow[]> => {
-    const { data } = await db
-      .from("external_profiles")
-      .select("id, platform_type, platform_name, url, custom_label, sort_order, is_public")
-      .eq("user_id", userId)
-      .eq("is_public", true)
-      .order("sort_order", { ascending: true });
-    return (data ?? []) as ExternalProfileRow[];
-  },
-  ["profile-external"],
-  { revalidate: 300, tags: ["profiles"] }
-);
+function getExternalProfiles(userId: string): Promise<ExternalProfileRow[]> {
+  return unstable_cache(
+    async () => {
+      const { data } = await db
+        .from("external_profiles")
+        .select("id, platform_type, platform_name, url, custom_label, sort_order, is_public")
+        .eq("user_id", userId)
+        .eq("is_public", true)
+        .order("sort_order", { ascending: true });
+      return (data ?? []) as ExternalProfileRow[];
+    },
+    ["profile-external", userId],
+    { revalidate: 300, tags: ["profiles"] }
+  )();
+}
 
-const getPublicListings = unstable_cache(
-  async (userId: string) => {
-    const { data } = await db
-      .from("listings")
-      .select("id, type, title, category, price, city, image_url")
-      .eq("user_id", userId)
-      .eq("published", true)
-      .order("created_at", { ascending: false });
-    return (data ?? []) as { id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null }[];
-  },
-  ["profile-listings"],
-  { revalidate: 300, tags: ["profiles", "listings"] }
-);
+function getPublicListings(userId: string): Promise<{ id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null }[]> {
+  return unstable_cache(
+    async () => {
+      const { data } = await db
+        .from("listings")
+        .select("id, type, title, category, price, city, image_url")
+        .eq("user_id", userId)
+        .eq("published", true)
+        .order("created_at", { ascending: false });
+      return (data ?? []) as { id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null }[];
+    },
+    ["profile-listings", userId],
+    { revalidate: 300, tags: ["profiles", "listings"] }
+  )();
+}
 
 type PublicCollab = { user_id: string; label: string; display_name: string; avatar_url: string | null; slug: string; role: string | null };
 
-const getPublicCollaborations = unstable_cache(
-  async (userId: string): Promise<PublicCollab[]> => {
-    const [asSender, asReceiver] = await Promise.all([
-      db
-        .from("friendships")
-        .select("receiver_id, sender_collab_label")
-        .eq("sender_id", userId)
+function getPublicCollaborations(userId: string): Promise<PublicCollab[]> {
+  return unstable_cache(
+    async () => {
+      const [asSender, asReceiver] = await Promise.all([
+        db
+          .from("friendships")
+          .select("receiver_id, sender_collab_label")
+          .eq("sender_id", userId)
+          .eq("status", "accepted")
+          .eq("sender_collab_public", true)
+          .not("sender_collab_label", "is", null),
+        db
+          .from("friendships")
+          .select("sender_id, receiver_collab_label")
+          .eq("receiver_id", userId)
+          .eq("status", "accepted")
+          .eq("receiver_collab_public", true)
+          .not("receiver_collab_label", "is", null),
+      ]);
+
+      const collabs: { friendId: string; label: string }[] = [
+        ...(asSender.data ?? []).map((f) => ({ friendId: f.receiver_id, label: f.sender_collab_label as string })),
+        ...(asReceiver.data ?? []).map((f) => ({ friendId: f.sender_id, label: f.receiver_collab_label as string })),
+      ];
+
+      if (collabs.length === 0) return [];
+
+      const ids = [...new Set(collabs.map((c) => c.friendId))];
+      const { data: profiles } = await db
+        .from("profiles")
+        .select("user_id, display_name, avatar_url, slug, role, positions")
+        .in("user_id", ids);
+
+      const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, p]));
+      return collabs.map((c) => {
+        const p = profileMap[c.friendId] ?? {};
+        return {
+          user_id: c.friendId,
+          label: c.label,
+          display_name: p.display_name ?? "Unbekannt",
+          avatar_url: p.avatar_url ?? null,
+          slug: p.slug ?? c.friendId,
+          role: p.role ?? (Array.isArray(p.positions) ? p.positions[0] : null) ?? null,
+        };
+      });
+    },
+    ["profile-collaborations", userId],
+    { revalidate: 300, tags: ["profiles"] }
+  )();
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getCompanyMembership(userId: string): Promise<any> {
+  return unstable_cache(
+    async () => {
+      const { data } = await db
+        .from("company_members")
+        .select("id, role, title, status, company_id, companies(id, slug, name, logo_url)")
+        .eq("user_id", userId)
         .eq("status", "accepted")
-        .eq("sender_collab_public", true)
-        .not("sender_collab_label", "is", null),
-      db
-        .from("friendships")
-        .select("sender_id, receiver_collab_label")
-        .eq("receiver_id", userId)
-        .eq("status", "accepted")
-        .eq("receiver_collab_public", true)
-        .not("receiver_collab_label", "is", null),
-    ]);
-
-    const collabs: { friendId: string; label: string }[] = [
-      ...(asSender.data ?? []).map((f) => ({ friendId: f.receiver_id, label: f.sender_collab_label as string })),
-      ...(asReceiver.data ?? []).map((f) => ({ friendId: f.sender_id, label: f.receiver_collab_label as string })),
-    ];
-
-    if (collabs.length === 0) return [];
-
-    const ids = [...new Set(collabs.map((c) => c.friendId))];
-    const { data: profiles } = await db
-      .from("profiles")
-      .select("user_id, display_name, avatar_url, slug, role, positions")
-      .in("user_id", ids);
-
-    const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, p]));
-    return collabs.map((c) => {
-      const p = profileMap[c.friendId] ?? {};
-      return {
-        user_id: c.friendId,
-        label: c.label,
-        display_name: p.display_name ?? "Unbekannt",
-        avatar_url: p.avatar_url ?? null,
-        slug: p.slug ?? c.friendId,
-        role: p.role ?? (Array.isArray(p.positions) ? p.positions[0] : null) ?? null,
-      };
-    });
-  },
-  ["profile-collaborations"],
-  { revalidate: 300, tags: ["profiles"] }
-);
-
-const getCompanyMembership = unstable_cache(
-  async (userId: string) => {
-    const { data } = await db
-      .from("company_members")
-      .select("id, role, title, status, company_id, companies(id, slug, name, logo_url)")
-      .eq("user_id", userId)
-      .eq("status", "accepted")
-      .limit(1)
-      .maybeSingle();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return data as any ?? null;
-  },
-  ["profile-company"],
-  { revalidate: 300, tags: ["profiles"] }
-);
+        .limit(1)
+        .maybeSingle();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return data as any ?? null;
+    },
+    ["profile-company", userId],
+    { revalidate: 300, tags: ["profiles"] }
+  )();
+}
 
 export default async function ProfilePage(
   { params }: { params: Promise<{ slug: string }> }

@@ -6,11 +6,11 @@ import ImageStrip from "@/components/ImageStrip";
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import {
-  MapPin, MessageSquare, Play, Award, ChevronDown, ChevronUp,
+  MapPin, MessageSquare, Award, ChevronDown, ChevronUp,
   Pencil, ExternalLink, X, Check, Globe, Building2, UserPlus, UserCheck, Clock,
   ChevronRight, Clapperboard, Film, Briefcase, Package, Car, Ban, Flag, Users2,
 } from "lucide-react";
-import type { UserProfile, ProfileModule, ProfileImage, FilmographyEntry, ProfileAward, PhysicalData, ProjectCredit } from "@/lib/profile-types";
+import type { UserProfile, ProfileModule, ProfileImage, FilmographyEntry, ProfileAward, ProjectCredit } from "@/lib/profile-types";
 import ReviewsSection from "@/components/ReviewsSection";
 import { PROFILE_CATEGORY_MAP } from "@/lib/profile-types";
 import { getPlatform, type ExternalProfileRow } from "@/lib/external-platforms";
@@ -98,13 +98,15 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
 
   async function submitReport() {
     if (!reportReason) return;
-    await fetch("/api/reports", {
+    const res = await fetch("/api/reports", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ target_type: "user", target_id: targetId, reason: reportReason }),
     });
-    setReportSent(true);
-    setReportOpen(false);
+    if (res.ok) {
+      setReportSent(true);
+      setReportOpen(false);
+    }
   }
 
   return (
@@ -298,7 +300,7 @@ function ExternalProfilesDisplay({ profiles }: { profiles: ExternalProfileRow[] 
           return (
             <a
               key={entry.id}
-              href={entry.url}
+              href={safeLink(entry.url) ?? "#"}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-bg-elevated border border-border rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-all group"
@@ -390,23 +392,22 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
     setFriendLoading(true);
     try {
       if (!friendStatus) {
-        // Send request
         const res = await fetch("/api/friendships", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ receiver_id: profile.user_id }),
         });
-        const { id } = await res.json();
-        setFriendshipId(id);
+        if (!res.ok) return;
+        const data = await res.json();
+        setFriendshipId(data.id);
         setFriendStatus("pending_sent");
       } else if (friendStatus === "pending_received" && friendshipId) {
-        // Accept
-        await fetch(`/api/friendships/${friendshipId}`, {
+        const res = await fetch(`/api/friendships/${friendshipId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ status: "accepted" }),
         });
-        setFriendStatus("friends");
+        if (res.ok) setFriendStatus("friends");
       }
     } finally {
       setFriendLoading(false);
@@ -681,8 +682,8 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                     <div className="flex items-center gap-3 px-3 py-1.5 hover:bg-bg-elevated transition-colors">
                       <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{film.year || "—"}</span>
                       <div className="flex-1 min-w-0">
-                        {film.imdb_url ? (
-                          <a href={film.imdb_url} target="_blank" rel="noopener noreferrer"
+                        {film.imdb_url && safeLink(film.imdb_url) ? (
+                          <a href={safeLink(film.imdb_url)!} target="_blank" rel="noopener noreferrer"
                             className="text-xs text-text-primary hover:text-gold transition-colors inline-flex items-center gap-1">
                             {film.title} <ExternalLink size={9} className="text-text-muted shrink-0" />
                           </a>
@@ -1123,12 +1124,13 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
     try {
       if (!friendStatus) {
         const res = await fetch("/api/friendships", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ receiver_id: profile.user_id }) });
-        const { id } = await res.json();
-        setFriendshipId(id);
+        if (!res.ok) return;
+        const data = await res.json();
+        setFriendshipId(data.id);
         setFriendStatus("pending_sent");
       } else if (friendStatus === "pending_received" && friendshipId) {
-        await fetch(`/api/friendships/${friendshipId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "accepted" }) });
-        setFriendStatus("friends");
+        const res = await fetch(`/api/friendships/${friendshipId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "accepted" }) });
+        if (res.ok) setFriendStatus("friends");
       }
     } finally { setFriendLoading(false); }
   }
@@ -1387,8 +1389,8 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                     <div className="flex items-center gap-3 px-3 py-1.5 hover:bg-bg-elevated transition-colors">
                       <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{film.year || "—"}</span>
                       <div className="flex-1 min-w-0">
-                        {film.imdb_url ? (
-                          <a href={film.imdb_url} target="_blank" rel="noopener noreferrer"
+                        {film.imdb_url && safeLink(film.imdb_url) ? (
+                          <a href={safeLink(film.imdb_url)!} target="_blank" rel="noopener noreferrer"
                             className="text-xs text-text-primary hover:text-gold transition-colors inline-flex items-center gap-1">
                             {film.title} <ExternalLink size={9} className="text-text-muted shrink-0" />
                           </a>
