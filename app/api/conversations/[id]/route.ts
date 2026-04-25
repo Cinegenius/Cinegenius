@@ -17,20 +17,21 @@ export async function GET(
 
   const { id } = await params;
 
-  const { data: conv, error: convError } = await db
+  const { data: conv } = await db
     .from("conversations")
-    .select("*")
+    .select("id, sender_id, receiver_id, listing_title")
     .eq("id", id)
     .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
-    .single();
+    .maybeSingle();
 
-  if (convError || !conv) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 });
+  if (!conv) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 });
 
   const { data: messages } = await db
     .from("messages")
-    .select("*")
+    .select("id, sender_id, content, read_at, created_at")
     .eq("conversation_id", id)
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: true })
+    .limit(200);
 
   // Ungelesene Nachrichten des anderen als gelesen markieren
   await db
@@ -57,7 +58,9 @@ export async function POST(
   if (!allowed) return NextResponse.json({ error: "Zu viele Nachrichten. Bitte kurz warten." }, { status: 429 });
 
   const { id } = await params;
-  const { content } = await req.json();
+  const body = await req.json().catch(() => null);
+  if (!body) return NextResponse.json({ error: "Ungültige Anfrage" }, { status: 400 });
+  const { content } = body;
 
   if (!content?.trim()) return NextResponse.json({ error: "Nachricht leer" }, { status: 400 });
   if (content.length > 5000) return NextResponse.json({ error: "Nachricht zu lang (max. 5000 Zeichen)" }, { status: 400 });
@@ -68,9 +71,9 @@ export async function POST(
     .select("id, sender_id, receiver_id")
     .eq("id", id)
     .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
-    .single();
+    .maybeSingle();
 
-  if (!conv) return NextResponse.json({ error: "Kein Zugriff" }, { status: 403 });
+  if (!conv) return NextResponse.json({ error: "Kein Zugriff" }, { status: 404 });
 
   // Block check — deny if either party has blocked the other
   const receiverId = conv.sender_id === userId ? conv.receiver_id : conv.sender_id;
@@ -81,7 +84,7 @@ export async function POST(
   const { data: msg, error } = await db
     .from("messages")
     .insert({ conversation_id: id, sender_id: userId, content: content.trim() })
-    .select()
+    .select("id, sender_id, content, read_at, created_at")
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
