@@ -12,7 +12,7 @@ export async function GET(
 
   const { data: project, error } = await db
     .from("projects")
-    .select("*")
+    .select("id, title, year, type, description, director, poster_url, images, metadata, verified, created_by, created_at, updated_at")
     .eq("id", id)
     .single();
 
@@ -74,12 +74,20 @@ export async function PATCH(
   // Explicit allowlist — prevents injection of id, created_by, or arbitrary columns
   const ALLOWED_KEYS = [
     "title", "year", "type", "description", "director",
-    "poster_url", "images", "metadata", "genre",
+    "poster_url", "images", "metadata",
   ] as const;
 
   const updates: Record<string, unknown> = {};
   for (const key of ALLOWED_KEYS) {
     if (key in body) updates[key] = body[key];
+  }
+
+  // genre is stored inside metadata — merge rather than writing a phantom top-level column
+  if ("genre" in body) {
+    const existing = (typeof updates.metadata === "object" && updates.metadata !== null)
+      ? updates.metadata as Record<string, unknown>
+      : {};
+    updates.metadata = { ...existing, genre: body.genre };
   }
 
   if (Object.keys(updates).length === 0) {

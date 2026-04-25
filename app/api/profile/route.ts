@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
   if (!body) return NextResponse.json({ error: "Ungültiger Request-Body" }, { status: 400 });
   const {
     display_name, bio, location, avatar_url, skills, portfolio_url, positions,
-    portfolio_images, experience, account_type, profile_types,
+    portfolio_images, experience, profile_types,
     cover_image_url, instagram_url, tiktok_url, youtube_url, vimeo_url, linkedin_url, website_url,
     day_rate, filmography, video_links, focal_point,
   } = body;
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
         positions: positions ?? [],
         portfolio_images: portfolio_images ?? [],
         experience: experience?.trim() ?? "",
-        account_type: account_type ?? "person",
+        account_type: "person",
         profile_types: profile_types ?? [],
         cover_image_url: cover_image_url ?? null,
         instagram_url: instagram_url ?? null,
@@ -158,7 +158,7 @@ export async function POST(req: NextRequest) {
 
 // All known profile columns — any unknown key from the client is silently dropped
 const ALLOWED_PATCH_KEYS = new Set([
-  // SECURITY: "role", "verified", "account_type" deliberately excluded — set by admin only
+  // SECURITY: "role", "verified", "account_type" excluded — set via admin routes only
   "display_name", "display_name_alias", "slug", "phone", "location", "bio",
   "available", "available_from", "travel_ready",
   "avatar_url", "cover_image_url", "portfolio_url", "website_url",
@@ -166,9 +166,9 @@ const ALLOWED_PATCH_KEYS = new Set([
   "reel_url", "imdb_url",
   "instagram_url", "tiktok_url", "youtube_url", "vimeo_url", "linkedin_url",
   "day_rate", "filmography", "video_links",
-  "account_type", "profile_types",
+  "profile_types",
   "profile_type", "modules", "physical", "crew", "creative", "vendor",
-  "focal_point",
+  "focal_point", "tagline",
 ]);
 
 export async function PATCH(req: NextRequest) {

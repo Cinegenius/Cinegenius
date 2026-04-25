@@ -14,6 +14,10 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const targetId = searchParams.get("userId");
 
+  if (targetId && !/^[a-zA-Z0-9_-]{1,128}$/.test(targetId)) {
+    return NextResponse.json({ error: "Ungültige userId" }, { status: 400 });
+  }
+
   if (targetId) {
     const { data } = await db
       .from("friendships")
@@ -79,6 +83,7 @@ export async function POST(req: NextRequest) {
 
   const { receiver_id } = await req.json();
   if (!receiver_id) return NextResponse.json({ error: "receiver_id fehlt" }, { status: 400 });
+  if (!/^[a-zA-Z0-9_-]{1,128}$/.test(receiver_id)) return NextResponse.json({ error: "Ungültige receiver_id" }, { status: 400 });
   if (receiver_id === userId) return NextResponse.json({ error: "Kann sich selbst nicht hinzufügen" }, { status: 400 });
 
   // Check for existing record

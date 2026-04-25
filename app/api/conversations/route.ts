@@ -76,16 +76,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Nachrichten an diesen Nutzer sind nicht möglich" }, { status: 403 });
   }
 
-  // Prüfen ob Konversation bereits existiert
+  // Bidirektional suchen — verhindert doppelte Conversations wenn der andere zuerst geschrieben hat
+  const orFilter = listing_id
+    ? `and(sender_id.eq.${userId},receiver_id.eq.${receiver_id},listing_id.eq.${listing_id}),and(sender_id.eq.${receiver_id},receiver_id.eq.${userId},listing_id.eq.${listing_id})`
+    : `and(sender_id.eq.${userId},receiver_id.eq.${receiver_id}),and(sender_id.eq.${receiver_id},receiver_id.eq.${userId})`;
+
   let existingQuery = db
     .from("conversations")
     .select("id")
-    .eq("sender_id", userId)
-    .eq("receiver_id", receiver_id);
+    .or(orFilter);
 
-  if (listing_id) {
-    existingQuery = existingQuery.eq("listing_id", listing_id);
-  } else {
+  if (!listing_id) {
     existingQuery = existingQuery.is("listing_id", null);
   }
 

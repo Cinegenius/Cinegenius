@@ -13,6 +13,12 @@ import { getPresetForType, type ProfileType } from "@/lib/profile-types";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 import Link from "next/link";
 
+// Only allow same-origin redirects to prevent open redirect after sign-up
+function safeRedirect(value: string | null): string {
+  if (!value || !value.startsWith("/") || value.startsWith("//")) return "/dashboard";
+  return value;
+}
+
 // ─── Intent → ProfileType mapping ────────────────────────────────────────────
 
 type Intent = {
@@ -91,8 +97,7 @@ export default function ProfileSetupPage() {
     if (!isLoaded || !user) return;
     fetch("/api/profile").then(r => r.json()).then(({ exists }) => {
       if (exists) {
-        const redirectTo = searchParams.get("redirect") || "/dashboard";
-        window.location.replace(redirectTo);
+        window.location.replace(safeRedirect(searchParams.get("redirect")));
       }
     });
   }, [isLoaded, user]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -109,7 +114,8 @@ export default function ProfileSetupPage() {
   async function handleAvatar(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setAvatarPreview(URL.createObjectURL(file));
+    const objectUrl = URL.createObjectURL(file);
+    setAvatarPreview((prev) => { if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev); return objectUrl; });
     setUploading(true);
     try {
       const compressed = await compressAvatar(file);
@@ -154,9 +160,9 @@ export default function ProfileSetupPage() {
         return;
       }
 
-      // Modules in background — non-blocking
+      // Save modules via the main profile PATCH (no separate /modules route needed)
       const modules = getPresetForType(primaryType);
-      fetch("/api/profile/modules", {
+      fetch("/api/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ profile_type: primaryType, modules }),
@@ -177,7 +183,7 @@ export default function ProfileSetupPage() {
     );
   }
 
-  const redirectTo = searchParams.get("redirect");
+  const redirectTo = safeRedirect(searchParams.get("redirect"));
 
   return (
     <div className="min-h-screen bg-bg-primary flex flex-col">
@@ -413,7 +419,7 @@ export default function ProfileSetupPage() {
               </Link>
 
               <Link
-                href={redirectTo ?? "/dashboard"}
+                href={redirectTo}
                 className="block text-xs text-text-muted hover:text-gold transition-colors text-center pt-2"
               >
                 Zum Dashboard →

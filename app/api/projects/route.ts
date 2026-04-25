@@ -6,7 +6,8 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q") ?? "";
-  const limit = Math.min(parseInt(searchParams.get("limit") ?? "20"), 50);
+  const rawLimit = Number.parseInt(searchParams.get("limit") ?? "20", 10);
+  const limit = Number.isFinite(rawLimit) ? Math.min(Math.max(rawLimit, 1), 50) : 20;
   const mine = searchParams.get("mine") === "true";
 
   if (mine) {

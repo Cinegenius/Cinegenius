@@ -179,16 +179,18 @@ function getPublicCollaborations(userId: string): Promise<PublicCollab[]> {
         .in("user_id", ids);
 
       const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, p]));
-      return collabs.map((c) => {
-        const p = profileMap[c.friendId] ?? {};
-        return {
+      return collabs.flatMap((c) => {
+        const p = profileMap[c.friendId];
+        // Skip if profile not found or has no valid slug — avoids /profile/user_xxx 404s
+        if (!p?.slug) return [];
+        return [{
           user_id: c.friendId,
           label: c.label,
           display_name: p.display_name ?? "Unbekannt",
           avatar_url: p.avatar_url ?? null,
-          slug: p.slug ?? c.friendId,
+          slug: p.slug,
           role: p.role ?? (Array.isArray(p.positions) ? p.positions[0] : null) ?? null,
-        };
+        }];
       });
     },
     ["profile-collaborations", userId],
