@@ -9,7 +9,7 @@ import Link from "next/link";
 type Props = {
   listingId: string;
   listingTitle: string;
-  listingType: "creator" | "location" | "vehicle" | "prop" | "job";
+  listingType: "creator" | "location" | "vehicle" | "prop" | "job" | "animal";
   ownerId: string;
   ownerName: string;
 };

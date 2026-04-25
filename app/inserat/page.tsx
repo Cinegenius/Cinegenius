@@ -12,7 +12,7 @@ import {
   ArrowRight, CheckCircle, Loader2, AlertTriangle, ChevronLeft, ChevronDown,
   Shield, Radio, Coffee, Truck, Monitor, Box, ClipboardList,
   Film, Palette, Drama, Upload, X, ImageIcon,
-  Smartphone, Video, Aperture,
+  Smartphone, Video, Aperture, PawPrint,
 } from "lucide-react";
 import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
 import { PROP_CATEGORY_FIELDS } from "@/lib/propCategoryFields";
@@ -27,7 +27,7 @@ type CategoryItem = {
   label: string;
   sub?: string;
   icon: LucideIcon;
-  type: "creator" | "job" | "prop" | "vehicle" | "location";
+  type: "creator" | "job" | "prop" | "vehicle" | "location" | "animal";
   category: string;
   color: string;
   bg: string;
@@ -175,6 +175,23 @@ const groups: Group[] = [
     ],
   },
   {
+    id: "tiere",
+    label: "Film-Tiere",
+    desc: "Ausgebildete Tiere für Film, Foto & Werbung anbieten",
+    color: "text-amber-400",
+    border: "border-amber-500/30",
+    items: [
+      { id: "tier_hunde",    label: "Hunde",          sub: "Ausgebildete Filmhunde aller Rassen…",   icon: PawPrint, type: "animal" as const, category: "Hunde",          color: "text-amber-400",   bg: "bg-amber-500/10 border-amber-500/20" },
+      { id: "tier_pferde",   label: "Pferde & Ponys", sub: "Reit- und Kutschpferde, Ponys…",         icon: PawPrint, type: "animal" as const, category: "Pferde",         color: "text-stone-400",   bg: "bg-stone-500/10 border-stone-500/20" },
+      { id: "tier_katzen",   label: "Katzen",         sub: "Rassekatzen, dressierte Hauskatzen…",    icon: PawPrint, type: "animal" as const, category: "Katzen",         color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/20" },
+      { id: "tier_voegel",   label: "Vögel",          sub: "Papageien, Greifvögel, Hühner…",         icon: PawPrint, type: "animal" as const, category: "Vögel",          color: "text-sky-400",     bg: "bg-sky-500/10 border-sky-500/20" },
+      { id: "tier_reptilien",label: "Reptilien",      sub: "Schlangen, Echsen, Schildkröten…",       icon: PawPrint, type: "animal" as const, category: "Reptilien",      color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
+      { id: "tier_nutztiere",label: "Nutztiere",      sub: "Kühe, Schafe, Ziegen, Schweine…",        icon: PawPrint, type: "animal" as const, category: "Nutztiere",      color: "text-lime-400",    bg: "bg-lime-500/10 border-lime-500/20" },
+      { id: "tier_exoten",   label: "Exoten",         sub: "Lamas, Alpakas, Minischweine, Füchse…",  icon: PawPrint, type: "animal" as const, category: "Exoten",         color: "text-violet-400",  bg: "bg-violet-500/10 border-violet-500/20" },
+      { id: "tier_sonstige", label: "Sonstige Tiere", sub: "Alle anderen Tierarten…",                icon: PawPrint, type: "animal" as const, category: "Sonstige Tiere", color: "text-zinc-400",    bg: "bg-zinc-500/10 border-zinc-500/20" },
+    ],
+  },
+  {
     id: "drehorte",
     label: "Locations",
     desc: "Location für Film, Foto oder Werbung anbieten",
@@ -305,6 +322,11 @@ export default function InseratPage() {
     fuel_type: "",
     license_class: "",
     condition: "",
+    // animal
+    animal_training: "",
+    animal_handler: true,
+    animal_count: "1",
+    animal_skills: "",
     // location
     sqm: "",
     ceiling_height: "",
@@ -424,6 +446,25 @@ export default function InseratPage() {
       };
     }
 
+    if (type === "animal") {
+      return {
+        type,
+        category,
+        title: form.title,
+        description: form.description || "",
+        price: parseFloat(form.price) || 0,
+        city: form.city,
+        metadata: {
+          training_level: form.animal_training || null,
+          handler_included: form.animal_handler,
+          count: form.animal_count || null,
+          special_skills: form.animal_skills || null,
+          delivery: form.delivery,
+          focal_point: focalPoint ?? null,
+        },
+      };
+    }
+
     if (type === "creator") {
       return {
         type,
@@ -514,6 +555,7 @@ export default function InseratPage() {
       : selected.type === "vehicle" ? "/vehicles"
       : selected.type === "job" ? "/jobs"
       : selected.type === "creator" ? "/creators"
+      : selected.type === "animal" ? "/tiere"
       : "/props";
     return id ? `${base}/${id}` : base;
   };
@@ -661,6 +703,7 @@ export default function InseratPage() {
   if (step === 2 && selected) {
     const { type, label, icon: Icon, color, bg } = selected;
     const isVehicle = type === "vehicle";
+    const isAnimal = type === "animal";
     const isLocation = type === "location";
     const isJob = type === "job";
     const isCreator = type === "creator";
@@ -736,6 +779,55 @@ export default function InseratPage() {
                   <div>
                     <p className="text-sm font-medium text-text-primary">Lieferung zum Set möglich</p>
                     <p className="text-xs text-text-muted">Das Fahrzeug kann zur Location geliefert werden</p>
+                  </div>
+                </label>
+              </div>
+            )}
+
+            {/* ── ANIMAL FIELDS ── */}
+            {isAnimal && (
+              <div className="space-y-5">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Dressur-Level</label>
+                    <select value={form.animal_training} onChange={(e) => f("animal_training", e.target.value)}
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm">
+                      <option value="">Bitte wählen…</option>
+                      {["Kinoprofi", "Erfahren", "Grundgehorsam", "Ungeübt"].map((o) => <option key={o} value={o}>{o}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Anzahl</label>
+                    <select value={form.animal_count} onChange={(e) => f("animal_count", e.target.value)}
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm">
+                      {["1 Tier", "2–5 Tiere", "Gruppe (6+)"].map((o) => <option key={o} value={o}>{o}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Besonderheiten / Tricks</label>
+                  <input type="text" value={form.animal_skills} onChange={(e) => f("animal_skills", e.target.value)}
+                    placeholder="z.B. sitzt, Männchen, läuft auf Kommando, apportiert"
+                    className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
+                </div>
+                <label className="flex items-center gap-3 cursor-pointer select-none">
+                  <div onClick={() => f("animal_handler", !form.animal_handler)}
+                    className={`w-10 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${form.animal_handler ? "bg-gold" : "bg-border"}`}>
+                    <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${form.animal_handler ? "left-5" : "left-1"}`} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-text-primary">Handler / Trainer dabei</p>
+                    <p className="text-xs text-text-muted">Professionelle Betreuung am Set inklusive</p>
+                  </div>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer select-none">
+                  <div onClick={() => f("delivery", !form.delivery)}
+                    className={`w-10 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${form.delivery ? "bg-gold" : "bg-border"}`}>
+                    <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${form.delivery ? "left-5" : "left-1"}`} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-text-primary">Anlieferung zum Set möglich</p>
+                    <p className="text-xs text-text-muted">Das Tier kann zur Location gebracht werden</p>
                   </div>
                 </label>
               </div>
@@ -1419,7 +1511,7 @@ export default function InseratPage() {
               setDropdownId("");
               setImageUrl(null);
               setImagePreview(null);
-              setForm({ title: "", description: "", price: "", city: "", make: "", model: "", year: "", fuel_type: "", license_class: "", condition: "", sqm: "", ceiling_height: "", max_crew: "", indoor_outdoor: "innen", power_available: false, power_details: "", parking_spots: "", company: "", projectType: "", shoot_start: "", shoot_end: "", pay_type: "", role_label: "", urgent: false, content_nudity: false, content_violence: false, content_stunts: false, delivery: false, rental_type: "miete", dimensions: "", safety_note: "", skills: "", experience: "" });
+              setForm({ title: "", description: "", price: "", city: "", make: "", model: "", year: "", fuel_type: "", license_class: "", condition: "", sqm: "", ceiling_height: "", max_crew: "", indoor_outdoor: "innen", power_available: false, power_details: "", parking_spots: "", company: "", projectType: "", shoot_start: "", shoot_end: "", pay_type: "", role_label: "", urgent: false, content_nudity: false, content_violence: false, content_stunts: false, delivery: false, rental_type: "miete", dimensions: "", safety_note: "", skills: "", experience: "", animal_training: "", animal_handler: true, animal_count: "1 Tier", animal_skills: "" });
               setLocAmenities([]); setLocBlockedDates([]); setLocExtraImages([]); setLocFloorPlanUrl(null); setLocFloorPlanPreview(null);
             }}
             className="px-6 py-3 border border-border text-text-secondary rounded-xl hover:border-gold hover:text-gold transition-all text-sm font-medium"

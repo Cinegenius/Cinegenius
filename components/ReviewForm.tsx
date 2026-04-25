@@ -6,7 +6,7 @@ import { Star, CheckCircle, X, Loader2 } from "lucide-react";
 interface Props {
   targetId: string;
   targetName: string;
-  targetType: "location" | "creator" | "prop" | "vehicle" | "profile";
+  targetType: "location" | "creator" | "prop" | "vehicle" | "profile" | "animal";
   onClose: () => void;
   onSubmit?: (rating: number, text: string) => void;
 }
@@ -19,6 +19,7 @@ const aspects: Record<Props["targetType"], string[]> = {
   prop:      ["Genauigkeit der Beschreibung", "Zustand", "Lieferung", "Kommunikation", "Wert"],
   vehicle:   ["Genauigkeit der Beschreibung", "Zustand", "Übergabe", "Kommunikation", "Wert"],
   profile:   ["Professionalität", "Kommunikation", "Pünktlichkeit", "Qualität der Arbeit", "Zuverlässigkeit"],
+  animal:    ["Dressur-Level", "Verhalten am Set", "Handler-Kommunikation", "Pünktlichkeit", "Wert"],
 };
 
 export default function ReviewForm({ targetId, targetName, targetType, onClose, onSubmit }: Props) {

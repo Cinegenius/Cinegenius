@@ -9,6 +9,7 @@ const typeToPath: Record<string, string> = {
   job: "jobs",
   prop: "props",
   vehicle: "vehicles",
+  animal: "tiere",
 };
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -21,6 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/jobs`,              lastModified: now, changeFrequency: "daily",   priority: 0.9 },
     { url: `${BASE}/props`,             lastModified: now, changeFrequency: "weekly",  priority: 0.8 },
     { url: `${BASE}/vehicles`,          lastModified: now, changeFrequency: "weekly",  priority: 0.8 },
+    { url: `${BASE}/tiere`,             lastModified: now, changeFrequency: "weekly",  priority: 0.8 },
     { url: `${BASE}/marketplace`,       lastModified: now, changeFrequency: "weekly",  priority: 0.7 },
     { url: `${BASE}/companies`,         lastModified: now, changeFrequency: "weekly",  priority: 0.8 },
     { url: `${BASE}/pricing`,           lastModified: now, changeFrequency: "monthly", priority: 0.6 },

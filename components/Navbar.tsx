@@ -11,7 +11,7 @@ import {
   Camera, Mic, Drama, Lightbulb, User, Users, Layers, Briefcase,
   LayoutDashboard, LogOut, MessageSquare, Bell,
   Home, Building2, TreePine, Coffee, Monitor,
-  Smartphone, ImageIcon, Video, Aperture, MapPin, ShoppingBag,
+  Smartphone, ImageIcon, Video, Aperture, MapPin, ShoppingBag, PawPrint,
 } from "lucide-react";
 import NotificationCenter from "@/components/NotificationCenter";
 import GlobalSearch from "@/components/GlobalSearch";
@@ -81,6 +81,7 @@ const marketGroups: { heading: string; items: NavItem[] }[] = [
       { icon: Layers,   label: "Requisiten", desc: "Set-Dressing, Möbel, Props", href: "/props",                  iconBg: "bg-violet-500/10 border-violet-500/20", iconColor: "text-violet-400" },
       { icon: Car,      label: "Fahrzeuge",  desc: "Classic Cars & Stuntautos",  href: "/vehicles",               iconBg: "bg-orange-500/10 border-orange-500/20", iconColor: "text-orange-400" },
       { icon: Zap,      label: "SFX",        desc: "Pyro, Atmosphäre, Effekte",  href: "/props?cat=sfx",          iconBg: "bg-yellow-500/10 border-yellow-500/20", iconColor: "text-yellow-400" },
+      { icon: PawPrint, label: "Film-Tiere", desc: "Hunde, Pferde, Exoten",      href: "/tiere",                  iconBg: "bg-emerald-500/10 border-emerald-500/20", iconColor: "text-emerald-400" },
     ],
   },
   {
@@ -248,7 +249,7 @@ export default function Navbar() {
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href.split("?")[0] + "/");
   const isCrewActive = isActive("/creators");
-  const isMarketActive = isActive("/marketplace") || isActive("/props") || isActive("/vehicles");
+  const isMarketActive = isActive("/marketplace") || isActive("/props") || isActive("/vehicles") || isActive("/tiere");
   const isLocationsActive = isActive("/locations");
   const isJobsActive = isActive("/jobs");
 
