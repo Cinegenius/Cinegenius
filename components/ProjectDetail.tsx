@@ -406,8 +406,8 @@ export default function ProjectDetail({
 
   const removePhoto = async (url: string) => {
     const newImages = project.images.filter((i) => i !== url);
-    await fetch(`/api/projects/${project.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ images: newImages }) });
-    setProject((p) => ({ ...p, images: newImages }));
+    const res = await fetch(`/api/projects/${project.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ images: newImages }) });
+    if (res.ok) setProject((p) => ({ ...p, images: newImages }));
   };
 
   const handleAddFestival = async () => {
@@ -430,8 +430,8 @@ export default function ProjectDetail({
   };
 
   const patchDistribution = async (patch: Partial<Project>) => {
-    await fetch(`/api/projects/${project.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch) });
-    setProject((p) => ({ ...p, ...patch }));
+    const res = await fetch(`/api/projects/${project.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch) });
+    if (res.ok) setProject((p) => ({ ...p, ...patch }));
   };
 
   const handleAddStreaming = async () => {

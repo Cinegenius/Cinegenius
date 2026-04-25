@@ -25,11 +25,13 @@ export async function GET() {
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
-  const { data } = await db
+  const { data, error: dbError } = await db
     .from("profiles")
     .select(PROFILE_COLS)
     .eq("user_id", userId)
     .maybeSingle();
+
+  if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 });
 
   // Back-fill Clerk metadata and set cookie for users who had a profile before this flag existed
   if (data) {

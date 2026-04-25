@@ -122,7 +122,9 @@ export default function ProfileSetupPage() {
       const fd = new FormData();
       fd.append("file", compressed);
       const res = await fetch("/api/upload/avatar", { method: "POST", body: fd });
+      if (!res.ok) throw new Error("Upload fehlgeschlagen");
       const { url } = await res.json();
+      if (!url) throw new Error("Upload ohne URL");
       setAvatarUrl(url);
       setFocalPickerImage(url);
     } finally {
@@ -148,7 +150,6 @@ export default function ProfileSetupPage() {
           focal_point: avatarUrl ? focalPoint : undefined,
           skills: [],
           positions: [],
-          account_type: "person",
           profile_types: profileTypes,
         }),
       });

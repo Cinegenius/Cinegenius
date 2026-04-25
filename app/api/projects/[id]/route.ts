@@ -12,7 +12,7 @@ export async function GET(
 
   const { data: project, error } = await db
     .from("projects")
-    .select("id, title, year, type, description, director, poster_url, images, metadata, verified, created_by, created_at, updated_at")
+    .select("id, title, year, type, description, director, poster_url, images, metadata, verified, created_at, updated_at, status, logline, production_company, runtime_minutes, trailer_url, release_cinema, release_streaming, release_tv, prep_start, prep_end, shoot_start, shoot_end, post_start, post_end")
     .eq("id", id)
     .single();
 
@@ -75,6 +75,9 @@ export async function PATCH(
   const ALLOWED_KEYS = [
     "title", "year", "type", "description", "director",
     "poster_url", "images", "metadata",
+    "status", "logline", "production_company", "runtime_minutes", "trailer_url",
+    "release_cinema", "release_streaming", "release_tv",
+    "prep_start", "prep_end", "shoot_start", "shoot_end", "post_start", "post_end",
   ] as const;
 
   const updates: Record<string, unknown> = {};
