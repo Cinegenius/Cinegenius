@@ -234,6 +234,7 @@ const LISTING_TYPE_META: Record<string, { label: string; color: string; href: (i
   location: { label: "Location",   color: "text-emerald-400",  href: (id) => `/locations/${id}` },
   vehicle:  { label: "Fahrzeug",   color: "text-sky-400",      href: (id) => `/vehicles/${id}` },
   creator:  { label: "Creator",    color: "text-rose-400",     href: (id) => `/creators/${id}` },
+  animal:   { label: "Tier",       color: "text-amber-400",    href: (id) => `/tiere/${id}` },
 };
 
 const LISTING_TYPE_ICON: Record<string, React.ElementType> = {

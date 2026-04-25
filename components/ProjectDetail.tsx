@@ -1,5 +1,15 @@
 "use client";
 
+function safeLink(url: string | null | undefined): string | null {
+  if (!url?.trim()) return null;
+  try {
+    const normalized = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+    const u = new URL(normalized);
+    if (!["http:", "https:"].includes(u.protocol)) return null;
+    return normalized;
+  } catch { return null; }
+}
+
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -831,10 +841,10 @@ export default function ProjectDetail({
             {!project.synopsis && !project.description && !project.logline && (
               <p className="text-text-muted text-sm">Noch keine Beschreibung vorhanden.{isCreator && " Klicke auf ✎ um eine hinzuzufügen."}</p>
             )}
-            {project.trailer_url && (
+            {safeLink(project.trailer_url) && (
               <div>
                 <h2 className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-3">Trailer</h2>
-                <a href={project.trailer_url} target="_blank" rel="noopener noreferrer"
+                <a href={safeLink(project.trailer_url)!} target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-2.5 bg-bg-elevated border border-border rounded-xl text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors">
                   <Play size={14} /> Trailer ansehen <ExternalLink size={11} className="text-text-muted" />
                 </a>
@@ -1127,8 +1137,8 @@ export default function ProjectDetail({
                         <p className="text-sm text-text-primary font-medium">{s.platform}</p>
                         <p className="text-xs text-text-muted">{s.date}{s.territory && ` · ${s.territory}`}</p>
                       </div>
-                      {s.url && (
-                        <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-text-muted hover:text-gold transition-colors"><ExternalLink size={13} /></a>
+                      {safeLink(s.url) && (
+                        <a href={safeLink(s.url)!} target="_blank" rel="noopener noreferrer" className="text-text-muted hover:text-gold transition-colors"><ExternalLink size={13} /></a>
                       )}
                       {isCreator && (
                         <button onClick={() => handleRemoveStreaming(i)} className="text-text-muted hover:text-crimson-light transition-colors opacity-0 group-hover:opacity-100"><X size={13} /></button>
@@ -1186,18 +1196,18 @@ export default function ProjectDetail({
             </section>
 
             {/* Trailer */}
-            {(project.trailer_url || project.teaser_url) && (
+            {(safeLink(project.trailer_url) || safeLink(project.teaser_url)) && (
               <section>
                 <h2 className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-4 flex items-center gap-2"><Play size={13} /> Trailer & Teaser</h2>
                 <div className="flex flex-wrap gap-3">
-                  {project.trailer_url && (
-                    <a href={project.trailer_url} target="_blank" rel="noopener noreferrer"
+                  {safeLink(project.trailer_url) && (
+                    <a href={safeLink(project.trailer_url)!} target="_blank" rel="noopener noreferrer"
                       className="flex items-center gap-2 px-4 py-2.5 bg-bg-elevated border border-border rounded-xl text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors">
                       <Play size={13} /> Trailer <ExternalLink size={10} className="text-text-muted" />
                     </a>
                   )}
-                  {project.teaser_url && (
-                    <a href={project.teaser_url} target="_blank" rel="noopener noreferrer"
+                  {safeLink(project.teaser_url) && (
+                    <a href={safeLink(project.teaser_url)!} target="_blank" rel="noopener noreferrer"
                       className="flex items-center gap-2 px-4 py-2.5 bg-bg-elevated border border-border rounded-xl text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors">
                       <Play size={13} /> Teaser <ExternalLink size={10} className="text-text-muted" />
                     </a>

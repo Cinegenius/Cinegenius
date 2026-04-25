@@ -12,7 +12,7 @@ import ReportButton from "@/components/ReportButton";
 import ReviewsSection from "@/components/ReviewsSection";
 import JsonLd from "@/components/JsonLd";
 
-async function getAnimal(slug: string) {
+async function getAnimal(slug: string, viewerId?: string | null) {
   try {
     const { data, error } = await db
       .from("listings")
@@ -22,6 +22,7 @@ async function getAnimal(slug: string) {
 
     if (error || !data) return null;
     if (data.type !== "animal") return null;
+    if (data.published === false && data.user_id !== viewerId) return null;
 
     const ownerRes = data.user_id
       ? await db.from("profiles").select("display_name").eq("user_id", data.user_id).single()
@@ -82,10 +83,9 @@ export default async function AnimalDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const animal = await getAnimal(slug);
-  if (!animal) notFound();
-
   const { userId } = await auth();
+  const animal = await getAnimal(slug, userId);
+  if (!animal) notFound();
   const isOwner = !!userId && userId === animal.ownerId;
 
   const jsonLd = {

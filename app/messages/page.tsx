@@ -70,12 +70,14 @@ function MessagesContent() {
   const showChat = !!(activeId || newConvRecipient);
 
   const loadConversations = useCallback(async () => {
-    const res = await fetch("/api/conversations");
-    const { data } = await res.json();
-    if (!data) return;
-    // Profiles are now pre-enriched server-side — no per-conversation fetches needed
-    setConversations(data as Conversation[]);
-    setLoading(false);
+    try {
+      const res = await fetch("/api/conversations");
+      if (!res.ok) throw new Error("fetch failed");
+      const { data } = await res.json();
+      setConversations(Array.isArray(data) ? data as Conversation[] : []);
+    } catch { /* silent — UI shows empty state */ } finally {
+      setLoading(false);
+    }
   }, []);
 
   const loadFriendRequests = useCallback(async () => {

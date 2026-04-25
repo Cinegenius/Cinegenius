@@ -26,7 +26,10 @@ export default function ProfileGuard({ children }: { children: React.ReactNode }
     }
 
     fetch("/api/profile")
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error("profile check failed");
+        return r.json();
+      })
       .then(({ exists }) => {
         if (!exists) {
           const redirect = window.location.pathname + window.location.search;
@@ -36,8 +39,9 @@ export default function ProfileGuard({ children }: { children: React.ReactNode }
         }
       })
       .catch(() => {
-        // on error, let through (don't block the user)
-        setReady(true);
+        // on error, redirect to setup — fail closed rather than letting unauthenticated state through
+        const redirect = window.location.pathname + window.location.search;
+        router.replace(`/profile-setup?redirect=${encodeURIComponent(redirect)}`);
       });
   }, [isLoaded, user, router]);
 

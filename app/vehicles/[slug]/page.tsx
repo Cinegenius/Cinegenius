@@ -13,7 +13,7 @@ import FavoriteButton from "@/components/FavoriteButton";
 import ReviewsSection from "@/components/ReviewsSection";
 import ReportButton from "@/components/ReportButton";
 
-async function getVehicle(slug: string) {
+async function getVehicle(slug: string, viewerId?: string | null) {
   try {
     const { data, error } = await db
       .from("listings")
@@ -24,6 +24,7 @@ async function getVehicle(slug: string) {
     if (error) console.error("[getVehicle] db error:", error.message, "slug:", slug);
     if (!data) { console.error("[getVehicle] no listing found for slug:", slug); return null; }
     if (data.type !== "vehicle") { console.error("[getVehicle] wrong type:", data.type, "slug:", slug); return null; }
+    if (data.published === false && data.user_id !== viewerId) return null;
 
   const ownerRes = data.user_id
     ? await db.from("profiles").select("display_name").eq("user_id", data.user_id).single()
@@ -92,10 +93,9 @@ export default async function VehicleDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const vehicle = await getVehicle(slug);
-  if (!vehicle) notFound();
-
   const { userId } = await auth();
+  const vehicle = await getVehicle(slug, userId);
+  if (!vehicle) notFound();
   const isOwner = !!userId && userId === vehicle.ownerId;
 
   const jsonLd = {

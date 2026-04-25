@@ -181,13 +181,29 @@ export async function PATCH(req: NextRequest) {
 
     const body = await req.json().catch(() => null);
     if (!body) return NextResponse.json({ error: "Ungültiger Request-Body" }, { status: 400 });
-    console.log("[profile PATCH] body keys:", Object.keys(body));
 
     // Only pass known columns to Supabase to avoid "column does not exist" errors
     const safe = Object.fromEntries(
       Object.entries(body).filter(([k]) => ALLOWED_PATCH_KEYS.has(k))
     );
-    console.log("[profile PATCH] safe keys:", Object.keys(safe), "userId:", userId);
+
+    // Slug: validate format and check uniqueness to prevent profile hijacking
+    if ("slug" in safe) {
+      const slug = String(safe.slug).trim().toLowerCase();
+      if (!/^[a-z0-9_-]{3,64}$/.test(slug)) {
+        return NextResponse.json({ error: "Slug ungültig (3–64 Zeichen, nur a-z, 0-9, _ und -)" }, { status: 400 });
+      }
+      const { data: conflict } = await db
+        .from("profiles")
+        .select("user_id")
+        .or(`slug.eq.${slug},user_id.eq.${slug}`)
+        .neq("user_id", userId)
+        .maybeSingle();
+      if (conflict) {
+        return NextResponse.json({ error: "Slug ist bereits vergeben" }, { status: 409 });
+      }
+      safe.slug = slug;
+    }
 
     const updated_at = new Date().toISOString();
     let payload: Record<string, unknown> = { ...safe, updated_at };
@@ -208,7 +224,6 @@ export async function PATCH(req: NextRequest) {
         const match = error.message.match(/Could not find the '(\w+)' column/);
         const badCol = match?.[1];
         if (badCol && badCol in payload) {
-          console.warn(`[profile PATCH] stripping missing column: ${badCol}`);
           const next = { ...payload };
           delete next[badCol];
           payload = next;

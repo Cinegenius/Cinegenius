@@ -126,6 +126,7 @@ export async function POST(req: Request) {
     prop: "/props",
     vehicle: "/vehicles",
     creator: "/creators",
+    animal: "/tiere",
   };
   if (pathMap[type]) revalidatePath(pathMap[type]);
   revalidateTag("listings", "max");

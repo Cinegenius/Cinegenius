@@ -58,8 +58,11 @@ export async function GET(req: NextRequest) {
     .range(from, to);
 
   if (category) query = query.contains("categories", [category]);
-  if (city)     query = query.ilike("city", `%${city}%`);
-  if (q)        query = query.or(`name.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%`);
+  if (city)     query = query.ilike("city", `%${city.trim().slice(0, 80).replace(/[%,()]/g, "")}%`);
+  if (q) {
+    const safeQ = q.trim().slice(0, 80).replace(/[%,()]/g, "");
+    if (safeQ) query = query.or(`name.ilike.%${safeQ}%,description.ilike.%${safeQ}%,city.ilike.%${safeQ}%`);
+  }
 
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
