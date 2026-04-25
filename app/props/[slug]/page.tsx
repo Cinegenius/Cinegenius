@@ -26,7 +26,7 @@ async function getProp(slug: string) {
     category: data.category ?? "Requisiten",
     vendor: (ownerRes as { data: { display_name: string | null } | null }).data?.display_name ?? "Privatanbieter",
     location: data.city ?? "",
-    dailyRate: data.price,
+    dailyRate: data.price ?? 0,
     image: data.image_url ?? "",
     condition: (data.metadata as { condition?: string } | null)?.condition ?? "Gut",
     era: (data.metadata as { era?: string } | null)?.era ?? null,

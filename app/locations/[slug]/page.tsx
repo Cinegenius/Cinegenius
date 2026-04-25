@@ -43,7 +43,7 @@ async function getLocation(slug: string) {
     title: data.title,
     type: data.category ?? "Speziallocation",
     city: data.city ?? "",
-    price: data.price,
+    price: data.price ?? 0,
     priceUnit: "day" as const,
     rating: 0,
     reviews: 0,

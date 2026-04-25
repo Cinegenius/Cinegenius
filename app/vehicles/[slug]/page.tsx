@@ -44,7 +44,7 @@ async function getVehicle(slug: string) {
     condition: (meta.condition as string) ?? "Gut",
     location: data.city ?? "",
     vendor: ownerName,
-    dailyRate: data.price,
+    dailyRate: data.price ?? 0,
     image: data.image_url ?? "",
     tags: ["Neu"] as string[],
     instantBook: false,
