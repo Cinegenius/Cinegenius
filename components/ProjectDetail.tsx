@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft, Clapperboard, Calendar, Users, Upload,
-  Plus, X, Check, Loader2, Pencil, Save, ImageIcon,
+  Plus, X, Check, Loader2, Pencil, Save, ImageIcon, Trash2,
   Film, Info, ExternalLink, Trophy, Award,
   UserRound, Megaphone, BookOpen, Briefcase, Video,
   Lightbulb, Wrench, Mic, Monitor, Shirt, Palette,
@@ -284,6 +285,7 @@ export default function ProjectDetail({
   const [tvForm, setTvForm] = useState(EMPTY_TV_FORM);
   const [savingTv, setSavingTv] = useState(false);
 
+  const router = useRouter();
   const isCreator = currentUserId === project.created_by;
   const isLoggedIn = !!currentUserId;
   const typeColor = project.type ? (TYPE_COLORS[project.type] ?? "bg-gold/10 text-gold border-gold/20") : "";
@@ -295,6 +297,16 @@ export default function ProjectDetail({
   const tvList: TvRelease[] = project.release_tv ?? [];
 
   // ─── Handlers ────────────────────────────────────────────────────────────────
+
+  const deleteProject = async () => {
+    if (!confirm("Projekt wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.")) return;
+    const res = await fetch(`/api/projects/${project.id}`, { method: "DELETE" });
+    if (res.ok) {
+      router.push("/projects");
+    } else {
+      alert("Fehler beim Löschen. Bitte versuche es erneut.");
+    }
+  };
 
   const uploadPoster = async (file: File) => {
     setUploadingPoster(true);
@@ -510,9 +522,14 @@ export default function ProjectDetail({
                 </div>
               </div>
               {isCreator && !editing && (
-                <button onClick={() => setEditing(true)} className="p-2 text-text-muted hover:text-gold transition-colors shrink-0">
-                  <Pencil size={15} />
-                </button>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button onClick={() => setEditing(true)} className="p-2 text-text-muted hover:text-gold transition-colors">
+                    <Pencil size={15} />
+                  </button>
+                  <button onClick={deleteProject} className="p-2 text-text-muted hover:text-red-400 transition-colors">
+                    <Trash2 size={15} />
+                  </button>
+                </div>
               )}
             </div>
 
