@@ -79,20 +79,21 @@ function ipRateLimit(req: NextRequest): NextResponse | null {
 // Covers both the /admin UI and all /api/admin/* endpoints.
 const isAdminRoute = createRouteMatcher(["/admin(.*)", "/api/admin(.*)"]);
 
-// Public routes — no session required.
-// Everything not listed here is auth-protected by auth.protect().
+// Public page routes — no session required.
 const isPublicRoute = createRouteMatcher([
   "/",
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/profile/(.*)",
-  "/companies/(.*)",
-  "/projects/(.*)",
-  "/locations/(.*)",
-  "/jobs/(.*)",
+  "/companies(.*)",
+  "/projects(.*)",
+  "/locations(.*)",
+  "/jobs(.*)",
   "/creators(.*)",
   "/props(.*)",
   "/vehicles(.*)",
+  "/tiere(.*)",
+  "/crew(.*)",
   "/search(.*)",
   "/photo(.*)",
   "/bts(.*)",
@@ -104,14 +105,11 @@ const isPublicRoute = createRouteMatcher([
   "/pricing(.*)",
   "/help(.*)",
   "/marketplace(.*)",
-  "/companies",
-  "/companies/(.*)",
-  "/projects",
-  "/projects/(.*)",
-  "/tiere",
-  "/tiere/(.*)",
-  "/crew",
-  "/crew/(.*)",
+]);
+
+// API routes where GET is public — mutations (POST/PATCH/PUT/DELETE) require auth.
+// This prevents a missed requireAuth() in a handler from opening write access.
+const isPublicApiGet = createRouteMatcher([
   "/api/listings(.*)",
   "/api/reviews(.*)",
   "/api/search(.*)",
@@ -148,8 +146,12 @@ export default clerkMiddleware(async (auth, request) => {
     }
 
     // Verified admin — fall through to security headers
+  } else if (isPublicApiGet(request)) {
+    // 3a. Public-GET API — only protect mutations so a missed handler check
+    //     doesn't silently open write access to unauthenticated callers.
+    if (request.method !== "GET") await auth.protect();
   } else if (!isPublicRoute(request)) {
-    // 3. Session-only protection for all other non-public routes
+    // 3b. Session-only protection for all other non-public routes
     await auth.protect();
   }
 
@@ -163,7 +165,7 @@ export default clerkMiddleware(async (auth, request) => {
     "Content-Security-Policy",
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://*.clerk.accounts.dev https://*.cinegenius.co https://js.stripe.com",
+      "script-src 'self' 'unsafe-inline' https://*.clerk.com https://*.clerk.accounts.dev https://*.cinegenius.co https://js.stripe.com",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://*.supabase.co https://www.google.com https://images.unsplash.com https://plus.unsplash.com https://upload.wikimedia.org https://img.clerk.com https://*.cinegenius.co",
       "font-src 'self' data:",

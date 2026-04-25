@@ -237,7 +237,8 @@ export default async function ProfilePage(
 
   // Track profile view (fire-and-forget, skip own profile)
   if (userId && userId !== profile.user_id) {
-    void db.from("profile_views").insert({ profile_id: profile.user_id, viewer_id: userId });
+    db.from("profile_views").insert({ profile_id: profile.user_id, viewer_id: userId })
+      .then(({ error }) => { if (error) console.error("[profile_views]", error.message); });
   }
 
   const jsonLd = {

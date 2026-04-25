@@ -20,7 +20,11 @@ import { getPlatform, type ExternalProfileRow } from "@/lib/external-platforms";
 /** Returns the URL only if it is non-empty and parseable — prevents dead links */
 function safeLink(url: string | null | undefined): string | null {
   if (!url?.trim()) return null;
-  try { new URL(url); return url; } catch { return null; }
+  try {
+    const u = new URL(url);
+    if (!["http:", "https:"].includes(u.protocol)) return null;
+    return url;
+  } catch { return null; }
 }
 
 function getEnabledModules(modules: ProfileModule[] | null | undefined) {
@@ -291,6 +295,8 @@ function ExternalProfilesDisplay({ profiles }: { profiles: ExternalProfileRow[] 
       <SectionLabel>Externe Profile</SectionLabel>
       <div className="flex flex-wrap gap-2">
         {visible.map((entry) => {
+          const href = safeLink(entry.url);
+          if (!href) return null;
           const plat = getPlatform(entry.platform_type);
           const displayName =
             entry.platform_type === "other" && entry.platform_name
@@ -300,7 +306,7 @@ function ExternalProfilesDisplay({ profiles }: { profiles: ExternalProfileRow[] 
           return (
             <a
               key={entry.id}
-              href={safeLink(entry.url) ?? "#"}
+              href={href}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-bg-elevated border border-border rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-all group"
@@ -373,7 +379,8 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
   // Fetch friendship status
   useEffect(() => {
     if (isOwner || !user) return;
-    fetch(`/api/friendships?userId=${profile.user_id}`)
+    const controller = new AbortController();
+    fetch(`/api/friendships?userId=${profile.user_id}`, { signal: controller.signal })
       .then(r => r.json())
       .then(({ friendship }) => {
         if (!friendship) return;
@@ -385,6 +392,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
         }
       })
       .catch(() => {});
+    return () => controller.abort();
   }, [isOwner, user, profile.user_id]);
 
   async function handleFriendAction() {
@@ -1107,7 +1115,8 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 
   useEffect(() => {
     if (isOwner || !user) return;
-    fetch(`/api/friendships?userId=${profile.user_id}`)
+    const controller = new AbortController();
+    fetch(`/api/friendships?userId=${profile.user_id}`, { signal: controller.signal })
       .then(r => r.json())
       .then(({ friendship }) => {
         if (!friendship) return;
@@ -1116,6 +1125,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
         else if (friendship.status === "pending")
           setFriendStatus(friendship.sender_id === user.id ? "pending_sent" : "pending_received");
       }).catch(() => {});
+    return () => controller.abort();
   }, [isOwner, user, profile.user_id]);
 
   async function handleFriendAction() {
