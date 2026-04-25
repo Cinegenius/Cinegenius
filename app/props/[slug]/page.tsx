@@ -3,9 +3,6 @@ import { db } from "@/lib/db";
 import type { Metadata } from "next";
 import PropDetail from "@/components/PropDetail";
 
-export const revalidate = 300;
-export const dynamicParams = true;
-
 async function getProp(slug: string) {
   try {
     const { data } = await db
@@ -40,10 +37,6 @@ async function getProp(slug: string) {
   } catch {
     return null;
   }
-}
-
-export async function generateStaticParams() {
-  return [];
 }
 
 export async function generateMetadata({

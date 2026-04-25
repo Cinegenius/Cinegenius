@@ -3,9 +3,6 @@ import { db } from "@/lib/db";
 import type { Metadata } from "next";
 import LocationDetail from "@/components/LocationDetail";
 
-export const revalidate = 300;
-export const dynamicParams = true;
-
 async function geocodeCity(city: string): Promise<{ lat: number; lng: number }> {
   try {
     const res = await fetch(
@@ -68,10 +65,6 @@ async function getLocation(slug: string) {
   } catch {
     return null;
   }
-}
-
-export async function generateStaticParams() {
-  return [];
 }
 
 export async function generateMetadata({

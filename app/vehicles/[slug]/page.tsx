@@ -12,9 +12,6 @@ import FavoriteButton from "@/components/FavoriteButton";
 import ReviewsSection from "@/components/ReviewsSection";
 import ReportButton from "@/components/ReportButton";
 
-export const revalidate = 300;
-export const dynamicParams = true;
-
 async function getVehicle(slug: string) {
   try {
     const { data, error } = await db
@@ -60,10 +57,6 @@ async function getVehicle(slug: string) {
   } catch {
     return null;
   }
-}
-
-export async function generateStaticParams() {
-  return [];
 }
 
 export async function generateMetadata({

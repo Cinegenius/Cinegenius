@@ -3,9 +3,6 @@ import { db } from "@/lib/db";
 import type { Metadata } from "next";
 import JobDetail from "@/components/JobDetail";
 
-export const revalidate = 300;
-export const dynamicParams = true;
-
 function parseJobDescription(raw: string) {
   const lines = raw.split("\n\n");
   if (lines.length < 2) return { company: undefined, projectType: undefined, shootDates: undefined, urgent: false, payType: undefined, contentWarnings: [] as string[], description: raw };
@@ -58,10 +55,6 @@ async function getJob(slug: string) {
   } catch {
     return null;
   }
-}
-
-export async function generateStaticParams() {
-  return [];
 }
 
 export async function generateMetadata({

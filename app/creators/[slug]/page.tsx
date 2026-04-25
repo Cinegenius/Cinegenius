@@ -7,8 +7,7 @@ import Link from "next/link";
 import { Lock, ArrowLeft } from "lucide-react";
 import CreatorDetail from "@/components/CreatorDetail";
 
-// Dynamic because of auth(), but creator data is cached
-export const dynamicParams = true;
+// Dynamic because of auth()
 
 function parseCreatorDescription(raw: string): { skills: string[]; credits: string[] } {
   const skillsMatch = raw.match(/^Skills: (.+)$/m);
@@ -77,10 +76,6 @@ async function _getCreator(slug: string) {
 }
 
 const getCreator = unstable_cache(_getCreator, ["creator"], { revalidate: 300, tags: ["listings", "profiles"] });
-
-export async function generateStaticParams() {
-  return [];
-}
 
 export async function generateMetadata({
   params,
