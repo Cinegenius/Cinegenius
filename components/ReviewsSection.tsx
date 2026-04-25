@@ -15,6 +15,11 @@ type Review = {
 
 type TargetType = "location" | "creator" | "prop" | "vehicle" | "profile" | "animal";
 
+// Map display types to the two API-accepted values
+function toApiType(t: TargetType): "listing" | "user" {
+  return t === "profile" ? "user" : "listing";
+}
+
 interface Props {
   targetId: string;
   targetType: TargetType;
@@ -29,25 +34,32 @@ export default function ReviewsSection({ targetId, targetType, targetName }: Pro
   const [canReview, setCanReview] = useState(false);
   const [alreadyReviewed, setAlreadyReviewed] = useState(false);
 
+  const apiType = toApiType(targetType);
+
   useEffect(() => {
-    fetch(`/api/reviews?target_id=${targetId}&target_type=${targetType}`)
-      .then((r) => r.json())
-      .then(({ data }) => { if (Array.isArray(data)) setReviews(data); })
+    const controller = new AbortController();
+    fetch(`/api/reviews?target_id=${targetId}&target_type=${apiType}`, { signal: controller.signal })
+      .then((r) => r.ok ? r.json() : null)
+      .then((json) => { if (json && Array.isArray(json.data)) setReviews(json.data); })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [targetId, targetType]);
+    return () => controller.abort();
+  }, [targetId, apiType]);
 
   // Check if current user is eligible to review (confirmed booking or accepted application)
   useEffect(() => {
     if (!user) return;
-    fetch(`/api/reviews/eligible?target_id=${targetId}&target_type=${targetType}`)
-      .then((r) => r.json())
-      .then(({ eligible, already_reviewed }) => {
-        setCanReview(!!eligible);
-        setAlreadyReviewed(!!already_reviewed);
+    const controller = new AbortController();
+    fetch(`/api/reviews/eligible?target_id=${targetId}&target_type=${apiType}`, { signal: controller.signal })
+      .then((r) => r.ok ? r.json() : null)
+      .then((json) => {
+        if (!json) return;
+        setCanReview(!!json.eligible);
+        setAlreadyReviewed(!!json.already_reviewed);
       })
       .catch(() => {});
-  }, [user, targetId, targetType]);
+    return () => controller.abort();
+  }, [user, targetId, apiType]);
 
   const avgRating = reviews.length
     ? Math.round((reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) * 10) / 10

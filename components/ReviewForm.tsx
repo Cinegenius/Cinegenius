@@ -45,7 +45,7 @@ export default function ReviewForm({ targetId, targetName, targetType, onClose, 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           target_id: targetId,
-          target_type: targetType,
+          target_type: targetType === "profile" ? "user" : "listing",
           rating: overall,
           text: text.trim(),
           aspect_ratings: aspectRatings,

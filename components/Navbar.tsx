@@ -199,22 +199,26 @@ export default function Navbar() {
     }
     setProfileDisplayName("");
     setProfileAvatarUrl("");
-    fetch("/api/profile")
-      .then(r => r.json())
-      .then(({ profile }) => {
-        if (profile?.display_name) setProfileDisplayName(profile.display_name);
-        if (profile?.avatar_url)   setProfileAvatarUrl(profile.avatar_url);
+
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    fetch("/api/profile", { signal })
+      .then(r => r.ok ? r.json() : null)
+      .then((json) => {
+        if (!json) return;
+        if (json.profile?.display_name) setProfileDisplayName(json.profile.display_name);
+        if (json.profile?.avatar_url)   setProfileAvatarUrl(json.profile.avatar_url);
       })
       .catch(() => {});
-    // Unread count einmalig laden
-    fetch("/api/unread-count")
-      .then(r => r.json())
-      .then(({ count }) => setUnreadMessages(count ?? 0))
+    fetch("/api/unread-count", { signal })
+      .then(r => r.ok ? r.json() : null)
+      .then((json) => { if (json) setUnreadMessages(json.count ?? 0); })
       .catch(() => {});
 
     // Realtime: Badge neu laden wenn neue Nachricht von jemand anderem ankommt
     const currentUserId = user?.id;
-    if (!currentUserId) return;
+    if (!currentUserId) return () => controller.abort();
     const channel = supabase
       .channel(`unread-nav:${currentUserId}`)
       .on("postgres_changes", {
@@ -222,16 +226,15 @@ export default function Navbar() {
         schema: "public",
         table: "messages",
       }, (payload) => {
-        // Nur wenn die Nachricht nicht von mir selbst ist
         if (payload.new?.sender_id !== currentUserId) {
           fetch("/api/unread-count")
-            .then(r => r.json())
-            .then(({ count }) => setUnreadMessages(count ?? 0))
+            .then(r => r.ok ? r.json() : null)
+            .then((json) => { if (json) setUnreadMessages(json.count ?? 0); })
             .catch(() => {});
         }
       })
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => { controller.abort(); supabase.removeChannel(channel); };
   }, [isSignedIn]);
 
   useEffect(() => {
