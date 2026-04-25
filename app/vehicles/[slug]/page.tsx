@@ -70,19 +70,24 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const vehicle = await getVehicle(slug);
-  if (!vehicle) return {};
-  const title = vehicle.title ?? "Fahrzeug";
-  return {
-    title,
-    description: `${vehicle.type} — ab ${vehicle.dailyRate.toLocaleString()} € / Tag. Jetzt auf CineGenius für Filmproduktionen mieten.`,
-    openGraph: {
-      title: `${title} | CineGenius`,
-      description: `${vehicle.type} mieten für Film & Foto.`,
-      ...(vehicle.image ? { images: [{ url: vehicle.image, width: 800, height: 600, alt: title }] } : {}),
-    },
-  };
+  try {
+    const { slug } = await params;
+    const vehicle = await getVehicle(slug);
+    if (!vehicle) return {};
+    const title = vehicle.title ?? "Fahrzeug";
+    return {
+      title,
+      description: `${vehicle.type} — ab ${vehicle.dailyRate.toLocaleString()} € / Tag. Jetzt auf CineGenius für Filmproduktionen mieten.`,
+      openGraph: {
+        title: `${title} | CineGenius`,
+        description: `${vehicle.type} mieten für Film & Foto.`,
+        ...(vehicle.image ? { images: [{ url: vehicle.image, width: 800, height: 600, alt: title }] } : {}),
+      },
+    };
+  } catch (e) {
+    console.error("[vehicle generateMetadata]", e);
+    return {};
+  }
 }
 
 export default async function VehicleDetailPage({
