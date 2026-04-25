@@ -16,14 +16,15 @@ export const revalidate = 300;
 export const dynamicParams = true;
 
 async function getVehicle(slug: string) {
-  const { data } = await db
-    .from("listings")
-    .select("*")
-    .eq("id", slug)
-    .eq("type", "vehicle")
-    .single();
+  try {
+    const { data } = await db
+      .from("listings")
+      .select("*")
+      .eq("id", slug)
+      .eq("type", "vehicle")
+      .single();
 
-  if (!data) return null;
+    if (!data) return null;
 
   const ownerRes = data.user_id
     ? await db.from("profiles").select("display_name").eq("user_id", data.user_id).single()
@@ -55,6 +56,9 @@ async function getVehicle(slug: string) {
     ownerName,
     extra_images: data.extra_images ?? [],
   };
+  } catch {
+    return null;
+  }
 }
 
 export async function generateStaticParams() {
@@ -69,13 +73,14 @@ export async function generateMetadata({
   const { slug } = await params;
   const vehicle = await getVehicle(slug);
   if (!vehicle) return {};
+  const title = vehicle.title ?? "Fahrzeug";
   return {
-    title: vehicle.title,
+    title,
     description: `${vehicle.type} — ab ${vehicle.dailyRate.toLocaleString()} € / Tag. Jetzt auf CineGenius für Filmproduktionen mieten.`,
     openGraph: {
-      title: `${vehicle.title} | CineGenius`,
+      title: `${title} | CineGenius`,
       description: `${vehicle.type} mieten für Film & Foto.`,
-      images: [{ url: vehicle.image, width: 800, height: 600, alt: vehicle.title }],
+      ...(vehicle.image ? { images: [{ url: vehicle.image, width: 800, height: 600, alt: title }] } : {}),
     },
   };
 }
