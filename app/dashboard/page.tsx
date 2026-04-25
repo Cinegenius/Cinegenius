@@ -79,7 +79,9 @@ export default function DashboardPage() {
   const isWelcome = searchParams.get("welcome") === "1";
   const [welcomeDismissed, setWelcomeDismissed] = useState(false);
 
-  const [activeTab, setActiveTab] = useState("overview");
+  const VALID_TABS = ["overview","listings","jobs","favorites","messages","bookings","earnings","transactions","friends","firma","settings","analytics"];
+  const tabParam = searchParams.get("tab") ?? "";
+  const [activeTab, setActiveTab] = useState(VALID_TABS.includes(tabParam) ? tabParam : "overview");
   const [onboardingDismissed, setOnboardingDismissed] = useState(false);
 
   // Real listings from Supabase
