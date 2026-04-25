@@ -2,8 +2,9 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
 import {
-  MapPin, PawPrint, Users, Truck, Calendar, Shield, ArrowRight,
+  MapPin, PawPrint, Users, Truck, Calendar, Shield, ArrowRight, Pencil,
 } from "lucide-react";
 import InquiryForm from "@/components/InquiryForm";
 import FavoriteButton from "@/components/FavoriteButton";
@@ -84,6 +85,9 @@ export default async function AnimalDetailPage({
   const animal = await getAnimal(slug);
   if (!animal) notFound();
 
+  const { userId } = await auth();
+  const isOwner = !!userId && userId === animal.ownerId;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -138,6 +142,12 @@ export default async function AnimalDetailPage({
                 <h1 className="font-display text-3xl font-bold text-text-primary">{animal.title}</h1>
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="px-3 py-1 bg-bg-elevated border border-border text-text-muted text-sm rounded-full">{animal.category}</span>
+                  {isOwner && (
+                    <Link href="/dashboard?tab=listings"
+                      className="flex items-center gap-1.5 px-3 py-1.5 border border-gold/40 text-gold text-xs font-medium rounded-lg hover:bg-gold/10 transition-colors">
+                      <Pencil size={12} /> Bearbeiten
+                    </Link>
+                  )}
                   <FavoriteButton
                     listingId={animal.id}
                     listingType="animal"

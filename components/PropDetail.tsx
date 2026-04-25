@@ -7,9 +7,10 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import {
   ArrowLeft, Star, CheckCircle, Calendar, Clock,
-  MapPin, Package, Shield, Truck, ChevronRight, Phone, Expand,
+  MapPin, Package, Shield, Truck, ChevronRight, Phone, Expand, Pencil,
 } from "lucide-react";
 import { useToast } from "@/contexts/ToastContext";
+import { useUser } from "@clerk/nextjs";
 
 const Lightbox = dynamic(() => import("@/components/Lightbox"), { ssr: false });
 import InquiryForm from "@/components/InquiryForm";
@@ -32,6 +33,7 @@ type Prop = {
   description?: string;
   ownerId?: string;
   ownerName?: string;
+  extra_images?: string[];
 };
 
 
@@ -44,12 +46,14 @@ const conditionColors: Record<string, string> = {
 
 export default function PropDetail({ prop }: { prop: Prop }) {
   const router = useRouter();
+  const { user } = useUser();
+  const isOwner = !!user && user.id === prop.ownerId;
   const [days, setDays] = useState(1);
   const [startDate, setStartDate] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [activeImg, setActiveImg] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const images = [prop.image].filter(Boolean) as string[];
+  const images = [prop.image, ...(prop.extra_images ?? [])].filter(Boolean) as string[];
   const { addToast } = useToast();
 
   const subtotal = prop.dailyRate * days;
@@ -78,25 +82,31 @@ export default function PropDetail({ prop }: { prop: Prop }) {
         {/* Bildergalerie */}
         <div className="relative grid grid-cols-4 gap-2 rounded-xl overflow-hidden h-72 sm:h-96 mb-8">
           <div
-            className="col-span-2 overflow-hidden cursor-pointer"
+            className="col-span-2 relative overflow-hidden cursor-pointer"
             onClick={() => { setActiveImg(0); setLightboxOpen(true); }}
           >
-            <Image
-              src={images[activeImg]}
-              alt={prop.title}
-              fill
-              className="object-cover hover:scale-105 transition-transform duration-500"
-              style={{ objectPosition: prop.focalPoint ? `${prop.focalPoint.x}% ${prop.focalPoint.y}%` : "50% 66%" }}
-              sizes="50vw"
-              priority
-            />
+            {images[0] ? (
+              <Image
+                src={images[0]}
+                alt={prop.title}
+                fill
+                className="object-cover hover:scale-105 transition-transform duration-500"
+                style={{ objectPosition: prop.focalPoint ? `${prop.focalPoint.x}% ${prop.focalPoint.y}%` : "50% 66%" }}
+                sizes="50vw"
+                priority
+              />
+            ) : (
+              <div className="w-full h-full bg-bg-elevated flex items-center justify-center">
+                <Package size={48} className="text-text-muted/20" />
+              </div>
+            )}
           </div>
           {images.length > 1 && (
             <div className="col-span-2 grid grid-cols-2 gap-2">
               {images.slice(1).map((img, i) => (
                 <div
                   key={i}
-                  className={`overflow-hidden cursor-pointer rounded-sm ${i === 2 ? "col-span-2 h-24" : ""}`}
+                  className={`relative overflow-hidden cursor-pointer rounded-sm ${i === 2 ? "col-span-2 h-24" : ""}`}
                   onClick={() => { setActiveImg(i + 1); setLightboxOpen(true); }}
                 >
                   <Image
@@ -156,6 +166,12 @@ export default function PropDetail({ prop }: { prop: Prop }) {
                 {prop.title}
               </h1>
               <div className="flex items-center gap-1 shrink-0 mt-1">
+                {isOwner && (
+                  <Link href={`/dashboard?tab=listings`}
+                    className="flex items-center gap-1.5 px-3 py-1.5 border border-gold/40 text-gold text-xs font-medium rounded-lg hover:bg-gold/10 transition-colors">
+                    <Pencil size={12} /> Bearbeiten
+                  </Link>
+                )}
                 <FavoriteButton
                   listingId={prop.id}
                   listingType="prop"

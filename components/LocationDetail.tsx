@@ -9,9 +9,10 @@ import {
   Shield, MessageSquare, ChevronRight, Expand,
   Wifi, Car, Zap as Power, Coffee, DoorOpen, Truck,
   Thermometer, Volume2, Wind, Accessibility, ArrowUpDown,
-  FlipHorizontal,
+  FlipHorizontal, Pencil,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import AvailabilityCalendar from "@/components/AvailabilityCalendar";
 import ReviewsSection from "@/components/ReviewsSection";
 import InquiryForm from "@/components/InquiryForm";
@@ -60,6 +61,8 @@ const AMENITY_ICONS: Record<string, React.ComponentType<{ size?: number; classNa
 };
 
 export default function LocationDetail({ location }: { location: Location }) {
+  const { user } = useUser();
+  const isOwner = !!user && user.id === location.ownerId;
   const [activeImg, setActiveImg] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [bookingStart, setBookingStart] = useState<Date | null>(null);
@@ -162,6 +165,12 @@ export default function LocationDetail({ location }: { location: Location }) {
                 </p>
               </div>
               <div className="flex items-center gap-1">
+                {isOwner && (
+                  <Link href={`/dashboard?tab=listings`}
+                    className="flex items-center gap-1.5 px-3 py-1.5 border border-gold/40 text-gold text-xs font-medium rounded-lg hover:bg-gold/10 transition-colors">
+                    <Pencil size={12} /> Bearbeiten
+                  </Link>
+                )}
                 <FavoriteButton listingId={location.id} listingType="location" listingTitle={location.title}
                   listingCity={location.city} listingPrice={location.price} listingImage={location.image} />
                 <ReportButton listingId={location.id} />

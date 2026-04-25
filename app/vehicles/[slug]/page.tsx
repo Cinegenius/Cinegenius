@@ -3,9 +3,10 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import JsonLd from "@/components/JsonLd";
+import { auth } from "@clerk/nextjs/server";
 import {
   MapPin, CheckCircle, Car, Calendar, Shield,
-  ArrowRight, Zap,
+  ArrowRight, Zap, Pencil,
 } from "lucide-react";
 import InquiryForm from "@/components/InquiryForm";
 import FavoriteButton from "@/components/FavoriteButton";
@@ -94,6 +95,9 @@ export default async function VehicleDetailPage({
   const vehicle = await getVehicle(slug);
   if (!vehicle) notFound();
 
+  const { userId } = await auth();
+  const isOwner = !!userId && userId === vehicle.ownerId;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -145,6 +149,12 @@ export default async function VehicleDetailPage({
                 <h1 className="font-display text-3xl font-bold text-text-primary">{vehicle.title}</h1>
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="px-3 py-1 bg-bg-elevated border border-border text-text-muted text-sm rounded-full">{vehicle.type}</span>
+                  {isOwner && (
+                    <Link href="/dashboard?tab=listings"
+                      className="flex items-center gap-1.5 px-3 py-1.5 border border-gold/40 text-gold text-xs font-medium rounded-lg hover:bg-gold/10 transition-colors">
+                      <Pencil size={12} /> Bearbeiten
+                    </Link>
+                  )}
                   <FavoriteButton
                     listingId={vehicle.id}
                     listingType="vehicle"
