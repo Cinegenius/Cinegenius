@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft, Clapperboard, Calendar, Users, Upload,
-  Plus, X, Check, Loader2, Pencil, Save, ImageIcon, Trash2,
+  Plus, X, Check, Loader2, Pencil, Save, ImageIcon, Trash2, ShieldCheck, ShieldAlert,
   Film, Info, ExternalLink, Trophy, Award,
   UserRound, Megaphone, BookOpen, Briefcase, Video,
   Lightbulb, Wrench, Mic, Monitor, Shirt, Palette,
@@ -51,6 +51,7 @@ type Project = {
   description: string | null;
   director: string | null;
   poster_url: string | null;
+  verified?: boolean | null;
   images: string[];
   created_by: string | null;
   // Status & story
@@ -217,6 +218,7 @@ export default function ProjectDetail({
   currentUserId,
   myCredit: initialMyCredit,
   userPositions = [],
+  isAdmin = false,
 }: {
   project: Project;
   credits: Credit[];
@@ -224,6 +226,7 @@ export default function ProjectDetail({
   currentUserId: string | null;
   myCredit: Credit | null;
   userPositions?: string[];
+  isAdmin?: boolean;
 }) {
   const [project, setProject] = useState(initialProject);
   const [credits, setCredits] = useState(initialCredits);
@@ -519,16 +522,44 @@ export default function ProjectDetail({
                       <Trophy size={11} /> {wonCount} Award{wonCount > 1 ? "s" : ""}
                     </span>
                   )}
+                  {project.verified
+                    ? <span className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                        <ShieldCheck size={11} /> Verifiziert
+                      </span>
+                    : <span className="flex items-center gap-1 px-2.5 py-1 text-xs rounded-full border bg-bg-elevated text-text-muted border-border">
+                        <ShieldAlert size={11} /> Ungeprüft
+                      </span>
+                  }
                 </div>
               </div>
-              {isCreator && !editing && (
+              {(isCreator || isAdmin) && !editing && (
                 <div className="flex items-center gap-1 shrink-0">
-                  <button onClick={() => setEditing(true)} className="p-2 text-text-muted hover:text-gold transition-colors">
-                    <Pencil size={15} />
-                  </button>
-                  <button onClick={deleteProject} className="p-2 text-text-muted hover:text-red-400 transition-colors">
-                    <Trash2 size={15} />
-                  </button>
+                  {isCreator && (
+                    <button onClick={() => setEditing(true)} className="p-2 text-text-muted hover:text-gold transition-colors">
+                      <Pencil size={15} />
+                    </button>
+                  )}
+                  {isAdmin && (
+                    <button
+                      title={project.verified ? "Verifizierung entfernen" : "Verifizieren"}
+                      onClick={async () => {
+                        const res = await fetch(`/api/projects/${project.id}/verify`, {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ verified: !project.verified }),
+                        });
+                        if (res.ok) setProject((p) => ({ ...p, verified: !p.verified }));
+                      }}
+                      className={`p-2 transition-colors ${project.verified ? "text-emerald-400 hover:text-text-muted" : "text-text-muted hover:text-emerald-400"}`}
+                    >
+                      <ShieldCheck size={15} />
+                    </button>
+                  )}
+                  {isCreator && (
+                    <button onClick={deleteProject} className="p-2 text-text-muted hover:text-red-400 transition-colors">
+                      <Trash2 size={15} />
+                    </button>
+                  )}
                 </div>
               )}
             </div>

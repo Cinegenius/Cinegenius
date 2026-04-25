@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { unstable_cache } from "next/cache";
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
+import { isAdminSession } from "@/lib/guards";
 import ProjectDetail from "@/components/ProjectDetail";
 import { departments } from "@/lib/departments";
 
@@ -73,7 +74,7 @@ export default async function ProjectPage({
   const data = await getProject(id);
   if (!data) notFound();
 
-  const { userId } = await auth();
+  const [{ userId }, isAdmin] = await Promise.all([auth(), isAdminSession()]);
   const myCredit = data.credits.find((c) => c.user_id === userId) ?? null;
 
   let userPositions: string[] = [];
@@ -97,6 +98,7 @@ export default async function ProjectPage({
       currentUserId={userId ?? null}
       myCredit={myCredit}
       userPositions={roleOptions}
+      isAdmin={isAdmin}
     />
   );
 }
