@@ -438,7 +438,11 @@ export default function Navbar() {
           {/* Mobile search */}
           <GlobalSearch />
 
-          {isLoaded && isSignedIn ? (
+          {!isLoaded ? (
+            <div className="flex-1 flex items-center justify-center py-12">
+              <div className="w-5 h-5 rounded-full border-2 border-border border-t-gold animate-spin" />
+            </div>
+          ) : isSignedIn ? (
             <>
               {/* Account links */}
               <div className="space-y-1">
