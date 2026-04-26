@@ -18,15 +18,33 @@ export default function AppleIcon() {
           borderRadius: 40,
         }}
       >
-        <div
-          style={{
-            fontSize: 90,
-            fontWeight: 900,
-            color: "#C2F135",
-            lineHeight: 1,
-          }}
-        >
-          ▶
+        <div style={{ position: "relative", width: 96, height: 104, display: "flex" }}>
+          <div
+            style={{
+              position: "absolute",
+              width: 64,
+              height: 14,
+              background: "#C2F135",
+              borderRadius: 7,
+              top: 22,
+              left: 10,
+              transform: "rotate(-38deg)",
+              transformOrigin: "right center",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              width: 64,
+              height: 14,
+              background: "#C2F135",
+              borderRadius: 7,
+              top: 66,
+              left: 10,
+              transform: "rotate(38deg)",
+              transformOrigin: "right center",
+            }}
+          />
         </div>
       </div>
     ),
