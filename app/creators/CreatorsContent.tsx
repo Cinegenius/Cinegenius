@@ -507,11 +507,412 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
     [selectedRoles]
   );
 
+  // ── Mobile promoted role shortcuts ────────────────────────────────────
+  const ROLE_SHORTCUTS: { label: string; role: string }[] = [
+    { label: "DP / Kamera",  role: "Director of Photography (DoP)" },
+    { label: "Regisseur",    role: "Regisseur"                     },
+    { label: "Schauspieler", role: "Schauspieler"                  },
+    { label: "Fotograf",     role: "Fotograf/in"                   },
+    { label: "Creator",      role: "Content Creator"               },
+    { label: "Gaffer",       role: "Gaffer (Oberbeleuchter)"       },
+    { label: "Ton",          role: "Production Sound Mixer"        },
+    { label: "Producer",     role: "Producer"                      },
+    { label: "Model",        role: "Model"                         },
+    { label: "Editor",       role: "Editor (Schnitt)"              },
+  ];
+  const mobilePromotedRoles = ROLE_SHORTCUTS.filter((s) => occupiedRoles.has(s.role));
+
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  const secondaryFilterCount = [
+    availableOnly,
+    !!cityFilter,
+    !!countryFilter,
+    !!languageFilter,
+    !!profileTypeFilter,
+    !!hairFilter,
+    !!eyeFilter,
+    !!bodyFilter,
+    !!travelFilter,
+    !!(ageMinFilter || ageMaxFilter),
+  ].filter(Boolean).length + selectedRoles.size;
+
+  const SORT_OPTIONS = [
+    { value: "featured", label: "Empfohlen" },
+    { value: "rating",   label: "Beste Bewertung" },
+    { value: "reviews",  label: "Meiste Bewertungen" },
+  ];
+
   return (
     <div className="min-h-screen">
 
-      {/* ── Filter Bar ─────────────────────────────────────────────────────── */}
-      <div className="bg-bg-secondary border-b border-border">
+      {/* ══════════════════════════════════════════════════════════════════════
+          MOBILE LAYOUT  (< lg)
+          ══════════════════════════════════════════════════════════════════ */}
+      <div className="lg:hidden">
+
+        {/* Row 1 — Search + View toggle */}
+        <div className="bg-bg-secondary border-b border-border px-3 py-2 flex items-center gap-2">
+          <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-xl px-3 focus-within:border-gold/50 transition-colors">
+            <Search size={14} className="text-text-muted shrink-0" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Name, Skill oder Keyword…"
+              className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none"
+            />
+            {query && (
+              <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors">
+                <X size={12} />
+              </button>
+            )}
+          </div>
+          <div className="flex bg-bg-elevated border border-border rounded-xl overflow-hidden shrink-0">
+            <button
+              onClick={() => setViewMode("grid")}
+              className={`flex items-center justify-center w-9 h-9 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted"}`}
+            >
+              <LayoutGrid size={14} />
+            </button>
+            <button
+              onClick={() => setViewMode("list")}
+              className={`flex items-center justify-center w-9 h-9 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted"}`}
+            >
+              <List size={14} />
+            </button>
+          </div>
+        </div>
+
+        {/* Row 2 — Promoted role chips */}
+        {mobilePromotedRoles.length > 0 && (
+          <div className="bg-bg-secondary border-b border-border px-3 py-2.5 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+            <div className="flex gap-2">
+              {mobilePromotedRoles.map(({ label, role }) => {
+                const active = selectedRoles.has(role);
+                return (
+                  <button
+                    key={role}
+                    onClick={() => toggleRole(role)}
+                    className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                      active
+                        ? "bg-gold text-bg-primary border-gold"
+                        : "border-border text-text-muted bg-bg-elevated hover:border-gold/40 hover:text-text-secondary"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Row 3 — Quick filters */}
+        <div className="bg-bg-secondary border-b border-border px-3 py-2 flex items-center gap-2">
+          {/* Available toggle */}
+          <button
+            onClick={() => setAvailableOnly((v) => !v)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all shrink-0 ${
+              availableOnly
+                ? "bg-gold text-bg-primary border-gold"
+                : "border-border text-text-muted bg-bg-elevated hover:border-gold/40"
+            }`}
+          >
+            {availableOnly && <span className="text-[10px]">✓</span>}
+            {tc("available")}
+          </button>
+
+          {/* City quick select */}
+          {availableCities.length > 0 && (
+            <div className="relative shrink-0">
+              <select
+                value={cityFilter}
+                onChange={(e) => setCityFilter(e.target.value)}
+                className={`appearance-none pl-2.5 pr-6 py-1.5 rounded-full text-xs font-medium border transition-all bg-bg-elevated cursor-pointer focus:outline-none ${
+                  cityFilter
+                    ? "border-gold/30 text-gold bg-gold/10"
+                    : "border-border text-text-muted hover:border-gold/40"
+                }`}
+              >
+                <option value="">Stadt</option>
+                {availableCities.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+              <ChevronDown size={10} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted" />
+            </div>
+          )}
+
+          {/* All filters button */}
+          <button
+            onClick={() => setSheetOpen(true)}
+            className={`ml-auto flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all shrink-0 ${
+              secondaryFilterCount > 0
+                ? "bg-gold/10 border-gold/30 text-gold"
+                : "border-border text-text-muted bg-bg-elevated hover:border-gold/40"
+            }`}
+          >
+            <SlidersHorizontal size={11} />
+            Alle Filter
+            {secondaryFilterCount > 0 && (
+              <span className="bg-gold text-bg-primary text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                {secondaryFilterCount}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* Row 4 — Active filter chips (only when active) */}
+        {activeChips.length > 0 && (
+          <div className="bg-bg-secondary border-b border-border px-3 py-2 flex flex-wrap gap-1.5 items-center">
+            {activeChips.map(({ role, dept }) => {
+              const colors = dept ? deptColors(dept.color) : deptColors("slate");
+              return (
+                <span
+                  key={role}
+                  className={`inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-full border font-medium ${colors.bg} ${colors.border} ${colors.text}`}
+                >
+                  {role}
+                  <button onClick={() => removeRole(role)} className="hover:opacity-70 ml-0.5">
+                    <X size={9} />
+                  </button>
+                </span>
+              );
+            })}
+            <button
+              onClick={() => {
+                clearAll();
+                setCityFilter(""); setCountryFilter(""); setLanguageFilter("");
+                setAvailableOnly(false); setVendorOnly(false);
+              }}
+              className="text-[11px] text-text-muted hover:text-red-400 transition-colors underline underline-offset-2"
+            >
+              Alle löschen
+            </button>
+          </div>
+        )}
+
+        {/* Row 5 — Result count + Sort */}
+        <div className="px-4 py-2.5 flex items-center justify-between">
+          <p className="text-xs text-text-muted">
+            <span className="text-text-primary font-semibold">{filtered.length}</span>{" "}
+            {filtered.length !== 1 ? "Profile" : "Profil"}
+            {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
+          </p>
+          <div className="relative">
+            <select
+              value={sortKey}
+              onChange={(e) => setSortKey(e.target.value)}
+              className="appearance-none pl-2.5 pr-6 py-1.5 bg-bg-elevated border border-border rounded-lg text-xs text-text-muted focus:outline-none focus:border-gold/50 transition-colors cursor-pointer"
+            >
+              {SORT_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+            <ArrowUpDown size={10} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted" />
+          </div>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          MOBILE FILTER SHEET
+          ══════════════════════════════════════════════════════════════════ */}
+      {sheetOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSheetOpen(false)} />
+          <div className="relative bg-bg-elevated border-t border-border rounded-t-2xl flex flex-col max-h-[85vh]">
+            <div className="flex justify-center pt-3 pb-1 shrink-0">
+              <div className="w-10 h-1 rounded-full bg-border" />
+            </div>
+            <div className="flex items-center justify-between px-4 pb-3 shrink-0">
+              <h3 className="text-sm font-semibold text-text-primary">Alle Filter</h3>
+              <button onClick={() => setSheetOpen(false)} className="text-text-muted hover:text-text-primary transition-colors p-1">
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-4 space-y-5 pb-4">
+              {/* Verfügbarkeit */}
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Verfügbarkeit</p>
+                <button
+                  onClick={() => setAvailableOnly((v) => !v)}
+                  className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-xl border text-sm font-medium transition-all ${availableOnly ? "bg-gold/10 border-gold/30 text-gold" : "border-border text-text-secondary bg-bg-secondary"}`}
+                >
+                  <div className={`w-8 h-5 rounded-full transition-colors relative shrink-0 ${availableOnly ? "bg-gold" : "bg-border"}`}>
+                    <span className={`absolute top-1 w-3 h-3 rounded-full bg-white transition-all ${availableOnly ? "left-4" : "left-1"}`} />
+                  </div>
+                  {tc("available")}
+                </button>
+              </div>
+
+              {/* Gewerk & Rollen */}
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Gewerk & Rollen</p>
+                <div className="flex gap-1.5 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
+                  {activeDepts.map((dept) => {
+                    const colors = deptColors(dept.color);
+                    const deptSelected = dept.roles.filter((r) => selectedRoles.has(r) && occupiedRoles.has(r)).length;
+                    const isActive = activeDept === dept.id;
+                    return (
+                      <button key={dept.id} onClick={() => setActiveDept(dept.id)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border shrink-0 transition-all ${isActive ? `${colors.bg} ${colors.text} border-transparent` : "border-border text-text-muted bg-bg-secondary"}`}>
+                        {dept.emoji} {dept.label}
+                        {deptSelected > 0 && (
+                          <span className={`w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center ${colors.bg} ${colors.text}`}>{deptSelected}</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="mt-2 max-h-52 overflow-y-auto">
+                  <RolePanel dept={activeDeptData} selectedRoles={selectedRoles} occupiedRoles={occupiedRoles} onToggle={toggleRole} onClose={() => setSheetOpen(false)} />
+                </div>
+              </div>
+
+              {/* Stadt */}
+              {availableCities.length > 0 && (
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Stadt</p>
+                  <div className="flex flex-wrap gap-2">
+                    <button onClick={() => setCityFilter("")}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${!cityFilter ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
+                      Alle
+                    </button>
+                    {availableCities.map((city) => (
+                      <button key={city} onClick={() => setCityFilter(cityFilter === city ? "" : city)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${cityFilter === city ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
+                        {city}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Sprache */}
+              {availableLanguages.length > 0 && (
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Sprache</p>
+                  <div className="flex flex-wrap gap-2">
+                    <button onClick={() => setLanguageFilter("")}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${!languageFilter ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
+                      Alle
+                    </button>
+                    {availableLanguages.slice(0, 12).map((lang) => (
+                      <button key={lang} onClick={() => setLanguageFilter(languageFilter === lang ? "" : lang)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${languageFilter === lang ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
+                        {lang}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Profiltyp */}
+              {availableProfileTypes.length > 0 && (
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Profiltyp</p>
+                  <div className="flex flex-wrap gap-2">
+                    <button onClick={() => setProfileTypeFilter("")}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${!profileTypeFilter ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
+                      Alle
+                    </button>
+                    {availableProfileTypes.map((type) => (
+                      <button key={type} onClick={() => setProfileTypeFilter(profileTypeFilter === type ? "" : type)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${profileTypeFilter === type ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
+                        {PROFILE_TYPE_DE[type] ?? type}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Casting: Haarfarbe / Augenfarbe */}
+              {(availableHairColors.length > 0 || availableEyeColors.length > 0) && (
+                <div className="grid grid-cols-2 gap-3">
+                  {availableHairColors.length > 0 && (
+                    <div>
+                      <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Haarfarbe</p>
+                      <select value={hairFilter} onChange={(e) => setHairFilter(e.target.value)}
+                        className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-xs text-text-secondary focus:outline-none focus:border-gold transition-colors">
+                        <option value="">Alle</option>
+                        {availableHairColors.map((h) => <option key={h} value={h}>{h}</option>)}
+                      </select>
+                    </div>
+                  )}
+                  {availableEyeColors.length > 0 && (
+                    <div>
+                      <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Augenfarbe</p>
+                      <select value={eyeFilter} onChange={(e) => setEyeFilter(e.target.value)}
+                        className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-xs text-text-secondary focus:outline-none focus:border-gold transition-colors">
+                        <option value="">Alle</option>
+                        {availableEyeColors.map((e) => <option key={e} value={e}>{e}</option>)}
+                      </select>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Spielalter */}
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Spielalter</p>
+                <div className="flex items-center gap-2">
+                  <input type="number" min="1" max="99" value={ageMinFilter} onChange={(e) => setAgeMinFilter(e.target.value)}
+                    placeholder="von" className="w-20 bg-bg-secondary border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-gold transition-colors" />
+                  <span className="text-xs text-text-muted">–</span>
+                  <input type="number" min="1" max="99" value={ageMaxFilter} onChange={(e) => setAgeMaxFilter(e.target.value)}
+                    placeholder="bis" className="w-20 bg-bg-secondary border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-gold transition-colors" />
+                </div>
+              </div>
+
+              {/* Reisebereitschaft */}
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Reisebereitschaft</p>
+                <div className="flex flex-wrap gap-2">
+                  <button onClick={() => setTravelFilter("")}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${!travelFilter ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
+                    Alle
+                  </button>
+                  {Object.entries(TRAVEL_DE).map(([key, label]) => (
+                    <button key={key} onClick={() => setTravelFilter(travelFilter === key ? "" : key)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${travelFilter === key ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="shrink-0 px-4 py-4 border-t border-border flex gap-3">
+              <button
+                onClick={() => {
+                  clearAll();
+                  setCityFilter(""); setCountryFilter(""); setLanguageFilter("");
+                  setAvailableOnly(false); setVendorOnly(false);
+                  setProfileTypeFilter(""); setHairFilter(""); setEyeFilter("");
+                  setBodyFilter(""); setTravelFilter(""); setAgeMinFilter(""); setAgeMaxFilter("");
+                }}
+                className="flex-1 py-3 border border-border rounded-xl text-sm font-medium text-text-muted hover:border-red-400/40 hover:text-red-400 transition-all"
+              >
+                Zurücksetzen
+              </button>
+              <button
+                onClick={() => setSheetOpen(false)}
+                className="flex-[2] py-3 bg-gold text-bg-primary rounded-xl text-sm font-bold hover:bg-gold-light transition-all"
+              >
+                {filtered.length} {filtered.length !== 1 ? "Profile" : "Profil"} anzeigen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          DESKTOP LAYOUT  (≥ lg)
+          ══════════════════════════════════════════════════════════════════ */}
+      <div className="hidden lg:block bg-bg-secondary border-b border-border">
         <div className="px-4 py-2 space-y-2">
 
           {/* Row 1: Search + View toggle */}
@@ -773,8 +1174,8 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       {/* ── Results ─────────────────────────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-        {/* Count */}
-        <p className="text-sm text-text-muted mb-5">
+        {/* Count — desktop only (mobile has Row 5) */}
+        <p className="hidden lg:block text-sm text-text-muted mb-5">
           <span className="text-text-primary font-semibold">
             {filtered.length} {filtered.length !== 1 ? "Profile" : "Profil"}
           </span>{" "}
