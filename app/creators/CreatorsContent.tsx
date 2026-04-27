@@ -569,123 +569,79 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
             )}
           </div>
           <div className="flex bg-bg-elevated border border-border rounded-xl overflow-hidden shrink-0">
-            <button
-              onClick={() => setViewMode("grid")}
-              className={`flex items-center justify-center w-9 h-9 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted"}`}
-            >
+            <button onClick={() => setViewMode("grid")}
+              className={`flex items-center justify-center w-9 h-9 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted"}`}>
               <LayoutGrid size={14} />
             </button>
-            <button
-              onClick={() => setViewMode("list")}
-              className={`flex items-center justify-center w-9 h-9 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted"}`}
-            >
+            <button onClick={() => setViewMode("list")}
+              className={`flex items-center justify-center w-9 h-9 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted"}`}>
               <List size={14} />
             </button>
           </div>
         </div>
 
-        {/* Row 2 — Promoted role chips */}
-        {mobilePromotedRoles.length > 0 && (
-          <div className="bg-bg-secondary border-b border-border px-3 py-2.5 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-            <div className="flex gap-2">
-              {mobilePromotedRoles.map(({ label, role }) => {
-                const active = selectedRoles.has(role);
-                return (
-                  <button
-                    key={role}
-                    onClick={() => toggleRole(role)}
-                    className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                      active
-                        ? "bg-gold text-bg-primary border-gold"
-                        : "border-border text-text-muted bg-bg-elevated hover:border-gold/40 hover:text-text-secondary"
-                    }`}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
+        {/* Row 2 — Verfügbar + Rollen-Chips + Filter-Button (eine scrollbare Zeile) */}
+        <div className="bg-bg-secondary border-b border-border px-3 py-2.5 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+          <div className="flex gap-2 items-center">
+            <button
+              onClick={() => setAvailableOnly((v) => !v)}
+              className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                availableOnly ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-elevated"
+              }`}
+            >
+              {availableOnly ? "✓ " : ""}{tc("available")}
+            </button>
+
+            <div className="w-px h-4 bg-border shrink-0" />
+
+            {mobilePromotedRoles.map(({ label, role }) => {
+              const active = selectedRoles.has(role);
+              return (
+                <button
+                  key={role}
+                  onClick={() => toggleRole(role)}
+                  className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                    active ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-elevated"
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
+
+            <div className="w-px h-4 bg-border shrink-0" />
+
+            <button
+              onClick={() => setSheetOpen(true)}
+              className={`shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                secondaryFilterCount > 0 ? "bg-gold/10 border-gold/30 text-gold" : "border-border text-text-muted bg-bg-elevated"
+              }`}
+            >
+              <SlidersHorizontal size={11} />
+              Alle Filter
+              {secondaryFilterCount > 0 && (
+                <span className="bg-gold text-bg-primary text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  {secondaryFilterCount}
+                </span>
+              )}
+            </button>
           </div>
-        )}
-
-        {/* Row 3 — Quick filters */}
-        <div className="bg-bg-secondary border-b border-border px-3 py-2 flex items-center gap-2">
-          {/* Available toggle */}
-          <button
-            onClick={() => setAvailableOnly((v) => !v)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all shrink-0 ${
-              availableOnly
-                ? "bg-gold text-bg-primary border-gold"
-                : "border-border text-text-muted bg-bg-elevated hover:border-gold/40"
-            }`}
-          >
-            {availableOnly && <span className="text-[10px]">✓</span>}
-            {tc("available")}
-          </button>
-
-          {/* City quick select */}
-          {availableCities.length > 0 && (
-            <div className="relative shrink-0">
-              <select
-                value={cityFilter}
-                onChange={(e) => setCityFilter(e.target.value)}
-                className={`appearance-none pl-2.5 pr-6 py-1.5 rounded-full text-xs font-medium border transition-all bg-bg-elevated cursor-pointer focus:outline-none ${
-                  cityFilter
-                    ? "border-gold/30 text-gold bg-gold/10"
-                    : "border-border text-text-muted hover:border-gold/40"
-                }`}
-              >
-                <option value="">Stadt</option>
-                {availableCities.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-              <ChevronDown size={10} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted" />
-            </div>
-          )}
-
-          {/* All filters button */}
-          <button
-            onClick={() => setSheetOpen(true)}
-            className={`ml-auto flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all shrink-0 ${
-              secondaryFilterCount > 0
-                ? "bg-gold/10 border-gold/30 text-gold"
-                : "border-border text-text-muted bg-bg-elevated hover:border-gold/40"
-            }`}
-          >
-            <SlidersHorizontal size={11} />
-            Alle Filter
-            {secondaryFilterCount > 0 && (
-              <span className="bg-gold text-bg-primary text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                {secondaryFilterCount}
-              </span>
-            )}
-          </button>
         </div>
 
-        {/* Row 4 — Active filter chips (only when active) */}
+        {/* Row 3 — Active role chips (nur wenn aktiv) */}
         {activeChips.length > 0 && (
           <div className="bg-bg-secondary border-b border-border px-3 py-2 flex flex-wrap gap-1.5 items-center">
             {activeChips.map(({ role, dept }) => {
               const colors = dept ? deptColors(dept.color) : deptColors("slate");
               return (
-                <span
-                  key={role}
-                  className={`inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-full border font-medium ${colors.bg} ${colors.border} ${colors.text}`}
-                >
+                <span key={role} className={`inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-full border font-medium ${colors.bg} ${colors.border} ${colors.text}`}>
                   {role}
-                  <button onClick={() => removeRole(role)} className="hover:opacity-70 ml-0.5">
-                    <X size={9} />
-                  </button>
+                  <button onClick={() => removeRole(role)} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               );
             })}
             <button
-              onClick={() => {
-                clearAll();
-                setCityFilter(""); setCountryFilter(""); setLanguageFilter("");
-                setAvailableOnly(false); setVendorOnly(false);
-              }}
+              onClick={() => { clearAll(); setCityFilter(""); setCountryFilter(""); setLanguageFilter(""); setAvailableOnly(false); setVendorOnly(false); }}
               className="text-[11px] text-text-muted hover:text-red-400 transition-colors underline underline-offset-2"
             >
               Alle löschen
@@ -693,7 +649,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
           </div>
         )}
 
-        {/* Row 5 — Result count + Sort */}
+        {/* Row 4 — Ergebnis-Count + Sort */}
         <div className="px-4 py-2.5 flex items-center justify-between">
           <p className="text-xs text-text-muted">
             <span className="text-text-primary font-semibold">{filtered.length}</span>{" "}
@@ -701,14 +657,9 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
             {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
           </p>
           <div className="relative">
-            <select
-              value={sortKey}
-              onChange={(e) => setSortKey(e.target.value)}
-              className="appearance-none pl-2.5 pr-6 py-1.5 bg-bg-elevated border border-border rounded-lg text-xs text-text-muted focus:outline-none focus:border-gold/50 transition-colors cursor-pointer"
-            >
-              {SORT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
+            <select value={sortKey} onChange={(e) => setSortKey(e.target.value)}
+              className="appearance-none pl-2.5 pr-6 py-1.5 bg-bg-elevated border border-border rounded-lg text-xs text-text-muted focus:outline-none focus:border-gold/50 transition-colors cursor-pointer">
+              {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
             <ArrowUpDown size={10} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted" />
           </div>
@@ -716,65 +667,56 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          MOBILE FILTER SHEET
+          MOBILE FILTER SHEET  — keine verschachtelte Suchleiste
           ══════════════════════════════════════════════════════════════════ */}
       {sheetOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSheetOpen(false)} />
-          <div className="relative bg-bg-elevated border-t border-border rounded-t-2xl flex flex-col max-h-[85vh]">
+          <div className="relative bg-bg-elevated border-t border-border rounded-t-2xl flex flex-col max-h-[90vh]">
             <div className="flex justify-center pt-3 pb-1 shrink-0">
               <div className="w-10 h-1 rounded-full bg-border" />
             </div>
             <div className="flex items-center justify-between px-4 pb-3 shrink-0">
               <h3 className="text-sm font-semibold text-text-primary">Alle Filter</h3>
-              <button onClick={() => setSheetOpen(false)} className="text-text-muted hover:text-text-primary transition-colors p-1">
-                <X size={18} />
-              </button>
+              <button onClick={() => setSheetOpen(false)} className="text-text-muted hover:text-text-primary p-1"><X size={18} /></button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-4 space-y-5 pb-4">
-              {/* Verfügbarkeit */}
-              <div>
-                <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Verfügbarkeit</p>
-                <button
-                  onClick={() => setAvailableOnly((v) => !v)}
-                  className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-xl border text-sm font-medium transition-all ${availableOnly ? "bg-gold/10 border-gold/30 text-gold" : "border-border text-text-secondary bg-bg-secondary"}`}
-                >
-                  <div className={`w-8 h-5 rounded-full transition-colors relative shrink-0 ${availableOnly ? "bg-gold" : "bg-border"}`}>
-                    <span className={`absolute top-1 w-3 h-3 rounded-full bg-white transition-all ${availableOnly ? "left-4" : "left-1"}`} />
-                  </div>
-                  {tc("available")}
-                </button>
-              </div>
+            <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-6">
 
-              {/* Gewerk & Rollen */}
-              <div>
-                <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Gewerk & Rollen</p>
-                <div className="flex gap-1.5 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
-                  {activeDepts.map((dept) => {
-                    const colors = deptColors(dept.color);
-                    const deptSelected = dept.roles.filter((r) => selectedRoles.has(r) && occupiedRoles.has(r)).length;
-                    const isActive = activeDept === dept.id;
-                    return (
-                      <button key={dept.id} onClick={() => setActiveDept(dept.id)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border shrink-0 transition-all ${isActive ? `${colors.bg} ${colors.text} border-transparent` : "border-border text-text-muted bg-bg-secondary"}`}>
-                        {dept.emoji} {dept.label}
-                        {deptSelected > 0 && (
-                          <span className={`w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center ${colors.bg} ${colors.text}`}>{deptSelected}</span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-                <div className="mt-2 max-h-52 overflow-y-auto">
-                  <RolePanel dept={activeDeptData} selectedRoles={selectedRoles} occupiedRoles={occupiedRoles} onToggle={toggleRole} onClose={() => setSheetOpen(false)} />
-                </div>
-              </div>
+              {/* Rollen — einfache Chips pro Abteilung, keine Suchleiste */}
+              {activeDepts.map((dept) => {
+                const deptRoles = dept.roles.filter((r) => occupiedRoles.has(r));
+                if (deptRoles.length === 0) return null;
+                const colors = deptColors(dept.color);
+                return (
+                  <div key={dept.id}>
+                    <p className={`text-[11px] uppercase tracking-widest font-semibold mb-2.5 ${colors.text}`}>
+                      {dept.emoji} {dept.label}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {deptRoles.map((role) => {
+                        const active = selectedRoles.has(role);
+                        return (
+                          <button
+                            key={role}
+                            onClick={() => toggleRole(role)}
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                              active ? `${colors.bg} ${colors.text} border-transparent` : "border-border text-text-muted bg-bg-secondary"
+                            }`}
+                          >
+                            {role}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
 
               {/* Stadt */}
               {availableCities.length > 0 && (
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Stadt</p>
+                  <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2.5">Stadt</p>
                   <div className="flex flex-wrap gap-2">
                     <button onClick={() => setCityFilter("")}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${!cityFilter ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
@@ -793,7 +735,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               {/* Sprache */}
               {availableLanguages.length > 0 && (
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Sprache</p>
+                  <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2.5">Sprache</p>
                   <div className="flex flex-wrap gap-2">
                     <button onClick={() => setLanguageFilter("")}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${!languageFilter ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
@@ -812,7 +754,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               {/* Profiltyp */}
               {availableProfileTypes.length > 0 && (
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Profiltyp</p>
+                  <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2.5">Profiltyp</p>
                   <div className="flex flex-wrap gap-2">
                     <button onClick={() => setProfileTypeFilter("")}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${!profileTypeFilter ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
@@ -828,12 +770,12 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                 </div>
               )}
 
-              {/* Casting: Haarfarbe / Augenfarbe */}
+              {/* Haarfarbe / Augenfarbe */}
               {(availableHairColors.length > 0 || availableEyeColors.length > 0) && (
                 <div className="grid grid-cols-2 gap-3">
                   {availableHairColors.length > 0 && (
                     <div>
-                      <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Haarfarbe</p>
+                      <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2">Haarfarbe</p>
                       <select value={hairFilter} onChange={(e) => setHairFilter(e.target.value)}
                         className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-xs text-text-secondary focus:outline-none focus:border-gold transition-colors">
                         <option value="">Alle</option>
@@ -843,7 +785,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                   )}
                   {availableEyeColors.length > 0 && (
                     <div>
-                      <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Augenfarbe</p>
+                      <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2">Augenfarbe</p>
                       <select value={eyeFilter} onChange={(e) => setEyeFilter(e.target.value)}
                         className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-xs text-text-secondary focus:outline-none focus:border-gold transition-colors">
                         <option value="">Alle</option>
@@ -856,7 +798,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 
               {/* Spielalter */}
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Spielalter</p>
+                <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2">Spielalter</p>
                 <div className="flex items-center gap-2">
                   <input type="number" min="1" max="99" value={ageMinFilter} onChange={(e) => setAgeMinFilter(e.target.value)}
                     placeholder="von" className="w-20 bg-bg-secondary border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-gold transition-colors" />
@@ -868,7 +810,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 
               {/* Reisebereitschaft */}
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Reisebereitschaft</p>
+                <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2.5">Reisebereitschaft</p>
                 <div className="flex flex-wrap gap-2">
                   <button onClick={() => setTravelFilter("")}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${!travelFilter ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
