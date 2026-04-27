@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
@@ -45,6 +46,7 @@ const conditionColors: Record<string, string> = {
 };
 
 export default function PropDetail({ prop }: { prop: Prop }) {
+  const tc = useTranslations("common");
   const router = useRouter();
   const { user } = useUser();
   const isOwner = !!user && user.id === prop.ownerId;
@@ -192,7 +194,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
               {[
-                { label: "Tagesrate", value: `${prop.dailyRate} €/Tag` },
+                { label: "Tagesrate", value: `${prop.dailyRate} €${tc("perDay")}` },
                 { label: "Zustand", value: prop.condition },
                 { label: "Kategorie", value: prop.category },
                 { label: "Abholung / Lieferung", value: prop.delivery ? "Beides möglich" : "Nur Abholung" },
@@ -263,7 +265,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
               <div className="bg-bg-secondary border border-border rounded-xl p-6">
                 <div className="flex items-end gap-1 mb-5">
                   <span className="text-3xl font-bold font-display text-text-primary">{prop.dailyRate} €</span>
-                  <span className="text-text-muted mb-1">/Tag</span>
+                  <span className="text-text-muted mb-1">{tc("perDay")}</span>
                 </div>
 
                 {prop.ownerId ? (

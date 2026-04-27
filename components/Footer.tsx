@@ -5,40 +5,40 @@ import { Logo } from "./Logo";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 
-const columns = [
-  {
-    titleKey: "col1",
-    links: [
-      { label: "Locations", href: "/locations" },
-      { label: "Marktplatz", href: "/marketplace" },
-      { label: "Fahrzeuge", href: "/vehicles" },
-      { label: "Custom Requisiten", href: "/marketplace/commission" },
-    ],
-  },
-  {
-    titleKey: "col2",
-    links: [
-      { label: "Film Jobs", href: "/jobs" },
-      { label: "Crew & Talente", href: "/creators" },
-      { label: "Job ausschreiben", href: "/dashboard" },
-      { label: "Crew finden", href: "/creators" },
-    ],
-  },
-  {
-    titleKey: "col3",
-    links: [
-      { label: "Über CineGenius", href: "/about" },
-      { label: "Hilfe & FAQ", href: "/help" },
-      { label: "Trust & Safety", href: "/trust" },
-      { label: "Preise", href: "/pricing" },
-    ],
-  },
-];
-
 export default function Footer() {
   const pathname = usePathname();
   const tf = useTranslations("footer");
   if (pathname?.startsWith("/dashboard")) return null;
+
+  const columns = [
+    {
+      titleKey: "col1",
+      links: [
+        { labelKey: "links_locations", href: "/locations" },
+        { labelKey: "links_marketplace", href: "/marketplace" },
+        { labelKey: "links_vehicles", href: "/vehicles" },
+        { labelKey: "links_customProps", href: "/marketplace/commission" },
+      ],
+    },
+    {
+      titleKey: "col2",
+      links: [
+        { labelKey: "links_filmJobs", href: "/jobs" },
+        { labelKey: "links_crewTalent", href: "/creators" },
+        { labelKey: "links_postJob", href: "/dashboard" },
+        { labelKey: "links_findCrew", href: "/creators" },
+      ],
+    },
+    {
+      titleKey: "col3",
+      links: [
+        { labelKey: "links_about", href: "/about" },
+        { labelKey: "links_help", href: "/help" },
+        { labelKey: "links_trust", href: "/trust" },
+        { labelKey: "links_pricing", href: "/pricing" },
+      ],
+    },
+  ];
 
   return (
     <footer className="border-t border-border bg-bg-secondary mt-20 pb-14 lg:pb-0">
@@ -62,12 +62,12 @@ export default function Footer() {
               </h4>
               <ul className="flex flex-col gap-2">
                 {col.links.map((link) => (
-                  <li key={link.label}>
+                  <li key={link.labelKey}>
                     <Link
                       href={link.href}
                       className="text-sm text-text-secondary hover:text-gold transition-colors"
                     >
-                      {link.label}
+                      {tf(link.labelKey as Parameters<typeof tf>[0])}
                     </Link>
                   </li>
                 ))}
@@ -83,16 +83,16 @@ export default function Footer() {
           </p>
           <div className="flex gap-6">
             {[
-              { label: "Datenschutz", href: "/datenschutz" },
-              { label: "AGB", href: "/agb" },
-              { label: "Impressum", href: "/impressum" },
-            ].map(({ label, href }) => (
+              { labelKey: "links_privacy", href: "/datenschutz" },
+              { labelKey: "links_terms", href: "/agb" },
+              { labelKey: "links_imprint", href: "/impressum" },
+            ].map(({ labelKey, href }) => (
               <Link
-                key={label}
+                key={labelKey}
                 href={href}
                 className="text-xs text-text-muted hover:text-text-secondary transition-colors"
               >
-                {label}
+                {tf(labelKey as Parameters<typeof tf>[0])}
               </Link>
             ))}
           </div>

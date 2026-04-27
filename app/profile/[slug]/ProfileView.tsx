@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import ImageStrip from "@/components/ImageStrip";
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
@@ -383,6 +384,7 @@ function CompanyBadge({ membership }: { membership: CompanyMembership }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function ActorProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [] }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[] }) {
+  const tc = useTranslations("common");
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const { user } = useUser();
   const [lightbox, setLightbox] = useState<string | null>(null);
@@ -526,7 +528,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`w-2 h-2 rounded-full shrink-0 ${profile.available ? "bg-emerald-400" : "bg-red-400"}`} />
                     <span className="text-xs font-medium text-text-muted">
-                      {profile.available ? "Verfügbar" : "Nicht verfügbar"}
+                      {profile.available ? tc("available") : tc("unavailable")}
                     </span>
                   </div>
                   <h1 className="font-display text-4xl sm:text-5xl font-bold text-text-primary leading-none tracking-tight">
@@ -1122,6 +1124,7 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function GenericProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [] }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[] }) {
+  const tc = useTranslations("common");
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const { user } = useUser();
   const [lightbox, setLightbox] = useState<string | null>(null);

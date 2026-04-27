@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   MapPin, CheckCircle, Search, X, LayoutGrid, List, SlidersHorizontal, ChevronDown, Users, Globe, Languages, ArrowUpDown,
 } from "lucide-react";
@@ -294,6 +295,7 @@ function RolePanel({
 
 function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCreator[]; hasStrip?: boolean }) {
   const searchParams = useSearchParams();
+  const tc = useTranslations("common");
 
   const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const [cityFilter, setCityFilter] = useState(() => searchParams.get("city") ?? "");
@@ -549,7 +551,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               >
                 <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${availableOnly ? "left-3.5" : "left-0.5"}`} />
               </div>
-              Verfügbar
+              {tc("available")}
             </label>
 
             <div className="w-px h-5 bg-border shrink-0" />

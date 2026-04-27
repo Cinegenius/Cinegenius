@@ -465,7 +465,7 @@ export default function Navbar() {
                   >
                     <Icon size={18} className={isActive(href) ? "text-gold" : "text-text-muted"} />
                     <span>{label}</span>
-                    {label === "Nachrichten" && unreadMessages > 0 && (
+                    {href === "/messages" && unreadMessages > 0 && (
                       <span className="ml-auto min-w-[20px] h-5 bg-crimson text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
                         {unreadMessages > 9 ? "9+" : unreadMessages}
                       </span>

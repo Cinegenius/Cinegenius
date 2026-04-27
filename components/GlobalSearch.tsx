@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Search, X, MapPin, Car, Package, Briefcase, Users,
   Loader2, Clock, ArrowRight, User, Building2,
@@ -15,21 +16,6 @@ type Result = {
   price: number;
   image: string | null;
   available: boolean | null;
-};
-
-const typeConfig: Record<string, {
-  label: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  href: (id: string) => string;
-  color: string;
-}> = {
-  location: { label: "Locations",        icon: MapPin,    href: (id) => `/locations/${id}`,  color: "text-sky-400"     },
-  vehicle:  { label: "Fahrzeuge",        icon: Car,       href: (id) => `/vehicles/${id}`,   color: "text-orange-400"  },
-  prop:     { label: "Requisiten",       icon: Package,   href: (id) => `/props/${id}`,      color: "text-violet-400"  },
-  job:      { label: "Jobs",             icon: Briefcase, href: (id) => `/jobs/${id}`,       color: "text-emerald-400" },
-  creator:  { label: "Filmschaffende",   icon: Users,     href: (id) => `/profile/${id}`,    color: "text-gold"        },
-  profile:  { label: "Filmschaffende",   icon: User,      href: (id) => `/profile/${id}`,    color: "text-gold"        },
-  company:  { label: "Firmen",           icon: Building2, href: (id) => `/companies/${id}`,  color: "text-blue-400"    },
 };
 
 // Type order for display
@@ -50,6 +36,7 @@ function clearRecentSearches() {
 }
 
 export default function GlobalSearch() {
+  const t = useTranslations("search");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Result[]>([]);
@@ -59,6 +46,21 @@ export default function GlobalSearch() {
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const typeConfig: Record<string, {
+    label: string;
+    icon: React.ComponentType<{ size?: number; className?: string }>;
+    href: (id: string) => string;
+    color: string;
+  }> = {
+    location: { label: t("typeLocations"), icon: MapPin,    href: (id) => `/locations/${id}`,  color: "text-sky-400"     },
+    vehicle:  { label: t("typeVehicles"),  icon: Car,       href: (id) => `/vehicles/${id}`,   color: "text-orange-400"  },
+    prop:     { label: t("typeProps"),     icon: Package,   href: (id) => `/props/${id}`,      color: "text-violet-400"  },
+    job:      { label: t("typeJobs"),      icon: Briefcase, href: (id) => `/jobs/${id}`,       color: "text-emerald-400" },
+    creator:  { label: t("typeCreators"), icon: Users,     href: (id) => `/profile/${id}`,    color: "text-gold"        },
+    profile:  { label: t("typeCreators"), icon: User,      href: (id) => `/profile/${id}`,    color: "text-gold"        },
+    company:  { label: t("typeCompanies"),icon: Building2, href: (id) => `/companies/${id}`,  color: "text-blue-400"    },
+  };
 
   // Cmd+K / Ctrl+K
   useEffect(() => {
@@ -148,10 +150,10 @@ export default function GlobalSearch() {
       <button
         onClick={() => setOpen(true)}
         className="flex items-center gap-2 px-3 py-1.5 text-sm text-text-muted border border-border rounded-lg hover:border-gold/50 hover:text-gold transition-all bg-bg-elevated/50 group"
-        title="Suchen (⌘K)"
+        title={t("buttonTitle")}
       >
         <Search size={14} />
-        <span className="hidden xl:inline text-xs">Suchen…</span>
+        <span className="hidden xl:inline text-xs">{t("buttonLabel")}</span>
         <kbd className="hidden xl:inline text-[10px] px-1.5 py-0.5 bg-bg-primary border border-border rounded text-text-muted group-hover:border-gold/30 transition-colors">⌘K</kbd>
       </button>
     );
@@ -177,7 +179,7 @@ export default function GlobalSearch() {
             value={query}
             onChange={(e) => { setQuery(e.target.value); setSelectedIdx(-1); }}
             onKeyDown={handleKeyDown}
-            placeholder="Nutzer, Locations, Crew, Requisiten, Jobs…"
+            placeholder={t("inputPlaceholder")}
             className="flex-1 bg-transparent text-text-primary placeholder:text-text-muted text-base focus:outline-none"
           />
           <div className="flex items-center gap-2 shrink-0">
@@ -197,9 +199,9 @@ export default function GlobalSearch() {
           {!query && recent.length > 0 && (
             <div className="px-4 py-3">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold">Letzte Suchen</p>
+                <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold">{t("recent")}</p>
                 <button onClick={() => { clearRecentSearches(); setRecent([]); }} className="text-[10px] text-text-muted hover:text-gold transition-colors">
-                  Löschen
+                  {t("clear")}
                 </button>
               </div>
               <div className="space-y-0.5">
@@ -217,9 +219,9 @@ export default function GlobalSearch() {
           {/* Empty suggestion chips */}
           {!query && recent.length === 0 && (
             <div className="px-4 py-8 text-center space-y-4">
-              <p className="text-xs text-text-muted">Nutzer, Locations, Crew, Requisiten und Jobs durchsuchen</p>
+              <p className="text-xs text-text-muted">{t("hint")}</p>
               <div className="flex flex-wrap justify-center gap-2">
-                {["Kameramann", "Warehouse Berlin", "Oldtimer", "Regie gesucht"].map((term) => (
+                {[t("suggestion1"), t("suggestion2"), t("suggestion3"), t("suggestion4")].map((term) => (
                   <button key={term} onClick={() => setQuery(term)}
                     className="px-3 py-1.5 text-xs border border-border rounded-full text-text-secondary hover:border-gold hover:text-gold transition-all">
                     {term}
@@ -232,8 +234,8 @@ export default function GlobalSearch() {
           {/* No results */}
           {query.length >= 2 && !loading && results.length === 0 && (
             <div className="px-4 py-10 text-center">
-              <p className="text-text-muted text-sm">Keine Ergebnisse für „{query}"</p>
-              <p className="text-xs text-text-muted mt-1 opacity-70">Versuche einen anderen Namen oder Begriff</p>
+              <p className="text-text-muted text-sm">{t("noResults", { query })}</p>
+              <p className="text-xs text-text-muted mt-1 opacity-70">{t("noResultsHint")}</p>
             </div>
           )}
 
@@ -278,7 +280,7 @@ export default function GlobalSearch() {
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         {isProfile && r.available !== null && (
-                          <span className={`w-2 h-2 rounded-full ${r.available ? "bg-success" : "bg-text-muted"}`} title={r.available ? "Verfügbar" : "Gebucht"} />
+                          <span className={`w-2 h-2 rounded-full ${r.available ? "bg-success" : "bg-text-muted"}`} />
                         )}
                         {!isProfile && r.price > 0 && (
                           <span className="text-xs font-mono text-gold">{r.price.toLocaleString()} €</span>
@@ -294,12 +296,12 @@ export default function GlobalSearch() {
           {/* Footer */}
           {query.length >= 2 && results.length > 0 && (
             <div className="px-4 py-3 border-t border-border flex items-center justify-between">
-              <p className="text-xs text-text-muted">{results.length} Ergebnis{results.length !== 1 ? "se" : ""}</p>
+              <p className="text-xs text-text-muted">{t("resultCount", { count: results.length })}</p>
               <button
                 onClick={() => { addRecentSearch(query); setOpen(false); router.push(`/search?q=${encodeURIComponent(query.trim())}`); }}
                 className="flex items-center gap-1.5 text-xs font-medium text-gold hover:text-gold-light transition-colors"
               >
-                Alle Ergebnisse <ArrowRight size={11} />
+                {t("viewAll")} <ArrowRight size={11} />
               </button>
             </div>
           )}
@@ -309,7 +311,7 @@ export default function GlobalSearch() {
                 onClick={() => { setOpen(false); router.push(`/search?q=${encodeURIComponent(query.trim())}`); }}
                 className="text-xs text-text-muted hover:text-gold transition-colors"
               >
-                Vollsuche öffnen <ArrowRight size={10} className="inline" />
+                {t("openFull")} <ArrowRight size={10} className="inline" />
               </button>
             </div>
           )}

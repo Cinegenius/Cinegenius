@@ -7,6 +7,7 @@ import {
   Wallet, ShieldCheck, FileCheck, Briefcase, UserPlus, Users,
 } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
+import { useTranslations } from "next-intl";
 import { timeAgo, notificationMeta, type NotificationType } from "@/lib/notifications";
 
 type Notification = {
@@ -35,6 +36,7 @@ const typeIcons: Record<NotificationType, React.ComponentType<{ size?: number; c
 };
 
 export default function NotificationCenter() {
+  const tn = useTranslations("notifications");
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
@@ -111,7 +113,7 @@ export default function NotificationCenter() {
       <button
         onClick={handleOpen}
         className="relative w-8 h-8 flex items-center justify-center rounded-md text-text-muted hover:text-gold hover:bg-bg-elevated transition-all"
-        aria-label="Benachrichtigungen"
+        aria-label={tn("ariaLabel")}
       >
         <Bell size={17} />
         {totalUnread > 0 && (
@@ -126,10 +128,10 @@ export default function NotificationCenter() {
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-semibold text-text-primary">Benachrichtigungen</h3>
+              <h3 className="text-sm font-semibold text-text-primary">{tn("heading")}</h3>
               {totalUnread > 0 && (
                 <span className="px-1.5 py-0.5 bg-gold text-bg-primary text-[10px] font-bold rounded-full">
-                  {totalUnread} neu
+                  {totalUnread} {tn("newBadge")}
                 </span>
               )}
             </div>
@@ -138,7 +140,7 @@ export default function NotificationCenter() {
                 onClick={markAllRead}
                 className="flex items-center gap-1 text-xs text-gold hover:text-gold-light transition-colors"
               >
-                <Check size={12} /> Alle gelesen
+                <Check size={12} /> {tn("markAllRead")}
               </button>
             )}
           </div>
@@ -158,12 +160,12 @@ export default function NotificationCenter() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <p className="text-sm font-medium leading-tight text-text-primary">
-                      {unreadMessages === 1 ? "1 neue Nachricht" : `${unreadMessages} neue Nachrichten`}
+                      {unreadMessages === 1 ? tn("newMessage") : tn("newMessages", { count: unreadMessages })}
                     </p>
                     <span className="w-2 h-2 rounded-full shrink-0 mt-1 bg-gold" />
                   </div>
                   <p className="text-xs text-text-muted leading-relaxed mt-0.5">
-                    Jetzt in der Nachrichtenübersicht ansehen
+                    {tn("viewMessages")}
                   </p>
                 </div>
               </Link>
@@ -180,9 +182,9 @@ export default function NotificationCenter() {
             {!loading && notifications.length === 0 && unreadMessages === 0 && (
               <div className="py-12 text-center">
                 <Bell size={28} className="text-text-muted mx-auto mb-3 opacity-40" />
-                <p className="text-sm text-text-muted">Keine Benachrichtigungen</p>
+                <p className="text-sm text-text-muted">{tn("empty")}</p>
                 <p className="text-xs text-text-muted mt-1 opacity-60">
-                  Hier erscheinen Buchungen, Anfragen und mehr.
+                  {tn("emptyDesc")}
                 </p>
               </div>
             )}
@@ -231,14 +233,14 @@ export default function NotificationCenter() {
               onClick={() => setOpen(false)}
               className="text-xs text-gold hover:text-gold-light transition-colors font-medium"
             >
-              Alle Benachrichtigungen →
+              {tn("viewAll")}
             </Link>
             <Link
               href="/messages"
               onClick={() => setOpen(false)}
               className="text-xs text-text-muted hover:text-gold transition-colors"
             >
-              Nachrichten
+              {tn("messages")}
             </Link>
           </div>
         </div>

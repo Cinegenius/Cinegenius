@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -117,6 +118,8 @@ export default function CreatorDetail({
   isOwnProfile?: boolean;
   currentUserId?: string | null;
 }) {
+  const tc = useTranslations("common");
+  const tcr = useTranslations("creators");
   const [activeSection, setActiveSection] = useState<"inquiry" | "message">("inquiry");
   const [message, setMessage] = useState("");
   const [msgSending, setMsgSending] = useState(false);
@@ -341,7 +344,7 @@ export default function CreatorDetail({
               <span className="flex items-center gap-1"><MapPin size={13} />{creator.location}</span>
               {creator.day_rate && (
                 <span className="flex items-center gap-1 text-text-secondary font-medium">
-                  <DollarSign size={13} className="text-gold" />{creator.day_rate.toLocaleString("de-DE")} €/Tag
+                  <DollarSign size={13} className="text-gold" />{creator.day_rate.toLocaleString("de-DE")} €{tc("perDay")}
                 </span>
               )}
               {creator.travel_ready && (
@@ -637,20 +640,20 @@ export default function CreatorDetail({
                 <span className={`w-2 h-2 rounded-full shrink-0 ${creator.available ? "bg-success" : "bg-text-muted"}`} />
                 {creator.available
                   ? creator.available_from
-                    ? `Verfügbar ab ${new Date(creator.available_from).toLocaleDateString("de-DE", { day: "numeric", month: "long" })}`
-                    : "Sofort verfügbar"
-                  : "Derzeit gebucht"}
+                    ? `${tcr("availableFrom")} ${new Date(creator.available_from).toLocaleDateString(undefined, { day: "numeric", month: "long" })}`
+                    : tcr("availableImmediately")
+                  : tcr("currentlyBooked")}
               </div>
 
               {/* Tabs */}
               <div className="flex rounded-xl border border-border bg-bg-secondary p-1 gap-1">
                 <button onClick={() => setActiveSection("inquiry")}
                   className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${activeSection === "inquiry" ? "bg-gold text-bg-primary" : "text-text-secondary hover:text-gold"}`}>
-                  Buchungsanfrage
+                  {tcr("bookingInquiry")}
                 </button>
                 <button onClick={() => setActiveSection("message")}
                   className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${activeSection === "message" ? "bg-gold text-bg-primary" : "text-text-secondary hover:text-gold"}`}>
-                  Nachricht
+                  {tcr("sendMessage")}
                 </button>
               </div>
 
@@ -659,7 +662,7 @@ export default function CreatorDetail({
                   <InquiryForm listingId={creator.id} listingTitle={creator.name} listingType="creator" ownerId={creator.ownerId} ownerName={creator.name} />
                 ) : (
                   <div className="bg-bg-secondary border border-border rounded-xl p-6 text-center text-sm text-text-muted">
-                    Anfragen derzeit nicht verfügbar.
+                    {tcr("inquiriesUnavailable")}
                   </div>
                 )
               )}
