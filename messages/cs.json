@@ -51,7 +51,7 @@
     "recent": "Poslední hledání",
     "clear": "Smazat",
     "hint": "Hledat uživatele, lokace, štáb, rekvizity a práce",
-    "noResults": "Žádné výsledky pro „{query}"",
+    "noResults": "Žádné výsledky pro \"{query}\"",
     "noResultsHint": "Zkus jiné jméno nebo výraz",
     "resultCount": "{count, plural, one {# výsledek} few {# výsledky} other {# výsledků}}",
     "viewAll": "Všechny výsledky",

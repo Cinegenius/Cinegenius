@@ -51,7 +51,7 @@
     "recent": "Legutóbbi keresések",
     "clear": "Törlés",
     "hint": "Keress felhasználókat, helyszíneket, stábot, kellékeket és állásokat",
-    "noResults": "Nincs találat a következőre: „{query}"",
+    "noResults": "Nincs találat a következőre: \"{query}\"",
     "noResultsHint": "Próbálj más nevet vagy kifejezést",
     "resultCount": "{count, plural, one {# találat} other {# találat}}",
     "viewAll": "Összes találat",

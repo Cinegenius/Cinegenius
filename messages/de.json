@@ -51,7 +51,7 @@
     "recent": "Letzte Suchen",
     "clear": "Löschen",
     "hint": "Nutzer, Locations, Crew, Requisiten und Jobs durchsuchen",
-    "noResults": "Keine Ergebnisse für „{query}"",
+    "noResults": "Keine Ergebnisse für \"{query}\"",
     "noResultsHint": "Versuche einen anderen Namen oder Begriff",
     "resultCount": "{count, plural, one {# Ergebnis} other {# Ergebnisse}}",
     "viewAll": "Alle Ergebnisse",
