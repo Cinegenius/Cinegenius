@@ -17,9 +17,9 @@ type Props = {
 };
 
 const heights = {
-  sm: "h-[380px] sm:h-[300px]",
-  md: "h-[440px] sm:h-[400px]",
-  lg: "h-[520px] sm:h-[520px]",
+  sm: "h-[120px] sm:h-[300px]",
+  md: "h-[130px] sm:h-[380px]",
+  lg: "h-[150px] sm:h-[460px]",
 };
 
 const overlayGradients = {
@@ -71,28 +71,28 @@ export default function CategoryHero({
         style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }}
       />
 
-      <div className={`relative z-10 w-full px-4 sm:px-8 lg:px-12 pt-20 sm:pt-0 flex flex-col ${contentAlign[overlay]}`}>
+      <div className={`relative z-10 w-full px-4 sm:px-8 lg:px-12 pt-6 sm:pt-0 flex flex-col ${contentAlign[overlay]}`}>
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/12 backdrop-blur-sm border border-white/20 rounded-full mb-4">
-          <span className="text-[11px] text-white/90 font-bold uppercase tracking-widest">{badge}</span>
+        <div className="inline-flex items-center gap-2 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-white/12 backdrop-blur-sm border border-white/20 rounded-full mb-2 sm:mb-4">
+          <span className="text-[10px] sm:text-[11px] text-white/90 font-bold uppercase tracking-widest">{badge}</span>
         </div>
 
         {/* Title */}
-        <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-3">
+        <h1 className="font-display text-xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight sm:mb-3">
           {title}
           {titleHighlight && (
-            <><br /><span className="text-gradient-gold">{titleHighlight}</span></>
+            <><span className="hidden sm:inline"><br /></span><span className="sm:hidden"> </span><span className="text-gradient-gold">{titleHighlight}</span></>
           )}
         </h1>
 
-        {/* Description */}
-        <p className="text-white/65 text-sm sm:text-base leading-relaxed mb-5 max-w-xl">
+        {/* Description — hidden on mobile */}
+        <p className="hidden sm:block text-white/65 text-sm sm:text-base leading-relaxed mb-5 max-w-xl">
           {description}
         </p>
 
-        {/* Stats */}
+        {/* Stats — hidden on mobile */}
         {stats && stats.length > 0 && (
-          <div className="flex items-center gap-6 mb-6">
+          <div className="hidden sm:flex items-center gap-6 mb-6">
             {stats.map((s, i) => (
               <div key={i} className="flex items-center gap-5">
                 <div>
@@ -105,13 +105,13 @@ export default function CategoryHero({
           </div>
         )}
 
-        {/* CTAs */}
+        {/* CTAs — hidden on mobile */}
         {(cta || ctaSecondary) && (
-          <div className="flex flex-wrap gap-3">
+          <div className="hidden sm:flex flex-wrap gap-3">
             {cta && (
               <Link
                 href={cta.href}
-                className="inline-flex items-center gap-2 px-5 py-3 sm:py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm"
               >
                 {cta.label} <ArrowRight size={14} />
               </Link>
@@ -119,7 +119,7 @@ export default function CategoryHero({
             {ctaSecondary && (
               <Link
                 href={ctaSecondary.href}
-                className="inline-flex items-center gap-2 px-5 py-3 sm:py-2.5 border border-white/25 text-white/85 font-semibold rounded-xl hover:border-white/50 hover:text-white transition-all text-sm"
+                className="inline-flex items-center gap-2 px-5 py-2.5 border border-white/25 text-white/85 font-semibold rounded-xl hover:border-white/50 hover:text-white transition-all text-sm"
               >
                 {ctaSecondary.label}
               </Link>
