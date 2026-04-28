@@ -62,14 +62,19 @@ export default function GlobalSearch() {
     company:  { label: t("typeCompanies"),icon: Building2, href: (id) => `/companies/${id}`,  color: "text-blue-400"    },
   };
 
-  // Cmd+K / Ctrl+K
+  // Cmd+K / Ctrl+K + custom event from mobile nav button
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); setOpen(true); }
       if (e.key === "Escape") setOpen(false);
     };
+    const openFromEvent = () => setOpen(true);
     document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
+    document.addEventListener("cg:opensearch", openFromEvent);
+    return () => {
+      document.removeEventListener("keydown", handler);
+      document.removeEventListener("cg:opensearch", openFromEvent);
+    };
   }, []);
 
   useEffect(() => {

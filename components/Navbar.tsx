@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth, useUser, useClerk } from "@clerk/nextjs";
 import {
-  Menu, X, Film, ChevronDown,
+  Menu, X, Film, ChevronDown, Search,
   Car, Shirt, Wrench, Clapperboard, Sparkles, Zap,
   Camera, Mic, Drama, Lightbulb, User, Users, Layers, Briefcase,
   LayoutDashboard, LogOut, MessageSquare, Bell,
@@ -157,12 +157,12 @@ const jobGroups: { heading: string; items: NavItem[] }[] = [
 const jobItems = jobGroups.flatMap((g) => g.items);
 
 const desktopNavHrefs = [
-  { href: "/locations", key: "locations" },
-  { href: "/creators",  key: "crew"      },
-  { href: "/props",     key: "marketplace" },
-  { href: "/jobs",      key: "jobs"      },
-  { href: "/companies", key: "companies" },
-  { href: "/projects",  key: "projects"  },
+  { href: "/locations", key: "locations"  },
+  { href: "/creators",  key: "crew"       },
+  { href: "/jobs",      key: "jobs"       },
+  { href: "/props",     key: "marketplace"},
+  { href: "/projects",  key: "projects"   },
+  { href: "/companies", key: "companies"  },
 ] as const;
 
 
@@ -398,10 +398,33 @@ export default function Navbar() {
               })()}
             </div>
 
-            {/* Mobile: notifications + language + theme + menu */}
+            {/* Mobile: search + notifications + language + menu */}
             <div className="lg:hidden flex items-center gap-1">
+              <button
+                onClick={() => document.dispatchEvent(new Event("cg:opensearch"))}
+                className="w-9 h-9 flex items-center justify-center text-text-secondary hover:text-gold transition-colors"
+                aria-label="CineGenius durchsuchen"
+              >
+                <Search size={20} />
+              </button>
               {isLoaded && isSignedIn && (
-                <NotificationCenter />
+                <>
+                  <NotificationCenter />
+                  <Link
+                    href="/dashboard"
+                    className="w-7 h-7 rounded-full overflow-hidden border-2 border-gold/40 shrink-0 flex items-center justify-center bg-gold/10"
+                    title="Mein Profil"
+                  >
+                    {user?.imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={user.imageUrl} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-[10px] font-bold text-gold">
+                        {(user?.firstName ?? user?.emailAddresses?.[0]?.emailAddress ?? "?")[0].toUpperCase()}
+                      </span>
+                    )}
+                  </Link>
+                </>
               )}
               <LanguageSwitcher />
               <button

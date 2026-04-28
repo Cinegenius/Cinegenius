@@ -939,8 +939,8 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
           )}
         </div>
 
-        {/* Bottom info */}
-        <div className="absolute bottom-0 left-0 right-0 px-6 sm:px-10 pb-10">
+        {/* Bottom info — pb-20 on mobile to clear the 56px BottomNav */}
+        <div className="absolute bottom-0 left-0 right-0 px-6 sm:px-10 pb-20 lg:pb-10">
           <p className="text-white/60 text-xs uppercase tracking-[0.2em] mb-2">
             {(profile.positions?.[0] ?? profile.role) ?? "Model"}
           </p>

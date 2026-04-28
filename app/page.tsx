@@ -318,13 +318,13 @@ export default async function HomePage() {
       {(posterStrip.length >= 1 || avatarStrip.length >= 1 || locationStrip.length >= 1) && (
         <div className="flex flex-col border-b border-border overflow-hidden">
           {posterStrip.length >= 1 && (
-            <ImageStrip images={posterStrip} aspectRatio="wide" height={60} durationOverride={35} direction="left" overlay={false} stripId="top" />
+            <ImageStrip images={posterStrip} aspectRatio="wide" height={60} durationOverride={70} direction="left" overlay={false} stripId="top" />
           )}
           {avatarStrip.length >= 1 && (
-            <ImageStrip images={avatarStrip} aspectRatio="square" height={60} durationOverride={45} direction="right" overlay={false} stripId="mid" startOffset={0.33} />
+            <ImageStrip images={avatarStrip} aspectRatio="square" height={60} durationOverride={90} direction="right" overlay={false} stripId="mid" startOffset={0.33} />
           )}
           {locationStrip.length >= 1 && (
-            <ImageStrip images={locationStrip} aspectRatio="wide" height={60} durationOverride={90} direction="left" overlay={false} stripId="bot" startOffset={0.5} />
+            <ImageStrip images={locationStrip} aspectRatio="wide" height={60} durationOverride={130} direction="left" overlay={false} stripId="bot" startOffset={0.5} />
           )}
         </div>
       )}

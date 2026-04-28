@@ -99,9 +99,14 @@ export default function ProjectsPage() {
       {/* Header */}
       <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-6 pb-5 max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <p className="text-text-muted text-sm">
-            Entdecke Produktionen aus der DACH-Region — von Spielfilm bis Social Media Content.
-          </p>
+          <div>
+            <p className="text-text-muted text-sm">
+              Hier zeigen Filmemacher, Creator und Agenturen ihre abgeschlossenen und laufenden Produktionen — als Portfolio und zur Teamsuche.
+            </p>
+            <p className="text-text-muted/60 text-xs mt-1">
+              Eigene Produktion eintragen → andere sehen deine Arbeit und können sich bewerben.
+            </p>
+          </div>
           <div className="flex items-center gap-2">
             <Link
               href="/projects/alle"
