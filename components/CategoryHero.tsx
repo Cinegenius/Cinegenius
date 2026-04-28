@@ -17,9 +17,9 @@ type Props = {
 };
 
 const heights = {
-  sm: "h-[120px] sm:h-[300px]",
-  md: "h-[130px] sm:h-[380px]",
-  lg: "h-[150px] sm:h-[460px]",
+  sm: "h-[300px]",
+  md: "h-[380px]",
+  lg: "h-[460px]",
 };
 
 const overlayGradients = {
@@ -48,85 +48,116 @@ export default function CategoryHero({
   height = "md",
 }: Props) {
   return (
-    <div className={`relative overflow-hidden ${heights[height]} flex items-start sm:items-center`}>
-      {/* Background image */}
-      <Image
-        src={image}
-        alt={title}
-        fill
-        priority
-        unoptimized
-        className="object-cover"
-        style={{ objectPosition: imagePosition }}
-        sizes="100vw"
-      />
+    <>
+      {/* ── Mobile: compact app-style header, no image ── */}
+      <div className="sm:hidden relative overflow-hidden" style={{ paddingTop: "64px" }}>
+        {/* Image as faint texture */}
+        <Image
+          src={image}
+          alt=""
+          fill
+          priority
+          unoptimized
+          className="object-cover"
+          style={{ objectPosition: imagePosition }}
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-bg-primary/88" />
+        {/* Gold left accent line */}
+        <div className="absolute top-0 left-0 bottom-0 w-[3px] bg-gradient-to-b from-gold/80 via-gold/30 to-transparent" />
 
-      {/* Cinematic gradient overlay */}
-      <div className={`absolute inset-0 ${overlayGradients[overlay]}`} />
-      {/* Always-on bottom fade for legibility */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-      {/* Grain texture — animated cinematic feel */}
-      <div
-        className="grain absolute inset-0 opacity-[0.08] mix-blend-overlay pointer-events-none"
-        style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }}
-      />
-
-      <div className={`relative z-10 w-full px-4 sm:px-8 lg:px-12 pt-6 sm:pt-0 flex flex-col ${contentAlign[overlay]}`}>
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-white/12 backdrop-blur-sm border border-white/20 rounded-full mb-2 sm:mb-4">
-          <span className="text-[10px] sm:text-[11px] text-white/90 font-bold uppercase tracking-widest">{badge}</span>
-        </div>
-
-        {/* Title */}
-        <h1 className="font-display text-xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight sm:mb-3">
-          {title}
-          {titleHighlight && (
-            <><span className="hidden sm:inline"><br /></span><span className="sm:hidden"> </span><span className="text-gradient-gold">{titleHighlight}</span></>
+        <div className="relative z-10 px-4 pt-4 pb-5 border-b border-border/60">
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-gold/80 mb-1.5">
+            {badge}
+          </p>
+          <h1 className="font-display text-[22px] font-bold text-text-primary leading-snug">
+            {title}
+            {titleHighlight && (
+              <> <span className="text-gradient-gold">{titleHighlight}</span></>
+            )}
+          </h1>
+          {cta && (
+            <Link
+              href={cta.href}
+              className="inline-flex items-center gap-1 mt-2.5 text-xs font-semibold text-gold/70 hover:text-gold transition-colors"
+            >
+              {cta.label} <ArrowRight size={11} />
+            </Link>
           )}
-        </h1>
-
-        {/* Description — hidden on mobile */}
-        <p className="hidden sm:block text-white/65 text-sm sm:text-base leading-relaxed mb-5 max-w-xl">
-          {description}
-        </p>
-
-        {/* Stats — hidden on mobile */}
-        {stats && stats.length > 0 && (
-          <div className="hidden sm:flex items-center gap-6 mb-6">
-            {stats.map((s, i) => (
-              <div key={i} className="flex items-center gap-5">
-                <div>
-                  <div className="text-xl font-bold text-white font-display">{s.value}</div>
-                  <div className="text-[11px] text-white/50 uppercase tracking-widest">{s.label}</div>
-                </div>
-                {i < stats.length - 1 && <span className="text-white/20 text-lg">·</span>}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* CTAs — hidden on mobile */}
-        {(cta || ctaSecondary) && (
-          <div className="hidden sm:flex flex-wrap gap-3">
-            {cta && (
-              <Link
-                href={cta.href}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm"
-              >
-                {cta.label} <ArrowRight size={14} />
-              </Link>
-            )}
-            {ctaSecondary && (
-              <Link
-                href={ctaSecondary.href}
-                className="inline-flex items-center gap-2 px-5 py-2.5 border border-white/25 text-white/85 font-semibold rounded-xl hover:border-white/50 hover:text-white transition-all text-sm"
-              >
-                {ctaSecondary.label}
-              </Link>
-            )}
-          </div>
-        )}
+        </div>
       </div>
-    </div>
+
+      {/* ── Desktop: full cinematic hero ── */}
+      <div className={`hidden sm:flex relative overflow-hidden ${heights[height]} items-center`}>
+        <Image
+          src={image}
+          alt={title}
+          fill
+          priority
+          unoptimized
+          className="object-cover"
+          style={{ objectPosition: imagePosition }}
+          sizes="100vw"
+        />
+        <div className={`absolute inset-0 ${overlayGradients[overlay]}`} />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+        <div
+          className="grain absolute inset-0 opacity-[0.08] mix-blend-overlay pointer-events-none"
+          style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }}
+        />
+
+        <div className={`relative z-10 w-full px-8 lg:px-12 flex flex-col ${contentAlign[overlay]}`}>
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/12 backdrop-blur-sm border border-white/20 rounded-full mb-4">
+            <span className="text-[11px] text-white/90 font-bold uppercase tracking-widest">{badge}</span>
+          </div>
+
+          <h1 className="font-display text-4xl lg:text-5xl font-bold text-white leading-tight mb-3">
+            {title}
+            {titleHighlight && (
+              <><br /><span className="text-gradient-gold">{titleHighlight}</span></>
+            )}
+          </h1>
+
+          <p className="text-white/65 text-base leading-relaxed mb-5 max-w-xl">
+            {description}
+          </p>
+
+          {stats && stats.length > 0 && (
+            <div className="flex items-center gap-6 mb-6">
+              {stats.map((s, i) => (
+                <div key={i} className="flex items-center gap-5">
+                  <div>
+                    <div className="text-xl font-bold text-white font-display">{s.value}</div>
+                    <div className="text-[11px] text-white/50 uppercase tracking-widest">{s.label}</div>
+                  </div>
+                  {i < stats.length - 1 && <span className="text-white/20 text-lg">·</span>}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {(cta || ctaSecondary) && (
+            <div className="flex flex-wrap gap-3">
+              {cta && (
+                <Link
+                  href={cta.href}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm"
+                >
+                  {cta.label} <ArrowRight size={14} />
+                </Link>
+              )}
+              {ctaSecondary && (
+                <Link
+                  href={ctaSecondary.href}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 border border-white/25 text-white/85 font-semibold rounded-xl hover:border-white/50 hover:text-white transition-all text-sm"
+                >
+                  {ctaSecondary.label}
+                </Link>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   );
 }
