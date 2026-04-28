@@ -1,6 +1,5 @@
 "use client";
 
-import "leaflet/dist/leaflet.css";
 import { useEffect, useRef } from "react";
 
 type Location = {
@@ -198,6 +197,16 @@ export default function LocationMap({
     }
   };
 
+  // Inject Leaflet CSS once (avoids Next.js SSR issues with static CSS import)
+  useEffect(() => {
+    if (document.getElementById("leaflet-css")) return;
+    const link = document.createElement("link");
+    link.id = "leaflet-css";
+    link.rel = "stylesheet";
+    link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+    document.head.appendChild(link);
+  }, []);
+
   // Init map
   useEffect(() => {
     if (typeof window === "undefined" || !mapRef.current) return;
@@ -214,7 +223,7 @@ export default function LocationMap({
       });
 
       L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
         {
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
           subdomains: "abcd",
