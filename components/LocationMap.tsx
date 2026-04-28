@@ -223,10 +223,9 @@ export default function LocationMap({
       });
 
       L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+        "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
         {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
-          subdomains: "abcd",
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
           maxZoom: 19,
         }
       ).addTo(map);
@@ -318,6 +317,7 @@ export default function LocationMap({
         .cine-popup .leaflet-popup-tip { background: #1a1a1a !important; }
         .cine-popup .leaflet-popup-content { margin: 0 !important; width: auto !important; }
         .leaflet-container { background: #0d0d0d !important; }
+        .leaflet-tile-pane { filter: invert(100%) hue-rotate(180deg) brightness(85%) contrast(85%) saturate(50%); }
         .leaflet-control-attribution {
           background: rgba(13,13,13,0.8) !important;
           color: #666 !important;
