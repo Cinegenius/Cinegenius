@@ -62,7 +62,7 @@ export default function CategoryHero({
           style={{ objectPosition: imagePosition }}
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-bg-primary/88" />
+        <div className="absolute inset-0 bg-bg-primary/65" />
         {/* Gold left accent line */}
         <div className="absolute top-0 left-0 bottom-0 w-[3px] bg-gradient-to-b from-gold/80 via-gold/30 to-transparent" />
 
