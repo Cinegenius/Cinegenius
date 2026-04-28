@@ -47,14 +47,13 @@ export default async function ProjectCategoryPage({ config }: { config: Category
   );
 
   return (
-    <div className="pt-16 min-h-screen bg-bg-primary">
+    <div className="pt-16 min-h-screen">
 
-      {/* ── Hero ── */}
-      {/* Height scales with viewport: narrow on mobile, taller on desktop so the image isn't a thin strip */}
-      <div className="relative overflow-hidden h-[300px] sm:h-[400px] md:h-[460px] lg:h-[520px] xl:h-[580px]">
+      {/* ── Fixed background image ── */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
         <Image
           src={config.image}
-          alt={config.label}
+          alt=""
           fill
           priority
           unoptimized
@@ -62,112 +61,118 @@ export default async function ProjectCategoryPage({ config }: { config: Category
           style={{ objectPosition: config.imagePosition ?? "center center" }}
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-black/20" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-
-        <div className="absolute inset-0 z-10 flex items-center px-4 sm:px-8 lg:px-12">
-          <div className="w-full">
-            <Link
-              href="/projects"
-              className="inline-flex items-center gap-1.5 text-white/60 hover:text-white text-xs mb-5 transition-colors"
-            >
-              <ArrowLeft size={12} /> Alle Projekte
-            </Link>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/12 backdrop-blur-sm border border-white/20 rounded-full mb-4">
-              <span className="text-[11px] text-white/90 font-bold uppercase tracking-widest">{config.badge}</span>
-            </div>
-            <h1 className="font-display text-3xl sm:text-5xl font-bold text-white leading-tight mb-3">
-              {config.headline}<br />
-              <span className="text-gradient-gold">{config.highlight}</span>
-            </h1>
-            <p className="text-white/65 text-sm sm:text-base max-w-xl leading-relaxed">
-              {config.description}
-            </p>
-          </div>
-        </div>
+        {/* Dark overlay — heavier at bottom so cards are readable */}
+        <div className="absolute inset-0 bg-bg-primary/55" />
+        <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/30 via-transparent to-bg-primary/80" />
       </div>
 
-      {/* ── Content ── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      {/* ── Scrollable content ── */}
+      <div className="relative z-10">
 
-        {/* Back + count */}
-        <div className="flex items-center justify-between mb-6">
-          <p className="text-sm text-text-muted">
-            <span className="font-semibold text-text-primary">{projects.length}</span> Projekt{projects.length !== 1 ? "e" : ""}
-          </p>
+        {/* ── Compact header ── */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-6">
           <Link
-            href="/dashboard/projects/new"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-xs"
+            href="/projects"
+            className="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-xs mb-6 transition-colors"
           >
-            + Projekt eintragen
+            <ArrowLeft size={12} /> Alle Projekte
           </Link>
+
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full mb-3">
+                <span className="text-[11px] text-white/80 font-bold uppercase tracking-widest">{config.badge}</span>
+              </div>
+              <h1 className="font-display text-2xl sm:text-3xl font-bold text-white leading-tight mb-1.5">
+                {config.headline} <span className="text-gradient-gold">{config.highlight}</span>
+              </h1>
+              <p className="text-white/55 text-sm max-w-xl leading-relaxed">
+                {config.description}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 shrink-0">
+              <span className="text-sm text-white/40">
+                <span className="font-semibold text-white/70">{projects.length}</span> Projekt{projects.length !== 1 ? "e" : ""}
+              </span>
+              <Link
+                href="/projects/neu"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-xs whitespace-nowrap"
+              >
+                + Projekt eintragen
+              </Link>
+            </div>
+          </div>
         </div>
 
-        {projects.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-            {projects.map((p: { id: string; title: string; year: number | null; type: string | null; director: string | null; poster_url: string | null }) => (
-              <Link
-                key={p.id}
-                href={`/projects/${p.id}`}
-                className="group card-hover rounded-xl overflow-hidden border border-border bg-bg-elevated block"
-              >
-                <div className="relative aspect-[2/3] overflow-hidden">
-                  {p.poster_url ? (
-                    <Image
-                      src={p.poster_url}
-                      alt={p.title}
-                      fill
-                      className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
-                      sizes="(max-width:640px) 50vw,(max-width:1024px) 25vw,16vw"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 bg-bg-secondary flex items-center justify-center">
-                      <Clapperboard size={28} className="text-text-muted/30" />
+        {/* ── Projects grid ── */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+          {projects.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+              {projects.map((p: { id: string; title: string; year: number | null; type: string | null; director: string | null; poster_url: string | null }) => (
+                <Link
+                  key={p.id}
+                  href={`/projects/${p.id}`}
+                  className="group rounded-xl overflow-hidden border border-white/8 bg-black/30 backdrop-blur-sm hover:border-white/20 hover:bg-black/45 transition-all block"
+                >
+                  <div className="relative aspect-[2/3] overflow-hidden">
+                    {p.poster_url ? (
+                      <Image
+                        src={p.poster_url}
+                        alt={p.title}
+                        fill
+                        className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                        sizes="(max-width:640px) 50vw,(max-width:1024px) 25vw,16vw"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-white/5 flex items-center justify-center">
+                        <Clapperboard size={28} className="text-white/20" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-2.5">
+                      <p className="text-[11px] text-white font-semibold leading-tight line-clamp-2">{p.title}</p>
+                      {p.year && <p className="text-[10px] text-white/50 mt-0.5">{p.year}</p>}
+                    </div>
+                  </div>
+                  {p.type && (
+                    <div className="px-2 py-1.5">
+                      <span className={`inline-block text-[10px] font-medium px-1.5 py-0.5 rounded border ${typeColor(p.type)}`}>
+                        {p.type}
+                      </span>
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-2.5">
-                    <p className="text-[11px] text-white font-semibold leading-tight line-clamp-2">{p.title}</p>
-                    {p.year && <p className="text-[10px] text-white/55 mt-0.5">{p.year}</p>}
-                  </div>
-                </div>
-                {p.type && (
-                  <div className="px-2 py-1.5">
-                    <span className={`inline-block text-[10px] font-medium px-1.5 py-0.5 rounded border ${typeColor(p.type)}`}>
-                      {p.type}
-                    </span>
-                  </div>
-                )}
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-24">
-            <div className="w-16 h-16 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center mx-auto mb-5">
-              <Clapperboard size={24} className="text-gold" />
+                </Link>
+              ))}
             </div>
-            <h2 className="font-display text-2xl font-bold text-text-primary mb-3">
-              Noch keine {config.label}-Projekte
-            </h2>
-            <p className="text-text-muted mb-7 max-w-md mx-auto">
-              Sei der Erste — trag dein Projekt ein und zeig der Community deine Arbeit.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link
-                href="/dashboard/projects/new"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm"
-              >
-                Projekt eintragen <ArrowRight size={14} />
-              </Link>
-              <Link
-                href="/projects"
-                className="inline-flex items-center gap-2 px-6 py-3 border border-border text-text-secondary rounded-xl hover:border-gold/40 hover:text-gold transition-all text-sm"
-              >
-                Alle Projekte ansehen
-              </Link>
+          ) : (
+            <div className="text-center py-24">
+              <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 flex items-center justify-center mx-auto mb-5">
+                <Clapperboard size={24} className="text-white/60" />
+              </div>
+              <h2 className="font-display text-2xl font-bold text-white mb-3">
+                Noch keine {config.label}-Projekte
+              </h2>
+              <p className="text-white/50 mb-7 max-w-md mx-auto">
+                Sei der Erste — trag dein Projekt ein und zeig der Community deine Arbeit.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link
+                  href="/projects/neu"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm"
+                >
+                  Projekt eintragen <ArrowRight size={14} />
+                </Link>
+                <Link
+                  href="/projects"
+                  className="inline-flex items-center gap-2 px-6 py-3 border border-white/20 text-white/70 rounded-xl hover:border-white/40 hover:text-white transition-all text-sm"
+                >
+                  Alle Projekte ansehen
+                </Link>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
