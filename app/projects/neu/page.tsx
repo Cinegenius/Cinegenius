@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  ArrowLeft, Clapperboard, Loader2, Check, Search, Plus,
+  ArrowLeft, Clapperboard, Loader2, Check, Search, Plus, X,
   ChevronRight, ShieldCheck, AlertCircle,
 } from "lucide-react";
 import ProfileGuard from "@/components/ProfileGuard";
@@ -96,6 +96,25 @@ export default function NeuesProjektPage() {
     productionCompany: "",
   });
 
+  // Team members (ghost profiles)
+  type TeamMember = { name: string; role: string };
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [memberName, setMemberName] = useState("");
+  const [memberRole, setMemberRole] = useState("");
+
+  function addMember() {
+    const name = memberName.trim();
+    const role = memberRole.trim();
+    if (!name || !role) return;
+    setTeamMembers((prev) => [...prev, { name, role }]);
+    setMemberName("");
+    setMemberRole("");
+  }
+
+  function removeMember(idx: number) {
+    setTeamMembers((prev) => prev.filter((_, i) => i !== idx));
+  }
+
   function openCreate() {
     setForm((f) => ({ ...f, title: query }));
     setShowCreate(true);
@@ -121,7 +140,34 @@ export default function NeuesProjektPage() {
       });
       const json = await res.json();
       if (!res.ok) { setCreateError(json.error ?? "Fehler"); return; }
-      router.push(`/projects/${json.project.id}`);
+
+      const projectId = json.project.id;
+
+      // Add ghost profile credits for each team member
+      if (teamMembers.length > 0) {
+        await Promise.allSettled(
+          teamMembers.map(async (member) => {
+            const profileRes = await fetch("/api/unclaimed-profiles", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name: member.name, primary_role: member.role }),
+            });
+            if (!profileRes.ok) return;
+            const profileJson = await profileRes.json();
+            await fetch("/api/project-credits", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                project_id: projectId,
+                role: member.role,
+                unclaimed_profile_id: profileJson.profile.id,
+              }),
+            });
+          })
+        );
+      }
+
+      router.push(`/projects/${projectId}`);
     } catch {
       setCreateError("Netzwerkfehler — bitte erneut versuchen");
     } finally {
@@ -383,6 +429,63 @@ export default function NeuesProjektPage() {
                     placeholder="Kurzbeschreibung, Festivalteilnahmen …"
                     className="w-full px-4 py-3 bg-bg-secondary border border-border rounded-xl text-text-primary placeholder-text-muted focus:outline-none focus:border-gold transition-colors resize-none"
                   />
+                </div>
+
+                {/* Team members (ghost profiles) */}
+                <div>
+                  <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">
+                    Teammitglieder <span className="text-text-muted font-normal normal-case">(optional — auch nicht registrierte Personen)</span>
+                  </label>
+
+                  {teamMembers.length > 0 && (
+                    <div className="mb-3 space-y-2">
+                      {teamMembers.map((m, idx) => (
+                        <div key={idx} className="flex items-center gap-2 px-3 py-2 bg-bg-elevated border border-border rounded-xl">
+                          <div className="w-6 h-6 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
+                            <span className="text-[9px] font-bold text-gold">{m.name.charAt(0).toUpperCase()}</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <span className="text-sm text-text-primary truncate">{m.name}</span>
+                            <span className="text-text-muted mx-1.5">·</span>
+                            <span className="text-xs text-text-muted">{m.role}</span>
+                          </div>
+                          <button type="button" onClick={() => removeMember(idx)} className="text-text-muted hover:text-red-400 transition-colors shrink-0">
+                            <X size={13} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={memberName}
+                      onChange={(e) => setMemberName(e.target.value)}
+                      placeholder="Name der Person"
+                      className="flex-1 min-w-0 px-3 py-2.5 bg-bg-secondary border border-border rounded-xl text-sm text-text-primary placeholder-text-muted focus:outline-none focus:border-gold transition-colors"
+                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addMember(); } }}
+                    />
+                    <div className="w-40 shrink-0">
+                      <RoleDropdown
+                        value={memberRole}
+                        onChange={setMemberRole}
+                        options={ALL_ROLES}
+                        placeholder="Rolle…"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={addMember}
+                      disabled={!memberName.trim() || !memberRole.trim()}
+                      className="px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-text-secondary hover:border-gold hover:text-gold transition-colors disabled:opacity-40 shrink-0"
+                    >
+                      <Plus size={14} />
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-text-muted mt-1.5">
+                    Sobald sie sich bei CineGenius anmelden, können sie das Profil übernehmen.
+                  </p>
                 </div>
 
                 {createError && (

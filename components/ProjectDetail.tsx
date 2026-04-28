@@ -28,13 +28,20 @@ import RoleDropdown from "@/components/RoleDropdown";
 
 type Credit = {
   id: string;
-  user_id: string;
+  user_id: string | null;
+  unclaimed_profile_id?: string | null;
   role: string;
   created_at: string;
   profile: {
     display_name: string;
     avatar_url: string | null;
     role: string | null;
+  } | null;
+  ghost?: {
+    name: string;
+    slug: string;
+    avatar_url: string | null;
+    primary_role: string | null;
   } | null;
 };
 
@@ -347,7 +354,7 @@ export default function ProjectDetail({
       const r2 = await fetch(`/api/projects/${project.id}`);
       const d2 = await r2.json();
       setCredits(d2.credits);
-      setMyCredit(d2.credits.find((c: Credit) => c.user_id === currentUserId) ?? null);
+      setMyCredit(d2.credits.find((c: Credit) => c.user_id && c.user_id === currentUserId) ?? null);
       setShowJoin(false); setJoinRole(""); setJoinCharacter(""); setJoinNote("");
     } catch (e: unknown) { setJoinError(e instanceof Error ? e.message : "Fehler"); }
     finally { setJoining(false); }
@@ -717,15 +724,19 @@ export default function ProjectDetail({
                             ? <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border shrink-0 w-8 text-center ${badge.cls}`}>{badge.text}</span>
                             : <span className="text-[10px] text-text-muted shrink-0 w-8 truncate text-center" title={roleLabel}>{roleLabel?.substring(0, 3).toUpperCase()}</span>
                           }
-                          <Link href={`/profile/${credit.user_id}`} className="flex items-center gap-2 min-w-0 flex-1 group/link">
+                          <Link
+                            href={credit.ghost ? `/person/${credit.ghost.slug}` : `/profile/${credit.user_id}`}
+                            className="flex items-center gap-2 min-w-0 flex-1 group/link"
+                          >
                             <div className="w-6 h-6 rounded-full overflow-hidden bg-bg-elevated border border-border shrink-0">
-                              {credit.profile?.avatar_url
+                              {(credit.profile?.avatar_url ?? credit.ghost?.avatar_url)
                                 // eslint-disable-next-line @next/next/no-img-element
-                                ? <img src={credit.profile.avatar_url} alt="" className="w-full h-full object-cover" />
-                                : <div className="w-full h-full flex items-center justify-center bg-rose-500/10"><span className="text-[8px] font-bold text-rose-300">{(credit.profile?.display_name ?? "?").charAt(0).toUpperCase()}</span></div>
+                                ? <img src={credit.profile?.avatar_url ?? credit.ghost?.avatar_url ?? ""} alt="" className="w-full h-full object-cover" />
+                                : <div className="w-full h-full flex items-center justify-center bg-rose-500/10"><span className="text-[8px] font-bold text-rose-300">{(credit.profile?.display_name ?? credit.ghost?.name ?? "?").charAt(0).toUpperCase()}</span></div>
                               }
                             </div>
-                            <span className="text-sm text-text-primary group-hover/link:text-rose-300 transition-colors truncate">{credit.profile?.display_name ?? "Unbekannt"}</span>
+                            <span className="text-sm text-text-primary group-hover/link:text-rose-300 transition-colors truncate">{credit.profile?.display_name ?? credit.ghost?.name ?? "Unbekannt"}</span>
+                            {credit.ghost && <span className="text-[9px] text-text-muted border border-border rounded px-1 shrink-0">nicht registriert</span>}
                             <ExternalLink size={10} className="text-text-muted shrink-0 opacity-0 group-hover/link:opacity-100 transition-opacity" />
                           </Link>
                           {characterName
@@ -761,15 +772,19 @@ export default function ProjectDetail({
                             return (
                               <div key={credit.id} className="grid grid-cols-[1fr_1.5fr_1fr] px-5 py-2.5 border-t border-border/30 hover:bg-bg-elevated/40 transition-colors items-center">
                                 <span className="text-xs text-text-muted truncate pr-4">{roleLabel}</span>
-                                <Link href={`/profile/${credit.user_id}`} className="flex items-center gap-2.5 min-w-0 group/link">
+                                <Link
+                                  href={credit.ghost ? `/person/${credit.ghost.slug}` : `/profile/${credit.user_id}`}
+                                  className="flex items-center gap-2.5 min-w-0 group/link"
+                                >
                                   <div className="w-6 h-6 rounded-full overflow-hidden bg-bg-elevated border border-border shrink-0">
-                                    {credit.profile?.avatar_url
+                                    {(credit.profile?.avatar_url ?? credit.ghost?.avatar_url)
                                       // eslint-disable-next-line @next/next/no-img-element
-                                      ? <img src={credit.profile.avatar_url} alt="" className="w-full h-full object-cover" />
-                                      : <div className="w-full h-full flex items-center justify-center bg-gold/10"><span className="text-[8px] font-bold text-gold">{(credit.profile?.display_name ?? "?").charAt(0).toUpperCase()}</span></div>
+                                      ? <img src={credit.profile?.avatar_url ?? credit.ghost?.avatar_url ?? ""} alt="" className="w-full h-full object-cover" />
+                                      : <div className="w-full h-full flex items-center justify-center bg-gold/10"><span className="text-[8px] font-bold text-gold">{(credit.profile?.display_name ?? credit.ghost?.name ?? "?").charAt(0).toUpperCase()}</span></div>
                                     }
                                   </div>
-                                  <span className="text-sm text-text-primary group-hover/link:text-gold transition-colors truncate">{credit.profile?.display_name ?? "Unbekannt"}</span>
+                                  <span className="text-sm text-text-primary group-hover/link:text-gold transition-colors truncate">{credit.profile?.display_name ?? credit.ghost?.name ?? "Unbekannt"}</span>
+                                  {credit.ghost && <span className="text-[9px] text-text-muted border border-border rounded px-1 shrink-0 ml-0.5">nicht registriert</span>}
                                   <ExternalLink size={10} className="text-text-muted shrink-0 opacity-0 group-hover/link:opacity-100 transition-opacity ml-0.5" />
                                 </Link>
                                 <span className="text-xs text-text-muted truncate pl-2">{note ?? ""}</span>
