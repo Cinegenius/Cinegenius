@@ -19,7 +19,7 @@ export default function WerbungPage() {
       description: "TV-Spots, Online-Ads, Imagefilme — Werbeprojekte von Agenturen und Produktionsfirmen im DACH-Raum.",
       image: "https://images.unsplash.com/photo-1535223289827-42f1e9919769?w=1600&q=90",
       imagePosition: "center 50%",
-      typeKeywords: ["werbefilm", "werbung", "commercial", "spot", "imagefilm"],
+      typeKeywords: ["Werbefilm"],
     }} />
   );
 }

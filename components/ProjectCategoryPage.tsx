@@ -11,7 +11,7 @@ export interface CategoryConfig {
   description: string;
   image: string;
   imagePosition?: string;
-  typeKeywords: string[]; // matched against project.type (case-insensitive includes)
+  typeKeywords: string[]; // exact case-insensitive match against project.type
   badge: string;
 }
 
@@ -42,7 +42,7 @@ export default async function ProjectCategoryPage({ config }: { config: Category
 
   const projects = (allProjects ?? []).filter((p: { type: string | null }) =>
     config.typeKeywords.some((kw) =>
-      (p.type ?? "").toLowerCase().includes(kw.toLowerCase())
+      (p.type ?? "").toLowerCase() === kw.toLowerCase()
     )
   );
 

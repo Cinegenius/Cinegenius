@@ -19,7 +19,7 @@ export default function MusikvideoPAge() {
       description: "Klassische Musikvideos, Lyric-Videos, Live-Performances und Künstler-Dokumentationen.",
       image: "https://images.unsplash.com/photo-1501612780327-45045538702b?w=1600&q=90",
       imagePosition: "center 40%",
-      typeKeywords: ["musikvideo", "musik", "video", "konzert", "band", "artist"],
+      typeKeywords: ["Musikvideo"],
     }} />
   );
 }

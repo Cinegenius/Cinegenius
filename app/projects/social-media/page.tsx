@@ -19,7 +19,7 @@ export default function SocialMediaPage() {
       description: "Instagram Reels, TikTok, YouTube, Podcasts — Content-Projekte von Creatorn und Influencern.",
       image: "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=1600&q=90",
       imagePosition: "center 40%",
-      typeKeywords: ["social", "tiktok", "instagram", "reel", "youtube", "content", "podcast", "influencer"],
+      typeKeywords: ["Social Media"],
     }} />
   );
 }

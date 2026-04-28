@@ -19,7 +19,7 @@ export default function DokumentationPage() {
       description: "Gesellschaft, Natur, Geschichte, Menschen — Dokumentarfilme und Reportagen aus dem deutschsprachigen Raum.",
       image: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=1600&q=90",
       imagePosition: "center 40%",
-      typeKeywords: ["dokumentation", "dokumentar", "reportage", "doku", "portrait"],
+      typeKeywords: ["Dokumentation"],
     }} />
   );
 }
