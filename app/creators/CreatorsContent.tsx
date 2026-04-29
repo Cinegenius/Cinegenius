@@ -1256,18 +1256,15 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               </div>
             )}
 
-            {/* ── Vendors: compact section ── */}
-            {filteredVendors.length > 0 && (
-              <div className="mt-12">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="h-px flex-1 bg-border" />
-                  <p className="text-xs uppercase tracking-widest text-text-muted font-semibold shrink-0">
-                    Locations &amp; Equipment · {filteredVendors.length} Anbieter
-                  </p>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
+            {/* ── Vendors: compact section, split by type ── */}
+            {filteredVendors.length > 0 && (() => {
+              const locationVendors  = filteredVendors.filter((c) => getPositions(c).some((p) => p.toLowerCase().includes("location")));
+              const equipmentVendors = filteredVendors.filter((c) => getPositions(c).some((p) => p.toLowerCase().includes("equipment") || p.toLowerCase().includes("verlei")));
+              const otherVendors     = filteredVendors.filter((c) => !locationVendors.includes(c) && !equipmentVendors.includes(c));
+
+              const VendorChips = ({ list }: { list: typeof filteredVendors }) => (
                 <div className="flex flex-wrap gap-2">
-                  {filteredVendors.map((c) => {
+                  {list.map((c) => {
                     const href = c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`;
                     return (
                       <Link key={c.id} href={href} suppressHydrationWarning
@@ -1292,8 +1289,41 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                     );
                   })}
                 </div>
-              </div>
-            )}
+              );
+
+              return (
+                <div className="mt-12 space-y-6">
+                  <div className="h-px bg-border" />
+
+                  {locationVendors.length > 0 && (
+                    <div>
+                      <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3">
+                        📍 Location Anbieter · {locationVendors.length}
+                      </p>
+                      <VendorChips list={locationVendors} />
+                    </div>
+                  )}
+
+                  {equipmentVendors.length > 0 && (
+                    <div>
+                      <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3">
+                        🎬 Equipment Verleiher · {equipmentVendors.length}
+                      </p>
+                      <VendorChips list={equipmentVendors} />
+                    </div>
+                  )}
+
+                  {otherVendors.length > 0 && (
+                    <div>
+                      <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3">
+                        Weitere Anbieter · {otherVendors.length}
+                      </p>
+                      <VendorChips list={otherVendors} />
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
           </div>
         );
