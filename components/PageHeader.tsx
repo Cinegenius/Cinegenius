@@ -29,8 +29,8 @@ export default function PageHeader({
           sizes="100vw"
         />
         {/* Left-to-right dark fade so text stays readable, image visible on right */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/40 to-transparent" />
       </div>
 
       {/* Content */}
