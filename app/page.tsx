@@ -180,13 +180,6 @@ export default async function HomePage() {
     { icon: Clapperboard, title: t("pillarProjectsTitle"),    desc: t("pillarProjectsDesc"),    href: "/projects",  pillarKey: "projekt",   accent: "from-rose-900/70",    insertHref: "/projects",                 insertLabel: t("pillarProjectsCta"),  imgPos: "50% 50%" },
   ];
 
-  const useCases = [
-    { title: t("usecase1Title"), desc: t("usecase1Desc"), image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=85", cta: t("usecase1Cta"), href: "/inserat" },
-    { title: t("usecase2Title"), desc: t("usecase2Desc"), image: "https://images.unsplash.com/photo-1625690303837-654c9666d2d0?q=80&w=1740&auto=format&fit=crop", cta: t("usecase2Cta"), href: "/creators" },
-    { title: t("usecase3Title"), desc: t("usecase3Desc"), image: "https://images.unsplash.com/photo-1776437209399-51c80373505e?q=80&w=870&auto=format&fit=crop", cta: t("usecase3Cta"), href: "/company-setup" },
-    { title: t("usecase4Title"), desc: t("usecase4Desc"), image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=85", cta: t("usecase4Cta"), href: "/inserat" },
-  ];
-
   const { liveStats, liveLocations, liveJobs, posterStrip, avatarStrip, locationStrip, pillarImages, companies, projects } = await getHomeData();
 
   return (
@@ -440,45 +433,6 @@ export default async function HomePage() {
               );
             })}
           </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════
-          USE CASES
-      ══════════════════════════════════════════════ */}
-      <section className="py-8 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 sm:mb-10 text-center sm:text-left">
-          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">{t("examplesLabel")}</p>
-          <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg mx-auto sm:mx-0">
-            {t("examplesTitle")}
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {useCases.map(({ title, desc, image, cta, href }) => (
-            <Link
-              key={href + title}
-              href={href}
-              className="group relative rounded-2xl overflow-hidden border border-border block"
-              style={{ minHeight: "280px" }}
-            >
-              <Image
-                src={image}
-                alt={title}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                sizes="(max-width:640px) 100vw,50vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/25 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-6">
-                <h3 className="font-display text-lg font-bold text-white mb-1.5 leading-tight">{title}</h3>
-                <p className="text-white/65 text-sm mb-4 leading-relaxed">{desc}</p>
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/15 backdrop-blur-sm border border-white/20 rounded-lg text-white text-xs font-semibold group-hover:bg-white/25 transition-colors">
-                  {cta} <ArrowRight size={12} />
-                </span>
-              </div>
-            </Link>
-          ))}
         </div>
       </section>
 
