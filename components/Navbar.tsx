@@ -197,8 +197,6 @@ export default function Navbar() {
       setUnreadMessages(0);
       return;
     }
-    setProfileDisplayName("");
-    setProfileAvatarUrl("");
 
     const controller = new AbortController();
     const { signal } = controller;
@@ -407,25 +405,27 @@ export default function Navbar() {
               >
                 <Search size={20} />
               </button>
-              {isLoaded && isSignedIn && (
-                <>
-                  <NotificationCenter />
-                  <Link
-                    href="/dashboard"
-                    className="w-7 h-7 rounded-full overflow-hidden border-2 border-gold/40 shrink-0 flex items-center justify-center bg-gold/10"
-                    title="Mein Profil"
-                  >
-                    {user?.imageUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={user.imageUrl} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-[10px] font-bold text-gold">
-                        {(user?.firstName ?? user?.emailAddresses?.[0]?.emailAddress ?? "?")[0].toUpperCase()}
-                      </span>
-                    )}
-                  </Link>
-                </>
-              )}
+              {isLoaded && isSignedIn && (() => {
+                const mobileAvatar = profileAvatarUrl || user?.imageUrl || "";
+                const mobileInitial = (profileDisplayName || user?.firstName || user?.emailAddresses?.[0]?.emailAddress || "?")[0].toUpperCase();
+                return (
+                  <>
+                    <NotificationCenter />
+                    <Link
+                      href="/dashboard"
+                      className="w-8 h-8 rounded-full overflow-hidden border-2 border-gold/40 shrink-0 flex items-center justify-center bg-gold/10"
+                      title="Mein Profil"
+                    >
+                      {mobileAvatar ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={mobileAvatar} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-[11px] font-bold text-gold">{mobileInitial}</span>
+                      )}
+                    </Link>
+                  </>
+                );
+              })()}
               <LanguageSwitcher />
               <button
                 className="w-9 h-9 flex items-center justify-center text-text-secondary hover:text-gold transition-colors"
