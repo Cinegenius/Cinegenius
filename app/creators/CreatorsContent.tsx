@@ -1114,154 +1114,191 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       </div>
 
       {/* ── Results ─────────────────────────────────────────────────────────── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 lg:pb-8">
+      {(() => {
+        const filteredCrew    = filtered.filter((c) => !c.isVendor);
+        const filteredVendors = filtered.filter((c) => c.isVendor);
+        const crewVisible     = filteredCrew.slice(0, visibleCount);
 
-        {/* Count — desktop only (mobile has Row 5) */}
-        <p className="hidden lg:block text-sm text-text-muted mb-5">
-          <span className="text-text-primary font-semibold">
-            {filtered.length} {filtered.length !== 1 ? "Profile" : "Profil"}
-          </span>{" "}
-          gefunden
-          {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
-          {filtered.length > visibleCount && (
-            <span className="text-text-muted"> · zeige {visibleCount}</span>
-          )}
-        </p>
+        return (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 lg:pb-8">
 
-        {filtered.length === 0 && (
-          <EmptyState
-            icon={Users}
-            title={allCreators.length === 0 ? "Noch keine Profile" : "Keine Profile gefunden"}
-            description={allCreators.length === 0 ? "Sei der Erste! Erstelle dein Profil und werde von Produktionen gefunden." : "Versuche andere Rollen, einen anderen Namen oder eine andere Stadt."}
-            action={allCreators.length === 0
-              ? { label: "Profil anlegen", onClick: () => window.location.href = "/profile" }
-              : { label: "Filter zurücksetzen", onClick: () => { setQuery(""); clearAll(); setAvailableOnly(false); setVendorOnly(false); setCityFilter(""); setCountryFilter(""); setLanguageFilter(""); } }
-            }
-          />
-        )}
+            {/* Count */}
+            <p className="hidden lg:block text-sm text-text-muted mb-5">
+              <span className="text-text-primary font-semibold">
+                {filteredCrew.length} {filteredCrew.length !== 1 ? "Crew-Profile" : "Crew-Profil"}
+              </span>
+              {filteredVendors.length > 0 && (
+                <span> · <span className="text-text-secondary">{filteredVendors.length} Anbieter</span></span>
+              )}
+              {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
+            </p>
 
-        {/* Card grid */}
-        <div className={viewMode === "grid" ? "grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3" : "space-y-2"}>
-          {filtered.slice(0, visibleCount).map((c) => {
-            const displayPositions = getPositions(c);
-
-            if (viewMode === "list") {
-              return (
-                <Link
-                  key={c.id}
-                  href={c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`}
-                  suppressHydrationWarning
-                  className="card-hover group flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:bg-bg-elevated transition-colors"
-                >
-                  <div className="relative shrink-0">
-                    {c.avatar ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img src={c.avatar} alt={c.name} loading="lazy" decoding="async"
-                        className="w-12 h-12 rounded-full object-cover border-2 border-border group-hover:border-gold transition-colors" />
-                    ) : (
-                      <div className="w-12 h-12 rounded-full bg-bg-elevated border-2 border-border flex items-center justify-center text-text-muted">
-                        <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <h3 className="font-semibold text-text-primary text-sm">{c.name}</h3>
-                      {c.verified && <CheckCircle size={12} className="text-success shrink-0" />}
-                    </div>
-                    <p className="text-xs text-gold truncate">{displayPositions.slice(0, 2).join(" · ")}</p>
-                    <p className="text-xs text-text-muted flex items-center gap-1 mt-0.5">
-                      <MapPin size={10} /> {c.location}
-                    </p>
-                  </div>
-                  {c.skills.length > 0 && (
-                    <div className="hidden sm:flex gap-1.5 shrink-0">
-                      {c.skills.slice(0, 2).map((s) => (
-                        <span key={s} className="text-[10px] px-2 py-0.5 bg-bg-elevated border border-border text-text-muted rounded-full">{s}</span>
-                      ))}
-                    </div>
-                  )}
-                </Link>
-              );
-            }
-
-            return (
-              <Link
-                key={c.id}
-                href={c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`}
-                suppressHydrationWarning
-                className="card-hover group rounded-xl border border-border bg-bg-secondary overflow-hidden block"
-              >
-                {/* Cover image — festes 4:5 Seitenverhältnis, alle Karten gleich groß */}
-                <div className="aspect-[4/5] overflow-hidden bg-bg-elevated">
-                  {c.image ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={c.image} alt={c.name} loading="lazy" decoding="async"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      style={{ objectPosition: c.focal_point ? `${c.focal_point.x}% ${c.focal_point.y}%` : "50% 33%" }} />
-                  ) : c.avatar ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={c.avatar} alt={c.name} loading="lazy" decoding="async"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      style={{ objectPosition: c.focal_point ? `${c.focal_point.x}% ${c.focal_point.y}%` : "50% 33%" }} />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-text-muted/20">
-                      <svg viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-                    </div>
-                  )}
-                </div>
-                <div className="p-3">
-                  <div className="min-w-0 mb-2">
-                    <div className="flex items-start justify-between gap-1 mb-0.5">
-                      <h3 className="font-semibold text-text-primary text-sm leading-tight truncate">{c.name}</h3>
-                      {c.verified && <CheckCircle size={12} className="text-success shrink-0 mt-0.5" />}
-                    </div>
-                    <div className="flex flex-wrap gap-1 mb-0.5">
-                      {displayPositions.slice(0, 1).map((p) => (
-                        <span key={p} className="text-[11px] text-gold font-medium truncate">{p}</span>
-                      ))}
-                    </div>
-                    {c.location && (
-                      <p className="text-[11px] text-text-muted flex items-center gap-0.5">
-                        <MapPin size={9} /> {c.location}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-end pt-2 border-t border-border">
-                    <span className="text-xs text-gold font-semibold group-hover:text-gold-light transition-colors">
-                      Anfragen →
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-
-        {(filtered.length > visibleCount || hasMoreFromApi) && (
-          <div className="mt-8 text-center">
-            <button
-              onClick={() => {
-                if (filtered.length > visibleCount) {
-                  setVisibleCount((v) => v + PAGE_SIZE);
-                } else {
-                  // Alle gefilterten Profile sichtbar — nächste Seite vom Server laden
-                  loadMoreFromApi();
+            {/* Empty */}
+            {filteredCrew.length === 0 && filteredVendors.length === 0 && (
+              <EmptyState
+                icon={Users}
+                title={allCreators.length === 0 ? "Noch keine Profile" : "Keine Profile gefunden"}
+                description={allCreators.length === 0 ? "Sei der Erste! Erstelle dein Profil und werde von Produktionen gefunden." : "Versuche andere Rollen, einen anderen Namen oder eine andere Stadt."}
+                action={allCreators.length === 0
+                  ? { label: "Profil anlegen", onClick: () => window.location.href = "/profile" }
+                  : { label: "Filter zurücksetzen", onClick: () => { setQuery(""); clearAll(); setAvailableOnly(false); setVendorOnly(false); setCityFilter(""); setCountryFilter(""); setLanguageFilter(""); } }
                 }
-              }}
-              disabled={loadingMore}
-              className="px-8 py-3 border border-border text-sm font-semibold text-text-secondary hover:border-gold hover:text-gold rounded-xl transition-all disabled:opacity-50 flex items-center gap-2 mx-auto"
-            >
-              {loadingMore
-                ? <><span className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin inline-block" /> Lädt…</>
-                : filtered.length > visibleCount
-                  ? `Mehr laden · ${filtered.length - visibleCount} weitere`
-                  : "Weitere Profile laden"
-              }
-            </button>
+              />
+            )}
+
+            {/* ── Crew grid ── */}
+            {filteredCrew.length > 0 && (
+              <div className={viewMode === "grid" ? "grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3" : "space-y-2"}>
+                {crewVisible.map((c) => {
+                  const displayPositions = getPositions(c);
+                  const href = c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`;
+
+                  if (viewMode === "list") {
+                    return (
+                      <Link key={c.id} href={href} suppressHydrationWarning
+                        className="card-hover group flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:bg-bg-elevated transition-colors">
+                        <div className="relative shrink-0">
+                          {c.avatar ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img src={c.avatar} alt={c.name} loading="lazy" decoding="async"
+                              className="w-12 h-12 rounded-full object-cover border-2 border-border group-hover:border-gold transition-colors" />
+                          ) : (
+                            <div className="w-12 h-12 rounded-full bg-bg-elevated border-2 border-border flex items-center justify-center text-text-muted">
+                              <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <h3 className="font-semibold text-text-primary text-sm">{c.name}</h3>
+                            {c.verified && <CheckCircle size={12} className="text-success shrink-0" />}
+                          </div>
+                          <p className="text-xs text-gold truncate">{displayPositions.slice(0, 2).join(" · ")}</p>
+                          <p className="text-xs text-text-muted flex items-center gap-1 mt-0.5"><MapPin size={10} /> {c.location}</p>
+                        </div>
+                        {c.skills.length > 0 && (
+                          <div className="hidden sm:flex gap-1.5 shrink-0">
+                            {c.skills.slice(0, 2).map((s) => (
+                              <span key={s} className="text-[10px] px-2 py-0.5 bg-bg-elevated border border-border text-text-muted rounded-full">{s}</span>
+                            ))}
+                          </div>
+                        )}
+                      </Link>
+                    );
+                  }
+
+                  return (
+                    <Link key={c.id} href={href} suppressHydrationWarning
+                      className="card-hover group rounded-xl border border-border bg-bg-secondary overflow-hidden block">
+                      <div className="aspect-[4/5] overflow-hidden bg-bg-elevated">
+                        {c.image ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img src={c.image} alt={c.name} loading="lazy" decoding="async"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            style={{ objectPosition: c.focal_point ? `${c.focal_point.x}% ${c.focal_point.y}%` : "50% 33%" }} />
+                        ) : c.avatar ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img src={c.avatar} alt={c.name} loading="lazy" decoding="async"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            style={{ objectPosition: c.focal_point ? `${c.focal_point.x}% ${c.focal_point.y}%` : "50% 33%" }} />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-text-muted/20">
+                            <svg viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-3">
+                        <div className="min-w-0 mb-2">
+                          <div className="flex items-start justify-between gap-1 mb-0.5">
+                            <h3 className="font-semibold text-text-primary text-sm leading-tight truncate">{c.name}</h3>
+                            {c.verified && <CheckCircle size={12} className="text-success shrink-0 mt-0.5" />}
+                          </div>
+                          <div className="flex flex-wrap gap-1 mb-0.5">
+                            {displayPositions.slice(0, 1).map((p) => (
+                              <span key={p} className="text-[11px] text-gold font-medium truncate">{p}</span>
+                            ))}
+                          </div>
+                          {c.location && (
+                            <p className="text-[11px] text-text-muted flex items-center gap-0.5"><MapPin size={9} /> {c.location}</p>
+                          )}
+                        </div>
+                        <div className="flex items-center justify-end pt-2 border-t border-border">
+                          <span className="text-xs text-gold font-semibold group-hover:text-gold-light transition-colors">Anfragen →</span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Load more crew */}
+            {(filteredCrew.length > visibleCount || hasMoreFromApi) && (
+              <div className="mt-8 text-center">
+                <button
+                  onClick={() => {
+                    if (filteredCrew.length > visibleCount) {
+                      setVisibleCount((v) => v + PAGE_SIZE);
+                    } else {
+                      loadMoreFromApi();
+                    }
+                  }}
+                  disabled={loadingMore}
+                  className="px-8 py-3 border border-border text-sm font-semibold text-text-secondary hover:border-gold hover:text-gold rounded-xl transition-all disabled:opacity-50 flex items-center gap-2 mx-auto"
+                >
+                  {loadingMore
+                    ? <><span className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin inline-block" /> Lädt…</>
+                    : filteredCrew.length > visibleCount
+                      ? `Mehr laden · ${filteredCrew.length - visibleCount} weitere`
+                      : "Weitere Profile laden"
+                  }
+                </button>
+              </div>
+            )}
+
+            {/* ── Vendors: compact section ── */}
+            {filteredVendors.length > 0 && (
+              <div className="mt-12">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-px flex-1 bg-border" />
+                  <p className="text-xs uppercase tracking-widest text-text-muted font-semibold shrink-0">
+                    Locations &amp; Equipment · {filteredVendors.length} Anbieter
+                  </p>
+                  <div className="h-px flex-1 bg-border" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {filteredVendors.map((c) => {
+                    const href = c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`;
+                    return (
+                      <Link key={c.id} href={href} suppressHydrationWarning
+                        className="group flex items-center gap-3 p-3 rounded-xl border border-border bg-bg-secondary hover:border-border-light hover:bg-bg-elevated transition-all">
+                        {c.avatar ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img src={c.avatar} alt={c.name} loading="lazy" decoding="async"
+                            className="w-10 h-10 rounded-full object-cover border border-border shrink-0" />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-bg-elevated border border-border flex items-center justify-center text-text-muted shrink-0">
+                            <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-sm font-semibold text-text-primary truncate">{c.name}</p>
+                            {c.verified && <CheckCircle size={11} className="text-success shrink-0" />}
+                          </div>
+                          <p className="text-[11px] text-text-muted truncate">{getPositions(c)[0]} · {c.location.split(",")[0]}</p>
+                        </div>
+                        <span className="text-[11px] text-text-muted group-hover:text-gold transition-colors shrink-0">→</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
           </div>
-        )}
-      </div>
+        );
+      })()}
     </div>
   );
 }
