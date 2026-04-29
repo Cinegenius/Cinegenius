@@ -97,26 +97,29 @@ export default function ProjectsPage() {
       </div>
 
       {/* Header */}
-      <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-6 pb-5 max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-8 pb-8 max-w-7xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
           <div>
-            <p className="text-text-muted text-sm">
-              Hier zeigen Filmemacher, Creator und Agenturen ihre abgeschlossenen und laufenden Produktionen — als Portfolio und zur Teamsuche.
-            </p>
-            <p className="text-text-muted/60 text-xs mt-1">
-              Eigene Produktion eintragen → andere sehen deine Arbeit und können sich bewerben.
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full mb-3">
+              <span className="text-[11px] text-white/80 font-bold uppercase tracking-widest">Projekte</span>
+            </div>
+            <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight mb-2">
+              Filmografien &amp; <span className="text-gradient-gold">Produktionen</span>
+            </h1>
+            <p className="text-white/60 text-sm sm:text-base leading-relaxed max-w-xl">
+              Filmemacher, Creator und Agenturen zeigen ihre Arbeiten — als Portfolio und zur Teamsuche.
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <Link
               href="/projects/alle"
-              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-border text-text-muted rounded-xl hover:border-gold/40 hover:text-gold transition-all text-sm whitespace-nowrap"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-white/20 text-white/70 rounded-xl hover:border-white/40 hover:text-white transition-all text-sm whitespace-nowrap backdrop-blur-sm"
             >
               Alle durchsuchen <ArrowRight size={13} />
             </Link>
             <Link
               href="/projects/neu"
-              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm whitespace-nowrap"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm whitespace-nowrap"
             >
               <Plus size={13} /> Projekt eintragen
             </Link>
