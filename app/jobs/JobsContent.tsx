@@ -424,8 +424,9 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
       <div className="pt-16 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image src="https://images.unsplash.com/photo-1616469829941-c7200edec809?w=1600&q=90" alt="" fill unoptimized priority
-            className="object-cover opacity-20" style={{ objectPosition: "center 35%" }} sizes="100vw" />
-          <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/60 via-bg-primary/40 to-bg-primary/90" />
+            className="object-cover" style={{ objectPosition: "center 35%" }} sizes="100vw" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/50 to-transparent" />
         </div>
         <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-8 pb-8 max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">

@@ -24,11 +24,12 @@ export default function PageHeader({
       <div className="absolute inset-0 z-0">
         <Image
           src={image} alt="" fill unoptimized priority
-          className="object-cover opacity-20"
+          className="object-cover"
           style={{ objectPosition: imagePosition }}
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/60 via-bg-primary/40 to-bg-primary/90" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/50 to-transparent" />
       </div>
 
       {/* Content */}
