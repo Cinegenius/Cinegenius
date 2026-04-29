@@ -588,7 +588,7 @@ export default async function HomePage() {
               className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold mb-1.5">
                 <Camera size={10} /> {t("showcasePhoto")}
               </span>
               <p className="text-white font-semibold text-sm">{t("showcasePhotoDesc")}</p>
@@ -599,7 +599,7 @@ export default async function HomePage() {
               className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold mb-1.5">
                 <Zap size={10} /> {t("showcaseSocial")}
               </span>
               <p className="text-white font-semibold text-sm">{t("showcaseSocialDesc")}</p>
@@ -610,7 +610,7 @@ export default async function HomePage() {
               className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold mb-1.5">
                 <TrendingUp size={10} /> {t("showcaseAds")}
               </span>
               <p className="text-white font-semibold text-sm">{t("showcaseAdsDesc")}</p>
@@ -621,7 +621,7 @@ export default async function HomePage() {
               className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-semibold mb-1.5">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold mb-1.5">
                 <Play size={10} /> {t("showcaseBts")}
               </span>
               <p className="text-white font-semibold text-sm">{t("showcaseBtsDesc")}</p>
