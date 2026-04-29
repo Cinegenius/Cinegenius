@@ -1266,29 +1266,28 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                   </p>
                   <div className="h-px flex-1 bg-border" />
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                <div className="flex flex-wrap gap-2">
                   {filteredVendors.map((c) => {
                     const href = c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`;
                     return (
                       <Link key={c.id} href={href} suppressHydrationWarning
-                        className="group flex items-center gap-3 p-3 rounded-xl border border-border bg-bg-secondary hover:border-border-light hover:bg-bg-elevated transition-all">
+                        className="group inline-flex items-center gap-2.5 px-3 py-2 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 hover:bg-bg-elevated transition-all">
                         {c.avatar ? (
                           /* eslint-disable-next-line @next/next/no-img-element */
                           <img src={c.avatar} alt={c.name} loading="lazy" decoding="async"
-                            className="w-10 h-10 rounded-full object-cover border border-border shrink-0" />
+                            className="w-7 h-7 rounded-full object-cover border border-border shrink-0" />
                         ) : (
-                          <div className="w-10 h-10 rounded-full bg-bg-elevated border border-border flex items-center justify-center text-text-muted shrink-0">
-                            <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                          <div className="w-7 h-7 rounded-full bg-bg-elevated border border-border flex items-center justify-center text-text-muted shrink-0">
+                            <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
                           </div>
                         )}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <p className="text-sm font-semibold text-text-primary truncate">{c.name}</p>
-                            {c.verified && <CheckCircle size={11} className="text-success shrink-0" />}
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1">
+                            <p className="text-xs font-semibold text-text-primary whitespace-nowrap">{c.name}</p>
+                            {c.verified && <CheckCircle size={10} className="text-success shrink-0" />}
                           </div>
-                          <p className="text-[11px] text-text-muted truncate">{getPositions(c)[0]} · {c.location.split(",")[0]}</p>
+                          <p className="text-[10px] text-text-muted whitespace-nowrap">{c.location.split(",")[0]}</p>
                         </div>
-                        <span className="text-[11px] text-text-muted group-hover:text-gold transition-colors shrink-0">→</span>
                       </Link>
                     );
                   })}
