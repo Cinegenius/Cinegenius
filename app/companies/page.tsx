@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import CompaniesContent from "./CompaniesContent";
-import CategoryHero from "@/components/CategoryHero";
+import PageHeader from "@/components/PageHeader";
 
 export const metadata: Metadata = {
   title: "Firmenverzeichnis — Verleiher, Studios & Agenturen",
@@ -25,15 +25,15 @@ export default async function CompaniesPage() {
 
   return (
     <>
-      <CategoryHero
+      <PageHeader
           badge="Firmen & Dienstleister"
           title="Studios, Verleiher"
           titleHighlight="& Agenturen"
           description="Kameraverleih, Tonstudios, Postproduktion, Casting-Agenturen — alle Filmdienstleister im DACH-Raum."
           image="https://images.unsplash.com/photo-1542204165-65bf26472b9b?w=1600&q=90"
           imagePosition="center 30%"
-          overlay="left"
-          height="sm"
+          ctaSecondary={{ label: "Alle durchsuchen", href: "/companies" }}
+          cta={{ label: "+ Firma eintragen", href: "/company-setup" }}
         />
       <CompaniesContent initialCompanies={data ?? []} />
     </>

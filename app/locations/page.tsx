@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
 import LocationsContent from "./LocationsContent";
-import CategoryHero from "@/components/CategoryHero";
+import PageHeader from "@/components/PageHeader";
 import { getTranslations } from "next-intl/server";
 
 export const revalidate = 60;
@@ -96,15 +96,13 @@ export default async function LocationsPage() {
 
   return (
     <>
-      <CategoryHero
+      <PageHeader
           badge="Locations"
           title={t("heroTitle")}
           titleHighlight={t("heroTitleHighlight")}
           description={t("heroDesc")}
           image="https://images.unsplash.com/photo-1657184925977-30a2d89fe72f?w=1600&q=90"
           imagePosition="center 60%"
-          overlay="left"
-          height="sm"
           cta={{ label: t("heroCta"), href: "/inserat?group=drehorte" }}
         />
       <LocationsContent serverListings={serverListings} />

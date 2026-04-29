@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { FILM_DEPARTMENTS, DEPT_KEYWORDS, ALL_ROLES } from "@/lib/filmRoles";
-import CategoryHero from "@/components/CategoryHero";
+import Image from "next/image";
 
 // ── Department icon map ───────────────────────────────────────────
 const DEPT_ICON_MAP: Record<string, LucideIcon> = {
@@ -421,17 +421,39 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
 
   return (
     <div className="min-h-screen">
-      <CategoryHero
-        badge="Jobs & Ausschreibungen"
-        title="Jobs in Film, Social Media"
-        titleHighlight="& Fotografie"
-        description={allJobs.length > 0 ? `${allJobs.length} offene Stellen — von der Kameraassistenz bis zum Social Media Manager.` : "Jobs ausschreiben und die passende Crew finden — kostenlos und ohne Provision."}
-        image="https://images.unsplash.com/photo-1616469829941-c7200edec809?w=1600&q=90"
-        imagePosition="center 35%"
-        overlay="left"
-        height="sm"
-        cta={{ label: "Job ausschreiben", href: "/inserat" }}
-      />
+      <div className="pt-16 relative overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <Image src="https://images.unsplash.com/photo-1616469829941-c7200edec809?w=1600&q=90" alt="" fill unoptimized priority
+            className="object-cover opacity-20" style={{ objectPosition: "center 35%" }} sizes="100vw" />
+          <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/60 via-bg-primary/40 to-bg-primary/90" />
+        </div>
+        <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-8 pb-8 max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full mb-3">
+                <span className="text-[11px] text-white/80 font-bold uppercase tracking-widest">Jobs & Ausschreibungen</span>
+              </div>
+              <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight mb-2">
+                Jobs in Film, Social Media{" "}
+                <span className="text-gradient-gold">&amp; Fotografie</span>
+              </h1>
+              <p className="text-white/60 text-sm sm:text-base leading-relaxed max-w-xl">
+                {allJobs.length > 0
+                  ? `${allJobs.length} offene Stellen — von der Kameraassistenz bis zum Social Media Manager.`
+                  : "Jobs ausschreiben und die passende Crew finden — kostenlos und ohne Provision."}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <Link href="/jobs" className="inline-flex items-center gap-2 px-4 py-2.5 border border-white/20 text-white/70 rounded-xl hover:border-white/40 hover:text-white transition-all text-sm whitespace-nowrap backdrop-blur-sm">
+                Alle Jobs →
+              </Link>
+              <Link href="/inserat" className="inline-flex items-center gap-2 px-4 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm whitespace-nowrap">
+                Job ausschreiben →
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* ── Filter Bar ───────────────────────────────────── */}
       <div className="bg-bg-secondary border-b border-border">
