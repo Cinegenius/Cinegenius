@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
 import CreatorsContent, { type ServerCreator } from "./CreatorsContent";
-import CategoryHero from "@/components/CategoryHero";
+import PageHeader from "@/components/PageHeader";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
 import { getTranslations } from "next-intl/server";
 
@@ -46,6 +47,12 @@ function parseCreatorDescription(raw: string): { skills: string[]; credits: stri
 
 export default async function CreatorsPage() {
   const t = await getTranslations("creators");
+  const { userId } = await auth();
+  let hasProfile = false;
+  if (userId) {
+    const { data } = await db.from("profiles").select("display_name").eq("user_id", userId).single();
+    hasProfile = !!(data?.display_name);
+  }
   // Fetch creator listings
   const { data: listings } = await db
     .from("listings")
@@ -164,16 +171,14 @@ export default async function CreatorsPage() {
 
   return (
     <>
-      <CategoryHero
+      <PageHeader
           badge="Crew"
           title={t("heroTitle")}
           titleHighlight={t("heroTitleHighlight")}
           description={t("heroDesc")}
           image="https://images.unsplash.com/photo-1601506521937-0121a7fc2a6b?w=1600&q=90"
           imagePosition="center 40%"
-          overlay="left"
-          height="sm"
-          cta={{ label: t("heroCta"), href: "/profile" }}
+          cta={!hasProfile ? { label: t("heroCta"), href: "/profile" } : undefined}
         />
       <CreatorsContent serverCreators={serverCreators} hasStrip={true} />
     </>
