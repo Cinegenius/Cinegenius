@@ -325,9 +325,6 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                 <LayoutList size={14} />
               </button>
             </div>
-            <Link href="/company-setup" className="hidden sm:flex items-center h-9 px-3 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
-              + Firma eintragen
-            </Link>
           </div>
 
           {/* Row 2: Filters */}
