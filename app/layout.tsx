@@ -67,6 +67,11 @@ export const metadata: Metadata = {
     title: "CineGenius — Film & Medien Marktplatz",
     description: "Locations mieten, Crew buchen, Equipment leihen — für Film, Social Media & Fotografie.",
   },
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
   robots: {
     index: true,
     follow: true,
