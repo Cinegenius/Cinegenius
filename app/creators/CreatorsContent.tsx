@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
-  MapPin, CheckCircle, Search, X, LayoutGrid, List, SlidersHorizontal, ChevronDown, Users, Globe, Languages, ArrowUpDown,
+  MapPin, CheckCircle, Search, X, LayoutGrid, List, SlidersHorizontal, ChevronDown, Users, Globe, Languages, ArrowUpDown, Wrench,
 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { departments, deptColors, type Department } from "@/lib/departments";
@@ -1268,22 +1268,22 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                     const href = c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`;
                     return (
                       <Link key={c.id} href={href} suppressHydrationWarning
-                        className="group inline-flex items-center gap-2.5 px-3 py-2 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 hover:bg-bg-elevated transition-all">
+                        className="group inline-flex items-center gap-2.5 px-3 py-2 rounded-xl border border-border/50 bg-bg-elevated/40 hover:border-gold/40 hover:bg-bg-elevated transition-all duration-200">
                         {c.avatar ? (
                           /* eslint-disable-next-line @next/next/no-img-element */
                           <img src={c.avatar} alt={c.name} loading="lazy" decoding="async"
-                            className="w-7 h-7 rounded-full object-cover border border-border shrink-0" />
+                            className="w-8 h-8 rounded-full object-cover border border-border/40 shrink-0" />
                         ) : (
-                          <div className="w-7 h-7 rounded-full bg-bg-elevated border border-border flex items-center justify-center text-text-muted shrink-0">
-                            <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                          <div className="w-8 h-8 rounded-full bg-bg-secondary border border-border/40 flex items-center justify-center text-text-muted shrink-0">
+                            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
                           </div>
                         )}
                         <div className="min-w-0">
                           <div className="flex items-center gap-1">
-                            <p className="text-xs font-semibold text-text-primary whitespace-nowrap">{c.name}</p>
-                            {c.verified && <CheckCircle size={10} className="text-success shrink-0" />}
+                            <p className="text-sm font-semibold text-text-primary whitespace-nowrap group-hover:text-gold transition-colors">{c.name}</p>
+                            {c.verified && <CheckCircle size={11} className="text-gold/60 shrink-0" />}
                           </div>
-                          <p className="text-[10px] text-text-muted whitespace-nowrap">{c.location.split(",")[0]}</p>
+                          <p className="text-[11px] text-text-muted whitespace-nowrap">{c.location.split(",")[0]}</p>
                         </div>
                       </Link>
                     );
@@ -1291,35 +1291,27 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                 </div>
               );
 
+              const VendorGroup = ({ icon, label, count, list }: { icon: React.ReactNode; label: string; count: number; list: typeof filteredVendors }) => (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-gold/60">{icon}</span>
+                    <span className="text-[11px] font-bold uppercase tracking-widest text-text-secondary">{label}</span>
+                    <span className="text-[11px] text-text-muted">· {count}</span>
+                  </div>
+                  <VendorChips list={list} />
+                </div>
+              );
+
               return (
-                <div className="mt-12 space-y-6">
-                  <div className="h-px bg-border" />
-
+                <div className="mt-10 pt-8 border-t border-border/50 space-y-7">
                   {locationVendors.length > 0 && (
-                    <div>
-                      <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3">
-                        📍 Location Anbieter · {locationVendors.length}
-                      </p>
-                      <VendorChips list={locationVendors} />
-                    </div>
+                    <VendorGroup icon={<MapPin size={13} />} label="Location Anbieter" count={locationVendors.length} list={locationVendors} />
                   )}
-
                   {equipmentVendors.length > 0 && (
-                    <div>
-                      <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3">
-                        🎬 Equipment Verleiher · {equipmentVendors.length}
-                      </p>
-                      <VendorChips list={equipmentVendors} />
-                    </div>
+                    <VendorGroup icon={<Wrench size={13} />} label="Equipment Verleiher" count={equipmentVendors.length} list={equipmentVendors} />
                   )}
-
                   {otherVendors.length > 0 && (
-                    <div>
-                      <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3">
-                        Weitere Anbieter · {otherVendors.length}
-                      </p>
-                      <VendorChips list={otherVendors} />
-                    </div>
+                    <VendorGroup icon={<Users size={13} />} label="Weitere Anbieter" count={otherVendors.length} list={otherVendors} />
                   )}
                 </div>
               );
