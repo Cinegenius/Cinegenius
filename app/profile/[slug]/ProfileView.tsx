@@ -9,7 +9,7 @@ import { useUser } from "@clerk/nextjs";
 import {
   MapPin, MessageSquare, Award, ChevronDown, ChevronUp,
   Pencil, ExternalLink, X, Check, Globe, Building2, UserPlus, UserCheck, Clock,
-  Film, Briefcase, Package, Car, Ban, Flag, Users2,
+  Film, Briefcase, Package, Car, Ban, Flag, Users2, MoreHorizontal,
 } from "lucide-react";
 import type { UserProfile, ProfileModule, ProfileImage, FilmographyEntry, ProfileAward, ProjectCredit } from "@/lib/profile-types";
 import ReviewsSection from "@/components/ReviewsSection";
@@ -126,50 +126,51 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
   }
 
   return (
-    <div className="flex flex-col gap-1">
-      <div className="flex items-center gap-2">
-        <button
-          onClick={toggleBlock}
-          disabled={blockLoading}
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all disabled:opacity-50 ${
-            youBlocked
-              ? "bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20"
-              : "border border-border text-text-muted hover:border-red-500/40 hover:text-red-400"
-          }`}
-        >
-          <Ban size={11} /> {youBlocked ? "Entblockieren" : "Blockieren"}
-        </button>
+    <div className="relative">
+      <button
+        onClick={() => setReportOpen((o) => !o)}
+        className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white/70 hover:text-white hover:bg-white/20 transition-all"
+        aria-label="Mehr Optionen"
+      >
+        <MoreHorizontal size={15} />
+      </button>
 
-        <div className="relative">
+      {reportOpen && (
+        <div className="absolute right-0 bottom-10 z-50 bg-bg-elevated border border-border rounded-xl shadow-2xl py-1 w-44">
+          <button
+            onClick={() => { toggleBlock(); setReportOpen(false); }}
+            disabled={blockLoading}
+            className={`w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors disabled:opacity-50 ${
+              youBlocked ? "text-red-400 hover:bg-red-500/10" : "text-text-secondary hover:bg-bg-primary hover:text-red-400"
+            }`}
+          >
+            <Ban size={12} /> {youBlocked ? "Entblockieren" : "Blockieren"}
+          </button>
           {reportSent ? (
-            <span className="text-xs text-emerald-400 px-2">Gemeldet</span>
+            <span className="flex items-center gap-2 px-3 py-2 text-xs text-emerald-400">
+              <Check size={12} /> Gemeldet
+            </span>
           ) : (
             <>
-              <button
-                onClick={() => setReportOpen((o) => !o)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-text-muted rounded-lg hover:border-yellow-500/40 hover:text-yellow-400 transition-all text-xs font-medium"
-              >
-                <Flag size={11} /> Melden
-              </button>
-              {reportOpen && (
-                <div className="absolute right-0 top-9 z-50 bg-bg-elevated border border-border rounded-xl shadow-2xl p-4 w-52">
-                  <p className="text-xs font-semibold text-text-primary mb-2">Grund wählen</p>
-                  {Object.entries(REPORT_REASONS).map(([value, label]) => (
-                    <button
-                      key={value}
-                      onClick={() => setReportReason(value)}
-                      className={`w-full text-left px-2 py-1.5 text-xs rounded-lg mb-0.5 transition-colors ${
-                        reportReason === value ? "bg-gold/20 text-gold" : "text-text-secondary hover:bg-bg-primary"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                  {reportError && <p className="text-xs text-red-400 mt-1">{reportError}</p>}
+              <div className="h-px bg-border/60 mx-2 my-1" />
+              <p className="px-3 pt-1 pb-0.5 text-[10px] uppercase tracking-widest text-text-muted font-semibold">Melden als</p>
+              {Object.entries(REPORT_REASONS).map(([value, label]) => (
+                <button
+                  key={value}
+                  onClick={() => setReportReason(value)}
+                  className={`w-full flex items-center gap-2 px-3 py-1.5 text-xs transition-colors ${
+                    reportReason === value ? "text-gold bg-gold/10" : "text-text-secondary hover:bg-bg-primary"
+                  }`}
+                >
+                  {reportReason === value && <Check size={10} />}
+                  {label}
+                </button>
+              ))}
+              {reportReason && (
+                <div className="px-2 pt-1">
                   <button
                     onClick={submitReport}
-                    disabled={!reportReason}
-                    className="w-full mt-2 px-3 py-1.5 bg-gold text-bg-primary font-semibold rounded-lg text-xs hover:bg-gold-light disabled:opacity-40 transition-colors"
+                    className="w-full px-3 py-1.5 bg-gold text-bg-primary font-semibold rounded-lg text-xs hover:bg-gold-light transition-colors"
                   >
                     Abschicken
                   </button>
@@ -177,9 +178,9 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
               )}
             </>
           )}
+          {blockError && <p className="px-3 py-1 text-xs text-red-400">{blockError}</p>}
         </div>
-      </div>
-      {blockError && <p className="text-xs text-red-400">{blockError}</p>}
+      )}
     </div>
   );
 }
@@ -909,33 +910,17 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/75" />
 
-        {/* Top bar */}
+        {/* Top bar — only badges + edit */}
         <div className="absolute top-0 left-0 right-0 pt-20 px-6 sm:px-10 flex items-start justify-between">
           {profile.verified && (
             <span className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md text-white text-[10px] font-semibold px-3 py-1.5 rounded-full border border-white/20">
               <Check size={10} /> Verified
             </span>
           )}
-          {isOwner ? (
+          {isOwner && (
             <Link href="/profile" className="ml-auto flex items-center gap-1.5 bg-white/10 backdrop-blur-md text-white text-[10px] font-semibold px-3 py-1.5 rounded-full border border-white/20 hover:bg-white/20 transition-colors">
               <Pencil size={10} /> Bearbeiten
             </Link>
-          ) : (
-            <div className="ml-auto flex gap-2">
-              {canContact && (
-                <>
-                  <Link href={`/messages?to=${profile.user_id}`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/90 text-black font-semibold rounded-lg hover:bg-white transition-colors text-xs">
-                    <MessageSquare size={12} /> Nachricht
-                  </Link>
-                  <Link href={`/booking?profile=${profile.user_id}`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 backdrop-blur-md border border-white/30 text-white rounded-lg hover:bg-white/20 transition-colors text-xs">
-                    Anfrage <ExternalLink size={11} />
-                  </Link>
-                </>
-              )}
-              <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
-            </div>
           )}
         </div>
 
@@ -944,14 +929,29 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
           <p className="text-white/60 text-xs uppercase tracking-[0.2em] mb-2">
             {(profile.positions?.[0] ?? profile.role) ?? "Model"}
           </p>
-          <h1 className="font-display text-5xl sm:text-7xl font-bold text-white leading-none tracking-tight mb-4">
+          <h1 className="font-display text-5xl sm:text-7xl font-bold text-white leading-none tracking-tight mb-3">
             {profile.display_name ?? "Unbekannt"}
           </h1>
-          {profile.location && (
-            <p className="text-white/60 text-sm flex items-center gap-1.5">
-              <MapPin size={12} /> {profile.location}
-            </p>
-          )}
+          <div className="flex items-center gap-3 flex-wrap">
+            {profile.location && (
+              <p className="text-white/60 text-sm flex items-center gap-1.5">
+                <MapPin size={12} /> {profile.location}
+              </p>
+            )}
+            {!isOwner && canContact && (
+              <div className="flex items-center gap-2 ml-auto">
+                <Link href={`/messages?to=${profile.user_id}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white rounded-lg hover:bg-white/25 transition-colors text-xs font-medium">
+                  <MessageSquare size={11} /> Nachricht
+                </Link>
+                <Link href={`/booking?profile=${profile.user_id}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white rounded-lg hover:bg-white/25 transition-colors text-xs font-medium">
+                  Anfrage <ExternalLink size={11} />
+                </Link>
+                <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
@@ -1219,33 +1219,27 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 </p>
               )}
             </div>
-            <div className="flex items-center gap-2 flex-wrap sm:shrink-0 sm:mt-1">
-              {!isOwner ? (
-                <>
-                  {canContact && (
-                    <>
-                      <Link href={`/messages?to=${profile.user_id}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 bg-white text-black font-semibold rounded-lg hover:bg-white/90 transition-colors text-xs shadow">
-                        <MessageSquare size={12} /> Nachricht
-                      </Link>
-                      <button onClick={handleFriendAction} disabled={friendLoading}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 bg-white/15 backdrop-blur-md border border-white/30 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
-                        {friendStatus === "friends" ? <><Check size={11} /> Vernetzt</> : friendStatus === "pending_sent" ? "Anfrage gesendet" : friendStatus === "pending_received" ? <><UserPlus size={11} /> Annehmen</> : <><UserPlus size={11} /> Vernetzen</>}
-                      </button>
-                      <Link href={`/booking?profile=${profile.user_id}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 bg-white/15 backdrop-blur-md border border-white/30 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
-                        Anfrage <ExternalLink size={11} />
-                      </Link>
-                    </>
-                  )}
-                  <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
-                </>
-              ) : (
-                <Link href="/profile" className="inline-flex items-center gap-1.5 px-3 py-2 bg-white/15 backdrop-blur-md border border-white/30 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
-                  <Pencil size={11} /> Bearbeiten
-                </Link>
-              )}
-            </div>
+            {!isOwner && (
+              <div className="flex items-center gap-2 flex-wrap sm:shrink-0 sm:mt-1">
+                {canContact && (
+                  <>
+                    <Link href={`/messages?to=${profile.user_id}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
+                      <MessageSquare size={11} /> Nachricht
+                    </Link>
+                    <button onClick={handleFriendAction} disabled={friendLoading}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs disabled:opacity-50">
+                      {friendStatus === "friends" ? <><Check size={11} /> Vernetzt</> : friendStatus === "pending_sent" ? "Gesendet" : friendStatus === "pending_received" ? <><UserPlus size={11} /> Annehmen</> : <><UserPlus size={11} /> Vernetzen</>}
+                    </button>
+                    <Link href={`/booking?profile=${profile.user_id}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
+                      Anfrage <ExternalLink size={11} />
+                    </Link>
+                  </>
+                )}
+                <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
+              </div>
+            )}
           </div>
         </div>
       </section>
