@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
-  MapPin, CheckCircle, Search, X, LayoutGrid, List, SlidersHorizontal, ChevronDown, Users, Globe, Languages, ArrowUpDown, Wrench,
+  MapPin, CheckCircle, Search, X, LayoutGrid, List, SlidersHorizontal, ChevronDown, Users, Globe, Languages, ArrowUpDown,
 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { departments, deptColors, type Department } from "@/lib/departments";
@@ -910,19 +910,6 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               onChange={setSortKey}
             />
 
-            <div className="w-px h-5 bg-border shrink-0" />
-
-            {/* Anbieter & Vermieter */}
-            <button
-              onClick={() => setVendorOnly((v) => !v)}
-              className={`flex items-center gap-1.5 h-9 px-3 rounded-lg text-xs font-medium border transition-all shrink-0 ${
-                vendorOnly
-                  ? "bg-gold/12 border-gold/30 text-gold"
-                  : "border-border text-text-muted hover:text-text-secondary hover:border-border-light"
-              }`}
-            >
-              Anbieter & Vermieter
-            </button>
 
             <div className="w-px h-5 bg-border shrink-0" />
 
@@ -1115,9 +1102,8 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 
       {/* ── Results ─────────────────────────────────────────────────────────── */}
       {(() => {
-        const filteredCrew    = filtered.filter((c) => !c.isVendor);
-        const filteredVendors = filtered.filter((c) => c.isVendor);
-        const crewVisible     = filteredCrew.slice(0, visibleCount);
+        const filteredCrew = filtered.filter((c) => !c.isVendor);
+        const crewVisible  = filteredCrew.slice(0, visibleCount);
 
         return (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 lg:pb-8">
@@ -1127,21 +1113,18 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               <span className="text-text-primary font-semibold">
                 {filteredCrew.length} {filteredCrew.length !== 1 ? "Crew-Profile" : "Crew-Profil"}
               </span>
-              {filteredVendors.length > 0 && (
-                <span> · <span className="text-text-secondary">{filteredVendors.length} Anbieter</span></span>
-              )}
               {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
             </p>
 
             {/* Empty */}
-            {filteredCrew.length === 0 && filteredVendors.length === 0 && (
+            {filteredCrew.length === 0 && (
               <EmptyState
                 icon={Users}
                 title={allCreators.length === 0 ? "Noch keine Profile" : "Keine Profile gefunden"}
                 description={allCreators.length === 0 ? "Sei der Erste! Erstelle dein Profil und werde von Produktionen gefunden." : "Versuche andere Rollen, einen anderen Namen oder eine andere Stadt."}
                 action={allCreators.length === 0
                   ? { label: "Profil anlegen", onClick: () => window.location.href = "/profile" }
-                  : { label: "Filter zurücksetzen", onClick: () => { setQuery(""); clearAll(); setAvailableOnly(false); setVendorOnly(false); setCityFilter(""); setCountryFilter(""); setLanguageFilter(""); } }
+                  : { label: "Filter zurücksetzen", onClick: () => { setQuery(""); clearAll(); setAvailableOnly(false); setCityFilter(""); setCountryFilter(""); setLanguageFilter(""); } }
                 }
               />
             )}
@@ -1256,66 +1239,6 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               </div>
             )}
 
-            {/* ── Vendors: compact section, split by type ── */}
-            {filteredVendors.length > 0 && (() => {
-              const locationVendors  = filteredVendors.filter((c) => getPositions(c).some((p) => p.toLowerCase().includes("location")));
-              const equipmentVendors = filteredVendors.filter((c) => getPositions(c).some((p) => p.toLowerCase().includes("equipment") || p.toLowerCase().includes("verlei")));
-              const otherVendors     = filteredVendors.filter((c) => !locationVendors.includes(c) && !equipmentVendors.includes(c));
-
-              const VendorChips = ({ list }: { list: typeof filteredVendors }) => (
-                <div className="flex flex-wrap gap-2">
-                  {list.map((c) => {
-                    const href = c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`;
-                    return (
-                      <Link key={c.id} href={href} suppressHydrationWarning
-                        className="group inline-flex items-center gap-2.5 px-3 py-2 rounded-xl border border-border/50 bg-bg-elevated/40 hover:border-gold/40 hover:bg-bg-elevated transition-all duration-200">
-                        {c.avatar ? (
-                          /* eslint-disable-next-line @next/next/no-img-element */
-                          <img src={c.avatar} alt={c.name} loading="lazy" decoding="async"
-                            className="w-8 h-8 rounded-full object-cover border border-border/40 shrink-0" />
-                        ) : (
-                          <div className="w-8 h-8 rounded-full bg-bg-secondary border border-border/40 flex items-center justify-center text-text-muted shrink-0">
-                            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-                          </div>
-                        )}
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-1">
-                            <p className="text-sm font-semibold text-text-primary whitespace-nowrap group-hover:text-gold transition-colors">{c.name}</p>
-                            {c.verified && <CheckCircle size={11} className="text-gold/60 shrink-0" />}
-                          </div>
-                          <p className="text-[11px] text-text-muted whitespace-nowrap">{c.location.split(",")[0]}</p>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              );
-
-              const VendorGroup = ({ icon, label, count, list }: { icon: React.ReactNode; label: string; count: number; list: typeof filteredVendors }) => (
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-gold/60">{icon}</span>
-                    <span className="text-[11px] font-bold uppercase tracking-widest text-text-secondary">{label}</span>
-                    <span className="text-[11px] text-text-muted">· {count}</span>
-                  </div>
-                  <VendorChips list={list} />
-                </div>
-              );
-
-              return (
-                <div className="mt-10 pt-8 border-t border-border/50 space-y-7">
-                  {locationVendors.length > 0 && (
-                    <VendorGroup icon={<MapPin size={13} />} label="Location Anbieter" count={locationVendors.length} list={locationVendors} />
-                  )}
-                  {equipmentVendors.length > 0 && (
-                    <VendorGroup icon={<Wrench size={13} />} label="Equipment Verleiher" count={equipmentVendors.length} list={equipmentVendors} />
-                  )}
-                  {otherVendors.length > 0 && (
-                    <VendorGroup icon={<Users size={13} />} label="Weitere Anbieter" count={otherVendors.length} list={otherVendors} />
-                  )}
-                </div>
-              );
-            })()}
 
           </div>
         );

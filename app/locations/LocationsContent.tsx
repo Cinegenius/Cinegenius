@@ -7,7 +7,7 @@ import dynamicImport from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   MapPin, Star, CheckCircle, Search, Zap, LayoutList,
-  Map, Navigation, SlidersHorizontal, X, Share2, Film,
+  Map, Navigation, SlidersHorizontal, X, Share2, Film, Users,
 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 const LocationMap = dynamicImport(() => import("@/components/LocationMap"), {
@@ -58,7 +58,46 @@ function getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number) {
 
 type ViewMode = "split" | "list" | "map";
 
-function LocationsInner({ serverListings }: { serverListings: Location[] }) {
+type VendorProfile = { id: string; name: string; location: string; avatar: string; verified: boolean };
+
+function VendorSection({ vendors }: { vendors: VendorProfile[] }) {
+  if (!vendors.length) return null;
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-10">
+      <div className="pt-8 border-t border-border/50">
+        <div className="flex items-center gap-2 mb-4">
+          <Users size={13} className="text-gold/60" />
+          <span className="text-[11px] font-bold uppercase tracking-widest text-text-secondary">Location Anbieter</span>
+          <span className="text-[11px] text-text-muted">· {vendors.length}</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {vendors.map((v) => (
+            <Link key={v.id} href={`/profile/${v.id}`}
+              className="group inline-flex items-center gap-2.5 px-3 py-2 rounded-xl border border-border/50 bg-bg-elevated/40 hover:border-gold/40 hover:bg-bg-elevated transition-all duration-200">
+              {v.avatar ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={v.avatar} alt={v.name} loading="lazy" className="w-8 h-8 rounded-full object-cover border border-border/40 shrink-0" />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-bg-secondary border border-border/40 flex items-center justify-center text-text-muted text-sm font-bold shrink-0">
+                  {v.name[0]}
+                </div>
+              )}
+              <div className="min-w-0">
+                <div className="flex items-center gap-1">
+                  <p className="text-sm font-semibold text-text-primary whitespace-nowrap group-hover:text-gold transition-colors">{v.name}</p>
+                  {v.verified && <CheckCircle size={11} className="text-gold/60 shrink-0" />}
+                </div>
+                {v.location && <p className="text-[11px] text-text-muted whitespace-nowrap">{v.location.split(",")[0]}</p>}
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListings: Location[]; vendorProfiles?: VendorProfile[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -547,10 +586,13 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
   );
 }
 
-export default function LocationsContent({ serverListings }: { serverListings: Location[] }) {
+export default function LocationsContent({ serverListings, vendorProfiles = [] }: { serverListings: Location[]; vendorProfiles?: VendorProfile[] }) {
   return (
-    <Suspense fallback={<div className="pt-16 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" /></div>}>
-      <LocationsInner serverListings={serverListings} />
-    </Suspense>
+    <>
+      <Suspense fallback={<div className="pt-16 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" /></div>}>
+        <LocationsInner serverListings={serverListings} vendorProfiles={vendorProfiles} />
+      </Suspense>
+      <VendorSection vendors={vendorProfiles} />
+    </>
   );
 }
