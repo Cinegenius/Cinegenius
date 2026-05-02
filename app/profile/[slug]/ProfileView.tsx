@@ -147,12 +147,12 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
       </button>
 
       {reportOpen && (
-        <div className="absolute right-0 bottom-10 z-50 bg-bg-elevated border border-border rounded-xl shadow-2xl py-1 w-44">
+        <div className="absolute right-0 bottom-10 z-50 bg-[#1e2028] border border-white/10 rounded-xl shadow-2xl py-1 w-52">
           <button
             onClick={() => { toggleBlock(); setReportOpen(false); }}
             disabled={blockLoading}
             className={`w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors disabled:opacity-50 ${
-              youBlocked ? "text-red-400 hover:bg-red-500/10" : "text-text-secondary hover:bg-bg-primary hover:text-red-400"
+              youBlocked ? "text-red-400 hover:bg-red-500/10" : "text-white/70 hover:bg-white/5 hover:text-red-400"
             }`}
           >
             <Ban size={12} /> {youBlocked ? "Entblockieren" : "Blockieren"}
@@ -163,14 +163,14 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
             </span>
           ) : (
             <>
-              <div className="h-px bg-border/60 mx-2 my-1" />
-              <p className="px-3 pt-1 pb-0.5 text-[10px] uppercase tracking-widest text-text-muted font-semibold">Melden als</p>
+              <div className="h-px bg-white/10 mx-2 my-1" />
+              <p className="px-3 pt-1 pb-0.5 text-[10px] uppercase tracking-widest text-white/40 font-semibold">Melden als</p>
               {Object.entries(REPORT_REASONS).map(([value, label]) => (
                 <button
                   key={value}
                   onClick={() => setReportReason(value)}
                   className={`w-full flex items-center gap-2 px-3 py-1.5 text-xs transition-colors ${
-                    reportReason === value ? "text-gold bg-gold/10" : "text-text-secondary hover:bg-bg-primary"
+                    reportReason === value ? "text-gold bg-gold/10" : "text-white/80 hover:bg-white/5"
                   }`}
                 >
                   {reportReason === value && <Check size={10} />}
