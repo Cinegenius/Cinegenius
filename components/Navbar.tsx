@@ -292,6 +292,13 @@ export default function Navbar() {
               <GlobalSearch />
               <LanguageSwitcher />
               <NotificationCenter />
+              {!isLoaded && (
+                <div className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full border border-border/30 animate-pulse">
+                  <div className="w-7 h-7 rounded-full bg-bg-elevated" />
+                  <div className="w-20 h-3 rounded-full bg-bg-elevated hidden xl:block" />
+                  <div className="w-2.5 h-2.5 rounded bg-bg-elevated" />
+                </div>
+              )}
               {isLoaded && !isSignedIn && (
                 <>
                   <Link
@@ -405,6 +412,9 @@ export default function Navbar() {
               >
                 <Search size={20} />
               </button>
+              {!isLoaded && (
+                <div className="w-8 h-8 rounded-full bg-bg-elevated border border-border/30 animate-pulse" />
+              )}
               {isLoaded && isSignedIn && (() => {
                 const mobileAvatar = profileAvatarUrl || user?.imageUrl || "";
                 const mobileInitial = (profileDisplayName || user?.firstName || user?.emailAddresses?.[0]?.emailAddress || "?")[0].toUpperCase();
