@@ -238,6 +238,10 @@ export default function LocationMap({
       // Re-cluster on zoom
       map.on("zoomend", () => { void renderMarkers(); });
 
+      // Force correct tile coverage after container settles
+      setTimeout(() => map.invalidateSize(), 0);
+      setTimeout(() => map.invalidateSize(), 200);
+
       // Initial render
       await renderMarkers();
 
@@ -251,6 +255,13 @@ export default function LocationMap({
     };
 
     initMap();
+
+    // Re-invalidate whenever the container is resized (e.g. panel opens/closes)
+    const observer = new ResizeObserver(() => {
+      mapInstanceRef.current?.invalidateSize();
+    });
+    if (mapRef.current) observer.observe(mapRef.current);
+    return () => observer.disconnect();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
