@@ -34,6 +34,8 @@ type Prop = {
   description?: string;
   ownerId?: string;
   ownerName?: string;
+  ownerAvatar?: string | null;
+  ownerSlug?: string | null;
   extra_images?: string[];
 };
 
@@ -243,20 +245,36 @@ export default function PropDetail({ prop }: { prop: Prop }) {
               />
             </div>
 
-            <div className="p-5 bg-bg-secondary border border-border rounded-xl flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
-                <Package size={20} className="text-gold" />
+            {prop.ownerSlug ? (
+              <Link href={`/profile/${prop.ownerSlug}`}
+                className="group p-5 bg-bg-secondary border border-border rounded-xl flex items-center gap-4 hover:border-gold/40 hover:bg-bg-elevated transition-all">
+                <div className="w-12 h-12 rounded-full bg-gold/10 border border-gold/20 overflow-hidden flex items-center justify-center shrink-0">
+                  {prop.ownerAvatar
+                    // eslint-disable-next-line @next/next/no-img-element
+                    ? <img src={prop.ownerAvatar} alt={prop.vendor} className="w-full h-full object-cover" />
+                    : <Package size={20} className="text-gold" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-text-primary group-hover:text-gold transition-colors">{prop.vendor}</p>
+                  <p className="text-xs text-text-muted flex items-center gap-1 mt-0.5">
+                    <MapPin size={11} /> {prop.location}
+                  </p>
+                </div>
+                <span className="text-xs text-text-muted group-hover:text-gold transition-colors shrink-0">Profil →</span>
+              </Link>
+            ) : (
+              <div className="p-5 bg-bg-secondary border border-border rounded-xl flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
+                  <Package size={20} className="text-gold" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-text-primary">{prop.vendor}</p>
+                  <p className="text-xs text-text-muted flex items-center gap-1 mt-0.5">
+                    <MapPin size={11} /> {prop.location}
+                  </p>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-text-primary">{prop.vendor}</p>
-                <p className="text-xs text-text-muted flex items-center gap-1 mt-0.5">
-                  <MapPin size={11} /> {prop.location}
-                </p>
-              </div>
-              <button className="px-3 py-1.5 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-all shrink-0 flex items-center gap-1.5">
-                <Phone size={12} /> Kontakt
-              </button>
-            </div>
+            )}
           </div>
 
           {/* BOOKING SIDEBAR */}

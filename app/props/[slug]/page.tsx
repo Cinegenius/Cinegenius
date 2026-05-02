@@ -15,14 +15,17 @@ async function getProp(slug: string) {
     if (!data) return null;
 
     const ownerRes = data.user_id
-      ? await db.from("profiles").select("display_name").eq("user_id", data.user_id).single()
+      ? await db.from("profiles").select("display_name, avatar_url, slug").eq("user_id", data.user_id).single()
       : { data: null };
+
+    type OwnerRow = { display_name: string | null; avatar_url: string | null; slug: string | null } | null;
+    const owner = (ownerRes as { data: OwnerRow }).data;
 
     return {
       id: data.id,
       title: data.title ?? "Requisite",
       category: data.category ?? "Requisiten",
-      vendor: (ownerRes as { data: { display_name: string | null } | null }).data?.display_name ?? "Privatanbieter",
+      vendor: owner?.display_name ?? "Privatanbieter",
       location: data.city ?? "",
       dailyRate: data.price ?? 0,
       image: data.image_url ?? "",
@@ -32,7 +35,9 @@ async function getProp(slug: string) {
       focalPoint: (data.metadata as { focal_point?: { x: number; y: number } | null } | null)?.focal_point ?? null,
       description: data.description ?? "",
       ownerId: data.user_id ?? "",
-      ownerName: (ownerRes as { data: { display_name: string | null } | null }).data?.display_name ?? "Anbieter",
+      ownerName: owner?.display_name ?? "Anbieter",
+      ownerAvatar: owner?.avatar_url ?? null,
+      ownerSlug: owner?.slug ?? data.user_id ?? null,
       extra_images: data.extra_images ?? [],
     };
   } catch {
