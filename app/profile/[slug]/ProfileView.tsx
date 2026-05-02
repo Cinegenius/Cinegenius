@@ -908,7 +908,7 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
         )}
 
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/75" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/88" />
 
         {/* Top bar — only badges + edit */}
         <div className="absolute top-0 left-0 right-0 pt-20 px-6 sm:px-10 flex items-start justify-between">
@@ -926,15 +926,15 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
 
         {/* Bottom info — pb-20 on mobile to clear the 56px BottomNav */}
         <div className="absolute bottom-0 left-0 right-0 px-6 sm:px-10 pb-20 lg:pb-10">
-          <p className="text-white/60 text-xs uppercase tracking-[0.2em] mb-2">
+          <p className="text-white/80 text-xs uppercase tracking-[0.2em] mb-2 drop-shadow">
             {(profile.positions?.[0] ?? profile.role) ?? "Model"}
           </p>
-          <h1 className="font-display text-5xl sm:text-7xl font-bold text-white leading-none tracking-tight mb-3">
+          <h1 className="font-display text-5xl sm:text-7xl font-bold text-white leading-none tracking-tight mb-3 drop-shadow-lg">
             {profile.display_name ?? "Unbekannt"}
           </h1>
           <div className="flex items-center gap-3 flex-wrap">
             {profile.location && (
-              <p className="text-white/60 text-sm flex items-center gap-1.5">
+              <p className="text-white/80 text-sm flex items-center gap-1.5 drop-shadow">
                 <MapPin size={12} /> {profile.location}
               </p>
             )}
@@ -1195,8 +1195,8 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
         {bgImage ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-90" />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-bg-primary" />
+            <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-bg-primary" />
           </>
         ) : (
           <div className="absolute inset-0 bg-gradient-to-b from-bg-elevated to-bg-primary" />
@@ -1209,12 +1209,12 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 {profile.display_name ?? "Unbekannt"}
               </h1>
               {(profile.positions?.[0] ?? profile.role) && (
-                <p className="text-white/75 text-sm mt-1 drop-shadow">
+                <p className="text-white/90 text-sm mt-1 drop-shadow-md">
                   {(profile.positions ?? [profile.role]).filter(Boolean).join(" · ")}
                 </p>
               )}
               {profile.location && (
-                <p className="text-white/60 text-xs mt-1.5 flex items-center gap-1 drop-shadow">
+                <p className="text-white/75 text-xs mt-1.5 flex items-center gap-1 drop-shadow-md">
                   <MapPin size={10} />{profile.location}
                 </p>
               )}
