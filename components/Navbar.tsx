@@ -171,12 +171,18 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [profileDisplayName, setProfileDisplayName] = useState(() => {
-    try { return localStorage.getItem("cg_profile_name") ?? ""; } catch { return ""; }
-  });
-  const [profileAvatarUrl, setProfileAvatarUrl] = useState(() => {
-    try { return localStorage.getItem("cg_profile_avatar") ?? ""; } catch { return ""; }
-  });
+  const [profileDisplayName, setProfileDisplayName] = useState("");
+  const [profileAvatarUrl, setProfileAvatarUrl] = useState("");
+
+  // Read cache immediately after hydration — before Clerk even loads
+  useEffect(() => {
+    try {
+      const n = localStorage.getItem("cg_profile_name");
+      const a = localStorage.getItem("cg_profile_avatar");
+      if (n) setProfileDisplayName(n);
+      if (a) setProfileAvatarUrl(a);
+    } catch { /* */ }
+  }, []);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const pathname = usePathname();
   const { isSignedIn, isLoaded } = useAuth();
