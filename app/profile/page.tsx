@@ -28,25 +28,9 @@ const PROJECT_TYPE_NORMALIZE: Record<string, string> = {
   "Event / Live": "Event",
   "Foto / Shooting": "Shooting",
 };
-const PROJECT_TYPE_COLOR: Record<string, string> = {
-  "Spielfilm":      "text-gold",
-  "Serie":          "text-violet-400",
-  "Werbefilm":      "text-sky-400",
-  "Kurzfilm":       "text-emerald-400",
-  "Dokumentation":  "text-amber-400",
-  "Musikvideo":     "text-pink-400",
-  "Corporate":      "text-cyan-400",
-  "Shooting":       "text-orange-400",
-  "Event":          "text-teal-400",
-};
 function normType(t: string | null | undefined): string | null {
   if (!t) return null;
   return PROJECT_TYPE_NORMALIZE[t] ?? t;
-}
-function typeColor(t: string | null | undefined): string {
-  if (!t) return "text-text-muted";
-  const norm = PROJECT_TYPE_NORMALIZE[t] ?? t;
-  return PROJECT_TYPE_COLOR[norm] ?? "text-text-muted";
 }
 import {
   PROFILE_CATEGORY_MAP,
@@ -1540,7 +1524,7 @@ export default function ProfilePage() {
                                 <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{credit.projects?.year ?? "—"}</span>
                                 <span className="text-xs text-text-primary truncate flex-1">{credit.projects?.title}</span>
                                 {collaborator && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[25%]">{collaborator}</span>}
-                                {normType(credit.projects?.type) && <span className={`text-[10px] font-medium shrink-0 ${typeColor(credit.projects?.type)}`}>{normType(credit.projects?.type)}</span>}
+                                {normType(credit.projects?.type) && <span className="text-[10px] text-text-muted shrink-0">{normType(credit.projects?.type)}</span>}
                                 <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                                   <button type="button" onClick={() => { setEditingCreditId(isEditing ? null : credit.id); setEditingCollaborator(collaborator ?? ""); }} className="text-text-muted hover:text-gold transition-colors">
                                     <Pencil size={11} />
