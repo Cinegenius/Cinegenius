@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import type { LucideIcon } from "lucide-react";
 import {
   Building2, MapPin, Search, CheckCircle, LayoutGrid, LayoutList,
@@ -47,25 +48,25 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
 };
 
 // ── Two-panel groupings ───────────────────────────────────────────
-const COMPANY_GROUPS: { id: string; label: string; Icon: LucideIcon; categoryIds: string[] }[] = [
+const COMPANY_GROUPS_META: { id: string; labelKey: "groupVerleih"|"groupStudio"|"groupPost"|"groupAusstattung"|"groupAgenturen"; Icon: LucideIcon; categoryIds: string[] }[] = [
   {
-    id: "verleih", label: "Verleih", Icon: Package,
+    id: "verleih", labelKey: "groupVerleih", Icon: Package,
     categoryIds: ["lichtverleih", "kameraverleih", "tonverleih", "grip-verleih", "fahrzeugverleih"],
   },
   {
-    id: "studio", label: "Studio & Produktion", Icon: Film,
+    id: "studio", labelKey: "groupStudio", Icon: Film,
     categoryIds: ["tonstudio", "filmproduktion", "fotostudio"],
   },
   {
-    id: "post", label: "Post & Digital", Icon: Monitor,
+    id: "post", labelKey: "groupPost", Icon: Monitor,
     categoryIds: ["postproduktion", "vfx-studio", "werbeagentur"],
   },
   {
-    id: "ausstattung", label: "Ausstattung", Icon: Shirt,
+    id: "ausstattung", labelKey: "groupAusstattung", Icon: Shirt,
     categoryIds: ["kostumfundus", "requisite"],
   },
   {
-    id: "agenturen", label: "Agenturen & Services", Icon: Users,
+    id: "agenturen", labelKey: "groupAgenturen", Icon: Users,
     categoryIds: ["casting-agentur", "location-agentur"],
   },
 ];
@@ -112,19 +113,25 @@ function FilterDropdown({
   );
 }
 
+type CompanyGroup = { id: string; label: string; Icon: LucideIcon; categoryIds: string[] };
+
 // ─── Two-panel category picker ────────────────────────────────────
 function CompanyCategoryPanel({
+  groups, clearLabel, clearSelectionLabel,
   activeGroupId, setActiveGroupId,
   selectedCategoryId,
   onSelectCategory,
   onClose,
 }: {
+  groups: CompanyGroup[];
+  clearLabel: string;
+  clearSelectionLabel: string;
   activeGroupId: string; setActiveGroupId: (id: string) => void;
   selectedCategoryId: string | null;
   onSelectCategory: (catId: string | null) => void;
   onClose: () => void;
 }) {
-  const activeGroup = COMPANY_GROUPS.find((g) => g.id === activeGroupId) ?? COMPANY_GROUPS[0];
+  const activeGroup = groups.find((g) => g.id === activeGroupId) ?? groups[0];
   const selectedCat = selectedCategoryId ? COMPANY_CATEGORY_BY_ID[selectedCategoryId] : null;
   const selectedInActiveGroup = activeGroup.categoryIds.includes(selectedCategoryId ?? "");
 
@@ -133,7 +140,7 @@ function CompanyCategoryPanel({
       {/* Mobile: horizontal group scroll + categories below */}
       <div className="sm:hidden">
         <div className="flex overflow-x-auto gap-1.5 p-3 border-b border-border bg-bg-secondary" style={{ scrollbarWidth: "none" }}>
-          {COMPANY_GROUPS.map(({ id, label, Icon, categoryIds }) => {
+          {groups.map(({ id, label, Icon, categoryIds }) => {
             const isActive = id === activeGroupId;
             const hasSelected = categoryIds.includes(selectedCategoryId ?? "");
             return (
@@ -153,7 +160,7 @@ function CompanyCategoryPanel({
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-semibold text-gold">{activeGroup.label}</h3>
             {selectedInActiveGroup && selectedCategoryId && (
-              <button onClick={() => onSelectCategory(null)} className="text-[10px] text-text-muted hover:text-red-400">Löschen</button>
+              <button onClick={() => onSelectCategory(null)} className="text-[10px] text-text-muted hover:text-red-400">{clearLabel}</button>
             )}
           </div>
           <div className="grid grid-cols-2 gap-1.5">
@@ -182,7 +189,7 @@ function CompanyCategoryPanel({
       {/* Desktop: two-panel */}
       <div className="hidden sm:flex" style={{ minHeight: 260 }}>
         <div className="w-52 shrink-0 border-r border-border overflow-y-auto bg-bg-secondary">
-          {COMPANY_GROUPS.map(({ id, label, Icon, categoryIds }) => {
+          {groups.map(({ id, label, Icon, categoryIds }) => {
             const isActive = id === activeGroupId;
             const hasSelected = categoryIds.includes(selectedCategoryId ?? "");
             return (
@@ -207,7 +214,7 @@ function CompanyCategoryPanel({
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-gold">{activeGroup.label}</h3>
             {selectedInActiveGroup && selectedCategoryId && (
-              <button onClick={() => onSelectCategory(null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">Auswahl löschen</button>
+              <button onClick={() => onSelectCategory(null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">{clearSelectionLabel}</button>
             )}
           </div>
           <div className="grid grid-cols-2 gap-1.5">
@@ -240,10 +247,13 @@ function CompanyCategoryPanel({
 // ─── Main ─────────────────────────────────────────────────────────
 export default function CompaniesContent({ initialCompanies }: { initialCompanies: Company[] }) {
   const router = useRouter();
+  const t = useTranslations("companies");
+
+  const COMPANY_GROUPS: CompanyGroup[] = COMPANY_GROUPS_META.map((g) => ({ ...g, label: t(g.labelKey) }));
 
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [activeGroupId, setActiveGroupId] = useState(COMPANY_GROUPS[0].id);
+  const [activeGroupId, setActiveGroupId] = useState(COMPANY_GROUPS_META[0].id);
   const [panelOpen, setPanelOpen] = useState(false);
   const [cityFilter, setCityFilter] = useState("");
   const [countryFilter, setCountryFilter] = useState("");
@@ -311,7 +321,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
             <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
               <Search size={14} className="text-text-muted shrink-0" />
               <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
-                placeholder="Firma, Leistung, Stichwort..."
+                placeholder={t("searchPlaceholder")}
                 className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
               {search && <button onClick={() => setSearch("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
             </div>
@@ -339,7 +349,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                   panelOpen || hasCatFilter ? "bg-gold/10 border-gold/30 text-gold" : "border-border text-text-muted hover:text-text-secondary hover:border-border"
                 }`}>
                 <SlidersHorizontal size={12} />
-                Kategorie
+                {t("filterCategory")}
                 {hasCatFilter
                   ? <span className="w-4 h-4 rounded-full bg-gold text-bg-primary text-[9px] font-bold flex items-center justify-center">✓</span>
                   : <ChevronDown size={11} className={`transition-transform ${panelOpen ? "rotate-180" : ""}`} />
@@ -349,11 +359,11 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
 
             {/* Stadt */}
             {availableCities.length > 0 && (
-              <FilterDropdown icon={MapPin} label="Stadt" value={cityFilter} options={availableCities} onChange={setCityFilter} />
+              <FilterDropdown icon={MapPin} label={t("filterCity")} value={cityFilter} options={availableCities} onChange={setCityFilter} />
             )}
 
             {/* Land */}
-            <FilterDropdown icon={Globe} label="Land" value={countryFilter} options={["Deutschland", "Österreich", "Schweiz"]} onChange={setCountryFilter} />
+            <FilterDropdown icon={Globe} label={t("filterCountry")} value={countryFilter} options={[t("countryDE"), t("countryAT"), t("countryCH")]} onChange={setCountryFilter} />
 
             {/* Verifiziert toggle */}
             <button
@@ -366,14 +376,14 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                 <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${verifiedOnly ? "left-3.5" : "left-0.5"}`} />
               </div>
               <Zap size={11} />
-              Verifiziert
+              {t("filterVerified")}
             </button>
 
             {hasAnyFilter && (
               <>
                 <div className="w-px h-6 bg-border shrink-0" />
                 <button onClick={clearAll} className="h-9 px-3 text-xs text-text-muted hover:text-red-400 transition-colors whitespace-nowrap shrink-0 border border-border rounded-lg hover:border-red-400/40">
-                  Löschen
+                  {t("clearFilter")}
                 </button>
               </>
             )}
@@ -383,6 +393,9 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
           {/* Category panel */}
           {panelOpen && (
             <CompanyCategoryPanel
+              groups={COMPANY_GROUPS}
+              clearLabel={t("clearFilter")}
+              clearSelectionLabel={t("clearSelection")}
               activeGroupId={activeGroupId}
               setActiveGroupId={setActiveGroupId}
               selectedCategoryId={selectedCategory}
@@ -414,12 +427,12 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
               )}
               {verifiedOnly && (
                 <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-gold/10 border-gold/30 text-gold">
-                  <CheckCircle size={9} /> Verifiziert
+                  <CheckCircle size={9} /> {t("filterVerified")}
                   <button onClick={() => setVerifiedOnly(false)} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               )}
               <button onClick={clearAll} className="text-[11px] text-text-muted hover:text-red-400 transition-colors underline underline-offset-2 ml-1">
-                Alle löschen
+                {t("clearAllFilters")}
               </button>
             </div>
           )}
@@ -429,7 +442,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
       {/* ── Results ──────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <p className="text-sm text-text-muted mb-5">
-          <span className="font-semibold text-text-primary">{filtered.length}</span> Unternehmen
+          <span className="font-semibold text-text-primary">{filtered.length}</span> {t("resultsCount", { count: filtered.length })}
           {selectedCat && <> in <span className={`font-semibold ${selectedCat.color}`}>{selectedCat.label}</span></>}
         </p>
 
@@ -440,18 +453,18 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
             </div>
             {hasAnyFilter ? (
               <>
-                <p className="text-text-primary font-semibold mb-1">Keine Unternehmen gefunden</p>
-                <p className="text-text-muted text-sm mb-5">Versuche andere Filter oder erweitere die Suche.</p>
+                <p className="text-text-primary font-semibold mb-1">{t("emptyFilteredTitle")}</p>
+                <p className="text-text-muted text-sm mb-5">{t("emptyFilteredDesc")}</p>
                 <button onClick={clearAll} className="px-5 py-2.5 border border-border rounded-xl text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors">
-                  Filter zurücksetzen
+                  {t("resetFilters")}
                 </button>
               </>
             ) : (
               <>
-                <p className="text-text-primary font-semibold mb-1">Noch keine Unternehmen eingetragen</p>
-                <p className="text-text-muted text-sm mb-5 max-w-xs mx-auto">Sei das erste Unternehmen und werde von tausenden Filmschaffenden gefunden.</p>
+                <p className="text-text-primary font-semibold mb-1">{t("emptyTitle")}</p>
+                <p className="text-text-muted text-sm mb-5 max-w-xs mx-auto">{t("emptyDesc")}</p>
                 <Link href="/company-setup" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl text-sm hover:bg-gold-light transition-colors">
-                  Jetzt Firmenprofil erstellen <ArrowRight size={14} />
+                  {t("emptyCta")} <ArrowRight size={14} />
                 </Link>
               </>
             )}
@@ -472,16 +485,16 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
           <div className="mt-8 text-center">
             <button onClick={() => setPage((p) => p + 1)}
               className="px-6 py-2.5 border border-border rounded-xl text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors">
-              Mehr laden · {filtered.length - paginated.length} weitere
+              {t("loadMore", { count: filtered.length - paginated.length })}
             </button>
           </div>
         )}
 
         {/* CTA — minimal, no duplicate button */}
         <p className="mt-10 text-center text-xs text-text-muted">
-          Noch nicht dabei?{" "}
+          {t("footerCta")}{" "}
           <Link href="/company-setup" className="text-gold hover:underline font-medium">
-            Kostenloses Firmenprofil erstellen →
+            {t("footerCtaLink")}
           </Link>
         </p>
       </div>

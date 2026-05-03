@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   Search, Clapperboard, Calendar, Users, X, ChevronDown,
   LayoutList, LayoutGrid, Film, MapPin, ArrowUpDown,
@@ -53,7 +54,8 @@ function SortDropdown({ value, options, onChange }: {
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
   }, [open]);
-  const label = options.find((o) => o.value === value)?.label ?? "Sortierung";
+  // label resolved from options array passed in
+  const label = options.find((o) => o.value === value)?.label ?? options[0]?.label ?? "";
   return (
     <div ref={ref} className="relative shrink-0">
       <button onClick={() => setOpen((v) => !v)}
@@ -120,6 +122,7 @@ function FilterDropdown({
 
 // ─── Main ─────────────────────────────────────────────────────────
 export default function ProjectsContent({ projects: allProjects }: { projects: Project[] }) {
+  const t = useTranslations("projects");
   const [query, setQuery] = useState("");
   const [categoryChip, setCategoryChip] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState("");
@@ -187,7 +190,7 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
             <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
               <Search size={14} className="text-text-muted shrink-0" />
               <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
-                placeholder="Titel oder Regisseur suchen..."
+                placeholder={t("searchPlaceholder")}
                 className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
               {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
             </div>
@@ -202,31 +205,31 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
             <SortDropdown
               value={sort}
               options={[
-                { value: "year_desc", label: "Neueste zuerst" },
-                { value: "year_asc",  label: "Älteste zuerst" },
-                { value: "title_asc", label: "A → Z" },
-                { value: "crew_desc", label: "Meiste Crew" },
+                { value: "year_desc", label: t("sortNewest") },
+                { value: "year_asc",  label: t("sortOldest") },
+                { value: "title_asc", label: t("sortAlpha") },
+                { value: "crew_desc", label: t("sortCrew") },
               ]}
               onChange={(v) => setSort(v as SortKey)}
             />
             <Link href="/dashboard/projects/new" className="hidden sm:flex items-center h-9 px-3 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors whitespace-nowrap shrink-0">
-              + Projekt erstellen
+              {t("createProject")}
             </Link>
 
             <div className="w-px h-6 bg-border shrink-0" />
 
             {availableTypes.length > 0 && (
-              <FilterDropdown icon={Film} label="Projekttyp" value={typeFilter} options={availableTypes} onChange={setTypeFilter} />
+              <FilterDropdown icon={Film} label={t("filterType")} value={typeFilter} options={availableTypes} onChange={setTypeFilter} />
             )}
             {availableYears.length > 0 && (
-              <FilterDropdown icon={Calendar} label="Jahr" value={yearFilter} options={availableYears} onChange={setYearFilter} />
+              <FilterDropdown icon={Calendar} label={t("filterYear")} value={yearFilter} options={availableYears} onChange={setYearFilter} />
             )}
             {availableDirectors.length > 0 && (
-              <FilterDropdown icon={MapPin} label="Regie" value={directorFilter} options={availableDirectors} onChange={setDirectorFilter} />
+              <FilterDropdown icon={MapPin} label={t("filterDirector")} value={directorFilter} options={availableDirectors} onChange={setDirectorFilter} />
             )}
             {hasAnyFilter && (
               <button onClick={clearAll} className="h-9 px-3 text-xs text-text-muted hover:text-red-400 transition-colors whitespace-nowrap border border-border rounded-lg hover:border-red-400/40 shrink-0">
-                Löschen
+                {t("clearFilter")}
               </button>
             )}
           </div>
@@ -253,7 +256,7 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
                 </span>
               )}
               <button onClick={clearAll} className="text-[11px] text-text-muted hover:text-red-400 transition-colors underline underline-offset-2 ml-1">
-                Alle löschen
+                {t("clearAllFilters")}
               </button>
             </div>
           )}
@@ -263,15 +266,15 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
       {/* ── Results ──────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <p className="text-sm text-text-muted mb-5">
-          <span className="font-semibold text-text-primary">{filtered.length}</span> {filtered.length === 1 ? "Projekt" : "Projekte"} gefunden
+          {t("resultsCount", { count: filtered.length })}
         </p>
 
         {filtered.length === 0 && (
           <div className="text-center py-20">
             <Clapperboard size={32} className="mx-auto mb-3 text-text-muted opacity-30" />
-            <p className="text-text-muted mb-3">Keine Projekte gefunden</p>
+            <p className="text-text-muted mb-3">{t("emptyTitle")}</p>
             {hasAnyFilter && (
-              <button onClick={clearAll} className="text-xs text-gold hover:underline">Filter zurücksetzen</button>
+              <button onClick={clearAll} className="text-xs text-gold hover:underline">{t("resetFilters")}</button>
             )}
           </div>
         )}
@@ -312,11 +315,11 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
             <div className="hidden sm:block bg-bg-secondary border border-border rounded-2xl overflow-hidden">
               <div className="grid grid-cols-[2fr_80px_120px_1fr_64px] gap-4 px-5 py-3 border-b border-border bg-bg-elevated">
                 {[
-                  { label: "Titel", key: "title_asc" as SortKey },
-                  { label: "Jahr",  key: "year_desc" as SortKey },
-                  { label: "Typ",   key: null },
-                  { label: "Regie", key: null },
-                  { label: "Crew",  key: "crew_desc" as SortKey },
+                  { label: t("colTitle"),    key: "title_asc" as SortKey },
+                  { label: t("colYear"),     key: "year_desc" as SortKey },
+                  { label: t("colType"),     key: null },
+                  { label: t("colDirector"), key: null },
+                  { label: t("colCrew"),     key: "crew_desc" as SortKey },
                 ].map(({ label, key }) => (
                   <button key={label} onClick={() => key && setSort(key)}
                     className={`text-[10px] uppercase tracking-widest font-semibold text-left transition-colors flex items-center gap-1 ${
@@ -387,9 +390,9 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
                     </div>
                   </div>
                 </div>
-                {project.director && <p className="text-xs text-text-muted mb-2">Regie: {project.director}</p>}
+                {project.director && <p className="text-xs text-text-muted mb-2">{t("directorPrefix", { name: project.director })}</p>}
                 <div className="flex items-center gap-1 text-xs text-text-muted">
-                  <Users size={11} /> {project.crew_count} {project.crew_count === 1 ? "Person" : "Personen"}
+                  <Users size={11} /> {t("personCount", { count: project.crew_count })}
                 </div>
               </Link>
             ))}

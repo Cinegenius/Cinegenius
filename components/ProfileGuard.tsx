@@ -4,6 +4,7 @@ import { useUser, useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Film } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 /**
  * Wraps pages that require a completed profile.
@@ -16,6 +17,7 @@ export default function ProfileGuard({ children }: { children: React.ReactNode }
   const router = useRouter();
   const { openSignIn } = useClerk();
   const [ready, setReady] = useState(false);
+  const t = useTranslations("common");
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -52,7 +54,7 @@ export default function ProfileGuard({ children }: { children: React.ReactNode }
           <div className="w-12 h-12 bg-gold/10 border border-gold/20 rounded-full flex items-center justify-center animate-pulse">
             <Film size={20} className="text-gold" />
           </div>
-          <p className="text-text-muted text-sm">Einen Moment...</p>
+          <p className="text-text-muted text-sm">{t("loading")}</p>
         </div>
       </div>
     );

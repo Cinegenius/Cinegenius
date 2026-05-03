@@ -47,6 +47,7 @@ function parseCreatorDescription(raw: string): { skills: string[]; credits: stri
 
 export default async function CreatorsPage() {
   const t = await getTranslations("creators");
+  const tCommon = await getTranslations("common");
   const { userId } = await auth();
   let hasProfile = false;
   if (userId) {
@@ -84,7 +85,7 @@ export default async function CreatorsPage() {
       avatar: l.image_url ?? "",
       rating: 0,
       reviews: 0,
-      dayRate: l.price > 0 ? `${l.price} €/Tag` : "Nach Vereinbarung",
+      dayRate: l.price > 0 ? `${l.price} €/Tag` : tCommon("byArrangement"),
       available: true,
       credits,
       skills,
@@ -132,7 +133,7 @@ export default async function CreatorsPage() {
         avatar: p.avatar_url ?? "",
         rating: 0,
         reviews: 0,
-        dayRate: p.day_rate ? `${p.day_rate} €/Tag` : "Nach Vereinbarung",
+        dayRate: p.day_rate ? `${p.day_rate} €/Tag` : tCommon("byArrangement"),
         available: p.available ?? true,
         credits: [],
         skills: p.skills ?? [],

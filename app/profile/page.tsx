@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
+import { useTranslations } from "next-intl";
 import { compressImage, compressAvatar } from "@/lib/compressImage";
 import {
   Camera, CheckCircle, User, Lock, Bell, CreditCard, MapPin, Film,
@@ -34,34 +35,40 @@ function safeLink(url: string | null | undefined): string | null {
 
 type CompletionResult = { score: number; missing: string[] };
 
+type CompletionHints = {
+  hintName: string; hintAvatar: string; hintCity: string; hintBio: string;
+  hintType: string; hintPhotos: string; hintVideo: string; hintLanguages: string;
+  hintHeight: string; hintHair: string; hintAge: string; hintRole: string; hintCredits: string;
+};
+
 function getCompletion(opts: {
   name: string; avatarUrl: string; location: string; bio: string;
   images: string[]; videoLinks: string[]; profileType: string;
   physical: { height_cm?: string; hair_color?: string; playing_age_min?: string };
   crew: { positions: string[]; filmography: unknown[] };
   languages: string[];
-}): CompletionResult {
+}, hints: CompletionHints): CompletionResult {
   const checks: [boolean, string][] = [
-    [!!opts.name,                        "Name eingeben"],
-    [!!opts.avatarUrl,                   "Profilfoto hochladen"],
-    [!!opts.location,                    "Stadt angeben"],
-    [!!opts.bio,                         "Kurzbeschreibung schreiben"],
-    [!!opts.profileType,                 "Profiltyp auswählen"],
-    [opts.images.length >= 2,            "Mindestens 2 Fotos hochladen"],
-    [opts.videoLinks.length > 0,         "Video / Showreel hinzufügen"],
-    [opts.languages.length > 0,          "Sprachen eintragen"],
+    [!!opts.name,                        hints.hintName],
+    [!!opts.avatarUrl,                   hints.hintAvatar],
+    [!!opts.location,                    hints.hintCity],
+    [!!opts.bio,                         hints.hintBio],
+    [!!opts.profileType,                 hints.hintType],
+    [opts.images.length >= 2,            hints.hintPhotos],
+    [opts.videoLinks.length > 0,         hints.hintVideo],
+    [opts.languages.length > 0,          hints.hintLanguages],
   ];
   const type = opts.profileType;
   const isTalent = ["actor","model","extra","host","dancer","stunt","voiceover","creator"].includes(type);
   const isCrew   = !isTalent && !!type && !["location","equipment","vehicle","studio","props"].includes(type);
   if (isTalent) {
-    checks.push([!!opts.physical.height_cm, "Größe eintragen"]);
-    checks.push([!!opts.physical.hair_color, "Haarfarbe eintragen"]);
-    if (type === "actor") checks.push([!!opts.physical.playing_age_min, "Spielalter hinterlegen"]);
+    checks.push([!!opts.physical.height_cm, hints.hintHeight]);
+    checks.push([!!opts.physical.hair_color, hints.hintHair]);
+    if (type === "actor") checks.push([!!opts.physical.playing_age_min, hints.hintAge]);
   }
   if (isCrew) {
-    checks.push([opts.crew.positions.length > 0, "Gewerk / Rolle auswählen"]);
-    checks.push([opts.crew.filmography.length > 0, "Credits hinzufügen"]);
+    checks.push([opts.crew.positions.length > 0, hints.hintRole]);
+    checks.push([opts.crew.filmography.length > 0, hints.hintCredits]);
   }
   const passed = checks.filter(([ok]) => ok).length;
   return {
@@ -71,14 +78,15 @@ function getCompletion(opts: {
 }
 
 // ─── Accordion role picker (same as profile-setup) ───────────────────────────
-const ROLE_CATEGORIES: { id: string; label: string; icon: ElementType; color: string; bg: string; desc: string; types: readonly (readonly [string, string])[] }[] = [
-  { id: "talent",   label: "Talent / Performance", icon: Drama,        color: "text-rose-400",    bg: "bg-rose-500/15",    desc: "Schauspieler, Model, Creator …",
+// Labels/descs resolved inside component using tP()
+const ROLE_CATEGORIES_META: { id: string; labelKey: string; icon: ElementType; color: string; bg: string; descKey: string; types: readonly (readonly [string, string])[] }[] = [
+  { id: "talent",   labelKey: "catTalentLabel",   icon: Drama,        color: "text-rose-400",    bg: "bg-rose-500/15",    descKey: "catTalentDesc",
     types: [["actor","Schauspieler/in"],["model","Model"],["extra","Komparse / Kleindarsteller"],["host","Moderator/in"],["dancer","Tänzer/in"],["stunt","Stunt Performer"],["voiceover","Synchronsprecher/in"],["creator","Influencer / Creator"]] },
-  { id: "crew",     label: "Filmcrew / Technik",   icon: Clapperboard,  color: "text-sky-400",     bg: "bg-sky-500/15",     desc: "Kamera, Licht, Ton, Regie …",
+  { id: "crew",     labelKey: "catCrewLabel",     icon: Clapperboard,  color: "text-sky-400",     bg: "bg-sky-500/15",     descKey: "catCrewDesc",
     types: [["camera","Kamera"],["lighting","Licht / Gaffer"],["sound","Ton"],["director_of_photography","Director of Photography"],["director","Regie"],["production","Produktion"],["makeup","Maske"],["costume","Kostüm"],["postproduction","Postproduktion"],["vfx","VFX"],["sfx","SFX"],["art_department","Szenenbild"],["broadcast","Broadcast"]] },
-  { id: "kreativ",  label: "Kreativ",               icon: Palette,       color: "text-violet-400",  bg: "bg-violet-500/15",  desc: "Fotograf, Editor, Art Director …",
+  { id: "kreativ",  labelKey: "catKreativLabel",  icon: Palette,       color: "text-violet-400",  bg: "bg-violet-500/15",  descKey: "catKreativDesc",
     types: [["filmmaker","Regisseur/in"],["writer","Autor/in"],["photographer","Fotograf/in"],["editor","Editor/in"],["motion_designer","Motion Designer"],["art_director","Art Director"]] },
-  { id: "anbieter", label: "Anbieter",              icon: Building2,     color: "text-amber-400",   bg: "bg-amber-500/15",   desc: "Location, Equipment, Studio …",
+  { id: "anbieter", labelKey: "catAnbieterLabel", icon: Building2,     color: "text-amber-400",   bg: "bg-amber-500/15",   descKey: "catAnbieterDesc",
     types: [["location","Location"],["equipment","Equipment"],["vehicle","Fahrzeuge"],["studio","Studio"],["props","Requisiten"]] },
 ];
 
@@ -93,8 +101,14 @@ function RoleAndPositionPicker({
   positions: string[];
   onPositionsChange: (p: string[]) => void;
 }) {
+  const tP = useTranslations("profile");
+  const ROLE_CATEGORIES = ROLE_CATEGORIES_META.map((c) => ({
+    ...c,
+    label: tP(c.labelKey as Parameters<typeof tP>[0]),
+    desc:  tP(c.descKey as Parameters<typeof tP>[0]),
+  }));
   const [openCat, setOpenCat] = useState<string | null>(() =>
-    ROLE_CATEGORIES.find((c) => c.types.some(([id]) => id === selectedType))?.id ?? null
+    ROLE_CATEGORIES_META.find((c) => c.types.some(([id]) => id === selectedType))?.id ?? null
   );
 
   return (
@@ -163,14 +177,14 @@ function RoleAndPositionPicker({
                 {showPositions && (
                   <div className="border-t border-border/60 px-4 pb-5 pt-4">
                     <div className="flex items-center justify-between mb-3">
-                      <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">Positionen</p>
+                      <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">{tP("positions")}</p>
                       {positions.length > 0 && (
                         <button
                           type="button"
                           onClick={() => onPositionsChange([])}
                           className="text-[10px] text-text-muted hover:text-crimson-light transition-colors"
                         >
-                          Alle entfernen
+                          {tP("removeAll")}
                         </button>
                       )}
                     </div>
@@ -266,15 +280,17 @@ function getCategory(type: string): "talent" | "crew" | "creative" | "vendor" | 
   return map[type] ?? null;
 }
 
-const tabs = [
-  { id: "profile",        label: "Profil",                icon: User        },
-  { id: "projekte",       label: "Projekte",               icon: Clapperboard },
-  { id: "inserate",       label: "Inserate",               icon: Film        },
-  { id: "netzwerk",       label: "Netzwerk",               icon: Users2      },
-  { id: "verification",   label: "Verifizierung",          icon: CheckCircle },
-  { id: "security",       label: "Sicherheit",             icon: Lock        },
-  { id: "notifications",  label: "Benachrichtigungen",     icon: Bell        },
-  { id: "billing",        label: "Abrechnung",             icon: CreditCard  },
+// Tab labels are resolved inside the component using useTranslations
+// We keep the IDs here and get labels from t() in the component
+const TAB_IDS = [
+  { id: "profile",        labelKey: "tabProfile",        icon: User        },
+  { id: "projekte",       labelKey: "tabProjects",       icon: Clapperboard },
+  { id: "inserate",       labelKey: "tabListings",       icon: Film        },
+  { id: "netzwerk",       labelKey: "tabNetwork",        icon: Users2      },
+  { id: "verification",   labelKey: "tabVerification",   icon: CheckCircle },
+  { id: "security",       labelKey: "tabSecurity",       icon: Lock        },
+  { id: "notifications",  labelKey: "tabNotifications",  icon: Bell        },
+  { id: "billing",        labelKey: "tabBilling",        icon: CreditCard  },
 ];
 
 // ─── Verification Tab ────────────────────────────────────────────────────────
@@ -314,6 +330,7 @@ function UploadZone({
 
 function VerificationTab() {
   const { addToast } = useToast();
+  const tV = useTranslations("profile");
   const [status, setStatus] = useState<VerifStatus>("loading");
   const [submitting, setSubmitting] = useState(false);
   const [idFile, setIdFile] = useState<{ name: string; url: string } | null>(null);
@@ -337,7 +354,7 @@ function VerificationTab() {
       fd.append("file", file);
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       const { url, error } = await res.json();
-      if (!res.ok || !url) { addToast(error ?? "Upload fehlgeschlagen", "error"); return; }
+      if (!res.ok || !url) { addToast(error ?? tV("uploadFailed"), "error"); return; }
       setIdFile({ name: file.name, url });
     } finally {
       setIdUploading(false);
@@ -357,9 +374,9 @@ function VerificationTab() {
       const data = await res.json();
       if (!res.ok) { addToast(data.error ?? "Fehler beim Einreichen", "error"); return; }
       setStatus("pending");
-      addToast("Ausweis eingereicht", "success");
+      addToast(tV("verifSubmit"), "success");
     } catch {
-      addToast("Unbekannter Fehler", "error");
+      addToast(tV("unknownError"), "error");
     } finally {
       setSubmitting(false);
     }
@@ -375,12 +392,12 @@ function VerificationTab() {
         <div className="w-16 h-16 bg-success/10 border border-success/20 rounded-full flex items-center justify-center mx-auto">
           <ShieldCheck size={28} className="text-success" />
         </div>
-        <h3 className="font-display text-xl font-bold text-text-primary">Identität verifiziert</h3>
+        <h3 className="font-display text-xl font-bold text-text-primary">{tV("verifApproved")}</h3>
         <p className="text-sm text-text-muted max-w-sm mx-auto leading-relaxed">
-          Dein Profil trägt das verifizierte Badge.
+          {tV("verifApprovedDesc")}
         </p>
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-success/10 border border-success/20 rounded-full text-success text-sm font-medium">
-          <CheckCircle size={14} /> Verifiziert
+          <CheckCircle size={14} /> {tV("verifVerified")}
         </div>
       </div>
     );
@@ -392,12 +409,12 @@ function VerificationTab() {
         <div className="w-16 h-16 bg-gold/10 border border-gold/20 rounded-full flex items-center justify-center mx-auto">
           <Clock size={28} className="text-gold" />
         </div>
-        <h3 className="font-display text-xl font-bold text-text-primary">Wird geprüft</h3>
+        <h3 className="font-display text-xl font-bold text-text-primary">{tV("verifPending")}</h3>
         <p className="text-sm text-text-muted max-w-sm mx-auto leading-relaxed">
-          Wir prüfen deinen Ausweis innerhalb von <strong className="text-text-primary">1–2 Werktagen</strong>.
+          {tV("verifPendingDesc")}
         </p>
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-gold/10 border border-gold/20 rounded-full text-gold text-sm font-medium">
-          <Clock size={14} /> Ausstehend
+          <Clock size={14} /> {tV("verifPendingStatus")}
         </div>
       </div>
     );
@@ -408,16 +425,16 @@ function VerificationTab() {
       <div className="space-y-5">
         <div className="p-6 bg-red-500/5 border border-red-500/20 rounded-xl text-center space-y-3">
           <AlertCircle size={28} className="text-red-400 mx-auto" />
-          <h3 className="font-semibold text-text-primary">Prüfung fehlgeschlagen</h3>
+          <h3 className="font-semibold text-text-primary">{tV("verifRejected")}</h3>
           <p className="text-sm text-text-muted max-w-sm mx-auto">
-            Dein Ausweis konnte nicht verifiziert werden. Bitte lade ein neues, gut lesbares Bild hoch.
+            {tV("verifRejectedDesc")}
           </p>
         </div>
         <button
           onClick={() => setStatus("none")}
           className="w-full py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors"
         >
-          Erneut versuchen
+          {tV("verifRetry")}
         </button>
       </div>
     );
@@ -427,8 +444,8 @@ function VerificationTab() {
   return (
     <div className="space-y-5">
       <UploadZone
-        label="Personalausweis oder Reisepass"
-        hint="JPG, PNG oder WEBP · Vorder- und Rückseite · max. 10 MB"
+        label={tV("verifIdLabel")}
+        hint={tV("verifIdHint")}
         accept="image/jpeg,image/png,image/webp"
         file={idFile}
         uploading={idUploading}
@@ -438,7 +455,7 @@ function VerificationTab() {
       <div className="p-4 bg-bg-secondary border border-border rounded-xl flex items-start gap-2.5">
         <ShieldCheck size={15} className="text-text-muted shrink-0 mt-0.5" />
         <p className="text-xs text-text-muted leading-relaxed">
-          Dein Ausweis wird ausschließlich zur Identitätsprüfung verwendet und vertraulich behandelt. Er ist für andere Nutzer nicht sichtbar.
+          {tV("verifPrivacy")}
         </p>
       </div>
 
@@ -447,7 +464,7 @@ function VerificationTab() {
         disabled={submitting || !idFile}
         className="w-full py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
-        {submitting ? <><Loader2 size={15} className="animate-spin" /> Einreichen…</> : <><ShieldCheck size={15} /> Ausweis einreichen</>}
+        {submitting ? <><Loader2 size={15} className="animate-spin" /> {tV("verifSubmitting")}</> : <><ShieldCheck size={15} /> {tV("verifSubmit")}</>}
       </button>
     </div>
   );
@@ -460,6 +477,7 @@ type FilmEntry = { year: number | string; title: string; role: string; type: str
 export default function ProfilePage() {
   const { addToast } = useToast();
   const { user, isLoaded } = useUser();
+  const t = useTranslations("profile");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [activeTab, setActiveTab] = useState("profile");
@@ -695,11 +713,11 @@ export default function ProfilePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ avatar_url: url }),
       });
-      addToast("Profilfoto aktualisiert", "success");
+      addToast(t("uploadSuccess"), "success");
       // Fokuspunkt setzen
       setFocalPickerImage(url);
     } catch {
-      addToast("Upload fehlgeschlagen", "error");
+      addToast(t("uploadFailed"), "error");
       setAvatarPreview(avatarUrl); // revert
     } finally {
       setAvatarUploading(false);
@@ -729,11 +747,11 @@ export default function ProfilePage() {
       const { url, error } = await res.json();
       if (error) throw new Error(error);
       setCoverImageUrl(url);
-      addToast("Coverbild aktualisiert", "success");
+      addToast(t("coverSuccess"), "success");
       // Fokuspunkt setzen
       setFocalPickerImage(url);
     } catch {
-      addToast("Upload fehlgeschlagen", "error");
+      addToast(t("uploadFailed"), "error");
       setCoverImagePreview(coverImageUrl);
     } finally {
       setCoverUploading(false);
@@ -772,7 +790,7 @@ export default function ProfilePage() {
       setJoinRole("");
       setProjectSearch("");
       setProjectResults([]);
-      addToast("Erfolgreich eingetragen!", "success");
+      addToast(t("joinedProject"), "success");
     } finally {
       setJoiningRole(false);
     }
@@ -781,11 +799,11 @@ export default function ProfilePage() {
   const leaveProject = async (projectId: string) => {
     await fetch(`/api/project-credits?project_id=${projectId}`, { method: "DELETE" });
     setProjectCredits((prev) => prev.filter((c) => c.project_id !== projectId));
-    addToast("Aus Projekt ausgetragen", "success");
+    addToast(t("leftProject"), "success");
   };
 
   const createProject = async () => {
-    if (!newProject.title.trim()) { addToast("Titel fehlt", "error"); return; }
+    if (!newProject.title.trim()) { addToast(t("titleMissing"), "error"); return; }
     setCreatingProject(true);
     try {
       const r = await fetch("/api/projects", {
@@ -801,7 +819,7 @@ export default function ProfilePage() {
       setProjectCredits(d2.credits ?? []);
       setShowNewProject(false);
       setNewProject({ title: "", year: "", type: "", description: "", director: "", myRole: "", poster_url: "", genre: "", productionCompany: "", location: "", equipment: "", link: "", alsoOnCrewUnited: false });
-      addToast("Projekt erstellt!", "success");
+      addToast(t("projectCreated"), "success");
     } finally {
       setCreatingProject(false);
     }
@@ -810,7 +828,7 @@ export default function ProfilePage() {
   // ── Save profile ────────────────────────────────────────────────────────────
   const handleSave = async () => {
     if (!form.name.trim() || !form.city.trim()) {
-      addToast("Name und Stadt sind Pflichtfelder", "error");
+      addToast(t("nameAndCityRequired"), "error");
       return;
     }
     setSaving(true);
@@ -879,7 +897,7 @@ export default function ProfilePage() {
         return;
       }
 
-      addToast("Profil erfolgreich aktualisiert", "success");
+      addToast(t("profileSaved"), "success");
     } catch (err) {
       addToast(`Fehler: ${err instanceof Error ? err.message : String(err)}`, "error");
     } finally {
@@ -919,10 +937,10 @@ export default function ProfilePage() {
       // Immediately persist to DB — don't rely on main save button
       await persistProfileImages(merged);
 
-      addToast(`${uploaded.length} Foto${uploaded.length > 1 ? "s" : ""} gespeichert`, "success");
+      addToast(t("photosSaved", { count: uploaded.length }), "success");
     } catch (err) {
       console.error("[photo upload]", err);
-      addToast(err instanceof Error ? err.message : "Upload fehlgeschlagen", "error");
+      addToast(err instanceof Error ? err.message : t("uploadFailed"), "error");
     } finally {
       setProfileUploading(false);
       if (profileImagesRef.current) profileImagesRef.current.value = "";
@@ -958,6 +976,20 @@ export default function ProfilePage() {
     physical: { height_cm: heightCm, hair_color: hairColor, playing_age_min: playingAgeMin },
     crew: { positions, filmography },
     languages,
+  }, {
+    hintName:      t("hintName"),
+    hintAvatar:    t("hintAvatar"),
+    hintCity:      t("hintCity"),
+    hintBio:       t("hintBio"),
+    hintType:      t("hintType"),
+    hintPhotos:    t("hintPhotos"),
+    hintVideo:     t("hintVideo"),
+    hintLanguages: t("hintLanguages"),
+    hintHeight:    t("hintHeight"),
+    hintHair:      t("hintHair"),
+    hintAge:       t("hintAge"),
+    hintRole:      t("hintRole"),
+    hintCredits:   t("hintCredits"),
   });
   const displayAvatarName = form.name || clerkEmail.split("@")[0] || "?";
 
@@ -969,7 +1001,7 @@ export default function ProfilePage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ focal_point: point }),
     });
-    addToast("Fokuspunkt gespeichert", "success");
+      addToast(t("focalSaved"), "success");
   }
 
   return (
@@ -993,10 +1025,10 @@ export default function ProfilePage() {
               className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-gold transition-colors mb-3"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg>
-              Zurück zum Dashboard
+              {t("backToDashboard")}
             </Link>
-            <h1 className="font-display text-2xl font-bold text-text-primary">Öffentliches Profil</h1>
-            <p className="text-sm text-text-muted mt-1">So wirst du anderen Nutzern auf CineGenius angezeigt.</p>
+            <h1 className="font-display text-2xl font-bold text-text-primary">{t("pageTitle")}</h1>
+            <p className="text-sm text-text-muted mt-1">{t("pageSubtitle")}</p>
           </div>
           {user?.id && (
             <Link
@@ -1006,7 +1038,7 @@ export default function ProfilePage() {
               className="inline-flex items-center gap-2 px-4 py-2 border border-border text-text-secondary text-sm font-medium rounded-lg hover:border-gold hover:text-gold transition-colors shrink-0"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
-              Profil ansehen
+              {t("viewProfile")}
             </Link>
           )}
         </div>
@@ -1015,14 +1047,14 @@ export default function ProfilePage() {
           {/* Sidebar */}
           <aside className="lg:w-56 shrink-0">
             <nav className="space-y-1">
-              {tabs.map(({ id, label, icon: Icon }) => (
+              {TAB_IDS.map(({ id, labelKey, icon: Icon }) => (
                 <button key={id} onClick={() => setActiveTab(id)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-left ${
                     activeTab === id
                       ? "bg-gold/10 text-gold border border-gold/20"
                       : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary border border-transparent"
                   }`}>
-                  <Icon size={15} /> {label}
+                  <Icon size={15} /> {t(labelKey as Parameters<typeof t>[0])}
                 </button>
               ))}
             </nav>
@@ -1046,7 +1078,7 @@ export default function ProfilePage() {
                 {completion.score < 100 && (
                   <div className="p-4 bg-bg-secondary border border-border rounded-xl">
                     <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-semibold text-text-primary">Profil-Vollständigkeit</p>
+                      <p className="text-sm font-semibold text-text-primary">{t("completionTitle")}</p>
                       <span className={`text-sm font-bold tabular-nums ${completion.score >= 70 ? "text-emerald-400" : completion.score >= 40 ? "text-gold" : "text-text-muted"}`}>
                         {completion.score}%
                       </span>
@@ -1071,8 +1103,8 @@ export default function ProfilePage() {
 
                 {/* ── Ich bin & Positionen (unified) ── */}
                 <div className="p-6 bg-bg-secondary border border-border rounded-xl">
-                  <h2 className="font-semibold text-text-primary mb-1">Ich bin …</h2>
-                  <p className="text-xs text-text-muted mb-4">Wähle deinen Typ — bei Crew & Kreativ kannst du direkt Positionen auswählen.</p>
+                  <h2 className="font-semibold text-text-primary mb-1">{t("sectionIAm")}</h2>
+                  <p className="text-xs text-text-muted mb-4">{t("sectionIAmDesc")}</p>
                   <RoleAndPositionPicker
                     selectedType={currentProfileType}
                     onSelectType={setCurrentProfileType}
@@ -1083,7 +1115,7 @@ export default function ProfilePage() {
 
                 {/* Avatar */}
                 <div className="p-6 bg-bg-secondary border border-border rounded-xl">
-                  <h2 className="font-semibold text-text-primary mb-5">Profilfoto</h2>
+                  <h2 className="font-semibold text-text-primary mb-5">{t("sectionAvatar")}</h2>
                   <div className="flex items-center gap-5">
                     <div className="relative shrink-0">
                       {avatarPreview ? (
@@ -1114,11 +1146,11 @@ export default function ProfilePage() {
                       <div className="flex gap-2">
                         <button onClick={() => fileRef.current?.click()}
                           className="px-3 py-1.5 text-xs border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-colors">
-                          Foto hochladen
+                          {t("photoUpload")}
                         </button>
                         {avatarPreview && (
                           <button onClick={removeAvatar} className="px-3 py-1.5 text-xs text-text-muted hover:text-crimson-light transition-colors">
-                            Entfernen
+                            {t("removePhoto")}
                           </button>
                         )}
                       </div>
@@ -1139,11 +1171,11 @@ export default function ProfilePage() {
                   />
                   <div className="flex items-start justify-between gap-4 mb-4">
                     <div>
-                      <h2 className="font-semibold text-text-primary mb-0.5">Fotos</h2>
+                      <h2 className="font-semibold text-text-primary mb-0.5">{t("sectionPhotos")}</h2>
                       <p className="text-xs text-text-muted">
                         {showTalentSections
-                          ? "Das Hauptfoto (★) erscheint groß, weitere als Seitenfotos auf deinem Profil."
-                          : "Fotos für dein Portfolio. Mehrere Bilder möglich."}
+                          ? t("sectionPhotosDescTalent")
+                          : t("sectionPhotosDescDefault")}
                       </p>
                     </div>
                     <button
@@ -1153,7 +1185,7 @@ export default function ProfilePage() {
                       className="shrink-0 flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-60"
                     >
                       {profileUploading ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
-                      {profileUploading ? "Lädt…" : "Fotos hochladen"}
+                      {profileUploading ? t("uploading") : t("uploadPhotos")}
                     </button>
                   </div>
 
@@ -1189,7 +1221,7 @@ export default function ProfilePage() {
                           </div>
                           {img.featured && (
                             <div className="absolute bottom-1.5 inset-x-0 flex justify-center">
-                              <span className="px-2 py-0.5 bg-gold text-bg-primary text-[9px] font-bold rounded-full">Hauptfoto</span>
+                              <span className="px-2 py-0.5 bg-gold text-bg-primary text-[9px] font-bold rounded-full">{t("mainPhoto")}</span>
                             </div>
                           )}
                         </div>
@@ -1201,7 +1233,7 @@ export default function ProfilePage() {
                         className="aspect-[3/4] rounded-xl border-2 border-dashed border-border hover:border-gold/60 hover:bg-gold/5 flex flex-col items-center justify-center gap-2 text-text-muted hover:text-gold transition-all disabled:opacity-50"
                       >
                         {profileUploading ? <Loader2 size={20} className="animate-spin" /> : <Plus size={20} />}
-                        <span className="text-[10px] font-semibold uppercase tracking-wide">{profileUploading ? "Lädt…" : "Hinzufügen"}</span>
+                        <span className="text-[10px] font-semibold uppercase tracking-wide">{profileUploading ? t("uploading") : t("addPhoto")}</span>
                       </button>
                     </div>
                   ) : (
@@ -1211,7 +1243,7 @@ export default function ProfilePage() {
                       className="w-full border-2 border-dashed border-border rounded-xl p-10 flex flex-col items-center justify-center text-center hover:border-gold/50 hover:bg-gold/5 transition-all"
                     >
                       <Upload size={28} className="text-text-muted mb-3" />
-                      <p className="text-sm font-medium text-text-secondary">Fotos hochladen</p>
+                      <p className="text-sm font-medium text-text-secondary">{t("uploadPhotos")}</p>
                       <p className="text-xs text-text-muted mt-1">JPG, PNG, WEBP · mehrere gleichzeitig möglich</p>
                     </button>
                   )}
@@ -1221,8 +1253,8 @@ export default function ProfilePage() {
                 {!showTalentSections && <div className="p-6 bg-bg-secondary border border-border rounded-xl">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h2 className="font-semibold text-text-primary mb-0.5">Coverbild</h2>
-                      <p className="text-xs text-text-muted">Großes Banner oben auf deinem Profil (16:9 empfohlen)</p>
+                      <h2 className="font-semibold text-text-primary mb-0.5">{t("sectionCover")}</h2>
+                      <p className="text-xs text-text-muted">{t("sectionCoverDesc")}</p>
                     </div>
                     <button
                       type="button"
@@ -1231,7 +1263,7 @@ export default function ProfilePage() {
                       className="flex items-center gap-2 px-4 py-2 bg-gold/10 border border-gold/20 text-gold text-xs font-semibold rounded-lg hover:bg-gold/20 transition-colors disabled:opacity-60"
                     >
                       {coverUploading ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
-                      {coverUploading ? "Lädt..." : "Bild hochladen"}
+                      {coverUploading ? t("uploading") : t("uploadCover")}
                     </button>
                     <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleCoverChange} />
                   </div>
@@ -1254,7 +1286,7 @@ export default function ProfilePage() {
                       className="w-full border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-gold/40 transition-colors aspect-[3/1] flex flex-col items-center justify-center gap-2"
                     >
                       <Camera size={24} className="text-text-muted" />
-                      <p className="text-sm text-text-muted">Coverbild hochladen</p>
+                      <p className="text-sm text-text-muted">{t("uploadCoverPlaceholder")}</p>
                       <p className="text-xs text-text-muted">JPG, PNG, WEBP · ideal 1500×500 px</p>
                     </button>
                   )}
@@ -1262,11 +1294,11 @@ export default function ProfilePage() {
 
                 {/* Basisinformationen */}
                 <div className="p-6 bg-bg-secondary border border-border rounded-xl">
-                  <h2 className="font-semibold text-text-primary mb-5">Basisinformationen</h2>
+                  <h2 className="font-semibold text-text-primary mb-5">{t("sectionBasics")}</h2>
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
-                        Name <span className="text-crimson-light">*</span>
+                        {t("fieldName")} <span className="text-crimson-light">*</span>
                       </label>
                       <input type="text" value={form.name}
                         onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
@@ -1274,7 +1306,7 @@ export default function ProfilePage() {
                     </div>
                     <div>
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
-                        Website / Portfolio
+                        {t("fieldWebsite")}
                       </label>
                       <input type="url" value={form.website}
                         onChange={(e) => setForm((p) => ({ ...p, website: e.target.value }))}
@@ -1283,24 +1315,24 @@ export default function ProfilePage() {
                     </div>
                     <div>
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
-                        Stadt <span className="text-crimson-light">*</span>
+                        {t("fieldCity")} <span className="text-crimson-light">*</span>
                       </label>
                       <input type="text" value={form.city} onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))}
-                        placeholder="z.B. München"
+                        placeholder={t("fieldCityPlaceholder")}
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
                     </div>
                     <div>
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
-                        Land
+                        {t("fieldCountry")}
                       </label>
                       <input type="text" value={form.country} onChange={(e) => setForm((p) => ({ ...p, country: e.target.value }))}
-                        placeholder="z.B. Deutschland"
+                        placeholder={t("fieldCountryPlaceholder")}
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
                     </div>
                     {/* Profil-URL / Slug */}
                     <div>
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
-                        Profil-URL
+                        {t("fieldProfileUrl")}
                       </label>
                       <div className="flex items-center gap-0 bg-bg-elevated border border-border rounded-lg overflow-hidden focus-within:border-gold transition-colors">
                         <span className="px-3 py-2.5 text-sm text-text-muted border-r border-border whitespace-nowrap select-none">
@@ -1314,18 +1346,18 @@ export default function ProfilePage() {
                           className="flex-1 bg-transparent px-3 py-2.5 text-sm focus:outline-none"
                         />
                       </div>
-                      <p className="text-xs text-text-muted mt-1">Nur Kleinbuchstaben, Zahlen und Bindestriche. Z.B. max-mustermann</p>
+                      <p className="text-xs text-text-muted mt-1">{t("fieldProfileUrlHint")}</p>
                     </div>
                     {/* E-Mail (read-only, from Clerk) */}
                     <div>
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
-                        E-Mail
+                        {t("fieldEmail")}
                       </label>
                       <input type="email" value={clerkEmail} readOnly
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm text-text-muted cursor-not-allowed" />
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">Bio</label>
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{t("fieldBio")}</label>
                       <textarea rows={4} value={form.bio ?? ""}
                         onChange={(e) => setForm((p) => ({ ...p, bio: e.target.value }))}
                         maxLength={500}
@@ -1334,7 +1366,7 @@ export default function ProfilePage() {
                     </div>
                     <div>
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5 flex items-center gap-1.5">
-                        <Euro size={11} /> Tagessatz (€)
+                        <Euro size={11} /> {t("fieldDayRate")}
                       </label>
                       <input
                         type="number"
@@ -1344,7 +1376,7 @@ export default function ProfilePage() {
                         placeholder="z.B. 450"
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors"
                       />
-                      <p className="text-xs text-text-muted mt-1">Leer lassen = &quot;Nach Vereinbarung&quot;</p>
+                      <p className="text-xs text-text-muted mt-1">{t("fieldDayRateHint")}</p>
                     </div>
                   </div>
 
@@ -1352,8 +1384,8 @@ export default function ProfilePage() {
                   <div className="mt-5 pt-5 border-t border-border space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-text-primary">Für Aufträge verfügbar</p>
-                        <p className="text-xs text-text-muted">Verfügbarkeits-Badge auf deinem öffentlichen Profil anzeigen</p>
+                        <p className="text-sm font-medium text-text-primary">{t("fieldAvailable")}</p>
+                        <p className="text-xs text-text-muted">{t("fieldAvailableDesc")}</p>
                       </div>
                       <button onClick={() => setForm((p) => ({ ...p, available: !p.available }))}
                         className={`w-11 h-6 rounded-full relative transition-colors ${form.available ? "bg-success" : "bg-bg-elevated border border-border"}`}>
@@ -1363,14 +1395,14 @@ export default function ProfilePage() {
                     </div>
                     <div className="flex items-start gap-4 flex-wrap">
                       <div className="flex-1 min-w-[180px]">
-                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">Verfügbar ab</label>
+                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{t("fieldAvailableFrom")}</label>
                         <input
                           type="date"
                           value={form.availableFrom ?? ""}
                           onChange={(e) => setForm((p) => ({ ...p, availableFrom: e.target.value }))}
                           className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors"
                         />
-                        <p className="text-xs text-text-muted mt-1">Leer lassen wenn sofort verfügbar</p>
+                        <p className="text-xs text-text-muted mt-1">{t("fieldAvailableFromHint")}</p>
                       </div>
                       <div className="flex items-center justify-between pt-6">
                         <div className="flex items-center gap-3">
@@ -1381,9 +1413,9 @@ export default function ProfilePage() {
                           </button>
                           <div>
                             <p className="text-sm font-medium text-text-primary flex items-center gap-1.5">
-                              <Plane size={13} className="text-text-muted" /> Reisebereit
+                              <Plane size={13} className="text-text-muted" /> {t("fieldTravelReady")}
                             </p>
-                            <p className="text-xs text-text-muted">Bereit für Drehs außerhalb deines Standorts</p>
+                            <p className="text-xs text-text-muted">{t("fieldTravelReadyDesc")}</p>
                           </div>
                         </div>
                       </div>
@@ -1397,16 +1429,16 @@ export default function ProfilePage() {
                 {/* Filmografie — verknüpfte Projekte */}
                 <div className="p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-1 flex items-center gap-2">
-                    <Clapperboard size={15} className="text-gold" /> Filmografie
+                    <Clapperboard size={15} className="text-gold" /> {t("sectionFilmography")}
                   </h2>
                   <p className="text-xs text-text-muted mb-5">
-                    Suche nach bestehenden Projekten oder erstelle ein neues — andere Crew-Mitglieder können sich ebenfalls eintragen.
+                    {t("sectionFilmographyDesc")}
                   </p>
 
                   {/* Manuelle Filmografie-Einträge (mit Link-Feld) */}
                   {filmography.length > 0 && (
                     <div className="mb-5">
-                      <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-1.5">Manuell eingetragen</p>
+                      <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-1.5">{t("manualEntries")}</p>
                       <div className="border border-border rounded-lg overflow-hidden bg-bg-elevated">
                         {filmography.map((film, idx) => (
                           <div key={idx} className="border-b border-border last:border-b-0">
@@ -1473,7 +1505,7 @@ export default function ProfilePage() {
                             setProjectSearch(e.target.value);
                             searchProjects(e.target.value);
                           }}
-                          placeholder="Projekt suchen (z.B. Das letzte Licht)..."
+                          placeholder={t("searchProjectPlaceholder")}
                           className="flex-1 bg-transparent border-none py-2.5 text-sm focus:outline-none"
                         />
                         {projectSearch && (
@@ -1516,7 +1548,7 @@ export default function ProfilePage() {
                                     onClick={() => setJoiningProjectId(proj.id)}
                                     className="text-xs text-gold hover:text-gold-light font-medium transition-colors"
                                   >
-                                    + Eintragen
+                                    {t("addToProject")}
                                   </button>
                                 )}
                               </div>
@@ -1530,7 +1562,7 @@ export default function ProfilePage() {
                         onClick={() => setShowNewProject(true)}
                         className="w-full py-2.5 border-2 border-dashed border-border hover:border-gold/40 text-text-muted hover:text-gold text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-1.5"
                       >
-                        <Plus size={13} /> Neues Projekt erstellen
+                        <Plus size={13} /> {t("createNewProject")}
                       </button>
                     </div>
                   )}
@@ -1539,66 +1571,66 @@ export default function ProfilePage() {
                   {showNewProject && (
                     <div className="p-4 bg-bg-elevated border border-gold/20 rounded-xl space-y-3">
                       <div className="flex items-center justify-between">
-                        <p className="text-xs font-semibold text-gold uppercase tracking-widest">Neues Projekt</p>
+                        <p className="text-xs font-semibold text-gold uppercase tracking-widest">{t("newProjectTitle")}</p>
                         <button type="button" onClick={() => setShowNewProject(false)} className="text-text-muted hover:text-crimson-light"><X size={14} /></button>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div className="col-span-2">
-                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Titel *</label>
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelTitle")} *</label>
                           <input type="text" value={newProject.title}
                             onChange={(e) => setNewProject((p) => ({ ...p, title: e.target.value }))}
                             placeholder="Das letzte Licht"
                             className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
                         </div>
                         <div>
-                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Jahr</label>
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelYear")}</label>
                           <input type="number" value={newProject.year}
                             onChange={(e) => setNewProject((p) => ({ ...p, year: e.target.value }))}
                             placeholder="2024"
                             className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
                         </div>
                         <div>
-                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Typ</label>
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelType")}</label>
                           <select value={newProject.type}
                             onChange={(e) => setNewProject((p) => ({ ...p, type: e.target.value }))}
                             className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold">
                             <option value="">—</option>
-                            {["Spielfilm","Kurzfilm","Serie","Dokumentation","Werbefilm","Musikvideo","Corporate"].map((t) => (
-                              <option key={t} value={t}>{t}</option>
+                            {["Spielfilm","Kurzfilm","Serie","Dokumentation","Werbefilm","Musikvideo","Corporate"].map((typeOpt) => (
+                              <option key={typeOpt} value={typeOpt}>{typeOpt}</option>
                             ))}
                           </select>
                         </div>
                         <div>
-                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Regie</label>
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelDirector")}</label>
                           <input type="text" value={newProject.director}
                             onChange={(e) => setNewProject((p) => ({ ...p, director: e.target.value }))}
                             placeholder="Anna K."
                             className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
                         </div>
                         <div>
-                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Meine Rolle *</label>
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelMyRole")} *</label>
                           <RoleDropdown value={newProject.myRole} onChange={(v) => setNewProject((p) => ({ ...p, myRole: v }))} options={[...new Set([...positions, ...ALL_CREW_ROLES])]} />
                         </div>
                         <div className="col-span-2">
-                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Kurzbeschreibung</label>
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelDescription")}</label>
                           <textarea rows={2} value={newProject.description}
                             onChange={(e) => setNewProject((p) => ({ ...p, description: e.target.value }))}
-                            placeholder="Worum geht es in diesem Projekt?"
+                            placeholder={t("newProjectPlaceholderDesc")}
                             className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold resize-none" />
                         </div>
                         <div className="col-span-2">
-                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Poster</label>
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelPoster")}</label>
                           {newProject.poster_url ? (
                             <div className="flex items-center gap-3">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src={newProject.poster_url} alt="Poster" className="h-20 w-14 object-cover rounded-md border border-border" />
                               <button type="button" onClick={() => setNewProject((p) => ({ ...p, poster_url: "" }))}
-                                className="text-xs text-text-muted hover:text-crimson-light">Entfernen</button>
+                                className="text-xs text-text-muted hover:text-crimson-light">{t("removePhoto")}</button>
                             </div>
                           ) : (
                             <label className={`flex items-center gap-2 px-3 py-2 bg-bg-secondary border border-dashed border-border rounded-lg cursor-pointer hover:border-gold transition-colors text-sm text-text-muted ${uploadingPoster ? "opacity-60 pointer-events-none" : ""}`}>
                               {uploadingPoster ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}
-                              {uploadingPoster ? "Wird hochgeladen…" : "Poster hochladen"}
+                              {uploadingPoster ? t("uploading") : t("labelPoster")}
                               <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                                 const file = e.target.files?.[0];
                                 if (!file) return;
@@ -1620,28 +1652,28 @@ export default function ProfilePage() {
 
                         {/* Extended metadata */}
                         <div>
-                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Genre</label>
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelGenre")}</label>
                           <input type="text" value={newProject.genre}
                             onChange={(e) => setNewProject((p) => ({ ...p, genre: e.target.value }))}
                             placeholder="Drama, Thriller…"
                             className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
                         </div>
                         <div>
-                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Produktionsfirma</label>
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelProductionCompany")}</label>
                           <input type="text" value={newProject.productionCompany}
                             onChange={(e) => setNewProject((p) => ({ ...p, productionCompany: e.target.value }))}
                             placeholder="XY Film GmbH"
                             className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
                         </div>
                         <div>
-                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Location</label>
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelLocation")}</label>
                           <input type="text" value={newProject.location}
                             onChange={(e) => setNewProject((p) => ({ ...p, location: e.target.value }))}
                             placeholder="München, Bayern"
                             className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
                         </div>
                         <div>
-                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Link (Trailer, Seite…)</label>
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelLink")}</label>
                           <input type="url" value={newProject.link}
                             onChange={(e) => setNewProject((p) => ({ ...p, link: e.target.value }))}
                             placeholder="https://…"
@@ -1656,7 +1688,7 @@ export default function ProfilePage() {
                               <span className="absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all"
                                 style={{ left: newProject.alsoOnCrewUnited ? "calc(100% - 18px)" : "2px" }} />
                             </div>
-                            <span className="text-xs text-text-secondary">Auch auf Crew United gelistet</span>
+                            <span className="text-xs text-text-secondary">{t("alsoOnCrewUnited")}</span>
                           </label>
                         </div>
                       </div>
@@ -1667,7 +1699,7 @@ export default function ProfilePage() {
                         className="w-full py-2.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
                       >
                         {creatingProject ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}
-                        Projekt erstellen & eintragen
+                        {t("createAndAdd")}
                       </button>
                     </div>
                   )}
@@ -1675,8 +1707,8 @@ export default function ProfilePage() {
 
                 {/* Social Links */}
                 <div className="p-6 bg-bg-secondary border border-border rounded-xl">
-                  <h2 className="font-semibold text-text-primary mb-1">Social Media & Links</h2>
-                  <p className="text-xs text-text-muted mb-5">Verlinke deine sozialen Profile — sie erscheinen als Buttons auf deinem Profil.</p>
+                  <h2 className="font-semibold text-text-primary mb-1">{t("sectionSocial")}</h2>
+                  <p className="text-xs text-text-muted mb-5">{t("sectionSocialDesc")}</p>
                   <div className="space-y-3">
                     {[
                       { label: "Instagram", icon: AtSign,      value: instagramUrl, set: setInstagramUrl, placeholder: "https://instagram.com/deinname" },
@@ -1706,8 +1738,8 @@ export default function ProfilePage() {
 
                 {/* Videos & Showreel */}
                 <div className="p-6 bg-bg-secondary border border-border rounded-xl">
-                  <h2 className="font-semibold text-text-primary mb-1">Videos & Showreel</h2>
-                  <p className="text-xs text-text-muted mb-5">Der erste Link wird als Haupt-Showreel angezeigt. Weitere Links erscheinen als Video-Grid. YouTube oder Vimeo.</p>
+                  <h2 className="font-semibold text-text-primary mb-1">{t("sectionVideos")}</h2>
+                  <p className="text-xs text-text-muted mb-5">{t("sectionVideosDesc")}</p>
                   {videoLinks.length > 0 && (
                     <div className="space-y-2 mb-4">
                       {videoLinks.map((url, i) => (
@@ -1738,7 +1770,7 @@ export default function ProfilePage() {
                             setNewVideoLink("");
                           }
                         }}
-                        placeholder="https://vimeo.com/... oder https://youtube.com/..."
+                        placeholder={t("videoLinkPlaceholder")}
                         className="flex-1 bg-transparent border-none py-2.5 text-sm focus:outline-none"
                       />
                     </div>
@@ -1759,7 +1791,7 @@ export default function ProfilePage() {
 
                 {/* Fähigkeiten */}
                 <div className="p-6 bg-bg-secondary border border-border rounded-xl">
-                  <h2 className="font-semibold text-text-primary mb-5">Fähigkeiten & Spezialgebiete</h2>
+                  <h2 className="font-semibold text-text-primary mb-5">{t("sectionSkills")}</h2>
                   {skills.length > 0 ? (
                     <div className="flex flex-wrap gap-2 mb-4">
                       {skills.map((s) => (
@@ -1771,10 +1803,10 @@ export default function ProfilePage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-text-muted mb-4">Noch keine Fähigkeiten eingetragen.</p>
+                    <p className="text-xs text-text-muted mb-4">{t("noSkills")}</p>
                   )}
                   <div className="flex gap-2">
-                    <input type="text" placeholder="Fähigkeit hinzufügen..." value={newSkill}
+                    <input type="text" placeholder={t("addSkillPlaceholder")} value={newSkill}
                       onChange={(e) => setNewSkill(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && addSkill()}
                       className="flex-1 bg-bg-elevated border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold transition-colors" />
@@ -1787,7 +1819,7 @@ export default function ProfilePage() {
 
                 {/* Sprachen */}
                 <div className="p-6 bg-bg-secondary border border-border rounded-xl">
-                  <h2 className="font-semibold text-text-primary mb-5">Sprachen</h2>
+                  <h2 className="font-semibold text-text-primary mb-5">{t("sectionLanguages")}</h2>
                   {languages.length > 0 ? (
                     <div className="flex flex-wrap gap-2 mb-4">
                       {languages.map((l) => (
@@ -1799,10 +1831,10 @@ export default function ProfilePage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-text-muted mb-4">Noch keine Sprachen eingetragen.</p>
+                    <p className="text-xs text-text-muted mb-4">{t("noLanguages")}</p>
                   )}
                   <div className="flex gap-2">
-                    <input type="text" placeholder="Sprache hinzufügen (z.B. Deutsch, Englisch…)" value={newLanguage}
+                    <input type="text" placeholder={t("addLanguagePlaceholder")} value={newLanguage}
                       onChange={(e) => setNewLanguage(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && addLanguage()}
                       className="flex-1 bg-bg-elevated border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold transition-colors" />
@@ -1815,8 +1847,8 @@ export default function ProfilePage() {
 
                 {/* Lizenzen & Führerscheine */}
                 <div className="p-6 bg-bg-secondary border border-border rounded-xl">
-                  <h2 className="font-semibold text-text-primary mb-1">Lizenzen & Führerscheine</h2>
-                  <p className="text-xs text-text-muted mb-4">Führerscheine, Drohnenlizenzen, Set-Zertifikate & mehr.</p>
+                  <h2 className="font-semibold text-text-primary mb-1">{t("sectionLicenses")}</h2>
+                  <p className="text-xs text-text-muted mb-4">{t("sectionLicensesDesc")}</p>
                   <LicensePicker
                     selected={crewCertificates}
                     onChange={setCrewCertificates}
@@ -1827,37 +1859,61 @@ export default function ProfilePage() {
 
                 {/* ── CASTING-DATEN ── */}
                 {showTalentSections && (() => {
-                  const HAIR = ["Schwarz","Dunkelbraun","Braun","Hellbraun","Blond","Hellblond","Rot","Grau","Weiß","Gefärbt"];
-                  const EYES = ["Braun","Dunkelbraun","Grün","Blaugrün","Blau","Grau","Haselnuss","Schwarz"];
+                  // Use stable IDs for storage, display translated labels
+                  const HAIR: { id: string; label: string }[] = [
+                    { id: "black",       label: t("hairBlack") },
+                    { id: "dark_brown",  label: t("hairDarkBrown") },
+                    { id: "brown",       label: t("hairBrown") },
+                    { id: "light_brown", label: t("hairLightBrown") },
+                    { id: "blonde",      label: t("hairBlonde") },
+                    { id: "light_blonde",label: t("hairLightBlonde") },
+                    { id: "red",         label: t("hairRed") },
+                    { id: "grey",        label: t("hairGrey") },
+                    { id: "white",       label: t("hairWhite") },
+                    { id: "dyed",        label: t("hairDyed") },
+                  ];
+                  const EYES: { id: string; label: string }[] = [
+                    { id: "brown",      label: t("eyesBrown") },
+                    { id: "dark_brown", label: t("eyesDarkBrown") },
+                    { id: "green",      label: t("eyesGreen") },
+                    { id: "blue_green", label: t("eyesBlueGreen") },
+                    { id: "blue",       label: t("eyesBlue") },
+                    { id: "grey",       label: t("eyesGrey") },
+                    { id: "hazel",      label: t("eyesHazel") },
+                    { id: "black",      label: t("eyesBlack") },
+                  ];
                   const BODIES = [
-                    { id:"slim",label:"Schlank" },{ id:"athletic",label:"Athletisch" },
-                    { id:"normal",label:"Normal" },{ id:"strong",label:"Kräftig" },
-                    { id:"muscular",label:"Muskulös" },{ id:"curvy",label:"Kurvig" },
+                    { id:"slim",     label: t("bodySlim") },
+                    { id:"athletic", label: t("bodyAthletic") },
+                    { id:"normal",   label: t("bodyNormal") },
+                    { id:"strong",   label: t("bodyStrong") },
+                    { id:"muscular", label: t("bodyMuscular") },
+                    { id:"curvy",    label: t("bodyCurvy") },
                   ];
                   return (
                     <div className="p-6 bg-bg-secondary border border-border rounded-xl space-y-6">
-                      <h2 className="font-semibold text-text-primary">Casting-Daten</h2>
+                      <h2 className="font-semibold text-text-primary">{t("sectionCasting")}</h2>
 
                       {/* Spielalter */}
                       <div>
-                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">Spielalter</label>
+                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">{t("castingAge")}</label>
                         <div className="flex items-center gap-3">
                           <input type="number" min="1" max="99" value={playingAgeMin}
                             onChange={e => setPlayingAgeMin(e.target.value)}
-                            placeholder="von"
+                            placeholder={t("ageFrom")}
                             className="w-24 bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
                           <span className="text-text-muted text-sm">–</span>
                           <input type="number" min="1" max="99" value={playingAgeMax}
                             onChange={e => setPlayingAgeMax(e.target.value)}
-                            placeholder="bis"
+                            placeholder={t("ageTo")}
                             className="w-24 bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
-                          <span className="text-text-muted text-sm">Jahre</span>
+                          <span className="text-text-muted text-sm">{t("castingAgeUnit")}</span>
                         </div>
                       </div>
 
                       {/* Größe */}
                       <div>
-                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">Größe (cm)</label>
+                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">{t("castingHeight")}</label>
                         <input type="number" min="100" max="220" value={heightCm}
                           onChange={e => setHeightCm(e.target.value)}
                           placeholder="170"
@@ -1866,33 +1922,33 @@ export default function ProfilePage() {
 
                       {/* Haarfarbe */}
                       <div>
-                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">Haarfarbe</label>
+                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">{t("castingHair")}</label>
                         <div className="flex flex-wrap gap-2">
                           {HAIR.map(c => (
-                            <button key={c} type="button" onClick={() => setHairColor(c === hairColor ? "" : c)}
+                            <button key={c.id} type="button" onClick={() => setHairColor(c.id === hairColor ? "" : c.id)}
                               className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                                hairColor === c ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-elevated text-text-secondary hover:border-gold/40"
-                              }`}>{c}</button>
+                                hairColor === c.id ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-elevated text-text-secondary hover:border-gold/40"
+                              }`}>{c.label}</button>
                           ))}
                         </div>
                       </div>
 
                       {/* Augenfarbe */}
                       <div>
-                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">Augenfarbe</label>
+                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">{t("castingEyes")}</label>
                         <div className="flex flex-wrap gap-2">
                           {EYES.map(c => (
-                            <button key={c} type="button" onClick={() => setEyeColor(c === eyeColor ? "" : c)}
+                            <button key={c.id} type="button" onClick={() => setEyeColor(c.id === eyeColor ? "" : c.id)}
                               className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                                eyeColor === c ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-elevated text-text-secondary hover:border-gold/40"
-                              }`}>{c}</button>
+                                eyeColor === c.id ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-elevated text-text-secondary hover:border-gold/40"
+                              }`}>{c.label}</button>
                           ))}
                         </div>
                       </div>
 
                       {/* Körperbau */}
                       <div>
-                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">Körperbau</label>
+                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">{t("castingBody")}</label>
                         <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                           {BODIES.map(b => (
                             <button key={b.id} type="button" onClick={() => setBodyType(b.id === bodyType ? "" : b.id)}
@@ -1910,14 +1966,14 @@ export default function ProfilePage() {
                             className={`w-10 h-5 rounded-full transition-colors relative shrink-0 ${beard ? "bg-gold" : "bg-bg-elevated border border-border"}`}>
                             <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${beard ? "left-5" : "left-0.5"}`} />
                           </div>
-                          <span className="text-sm text-text-secondary">Bart vorhanden</span>
+                          <span className="text-sm text-text-secondary">{t("castingBeard")}</span>
                         </label>
                         <label className="flex items-center gap-3 cursor-pointer">
                           <div onClick={() => setTattoos(v => !v)}
                             className={`w-10 h-5 rounded-full transition-colors relative shrink-0 ${tattoos ? "bg-gold" : "bg-bg-elevated border border-border"}`}>
                             <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${tattoos ? "left-5" : "left-0.5"}`} />
                           </div>
-                          <span className="text-sm text-text-secondary">Tattoos vorhanden</span>
+                          <span className="text-sm text-text-secondary">{t("castingTattoos")}</span>
                         </label>
                         {tattoos && (
                           <label className="flex items-center gap-3 cursor-pointer ml-13">
@@ -1925,7 +1981,7 @@ export default function ProfilePage() {
                               className={`w-10 h-5 rounded-full transition-colors relative shrink-0 ${tattoosCoverable ? "bg-gold" : "bg-bg-elevated border border-border"}`}>
                               <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${tattoosCoverable ? "left-5" : "left-0.5"}`} />
                             </div>
-                            <span className="text-sm text-text-muted">Tattoos abdeckbar</span>
+                            <span className="text-sm text-text-muted">{t("castingTattoosHide")}</span>
                           </label>
                         )}
                       </div>
@@ -1936,7 +1992,7 @@ export default function ProfilePage() {
                 <button onClick={handleSave} disabled={saving}
                   className="w-full py-3 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
                   {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
-                  {saving ? "Wird gespeichert..." : "Änderungen speichern"}
+                  {saving ? t("saving") : t("saveChanges")}
                 </button>
               </div>
             )}
@@ -1945,10 +2001,10 @@ export default function ProfilePage() {
             {activeTab === "projekte" && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="font-semibold text-text-primary">Meine Projekte</h2>
+                  <h2 className="font-semibold text-text-primary">{t("sectionMyProjects")}</h2>
                   <Link href="/dashboard/projects/new"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">
-                    <Plus size={12} /> Projekt eintragen
+                    <Plus size={12} /> {t("addProjectBtn")}
                   </Link>
                 </div>
                 {myProjectsLoading ? (
@@ -1956,15 +2012,15 @@ export default function ProfilePage() {
                 ) : myProjects.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-16 border border-dashed border-border rounded-xl text-center">
                     <Clapperboard size={32} className="text-text-muted mb-3" />
-                    <p className="text-text-muted text-sm mb-4">Noch keine Projekte eingetragen</p>
+                    <p className="text-text-muted text-sm mb-4">{t("noProjects")}</p>
                     <Link href="/dashboard/projects/new"
                       className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors">
-                      <Plus size={14} /> Erstes Projekt eintragen
+                      <Plus size={14} /> {t("addFirstProject")}
                     </Link>
                   </div>
                 ) : (() => {
                   const grouped = myProjects.reduce<Record<string, MyProject[]>>((acc, p) => {
-                    const key = p.type ?? "Sonstiges";
+                    const key = p.type ?? t("typeOther");
                     (acc[key] = acc[key] ?? []).push(p);
                     return acc;
                   }, {});
@@ -1993,11 +2049,11 @@ export default function ProfilePage() {
             {/* ── INSERATE ── */}
             {activeTab === "inserate" && (() => {
               const TYPE_META: Record<string, { label: string; href: string; color: string }> = {
-                job:      { label: "Jobs & Stellenangebote", href: "/jobs",      color: "text-gold" },
-                prop:     { label: "Marktplatz",             href: "/props",     color: "text-violet-400" },
-                location: { label: "Locations",              href: "/locations", color: "text-emerald-400" },
-                vehicle:  { label: "Fahrzeuge",              href: "/vehicles",  color: "text-sky-400" },
-                creator:  { label: "Creator / Talent",       href: "/creators",  color: "text-rose-400" },
+                job:      { label: t("listingTypeJobs"),      href: "/jobs",      color: "text-gold" },
+                prop:     { label: t("listingTypeMarket"),    href: "/props",     color: "text-violet-400" },
+                location: { label: t("listingTypeLocations"), href: "/locations", color: "text-emerald-400" },
+                vehicle:  { label: t("listingTypeVehicles"),  href: "/vehicles",  color: "text-sky-400" },
+                creator:  { label: t("listingTypeCreator"),   href: "/creators",  color: "text-rose-400" },
               };
               const grouped = myListings.reduce<Record<string, MyListing[]>>((acc, l) => {
                 (acc[l.type] = acc[l.type] ?? []).push(l);
@@ -2007,10 +2063,10 @@ export default function ProfilePage() {
               return (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h2 className="font-semibold text-text-primary">Meine Inserate</h2>
+                    <h2 className="font-semibold text-text-primary">{t("sectionMyListings")}</h2>
                     <Link href="/inserat"
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">
-                      <Plus size={12} /> Inserat erstellen
+                      <Plus size={12} /> {t("addListingBtn")}
                     </Link>
                   </div>
 
@@ -2019,10 +2075,10 @@ export default function ProfilePage() {
                   ) : myListings.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 border border-dashed border-border rounded-xl text-center">
                       <Film size={32} className="text-text-muted mb-3" />
-                      <p className="text-text-muted text-sm mb-4">Noch keine Inserate erstellt</p>
+                      <p className="text-text-muted text-sm mb-4">{t("noListings")}</p>
                       <Link href="/inserat"
                         className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors">
-                        <Plus size={14} /> Erstes Inserat erstellen
+                        <Plus size={14} /> {t("addFirstListing")}
                       </Link>
                     </div>
                   ) : (
@@ -2060,9 +2116,9 @@ export default function ProfilePage() {
             {activeTab === "netzwerk" && (
               <div className="space-y-6">
                 <div>
-                  <h2 className="font-semibold text-text-primary">Mein Netzwerk</h2>
+                  <h2 className="font-semibold text-text-primary">{t("sectionNetwork")}</h2>
                   <p className="text-xs text-text-muted mt-1">
-                    Markiere Verbindungen als Zusammenarbeit und wähle, ob sie auf deinem öffentlichen Profil erscheinen sollen.
+                    {t("networkDesc")}
                   </p>
                 </div>
 
@@ -2071,8 +2127,8 @@ export default function ProfilePage() {
                 ) : friends.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-16 border border-dashed border-border rounded-xl text-center">
                     <Users2 size={32} className="text-text-muted mb-3" />
-                    <p className="text-text-muted text-sm mb-2">Noch keine Verbindungen</p>
-                    <p className="text-xs text-text-muted">Verbinde dich mit anderen Mitgliedern über ihr Profil.</p>
+                    <p className="text-text-muted text-sm mb-2">{t("noConnections")}</p>
+                    <p className="text-xs text-text-muted">{t("noConnectionsDesc")}</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -2100,7 +2156,7 @@ export default function ProfilePage() {
                               type="text"
                               value={edit.label}
                               onChange={(e) => setCollabEdits((prev) => ({ ...prev, [fr.friendship_id]: { ...edit, label: e.target.value } }))}
-                              placeholder="Rolle / Bezeichnung (z.B. Oberbeleuchter)"
+                              placeholder={t("collabRolePlaceholder")}
                               className="flex-1 bg-bg-elevated border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold transition-colors placeholder:text-text-muted"
                             />
                             <button
@@ -2113,7 +2169,7 @@ export default function ProfilePage() {
                               }`}
                             >
                               {edit.is_public ? <Eye size={12} /> : <EyeOff size={12} />}
-                              {edit.is_public ? "Sichtbar" : "Versteckt"}
+                              {edit.is_public ? t("collabVisible") : t("collabHidden")}
                             </button>
                             <button
                               type="button"
@@ -2126,9 +2182,9 @@ export default function ProfilePage() {
                                     headers: { "Content-Type": "application/json" },
                                     body: JSON.stringify({ action: "collab", label: edit.label || null, is_public: edit.is_public }),
                                   });
-                                  addToast("Gespeichert", "success");
+                                  addToast(t("collabSaved"), "success");
                                 } catch {
-                                  addToast("Fehler beim Speichern", "error");
+                                  addToast(t("savingError"), "error");
                                 } finally {
                                   setCollabEdits((prev) => ({ ...prev, [fr.friendship_id]: { ...edit, saving: false } }));
                                 }
@@ -2136,12 +2192,12 @@ export default function ProfilePage() {
                               className="flex items-center gap-1.5 px-3 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-60 shrink-0"
                             >
                               {edit.saving ? <Loader2 size={11} className="animate-spin" /> : <Save size={11} />}
-                              Speichern
+                              {t("save")}
                             </button>
                           </div>
                           {edit.label && edit.is_public && (
                             <p className="text-[10px] text-text-muted mt-2">
-                              Erscheint auf deinem Profil: <span className="text-gold">{fr.display_name}</span> · {edit.label}
+                              {t("collabPreview")} <span className="text-gold">{fr.display_name}</span> · {edit.label}
                             </p>
                           )}
                         </div>
@@ -2159,23 +2215,23 @@ export default function ProfilePage() {
             {activeTab === "security" && (
               <div className="space-y-6">
                 <div className="p-6 bg-bg-secondary border border-border rounded-xl">
-                  <h2 className="font-semibold text-text-primary mb-5">Passwort ändern</h2>
+                  <h2 className="font-semibold text-text-primary mb-5">{t("securityTitle")}</h2>
                   <div className="space-y-4 max-w-sm">
-                    {["Aktuelles Passwort", "Neues Passwort", "Neues Passwort bestätigen"].map((label) => (
+                    {[t("securityCurrentPw"), t("securityNewPw"), t("securityConfirmPw")].map((label) => (
                       <div key={label}>
                         <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{label}</label>
                         <input type="password" className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
                       </div>
                     ))}
-                    <button onClick={() => addToast("Passwort erfolgreich aktualisiert", "success")}
+                    <button onClick={() => addToast(t("passwordUpdated"), "success")}
                       className="px-5 py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors">
-                      Passwort aktualisieren
+                      {t("securityUpdateBtn")}
                     </button>
                   </div>
                 </div>
                 <div className="p-6 bg-bg-secondary border border-border rounded-xl">
-                  <h2 className="font-semibold text-text-primary mb-1">Zwei-Faktor-Authentifizierung</h2>
-                  <p className="text-xs text-text-muted mb-5">Füge deinem Konto eine zusätzliche Sicherheitsebene hinzu.</p>
+                  <h2 className="font-semibold text-text-primary mb-1">{t("security2FATitle")}</h2>
+                  <p className="text-xs text-text-muted mb-5">{t("security2FADesc")}</p>
                   <div className="flex items-center justify-between p-4 bg-bg-elevated border border-border rounded-lg">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-success/10 rounded-full flex items-center justify-center">
@@ -2186,7 +2242,7 @@ export default function ProfilePage() {
                         <p className="text-xs text-text-muted">Google Authenticator</p>
                       </div>
                     </div>
-                    <span className="text-xs text-success font-medium">Aktiviert</span>
+                    <span className="text-xs text-success font-medium">{t("security2FAActive")}</span>
                   </div>
                 </div>
               </div>
@@ -2195,11 +2251,11 @@ export default function ProfilePage() {
             {/* ── BENACHRICHTIGUNGEN ── */}
             {activeTab === "notifications" && (
               <div className="p-6 bg-bg-secondary border border-border rounded-xl space-y-6">
-                <h2 className="font-semibold text-text-primary">Benachrichtigungseinstellungen</h2>
+                <h2 className="font-semibold text-text-primary">{t("notifTitle")}</h2>
                 {[
-                  { section: "Buchungen & Anfragen", items: ["Neue Buchungsanfrage", "Buchung bestätigt", "Buchung storniert"] },
-                  { section: "Nachrichten",          items: ["Neue Nachricht von einem Anbieter", "Nachricht von einer Produktion"] },
-                  { section: "Marketing",            items: ["Plattform-Updates und neue Features", "Tipps für bessere Inserate"] },
+                  { section: t("notifGroupBookings"), items: [t("notifBookingNew"), t("notifBookingConfirmed"), t("notifBookingCancelled")] },
+                  { section: t("notifGroupMessages"), items: [t("notifMessageProvider"), t("notifMessageProduction")] },
+                  { section: t("notifGroupMarketing"), items: [t("notifMarketingUpdates"), t("notifMarketingTips")] },
                 ].map(({ section, items }) => (
                   <div key={section}>
                     <h3 className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-3">{section}</h3>
@@ -2220,9 +2276,9 @@ export default function ProfilePage() {
                     </div>
                   </div>
                 ))}
-                <button onClick={() => addToast("Einstellungen gespeichert", "success")}
+                <button onClick={() => addToast(t("settingsSaved"), "success")}
                   className="px-5 py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors">
-                  Einstellungen speichern
+                  {t("notifSave")}
                 </button>
               </div>
             )}
@@ -2233,42 +2289,42 @@ export default function ProfilePage() {
                 <div className="p-6 bg-bg-secondary border border-border rounded-xl">
                   <div className="flex items-center justify-between mb-2">
                     <h2 className="font-semibold text-text-primary flex items-center gap-2">
-                      <Wallet size={16} className="text-gold" /> Auszahlungskonto
+                      <Wallet size={16} className="text-gold" /> {t("billingTitle")}
                     </h2>
                   </div>
                   <p className="text-xs text-text-muted mb-5 leading-relaxed">
-                    Nach Abschluss einer Buchung wird deine Auszahlung auf dieses Konto überwiesen.
+                    {t("billingDesc")}
                   </p>
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="sm:col-span-2">
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">Kontoinhaber</label>
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{t("billingHolder")}</label>
                       <input type="text" value={payout.accountHolder}
                         onChange={(e) => setPayout(p => ({ ...p, accountHolder: e.target.value }))}
                         placeholder={form.name || "Dein Name"}
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">IBAN</label>
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{t("billingIBAN")}</label>
                       <input type="text" value={payout.iban}
                         onChange={(e) => setPayout(p => ({ ...p, iban: e.target.value }))}
                         placeholder="DE89 3704 0044 ..."
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-gold transition-colors" />
                     </div>
                     <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">BIC / SWIFT</label>
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{t("billingBIC")}</label>
                       <input type="text" value={payout.bic}
                         onChange={(e) => setPayout(p => ({ ...p, bic: e.target.value }))}
                         placeholder="COBADEFFXXX"
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-gold transition-colors" />
                     </div>
                     <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">Bank</label>
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{t("billingBank")}</label>
                       <input type="text" value={payout.bank}
                         onChange={(e) => setPayout(p => ({ ...p, bank: e.target.value }))}
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
                     </div>
                     <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">USt-IdNr. <span className="font-normal normal-case tracking-normal text-text-muted">(optional)</span></label>
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{t("billingVAT")} <span className="font-normal normal-case tracking-normal text-text-muted">{t("billingVATOptional")}</span></label>
                       <input type="text" value={payout.vatId}
                         onChange={(e) => setPayout(p => ({ ...p, vatId: e.target.value }))}
                         placeholder="DE123456789"
@@ -2277,24 +2333,24 @@ export default function ProfilePage() {
                   </div>
                   <div className="flex justify-end mt-5 pt-5 border-t border-border">
                     <button
-                      onClick={async () => { setPayoutSaving(true); await new Promise(r => setTimeout(r, 700)); setPayoutSaving(false); addToast("Auszahlungskonto gespeichert", "success"); }}
+                      onClick={async () => { setPayoutSaving(true); await new Promise(r => setTimeout(r, 700)); setPayoutSaving(false); addToast(t("payoutSaved"), "success"); }}
                       disabled={payoutSaving}
                       className="flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-60">
                       {payoutSaving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
-                      {payoutSaving ? "Wird gespeichert..." : "Konto speichern"}
+                      {payoutSaving ? t("billingSaving") : t("billingSave")}
                     </button>
                   </div>
                 </div>
 
                 <div className="p-6 bg-bg-secondary border border-border rounded-xl">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="font-semibold text-text-primary">Mein Konto</h2>
+                    <h2 className="font-semibold text-text-primary">{t("myAccount")}</h2>
                     <span className="px-3 py-1 bg-success/10 border border-success/20 text-success text-xs font-semibold rounded-full">
-                      Kostenlos · Aktiv
+                      {t("myAccountFree")}
                     </span>
                   </div>
                   <p className="text-sm text-text-muted leading-relaxed">
-                    CineGenius ist komplett kostenlos — keine Provision, keine Gebühren, kein Abo.
+                    {t("myAccountDesc")}
                   </p>
                 </div>
               </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import {
   Film, Tv, Camera, Zap, Music, FileVideo, Building2, Radio, ArrowRight, Plus,
 } from "lucide-react";
@@ -12,74 +13,25 @@ export const metadata: Metadata = {
   description: "Filmprojekte & Produktionen auf CineGenius — wähle eine Kategorie.",
 };
 
-const CATEGORIES = [
-  {
-    label: "Film & Serie",
-    desc: "Spielfilme, Kurzfilme, Serien",
-    href: "/projects/film",
-    icon: Film,
-    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=80",
-    accent: "#c8f135",
-  },
-  {
-    label: "Werbung",
-    desc: "TV-Spots, Commercials, Online-Ads",
-    href: "/projects/werbung",
-    icon: Tv,
-    image: "https://images.unsplash.com/photo-1557858310-9052820906f7?w=800&q=80",
-    accent: "#c8f135",
-  },
-  {
-    label: "Foto & Shooting",
-    desc: "Editorial, Portrait, Kampagnen",
-    href: "/projects/foto",
-    icon: Camera,
-    image: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=800&q=80",
-    accent: "#c8f135",
-  },
-  {
-    label: "Social Media",
-    desc: "TikTok, Instagram Reels, YouTube",
-    href: "/projects/social-media",
-    icon: Zap,
-    image: "https://images.unsplash.com/photo-1683721003111-070bcc053d8b?w=800&q=80",
-    accent: "#c8f135",
-  },
-  {
-    label: "Musikvideo",
-    desc: "Musikvideos, Konzertfilme, Visuals",
-    href: "/projects/musikvideo",
-    icon: Music,
-    image: "https://images.unsplash.com/photo-1501612780327-45045538702b?w=800&q=80",
-    accent: "#c8f135",
-  },
-  {
-    label: "Dokumentation",
-    desc: "Dokumentarfilme, Reportagen",
-    href: "/projects/dokumentation",
-    icon: FileVideo,
-    image: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80",
-    accent: "#c8f135",
-  },
-  {
-    label: "Corporate",
-    desc: "Imagefilme, Employer Branding",
-    href: "/projects/corporate",
-    icon: Building2,
-    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
-    accent: "#c8f135",
-  },
-  {
-    label: "Event & Live",
-    desc: "Konzerte, Festivals, Hochzeiten",
-    href: "/projects/event",
-    icon: Radio,
-    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80",
-    accent: "#c8f135",
-  },
+const CATEGORIES_META = [
+  { labelKey: "catFilmSerie" as const,   descKey: "catFilmSerieDesc" as const,   href: "/projects/film",       icon: Film,      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=80", accent: "#c8f135" },
+  { labelKey: "catWerbung" as const,     descKey: "catWerbungDesc" as const,     href: "/projects/werbung",    icon: Tv,        image: "https://images.unsplash.com/photo-1557858310-9052820906f7?w=800&q=80", accent: "#c8f135" },
+  { labelKey: "catFoto" as const,        descKey: "catFotoDesc" as const,        href: "/projects/foto",       icon: Camera,    image: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=800&q=80", accent: "#c8f135" },
+  { labelKey: "catSocialMedia" as const, descKey: "catSocialMediaDesc" as const, href: "/projects/social-media",icon: Zap,      image: "https://images.unsplash.com/photo-1683721003111-070bcc053d8b?w=800&q=80", accent: "#c8f135" },
+  { labelKey: "catMusikvideo" as const,  descKey: "catMusikvideoDesc" as const,  href: "/projects/musikvideo", icon: Music,     image: "https://images.unsplash.com/photo-1501612780327-45045538702b?w=800&q=80", accent: "#c8f135" },
+  { labelKey: "catDokumentation" as const,descKey: "catDokumentationDesc" as const,href: "/projects/dokumentation",icon: FileVideo,image: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80", accent: "#c8f135" },
+  { labelKey: "catCorporate" as const,   descKey: "catCorporateDesc" as const,   href: "/projects/corporate",  icon: Building2, image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80", accent: "#c8f135" },
+  { labelKey: "catEvent" as const,       descKey: "catEventDesc" as const,       href: "/projects/event",      icon: Radio,     image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80", accent: "#c8f135" },
 ];
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const t = await getTranslations("projects");
+  const CATEGORIES = CATEGORIES_META.map((c) => ({
+    ...c,
+    label: t(c.labelKey),
+    desc: t(c.descKey),
+  }));
+
   return (
     <div className="pt-16 min-h-screen bg-bg-primary relative overflow-hidden">
 
@@ -101,13 +53,13 @@ export default function ProjectsPage() {
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full mb-3">
-              <span className="text-[11px] text-white/80 font-bold uppercase tracking-widest">Projekte</span>
+              <span className="text-[11px] text-white/80 font-bold uppercase tracking-widest">{t("badge")}</span>
             </div>
             <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight mb-2">
-              Filmografien &amp; <span className="text-gradient-gold">Produktionen</span>
+              {t("title").split("&")[0]}&amp; <span className="text-gradient-gold">{t("title").split("& ")[1]}</span>
             </h1>
             <p className="text-white/60 text-sm sm:text-base leading-relaxed max-w-xl">
-              Filmemacher, Creator und Agenturen zeigen ihre Arbeiten — als Portfolio und zur Teamsuche.
+              {t("subtitle")}
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -115,13 +67,13 @@ export default function ProjectsPage() {
               href="/projects/alle"
               className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-white/20 text-white/70 rounded-xl hover:border-white/40 hover:text-white transition-all text-sm whitespace-nowrap backdrop-blur-sm"
             >
-              Alle durchsuchen <ArrowRight size={13} />
+              {t("allBrowse")} <ArrowRight size={13} />
             </Link>
             <Link
               href="/projects/neu"
               className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm whitespace-nowrap"
             >
-              <Plus size={13} /> Projekt eintragen
+              <Plus size={13} /> {t("addProject")}
             </Link>
           </div>
         </div>

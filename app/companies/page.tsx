@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import CompaniesContent from "./CompaniesContent";
 import PageHeader from "@/components/PageHeader";
+import { getTranslations } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: "Firmenverzeichnis — Verleiher, Studios & Agenturen",
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 export default async function CompaniesPage() {
+  const t = await getTranslations("companies");
   const { data } = await db
     .from("companies")
     .select("*")
@@ -26,14 +28,14 @@ export default async function CompaniesPage() {
   return (
     <>
       <PageHeader
-          badge="Firmen & Dienstleister"
-          title="Studios, Verleiher"
-          titleHighlight="& Agenturen"
-          description="Kameraverleih, Tonstudios, Postproduktion, Casting-Agenturen — alle Filmdienstleister im DACH-Raum."
+          badge={t("badge")}
+          title={t("title")}
+          titleHighlight={t("titleHighlight")}
+          description={t("description")}
           image="https://images.unsplash.com/photo-1542204165-65bf26472b9b?w=1600&q=90"
           imagePosition="center 30%"
-          ctaSecondary={{ label: "Alle durchsuchen", href: "/companies" }}
-          cta={{ label: "+ Firma eintragen", href: "/company-setup" }}
+          ctaSecondary={{ label: t("allBrowse"), href: "/companies" }}
+          cta={{ label: t("addCompany"), href: "/company-setup" }}
         />
       <CompaniesContent initialCompanies={data ?? []} />
     </>
