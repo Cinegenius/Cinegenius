@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Search, ChevronDown, ChevronUp, MessageSquare, Mail, BookOpen, Film, MapPin, Package, Briefcase, CreditCard, Shield } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, MessageSquare, Mail, BookOpen, MapPin, Package, Briefcase, Shield } from "lucide-react";
 
 const categories = [
   {
@@ -11,19 +11,19 @@ const categories = [
     items: [
       {
         q: "Was ist CineGenius?",
-        a: "CineGenius ist der All-in-One-Marktplatz für die Film- und Medienbranche. Du kannst Locations finden, Crew und Talente buchen, Requisiten und Equipment mieten und Custom Props in Auftrag geben — alles an einem Ort, speziell für Produktionen entwickelt.",
+        a: "CineGenius ist der kostenlose Marktplatz für die Film- und Medienbranche im DACH-Raum. Du findest hier Locations, Crew & Talente, Requisiten, Equipment, Fahrzeuge und offene Jobs — alles an einem Ort, direkt ohne Vermittlungsagentur.",
       },
       {
         q: "Brauche ich ein Konto zum Stöbern?",
-        a: "Nein — du kannst alle Locations, Requisiten, Jobs und Filmschaffenden ohne Registrierung durchsuchen. Ein Konto brauchst du nur, um eine Buchungsanfrage zu stellen, dich auf Jobs zu bewerben oder eigene Angebote einzustellen.",
+        a: "Nein — du kannst alle Locations, Requisiten, Jobs und Filmschaffenden ohne Registrierung durchsuchen. Ein Konto brauchst du nur, um Kontakt aufzunehmen, dich auf Jobs zu bewerben oder eigene Angebote einzustellen.",
       },
       {
         q: "Ist CineGenius kostenlos?",
-        a: "Ja — vollständig kostenlos. Registrierung, Profilerstellung, Inserate schalten und Angebote durchsuchen sind ohne Zeitlimit kostenlos. Keine versteckten Gebühren.",
+        a: "Ja — vollständig und dauerhaft kostenlos. Registrierung, Profilerstellung, Inserate schalten und Angebote durchsuchen sind für alle kostenlos. Es gibt keine Gebühren, keine Provisionen und keine versteckten Kosten.",
       },
       {
-        q: "Was ist der Unterschied zwischen Anbieter- und Produktionskonto?",
-        a: "Anbieter sind Location-Inhaber, Requisiten-Häuser, Crew-Mitglieder oder Hersteller, die ihre Angebote einstellen. Produktionen sind Unternehmen oder Einzelpersonen, die mieten oder buchen möchten. Du kannst in deinen Kontoeinstellungen zwischen beiden Moden wechseln.",
+        q: "Wie nehme ich Kontakt mit einem Anbieter auf?",
+        a: "Jedes Inserat hat einen Kontakt-Button. Damit öffnest du direkt die interne Nachrichtenfunktion. Alle weiteren Absprachen — Preise, Verfügbarkeit, Konditionen — klärt ihr direkt miteinander.",
       },
     ],
   },
@@ -32,20 +32,16 @@ const categories = [
     label: "Locations",
     items: [
       {
-        q: "Wie werden Locations geprüft?",
-        a: "Jede Location wird vor der Veröffentlichung manuell geprüft. Wir verifizieren Eigentumsrechte, prüfen die Angemessenheit der Preise und bestätigen, dass Fotos und Beschreibung übereinstimmen. Verifizierte Locations erhalten ein Häkchen-Badge.",
+        q: "Wie stelle ich meine Location ein?",
+        a: "Klicke oben rechts auf 'Inserat erstellen', wähle 'Location' und fülle das Formular aus. Dein Inserat wird nach einer kurzen Prüfung freigeschaltet. Verifizierte Inserate erhalten ein Badge.",
       },
       {
-        q: "Was ist Sofortbuchung?",
-        a: "Locations mit Sofortbuchung können ohne Wartezeit auf Bestätigung des Anbieters gebucht werden. Die Daten werden automatisch blockiert und der Vertrag wird automatisch erstellt. Nicht alle Locations bieten Sofortbuchung an.",
+        q: "Kann ich eine Location vor der Anmietung besichtigen?",
+        a: "Ja — die meisten Location-Inhaber bieten einen kurzen Scout-Besuch oder eine Video-Besichtigung an. Schreib dem Anbieter einfach über die Nachrichtenfunktion.",
       },
       {
-        q: "Was deckt die Kaution ab?",
-        a: "Die Kaution (30% des Mietwerts) wird treuhänderisch gehalten und innerhalb von 5 Werktagen nach dem Drehtag zurückerstattet, sofern keine Schäden entstanden sind. Gemeldete Schäden werden vor der Rückzahlung gegen die Kaution aufgerechnet.",
-      },
-      {
-        q: "Kann ich eine Location vor der Buchung besichtigen?",
-        a: "Ja — die meisten Location-Inhaber bieten einen kurzen Scout-Besuch oder eine Video-Besichtigung vor der Buchung an. Nutze den Kontakt-Button in jedem Inserat, um einen Termin zu vereinbaren.",
+        q: "Wie werden Preise und Konditionen vereinbart?",
+        a: "Preise und Konditionen werden direkt zwischen Anbieter und Produktion ausgehandelt. CineGenius stellt nur die Kontaktmöglichkeit bereit — keine Buchungsgebühren, keine Provision.",
       },
     ],
   },
@@ -54,16 +50,16 @@ const categories = [
     label: "Requisiten & Verleih",
     items: [
       {
-        q: "Wie funktioniert der Requisiten-Verleih?",
-        a: "Finde den gewünschten Artikel, wähle Startdatum und Mietdauer und sende eine Anfrage. Der Anbieter bestätigt die Verfügbarkeit innerhalb von 24 Stunden. Du zahlst Anzahlung und Servicegebühr vorab, den Restbetrag bei Abholung.",
-      },
-      {
-        q: "Was passiert, wenn eine Requisite während meiner Miete beschädigt wird?",
-        a: "Schäden müssen innerhalb von 4 Stunden nach Lieferung/Abholung gemeldet werden. Der Mieter haftet für Schadenskosten laut Anbietereinschätzung. Beim Checkout bieten wir optional einen Schadenschutz, der Versehen bis zu einem festgelegten Betrag abdeckt.",
+        q: "Wie funktioniert der Requisiten-Verleih auf CineGenius?",
+        a: "Du findest den gewünschten Artikel, siehst Fotos und Beschreibung, und nimmst dann direkt Kontakt mit dem Anbieter auf. Verfügbarkeit, Mietdauer und Abholung klärt ihr persönlich — CineGenius ist das Verzeichnis, der Rest läuft direkt zwischen euch.",
       },
       {
         q: "Kann ich Requisiten ans Set liefern lassen?",
-        a: "Viele Anbieter bieten Lieferung an. Achte auf das grüne 'Lieferung verfügbar'-Badge bei Requisiten. Lieferangebote werden separat vom Anbieter je nach deinem Standort erstellt.",
+        a: "Das entscheidet jeder Anbieter selbst. Frag einfach per Nachricht an, ob Lieferung möglich ist und was sie kostet.",
+      },
+      {
+        q: "Was mache ich, wenn ein Anbieter nicht antwortet?",
+        a: "Wenn du innerhalb von 2–3 Tagen keine Antwort erhältst, kannst du es nochmals versuchen oder einen anderen Anbieter kontaktieren. Du kannst uns auch unter support@cinegenius.co melden, wenn ein Inserat veraltet oder inaktiv wirkt.",
       },
     ],
   },
@@ -73,37 +69,19 @@ const categories = [
     items: [
       {
         q: "Wie bewerbe ich mich auf einen Job?",
-        a: "Gehe zu einem beliebigen Job-Inserat, scrolle zum Bewerbungsformular, füge eine Kurzbewerbung und deinen Portfolio-Link hinzu und sende ab. Das Produktionsteam antwortet in der Regel innerhalb von 3–5 Tagen.",
+        a: "Gehe zum Job-Inserat und nutze den Kontakt-Button oder das Bewerbungsformular. Du kannst eine Kurzbewerbung schreiben und dein Portfolio verlinken. Die weitere Kommunikation läuft direkt mit der Produktion.",
       },
       {
-        q: "Werden meine persönlichen Daten bei einer Bewerbung weitergegeben?",
-        a: "Nur Name und Kontaktdaten aus deinem CineGenius-Profil werden mit der buchenden Produktion geteilt. Dein vollständiges Profil (inkl. Portfolio und Credits) ist für sie erst nach deiner Bewerbung sichtbar.",
+        q: "Werden meine Daten bei einer Bewerbung weitergegeben?",
+        a: "Dein öffentliches CineGenius-Profil (Name, Foto, Skills, Portfolio) ist für alle sichtbar. Kontaktdaten teilst du nur, wenn du selbst antwortest — CineGenius gibt nichts automatisch weiter.",
       },
       {
         q: "Können Produktionen Jobs kostenlos ausschreiben?",
-        a: "Ja — vollständig kostenlos und ohne Limit. Alle Stellenausschreibungen, Crew-Suche und Bewerbungen sind kostenlos.",
-      },
-    ],
-  },
-  {
-    icon: CreditCard,
-    label: "Zahlungen & Abrechnung",
-    items: [
-      {
-        q: "Wann werde ich belastet?",
-        a: "Du wirst zum Zeitpunkt der Buchungsbestätigung mit Anzahlung und Servicegebühr belastet. Der verbleibende Mietbetrag ist zum Zeitpunkt der Abholung oder Lieferung fällig. Du wirst nie belastet, bevor der Anbieter bestätigt hat.",
+        a: "Ja — vollständig kostenlos und ohne Limit. Alle Stellenausschreibungen, Crew-Suche und Bewerbungen sind dauerhaft kostenlos.",
       },
       {
-        q: "Welche Zahlungsmethoden werden akzeptiert?",
-        a: "Wir akzeptieren alle gängigen Kredit- und Debitkarten (Visa, Mastercard, Amex) sowie Banküberweisung für Buchungen über 5.000 €. Zahlungen werden über Stripe verarbeitet und sind vollständig verschlüsselt.",
-      },
-      {
-        q: "Was ist die Stornierungsrichtlinie?",
-        a: "Standard: volle Rückerstattung bei Stornierung 72 Stunden vor Beginn. Bei Stornierung innerhalb von 72 Stunden verfällt die Anzahlung. Einzelne Inserate können strengere Regelungen haben — prüfe immer die Konditionen des Inserats.",
-      },
-      {
-        q: "Wie werden Anbieter bezahlt?",
-        a: "Anbieter-Auszahlungen werden innerhalb von 2 Werktagen nach Buchungsbestätigung verarbeitet. Gelder werden per Banküberweisung auf dein hinterlegtes Konto überwiesen.",
+        q: "Wie erstelle ich ein Crew-Profil?",
+        a: "Registriere dich kostenlos, gehe zu 'Profil bearbeiten' und wähle deinen Typ (Schauspieler/in, Filmcrew, Fotograf/in usw.). Lade ein Profilfoto hoch, füge deine Skills und Credits hinzu — fertig. Dein Profil erscheint dann in der Crew-Suche.",
       },
     ],
   },
@@ -112,16 +90,16 @@ const categories = [
     label: "Sicherheit & Vertrauen",
     items: [
       {
-        q: "Ist CineGenius sicher?",
-        a: "Alle Transaktionen werden über Stripe abgewickelt und durch Treuhandschutz gesichert. Wir verifizieren Anbieteridentitäten, prüfen alle Inserate und bieten ein Streitschlichtungsverfahren für auftretende Probleme.",
+        q: "Ist CineGenius seriös?",
+        a: "CineGenius ist eine deutschsprachige Plattform speziell für die Film- und Medienbranche. Wir prüfen Inserate vor der Freischaltung und entfernen inaktive oder irreführende Einträge. Bei Fragen erreichst du uns jederzeit unter support@cinegenius.co.",
       },
       {
-        q: "Was passiert, wenn ein Anbieter meine Buchung storniert?",
-        a: "Wenn ein Anbieter eine bestätigte Buchung storniert, erhältst du innerhalb von 5 Werktagen eine vollständige Rückerstattung und ein Service-Guthaben für deine nächste Buchung. Wir helfen auch bei der Suche nach einer Alternative.",
+        q: "Wie melde ich ein verdächtiges Inserat?",
+        a: "Schreib uns einfach an support@cinegenius.co mit dem Link zum Inserat und einer kurzen Beschreibung. Wir prüfen alle Meldungen und reagieren schnell.",
       },
       {
-        q: "Wie melde ich ein betrügerisches Inserat?",
-        a: "Nutze den 'Melden'-Button bei jedem Inserat oder schreibe an trust@cinegenius.co. Wir untersuchen alle Meldungen innerhalb von 24 Stunden und entfernen betrügerische Inserate sofort.",
+        q: "Was passiert mit meinen Daten?",
+        a: "Deine Daten werden ausschließlich zur Bereitstellung der Plattform verwendet und nicht an Dritte verkauft. Details findest du in unserer Datenschutzerklärung.",
       },
     ],
   },
