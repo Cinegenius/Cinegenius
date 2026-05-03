@@ -1230,27 +1230,33 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 </p>
               )}
             </div>
-            {!isOwner && (
-              <div className="flex items-center gap-2 flex-wrap sm:shrink-0 sm:mt-1">
-                {canContact && (
-                  <>
-                    <Link href={`/messages?to=${profile.user_id}`}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
-                      <MessageSquare size={11} /> Nachricht
-                    </Link>
-                    <button onClick={handleFriendAction} disabled={friendLoading}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs disabled:opacity-50">
-                      {friendStatus === "friends" ? <><Check size={11} /> Vernetzt</> : friendStatus === "pending_sent" ? "Gesendet" : friendStatus === "pending_received" ? <><UserPlus size={11} /> Annehmen</> : <><UserPlus size={11} /> Vernetzen</>}
-                    </button>
-                    <Link href={`/booking?profile=${profile.user_id}`}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
-                      Anfrage <ExternalLink size={11} />
-                    </Link>
-                  </>
-                )}
-                <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
-              </div>
-            )}
+            <div className="flex items-center gap-2 flex-wrap sm:shrink-0 sm:mt-1">
+              {!isOwner ? (
+                <>
+                  {canContact && (
+                    <>
+                      <Link href={`/messages?to=${profile.user_id}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
+                        <MessageSquare size={11} /> Nachricht
+                      </Link>
+                      <button onClick={handleFriendAction} disabled={friendLoading}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs disabled:opacity-50">
+                        {friendStatus === "friends" ? <><Check size={11} /> Vernetzt</> : friendStatus === "pending_sent" ? "Gesendet" : friendStatus === "pending_received" ? <><UserPlus size={11} /> Annehmen</> : <><UserPlus size={11} /> Vernetzen</>}
+                      </button>
+                      <Link href={`/booking?profile=${profile.user_id}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
+                        Anfrage <ExternalLink size={11} />
+                      </Link>
+                    </>
+                  )}
+                  <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
+                </>
+              ) : (
+                <Link href="/profile" className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md text-white text-[10px] font-semibold px-3 py-1.5 rounded-full border border-white/20 hover:bg-white/20 transition-colors">
+                  <Pencil size={10} /> Bearbeiten
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </section>
