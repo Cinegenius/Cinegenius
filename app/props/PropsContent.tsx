@@ -137,7 +137,7 @@ function FilterDropdown({
 function CategoryPanel({
   activeDeptId, setActiveDeptId,
   selectedDept, selectedGroup, onSelectGroup,
-  onClose,
+  onClose, clearLabel, clearSelectionLabel,
 }: {
   activeDeptId: string;
   setActiveDeptId: (id: string) => void;
@@ -145,6 +145,8 @@ function CategoryPanel({
   selectedGroup: { deptId: string; groupId: string } | null;
   onSelectGroup: (deptId: string, groupId: string | null) => void;
   onClose: () => void;
+  clearLabel: string;
+  clearSelectionLabel: string;
 }) {
   const activeDept = DEPARTMENTS.find((d) => d.id === activeDeptId) ?? DEPARTMENTS[0];
   const colors = deptColors(activeDept.color);
@@ -176,7 +178,7 @@ function CategoryPanel({
           <div className="flex items-center justify-between mb-2">
             <h3 className={`text-sm font-semibold ${colors.text}`}>{activeDept.label}</h3>
             {(selectedGroup?.deptId === activeDeptId || selectedDept === activeDeptId) && (
-              <button onClick={() => onSelectGroup(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400">Löschen</button>
+              <button onClick={() => onSelectGroup(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400">{clearLabel}</button>
             )}
           </div>
           <div className="grid grid-cols-2 gap-1.5">
@@ -225,7 +227,7 @@ function CategoryPanel({
           <div className="flex items-center justify-between mb-3">
             <h3 className={`text-sm font-semibold ${colors.text}`}>{activeDept.label}</h3>
             {(selectedGroup?.deptId === activeDeptId || selectedDept === activeDeptId) && (
-              <button onClick={() => onSelectGroup(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">Auswahl löschen</button>
+              <button onClick={() => onSelectGroup(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">{clearSelectionLabel}</button>
             )}
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -252,6 +254,7 @@ function CategoryPanel({
 
 function PropCard({ p, list }: { p: Prop; list?: boolean }) {
   const tc = useTranslations("common");
+  const tp = useTranslations("props");
   const href = p.type === "vehicle" ? `/vehicles/${p.id}` : `/props/${p.id}`;
 
   if (list) {
@@ -272,7 +275,7 @@ function PropCard({ p, list }: { p: Prop; list?: boolean }) {
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[10px] text-text-muted flex items-center gap-1"><MapPin size={9} />{p.location || p.vendor}</span>
             <span className="text-[10px] px-2 py-0.5 bg-bg-elevated border border-border text-text-muted rounded-full">{p.category}</span>
-            {p.delivery && <span className="text-[10px] text-teal-400 flex items-center gap-0.5"><Truck size={9} /> Lieferung</span>}
+            {p.delivery && <span className="text-[10px] text-teal-400 flex items-center gap-0.5"><Truck size={9} /> {tp("deliveryBadge")}</span>}
           </div>
         </div>
         <div className="shrink-0 text-right">
@@ -317,7 +320,7 @@ function PropCard({ p, list }: { p: Prop; list?: boolean }) {
       <div className="px-3 py-2 flex items-center justify-between border-t border-border/50">
         <span className="text-[10px] text-text-muted">{p.condition}</span>
         {p.era && <span className="text-[10px] text-gold/70">{p.era}</span>}
-        <span className="text-[10px] text-text-muted group-hover:text-gold transition-colors">Details →</span>
+        <span className="text-[10px] text-text-muted group-hover:text-gold transition-colors">{tp("detailsArrow")}</span>
       </div>
     </Link>
   );
@@ -328,6 +331,7 @@ function PropCard({ p, list }: { p: Prop; list?: boolean }) {
 function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations("props");
 
   const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const [selectedDept, setSelectedDept] = useState<string | null>(() => searchParams.get("dept") ?? null);
@@ -519,7 +523,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
             <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors min-w-0">
               <Search size={14} className="text-text-muted shrink-0" />
               <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
-                placeholder="Kamera, Requisite, Kostüm…"
+                placeholder={t("searchPlaceholder")}
                 className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none" />
               {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors shrink-0"><X size={12} /></button>}
             </div>
@@ -534,7 +538,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               }`}
             >
               <Layers size={11} />
-              <span className="hidden sm:inline">Kategorie</span>
+              <span className="hidden sm:inline">{t("categoryBtn")}</span>
               {hasCategoryFilter
                 ? <span className="bg-gold text-bg-primary text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">✓</span>
                 : <ChevronDown size={11} className={`transition-transform ${panelOpen ? "rotate-180" : ""}`} />
@@ -551,7 +555,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               }`}
             >
               <SlidersHorizontal size={11} />
-              <span className="hidden sm:inline">Filter</span>
+              <span className="hidden sm:inline">{t("filterBtn")}</span>
               {secondaryFilterCount > 0
                 ? <span className="bg-gold text-bg-primary text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{secondaryFilterCount}</span>
                 : <ChevronDown size={11} className={`transition-transform ${filterPanelOpen ? "rotate-180" : ""}`} />
@@ -575,6 +579,8 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               selectedGroup={selectedGroup}
               onSelectGroup={handleSelectGroup}
               onClose={() => setPanelOpen(false)}
+              clearLabel={t("clearCategory")}
+              clearSelectionLabel={t("clearCategoryDesktop")}
             />
           )}
 
@@ -584,7 +590,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
 
               {/* Szenen */}
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Szene</p>
+                <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">{t("sceneLabel")}</p>
                 <div className="flex flex-wrap gap-1.5">
                   {SCENES.map((scene) => {
                     const Icon = SCENE_ICON_MAP[scene.iconName] ?? Package;
@@ -613,7 +619,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                     <div className="h-px bg-border" />
                     <div>
                       <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-3">
-                        {DEPARTMENTS.find((d) => d.id === deptKey)?.label ?? "Kategorie"} — Details
+                        {DEPARTMENTS.find((d) => d.id === deptKey)?.label ?? t("categoryBtn")} — {t("detailsLabel")}
                       </p>
                       <div className="flex flex-wrap gap-x-6 gap-y-3">
                         {selectFields.map((field) => (
@@ -645,22 +651,22 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               {/* Second row: Angebotstyp + Sortierung */}
               <div className="flex flex-wrap gap-6">
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Angebotstyp</p>
+                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">{t("offerTypeLabel")}</p>
                   <div className="flex gap-1.5">
-                    {(["alle", "miete", "kauf"] as const).map((t) => (
-                      <button key={t} onClick={() => setRentalTypeFilter(t)}
+                    {(["alle", "miete", "kauf"] as const).map((rt) => (
+                      <button key={rt} onClick={() => setRentalTypeFilter(rt)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                          rentalTypeFilter === t ? "bg-gold/12 border-gold/30 text-gold" : "border-border text-text-muted hover:text-text-secondary"
+                          rentalTypeFilter === rt ? "bg-gold/12 border-gold/30 text-gold" : "border-border text-text-muted hover:text-text-secondary"
                         }`}>
-                        {t === "alle" ? "Alle" : t === "miete" ? "Mieten" : "Kaufen"}
+                        {rt === "alle" ? t("offerAll") : rt === "miete" ? t("offerRent") : t("offerBuy")}
                       </button>
                     ))}
                   </div>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Sortierung</p>
+                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">{t("sortLabel")}</p>
                   <div className="flex gap-1.5">
-                    {[{ value: "featured", label: "Empfohlen" }, { value: "price-asc", label: "Preis ↑" }, { value: "price-desc", label: "Preis ↓" }].map((o) => (
+                    {[{ value: "featured", label: t("sortFeatured") }, { value: "price-asc", label: t("sortPriceAsc") }, { value: "price-desc", label: t("sortPriceDesc") }].map((o) => (
                       <button key={o.value} onClick={() => setSortKey(o.value)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                           sortKey === o.value ? "bg-gold/12 border-gold/30 text-gold" : "border-border text-text-muted hover:text-text-secondary"
@@ -678,34 +684,34 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               <div className="flex flex-wrap gap-x-6 gap-y-3 items-end">
                 {/* Lieferung */}
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Lieferung</p>
+                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">{t("deliveryLabel")}</p>
                   <label className="flex items-center gap-2 cursor-pointer select-none">
                     <div onClick={() => setDeliveryOnly((v) => !v)}
                       className={`w-8 h-4.5 rounded-full transition-colors relative cursor-pointer ${deliveryOnly ? "bg-gold" : "bg-border"}`}>
                       <span className={`absolute top-0.5 w-3.5 h-3.5 rounded-full bg-white transition-all ${deliveryOnly ? "left-4" : "left-0.5"}`} />
                     </div>
-                    <span className="text-xs text-text-muted">Nur mit Lieferung</span>
+                    <span className="text-xs text-text-muted">{t("deliveryOnly")}</span>
                   </label>
                 </div>
 
                 {/* Stadt */}
                 {availableLocations.length > 0 && (
                   <div>
-                    <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Stadt</p>
-                    <FilterDropdown icon={MapPin} label="Alle Städte" value={locationFilter} options={availableLocations} onChange={setLocationFilter} />
+                    <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">{t("cityLabel")}</p>
+                    <FilterDropdown icon={MapPin} label={t("allCities")} value={locationFilter} options={availableLocations} onChange={setLocationFilter} />
                   </div>
                 )}
 
                 {/* Zustand */}
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Zustand</p>
-                  <FilterDropdown icon={CheckCircle} label="Alle" value={conditionFilter} options={CONDITIONS} onChange={setConditionFilter} />
+                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">{t("conditionLabel")}</p>
+                  <FilterDropdown icon={CheckCircle} label={t("allConditions")} value={conditionFilter} options={CONDITIONS} onChange={setConditionFilter} />
                 </div>
 
                 {/* Preis */}
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">Preis / Tag</p>
-                  <FilterDropdown icon={Euro} label="Alle Preise"
+                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2">{t("priceLabel")}</p>
+                  <FilterDropdown icon={Euro} label={t("allPrices")}
                     value={minRate || maxRate ? `${minRate || "0"} – ${maxRate || "∞"} €` : ""}
                     options={["bis 50 €", "bis 100 €", "bis 250 €", "bis 500 €", "ab 500 €"]}
                     onChange={(v) => {
@@ -722,7 +728,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
 
               {secondaryFilterCount > 0 && (
                 <button onClick={clearAll} className="text-[11px] text-text-muted hover:text-red-400 transition-colors underline underline-offset-2">
-                  Alle Filter löschen
+                  {t("clearAllFilters")}
                 </button>
               )}
             </div>
@@ -761,12 +767,12 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               )}
               {deliveryOnly && (
                 <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-teal-500/10 border-teal-500/20 text-teal-400">
-                  <Truck size={9} /> Lieferung
+                  <Truck size={9} /> {t("deliveryBadge")}
                   <button onClick={() => setDeliveryOnly(false)} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               )}
               <button onClick={clearAll} className="text-[11px] text-text-muted hover:text-red-400 transition-colors underline underline-offset-2 ml-1">
-                Alle löschen
+                {t("clearAll")}
               </button>
             </div>
           )}
@@ -777,7 +783,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex items-center justify-between mb-5">
           <p className="text-sm text-text-muted">
-            <span className="text-text-primary font-semibold">{filtered.length}</span> Artikel gefunden
+            <span className="text-text-primary font-semibold">{t("results", { count: filtered.length })}</span>
             {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
             {selectedScene && (() => {
               const scene = SCENES.find((s) => s.id === selectedScene);
@@ -786,16 +792,16 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
           </p>
           {hasAnyFilter && (
             <button onClick={clearAll} className="text-xs text-text-muted hover:text-red-400 transition-colors flex items-center gap-1">
-              <X size={11} /> Alle Filter löschen
+              <X size={11} /> {t("clearAllFilters")}
             </button>
           )}
         </div>
 
         {filtered.length === 0 ? (
           <EmptyState icon={Package}
-            title={serverListings.length === 0 ? "Noch keine Artikel eingetragen" : selectedScene ? `Noch keine Artikel für Szene „${SCENES.find(s => s.id === selectedScene)?.label}"` : "Keine Artikel gefunden"}
-            description={serverListings.length === 0 ? "Sei der Erste! Biete Equipment, Requisiten oder Kostüme an." : selectedScene ? "Diese Szene füllt sich, sobald Anbieter Artikel mit passender Kategorie inserieren." : "Versuche eine andere Suche oder wähle eine andere Kategorie."}
-            action={serverListings.length === 0 ? { label: "Jetzt inserieren", onClick: () => window.location.href = "/inserat?group=marktplatz" } : { label: "Alles anzeigen", onClick: clearAll }} />
+            title={serverListings.length === 0 ? t("emptyTitle") : t("emptyTitleFiltered")}
+            description={serverListings.length === 0 ? t("emptyDesc") : t("emptyDescFiltered")}
+            action={serverListings.length === 0 ? { label: t("emptyPost"), onClick: () => window.location.href = "/inserat?group=marktplatz" } : { label: t("emptyReset"), onClick: clearAll }} />
         ) : (
           <>
             <div className={viewMode === "grid"
@@ -809,7 +815,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               <div className="mt-10 text-center">
                 <button onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}
                   className="px-8 py-3 border border-border text-sm font-semibold text-text-secondary hover:border-gold hover:text-gold rounded-xl transition-all">
-                  Mehr laden · {filtered.length - visibleCount} weitere
+                  {t("loadMore", { count: filtered.length - visibleCount })}
                 </button>
               </div>
             )}
@@ -823,13 +829,14 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
 type VendorProfile = { id: string; name: string; location: string; avatar: string; verified: boolean };
 
 function VendorSection({ vendors }: { vendors: VendorProfile[] }) {
+  const t = useTranslations("props");
   if (!vendors.length) return null;
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-10">
       <div className="pt-8 border-t border-border/50">
         <div className="flex items-center gap-2 mb-4">
           <Users size={13} className="text-gold/60" />
-          <span className="text-[11px] font-bold uppercase tracking-widest text-text-secondary">Equipment Verleiher</span>
+          <span className="text-[11px] font-bold uppercase tracking-widest text-text-secondary">{t("vendorSection")}</span>
           <span className="text-[11px] text-text-muted">· {vendors.length}</span>
         </div>
         <div className="flex flex-wrap gap-2">

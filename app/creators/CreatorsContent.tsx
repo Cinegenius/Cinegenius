@@ -204,6 +204,7 @@ function RolePanel({
   onToggle: (role: string) => void;
   onClose: () => void;
 }) {
+  const t = useTranslations("creators");
   const [search, setSearch] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const colors = deptColors(dept.color);
@@ -229,10 +230,10 @@ function RolePanel({
       <div className={`flex items-center justify-between pb-2 mb-2 border-b border-border/60`}>
         <div className="flex items-center gap-2">
           <span className={`text-xs font-semibold ${colors.text}`}>{dept.label}</span>
-          <span className="text-[11px] text-text-muted">{deptRoles.length} Rollen</span>
+          <span className="text-[11px] text-text-muted">{t("deptRoles", { count: deptRoles.length })}</span>
           {selectedCount > 0 && (
             <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${colors.bg} ${colors.border} border ${colors.text}`}>
-              {selectedCount} aktiv
+              {t("activeRoles", { count: selectedCount })}
             </span>
           )}
         </div>
@@ -250,7 +251,7 @@ function RolePanel({
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Suchen…"
+            placeholder={t("searchRoles")}
             className="bg-transparent border-none text-xs w-full focus:outline-none text-text-secondary placeholder:text-text-muted"
           />
           {search && (
@@ -264,7 +265,7 @@ function RolePanel({
       {/* Role grid */}
       <div className="flex-1 overflow-y-auto">
         {visible.length === 0 ? (
-          <p className="text-xs text-text-muted text-center py-4">Keine Rollen gefunden</p>
+          <p className="text-xs text-text-muted text-center py-4">{t("noRolesFound")}</p>
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-px">
             {visible.map((role) => {
@@ -296,6 +297,7 @@ function RolePanel({
 function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCreator[]; hasStrip?: boolean }) {
   const searchParams = useSearchParams();
   const tc = useTranslations("common");
+  const t = useTranslations("creators");
 
   const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const [cityFilter, setCityFilter] = useState(() => searchParams.get("city") ?? "");
@@ -538,9 +540,9 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
   ].filter(Boolean).length + selectedRoles.size;
 
   const SORT_OPTIONS = [
-    { value: "featured", label: "Empfohlen" },
-    { value: "rating",   label: "Beste Bewertung" },
-    { value: "reviews",  label: "Meiste Bewertungen" },
+    { value: "featured", label: t("sortFeatured") },
+    { value: "rating",   label: t("sortRating") },
+    { value: "reviews",  label: t("sortRatingCount") },
   ];
 
   return (
@@ -559,7 +561,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Name, Skill oder Keyword…"
+              placeholder={t("searchPlaceholder")}
               className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none"
             />
             {query && (
@@ -618,7 +620,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               }`}
             >
               <SlidersHorizontal size={11} />
-              Alle Filter
+              {t("filterAllFilters")}
               {secondaryFilterCount > 0 && (
                 <span className="bg-gold text-bg-primary text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                   {secondaryFilterCount}
@@ -644,7 +646,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               onClick={() => { clearAll(); setCityFilter(""); setCountryFilter(""); setLanguageFilter(""); setAvailableOnly(false); setVendorOnly(false); }}
               className="text-[11px] text-text-muted hover:text-red-400 transition-colors underline underline-offset-2"
             >
-              Alle löschen
+              {t("clearAll")}
             </button>
           </div>
         )}
@@ -652,8 +654,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
         {/* Row 4 — Ergebnis-Count + Sort */}
         <div className="px-4 py-2.5 flex items-center justify-between">
           <p className="text-xs text-text-muted">
-            <span className="text-text-primary font-semibold">{filtered.length}</span>{" "}
-            {filtered.length !== 1 ? "Profile" : "Profil"}
+            <span className="text-text-primary font-semibold">{t("results", { count: filtered.length })}</span>
             {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
           </p>
           <div className="relative">
@@ -677,7 +678,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               <div className="w-10 h-1 rounded-full bg-border" />
             </div>
             <div className="flex items-center justify-between px-4 pb-3 shrink-0">
-              <h3 className="text-sm font-semibold text-text-primary">Alle Filter</h3>
+              <h3 className="text-sm font-semibold text-text-primary">{t("filterAllFilters")}</h3>
               <button onClick={() => setSheetOpen(false)} className="text-text-muted hover:text-text-primary p-1"><X size={18} /></button>
             </div>
 
@@ -716,11 +717,11 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               {/* Stadt */}
               {availableCities.length > 0 && (
                 <div>
-                  <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2.5">Stadt</p>
+                  <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2.5">{t("filterCity")}</p>
                   <div className="flex flex-wrap gap-2">
                     <button onClick={() => setCityFilter("")}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${!cityFilter ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
-                      Alle
+                      {t("filterAll")}
                     </button>
                     {availableCities.map((city) => (
                       <button key={city} onClick={() => setCityFilter(cityFilter === city ? "" : city)}
@@ -735,11 +736,11 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               {/* Sprache */}
               {availableLanguages.length > 0 && (
                 <div>
-                  <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2.5">Sprache</p>
+                  <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2.5">{t("filterLanguage")}</p>
                   <div className="flex flex-wrap gap-2">
                     <button onClick={() => setLanguageFilter("")}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${!languageFilter ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
-                      Alle
+                      {t("filterAll")}
                     </button>
                     {availableLanguages.slice(0, 12).map((lang) => (
                       <button key={lang} onClick={() => setLanguageFilter(languageFilter === lang ? "" : lang)}
@@ -754,11 +755,11 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               {/* Profiltyp */}
               {availableProfileTypes.length > 0 && (
                 <div>
-                  <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2.5">Profiltyp</p>
+                  <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2.5">{t("filterProfileType")}</p>
                   <div className="flex flex-wrap gap-2">
                     <button onClick={() => setProfileTypeFilter("")}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${!profileTypeFilter ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
-                      Alle
+                      {t("filterAll")}
                     </button>
                     {availableProfileTypes.map((type) => (
                       <button key={type} onClick={() => setProfileTypeFilter(profileTypeFilter === type ? "" : type)}
@@ -775,7 +776,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                 <div className="grid grid-cols-2 gap-3">
                   {availableHairColors.length > 0 && (
                     <div>
-                      <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2">Haarfarbe</p>
+                      <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2">{t("filterHairColor")}</p>
                       <select value={hairFilter} onChange={(e) => setHairFilter(e.target.value)}
                         className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-xs text-text-secondary focus:outline-none focus:border-gold transition-colors">
                         <option value="">Alle</option>
@@ -785,7 +786,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                   )}
                   {availableEyeColors.length > 0 && (
                     <div>
-                      <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2">Augenfarbe</p>
+                      <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2">{t("filterEyeColor")}</p>
                       <select value={eyeFilter} onChange={(e) => setEyeFilter(e.target.value)}
                         className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-xs text-text-secondary focus:outline-none focus:border-gold transition-colors">
                         <option value="">Alle</option>
@@ -798,7 +799,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 
               {/* Spielalter */}
               <div>
-                <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2">Spielalter</p>
+                <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2">{t("filterAge")}</p>
                 <div className="flex items-center gap-2">
                   <input type="number" min="1" max="99" value={ageMinFilter} onChange={(e) => setAgeMinFilter(e.target.value)}
                     placeholder="von" className="w-20 bg-bg-secondary border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-gold transition-colors" />
@@ -810,11 +811,11 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 
               {/* Reisebereitschaft */}
               <div>
-                <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2.5">Reisebereitschaft</p>
+                <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2.5">{t("filterTravel")}</p>
                 <div className="flex flex-wrap gap-2">
                   <button onClick={() => setTravelFilter("")}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${!travelFilter ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
-                    Alle
+                    {t("filterAll")}
                   </button>
                   {Object.entries(TRAVEL_DE).map(([key, label]) => (
                     <button key={key} onClick={() => setTravelFilter(travelFilter === key ? "" : key)}
@@ -838,13 +839,13 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                 }}
                 className="flex-1 py-3 border border-border rounded-xl text-sm font-medium text-text-muted hover:border-red-400/40 hover:text-red-400 transition-all"
               >
-                Zurücksetzen
+                {t("resetFilters")}
               </button>
               <button
                 onClick={() => setSheetOpen(false)}
                 className="flex-[2] py-3 bg-gold text-bg-primary rounded-xl text-sm font-bold hover:bg-gold-light transition-all"
               >
-                {filtered.length} {filtered.length !== 1 ? "Profile" : "Profil"} anzeigen
+                {t("showResults", { count: filtered.length })}
               </button>
             </div>
           </div>
@@ -865,7 +866,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Name, Skill suchen…"
+                placeholder={t("searchPlaceholder")}
                 className="bg-transparent border-none py-2 text-sm w-full focus:outline-none"
               />
               {query && (
@@ -902,11 +903,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
             {/* Sort */}
             <SortDropdown
               value={sortKey}
-              options={[
-                { value: "featured", label: "Empfohlen" },
-                { value: "rating",   label: "Beste Bewertung" },
-                { value: "reviews",  label: "Meiste Bewertungen" },
-              ]}
+              options={SORT_OPTIONS}
               onChange={setSortKey}
             />
 
@@ -923,7 +920,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               }`}
             >
               <SlidersHorizontal size={11} />
-              Gewerk & Rollen
+              {t("deptFilter")}
               {selectedRoles.size > 0 && (
                 <span className="bg-gold text-bg-primary text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                   {selectedRoles.size}
@@ -933,10 +930,10 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
             </button>
 
             {availableCities.length > 0 && (
-              <FilterDropdown icon={MapPin} label="Stadt" value={cityFilter} options={availableCities} onChange={setCityFilter} />
+              <FilterDropdown icon={MapPin} label={t("filterCity")} value={cityFilter} options={availableCities} onChange={setCityFilter} />
             )}
             {availableLanguages.length > 0 && (
-              <FilterDropdown icon={Languages} label="Sprache" value={languageFilter} options={availableLanguages} onChange={setLanguageFilter} />
+              <FilterDropdown icon={Languages} label={t("filterLanguage")} value={languageFilter} options={availableLanguages} onChange={setLanguageFilter} />
             )}
 
             <button
@@ -948,7 +945,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               }`}
             >
               <SlidersHorizontal size={11} />
-              Mehr Filter
+              {t("moreFilters")}
               {[profileTypeFilter, hairFilter, eyeFilter, travelFilter, ageMinFilter, ageMaxFilter, countryFilter].filter(Boolean).length > 0 && (
                 <span className="bg-gold text-bg-primary text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                   {[profileTypeFilter, hairFilter, eyeFilter, travelFilter, ageMinFilter, ageMaxFilter, countryFilter].filter(Boolean).length}
@@ -968,7 +965,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                 }}
                 className="h-9 px-3 text-xs text-text-muted hover:text-red-400 transition-colors whitespace-nowrap border border-border rounded-lg hover:border-red-400/40 shrink-0"
               >
-                Löschen
+                {t("clearRoles")}
               </button>
             )}
           </div>
@@ -977,12 +974,12 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
           {moreFiltersOpen && (
             <div className="flex items-center gap-2 flex-wrap pt-1">
               {availableCountries.length > 0 && (
-                <FilterDropdown icon={Globe} label="Land" value={countryFilter} options={availableCountries} onChange={setCountryFilter} />
+                <FilterDropdown icon={Globe} label={t("filterCountry")} value={countryFilter} options={availableCountries} onChange={setCountryFilter} />
               )}
               {availableProfileTypes.length > 0 && (
                 <FilterDropdown
                   icon={Users}
-                  label="Profiltyp"
+                  label={t("filterProfileType")}
                   value={profileTypeFilter ? (PROFILE_TYPE_DE[profileTypeFilter] ?? profileTypeFilter) : ""}
                   options={availableProfileTypes.map(t => PROFILE_TYPE_DE[t] ?? t)}
                   onChange={v => {
@@ -992,13 +989,13 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                 />
               )}
               {availableHairColors.length > 0 && (
-                <FilterDropdown icon={SlidersHorizontal} label="Haarfarbe" value={hairFilter} options={availableHairColors} onChange={setHairFilter} />
+                <FilterDropdown icon={SlidersHorizontal} label={t("filterHairColor")} value={hairFilter} options={availableHairColors} onChange={setHairFilter} />
               )}
               {availableEyeColors.length > 0 && (
-                <FilterDropdown icon={SlidersHorizontal} label="Augenfarbe" value={eyeFilter} options={availableEyeColors} onChange={setEyeFilter} />
+                <FilterDropdown icon={SlidersHorizontal} label={t("filterEyeColor")} value={eyeFilter} options={availableEyeColors} onChange={setEyeFilter} />
               )}
               <div className="flex items-center gap-1 shrink-0">
-                <span className="text-xs text-text-muted whitespace-nowrap">Spielalter</span>
+                <span className="text-xs text-text-muted whitespace-nowrap">{t("filterAge")}</span>
                 <input type="number" min="1" max="99" value={ageMinFilter} onChange={e => setAgeMinFilter(e.target.value)}
                   placeholder="von" className="w-14 bg-bg-elevated border border-border rounded-lg px-2 py-1.5 text-xs text-text-primary focus:outline-none focus:border-gold transition-colors" />
                 <span className="text-xs text-text-muted">–</span>
@@ -1007,7 +1004,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               </div>
               <FilterDropdown
                 icon={Globe}
-                label="Reisen"
+                label={t("filterTravel")}
                 value={travelFilter ? (TRAVEL_DE[travelFilter] ?? travelFilter) : ""}
                 options={Object.values(TRAVEL_DE)}
                 onChange={v => {
@@ -1093,7 +1090,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                 onClick={clearAll}
                 className="text-[11px] text-text-muted hover:text-red-400 transition-colors underline underline-offset-2 ml-1"
               >
-                Alle löschen
+                {t("clearAll")}
               </button>
             </div>
           )}
@@ -1111,7 +1108,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
             {/* Count */}
             <p className="hidden lg:block text-sm text-text-muted mb-5">
               <span className="text-text-primary font-semibold">
-                {filteredCrew.length} {filteredCrew.length !== 1 ? "Crew-Profile" : "Crew-Profil"}
+                {t("results", { count: filteredCrew.length })}
               </span>
               {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
             </p>
@@ -1120,11 +1117,11 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
             {filteredCrew.length === 0 && (
               <EmptyState
                 icon={Users}
-                title={allCreators.length === 0 ? "Noch keine Profile" : "Keine Profile gefunden"}
-                description={allCreators.length === 0 ? "Sei der Erste! Erstelle dein Profil und werde von Produktionen gefunden." : "Versuche andere Rollen, einen anderen Namen oder eine andere Stadt."}
+                title={allCreators.length === 0 ? t("emptyTitle") : t("emptyTitleFiltered")}
+                description={allCreators.length === 0 ? t("emptyDesc") : t("emptyDescFiltered")}
                 action={allCreators.length === 0
-                  ? { label: "Profil anlegen", onClick: () => window.location.href = "/profile" }
-                  : { label: "Filter zurücksetzen", onClick: () => { setQuery(""); clearAll(); setAvailableOnly(false); setCityFilter(""); setCountryFilter(""); setLanguageFilter(""); } }
+                  ? { label: t("emptyActionCreate"), onClick: () => window.location.href = "/profile" }
+                  : { label: t("emptyActionReset"), onClick: () => { setQuery(""); clearAll(); setAvailableOnly(false); setCityFilter(""); setCountryFilter(""); setLanguageFilter(""); } }
                 }
               />
             )}
@@ -1157,7 +1154,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                           <div className="flex items-center gap-1.5">
                             <span className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{c.name}</span>
                             {c.verified && <CheckCircle size={11} className="text-gold/60 shrink-0" />}
-                            {c.available && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" title="Verfügbar" />}
+                            {c.available && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" title={tc("available")} />}
                           </div>
                           <p className="text-[11px] text-text-muted truncate">{displayPositions.slice(0, 2).join(" · ")}</p>
                         </div>
@@ -1227,10 +1224,10 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                   className="px-8 py-3 border border-border text-sm font-semibold text-text-secondary hover:border-gold hover:text-gold rounded-xl transition-all disabled:opacity-50 flex items-center gap-2 mx-auto"
                 >
                   {loadingMore
-                    ? <><span className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin inline-block" /> Lädt…</>
+                    ? <><span className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin inline-block" /> {t("loading")}</>
                     : filteredCrew.length > visibleCount
-                      ? `Mehr laden · ${filteredCrew.length - visibleCount} weitere`
-                      : "Weitere Profile laden"
+                      ? t("loadMore", { count: filteredCrew.length - visibleCount })
+                      : t("loadMoreApi")
                   }
                 </button>
               </div>

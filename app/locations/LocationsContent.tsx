@@ -10,6 +10,7 @@ import {
   Map, Navigation, SlidersHorizontal, X, Share2, Film, Users,
 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
+import { useTranslations } from "next-intl";
 const LocationMap = dynamicImport(() => import("@/components/LocationMap"), {
   ssr: false,
   loading: () => (
@@ -61,13 +62,14 @@ type ViewMode = "split" | "list" | "map";
 type VendorProfile = { id: string; name: string; location: string; avatar: string; verified: boolean };
 
 function VendorSection({ vendors }: { vendors: VendorProfile[] }) {
+  const t = useTranslations("locations");
   if (!vendors.length) return null;
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-10">
       <div className="pt-8 border-t border-border/50">
         <div className="flex items-center gap-2 mb-4">
           <Users size={13} className="text-gold/60" />
-          <span className="text-[11px] font-bold uppercase tracking-widest text-text-secondary">Location Anbieter</span>
+          <span className="text-[11px] font-bold uppercase tracking-widest text-text-secondary">{t("vendorSection")}</span>
           <span className="text-[11px] text-text-muted">· {vendors.length}</span>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -100,6 +102,7 @@ function VendorSection({ vendors }: { vendors: VendorProfile[] }) {
 function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListings: Location[]; vendorProfiles?: VendorProfile[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations("locations");
 
   const allLocations = useMemo(() => serverListings, [serverListings]);
 
@@ -199,7 +202,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
 
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
-      setLocationError("Geolocation not supported by your browser.");
+      setLocationError(t("geolocationUnsupported"));
       return;
     }
     setLocating(true);
@@ -210,7 +213,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
         setLocating(false);
       },
       () => {
-        setLocationError("Standort konnte nicht ermittelt werden. Bitte Zugriff erlauben.");
+        setLocationError(t("geolocationError"));
         setLocating(false);
       }
     );
@@ -274,7 +277,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Stadt, Location-Name oder Typ..."
+                placeholder={t("searchPlaceholder")}
                 className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none"
               />
               {query && (
@@ -287,9 +290,9 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
             {/* View toggle */}
             <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
               {([
-                { mode: "list" as ViewMode, icon: LayoutList, label: "Liste" },
-                { mode: "split" as ViewMode, icon: MapPin, label: "Karte+Liste", hideOnMobile: true },
-                { mode: "map" as ViewMode, icon: Map, label: "Karte" },
+                { mode: "list" as ViewMode, icon: LayoutList, label: t("viewList") },
+                { mode: "split" as ViewMode, icon: MapPin, label: t("viewSplit"), hideOnMobile: true },
+                { mode: "map" as ViewMode, icon: Map, label: t("viewMap") },
               ]).map(({ mode, icon: Icon, label, hideOnMobile }) => (
                 <button
                   key={mode}
@@ -321,13 +324,13 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
               }`}
             >
               <Navigation size={13} className={locating ? "animate-spin" : ""} />
-              {locating ? "Suche..." : userLocation ? "Nähe ✓" : "In meiner Nähe"}
+              {locating ? t("locating") : userLocation ? t("locateActive") : t("locateMe")}
             </button>
 
             {/* Radius */}
             {userLocation && (
               <div className="flex items-center gap-2 bg-bg-elevated border border-gold/30 rounded-lg h-9 px-3 shrink-0">
-                <span className="text-xs text-text-muted">Radius:</span>
+                <span className="text-xs text-text-muted">{t("radiusLabel")}</span>
                 <select
                   value={radiusKm}
                   onChange={(e) => setRadiusKm(Number(e.target.value))}
@@ -350,7 +353,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
               }`}
             >
               <SlidersHorizontal size={13} />
-              Filter
+              {t("filterBtn")}
               {hasActiveFilters && (
                 <span className="w-4 h-4 bg-gold text-bg-primary text-[10px] rounded-full flex items-center justify-center font-bold">!</span>
               )}
@@ -362,7 +365,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
               title="Copy shareable link"
               className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-xs font-medium border border-border text-text-secondary hover:border-gold hover:text-gold transition-all shrink-0"
             >
-              <Share2 size={13} /> {copied ? "Kopiert!" : "Teilen"}
+              <Share2 size={13} /> {copied ? t("copied") : t("shareBtn")}
             </button>
 
           </div>
@@ -395,38 +398,43 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
                 </div>
 
                 <div className="flex items-center gap-1">
-                  {["Alle", "Innen", "Außen", "Innen & Außen"].map((opt) => (
-                    <button key={opt} onClick={() => setLageFilter(opt)}
+                  {[
+                    { val: "Alle", label: t("filterAll") },
+                    { val: "Innen", label: t("filterInnen") },
+                    { val: "Außen", label: t("filterAussen") },
+                    { val: "Innen & Außen", label: t("filterInnenAussen") },
+                  ].map(({ val, label }) => (
+                    <button key={val} onClick={() => setLageFilter(val)}
                       className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all border ${
-                        lageFilter === opt ? "bg-gold text-bg-primary border-gold" : "border-border text-text-secondary hover:border-gold hover:text-gold"
+                        lageFilter === val ? "bg-gold text-bg-primary border-gold" : "border-border text-text-secondary hover:border-gold hover:text-gold"
                       }`}>
-                      {opt}
+                      {label}
                     </button>
                   ))}
                 </div>
                 <label className="flex items-center gap-1.5 cursor-pointer text-xs text-text-secondary">
                   <input type="checkbox" className="accent-gold" checked={powerOnly} onChange={(e) => setPowerOnly(e.target.checked)} />
-                  <Zap size={11} className="text-gold" /> Strom vorhanden
+                  <Zap size={11} className="text-gold" /> {t("filterPower")}
                 </label>
                 <label className="flex items-center gap-1.5 cursor-pointer text-xs text-text-secondary">
                   <input type="checkbox" className="accent-gold" checked={instantOnly} onChange={(e) => setInstantOnly(e.target.checked)} />
-                  <Zap size={11} className="text-gold" /> Sofortbuchung
+                  <Zap size={11} className="text-gold" /> {t("filterInstant")}
                 </label>
                 <label className="flex items-center gap-1.5 cursor-pointer text-xs text-text-secondary">
                   <input type="checkbox" className="accent-gold" checked={verifiedOnly} onChange={(e) => setVerifiedOnly(e.target.checked)} />
-                  <CheckCircle size={11} className="text-success" /> Verifiziert
+                  <CheckCircle size={11} className="text-success" /> {t("filterVerified")}
                 </label>
 
                 <select value={sortKey} onChange={(e) => setSortKey(e.target.value)} className="text-xs py-1.5 px-2 bg-bg-elevated border border-border rounded-lg text-text-secondary">
-                  <option value="featured">Empfohlen</option>
-                  <option value="price-asc">Preis ↑</option>
-                  <option value="price-desc">Preis ↓</option>
-                  <option value="rating">Beste Bewertung</option>
+                  <option value="featured">{t("sortFeatured")}</option>
+                  <option value="price-asc">{t("sortPriceAsc")}</option>
+                  <option value="price-desc">{t("sortPriceDesc")}</option>
+                  <option value="rating">{t("sortRating")}</option>
                 </select>
 
                 {hasActiveFilters && (
                   <button onClick={resetFilters} className="text-xs text-crimson-light hover:text-crimson flex items-center gap-1 transition-colors">
-                    <X size={12} /> Zurücksetzen
+                    <X size={12} /> {t("resetFilters")}
                   </button>
                 )}
               </div>
@@ -450,8 +458,8 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
           >
             <div className="sticky top-0 z-10 bg-bg-primary/90 backdrop-blur-nav border-b border-border px-4 py-2.5 flex items-center justify-between">
               <p className="text-xs text-text-muted">
-                <span className="text-text-primary font-semibold">{filtered.length}</span> {filtered.length !== 1 ? "Locations" : "Location"}
-                {userLocation && <span className="text-gold"> im Umkreis von {radiusKm} km</span>}
+                <span className="text-text-primary font-semibold">{t("results", { count: filtered.length })}</span>
+                {userLocation && <span className="text-gold"> {t("inRadius", { radius: radiusKm })}</span>}
                 {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
               </p>
             </div>
@@ -459,9 +467,9 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
             {filtered.length === 0 ? (
               <EmptyState
                 icon={Film}
-                title={allLocations.length === 0 ? "Noch keine Locations" : "Keine Locations gefunden"}
-                description={allLocations.length === 0 ? "Sei der Erste! Trage deine Location ein und werde von Produktionen gefunden." : userLocation ? "Keine Locations in diesem Umkreis — vergrößere den Radius oder entferne Filter." : "Versuche eine andere Suche oder entferne aktive Filter."}
-                action={allLocations.length === 0 ? { label: "Location eintragen", onClick: () => window.location.href = "/inserat?group=drehorte" } : { label: "Filter zurücksetzen", onClick: resetFilters }}
+                title={allLocations.length === 0 ? t("emptyTitle") : t("emptyTitleFiltered")}
+                description={allLocations.length === 0 ? t("emptyDesc") : userLocation ? t("emptyDescRadius") : t("emptyDescFiltered")}
+                action={allLocations.length === 0 ? { label: t("emptyAction"), onClick: () => window.location.href = "/inserat?group=drehorte" } : { label: t("emptyActionReset"), onClick: resetFilters }}
               />
             ) : (
               <div className={`p-3 ${viewMode === "list" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-6" : "space-y-2"}`}>
@@ -562,7 +570,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
                   onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}
                   className="px-6 py-2.5 bg-bg-secondary border border-border rounded-lg text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors"
                 >
-                  Mehr laden · {filtered.length - visibleCount} weitere Locations
+                  {t("loadMore", { count: filtered.length - visibleCount })}
                 </button>
               </div>
             )}

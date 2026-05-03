@@ -13,6 +13,7 @@ import {
 import EmptyState from "@/components/EmptyState";
 import { FILM_DEPARTMENTS, DEPT_KEYWORDS, ALL_ROLES } from "@/lib/filmRoles";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 // ── Department icon map ───────────────────────────────────────────
 const DEPT_ICON_MAP: Record<string, LucideIcon> = {
@@ -152,12 +153,14 @@ function JobDeptPanel({
   activeDeptId, setActiveDeptId,
   selectedDeptId, selectedRoleId,
   onSelectDept, onSelectRole, onClose,
+  clearLabel, clearSelectionLabel,
 }: {
   activeDeptId: string; setActiveDeptId: (id: string) => void;
   selectedDeptId: string | null; selectedRoleId: string | null;
   onSelectDept: (deptId: string) => void;
   onSelectRole: (deptId: string, roleId: string | null) => void;
   onClose: () => void;
+  clearLabel: string; clearSelectionLabel: string;
 }) {
   const activeDept = FILM_DEPARTMENTS.find((d) => d.id === activeDeptId) ?? FILM_DEPARTMENTS[0];
 
@@ -187,7 +190,7 @@ function JobDeptPanel({
           <div className="flex items-center justify-between mb-2">
             <h3 className={`text-sm font-semibold ${activeDept.color}`}>{activeDept.label}</h3>
             {selectedDeptId === activeDeptId && (
-              <button onClick={() => onSelectRole(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">Löschen</button>
+              <button onClick={() => onSelectRole(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">{clearLabel}</button>
             )}
           </div>
           <div className="grid grid-cols-2 gap-1.5">
@@ -247,7 +250,7 @@ function JobDeptPanel({
           <div className="flex items-center justify-between mb-3">
             <h3 className={`text-sm font-semibold ${activeDept.color}`}>{activeDept.label}</h3>
             {selectedDeptId === activeDeptId && (
-              <button onClick={() => onSelectRole(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">Auswahl löschen</button>
+              <button onClick={() => onSelectRole(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">{clearSelectionLabel}</button>
             )}
           </div>
           <div className="grid grid-cols-2 gap-1.5">
@@ -275,6 +278,7 @@ function JobDeptPanel({
 function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations("jobs");
 
   const allJobs = useMemo(() => serverJobs, [serverJobs]);
 
@@ -432,24 +436,24 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full mb-3">
-                <span className="text-[11px] text-white/80 font-bold uppercase tracking-widest">Jobs & Ausschreibungen</span>
+                <span className="text-[11px] text-white/80 font-bold uppercase tracking-widest">{t("heroBadge")}</span>
               </div>
               <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight mb-2">
-                Jobs in Film, Social Media{" "}
-                <span className="text-gradient-gold">&amp; Fotografie</span>
+                {t("heroTitle")}{" "}
+                <span className="text-gradient-gold">{t("heroTitleHighlight")}</span>
               </h1>
               <p className="text-white/60 text-sm sm:text-base leading-relaxed max-w-xl">
                 {allJobs.length > 0
-                  ? `${allJobs.length} offene Stellen — von der Kameraassistenz bis zum Social Media Manager.`
-                  : "Jobs ausschreiben und die passende Crew finden — kostenlos und ohne Provision."}
+                  ? t("heroDesc", { count: allJobs.length })
+                  : t("heroDescEmpty")}
               </p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <Link href="/jobs" className="inline-flex items-center gap-2 px-4 py-2.5 border border-white/20 text-white/70 rounded-xl hover:border-white/40 hover:text-white transition-all text-sm whitespace-nowrap backdrop-blur-sm">
-                Alle Jobs →
+                {t("allJobs")}
               </Link>
               <Link href="/inserat" className="inline-flex items-center gap-2 px-4 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm whitespace-nowrap">
-                Job ausschreiben →
+                {t("postJobBtn")}
               </Link>
             </div>
           </div>
@@ -465,7 +469,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
             <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
               <Search size={14} className="text-text-muted shrink-0" />
               <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
-                placeholder="Rolle, Fähigkeit, Stichwort..."
+                placeholder={t("searchPlaceholder")}
                 className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none" />
               {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
             </div>
@@ -476,9 +480,9 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
             <SortDropdown
               value={sortKey}
               options={[
-                { value: "newest",    label: "Neueste zuerst" },
-                { value: "rate-desc", label: "Gage (hoch → niedrig)" },
-                { value: "urgent",    label: "Dringend zuerst" },
+                { value: "newest",    label: t("sortNewest") },
+                { value: "rate-desc", label: t("sortRateDesc") },
+                { value: "urgent",    label: t("sortUrgent") },
               ]}
               onChange={setSortKey}
             />
@@ -494,7 +498,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
                     : "border-border text-text-muted hover:border-gold/40 hover:text-gold"
                 }`}>
                 <SlidersHorizontal size={11} />
-                Bereich & Rolle
+                {t("filterDeptRole")}
                 {hasDeptFilter && <span className="bg-gold text-bg-primary text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">✓</span>}
                 <ChevronDown size={11} className={`transition-transform ${panelOpen ? "rotate-180" : ""}`} />
               </button>
@@ -503,18 +507,18 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
             <div className="w-px h-5 bg-border shrink-0" />
 
             {/* Projekttyp */}
-            <FilterDropdown icon={Film} label="Projekttyp" value={activeType} options={PROJECT_TYPES} onChange={setActiveType} />
+            <FilterDropdown icon={Film} label={t("filterProjectType")} value={activeType} options={PROJECT_TYPES} onChange={setActiveType} />
 
             {/* Vergütung */}
-            <FilterDropdown icon={Briefcase} label="Vergütung" value={payTypeFilter} options={PAY_TYPES} onChange={setPayTypeFilter} />
+            <FilterDropdown icon={Briefcase} label={t("filterPay")} value={payTypeFilter} options={PAY_TYPES} onChange={setPayTypeFilter} />
 
             {/* Stadt */}
             {availableCities.length > 0 && (
-              <FilterDropdown icon={MapPin} label="Stadt" value={cityFilter} options={availableCities} onChange={setCityFilter} />
+              <FilterDropdown icon={MapPin} label={t("filterCity")} value={cityFilter} options={availableCities} onChange={setCityFilter} />
             )}
 
             {/* Land */}
-            <FilterDropdown icon={Globe} label="Land" value={countryFilter} options={["Deutschland", "Österreich", "Schweiz", "Remote"]} onChange={setCountryFilter} />
+            <FilterDropdown icon={Globe} label={t("filterCountry")} value={countryFilter} options={["Deutschland", "Österreich", "Schweiz", "Remote"]} onChange={setCountryFilter} />
 
             {/* Dringend toggle */}
             <label className="flex items-center gap-1.5 text-xs text-text-muted cursor-pointer hover:text-text-secondary transition-colors select-none shrink-0">
@@ -523,24 +527,24 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
                 <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${urgentOnly ? "left-3.5" : "left-0.5"}`} />
               </div>
               <Zap size={10} className={urgentOnly ? "text-gold" : ""} />
-              Dringend
+              {t("filterUrgentLabel")}
             </label>
 
             {/* Job type toggle */}
             <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
-              {(["alle", "freelance", "festanstellung", "praktikum"] as const).map((t) => (
-                <button key={t} onClick={() => setJobTypeFilter(t)}
+              {(["alle", "freelance", "festanstellung", "praktikum"] as const).map((jt) => (
+                <button key={jt} onClick={() => setJobTypeFilter(jt)}
                   className={`h-9 px-2.5 text-[11px] font-medium transition-all border-r border-border last:border-r-0 ${
-                    jobTypeFilter === t ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-secondary"
+                    jobTypeFilter === jt ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-secondary"
                   }`}>
-                  {t === "alle" ? "Alle" : t === "freelance" ? "Freelance" : t === "festanstellung" ? "Festanstellung" : "Praktikum"}
+                  {jt === "alle" ? t("filterAll") : jt === "freelance" ? t("filterFreelance") : jt === "festanstellung" ? t("filterFulltime") : t("filterInternship")}
                 </button>
               ))}
             </div>
 
             {hasAnyFilter && (
               <button onClick={clearAll} className="h-9 px-3 text-xs text-text-muted hover:text-red-400 transition-colors whitespace-nowrap border border-border rounded-lg hover:border-red-400/40 shrink-0">
-                Löschen
+                {t("clearFilter")}
               </button>
             )}
 
@@ -556,6 +560,8 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
               onSelectDept={handleSelectDept}
               onSelectRole={handleSelectRole}
               onClose={() => setPanelOpen(false)}
+              clearLabel={t("clearFilter")}
+              clearSelectionLabel={t("clearSelection")}
             />
           )}
 
@@ -582,13 +588,13 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
               )}
               {urgentOnly && (
                 <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-gold/10 border-gold/30 text-gold">
-                  <Zap size={9} /> Dringend
+                  <Zap size={9} /> {t("urgentBadge")}
                   <button onClick={() => setUrgentOnly(false)} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               )}
               {jobTypeFilter !== "alle" && (
                 <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary">
-                  {jobTypeFilter === "freelance" ? "Freelance" : jobTypeFilter === "festanstellung" ? "Festanstellung" : "Praktikum"}
+                  {jobTypeFilter === "freelance" ? t("filterFreelance") : jobTypeFilter === "festanstellung" ? t("filterFulltime") : t("filterInternship")}
                   <button onClick={() => setJobTypeFilter("alle")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               )}
@@ -605,7 +611,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
                 </span>
               )}
               <button onClick={clearAll} className="text-[11px] text-text-muted hover:text-red-400 transition-colors underline underline-offset-2 ml-1">
-                Alle löschen
+                {t("clearAll")}
               </button>
             </div>
           )}
@@ -616,7 +622,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-5">
           <p className="text-sm text-text-muted">
-            <span className="text-text-primary font-semibold">{filtered.length} {filtered.length !== 1 ? "Stellen" : "Stelle"}</span> gefunden
+            <span className="text-text-primary font-semibold">{t("results", { count: filtered.length })}</span>
             {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
           </p>
         </div>
@@ -624,9 +630,9 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
         {filtered.length === 0 && (
           <EmptyState
             icon={Briefcase}
-            title={allJobs.length === 0 ? "Noch keine Jobs ausgeschrieben" : "Keine Jobs gefunden"}
-            description={allJobs.length === 0 ? "Sei der Erste! Schreibe einen Job aus und finde deine Crew." : "Versuche einen anderen Suchbegriff oder entferne aktive Filter."}
-            action={allJobs.length === 0 ? { label: "Job ausschreiben", onClick: () => window.location.href = "/inserat?group=jobs" } : { label: "Filter zurücksetzen", onClick: clearAll }}
+            title={allJobs.length === 0 ? t("emptyTitle") : t("emptyTitleFiltered")}
+            description={allJobs.length === 0 ? t("emptyDesc") : t("emptyDescFiltered")}
+            action={allJobs.length === 0 ? { label: t("emptyPost"), onClick: () => window.location.href = "/inserat?group=jobs" } : { label: t("emptyReset"), onClick: clearAll }}
           />
         )}
 
@@ -642,9 +648,9 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
             const rateDisplay = !job.rate || job.rate === "0 €/Tag" || job.rate === "0" ? null : job.rate;
 
             const jobTypeMeta: Record<string, { label: string; cls: string }> = {
-              festanstellung: { label: "Festanstellung", cls: "bg-violet-500/10 border-violet-500/20 text-violet-400" },
-              praktikum:      { label: "Praktikum",      cls: "bg-sky-500/10 border-sky-500/20 text-sky-400" },
-              freelance:      { label: "Freelance",      cls: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" },
+              festanstellung: { label: t("badgeFulltime"),   cls: "bg-violet-500/10 border-violet-500/20 text-violet-400" },
+              praktikum:      { label: t("badgeInternship"), cls: "bg-sky-500/10 border-sky-500/20 text-sky-400" },
+              freelance:      { label: t("badgeFreelance"),  cls: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" },
             };
             const jobTypeBadge = job.jobType ? jobTypeMeta[job.jobType] : jobTypeMeta.freelance;
 
@@ -664,7 +670,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
                     <div className="flex items-center gap-2 min-w-0 flex-wrap">
                       <h3 className="font-semibold text-sm text-text-primary group-hover:text-gold transition-colors leading-snug">{job.title}</h3>
                       {urgent && (
-                        <span className="px-1.5 py-0.5 bg-crimson/15 border border-crimson/30 text-crimson-light text-[10px] rounded font-semibold shrink-0">Dringend</span>
+                        <span className="px-1.5 py-0.5 bg-crimson/15 border border-crimson/30 text-crimson-light text-[10px] rounded font-semibold shrink-0">{t("urgentBadge")}</span>
                       )}
                     </div>
                     {rateDisplay && (
@@ -711,7 +717,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
           <div className="mt-6 text-center">
             <button onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}
               className="px-6 py-2.5 bg-bg-secondary border border-border rounded-lg text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors">
-              Mehr laden · {filtered.length - visibleCount} weitere Jobs
+              {t("loadMore", { count: filtered.length - visibleCount })}
             </button>
           </div>
         )}
