@@ -803,7 +803,6 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{proj.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</span>
                             {normType(proj.type) && <span className="text-[10px] text-text-muted shrink-0 hidden sm:inline">{normType(proj.type)}</span>}
-                            {credit.role && <span className="text-[10px] text-text-primary shrink-0 truncate max-w-[28%]">{credit.role}</span>}
                           </Link>
                         );
                       })}
@@ -1406,7 +1405,6 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{proj.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</span>
                             {normType(proj.type) && <span className="text-[10px] text-text-muted shrink-0 hidden sm:inline">{normType(proj.type)}</span>}
-                            {credit.role && <span className="text-[10px] text-text-primary shrink-0 truncate max-w-[28%]">{credit.role}</span>}
                           </Link>
                         );
                       })}
