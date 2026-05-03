@@ -23,7 +23,6 @@ import {
   TrendingUp, Film, Play, Building2, Clapperboard, Camera,
 } from "lucide-react";
 import { stats } from "@/lib/data";
-import ImageStrip from "@/components/ImageStrip";
 import HeroSearch from "@/components/HeroSearch";
 
 function fmtCount(n: number, fallback: string): string {
@@ -42,15 +41,13 @@ async function getHomeData() {
     { count: companyCount },
     { data: recentLocations },
     { data: recentJobs },
-    { data: recentProjects },
-    { data: recentProfiles },
-    { data: recentLocationsStrip },
     { data: locationImages },
     { data: crewImages },
     { data: equipmentImages },
     { data: jobImages },
     { data: liveCompanies },
     { data: liveProjects },
+    { data: userReviewsRaw },
   ] = await Promise.all([
     db.from("listings").select("*", { count: "exact", head: true }).eq("type", "location").eq("published", true),
     db.from("listings").select("*", { count: "exact", head: true }).eq("type", "job").eq("published", true),
@@ -60,16 +57,52 @@ async function getHomeData() {
     db.from("companies").select("*", { count: "exact", head: true }).eq("published", true),
     db.from("listings").select("id,title,city,price,image_url,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(3),
     db.from("listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
-    db.from("projects").select("id,title,poster_url").not("poster_url", "is", null).order("created_at", { ascending: false }).limit(50),
-    db.from("profiles").select("user_id,display_name,avatar_url").not("avatar_url", "is", null).order("updated_at", { ascending: false }).limit(50),
-    db.from("listings").select("id,title,image_url").eq("type", "location").eq("published", true).not("image_url", "is", null).order("created_at", { ascending: false }).limit(50),
     db.from("listings").select("image_url").eq("type", "location").eq("published", true).not("image_url", "is", null).limit(20),
     db.from("profiles").select("avatar_url").not("avatar_url", "is", null).not("display_name", "is", null).limit(20),
     db.from("listings").select("image_url").in("type", ["prop", "vehicle"]).eq("published", true).not("image_url", "is", null).limit(20),
     db.from("listings").select("image_url").eq("type", "job").eq("published", true).not("image_url", "is", null).limit(20),
     db.from("companies").select("id,slug,name,logo_url,city").not("logo_url", "is", null).order("created_at", { ascending: false }).limit(12),
     db.from("projects").select("id,title,poster_url,year,type,director").not("poster_url", "is", null).order("created_at", { ascending: false }).limit(8),
+    db.from("reviews").select("target_id, rating").eq("target_type", "user"),
   ]);
+
+  // Compute top-rated creator IDs from reviews (min 2 reviews)
+  const ratingMap: Record<string, { sum: number; count: number }> = {};
+  for (const r of (userReviewsRaw ?? []) as Array<{ target_id: string; rating: number }>) {
+    if (!ratingMap[r.target_id]) ratingMap[r.target_id] = { sum: 0, count: 0 };
+    ratingMap[r.target_id].sum += r.rating;
+    ratingMap[r.target_id].count += 1;
+  }
+  const topRatedIds = Object.entries(ratingMap)
+    .filter(([, v]) => v.count >= 2)
+    .sort((a, b) => b[1].sum / b[1].count - a[1].sum / a[1].count)
+    .slice(0, 8)
+    .map(([id]) => id);
+
+  let topCreators: Array<{
+    id: string; name: string; tagline?: string; avatar?: string;
+    city?: string; verified: boolean; rating: number; reviews: number;
+  }> = [];
+  if (topRatedIds.length >= 3) {
+    const { data: topProfiles } = await db
+      .from("profiles")
+      .select("user_id, display_name, tagline, avatar_url, location, verified")
+      .in("user_id", topRatedIds)
+      .not("display_name", "is", null);
+    topCreators = ((topProfiles ?? []) as Array<Record<string, unknown>>)
+      .map((p) => ({
+        id: p.user_id as string,
+        name: p.display_name as string,
+        tagline: p.tagline as string | undefined,
+        avatar: typeof p.avatar_url === "string" && (p.avatar_url as string).includes("supabase.co/storage") ? p.avatar_url as string : undefined,
+        city: typeof p.location === "string" ? (p.location as string).split(",")[0]?.trim() : undefined,
+        verified: (p.verified as boolean) ?? false,
+        rating: Math.round((ratingMap[p.user_id as string].sum / ratingMap[p.user_id as string].count) * 10) / 10,
+        reviews: ratingMap[p.user_id as string].count,
+      }))
+      .sort((a, b) => b.rating - a.rating || b.reviews - a.reviews)
+      .slice(0, 8);
+  }
 
   const liveStats = [
     { value: fmtCount(locationCount ?? 0, stats[0].value), label: stats[0].label },
@@ -101,18 +134,6 @@ async function getHomeData() {
         created_at: (j.created_at ?? "") as string,
       }))
     : [];
-
-  const posterStrip = (recentProjects ?? [])
-    .filter((p: { poster_url: string | null }) => p.poster_url?.includes("supabase.co/storage"))
-    .map((p: { id: string; title: string; poster_url: string }) => ({ src: p.poster_url, alt: p.title, href: `/projects/${p.id}` }));
-
-  const avatarStrip = (recentProfiles ?? [])
-    .filter((p: { avatar_url: string | null }) => p.avatar_url?.includes("supabase.co/storage"))
-    .map((p: { user_id: string; display_name: string | null; avatar_url: string }) => ({ src: p.avatar_url, alt: p.display_name ?? "Crew", href: `/profile/${p.user_id}` }));
-
-  const locationStrip = (recentLocationsStrip ?? [])
-    .filter((l: { image_url: string | null }) => l.image_url?.includes("supabase.co/storage"))
-    .map((l: { id: string; title: string; image_url: string }) => ({ src: l.image_url, alt: l.title, href: `/locations/${l.id}` }));
 
   function pickRandom(arr: Array<Record<string, string | null | undefined>>): string | null {
     const urls = arr
@@ -148,7 +169,7 @@ async function getHomeData() {
       year: p.year,
     }));
 
-  return { liveStats, liveLocations, liveJobs, posterStrip, avatarStrip, locationStrip, pillarImages, companies, projects };
+  return { liveStats, liveLocations, liveJobs, pillarImages, companies, projects, topCreators };
 }
 
 export default async function HomePage() {
@@ -180,7 +201,7 @@ export default async function HomePage() {
     { icon: Clapperboard, title: t("pillarProjectsTitle"),    desc: t("pillarProjectsDesc"),    href: "/projects",  pillarKey: "projekt",   accent: "from-rose-900/70",    insertHref: "/projects",                 insertLabel: t("pillarProjectsCta"),  imgPos: "50% 50%" },
   ];
 
-  const { liveStats, liveLocations, liveJobs, posterStrip, avatarStrip, locationStrip, pillarImages, companies, projects } = await getHomeData();
+  const { liveStats, liveLocations, liveJobs, pillarImages, companies, projects, topCreators } = await getHomeData();
 
   return (
     <>
@@ -307,19 +328,77 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* ── IMAGE STRIPS ── */}
-      {(posterStrip.length >= 1 || avatarStrip.length >= 1 || locationStrip.length >= 1) && (
-        <div className="flex flex-col border-b border-border overflow-hidden">
-          {posterStrip.length >= 1 && (
-            <ImageStrip images={posterStrip} aspectRatio="wide" height={60} durationOverride={70} direction="left" overlay={false} stripId="top" />
-          )}
-          {avatarStrip.length >= 1 && (
-            <ImageStrip images={avatarStrip} aspectRatio="square" height={60} durationOverride={90} direction="right" overlay={false} stripId="mid" startOffset={0.33} />
-          )}
-          {locationStrip.length >= 1 && (
-            <ImageStrip images={locationStrip} aspectRatio="wide" height={60} durationOverride={130} direction="left" overlay={false} stripId="bot" startOffset={0.5} />
-          )}
-        </div>
+      {/* ══════════════════════════════════════════════
+          TOP RATED CREATORS
+      ══════════════════════════════════════════════ */}
+      {topCreators.length >= 3 && (
+        <section className="py-8 sm:py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center sm:flex-row sm:items-end sm:justify-between mb-6 text-center sm:text-left">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("topCreatorsLabel")}</p>
+              <h2 className="font-display text-2xl font-bold text-text-primary">{t("topCreatorsTitle")}</h2>
+            </div>
+            <Link href="/creators" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium mt-2 sm:mt-0">
+              {tc("viewAll")} <ArrowRight size={14} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {topCreators.map((c) => (
+              <Link
+                key={c.id}
+                href={`/profile/${c.id}`}
+                className="group card-hover rounded-2xl border border-border bg-bg-secondary hover:border-gold/30 transition-all overflow-hidden flex flex-col"
+              >
+                <div className="relative aspect-square bg-bg-elevated overflow-hidden">
+                  {c.avatar ? (
+                    <Image
+                      src={c.avatar}
+                      alt={c.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                      sizes="(max-width:640px) 50vw,(max-width:1024px) 33vw,25vw"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-gold/10 to-bg-elevated flex items-center justify-center">
+                      <span className="text-4xl font-display font-bold text-gold/40">
+                        {c.name.slice(0, 2).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                  {c.verified && (
+                    <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-gold flex items-center justify-center">
+                      <CheckCircle size={11} className="text-bg-primary" />
+                    </div>
+                  )}
+                </div>
+                <div className="p-3 flex flex-col flex-1">
+                  <h3 className="font-semibold text-text-primary text-sm leading-snug mb-0.5">{c.name}</h3>
+                  {c.city && (
+                    <p className="text-[11px] text-text-muted flex items-center gap-1 mb-1.5">
+                      <MapPin size={9} /> {c.city}
+                    </p>
+                  )}
+                  {c.tagline && (
+                    <p className="text-xs text-text-secondary leading-relaxed line-clamp-2 flex-1 mb-2">{c.tagline}</p>
+                  )}
+                  <div className="flex items-center gap-1.5 mt-auto">
+                    <div className="flex items-center gap-0.5">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <Star
+                          key={i}
+                          size={11}
+                          className={i <= Math.round(c.rating) ? "text-gold fill-gold" : "text-border fill-border"}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-xs font-semibold text-text-primary">{c.rating.toFixed(1)}</span>
+                    <span className="text-[11px] text-text-muted">({c.reviews})</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
       )}
 
       {/* ══════════════════════════════════════════════
