@@ -84,9 +84,25 @@ const PROJECT_TYPE_NORMALIZE: Record<string, string> = {
   "Event / Live": "Event",
   "Foto / Shooting": "Shooting",
 };
+const PROJECT_TYPE_COLOR: Record<string, string> = {
+  "Spielfilm":      "text-gold",
+  "Serie":          "text-violet-400",
+  "Werbefilm":      "text-sky-400",
+  "Kurzfilm":       "text-emerald-400",
+  "Dokumentation":  "text-amber-400",
+  "Musikvideo":     "text-pink-400",
+  "Corporate":      "text-cyan-400",
+  "Shooting":       "text-orange-400",
+  "Event":          "text-teal-400",
+};
 function normType(t: string | null | undefined): string | null {
   if (!t) return null;
   return PROJECT_TYPE_NORMALIZE[t] ?? t;
+}
+function typeColor(t: string | null | undefined): string {
+  if (!t) return "text-text-muted";
+  const norm = PROJECT_TYPE_NORMALIZE[t] ?? t;
+  return PROJECT_TYPE_COLOR[norm] ?? "text-text-muted";
 }
 
 function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; initialYouBlocked: boolean }) {
@@ -743,7 +759,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                     </div>
                     {isOpen && hasDetails && (
                       <div className="px-3 pb-1.5 pl-14 flex flex-wrap gap-x-4 gap-y-0.5 text-[10px] text-text-muted border-t border-border pt-1">
-                        {normType(film.type) && <span>Typ: <span className="text-text-secondary">{normType(film.type)}</span></span>}
+                        {normType(film.type) && <span>Typ: <span className={`font-medium ${typeColor(film.type)}`}>{normType(film.type)}</span></span>}
                         {film.director && <span>Regie: <span className="text-text-secondary">{film.director}</span></span>}
                         {film.production && <span>Prod.: <span className="text-text-secondary">{film.production}</span></span>}
                         {film.festival && <span className="text-gold">★ {film.festival}</span>}
@@ -802,7 +818,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                             className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{proj.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</span>
-                            {normType(proj.type) && <span className="text-[10px] text-text-muted shrink-0 hidden sm:inline">{normType(proj.type)}</span>}
+                            {normType(proj.type) && <span className={`text-[10px] shrink-0 hidden sm:inline font-medium ${typeColor(proj.type)}`}>{normType(proj.type)}</span>}
                           </Link>
                         );
                       })}
@@ -1404,7 +1420,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                             className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{proj.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</span>
-                            {normType(proj.type) && <span className="text-[10px] text-text-muted shrink-0 hidden sm:inline">{normType(proj.type)}</span>}
+                            {normType(proj.type) && <span className={`text-[10px] shrink-0 hidden sm:inline font-medium ${typeColor(proj.type)}`}>{normType(proj.type)}</span>}
                           </Link>
                         );
                       })}
@@ -1451,7 +1467,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                     </div>
                     {isOpen && hasDetails && (
                       <div className="px-3 pb-1.5 pl-14 flex flex-wrap gap-x-4 gap-y-0.5 text-[10px] text-text-muted border-t border-border pt-1">
-                        {normType(film.type) && <span>Typ: <span className="text-text-secondary">{normType(film.type)}</span></span>}
+                        {normType(film.type) && <span>Typ: <span className={`font-medium ${typeColor(film.type)}`}>{normType(film.type)}</span></span>}
                         {film.director && <span>Regie: <span className="text-text-secondary">{film.director}</span></span>}
                         {film.production && <span>Prod.: <span className="text-text-secondary">{film.production}</span></span>}
                         {film.festival && <span className="text-gold">★ {film.festival}</span>}

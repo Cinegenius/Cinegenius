@@ -7,6 +7,33 @@ import {
   Clapperboard, UserRound, Loader2, Check, ArrowLeft, ShieldAlert, Film,
 } from "lucide-react";
 
+const PROJECT_TYPE_NORMALIZE: Record<string, string> = {
+  "Werbefilm / Commercial": "Werbefilm",
+  "Corporate Film": "Corporate",
+  "Event / Live": "Event",
+  "Foto / Shooting": "Shooting",
+};
+const PROJECT_TYPE_COLOR: Record<string, string> = {
+  "Spielfilm":      "text-gold",
+  "Serie":          "text-violet-400",
+  "Werbefilm":      "text-sky-400",
+  "Kurzfilm":       "text-emerald-400",
+  "Dokumentation":  "text-amber-400",
+  "Musikvideo":     "text-pink-400",
+  "Corporate":      "text-cyan-400",
+  "Shooting":       "text-orange-400",
+  "Event":          "text-teal-400",
+};
+function normType(t: string | null | undefined): string | null {
+  if (!t) return null;
+  return PROJECT_TYPE_NORMALIZE[t] ?? t;
+}
+function typeColor(t: string | null | undefined): string {
+  if (!t) return "text-text-muted";
+  const norm = PROJECT_TYPE_NORMALIZE[t] ?? t;
+  return PROJECT_TYPE_COLOR[norm] ?? "text-text-muted";
+}
+
 type Project = {
   id: string;
   title: string;
@@ -165,8 +192,10 @@ export default function PersonView({
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{project.title}</p>
-                      <p className="text-xs text-text-muted mt-0.5">
-                        {[project.type, project.year, project.director].filter(Boolean).join(" · ")}
+                      <p className="text-xs text-text-muted mt-0.5 flex items-center gap-1 flex-wrap">
+                        {normType(project.type) && <span className={`font-medium ${typeColor(project.type)}`}>{normType(project.type)}</span>}
+                        {(project.year || project.director) && normType(project.type) && <span>·</span>}
+                        {[project.year, project.director].filter(Boolean).join(" · ")}
                       </p>
                       <p className="text-xs text-gold/80 mt-1">{roleLabel}</p>
                     </div>
