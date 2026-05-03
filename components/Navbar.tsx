@@ -27,7 +27,7 @@ const crewGroups: { heading: string; platform?: string; items: NavItem[] }[] = [
     heading: "🎬 Film — Talent",
     platform: "film",
     items: [
-      { icon: Drama,     label: "Schauspieler", desc: "Haupt- & Nebenrollen",    href: "/creators?kategorie=vor-der-kamera", iconBg: "bg-rose-500/10 border-rose-500/20",   iconColor: "text-rose-400" },
+      { icon: Drama,     label: "Schauspieler/in", desc: "Haupt- & Nebenrollen",    href: "/creators?kategorie=vor-der-kamera", iconBg: "bg-rose-500/10 border-rose-500/20",   iconColor: "text-rose-400" },
       { icon: Users,     label: "Statisten",    desc: "Background & Komparsen",  href: "/creators?kategorie=statisten",    iconBg: "bg-sky-500/10 border-sky-500/20",     iconColor: "text-sky-400" },
       { icon: User,      label: "Models",       desc: "Fashion, Print & Video",  href: "/creators?kategorie=models",       iconBg: "bg-pink-500/10 border-pink-500/20",   iconColor: "text-pink-400" },
     ],
@@ -37,7 +37,7 @@ const crewGroups: { heading: string; platform?: string; items: NavItem[] }[] = [
     platform: "film",
     items: [
       { icon: Clapperboard, label: "Regie",      desc: "Director, AD, Continuity",     href: "/creators?kategorie=regie",      iconBg: "bg-purple-500/10 border-purple-500/20", iconColor: "text-purple-400" },
-      { icon: Camera,    label: "Kamera",     desc: "DP, Kameramann, AC",          href: "/creators?kategorie=kamera",     iconBg: "bg-blue-500/10 border-blue-500/20",     iconColor: "text-blue-400" },
+      { icon: Camera,    label: "Kamera",     desc: "DP, Kamerafrau/-mann, AC",    href: "/creators?kategorie=kamera",     iconBg: "bg-blue-500/10 border-blue-500/20",     iconColor: "text-blue-400" },
       { icon: Lightbulb, label: "Licht",      desc: "Gaffer, Best Boy",             href: "/creators?kategorie=licht",      iconBg: "bg-amber-500/10 border-amber-500/20",   iconColor: "text-amber-400" },
       { icon: Mic,       label: "Ton",        desc: "Mixer, Boom, Designer",        href: "/creators?kategorie=ton",        iconBg: "bg-teal-500/10 border-teal-500/20",     iconColor: "text-teal-400" },
       { icon: Briefcase, label: "Produktion", desc: "Producer, Koordination",       href: "/creators?kategorie=produktion", iconBg: "bg-emerald-500/10 border-emerald-500/20", iconColor: "text-emerald-400" },
@@ -130,10 +130,10 @@ const jobGroups: { heading: string; items: NavItem[] }[] = [
   {
     heading: "🎬 Film — Kreativ",
     items: [
-      { icon: Drama,        label: "Vor der Kamera", desc: "Schauspieler, Stunt, Sprecher",  href: "/jobs?role=Vor+der+Kamera",   iconBg: "bg-rose-500/10 border-rose-500/20",     iconColor: "text-rose-400" },
+      { icon: Drama,        label: "Vor der Kamera", desc: "Schauspieler/in, Stunt, Sprecher/in",  href: "/jobs?role=Vor+der+Kamera",   iconBg: "bg-rose-500/10 border-rose-500/20",     iconColor: "text-rose-400" },
       { icon: Clapperboard, label: "Regie",           desc: "Director, AD, Continuity",       href: "/jobs?role=Regie",            iconBg: "bg-violet-500/10 border-violet-500/20", iconColor: "text-violet-400" },
-      { icon: Camera,       label: "Kamera",          desc: "DoP, Kameramann, AC",             href: "/jobs?role=Kamera",           iconBg: "bg-sky-500/10 border-sky-500/20",       iconColor: "text-sky-400" },
-      { icon: Lightbulb,    label: "Licht & Ton",     desc: "Gaffer, Tonmeister, Boom",        href: "/jobs?role=Licht",            iconBg: "bg-amber-500/10 border-amber-500/20",   iconColor: "text-amber-400" },
+      { icon: Camera,       label: "Kamera",          desc: "DoP, Kamerafrau/-mann, AC",       href: "/jobs?role=Kamera",           iconBg: "bg-sky-500/10 border-sky-500/20",       iconColor: "text-sky-400" },
+      { icon: Lightbulb,    label: "Licht & Ton",     desc: "Gaffer, Tontechniker/in, Boom",   href: "/jobs?role=Licht",            iconBg: "bg-amber-500/10 border-amber-500/20",   iconColor: "text-amber-400" },
       { icon: Briefcase,    label: "Produktion",      desc: "Producer, PA, Location",          href: "/jobs?role=Produktion",       iconBg: "bg-emerald-500/10 border-emerald-500/20", iconColor: "text-emerald-400" },
       { icon: Monitor,      label: "Post",            desc: "Editor, Colorist, VFX",           href: "/jobs?role=Postproduktion",   iconBg: "bg-blue-500/10 border-blue-500/20",     iconColor: "text-blue-400" },
     ],

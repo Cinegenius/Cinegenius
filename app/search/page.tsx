@@ -53,13 +53,13 @@ const TABS = [
 // ─── Suggestion chips ──────────────────────────────────────────────────────────
 
 const SUGGESTIONS = [
-  "Kameramann",
+  "Kamerafrau/-mann",
   "Warehouse Berlin",
   "Oldtimer 1960s",
   "Regie Kurzfilm",
   "Studio München",
-  "Schauspieler gesucht",
-  "Drohnen Pilot",
+  "Schauspieler/in gesucht",
+  "Drohnenpilot/in",
   "Fotostudio Hamburg",
 ];
 

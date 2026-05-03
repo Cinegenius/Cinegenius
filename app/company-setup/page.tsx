@@ -588,7 +588,7 @@ export default function CompanySetupPage() {
                     type="text"
                     value={ownerTitle}
                     onChange={(e) => setOwnerTitle(e.target.value)}
-                    placeholder="z.B. Geschäftsführer, Produzent, Creative Director..."
+                    placeholder="z.B. Geschäftsführer/in, Produzent/in, Creative Director..."
                     className="bg-transparent border-none py-3 text-sm flex-1 focus:outline-none"
                     maxLength={80}
                   />

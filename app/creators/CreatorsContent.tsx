@@ -513,7 +513,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
   const ROLE_SHORTCUTS: { label: string; role: string }[] = [
     { label: "DP / Kamera",  role: "Director of Photography (DoP)" },
     { label: "Regisseur",    role: "Regisseur"                     },
-    { label: "Schauspieler", role: "Schauspieler"                  },
+    { label: "Schauspieler/in", role: "Schauspieler"                },
     { label: "Fotograf",     role: "Fotograf/in"                   },
     { label: "Creator",      role: "Content Creator"               },
     { label: "Gaffer",       role: "Gaffer (Oberbeleuchter)"       },
