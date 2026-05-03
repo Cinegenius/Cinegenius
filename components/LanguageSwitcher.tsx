@@ -81,18 +81,18 @@ export default function LanguageSwitcher() {
       </button>
 
       {open && (
-        <div className="absolute top-full right-0 mt-2 w-44 bg-bg-elevated border border-border rounded-xl shadow-2xl overflow-hidden z-50 animate-fade-in">
+        <div className="absolute top-full right-0 mt-1.5 w-32 bg-bg-elevated border border-border rounded-lg shadow-xl overflow-hidden z-50 animate-fade-in">
           {LANGUAGES.map((lang) => (
             <button
               key={lang.code}
               onClick={() => select(lang.code)}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors hover:bg-bg-hover ${
+              className={`w-full flex items-center gap-2 px-3 py-1.5 text-xs transition-colors hover:bg-bg-hover ${
                 current === lang.code ? "text-gold" : "text-text-secondary"
               }`}
             >
-              <span className="text-base leading-none">{lang.flag}</span>
+              <span className="leading-none">{lang.flag}</span>
               <span className="flex-1 text-left">{lang.label}</span>
-              {current === lang.code && <Check size={13} className="text-gold shrink-0" />}
+              {current === lang.code && <Check size={11} className="text-gold shrink-0" />}
             </button>
           ))}
         </div>
