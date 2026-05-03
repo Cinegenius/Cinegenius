@@ -110,12 +110,20 @@ export default function AdminPage() {
   }, [activeTab, projectsPage, projectsSearch]);
 
   const loadProjectCredits = async (projectId: string) => {
-    if (projectCreditsMap[projectId]) return;
+    if (projectCreditsMap[projectId] !== undefined) return;
     setCreditsLoading(projectId);
     try {
       const r = await fetch(`/api/admin/project-credits?project_id=${projectId}`);
       const d = await r.json();
+      if (!r.ok) {
+        console.error("[admin] project-credits error:", d.error ?? r.status);
+        setProjectCreditsMap((prev) => ({ ...prev, [projectId]: [] }));
+        return;
+      }
       setProjectCreditsMap((prev) => ({ ...prev, [projectId]: d.credits ?? [] }));
+    } catch (e) {
+      console.error("[admin] loadProjectCredits failed:", e);
+      setProjectCreditsMap((prev) => ({ ...prev, [projectId]: [] }));
     } finally {
       setCreditsLoading(null);
     }
@@ -893,7 +901,7 @@ export default function AdminPage() {
                         {creditsLoading === p.id && (
                           <p className="text-xs text-text-muted px-4 py-3">Laden…</p>
                         )}
-                        {!creditsLoading && (projectCreditsMap[p.id] ?? []).length === 0 && (
+                        {creditsLoading !== p.id && projectCreditsMap[p.id] !== undefined && (projectCreditsMap[p.id] ?? []).length === 0 && (
                           <p className="text-xs text-text-muted px-4 py-3">Noch keine Crew eingetragen.</p>
                         )}
                         {(projectCreditsMap[p.id] ?? []).map((c) => (

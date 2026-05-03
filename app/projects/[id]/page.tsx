@@ -22,7 +22,7 @@ type RawCredit = {
 async function _getProject(id: string) {
   const [{ data: project }, { data: credits }, { data: festivals }] = await Promise.all([
     db.from("projects").select("*").eq("id", id).single(),
-    db.from("project_credits").select("id, user_id, unclaimed_profile_id, role, created_at").eq("project_id", id).order("created_at", { ascending: true }),
+    db.from("project_credits").select("*").eq("project_id", id).order("created_at", { ascending: true }),
     db.from("project_festivals").select("*").eq("project_id", id).order("year", { ascending: false }),
   ]);
 

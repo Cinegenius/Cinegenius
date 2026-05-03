@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
 
   const { data: credits, error } = await db
     .from("project_credits")
-    .select("id, user_id, unclaimed_profile_id, role, created_at")
+    .select("*")
     .eq("project_id", project_id)
     .order("created_at", { ascending: true });
 
