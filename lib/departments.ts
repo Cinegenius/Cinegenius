@@ -1,15 +1,21 @@
 export type Department = {
   id: string;
   label: string;
+  labels: Record<string, string>;
   emoji: string;
   color: string; // tailwind accent (text-*/border-*/bg-*)
   roles: string[];
 };
 
+export function getDeptLabel(dept: Department, locale: string): string {
+  return dept.labels[locale] ?? dept.label;
+}
+
 export const departments: Department[] = [
   {
     id: "produktion",
     label: "Produktion",
+    labels: { "de":"Produktion", "en":"Production", "es":"Producción", "it":"Produzione", "cs":"Produkce", "hu":"Produkció" },
     emoji: "🎬",
     color: "emerald",
     roles: [
@@ -26,6 +32,7 @@ export const departments: Department[] = [
   {
     id: "regie",
     label: "Regie",
+    labels: { "de":"Regie", "en":"Direction", "es":"Dirección", "it":"Regia", "cs":"Režie", "hu":"Rendezés" },
     emoji: "🎭",
     color: "violet",
     roles: [
@@ -38,6 +45,7 @@ export const departments: Department[] = [
   {
     id: "kamera",
     label: "Kamera",
+    labels: { "de":"Kamera", "en":"Camera", "es":"Cámara", "it":"Camera", "cs":"Kamera", "hu":"Kamera" },
     emoji: "🎥",
     color: "sky",
     roles: [
@@ -54,6 +62,7 @@ export const departments: Department[] = [
   {
     id: "licht",
     label: "Licht",
+    labels: { "de":"Licht", "en":"Lighting", "es":"Iluminación", "it":"Illuminazione", "cs":"Osvětlení", "hu":"Világítás" },
     emoji: "💡",
     color: "amber",
     roles: [
@@ -67,6 +76,7 @@ export const departments: Department[] = [
   {
     id: "ton",
     label: "Ton",
+    labels: { "de":"Ton", "en":"Sound", "es":"Sonido", "it":"Suono", "cs":"Zvuk", "hu":"Hang" },
     emoji: "🎧",
     color: "teal",
     roles: [
@@ -82,6 +92,7 @@ export const departments: Department[] = [
   {
     id: "art",
     label: "Art Department",
+    labels: { "de":"Art Department", "en":"Art Department", "es":"Arte", "it":"Arte", "cs":"Art oddělení", "hu":"Díszlet" },
     emoji: "🎨",
     color: "indigo",
     roles: [
@@ -103,6 +114,7 @@ export const departments: Department[] = [
   {
     id: "kostuem",
     label: "Kostüm",
+    labels: { "de":"Kostüm", "en":"Costume", "es":"Vestuario", "it":"Costume", "cs":"Kostýmy", "hu":"Jelmez" },
     emoji: "👗",
     color: "rose",
     roles: [
@@ -115,6 +127,7 @@ export const departments: Department[] = [
   {
     id: "maske",
     label: "Maske & Hair",
+    labels: { "de":"Maske & Hair", "en":"Make-up & Hair", "es":"Maquillaje & Cabello", "it":"Trucco & Capelli", "cs":"Masky & Vlasy", "hu":"Smink & Haj" },
     emoji: "💄",
     color: "fuchsia",
     roles: [
@@ -127,6 +140,7 @@ export const departments: Department[] = [
   {
     id: "post",
     label: "Postproduktion",
+    labels: { "de":"Postproduktion", "en":"Post-Production", "es":"Postproducción", "it":"Post-Produzione", "cs":"Postprodukce", "hu":"Utómunka" },
     emoji: "✂️",
     color: "blue",
     roles: [
@@ -146,6 +160,7 @@ export const departments: Department[] = [
   {
     id: "musik",
     label: "Musik & Audio",
+    labels: { "de":"Musik & Audio", "en":"Music & Audio", "es":"Música & Audio", "it":"Musica & Audio", "cs":"Hudba & Audio", "hu":"Zene & Audió" },
     emoji: "🎼",
     color: "purple",
     roles: [
@@ -156,6 +171,7 @@ export const departments: Department[] = [
   {
     id: "set-logistik",
     label: "Set / Logistik",
+    labels: { "de":"Set / Logistik", "en":"Set / Logistics", "es":"Set / Logística", "it":"Set / Logistica", "cs":"Set / Logistika", "hu":"Helyszín / Logisztika" },
     emoji: "🚚",
     color: "slate",
     roles: [
@@ -168,6 +184,7 @@ export const departments: Department[] = [
   {
     id: "cast",
     label: "Cast & Performance",
+    labels: { "de":"Cast & Performance", "en":"Cast & Performance", "es":"Reparto & Actuación", "it":"Cast & Performance", "cs":"Herci & Výkony", "hu":"Szereplők" },
     emoji: "🎭",
     color: "orange",
     roles: [
@@ -179,6 +196,7 @@ export const departments: Department[] = [
   {
     id: "sfx",
     label: "SFX",
+    labels: { "de":"SFX", "en":"SFX", "es":"SFX", "it":"SFX", "cs":"SFX", "hu":"SFX" },
     emoji: "💥",
     color: "red",
     roles: [
@@ -190,6 +208,7 @@ export const departments: Department[] = [
   {
     id: "broadcast",
     label: "TV / Broadcast",
+    labels: { "de":"TV / Broadcast", "en":"TV / Broadcast", "es":"TV / Broadcast", "it":"TV / Broadcast", "cs":"TV / Broadcast", "hu":"TV / Broadcast" },
     emoji: "📺",
     color: "cyan",
     roles: [
@@ -201,6 +220,7 @@ export const departments: Department[] = [
   {
     id: "virtual",
     label: "Virtual Production",
+    labels: { "de":"Virtual Production", "en":"Virtual Production", "es":"Producción Virtual", "it":"Produzione Virtuale", "cs":"Virtuální produkce", "hu":"Virtuális produkció" },
     emoji: "🧠",
     color: "pink",
     roles: [
@@ -211,6 +231,7 @@ export const departments: Department[] = [
   {
     id: "redaktion",
     label: "Redaktion & Content",
+    labels: { "de":"Redaktion & Content", "en":"Editorial & Content", "es":"Redacción & Contenido", "it":"Redazione & Contenuto", "cs":"Redakce & Obsah", "hu":"Szerkesztőség & Tartalom" },
     emoji: "✍️",
     color: "lime",
     roles: [
@@ -221,6 +242,7 @@ export const departments: Department[] = [
   {
     id: "social",
     label: "Social Media",
+    labels: { "de":"Social Media", "en":"Social Media", "es":"Redes Sociales", "it":"Social Media", "cs":"Sociální sítě", "hu":"Közösségi média" },
     emoji: "📱",
     color: "purple",
     roles: [
@@ -232,6 +254,7 @@ export const departments: Department[] = [
   {
     id: "foto",
     label: "Fotografie",
+    labels: { "de":"Fotografie", "en":"Photography", "es":"Fotografía", "it":"Fotografia", "cs":"Fotografie", "hu":"Fotográfia" },
     emoji: "📷",
     color: "cyan",
     roles: [
@@ -243,6 +266,7 @@ export const departments: Department[] = [
   {
     id: "ki",
     label: "KI & AI",
+    labels: { "de":"KI & AI", "en":"AI & Technology", "es":"IA & Tecnología", "it":"IA & Tecnologia", "cs":"AI & Technologie", "hu":"AI & Technológia" },
     emoji: "🤖",
     color: "violet",
     roles: [

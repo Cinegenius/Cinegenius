@@ -3,12 +3,12 @@
 import React, { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import {
   MapPin, CheckCircle, Search, X, LayoutGrid, List, SlidersHorizontal, ChevronDown, Users, Globe, Languages, ArrowUpDown,
 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
-import { departments, deptColors, type Department } from "@/lib/departments";
+import { departments, deptColors, getDeptLabel, type Department } from "@/lib/departments";
 
 const PAGE_SIZE = 24;
 
@@ -197,12 +197,14 @@ function RolePanel({
   occupiedRoles,
   onToggle,
   onClose,
+  locale,
 }: {
   dept: Department;
   selectedRoles: Set<string>;
   occupiedRoles: Set<string>;
   onToggle: (role: string) => void;
   onClose: () => void;
+  locale: string;
 }) {
   const t = useTranslations("creators");
   const [search, setSearch] = useState("");
@@ -229,7 +231,7 @@ function RolePanel({
       {/* Header */}
       <div className={`flex items-center justify-between pb-2 mb-2 border-b border-border/60`}>
         <div className="flex items-center gap-2">
-          <span className={`text-xs font-semibold ${colors.text}`}>{dept.label}</span>
+          <span className={`text-xs font-semibold ${colors.text}`}>{getDeptLabel(dept, locale)}</span>
           <span className="text-[11px] text-text-muted">{t("deptRoles", { count: deptRoles.length })}</span>
           {selectedCount > 0 && (
             <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${colors.bg} ${colors.border} border ${colors.text}`}>
@@ -298,6 +300,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
   const searchParams = useSearchParams();
   const tc = useTranslations("common");
   const t = useTranslations("creators");
+  const locale = useLocale();
 
   const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const [cityFilter, setCityFilter] = useState(() => searchParams.get("city") ?? "");
@@ -376,23 +379,25 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
     };
   }, [allCreators]);
 
-  const PROFILE_TYPE_DE: Record<string, string> = {
-    actor:"Schauspieler/in", model:"Model", extra:"Komparse", host:"Moderator/in",
-    dancer:"Tänzer/in", stunt:"Stunt Performer", voiceover:"Synchronsprecher/in",
-    creator:"Creator", camera:"Kamera", lighting:"Licht", sound:"Ton",
-    director_of_photography:"DoP", director:"Regie", production:"Produktion",
-    makeup:"Maske", costume:"Kostüm", postproduction:"Postproduktion",
-    vfx:"VFX", sfx:"SFX", art_department:"Szenenbild", broadcast:"Broadcast",
-    filmmaker:"Regisseur/in", writer:"Autor/in", photographer:"Fotograf/in",
-    editor:"Editor/in", motion_designer:"Motion Designer", art_director:"Art Director",
-    location:"Location", equipment:"Equipment", vehicle:"Fahrzeuge",
-    studio:"Studio", props:"Requisiten",
+  const PROFILE_TYPE_LABELS: Record<string, Record<string, string>> = {
+    de: { actor:"Schauspieler/in", model:"Model", extra:"Komparse/in", host:"Moderator/in", dancer:"Tänzer/in", stunt:"Stunt Performer", voiceover:"Synchronsprecher/in", creator:"Creator", camera:"Kamera", lighting:"Licht", sound:"Ton", director_of_photography:"DoP", director:"Regie", production:"Produktion", makeup:"Maske", costume:"Kostüm", postproduction:"Postproduktion", vfx:"VFX", sfx:"SFX", art_department:"Szenenbild", broadcast:"Broadcast", filmmaker:"Regisseur/in", writer:"Autor/in", photographer:"Fotograf/in", editor:"Editor/in", motion_designer:"Motion Designer", art_director:"Art Director", location:"Location", equipment:"Equipment", vehicle:"Fahrzeuge", studio:"Studio", props:"Requisiten" },
+    en: { actor:"Actor/Actress", model:"Model", extra:"Extra", host:"Host", dancer:"Dancer", stunt:"Stunt Performer", voiceover:"Voice Over", creator:"Creator", camera:"Camera", lighting:"Lighting", sound:"Sound", director_of_photography:"DoP", director:"Director", production:"Production", makeup:"Make-up", costume:"Costume", postproduction:"Post-Production", vfx:"VFX", sfx:"SFX", art_department:"Art Department", broadcast:"Broadcast", filmmaker:"Filmmaker", writer:"Writer", photographer:"Photographer", editor:"Editor", motion_designer:"Motion Designer", art_director:"Art Director", location:"Location", equipment:"Equipment", vehicle:"Vehicles", studio:"Studio", props:"Props" },
+    es: { actor:"Actor/Actriz", model:"Modelo", extra:"Extra", host:"Presentador/a", dancer:"Bailarín/a", stunt:"Especialista", voiceover:"Actor/a de doblaje", creator:"Creador/a", camera:"Cámara", lighting:"Iluminación", sound:"Sonido", director_of_photography:"DoP", director:"Director/a", production:"Producción", makeup:"Maquillaje", costume:"Vestuario", postproduction:"Postproducción", vfx:"VFX", sfx:"SFX", art_department:"Arte", broadcast:"Broadcast", filmmaker:"Cineasta", writer:"Guionista", photographer:"Fotógrafo/a", editor:"Editor/a", motion_designer:"Motion Designer", art_director:"Dir. de Arte", location:"Locación", equipment:"Equipamiento", vehicle:"Vehículos", studio:"Estudio", props:"Atrezzo" },
+    it: { actor:"Attore/Attrice", model:"Modello/a", extra:"Comparsa", host:"Presentatore/trice", dancer:"Ballerino/a", stunt:"Stuntman/woman", voiceover:"Doppiatore/trice", creator:"Creator", camera:"Camera", lighting:"Illuminazione", sound:"Suono", director_of_photography:"DoP", director:"Regista", production:"Produzione", makeup:"Trucco", costume:"Costume", postproduction:"Post-Produzione", vfx:"VFX", sfx:"SFX", art_department:"Arte", broadcast:"Broadcast", filmmaker:"Cineasta", writer:"Sceneggiatore/trice", photographer:"Fotografo/a", editor:"Editor", motion_designer:"Motion Designer", art_director:"Art Director", location:"Location", equipment:"Attrezzatura", vehicle:"Veicoli", studio:"Studio", props:"Oggetti di scena" },
+    cs: { actor:"Herec/Herečka", model:"Model", extra:"Komparz", host:"Moderátor/ka", dancer:"Tanečník/ce", stunt:"Kaskadér/ka", voiceover:"Dabér/ka", creator:"Creator", camera:"Kamera", lighting:"Osvětlení", sound:"Zvuk", director_of_photography:"DoP", director:"Režisér/ka", production:"Produkce", makeup:"Masky", costume:"Kostýmy", postproduction:"Postprodukce", vfx:"VFX", sfx:"SFX", art_department:"Art oddělení", broadcast:"Broadcast", filmmaker:"Filmař/ka", writer:"Scenárista/ka", photographer:"Fotograf/ka", editor:"Editor/ka", motion_designer:"Motion Designer", art_director:"Art Director", location:"Lokace", equipment:"Vybavení", vehicle:"Vozidla", studio:"Studio", props:"Rekvizity" },
+    hu: { actor:"Színész/Színésznő", model:"Modell", extra:"Statiszta", host:"Műsorvezető", dancer:"Táncos/Táncosnő", stunt:"Kaszkadőr", voiceover:"Szinkronszínész/nő", creator:"Creator", camera:"Kamera", lighting:"Világítás", sound:"Hang", director_of_photography:"DoP", director:"Rendező", production:"Produkció", makeup:"Smink", costume:"Jelmez", postproduction:"Utómunka", vfx:"VFX", sfx:"SFX", art_department:"Díszlet", broadcast:"Broadcast", filmmaker:"Filmkészítő", writer:"Forgatókönyvíró", photographer:"Fotós", editor:"Vágó", motion_designer:"Motion Designer", art_director:"Art Director", location:"Helyszín", equipment:"Felszerelés", vehicle:"Járművek", studio:"Stúdió", props:"Kellékek" },
   };
+  const PROFILE_TYPE_MAP = PROFILE_TYPE_LABELS[locale] ?? PROFILE_TYPE_LABELS.de;
 
-  const TRAVEL_DE: Record<string, string> = {
-    regional:"Regional", national:"Deutschlandweit",
-    european:"Europaweit", worldwide:"Weltweit",
+  const TRAVEL_LABELS: Record<string, Record<string, string>> = {
+    de: { regional:"Regional", national:"Deutschlandweit", european:"Europaweit", worldwide:"Weltweit" },
+    en: { regional:"Regional", national:"Nationwide", european:"Europe-wide", worldwide:"Worldwide" },
+    es: { regional:"Regional", national:"Nacional", european:"Europa", worldwide:"Mundial" },
+    it: { regional:"Regionale", national:"Nazionale", european:"Europa", worldwide:"Mondiale" },
+    cs: { regional:"Regionálně", national:"Celostátně", european:"Evropsky", worldwide:"Celosvětově" },
+    hu: { regional:"Regionális", national:"Országosan", european:"Európai", worldwide:"Világszerte" },
   };
+  const TRAVEL_MAP = TRAVEL_LABELS[locale] ?? TRAVEL_LABELS.de;
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const [vendorOnly, setVendorOnly] = useState(false);
@@ -692,7 +697,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                 return (
                   <div key={dept.id}>
                     <p className={`text-[11px] uppercase tracking-widest font-semibold mb-2.5 ${colors.text}`}>
-                      {dept.emoji} {dept.label}
+                      {dept.emoji} {getDeptLabel(dept, locale)}
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {deptRoles.map((role) => {
@@ -764,7 +769,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                     {availableProfileTypes.map((type) => (
                       <button key={type} onClick={() => setProfileTypeFilter(profileTypeFilter === type ? "" : type)}
                         className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${profileTypeFilter === type ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
-                        {PROFILE_TYPE_DE[type] ?? type}
+                        {PROFILE_TYPE_MAP[type] ?? type}
                       </button>
                     ))}
                   </div>
@@ -817,7 +822,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                     className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${!travelFilter ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
                     {t("filterAll")}
                   </button>
-                  {Object.entries(TRAVEL_DE).map(([key, label]) => (
+                  {Object.entries(TRAVEL_MAP).map(([key, label]) => (
                     <button key={key} onClick={() => setTravelFilter(travelFilter === key ? "" : key)}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${travelFilter === key ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
                       {label}
@@ -980,10 +985,10 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                 <FilterDropdown
                   icon={Users}
                   label={t("filterProfileType")}
-                  value={profileTypeFilter ? (PROFILE_TYPE_DE[profileTypeFilter] ?? profileTypeFilter) : ""}
-                  options={availableProfileTypes.map(t => PROFILE_TYPE_DE[t] ?? t)}
+                  value={profileTypeFilter ? (PROFILE_TYPE_MAP[profileTypeFilter] ?? profileTypeFilter) : ""}
+                  options={availableProfileTypes.map(t => PROFILE_TYPE_MAP[t] ?? t)}
                   onChange={v => {
-                    const found = availableProfileTypes.find(t => (PROFILE_TYPE_DE[t] ?? t) === v);
+                    const found = availableProfileTypes.find(t => (PROFILE_TYPE_MAP[t] ?? t) === v);
                     setProfileTypeFilter(found ?? "");
                   }}
                 />
@@ -1005,10 +1010,10 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               <FilterDropdown
                 icon={Globe}
                 label={t("filterTravel")}
-                value={travelFilter ? (TRAVEL_DE[travelFilter] ?? travelFilter) : ""}
-                options={Object.values(TRAVEL_DE)}
+                value={travelFilter ? (TRAVEL_MAP[travelFilter] ?? travelFilter) : ""}
+                options={Object.values(TRAVEL_MAP)}
                 onChange={v => {
-                  const found = Object.entries(TRAVEL_DE).find(([, label]) => label === v)?.[0] ?? "";
+                  const found = Object.entries(TRAVEL_MAP).find(([, label]) => label === v)?.[0] ?? "";
                   setTravelFilter(found);
                 }}
               />
@@ -1030,14 +1035,14 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border shrink-0 transition-all ${
                           isActive ? `${colors.bg} ${colors.text} border-transparent` : "border-border text-text-muted"
                         }`}>
-                        {dept.emoji} {dept.label}
+                        {dept.emoji} {getDeptLabel(dept, locale)}
                         {deptSelected > 0 && <span className={`w-3.5 h-3.5 rounded-full text-[8px] font-bold flex items-center justify-center ${colors.bg} ${colors.text}`}>{deptSelected}</span>}
                       </button>
                     );
                   })}
                 </div>
                 <div className="p-3">
-                  <RolePanel dept={activeDeptData} selectedRoles={selectedRoles} occupiedRoles={occupiedRoles} onToggle={toggleRole} onClose={() => setFilterOpen(false)} />
+                  <RolePanel dept={activeDeptData} selectedRoles={selectedRoles} occupiedRoles={occupiedRoles} onToggle={toggleRole} onClose={() => setFilterOpen(false)} locale={locale} />
                 </div>
               </div>
               {/* Desktop: two-panel */}
@@ -1054,7 +1059,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                         className={`w-full flex items-center justify-between px-3 py-2 text-left text-xs transition-colors border-b border-border/40 last:border-0 ${
                           isActive ? `${colors.bg} ${colors.text} font-semibold` : "text-text-muted hover:text-text-secondary hover:bg-white/[0.02]"
                         }`}>
-                        <span>{dept.label}</span>
+                        <span>{getDeptLabel(dept, locale)}</span>
                         {deptSelected > 0 && (
                           <span className={`text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${colors.bg} border ${colors.border} ${colors.text}`}>{deptSelected}</span>
                         )}
@@ -1063,7 +1068,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                   })}
                 </div>
                 <div className="flex-1 overflow-y-auto p-3">
-                  <RolePanel dept={activeDeptData} selectedRoles={selectedRoles} occupiedRoles={occupiedRoles} onToggle={toggleRole} onClose={() => setFilterOpen(false)} />
+                  <RolePanel dept={activeDeptData} selectedRoles={selectedRoles} occupiedRoles={occupiedRoles} onToggle={toggleRole} onClose={() => setFilterOpen(false)} locale={locale} />
                 </div>
               </div>
             </div>
