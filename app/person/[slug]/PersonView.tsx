@@ -176,7 +176,7 @@ export default function PersonView({
               {credits.map((credit) => {
                 const project = credit.projects;
                 if (!project) return null;
-                const [roleLabel] = credit.role.split("||");
+                const [roleLabel, collaborator] = credit.role.split("||").map(s => s.trim());
                 return (
                   <Link
                     key={credit.id}
@@ -197,7 +197,7 @@ export default function PersonView({
                         {(project.year || project.director) && normType(project.type) && <span>·</span>}
                         {[project.year, project.director].filter(Boolean).join(" · ")}
                       </p>
-                      <p className="text-xs text-gold/80 mt-1">{roleLabel}</p>
+                      <p className="text-xs text-gold/80 mt-1">{roleLabel}{collaborator && <span className="text-text-muted ml-2">· {collaborator}</span>}</p>
                     </div>
                   </Link>
                 );

@@ -82,6 +82,42 @@ export async function DELETE(req: NextRequest) {
   return NextResponse.json({ success: true });
 }
 
+// PATCH /api/project-credits — update collaborator on a credit
+export async function PATCH(req: NextRequest) {
+  const authResult = await requireAuth();
+  if (authResult instanceof NextResponse) return authResult;
+  const { userId } = authResult;
+
+  const body = await req.json().catch(() => null);
+  if (!body) return NextResponse.json({ error: "Ungültige Anfrage" }, { status: 400 });
+  const { id, collaborator } = body;
+  if (!id) return NextResponse.json({ error: "id fehlt" }, { status: 400 });
+
+  // Fetch the current credit to verify ownership and get existing role
+  const { data: existing } = await db
+    .from("project_credits")
+    .select("id, user_id, role")
+    .eq("id", id)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (!existing) return NextResponse.json({ error: "Credit nicht gefunden" }, { status: 404 });
+
+  // Keep the role part, replace or remove the collaborator part
+  const baseRole = existing.role.split("||")[0].trim();
+  const newRole = collaborator?.trim() ? `${baseRole}||${collaborator.trim()}` : baseRole;
+
+  const { error } = await db
+    .from("project_credits")
+    .update({ role: newRole })
+    .eq("id", id)
+    .eq("user_id", userId);
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  revalidateTag("projects");
+  return NextResponse.json({ role: newRole });
+}
+
 // GET /api/project-credits?user_id=xxx — get all credits for a user
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);

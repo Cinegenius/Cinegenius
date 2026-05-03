@@ -9,7 +9,7 @@ import {
   Camera, CheckCircle, User, Lock, Bell, CreditCard, MapPin, Film,
   Plus, X, Save, Wallet, Upload, ShieldCheck, Clock, AlertCircle, Loader2,
   Globe, Plane, Video, Euro, Clapperboard, Link2, AtSign, PlayCircle, ExternalLink,
-  Drama, Palette, Building2, Users2, Eye, EyeOff,
+  Drama, Palette, Building2, Users2, Eye, EyeOff, Pencil, Check,
 } from "lucide-react";
 import type { ElementType } from "react";
 import LicensePicker from "@/components/LicensePicker";
@@ -582,6 +582,9 @@ export default function ProfilePage() {
   const [joinRole, setJoinRole] = useState("");
   const [joiningProjectId, setJoiningProjectId] = useState<string | null>(null);
   const [joiningRole, setJoiningRole] = useState(false);
+  const [editingCreditId, setEditingCreditId] = useState<string | null>(null);
+  const [editingCollaborator, setEditingCollaborator] = useState("");
+  const [savingCollaborator, setSavingCollaborator] = useState(false);
   const [showNewProject, setShowNewProject] = useState(false);
   const [newProject, setNewProject] = useState({ title: "", year: "", type: "", description: "", director: "", myRole: "", poster_url: "", genre: "", productionCompany: "", location: "", equipment: "", link: "", alsoOnCrewUnited: false });
   const [creatingProject, setCreatingProject] = useState(false);
@@ -825,6 +828,24 @@ export default function ProfilePage() {
     await fetch(`/api/project-credits?project_id=${projectId}`, { method: "DELETE" });
     setProjectCredits((prev) => prev.filter((c) => c.project_id !== projectId));
     addToast(t("leftProject"), "success");
+  };
+
+  const saveCollaborator = async (creditId: string) => {
+    setSavingCollaborator(true);
+    try {
+      const res = await fetch("/api/project-credits", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: creditId, collaborator: editingCollaborator }),
+      });
+      const d = await res.json();
+      if (!res.ok) { addToast(d.error, "error"); return; }
+      setProjectCredits((prev) => prev.map((c) => c.id === creditId ? { ...c, role: d.role } : c));
+      setEditingCreditId(null);
+      setEditingCollaborator("");
+    } finally {
+      setSavingCollaborator(false);
+    }
   };
 
   const createProject = async () => {
@@ -1510,20 +1531,50 @@ export default function ProfilePage() {
                   {projectCredits.length > 0 && (
                     <div className="mb-5">
                       <div className="border border-border rounded-lg overflow-hidden bg-bg-elevated">
-                        {projectCredits.map((credit) => (
-                          <div key={credit.id} className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-secondary transition-colors">
-                            <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{credit.projects?.year ?? "—"}</span>
-                            <span className="text-xs text-text-primary truncate flex-1">{credit.projects?.title}</span>
-                            {normType(credit.projects?.type) && <span className={`text-[10px] font-medium shrink-0 ${typeColor(credit.projects?.type)}`}>{normType(credit.projects?.type)}</span>}
-                            {credit.role && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[28%]">{credit.role}</span>}
-                            <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <a href={`/projects/${credit.project_id}`} className="text-[10px] text-text-muted hover:text-gold transition-colors" target="_blank" rel="noopener noreferrer">→</a>
-                              <button type="button" onClick={() => leaveProject(credit.project_id)} className="text-text-muted hover:text-crimson-light transition-colors">
-                                <X size={12} />
-                              </button>
+                        {projectCredits.map((credit) => {
+                          const [baseRole, collaborator] = credit.role?.split("||") ?? ["", ""];
+                          const isEditing = editingCreditId === credit.id;
+                          return (
+                            <div key={credit.id} className="border-b border-border last:border-b-0">
+                              <div className="group flex items-center gap-3 px-3 py-1.5 hover:bg-bg-secondary transition-colors">
+                                <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{credit.projects?.year ?? "—"}</span>
+                                <span className="text-xs text-text-primary truncate flex-1">{credit.projects?.title}</span>
+                                {collaborator && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[25%]">{collaborator}</span>}
+                                {normType(credit.projects?.type) && <span className={`text-[10px] font-medium shrink-0 ${typeColor(credit.projects?.type)}`}>{normType(credit.projects?.type)}</span>}
+                                <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <button type="button" onClick={() => { setEditingCreditId(isEditing ? null : credit.id); setEditingCollaborator(collaborator ?? ""); }} className="text-text-muted hover:text-gold transition-colors">
+                                    <Pencil size={11} />
+                                  </button>
+                                  <a href={`/projects/${credit.project_id}`} className="text-[10px] text-text-muted hover:text-gold transition-colors" target="_blank" rel="noopener noreferrer">→</a>
+                                  <button type="button" onClick={() => leaveProject(credit.project_id)} className="text-text-muted hover:text-crimson-light transition-colors">
+                                    <X size={12} />
+                                  </button>
+                                </div>
+                              </div>
+                              {isEditing && (
+                                <div className="px-3 pb-2 flex items-center gap-2 bg-bg-secondary border-t border-border">
+                                  <span className="text-[10px] text-text-muted shrink-0">{baseRole}</span>
+                                  <span className="text-[10px] text-text-muted shrink-0">·</span>
+                                  <input
+                                    type="text"
+                                    value={editingCollaborator}
+                                    onChange={(e) => setEditingCollaborator(e.target.value)}
+                                    placeholder="z.B. Regie: Max Mustermann"
+                                    className="flex-1 bg-transparent text-[11px] py-1.5 focus:outline-none placeholder:text-text-muted/50"
+                                    autoFocus
+                                    onKeyDown={(e) => { if (e.key === "Enter") saveCollaborator(credit.id); if (e.key === "Escape") setEditingCreditId(null); }}
+                                  />
+                                  <button type="button" onClick={() => saveCollaborator(credit.id)} disabled={savingCollaborator} className="text-gold hover:text-gold-light transition-colors shrink-0">
+                                    {savingCollaborator ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
+                                  </button>
+                                  <button type="button" onClick={() => setEditingCreditId(null)} className="text-text-muted hover:text-text-primary transition-colors shrink-0">
+                                    <X size={12} />
+                                  </button>
+                                </div>
+                              )}
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   )}

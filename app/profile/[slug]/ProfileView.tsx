@@ -813,11 +813,13 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                     <div className="border border-border rounded-lg overflow-hidden">
                       {[...items].sort((a, b) => (b.projects?.year ?? 0) - (a.projects?.year ?? 0)).map((credit) => {
                         const proj = credit.projects!;
+                        const collaborator = credit.role?.split("||")[1]?.trim() ?? null;
                         return (
                           <Link key={credit.id} href={`/projects/${credit.project_id}`}
                             className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{proj.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</span>
+                            {collaborator && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[25%] hidden sm:inline">{collaborator}</span>}
                             {normType(proj.type) && <span className={`text-[10px] shrink-0 hidden sm:inline font-medium ${typeColor(proj.type)}`}>{normType(proj.type)}</span>}
                           </Link>
                         );
@@ -1415,11 +1417,13 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                     <div className="border border-border rounded-lg overflow-hidden bg-bg-secondary">
                       {[...items].sort((a, b) => (b.projects?.year ?? 0) - (a.projects?.year ?? 0)).map((credit) => {
                         const proj = credit.projects!;
+                        const collaborator = credit.role?.split("||")[1]?.trim() ?? null;
                         return (
                           <Link key={credit.id} href={`/projects/${credit.project_id}`}
                             className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{proj.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</span>
+                            {collaborator && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[25%]">{collaborator}</span>}
                             {normType(proj.type) && <span className={`text-[10px] shrink-0 hidden sm:inline font-medium ${typeColor(proj.type)}`}>{normType(proj.type)}</span>}
                           </Link>
                         );
