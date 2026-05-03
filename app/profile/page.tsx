@@ -811,10 +811,21 @@ export default function ProfilePage() {
       });
       const d = await r.json();
       if (!r.ok) { addToast(d.error, "error"); return; }
-      // Refresh credits
-      const r2 = await fetch(`/api/project-credits?user_id=${user?.id}`);
-      const d2 = await r2.json();
-      setProjectCredits(d2.credits ?? []);
+      if (d.credit && newProject.myRole?.trim()) {
+        setProjectCredits((prev) => [{
+          id: d.credit.id,
+          role: newProject.myRole,
+          project_id: d.project.id,
+          projects: {
+            id: d.project.id,
+            title: newProject.title,
+            year: newProject.year ? parseInt(newProject.year) : null,
+            type: newProject.type || null,
+            director: newProject.director?.trim() || null,
+            poster_url: newProject.poster_url || null,
+          },
+        }, ...prev]);
+      }
       setShowNewProject(false);
       setNewProject({ title: "", year: "", type: "", description: "", director: "", myRole: "", poster_url: "", genre: "", productionCompany: "", location: "", equipment: "", link: "", alsoOnCrewUnited: false });
       addToast(t("projectCreated"), "success");

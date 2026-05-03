@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 
 // GET /api/projects?q=titel&limit=10&mine=true
 export async function GET(req: NextRequest) {
@@ -100,13 +101,16 @@ export async function POST(req: NextRequest) {
   if (projError) return NextResponse.json({ error: projError.message }, { status: 500 });
 
   // Auto-add creator with their role
+  let credit: { id: string; created_at: string } | null = null;
   if (myRole?.trim()) {
-    await db.from("project_credits").insert({
-      project_id: project.id,
-      user_id: userId,
-      role: myRole.trim(),
-    });
+    const { data: creditData } = await db
+      .from("project_credits")
+      .insert({ project_id: project.id, user_id: userId, role: myRole.trim() })
+      .select("id, created_at")
+      .single();
+    credit = creditData ?? null;
   }
 
-  return NextResponse.json({ project });
+  revalidateTag("projects");
+  return NextResponse.json({ project, credit });
 }
