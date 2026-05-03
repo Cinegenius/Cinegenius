@@ -111,6 +111,6 @@ export async function POST(req: NextRequest) {
     credit = creditData ?? null;
   }
 
-  revalidateTag("projects", "max");
+  revalidateTag("projects", { expire: 0 });
   return NextResponse.json({ project, credit });
 }

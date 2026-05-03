@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  revalidateTag("projects", "max");
+  revalidateTag("projects", { expire: 0 });
   return NextResponse.json({ credit: data });
 }
 
@@ -78,7 +78,7 @@ export async function DELETE(req: NextRequest) {
     .eq("user_id", userId);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  revalidateTag("projects", "max");
+  revalidateTag("projects", { expire: 0 });
   return NextResponse.json({ success: true });
 }
 
@@ -114,7 +114,7 @@ export async function PATCH(req: NextRequest) {
     .eq("user_id", userId);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  revalidateTag("projects", "max");
+  revalidateTag("projects", { expire: 0 });
   return NextResponse.json({ role: newRole });
 }
 
