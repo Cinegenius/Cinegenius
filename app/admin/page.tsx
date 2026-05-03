@@ -7,7 +7,7 @@ import {
   Save, Shield, Settings, ChevronRight, ArrowDownCircle,
   Plus, Minus, Wallet, ShieldCheck,
   Activity, Film, Package,
-  Briefcase, BadgeCheck,
+  Briefcase, BadgeCheck, Clapperboard, ChevronDown, Pencil, Trash2, X, Check,
 } from "lucide-react";
 import {
   defaultTiers, CommissionTier, calculateCommission,
@@ -17,6 +17,7 @@ const navItems = [
   { icon: LayoutDashboard, label: "Übersicht",      id: "overview" },
   { icon: BarChart2,       label: "Analytics",       id: "analytics" },
   { icon: ShieldCheck,     label: "Verifizierungen", id: "verifications" },
+  { icon: Clapperboard,    label: "Projekte",        id: "projects" },
   { icon: Percent,         label: "Provision",       id: "commission" },
   { icon: ArrowDownCircle, label: "Auszahlungen",    id: "payouts" },
   { icon: Users,           label: "Benutzer",        id: "users" },
@@ -28,6 +29,8 @@ const navItems = [
 type RealListing = { id: string; type: string; title: string; city: string; price: number; published: boolean; created_at: string };
 type VerifRequest = { id: string; user_id: string; display_name: string | null; status: string; notes: string | null; submitted_at: string; reviewed_at: string | null };
 type AdminUser = { user_id: string; display_name: string | null; location: string | null; avatar_url: string | null; profile_types: string[] | null; verified: boolean; created_at: string; tagline: string | null };
+type AdminProject = { id: string; title: string; year: number | null; type: string | null; verified: boolean; created_at: string; director: string | null; crew_count: number };
+type AdminCredit = { id: string; user_id: string | null; unclaimed_profile_id: string | null; role: string; created_at: string; name: string; type: "user" | "ghost" };
 
 
 
@@ -49,6 +52,20 @@ export default function AdminPage() {
   const [usersSearch, setUsersSearch] = useState("");
   const [usersPage, setUsersPage] = useState(1);
   const [verifyActing, setVerifyActing] = useState<string | null>(null);
+
+  // Projects state
+  const [adminProjects, setAdminProjects] = useState<AdminProject[]>([]);
+  const [projectsLoading, setProjectsLoading] = useState(false);
+  const [projectsTotal, setProjectsTotal] = useState(0);
+  const [projectsSearch, setProjectsSearch] = useState("");
+  const [projectsPage, setProjectsPage] = useState(1);
+  const [verifyProjectActing, setVerifyProjectActing] = useState<string | null>(null);
+  const [expandedProject, setExpandedProject] = useState<string | null>(null);
+  const [projectCreditsMap, setProjectCreditsMap] = useState<Record<string, AdminCredit[]>>({});
+  const [creditsLoading, setCreditsLoading] = useState<string | null>(null);
+  const [editingCredit, setEditingCredit] = useState<string | null>(null);
+  const [editingRole, setEditingRole] = useState("");
+  const [creditActing, setCreditActing] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/listings")
@@ -79,6 +96,90 @@ export default function AdminPage() {
       .catch(() => {})
       .finally(() => setUsersLoading(false));
   }, [activeTab, usersPage, usersSearch]);
+
+  useEffect(() => {
+    if (activeTab !== "projects") return;
+    setProjectsLoading(true);
+    const params = new URLSearchParams({ page: String(projectsPage) });
+    if (projectsSearch) params.set("search", projectsSearch);
+    fetch(`/api/admin/projects?${params}`)
+      .then((r) => r.json())
+      .then(({ projects, total }) => { setAdminProjects(projects ?? []); setProjectsTotal(total ?? 0); })
+      .catch(() => {})
+      .finally(() => setProjectsLoading(false));
+  }, [activeTab, projectsPage, projectsSearch]);
+
+  const loadProjectCredits = async (projectId: string) => {
+    if (projectCreditsMap[projectId]) return;
+    setCreditsLoading(projectId);
+    try {
+      const r = await fetch(`/api/admin/project-credits?project_id=${projectId}`);
+      const d = await r.json();
+      setProjectCreditsMap((prev) => ({ ...prev, [projectId]: d.credits ?? [] }));
+    } finally {
+      setCreditsLoading(null);
+    }
+  };
+
+  const handleToggleProject = (projectId: string) => {
+    if (expandedProject === projectId) { setExpandedProject(null); return; }
+    setExpandedProject(projectId);
+    loadProjectCredits(projectId);
+  };
+
+  const handleVerifyProject = async (projectId: string, currentlyVerified: boolean) => {
+    setVerifyProjectActing(projectId);
+    try {
+      await fetch("/api/admin/projects", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId, verified: !currentlyVerified }),
+      });
+      setAdminProjects((prev) => prev.map((p) => p.id === projectId ? { ...p, verified: !currentlyVerified } : p));
+    } finally {
+      setVerifyProjectActing(null);
+    }
+  };
+
+  const handleSaveCredit = async (creditId: string) => {
+    setCreditActing(creditId);
+    try {
+      const r = await fetch("/api/admin/project-credits", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: creditId, role: editingRole }),
+      });
+      if (r.ok) {
+        setProjectCreditsMap((prev) => {
+          const updated: Record<string, AdminCredit[]> = {};
+          for (const [pid, credits] of Object.entries(prev)) {
+            updated[pid] = credits.map((c) => c.id === creditId ? { ...c, role: editingRole } : c);
+          }
+          return updated;
+        });
+        setEditingCredit(null);
+      }
+    } finally {
+      setCreditActing(null);
+    }
+  };
+
+  const handleDeleteCredit = async (creditId: string, projectId: string) => {
+    if (!confirm("Credit wirklich löschen?")) return;
+    setCreditActing(creditId);
+    try {
+      const r = await fetch(`/api/admin/project-credits?id=${creditId}`, { method: "DELETE" });
+      if (r.ok) {
+        setProjectCreditsMap((prev) => ({
+          ...prev,
+          [projectId]: (prev[projectId] ?? []).filter((c) => c.id !== creditId),
+        }));
+        setAdminProjects((prev) => prev.map((p) => p.id === projectId ? { ...p, crew_count: Math.max(0, p.crew_count - 1) } : p));
+      }
+    } finally {
+      setCreditActing(null);
+    }
+  };
 
   const handleToggleVerify = async (targetUserId: string, currentlyVerified: boolean) => {
     setVerifyActing(targetUserId);
@@ -707,6 +808,170 @@ export default function AdminPage() {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* ── PROJEKTE ── */}
+          {activeTab === "projects" && (
+            <div className="space-y-4">
+              {/* Search */}
+              <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-xl px-4 focus-within:border-gold transition-colors max-w-md">
+                <Search size={14} className="text-text-muted shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Projekt suchen…"
+                  value={projectsSearch}
+                  onChange={(e) => { setProjectsSearch(e.target.value); setProjectsPage(1); }}
+                  className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none"
+                />
+                {projectsSearch && (
+                  <button onClick={() => setProjectsSearch("")} className="text-text-muted hover:text-text-primary">
+                    <X size={13} />
+                  </button>
+                )}
+              </div>
+
+              <p className="text-sm text-text-muted">
+                {projectsLoading ? "Laden…" : <><span className="text-text-primary font-semibold">{projectsTotal}</span> Projekte</>}
+              </p>
+
+              {!projectsLoading && adminProjects.length === 0 && (
+                <div className="text-center py-20 border border-dashed border-border rounded-2xl">
+                  <Clapperboard size={32} className="text-text-muted mx-auto opacity-30 mb-3" />
+                  <p className="font-semibold text-text-primary">Keine Projekte gefunden</p>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                {adminProjects.map((p) => (
+                  <div key={p.id} className="border border-border rounded-xl bg-bg-secondary overflow-hidden">
+                    {/* Project row */}
+                    <div className="flex items-center gap-3 p-4">
+                      <button
+                        onClick={() => handleToggleProject(p.id)}
+                        className="flex items-center gap-1.5 text-text-muted hover:text-gold transition-colors shrink-0"
+                      >
+                        <ChevronDown size={14} className={`transition-transform ${expandedProject === p.id ? "rotate-180" : ""}`} />
+                        <span className="text-[10px] font-medium">{p.crew_count}</span>
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="text-sm font-medium text-text-primary truncate">{p.title}</p>
+                          {p.verified && <BadgeCheck size={13} className="text-gold shrink-0" />}
+                        </div>
+                        <p className="text-xs text-text-muted">
+                          {[p.type, p.year, p.director].filter(Boolean).join(" · ")}
+                          {" · "}{new Date(p.created_at).toLocaleDateString("de-DE")}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <a
+                          href={`/projects/${p.id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-2.5 py-1.5 text-xs border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-all flex items-center gap-1"
+                        >
+                          <Eye size={11} /> Ansehen
+                        </a>
+                        <button
+                          onClick={() => handleVerifyProject(p.id, p.verified)}
+                          disabled={verifyProjectActing === p.id}
+                          className={`px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-all disabled:opacity-50 ${
+                            p.verified
+                              ? "border-gold/30 text-gold bg-gold/10 hover:bg-gold/5"
+                              : "border-border text-text-muted hover:border-gold hover:text-gold"
+                          }`}
+                        >
+                          {verifyProjectActing === p.id ? "…" : p.verified ? "Verifiziert" : "Verifizieren"}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Credits expanded */}
+                    {expandedProject === p.id && (
+                      <div className="border-t border-border bg-bg-elevated">
+                        {creditsLoading === p.id && (
+                          <p className="text-xs text-text-muted px-4 py-3">Laden…</p>
+                        )}
+                        {!creditsLoading && (projectCreditsMap[p.id] ?? []).length === 0 && (
+                          <p className="text-xs text-text-muted px-4 py-3">Noch keine Crew eingetragen.</p>
+                        )}
+                        {(projectCreditsMap[p.id] ?? []).map((c) => (
+                          <div key={c.id} className="border-b border-border last:border-b-0">
+                            {editingCredit === c.id ? (
+                              <div className="flex items-center gap-2 px-4 py-2">
+                                <div className="w-6 h-6 rounded-full bg-bg-hover flex items-center justify-center shrink-0">
+                                  <Users size={11} className="text-text-muted" />
+                                </div>
+                                <span className="text-xs text-text-muted shrink-0 w-28 truncate">{c.name}</span>
+                                <input
+                                  type="text"
+                                  value={editingRole}
+                                  onChange={(e) => setEditingRole(e.target.value)}
+                                  autoFocus
+                                  className="flex-1 bg-bg-primary border border-border rounded px-2 py-1 text-xs focus:outline-none focus:border-gold"
+                                  onKeyDown={(e) => { if (e.key === "Enter") handleSaveCredit(c.id); if (e.key === "Escape") setEditingCredit(null); }}
+                                />
+                                <button onClick={() => handleSaveCredit(c.id)} disabled={!!creditActing} className="text-gold hover:text-gold-light transition-colors shrink-0">
+                                  {creditActing === c.id ? "…" : <Check size={13} />}
+                                </button>
+                                <button onClick={() => setEditingCredit(null)} className="text-text-muted hover:text-text-primary transition-colors shrink-0">
+                                  <X size={13} />
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-3 px-4 py-2 hover:bg-bg-hover transition-colors group">
+                                <div className="w-6 h-6 rounded-full bg-bg-hover flex items-center justify-center shrink-0">
+                                  <Users size={11} className={c.type === "user" ? "text-gold" : "text-text-muted"} />
+                                </div>
+                                <span className="text-xs font-medium text-text-primary w-28 shrink-0 truncate">{c.name}</span>
+                                <span className="text-xs text-text-muted flex-1 truncate">{c.role.split("||")[0]}</span>
+                                <span className="text-[10px] text-text-muted shrink-0">{new Date(c.created_at).toLocaleDateString("de-DE")}</span>
+                                <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                                  <button
+                                    onClick={() => { setEditingCredit(c.id); setEditingRole(c.role.split("||")[0]); }}
+                                    className="text-text-muted hover:text-gold transition-colors"
+                                  >
+                                    <Pencil size={12} />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteCredit(c.id, p.id)}
+                                    disabled={creditActing === c.id}
+                                    className="text-text-muted hover:text-crimson-light transition-colors"
+                                  >
+                                    <Trash2 size={12} />
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {projectsTotal > 30 && (
+                <div className="flex items-center justify-between pt-2">
+                  <button
+                    onClick={() => setProjectsPage((p) => Math.max(1, p - 1))}
+                    disabled={projectsPage === 1}
+                    className="px-4 py-2 text-xs border border-border rounded-lg text-text-secondary hover:border-gold hover:text-gold disabled:opacity-40 transition-all"
+                  >
+                    Zurück
+                  </button>
+                  <p className="text-xs text-text-muted">Seite {projectsPage} · {Math.ceil(projectsTotal / 30)} gesamt</p>
+                  <button
+                    onClick={() => setProjectsPage((p) => p + 1)}
+                    disabled={projectsPage >= Math.ceil(projectsTotal / 30)}
+                    className="px-4 py-2 text-xs border border-border rounded-lg text-text-secondary hover:border-gold hover:text-gold disabled:opacity-40 transition-all"
+                  >
+                    Weiter
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
