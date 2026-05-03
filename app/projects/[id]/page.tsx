@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { unstable_cache } from "next/cache";
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import { isAdminSession } from "@/lib/guards";
@@ -60,7 +59,7 @@ async function _getProject(id: string) {
   return { project, credits: creditsWithProfiles, festivals: festivals ?? [] };
 }
 
-const getProject = unstable_cache(_getProject, ["project-detail"], { revalidate: 30, tags: ["projects"] });
+const getProject = _getProject;
 
 export async function generateMetadata({
   params,
