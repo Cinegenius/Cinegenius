@@ -235,6 +235,7 @@ export default function ProjectDetail({
   currentUserId,
   myCredit: initialMyCredit,
   userPositions = [],
+  userProfile = null,
   isAdmin = false,
 }: {
   project: Project;
@@ -243,6 +244,7 @@ export default function ProjectDetail({
   currentUserId: string | null;
   myCredit: Credit | null;
   userPositions?: string[];
+  userProfile?: { display_name: string | null; avatar_url: string | null } | null;
   isAdmin?: boolean;
 }) {
   const [project, setProject] = useState(initialProject);
@@ -351,10 +353,18 @@ export default function ProjectDetail({
       const res = await fetch("/api/project-credits", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ project_id: project.id, role: roleValue }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      const r2 = await fetch(`/api/projects/${project.id}`);
-      const d2 = await r2.json();
-      setCredits(d2.credits);
-      setMyCredit(d2.credits.find((c: Credit) => c.user_id && c.user_id === currentUserId) ?? null);
+      // Add the new credit directly to local state — no second fetch needed
+      const newCredit: Credit = {
+        id: data.credit.id,
+        user_id: currentUserId,
+        unclaimed_profile_id: null,
+        role: roleValue,
+        created_at: data.credit.created_at,
+        profile: userProfile ? { display_name: userProfile.display_name ?? "", avatar_url: userProfile.avatar_url, role: null } : null,
+        ghost: null,
+      };
+      setCredits((prev) => [...prev, newCredit]);
+      setMyCredit(newCredit);
       setShowJoin(false); setJoinRole(""); setJoinCharacter(""); setJoinNote("");
     } catch (e: unknown) { setJoinError(e instanceof Error ? e.message : "Fehler"); }
     finally { setJoining(false); }

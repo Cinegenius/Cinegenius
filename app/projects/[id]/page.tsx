@@ -95,13 +95,15 @@ export default async function ProjectPage({
   const myCredit = data.credits.find((c) => c.user_id && c.user_id === userId) ?? null;
 
   let userPositions: string[] = [];
+  let userProfile: { display_name: string | null; avatar_url: string | null } | null = null;
   if (userId) {
     const { data: prof } = await db
       .from("profiles")
-      .select("positions")
+      .select("positions, display_name, avatar_url")
       .eq("user_id", userId)
       .maybeSingle();
     userPositions = (prof?.positions as string[] | null) ?? [];
+    if (prof) userProfile = { display_name: prof.display_name ?? null, avatar_url: prof.avatar_url ?? null };
   }
 
   // If user has positions, show them first, then remaining roles; otherwise full list
@@ -115,6 +117,7 @@ export default async function ProjectPage({
       currentUserId={userId ?? null}
       myCredit={myCredit}
       userPositions={roleOptions}
+      userProfile={userProfile}
       isAdmin={isAdmin}
     />
   );
