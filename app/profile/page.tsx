@@ -107,9 +107,7 @@ function RoleAndPositionPicker({
     label: tP(c.labelKey as Parameters<typeof tP>[0]),
     desc:  tP(c.descKey as Parameters<typeof tP>[0]),
   }));
-  const [openCat, setOpenCat] = useState<string | null>(() =>
-    ROLE_CATEGORIES_META.find((c) => c.types.some(([id]) => id === selectedType))?.id ?? null
-  );
+  const [openCat, setOpenCat] = useState<string | null>(null);
 
   return (
     <div className="space-y-2">
@@ -160,7 +158,7 @@ function RoleAndPositionPicker({
                     <button
                       key={id}
                       type="button"
-                      onClick={() => onSelectType(id === selectedType ? "" : id)}
+                      onClick={() => { onSelectType(id === selectedType ? "" : id); setOpenCat(null); }}
                       className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left transition-all active:scale-95 text-xs font-medium ${
                         selectedType === id
                           ? "border-gold bg-gold/10 text-gold"
