@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { rateLimit } from "@/lib/rateLimit";
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 
 // POST /api/project-credits
 // - Without unclaimed_profile_id: adds the authenticated user themselves
@@ -56,6 +57,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  revalidateTag("projects");
   return NextResponse.json({ credit: data });
 }
 
@@ -76,6 +78,7 @@ export async function DELETE(req: NextRequest) {
     .eq("user_id", userId);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  revalidateTag("projects");
   return NextResponse.json({ success: true });
 }
 

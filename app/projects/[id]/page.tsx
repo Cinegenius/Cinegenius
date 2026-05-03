@@ -60,7 +60,7 @@ async function _getProject(id: string) {
   return { project, credits: creditsWithProfiles, festivals: festivals ?? [] };
 }
 
-const getProject = unstable_cache(_getProject, ["project"], { revalidate: 300, tags: ["projects"] });
+const getProject = unstable_cache(_getProject, ["project-detail"], { revalidate: 30, tags: ["projects"] });
 
 export async function generateMetadata({
   params,
