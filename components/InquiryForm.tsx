@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+import { useUser, useClerk } from "@clerk/nextjs";
 import { Send, CheckCircle, Shield, Clock, ChevronRight, Loader2, LogIn } from "lucide-react";
-import Link from "next/link";
 
 type Props = {
   listingId: string;
@@ -17,6 +16,7 @@ type Props = {
 export default function InquiryForm({ listingId, listingTitle, listingType, ownerId, ownerName }: Props) {
   const router = useRouter();
   const { user, isLoaded } = useUser();
+  const { openSignIn } = useClerk();
 
   const [step, setStep] = useState<"form" | "sent">("form");
   const [sending, setSending] = useState(false);
@@ -76,12 +76,12 @@ export default function InquiryForm({ listingId, listingTitle, listingType, owne
           <LogIn size={20} className="text-gold" />
         </div>
         <p className="text-sm text-text-secondary">Bitte melde dich an um eine Anfrage zu senden.</p>
-        <Link
-          href="/sign-in"
+        <button
+          onClick={() => openSignIn()}
           className="block w-full py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors text-center"
         >
           Anmelden
-        </Link>
+        </button>
       </div>
     );
   }

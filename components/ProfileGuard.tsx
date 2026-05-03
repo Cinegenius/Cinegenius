@@ -1,6 +1,6 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
+import { useUser, useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Film } from "lucide-react";
@@ -14,14 +14,14 @@ import { Film } from "lucide-react";
 export default function ProfileGuard({ children }: { children: React.ReactNode }) {
   const { user, isLoaded } = useUser();
   const router = useRouter();
+  const { openSignIn } = useClerk();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     if (!isLoaded) return;
 
     if (!user) {
-      const redirect = window.location.pathname + window.location.search;
-      router.replace(`/sign-in?redirect=${encodeURIComponent(redirect)}`);
+      openSignIn();
       return;
     }
 

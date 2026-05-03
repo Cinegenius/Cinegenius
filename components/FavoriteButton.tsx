@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Heart } from "lucide-react";
-import { useAuth } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { useAuth, useClerk } from "@clerk/nextjs";
 
 interface Props {
   listingId: string;
@@ -21,7 +20,7 @@ export default function FavoriteButton({
   className = "", size = "md",
 }: Props) {
   const { isSignedIn, isLoaded } = useAuth();
-  const router = useRouter();
+  const { openSignIn } = useClerk();
   const [favorited, setFavorited] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -37,7 +36,7 @@ export default function FavoriteButton({
     e.preventDefault();
     e.stopPropagation();
     if (!isLoaded) return;
-    if (!isSignedIn) { router.push("/sign-in"); return; }
+    if (!isSignedIn) { openSignIn(); return; }
     if (loading) return;
     setLoading(true);
     const optimistic = !favorited;

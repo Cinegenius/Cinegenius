@@ -177,7 +177,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const { isSignedIn, isLoaded } = useAuth();
   const { user } = useUser();
-  const { signOut } = useClerk();
+  const { signOut, openSignIn, openSignUp } = useClerk();
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   const closeAll = () => { setUserMenuOpen(false); };
@@ -301,18 +301,18 @@ export default function Navbar() {
               )}
               {isLoaded && !isSignedIn && (
                 <>
-                  <Link
-                    href="/sign-in"
+                  <button
+                    onClick={() => openSignIn()}
                     className="px-4 py-2 text-sm font-semibold border border-border text-text-secondary hover:border-gold hover:text-gold rounded-md transition-all"
                   >
                     {t("signIn")}
-                  </Link>
-                  <Link
-                    href="/sign-up"
+                  </button>
+                  <button
+                    onClick={() => openSignUp()}
                     className="px-4 py-2 text-sm font-semibold bg-gold text-bg-primary rounded-md hover:bg-gold-light transition-colors"
                   >
                     {t("signUp")}
-                  </Link>
+                  </button>
                 </>
               )}
               {isLoaded && isSignedIn && (() => {
@@ -530,12 +530,12 @@ export default function Navbar() {
             </>
           ) : (
             <div className="mt-auto pt-4 border-t border-border space-y-2">
-              <Link href="/sign-in" onClick={() => setOpen(false)} className="block w-full py-2.5 px-3 text-sm text-center font-medium border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-all">
+              <button onClick={() => { setOpen(false); openSignIn(); }} className="block w-full py-2.5 px-3 text-sm text-center font-medium border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-all">
                 {t("signIn")}
-              </Link>
-              <Link href="/sign-up" onClick={() => setOpen(false)} className="block w-full py-2.5 px-3 text-sm text-center font-semibold bg-gold text-bg-primary rounded-lg hover:bg-gold-light transition-colors">
+              </button>
+              <button onClick={() => { setOpen(false); openSignUp(); }} className="block w-full py-2.5 px-3 text-sm text-center font-semibold bg-gold text-bg-primary rounded-lg hover:bg-gold-light transition-colors">
                 {t("signUp")}
-              </Link>
+              </button>
             </div>
           )}
         </nav>

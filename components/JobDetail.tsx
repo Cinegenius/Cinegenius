@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
 import { ArrowLeft, MapPin, Clock, Briefcase, CheckCircle, Users, Calendar, Shield, AlertTriangle, DollarSign } from "lucide-react";
 import FavoriteButton from "@/components/FavoriteButton";
@@ -28,6 +28,7 @@ type Job = {
 
 export default function JobDetail({ job }: { job: Job }) {
   const { userId } = useAuth();
+  const { openSignIn } = useClerk();
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -187,9 +188,9 @@ export default function JobDetail({ job }: { job: Job }) {
                 {!userId ? (
                   <div className="text-center py-4 space-y-3">
                     <p className="text-sm text-text-muted">Melde dich an, um dich zu bewerben.</p>
-                    <Link href="/sign-in" className="block w-full py-2.5 bg-gold text-bg-primary font-semibold rounded-lg text-sm text-center hover:bg-gold-light transition-colors">
+                    <button onClick={() => openSignIn()} className="block w-full py-2.5 bg-gold text-bg-primary font-semibold rounded-lg text-sm text-center hover:bg-gold-light transition-colors">
                       Anmelden
-                    </Link>
+                    </button>
                   </div>
                 ) : userId === job.ownerId ? (
                   <div className="text-center py-4 space-y-2">
