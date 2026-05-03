@@ -202,6 +202,7 @@ export default function Navbar() {
 
   useEffect(() => {
     if (!isSignedIn) {
+      if (!isLoaded) return;
       setProfileDisplayName("");
       setProfileAvatarUrl("");
       setUnreadMessages(0);
@@ -250,7 +251,7 @@ export default function Navbar() {
       })
       .subscribe();
     return () => { controller.abort(); supabase.removeChannel(channel); };
-  }, [isSignedIn]);
+  }, [isSignedIn, isLoaded]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
