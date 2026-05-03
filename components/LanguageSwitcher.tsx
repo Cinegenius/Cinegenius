@@ -76,8 +76,7 @@ export default function LanguageSwitcher() {
         disabled={loading}
       >
         <Globe size={15} />
-        <span className="hidden sm:inline font-medium">{currentLang?.flag} {currentLang?.label}</span>
-        <span className="sm:hidden">{currentLang?.flag}</span>
+        <span>{currentLang?.flag}</span>
       </button>
 
       {open && (
