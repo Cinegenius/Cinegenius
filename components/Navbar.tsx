@@ -171,8 +171,12 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [profileDisplayName, setProfileDisplayName] = useState("");
-  const [profileAvatarUrl, setProfileAvatarUrl] = useState("");
+  const [profileDisplayName, setProfileDisplayName] = useState(() => {
+    try { return localStorage.getItem("cg_profile_name") ?? ""; } catch { return ""; }
+  });
+  const [profileAvatarUrl, setProfileAvatarUrl] = useState(() => {
+    try { return localStorage.getItem("cg_profile_avatar") ?? ""; } catch { return ""; }
+  });
   const [unreadMessages, setUnreadMessages] = useState(0);
   const pathname = usePathname();
   const { isSignedIn, isLoaded } = useAuth();
@@ -195,6 +199,7 @@ export default function Navbar() {
       setProfileDisplayName("");
       setProfileAvatarUrl("");
       setUnreadMessages(0);
+      try { localStorage.removeItem("cg_profile_name"); localStorage.removeItem("cg_profile_avatar"); } catch { /* */ }
       return;
     }
 
@@ -205,8 +210,14 @@ export default function Navbar() {
       .then(r => r.ok ? r.json() : null)
       .then((json) => {
         if (!json) return;
-        if (json.profile?.display_name) setProfileDisplayName(json.profile.display_name);
-        if (json.profile?.avatar_url)   setProfileAvatarUrl(json.profile.avatar_url);
+        if (json.profile?.display_name) {
+          setProfileDisplayName(json.profile.display_name);
+          try { localStorage.setItem("cg_profile_name", json.profile.display_name); } catch { /* */ }
+        }
+        if (json.profile?.avatar_url) {
+          setProfileAvatarUrl(json.profile.avatar_url);
+          try { localStorage.setItem("cg_profile_avatar", json.profile.avatar_url); } catch { /* */ }
+        }
       })
       .catch(() => {});
     fetch("/api/unread-count", { signal })
@@ -292,7 +303,7 @@ export default function Navbar() {
               <GlobalSearch />
               <LanguageSwitcher />
               <NotificationCenter />
-              {!isLoaded && (
+              {!isLoaded && !profileDisplayName && !profileAvatarUrl && (
                 <div className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full border border-border/30 animate-pulse">
                   <div className="w-7 h-7 rounded-full bg-bg-elevated" />
                   <div className="w-20 h-3 rounded-full bg-bg-elevated hidden xl:block" />
@@ -315,9 +326,9 @@ export default function Navbar() {
                   </button>
                 </>
               )}
-              {isLoaded && isSignedIn && (() => {
+              {(isLoaded ? isSignedIn : !!(profileDisplayName || profileAvatarUrl)) && (() => {
                 const avatarSrc = profileAvatarUrl || user?.imageUrl || "";
-                const displayName = profileDisplayName || user?.firstName || user?.emailAddresses[0]?.emailAddress?.split("@")[0] || "";
+                const displayName = profileDisplayName || user?.firstName || user?.emailAddresses?.[0]?.emailAddress?.split("@")[0] || "";
                 const email = user?.primaryEmailAddress?.emailAddress ?? "";
                 const initial = displayName[0]?.toUpperCase() ?? "?";
                 return (
@@ -412,10 +423,10 @@ export default function Navbar() {
               >
                 <Search size={20} />
               </button>
-              {!isLoaded && (
+              {!isLoaded && !profileDisplayName && !profileAvatarUrl && (
                 <div className="w-8 h-8 rounded-full bg-bg-elevated border border-border/30 animate-pulse" />
               )}
-              {isLoaded && isSignedIn && (() => {
+              {(isLoaded ? isSignedIn : !!(profileDisplayName || profileAvatarUrl)) && (() => {
                 const mobileAvatar = profileAvatarUrl || user?.imageUrl || "";
                 const mobileInitial = (profileDisplayName || user?.firstName || user?.emailAddresses?.[0]?.emailAddress || "?")[0].toUpperCase();
                 return (
