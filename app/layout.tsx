@@ -116,6 +116,13 @@ export default async function RootLayout({
         suppressHydrationWarning
         className={`${playfair.variable} ${inter.variable} ${jetbrains.variable}`}
       >
+        <head>
+          {/* Clerk JS loads from these domains — early connection cuts auth init time */}
+          <link rel="preconnect" href="https://clerk.cinegenius.co" />
+          <link rel="preconnect" href="https://img.clerk.com" />
+          <link rel="dns-prefetch" href="https://clerk.cinegenius.co" />
+          <link rel="dns-prefetch" href="https://clerk.com" />
+        </head>
         <body className="min-h-screen flex flex-col bg-bg-primary text-text-primary font-sans">
           <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
