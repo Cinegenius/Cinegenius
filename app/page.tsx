@@ -473,7 +473,7 @@ export default async function HomePage() {
               return (
                 <Link
                   key={href}
-                  href={image ? href : insertHref}
+                  href={href}
                   className="group flex flex-col rounded-2xl overflow-hidden border border-border bg-bg-elevated hover:border-gold/30 transition-all duration-300"
                 >
                   <div className="relative h-36 sm:h-48 overflow-hidden bg-bg-elevated">
@@ -489,9 +489,13 @@ export default async function HomePage() {
                     ) : (
                       <div className={`absolute inset-0 bg-gradient-to-br ${accent} to-bg-elevated flex flex-col items-center justify-center gap-3`}>
                         <p className="text-xs text-white/40 font-medium">{t("pillarEmpty")}</p>
-                        <span className="px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg group-hover:bg-[#D6F96A] transition-colors">
+                        <a
+                          href={insertHref}
+                          onClick={(e) => e.stopPropagation()}
+                          className="px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-[#D6F96A] transition-colors"
+                        >
                           {insertLabel} →
-                        </span>
+                        </a>
                       </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-bg-elevated/80 via-transparent to-transparent" />
