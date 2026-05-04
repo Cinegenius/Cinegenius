@@ -356,6 +356,17 @@ export default function InseratPage() {
     experience: "",
   });
 
+  const [myCompanies, setMyCompanies] = useState<{ id: string; name: string; logo_url: string | null }[]>([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>("");
+
+  useEffect(() => {
+    if (!userId) return;
+    fetch("/api/companies?mine=true&limit=50")
+      .then((r) => r.json())
+      .then((d) => setMyCompanies(d.companies ?? []))
+      .catch(() => {});
+  }, [userId]);
+
   const f = (field: string, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
@@ -538,7 +549,7 @@ export default function InseratPage() {
     const res = await fetch("/api/listings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...payload, image_url: imageUrl }),
+      body: JSON.stringify({ ...payload, image_url: imageUrl, company_id: selectedCompanyId || null }),
     });
 
     const json = await res.json();
@@ -732,6 +743,26 @@ export default function InseratPage() {
           </div>
 
           <div className="space-y-5">
+
+            {/* ── FIRMA VERKNÜPFEN ── */}
+            {myCompanies.length > 0 && (
+              <div>
+                <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Zu Firma verknüpfen (optional)</label>
+                <select
+                  value={selectedCompanyId}
+                  onChange={(e) => setSelectedCompanyId(e.target.value)}
+                  className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm"
+                >
+                  <option value="">Kein Firmenprofil</option>
+                  {myCompanies.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+                {selectedCompanyId && (
+                  <p className="text-xs text-text-muted mt-1.5">Dieses Inserat erscheint auf deinem Firmenprofil.</p>
+                )}
+              </div>
+            )}
 
             {/* ── VEHICLE FIELDS ── */}
             {isVehicle && (
