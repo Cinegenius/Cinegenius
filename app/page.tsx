@@ -198,7 +198,7 @@ export default async function HomePage() {
     { icon: ShoppingBag,  title: t("pillarMarketplaceTitle"), desc: t("pillarMarketplaceDesc"), href: "/props",     pillarKey: "equipment", accent: "from-slate-900/70",   insertHref: "/inserat?group=marktplatz", insertLabel: t("pillarMarketplaceCta"), imgPos: "50% 66%" },
     { icon: Briefcase,    title: t("pillarJobsTitle"),        desc: t("pillarJobsDesc"),        href: "/jobs",      pillarKey: "job",       accent: "from-zinc-900/70",    insertHref: "/inserat?group=jobs",       insertLabel: t("pillarJobsCta"),       imgPos: "50% 50%" },
     { icon: Building2,    title: t("pillarCompaniesTitle"),   desc: t("pillarCompaniesDesc"),   href: "/companies", pillarKey: "firma",     accent: "from-emerald-900/70", insertHref: "/company-setup",            insertLabel: t("pillarCompaniesCta"), imgPos: "50% 50%" },
-    { icon: Clapperboard, title: t("pillarProjectsTitle"),    desc: t("pillarProjectsDesc"),    href: "/projects",  pillarKey: "projekt",   accent: "from-rose-900/70",    insertHref: "/projects",                 insertLabel: t("pillarProjectsCta"),  imgPos: "50% 50%" },
+    { icon: Clapperboard, title: t("pillarProjectsTitle"),    desc: t("pillarProjectsDesc"),    href: "/projects",  pillarKey: "projekt",   accent: "from-rose-900/70",    insertHref: "/projects/neu",             insertLabel: t("pillarProjectsCta"),  imgPos: "50% 50%" },
   ];
 
   const { liveStats, liveLocations, liveJobs, pillarImages, companies, projects, topCreators } = await getHomeData();
