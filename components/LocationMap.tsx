@@ -239,8 +239,10 @@ export default function LocationMap({
       map.on("zoomend", () => { void renderMarkers(); });
 
       // Force correct tile coverage after container settles
-      setTimeout(() => map.invalidateSize(), 0);
-      setTimeout(() => map.invalidateSize(), 200);
+      // Multiple delays cover SSR hydration, layout shifts, and panel transitions
+      [0, 100, 300, 600, 1200].forEach((ms) =>
+        setTimeout(() => map.invalidateSize(), ms)
+      );
 
       // Initial render
       await renderMarkers();
