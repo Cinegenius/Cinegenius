@@ -137,7 +137,7 @@ export default function LocationMap({
                 <div style="font-size:11px;color:#9e9e9e;margin-bottom:8px">${loc.city} · ${loc.type}</div>
                 <div style="display:flex;align-items:center;justify-content:space-between">
                   <span style="font-size:11px;color:#9e9e9e">★ ${loc.rating} (${loc.reviews})</span>
-                  <span style="font-size:13px;font-weight:700;color:#C2F135">$${loc.price.toLocaleString()}/${loc.priceUnit}</span>
+                  <span style="font-size:13px;font-weight:700;color:#C2F135">${loc.price.toLocaleString("de-DE")} €/Tag</span>
                 </div>
                 <a href="/locations/${loc.id}" style="
                   display:block;
