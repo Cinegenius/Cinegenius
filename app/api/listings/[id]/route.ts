@@ -16,7 +16,7 @@ export async function PATCH(
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Ungültige Anfrage" }, { status: 400 });
 
-  const { title, description, price, city, published } = body;
+  const { title, description, price, city, published, image_url } = body;
 
   if (title !== undefined && title.length > 200)
     return NextResponse.json({ error: "Titel zu lang (max. 200 Zeichen)" }, { status: 400 });
@@ -31,6 +31,7 @@ export async function PATCH(
   if (price !== undefined)       updates.price       = Math.max(0, Math.min(Number(price) || 0, 1_000_000));
   if (city !== undefined)        updates.city        = city.trim();
   if (published !== undefined)   updates.published   = Boolean(published);
+  if (image_url !== undefined)   updates.image_url   = image_url || null;
 
   if (Object.keys(updates).length === 0)
     return NextResponse.json({ error: "Keine Änderungen" }, { status: 400 });

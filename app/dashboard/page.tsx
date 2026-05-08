@@ -8,7 +8,7 @@ import {
   BarChart2, Settings, Plus, Eye,
   Briefcase, CheckCircle, ChevronRight, ExternalLink,
   User, Wallet, ArrowDownCircle, Receipt, Send,
-  Pencil, Save, Loader2, Heart, MapPin, Car, Package, Trash2,
+  Pencil, Save, Loader2, Upload, Heart, MapPin, Car, Package, Trash2,
   Users, UserPlus, Check, X, Globe, Lock, Clock, ShieldCheck,
   Building2, AlertCircle, FileText, ArrowLeft,
 } from "lucide-react";
@@ -169,14 +169,26 @@ export default function DashboardPage() {
   };
 
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ title: "", description: "", price: "", city: "" });
+  const [editForm, setEditForm] = useState({ title: "", description: "", price: "", city: "", image_url: "" });
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState("");
+  const [editUploading, setEditUploading] = useState(false);
 
   const startEdit = (l: typeof myListings[number]) => {
     setEditingId(l.id);
-    setEditForm({ title: l.title, description: l.description ?? "", price: String(l.price), city: l.city });
+    setEditForm({ title: l.title, description: l.description ?? "", price: String(l.price), city: l.city, image_url: l.image_url ?? "" });
     setEditError("");
+  };
+
+  const uploadEditImage = async (file: File) => {
+    setEditUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const r = await fetch("/api/upload", { method: "POST", body: fd });
+      const d = await r.json();
+      if (d.url) setEditForm((p) => ({ ...p, image_url: d.url }));
+    } catch { /* ignore */ } finally { setEditUploading(false); }
   };
 
   const saveEdit = async () => {
@@ -196,6 +208,7 @@ export default function DashboardPage() {
           description: editForm.description,
           price: parseFloat(editForm.price) || 0,
           city: editForm.city.trim(),
+          image_url: editForm.image_url || null,
         }),
       });
       const { error } = await res.json();
@@ -1546,8 +1559,11 @@ export default function DashboardPage() {
               {myListings.map((l) => (
                 <div key={l.id}>
                 <div className={`flex items-center gap-4 p-5 rounded-xl border bg-bg-secondary transition-colors ${editingId === l.id ? "border-gold/30" : "border-border hover:bg-bg-elevated"}`}>
-                  <div className="w-14 h-14 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0 text-2xl">
-                    {l.type === "location" ? "📍" : l.type === "vehicle" ? "🚗" : l.type === "job" ? "💼" : l.type === "creator" ? "🎬" : "📦"}
+                  <div className="w-14 h-14 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0 overflow-hidden text-2xl">
+                    {l.image_url
+                      ? <img src={l.image_url} alt={l.title} className="w-full h-full object-cover" />
+                      : (l.type === "location" ? "📍" : l.type === "vehicle" ? "🚗" : l.type === "job" ? "💼" : l.type === "creator" ? "🎬" : "📦")
+                    }
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -1605,6 +1621,24 @@ export default function DashboardPage() {
                     {editError && (
                       <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{editError}</p>
                     )}
+                    {/* Image upload */}
+                    <div>
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">Bild</label>
+                      <div className="flex items-center gap-3">
+                        {editForm.image_url && (
+                          <img src={editForm.image_url} alt="" className="w-16 h-16 rounded-lg object-cover border border-border shrink-0" />
+                        )}
+                        <label className={`flex items-center gap-2 px-3 py-2 border border-border rounded-lg text-xs text-text-secondary hover:border-gold hover:text-gold transition-colors cursor-pointer ${editUploading ? "opacity-50 pointer-events-none" : ""}`}>
+                          {editUploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+                          {editUploading ? "Wird hochgeladen…" : "Bild ändern"}
+                          <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadEditImage(f); }} />
+                        </label>
+                        {editForm.image_url && (
+                          <button onClick={() => setEditForm((p) => ({ ...p, image_url: "" }))} className="text-xs text-red-400 hover:text-red-300 transition-colors">Entfernen</button>
+                        )}
+                      </div>
+                    </div>
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">Titel *</label>
