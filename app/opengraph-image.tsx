@@ -20,7 +20,7 @@ export default function Image() {
           overflow: "hidden",
         }}
       >
-        {/* Decorative glow circles */}
+        {/* Glow top-right */}
         <div
           style={{
             position: "absolute",
@@ -33,6 +33,7 @@ export default function Image() {
             display: "flex",
           }}
         />
+        {/* Glow bottom-left */}
         <div
           style={{
             position: "absolute",
@@ -64,30 +65,46 @@ export default function Image() {
           >
             ▶
           </div>
-          <span style={{ fontSize: 40, fontWeight: 700, color: "#FFFFFF", letterSpacing: "-0.5px" }}>
-            Cine<span style={{ color: "#C2F135" }}>Genius</span>
-          </span>
+          <div style={{ display: "flex", fontSize: 40, fontWeight: 700, letterSpacing: "-0.5px" }}>
+            <span style={{ color: "#FFFFFF" }}>Cine</span>
+            <span style={{ color: "#C2F135" }}>Genius</span>
+          </div>
         </div>
 
         {/* Main content */}
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          <div
-            style={{
-              fontSize: 64,
-              fontWeight: 800,
-              color: "#FFFFFF",
-              lineHeight: 1.05,
-              letterSpacing: "-2px",
-            }}
-          >
-            Locations, Crew
-            <br />
-            <span style={{ color: "#C2F135" }}>&amp; Equipment</span>
+          {/* Headline line 1 */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+            <span
+              style={{
+                fontSize: 64,
+                fontWeight: 800,
+                color: "#FFFFFF",
+                lineHeight: 1.05,
+                letterSpacing: "-2px",
+              }}
+            >
+              Locations, Crew
+            </span>
+            <div style={{ display: "flex" }}>
+              <span
+                style={{
+                  fontSize: 64,
+                  fontWeight: 800,
+                  color: "#C2F135",
+                  lineHeight: 1.05,
+                  letterSpacing: "-2px",
+                }}
+              >
+                &amp; Equipment
+              </span>
+            </div>
           </div>
 
-          <div style={{ fontSize: 26, color: "rgba(255,255,255,0.55)", fontWeight: 400, lineHeight: 1.4 }}>
+          {/* Subtitle */}
+          <span style={{ fontSize: 26, color: "rgba(255,255,255,0.55)", fontWeight: 400 }}>
             Der Marktplatz für Film, Social Media &amp; Fotografie im DACH-Raum.
-          </div>
+          </span>
 
           {/* Category pills */}
           <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
@@ -95,13 +112,13 @@ export default function Image() {
               <div
                 key={label}
                 style={{
+                  display: "flex",
                   padding: "8px 20px",
                   border: "1px solid rgba(194,241,53,0.35)",
                   borderRadius: 100,
                   color: "#C2F135",
                   fontSize: 18,
                   fontWeight: 500,
-                  display: "flex",
                 }}
               >
                 {label}
