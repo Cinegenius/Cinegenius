@@ -1,9 +1,9 @@
 import { db } from "@/lib/db";
-import { requireAuth, assertOwner } from "@/lib/guards";
-import { revalidateTag } from "next/cache";
+import { requireAuth } from "@/lib/auth";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
-// PATCH /api/listings/[id] — update own listing fields
+// PATCH /api/listings/[id] — edit own listing
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -13,61 +13,55 @@ export async function PATCH(
   const { userId } = authResult;
 
   const { id } = await params;
+  const body = await req.json().catch(() => null);
+  if (!body) return NextResponse.json({ error: "Ungültige Anfrage" }, { status: 400 });
 
-  // Fetch resource first — never trust client on ownership
-  const { data: existing } = await db
-    .from("listings")
-    .select("id, user_id")
-    .eq("id", id)
-    .maybeSingle();
+  const { title, description, price, city, published } = body;
 
-  const ownershipError = assertOwner(existing?.user_id, userId);
-  if (ownershipError) return ownershipError;
-
-  const body = await req.json();
-
-  // Input length limits
-  if (body.title !== undefined && String(body.title).length > 200)
+  if (title !== undefined && title.length > 200)
     return NextResponse.json({ error: "Titel zu lang (max. 200 Zeichen)" }, { status: 400 });
-  if (body.city !== undefined && String(body.city).length > 100)
+  if (city !== undefined && city.length > 100)
     return NextResponse.json({ error: "Stadt zu lang (max. 100 Zeichen)" }, { status: 400 });
-  if (body.description !== undefined && String(body.description).length > 5000)
+  if (description !== undefined && description.length > 5000)
     return NextResponse.json({ error: "Beschreibung zu lang (max. 5000 Zeichen)" }, { status: 400 });
 
-  // Explicit allowlist — no client-controlled columns can be injected
-  const ALLOWED_KEYS = [
-    "published", "title", "description", "price", "city",
-    "category", "image_url", "images", "lat", "lng",
-  ] as const;
-
   const updates: Record<string, unknown> = {};
-  for (const key of ALLOWED_KEYS) {
-    if (key in body) updates[key] = body[key];
-  }
+  if (title !== undefined)       updates.title       = title.trim();
+  if (description !== undefined) updates.description = description;
+  if (price !== undefined)       updates.price       = Math.max(0, Math.min(Number(price) || 0, 1_000_000));
+  if (city !== undefined)        updates.city        = city.trim();
+  if (published !== undefined)   updates.published   = Boolean(published);
 
-  if ("price" in updates) {
-    updates["price"] = Math.max(0, Math.min(Number(updates["price"]) || 0, 1_000_000));
-  }
-
-  if (Object.keys(updates).length === 0) {
-    return NextResponse.json({ error: "Keine gültigen Felder" }, { status: 400 });
-  }
+  if (Object.keys(updates).length === 0)
+    return NextResponse.json({ error: "Keine Änderungen" }, { status: 400 });
 
   const { data, error } = await db
     .from("listings")
     .update(updates)
     .eq("id", id)
-    .select()
+    .eq("user_id", userId)
+    .select("id, type")
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error("[listings PATCH]", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+  if (!data) return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
+
+  const pathMap: Record<string, string> = {
+    job: "/jobs", location: "/locations", prop: "/props",
+    vehicle: "/vehicles", creator: "/creators", animal: "/tiere",
+  };
+  if (pathMap[data.type]) revalidatePath(pathMap[data.type]);
   revalidateTag("listings", "max");
-  return NextResponse.json({ data });
+
+  return NextResponse.json({ success: true });
 }
 
 // DELETE /api/listings/[id] — delete own listing
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const authResult = await requireAuth();
@@ -76,24 +70,30 @@ export async function DELETE(
 
   const { id } = await params;
 
-  // Pre-fetch to verify existence and ownership before deleting.
-  // Without this, a DELETE on a non-existent or foreign row would
-  // silently return success (Supabase deletes 0 rows, no error).
-  const { data: existing } = await db
+  const { data: listing } = await db
     .from("listings")
-    .select("id, user_id")
+    .select("type")
     .eq("id", id)
-    .maybeSingle();
-
-  const ownershipError = assertOwner(existing?.user_id, userId);
-  if (ownershipError) return ownershipError;
+    .eq("user_id", userId)
+    .single();
 
   const { error } = await db
     .from("listings")
     .delete()
-    .eq("id", id);
+    .eq("id", id)
+    .eq("user_id", userId);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error("[listings DELETE]", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  const pathMap: Record<string, string> = {
+    job: "/jobs", location: "/locations", prop: "/props",
+    vehicle: "/vehicles", creator: "/creators", animal: "/tiere",
+  };
+  if (listing?.type && pathMap[listing.type]) revalidatePath(pathMap[listing.type]);
   revalidateTag("listings", "max");
+
   return NextResponse.json({ success: true });
 }
