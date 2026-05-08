@@ -1,13 +1,10 @@
 import { ImageResponse } from "next/og";
 
-export const runtime = "edge";
 export const alt = "CineGenius — Marktplatz für Film, Social Media & Fotografie";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default async function Image() {
-  const heroUrl = new URL("/hero-bg.jpg", process.env.NEXT_PUBLIC_APP_URL ?? "https://cinegenius.co").toString();
-
+export default function Image() {
   return new ImageResponse(
     (
       <div
@@ -16,85 +13,100 @@ export default async function Image() {
           height: 630,
           display: "flex",
           flexDirection: "column",
-          justifyContent: "flex-end",
+          justifyContent: "space-between",
+          background: "linear-gradient(135deg, #0A0A0A 0%, #0f1a05 50%, #0A0A0A 100%)",
+          padding: "70px 80px",
           position: "relative",
           overflow: "hidden",
-          backgroundColor: "#0A0A0A",
         }}
       >
-        {/* Hero background */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={heroUrl}
-          alt=""
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            objectPosition: "center 40%",
-            opacity: 0.55,
-          }}
-        />
-
-        {/* Gradient overlay */}
+        {/* Decorative glow circles */}
         <div
           style={{
             position: "absolute",
-            inset: 0,
-            background: "linear-gradient(to bottom, rgba(10,10,10,0.2) 0%, rgba(10,10,10,0.85) 100%)",
-          }}
-        />
-
-        {/* Content */}
-        <div
-          style={{
-            position: "relative",
+            top: -120,
+            right: -80,
+            width: 500,
+            height: 500,
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(194,241,53,0.12) 0%, transparent 70%)",
             display: "flex",
-            flexDirection: "column",
-            padding: "0 80px 70px",
           }}
-        >
-          {/* Logo */}
-          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
-            <div
-              style={{
-                width: 44,
-                height: 44,
-                background: "#C2F135",
-                borderRadius: 10,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 26,
-                fontWeight: 900,
-                color: "#0A0A0A",
-              }}
-            >
-              ▶
-            </div>
-            <span style={{ fontSize: 36, fontWeight: 700, color: "#FFFFFF", letterSpacing: "-0.5px" }}>
-              Cine<span style={{ color: "#C2F135" }}>Genius</span>
-            </span>
-          </div>
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: -150,
+            left: -100,
+            width: 600,
+            height: 600,
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(194,241,53,0.07) 0%, transparent 70%)",
+            display: "flex",
+          }}
+        />
 
-          {/* Tagline */}
+        {/* Logo row */}
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
           <div
             style={{
-              fontSize: 52,
-              fontWeight: 700,
-              color: "#FFFFFF",
-              lineHeight: 1.1,
-              letterSpacing: "-1px",
-              marginBottom: 18,
+              width: 52,
+              height: 52,
+              background: "#C2F135",
+              borderRadius: 12,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 28,
+              fontWeight: 900,
+              color: "#0A0A0A",
             }}
           >
-            Locations, Crew & Equipment
+            ▶
+          </div>
+          <span style={{ fontSize: 40, fontWeight: 700, color: "#FFFFFF", letterSpacing: "-0.5px" }}>
+            Cine<span style={{ color: "#C2F135" }}>Genius</span>
+          </span>
+        </div>
+
+        {/* Main content */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          <div
+            style={{
+              fontSize: 64,
+              fontWeight: 800,
+              color: "#FFFFFF",
+              lineHeight: 1.05,
+              letterSpacing: "-2px",
+            }}
+          >
+            Locations, Crew
+            <br />
+            <span style={{ color: "#C2F135" }}>&amp; Equipment</span>
           </div>
 
-          <div style={{ fontSize: 24, color: "rgba(255,255,255,0.6)", fontWeight: 400 }}>
-            Der Marktplatz für Film, Social Media & Fotografie im DACH-Raum.
+          <div style={{ fontSize: 26, color: "rgba(255,255,255,0.55)", fontWeight: 400, lineHeight: 1.4 }}>
+            Der Marktplatz für Film, Social Media &amp; Fotografie im DACH-Raum.
+          </div>
+
+          {/* Category pills */}
+          <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
+            {["Locations", "Filmcrew", "Equipment", "Jobs", "Tiere"].map((label) => (
+              <div
+                key={label}
+                style={{
+                  padding: "8px 20px",
+                  border: "1px solid rgba(194,241,53,0.35)",
+                  borderRadius: 100,
+                  color: "#C2F135",
+                  fontSize: 18,
+                  fontWeight: 500,
+                  display: "flex",
+                }}
+              >
+                {label}
+              </div>
+            ))}
           </div>
         </div>
       </div>
