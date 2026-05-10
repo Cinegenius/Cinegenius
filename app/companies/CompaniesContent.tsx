@@ -2,14 +2,13 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import type { LucideIcon } from "lucide-react";
 import {
   Building2, MapPin, Search, CheckCircle, LayoutGrid, LayoutList,
   ChevronRight, X, Camera, Volume2, Wrench, Shirt,
   Package, Film, Monitor, Users, Sparkles, Megaphone, Car,
-  Lightbulb, ArrowRight, SlidersHorizontal, ChevronDown, Globe, Zap,
+  Lightbulb, ArrowRight, Globe, Zap, Plus,
 } from "lucide-react";
 import { COMPANY_CATEGORIES, COMPANY_CATEGORY_BY_ID } from "@/lib/companyCategories";
 
@@ -46,30 +45,6 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
   "werbeagentur":     Megaphone,
   "fahrzeugverleih":  Car,
 };
-
-// ── Two-panel groupings ───────────────────────────────────────────
-const COMPANY_GROUPS_META: { id: string; labelKey: "groupVerleih"|"groupStudio"|"groupPost"|"groupAusstattung"|"groupAgenturen"; Icon: LucideIcon; categoryIds: string[] }[] = [
-  {
-    id: "verleih", labelKey: "groupVerleih", Icon: Package,
-    categoryIds: ["lichtverleih", "kameraverleih", "tonverleih", "grip-verleih", "fahrzeugverleih"],
-  },
-  {
-    id: "studio", labelKey: "groupStudio", Icon: Film,
-    categoryIds: ["tonstudio", "filmproduktion", "fotostudio"],
-  },
-  {
-    id: "post", labelKey: "groupPost", Icon: Monitor,
-    categoryIds: ["postproduktion", "vfx-studio", "werbeagentur"],
-  },
-  {
-    id: "ausstattung", labelKey: "groupAusstattung", Icon: Shirt,
-    categoryIds: ["kostumfundus", "requisite"],
-  },
-  {
-    id: "agenturen", labelKey: "groupAgenturen", Icon: Users,
-    categoryIds: ["casting-agentur", "location-agentur"],
-  },
-];
 
 // ─── FilterDropdown ───────────────────────────────────────────────
 function FilterDropdown({
@@ -113,161 +88,17 @@ function FilterDropdown({
   );
 }
 
-type CompanyGroup = { id: string; label: string; Icon: LucideIcon; categoryIds: string[] };
-
-// ─── Two-panel category picker ────────────────────────────────────
-function CompanyCategoryPanel({
-  groups, clearLabel, clearSelectionLabel,
-  activeGroupId, setActiveGroupId,
-  selectedCategoryId,
-  onSelectCategory,
-  onClose,
-}: {
-  groups: CompanyGroup[];
-  clearLabel: string;
-  clearSelectionLabel: string;
-  activeGroupId: string; setActiveGroupId: (id: string) => void;
-  selectedCategoryId: string | null;
-  onSelectCategory: (catId: string | null) => void;
-  onClose: () => void;
-}) {
-  const activeGroup = groups.find((g) => g.id === activeGroupId) ?? groups[0];
-  const selectedCat = selectedCategoryId ? COMPANY_CATEGORY_BY_ID[selectedCategoryId] : null;
-  const selectedInActiveGroup = activeGroup.categoryIds.includes(selectedCategoryId ?? "");
-
-  return (
-    <div className="border border-border rounded-xl overflow-hidden bg-bg-elevated">
-      {/* Mobile: horizontal group scroll + categories below */}
-      <div className="sm:hidden">
-        <div className="flex overflow-x-auto gap-1.5 p-3 border-b border-border bg-bg-secondary" style={{ scrollbarWidth: "none" }}>
-          {groups.map(({ id, label, Icon, categoryIds }) => {
-            const isActive = id === activeGroupId;
-            const hasSelected = categoryIds.includes(selectedCategoryId ?? "");
-            return (
-              <button key={id}
-                onClick={() => setActiveGroupId(id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border shrink-0 transition-all ${
-                  isActive ? "bg-gold/10 border-gold/30 text-gold" : "border-border text-text-muted"
-                }`}>
-                <Icon size={11} className={isActive ? "text-gold" : "text-text-muted"} />
-                {label}
-                {hasSelected && <span className="w-3 h-3 rounded-full bg-gold text-bg-primary text-[8px] font-bold flex items-center justify-center">✓</span>}
-              </button>
-            );
-          })}
-        </div>
-        <div className="p-3">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-semibold text-gold">{activeGroup.label}</h3>
-            {selectedInActiveGroup && selectedCategoryId && (
-              <button onClick={() => onSelectCategory(null)} className="text-[10px] text-text-muted hover:text-red-400">{clearLabel}</button>
-            )}
-          </div>
-          <div className="grid grid-cols-2 gap-1.5">
-            {activeGroup.categoryIds.map((catId) => {
-              const cat = COMPANY_CATEGORY_BY_ID[catId];
-              if (!cat) return null;
-              const Icon = CATEGORY_ICONS[catId] ?? Building2;
-              const isSelected = selectedCategoryId === catId;
-              return (
-                <button key={catId}
-                  onClick={() => { onSelectCategory(isSelected ? null : catId); onClose(); }}
-                  className={`text-left px-3 py-2.5 rounded-lg text-xs border transition-all ${
-                    isSelected ? `${cat.bg} ${cat.color} font-semibold` : "border-border/60 text-text-muted"
-                  }`}>
-                  <div className="flex items-center gap-1.5 mb-0.5">
-                    <Icon size={11} className={isSelected ? cat.color : "text-text-muted"} />
-                    <span className="font-medium leading-tight">{cat.label}</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Desktop: two-panel */}
-      <div className="hidden sm:flex" style={{ minHeight: 260 }}>
-        <div className="w-52 shrink-0 border-r border-border overflow-y-auto bg-bg-secondary">
-          {groups.map(({ id, label, Icon, categoryIds }) => {
-            const isActive = id === activeGroupId;
-            const hasSelected = categoryIds.includes(selectedCategoryId ?? "");
-            return (
-              <button key={id}
-                onMouseEnter={() => setActiveGroupId(id)}
-                onClick={() => setActiveGroupId(id)}
-                className={`w-full flex items-center justify-between px-3 py-2.5 text-left text-xs transition-colors border-b border-border/40 last:border-0 ${
-                  isActive ? "bg-gold/10 text-gold font-semibold" : "text-text-muted hover:text-text-secondary hover:bg-white/[0.02]"
-                }`}>
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className={`w-6 h-6 rounded-md border flex items-center justify-center shrink-0 ${isActive ? "bg-gold/15 border-gold/30" : "bg-bg-elevated border-border"}`}>
-                    <Icon size={11} className={isActive ? "text-gold" : "text-text-muted"} />
-                  </span>
-                  <span className="truncate">{label}</span>
-                </div>
-                {hasSelected && <span className="w-3.5 h-3.5 rounded-full bg-gold text-bg-primary text-[8px] font-bold flex items-center justify-center shrink-0">✓</span>}
-              </button>
-            );
-          })}
-        </div>
-        <div className="flex-1 p-4 overflow-y-auto">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-gold">{activeGroup.label}</h3>
-            {selectedInActiveGroup && selectedCategoryId && (
-              <button onClick={() => onSelectCategory(null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">{clearSelectionLabel}</button>
-            )}
-          </div>
-          <div className="grid grid-cols-2 gap-1.5">
-            {activeGroup.categoryIds.map((catId) => {
-              const cat = COMPANY_CATEGORY_BY_ID[catId];
-              if (!cat) return null;
-              const Icon = CATEGORY_ICONS[catId] ?? Building2;
-              const isSelected = selectedCategoryId === catId;
-              return (
-                <button key={catId}
-                  onClick={() => { onSelectCategory(isSelected ? null : catId); onClose(); }}
-                  className={`text-left px-3 py-2.5 rounded-lg text-xs border transition-all ${
-                    isSelected ? `${cat.bg} ${cat.color} font-semibold` : "border-border/60 text-text-muted hover:text-text-secondary hover:border-border hover:bg-white/[0.02]"
-                  }`}>
-                  <div className="flex items-center gap-1.5 mb-0.5">
-                    <Icon size={11} className={isSelected ? cat.color : "text-text-muted"} />
-                    <span className="font-medium leading-tight">{cat.label}</span>
-                  </div>
-                  <div className="text-[10px] opacity-50">{cat.examples}</div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── Main ─────────────────────────────────────────────────────────
 export default function CompaniesContent({ initialCompanies }: { initialCompanies: Company[] }) {
-  const router = useRouter();
   const t = useTranslations("companies");
-
-  const COMPANY_GROUPS: CompanyGroup[] = COMPANY_GROUPS_META.map((g) => ({ ...g, label: t(g.labelKey) }));
 
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [activeGroupId, setActiveGroupId] = useState(COMPANY_GROUPS_META[0].id);
-  const [panelOpen, setPanelOpen] = useState(false);
   const [cityFilter, setCityFilter] = useState("");
   const [countryFilter, setCountryFilter] = useState("");
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [page, setPage] = useState(1);
-  const panelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!panelOpen) return;
-    const h = (e: MouseEvent) => { if (panelRef.current && !panelRef.current.contains(e.target as Node)) setPanelOpen(false); };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, [panelOpen]);
 
   const availableCities = useMemo(() => {
     const cities = initialCompanies.map((c) => c.city?.split(",")[0]?.trim()).filter(Boolean) as string[];
@@ -322,7 +153,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
               <Search size={14} className="text-text-muted shrink-0" />
               <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
                 placeholder={t("searchPlaceholder")}
-                className="bg-transparent border-none py-2 text-sm w-full focus:outline-none" />
+                className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none" />
               {search && <button onClick={() => setSearch("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
             </div>
             <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
@@ -340,31 +171,6 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
           {/* Row 2: Filters */}
           <div className="flex items-center gap-2 overflow-x-auto lg:overflow-visible pb-0.5" style={{ scrollbarWidth: "none" }}>
 
-            <div className="w-px h-6 bg-border shrink-0" />
-
-            {/* Kategorie trigger */}
-            <div ref={panelRef} className="relative shrink-0">
-              <button onClick={() => setPanelOpen((v) => !v)}
-                className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all ${
-                  panelOpen || hasCatFilter ? "bg-gold/10 border-gold/30 text-gold" : "border-border text-text-muted hover:text-text-secondary hover:border-border"
-                }`}>
-                <SlidersHorizontal size={12} />
-                {t("filterCategory")}
-                {hasCatFilter
-                  ? <span className="w-4 h-4 rounded-full bg-gold text-bg-primary text-[9px] font-bold flex items-center justify-center">✓</span>
-                  : <ChevronDown size={11} className={`transition-transform ${panelOpen ? "rotate-180" : ""}`} />
-                }
-              </button>
-            </div>
-
-            {/* Stadt */}
-            {availableCities.length > 0 && (
-              <FilterDropdown icon={MapPin} label={t("filterCity")} value={cityFilter} options={availableCities} onChange={setCityFilter} />
-            )}
-
-            {/* Land */}
-            <FilterDropdown icon={Globe} label={t("filterCountry")} value={countryFilter} options={[t("countryDE"), t("countryAT"), t("countryCH")]} onChange={setCountryFilter} />
-
             {/* Verifiziert toggle */}
             <button
               onClick={() => setVerifiedOnly((v) => !v)}
@@ -379,6 +185,16 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
               {t("filterVerified")}
             </button>
 
+            <div className="w-px h-6 bg-border shrink-0" />
+
+            {/* Stadt */}
+            {availableCities.length > 0 && (
+              <FilterDropdown icon={MapPin} label={t("filterCity")} value={cityFilter} options={availableCities} onChange={setCityFilter} />
+            )}
+
+            {/* Land */}
+            <FilterDropdown icon={Globe} label={t("filterCountry")} value={countryFilter} options={[t("countryDE"), t("countryAT"), t("countryCH")]} onChange={setCountryFilter} />
+
             {hasAnyFilter && (
               <>
                 <div className="w-px h-6 bg-border shrink-0" />
@@ -390,21 +206,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
 
           </div>
 
-          {/* Category panel */}
-          {panelOpen && (
-            <CompanyCategoryPanel
-              groups={COMPANY_GROUPS}
-              clearLabel={t("clearFilter")}
-              clearSelectionLabel={t("clearSelection")}
-              activeGroupId={activeGroupId}
-              setActiveGroupId={setActiveGroupId}
-              selectedCategoryId={selectedCategory}
-              onSelectCategory={(catId) => { setSelectedCategory(catId); setPage(1); }}
-              onClose={() => setPanelOpen(false)}
-            />
-          )}
-
-          {/* Row 4: Active chips */}
+          {/* Active chips */}
           {(hasCatFilter || cityFilter || countryFilter || verifiedOnly) && (
             <div className="flex flex-wrap gap-1.5 items-center">
               {selectedCat && (
@@ -440,63 +242,142 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
       </div>
 
       {/* ── Results ──────────────────────────────────────── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <p className="text-sm text-text-muted mb-5">
-          <span className="font-semibold text-text-primary">{filtered.length}</span> {t("resultsCount", { count: filtered.length })}
-          {selectedCat && <> in <span className={`font-semibold ${selectedCat.color}`}>{selectedCat.label}</span></>}
-        </p>
+      <div className="px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex gap-8 items-start">
 
-        {paginated.length === 0 ? (
-          <div className="py-16 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-bg-secondary border border-border flex items-center justify-center mx-auto mb-5">
-              <Building2 size={28} className="text-text-muted opacity-40" />
+          {/* Sidebar */}
+          <aside className="cat-sidebar w-44 shrink-0 sticky top-20">
+            <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3 px-2">
+              Kategorie
+            </p>
+            <nav className="space-y-0.5">
+              <button
+                onClick={() => { setSelectedCategory(null); setPage(1); }}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
+                  !selectedCategory
+                    ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
+                    : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
+                }`}
+              >
+                <Building2 size={14} className={!selectedCategory ? "text-gold" : "text-text-muted"} />
+                Alle Firmen
+              </button>
+              {[...COMPANY_CATEGORIES].sort((a, b) => a.label.localeCompare(b.label, "de")).map((cat) => {
+                const Icon = CATEGORY_ICONS[cat.id] ?? Building2;
+                const isActive = selectedCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => { setSelectedCategory(isActive ? null : cat.id); setPage(1); }}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
+                      isActive
+                        ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
+                        : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
+                    }`}
+                  >
+                    <Icon size={14} className={isActive ? "text-gold" : "text-text-muted"} />
+                    <span className="truncate">{cat.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+            <div className="mt-6 pt-5 border-t border-border">
+              <Link
+                href="/company-setup"
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gold hover:bg-gold/10 rounded-lg transition-colors font-medium"
+              >
+                <Plus size={14} />
+                Firma registrieren
+              </Link>
             </div>
-            {hasAnyFilter ? (
-              <>
-                <p className="text-text-primary font-semibold mb-1">{t("emptyFilteredTitle")}</p>
-                <p className="text-text-muted text-sm mb-5">{t("emptyFilteredDesc")}</p>
-                <button onClick={clearAll} className="px-5 py-2.5 border border-border rounded-xl text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors">
-                  {t("resetFilters")}
-                </button>
-              </>
+          </aside>
+
+          {/* Main content */}
+          <div className="flex-1 min-w-0">
+
+            {/* Mobile category pills */}
+            <div className="cat-pills gap-2 overflow-x-auto pb-3 mb-4" style={{ scrollbarWidth: "none" }}>
+              <button
+                onClick={() => { setSelectedCategory(null); setPage(1); }}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
+                  !selectedCategory ? "bg-gold/10 text-gold border-gold/40" : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
+                }`}
+              >
+                Alle
+              </button>
+              {[...COMPANY_CATEGORIES].sort((a, b) => a.label.localeCompare(b.label, "de")).map((cat) => {
+                const isActive = selectedCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => { setSelectedCategory(isActive ? null : cat.id); setPage(1); }}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
+                      isActive ? "bg-gold/10 text-gold border-gold/40" : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <p className="text-sm text-text-muted mb-5">
+              <span className="font-semibold text-text-primary">{filtered.length}</span> {t("resultsCount", { count: filtered.length })}
+              {selectedCat && <> in <span className={`font-semibold ${selectedCat.color}`}>{selectedCat.label}</span></>}
+            </p>
+
+            {paginated.length === 0 ? (
+              <div className="py-16 text-center">
+                <div className="w-16 h-16 rounded-2xl bg-bg-secondary border border-border flex items-center justify-center mx-auto mb-5">
+                  <Building2 size={28} className="text-text-muted opacity-40" />
+                </div>
+                {hasAnyFilter ? (
+                  <>
+                    <p className="text-text-primary font-semibold mb-1">{t("emptyFilteredTitle")}</p>
+                    <p className="text-text-muted text-sm mb-5">{t("emptyFilteredDesc")}</p>
+                    <button onClick={clearAll} className="px-5 py-2.5 border border-border rounded-xl text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors">
+                      {t("resetFilters")}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-text-primary font-semibold mb-1">{t("emptyTitle")}</p>
+                    <p className="text-text-muted text-sm mb-5 max-w-xs mx-auto">{t("emptyDesc")}</p>
+                    <Link href="/company-setup" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl text-sm hover:bg-gold-light transition-colors">
+                      {t("emptyCta")} <ArrowRight size={14} />
+                    </Link>
+                  </>
+                )}
+              </div>
+            ) : viewMode === "grid" ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                {paginated.map((company) => <CompanyCard key={company.id} company={company} />)}
+              </div>
             ) : (
-              <>
-                <p className="text-text-primary font-semibold mb-1">{t("emptyTitle")}</p>
-                <p className="text-text-muted text-sm mb-5 max-w-xs mx-auto">{t("emptyDesc")}</p>
-                <Link href="/company-setup" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl text-sm hover:bg-gold-light transition-colors">
-                  {t("emptyCta")} <ArrowRight size={14} />
-                </Link>
-              </>
+              <div className="bg-bg-secondary border border-border rounded-2xl overflow-hidden">
+                <div className="divide-y divide-border">
+                  {paginated.map((company) => <CompanyListRow key={company.id} company={company} />)}
+                </div>
+              </div>
             )}
-          </div>
-        ) : viewMode === "grid" ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
-            {paginated.map((company) => <CompanyCard key={company.id} company={company} />)}
-          </div>
-        ) : (
-          <div className="bg-bg-secondary border border-border rounded-2xl overflow-hidden">
-            <div className="divide-y divide-border">
-              {paginated.map((company) => <CompanyListRow key={company.id} company={company} />)}
-            </div>
-          </div>
-        )}
 
-        {hasMore && (
-          <div className="mt-8 text-center">
-            <button onClick={() => setPage((p) => p + 1)}
-              className="px-6 py-2.5 border border-border rounded-xl text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors">
-              {t("loadMore", { count: filtered.length - paginated.length })}
-            </button>
-          </div>
-        )}
+            {hasMore && (
+              <div className="mt-8 text-center">
+                <button onClick={() => setPage((p) => p + 1)}
+                  className="px-6 py-2.5 border border-border rounded-xl text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors">
+                  {t("loadMore", { count: filtered.length - paginated.length })}
+                </button>
+              </div>
+            )}
 
-        {/* CTA — minimal, no duplicate button */}
-        <p className="mt-10 text-center text-xs text-text-muted">
-          {t("footerCta")}{" "}
-          <Link href="/company-setup" className="text-gold hover:underline font-medium">
-            {t("footerCtaLink")}
-          </Link>
-        </p>
+            <p className="mt-10 text-center text-xs text-text-muted">
+              {t("footerCta")}{" "}
+              <Link href="/company-setup" className="text-gold hover:underline font-medium">
+                {t("footerCtaLink")}
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
