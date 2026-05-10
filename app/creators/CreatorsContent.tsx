@@ -631,23 +631,6 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 
             <div className="w-px h-4 bg-border shrink-0" />
 
-            {mobilePromotedRoles.map(({ label, role }) => {
-              const active = selectedRoles.has(role);
-              return (
-                <button
-                  key={role}
-                  onClick={() => toggleRole(role)}
-                  className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                    active ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-elevated"
-                  }`}
-                >
-                  {label}
-                </button>
-              );
-            })}
-
-            <div className="w-px h-4 bg-border shrink-0" />
-
             <button
               onClick={() => setSheetOpen(true)}
               className={`shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all ${
@@ -1117,7 +1100,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
         const crewVisible  = filteredCrew.slice(0, visibleCount);
 
         return (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 lg:pb-8">
+          <div className="px-4 sm:px-6 lg:px-8 py-6 pb-24 lg:pb-8">
             <div className="flex gap-8 items-start">
 
             {/* Left sidebar */}
