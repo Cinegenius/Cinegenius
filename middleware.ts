@@ -211,7 +211,7 @@ export default clerkMiddleware(async (auth, request) => {
     "Content-Security-Policy",
     [
       "default-src 'self'",
-      `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' https://*.clerk.com https://*.clerk.accounts.dev https://*.cinegenius.co https://js.stripe.com`,
+      `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""} https://*.clerk.com https://*.clerk.accounts.dev https://*.cinegenius.co https://js.stripe.com`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://*.supabase.co https://www.google.com https://images.unsplash.com https://plus.unsplash.com https://upload.wikimedia.org https://img.clerk.com https://*.cinegenius.co https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com",
       "font-src 'self' data:",
