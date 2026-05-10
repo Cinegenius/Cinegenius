@@ -102,7 +102,7 @@ export default async function MarketplacePage({
         <div className="flex gap-8 items-start">
 
           {/* ── Left sidebar ── */}
-          <aside className="hidden lg:block w-44 shrink-0 sticky top-20">
+          <aside className="hidden md:block w-44 shrink-0 sticky top-20">
             <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3 px-2">
               Kategorien
             </p>
@@ -142,7 +142,7 @@ export default async function MarketplacePage({
           <div className="flex-1 min-w-0">
 
             {/* Mobile category pills */}
-            <div className="lg:hidden flex gap-2 overflow-x-auto pb-3 mb-5" style={{ scrollbarWidth: "none" }}>
+            <div className="md:hidden flex gap-2 overflow-x-auto pb-3 mb-5" style={{ scrollbarWidth: "none" }}>
               {SIDEBAR.map(({ slug, label, href }) => {
                 const isActive = slug === activeSlug;
                 const dest = href ?? `/marketplace?cat=${slug}`;
