@@ -8,7 +8,7 @@ import {
   Building2, MapPin, Search, CheckCircle, LayoutGrid, LayoutList,
   ChevronRight, X, Camera, Volume2, Wrench, Shirt,
   Package, Film, Monitor, Users, Sparkles, Megaphone, Car,
-  Lightbulb, ArrowRight, Globe, Zap, Plus,
+  Lightbulb, ArrowRight, Globe, Zap, Plus, ChevronDown,
 } from "lucide-react";
 import { COMPANY_CATEGORIES, COMPANY_CATEGORY_BY_ID } from "@/lib/companyCategories";
 
