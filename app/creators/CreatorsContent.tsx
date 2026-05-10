@@ -1097,7 +1097,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
             <div className="flex gap-8 items-start">
 
             {/* Left sidebar */}
-            <aside className="hidden md:block w-44 shrink-0 sticky top-20">
+            <aside className="w-44 shrink-0 sticky top-20">
               <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3 px-2">
                 Bereiche
               </p>
@@ -1145,8 +1145,8 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
             {/* Main content */}
             <div className="flex-1 min-w-0">
 
-            {/* Mobile dept pills */}
-            <div className="md:hidden flex gap-2 overflow-x-auto pb-3 mb-4" style={{ scrollbarWidth: "none" }}>
+            {/* Mobile dept pills — hidden, sidebar always shown */}
+            <div className="hidden flex gap-2 overflow-x-auto pb-3 mb-4" style={{ scrollbarWidth: "none" }}>
               <button
                 onClick={() => setSidebarDept(null)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
