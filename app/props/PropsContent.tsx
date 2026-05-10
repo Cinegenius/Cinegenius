@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import {
   Search, Package, X, SlidersHorizontal, Truck, MapPin, ChevronDown,
-  LayoutGrid, List, Euro, CheckCircle, ArrowUpDown,
+  LayoutGrid, List, Euro, CheckCircle, ArrowUpDown, Plus,
   Camera, Lightbulb, Wrench, Mic, Shirt, Sparkles, Layers, Car, Zap,
   Monitor, Building2, Briefcase, Palette, Scissors,
   Home, Utensils, Shield, Wine, FlaskConical, Hotel, ChefHat, HeartPulse, Users,
@@ -26,6 +26,23 @@ const ICON_MAP: Record<string, LucideIcon> = {
 const SCENE_ICON_MAP: Record<string, LucideIcon> = {
   Home, Utensils, Shield, Wine, FlaskConical, Hotel, ChefHat, HeartPulse,
   Car, Shirt, Briefcase, Package,
+};
+
+const DEPT_ICON_MAP: Record<string, LucideIcon> = {
+  kamera:             Camera,
+  licht:              Lightbulb,
+  grip:               Wrench,
+  ton:                Mic,
+  kostuem:            Shirt,
+  maske:              Sparkles,
+  requisiten:         Package,
+  szenenbild:         Palette,
+  fahrzeuge:          Car,
+  sfx:                Zap,
+  "virtual-production": Monitor,
+  post:               Scissors,
+  studio:             Building2,
+  produktion:         Briefcase,
 };
 
 const PAGE_SIZE = 24;
@@ -780,47 +797,98 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
       </div>
 
       {/* ── Results ──────────────────────────────────────── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex items-center justify-between mb-5">
-          <p className="text-sm text-text-muted">
-            <span className="text-text-primary font-semibold">{t("results", { count: filtered.length })}</span>
-            {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
-            {selectedScene && (() => {
-              const scene = SCENES.find((s) => s.id === selectedScene);
-              return scene ? <span className="text-text-muted"> · Szene: {scene.label}</span> : null;
-            })()}
-          </p>
-          {hasAnyFilter && (
-            <button onClick={clearAll} className="text-xs text-text-muted hover:text-red-400 transition-colors flex items-center gap-1">
-              <X size={11} /> {t("clearAllFilters")}
-            </button>
-          )}
-        </div>
+      <div className="px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex gap-8 items-start">
 
-        {filtered.length === 0 ? (
-          <EmptyState icon={Package}
-            title={serverListings.length === 0 ? t("emptyTitle") : t("emptyTitleFiltered")}
-            description={serverListings.length === 0 ? t("emptyDesc") : t("emptyDescFiltered")}
-            action={serverListings.length === 0 ? { label: t("emptyPost"), onClick: () => window.location.href = "/inserat?group=marktplatz" } : { label: t("emptyReset"), onClick: clearAll }} />
-        ) : (
-          <>
-            <div className={viewMode === "grid"
-              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-              : "space-y-2"}>
-              {filtered.slice(0, visibleCount).map((p) => (
-                <PropCard key={p.id} p={p} list={viewMode === "list"} />
-              ))}
+          {/* Sidebar */}
+          <aside className="cat-sidebar w-44 shrink-0 sticky top-20">
+            <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3 px-2">
+              Kategorien
+            </p>
+            <nav className="space-y-0.5">
+              <button
+                onClick={() => { setSelectedDept(null); setSelectedGroup(null); }}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
+                  !selectedDept
+                    ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
+                    : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
+                }`}
+              >
+                <Layers size={14} className={!selectedDept ? "text-gold" : "text-text-muted"} />
+                Alle Artikel
+              </button>
+              {DEPARTMENTS.map((dept) => {
+                const Icon = DEPT_ICON_MAP[dept.id] ?? Package;
+                const isActive = selectedDept === dept.id;
+                return (
+                  <button
+                    key={dept.id}
+                    onClick={() => { setSelectedDept(isActive ? null : dept.id); setSelectedGroup(null); }}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
+                      isActive
+                        ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
+                        : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
+                    }`}
+                  >
+                    <Icon size={14} className={isActive ? "text-gold" : "text-text-muted"} />
+                    {dept.label}
+                  </button>
+                );
+              })}
+            </nav>
+            <div className="mt-6 pt-5 border-t border-border">
+              <a href="/inserat?group=marktplatz"
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gold hover:bg-gold/10 rounded-lg transition-colors font-medium">
+                <Plus size={14} />
+                Inserat erstellen
+              </a>
             </div>
-            {filtered.length > visibleCount && (
-              <div className="mt-10 text-center">
-                <button onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}
-                  className="px-8 py-3 border border-border text-sm font-semibold text-text-secondary hover:border-gold hover:text-gold rounded-xl transition-all">
-                  {t("loadMore", { count: filtered.length - visibleCount })}
+          </aside>
+
+          {/* Main content */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between mb-5">
+              <p className="text-sm text-text-muted">
+                <span className="text-text-primary font-semibold">{t("results", { count: filtered.length })}</span>
+                {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
+                {selectedScene && (() => {
+                  const scene = SCENES.find((s) => s.id === selectedScene);
+                  return scene ? <span className="text-text-muted"> · Szene: {scene.label}</span> : null;
+                })()}
+              </p>
+              {hasAnyFilter && (
+                <button onClick={clearAll} className="text-xs text-text-muted hover:text-red-400 transition-colors flex items-center gap-1">
+                  <X size={11} /> {t("clearAllFilters")}
                 </button>
-              </div>
+              )}
+            </div>
+
+            {filtered.length === 0 ? (
+              <EmptyState icon={Package}
+                title={serverListings.length === 0 ? t("emptyTitle") : t("emptyTitleFiltered")}
+                description={serverListings.length === 0 ? t("emptyDesc") : t("emptyDescFiltered")}
+                action={serverListings.length === 0 ? { label: t("emptyPost"), onClick: () => window.location.href = "/inserat?group=marktplatz" } : { label: t("emptyReset"), onClick: clearAll }} />
+            ) : (
+              <>
+                <div className={viewMode === "grid"
+                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+                  : "space-y-2"}>
+                  {filtered.slice(0, visibleCount).map((p) => (
+                    <PropCard key={p.id} p={p} list={viewMode === "list"} />
+                  ))}
+                </div>
+                {filtered.length > visibleCount && (
+                  <div className="mt-10 text-center">
+                    <button onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}
+                      className="px-8 py-3 border border-border text-sm font-semibold text-text-secondary hover:border-gold hover:text-gold rounded-xl transition-all">
+                      {t("loadMore", { count: filtered.length - visibleCount })}
+                    </button>
+                  </div>
+                )}
+              </>
             )}
-          </>
-        )}
+          </div>{/* end main content */}
+        </div>{/* end flex gap-8 */}
       </div>
     </div>
   );
