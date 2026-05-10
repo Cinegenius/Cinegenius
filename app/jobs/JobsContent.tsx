@@ -464,7 +464,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
       <div className="bg-bg-secondary border-b border-border">
         <div className="px-4 py-2 space-y-2">
 
-          {/* Row 1: Search */}
+          {/* Row 1: Search + Sort */}
           <div className="flex items-center gap-2">
             <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
               <Search size={14} className="text-text-muted shrink-0" />
@@ -473,10 +473,6 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
                 className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none" />
               {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors"><X size={12} /></button>}
             </div>
-          </div>
-
-          {/* Row 2: Filters */}
-          <div className="flex items-center gap-2 overflow-x-auto lg:overflow-visible pb-0.5" style={{ scrollbarWidth: "none" }}>
             <SortDropdown
               value={sortKey}
               options={[
@@ -486,7 +482,10 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
               ]}
               onChange={setSortKey}
             />
+          </div>
 
+          {/* Row 2: Filters */}
+          <div className="flex items-center gap-2 overflow-x-auto lg:overflow-visible pb-0.5" style={{ scrollbarWidth: "none" }}>
             <div className="w-px h-6 bg-border shrink-0" />
 
             {/* Projekttyp */}
@@ -667,7 +666,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
               >
                 Alle Bereiche
               </button>
-              {FILM_DEPARTMENTS.map((dept) => {
+              {[...FILM_DEPARTMENTS].sort((a, b) => a.label.localeCompare(b.label, "de")).map((dept) => {
                 const isActive = selectedDeptId === dept.id;
                 return (
                   <button

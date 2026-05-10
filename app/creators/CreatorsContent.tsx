@@ -876,7 +876,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       <div className="hidden lg:block bg-bg-secondary border-b border-border">
         <div className="px-4 py-2 space-y-2">
 
-          {/* Row 1: Search + View toggle */}
+          {/* Row 1: Search + Sort + View toggle */}
           <div className="flex items-center gap-2">
             <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors">
               <Search size={14} className="text-text-muted shrink-0" />
@@ -885,7 +885,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={t("searchPlaceholder")}
-                className="bg-transparent border-none py-2 text-sm w-full focus:outline-none"
+                className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none"
               />
               {query && (
                 <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors">
@@ -893,6 +893,11 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                 </button>
               )}
             </div>
+            <SortDropdown
+              value={sortKey}
+              options={SORT_OPTIONS}
+              onChange={setSortKey}
+            />
             <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
               <button onClick={() => setViewMode("grid")} className={`flex items-center justify-center w-9 h-9 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}>
                 <LayoutGrid size={14} />
@@ -915,15 +920,6 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               </div>
               {tc("available")}
             </label>
-
-            <div className="w-px h-5 bg-border shrink-0" />
-
-            {/* Sort */}
-            <SortDropdown
-              value={sortKey}
-              options={SORT_OPTIONS}
-              onChange={setSortKey}
-            />
 
 
             {availableCities.length > 0 && (
@@ -1165,7 +1161,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               >
                 Alle Bereiche
               </button>
-              {departments.map((dept) => {
+              {[...departments].sort((a, b) => a.label.localeCompare(b.label, "de")).map((dept) => {
                 const isActive = sidebarDept === dept.id;
                 return (
                   <button

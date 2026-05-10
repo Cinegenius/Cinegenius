@@ -374,7 +374,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                 }`}>
                 Alle
               </button>
-              {DEPARTMENTS.map((dept) => {
+              {[...DEPARTMENTS].sort((a, b) => a.label.localeCompare(b.label, "de")).map((dept) => {
                 const isActive = selectedDept === dept.id;
                 return (
                   <button key={dept.id} onClick={() => setSelectedDept(isActive ? null : dept.id)}
