@@ -17,11 +17,17 @@ const LocationMap = dynamicImport(() => import("@/components/LocationMap"), {
     <div className="w-full h-full bg-bg-secondary flex items-center justify-center rounded-xl border border-border">
       <div className="text-center">
         <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-text-muted text-sm">Loading map...</p>
+        <p className="text-text-muted text-sm">Karte wird geladen…</p>
       </div>
     </div>
   ),
 });
+
+// Kick off Leaflet download immediately when this module loads — by the time
+// the user switches to map view, the bundle is already in the browser cache.
+if (typeof window !== "undefined") {
+  void import("leaflet");
+}
 
 const locationTypes = [
   "All Types", "Wohnen", "Villa", "Büro", "Industrie",

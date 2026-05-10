@@ -197,14 +197,17 @@ export default function LocationMap({
     }
   };
 
-  // Inject Leaflet CSS once (avoids Next.js SSR issues with static CSS import)
+  // Leaflet CSS — preload as soon as component is defined (before map init)
   useEffect(() => {
     if (document.getElementById("leaflet-css")) return;
     const link = document.createElement("link");
     link.id = "leaflet-css";
     link.rel = "stylesheet";
     link.href = "/leaflet.css";
-    document.head.appendChild(link);
+    // Insert before any other styles so it doesn't block rendering
+    const first = document.head.querySelector("link, style");
+    if (first) document.head.insertBefore(link, first);
+    else document.head.appendChild(link);
   }, []);
 
   // Init map
@@ -222,10 +225,12 @@ export default function LocationMap({
         zoomControl: false,
       });
 
+      // CartoDB Dark Matter — CDN-backed, natively dark, no CSS filter needed
       L.tileLayer(
-        "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
         {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          subdomains: ["a", "b", "c", "d"],
           maxZoom: 19,
         }
       ).addTo(map);
@@ -330,7 +335,6 @@ export default function LocationMap({
         .cine-popup .leaflet-popup-tip { background: #1a1a1a !important; }
         .cine-popup .leaflet-popup-content { margin: 0 !important; width: auto !important; }
         .leaflet-container { background: #0d0d0d !important; }
-        .leaflet-tile-pane { filter: invert(100%) hue-rotate(180deg) brightness(85%) contrast(85%) saturate(50%); }
         .leaflet-control-attribution {
           background: rgba(13,13,13,0.8) !important;
           color: #666 !important;
