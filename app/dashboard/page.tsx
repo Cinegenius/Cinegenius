@@ -100,9 +100,6 @@ export default function DashboardPage() {
   const [viewStats, setViewStats] = useState<{ views7: number; views14: number; trend: number; daily: number[] } | null>(null);
 
   useEffect(() => {
-    // Presence ping
-    fetch("/api/presence", { method: "POST" }).catch(() => {});
-
     // Profile + Completeness
     fetch("/api/profile")
       .then((r) => r.json())

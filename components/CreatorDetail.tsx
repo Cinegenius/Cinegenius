@@ -352,7 +352,7 @@ export default function CreatorDetail({
               )}
               {creator.last_seen_at && (
                 <span className="flex items-center gap-1.5">
-                  <span className={`w-2 h-2 rounded-full ${Date.now() - new Date(creator.last_seen_at).getTime() < 24 * 3600000 ? "bg-success" : "bg-text-muted"}`} />
+                  <span className={`w-2 h-2 rounded-full ${Date.now() - new Date(creator.last_seen_at).getTime() < 5 * 60000 ? "bg-success" : "bg-text-muted"}`} />
                   {formatLastSeen(creator.last_seen_at)}
                 </span>
               )}
