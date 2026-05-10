@@ -517,6 +517,14 @@ input, select, textarea { color: inherit; }
 /* ── Browser autofill override ───────────────────────────────────────────── */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
+/* ── Category sidebar responsive ─────────────────────────────────────────── */
+.cat-sidebar        { display: none; }
+.cat-pills          { display: flex; }
+@media (min-width: 768px) {
+  .cat-sidebar      { display: block; }
+  .cat-pills        { display: none; }
+}
+
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 60px #161A23 inset !important;
