@@ -4,7 +4,7 @@ import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Shield, CreditCard, Calendar, MapPin, Info,
+  Shield, CreditCard, Calendar, MapPin, Info, Lock,
   ChevronRight, CheckCircle, ArrowLeft, AlertCircle,
 } from "lucide-react";
 
@@ -209,17 +209,6 @@ function CheckoutContent() {
                     <CreditCard size={16} className="text-gold" /> Buchung bestätigen
                   </h2>
 
-                  {/* Demo notice */}
-                  <div className="p-4 mb-5 rounded-xl bg-gold/5 border border-gold/20 flex items-start gap-3">
-                    <AlertCircle size={15} className="text-gold shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-semibold text-gold mb-0.5">Demo-Modus — keine echte Zahlung</p>
-                      <p className="text-xs text-text-muted leading-relaxed">
-                        Die Zahlungsintegration (Stripe) ist noch nicht aktiv. Deine Buchung wird gespeichert,
-                        aber es wird keine Karte belastet. Die Stripe-Anbindung folgt in einem Update.
-                      </p>
-                    </div>
-                  </div>
 
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between py-2 border-b border-border">
@@ -344,7 +333,7 @@ function CheckoutContent() {
                   {[
                     { icon: Shield, text: "Sichere Buchungsabwicklung" },
                     { icon: CheckCircle, text: "Kostenlose Stornierung bis 48h vorher" },
-                    { icon: AlertCircle, text: "Stripe-Zahlung kommt in einem Update" },
+                    { icon: Lock, text: "Zahlung wird treuhänderisch abgewickelt" },
                   ].map(({ icon: Icon, text }) => (
                     <div key={text} className="flex items-center gap-2">
                       <Icon size={12} className="text-gold shrink-0" />
