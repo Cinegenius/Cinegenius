@@ -6,9 +6,33 @@ import { useSearchParams } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import {
   MapPin, CheckCircle, Search, X, LayoutGrid, List, SlidersHorizontal, ChevronDown, Users, Globe, Languages, ArrowUpDown, Plus,
+  Clapperboard, Video, Lightbulb, Mic, Palette, Shirt, Sparkles, Scissors, Music, Truck, Star, Zap, Tv, MonitorPlay, FileText, Smartphone, Camera, Bot,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { departments, deptColors, getDeptLabel, type Department } from "@/lib/departments";
+
+const DEPT_ICON: Record<string, LucideIcon> = {
+  produktion:    Clapperboard,
+  regie:         Clapperboard,
+  kamera:        Video,
+  licht:         Lightbulb,
+  ton:           Mic,
+  art:           Palette,
+  kostuem:       Shirt,
+  maske:         Sparkles,
+  post:          Scissors,
+  musik:         Music,
+  "set-logistik":Truck,
+  cast:          Star,
+  sfx:           Zap,
+  broadcast:     Tv,
+  virtual:       MonitorPlay,
+  redaktion:     FileText,
+  social:        Smartphone,
+  foto:          Camera,
+  ki:            Bot,
+};
 
 const PAGE_SIZE = 24;
 
@@ -1115,6 +1139,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                 </button>
                 {departments.map((dept) => {
                   const isActive = sidebarDept === dept.id;
+                  const Icon = DEPT_ICON[dept.id] ?? Users;
                   return (
                     <button
                       key={dept.id}
@@ -1125,7 +1150,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                           : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
                       }`}
                     >
-                      <span className={`text-xs ${isActive ? "text-gold" : "text-text-muted"}`}>{dept.emoji}</span>
+                      <Icon size={14} className={isActive ? "text-gold" : "text-text-muted"} />
                       {dept.label}
                     </button>
                   );
@@ -1169,7 +1194,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                         : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
                     }`}
                   >
-                    {dept.emoji} {dept.label}
+                    {dept.label}
                   </button>
                 );
               })}
