@@ -8,7 +8,7 @@ import {
   MapPin, Briefcase, Clock, Search, ChevronRight, Zap, SlidersHorizontal,
   ChevronDown, X, Users2, Clapperboard, Video, Lightbulb, Wrench, Mic,
   Sparkles, Shirt, Palette, Monitor, Share2, Play, Camera, Scissors,
-  Film, Smartphone, Aperture, Globe, ArrowUpDown,
+  Film, Smartphone, Aperture, Globe, ArrowUpDown, Plus,
 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { FILM_DEPARTMENTS, DEPT_KEYWORDS, ALL_ROLES } from "@/lib/filmRoles";
@@ -489,23 +489,6 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
 
             <div className="w-px h-6 bg-border shrink-0" />
 
-            {/* Bereich & Rolle trigger */}
-            <div ref={panelRef} className="relative shrink-0">
-              <button onClick={() => setPanelOpen((v) => !v)}
-                className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all ${
-                  panelOpen || hasDeptFilter
-                    ? "bg-gold/12 border-gold/30 text-gold"
-                    : "border-border text-text-muted hover:border-gold/40 hover:text-gold"
-                }`}>
-                <SlidersHorizontal size={11} />
-                {t("filterDeptRole")}
-                {hasDeptFilter && <span className="bg-gold text-bg-primary text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">✓</span>}
-                <ChevronDown size={11} className={`transition-transform ${panelOpen ? "rotate-180" : ""}`} />
-              </button>
-            </div>
-
-            <div className="w-px h-5 bg-border shrink-0" />
-
             {/* Projekttyp */}
             <FilterDropdown icon={Film} label={t("filterProjectType")} value={activeType} options={PROJECT_TYPES} onChange={setActiveType} />
 
@@ -620,12 +603,95 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
 
       {/* ── Results ──────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center justify-between mb-5">
-          <p className="text-sm text-text-muted">
-            <span className="text-text-primary font-semibold">{t("results", { count: filtered.length })}</span>
-            {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
-          </p>
-        </div>
+        <div className="flex gap-8 items-start">
+
+          {/* Left sidebar */}
+          <aside className="hidden lg:block w-52 shrink-0 sticky top-20">
+            <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3 px-2">
+              Bereiche
+            </p>
+            <nav className="space-y-0.5">
+              <button
+                onClick={() => { setSelectedDeptId(null); setSelectedRoleId(null); }}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
+                  !selectedDeptId
+                    ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
+                    : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
+                }`}
+              >
+                <Briefcase size={14} className={!selectedDeptId ? "text-gold" : "text-text-muted"} />
+                Alle Bereiche
+              </button>
+              {FILM_DEPARTMENTS.map((dept) => {
+                const Icon = DEPT_ICON_MAP[dept.id] ?? Briefcase;
+                const isActive = selectedDeptId === dept.id;
+                return (
+                  <button
+                    key={dept.id}
+                    onClick={() => handleSelectDept(dept.id)}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
+                      isActive
+                        ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
+                        : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
+                    }`}
+                  >
+                    <Icon size={14} className={isActive ? "text-gold" : "text-text-muted"} />
+                    {dept.label}
+                  </button>
+                );
+              })}
+            </nav>
+            <div className="mt-6 pt-5 border-t border-border">
+              <Link
+                href="/inserat?group=jobs"
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gold hover:bg-gold/10 rounded-lg transition-colors font-medium"
+              >
+                <Plus size={14} />
+                Job inserieren
+              </Link>
+            </div>
+          </aside>
+
+          {/* Main content */}
+          <div className="flex-1 min-w-0">
+
+            {/* Mobile dept pills */}
+            <div className="lg:hidden flex gap-2 overflow-x-auto pb-3 mb-4" style={{ scrollbarWidth: "none" }}>
+              <button
+                onClick={() => { setSelectedDeptId(null); setSelectedRoleId(null); }}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
+                  !selectedDeptId
+                    ? "bg-gold/10 text-gold border-gold/40"
+                    : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
+                }`}
+              >
+                Alle Bereiche
+              </button>
+              {FILM_DEPARTMENTS.map((dept) => {
+                const isActive = selectedDeptId === dept.id;
+                return (
+                  <button
+                    key={dept.id}
+                    onClick={() => handleSelectDept(dept.id)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
+                      isActive
+                        ? "bg-gold/10 text-gold border-gold/40"
+                        : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
+                    }`}
+                  >
+                    {dept.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Count */}
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-text-muted">
+                <span className="text-text-primary font-semibold">{t("results", { count: filtered.length })}</span>
+                {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
+              </p>
+            </div>
 
         {filtered.length === 0 && (
           <EmptyState
@@ -721,6 +787,8 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
             </button>
           </div>
         )}
+          </div>{/* end main content */}
+        </div>{/* end flex gap-8 */}
       </div>
     </div>
   );

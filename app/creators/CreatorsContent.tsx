@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import {
-  MapPin, CheckCircle, Search, X, LayoutGrid, List, SlidersHorizontal, ChevronDown, Users, Globe, Languages, ArrowUpDown,
+  MapPin, CheckCircle, Search, X, LayoutGrid, List, SlidersHorizontal, ChevronDown, Users, Globe, Languages, ArrowUpDown, Plus,
 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { departments, deptColors, getDeptLabel, type Department } from "@/lib/departments";
@@ -406,6 +406,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
   const [filterOpen, setFilterOpen] = useState(false);
   const [moreFiltersOpen, setMoreFiltersOpen] = useState(false);
   const [selectedRoles, setSelectedRoles] = useState<Set<string>>(new Set());
+  const [sidebarDept, setSidebarDept] = useState<string | null>(null);
 
   // Which department roles actually have at least one creator
   const occupiedRoles = useMemo(() => {
@@ -463,6 +464,11 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       );
     }
 
+    if (sidebarDept) {
+      const deptRoles = departments.find((d) => d.id === sidebarDept)?.roles ?? [];
+      result = result.filter((c) => deptRoles.some((role) => matchesRole(c, role)));
+    }
+
     if (vendorOnly) result = result.filter((c) => c.isVendor === true);
     if (availableOnly) result = result.filter((c) => c.available);
 
@@ -499,7 +505,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
     if (sortKey === "reviews") result.sort((a, b) => b.reviews - a.reviews);
 
     return result;
-  }, [query, selectedRoles, availableOnly, vendorOnly, cityFilter, countryFilter, languageFilter,
+  }, [query, selectedRoles, sidebarDept, availableOnly, vendorOnly, cityFilter, countryFilter, languageFilter,
       profileTypeFilter, hairFilter, eyeFilter, bodyFilter, travelFilter, ageMinFilter, ageMaxFilter,
       sortKey, allCreators]);
 
@@ -913,27 +919,6 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
             />
 
 
-            <div className="w-px h-5 bg-border shrink-0" />
-
-            {/* Gewerk & Rollen */}
-            <button
-              onClick={() => setFilterOpen((v) => !v)}
-              className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all shrink-0 ${
-                filterOpen || selectedRoles.size > 0
-                  ? "bg-gold/12 border-gold/30 text-gold"
-                  : "border-border text-text-muted hover:text-text-secondary hover:border-border-light"
-              }`}
-            >
-              <SlidersHorizontal size={11} />
-              {t("deptFilter")}
-              {selectedRoles.size > 0 && (
-                <span className="bg-gold text-bg-primary text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                  {selectedRoles.size}
-                </span>
-              )}
-              <ChevronDown size={11} className={`transition-transform ${filterOpen ? "rotate-180" : ""}`} />
-            </button>
-
             {availableCities.length > 0 && (
               <FilterDropdown icon={MapPin} label={t("filterCity")} value={cityFilter} options={availableCities} onChange={setCityFilter} />
             )}
@@ -1109,9 +1094,89 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 
         return (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 lg:pb-8">
+            <div className="flex gap-8 items-start">
+
+            {/* Left sidebar */}
+            <aside className="hidden lg:block w-52 shrink-0 sticky top-20">
+              <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3 px-2">
+                Bereiche
+              </p>
+              <nav className="space-y-0.5">
+                <button
+                  onClick={() => setSidebarDept(null)}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
+                    !sidebarDept
+                      ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
+                      : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
+                  }`}
+                >
+                  <Users size={14} className={!sidebarDept ? "text-gold" : "text-text-muted"} />
+                  Alle Bereiche
+                </button>
+                {departments.map((dept) => {
+                  const isActive = sidebarDept === dept.id;
+                  return (
+                    <button
+                      key={dept.id}
+                      onClick={() => setSidebarDept(isActive ? null : dept.id)}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
+                        isActive
+                          ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
+                          : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
+                      }`}
+                    >
+                      <span className={`text-xs ${isActive ? "text-gold" : "text-text-muted"}`}>{dept.emoji}</span>
+                      {dept.label}
+                    </button>
+                  );
+                })}
+              </nav>
+              <div className="mt-6 pt-5 border-t border-border">
+                <a
+                  href="/profile"
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-gold hover:bg-gold/10 rounded-lg transition-colors font-medium"
+                >
+                  <Plus size={14} />
+                  Profil erstellen
+                </a>
+              </div>
+            </aside>
+
+            {/* Main content */}
+            <div className="flex-1 min-w-0">
+
+            {/* Mobile dept pills */}
+            <div className="lg:hidden flex gap-2 overflow-x-auto pb-3 mb-4" style={{ scrollbarWidth: "none" }}>
+              <button
+                onClick={() => setSidebarDept(null)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
+                  !sidebarDept
+                    ? "bg-gold/10 text-gold border-gold/40"
+                    : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
+                }`}
+              >
+                Alle Bereiche
+              </button>
+              {departments.map((dept) => {
+                const isActive = sidebarDept === dept.id;
+                return (
+                  <button
+                    key={dept.id}
+                    onClick={() => setSidebarDept(isActive ? null : dept.id)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
+                      isActive
+                        ? "bg-gold/10 text-gold border-gold/40"
+                        : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
+                    }`}
+                  >
+                    {dept.emoji} {dept.label}
+                  </button>
+                );
+              })}
+            </div>
 
             {/* Count */}
-            <p className="hidden lg:block text-sm text-text-muted mb-5">
+            <p className="text-sm text-text-muted mb-5">
               <span className="text-text-primary font-semibold">
                 {t("results", { count: filteredCrew.length })}
               </span>
@@ -1239,6 +1304,8 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
             )}
 
 
+            </div>{/* end main content */}
+            </div>{/* end flex gap-8 */}
           </div>
         );
       })()}
