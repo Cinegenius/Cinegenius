@@ -606,7 +606,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
         <div className="flex gap-8 items-start">
 
           {/* Left sidebar */}
-          <aside className="hidden lg:block w-52 shrink-0 sticky top-20">
+          <aside className="hidden md:block w-44 shrink-0 sticky top-20">
             <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3 px-2">
               Bereiche
             </p>
@@ -656,7 +656,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
           <div className="flex-1 min-w-0">
 
             {/* Mobile dept pills */}
-            <div className="lg:hidden flex gap-2 overflow-x-auto pb-3 mb-4" style={{ scrollbarWidth: "none" }}>
+            <div className="md:hidden flex gap-2 overflow-x-auto pb-3 mb-4" style={{ scrollbarWidth: "none" }}>
               <button
                 onClick={() => { setSelectedDeptId(null); setSelectedRoleId(null); }}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
