@@ -10,7 +10,6 @@ export async function PATCH(req: NextRequest) {
 
     const body = await req.json();
     const { profile_type, modules } = body;
-    console.log("[modules PATCH] profile_type:", profile_type, "modules count:", modules?.length);
 
     const { error } = await db.rpc("update_profile_modules", {
       p_user_id: userId,
@@ -23,7 +22,6 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: error.message, code: error.code }, { status: 500 });
     }
 
-    console.log("[modules PATCH] success");
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("[modules PATCH] uncaught exception:", err);

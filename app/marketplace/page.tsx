@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Marktplatz — Equipment & Requisiten",
+  description: "Kamera-Equipment, Fahrzeuge, Requisiten und mehr kaufen oder mieten — der Marktplatz für Filmproduktionen im DACH-Raum.",
+};
 import { db } from "@/lib/db";
 import Image from "next/image";
 import {

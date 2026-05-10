@@ -45,7 +45,6 @@ async function _getProfile(slug: string): Promise<UserProfile | null> {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (!extraErr && extraData) extra = extraData as any;
-  else if (extraErr) console.warn("[getProfile] extra fields error:", extraErr.code, extraErr.message);
 
   // Merge base + extra
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

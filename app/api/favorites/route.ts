@@ -16,6 +16,7 @@
 
 import { db } from "@/lib/db";
 import { getCurrentUser, requireAuth } from "@/lib/auth";
+import { rateLimit } from "@/lib/rateLimit";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET /api/favorites — list all favorites for current user
@@ -53,6 +54,9 @@ export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
+
+  const { allowed } = await rateLimit(`fav:${userId}`, 60, 60);
+  if (!allowed) return NextResponse.json({ error: "Zu viele Anfragen. Bitte kurz warten." }, { status: 429 });
 
   const body = await req.json();
   const { listing_id } = body;

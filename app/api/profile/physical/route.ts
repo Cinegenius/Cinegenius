@@ -11,18 +11,11 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json();
     const { profile_type, physical } = body;
 
-    console.log("[physical PATCH] userId:", userId);
-    console.log("[physical PATCH] profile_type:", profile_type);
-    console.log("[physical PATCH] physical:", JSON.stringify(physical));
-
-    // First verify the row exists
     const { data: existing } = await db
       .from("profiles")
       .select("user_id, profile_type, physical")
       .eq("user_id", userId)
       .maybeSingle();
-
-    console.log("[physical PATCH] existing row:", JSON.stringify(existing));
 
     if (!existing) {
       return NextResponse.json({ error: "Profil nicht gefunden" }, { status: 404 });
@@ -34,21 +27,16 @@ export async function PATCH(req: NextRequest) {
       p_physical:     physical ?? null,
     });
 
-    console.log("[physical PATCH] rpc result:", JSON.stringify({ error, data }));
-
     if (error) {
       console.error("[physical PATCH] rpc error:", error.code, error.message);
       return NextResponse.json({ error: error.message, code: error.code }, { status: 500 });
     }
 
-    // Verify the update worked
     const { data: after } = await db
       .from("profiles")
       .select("physical, profile_type")
       .eq("user_id", userId)
       .maybeSingle();
-
-    console.log("[physical PATCH] after update:", JSON.stringify(after));
 
     return NextResponse.json({ success: true, debug: { before: existing, after } });
   } catch (err) {

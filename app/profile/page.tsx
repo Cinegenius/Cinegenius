@@ -931,7 +931,6 @@ export default function ProfilePage() {
         body: JSON.stringify({ profile_type: currentProfileType || null, physical }),
       });
       const physResult = await physRes.json();
-      console.log("[save] physical result:", JSON.stringify(physResult));
       if (!physRes.ok || physResult.error) {
         const msg = physResult.error ?? `HTTP ${physRes.status}`;
         addToast(`Casting-Daten: ${msg}`, "error");

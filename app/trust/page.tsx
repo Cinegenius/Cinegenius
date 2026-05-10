@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Vertrauen & Sicherheit",
+  description: "Wie CineGenius Käufer und Anbieter schützt — verifizierte Profile, sichere Zahlungen, Streitschlichtung und Bewertungssystem.",
+};
 import {
   Shield, CheckCircle, AlertCircle, RotateCcw, MessageSquare,
   Clock, Banknote, ArrowRight, Lock, Eye, Flag,
