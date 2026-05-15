@@ -60,12 +60,19 @@ export async function POST(req: Request) {
         }
       }
 
-      await resend.emails.send({
-        from: "CineGenius <noreply@cinegenius.co>",
-        to: e.to_email_address,
-        subject: e.subject,
-        html,
-      });
+      try {
+        const result = await resend.emails.send({
+          from: "CineGenius <noreply@cinegenius.co>",
+          to: e.to_email_address,
+          subject: e.subject,
+          html,
+        });
+        if (result.error) {
+          return new Response(`Resend error: ${JSON.stringify(result.error)}`, { status: 500 });
+        }
+      } catch (err) {
+        return new Response(`Resend exception: ${String(err)}`, { status: 500 });
+      }
     }
     return new Response("OK", { status: 200 });
   }
