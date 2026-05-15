@@ -152,6 +152,11 @@ const isPublicApiGet = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
+  // Webhooks must never be redirected — bypass everything immediately
+  if (request.nextUrl.pathname.startsWith("/api/webhooks/")) {
+    return NextResponse.next();
+  }
+
   // 1. IP-based rate limiting — runs before auth to reject floods cheaply
   const rateLimitRes = ipRateLimit(request);
   if (rateLimitRes) return rateLimitRes;
