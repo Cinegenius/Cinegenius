@@ -1,6 +1,9 @@
 /**
  * Client-side image compression via Canvas API.
  * Resizes and converts to WebP before upload — no extra packages needed.
+ *
+ * Falls back to the original file if the browser cannot compress
+ * (e.g. Safari < 16.4 without WebP encoding, HEIC files on old iOS).
  */
 
 interface CompressOptions {
@@ -9,22 +12,28 @@ interface CompressOptions {
   quality?: number; // 0–1
 }
 
-export async function compressImage(
+async function tryCompress(
   file: File | Blob,
-  options: CompressOptions = {}
+  maxWidth: number,
+  maxHeight: number,
+  quality: number,
 ): Promise<File> {
-  const { maxWidth = 1920, maxHeight = 1920, quality = 0.82 } = options;
-
   return new Promise((resolve, reject) => {
     const img = new Image();
-    const url = URL.createObjectURL(file);
+
+    let url: string;
+    try {
+      url = URL.createObjectURL(file);
+    } catch (e) {
+      // Safari throws "The string did not match the expected pattern." for
+      // HEIC/HEIF files or files with an unrecognised MIME type.
+      return reject(e);
+    }
 
     img.onload = () => {
       URL.revokeObjectURL(url);
 
       let { width, height } = img;
-
-      // Scale down proportionally if needed
       if (width > maxWidth || height > maxHeight) {
         const ratio = Math.min(maxWidth / width, maxHeight / height);
         width  = Math.round(width  * ratio);
@@ -36,23 +45,31 @@ export async function compressImage(
       canvas.height = height;
 
       const ctx = canvas.getContext("2d");
-      if (!ctx) return reject(new Error("Canvas context unavailable"));
+      if (!ctx) return reject(new Error("Canvas unavailable"));
 
       ctx.drawImage(img, 0, 0, width, height);
 
-      const baseName = (file instanceof File ? file.name : "image").replace(/\.[^.]+$/, "");
+      const baseName = (file instanceof File ? file.name : "image")
+        .replace(/\.[^.]+$/, "");
 
       const finish = (blob: Blob | null, ext: string, mime: string) => {
-        if (!blob) return reject(new Error("Compression failed"));
+        if (!blob) return reject(new Error("toBlob failed"));
         resolve(new File([blob], `${baseName}.${ext}`, { type: mime }));
       };
 
-      // Safari < 16.4 throws synchronously when 'image/webp' is not supported.
-      // Wrap in try-catch and fall back to JPEG.
+      // Safari < 16.4 throws synchronously for 'image/webp' — fall back to JPEG.
       try {
-        canvas.toBlob((blob) => finish(blob, "webp", "image/webp"), "image/webp", quality);
+        canvas.toBlob(
+          (blob) => finish(blob, "webp", "image/webp"),
+          "image/webp",
+          quality,
+        );
       } catch {
-        canvas.toBlob((blob) => finish(blob, "jpg", "image/jpeg"), "image/jpeg", quality);
+        canvas.toBlob(
+          (blob) => finish(blob, "jpg", "image/jpeg"),
+          "image/jpeg",
+          quality,
+        );
       }
     };
 
@@ -65,7 +82,23 @@ export async function compressImage(
   });
 }
 
-/** Convenience wrapper for avatar uploads — smaller max size */
+export async function compressImage(
+  file: File | Blob,
+  options: CompressOptions = {},
+): Promise<File> {
+  const { maxWidth = 1920, maxHeight = 1920, quality = 0.82 } = options;
+
+  try {
+    return await tryCompress(file, maxWidth, maxHeight, quality);
+  } catch {
+    // Compression not possible on this browser/file type — upload original.
+    // The server's size + magic-byte validation still applies.
+    if (file instanceof File) return file;
+    return new File([file], "image.jpg", { type: "image/jpeg" });
+  }
+}
+
+/** Convenience wrapper for avatar uploads — smaller max size. */
 export function compressAvatar(file: File | Blob): Promise<File> {
   return compressImage(file, { maxWidth: 500, maxHeight: 500, quality: 0.88 });
 }
