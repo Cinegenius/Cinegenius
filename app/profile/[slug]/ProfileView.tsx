@@ -479,6 +479,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
   const visibleFilms = showAllFilms ? films : films.slice(0, 6);
   const awards: ProfileAward[] = profile.awards ?? [];
   const skills: string[] = profile.skills ?? [];
+  const memberships: string[] = (profile as any).memberships ?? [];
   const languages = profile.languages ?? [];
 
   const playingAge = p.playing_age_min || p.playing_age_max
@@ -831,6 +832,21 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
           </>
         )}
 
+        {/* ── MITGLIEDSCHAFTEN ──────────────────────────────────────────── */}
+        {memberships.length > 0 && (
+          <>
+            <Divider />
+            <SectionLabel>Mitgliedschaften</SectionLabel>
+            <div className="flex flex-wrap gap-2">
+              {memberships.map((m) => (
+                <span key={m} className="px-4 py-2 bg-bg-secondary border border-border rounded-lg text-sm text-text-secondary hover:border-gold/40 transition-colors">
+                  {m}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
+
         {/* ── AWARDS ────────────────────────────────────────────────────── */}
         {awards.length > 0 && (
           <>
@@ -899,6 +915,7 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
   const reelUrl = profile.showreel_url ?? profile.reel_url;
   const reelEmbed = reelUrl ? getVideoEmbed(reelUrl) : null;
   const skills: string[] = profile.skills ?? [];
+  const memberships: string[] = (profile as any).memberships ?? [];
   const languages = profile.languages ?? [];
 
   return (
@@ -1075,6 +1092,18 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
                   </div>
                 </div>
               )}
+              {memberships.length > 0 && (
+                <div>
+                  <SectionLabel>Mitgliedschaften</SectionLabel>
+                  <div className="flex flex-wrap gap-2">
+                    {memberships.map((m) => (
+                      <span key={m} className="px-3 py-1.5 bg-bg-secondary border border-border rounded-lg text-xs text-text-secondary">
+                        {m}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </>
         )}
@@ -1184,6 +1213,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
   const films: FilmographyEntry[] = profile.filmography ?? [];
   const awards: ProfileAward[] = profile.awards ?? [];
   const skills: string[] = profile.skills ?? [];
+  const memberships: string[] = (profile as any).memberships ?? [];
   const languages = profile.languages ?? [];
   const certificates: string[] = profile.crew?.certificates ?? [];
   const software: string[] = profile.crew?.software ?? [];
@@ -1308,6 +1338,17 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 <div className="flex flex-wrap gap-1.5">
                   {skills.map((s) => (
                     <span key={s} className="px-2.5 py-1 bg-bg-secondary border border-border rounded-lg text-xs text-text-secondary">{s}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {memberships.length > 0 && (
+              <div>
+                <p className="text-[9px] uppercase tracking-[0.15em] text-text-muted font-semibold mb-2">Mitgliedschaften</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {memberships.map((m) => (
+                    <span key={m} className="px-2.5 py-1 bg-bg-secondary border border-border rounded-lg text-xs text-text-secondary">{m}</span>
                   ))}
                 </div>
               </div>

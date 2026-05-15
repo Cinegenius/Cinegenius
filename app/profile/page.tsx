@@ -526,6 +526,8 @@ export default function ProfilePage() {
   });
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState("");
+  const [memberships, setMemberships] = useState<string[]>([]);
+  const [newMembership, setNewMembership] = useState("");
   const [positions, setPositions] = useState<string[]>([]);
   const [languages, setLanguages] = useState<string[]>([]);
   const [newLanguage, setNewLanguage] = useState("");
@@ -650,6 +652,7 @@ export default function ProfilePage() {
             slug:          profile.slug                ?? "",
           });
           setSkills(profile.skills ?? []);
+          setMemberships((profile as any).memberships ?? []);
           setPositions(profile.positions ?? []);
           setLanguages(profile.languages ?? []);
           setProfileImages(profile.profile_images ?? []);
@@ -886,6 +889,7 @@ export default function ProfilePage() {
           role:           positions[0] ?? null,
           available:      form.available,
           skills,
+          memberships,
           positions,
           languages,
           profile_images: profileImages,
@@ -992,6 +996,14 @@ export default function ProfilePage() {
     if (s && !skills.includes(s)) {
       setSkills((prev) => [...prev, s]);
       setNewSkill("");
+    }
+  };
+
+  const addMembership = () => {
+    const m = newMembership.trim();
+    if (m && !memberships.includes(m)) {
+      setMemberships((prev) => [...prev, m]);
+      setNewMembership("");
     }
   };
 
@@ -1882,6 +1894,35 @@ export default function ProfilePage() {
                       onKeyDown={(e) => e.key === "Enter" && addSkill()}
                       className="flex-1 bg-bg-elevated border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold transition-colors" />
                     <button onClick={addSkill}
+                      className="px-3 py-2 bg-gold/10 border border-gold/20 text-gold rounded-lg hover:bg-gold/20 transition-colors">
+                      <Plus size={15} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Mitgliedschaften */}
+                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
+                  <h2 className="font-semibold text-text-primary mb-1">Mitgliedschaften</h2>
+                  <p className="text-xs text-text-muted mb-4">Gewerkschaften, Verbände, Agenturen (z.B. Verdi, IGLBM)</p>
+                  {memberships.length > 0 ? (
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {memberships.map((m) => (
+                        <span key={m} className="flex items-center gap-1.5 px-3 py-1.5 bg-gold-subtle border border-gold/20 rounded-full text-xs text-gold">
+                          {m}
+                          <button onClick={() => setMemberships((p) => p.filter((x) => x !== m))}
+                            className="hover:text-crimson-light transition-colors"><X size={11} /></button>
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-text-muted mb-4">Noch keine Mitgliedschaften eingetragen.</p>
+                  )}
+                  <div className="flex gap-2">
+                    <input type="text" placeholder="z.B. Verdi, IGLBM, Agentur XY" value={newMembership}
+                      onChange={(e) => setNewMembership(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && addMembership()}
+                      className="flex-1 bg-bg-elevated border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold transition-colors" />
+                    <button onClick={addMembership}
                       className="px-3 py-2 bg-gold/10 border border-gold/20 text-gold rounded-lg hover:bg-gold/20 transition-colors">
                       <Plus size={15} />
                     </button>

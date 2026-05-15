@@ -466,6 +466,7 @@ export interface UserProfile {
 
   // Credits
   skills: string[] | null;
+  memberships: string[] | null;
   filmography: FilmographyEntry[] | null;
   awards: ProfileAward[] | null;
   education?: EducationEntry[] | null;

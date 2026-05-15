@@ -12,7 +12,7 @@ const PROFILE_COLS = [
   "avatar_url", "cover_image_url", "role", "positions", "location", "bio",
   "tagline", "profile_type", "profile_types", "account_type",
   "verified", "available", "available_from", "day_rate", "languages",
-  "travel_ready", "skills", "filmography", "portfolio_url", "portfolio_images",
+  "travel_ready", "skills", "memberships", "filmography", "portfolio_url", "portfolio_images",
   "profile_images", "showreel_url", "reel_url", "awards", "availability_config",
   "modules", "instagram_url", "tiktok_url", "youtube_url", "vimeo_url",
   "linkedin_url", "website_url", "video_links",
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Ungültiger Request-Body" }, { status: 400 });
   const {
-    display_name, bio, location, avatar_url, skills, portfolio_url, positions,
+    display_name, bio, location, avatar_url, skills, memberships, portfolio_url, positions,
     portfolio_images, experience, profile_types,
     cover_image_url, instagram_url, tiktok_url, youtube_url, vimeo_url, linkedin_url, website_url,
     day_rate, filmography, video_links, focal_point,
@@ -96,6 +96,7 @@ export async function POST(req: NextRequest) {
         location: location?.trim() ?? "",
         avatar_url: avatar_url ?? null,
         skills: skills ?? [],
+        memberships: memberships ?? [],
         portfolio_url: portfolio_url?.trim() || null,
         positions: positions ?? [],
         portfolio_images: portfolio_images ?? [],
@@ -164,7 +165,7 @@ const ALLOWED_PATCH_KEYS = new Set([
   "display_name", "display_name_alias", "slug", "phone", "location", "bio",
   "available", "available_from", "travel_ready",
   "avatar_url", "cover_image_url", "portfolio_url", "website_url",
-  "skills", "positions", "languages", "portfolio_images", "profile_images", "experience",
+  "skills", "memberships", "positions", "languages", "portfolio_images", "profile_images", "experience",
   "reel_url", "imdb_url",
   "instagram_url", "tiktok_url", "youtube_url", "vimeo_url", "linkedin_url",
   "day_rate", "filmography", "video_links",
