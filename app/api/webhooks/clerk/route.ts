@@ -114,11 +114,15 @@ function extractOtp(body: string): string | null {
 
 function buildOtpEmail(otp: string, type: "verification" | "password"): string {
   const isPassword = type === "password";
-  const label = isPassword ? "Passwort" : "Sicherheit";
-  const headline = isPassword ? "Passwort zurücksetzen" : "Dein Bestätigungscode";
+
+  const welcome = isPassword
+    ? "Kein Problem — das passiert."
+    : "Willkommen bei CineGenius!";
+  const headline = isPassword ? "Passwort zurücksetzen" : "Fast geschafft!";
   const subline = isPassword
-    ? "Gib diesen Code ein, um dein Passwort zurückzusetzen. Er ist <strong style=\"color:#EFEFEF;\">10 Minuten</strong> gültig."
-    : "Gib diesen Code ein, um deine Anmeldung zu bestätigen. Er ist <strong style=\"color:#EFEFEF;\">10 Minuten</strong> gültig.";
+    ? "Gib diesen Code ein, um ein neues Passwort zu vergeben. Er ist <strong style=\"color:#EFEFEF;\">10 Minuten</strong> gültig."
+    : "Nur noch ein Schritt. Gib diesen Code ein und dein Account ist sofort bereit — Locations, Crew &amp; Jobs warten auf dich.";
+  const label = isPassword ? "Passwort" : "Bestätigung";
 
   return `<!DOCTYPE html>
 <html lang="de">
@@ -138,10 +142,10 @@ function buildOtpEmail(otp: string, type: "verification" | "password"): string {
             <td style="padding-bottom:40px;text-align:center;">
               <table cellpadding="0" cellspacing="0" border="0" style="display:inline-table;">
                 <tr>
-                  <td style="background:#C2F135;border-radius:8px;width:32px;height:32px;text-align:center;vertical-align:middle;font-size:16px;line-height:32px;">
+                  <td style="background:#C2F135;border-radius:8px;width:36px;height:36px;text-align:center;vertical-align:middle;font-size:18px;line-height:36px;">
                     &#9654;
                   </td>
-                  <td style="padding-left:10px;font-size:20px;font-weight:700;color:#FFFFFF;letter-spacing:-0.3px;vertical-align:middle;">
+                  <td style="padding-left:10px;font-size:22px;font-weight:800;color:#FFFFFF;letter-spacing:-0.5px;vertical-align:middle;">
                     Cine<span style="color:#C2F135;">Genius</span>
                   </td>
                 </tr>
@@ -166,10 +170,13 @@ function buildOtpEmail(otp: string, type: "verification" | "password"): string {
                   <td style="padding:44px 44px 40px;">
 
                     <!-- Label -->
-                    <p style="margin:0 0 20px;font-size:11px;font-weight:700;color:#C2F135;text-transform:uppercase;letter-spacing:3px;">${label}</p>
+                    <p style="margin:0 0 16px;font-size:11px;font-weight:700;color:#C2F135;text-transform:uppercase;letter-spacing:3px;">${label}</p>
+
+                    <!-- Welcome -->
+                    <p style="margin:0 0 8px;font-size:15px;color:#888888;line-height:1.5;">${welcome}</p>
 
                     <!-- Headline -->
-                    <h1 style="margin:0 0 14px;font-size:32px;font-weight:800;color:#FFFFFF;line-height:1.15;letter-spacing:-0.8px;">
+                    <h1 style="margin:0 0 20px;font-size:34px;font-weight:800;color:#FFFFFF;line-height:1.15;letter-spacing:-0.8px;">
                       ${headline}
                     </h1>
 
