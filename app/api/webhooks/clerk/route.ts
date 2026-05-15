@@ -29,12 +29,8 @@ export async function POST(req: Request) {
       "svix-timestamp": svixTimestamp,
       "svix-signature": svixSignature,
     }) as typeof event;
-  } catch (err) {
-    const s = process.env.CLERK_WEBHOOK_SECRET ?? "";
-    return new Response(
-      `Signature verification failed: ${String(err)} | secretLen=${s.length} | secretStart=${s.substring(0, 8)}`,
-      { status: 400 }
-    );
+  } catch {
+    return new Response("Invalid signature", { status: 400 });
   }
 
   // Clerk verification/invitation emails — fired when "Delivered by Clerk" is OFF
