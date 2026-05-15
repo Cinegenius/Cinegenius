@@ -30,7 +30,11 @@ export async function POST(req: Request) {
       "svix-signature": svixSignature,
     }) as typeof event;
   } catch (err) {
-    return new Response(`Signature verification failed: ${String(err)}`, { status: 400 });
+    const s = process.env.CLERK_WEBHOOK_SECRET ?? "";
+    return new Response(
+      `Signature verification failed: ${String(err)} | secretLen=${s.length} | secretStart=${s.substring(0, 8)}`,
+      { status: 400 }
+    );
   }
 
   // Clerk verification/invitation emails — fired when "Delivered by Clerk" is OFF
