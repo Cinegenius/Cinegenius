@@ -40,15 +40,20 @@ export async function compressImage(
 
       ctx.drawImage(img, 0, 0, width, height);
 
-      canvas.toBlob(
-        (blob) => {
-          if (!blob) return reject(new Error("Compression failed"));
-          const name = (file instanceof File ? file.name : "image").replace(/\.[^.]+$/, "") + ".webp";
-          resolve(new File([blob], name, { type: "image/webp" }));
-        },
-        "image/webp",
-        quality
-      );
+      const baseName = (file instanceof File ? file.name : "image").replace(/\.[^.]+$/, "");
+
+      const finish = (blob: Blob | null, ext: string, mime: string) => {
+        if (!blob) return reject(new Error("Compression failed"));
+        resolve(new File([blob], `${baseName}.${ext}`, { type: mime }));
+      };
+
+      // Safari < 16.4 throws synchronously when 'image/webp' is not supported.
+      // Wrap in try-catch and fall back to JPEG.
+      try {
+        canvas.toBlob((blob) => finish(blob, "webp", "image/webp"), "image/webp", quality);
+      } catch {
+        canvas.toBlob((blob) => finish(blob, "jpg", "image/jpeg"), "image/jpeg", quality);
+      }
     };
 
     img.onerror = () => {

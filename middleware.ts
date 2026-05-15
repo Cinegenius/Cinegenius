@@ -95,7 +95,7 @@ function csrfCheck(request: NextRequest): NextResponse | null {
   const referer = request.headers.get("referer");
 
   const originOk  = origin  && SAFE_ORIGINS.has(origin);
-  const refererOk = referer && SAFE_ORIGINS.has(new URL(referer).origin);
+  const refererOk = referer && (() => { try { return SAFE_ORIGINS.has(new URL(referer).origin); } catch { return false; } })();
 
   if (!originOk && !refererOk) {
     return NextResponse.json({ error: "CSRF check failed" }, { status: 403 });
