@@ -468,6 +468,11 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
   const activeDeptData = activeDepts.find((d) => d.id === activeDept) ?? activeDepts[0] ?? departments[0];
 
   // Filtered results
+  const isTopMode = !query.trim() && selectedRoles.size === 0 && !sidebarDept
+    && !availableOnly && !vendorOnly && !cityFilter && !countryFilter && !languageFilter
+    && !profileTypeFilter && !hairFilter && !eyeFilter && !bodyFilter && !travelFilter
+    && !ageMinFilter && !ageMaxFilter;
+
   const filtered = useMemo(() => {
     let result = [...allCreators];
 
@@ -528,10 +533,20 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
     if (sortKey === "rating") result.sort((a, b) => b.rating - a.rating);
     if (sortKey === "reviews") result.sort((a, b) => b.reviews - a.reviews);
 
+    // "Alle Bereiche" with no active filters → show only top 20 by rating
+    if (isTopMode) {
+      result.sort((a, b) => {
+        if (b.rating !== a.rating) return b.rating - a.rating;
+        if (b.reviews !== a.reviews) return b.reviews - a.reviews;
+        return (b.verified ? 1 : 0) - (a.verified ? 1 : 0);
+      });
+      return result.slice(0, 20);
+    }
+
     return result;
   }, [query, selectedRoles, sidebarDept, availableOnly, vendorOnly, cityFilter, countryFilter, languageFilter,
       profileTypeFilter, hairFilter, eyeFilter, bodyFilter, travelFilter, ageMinFilter, ageMaxFilter,
-      sortKey, allCreators]);
+      sortKey, allCreators, isTopMode]);
 
   useEffect(() => { setVisibleCount(PAGE_SIZE); }, [filtered]);
 
@@ -672,7 +687,11 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
         {/* Row 4 — Ergebnis-Count + Sort */}
         <div className="px-4 py-2.5 flex items-center justify-between">
           <p className="text-xs text-text-muted">
-            <span className="text-text-primary font-semibold">{t("results", { count: filtered.length })}</span>
+            {isTopMode ? (
+              <span className="text-gold font-semibold">Top 20 nach Bewertung</span>
+            ) : (
+              <span className="text-text-primary font-semibold">{t("results", { count: filtered.length })}</span>
+            )}
             {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
           </p>
           <div className="relative">
@@ -1181,9 +1200,13 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 
             {/* Count */}
             <p className="text-sm text-text-muted mb-5">
-              <span className="text-text-primary font-semibold">
-                {t("results", { count: filteredCrew.length })}
-              </span>
+              {isTopMode ? (
+                <span className="text-gold font-semibold">Top 20 nach Bewertung</span>
+              ) : (
+                <span className="text-text-primary font-semibold">
+                  {t("results", { count: filteredCrew.length })}
+                </span>
+              )}
               {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
             </p>
 

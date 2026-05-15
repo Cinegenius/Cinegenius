@@ -154,15 +154,26 @@ export default async function CreatorsPage() {
       };
     });
 
-  // Fetch ratings for all creators in parallel
-  const allIds = [...fromListings.map((c) => c.id), ...fromProfiles.map((c) => c.id)];
-  const ratingsMap = await fetchRatings(allIds, "creator");
+  // Fetch ratings with correct target_type per source
+  const listingDbIds = (listings ?? []).map((l: { id: string }) => l.id);
+  const profileUserIds = fromProfiles.map((c) => c.id);
+  const [listingRatings, profileRatings] = await Promise.all([
+    fetchRatings(listingDbIds, "listing"),
+    fetchRatings(profileUserIds, "user"),
+  ]);
 
-  const serverCreators: ServerCreator[] = [...fromListings, ...fromProfiles].map((c) => ({
-    ...c,
-    rating: ratingsMap[c.id]?.rating ?? 0,
-    reviews: ratingsMap[c.id]?.reviews ?? 0,
-  }));
+  const serverCreators: ServerCreator[] = [
+    ...fromListings.map((c) => ({
+      ...c,
+      rating:  listingRatings[c.id.replace("listing_", "")]?.rating  ?? 0,
+      reviews: listingRatings[c.id.replace("listing_", "")]?.reviews ?? 0,
+    })),
+    ...fromProfiles.map((c) => ({
+      ...c,
+      rating:  profileRatings[c.id]?.rating  ?? 0,
+      reviews: profileRatings[c.id]?.reviews ?? 0,
+    })),
+  ];
 
   // Avatar strip — only real user-uploaded avatars (Supabase storage URLs)
   const avatarImages = [...fromListings, ...fromProfiles]
