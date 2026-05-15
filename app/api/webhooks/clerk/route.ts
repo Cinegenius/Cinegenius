@@ -29,8 +29,8 @@ export async function POST(req: Request) {
       "svix-timestamp": svixTimestamp,
       "svix-signature": svixSignature,
     }) as typeof event;
-  } catch {
-    return new Response("Invalid signature", { status: 400 });
+  } catch (err) {
+    return new Response(`Signature verification failed: ${String(err)}`, { status: 400 });
   }
 
   // Clerk verification/invitation emails — fired when "Delivered by Clerk" is OFF
