@@ -57,7 +57,7 @@ function StatPill({ label, value }: { label: string; value?: string | number | n
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[9px] uppercase tracking-[0.15em] text-text-muted font-semibold mb-5">
+    <p className="text-[10px] uppercase tracking-widest text-text-muted/70 font-semibold mb-4">
       {children}
     </p>
   );
@@ -801,7 +801,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                         const collaborator = credit.role?.split("||")[1]?.trim() ?? null;
                         return (
                           <Link key={credit.id} href={`/projects/${credit.project_id}`}
-                            className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
+                            className="group flex items-center gap-3 px-3 py-2 border-b border-border/60 last:border-b-0 hover:bg-bg-elevated/60 transition-colors">
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{proj.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</span>
                             {collaborator && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[25%] hidden sm:inline">{collaborator}</span>}
@@ -1237,26 +1237,26 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
         {bgImage ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-bg-primary" />
+            <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-45" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-bg-primary" />
           </>
         ) : (
           <div className="absolute inset-0 bg-gradient-to-b from-bg-elevated to-bg-primary" />
         )}
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-10">
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-14">
           <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
             <div className="flex-1 min-w-0 w-full">
-              <h1 className="font-display text-3xl sm:text-4xl font-bold text-white leading-tight drop-shadow-lg">
+              <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-white leading-tight drop-shadow-lg">
                 {profile.display_name ?? "Unbekannt"}
               </h1>
               {(profile.positions?.[0] ?? profile.role) && (
-                <p className="text-white/90 text-sm mt-1 drop-shadow-md">
-                  {(profile.positions ?? [profile.role]).filter(Boolean).join(" · ")}
+                <p className="text-white/70 text-sm sm:text-base mt-2.5 font-light tracking-wide drop-shadow-md">
+                  {(profile.positions ?? [profile.role]).filter(Boolean).join("  ·  ")}
                 </p>
               )}
               {profile.location && (
-                <p className="text-white/75 text-xs mt-1.5 flex items-center gap-1 drop-shadow-md">
+                <p className="text-white/40 text-xs mt-2 flex items-center gap-1 drop-shadow-md">
                   <MapPin size={10} />{profile.location}
                 </p>
               )}
@@ -1295,21 +1295,23 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
 
         {/* Two-column: avatar + compact info */}
-        <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-8 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-[220px_1fr] gap-8 mb-10">
           {/* Avatar */}
           <div className="shrink-0">
             {profile.avatar_url ? (
-              <Image src={profile.avatar_url} alt={profile.display_name ?? ""} width={200} height={200}
-                className="w-full aspect-square rounded-2xl object-cover ring-1 ring-border shadow-xl" />
+              <div className="relative">
+                <Image src={profile.avatar_url} alt={profile.display_name ?? ""} width={200} height={200}
+                  className="w-full aspect-square rounded-2xl object-cover ring-1 ring-white/8 shadow-2xl" />
+                <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/55 backdrop-blur-sm px-2.5 py-1 rounded-full">
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${profile.available ? "bg-emerald-400" : "bg-red-400"}`} />
+                  <span className="text-[10px] text-white/75">{profile.available ? "Verfügbar" : "Nicht verfügbar"}</span>
+                </div>
+              </div>
             ) : (
               <div className="w-full aspect-square rounded-2xl bg-bg-elevated border border-border flex items-center justify-center text-4xl font-bold text-text-muted">
                 {(profile.display_name ?? "?")[0]}
               </div>
             )}
-            <div className="flex items-center gap-1.5 mt-3">
-              <span className={`w-2 h-2 rounded-full ${profile.available ? "bg-emerald-400" : "bg-red-400"}`} />
-              <span className="text-xs text-text-muted">{profile.available ? "Verfügbar" : "Nicht verfügbar"}</span>
-            </div>
           </div>
 
           {/* Compact info */}
@@ -1318,8 +1320,8 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 
             {profile.bio && (
               <div>
-                <p className="text-[9px] uppercase tracking-[0.15em] text-text-muted font-semibold mb-2">Über mich</p>
-                <p className="text-text-secondary text-sm leading-relaxed">{profile.bio}</p>
+                <p className="text-[10px] uppercase tracking-widest text-text-muted/70 font-semibold mb-2.5">Über mich</p>
+                <p className="text-text-secondary text-[13px] leading-relaxed">{profile.bio}</p>
               </div>
             )}
 
@@ -1334,10 +1336,10 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 
             {skills.length > 0 && (
               <div>
-                <p className="text-[9px] uppercase tracking-[0.15em] text-text-muted font-semibold mb-2">Skills</p>
+                <p className="text-[10px] uppercase tracking-widest text-text-muted/70 font-semibold mb-2.5">Skills</p>
                 <div className="flex flex-wrap gap-1.5">
                   {skills.map((s) => (
-                    <span key={s} className="px-2.5 py-1 bg-bg-secondary border border-border rounded-lg text-xs text-text-secondary">{s}</span>
+                    <span key={s} className="px-2 py-0.5 bg-transparent border border-border/60 rounded-md text-[11px] text-text-muted">{s}</span>
                   ))}
                 </div>
               </div>
@@ -1345,10 +1347,10 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 
             {memberships.length > 0 && (
               <div>
-                <p className="text-[9px] uppercase tracking-[0.15em] text-text-muted font-semibold mb-2">Mitgliedschaften</p>
+                <p className="text-[10px] uppercase tracking-widest text-text-muted/70 font-semibold mb-2.5">Mitgliedschaften</p>
                 <div className="flex flex-wrap gap-1.5">
                   {memberships.map((m) => (
-                    <span key={m} className="px-2.5 py-1 bg-bg-secondary border border-border rounded-lg text-xs text-text-secondary">{m}</span>
+                    <span key={m} className="px-2 py-0.5 bg-transparent border border-border/60 rounded-md text-[11px] text-text-muted">{m}</span>
                   ))}
                 </div>
               </div>
@@ -1356,10 +1358,10 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 
             {certificates.length > 0 && (
               <div>
-                <p className="text-[9px] uppercase tracking-[0.15em] text-text-muted font-semibold mb-2">Lizenzen & Zertifikate</p>
+                <p className="text-[10px] uppercase tracking-widest text-text-muted/70 font-semibold mb-2.5">Lizenzen & Zertifikate</p>
                 <div className="flex flex-wrap gap-1.5">
                   {certificates.map((c) => (
-                    <span key={c} className="px-2.5 py-1 bg-bg-secondary border border-border rounded-lg text-xs text-text-secondary">{c}</span>
+                    <span key={c} className="px-2 py-0.5 bg-transparent border border-border/60 rounded-md text-[11px] text-text-muted">{c}</span>
                   ))}
                 </div>
               </div>
@@ -1367,10 +1369,10 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 
             {software.length > 0 && (
               <div>
-                <p className="text-[9px] uppercase tracking-[0.15em] text-text-muted font-semibold mb-2">Software</p>
+                <p className="text-[10px] uppercase tracking-widest text-text-muted/70 font-semibold mb-2.5">Software</p>
                 <div className="flex flex-wrap gap-1.5">
                   {software.map((s) => (
-                    <span key={s} className="px-2.5 py-1 bg-bg-secondary border border-border rounded-lg text-xs text-text-secondary">{s}</span>
+                    <span key={s} className="px-2 py-0.5 bg-transparent border border-border/60 rounded-md text-[11px] text-text-muted">{s}</span>
                   ))}
                 </div>
               </div>
@@ -1389,11 +1391,11 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
               if (links.length === 0) return null;
               return (
                 <div>
-                  <p className="text-[9px] uppercase tracking-[0.15em] text-text-muted font-semibold mb-2">Links</p>
+                  <p className="text-[10px] uppercase tracking-widest text-text-muted/70 font-semibold mb-2.5">Links</p>
                   <div className="flex flex-wrap gap-1.5">
                     {links.map(({ label, url }) => (
                       <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-2.5 py-1 bg-bg-secondary border border-border rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-bg-secondary/50 border border-border/60 rounded-lg text-xs text-text-secondary hover:border-gold/50 hover:text-gold/90 hover:bg-bg-elevated transition-colors">
                         {label} <ExternalLink size={9} className="shrink-0 opacity-50" />
                       </a>
                     ))}
@@ -1445,7 +1447,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                         const collaborator = credit.role?.split("||")[1]?.trim() ?? null;
                         return (
                           <Link key={credit.id} href={`/projects/${credit.project_id}`}
-                            className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
+                            className="group flex items-center gap-3 px-3 py-2 border-b border-border/60 last:border-b-0 hover:bg-bg-elevated/60 transition-colors">
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{proj.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</span>
                             {collaborator && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[25%]">{collaborator}</span>}
@@ -1470,8 +1472,8 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 const isOpen = expandedFilm === i;
                 const hasDetails = !!(film.director || film.festival || film.type || film.production);
                 return (
-                  <div key={`film-${i}`} className="border-b border-border last:border-b-0">
-                    <div className="flex items-center gap-3 px-3 py-1.5 hover:bg-bg-elevated transition-colors">
+                  <div key={`film-${i}`} className="border-b border-border/60 last:border-b-0">
+                    <div className="flex items-center gap-3 px-3 py-2 hover:bg-bg-elevated/60 transition-colors">
                       <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{film.year || "—"}</span>
                       <div className="flex-1 min-w-0">
                         {film.imdb_url && safeLink(film.imdb_url) ? (
