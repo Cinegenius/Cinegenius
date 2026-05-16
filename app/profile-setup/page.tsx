@@ -91,14 +91,6 @@ export default function ProfileSetupPage() {
     }
   }
 
-  if (!isLoaded) {
-    return (
-      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
-        <Loader2 size={24} className="animate-spin text-gold" />
-      </div>
-    );
-  }
-
   const redirectTo = safeRedirect(searchParams.get("redirect"));
   const canSave = displayName.trim().length > 0 && city.trim().length > 0 && !saving && !uploading;
 

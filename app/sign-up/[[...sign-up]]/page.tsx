@@ -48,7 +48,14 @@ export default function SignUpPage() {
           <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Kostenlos starten</p>
           <h1 className="font-display text-3xl font-bold text-text-primary">Account erstellen</h1>
         </div>
-        <Suspense>
+        <Suspense fallback={
+          <div className="space-y-3">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-12 rounded-xl bg-bg-elevated animate-pulse" />
+            ))}
+            <div className="h-12 rounded-xl bg-gold/20 animate-pulse" />
+          </div>
+        }>
           <SignUpForm />
         </Suspense>
       </div>
