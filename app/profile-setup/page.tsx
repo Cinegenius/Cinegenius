@@ -444,13 +444,24 @@ export default function ProfileSetupPage() {
             )}
 
             {step === 0 && (
-              <button
-                onClick={() => setStep(1)}
-                disabled={selectedIntents.length === 0}
-                className="flex-1 py-3.5 rounded-2xl bg-gold text-bg-primary font-bold text-base disabled:opacity-30 transition-opacity active:scale-95"
-              >
-                Weiter {selectedIntents.length > 1 ? `(${selectedIntents.length})` : ""}
-              </button>
+              <div className="flex-1 flex flex-col gap-2">
+                <button
+                  onClick={() => setStep(1)}
+                  disabled={selectedIntents.length === 0}
+                  className={`w-full py-3.5 rounded-2xl font-bold text-base transition-all active:scale-95 ${
+                    selectedIntents.length > 0
+                      ? "bg-gold text-bg-primary"
+                      : "bg-bg-elevated border border-border text-text-muted cursor-not-allowed"
+                  }`}
+                >
+                  {selectedIntents.length > 0
+                    ? `Weiter${selectedIntents.length > 1 ? ` (${selectedIntents.length})` : ""}`
+                    : "Weiter"}
+                </button>
+                {selectedIntents.length === 0 && (
+                  <p className="text-center text-xs text-text-muted">Bitte erst eine Option auswählen</p>
+                )}
+              </div>
             )}
 
             {step === 1 && (
