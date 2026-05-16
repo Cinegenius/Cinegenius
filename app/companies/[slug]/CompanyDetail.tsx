@@ -176,7 +176,7 @@ export default function CompanyDetail({
   }
 
   return (
-    <div className="pt-16 min-h-screen bg-bg-primary text-text-primary">
+    <div className="pt-16 min-h-screen bg-bg-primary text-text-primary overflow-x-hidden">
 
       {isWelcome && !welcomeDismissed && (
         <div className="bg-gold/10 border-b border-gold/20">
@@ -187,92 +187,142 @@ export default function CompanyDetail({
         </div>
       )}
 
-      {/* ── HEADER ────────────────────────────────────────────────────── */}
-      <div className="border-b border-border bg-bg-secondary">
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="flex items-start gap-5">
+      {/* ── HERO ─────────────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden border-b border-border">
+        {/* Gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-bg-elevated to-bg-primary" />
 
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-10 pb-8 sm:pb-10">
+
+          {/* Edit button */}
+          {isOwner && (
+            <div className="flex justify-end mb-6">
+              <Link href="/company-setup"
+                className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-xs text-text-muted hover:text-gold hover:border-gold/40 transition-colors bg-bg-primary/60 backdrop-blur-sm">
+                <Pencil size={12} /> Bearbeiten
+              </Link>
+            </div>
+          )}
+
+          {/* Logo + Name */}
+          <div className="flex items-start gap-4 sm:gap-5 mb-5">
             {/* Logo */}
-            <div className="w-48 h-48 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center shrink-0 overflow-hidden">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-bg-primary border border-border flex items-center justify-center shrink-0 overflow-hidden shadow-xl">
               {company.logo_url
-                ? <img src={company.logo_url} alt={company.name} className="w-full h-full object-cover" /> // eslint-disable-line @next/next/no-img-element
-                : <Building2 size={56} className="text-text-muted" />
+                // eslint-disable-next-line @next/next/no-img-element
+                ? <img src={company.logo_url} alt={company.name} className="w-full h-full object-cover" />
+                : <Building2 size={28} className="text-text-muted/50" />
               }
             </div>
 
-            <div className="flex-1 min-w-0">
-              {/* Name + badges */}
-              <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                <h1 className="font-display text-xl sm:text-2xl font-bold text-text-primary leading-tight">
-                  {company.name}
-                </h1>
-                {company.verified && (
-                  <span className="flex items-center gap-1 px-2 py-0.5 bg-gold/10 border border-gold/20 rounded-full text-[10px] text-gold font-semibold">
-                    <CheckCircle size={9} /> Verifiziert
-                  </span>
-                )}
-              </div>
-
-              {/* Tagline */}
-              {company.tagline && (
-                <p className="text-sm text-text-muted italic mb-2">{company.tagline}</p>
-              )}
-
-              {/* Categories */}
+            {/* Name + tagline */}
+            <div className="flex-1 min-w-0 pt-0.5">
               {cats.length > 0 && (
-                <div className="flex flex-wrap gap-1 mb-2">
+                <div className="flex flex-wrap gap-1 mb-1.5">
                   {cats.map((cat) => (
-                    <span key={cat.id} className={`px-2 py-0.5 text-[11px] font-medium rounded-full border ${cat.bg} ${cat.color}`}>
+                    <span key={cat.id} className={`px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded-full border ${cat.bg} ${cat.color}`}>
                       {cat.label}
                     </span>
                   ))}
                 </div>
               )}
 
-              {/* Industry focus chips */}
-              {company.industry_focus?.length > 0 && (
-                <div className="flex flex-wrap gap-1 mb-2.5">
-                  {company.industry_focus.map((f) => (
-                    <span key={f} className={`px-2 py-0.5 text-[10px] font-medium rounded-full border ${INDUSTRY_COLORS[f] ?? "bg-bg-elevated text-text-muted border-border"}`}>
-                      {f}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Meta row */}
-              <div className="flex flex-wrap items-center gap-3 text-xs text-text-muted">
-                <span className="flex items-center gap-1"><MapPin size={11} />{company.city}</span>
-                {company.website && (
-                  <a href={company.website} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-1 hover:text-gold transition-colors">
-                    <Globe size={11} />
-                    {company.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
-                    <ExternalLink size={9} />
-                  </a>
-                )}
-                {acceptedMembers.length > 0 && (
-                  <span className="flex items-center gap-1">
-                    <Users size={11} /> {acceptedMembers.length} {acceptedMembers.length === 1 ? "Person" : "Personen"}
-                  </span>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="font-display text-2xl sm:text-3xl font-bold text-text-primary leading-tight">
+                  {company.name}
+                </h1>
+                {company.verified && (
+                  <CheckCircle size={15} className="text-gold shrink-0" />
                 )}
               </div>
-            </div>
 
-            {/* Edit */}
-            {isOwner && (
-              <Link href="/company-setup"
-                className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-xs text-text-muted hover:text-gold hover:border-gold/40 transition-colors shrink-0">
-                <Pencil size={12} /> Bearbeiten
-              </Link>
+              {company.tagline && (
+                <p className="text-text-muted text-sm mt-1 leading-snug">{company.tagline}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Industry focus */}
+          {company.industry_focus?.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {company.industry_focus.map((f) => (
+                <span key={f} className={`px-2.5 py-1 text-xs font-medium rounded-full border ${INDUSTRY_COLORS[f] ?? "bg-bg-elevated text-text-muted border-border"}`}>
+                  {f}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Meta row */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-text-muted mb-6">
+            <span className="flex items-center gap-1.5"><MapPin size={11} />{company.city}</span>
+            {acceptedMembers.length > 0 && (
+              <span className="flex items-center gap-1.5">
+                <Users size={11} /> {acceptedMembers.length} {acceptedMembers.length === 1 ? "Person" : "Personen"}
+              </span>
+            )}
+            {company.founded_year && (
+              <span className="flex items-center gap-1.5">
+                <Calendar size={11} /> Seit {company.founded_year}
+              </span>
+            )}
+            {company.website && (
+              <a href={company.website} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-1 hover:text-gold transition-colors">
+                <Globe size={11} />
+                {company.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+                <ExternalLink size={9} />
+              </a>
             )}
           </div>
-        </div>
-      </div>
 
-      {/* ── BODY ─────────────────────────────────────────────────────── */}
+          {/* CTA buttons */}
+          <div className="flex flex-wrap gap-2">
+            {company.email && (
+              <a href={`mailto:${company.email}`}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors text-xs">
+                <Mail size={13} /> E-Mail schreiben
+              </a>
+            )}
+            {company.phone && (
+              <a href={`tel:${company.phone}`}
+                className="inline-flex items-center gap-1.5 px-4 py-2 border border-border bg-bg-elevated rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
+                <Phone size={13} /> {company.phone}
+              </a>
+            )}
+            {currentUserId && !isOwner && !localMembership && (
+              <>
+                {joinError && <p className="w-full text-xs text-crimson-light -mb-1">{joinError}</p>}
+                <button onClick={handleJoinRequest} disabled={joining}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 border border-border bg-bg-elevated rounded-lg text-xs text-text-muted hover:border-gold/40 hover:text-gold transition-colors disabled:opacity-50">
+                  <UserPlus size={13} /> {joining ? "Wird gesendet…" : "Team beitreten"}
+                </button>
+              </>
+            )}
+            {currentUserId && !isOwner && localMembership?.status === "pending" && (
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-amber-400 flex items-center gap-1.5"><Clock size={11} /> Anfrage ausstehend</span>
+                <button onClick={handleLeave} className="text-xs text-text-muted hover:text-crimson-light transition-colors flex items-center gap-1">
+                  <UserMinus size={11} /> Zurückziehen
+                </button>
+              </div>
+            )}
+            {currentUserId && !isOwner && localMembership?.status === "accepted" && (
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-success flex items-center gap-1.5"><CheckCircle size={11} /> Du bist Teammitglied</span>
+                <button onClick={handleLeave} className="text-xs text-text-muted hover:text-crimson-light transition-colors flex items-center gap-1">
+                  <UserMinus size={11} /> Firma verlassen
+                </button>
+              </div>
+            )}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ── BODY ─────────────────────────────────────────────────────────── */}
       <div className="max-w-4xl mx-auto px-4 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-10">
 
           {/* ── LEFT ──────────────────────────────────────────────────── */}
           <div className="space-y-10 min-w-0">
@@ -302,18 +352,16 @@ export default function CompanyDetail({
               </section>
             )}
 
-            {/* Team — project list style */}
+            {/* Team */}
             {(acceptedMembers.length > 0 || isOwner) && (
               <section>
                 <SectionLabel>Team ({acceptedMembers.length})</SectionLabel>
                 <div className="bg-bg-secondary border border-border rounded-2xl overflow-hidden">
-                  {/* Header row */}
                   <div className="grid grid-cols-[2fr_1fr_90px] gap-4 px-5 py-3 border-b border-border bg-bg-elevated">
                     <span className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">Name</span>
                     <span className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">Position</span>
                     <span className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">Rolle</span>
                   </div>
-                  {/* Member rows */}
                   <div className="divide-y divide-border">
                     {(showAllTeam ? acceptedMembers : acceptedMembers.slice(0, 10)).map((m) => {
                       const slug = m.profile?.slug ?? m.user_id;
@@ -345,7 +393,6 @@ export default function CompanyDetail({
                       );
                     })}
                   </div>
-                  {/* Show more */}
                   {acceptedMembers.length > 10 && (
                     <button
                       onClick={() => setShowAllTeam((v) => !v)}
@@ -387,7 +434,7 @@ export default function CompanyDetail({
               </section>
             )}
 
-            {/* Portfolio — prominent grid */}
+            {/* Portfolio */}
             {company.portfolio_images.length > 0 && (
               <section>
                 <SectionLabel>Portfolio</SectionLabel>
@@ -508,7 +555,8 @@ export default function CompanyDetail({
                       <Link key={listing.id} href={href}
                         className="flex items-center gap-3 py-3 group -mx-1 px-1 rounded-lg hover:bg-bg-secondary/60 transition-colors">
                         {listing.image_url
-                          ? <img src={listing.image_url} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" /> // eslint-disable-line @next/next/no-img-element
+                          // eslint-disable-next-line @next/next/no-img-element
+                          ? <img src={listing.image_url} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
                           : <div className="w-10 h-10 rounded-lg bg-bg-elevated flex items-center justify-center shrink-0"><Icon size={16} className="text-text-muted" /></div>
                         }
                         <div className="flex-1 min-w-0">
@@ -532,33 +580,6 @@ export default function CompanyDetail({
 
           {/* ── RIGHT ─────────────────────────────────────────────────── */}
           <div className="space-y-8">
-
-            {/* Contact */}
-            {(company.email || company.website || company.phone) && (
-              <section>
-                <SectionLabel>Kontakt</SectionLabel>
-                <div className="space-y-2">
-                  {company.email && (
-                    <a href={`mailto:${company.email}`}
-                      className="flex items-center gap-2 w-full px-3 py-2.5 bg-gold text-bg-primary rounded-lg text-sm font-semibold hover:bg-gold-light transition-colors">
-                      <Mail size={13} /> E-Mail schreiben
-                    </a>
-                  )}
-                  {company.phone && (
-                    <a href={`tel:${company.phone}`}
-                      className="flex items-center gap-2 w-full px-3 py-2.5 bg-bg-secondary border border-border rounded-lg text-sm text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
-                      <Phone size={13} /> {company.phone}
-                    </a>
-                  )}
-                  {company.website && (
-                    <a href={company.website} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-2 w-full px-3 py-2.5 bg-bg-secondary border border-border rounded-lg text-sm text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
-                      <Globe size={13} /> Website <ExternalLink size={10} className="ml-auto" />
-                    </a>
-                  )}
-                </div>
-              </section>
-            )}
 
             {/* Social links */}
             {company.social_links && Object.values(company.social_links).some(Boolean) && (
@@ -589,35 +610,6 @@ export default function CompanyDetail({
                       </a>
                     ))}
                 </div>
-              </section>
-            )}
-
-            {/* Join / leave */}
-            {currentUserId && !isOwner && (
-              <section>
-                {!localMembership ? (
-                  <>
-                    {joinError && <p className="text-xs text-crimson-light mb-1.5">{joinError}</p>}
-                    <button onClick={handleJoinRequest} disabled={joining}
-                      className="w-full flex items-center justify-center gap-2 px-3 py-2.5 border border-border rounded-lg text-sm text-text-muted hover:border-gold/40 hover:text-gold transition-colors disabled:opacity-50">
-                      <UserPlus size={13} /> {joining ? "Wird gesendet…" : "Team beitreten"}
-                    </button>
-                  </>
-                ) : localMembership.status === "pending" ? (
-                  <div className="space-y-1.5">
-                    <p className="text-xs text-amber-400 flex items-center gap-1.5"><Clock size={11} /> Anfrage ausstehend</p>
-                    <button onClick={handleLeave} className="text-xs text-text-muted hover:text-crimson-light transition-colors flex items-center gap-1">
-                      <UserMinus size={11} /> Zurückziehen
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-1.5">
-                    <p className="text-xs text-success flex items-center gap-1.5"><CheckCircle size={11} /> Du bist Teammitglied</p>
-                    <button onClick={handleLeave} className="text-xs text-text-muted hover:text-crimson-light transition-colors flex items-center gap-1">
-                      <UserMinus size={11} /> Firma verlassen
-                    </button>
-                  </div>
-                )}
               </section>
             )}
 
@@ -679,7 +671,12 @@ export default function CompanyDetail({
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[10px] uppercase tracking-[0.14em] text-text-muted font-semibold mb-3">{children}</p>
+    <div className="flex items-center gap-2 mb-4">
+      <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
+      <p className="text-[10px] uppercase tracking-widest text-text-muted/70 font-semibold">
+        {children}
+      </p>
+    </div>
   );
 }
 
@@ -689,10 +686,10 @@ function Avatar({ member, size = 40 }: { member: Member; size?: number }) {
     <div className="rounded-full bg-bg-elevated border border-border overflow-hidden shrink-0 flex items-center justify-center"
       style={{ width: size, height: size, minWidth: size }}>
       {member.profile?.avatar_url
-        ? <img src={member.profile.avatar_url} alt={name} className="w-full h-full object-cover" /> // eslint-disable-line @next/next/no-img-element
+        // eslint-disable-next-line @next/next/no-img-element
+        ? <img src={member.profile.avatar_url} alt={name} className="w-full h-full object-cover" />
         : <span className="text-xs font-bold text-text-muted">{name[0]?.toUpperCase()}</span>
       }
     </div>
   );
 }
-
