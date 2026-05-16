@@ -15,7 +15,6 @@ import type { ElementType } from "react";
 import LicensePicker from "@/components/LicensePicker";
 import ExternalProfilesSection from "@/components/ExternalProfilesSection";
 import { useToast } from "@/contexts/ToastContext";
-import ProfileGuard from "@/components/ProfileGuard";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 import { departments, deptColors } from "@/lib/departments";
 import RoleDropdown from "@/components/RoleDropdown";
@@ -1057,7 +1056,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <ProfileGuard>
+    <>
     {focalPickerImage && (
       <FocalPointPicker
         imageUrl={focalPickerImage}
@@ -2485,6 +2484,6 @@ export default function ProfilePage() {
         </div>
       </div>
     </div>
-    </ProfileGuard>
+    </>
   );
 }

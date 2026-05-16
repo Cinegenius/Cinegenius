@@ -13,7 +13,6 @@ import {
   Building2, AlertCircle, FileText, ArrowLeft,
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
-import ProfileGuard from "@/components/ProfileGuard";
 
 type RealMessage = {
   id: string;
@@ -597,7 +596,6 @@ export default function DashboardPage() {
   };
 
   return (
-    <ProfileGuard>
     <div className="pt-16 min-h-screen flex">
       {/* Sidebar */}
       <aside className="hidden lg:flex w-60 border-r border-border bg-bg-secondary flex-col fixed left-0 top-16 bottom-0 z-40">
@@ -2904,6 +2902,5 @@ export default function DashboardPage() {
       )}
 
     </div>
-    </ProfileGuard>
   );
 }
