@@ -1066,8 +1066,8 @@ export default function ProfilePage() {
         onClose={() => setFocalPickerImage(null)}
       />
     )}
-    <div className="pt-16 min-h-screen">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
+    <div className="pt-16 min-h-screen overflow-x-hidden">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
 
         {/* ── Header ── */}
         <div className="flex items-start justify-between gap-4 flex-wrap mb-8">
@@ -1095,10 +1095,24 @@ export default function ProfilePage() {
           )}
         </div>
 
-        <div className="flex gap-8 flex-col lg:flex-row">
-          {/* Sidebar */}
+        <div className="flex gap-6 flex-col lg:flex-row">
+          {/* Sidebar — vertical on desktop, horizontal scroll on mobile */}
           <aside className="lg:w-56 shrink-0">
-            <nav className="space-y-1">
+            {/* Mobile: horizontal scrollable tabs */}
+            <div className="flex lg:hidden gap-2 overflow-x-auto pb-1 scrollbar-none -mx-4 px-4">
+              {TAB_IDS.map(({ id, labelKey, icon: Icon }) => (
+                <button key={id} onClick={() => setActiveTab(id)}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 ${
+                    activeTab === id
+                      ? "bg-gold/10 text-gold border border-gold/20"
+                      : "text-text-secondary bg-bg-secondary border border-border"
+                  }`}>
+                  <Icon size={12} /> {t(labelKey as Parameters<typeof t>[0])}
+                </button>
+              ))}
+            </div>
+            {/* Desktop: vertical nav */}
+            <nav className="hidden lg:block space-y-1">
               {TAB_IDS.map(({ id, labelKey, icon: Icon }) => (
                 <button key={id} onClick={() => setActiveTab(id)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-left ${
@@ -1154,7 +1168,7 @@ export default function ProfilePage() {
                 )}
 
                 {/* ── Ich bin & Positionen (unified) ── */}
-                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
+                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-1">{t("sectionIAm")}</h2>
                   <p className="text-xs text-text-muted mb-4">{t("sectionIAmDesc")}</p>
                   <RoleAndPositionPicker
@@ -1166,7 +1180,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Avatar */}
-                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
+                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-5">{t("sectionAvatar")}</h2>
                   <div className="flex items-center gap-5">
                     <div className="relative shrink-0">
@@ -1212,7 +1226,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Profilfotos — direkt unter Avatar */}
-                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
+                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <input
                     ref={profileImagesRef}
                     type="file"
@@ -1302,7 +1316,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Cover Image — only for crew/creative/vendor; talent uses profile_images as hero */}
-                {!showTalentSections && <div className="p-6 bg-bg-secondary border border-border rounded-xl">
+                {!showTalentSections && <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <h2 className="font-semibold text-text-primary mb-0.5">{t("sectionCover")}</h2>
@@ -1345,7 +1359,7 @@ export default function ProfilePage() {
                 </div>}
 
                 {/* Basisinformationen */}
-                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
+                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-5">{t("sectionBasics")}</h2>
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
@@ -1386,16 +1400,16 @@ export default function ProfilePage() {
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
                         {t("fieldProfileUrl")}
                       </label>
-                      <div className="flex items-center gap-0 bg-bg-elevated border border-border rounded-lg overflow-hidden focus-within:border-gold transition-colors">
-                        <span className="px-3 py-2.5 text-sm text-text-muted border-r border-border whitespace-nowrap select-none">
-                          cinegenius.de/profile/
+                      <div className="flex items-center min-w-0 bg-bg-elevated border border-border rounded-lg overflow-hidden focus-within:border-gold transition-colors">
+                        <span className="px-2.5 py-2.5 text-xs text-text-muted border-r border-border shrink-0 select-none">
+                          /profile/
                         </span>
                         <input
                           type="text"
                           value={form.slug}
                           onChange={(e) => setForm((p) => ({ ...p, slug: e.target.value }))}
                           placeholder="dein-name"
-                          className="flex-1 bg-transparent px-3 py-2.5 text-sm focus:outline-none"
+                          className="flex-1 min-w-0 bg-transparent px-3 py-2.5 text-sm focus:outline-none"
                         />
                       </div>
                       <p className="text-xs text-text-muted mt-1">{t("fieldProfileUrlHint")}</p>
@@ -1479,7 +1493,7 @@ export default function ProfilePage() {
                 {showCrewSections && <>
 
                 {/* Filmografie — verknüpfte Projekte */}
-                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
+                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-1 flex items-center gap-2">
                     <Clapperboard size={15} className="text-gold" /> {t("sectionFilmography")}
                   </h2>
@@ -1789,7 +1803,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Social Links */}
-                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
+                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-1">{t("sectionSocial")}</h2>
                   <p className="text-xs text-text-muted mb-5">{t("sectionSocialDesc")}</p>
                   <div className="space-y-3">
@@ -1820,7 +1834,7 @@ export default function ProfilePage() {
                 <ExternalProfilesSection />
 
                 {/* Videos & Showreel */}
-                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
+                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-1">{t("sectionVideos")}</h2>
                   <p className="text-xs text-text-muted mb-5">{t("sectionVideosDesc")}</p>
                   {videoLinks.length > 0 && (
@@ -1873,7 +1887,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Fähigkeiten */}
-                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
+                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-5">{t("sectionSkills")}</h2>
                   {skills.length > 0 ? (
                     <div className="flex flex-wrap gap-2 mb-4">
@@ -1901,7 +1915,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Mitgliedschaften */}
-                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
+                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-1">Mitgliedschaften</h2>
                   <p className="text-xs text-text-muted mb-4">Gewerkschaften, Verbände, Agenturen (z.B. Verdi, IGLBM)</p>
                   {memberships.length > 0 ? (
@@ -1930,7 +1944,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Sprachen */}
-                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
+                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-5">{t("sectionLanguages")}</h2>
                   {languages.length > 0 ? (
                     <div className="flex flex-wrap gap-2 mb-4">
@@ -1958,7 +1972,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Lizenzen & Führerscheine */}
-                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
+                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-1">{t("sectionLicenses")}</h2>
                   <p className="text-xs text-text-muted mb-4">{t("sectionLicensesDesc")}</p>
                   <LicensePicker
@@ -2326,7 +2340,7 @@ export default function ProfilePage() {
             {/* ── SICHERHEIT ── */}
             {activeTab === "security" && (
               <div className="space-y-6">
-                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
+                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-5">{t("securityTitle")}</h2>
                   <div className="space-y-4 max-w-sm">
                     {[t("securityCurrentPw"), t("securityNewPw"), t("securityConfirmPw")].map((label) => (
@@ -2341,7 +2355,7 @@ export default function ProfilePage() {
                     </button>
                   </div>
                 </div>
-                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
+                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-1">{t("security2FATitle")}</h2>
                   <p className="text-xs text-text-muted mb-5">{t("security2FADesc")}</p>
                   <div className="flex items-center justify-between p-4 bg-bg-elevated border border-border rounded-lg">
@@ -2398,7 +2412,7 @@ export default function ProfilePage() {
             {/* ── ABRECHNUNG ── */}
             {activeTab === "billing" && (
               <div className="space-y-6">
-                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
+                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <div className="flex items-center justify-between mb-2">
                     <h2 className="font-semibold text-text-primary flex items-center gap-2">
                       <Wallet size={16} className="text-gold" /> {t("billingTitle")}
@@ -2454,7 +2468,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                <div className="p-6 bg-bg-secondary border border-border rounded-xl">
+                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="font-semibold text-text-primary">{t("myAccount")}</h2>
                     <span className="px-3 py-1 bg-success/10 border border-success/20 text-success text-xs font-semibold rounded-full">
