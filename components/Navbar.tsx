@@ -489,32 +489,60 @@ export default function Navbar() {
           {/* Mobile search */}
           <GlobalSearch />
 
-          {!isLoaded ? (
-            <div className="flex-1 flex items-center justify-center py-12">
-              <div className="w-5 h-5 rounded-full border-2 border-border border-t-gold animate-spin" />
-            </div>
-          ) : isSignedIn ? (
-            <>
-              {/* Account links */}
-              <div className="space-y-1">
+          {/* ── Navigation — always visible, no auth dependency ── */}
+          <div className="space-y-0.5">
+            {[
+              { href: "/locations", icon: MapPin,      label: t("locations")  },
+              { href: "/creators",  icon: Users,       label: t("crew")       },
+              { href: "/jobs",      icon: Briefcase,   label: t("jobs")       },
+              { href: "/props",     icon: ShoppingBag, label: t("marketplace")},
+              { href: "/projects",  icon: Film,        label: t("projects")   },
+              { href: "/companies", icon: Building2,   label: t("companies")  },
+            ].map(({ href, icon: Icon, label }) => (
+              <Link
+                key={href}
+                href={href}
+                onClick={() => setOpen(false)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                  isActive(href)
+                    ? "bg-gold/10 text-gold border border-gold/20"
+                    : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"
+                }`}
+              >
+                <Icon size={17} className={isActive(href) ? "text-gold" : "text-text-muted"} />
+                {label}
+              </Link>
+            ))}
+          </div>
+
+          {/* ── Auth section — only this part waits for Clerk ── */}
+          <div className="mt-auto border-t border-border pt-4 space-y-1">
+            {/* Loading skeleton — only while Clerk not ready and no cache */}
+            {!isLoaded && !profileDisplayName && !profileAvatarUrl ? (
+              <div className="space-y-2">
+                <div className="h-11 bg-bg-elevated rounded-xl animate-pulse" />
+                <div className="h-11 bg-bg-elevated/60 rounded-xl animate-pulse" />
+              </div>
+            ) : (isLoaded ? isSignedIn : !!(profileDisplayName || profileAvatarUrl)) ? (
+              <>
+                {/* Account links */}
                 {[
-                  { href: "/dashboard",     icon: LayoutDashboard, label: t("dashboard")      },
-                  { href: "/dashboard",     icon: Film,            label: t("myListings")      },
-                  { href: "/messages",      icon: MessageSquare,   label: t("messages")        },
-                  { href: "/notifications", icon: Bell,            label: t("notifications")   },
+                  { href: "/dashboard",     icon: LayoutDashboard, label: t("dashboard")    },
+                  { href: "/messages",      icon: MessageSquare,   label: t("messages")      },
+                  { href: "/notifications", icon: Bell,            label: t("notifications") },
                   { href: user?.id ? `/profile/${user.id}` : "/profile", icon: User, label: t("myProfile") },
                 ].map(({ href, icon: Icon, label }) => (
                   <Link
                     key={label}
                     href={href}
                     onClick={() => setOpen(false)}
-                    className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-base font-medium transition-all ${
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                       isActive(href)
                         ? "bg-gold/10 text-gold border border-gold/20"
                         : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"
                     }`}
                   >
-                    <Icon size={18} className={isActive(href) ? "text-gold" : "text-text-muted"} />
+                    <Icon size={17} className={isActive(href) ? "text-gold" : "text-text-muted"} />
                     <span>{label}</span>
                     {href === "/messages" && unreadMessages > 0 && (
                       <span className="ml-auto min-w-[20px] h-5 bg-crimson text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
@@ -523,39 +551,34 @@ export default function Navbar() {
                     )}
                   </Link>
                 ))}
-              </div>
 
-              {/* CTA */}
-              <div className="pt-2 border-t border-border">
-                <Link
-                  href="/inserat"
-                  onClick={() => setOpen(false)}
-                  className="block w-full py-3 px-4 text-sm text-center font-semibold bg-gold text-bg-primary rounded-xl hover:bg-gold-light transition-colors"
-                >
-                  + {t("createListing")}
-                </Link>
-              </div>
-
-              {/* Sign out */}
-              <div className="pt-2 border-t border-border">
-                <button
-                  onClick={() => { setOpen(false); signOut(); }}
-                  className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-text-secondary hover:text-red-400 rounded-lg transition-colors"
-                >
-                  <LogOut size={14} /> {t("signOut")}
+                <div className="pt-2 space-y-2">
+                  <Link
+                    href="/inserat"
+                    onClick={() => setOpen(false)}
+                    className="block w-full py-3 px-4 text-sm text-center font-semibold bg-gold text-bg-primary rounded-xl hover:bg-gold-light transition-colors"
+                  >
+                    + {t("createListing")}
+                  </Link>
+                  <button
+                    onClick={() => { setOpen(false); signOut(); }}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm text-text-muted hover:text-red-400 rounded-lg transition-colors"
+                  >
+                    <LogOut size={14} /> {t("signOut")}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-2">
+                <button onClick={() => { setOpen(false); openSignIn(); }} className="block w-full py-3 px-4 text-sm text-center font-medium border border-border text-text-secondary hover:border-gold hover:text-gold rounded-xl transition-all">
+                  {t("signIn")}
+                </button>
+                <button onClick={() => { setOpen(false); openSignUp(); }} className="block w-full py-3 px-4 text-sm text-center font-semibold bg-gold text-bg-primary rounded-xl hover:bg-gold-light transition-colors">
+                  {t("signUp")}
                 </button>
               </div>
-            </>
-          ) : (
-            <div className="mt-auto pt-4 border-t border-border space-y-2">
-              <button onClick={() => { setOpen(false); openSignIn(); }} className="block w-full py-2.5 px-3 text-sm text-center font-medium border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-all">
-                {t("signIn")}
-              </button>
-              <button onClick={() => { setOpen(false); openSignUp(); }} className="block w-full py-2.5 px-3 text-sm text-center font-semibold bg-gold text-bg-primary rounded-lg hover:bg-gold-light transition-colors">
-                {t("signUp")}
-              </button>
-            </div>
-          )}
+            )}
+          </div>
         </nav>
       </div>
     </>
