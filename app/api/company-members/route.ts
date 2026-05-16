@@ -108,6 +108,24 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // Notify owner that someone wants to join
+  try {
+    const [{ data: profile }, { data: company }] = await Promise.all([
+      admin.from("profiles").select("display_name, slug").eq("user_id", userId).single(),
+      admin.from("companies").select("name, slug").eq("id", company_id).single(),
+    ]);
+    if (profile && company) {
+      await admin.from("notifications").insert({
+        user_id: co.owner_user_id,
+        type: "company_join_request",
+        title: "Neue Beitrittsanfrage",
+        body: `${profile.display_name} möchte ${company.name} beitreten.`,
+        href: `/companies/${company.slug}`,
+      });
+    }
+  } catch { /* non-critical */ }
+
   return NextResponse.json({ data });
 }
 
@@ -156,6 +174,23 @@ export async function PATCH(req: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // Notify requesting user if their request was accepted
+  if (isOwner && status === "accepted") {
+    try {
+      const { data: company } = await admin.from("companies").select("name, slug").eq("id", member.company_id).single();
+      if (company) {
+        await admin.from("notifications").insert({
+          user_id: member.user_id,
+          type: "company_join_accepted",
+          title: "Beitritt bestätigt",
+          body: `Du bist jetzt Mitglied von ${company.name}.`,
+          href: `/companies/${company.slug}`,
+        });
+      }
+    } catch { /* non-critical */ }
+  }
+
   return NextResponse.json({ data });
 }
 
