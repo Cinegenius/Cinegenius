@@ -66,7 +66,7 @@ export default async function CreatorsPage() {
   // Fetch profiles — limit initial load to 96 for fast page render
   const { data: profiles } = await db
     .from("profiles")
-    .select("user_id, display_name, location, bio, skills, role, positions, available, avatar_url, portfolio_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point")
+    .select("user_id, display_name, location, bio, skills, role, positions, available, avatar_url, portfolio_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point, last_seen_at")
     .not("display_name", "is", null)
     .neq("display_name", "")
     .order("created_at", { ascending: false })
@@ -151,6 +151,7 @@ export default async function CreatorsPage() {
         height_cm: phys.height_cm ?? null,
         travel: avail.travel ?? (p.travel_ready ? "national" : ""),
         focal_point: p.focal_point ?? undefined,
+        last_seen_at: p.last_seen_at ?? null,
       };
     });
 
