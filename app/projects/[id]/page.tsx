@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
+import { unstable_cache } from "next/cache";
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import { isAdminSession } from "@/lib/guards";
@@ -8,7 +9,6 @@ import { departments } from "@/lib/departments";
 
 const ALL_CREW_ROLES = departments.flatMap((d) => d.roles);
 
-export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 
 type RawCredit = {
@@ -59,7 +59,7 @@ async function _getProject(id: string) {
   return { project, credits: creditsWithProfiles, festivals: festivals ?? [] };
 }
 
-const getProject = _getProject;
+const getProject = unstable_cache(_getProject, ["project-id"], { revalidate: 300, tags: ["projects"] });
 
 export async function generateMetadata({
   params,

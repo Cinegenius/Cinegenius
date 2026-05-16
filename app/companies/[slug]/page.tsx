@@ -1,10 +1,63 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
+import { unstable_cache } from "next/cache";
 import type { Metadata } from "next";
 import CompanyDetail from "./CompanyDetail";
 
-export const dynamic = "force-dynamic";
+// Cache public company data for 5 minutes
+const getCompany = unstable_cache(
+  async (slug: string) => {
+    const { data } = await db.from("companies").select("*").eq("slug", slug).maybeSingle();
+    return data;
+  },
+  ["company-slug"],
+  { revalidate: 300, tags: ["companies"] }
+);
+
+const getCompanyPublicData = unstable_cache(
+  async (companyId: string) => {
+    const [listingsRes, rawMembersRes, servicesRes, equipmentRes] = await Promise.all([
+      db.from("listings")
+        .select("id, title, type, category, price, city, image_url, created_at")
+        .eq("company_id", companyId)
+        .order("created_at", { ascending: false }),
+      db.from("company_members")
+        .select("id, user_id, role, title, status, created_at")
+        .eq("company_id", companyId)
+        .eq("status", "accepted")
+        .order("created_at", { ascending: true }),
+      db.from("company_services")
+        .select("*")
+        .eq("company_id", companyId)
+        .order("order", { ascending: true }),
+      db.from("company_equipment")
+        .select("*")
+        .eq("company_id", companyId)
+        .order("created_at", { ascending: false }),
+    ]);
+
+    const rawMembers = rawMembersRes.data ?? [];
+    let members: object[] = [];
+    if (rawMembers.length > 0) {
+      const { data: profiles } = await db
+        .from("profiles")
+        .select("user_id, display_name, avatar_url, slug, role")
+        .in("user_id", rawMembers.map((m) => m.user_id));
+      const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, p]));
+      members = rawMembers.map((m) => ({ ...m, profile: profileMap[m.user_id] ?? null }));
+    }
+
+    return {
+      listings: listingsRes.data ?? [],
+      members,
+      services: servicesRes.data ?? [],
+      equipment: equipmentRes.data ?? [],
+    };
+  },
+  ["company-public-data"],
+  { revalidate: 300, tags: ["companies"] }
+);
 
 export async function generateMetadata({
   params,
@@ -12,12 +65,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const { data: company } = await db
-    .from("companies")
-    .select("name, description, city, logo_url, categories")
-    .eq("slug", slug)
-    .maybeSingle();
-
+  const company = await getCompany(slug);
   if (!company) return {};
 
   const cats = Array.isArray(company.categories) ? (company.categories as string[]).join(", ") : "";
@@ -44,70 +92,46 @@ export default async function CompanyPage({
   const { slug } = await params;
   const { userId } = await auth();
 
-  // Fetch by slug without published filter first — owners must always see their own page
-  const { data: company } = await db
-    .from("companies")
-    .select("*")
-    .eq("slug", slug)
-    .maybeSingle();
+  const company = await getCompany(slug);
 
-  // Non-owners only see published companies
   if (!company || (company.published === false && userId !== company.owner_user_id)) notFound();
 
   const isOwner = userId === company.owner_user_id;
 
-  const [listingsRes, rawMembersRes, servicesRes, equipmentRes] = await Promise.all([
-    db
-      .from("listings")
-      .select("id, title, type, category, price, city, image_url, created_at")
-      .eq("company_id", company.id)
-      .order("created_at", { ascending: false }),
-    db
-      .from("company_members")
-      .select("id, user_id, role, title, status, created_at")
-      .eq("company_id", company.id)
-      .order("created_at", { ascending: true }),
-    db
-      .from("company_services")
-      .select("*")
-      .eq("company_id", company.id)
-      .order("order", { ascending: true }),
-    db
-      .from("company_equipment")
-      .select("*")
-      .eq("company_id", company.id)
-      .order("created_at", { ascending: false }),
+  // Public data from cache + owner's pending members fetched fresh
+  const [publicData, ownerPendingMembers, myMembership] = await Promise.all([
+    getCompanyPublicData(company.id),
+    // Owner sees pending members too — fetched fresh (not cached)
+    isOwner
+      ? db.from("company_members")
+          .select("id, user_id, role, title, status, created_at")
+          .eq("company_id", company.id)
+          .eq("status", "pending")
+          .order("created_at", { ascending: true })
+          .then(async (res) => {
+            const pending = res.data ?? [];
+            if (!pending.length) return [];
+            const { data: profiles } = await db
+              .from("profiles")
+              .select("user_id, display_name, avatar_url, slug, role")
+              .in("user_id", pending.map((m) => m.user_id));
+            const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, p]));
+            return pending.map((m) => ({ ...m, profile: profileMap[m.user_id] ?? null }));
+          })
+      : Promise.resolve([]),
+    // Check current user's membership status
+    userId && !isOwner
+      ? db.from("company_members")
+          .select("id, status")
+          .eq("company_id", company.id)
+          .eq("user_id", userId)
+          .maybeSingle()
+          .then((r) => r.data ?? null)
+      : Promise.resolve(null),
   ]);
 
-  // Enrich members with profiles
-  const rawMembers = rawMembersRes.data ?? [];
-  const visible = isOwner ? rawMembers : rawMembers.filter((m) => m.status === "accepted");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let membersRes: any[] = [];
-  if (visible.length > 0) {
-    const userIds = visible.map((m) => m.user_id);
-    const { data: profiles } = await db
-      .from("profiles")
-      .select("user_id, display_name, avatar_url, slug, role")
-      .in("user_id", userIds);
-    const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, p]));
-    membersRes = visible.map((m) => ({ ...m, profile: profileMap[m.user_id] ?? null }));
-  }
+  const allMembers = [...publicData.members, ...ownerPendingMembers] as object[];
 
-  // Check if current user has already requested to join
-  let myMembership: { id: string; status: string } | null = null;
-  if (userId && !isOwner) {
-    const { data: mm } = await db
-      .from("company_members")
-      .select("id, status")
-      .eq("company_id", company.id)
-      .eq("user_id", userId)
-      .maybeSingle();
-    myMembership = mm ?? null;
-  }
-
-  // Normalise JSONB arrays that Supabase types as Json
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const normalised = {
     ...company,
     portfolio_images: Array.isArray(company.portfolio_images) ? company.portfolio_images as string[] : [],
@@ -124,10 +148,11 @@ export default async function CompanyPage({
     <CompanyDetail
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       company={normalised as any}
-      listings={listingsRes.data ?? []}
-      members={membersRes}
-      services={servicesRes.data ?? []}
-      equipment={equipmentRes.data ?? []}
+      listings={publicData.listings}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      members={allMembers as any[]}
+      services={publicData.services}
+      equipment={publicData.equipment}
       myMembership={myMembership}
       currentUserId={userId ?? null}
     />
