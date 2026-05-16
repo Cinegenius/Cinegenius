@@ -47,7 +47,8 @@
 
 * { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
+
 
 /* iPhone safe area for bottom nav */
 .safe-area-pb {
@@ -60,6 +61,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: "kern" 1, "liga" 1;
+  overflow-x: hidden;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

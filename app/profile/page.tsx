@@ -1099,7 +1099,7 @@ export default function ProfilePage() {
           {/* Sidebar — vertical on desktop, horizontal scroll on mobile */}
           <aside className="lg:w-56 shrink-0">
             {/* Mobile: horizontal scrollable tabs */}
-            <div className="flex lg:hidden gap-2 overflow-x-auto pb-1 scrollbar-none -mx-4 px-4">
+            <div className="flex lg:hidden gap-2 overflow-x-auto pb-1 scrollbar-none">
               {TAB_IDS.map(({ id, labelKey, icon: Icon }) => (
                 <button key={id} onClick={() => setActiveTab(id)}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 ${
