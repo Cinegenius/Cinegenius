@@ -75,13 +75,15 @@ export default function CompanySetupPage() {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [teamLoading, setTeamLoading] = useState(false);
 
+  // Pre-fill email from Clerk once loaded
   useEffect(() => {
     if (!isLoaded || !user) return;
-    // Pre-fill email from Clerk
     const primaryEmail = user.primaryEmailAddress?.emailAddress;
-    if (primaryEmail) setEmail(primaryEmail);
+    if (primaryEmail) setEmail((prev) => prev || primaryEmail);
+  }, [isLoaded, user]);
 
-    // Check if user already has a company
+  useEffect(() => {
+    // Check if user already has a company — fires immediately, no Clerk wait
     fetch("/api/companies?mine=true")
       .then((r) => r.json())
       .then(({ data }) => {
@@ -128,7 +130,7 @@ export default function CompanySetupPage() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [isLoaded, user]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

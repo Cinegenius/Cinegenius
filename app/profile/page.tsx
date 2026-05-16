@@ -633,7 +633,6 @@ export default function ProfilePage() {
 
   // ── Load profile from Supabase ──────────────────────────────────────────────
   useEffect(() => {
-    if (!isLoaded) return;
     fetch("/api/profile")
       .then((r) => r.json())
       .then(({ profile }) => {
@@ -696,7 +695,7 @@ export default function ProfilePage() {
         setProfileLoading(false);
       })
       .catch(() => setProfileLoading(false));
-  }, [isLoaded]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load project credits separately
   useEffect(() => {

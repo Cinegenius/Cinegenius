@@ -581,8 +581,7 @@ export default function InseratPage() {
     return form.title.trim() && hasCity;
   };
 
-  if (!isLoaded) return null;
-  if (!userId) { router.push("/sign-in"); return null; }
+  if (isLoaded && !userId) { router.push("/sign-in"); return null; }
 
   // ── STEP 1 ──────────────────────────────────────────────────────────────────
 

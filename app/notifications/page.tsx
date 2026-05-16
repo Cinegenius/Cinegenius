@@ -178,6 +178,7 @@ export default function NotificationsPage() {
   const fetchNotifications = useCallback(async () => {
     try {
       const res = await fetch("/api/notifications");
+      if (res.status === 401) { setLoading(false); return; }
       if (!res.ok) return;
       const { notifications: data } = await res.json();
       setNotifications(data ?? []);
@@ -187,13 +188,12 @@ export default function NotificationsPage() {
   }, []);
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn) { setLoading(false); return; }
     fetchNotifications();
     fetch("/api/friendships")
       .then(r => r.json())
       .then(({ incoming }) => setFriendRequests(incoming ?? []))
       .catch(() => {});
-  }, [isLoaded, isSignedIn, fetchNotifications]);
+  }, [fetchNotifications]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleFriendRequest = async (friendshipId: string, action: "accepted" | "rejected") => {
     setProcessingIds(prev => new Set(prev).add(friendshipId));
