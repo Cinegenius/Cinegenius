@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export default async function VehiclesPage() {
   const { data } = await db
     .from("listings")
-    .select("id, user_id, title, category, city, price, image_url, description, metadata")
+    .select("id, user_id, title, category, city, price, image_url, description, metadata, created_at")
     .eq("published", true)
     .eq("type", "vehicle")
     .order("created_at", { ascending: false })
@@ -26,7 +26,7 @@ export default async function VehiclesPage() {
   const serverVehicles = (data ?? []).map((l: {
     id: string; title: string; city: string; price: number; image_url: string | null;
     description: string | null; category: string | null;
-    metadata: Record<string, unknown> | null;
+    metadata: Record<string, unknown> | null; created_at?: string | null;
   }) => {
     const meta = (l.metadata ?? {}) as Record<string, unknown>;
     // Support both new metadata format and legacy description-embedded format
@@ -49,7 +49,7 @@ export default async function VehiclesPage() {
       vendor: "",
       dailyRate: l.price,
       image: l.image_url ?? "",
-      tags: ["Neu"],
+      tags: l.created_at && (Date.now() - new Date(l.created_at).getTime() < 3 * 24 * 60 * 60 * 1000) ? ["Neu"] : [],
       instantBook: false,
       verified: false,
       delivery: (meta.delivery as boolean) ?? false,

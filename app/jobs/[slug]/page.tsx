@@ -45,7 +45,7 @@ async function getJob(slug: string) {
       urgent: parsed.urgent,
       payType: parsed.payType,
       contentWarnings: parsed.contentWarnings,
-      tags: ["Neu"],
+      tags: data.created_at && (Date.now() - new Date(data.created_at as string).getTime() < 3 * 24 * 60 * 60 * 1000) ? ["Neu"] : [],
       posted: "Aktuell",
       description: parsed.description,
       ownerId: data.user_id ?? "",

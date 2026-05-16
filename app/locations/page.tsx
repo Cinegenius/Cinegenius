@@ -49,7 +49,7 @@ export default async function LocationsPage() {
   const t = await getTranslations("locations");
   const { data } = await db
     .from("listings")
-    .select("id, title, city, price, image_url, category, description, metadata")
+    .select("id, title, city, price, image_url, category, description, metadata, created_at")
     .eq("published", true)
     .eq("type", "location")
     .order("created_at", { ascending: false })
@@ -68,7 +68,7 @@ export default async function LocationsPage() {
   const serverListings = rows.map((l: {
     id: string; title: string; city: string;
     price: number; description: string; category: string | null; image_url: string | null;
-    metadata?: Record<string, unknown> | null;
+    metadata?: Record<string, unknown> | null; created_at?: string | null;
   }) => {
     const { lat, lng } = coords[l.city] ?? FALLBACK;
     return {
@@ -81,7 +81,7 @@ export default async function LocationsPage() {
       rating: ratingsMap[l.id]?.rating ?? 0,
       reviews: ratingsMap[l.id]?.reviews ?? 0,
       image: l.image_url ?? "",
-      tags: ["Neu"],
+      tags: l.created_at && (Date.now() - new Date(l.created_at).getTime() < 3 * 24 * 60 * 60 * 1000) ? ["Neu"] : [],
       instantBook: false,
       verified: false,
       sqft: 0,

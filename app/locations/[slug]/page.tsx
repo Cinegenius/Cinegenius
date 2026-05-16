@@ -46,7 +46,7 @@ async function getLocation(slug: string) {
       rating: 0,
       reviews: 0,
       image: data.image_url ?? "",
-      tags: ["Neu"],
+      tags: data.created_at && (Date.now() - new Date(data.created_at as string).getTime() < 3 * 24 * 60 * 60 * 1000) ? ["Neu"] : [],
       instantBook: false,
       verified: false,
       sqft: 0,

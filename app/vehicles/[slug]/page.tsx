@@ -47,7 +47,7 @@ async function getVehicle(slug: string, viewerId?: string | null) {
     vendor: ownerName,
     dailyRate: data.price ?? 0,
     image: data.image_url ?? "",
-    tags: ["Neu"] as string[],
+    tags: (data.created_at && (Date.now() - new Date(data.created_at as string).getTime() < 3 * 24 * 60 * 60 * 1000) ? ["Neu"] : []) as string[],
     instantBook: false,
     verified: false,
     delivery: (meta.delivery as boolean) ?? false,
