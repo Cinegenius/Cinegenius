@@ -544,12 +544,12 @@ export default function Navbar() {
             </>
           ) : (
             <div className="mt-auto pt-4 border-t border-border space-y-2">
-              <button onClick={() => { setOpen(false); openSignIn(); }} className="block w-full py-2.5 px-3 text-sm text-center font-medium border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-all">
+              <Link href="/sign-in" onClick={() => setOpen(false)} className="block w-full py-2.5 px-3 text-sm text-center font-medium border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-all">
                 {t("signIn")}
-              </button>
-              <button onClick={() => { setOpen(false); openSignUp(); }} className="block w-full py-2.5 px-3 text-sm text-center font-semibold bg-gold text-bg-primary rounded-lg hover:bg-gold-light transition-colors">
+              </Link>
+              <Link href="/sign-up" onClick={() => setOpen(false)} className="block w-full py-2.5 px-3 text-sm text-center font-semibold bg-gold text-bg-primary rounded-lg hover:bg-gold-light transition-colors">
                 {t("signUp")}
-              </button>
+              </Link>
             </div>
           )}
         </nav>
