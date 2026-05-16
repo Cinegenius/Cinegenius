@@ -489,11 +489,7 @@ export default function Navbar() {
           {/* Mobile search */}
           <GlobalSearch />
 
-          {!isLoaded ? (
-            <div className="flex-1 flex items-start justify-center pt-8">
-              <div className="w-4 h-4 rounded-full border-2 border-border border-t-gold animate-spin" />
-            </div>
-          ) : isSignedIn ? (
+          {(isLoaded ? isSignedIn : !!(profileDisplayName || profileAvatarUrl)) ? (
             <>
               {/* Account links */}
               <div className="space-y-1">
