@@ -537,7 +537,7 @@ export default function Navbar() {
               </div>
 
               {/* Sign out */}
-              <div className="mt-auto pt-4 border-t border-border">
+              <div className="pt-2 border-t border-border">
                 <button
                   onClick={() => { setOpen(false); signOut(); }}
                   className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-text-secondary hover:text-red-400 rounded-lg transition-colors"
