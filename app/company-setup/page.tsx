@@ -11,6 +11,7 @@ import {
   Quote, Globe2,
 } from "lucide-react";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
+import { safeObjectURL } from "@/lib/compressImage";
 import ProfileGuard from "@/components/ProfileGuard";
 
 const MAX_PORTFOLIO = 8;
@@ -132,7 +133,7 @@ export default function CompanySetupPage() {
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setLogoPreview(URL.createObjectURL(file));
+    const _lp = safeObjectURL(file); if (_lp) setLogoPreview(_lp);
     setUploadingLogo(true);
     try {
       const fd = new FormData();

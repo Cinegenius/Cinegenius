@@ -102,3 +102,15 @@ export async function compressImage(
 export function compressAvatar(file: File | Blob): Promise<File> {
   return compressImage(file, { maxWidth: 500, maxHeight: 500, quality: 0.88 });
 }
+
+/**
+ * Safe wrapper around URL.createObjectURL — returns null instead of throwing.
+ * iOS Safari throws "The string did not match the expected pattern." for HEIC/HEIF.
+ */
+export function safeObjectURL(file: File | Blob): string | null {
+  try {
+    return URL.createObjectURL(file);
+  } catch {
+    return null;
+  }
+}

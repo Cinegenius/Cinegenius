@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { compressImage } from "@/lib/compressImage";
+import { compressImage, safeObjectURL } from "@/lib/compressImage";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import ProfileGuard from "@/components/ProfileGuard";
@@ -518,7 +518,7 @@ export default function InseratPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setImagePreview(URL.createObjectURL(file));
+    const _prev = safeObjectURL(file); if (_prev) setImagePreview(_prev);
     setUploading(true);
     setError("");
 
@@ -977,7 +977,7 @@ export default function InseratPage() {
                       {locFloorUploading ? <span className="animate-spin text-gold">⟳</span> : <span>+</span>} Grundriss hochladen
                       <input type="file" accept="image/*,.pdf" className="hidden" onChange={async (e) => {
                         const file = e.target.files?.[0]; if (!file) return;
-                        setLocFloorPlanPreview(URL.createObjectURL(file));
+                        const _fp = safeObjectURL(file); if (_fp) setLocFloorPlanPreview(_fp);
                         setLocFloorUploading(true);
                         const fd = new FormData(); fd.append("file", file);
                         const res = await fetch("/api/upload", { method: "POST", body: fd });

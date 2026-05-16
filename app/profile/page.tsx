@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import { useTranslations } from "next-intl";
-import { compressImage, compressAvatar } from "@/lib/compressImage";
+import { compressImage, compressAvatar, safeObjectURL } from "@/lib/compressImage";
 import {
   Camera, CheckCircle, User, Lock, Bell, CreditCard, MapPin, Film,
   Plus, X, Save, Wallet, Upload, ShieldCheck, Clock, AlertCircle, Loader2,
@@ -711,8 +711,8 @@ export default function ProfilePage() {
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const preview = URL.createObjectURL(file);
-    setAvatarPreview(preview);
+    const preview = safeObjectURL(file);
+    if (preview) setAvatarPreview(preview);
     setAvatarUploading(true);
     try {
       const compressed = await compressAvatar(file);
@@ -751,7 +751,7 @@ export default function ProfilePage() {
   const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setCoverImagePreview(URL.createObjectURL(file));
+    const _cp = safeObjectURL(file); if (_cp) setCoverImagePreview(_cp);
     setCoverUploading(true);
     try {
       const compressed = await compressImage(file, { maxWidth: 1920, maxHeight: 1080, quality: 0.85 });

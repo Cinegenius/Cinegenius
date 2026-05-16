@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import { compressAvatar } from "@/lib/compressImage";
+import { compressAvatar, safeObjectURL } from "@/lib/compressImage";
 import { useUser } from "@clerk/nextjs";
 import { Loader2, Camera, CheckCircle, ArrowRight } from "lucide-react";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
@@ -48,8 +48,8 @@ export default function ProfileSetupPage() {
   async function handleAvatar(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const objectUrl = URL.createObjectURL(file);
-    setAvatarPreview((prev) => { if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev); return objectUrl; });
+    const objectUrl = safeObjectURL(file);
+    if (objectUrl) setAvatarPreview((prev) => { if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev); return objectUrl; });
     setUploading(true);
     try {
       const compressed = await compressAvatar(file);
