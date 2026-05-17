@@ -31,31 +31,31 @@ export default function PageHeader({
 
       {/* Main glow — top right */}
       <div className="absolute -top-16 -right-16 w-[600px] h-[480px] rounded-full blur-[90px] pointer-events-none"
-        style={{ background: `radial-gradient(ellipse at center, ${g(0.22)}, transparent 70%)` }} />
+        style={{ background: `radial-gradient(ellipse at center, ${g(0.45)}, transparent 70%)` }} />
 
       {/* Secondary glow — bottom left */}
       <div className="absolute -bottom-10 left-1/3 w-72 h-52 rounded-full blur-[60px] pointer-events-none"
-        style={{ background: `radial-gradient(ellipse at center, ${g(0.10)}, transparent 70%)` }} />
+        style={{ background: `radial-gradient(ellipse at center, ${g(0.20)}, transparent 70%)` }} />
 
       {/* Film grain */}
       <div className="absolute inset-0 opacity-[0.04] mix-blend-overlay pointer-events-none"
         style={{ backgroundImage: GRAIN }} />
 
-      {/* Left accent bar — always lime (brand) */}
+      {/* Left accent bar — accent color */}
       <div className="absolute top-0 left-0 bottom-0 w-[3px] pointer-events-none"
-        style={{ background: `linear-gradient(to bottom, rgba(${LIME},0.7), rgba(${LIME},0.2) 55%, transparent)` }} />
+        style={{ background: `linear-gradient(to bottom, ${g(0.9)}, ${g(0.35)} 55%, transparent)` }} />
 
       {/* Bottom hairline — accent color */}
       <div className="absolute bottom-0 left-0 right-0 h-px pointer-events-none"
-        style={{ background: `linear-gradient(to right, transparent, ${g(0.30)} 40%, ${g(0.30)} 60%, transparent)` }} />
+        style={{ background: `linear-gradient(to right, transparent, ${g(0.50)} 40%, ${g(0.50)} 60%, transparent)` }} />
 
       {/* Content */}
       <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-8 pb-8 max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-3"
-              style={{ background: `rgba(${LIME},0.08)`, border: `1px solid rgba(${LIME},0.22)` }}>
-              <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: `rgba(${LIME},0.85)` }}>{badge}</span>
+              style={{ background: g(0.10), border: `1px solid ${g(0.35)}` }}>
+              <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: g(1) }}>{badge}</span>
             </div>
             <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary leading-tight mb-2">
               {title}
