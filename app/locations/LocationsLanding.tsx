@@ -110,13 +110,13 @@ export default function LocationsLanding({
             </div>
           </form>
 
-          {/* Category pills — always horizontal scroll */}
-          <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+          {/* Category pills — scroll on mobile, wrap on desktop */}
+          <div className="flex gap-2 overflow-x-auto sm:overflow-x-visible sm:flex-wrap sm:justify-center pb-1" style={{ scrollbarWidth: "none" }}>
             {CATEGORIES.map(({ label, value }) => (
               <Link
                 key={label}
                 href={`/locations/suche${value ? `?type=${encodeURIComponent(value)}` : ""}`}
-                className="shrink-0 px-3 py-1.5 rounded-full text-xs border border-border text-text-secondary hover:text-text-primary hover:border-indigo-400/40 transition-all bg-bg-elevated whitespace-nowrap"
+                className="shrink-0 sm:shrink px-3 py-1.5 rounded-full text-xs border border-border text-text-secondary hover:text-text-primary hover:border-indigo-400/40 transition-all bg-bg-elevated whitespace-nowrap"
               >
                 {label}
               </Link>
