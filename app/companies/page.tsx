@@ -32,8 +32,7 @@ export default async function CompaniesPage() {
           title={t("title")}
           titleHighlight={t("titleHighlight")}
           description={t("description")}
-          image="https://images.unsplash.com/photo-1542204165-65bf26472b9b?w=1600&q=90"
-          imagePosition="center 30%"
+          accentRgb="251,113,133"
           ctaSecondary={{ label: t("allBrowse"), href: "/companies" }}
           cta={{ label: t("addCompany"), href: "/company-setup" }}
         />

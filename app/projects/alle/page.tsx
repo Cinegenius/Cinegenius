@@ -47,8 +47,7 @@ export default async function AlleProjectsPage() {
         title="Filmprojekte"
         titleHighlight="& Produktionen"
         description="Alle Kategorien — durchsuche und filtere nach Typ, Jahr und Regie."
-        image="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1600&q=90"
-        imagePosition="center 50%"
+        accentRgb="56,189,248"
         overlay="left"
         height="sm"
       />

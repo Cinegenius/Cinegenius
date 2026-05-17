@@ -189,8 +189,7 @@ export default async function CreatorsPage() {
           title={t("heroTitle")}
           titleHighlight={t("heroTitleHighlight")}
           description={t("heroDesc")}
-          image="https://images.unsplash.com/photo-1601506521937-0121a7fc2a6b?w=1600&q=90"
-          imagePosition="center 40%"
+          accentRgb="251,146,60"
           cta={!hasProfile ? { label: t("heroCta"), href: "/profile" } : undefined}
         />
       <CreatorsContent serverCreators={serverCreators} hasStrip={true} />

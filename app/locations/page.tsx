@@ -120,8 +120,7 @@ export default async function LocationsPage() {
           title={t("heroTitle")}
           titleHighlight={t("heroTitleHighlight")}
           description={t("heroDesc")}
-          image="https://images.unsplash.com/photo-1657184925977-30a2d89fe72f?w=1600&q=90"
-          imagePosition="center 60%"
+          accentRgb="99,102,241"
           cta={{ label: t("heroCta"), href: "/inserat?group=drehorte" }}
         />
       <LocationsContent serverListings={serverListings} vendorProfiles={locationVendors} />

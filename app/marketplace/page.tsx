@@ -91,8 +91,7 @@ export default async function MarketplacePage({
         title="Requisiten, Kameras,"
         titleHighlight="Licht & Equipment"
         description="Von Privatpersonen und Verleihfirmen — alles für Film, Fotografie und Social Media Produktion."
-        image="https://images.unsplash.com/photo-1431068799455-80bae0caf685?w=1600&q=90"
-        imagePosition="center 50%"
+        accentRgb="167,139,250"
         overlay="left"
         height="sm"
         cta={{ label: "Inserat erstellen →", href: "/inserat" }}

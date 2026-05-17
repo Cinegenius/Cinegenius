@@ -426,15 +426,13 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
     <div className="min-h-screen">
       <div className="pt-16 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #1a1d26 0%, #0E1016 60%)" }}>
         <div className="absolute -top-16 -right-16 w-[600px] h-[480px] rounded-full blur-[90px] pointer-events-none"
-          style={{ background: "radial-gradient(ellipse at center, rgba(194,241,53,0.18), transparent 70%)" }} />
+          style={{ background: "radial-gradient(ellipse at center, rgba(34,211,238,0.22), transparent 70%)" }} />
         <div className="absolute -bottom-10 left-1/3 w-72 h-52 rounded-full blur-[60px] pointer-events-none"
-          style={{ background: "radial-gradient(ellipse at center, rgba(194,241,53,0.09), transparent 70%)" }} />
-        <div className="absolute inset-0 pointer-events-none"
-          style={{ backgroundImage: "radial-gradient(circle, rgba(194,241,53,0.10) 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+          style={{ background: "radial-gradient(ellipse at center, rgba(34,211,238,0.10), transparent 70%)" }} />
         <div className="absolute top-0 left-0 bottom-0 w-[3px] pointer-events-none"
           style={{ background: "linear-gradient(to bottom, rgba(194,241,53,0.7), rgba(194,241,53,0.2) 55%, transparent)" }} />
         <div className="absolute bottom-0 left-0 right-0 h-px pointer-events-none"
-          style={{ background: "linear-gradient(to right, transparent, rgba(194,241,53,0.25) 40%, rgba(194,241,53,0.25) 60%, transparent)" }} />
+          style={{ background: "linear-gradient(to right, transparent, rgba(34,211,238,0.30) 40%, rgba(34,211,238,0.30) 60%, transparent)" }} />
 
         <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-8 pb-8 max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">

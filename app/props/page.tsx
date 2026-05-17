@@ -74,8 +74,7 @@ export default async function PropsPage() {
           title={t("heroTitle")}
           titleHighlight={t("heroTitleHighlight")}
           description={t("heroDesc")}
-          image="https://images.unsplash.com/photo-1431068799455-80bae0caf685?w=1600&q=90"
-          imagePosition="center 50%"
+          accentRgb="52,211,153"
           cta={{ label: t("heroCta"), href: "/inserat" }}
         />
       <PropsContent serverListings={serverListings} vendorProfiles={equipmentVendors} />

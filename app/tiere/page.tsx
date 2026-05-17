@@ -51,8 +51,7 @@ export default async function TierePage() {
         title="Ausgebildete Tiere"
         titleHighlight="für deine Produktion"
         description="Von dressierten Hunden bis zu exotischen Tieren — finde den perfekten vierbeinigen Star für deinen Film, deine Werbung oder dein Fotoshooting."
-        image="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=1600&q=90"
-        imagePosition="center 40%"
+        accentRgb="74,222,128"
         overlay="left"
         height="sm"
         cta={{ label: "Tier inserieren", href: "/inserat" }}
