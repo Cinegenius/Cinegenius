@@ -59,71 +59,64 @@ export default function LocationsLanding({
     <div className="min-h-screen bg-bg-primary">
 
       {/* ── Hero / Search ─────────────────────────────────────────── */}
-      <div className="relative overflow-hidden pt-16 pb-8 px-4">
-        {/* Background glows */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full blur-[120px] pointer-events-none"
-          style={{ background: `radial-gradient(ellipse at center, ${g(0.30)}, transparent 70%)` }} />
-        <div className="absolute bottom-0 right-0 w-[400px] h-[300px] rounded-full blur-[100px] pointer-events-none"
-          style={{ background: `radial-gradient(ellipse at center, ${g(0.12)}, transparent 70%)` }} />
+      <div className="relative overflow-hidden pt-8 pb-6 px-4">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] rounded-full blur-[100px] pointer-events-none"
+          style={{ background: `radial-gradient(ellipse at center, ${g(0.25)}, transparent 70%)` }} />
 
-        <div className="relative z-10 max-w-3xl mx-auto text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4"
+        <div className="relative z-10 max-w-2xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-3"
             style={{ background: g(0.10), border: `1px solid ${g(0.30)}` }}>
-            <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: g(1) }}>
+            <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: g(1) }}>
               Filmlocations Deutschland
             </span>
           </div>
 
-          <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold text-text-primary mb-3 leading-tight">
-            Finde die perfekte{" "}
-            <span className="text-gradient-gold">Location</span>
+          <h1 className="font-display text-2xl sm:text-4xl font-bold text-text-primary mb-2 leading-tight">
+            Finde die perfekte <span className="text-gradient-gold">Location</span>
           </h1>
 
-          <p className="text-text-secondary text-base mb-6">
+          <p className="text-text-muted text-sm mb-4">
             {totalCount > 0
               ? `${totalCount.toLocaleString("de-DE")} Locations für Film, Werbung & Foto`
               : "Apartments, Villen, Studios, Außengelände & mehr"}
           </p>
 
-          {/* Search bar — stacks on mobile */}
-          <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center bg-bg-elevated border border-border rounded-2xl p-2 shadow-2xl gap-2 focus-within:border-indigo-400/50 transition-colors">
-              <div className="flex items-center gap-3 flex-1 px-3">
-                <Search size={18} className="text-text-muted shrink-0" />
+          {/* Search bar */}
+          <form onSubmit={handleSearch} className="max-w-xl mx-auto mb-4">
+            <div className="flex items-center bg-bg-elevated border border-border rounded-xl p-1.5 shadow-xl gap-2 focus-within:border-indigo-400/50 transition-colors">
+              <div className="flex items-center gap-2 flex-1 px-3">
+                <Search size={15} className="text-text-muted shrink-0" />
                 <input
                   type="text"
-                  placeholder="Stadt, Location-Typ..."
+                  placeholder="Stadt, Location-Typ oder Stichwort..."
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  className="flex-1 bg-transparent text-text-primary placeholder:text-text-muted outline-none text-base py-2"
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  className="flex-1 bg-transparent text-text-primary placeholder:text-text-muted outline-none text-sm py-1.5"
                   autoComplete="off"
                 />
                 {query && (
-                  <button type="button" onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors px-1">
+                  <button type="button" onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors">
                     ×
                   </button>
                 )}
               </div>
               <button
                 type="submit"
-                className="w-full sm:w-auto px-6 py-3 bg-gold text-bg-primary font-bold rounded-xl hover:bg-gold-light transition-colors text-sm"
+                className="px-5 py-2 bg-gold text-bg-primary font-bold rounded-lg hover:bg-gold-light transition-colors text-sm shrink-0"
               >
                 Suchen →
               </button>
             </div>
           </form>
 
-          {/* Category pills — horizontal scroll on mobile */}
-          <div
-            className="flex gap-2 mt-5 overflow-x-auto pb-1 justify-start sm:justify-center"
-            style={{ scrollbarWidth: "none" }}
-          >
+          {/* Category pills — always horizontal scroll */}
+          <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
             {CATEGORIES.map(({ label, value }) => (
               <Link
                 key={label}
                 href={`/locations/suche${value ? `?type=${encodeURIComponent(value)}` : ""}`}
-                className="shrink-0 px-4 py-2 rounded-full text-sm border border-border text-text-secondary hover:text-text-primary hover:border-indigo-400/40 transition-all bg-bg-elevated whitespace-nowrap"
+                className="shrink-0 px-3 py-1.5 rounded-full text-xs border border-border text-text-secondary hover:text-text-primary hover:border-indigo-400/40 transition-all bg-bg-elevated whitespace-nowrap"
               >
                 {label}
               </Link>
