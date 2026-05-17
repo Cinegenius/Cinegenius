@@ -82,7 +82,7 @@ export default function LocationsLanding({
           </p>
 
           {/* Search bar */}
-          <form onSubmit={handleSearch} className="max-w-xl mx-auto mb-4">
+          <form onSubmit={handleSearch} className="max-w-xl mx-auto mb-3">
             <div className="flex items-center bg-bg-elevated border border-border rounded-xl p-1.5 shadow-xl gap-2 focus-within:border-indigo-400/50 transition-colors">
               <div className="flex items-center gap-2 flex-1 px-3">
                 <Search size={15} className="text-text-muted shrink-0" />
@@ -109,6 +109,17 @@ export default function LocationsLanding({
               </button>
             </div>
           </form>
+
+          {/* Quick link to full search */}
+          <div className="mb-4">
+            <Link
+              href="/locations/suche"
+              className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-gold transition-colors"
+            >
+              <MapPin size={11} />
+              Alle Locations mit Karte & Filtern ansehen <ArrowRight size={11} />
+            </Link>
+          </div>
 
           {/* Category pills — scroll on mobile, wrap on desktop */}
           <div className="flex gap-2 overflow-x-auto sm:overflow-x-visible sm:flex-wrap sm:justify-center pb-1" style={{ scrollbarWidth: "none" }}>
