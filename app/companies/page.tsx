@@ -26,7 +26,7 @@ export default async function CompaniesPage() {
     .limit(200);
 
   return (
-    <>
+    <div style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(251,113,133,0.06) 0%, transparent 50%)" }}>
       <PageHeader
           badge={t("badge")}
           title={t("title")}
@@ -37,6 +37,6 @@ export default async function CompaniesPage() {
           cta={{ label: t("addCompany"), href: "/company-setup" }}
         />
       <CompaniesContent initialCompanies={data ?? []} />
-    </>
+    </div>
   );
 }

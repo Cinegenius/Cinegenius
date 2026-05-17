@@ -4,7 +4,8 @@ import { useState, useMemo, useEffect, useRef, useCallback, Suspense } from "rea
 import Link from "next/link";
 import Image from "next/image";
 import dynamicImport from "next/dynamic";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
+
 import {
   MapPin, Star, CheckCircle, Search, Zap, LayoutList,
   Map, Navigation, SlidersHorizontal, X, Share2, Film, Users,
@@ -107,6 +108,7 @@ function VendorSection({ vendors }: { vendors: VendorProfile[] }) {
 
 function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListings: Location[]; vendorProfiles?: VendorProfile[] }) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const t = useTranslations("locations");
 
@@ -149,7 +151,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
     if (current.max) params.set("max", current.max);
     if (current.sort && current.sort !== "featured") params.set("sort", current.sort);
     const qs = params.toString();
-    router.replace(qs ? `/locations?${qs}` : "/locations", { scroll: false });
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   }, [query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, sortKey, router]);
 
   void updateURL;
@@ -244,7 +246,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
     setMinPrice(""); setMaxPrice("");
     setLageFilter("Alle"); setPowerOnly(false);
     setUserLocation(null);
-    router.replace("/locations", { scroll: false });
+    router.replace(pathname, { scroll: false });
   };
 
   // Sync URL with filters
@@ -261,7 +263,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
       if (powerOnly) params.set("power", "1");
       if (sortKey !== "featured") params.set("sort", sortKey);
       const qs = params.toString();
-      router.replace(qs ? `/locations?${qs}` : "/locations", { scroll: false });
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     }, 300);
     return () => clearTimeout(timer);
   }, [query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, router]);

@@ -183,7 +183,7 @@ export default async function CreatorsPage() {
     .sort((a, b) => a.alt.localeCompare(b.alt));
 
   return (
-    <>
+    <div style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(251,146,60,0.06) 0%, transparent 50%)" }}>
       <PageHeader
           badge="Crew"
           title={t("heroTitle")}
@@ -193,6 +193,6 @@ export default async function CreatorsPage() {
           cta={!hasProfile ? { label: t("heroCta"), href: "/profile" } : undefined}
         />
       <CreatorsContent serverCreators={serverCreators} hasStrip={true} />
-    </>
+    </div>
   );
 }

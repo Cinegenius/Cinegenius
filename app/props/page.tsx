@@ -68,7 +68,7 @@ export default async function PropsPage() {
   }));
 
   return (
-    <>
+    <div style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(52,211,153,0.06) 0%, transparent 50%)" }}>
       <PageHeader
           badge={t("heroBadge")}
           title={t("heroTitle")}
@@ -78,6 +78,6 @@ export default async function PropsPage() {
           cta={{ label: t("heroCta"), href: "/inserat" }}
         />
       <PropsContent serverListings={serverListings} vendorProfiles={equipmentVendors} />
-    </>
+    </div>
   );
 }

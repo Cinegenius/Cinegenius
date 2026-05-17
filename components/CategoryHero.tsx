@@ -67,7 +67,7 @@ export default function CategoryHero({
         <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-text-primary leading-tight mb-3">
           {title}
           {titleHighlight && (
-            <><br className="hidden sm:block" /><span className="text-gradient-gold">{titleHighlight}</span></>
+            <> <span className="text-gradient-gold">{titleHighlight}</span></>
           )}
         </h1>
 

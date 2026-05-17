@@ -45,7 +45,7 @@ export default async function TierePage() {
   }));
 
   return (
-    <>
+    <div style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(74,222,128,0.06) 0%, transparent 50%)" }}>
       <CategoryHero
         badge="Film-Tiere"
         title="Ausgebildete Tiere"
@@ -57,6 +57,6 @@ export default async function TierePage() {
         cta={{ label: "Tier inserieren", href: "/inserat" }}
       />
       <TiereContent serverListings={serverListings} />
-    </>
+    </div>
   );
 }
