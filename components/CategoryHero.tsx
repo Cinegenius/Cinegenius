@@ -58,13 +58,13 @@ export default function CategoryHero({
         style={{ background: `linear-gradient(to right, transparent, ${g(0.50)} 40%, ${g(0.50)} 60%, transparent)` }} />
 
       {/* Content */}
-      <div className={`relative z-10 w-full px-6 sm:px-8 lg:px-12 py-10 flex flex-col ${isCenter ? "items-center text-center max-w-2xl mx-auto" : "items-start max-w-2xl"}`}>
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4"
+      <div className={`relative z-10 w-full px-6 sm:px-8 lg:px-12 py-6 flex flex-col ${isCenter ? "items-center text-center max-w-2xl mx-auto" : "items-start max-w-5xl"}`}>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-3"
           style={{ background: g(0.10), border: `1px solid ${g(0.35)}` }}>
           <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: g(1) }}>{badge}</span>
         </div>
 
-        <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-text-primary leading-tight mb-3">
+        <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary leading-tight mb-2">
           {title}
           {titleHighlight && (
             <> <span className="text-gradient-gold">{titleHighlight}</span></>

@@ -26,17 +26,6 @@ type CityGroup = {
 const ACCENT = "99,102,241";
 const g = (a: number) => `rgba(${ACCENT},${a})`;
 
-const CATEGORIES = [
-  { label: "Alle anzeigen", value: "" },
-  { label: "Innenaufnahmen", value: "Wohnen" },
-  { label: "Villa", value: "Villa" },
-  { label: "Studio", value: "Studio" },
-  { label: "Industrie", value: "Industrie" },
-  { label: "Außen / Natur", value: "Natur" },
-  { label: "Gastronomie", value: "Gastronomie" },
-  { label: "Büro", value: "Büro" },
-  { label: "Speziallocation", value: "Speziallocation" },
-];
 
 export default function LocationsLanding({
   cityGroups,
@@ -112,29 +101,6 @@ export default function LocationsLanding({
             </div>
           </form>
 
-          {/* Quick link to full search */}
-          <div className="mb-4">
-            <Link
-              href="/locations/suche"
-              className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-gold transition-colors"
-            >
-              <MapPin size={11} />
-              Alle Locations mit Karte & Filtern ansehen <ArrowRight size={11} />
-            </Link>
-          </div>
-
-          {/* Category pills — scroll on mobile, wrap on desktop */}
-          <div className="flex gap-2 overflow-x-auto sm:overflow-x-visible sm:flex-wrap sm:justify-center pb-1" style={{ scrollbarWidth: "none" }}>
-            {CATEGORIES.map(({ label, value }) => (
-              <Link
-                key={label}
-                href={`/locations/suche${value ? `?type=${encodeURIComponent(value)}` : ""}`}
-                className="shrink-0 sm:shrink px-3 py-1.5 rounded-full text-xs border border-border text-text-secondary hover:text-text-primary hover:border-indigo-400/40 transition-all bg-bg-elevated whitespace-nowrap"
-              >
-                {label}
-              </Link>
-            ))}
-          </div>
         </div>
       </div>
 
