@@ -94,7 +94,7 @@ export default function CompanySetupPage() {
           setCity(c.city ?? "");
           setDescription(c.description ?? "");
           setWebsite(c.website ?? "");
-          setEmail(c.email ?? primaryEmail ?? "");
+          setEmail(c.email ?? "");
           setPhone(c.phone ?? "");
           setLogoUrl(c.logo_url ?? "");
           setLogoPreview(c.logo_url ?? "");

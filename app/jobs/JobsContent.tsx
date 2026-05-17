@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { FILM_DEPARTMENTS, DEPT_KEYWORDS, ALL_ROLES } from "@/lib/filmRoles";
-import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 // ── Department icon map ───────────────────────────────────────────
@@ -425,31 +424,43 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
 
   return (
     <div className="min-h-screen">
-      <div className="pt-16 relative overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <Image src="https://images.unsplash.com/photo-1616469829941-c7200edec809?w=1600&q=90" alt="" fill unoptimized priority
-            className="object-cover" style={{ objectPosition: "center 35%" }} sizes="100vw" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/50 to-transparent" />
-        </div>
+      <div className="pt-16 relative overflow-hidden bg-bg-primary">
+        {/* Gradient base */}
+        <div className="absolute inset-0 bg-gradient-to-br from-bg-elevated/70 via-bg-primary to-bg-primary pointer-events-none" />
+        {/* Gold glow top-right */}
+        <div className="absolute -top-24 -right-24 w-[560px] h-[440px] rounded-full blur-3xl pointer-events-none"
+          style={{ background: "radial-gradient(ellipse at center, color-mix(in srgb, var(--color-gold) 8%, transparent), transparent 70%)" }} />
+        {/* Secondary glow */}
+        <div className="absolute bottom-0 left-1/3 w-72 h-48 rounded-full blur-2xl pointer-events-none"
+          style={{ background: "radial-gradient(ellipse at center, color-mix(in srgb, var(--color-gold) 4%, transparent), transparent 70%)" }} />
+        {/* Dot grid */}
+        <div className="absolute inset-0 opacity-[0.045] pointer-events-none"
+          style={{ backgroundImage: "radial-gradient(circle, var(--color-gold) 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+        {/* Left accent */}
+        <div className="absolute top-0 left-0 bottom-0 w-[3px] pointer-events-none"
+          style={{ background: "linear-gradient(to bottom, color-mix(in srgb, var(--color-gold) 55%, transparent), color-mix(in srgb, var(--color-gold) 15%, transparent) 60%, transparent)" }} />
+        {/* Bottom edge */}
+        <div className="absolute bottom-0 left-0 right-0 h-px pointer-events-none"
+          style={{ background: "linear-gradient(to right, transparent, color-mix(in srgb, var(--color-gold) 18%, transparent) 40%, color-mix(in srgb, var(--color-gold) 18%, transparent) 60%, transparent)" }} />
+
         <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-8 pb-8 max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full mb-3">
-                <span className="text-[11px] text-white/80 font-bold uppercase tracking-widest">{t("heroBadge")}</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-bg-elevated/80 border border-gold/20 rounded-full mb-3">
+                <span className="text-[11px] text-gold/80 font-bold uppercase tracking-widest">{t("heroBadge")}</span>
               </div>
-              <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight mb-2">
+              <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary leading-tight mb-2">
                 {t("heroTitle")}{" "}
                 <span className="text-gradient-gold">{t("heroTitleHighlight")}</span>
               </h1>
-              <p className="text-white/60 text-sm sm:text-base leading-relaxed max-w-xl">
+              <p className="text-text-secondary text-sm sm:text-base leading-relaxed max-w-xl">
                 {allJobs.length > 0
                   ? t("heroDesc", { count: allJobs.length })
                   : t("heroDescEmpty")}
               </p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              <Link href="/jobs" className="inline-flex items-center gap-2 px-4 py-2.5 border border-white/20 text-white/70 rounded-xl hover:border-white/40 hover:text-white transition-all text-sm whitespace-nowrap backdrop-blur-sm">
+              <Link href="/jobs" className="inline-flex items-center gap-2 px-4 py-2.5 border border-border text-text-secondary rounded-xl hover:border-gold/40 hover:text-gold transition-all text-sm whitespace-nowrap">
                 {t("allJobs")}
               </Link>
               <Link href="/inserat" className="inline-flex items-center gap-2 px-4 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm whitespace-nowrap">
