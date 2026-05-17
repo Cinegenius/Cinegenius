@@ -9,7 +9,7 @@ import {
   Shield, MessageSquare, ChevronRight, Expand,
   Wifi, Car, Zap as Power, Coffee, DoorOpen, Truck,
   Thermometer, Volume2, Wind, Accessibility, ArrowUpDown,
-  FlipHorizontal, Pencil,
+  FlipHorizontal, Pencil, Maximize2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
@@ -142,7 +142,7 @@ export default function LocationDetail({ location }: { location: Location }) {
       )}
 
       {/* Content + sidebar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-28 lg:pb-20">
         <div className="flex gap-10 flex-col lg:flex-row">
           {/* Left */}
           <div className="flex-1 min-w-0">
@@ -190,19 +190,30 @@ export default function LocationDetail({ location }: { location: Location }) {
 
             {/* Key specs */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-              {[
-                meta.sqm && { label: "Fläche", value: `${meta.sqm} m²` },
-                meta.ceiling_height_m && { label: "Deckenhöhe", value: `${meta.ceiling_height_m} m` },
-                meta.max_crew && { label: "Max. Crew", value: `${meta.max_crew} Personen` },
-                meta.parking_spots != null && { label: "Parkplätze", value: String(meta.parking_spots) },
-                lageLabel && { label: "Lage", value: lageLabel },
-                location.price > 0 && { label: "Preis", value: `${location.price.toLocaleString()} €/Tag` },
-              ].filter((x): x is { label: string; value: string } => !!x).map(({ label, value }) => (
-                <div key={label} className="p-4 bg-bg-secondary border border-border rounded-xl text-center">
-                  <div className="text-xs uppercase tracking-widest text-text-muted mb-1">{label}</div>
-                  <div className="text-sm font-semibold text-text-primary">{value}</div>
-                </div>
-              ))}
+              {(() => {
+                const specIcons: Record<string, React.ReactNode> = {
+                  "Fläche": <Maximize2 size={14} className="text-gold" />,
+                  "Deckenhöhe": <ArrowUpDown size={14} className="text-gold" />,
+                  "Max. Crew": <Users size={14} className="text-gold" />,
+                  "Parkplätze": <Car size={14} className="text-gold" />,
+                  "Lage": <MapPin size={14} className="text-gold" />,
+                  "Preis": <Zap size={14} className="text-gold" />,
+                };
+                return [
+                  meta.sqm && { label: "Fläche", value: `${meta.sqm} m²` },
+                  meta.ceiling_height_m && { label: "Deckenhöhe", value: `${meta.ceiling_height_m} m` },
+                  meta.max_crew && { label: "Max. Crew", value: `${meta.max_crew} Personen` },
+                  meta.parking_spots != null && { label: "Parkplätze", value: String(meta.parking_spots) },
+                  lageLabel && { label: "Lage", value: lageLabel },
+                  location.price > 0 && { label: "Preis", value: `${location.price.toLocaleString()} €/Tag` },
+                ].filter((x): x is { label: string; value: string } => !!x).map(({ label, value }) => (
+                  <div key={label} className="p-3 bg-bg-secondary border border-border rounded-xl flex flex-col items-center gap-1.5 text-center">
+                    {specIcons[label] ?? null}
+                    <div className="text-[10px] uppercase tracking-widest text-text-muted">{label}</div>
+                    <div className="text-sm font-semibold text-text-primary">{value}</div>
+                  </div>
+                ));
+              })()}
             </div>
 
             {/* Description */}
@@ -260,7 +271,7 @@ export default function LocationDetail({ location }: { location: Location }) {
 
           {/* Booking sidebar */}
           <div className="lg:w-[360px] shrink-0">
-            <div className="sticky top-20 space-y-4">
+            <div id="booking-sidebar" className="sticky top-20 space-y-4">
               <div className="bg-bg-secondary border border-border rounded-xl p-5">
                 <div className="flex items-end gap-1 mb-1">
                   <span className="text-3xl font-bold font-display text-text-primary">
@@ -308,6 +319,29 @@ export default function LocationDetail({ location }: { location: Location }) {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Mobile sticky CTA */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-bg-primary/95 backdrop-blur-sm border-t border-border px-4 py-3 flex items-center gap-3">
+        <div className="flex-1">
+          <div className="text-lg font-bold font-display text-text-primary">
+            {location.price > 0 ? `${location.price.toLocaleString()} €` : "Auf Anfrage"}
+            {location.price > 0 && <span className="text-text-muted font-normal text-sm">/{location.priceUnit}</span>}
+          </div>
+          <div className="flex items-center gap-1">
+            <Star size={11} className="text-gold fill-gold" />
+            <span className="text-xs text-text-secondary">{location.rating} · {location.reviews} Bewertungen</span>
+          </div>
+        </div>
+        <button
+          onClick={() => {
+            const sidebar = document.getElementById("booking-sidebar");
+            if (sidebar) sidebar.scrollIntoView({ behavior: "smooth" });
+          }}
+          className="bg-gold text-bg-primary font-semibold px-5 py-2.5 rounded-xl text-sm hover:bg-gold-light transition-colors shrink-0"
+        >
+          {location.instantBook ? "Sofort buchen" : "Anfragen"}
+        </button>
       </div>
     </div>
   );

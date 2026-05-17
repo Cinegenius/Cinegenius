@@ -478,7 +478,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
                 action={allLocations.length === 0 ? { label: t("emptyAction"), onClick: () => window.location.href = "/inserat?group=drehorte" } : { label: t("emptyActionReset"), onClick: resetFilters }}
               />
             ) : (
-              <div className={`p-3 ${viewMode === "list" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-6" : "space-y-2"}`}>
+              <div className={`${viewMode === "list" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-6" : "space-y-3 p-3"}`}>
                 {filtered.slice(0, visibleCount).map((loc) => (
                   viewMode === "split" ? (
                     <div
@@ -488,45 +488,41 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
                       onMouseLeave={() => setActiveId(null)}
                       className={`group rounded-xl border overflow-hidden transition-all cursor-pointer ${
                         activeId === loc.id
-                          ? "border-gold shadow-gold"
+                          ? "border-gold shadow-[0_0_0_1px_var(--color-gold)]"
                           : "border-border hover:border-gold/50"
                       }`}
                     >
-                      <Link href={`/locations/${loc.id}`} className="flex gap-3 p-3 bg-bg-secondary hover:bg-bg-elevated transition-colors">
-                        <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-bg-elevated">
+                      <Link href={`/locations/${loc.id}`} className="block bg-bg-secondary hover:bg-bg-elevated transition-colors">
+                        <div className="relative aspect-video overflow-hidden bg-bg-elevated">
                           {loc.image
-                            ? <Image src={loc.image} alt={loc.title} fill className="object-cover group-hover:scale-110 transition-transform duration-500" style={{ objectPosition: loc.focalPoint ? `${loc.focalPoint.x}% ${loc.focalPoint.y}%` : "50% 50%" }} sizes="300px" />
-                            : <div className="w-full h-full flex items-center justify-center text-text-muted/30"><svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div>
+                            ? <Image src={loc.image} alt={loc.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" style={{ objectPosition: loc.focalPoint ? `${loc.focalPoint.x}% ${loc.focalPoint.y}%` : "50% 50%" }} sizes="420px" />
+                            : <div className="w-full h-full flex items-center justify-center text-text-muted/30"><MapPin size={32} /></div>
                           }
-                          {loc.isReal && (
-                            <div className="absolute top-1 left-1 bg-success text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
-                              NEU
-                            </div>
-                          )}
-                          {loc.instantBook && (
-                            <div className="absolute bottom-0 left-0 right-0 bg-gold text-bg-primary text-xs text-center py-0.5 font-semibold">
-                              Instant
+                          <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/60 to-transparent" />
+                          <div className="absolute top-2 left-2 flex gap-1">
+                            {loc.isReal && <span className="px-1.5 py-0.5 bg-success text-white text-[10px] font-bold rounded">NEU</span>}
+                            {loc.instantBook && <span className="px-1.5 py-0.5 bg-gold text-bg-primary text-[10px] font-bold rounded">Instant</span>}
+                          </div>
+                          {loc.verified && (
+                            <div className="absolute top-2 right-2">
+                              <CheckCircle size={14} className="text-success drop-shadow" />
                             </div>
                           )}
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-1 mb-0.5">
-                            <h3 className="font-semibold text-text-primary text-sm leading-snug line-clamp-1">{loc.title}</h3>
-                            {loc.verified && <CheckCircle size={12} className="text-success shrink-0 mt-0.5" />}
-                          </div>
-                          <p className="text-xs text-text-muted flex items-center gap-1 mb-1.5">
-                            <MapPin size={10} /> {loc.city}
+                        <div className="p-3">
+                          <h3 className="font-semibold text-text-primary text-sm leading-snug line-clamp-1 mb-0.5">{loc.title}</h3>
+                          <p className="text-xs text-text-muted flex items-center gap-1 mb-2">
+                            <MapPin size={10} /> {loc.city} · {loc.type}
                           </p>
-                          <div className="flex items-center gap-1.5 mb-1.5">
-                            <Star size={11} className="text-gold fill-gold" />
-                            <span className="text-xs text-text-secondary">{loc.rating}</span>
-                            <span className="text-xs text-text-muted">({loc.reviews})</span>
-                          </div>
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-text-muted">{loc.sqft.toLocaleString()} sqft</span>
+                            <div className="flex items-center gap-1">
+                              <Star size={11} className="text-gold fill-gold" />
+                              <span className="text-xs text-text-secondary">{loc.rating}</span>
+                              <span className="text-xs text-text-muted">({loc.reviews})</span>
+                            </div>
                             <span className="text-sm font-bold text-gold">
-                              ${loc.price.toLocaleString()}
-                              <span className="text-text-muted font-normal text-xs">/{loc.priceUnit}</span>
+                              {loc.price > 0 ? `${loc.price.toLocaleString()} €` : "Auf Anfrage"}
+                              {loc.price > 0 && <span className="text-text-muted font-normal text-xs">/{loc.priceUnit}</span>}
                             </span>
                           </div>
                         </div>
