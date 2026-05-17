@@ -424,30 +424,24 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
 
   return (
     <div className="min-h-screen">
-      <div className="pt-16 relative overflow-hidden bg-bg-primary">
-        {/* Gradient base */}
-        <div className="absolute inset-0 bg-gradient-to-br from-bg-elevated/70 via-bg-primary to-bg-primary pointer-events-none" />
-        {/* Gold glow top-right */}
-        <div className="absolute -top-24 -right-24 w-[560px] h-[440px] rounded-full blur-3xl pointer-events-none"
-          style={{ background: "radial-gradient(ellipse at center, color-mix(in srgb, var(--color-gold) 8%, transparent), transparent 70%)" }} />
-        {/* Secondary glow */}
-        <div className="absolute bottom-0 left-1/3 w-72 h-48 rounded-full blur-2xl pointer-events-none"
-          style={{ background: "radial-gradient(ellipse at center, color-mix(in srgb, var(--color-gold) 4%, transparent), transparent 70%)" }} />
-        {/* Dot grid */}
-        <div className="absolute inset-0 opacity-[0.045] pointer-events-none"
-          style={{ backgroundImage: "radial-gradient(circle, var(--color-gold) 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
-        {/* Left accent */}
+      <div className="pt-16 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #1a1d26 0%, #0E1016 60%)" }}>
+        <div className="absolute -top-16 -right-16 w-[600px] h-[480px] rounded-full blur-[90px] pointer-events-none"
+          style={{ background: "radial-gradient(ellipse at center, rgba(194,241,53,0.18), transparent 70%)" }} />
+        <div className="absolute -bottom-10 left-1/3 w-72 h-52 rounded-full blur-[60px] pointer-events-none"
+          style={{ background: "radial-gradient(ellipse at center, rgba(194,241,53,0.09), transparent 70%)" }} />
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ backgroundImage: "radial-gradient(circle, rgba(194,241,53,0.10) 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
         <div className="absolute top-0 left-0 bottom-0 w-[3px] pointer-events-none"
-          style={{ background: "linear-gradient(to bottom, color-mix(in srgb, var(--color-gold) 55%, transparent), color-mix(in srgb, var(--color-gold) 15%, transparent) 60%, transparent)" }} />
-        {/* Bottom edge */}
+          style={{ background: "linear-gradient(to bottom, rgba(194,241,53,0.7), rgba(194,241,53,0.2) 55%, transparent)" }} />
         <div className="absolute bottom-0 left-0 right-0 h-px pointer-events-none"
-          style={{ background: "linear-gradient(to right, transparent, color-mix(in srgb, var(--color-gold) 18%, transparent) 40%, color-mix(in srgb, var(--color-gold) 18%, transparent) 60%, transparent)" }} />
+          style={{ background: "linear-gradient(to right, transparent, rgba(194,241,53,0.25) 40%, rgba(194,241,53,0.25) 60%, transparent)" }} />
 
         <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-8 pb-8 max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-bg-elevated/80 border border-gold/20 rounded-full mb-3">
-                <span className="text-[11px] text-gold/80 font-bold uppercase tracking-widest">{t("heroBadge")}</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-3"
+                style={{ background: "rgba(194,241,53,0.08)", border: "1px solid rgba(194,241,53,0.22)" }}>
+                <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: "rgba(194,241,53,0.85)" }}>{t("heroBadge")}</span>
               </div>
               <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary leading-tight mb-2">
                 {t("heroTitle")}{" "}
