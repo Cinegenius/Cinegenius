@@ -82,7 +82,7 @@ function VendorSection({ vendors }: { vendors: VendorProfile[] }) {
         <div className="flex flex-wrap gap-2">
           {vendors.map((v) => (
             <Link key={v.id} href={`/profile/${v.id}`}
-              className="group inline-flex items-center gap-2.5 px-3 py-2 rounded-xl border border-border/50 bg-bg-elevated/40 hover:border-indigo-400/40 hover:bg-bg-elevated transition-all duration-200">
+              className="group inline-flex items-center gap-2.5 px-3 py-2 rounded-xl border border-border/50 bg-bg-elevated/40 hover:border-gold/40 hover:bg-bg-elevated transition-all duration-200">
               {v.avatar ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={v.avatar} alt={v.name} loading="lazy" className="w-8 h-8 rounded-full object-cover border border-border/40 shrink-0" />
@@ -93,7 +93,7 @@ function VendorSection({ vendors }: { vendors: VendorProfile[] }) {
               )}
               <div className="min-w-0">
                 <div className="flex items-center gap-1">
-                  <p className="text-sm font-semibold text-text-primary whitespace-nowrap group-hover:text-indigo-400 transition-colors">{v.name}</p>
+                  <p className="text-sm font-semibold text-text-primary whitespace-nowrap group-hover:text-gold transition-colors">{v.name}</p>
                   {v.verified && <CheckCircle size={11} className="text-gold/60 shrink-0" />}
                 </div>
                 {v.location && <p className="text-[11px] text-text-muted whitespace-nowrap">{v.location.split(",")[0]}</p>}
@@ -279,7 +279,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
           {/* Row 1: Search + View toggle */}
           <div className="flex items-center gap-2">
             {/* Search */}
-            <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-indigo-400 transition-colors">
+            <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold transition-colors">
               <Search size={14} className="text-text-muted shrink-0" />
               <input
                 type="text"
@@ -308,10 +308,9 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
                   title={label}
                   className={`${hideOnMobile ? "hidden sm:flex" : "flex"} items-center gap-1.5 h-9 px-2.5 text-xs font-medium transition-all border-r border-border last:border-r-0 ${
                     viewMode === mode
-                      ? "text-white"
+                      ? "bg-gold text-bg-primary"
                       : "text-text-muted hover:text-text-primary hover:bg-bg-hover"
                   }`}
-                  style={viewMode === mode ? { background: "rgba(99,102,241,1)" } : undefined}
                 >
                   <Icon size={13} />
                   <span className="hidden sm:inline">{label}</span>
@@ -328,10 +327,9 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
               disabled={locating}
               className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all shrink-0 ${
                 userLocation
-                  ? "text-white border-indigo-500"
-                  : "border-border text-text-secondary hover:border-indigo-400 hover:text-indigo-400"
+                  ? "bg-gold text-bg-primary border-gold"
+                  : "border-border text-text-secondary hover:border-gold hover:text-gold"
               }`}
-              style={userLocation ? { background: "rgba(99,102,241,1)" } : undefined}
             >
               <Navigation size={13} className={locating ? "animate-spin" : ""} />
               {locating ? t("locating") : userLocation ? t("locateActive") : t("locateMe")}
@@ -339,12 +337,12 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
 
             {/* Radius */}
             {userLocation && (
-              <div className="flex items-center gap-2 bg-bg-elevated border border-indigo-500/30 rounded-lg h-9 px-3 shrink-0">
+              <div className="flex items-center gap-2 bg-bg-elevated border border-gold/30 rounded-lg h-9 px-3 shrink-0">
                 <span className="text-xs text-text-muted">{t("radiusLabel")}</span>
                 <select
                   value={radiusKm}
                   onChange={(e) => setRadiusKm(Number(e.target.value))}
-                  className="bg-transparent border-none text-xs font-semibold focus:outline-none text-indigo-400"
+                  className="bg-transparent border-none text-xs text-gold font-semibold focus:outline-none"
                 >
                   {[10, 25, 50, 100, 200, 500].map((r) => (
                     <option key={r} value={r}>{r} km</option>
@@ -358,14 +356,14 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border transition-all shrink-0 ${
                 showFilters || hasActiveFilters
-                  ? "border-indigo-500 text-indigo-400"
-                  : "border-border text-text-secondary hover:border-indigo-400 hover:text-indigo-400"
+                  ? "border-gold text-gold"
+                  : "border-border text-text-secondary hover:border-gold hover:text-gold"
               }`}
             >
               <SlidersHorizontal size={13} />
               {t("filterBtn")}
               {hasActiveFilters && (
-                <span className="w-4 h-4 text-white text-[10px] rounded-full flex items-center justify-center font-bold" style={{ background: "rgba(99,102,241,1)" }}>!</span>
+                <span className="w-4 h-4 bg-gold text-bg-primary text-[10px] rounded-full flex items-center justify-center font-bold">!</span>
               )}
             </button>
 
@@ -373,7 +371,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
             <button
               onClick={handleCopyLink}
               title="Copy shareable link"
-              className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-xs font-medium border border-border text-text-secondary hover:border-indigo-400 hover:text-indigo-400 transition-all shrink-0"
+              className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-xs font-medium border border-border text-text-secondary hover:border-gold hover:text-gold transition-all shrink-0"
             >
               <Share2 size={13} /> {copied ? t("copied") : t("shareBtn")}
             </button>
@@ -390,10 +388,9 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
                     onClick={() => setActiveType(t)}
                     className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all border ${
                       activeType === t
-                        ? "text-white border-indigo-500"
-                        : "border-border text-text-secondary hover:border-indigo-400 hover:text-indigo-400"
+                        ? "bg-gold text-bg-primary border-gold"
+                        : "border-border text-text-secondary hover:border-gold hover:text-gold"
                     }`}
-                    style={activeType === t ? { background: "rgba(99,102,241,1)" } : undefined}
                   >
                     {t}
                   </button>
@@ -417,23 +414,22 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
                   ].map(({ val, label }) => (
                     <button key={val} onClick={() => setLageFilter(val)}
                       className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all border ${
-                        lageFilter === val ? "text-white border-indigo-500" : "border-border text-text-secondary hover:border-indigo-400 hover:text-indigo-400"
-                      }`}
-                      style={lageFilter === val ? { background: "rgba(99,102,241,1)" } : undefined}>
+                        lageFilter === val ? "bg-gold text-bg-primary border-gold" : "border-border text-text-secondary hover:border-gold hover:text-gold"
+                      }`}>
                       {label}
                     </button>
                   ))}
                 </div>
                 <label className="flex items-center gap-1.5 cursor-pointer text-xs text-text-secondary">
-                  <input type="checkbox" className="accent-indigo-500" checked={powerOnly} onChange={(e) => setPowerOnly(e.target.checked)} />
+                  <input type="checkbox" className="accent-gold" checked={powerOnly} onChange={(e) => setPowerOnly(e.target.checked)} />
                   <Zap size={11} className="text-gold" /> {t("filterPower")}
                 </label>
                 <label className="flex items-center gap-1.5 cursor-pointer text-xs text-text-secondary">
-                  <input type="checkbox" className="accent-indigo-500" checked={instantOnly} onChange={(e) => setInstantOnly(e.target.checked)} />
+                  <input type="checkbox" className="accent-gold" checked={instantOnly} onChange={(e) => setInstantOnly(e.target.checked)} />
                   <Zap size={11} className="text-gold" /> {t("filterInstant")}
                 </label>
                 <label className="flex items-center gap-1.5 cursor-pointer text-xs text-text-secondary">
-                  <input type="checkbox" className="accent-indigo-500" checked={verifiedOnly} onChange={(e) => setVerifiedOnly(e.target.checked)} />
+                  <input type="checkbox" className="accent-gold" checked={verifiedOnly} onChange={(e) => setVerifiedOnly(e.target.checked)} />
                   <CheckCircle size={11} className="text-success" /> {t("filterVerified")}
                 </label>
 
@@ -495,7 +491,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
                       className={`group rounded-xl border overflow-hidden transition-all cursor-pointer ${
                         activeId === loc.id
                           ? "border-gold shadow-[0_0_0_1px_var(--color-gold)]"
-                          : "border-border hover:border-indigo-500/50"
+                          : "border-border hover:border-gold/50"
                       }`}
                     >
                       <Link href={`/locations/${loc.id}`} className="block bg-bg-secondary hover:bg-bg-elevated transition-colors">
@@ -576,7 +572,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
               <div className="p-4 text-center">
                 <button
                   onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}
-                  className="px-6 py-2.5 bg-bg-secondary border border-border rounded-lg text-sm text-text-secondary hover:border-indigo-400 hover:text-indigo-400 transition-colors"
+                  className="px-6 py-2.5 bg-bg-secondary border border-border rounded-lg text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors"
                 >
                   {t("loadMore", { count: filtered.length - visibleCount })}
                 </button>

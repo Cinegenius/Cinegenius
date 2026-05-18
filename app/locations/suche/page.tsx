@@ -85,8 +85,8 @@ export default async function LocationsSuchePage() {
   }));
 
   return (
-    <>
-      <div className="pt-16 bg-bg-primary border-b border-border">
+    <div style={{ background: "radial-gradient(ellipse at 60% 0%, rgba(99,102,241,0.08) 0%, transparent 50%)" }}>
+      <div className="pt-16 bg-transparent border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <Link href="/locations" className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-gold transition-colors">
             <ArrowLeft size={14} /> Zurück zur Übersicht
@@ -94,6 +94,6 @@ export default async function LocationsSuchePage() {
         </div>
       </div>
       <LocationsContent serverListings={serverListings} vendorProfiles={locationVendors} />
-    </>
+    </div>
   );
 }
