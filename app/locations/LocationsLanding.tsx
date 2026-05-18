@@ -48,9 +48,9 @@ export default function LocationsLanding({
     <div className="min-h-screen bg-bg-primary" style={{ background: "radial-gradient(ellipse at 60% 0%, rgba(99,102,241,0.12) 0%, transparent 55%)" }}>
 
       {/* ── Hero / Search ─────────────────────────────────────────── */}
-      <div className="relative overflow-hidden pt-8 pb-6 px-4">
-        <div className="absolute -top-20 right-0 w-[800px] h-[500px] rounded-full blur-[130px] pointer-events-none"
-          style={{ background: `radial-gradient(ellipse at center, ${g(0.22)}, transparent 65%)` }} />
+      <div className="relative pt-8 pb-6 px-4">
+        <div className="absolute -top-20 right-0 w-[900px] h-[600px] rounded-full blur-[140px] pointer-events-none"
+          style={{ background: `radial-gradient(ellipse at center, ${g(0.20)}, transparent 60%)` }} />
 
         <div className="relative z-10 max-w-2xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-3"
