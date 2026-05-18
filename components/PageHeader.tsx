@@ -31,7 +31,7 @@ export default function PageHeader({
 
       {/* Main glow — top right */}
       <div className="absolute -top-16 -right-16 w-[600px] h-[480px] rounded-full blur-[100px] pointer-events-none"
-        style={{ background: `radial-gradient(ellipse at center, ${g(0.18)}, transparent 70%)` }} />
+        style={{ background: `radial-gradient(ellipse at center, ${g(0.40)}, transparent 70%)` }} />
 
       {/* Film grain */}
       <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none"

@@ -39,7 +39,7 @@ export default function CategoryHero({
     >
       {/* Main glow — top right */}
       <div className="absolute -top-16 -right-16 w-[650px] h-[520px] rounded-full blur-[110px] pointer-events-none"
-        style={{ background: `radial-gradient(ellipse at center, ${g(0.18)}, transparent 70%)` }} />
+        style={{ background: `radial-gradient(ellipse at center, ${g(0.40)}, transparent 70%)` }} />
 
       {/* Film grain */}
       <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none"
