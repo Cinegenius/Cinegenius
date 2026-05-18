@@ -30,24 +30,12 @@ export default function PageHeader({
     <div className="pt-16 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #1a1d26 0%, #0E1016 60%)" }}>
 
       {/* Main glow — top right */}
-      <div className="absolute -top-16 -right-16 w-[600px] h-[480px] rounded-full blur-[90px] pointer-events-none"
-        style={{ background: `radial-gradient(ellipse at center, ${g(0.45)}, transparent 70%)` }} />
-
-      {/* Secondary glow — bottom left */}
-      <div className="absolute -bottom-10 left-1/3 w-72 h-52 rounded-full blur-[60px] pointer-events-none"
-        style={{ background: `radial-gradient(ellipse at center, ${g(0.20)}, transparent 70%)` }} />
+      <div className="absolute -top-16 -right-16 w-[600px] h-[480px] rounded-full blur-[100px] pointer-events-none"
+        style={{ background: `radial-gradient(ellipse at center, ${g(0.18)}, transparent 70%)` }} />
 
       {/* Film grain */}
-      <div className="absolute inset-0 opacity-[0.04] mix-blend-overlay pointer-events-none"
+      <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none"
         style={{ backgroundImage: GRAIN }} />
-
-      {/* Left accent bar — accent color */}
-      <div className="absolute top-0 left-0 bottom-0 w-[3px] pointer-events-none"
-        style={{ background: `linear-gradient(to bottom, ${g(0.9)}, ${g(0.35)} 55%, transparent)` }} />
-
-      {/* Bottom hairline — accent color */}
-      <div className="absolute bottom-0 left-0 right-0 h-px pointer-events-none"
-        style={{ background: `linear-gradient(to right, transparent, ${g(0.50)} 40%, ${g(0.50)} 60%, transparent)` }} />
 
       {/* Content */}
       <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-8 pb-8 max-w-7xl mx-auto">

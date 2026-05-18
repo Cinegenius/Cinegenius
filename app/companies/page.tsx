@@ -26,7 +26,7 @@ export default async function CompaniesPage() {
     .limit(200);
 
   return (
-    <div style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(251,113,133,0.06) 0%, transparent 50%)" }}>
+    <div style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(251,113,133,0.03) 0%, transparent 50%)" }}>
       <PageHeader
           badge={t("badge")}
           title={t("title")}

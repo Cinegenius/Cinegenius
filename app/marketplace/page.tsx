@@ -85,7 +85,7 @@ export default async function MarketplacePage({
   const activeEntry = SIDEBAR.find((s) => s.slug === activeSlug)!;
 
   return (
-    <div className="min-h-screen" style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(167,139,250,0.06) 0%, transparent 50%)" }}>
+    <div className="min-h-screen" style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(167,139,250,0.03) 0%, transparent 50%)" }}>
       <CategoryHero
         badge="Marktplatz"
         title="Requisiten, Kameras,"

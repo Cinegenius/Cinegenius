@@ -423,16 +423,10 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   const activeRoleData = selectedRoleId ? ALL_ROLES.find((r) => r.id === selectedRoleId) : null;
 
   return (
-    <div className="min-h-screen" style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(34,211,238,0.06) 0%, transparent 50%)" }}>
+    <div className="min-h-screen" style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(34,211,238,0.03) 0%, transparent 50%)" }}>
       <div className="pt-16 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #1a1d26 0%, #0E1016 60%)" }}>
-        <div className="absolute -top-16 -right-16 w-[600px] h-[480px] rounded-full blur-[90px] pointer-events-none"
-          style={{ background: "radial-gradient(ellipse at center, rgba(34,211,238,0.45), transparent 70%)" }} />
-        <div className="absolute -bottom-10 left-1/3 w-72 h-52 rounded-full blur-[60px] pointer-events-none"
-          style={{ background: "radial-gradient(ellipse at center, rgba(34,211,238,0.20), transparent 70%)" }} />
-        <div className="absolute top-0 left-0 bottom-0 w-[3px] pointer-events-none"
-          style={{ background: "linear-gradient(to bottom, rgba(34,211,238,0.9), rgba(34,211,238,0.35) 55%, transparent)" }} />
-        <div className="absolute bottom-0 left-0 right-0 h-px pointer-events-none"
-          style={{ background: "linear-gradient(to right, transparent, rgba(34,211,238,0.50) 40%, rgba(34,211,238,0.50) 60%, transparent)" }} />
+        <div className="absolute -top-16 -right-16 w-[600px] h-[480px] rounded-full blur-[100px] pointer-events-none"
+          style={{ background: "radial-gradient(ellipse at center, rgba(34,211,238,0.18), transparent 70%)" }} />
 
         <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-8 pb-8 max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
