@@ -34,8 +34,7 @@ export default function CategoryHero({
 
   return (
     <div
-      className={`pt-16 relative overflow-hidden flex items-center ${heights[height]}`}
-      style={{ background: "linear-gradient(135deg, #1a1d26 0%, #0E1016 60%)" }}
+      className={`pt-16 relative flex items-center ${heights[height]}`}
     >
       {/* Main glow — top right */}
       <div className="absolute -top-16 -right-16 w-[650px] h-[520px] rounded-full blur-[110px] pointer-events-none"

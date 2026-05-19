@@ -424,7 +424,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
 
   return (
     <div className="min-h-screen" style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(34,211,238,0.03) 0%, transparent 50%)" }}>
-      <div className="pt-16 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #1a1d26 0%, #0E1016 60%)" }}>
+      <div className="pt-16 relative">
         <div className="absolute -top-16 -right-16 w-[600px] h-[480px] rounded-full blur-[100px] pointer-events-none"
           style={{ background: "radial-gradient(ellipse at center, rgba(34,211,238,0.40), transparent 70%)" }} />
 
