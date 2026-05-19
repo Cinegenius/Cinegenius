@@ -131,11 +131,14 @@ function getPublicListings(userId: string): Promise<{ id: string; type: string; 
     async () => {
       const { data } = await db
         .from("listings")
-        .select("id, type, title, category, price, city, image_url")
+        .select("id, type, title, category, price, city, image_url, metadata")
         .eq("user_id", userId)
         .eq("published", true)
         .order("created_at", { ascending: false });
-      return (data ?? []) as { id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null }[];
+      return (data ?? []).map((l: { id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null; metadata?: Record<string, unknown> | null }) => ({
+        ...l,
+        focal_point: (l.metadata?.focal_point as { x: number; y: number } | null) ?? null,
+      }));
     },
     ["profile-listings", userId],
     { revalidate: 300, tags: ["profiles", "listings"] }

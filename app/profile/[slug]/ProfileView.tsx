@@ -282,7 +282,12 @@ function ListingsSection({ listings }: { listings: PublicListing[] }) {
                       className="group flex items-center gap-3 px-3 py-2 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
                       {hasPhoto && (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={l.image_url!} alt={l.title} className="w-12 h-9 rounded object-cover shrink-0 border border-border/50" />
+                        <img
+                          src={l.image_url!}
+                          alt={l.title}
+                          className="w-24 h-16 rounded object-cover shrink-0 border border-border/50"
+                          style={l.focal_point ? { objectPosition: `${l.focal_point.x * 100}% ${l.focal_point.y * 100}%` } : undefined}
+                        />
                       )}
                       <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{l.title}</span>
                       {l.category && <span className="text-[10px] text-text-primary shrink-0 hidden sm:inline">{l.category}</span>}
@@ -1611,7 +1616,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 // MAIN — type-based routing
 // ═══════════════════════════════════════════════════════════════════════════════
 
-type PublicListing = { id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null };
+type PublicListing = { id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null; focal_point?: { x: number; y: number } | null };
 
 export default function ProfileView({
   profile,

@@ -41,13 +41,13 @@ export default async function AlleProjectsPage() {
   );
 
   return (
-    <div style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(56,189,248,0.03) 0%, transparent 50%)" }}>
+    <div style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(234,179,8,0.08) 0%, transparent 50%)" }}>
       <CategoryHero
         badge="Alle Projekte"
         title="Filmprojekte"
         titleHighlight="& Produktionen"
         description="Alle Kategorien — durchsuche und filtere nach Typ, Jahr und Regie."
-        accentRgb="56,189,248"
+        accentRgb="234,179,8"
         overlay="left"
         height="sm"
       />

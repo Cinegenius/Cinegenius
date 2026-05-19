@@ -85,13 +85,13 @@ export default async function MarketplacePage({
   const activeEntry = SIDEBAR.find((s) => s.slug === activeSlug)!;
 
   return (
-    <div className="min-h-screen" style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(167,139,250,0.03) 0%, transparent 50%)" }}>
+    <div className="min-h-screen" style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(168,85,247,0.08) 0%, transparent 50%)" }}>
       <CategoryHero
         badge="Marktplatz"
         title="Requisiten, Kameras,"
         titleHighlight="Licht & Equipment"
         description="Von Privatpersonen und Verleihfirmen — alles für Film, Fotografie und Social Media Produktion."
-        accentRgb="167,139,250"
+        accentRgb="168,85,247"
         overlay="left"
         height="sm"
         cta={{ label: "Inserat erstellen →", href: "/inserat" }}
