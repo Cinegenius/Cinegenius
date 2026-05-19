@@ -14,7 +14,6 @@ import {
   Smartphone, ImageIcon, Video, Aperture, MapPin, ShoppingBag, PawPrint,
 } from "lucide-react";
 import NotificationCenter from "@/components/NotificationCenter";
-import GlobalSearch from "@/components/GlobalSearch";
 import { Logo } from "@/components/Logo";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { supabase } from "@/lib/supabase";
@@ -307,7 +306,6 @@ export default function Navbar() {
 
             {/* Desktop CTA */}
             <div className="hidden lg:flex items-center gap-2">
-              <GlobalSearch />
               <LanguageSwitcher />
               <NotificationCenter />
               {!isLoaded && !profileDisplayName && !profileAvatarUrl && (
@@ -485,9 +483,6 @@ export default function Navbar() {
         </div>
 
         <nav className="px-4 py-5 overflow-y-auto h-[calc(100%-4rem)] flex flex-col gap-4">
-
-          {/* Mobile search */}
-          <GlobalSearch />
 
           {(isLoaded ? isSignedIn : !!(profileDisplayName || profileAvatarUrl)) ? (
             <>
