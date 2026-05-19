@@ -1116,7 +1116,8 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 
       {/* ── Results ─────────────────────────────────────────────────────────── */}
       {(() => {
-        const filteredCrew = filtered.filter((c) => !c.isVendor);
+        const isVendorCategory = sidebarDept === "__locations" || sidebarDept === "__marktplatz";
+        const filteredCrew = isVendorCategory ? filtered : filtered.filter((c) => !c.isVendor);
         const crewVisible  = filteredCrew.slice(0, visibleCount);
 
         return (
