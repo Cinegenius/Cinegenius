@@ -63,6 +63,15 @@ export default async function CreatorsPage() {
     .order("created_at", { ascending: false })
     .limit(300);
 
+  // Fetch location + marketplace listings
+  const { data: vendorListings } = await db
+    .from("listings")
+    .select("id, user_id, type, title, category, city, price, image_url, metadata")
+    .eq("published", true)
+    .in("type", ["location", "prop", "vehicle"])
+    .order("created_at", { ascending: false })
+    .limit(300);
+
   // Fetch profiles — limit initial load to 96 for fast page render
   const { data: profiles } = await db
     .from("profiles")
@@ -91,6 +100,37 @@ export default async function CreatorsPage() {
       skills,
       verified: false,
       isReal: true,
+    };
+  });
+
+  // Map location + marketplace listings to ServerCreator
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const fromVendorListings: ServerCreator[] = (vendorListings ?? []).map((l: any) => {
+    const profileType = l.type === "location" ? "location"
+      : l.type === "vehicle" ? "vehicle"
+      : "props";
+    const roleLabel = l.type === "location" ? "Location Anbieter"
+      : l.type === "vehicle" ? "Fahrzeug Anbieter"
+      : "Requisiten / Equipment";
+    return {
+      id: `listing_${l.id}`,
+      name: l.title,
+      role: l.category ?? roleLabel,
+      positions: [roleLabel],
+      location: l.city ?? "",
+      image: l.image_url ?? "",
+      avatar: l.image_url ?? "",
+      rating: 0,
+      reviews: 0,
+      dayRate: l.price > 0 ? `${l.price} €/Tag` : tCommon("byArrangement"),
+      available: true,
+      credits: [],
+      skills: [],
+      verified: false,
+      isReal: true,
+      profile_type: profileType,
+      isVendor: true,
+      focal_point: (l.metadata?.focal_point as { x: number; y: number } | null) ?? undefined,
     };
   });
 
@@ -174,6 +214,7 @@ export default async function CreatorsPage() {
       rating:  profileRatings[c.id]?.rating  ?? 0,
       reviews: profileRatings[c.id]?.reviews ?? 0,
     })),
+    ...fromVendorListings,
   ];
 
   // Avatar strip — only real user-uploaded avatars (Supabase storage URLs)
