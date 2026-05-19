@@ -230,7 +230,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
     <div className="min-h-screen">
 
       {/* ── Filter Bar ───────────────────────────────────────────── */}
-      <div className="bg-bg-secondary border-b border-border">
+      <div className="bg-transparent border-b border-border/30">
         <div className="px-4 py-2 space-y-2">
 
           {/* Main row */}

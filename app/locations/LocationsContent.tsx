@@ -273,7 +273,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
   return (
     <div className="min-h-screen flex flex-col h-screen">
       {/* ── TOP BAR ── */}
-      <div className="bg-bg-secondary border-b border-border py-2 px-4 shrink-0">
+      <div className="bg-transparent border-b border-border/30 py-2 px-4 shrink-0">
         <div className="max-w-full mx-auto space-y-2">
 
           {/* Row 1: Search + View toggle */}
