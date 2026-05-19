@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import {
-  MapPin, CheckCircle, Search, X, LayoutGrid, List, SlidersHorizontal, ChevronDown, Users, Globe, Languages, ArrowUpDown, Plus,
+  MapPin, CheckCircle, Search, X, LayoutGrid, List, SlidersHorizontal, ChevronDown, Users, Globe, Languages, ArrowUpDown, Plus, ShoppingBag,
   Clapperboard, Video, Lightbulb, Mic, Palette, Shirt, Sparkles, Scissors, Music, Truck, Star, Zap, Tv, MonitorPlay, FileText, Smartphone, Camera, Bot,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -494,7 +494,11 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       );
     }
 
-    if (sidebarDept) {
+    if (sidebarDept === "__locations") {
+      result = result.filter((c) => c.profile_type === "location");
+    } else if (sidebarDept === "__marktplatz") {
+      result = result.filter((c) => ["equipment", "vehicle", "studio", "props"].includes(c.profile_type ?? ""));
+    } else if (sidebarDept) {
       const deptRoles = departments.find((d) => d.id === sidebarDept)?.roles ?? [];
       result = result.filter((c) => deptRoles.some((role) => matchesRole(c, role)));
     }
@@ -1154,6 +1158,28 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                     </button>
                   );
                 })}
+                <div className="pt-3 mt-2 border-t border-border/50 space-y-0.5">
+                  {([
+                    { id: "__locations", label: "Locations", Icon: MapPin },
+                    { id: "__marktplatz", label: "Marktplatz", Icon: ShoppingBag },
+                  ] as const).map(({ id, label, Icon }) => {
+                    const isActive = sidebarDept === id;
+                    return (
+                      <button
+                        key={id}
+                        onClick={() => setSidebarDept(isActive ? null : id)}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
+                          isActive
+                            ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
+                            : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
+                        }`}
+                      >
+                        <Icon size={14} className={isActive ? "text-gold" : "text-text-muted"} />
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
               </nav>
               <div className="mt-6 pt-5 border-t border-border">
                 <a
@@ -1194,6 +1220,25 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                     }`}
                   >
                     {dept.label}
+                  </button>
+                );
+              })}
+              {([
+                { id: "__locations", label: "Locations" },
+                { id: "__marktplatz", label: "Marktplatz" },
+              ] as const).map(({ id, label }) => {
+                const isActive = sidebarDept === id;
+                return (
+                  <button
+                    key={id}
+                    onClick={() => setSidebarDept(isActive ? null : id)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
+                      isActive
+                        ? "bg-gold/10 text-gold border-gold/40"
+                        : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
+                    }`}
+                  >
+                    {label}
                   </button>
                 );
               })}
