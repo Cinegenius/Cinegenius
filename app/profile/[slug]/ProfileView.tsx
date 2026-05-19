@@ -275,17 +275,24 @@ function ListingsSection({ listings }: { listings: PublicListing[] }) {
             <div key={type}>
               <p className={`text-[9px] font-bold uppercase tracking-widest mb-2 ${meta.color}`}>{meta.label}</p>
               <div className="border border-border rounded-lg overflow-hidden bg-bg-secondary">
-                {items.map((l) => (
-                  <Link key={l.id} href={meta.href(l.id)}
-                    className="group flex items-center gap-3 px-3 py-1.5 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
-                    <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{l.title}</span>
-                    {l.category && <span className="text-[10px] text-text-primary shrink-0 hidden sm:inline">{l.category}</span>}
-                    {l.city && <span className="text-[10px] text-text-primary shrink-0">{l.city}</span>}
-                    {l.price != null && l.price > 0 && (
-                      <span className="text-[10px] text-gold font-semibold shrink-0">{l.price.toLocaleString("de-DE")} €</span>
-                    )}
-                  </Link>
-                ))}
+                {items.map((l) => {
+                  const hasPhoto = ["location", "prop", "vehicle", "animal"].includes(l.type) && !!l.image_url;
+                  return (
+                    <Link key={l.id} href={meta.href(l.id)}
+                      className="group flex items-center gap-3 px-3 py-2 border-b border-border last:border-b-0 hover:bg-bg-elevated transition-colors">
+                      {hasPhoto && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={l.image_url!} alt={l.title} className="w-12 h-9 rounded object-cover shrink-0 border border-border/50" />
+                      )}
+                      <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{l.title}</span>
+                      {l.category && <span className="text-[10px] text-text-primary shrink-0 hidden sm:inline">{l.category}</span>}
+                      {l.city && <span className="text-[10px] text-text-primary shrink-0">{l.city}</span>}
+                      {l.price != null && l.price > 0 && (
+                        <span className="text-[10px] text-gold font-semibold shrink-0">{l.price.toLocaleString("de-DE")} €</span>
+                      )}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           );
