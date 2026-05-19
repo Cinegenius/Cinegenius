@@ -473,12 +473,10 @@ function VendorSection({ vendors }: { vendors: VendorProfile[] }) {
 }
 
 export default function PropsContent({ serverListings, vendorProfiles = [] }: { serverListings: Prop[]; vendorProfiles?: VendorProfile[] }) {
+  void vendorProfiles;
   return (
-    <>
-      <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" /></div>}>
-        <PropsInner serverListings={serverListings} />
-      </Suspense>
-      <VendorSection vendors={vendorProfiles} />
-    </>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" /></div>}>
+      <PropsInner serverListings={serverListings} />
+    </Suspense>
   );
 }
