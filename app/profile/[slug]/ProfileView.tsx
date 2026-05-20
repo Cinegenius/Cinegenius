@@ -1255,8 +1255,8 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
         {bgImage ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-45" />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-bg-primary" />
+            <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-bg-primary" />
           </>
         ) : (
           <div className="absolute inset-0 bg-gradient-to-b from-bg-elevated to-bg-primary" />
@@ -1269,18 +1269,26 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 {profile.display_name ?? "Unbekannt"}
                 <span className="block h-0.5 w-12 bg-gold mt-3 rounded-full" />
               </h1>
-              {(profile.positions?.[0] ?? profile.role) && (
-                <p className="text-white/70 text-sm sm:text-base mt-3 font-light tracking-wide drop-shadow-md">
-                  {(profile.positions ?? [profile.role]).filter(Boolean).map((pos, i, arr) => (
-                    <span key={i}>
-                      {pos}
-                      {i < arr.length - 1 && <span className="text-gold mx-2">·</span>}
+              {(profile.positions?.[0] ?? profile.role) && (() => {
+                const allPos = (profile.positions ?? [profile.role]).filter(Boolean) as string[];
+                const [primary, ...rest] = allPos;
+                return (
+                  <div className="mt-3">
+                    <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide bg-gold/20 text-gold border border-gold/30 drop-shadow-md">
+                      {primary}
                     </span>
-                  ))}
-                </p>
-              )}
+                    {rest.length > 0 && (
+                      <p className="text-white/70 text-sm mt-2 font-light tracking-wide drop-shadow-md" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}>
+                        {rest.map((pos, i) => (
+                          <span key={i}>{pos}{i < rest.length - 1 && <span className="text-gold/60 mx-2">·</span>}</span>
+                        ))}
+                      </p>
+                    )}
+                  </div>
+                );
+              })()}
               {profile.location && (
-                <p className="text-white/40 text-xs mt-2 flex items-center gap-1 drop-shadow-md">
+                <p className="text-white/60 text-xs mt-2.5 flex items-center gap-1 drop-shadow-md" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.9)" }}>
                   <MapPin size={10} />{profile.location}
                 </p>
               )}
