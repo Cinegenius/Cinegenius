@@ -124,7 +124,7 @@ export default function LicensePicker({ selected, onChange }: Props) {
                 filtered.map((cat) => (
                   <div key={cat.id}>
                     <div className="px-4 py-2 bg-bg-secondary border-b border-border/60 sticky top-0">
-                      <p className="text-[10px] font-semibold uppercase tracking-widest text-text-muted flex items-center gap-1.5">
+                      <p className="text-[10px] font-semibold uppercase tracking-widest text-text-primary flex items-center gap-1.5">
                         <span>{cat.icon}</span> {cat.label}
                       </p>
                     </div>
@@ -139,7 +139,7 @@ export default function LicensePicker({ selected, onChange }: Props) {
                             className={`px-3 py-1.5 rounded-lg text-xs border transition-all ${
                               isSelected
                                 ? "bg-gold/12 border-gold/30 text-gold font-medium"
-                                : "border-border/60 text-text-secondary hover:border-gold/30 hover:text-text-primary hover:bg-white/[0.03]"
+                                : "border-border text-text-primary hover:border-gold/30 hover:text-gold hover:bg-white/[0.04]"
                             }`}
                           >
                             {isSelected && <span className="mr-1">✓</span>}
