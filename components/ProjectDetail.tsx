@@ -762,9 +762,9 @@ export default function ProjectDetail({
                 {grouped.filter(({ dept }) => dept !== "Besetzung").length > 0 && (
                   <div className="rounded-2xl border border-border overflow-hidden">
                     <div className="grid grid-cols-[1fr_1.5fr_1fr] px-5 py-2.5 bg-bg-elevated border-b border-border">
-                      <span className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">Tätigkeit</span>
-                      <span className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">Name</span>
-                      <span className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">Anmerkung</span>
+                      <span className="text-[10px] uppercase tracking-widest font-semibold text-text-secondary">Tätigkeit</span>
+                      <span className="text-[10px] uppercase tracking-widest font-semibold text-text-secondary">Name</span>
+                      <span className="text-[10px] uppercase tracking-widest font-semibold text-text-secondary">Anmerkung</span>
                     </div>
                     {grouped.filter(({ dept }) => dept !== "Besetzung").map(({ dept, members }) => {
                       const s = DEPT_STYLES[dept] ?? DEPT_STYLES["Sonstiges"];
@@ -781,7 +781,7 @@ export default function ProjectDetail({
                             const [roleLabel, note] = credit.role.split("||");
                             return (
                               <div key={credit.id} className="grid grid-cols-[1fr_1.5fr_1fr] px-5 py-2.5 border-t border-border/30 hover:bg-bg-elevated/40 transition-colors items-center">
-                                <span className="text-xs text-text-muted truncate pr-4">{roleLabel}</span>
+                                <span className="text-xs text-text-secondary truncate pr-4">{roleLabel}</span>
                                 <Link
                                   href={credit.ghost ? `/person/${credit.ghost.slug}` : `/profile/${credit.user_id}`}
                                   className="flex items-center gap-2.5 min-w-0 group/link"
@@ -797,7 +797,7 @@ export default function ProjectDetail({
                                   {credit.ghost && <span className="text-[9px] text-text-muted border border-border rounded px-1 shrink-0 ml-0.5">nicht registriert</span>}
                                   <ExternalLink size={10} className="text-text-muted shrink-0 opacity-0 group-hover/link:opacity-100 transition-opacity ml-0.5" />
                                 </Link>
-                                <span className="text-xs text-text-muted truncate pl-2">{note ?? ""}</span>
+                                <span className="text-xs text-text-secondary truncate pl-2">{note ?? ""}</span>
                               </div>
                             );
                           })}

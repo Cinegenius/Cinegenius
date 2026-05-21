@@ -5,10 +5,9 @@ import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { sendWelcomeEmail } from "@/lib/email";
 
-// All profile columns needed by the edit form.
-// Update if new columns are added to the profiles table.
+// Stable columns that always exist in the profiles table
 const PROFILE_COLS = [
-  "user_id", "display_name", "display_name_alias", "slug", "phone", "contact_email",
+  "user_id", "display_name", "display_name_alias", "slug", "phone",
   "avatar_url", "cover_image_url", "role", "positions", "location", "bio",
   "tagline", "profile_type", "profile_types", "account_type",
   "verified", "available", "available_from", "day_rate", "languages",
@@ -20,18 +19,32 @@ const PROFILE_COLS = [
   "experience", "updated_at", "created_at",
 ].join(", ");
 
+// Newer optional columns — fetched separately so a missing column doesn't break the whole query
+const PROFILE_COLS_EXTRA = "contact_email";
+
 export async function GET() {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
-  const { data, error: dbError } = await db
+  const { data: base, error: dbError } = await db
     .from("profiles")
     .select(PROFILE_COLS)
     .eq("user_id", userId)
     .maybeSingle();
 
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 });
+
+  // Merge in optional newer columns (silently ignore if they don't exist in the DB yet)
+  let data = base;
+  if (base) {
+    const { data: extra } = await db
+      .from("profiles")
+      .select(PROFILE_COLS_EXTRA)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (extra) data = { ...base, ...extra };
+  }
 
   // Back-fill Clerk metadata and set cookie for users who had a profile before this flag existed
   if (data) {
