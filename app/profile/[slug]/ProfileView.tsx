@@ -505,7 +505,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
     : null;
 
   const pContact = profile as unknown as { tiktok_url?: string; vimeo_url?: string; phone?: string; contact_email?: string };
-  const socialLinks = [
+  const socialLinks = ([
     { label: "Instagram", url: safeLink(profile.instagram_url) },
     { label: "TikTok",    url: safeLink(pContact.tiktok_url) },
     { label: "YouTube",   url: safeLink(profile.youtube_url) },
@@ -514,7 +514,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
     { label: "Website",   url: safeLink(profile.website_url), icon: true },
     pContact.phone?.trim()         ? { label: pContact.phone.trim(),         url: `tel:${pContact.phone.trim()}`,             contactIcon: "phone" as const } : null,
     pContact.contact_email?.trim() ? { label: pContact.contact_email.trim(), url: `mailto:${pContact.contact_email.trim()}`, contactIcon: "mail" as const } : null,
-  ].filter(Boolean) as { label: string; url: string; icon?: boolean; contactIcon?: "phone" | "mail" }[];
+  ] as const).filter((l): l is NonNullable<typeof l> & { url: string } => l !== null && !!l.url) as { label: string; url: string; icon?: boolean; contactIcon?: "phone" | "mail" }[];
 
   return (
     <div className="min-h-screen bg-bg-primary text-text-primary">
@@ -1142,7 +1142,7 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
 
         {(() => {
           const gp = profile as unknown as { tiktok_url?: string; vimeo_url?: string; phone?: string; contact_email?: string };
-          const links = [
+          const links = ([
             { label: "Instagram", url: safeLink(profile.instagram_url) },
             { label: "TikTok",    url: safeLink(gp.tiktok_url) },
             { label: "YouTube",   url: safeLink(profile.youtube_url) },
@@ -1151,7 +1151,7 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
             { label: "Website",   url: safeLink(profile.website_url) },
             gp.phone?.trim()         ? { label: gp.phone.trim(),         url: `tel:${gp.phone.trim()}`,             contactIcon: "phone" as const } : null,
             gp.contact_email?.trim() ? { label: gp.contact_email.trim(), url: `mailto:${gp.contact_email.trim()}`, contactIcon: "mail" as const } : null,
-          ].filter(Boolean) as { label: string; url: string; contactIcon?: "phone" | "mail" }[];
+          ] as const).filter((l): l is NonNullable<typeof l> & { url: string } => l !== null && !!l.url) as { label: string; url: string; contactIcon?: "phone" | "mail" }[];
           if (links.length === 0) return null;
           return (
             <>
@@ -1440,7 +1440,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
             {/* Social links */}
             {(() => {
               const gp2 = profile as unknown as { tiktok_url?: string; vimeo_url?: string; phone?: string; contact_email?: string };
-              const links = [
+              const links = ([
                 { label: "Instagram", url: safeLink(profile.instagram_url) },
                 { label: "TikTok",    url: safeLink(gp2.tiktok_url) },
                 { label: "YouTube",   url: safeLink(profile.youtube_url) },
@@ -1449,7 +1449,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 { label: "Website",   url: safeLink(profile.website_url) },
                 gp2.phone?.trim()         ? { label: gp2.phone.trim(),         url: `tel:${gp2.phone.trim()}`,             contactIcon: "phone" as const } : null,
                 gp2.contact_email?.trim() ? { label: gp2.contact_email.trim(), url: `mailto:${gp2.contact_email.trim()}`, contactIcon: "mail" as const } : null,
-              ].filter(Boolean) as { label: string; url: string; contactIcon?: "phone" | "mail" }[];
+              ] as const).filter((l): l is NonNullable<typeof l> & { url: string } => l !== null && !!l.url) as { label: string; url: string; contactIcon?: "phone" | "mail" }[];
               if (links.length === 0) return null;
               return (
                 <div>
