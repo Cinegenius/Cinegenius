@@ -904,17 +904,34 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
         <div className="h-16" />
       </div>
 
-      {/* ── FOTO-STRIP full-bleed unten ───────────────────────────────── */}
+      {/* ── FOTO-GRID ─────────────────────────────────────────────────── */}
       {stripImages.length > 0 && (
-        <ImageStrip
-          images={stripImages.map((img) => ({ src: img.url, alt: img.caption ?? "", onClick: () => setLightbox(img.url) }))}
-          aspectRatio="poster"
-          height={320}
-          speed="slow"
-          overlay
-        />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+            {stripImages.map((img, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setLightbox(img.url)}
+                className="relative aspect-[4/3] overflow-hidden rounded-xl group bg-bg-elevated"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={img.url}
+                  alt={img.caption ?? ""}
+                  className="w-full h-full object-cover transition-all duration-500 group-hover:brightness-110 group-hover:scale-[1.03]"
+                  loading="lazy"
+                />
+                {img.caption && (
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <p className="text-white text-xs truncate">{img.caption}</p>
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
       )}
-      <div className="h-16" />
     </div>
   );
 }
@@ -1622,18 +1639,34 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 
       </div>
 
-      {/* Photo strip — full-bleed scrolling marquee */}
+      {/* ── FOTO-GRID ─────────────────────────────────────────────────── */}
       {images.length > 0 && (
-        <ImageStrip
-          images={images.map((img) => ({ src: img.url, alt: img.caption ?? "", onClick: () => setLightbox(img.url) }))}
-          aspectRatio="poster"
-          height={320}
-          speed="slow"
-          overlay
-        />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+            {images.map((img, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setLightbox(img.url)}
+                className="relative aspect-[4/3] overflow-hidden rounded-xl group bg-bg-elevated"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={img.url}
+                  alt={img.caption ?? ""}
+                  className="w-full h-full object-cover transition-all duration-500 group-hover:brightness-110 group-hover:scale-[1.03]"
+                  loading="lazy"
+                />
+                {img.caption && (
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <p className="text-white text-xs truncate">{img.caption}</p>
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
       )}
-
-      <div className="h-16" />
     </div>
   );
 }
