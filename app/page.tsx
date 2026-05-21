@@ -464,66 +464,24 @@ export default async function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════
-          PLATFORM PILLARS
+          PLATFORM PILLARS (compact nav strip)
       ══════════════════════════════════════════════ */}
-      <section className="py-8 sm:py-16 bg-bg-secondary border-y border-border">
+      <section className="py-3 sm:py-4 bg-bg-secondary border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center sm:flex-row sm:items-end sm:justify-between mb-8 sm:mb-10 text-center sm:text-left">
-            <div>
-              <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">{t("platformLabel")}</p>
-              <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg">
-                {t("platformTitle")}
-              </h2>
-            </div>
-            <Link href="/creators" className="hidden sm:flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium shrink-0">
-              {t("platformDiscoverAll")} <ArrowRight size={14} />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {featurePillars.map(({ icon: Icon, title, desc, href, pillarKey, accent, insertHref, insertLabel, imgPos }) => {
-              const image = pillarImages[pillarKey as keyof typeof pillarImages];
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  className="group flex flex-col rounded-2xl overflow-hidden border border-border bg-bg-elevated hover:border-gold/30 transition-all duration-300"
-                >
-                  <div className="relative h-36 sm:h-48 overflow-hidden bg-bg-elevated">
-                    {image ? (
-                      <Image
-                        src={image}
-                        alt={title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                        style={{ objectPosition: imgPos }}
-                        sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw"
-                      />
-                    ) : (
-                      <div className={`absolute inset-0 bg-gradient-to-br ${accent} to-bg-elevated flex flex-col items-center justify-center gap-3`}>
-                        <p className="text-xs text-white/40 font-medium">{t("pillarEmpty")}</p>
-                        <span className="px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg group-hover:bg-[#D6F96A] transition-colors">
-                          {insertLabel} →
-                        </span>
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-bg-elevated/80 via-transparent to-transparent" />
-                  </div>
-                  <div className="p-5 flex flex-col flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-8 h-8 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
-                        <Icon size={14} className="text-gold" />
-                      </div>
-                      <h3 className="font-display text-base font-bold text-text-primary">{title}</h3>
-                    </div>
-                    <p className="text-sm text-text-muted leading-relaxed mb-4 flex-1">{desc}</p>
-                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold group-hover:gap-3 transition-all duration-200">
-                      {t("pillarDiscover")} <ArrowRight size={12} />
-                    </span>
-                  </div>
-                </Link>
-              );
-            })}
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+            {featurePillars.map(({ icon: Icon, title, href }) => (
+              <Link
+                key={href}
+                href={href}
+                className="group flex flex-col sm:flex-row items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2.5 rounded-xl border border-border bg-bg-elevated hover:border-gold/30 hover:bg-bg-hover transition-all text-center sm:text-left"
+              >
+                <div className="w-6 h-6 rounded-md bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
+                  <Icon size={12} className="text-gold" />
+                </div>
+                <span className="text-[11px] sm:text-xs font-semibold text-text-secondary group-hover:text-text-primary transition-colors leading-tight">{title}</span>
+                <ArrowRight size={10} className="hidden sm:block ml-auto text-text-muted/40 group-hover:text-gold transition-colors shrink-0" />
+              </Link>
+            ))}
           </div>
         </div>
       </section>

@@ -2,92 +2,91 @@ import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import Image from "next/image";
 import Link from "next/link";
-import { Aperture, ArrowRight, MapPin } from "lucide-react";
+import { Aperture, ArrowRight } from "lucide-react";
+import { auth } from "@clerk/nextjs/server";
+import BTSMosaicGrid, { type BTSGridItem } from "./BTSMosaicGrid";
 
 export const metadata: Metadata = {
   title: "Behind the Scenes — Backstage & Set-Fotos | CineGenius",
   description: "Echte Behind-the-Scenes-Fotos von Filmsets, Shootings und Produktionen. Entdecke Crews, Locations und Projekte hinter der Kamera.",
 };
 
-export const revalidate = 300;
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type RawProfile = Record<string, any>;
-
-interface BTSItem {
-  imageUrl: string;
-  caption?: string;
-  authorName: string;
-  authorCity?: string;
-  profileId: string;
-}
 
 const BTS_TYPES = new Set(["bts", "set_photo", "portfolio"]);
 const CREW_TYPES = new Set(["camera", "lighting", "sound", "director_of_photography", "director",
   "production", "makeup", "costume", "filmmaker", "photographer", "editor"]);
 
-async function getTopRatedImages(limit = 3): Promise<{ imageUrl: string; avg: number; count: number; profileId: string; authorName: string }[]> {
-  try {
-    const { data: likeRows } = await db
-      .from("profile_image_likes")
-      .select("image_url, profile_id, rating");
-    if (!likeRows?.length) return [];
+export default async function BTSPage() {
+  const { userId } = await auth();
 
-    const agg: Record<string, { sum: number; count: number; profileId: string }> = {};
-    for (const row of likeRows) {
-      if (!agg[row.image_url]) agg[row.image_url] = { sum: 0, count: 0, profileId: row.profile_id };
-      agg[row.image_url].sum += row.rating ?? 1;
-      agg[row.image_url].count += 1;
-    }
+  // Fetch all likes once — used for top-rated section AND mosaic ratings
+  const { data: likeRows } = await db
+    .from("profile_image_likes")
+    .select("image_url, profile_id, liker_id, rating");
 
-    const top = Object.entries(agg)
-      .filter(([, v]) => v.count >= 1)
-      .sort((a, b) => (b[1].sum / b[1].count) - (a[1].sum / a[1].count))
-      .slice(0, limit);
+  // Build aggregate ratings + myRatings
+  const agg: Record<string, { sum: number; count: number; profileId: string }> = {};
+  const myRatings: Record<string, number> = {};
 
-    if (!top.length) return [];
+  for (const row of likeRows ?? []) {
+    if (!agg[row.image_url]) agg[row.image_url] = { sum: 0, count: 0, profileId: row.profile_id };
+    agg[row.image_url].sum += row.rating ?? 1;
+    agg[row.image_url].count += 1;
+    if (userId && row.liker_id === userId) myRatings[row.image_url] = row.rating ?? 1;
+  }
 
-    const profileIds = [...new Set(top.map(([, v]) => v.profileId))];
-    const { data: profiles } = await db
+  const allRatings: Record<string, { avg: number; count: number }> = {};
+  for (const [url, { sum, count }] of Object.entries(agg)) {
+    allRatings[url] = { avg: Math.round((sum / count) * 10) / 10, count };
+  }
+
+  // Top 3 rated images
+  const topEntries = Object.entries(agg)
+    .filter(([, v]) => v.count >= 1)
+    .sort((a, b) => b[1].sum / b[1].count - a[1].sum / a[1].count)
+    .slice(0, 3);
+
+  let topRated: { imageUrl: string; avg: number; count: number; profileSlug: string; authorName: string }[] = [];
+
+  if (topEntries.length > 0) {
+    const topProfileIds = [...new Set(topEntries.map(([, v]) => v.profileId))];
+    const { data: topProfiles } = await db
       .from("profiles")
       .select("user_id, display_name, slug")
-      .in("user_id", profileIds);
-    const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, p]));
+      .in("user_id", topProfileIds);
+    const topProfileMap = Object.fromEntries((topProfiles ?? []).map((p) => [p.user_id, p]));
 
-    return top.map(([imageUrl, { sum, count, profileId }]) => ({
+    topRated = topEntries.map(([imageUrl, { sum, count, profileId }]) => ({
       imageUrl,
       avg: Math.round((sum / count) * 10) / 10,
       count,
-      profileId: profileMap[profileId]?.slug ?? profileId,
-      authorName: profileMap[profileId]?.display_name ?? "Unbekannt",
+      profileSlug: topProfileMap[profileId]?.slug ?? profileId,
+      authorName: topProfileMap[profileId]?.display_name ?? "Unbekannt",
     }));
-  } catch { return []; }
-}
+  }
 
-export default async function BTSPage() {
-  const topRated = await getTopRatedImages(3);
-
+  // Fetch profiles + build btsItems
   const { data: profiles } = await db
     .from("profiles")
-    .select("user_id, display_name, tagline, location, avatar_url, profile_images, profile_type, profile_types")
+    .select("user_id, slug, display_name, tagline, location, avatar_url, profile_images, profile_type, profile_types")
     .not("display_name", "is", null)
     .neq("display_name", "")
     .order("updated_at", { ascending: false })
     .limit(300);
 
-  const btsItems: BTSItem[] = [];
+  const btsItems: BTSGridItem[] = [];
 
   for (const p of (profiles ?? []) as RawProfile[]) {
     const images = Array.isArray(p.profile_images)
       ? (p.profile_images as Array<{ url?: string; media_type?: string; caption?: string }>)
       : [];
 
-    // Prefer explicit BTS/set photos
     const btsImgs = images.filter(
       (img) => img.url?.includes("supabase.co/storage") && BTS_TYPES.has(img.media_type ?? "")
     );
 
-    // Fallback: any portfolio image from crew/creative profiles
     const isCrew = [p.profile_type, ...(Array.isArray(p.profile_types) ? p.profile_types : [])]
       .some((t: string) => CREW_TYPES.has(t));
 
@@ -104,6 +103,7 @@ export default async function BTSPage() {
         authorName: p.display_name,
         authorCity: typeof p.location === "string" ? p.location.split(",")[0]?.trim() : undefined,
         profileId: p.user_id,
+        profileSlug: p.slug ?? p.user_id,
       });
     });
   }
@@ -153,7 +153,7 @@ export default async function BTSPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {topRated.map((item, i) => (
-              <Link key={item.imageUrl} href={`/profile/${item.profileId}`}
+              <Link key={item.imageUrl} href={`/profile/${item.profileSlug}`}
                 className="group relative rounded-2xl overflow-hidden aspect-video bg-bg-elevated border border-gold/20">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={item.imageUrl} alt={item.authorName}
@@ -171,42 +171,14 @@ export default async function BTSPage() {
         </section>
       )}
 
-      {/* Mosaic Grid */}
+      {/* Mosaic Grid with inline rating */}
       {btsItems.length > 0 ? (
         <section className="pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 auto-rows-[200px]">
-            {btsItems.map((item, i) => {
-              // Every 7th item spans 2 rows for visual variety
-              const tall = i % 7 === 0;
-              return (
-                <Link
-                  key={`${item.profileId}-${i}`}
-                  href={`/profile/${item.profileId}`}
-                  className={`group relative rounded-xl overflow-hidden bg-bg-elevated border border-border ${tall ? "row-span-2" : ""}`}
-                >
-                  <Image
-                    src={item.imageUrl}
-                    alt={item.authorName}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                    sizes="(max-width:640px) 50vw,(max-width:1024px) 33vw,25vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-1 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    {item.caption && (
-                      <p className="text-white/80 text-[10px] mb-0.5 line-clamp-1">{item.caption}</p>
-                    )}
-                    <p className="text-white font-semibold text-xs">{item.authorName}</p>
-                    {item.authorCity && (
-                      <p className="text-white/60 text-[10px] flex items-center gap-1 mt-0.5">
-                        <MapPin size={8} /> {item.authorCity}
-                      </p>
-                    )}
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
+          <BTSMosaicGrid
+            items={btsItems}
+            initialRatings={allRatings}
+            initialMyRatings={myRatings}
+          />
         </section>
       ) : (
         <section className="pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-20">
