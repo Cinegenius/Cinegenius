@@ -1692,7 +1692,7 @@ function PhotoGrid({
   const canRate = isSignedIn && !isOwner;
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
       {sorted.map((img, i) => {
         const ratingData = ratings[img.url];
         const myR = myRatings[img.url] ?? 0;
@@ -1700,63 +1700,68 @@ function PhotoGrid({
         const hovering = hoverRating?.url === img.url;
         const displayStars = hovering ? hoverRating!.star : myR;
         return (
-          <button
-            key={img.url}
-            type="button"
-            onClick={() => onLightbox(img.url)}
-            className="relative aspect-[4/3] overflow-hidden rounded-xl group bg-bg-elevated"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={img.url} alt={img.caption ?? ""} className="w-full h-full object-cover transition-all duration-500 group-hover:brightness-110 group-hover:scale-[1.03]" loading="lazy" />
+          <div key={img.url} className="flex flex-col rounded-xl overflow-hidden bg-bg-elevated border border-border/50">
+            {/* Image */}
+            <button
+              type="button"
+              onClick={() => onLightbox(img.url)}
+              className="relative aspect-[4/3] overflow-hidden group"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={img.url} alt={img.caption ?? ""} className="w-full h-full object-cover transition-all duration-500 group-hover:brightness-110 group-hover:scale-[1.03]" loading="lazy" />
+              {isTop && (
+                <div className="absolute top-2 left-2 px-2 py-0.5 bg-gold/90 rounded-full text-bg-primary text-[10px] font-bold">★ Top</div>
+              )}
+            </button>
 
-            {/* Top badge */}
-            {isTop && (
-              <div className="absolute top-2 left-2 px-2 py-0.5 bg-gold/90 rounded-full text-bg-primary text-[10px] font-bold">★ Top</div>
-            )}
-
-            {/* Average rating badge (always visible if rated) */}
-            {ratingData && ratingData.count > 0 && (
-              <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 bg-black/60 backdrop-blur-sm rounded-full">
-                <span className="text-gold text-[10px]">★</span>
-                <span className="text-white text-[10px] font-semibold">{ratingData.avg.toFixed(1)}</span>
-                <span className="text-white/40 text-[10px]">({ratingData.count})</span>
+            {/* Rating strip — always visible */}
+            <div className="px-3 py-2 flex items-center justify-between gap-2 bg-bg-secondary">
+              {/* Left: avg score */}
+              <div className="flex items-center gap-1.5 min-w-0">
+                {ratingData && ratingData.count > 0 ? (
+                  <>
+                    <span className="text-gold text-xs font-bold">{ratingData.avg.toFixed(1)}</span>
+                    <div className="flex gap-0.5">
+                      {[1,2,3,4,5].map((s) => (
+                        <span key={s} className={`text-[11px] ${s <= Math.round(ratingData.avg) ? "text-gold" : "text-text-muted/40"}`}>★</span>
+                      ))}
+                    </div>
+                    <span className="text-[10px] text-text-muted">({ratingData.count})</span>
+                  </>
+                ) : (
+                  <span className="text-[10px] text-text-muted">Noch keine Bewertung</span>
+                )}
               </div>
-            )}
 
-            {/* Star rating control — appears on hover */}
-            {canRate && (
-              <div
-                className="absolute bottom-0 inset-x-0 flex flex-col items-center gap-1 pb-2 pt-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex gap-1">
+              {/* Right: interactive stars (only for other users) */}
+              {canRate && (
+                <div
+                  className="flex shrink-0"
+                  onMouseLeave={() => setHoverRating(null)}
+                  onClick={(e) => e.stopPropagation()}
+                >
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
                       key={star}
                       type="button"
                       onMouseEnter={() => setHoverRating({ url: img.url, star })}
-                      onMouseLeave={() => setHoverRating(null)}
                       onClick={(e) => rate(img.url, star, e)}
-                      className="text-xl leading-none transition-transform hover:scale-125"
-                      style={{ color: star <= displayStars ? "#d4af37" : "rgba(255,255,255,0.3)" }}
+                      className="w-7 h-7 flex items-center justify-center text-lg leading-none transition-transform active:scale-125 hover:scale-110 cursor-pointer touch-manipulation"
+                      title={`${star} Stern${star > 1 ? "e" : ""}`}
+                      style={{ color: star <= displayStars ? "#d4af37" : (hovering ? "rgba(212,175,55,0.3)" : "rgba(255,255,255,0.2)") }}
                     >
                       ★
                     </button>
                   ))}
                 </div>
-                {myR > 0 && (
-                  <span className="text-[10px] text-white/60">Deine Bewertung: {myR} ★</span>
-                )}
-              </div>
-            )}
+              )}
 
-            {/* Caption */}
-            {img.caption && !canRate && (
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <p className="text-white text-xs truncate">{img.caption}</p>
-              </div>
-            )}
-          </button>
+              {/* Owner sees their own avg only, no interactive stars */}
+              {isOwner && ratingData && ratingData.count > 0 && (
+                <span className="text-[10px] text-text-muted shrink-0">{ratingData.count}× bewertet</span>
+              )}
+            </div>
+          </div>
         );
       })}
     </div>

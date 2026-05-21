@@ -48,6 +48,15 @@ export async function POST(req: NextRequest) {
 
   const r = Math.min(5, Math.max(1, Math.round(Number(rating) || 5)));
 
+  // Check BEFORE upsert whether this is a new rating or an update
+  const { data: existing } = await db
+    .from("profile_image_likes")
+    .select("id")
+    .eq("liker_id", userId)
+    .eq("image_url", image_url)
+    .maybeSingle();
+  const isNew = !existing;
+
   const { error } = await db
     .from("profile_image_likes")
     .upsert(
@@ -56,6 +65,22 @@ export async function POST(req: NextRequest) {
     );
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // Notify profile owner only on first rating (not on updates)
+  if (isNew) {
+    try {
+      const { data: liker } = await db.from("profiles").select("display_name, slug").eq("user_id", userId).maybeSingle();
+      const name = liker?.display_name ?? "Jemand";
+      const { data: owner } = await db.from("profiles").select("slug").eq("user_id", profile_id).maybeSingle();
+      await db.from("notifications").insert({
+        user_id: profile_id,
+        type: "review",
+        title: "Foto bewertet",
+        body: `${name} hat eines deiner Fotos mit ${r} Stern${r !== 1 ? "en" : ""} bewertet.`,
+        href: `/profile/${owner?.slug ?? profile_id}`,
+      });
+    } catch { /* fire-and-forget */ }
+  }
 
   revalidateTag("profile-image-likes", "profiles");
   return NextResponse.json({ success: true });
