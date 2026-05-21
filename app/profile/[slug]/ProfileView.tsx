@@ -9,7 +9,7 @@ import { useUser } from "@clerk/nextjs";
 import {
   MapPin, MessageSquare, Award, ChevronDown, ChevronUp,
   Pencil, ExternalLink, X, Check, Globe, Building2, UserPlus, UserCheck, Clock,
-  Film, Briefcase, Package, Car, Ban, Flag, Users2, MoreHorizontal,
+  Film, Briefcase, Package, Car, Ban, Flag, Users2, MoreHorizontal, Phone, Mail,
 } from "lucide-react";
 import type { UserProfile, ProfileModule, ProfileImage, FilmographyEntry, ProfileAward, ProjectCredit } from "@/lib/profile-types";
 import ReviewsSection from "@/components/ReviewsSection";
@@ -504,14 +504,17 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
     ? [p.playing_age_min, p.playing_age_max].filter(Boolean).join("–") + " J."
     : null;
 
+  const pContact = profile as unknown as { tiktok_url?: string; vimeo_url?: string; phone?: string; contact_email?: string };
   const socialLinks = [
     { label: "Instagram", url: safeLink(profile.instagram_url) },
-    { label: "TikTok",    url: safeLink((profile as unknown as {tiktok_url?: string}).tiktok_url) },
+    { label: "TikTok",    url: safeLink(pContact.tiktok_url) },
     { label: "YouTube",   url: safeLink(profile.youtube_url) },
-    { label: "Vimeo",     url: safeLink((profile as unknown as {vimeo_url?: string}).vimeo_url) },
+    { label: "Vimeo",     url: safeLink(pContact.vimeo_url) },
     { label: "LinkedIn",  url: safeLink(profile.linkedin_url) },
     { label: "Website",   url: safeLink(profile.website_url), icon: true },
-  ].filter(l => l.url);
+    pContact.phone?.trim()         ? { label: pContact.phone.trim(),         url: `tel:${pContact.phone.trim()}`,             contactIcon: "phone" as const } : null,
+    pContact.contact_email?.trim() ? { label: pContact.contact_email.trim(), url: `mailto:${pContact.contact_email.trim()}`, contactIcon: "mail" as const } : null,
+  ].filter(Boolean) as { label: string; url: string; icon?: boolean; contactIcon?: "phone" | "mail" }[];
 
   return (
     <div className="min-h-screen bg-bg-primary text-text-primary">
@@ -653,10 +656,13 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
               {/* Social links */}
               {socialLinks.length > 0 && (
                 <div className="flex gap-2 flex-wrap">
-                  {socialLinks.map(({ label, url, icon }) => (
+                  {socialLinks.map(({ label, url, icon, contactIcon }) => (
                     <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-bg-elevated border border-border rounded-lg text-xs text-text-secondary hover:border-gold/50 hover:text-gold transition-all">
-                      {icon && <Globe size={11} />}{label}
+                      {contactIcon === "phone" && <Phone size={11} />}
+                      {contactIcon === "mail"  && <Mail size={11} />}
+                      {icon && !contactIcon    && <Globe size={11} />}
+                      {label}
                     </a>
                   ))}
                 </div>
@@ -1135,24 +1141,30 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
         )}
 
         {(() => {
+          const gp = profile as unknown as { tiktok_url?: string; vimeo_url?: string; phone?: string; contact_email?: string };
           const links = [
             { label: "Instagram", url: safeLink(profile.instagram_url) },
-            { label: "TikTok",    url: safeLink((profile as unknown as {tiktok_url?: string}).tiktok_url) },
+            { label: "TikTok",    url: safeLink(gp.tiktok_url) },
             { label: "YouTube",   url: safeLink(profile.youtube_url) },
-            { label: "Vimeo",     url: safeLink((profile as unknown as {vimeo_url?: string}).vimeo_url) },
+            { label: "Vimeo",     url: safeLink(gp.vimeo_url) },
             { label: "LinkedIn",  url: safeLink(profile.linkedin_url) },
             { label: "Website",   url: safeLink(profile.website_url) },
-          ].filter(l => l.url);
+            gp.phone?.trim()         ? { label: gp.phone.trim(),         url: `tel:${gp.phone.trim()}`,             contactIcon: "phone" as const } : null,
+            gp.contact_email?.trim() ? { label: gp.contact_email.trim(), url: `mailto:${gp.contact_email.trim()}`, contactIcon: "mail" as const } : null,
+          ].filter(Boolean) as { label: string; url: string; contactIcon?: "phone" | "mail" }[];
           if (links.length === 0) return null;
           return (
             <>
               <Divider />
               <SectionLabel>Links</SectionLabel>
               <div className="flex flex-wrap gap-2 pb-4">
-                {links.map(({ label, url }) => (
+                {links.map(({ label, url, contactIcon }) => (
                   <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-bg-secondary border border-border rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
-                    {label} <ExternalLink size={9} className="opacity-50" />
+                    {contactIcon === "phone" && <Phone size={11} />}
+                    {contactIcon === "mail"  && <Mail size={11} />}
+                    {label}
+                    {!contactIcon && <ExternalLink size={9} className="opacity-50" />}
                   </a>
                 ))}
               </div>
@@ -1427,14 +1439,17 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 
             {/* Social links */}
             {(() => {
+              const gp2 = profile as unknown as { tiktok_url?: string; vimeo_url?: string; phone?: string; contact_email?: string };
               const links = [
                 { label: "Instagram", url: safeLink(profile.instagram_url) },
-                { label: "TikTok",    url: safeLink((profile as unknown as {tiktok_url?: string}).tiktok_url) },
+                { label: "TikTok",    url: safeLink(gp2.tiktok_url) },
                 { label: "YouTube",   url: safeLink(profile.youtube_url) },
-                { label: "Vimeo",     url: safeLink((profile as unknown as {vimeo_url?: string}).vimeo_url) },
+                { label: "Vimeo",     url: safeLink(gp2.vimeo_url) },
                 { label: "LinkedIn",  url: safeLink(profile.linkedin_url) },
                 { label: "Website",   url: safeLink(profile.website_url) },
-              ].filter(l => l.url);
+                gp2.phone?.trim()         ? { label: gp2.phone.trim(),         url: `tel:${gp2.phone.trim()}`,             contactIcon: "phone" as const } : null,
+                gp2.contact_email?.trim() ? { label: gp2.contact_email.trim(), url: `mailto:${gp2.contact_email.trim()}`, contactIcon: "mail" as const } : null,
+              ].filter(Boolean) as { label: string; url: string; contactIcon?: "phone" | "mail" }[];
               if (links.length === 0) return null;
               return (
                 <div>
@@ -1443,10 +1458,13 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                     <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Links</p>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {links.map(({ label, url }) => (
+                    {links.map(({ label, url, contactIcon }) => (
                       <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
                         className="inline-flex items-center gap-1 px-3 py-1.5 bg-bg-secondary/50 border border-border/60 rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
-                        {label} <ExternalLink size={9} className="shrink-0 opacity-40" />
+                        {contactIcon === "phone" && <Phone size={11} className="shrink-0" />}
+                        {contactIcon === "mail"  && <Mail size={11} className="shrink-0" />}
+                        {label}
+                        {!contactIcon && <ExternalLink size={9} className="shrink-0 opacity-40" />}
                       </a>
                     ))}
                   </div>
