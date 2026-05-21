@@ -43,7 +43,8 @@ export async function GET() {
       .select(PROFILE_COLS_EXTRA)
       .eq("user_id", userId)
       .maybeSingle();
-    if (extra) data = { ...base, ...extra };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (extra) data = Object.assign({}, base, extra) as any;
   }
 
   // Back-fill Clerk metadata and set cookie for users who had a profile before this flag existed
