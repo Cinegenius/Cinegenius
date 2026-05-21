@@ -14,9 +14,9 @@ import type { ExternalProfileRow } from "@/lib/external-platforms";
 export const dynamicParams = true;
 
 // Stable base columns that always exist
-const BASE_FIELDS = "user_id, display_name, avatar_url, cover_image_url, role, positions, location, bio, tagline, slug, profile_type, verified, available, available_from, day_rate, languages, travel_ready, skills, filmography, profile_images, showreel_url, reel_url, awards, availability_config, modules, instagram_url, tiktok_url, youtube_url, vimeo_url, linkedin_url, website_url, video_links";
+const BASE_FIELDS = "user_id, display_name, avatar_url, cover_image_url, role, positions, location, bio, tagline, slug, profile_type, verified, available, available_from, day_rate, languages, travel_ready, skills, filmography, profile_images, showreel_url, reel_url, awards, availability_config, modules, instagram_url, tiktok_url, youtube_url, vimeo_url, linkedin_url, website_url, video_links, phone";
 // Newer columns — fetched separately so a missing column doesn't break the whole query
-const EXTRA_FIELDS = "physical, crew, creative, vendor, agency";
+const EXTRA_FIELDS = "physical, crew, creative, vendor, agency, contact_email";
 
 async function _getProfile(slug: string): Promise<UserProfile | null> {
   // Validate slug to prevent PostgREST filter injection — allow only slug chars or UUID chars
