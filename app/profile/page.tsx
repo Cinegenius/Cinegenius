@@ -1232,12 +1232,14 @@ export default function ProfilePage() {
                 {/* Profilfotos — direkt unter Avatar */}
                 <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <input
+                    id="profile-images-input"
                     ref={profileImagesRef}
                     type="file"
                     accept="image/*"
                     multiple
                     className="hidden"
                     onChange={handleProfileImagesUpload}
+                    disabled={profileUploading}
                   />
                   <div className="flex items-start justify-between gap-4 mb-4">
                     <div>
@@ -1248,15 +1250,13 @@ export default function ProfilePage() {
                           : t("sectionPhotosDescDefault")}
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => profileImagesRef.current?.click()}
-                      disabled={profileUploading}
-                      className="shrink-0 flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-60"
+                    <label
+                      htmlFor="profile-images-input"
+                      className={`shrink-0 flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors cursor-pointer ${profileUploading ? "opacity-60 pointer-events-none" : ""}`}
                     >
                       {profileUploading ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
                       {profileUploading ? t("uploading") : t("uploadPhotos")}
-                    </button>
+                    </label>
                   </div>
 
                   {profileImages.length > 0 ? (
@@ -1296,26 +1296,23 @@ export default function ProfilePage() {
                           )}
                         </div>
                       ))}
-                      <button
-                        type="button"
-                        onClick={() => profileImagesRef.current?.click()}
-                        disabled={profileUploading}
-                        className="aspect-[3/4] rounded-xl border-2 border-dashed border-border hover:border-gold/60 hover:bg-gold/5 flex flex-col items-center justify-center gap-2 text-text-muted hover:text-gold transition-all disabled:opacity-50"
+                      <label
+                        htmlFor="profile-images-input"
+                        className={`aspect-[3/4] rounded-xl border-2 border-dashed border-border hover:border-gold/60 hover:bg-gold/5 flex flex-col items-center justify-center gap-2 text-text-muted hover:text-gold transition-all cursor-pointer ${profileUploading ? "opacity-50 pointer-events-none" : ""}`}
                       >
                         {profileUploading ? <Loader2 size={20} className="animate-spin" /> : <Plus size={20} />}
                         <span className="text-[10px] font-semibold uppercase tracking-wide">{profileUploading ? t("uploading") : t("addPhoto")}</span>
-                      </button>
+                      </label>
                     </div>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={() => profileImagesRef.current?.click()}
-                      className="w-full border-2 border-dashed border-border rounded-xl p-10 flex flex-col items-center justify-center text-center hover:border-gold/50 hover:bg-gold/5 transition-all"
+                    <label
+                      htmlFor="profile-images-input"
+                      className="w-full border-2 border-dashed border-border rounded-xl p-10 flex flex-col items-center justify-center text-center hover:border-gold/50 hover:bg-gold/5 transition-all cursor-pointer"
                     >
                       <Upload size={28} className="text-text-muted mb-3" />
                       <p className="text-sm font-medium text-text-secondary">{t("uploadPhotos")}</p>
                       <p className="text-xs text-text-muted mt-1">JPG, PNG, WEBP · mehrere gleichzeitig möglich</p>
-                    </button>
+                    </label>
                   )}
                 </div>
 
