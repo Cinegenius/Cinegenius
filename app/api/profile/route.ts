@@ -8,7 +8,7 @@ import { sendWelcomeEmail } from "@/lib/email";
 // All profile columns needed by the edit form.
 // Update if new columns are added to the profiles table.
 const PROFILE_COLS = [
-  "user_id", "display_name", "display_name_alias", "slug", "phone",
+  "user_id", "display_name", "display_name_alias", "slug", "phone", "contact_email",
   "avatar_url", "cover_image_url", "role", "positions", "location", "bio",
   "tagline", "profile_type", "profile_types", "account_type",
   "verified", "available", "available_from", "day_rate", "languages",
@@ -162,7 +162,7 @@ export async function POST(req: NextRequest) {
 // All known profile columns — any unknown key from the client is silently dropped
 const ALLOWED_PATCH_KEYS = new Set([
   // SECURITY: "role", "verified", "account_type" excluded — set via admin routes only
-  "display_name", "display_name_alias", "slug", "phone", "location", "bio",
+  "display_name", "display_name_alias", "slug", "phone", "contact_email", "location", "bio",
   "available", "available_from", "travel_ready",
   "avatar_url", "cover_image_url", "portfolio_url", "website_url",
   "skills", "memberships", "positions", "languages", "portfolio_images", "profile_images", "experience",

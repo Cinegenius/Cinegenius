@@ -522,6 +522,8 @@ export default function ProfilePage() {
     availableFrom: "",
     travelReady: false,
     slug: "",
+    phone: "",
+    contactEmail: "",
   });
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState("");
@@ -648,6 +650,8 @@ export default function ProfilePage() {
             availableFrom: profile.available_from      ?? "",
             travelReady:   profile.travel_ready        ?? false,
             slug:          profile.slug                ?? "",
+            phone:         profile.phone               ?? "",
+            contactEmail:  profile.contact_email       ?? "",
           });
           setSkills(profile.skills ?? []);
           setMemberships((profile as any).memberships ?? []);
@@ -902,6 +906,8 @@ export default function ProfilePage() {
           linkedin_url:   linkedinUrl || null,
           website_url:    safeLink(form.website) || null,
           imdb_url:       safeLink(form.imdbUrl) || null,
+          phone:          form.phone.trim() || null,
+          contact_email:  form.contactEmail.trim() || null,
           day_rate:       dayRate ? parseInt(dayRate) : null,
           filmography,
           video_links:    videoLinks,
@@ -1376,6 +1382,26 @@ export default function ProfilePage() {
                         onChange={(e) => setForm((p) => ({ ...p, website: e.target.value }))}
                         placeholder="https://…"
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
+                    </div>
+                    <div>
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
+                        Telefon / WhatsApp
+                      </label>
+                      <input type="tel" value={form.phone}
+                        onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
+                        placeholder="+49 170 1234567"
+                        className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
+                      <p className="text-xs text-text-muted mt-1">Nur für eingeloggte Nutzer sichtbar</p>
+                    </div>
+                    <div>
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
+                        Kontakt-E-Mail
+                      </label>
+                      <input type="email" value={form.contactEmail}
+                        onChange={(e) => setForm((p) => ({ ...p, contactEmail: e.target.value }))}
+                        placeholder="kontakt@beispiel.de"
+                        className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
+                      <p className="text-xs text-text-muted mt-1">Öffentliche Kontakt-E-Mail (optional, kann von deiner Login-E-Mail abweichen)</p>
                     </div>
                     <div>
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
