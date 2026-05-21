@@ -26,7 +26,47 @@ const BTS_TYPES = new Set(["bts", "set_photo", "portfolio"]);
 const CREW_TYPES = new Set(["camera", "lighting", "sound", "director_of_photography", "director",
   "production", "makeup", "costume", "filmmaker", "photographer", "editor"]);
 
+async function getTopRatedImages(limit = 3): Promise<{ imageUrl: string; avg: number; count: number; profileId: string; authorName: string }[]> {
+  try {
+    const { data: likeRows } = await db
+      .from("profile_image_likes")
+      .select("image_url, profile_id, rating");
+    if (!likeRows?.length) return [];
+
+    const agg: Record<string, { sum: number; count: number; profileId: string }> = {};
+    for (const row of likeRows) {
+      if (!agg[row.image_url]) agg[row.image_url] = { sum: 0, count: 0, profileId: row.profile_id };
+      agg[row.image_url].sum += row.rating ?? 1;
+      agg[row.image_url].count += 1;
+    }
+
+    const top = Object.entries(agg)
+      .filter(([, v]) => v.count >= 1)
+      .sort((a, b) => (b[1].sum / b[1].count) - (a[1].sum / a[1].count))
+      .slice(0, limit);
+
+    if (!top.length) return [];
+
+    const profileIds = [...new Set(top.map(([, v]) => v.profileId))];
+    const { data: profiles } = await db
+      .from("profiles")
+      .select("user_id, display_name, slug")
+      .in("user_id", profileIds);
+    const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, p]));
+
+    return top.map(([imageUrl, { sum, count, profileId }]) => ({
+      imageUrl,
+      avg: Math.round((sum / count) * 10) / 10,
+      count,
+      profileId: profileMap[profileId]?.slug ?? profileId,
+      authorName: profileMap[profileId]?.display_name ?? "Unbekannt",
+    }));
+  } catch { return []; }
+}
+
 export default async function BTSPage() {
+  const topRated = await getTopRatedImages(3);
+
   const { data: profiles } = await db
     .from("profiles")
     .select("user_id, display_name, tagline, location, avatar_url, profile_images, profile_type, profile_types")
@@ -103,6 +143,33 @@ export default async function BTSPage() {
           </Link>
         </div>
       </section>
+
+      {/* Top 3 rated */}
+      {topRated.length > 0 && (
+        <section className="pb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-gold text-lg">★</span>
+            <h2 className="text-sm font-bold uppercase tracking-widest text-gold">Top Bewertet</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {topRated.map((item, i) => (
+              <Link key={item.imageUrl} href={`/profile/${item.profileId}`}
+                className="group relative rounded-2xl overflow-hidden aspect-video bg-bg-elevated border border-gold/20">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={item.imageUrl} alt={item.authorName}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-gold/90 rounded-full text-bg-primary text-[11px] font-bold">
+                  #{i + 1} ★ {item.avg.toFixed(1)} <span className="opacity-60">({item.count})</span>
+                </div>
+                <div className="absolute bottom-3 left-3">
+                  <p className="text-white font-semibold text-sm">{item.authorName}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Mosaic Grid */}
       {btsItems.length > 0 ? (

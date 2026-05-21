@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 
 // GET /api/profile-image-likes?profile_id=xxx
-// Returns like counts + which ones the current user liked
+// Returns avg rating + count per image, plus current user's own ratings
 export async function GET(req: NextRequest) {
   const profileId = req.nextUrl.searchParams.get("profile_id");
   if (!profileId) return NextResponse.json({ error: "profile_id required" }, { status: 400 });
@@ -13,39 +13,55 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await db
     .from("profile_image_likes")
-    .select("image_url, liker_id")
+    .select("image_url, liker_id, rating")
     .eq("profile_id", profileId);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const counts: Record<string, number> = {};
-  const liked = new Set<string>();
+  const agg: Record<string, { sum: number; count: number }> = {};
+  const myRatings: Record<string, number> = {};
+
   for (const row of data ?? []) {
-    counts[row.image_url] = (counts[row.image_url] ?? 0) + 1;
-    if (userId && row.liker_id === userId) liked.add(row.image_url);
+    if (!agg[row.image_url]) agg[row.image_url] = { sum: 0, count: 0 };
+    agg[row.image_url].sum += row.rating ?? 1;
+    agg[row.image_url].count += 1;
+    if (userId && row.liker_id === userId) myRatings[row.image_url] = row.rating ?? 1;
   }
 
-  return NextResponse.json({ counts, liked: [...liked] });
+  const ratings: Record<string, { avg: number; count: number }> = {};
+  for (const [url, { sum, count }] of Object.entries(agg)) {
+    ratings[url] = { avg: Math.round((sum / count) * 10) / 10, count };
+  }
+
+  return NextResponse.json({ ratings, myRatings });
 }
 
-// POST /api/profile-image-likes  { profile_id, image_url }
+// POST /api/profile-image-likes  { profile_id, image_url, rating: 1-5 }
+// Upserts — updates existing rating if user rated this image before
 export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
 
-  const { profile_id, image_url } = await req.json().catch(() => ({}));
+  const { profile_id, image_url, rating } = await req.json().catch(() => ({}));
   if (!profile_id || !image_url) return NextResponse.json({ error: "profile_id und image_url erforderlich" }, { status: 400 });
+  if (profile_id === userId) return NextResponse.json({ error: "Eigene Fotos können nicht bewertet werden" }, { status: 403 });
 
-  if (profile_id === userId) return NextResponse.json({ error: "Eigene Fotos können nicht geliked werden" }, { status: 403 });
+  const r = Math.min(5, Math.max(1, Math.round(Number(rating) || 5)));
 
-  const { error } = await db.from("profile_image_likes").insert({ liker_id: userId, profile_id, image_url });
-  if (error && error.code !== "23505") return NextResponse.json({ error: error.message }, { status: 500 });
+  const { error } = await db
+    .from("profile_image_likes")
+    .upsert(
+      { liker_id: userId, profile_id, image_url, rating: r },
+      { onConflict: "liker_id,image_url" }
+    );
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   revalidateTag("profile-image-likes", "profiles");
   return NextResponse.json({ success: true });
 }
 
-// DELETE /api/profile-image-likes  { profile_id, image_url }
+// DELETE /api/profile-image-likes  { image_url }
 export async function DELETE(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });

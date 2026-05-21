@@ -413,7 +413,7 @@ function CompanyBadge({ membership }: { membership: CompanyMembership }) {
 // ACTOR PROFILE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ActorProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikeCounts = {}, myLikedImageUrls = [] }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikeCounts?: Record<string, number>; myLikedImageUrls?: string[] }) {
+function ActorProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageRatings = {}, myImageRatings = {} }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageRatings?: Record<string, { avg: number; count: number }>; myImageRatings?: Record<string, number> }) {
   const tc = useTranslations("common");
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const { user } = useUser();
@@ -907,7 +907,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
       {/* ── FOTO-GRID ─────────────────────────────────────────────────── */}
       {stripImages.length > 0 && (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-          <PhotoGrid images={stripImages} profileId={profile.user_id} isOwner={isOwner} initialCounts={imageLikeCounts} initialLiked={myLikedImageUrls} onLightbox={setLightbox} />
+          <PhotoGrid images={stripImages} profileId={profile.user_id} isOwner={isOwner} initialRatings={imageRatings} initialMyRatings={myImageRatings} onLightbox={setLightbox} />
         </div>
       )}
     </div>
@@ -918,7 +918,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
 // MODEL PROFILE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ModelProfile({ profile, isOwner, companyMembership, listings = [], blockStatus = null, collaborations = [], imageLikeCounts = {}, myLikedImageUrls = [] }: { profile: UserProfile; isOwner: boolean; companyMembership: CompanyMembership; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikeCounts?: Record<string, number>; myLikedImageUrls?: string[] }) {
+function ModelProfile({ profile, isOwner, companyMembership, listings = [], blockStatus = null, collaborations = [], imageRatings = {}, myImageRatings = {} }: { profile: UserProfile; isOwner: boolean; companyMembership: CompanyMembership; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageRatings?: Record<string, { avg: number; count: number }>; myImageRatings?: Record<string, number> }) {
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const [lightbox, setLightbox] = useState<string | null>(null);
 
@@ -1189,7 +1189,7 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
 // GENERIC PROFILE (Crew, Creative, Vendor etc.)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function GenericProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikeCounts = {}, myLikedImageUrls = [] }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikeCounts?: Record<string, number>; myLikedImageUrls?: string[] }) {
+function GenericProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageRatings = {}, myImageRatings = {} }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageRatings?: Record<string, { avg: number; count: number }>; myImageRatings?: Record<string, number> }) {
   const tc = useTranslations("common");
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const { user } = useUser();
@@ -1620,7 +1620,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
       {/* ── FOTO-GRID ─────────────────────────────────────────────────── */}
       {images.length > 0 && (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-          <PhotoGrid images={images} profileId={profile.user_id} isOwner={isOwner} initialCounts={imageLikeCounts} initialLiked={myLikedImageUrls} onLightbox={setLightbox} />
+          <PhotoGrid images={images} profileId={profile.user_id} isOwner={isOwner} initialRatings={imageRatings} initialMyRatings={myImageRatings} onLightbox={setLightbox} />
         </div>
       )}
     </div>
@@ -1634,53 +1634,71 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 type PublicListing = { id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null; focal_point?: { x: number; y: number } | null };
 
 // ─── Photo grid with likes ────────────────────────────────────────────────────
+function StarRating({ value, max = 5, size = 14 }: { value: number; max?: number; size?: number }) {
+  return (
+    <span className="inline-flex gap-0.5">
+      {Array.from({ length: max }, (_, i) => (
+        <span key={i} style={{ fontSize: size, lineHeight: 1 }} className={i < Math.round(value) ? "text-gold" : "text-white/30"}>★</span>
+      ))}
+    </span>
+  );
+}
+
 function PhotoGrid({
   images,
   profileId,
   isOwner,
-  initialCounts,
-  initialLiked,
+  initialRatings,
+  initialMyRatings,
   onLightbox,
 }: {
   images: ProfileImage[];
   profileId: string;
   isOwner: boolean;
-  initialCounts: Record<string, number>;
-  initialLiked: string[];
+  initialRatings: Record<string, { avg: number; count: number }>;
+  initialMyRatings: Record<string, number>;
   onLightbox: (url: string) => void;
 }) {
   const { isSignedIn } = useUser();
-  const [counts, setCounts] = useState<Record<string, number>>(initialCounts);
-  const [liked, setLiked] = useState<Set<string>>(new Set(initialLiked));
+  const [ratings, setRatings] = useState(initialRatings);
+  const [myRatings, setMyRatings] = useState(initialMyRatings);
+  const [hoverRating, setHoverRating] = useState<{ url: string; star: number } | null>(null);
 
-  const sorted = [...images].sort((a, b) => (counts[b.url] ?? 0) - (counts[a.url] ?? 0));
+  const sorted = [...images].sort((a, b) => (ratings[b.url]?.avg ?? 0) - (ratings[a.url]?.avg ?? 0));
 
-  const toggle = async (url: string, e: React.MouseEvent) => {
+  const rate = async (url: string, star: number, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isSignedIn || isOwner) return;
-    const isLiked = liked.has(url);
-    // Optimistic update
-    setLiked((prev) => { const s = new Set(prev); isLiked ? s.delete(url) : s.add(url); return s; });
-    setCounts((prev) => ({ ...prev, [url]: Math.max(0, (prev[url] ?? 0) + (isLiked ? -1 : 1)) }));
+    const prev = myRatings[url];
+    // Optimistic
+    setMyRatings((m) => ({ ...m, [url]: star }));
+    setRatings((r) => {
+      const cur = r[url] ?? { avg: 0, count: 0 };
+      const newCount = prev ? cur.count : cur.count + 1;
+      const newSum = prev ? (cur.avg * cur.count - prev + star) : (cur.avg * cur.count + star);
+      return { ...r, [url]: { avg: Math.round((newSum / newCount) * 10) / 10, count: newCount } };
+    });
     try {
       await fetch("/api/profile-image-likes", {
-        method: isLiked ? "DELETE" : "POST",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profile_id: profileId, image_url: url }),
+        body: JSON.stringify({ profile_id: profileId, image_url: url, rating: star }),
       });
     } catch {
-      // Revert on error
-      setLiked((prev) => { const s = new Set(prev); isLiked ? s.add(url) : s.delete(url); return s; });
-      setCounts((prev) => ({ ...prev, [url]: Math.max(0, (prev[url] ?? 0) + (isLiked ? 1 : -1)) }));
+      setMyRatings((m) => { const n = { ...m }; if (prev) n[url] = prev; else delete n[url]; return n; });
     }
   };
+
+  const canRate = isSignedIn && !isOwner;
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
       {sorted.map((img, i) => {
-        const likeCount = counts[img.url] ?? 0;
-        const isLiked = liked.has(img.url);
-        const isTop = i === 0 && likeCount > 0;
+        const ratingData = ratings[img.url];
+        const myR = myRatings[img.url] ?? 0;
+        const isTop = i === 0 && (ratingData?.avg ?? 0) >= 4;
+        const hovering = hoverRating?.url === img.url;
+        const displayStars = hovering ? hoverRating!.star : myR;
         return (
           <button
             key={img.url}
@@ -1689,34 +1707,55 @@ function PhotoGrid({
             className="relative aspect-[4/3] overflow-hidden rounded-xl group bg-bg-elevated"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={img.url}
-              alt={img.caption ?? ""}
-              className="w-full h-full object-cover transition-all duration-500 group-hover:brightness-110 group-hover:scale-[1.03]"
-              loading="lazy"
-            />
+            <img src={img.url} alt={img.caption ?? ""} className="w-full h-full object-cover transition-all duration-500 group-hover:brightness-110 group-hover:scale-[1.03]" loading="lazy" />
+
             {/* Top badge */}
             {isTop && (
-              <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 bg-gold/90 rounded-full text-bg-primary text-[10px] font-bold">
-                ★ Top
+              <div className="absolute top-2 left-2 px-2 py-0.5 bg-gold/90 rounded-full text-bg-primary text-[10px] font-bold">★ Top</div>
+            )}
+
+            {/* Average rating badge (always visible if rated) */}
+            {ratingData && ratingData.count > 0 && (
+              <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 bg-black/60 backdrop-blur-sm rounded-full">
+                <span className="text-gold text-[10px]">★</span>
+                <span className="text-white text-[10px] font-semibold">{ratingData.avg.toFixed(1)}</span>
+                <span className="text-white/40 text-[10px]">({ratingData.count})</span>
               </div>
             )}
+
+            {/* Star rating control — appears on hover */}
+            {canRate && (
+              <div
+                className="absolute bottom-0 inset-x-0 flex flex-col items-center gap-1 pb-2 pt-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onMouseEnter={() => setHoverRating({ url: img.url, star })}
+                      onMouseLeave={() => setHoverRating(null)}
+                      onClick={(e) => rate(img.url, star, e)}
+                      className="text-xl leading-none transition-transform hover:scale-125"
+                      style={{ color: star <= displayStars ? "#d4af37" : "rgba(255,255,255,0.3)" }}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+                {myR > 0 && (
+                  <span className="text-[10px] text-white/60">Deine Bewertung: {myR} ★</span>
+                )}
+              </div>
+            )}
+
             {/* Caption */}
-            {img.caption && (
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            {img.caption && !canRate && (
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <p className="text-white text-xs truncate">{img.caption}</p>
               </div>
             )}
-            {/* Like button */}
-            <div className="absolute bottom-2 right-2" onClick={(e) => toggle(img.url, e)}>
-              <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold transition-all backdrop-blur-sm ${
-                isLiked
-                  ? "bg-red-500/80 text-white"
-                  : "bg-black/40 text-white/70 hover:bg-red-500/60 hover:text-white"
-              } ${(!isSignedIn || isOwner) ? "pointer-events-none opacity-50" : "cursor-pointer"}`}>
-                ♥ {likeCount > 0 ? likeCount : ""}
-              </div>
-            </div>
           </button>
         );
       })}
@@ -1733,8 +1772,8 @@ export default function ProfileView({
   listings = [],
   blockStatus = null,
   collaborations = [],
-  imageLikeCounts = {},
-  myLikedImageUrls = [],
+  imageRatings = {},
+  myImageRatings = {},
 }: {
   profile: UserProfile;
   isOwner: boolean;
@@ -1744,21 +1783,21 @@ export default function ProfileView({
   listings?: PublicListing[];
   blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null;
   collaborations?: PublicCollab[];
-  imageLikeCounts?: Record<string, number>;
-  myLikedImageUrls?: string[];
+  imageRatings?: Record<string, { avg: number; count: number }>;
+  myImageRatings?: Record<string, number>;
 }) {
   const category = PROFILE_CATEGORY_MAP[profile.profile_type] ?? "crew";
 
   // Model types get editorial layout
   if (profile.profile_type === "model") {
-    return <ModelProfile profile={profile} isOwner={isOwner} companyMembership={companyMembership} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikeCounts={imageLikeCounts} myLikedImageUrls={myLikedImageUrls} />;
+    return <ModelProfile profile={profile} isOwner={isOwner} companyMembership={companyMembership} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageRatings={imageRatings} myImageRatings={myImageRatings} />;
   }
 
   // Actor/talent types get casting-ready layout
   if (category === "talent") {
-    return <ActorProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikeCounts={imageLikeCounts} myLikedImageUrls={myLikedImageUrls} />;
+    return <ActorProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageRatings={imageRatings} myImageRatings={myImageRatings} />;
   }
 
   // Crew, creative, vendor get generic layout
-  return <GenericProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikeCounts={imageLikeCounts} myLikedImageUrls={myLikedImageUrls} />;
+  return <GenericProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageRatings={imageRatings} myImageRatings={myImageRatings} />;
 }
