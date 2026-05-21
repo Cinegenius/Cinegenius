@@ -169,7 +169,20 @@ async function getHomeData() {
       year: p.year,
     }));
 
-  return { liveStats, liveLocations, liveJobs, pillarImages, companies, projects, topCreators };
+  // Fetch top-liked profile image for BTS card
+  let btsImage: string | null = null;
+  try {
+    const { data: likeRows } = await db
+      .from("profile_image_likes")
+      .select("image_url");
+    if (likeRows && likeRows.length > 0) {
+      const counts: Record<string, number> = {};
+      for (const row of likeRows) counts[row.image_url] = (counts[row.image_url] ?? 0) + 1;
+      btsImage = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+    }
+  } catch { /* table may not exist yet */ }
+
+  return { liveStats, liveLocations, liveJobs, pillarImages, companies, projects, topCreators, btsImage };
 }
 
 export default async function HomePage() {
@@ -201,7 +214,7 @@ export default async function HomePage() {
     { icon: Clapperboard, title: t("pillarProjectsTitle"),    desc: t("pillarProjectsDesc"),    href: "/projects",  pillarKey: "projekt",   accent: "from-rose-900/70",    insertHref: "/projects/neu",             insertLabel: t("pillarProjectsCta"),  imgPos: "50% 50%" },
   ];
 
-  const { liveStats, liveLocations, liveJobs, pillarImages, companies, projects, topCreators } = await getHomeData();
+  const { liveStats, liveLocations, liveJobs, pillarImages, companies, projects, topCreators, btsImage } = await getHomeData();
 
   return (
     <>
@@ -650,8 +663,9 @@ export default async function HomePage() {
             </div>
           </Link>
           <Link href="/bts" className="relative rounded-2xl overflow-hidden group block">
-            <Image src="https://plus.unsplash.com/premium_photo-1682001110037-50545d73acfa?w=800&q=85" alt="Behind the scenes" fill
-              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={btsImage ?? "https://plus.unsplash.com/premium_photo-1682001110037-50545d73acfa?w=800&q=85"} alt="Behind the scenes"
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold mb-1.5">

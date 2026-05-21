@@ -3736,3 +3736,17 @@ Run kill 46652 to stop it.
 ✓ Ready in 351ms
 
  GET /locations/suche 200 in 6.0s (next.js: 1404ms, proxy.ts: 90ms, application-code: 4.5s)
+✓ Compiled in 62ms
+ GET /apple-touch-icon.png 404 in 842ms (next.js: 311ms, application-code: 531ms)
+ GET /apple-touch-icon-precomposed.png 404 in 1106ms (next.js: 560ms, application-code: 547ms)
+ GET / 200 in 2.4s (next.js: 630ms, proxy.ts: 207ms, application-code: 1546ms)
+ GET /sign-in?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fopengraph-image%3F7af210acba8b31f6%3D 200 in 2.7s (next.js: 2.6s, proxy.ts: 4ms, application-code: 87ms)
+ GET /apple-touch-icon-precomposed.png 404 in 447ms (next.js: 45ms, application-code: 402ms)
+ GET /apple-touch-icon.png 404 in 430ms (next.js: 106ms, application-code: 324ms)
+ GET /creators 200 in 1699ms (next.js: 142ms, proxy.ts: 135ms, application-code: 1422ms)
+✓ Compiled in 121ms
+✓ Compiled in 72ms
+✓ Compiled in 61ms
+✓ Compiled in 212ms
+✓ Compiled in 72ms
+✓ Compiled in 73ms

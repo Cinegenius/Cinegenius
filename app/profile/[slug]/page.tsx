@@ -231,13 +231,27 @@ export default async function ProfilePage(
   if (!profile) notFound();
 
   const isOwner = userId === profile.user_id;
-  const [projectCredits, companyMembership, externalProfiles, listings, blockStatus, collaborations] = await Promise.all([
+  const [projectCredits, companyMembership, externalProfiles, listings, blockStatus, collaborations, imageLikesData] = await Promise.all([
     getProjectCredits(profile.user_id),
     getCompanyMembership(profile.user_id),
     getExternalProfiles(profile.user_id),
     getPublicListings(profile.user_id),
     userId && !isOwner ? getBlockStatus(userId, profile.user_id) : Promise.resolve(null),
     getPublicCollaborations(profile.user_id),
+    // Fetch image like counts + which ones current user liked
+    (async () => {
+      const { data } = await db
+        .from("profile_image_likes")
+        .select("image_url, liker_id")
+        .eq("profile_id", profile.user_id);
+      const counts: Record<string, number> = {};
+      const myLiked = new Set<string>();
+      for (const row of data ?? []) {
+        counts[row.image_url] = (counts[row.image_url] ?? 0) + 1;
+        if (userId && row.liker_id === userId) myLiked.add(row.image_url);
+      }
+      return { counts, myLiked: [...myLiked] };
+    })(),
   ]);
 
   // Track profile view — awaited so serverless doesn't drop it before .then() runs
@@ -269,6 +283,8 @@ export default async function ProfilePage(
         listings={listings}
         blockStatus={blockStatus}
         collaborations={collaborations}
+        imageLikeCounts={imageLikesData.counts}
+        myLikedImageUrls={imageLikesData.myLiked}
       />
     </>
   );
