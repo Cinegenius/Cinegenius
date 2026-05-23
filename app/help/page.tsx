@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Search, ChevronDown, ChevronUp, MessageSquare, Mail, BookOpen, MapPin, Package, Briefcase, Shield } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, MessageSquare, Mail, BookOpen, MapPin, Package, Briefcase, Shield, Car, PawPrint } from "lucide-react";
 
 const categories = [
   {
@@ -11,7 +11,7 @@ const categories = [
     items: [
       {
         q: "Was ist CineGenius?",
-        a: "CineGenius ist der kostenlose Marktplatz für die Film- und Medienbranche im DACH-Raum. Du findest hier Locations, Crew & Talente, Requisiten, Equipment, Fahrzeuge und offene Jobs — alles an einem Ort, direkt ohne Vermittlungsagentur.",
+        a: "CineGenius ist der kostenlose Marktplatz für die Film- und Medienbranche im DACH-Raum. Du findest hier Locations, Crew & Talente, Requisiten, Equipment, Fahrzeuge, Tiere für Produktionen und offene Jobs — alles an einem Ort, direkt ohne Vermittlungsagentur.",
       },
       {
         q: "Brauche ich ein Konto zum Stöbern?",
@@ -60,6 +60,42 @@ const categories = [
       {
         q: "Was mache ich, wenn ein Anbieter nicht antwortet?",
         a: "Wenn du innerhalb von 2–3 Tagen keine Antwort erhältst, kannst du es nochmals versuchen oder einen anderen Anbieter kontaktieren. Du kannst uns auch unter support@cinegenius.co melden, wenn ein Inserat veraltet oder inaktiv wirkt.",
+      },
+    ],
+  },
+  {
+    icon: Car,
+    label: "Fahrzeuge",
+    items: [
+      {
+        q: "Welche Fahrzeuge finde ich auf CineGenius?",
+        a: "Auf CineGenius findest du Bild-Fahrzeuge (z. B. klassische Autos, Motorräder), Produktionsfahrzeuge (Kostümbus, Maske & Hair, Equipment-Transporter, Generator-Fahrzeuge, Darsteller-Trailer u. v. m.) sowie Oldtimer und Spezialfahrzeuge für Filmproduktionen.",
+      },
+      {
+        q: "Wie stelle ich mein Fahrzeug ein?",
+        a: "Klicke auf 'Inserat erstellen' und wähle die Kategorie 'Fahrzeug'. Für Produktionsfahrzeuge kannst du zusätzlich den genauen Fahrzeugtyp angeben (z. B. Kostümbus oder Generator-Fahrzeug). Nach einer kurzen Prüfung wird dein Inserat freigeschaltet.",
+      },
+      {
+        q: "Wie wird die Miete / der Einsatz vereinbart?",
+        a: "Preise, Verfügbarkeit und Konditionen klärt ihr direkt mit dem Anbieter per Nachricht. CineGenius stellt nur die Kontaktmöglichkeit bereit — keine Provision, keine Buchungsgebühren.",
+      },
+    ],
+  },
+  {
+    icon: PawPrint,
+    label: "Tiere",
+    items: [
+      {
+        q: "Kann ich Tiere für meine Produktion über CineGenius buchen?",
+        a: "Ja — im Bereich 'Tiere' findest du ausgebildete Filmtiere und erfahrene Tiertrainer/-innen für Foto- und Filmproduktionen. Von Hunden und Pferden bis zu Exoten — die Anbieter listen ihre Tiere mit Fotos, Ausbildungsstand und Einsatzbereichen.",
+      },
+      {
+        q: "Wie stelle ich mein Tier / meine Tieragentur ein?",
+        a: "Klicke auf 'Inserat erstellen' und wähle die Kategorie 'Tiere'. Beschreibe das Tier, seinen Ausbildungsstand und bisherige Produktionen, und lade aussagekräftige Fotos hoch.",
+      },
+      {
+        q: "Welche Voraussetzungen gelten für Tiere am Set?",
+        a: "Das ist Sache der jeweiligen Produktion und des Tierhalters. CineGenius empfiehlt, Tierschutzanforderungen, Versicherung und Betreuung vor Drehbeginn schriftlich zu klären. Halter und Produktion sind eigenverantwortlich für das Wohl der Tiere am Set.",
       },
     ],
   },
