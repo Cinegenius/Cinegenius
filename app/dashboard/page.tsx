@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -10,7 +10,7 @@ import {
   User, Wallet, ArrowDownCircle, Receipt, Send,
   Pencil, Save, Loader2, Upload, Heart, MapPin, Car, Package, Trash2,
   Users, UserPlus, Check, X, Globe, Lock, Clock, ShieldCheck,
-  Building2, AlertCircle, FileText, ArrowLeft,
+  Building2, AlertCircle, FileText, ArrowLeft, Search,
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 
@@ -352,6 +352,7 @@ export default function DashboardPage() {
   const [friendsOutgoing, setFriendsOutgoing] = useState<FriendEntry[]>([]);
   const [friendsLoading, setFriendsLoading] = useState(false);
   const [friendsTab, setFriendsTab] = useState<"friends" | "incoming" | "outgoing">("incoming");
+  const [friendSearch, setFriendSearch] = useState("");
 
   const doLoadFriends = (showSpinner: boolean) => {
     if (showSpinner) setFriendsLoading(true);
@@ -2698,46 +2699,82 @@ export default function DashboardPage() {
                 </>
               )}
 
-              {!friendsLoading && friendsTab === "friends" && (
-                <>
-                  {friends.length === 0 ? (
-                    <div className="text-center py-12 border border-dashed border-border rounded-2xl">
-                      <Users size={24} className="mx-auto text-text-muted opacity-30 mb-3" />
-                      <p className="text-sm text-text-muted">Noch keine Freunde</p>
-                      <p className="text-xs text-text-muted mt-1">Besuche Profile von Filmschaffenden und füge sie hinzu.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {friends.map(f => (
-                        <div key={f.friendship_id} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 transition-colors">
-                          <div className="shrink-0">
-                            {f.avatar_url ? (
-                              <img src={f.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover border border-border" />
-                            ) : (
-                              <div className="w-11 h-11 rounded-full bg-gold/15 border border-gold/20 flex items-center justify-center">
-                                <span className="text-gold font-bold text-base">{f.display_name[0]?.toUpperCase()}</span>
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-text-primary text-sm truncate">{f.display_name}</p>
-                            <p className="text-xs text-text-muted truncate">{f.role}</p>
-                          </div>
-                          <div className="flex items-center gap-2 shrink-0">
-                            <Link href={`/profile/${f.user_id}`} className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all">
-                              Profil
-                            </Link>
-                            <button onClick={() => removeFriendEntry(f.friendship_id)}
-                              className="px-3 py-1.5 text-xs border border-border text-text-muted rounded-lg hover:border-red-400 hover:text-red-400 transition-all">
-                              Entfernen
-                            </button>
-                          </div>
+              {!friendsLoading && friendsTab === "friends" && (() => {
+                const q = friendSearch.trim().toLowerCase();
+                const filtered = friends.filter(f =>
+                  !q || f.display_name.toLowerCase().includes(q) || (f.role ?? "").toLowerCase().includes(q)
+                );
+                const grouped = filtered.reduce<Record<string, typeof friends>>((acc, f) => {
+                  const key = f.role?.trim() || "Sonstige";
+                  (acc[key] ??= []).push(f);
+                  return acc;
+                }, {});
+                const sortedGroups = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b, "de"));
+                sortedGroups.forEach(([, members]) => members.sort((a, b) => a.display_name.localeCompare(b.display_name, "de")));
+
+                return (
+                  <>
+                    {friends.length === 0 ? (
+                      <div className="text-center py-12 border border-dashed border-border rounded-2xl">
+                        <Users size={24} className="mx-auto text-text-muted opacity-30 mb-3" />
+                        <p className="text-sm text-text-muted">Noch keine Freunde</p>
+                        <p className="text-xs text-text-muted mt-1">Besuche Profile von Filmschaffenden und füge sie hinzu.</p>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="relative mb-4">
+                          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
+                          <input
+                            value={friendSearch}
+                            onChange={e => setFriendSearch(e.target.value)}
+                            placeholder="Freunde suchen…"
+                            className="w-full pl-9 pr-4 py-2 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold/50 transition-colors"
+                          />
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </>
-              )}
+                        {filtered.length === 0 ? (
+                          <p className="text-sm text-text-muted text-center py-8">Keine Ergebnisse für „{friendSearch}"</p>
+                        ) : (
+                          <div className="space-y-5">
+                            {sortedGroups.map(([role, members]) => (
+                              <div key={role}>
+                                <p className="text-[10px] font-semibold text-text-muted uppercase tracking-wider mb-2 px-1">{role}</p>
+                                <div className="space-y-2">
+                                  {members.map(f => (
+                                    <div key={f.friendship_id} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 transition-colors">
+                                      <div className="shrink-0">
+                                        {f.avatar_url ? (
+                                          <img src={f.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover border border-border" />
+                                        ) : (
+                                          <div className="w-11 h-11 rounded-full bg-gold/15 border border-gold/20 flex items-center justify-center">
+                                            <span className="text-gold font-bold text-base">{f.display_name[0]?.toUpperCase()}</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <p className="font-semibold text-text-primary text-sm truncate">{f.display_name}</p>
+                                        <p className="text-xs text-text-muted truncate">{f.role}</p>
+                                      </div>
+                                      <div className="flex items-center gap-2 shrink-0">
+                                        <Link href={`/profile/${f.user_id}`} className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all">
+                                          Profil
+                                        </Link>
+                                        <button onClick={() => removeFriendEntry(f.friendship_id)}
+                                          className="px-3 py-1.5 text-xs border border-border text-text-muted rounded-lg hover:border-red-400 hover:text-red-400 transition-all">
+                                          Entfernen
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </>
+                );
+              })()}
 
               {!friendsLoading && friendsTab === "outgoing" && (
                 <>

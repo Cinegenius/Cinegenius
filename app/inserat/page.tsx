@@ -618,6 +618,16 @@ export default function InseratPage() {
       activeBorder: "border-violet-400",
     },
     {
+      id: "tiere",
+      label: "Film-Tiere inserieren",
+      sub: "Hunde · Pferde · Katzen · Exoten",
+      icon: PawPrint,
+      color: "text-amber-400",
+      border: "border-amber-500/30 hover:border-amber-400",
+      bg: "bg-amber-500/5",
+      activeBorder: "border-amber-400",
+    },
+    {
       id: "firma",
       label: "Firma eintragen",
       sub: "Produktionsfirma · Agentur · Studio",
