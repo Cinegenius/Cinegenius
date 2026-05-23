@@ -18,6 +18,51 @@ import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
 import { PROP_CATEGORY_FIELDS } from "@/lib/propCategoryFields";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 
+// ─── FormSelect ──────────────────────────────────────────────────────────────
+
+function FormSelect({ value, onChange, options, placeholder, className = "" }: {
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  placeholder?: string;
+  className?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, [open]);
+  const selected = options.find(o => o.value === value);
+  return (
+    <div ref={ref} className={`relative ${className}`}>
+      <button type="button" onClick={() => setOpen(v => !v)}
+        className={`w-full flex items-center justify-between gap-2 px-4 py-3 bg-bg-elevated border rounded-xl text-sm transition-colors text-left ${open ? "border-gold" : "border-border hover:border-gold/40"} ${selected ? "text-text-primary" : "text-text-muted"}`}>
+        <span className="truncate">{selected?.label ?? placeholder ?? "Bitte wählen…"}</span>
+        <ChevronDown size={14} className={`shrink-0 text-text-muted transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-bg-elevated border border-border rounded-xl shadow-xl overflow-hidden max-h-60 overflow-y-auto">
+          {placeholder && (
+            <button type="button" onClick={() => { onChange(""); setOpen(false); }}
+              className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-white/[0.04] ${!value ? "text-gold font-medium" : "text-text-muted"}`}>
+              {placeholder}
+            </button>
+          )}
+          {options.map((o) => (
+            <button key={o.value} type="button" onClick={() => { onChange(o.value); setOpen(false); }}
+              className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-white/[0.04] ${value === o.value ? "text-gold font-medium" : "text-text-secondary"}`}>
+              {o.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 type LucideIcon = React.ElementType;
@@ -757,16 +802,9 @@ export default function InseratPage() {
             {myCompanies.length > 0 && (
               <div>
                 <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Zu Firma verknüpfen (optional)</label>
-                <select
-                  value={selectedCompanyId}
-                  onChange={(e) => setSelectedCompanyId(e.target.value)}
-                  className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm"
-                >
-                  <option value="">Kein Firmenprofil</option>
-                  {myCompanies.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
+                <FormSelect value={selectedCompanyId} onChange={setSelectedCompanyId}
+                  placeholder="Kein Firmenprofil"
+                  options={myCompanies.map((c) => ({ value: c.id, label: c.name }))} />
                 {selectedCompanyId && (
                   <p className="text-xs text-text-muted mt-1.5">Dieses Inserat erscheint auf deinem Firmenprofil.</p>
                 )}
@@ -796,19 +834,15 @@ export default function InseratPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Kraftstoff</label>
-                    <select value={form.fuel_type} onChange={(e) => f("fuel_type", e.target.value)}
-                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm">
-                      <option value="">Bitte wählen…</option>
-                      {["Benzin", "Diesel", "Elektro", "Hybrid", "LPG", "Sonstiges"].map((o) => <option key={o} value={o}>{o}</option>)}
-                    </select>
+                    <FormSelect value={form.fuel_type} onChange={(v) => f("fuel_type", v)}
+                      placeholder="Bitte wählen…"
+                      options={["Benzin", "Diesel", "Elektro", "Hybrid", "LPG", "Sonstiges"].map(o => ({ value: o, label: o }))} />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Führerscheinklasse</label>
-                    <select value={form.license_class} onChange={(e) => f("license_class", e.target.value)}
-                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm">
-                      <option value="">Bitte wählen…</option>
-                      {["B", "BE", "C", "CE", "D", "A", "Keine (stationär / Requisite)"].map((o) => <option key={o} value={o}>{o}</option>)}
-                    </select>
+                    <FormSelect value={form.license_class} onChange={(v) => f("license_class", v)}
+                      placeholder="Bitte wählen…"
+                      options={["B", "BE", "C", "CE", "D", "A", "Keine (stationär / Requisite)"].map(o => ({ value: o, label: o }))} />
                   </div>
                 </div>
                 <label className="flex items-center gap-3 cursor-pointer select-none">
@@ -830,18 +864,14 @@ export default function InseratPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Dressur-Level</label>
-                    <select value={form.animal_training} onChange={(e) => f("animal_training", e.target.value)}
-                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm">
-                      <option value="">Bitte wählen…</option>
-                      {["Kinoprofi", "Erfahren", "Grundgehorsam", "Ungeübt"].map((o) => <option key={o} value={o}>{o}</option>)}
-                    </select>
+                    <FormSelect value={form.animal_training} onChange={(v) => f("animal_training", v)}
+                      placeholder="Bitte wählen…"
+                      options={["Kinoprofi", "Erfahren", "Grundgehorsam", "Ungeübt"].map(o => ({ value: o, label: o }))} />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Anzahl</label>
-                    <select value={form.animal_count} onChange={(e) => f("animal_count", e.target.value)}
-                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm">
-                      {["1 Tier", "2–5 Tiere", "Gruppe (6+)"].map((o) => <option key={o} value={o}>{o}</option>)}
-                    </select>
+                    <FormSelect value={form.animal_count} onChange={(v) => f("animal_count", v)}
+                      options={["1 Tier", "2–5 Tiere", "Gruppe (6+)"].map(o => ({ value: o, label: o }))} />
                   </div>
                 </div>
                 <div>
@@ -1108,11 +1138,9 @@ export default function InseratPage() {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Projekttyp</label>
-                    <select value={form.projectType} onChange={(e) => f("projectType", e.target.value)}
-                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm">
-                      <option value="">Bitte wählen…</option>
-                      {projectTypes.map((t) => <option key={t} value={t}>{t}</option>)}
-                    </select>
+                    <FormSelect value={form.projectType} onChange={(v) => f("projectType", v)}
+                      placeholder="Bitte wählen…"
+                      options={projectTypes.map(t => ({ value: t, label: t }))} />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
