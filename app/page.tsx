@@ -576,7 +576,7 @@ export default async function HomePage() {
             </div>
           </Link>
           <Link href="/tiere" className="relative rounded-2xl overflow-hidden group block">
-            <Image src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=85" alt="Film-Tiere" fill
+            <Image src="/tier.jpg" alt="Film-Tiere" fill
               className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4">
