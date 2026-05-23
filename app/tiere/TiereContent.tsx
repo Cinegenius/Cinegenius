@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Search, PawPrint, X, Truck, MapPin, Users, Heart } from "lucide-react";
+import { Search, PawPrint, X, Truck, MapPin, Users, Heart, ChevronDown } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 
 const SPECIES = ["Alle", "Hunde", "Pferde & Ponys", "Katzen", "Vögel", "Reptilien", "Nutztiere", "Exoten", "Sonstige Tiere"];
@@ -24,6 +24,40 @@ type Animal = {
   description?: string;
   ownerId?: string;
 };
+
+function FilterDropdown({ value, options, onChange, placeholder }: {
+  value: string; options: string[]; onChange: (v: string) => void; placeholder?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, [open]);
+  return (
+    <div ref={ref} className="relative shrink-0">
+      <button onClick={() => setOpen(v => !v)}
+        className={`flex items-center gap-2 h-10 px-3 rounded-xl text-sm font-medium border transition-all bg-bg-elevated ${
+          value !== options[0] ? "border-gold/40 text-gold" : "border-border text-text-secondary hover:border-gold/30 hover:text-text-primary"
+        }`}>
+        {value || placeholder}
+        <ChevronDown size={13} className={`transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 z-50 bg-bg-elevated border border-border rounded-xl shadow-xl overflow-hidden min-w-[160px]">
+          {options.map((o) => (
+            <button key={o} onClick={() => { onChange(o); setOpen(false); }}
+              className={`w-full text-left px-3 py-2 text-sm transition-colors hover:bg-white/[0.04] ${value === o ? "text-gold font-medium" : "text-text-secondary"}`}>
+              {o}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const TRAINING_COLORS: Record<string, string> = {
   "Kinoprofi": "text-gold border-gold/30 bg-gold-subtle",
@@ -133,15 +167,8 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
           />
         </div>
 
-        <select value={species} onChange={(e) => setSpecies(e.target.value)}
-          className="px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-sm text-text-secondary focus:outline-none focus:border-gold transition-colors">
-          {SPECIES.map((s) => <option key={s} value={s}>{s}</option>)}
-        </select>
-
-        <select value={training} onChange={(e) => setTraining(e.target.value)}
-          className="px-3 py-2.5 bg-bg-elevated border border-border rounded-xl text-sm text-text-secondary focus:outline-none focus:border-gold transition-colors">
-          {TRAINING.map((t) => <option key={t} value={t}>{t}</option>)}
-        </select>
+        <FilterDropdown value={species} options={SPECIES} onChange={setSpecies} />
+        <FilterDropdown value={training} options={TRAINING} onChange={setTraining} />
 
         <button onClick={() => setDeliveryOnly((v) => !v)}
           className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm border transition-colors ${
