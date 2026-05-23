@@ -1626,8 +1626,6 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 
         <CollaborationsSection collaborations={collaborations} />
 
-        <Divider />
-
         <ListingsSection listings={listings} />
 
         <div className="mt-12 mb-8">
