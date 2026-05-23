@@ -203,7 +203,8 @@ const groups: Group[] = [
     border: "border-violet-500/30",
     items: [
       // Film Equipment
-      { id: "mk_fahrzeuge",      label: "Fahrzeug vermieten",     sub: "Auto, Motorrad, Oldtimer, Transporter…",   icon: Car,         type: "vehicle", category: "Bild-Fahrzeug",        color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/20" },
+      { id: "mk_fahrzeuge",           label: "Bildfahrzeug vermieten",        sub: "Classic Car, Oldtimer, Stunt, Motorrad…",     icon: Car,         type: "vehicle", category: "Bild-Fahrzeug",          color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/20" },
+      { id: "mk_produktionsfahrzeug", label: "Produktionsfahrzeug vermieten", sub: "Kostümbus, Equipmenttransporter, Maske…",     icon: Truck,       type: "vehicle", category: "Produktionsfahrzeug",     color: "text-cyan-400",    bg: "bg-cyan-500/10 border-cyan-500/20" },
       { id: "mk_kostuem",        label: "Kostüme & Kleidung",     sub: "Verkleidungen, Uniformen, Zeitgeist…",     icon: Shirt,       type: "prop",    category: "Kostüme",              color: "text-rose-400",    bg: "bg-rose-500/10 border-rose-500/20" },
       { id: "mk_requisiten",     label: "Objekte & Dekoration",   sub: "Alltagsgegenstände, Kunstwerke, Deko…",    icon: Package,     type: "prop",    category: "Requisiten",           color: "text-violet-400",  bg: "bg-violet-500/10 border-violet-500/20" },
       { id: "mk_moebel",         label: "Möbel & Einrichtung",    sub: "Sofas, Lampen, Tische, Wanddeko…",         icon: Layers,      type: "prop",    category: "Möbel / Szenenbild",   color: "text-indigo-400",  bg: "bg-indigo-500/10 border-indigo-500/20" },
@@ -367,6 +368,7 @@ export default function InseratPage() {
     fuel_type: "",
     license_class: "",
     condition: "",
+    vehicle_subtype: "",
     // animal
     animal_training: "",
     animal_handler: true,
@@ -429,7 +431,9 @@ export default function InseratPage() {
       return {
         type,
         category,
-        title: form.title || `${form.make} ${form.model}${form.year ? ` (${form.year})` : ""}`.trim(),
+        title: form.title || (category === "Produktionsfahrzeug" && form.vehicle_subtype
+          ? `${form.vehicle_subtype}${form.make ? ` – ${form.make}` : ""}`
+          : `${form.make} ${form.model}${form.year ? ` (${form.year})` : ""}`).trim(),
         description: form.description || "",
         price: parseFloat(form.price) || 0,
         city: form.city,
@@ -440,6 +444,7 @@ export default function InseratPage() {
           fuel_type: form.fuel_type || null,
           license_class: form.license_class || null,
           condition: form.condition || null,
+          vehicle_subtype: form.vehicle_subtype || null,
           delivery: form.delivery,
           focal_point: focalPoint ?? null,
         },
@@ -620,7 +625,11 @@ export default function InseratPage() {
     if (!selected) return false;
     const { type } = selected;
     const hasCity = form.city.trim() !== "";
-    if (type === "vehicle") return (form.make.trim() || form.title.trim()) && hasCity;
+    if (type === "vehicle") {
+      const base = (form.make.trim() || form.title.trim()) && hasCity;
+      if (selected.category === "Produktionsfahrzeug") return base && !!form.vehicle_subtype;
+      return base;
+    }
     if (type === "job") return form.role_label.trim() && form.title.trim() && hasCity && form.shoot_start !== "";
     if (type === "creator") return form.title.trim() && hasCity;
     return form.title.trim() && hasCity;
@@ -831,6 +840,14 @@ export default function InseratPage() {
                       className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                 </div>
+                {selected.category === "Produktionsfahrzeug" && (
+                  <div>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Fahrzeugtyp *</label>
+                    <FormSelect value={form.vehicle_subtype} onChange={(v) => f("vehicle_subtype", v)}
+                      placeholder="Bitte wählen…"
+                      options={["Kostümbus", "Maske & Hair", "Equipment-Transporter", "Kamera-Van", "Generator-Fahrzeug", "Catering / Crafty", "Produktions-Van", "Regisseur-Trailer", "Darsteller-Trailer", "Sonstiges"].map(o => ({ value: o, label: o }))} />
+                  </div>
+                )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Kraftstoff</label>
@@ -1579,7 +1596,7 @@ export default function InseratPage() {
               setDropdownId("");
               setImageUrl(null);
               setImagePreview(null);
-              setForm({ title: "", description: "", price: "", city: "", make: "", model: "", year: "", fuel_type: "", license_class: "", condition: "", sqm: "", ceiling_height: "", max_crew: "", indoor_outdoor: "innen", power_available: false, power_details: "", parking_spots: "", company: "", projectType: "", shoot_start: "", shoot_end: "", pay_type: "", role_label: "", urgent: false, content_nudity: false, content_violence: false, content_stunts: false, delivery: false, rental_type: "miete", dimensions: "", safety_note: "", skills: "", experience: "", animal_training: "", animal_handler: true, animal_count: "1 Tier", animal_skills: "" });
+              setForm({ title: "", description: "", price: "", city: "", make: "", model: "", year: "", fuel_type: "", license_class: "", condition: "", vehicle_subtype: "", sqm: "", ceiling_height: "", max_crew: "", indoor_outdoor: "innen", power_available: false, power_details: "", parking_spots: "", company: "", projectType: "", shoot_start: "", shoot_end: "", pay_type: "", role_label: "", urgent: false, content_nudity: false, content_violence: false, content_stunts: false, delivery: false, rental_type: "miete", dimensions: "", safety_note: "", skills: "", experience: "", animal_training: "", animal_handler: true, animal_count: "1 Tier", animal_skills: "" });
               setLocAmenities([]); setLocBlockedDates([]); setLocExtraImages([]); setLocFloorPlanUrl(null); setLocFloorPlanPreview(null);
             }}
             className="px-6 py-3 border border-border text-text-secondary rounded-xl hover:border-gold hover:text-gold transition-all text-sm font-medium"

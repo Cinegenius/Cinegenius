@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Car, MapPin, CheckCircle, Filter, X, Zap, Truck, Search } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 
-const vehicleTypes = ["Alle", "Bild-Fahrzeug", "Classic Car", "Vintage Van", "Military Vehicle", "Vintage Limousine", "Stunt Vehicle", "Luxury Classic"];
+const vehicleTypes = ["Alle", "Bild-Fahrzeug", "Produktionsfahrzeug", "Classic Car", "Vintage Van", "Military Vehicle", "Vintage Limousine", "Stunt Vehicle", "Luxury Classic"];
 const eras = ["Alle", "1950s", "1960s–70s", "1970s", "1970s–80s", "1980s–90s", "2000s", "Modern"];
 
 type Vehicle = {
