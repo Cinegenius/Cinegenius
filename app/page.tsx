@@ -510,14 +510,14 @@ export default async function HomePage() {
       {/* ══════════════════════════════════════════════
           VISUAL SHOWCASE
       ══════════════════════════════════════════════ */}
-      <section className="hidden sm:block py-8 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-8 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8 sm:mb-10">
           <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">{t("showcaseLabel")}</p>
           <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg">
             {t("showcaseTitle")}
           </h2>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-[200px]">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-[160px] sm:auto-rows-[200px]">
           <Link href="/projects" className="relative rounded-2xl overflow-hidden group block">
             <Image src="https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=85" alt="Film Set" fill
               className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
