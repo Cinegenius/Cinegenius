@@ -1869,6 +1869,74 @@ function PhotoGrid({
   );
 }
 
+type SimilarProfile = {
+  user_id: string;
+  display_name: string;
+  avatar_url: string | null;
+  slug: string;
+  role: string | null;
+  profile_type: string;
+  location: string | null;
+  tagline: string | null;
+  verified: boolean;
+  day_rate: number | null;
+};
+
+function SimilarProfilesSection({ profiles }: { profiles: SimilarProfile[] }) {
+  if (profiles.length === 0) return null;
+  return (
+    <section className="border-t border-border bg-bg-secondary py-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="font-display text-lg font-bold text-text-primary">Ähnliche Profile</h2>
+          <Link href="/creators" className="text-xs text-gold hover:text-gold-light transition-colors font-semibold">
+            Alle entdecken →
+          </Link>
+        </div>
+        <div className="flex gap-3 overflow-x-auto pb-2 sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:overflow-visible scrollbar-hide">
+          {profiles.map((p) => {
+            const city = typeof p.location === "string" ? p.location.split(",")[0]?.trim() : null;
+            return (
+              <Link
+                key={p.user_id}
+                href={`/profile/${p.slug}`}
+                className="group shrink-0 w-36 sm:w-auto flex flex-col items-center text-center p-3 rounded-xl border border-border bg-bg-elevated hover:border-gold/40 transition-all"
+              >
+                <div className="relative w-14 h-14 rounded-full overflow-hidden bg-bg-hover border border-border mb-2.5">
+                  {p.avatar_url ? (
+                    <Image src={p.avatar_url} alt={p.display_name} fill className="object-cover" sizes="56px" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-text-muted text-lg font-bold">
+                      {p.display_name[0]?.toUpperCase()}
+                    </div>
+                  )}
+                  {p.verified && (
+                    <span className="absolute bottom-0 right-0 w-4 h-4 bg-gold rounded-full border-2 border-bg-elevated flex items-center justify-center">
+                      <Check size={8} className="text-bg-primary stroke-[3]" />
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs font-semibold text-text-primary leading-tight line-clamp-1 group-hover:text-gold transition-colors">{p.display_name}</p>
+                {(p.role ?? p.tagline) && (
+                  <p className="text-[10px] text-text-muted mt-0.5 line-clamp-1">{p.role ?? p.tagline}</p>
+                )}
+                {city && (
+                  <p className="text-[10px] text-text-muted/60 mt-0.5 flex items-center gap-0.5">
+                    <MapPin size={7} />{city}
+                  </p>
+                )}
+                {p.day_rate && p.day_rate > 0 && (
+                  <p className="text-[10px] text-gold font-semibold mt-1">{p.day_rate} €/Tag</p>
+                )}
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function ProfileView({
   profile,
   isOwner,
@@ -1880,6 +1948,7 @@ export default function ProfileView({
   collaborations = [],
   imageLikes = {},
   myImageLikes = [],
+  similarProfiles = [],
 }: {
   profile: UserProfile;
   isOwner: boolean;
@@ -1891,19 +1960,24 @@ export default function ProfileView({
   collaborations?: PublicCollab[];
   imageLikes?: Record<string, number>;
   myImageLikes?: string[];
+  similarProfiles?: SimilarProfile[];
 }) {
   const category = PROFILE_CATEGORY_MAP[profile.profile_type] ?? "crew";
 
+  const similarSection = !isOwner && similarProfiles.length > 0
+    ? <SimilarProfilesSection profiles={similarProfiles} />
+    : null;
+
   // Model types get editorial layout
   if (profile.profile_type === "model") {
-    return <ModelProfile profile={profile} isOwner={isOwner} companyMembership={companyMembership} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />;
+    return <><ModelProfile profile={profile} isOwner={isOwner} companyMembership={companyMembership} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
   }
 
   // Actor/talent types get casting-ready layout
   if (category === "talent") {
-    return <ActorProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />;
+    return <><ActorProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
   }
 
   // Crew, creative, vendor get generic layout
-  return <GenericProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />;
+  return <><GenericProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
 }

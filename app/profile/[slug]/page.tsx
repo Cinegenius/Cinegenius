@@ -231,7 +231,7 @@ export default async function ProfilePage(
   if (!profile) notFound();
 
   const isOwner = userId === profile.user_id;
-  const [projectCredits, companyMembership, externalProfiles, listings, blockStatus, collaborations, imageLikesData] = await Promise.all([
+  const [projectCredits, companyMembership, externalProfiles, listings, blockStatus, collaborations, imageLikesData, similarProfiles] = await Promise.all([
     getProjectCredits(profile.user_id),
     getCompanyMembership(profile.user_id),
     getExternalProfiles(profile.user_id),
@@ -251,6 +251,24 @@ export default async function ProfilePage(
         if (userId && row.liker_id === userId) myLikes.push(row.image_url);
       }
       return { likes, myLikes };
+    })(),
+    // Similar profiles: same type, prioritize same city, exclude self
+    (async () => {
+      const city = typeof profile.location === "string" ? profile.location.split(",")[0]?.trim() : null;
+      const { data } = await db
+        .from("profiles")
+        .select("user_id, display_name, avatar_url, slug, role, profile_type, location, tagline, verified, day_rate")
+        .eq("profile_type", profile.profile_type)
+        .neq("user_id", profile.user_id)
+        .not("display_name", "is", null)
+        .not("slug", "is", null)
+        .order("updated_at", { ascending: false })
+        .limit(20);
+      const rows = (data ?? []) as Array<{ user_id: string; display_name: string; avatar_url: string | null; slug: string; role: string | null; profile_type: string; location: string | null; tagline: string | null; verified: boolean; day_rate: number | null }>;
+      // Prioritize same city, then fill with others, cap at 6
+      const sameCity = city ? rows.filter(r => r.location?.includes(city)) : [];
+      const others = rows.filter(r => !city || !r.location?.includes(city));
+      return [...sameCity, ...others].slice(0, 6);
     })(),
   ]);
 
@@ -285,6 +303,7 @@ export default async function ProfilePage(
         collaborations={collaborations}
         imageLikes={imageLikesData.likes}
         myImageLikes={imageLikesData.myLikes}
+        similarProfiles={similarProfiles}
       />
     </>
   );
