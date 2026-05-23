@@ -1494,6 +1494,8 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           </div>
         </div>
 
+        <Divider />
+
         {/* Projekte — grouped by profile position, rest in Weitere */}
         {projectCredits.filter(c => c.projects).length > 0 && (() => {
           const credits = projectCredits.filter(c => c.projects);
@@ -1623,6 +1625,8 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
         )}
 
         <CollaborationsSection collaborations={collaborations} />
+
+        <Divider />
 
         <ListingsSection listings={listings} />
 
