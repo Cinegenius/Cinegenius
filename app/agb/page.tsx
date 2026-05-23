@@ -13,7 +13,7 @@ export default function AgbPage() {
         <div className="mb-10">
           <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-3">Rechtliches</p>
           <h1 className="font-display text-3xl font-bold text-text-primary mb-2">Allgemeine Geschäftsbedingungen</h1>
-          <p className="text-text-muted text-sm">Stand: April 2026</p>
+          <p className="text-text-muted text-sm">Stand: Mai 2026</p>
         </div>
 
         <div className="space-y-8 text-text-secondary">
@@ -42,6 +42,7 @@ export default function AgbPage() {
               <li>Requisiten, Ausstattung und Custom-Anfertigung</li>
               <li>Film Jobs und Produktionsausschreibungen</li>
               <li>Crew-Profilen und Talenten</li>
+              <li>Tieren für Filmproduktionen</li>
               <li>Unternehmensprofilen der Film- und Medienbranche</li>
             </ul>
             <p className="text-sm leading-relaxed mt-3">

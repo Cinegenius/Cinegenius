@@ -14,7 +14,7 @@ export default function DatenschutzPage() {
         <div className="mb-10">
           <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-3">Rechtliches</p>
           <h1 className="font-display text-3xl font-bold text-text-primary mb-2">Datenschutzerklärung</h1>
-          <p className="text-text-muted text-sm">Gemäß DSGVO, BDSG und TTDSG — Stand: April 2026</p>
+          <p className="text-text-muted text-sm">Gemäß DSGVO, BDSG und TTDSG — Stand: Mai 2026</p>
         </div>
 
         <div className="space-y-10 text-text-secondary text-sm leading-relaxed">
@@ -101,7 +101,21 @@ export default function DatenschutzPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">7. Zahlungsabwicklung (Stripe)</h2>
+            <h2 className="text-base font-semibold text-text-primary mb-3">7. Online-Präsenzstatus</h2>
+            <p>
+              Wenn du eingeloggt bist, sendet die Plattform alle 30 Sekunden einen anonymen Ping an unsere Server, der deinen Online-Status aktualisiert. Dabei wird ausschließlich deine pseudonymisierte Nutzer-ID sowie ein Zeitstempel gespeichert — keine Inhalte oder Standortdaten. Dieser Status wird anderen Nutzern als „Online"-Indikator angezeigt. Rechtsgrundlage ist das berechtigte Interesse an einer funktionalen Kommunikationsplattform (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO). Der Status wird nach Ablauf der Sitzung automatisch zurückgesetzt.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-base font-semibold text-text-primary mb-3">8. Foto-Likes</h2>
+            <p>
+              Nutzer können Profilbilder anderer Nutzer mit einem Like versehen. Dabei speichern wir, welcher Nutzer (pseudonymisierte ID) welches Bild (URL) geliked hat, sowie den Zeitstempel der Aktion. Diese Information ist für den Profilinhaber einsehbar (Anzahl der Likes). Die individuelle Zuordnung (wer hat geliked) ist nicht öffentlich sichtbar. Rechtsgrundlage ist die Vertragserfüllung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO). Likes können jederzeit durch erneutes Klicken entfernt werden.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-base font-semibold text-text-primary mb-3">10. Zahlungsabwicklung (Stripe)</h2>
             <p>
               Buchungen werden über <strong className="text-text-primary">Stripe Inc.</strong> (USA) abgewickelt. Bei einer Zahlung werden Zahlungsdaten direkt von Stripe entgegengenommen — wir haben zu keinem Zeitpunkt Zugriff auf vollständige Kartennummern. Stripe verarbeitet Name, E-Mail, Rechnungsadresse und Zahlungsmittelinformationen auf Basis der Vertragserfüllung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO).<br />
               Datenschutz Stripe: <a href="https://stripe.com/de/privacy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">stripe.com/de/privacy</a>
@@ -109,7 +123,7 @@ export default function DatenschutzPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">8. Hosting & Infrastruktur (Vercel)</h2>
+            <h2 className="text-base font-semibold text-text-primary mb-3">11. Hosting & Infrastruktur (Vercel)</h2>
             <p>
               Die Plattform wird bei <strong className="text-text-primary">Vercel Inc.</strong> (USA) gehostet. Vercel verarbeitet Zugriffsdaten (IP-Adresse, Browsertyp, aufgerufene Seite, Datum und Uhrzeit) in Server-Logs. Rechtsgrundlage ist das berechtigte Interesse an einem sicheren und fehlerfreien Betrieb (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO). Log-Daten werden nach maximal 30 Tagen gelöscht.<br />
               Datenschutz Vercel: <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">vercel.com/legal/privacy-policy</a>
@@ -117,7 +131,7 @@ export default function DatenschutzPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">9. Fehler-Tracking (Sentry)</h2>
+            <h2 className="text-base font-semibold text-text-primary mb-3">12. Fehler-Tracking (Sentry)</h2>
             <p>
               Zur Erkennung und Behebung technischer Fehler setzen wir <strong className="text-text-primary">Sentry</strong> (Functional Software Inc., San Francisco, USA) ein. Tritt ein Fehler auf, werden technische Informationen — Fehlermeldung, Stack-Trace, Browsertyp, Betriebssystem sowie deine pseudonymisierte Nutzer-ID (kein Name, keine E-Mail) — an Sentry übermittelt. Sentry ist ausschließlich in der Produktionsumgebung aktiv.
             </p>
@@ -128,7 +142,7 @@ export default function DatenschutzPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">10. E-Mail-Versand (Resend)</h2>
+            <h2 className="text-base font-semibold text-text-primary mb-3">13. E-Mail-Versand (Resend)</h2>
             <p>
               Transaktions-E-Mails (z.&nbsp;B. Buchungsbestätigungen, Benachrichtigungen, Systemmeldungen) werden über <strong className="text-text-primary">Resend Inc.</strong> (USA) versendet. Dabei wird deine E-Mail-Adresse sowie dein Name an Resend übermittelt. Wir versenden ausschließlich transaktionale Nachrichten, die zur Vertragserfüllung notwendig sind (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO). Werbe-E-Mails versenden wir nicht ohne ausdrückliche Einwilligung.<br />
               Datenschutz Resend: <a href="https://resend.com/privacy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">resend.com/privacy</a>
@@ -136,7 +150,7 @@ export default function DatenschutzPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">11. Nutzungsstatistiken (Vercel Analytics & Speed Insights)</h2>
+            <h2 className="text-base font-semibold text-text-primary mb-3">14. Nutzungsstatistiken (Vercel Analytics & Speed Insights)</h2>
             <p>
               Wir nutzen <strong className="text-text-primary">Vercel Analytics</strong> und <strong className="text-text-primary">Vercel Speed Insights</strong> zur Auswertung von Seitenaufrufen und Ladezeiten. Diese Dienste arbeiten <strong className="text-text-primary">ohne Cookies und ohne persönliche Identifikatoren</strong>. IP-Adressen werden nicht gespeichert; die Daten sind vollständig aggregiert und anonymisiert. Eine Rückverfolgung auf einzelne Personen ist technisch ausgeschlossen. Rechtsgrundlage ist das berechtigte Interesse an der Verbesserung der Plattform (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO).<br />
               Datenschutz Vercel Analytics: <a href="https://vercel.com/docs/analytics/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">vercel.com/docs/analytics/privacy-policy</a>
@@ -144,7 +158,7 @@ export default function DatenschutzPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">12. Geocoding (OpenStreetMap Nominatim)</h2>
+            <h2 className="text-base font-semibold text-text-primary mb-3">15. Geocoding (OpenStreetMap Nominatim)</h2>
             <p>
               Für die Kartenansicht bei Locations ermitteln wir geografische Koordinaten über die öffentliche <strong className="text-text-primary">Nominatim-API</strong> der OpenStreetMap Foundation (UK). Dabei werden ausschließlich Städtenamen übertragen — keine personenbezogenen Daten. Ergebnisse werden serverseitig 24 Stunden gecacht, sodass jede Stadt nur einmal angefragt wird. Rechtsgrundlage ist das berechtigte Interesse (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO).<br />
               Datenschutz OpenStreetMap: <a href="https://osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">osmfoundation.org/wiki/Privacy_Policy</a>
@@ -152,7 +166,7 @@ export default function DatenschutzPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">13. Cookies, localStorage & lokale Speicherung</h2>
+            <h2 className="text-base font-semibold text-text-primary mb-3">16. Cookies, localStorage & lokale Speicherung</h2>
             <div className="space-y-3">
               <p>
                 <strong className="text-text-primary">Technisch notwendige Cookies (Clerk):</strong> Clerk setzt Session-Cookies, die für die Authentifizierung zwingend erforderlich sind. Ohne diese Cookies ist eine Anmeldung nicht möglich. Rechtsgrundlage: Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO, § 25 Abs.&nbsp;2 Nr.&nbsp;2 TTDSG.
@@ -174,19 +188,21 @@ export default function DatenschutzPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">14. Drittlandübertragungen (USA)</h2>
+            <h2 className="text-base font-semibold text-text-primary mb-3">17. Drittlandübertragungen (USA)</h2>
             <p>
               Mehrere eingesetzte Dienste (Clerk, Vercel, Stripe, Sentry, Resend) haben ihren Sitz in den USA. Da die USA kein der EU vergleichbares Datenschutzniveau garantieren, erfolgen diese Übertragungen auf Basis von EU-Standardvertragsklauseln (SCC) gemäß Art.&nbsp;46 Abs.&nbsp;2 lit.&nbsp;c DSGVO. Die SCC-Dokumente der jeweiligen Anbieter können über deren Datenschutzseiten abgerufen werden.
             </p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">15. Speicherdauer & Löschung</h2>
+            <h2 className="text-base font-semibold text-text-primary mb-3">18. Speicherdauer & Löschung</h2>
             <div className="space-y-2 mt-1">
               {[
                 ["Profildaten & Inserate", "Bis zur Kontolöschung; danach binnen 30 Tagen vollständig gelöscht"],
                 ["Nachrichten", "Bis zur Löschung des Kontos eines der Beteiligten"],
                 ["Profilaufrufe", "90 Tage (automatische Löschung)"],
+                ["Foto-Likes", "Bis zur Kontolöschung oder manuellen Entfernung"],
+                ["Online-Präsenzstatus", "Wird nach Sitzungsende automatisch zurückgesetzt"],
                 ["Server-Logs (Vercel)", "Max. 30 Tage"],
                 ["Fehler-Logs (Sentry)", "90 Tage"],
                 ["Buchungsdaten", "10 Jahre (§ 147 AO — gesetzliche Aufbewahrungspflicht)"],
@@ -201,14 +217,14 @@ export default function DatenschutzPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">16. Datensicherheit</h2>
+            <h2 className="text-base font-semibold text-text-primary mb-3">19. Datensicherheit</h2>
             <p>
               Alle Datenübertragungen sind mit HTTPS/TLS verschlüsselt. Der Zugriff auf Datenbankdaten ist durch Row Level Security (RLS) strikt auf autorisierte Nutzer beschränkt — jeder Nutzer kann ausschließlich auf die ihm erlaubten Datensätze zugreifen. Passwörter werden von uns nicht gespeichert. Administrative Zugriffe auf die Plattform sind protokolliert und auf wenige Personen beschränkt.
             </p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">17. Deine Rechte (Art. 15–21 DSGVO)</h2>
+            <h2 className="text-base font-semibold text-text-primary mb-3">20. Deine Rechte (Art. 15–21 DSGVO)</h2>
             <p className="mb-3">Du hast folgende Rechte gegenüber uns als Verantwortlichem:</p>
             <ul className="space-y-2 list-disc list-inside marker:text-gold">
               <li><strong className="text-text-primary">Auskunft</strong> — Welche Daten wir über dich verarbeiten (Art. 15 DSGVO)</li>
@@ -232,21 +248,21 @@ export default function DatenschutzPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">18. Minderjährige</h2>
+            <h2 className="text-base font-semibold text-text-primary mb-3">21. Minderjährige</h2>
             <p>
               CineGenius richtet sich ausschließlich an Personen ab 18 Jahren. Wir erheben wissentlich keine Daten von Minderjährigen. Solltest du Kenntnis davon haben, dass ein Minderjähriger ein Konto erstellt hat, melde dies bitte unter <a href="mailto:support@cinegenius.co" className="text-gold hover:underline">support@cinegenius.co</a>.
             </p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">19. Änderungen dieser Datenschutzerklärung</h2>
+            <h2 className="text-base font-semibold text-text-primary mb-3">22. Änderungen dieser Datenschutzerklärung</h2>
             <p>
               Wir behalten uns vor, diese Erklärung bei Änderungen an der Plattform oder neuen gesetzlichen Anforderungen zu aktualisieren. Die jeweils aktuelle Version ist unter <strong className="text-text-primary">cinegenius.co/datenschutz</strong> abrufbar. Bei wesentlichen Änderungen informieren wir registrierte Nutzer per E-Mail.
             </p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">20. Kontakt bei Datenschutzfragen</h2>
+            <h2 className="text-base font-semibold text-text-primary mb-3">23. Kontakt bei Datenschutzfragen</h2>
             <p>
               Markus Müller<br />
               Plinganserstrasse 19, 81369 München<br />
