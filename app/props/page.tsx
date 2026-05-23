@@ -28,7 +28,7 @@ export default async function PropsPage() {
 
   const serverListings = (data ?? []).map((l: {
     id: string; title: string; city: string; price: number; category: string | null;
-    image_url: string | null; rental_type?: string | null; type: string;
+    image_url: string | null; rental_type?: string | null; type: string; user_id: string;
     metadata?: Record<string, unknown> | null;
   }) => ({
     id: l.id,
@@ -46,6 +46,7 @@ export default async function PropsPage() {
     focalPoint: ((l.metadata as Record<string, unknown> | null)?.focal_point as { x: number; y: number } | null) ?? null,
     isReal: true,
     meta: l.metadata ?? null,
+    ownerId: l.user_id,
   }));
 
   const { data: vendorData } = await db

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import dynamicImport from "next/dynamic";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 
 import {
   MapPin, Star, CheckCircle, Search, Zap, LayoutList,
@@ -43,7 +44,10 @@ type Location = {
   tags: string[]; instantBook: boolean; verified: boolean;
   sqft: number; capacity: number; lat: number; lng: number; isReal?: boolean;
   focalPoint?: { x: number; y: number } | null; description?: string;
+  ownerId?: string;
 };
+
+type RatingData = { avg: number; count: number } | undefined;
 
 function parseLocationMeta(desc: string): { lage?: string; hasPower: boolean } {
   const metaLine = desc.split("\n\n")[0] ?? desc;
@@ -111,8 +115,45 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const t = useTranslations("locations");
+  const { user } = useUser();
 
   const allLocations = useMemo(() => serverListings, [serverListings]);
+
+  const [liveRatings, setLiveRatings] = useState<Record<string, { avg: number; count: number }>>({});
+  const [myRatings, setMyRatings] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    const ids = serverListings.map(l => l.id).join(",");
+    if (!ids) return;
+    fetch(`/api/listing-ratings?ids=${ids}`)
+      .then(r => r.json())
+      .then(({ ratings, myRatings: my }) => {
+        setLiveRatings(ratings ?? {});
+        setMyRatings(my ?? {});
+      })
+      .catch(() => {});
+  }, [serverListings]);
+
+  const handleRate = async (listingId: string, ownerId: string | undefined, star: number) => {
+    if (!user) return;
+    const prev = myRatings[listingId];
+    setMyRatings(m => ({ ...m, [listingId]: star }));
+    setLiveRatings(r => {
+      const cur = r[listingId] ?? { avg: 0, count: 0 };
+      const newCount = prev ? cur.count : cur.count + 1;
+      const newSum = prev ? cur.avg * cur.count - prev + star : cur.avg * cur.count + star;
+      return { ...r, [listingId]: { avg: Math.round((newSum / newCount) * 10) / 10, count: newCount } };
+    });
+    try {
+      await fetch("/api/listing-ratings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listing_id: listingId, owner_id: ownerId, rating: star }),
+      });
+    } catch {
+      setMyRatings(m => { const n = { ...m }; if (prev) n[listingId] = prev; else delete n[listingId]; return n; });
+    }
+  };
 
   const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const [activeType, setActiveType] = useState(() => searchParams.get("type") ?? "All Types");
@@ -513,19 +554,42 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
                         </div>
                         <div className="p-3">
                           <h3 className="font-semibold text-text-primary text-sm leading-snug line-clamp-1 mb-0.5">{loc.title}</h3>
-                          <p className="text-xs text-text-muted flex items-center gap-1 mb-2">
+                          <p className="text-xs text-text-muted flex items-center gap-1 mb-1.5">
                             <MapPin size={10} /> {loc.city} · {loc.type}
                           </p>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-1">
-                              <Star size={11} className="text-gold fill-gold" />
-                              <span className="text-xs text-text-secondary">{loc.rating}</span>
-                              <span className="text-xs text-text-muted">({loc.reviews})</span>
-                            </div>
+                          <div className="flex items-center justify-between mb-1.5">
                             <span className="text-sm font-bold text-gold">
                               {loc.price > 0 ? `${loc.price.toLocaleString()} €` : "Auf Anfrage"}
                               {loc.price > 0 && <span className="text-text-muted font-normal text-xs">/{loc.priceUnit}</span>}
                             </span>
+                          </div>
+                          <div className="flex items-center justify-between pt-1.5 border-t border-border/30"
+                            onClick={(e) => e.stopPropagation()}>
+                            <div className="flex items-center gap-1 pointer-events-none">
+                              {(liveRatings[loc.id]?.count ?? 0) > 0 ? (
+                                <>
+                                  <span className="text-gold text-[10px] font-bold">{liveRatings[loc.id].avg.toFixed(1)}</span>
+                                  {[1,2,3,4,5].map((s) => (
+                                    <span key={s} className={`text-[9px] ${s <= Math.round(liveRatings[loc.id].avg) ? "text-gold" : "text-text-muted/30"}`}>★</span>
+                                  ))}
+                                  <span className="text-[9px] text-text-muted">({liveRatings[loc.id].count})</span>
+                                </>
+                              ) : (
+                                <span className="text-[9px] text-text-muted/60">Noch keine Bewertung</span>
+                              )}
+                            </div>
+                            {!!user && user.id !== loc.ownerId && (
+                              <div className="flex">
+                                {[1,2,3,4,5].map((star) => (
+                                  <button key={star} type="button"
+                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); void handleRate(loc.id, loc.ownerId, star); }}
+                                    className="w-5 h-5 flex items-center justify-center text-xs touch-manipulation transition-transform active:scale-125 hover:scale-110"
+                                    style={{ color: star <= (myRatings[loc.id] ?? 0) ? "#d4af37" : "rgba(255,255,255,0.2)" }}>
+                                    ★
+                                  </button>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </Link>
@@ -549,17 +613,39 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
                         </div>
                       </div>
                       <div className="p-4">
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <h3 className="font-semibold text-text-primary text-sm">{loc.title}</h3>
-                          <div className="flex items-center gap-1 shrink-0">
-                            <Star size={11} className="text-gold fill-gold" />
-                            <span className="text-xs text-text-secondary">{loc.rating}</span>
-                          </div>
-                        </div>
-                        <p className="text-xs text-text-muted mb-3 flex items-center gap-1"><MapPin size={11} /> {loc.city}</p>
-                        <div className="flex items-center justify-between pt-3 border-t border-border">
+                        <h3 className="font-semibold text-text-primary text-sm mb-1">{loc.title}</h3>
+                        <p className="text-xs text-text-muted mb-2 flex items-center gap-1"><MapPin size={11} /> {loc.city}</p>
+                        <div className="flex items-center justify-between pt-2 border-t border-border mb-1.5">
                           <span className="text-xs text-text-muted">{loc.type}</span>
                           <span className="text-sm font-bold text-gold">{loc.price.toLocaleString()} €<span className="text-text-muted font-normal text-xs">/{loc.priceUnit}</span></span>
+                        </div>
+                        <div className="flex items-center justify-between pt-1.5 border-t border-border/30"
+                          onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center gap-1 pointer-events-none">
+                            {(liveRatings[loc.id]?.count ?? 0) > 0 ? (
+                              <>
+                                <span className="text-gold text-[10px] font-bold">{liveRatings[loc.id].avg.toFixed(1)}</span>
+                                {[1,2,3,4,5].map((s) => (
+                                  <span key={s} className={`text-[9px] ${s <= Math.round(liveRatings[loc.id].avg) ? "text-gold" : "text-text-muted/30"}`}>★</span>
+                                ))}
+                                <span className="text-[9px] text-text-muted">({liveRatings[loc.id].count})</span>
+                              </>
+                            ) : (
+                              <span className="text-[9px] text-text-muted/60">Noch keine Bewertung</span>
+                            )}
+                          </div>
+                          {!!user && user.id !== loc.ownerId && (
+                            <div className="flex">
+                              {[1,2,3,4,5].map((star) => (
+                                <button key={star} type="button"
+                                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); void handleRate(loc.id, loc.ownerId, star); }}
+                                  className="w-5 h-5 flex items-center justify-center text-xs touch-manipulation transition-transform active:scale-125 hover:scale-110"
+                                  style={{ color: star <= (myRatings[loc.id] ?? 0) ? "#d4af37" : "rgba(255,255,255,0.2)" }}>
+                                  ★
+                                </button>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </Link>

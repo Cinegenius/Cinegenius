@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect, useRef, Suspense } from "react";
+import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
@@ -40,7 +41,10 @@ type Prop = {
   dailyRate: number; image: string; condition: string; era: string | null;
   delivery: boolean; rentalType?: "miete" | "kauf"; focalPoint?: { x: number; y: number } | null;
   description?: string; isReal?: boolean; type?: string; meta?: Record<string, unknown> | null;
+  ownerId?: string;
 };
+
+type RatingData = { avg: number; count: number } | undefined;
 
 // ─── SortDropdown ────────────────────────────────────────────────
 function SortDropdown({ value, options, onChange }: {
@@ -79,7 +83,11 @@ function SortDropdown({ value, options, onChange }: {
 
 // ─── Prop card ────────────────────────────────────────────────────
 
-function PropCard({ p, list }: { p: Prop; list?: boolean }) {
+function PropCard({ p, list, ratingData, myRating, onRate, canRate }: {
+  p: Prop; list?: boolean;
+  ratingData?: RatingData; myRating?: number;
+  onRate?: (star: number) => void; canRate?: boolean;
+}) {
   const tc = useTranslations("common");
   const tp = useTranslations("props");
   const href = p.type === "vehicle" ? `/vehicles/${p.id}` : `/props/${p.id}`;
@@ -144,10 +152,41 @@ function PropCard({ p, list }: { p: Prop; list?: boolean }) {
           </div>
         </div>
       </div>
-      <div className="px-3 py-2 flex items-center justify-between border-t border-border/50">
-        <span className="text-[10px] text-text-muted">{p.condition}</span>
-        {p.era && <span className="text-[10px] text-gold/70">{p.era}</span>}
-        <span className="text-[10px] text-text-muted group-hover:text-gold transition-colors">{tp("detailsArrow")}</span>
+      <div className="px-3 py-2 border-t border-border/50">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] text-text-muted">{p.condition}</span>
+          {p.era && <span className="text-[10px] text-gold/70">{p.era}</span>}
+          <span className="text-[10px] text-text-muted group-hover:text-gold transition-colors">{tp("detailsArrow")}</span>
+        </div>
+        {/* Rating strip */}
+        <div className="flex items-center justify-between mt-1.5 pt-1.5 border-t border-border/30"
+          onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center gap-1 pointer-events-none">
+            {ratingData && ratingData.count > 0 ? (
+              <>
+                <span className="text-gold text-[10px] font-bold">{ratingData.avg.toFixed(1)}</span>
+                {[1,2,3,4,5].map((s) => (
+                  <span key={s} className={`text-[9px] ${s <= Math.round(ratingData.avg) ? "text-gold" : "text-text-muted/30"}`}>★</span>
+                ))}
+                <span className="text-[9px] text-text-muted">({ratingData.count})</span>
+              </>
+            ) : (
+              <span className="text-[9px] text-text-muted/60">Noch keine Bewertung</span>
+            )}
+          </div>
+          {canRate && (
+            <div className="flex">
+              {[1,2,3,4,5].map((star) => (
+                <button key={star} type="button"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); onRate?.(star); }}
+                  className="w-5 h-5 flex items-center justify-center text-xs touch-manipulation transition-transform active:scale-125 hover:scale-110"
+                  style={{ color: star <= (myRating ?? 0) ? "#d4af37" : "rgba(255,255,255,0.2)" }}>
+                  ★
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </Link>
   );
@@ -159,6 +198,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("props");
+  const { user } = useUser();
 
   const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const [selectedDept, setSelectedDept] = useState<string | null>(() => searchParams.get("dept") ?? null);
@@ -166,6 +206,42 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const [sortKey, setSortKey] = useState("featured");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [liveRatings, setLiveRatings] = useState<Record<string, { avg: number; count: number }>>({});
+  const [myRatings, setMyRatings] = useState<Record<string, number>>({});
+
+  // Batch-fetch listing ratings
+  useEffect(() => {
+    const ids = serverListings.map(l => l.id).join(",");
+    if (!ids) return;
+    fetch(`/api/listing-ratings?ids=${ids}`)
+      .then(r => r.json())
+      .then(({ ratings, myRatings: my }) => {
+        setLiveRatings(ratings ?? {});
+        setMyRatings(my ?? {});
+      })
+      .catch(() => {});
+  }, [serverListings]);
+
+  const handleRate = async (listingId: string, ownerId: string | undefined, star: number) => {
+    if (!user) return;
+    const prev = myRatings[listingId];
+    setMyRatings(m => ({ ...m, [listingId]: star }));
+    setLiveRatings(r => {
+      const cur = r[listingId] ?? { avg: 0, count: 0 };
+      const newCount = prev ? cur.count : cur.count + 1;
+      const newSum = prev ? cur.avg * cur.count - prev + star : cur.avg * cur.count + star;
+      return { ...r, [listingId]: { avg: Math.round((newSum / newCount) * 10) / 10, count: newCount } };
+    });
+    try {
+      await fetch("/api/listing-ratings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listing_id: listingId, owner_id: ownerId, rating: star }),
+      });
+    } catch {
+      setMyRatings(m => { const n = { ...m }; if (prev) n[listingId] = prev; else delete n[listingId]; return n; });
+    }
+  };
 
   // Sync URL
   useEffect(() => {
@@ -412,7 +488,12 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                   ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
                   : "space-y-2"}>
                   {filtered.slice(0, visibleCount).map((p) => (
-                    <PropCard key={p.id} p={p} list={viewMode === "list"} />
+                    <PropCard key={p.id} p={p} list={viewMode === "list"}
+                      ratingData={liveRatings[p.id]}
+                      myRating={myRatings[p.id]}
+                      canRate={!!user && user.id !== p.ownerId}
+                      onRate={(star) => handleRate(p.id, p.ownerId, star)}
+                    />
                   ))}
                 </div>
                 {filtered.length > visibleCount && (
