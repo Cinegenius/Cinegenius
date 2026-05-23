@@ -16,6 +16,7 @@ import GlobalEffects from "@/components/GlobalEffects";
 import PresencePing from "@/components/PresencePing";
 import CookieBanner from "@/components/CookieBanner";
 import { ToastProvider } from "@/contexts/ToastContext";
+import GlobalSearch from "@/components/GlobalSearch";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -130,6 +131,7 @@ export default async function RootLayout({
             <ToastProvider>
               <GlobalEffects />
               <PresencePing />
+              <GlobalSearch />
               <Navbar />
               <main className="flex-1 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">{children}</main>
               <Footer />

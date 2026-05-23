@@ -306,6 +306,15 @@ export default function Navbar() {
 
             {/* Desktop CTA */}
             <div className="hidden lg:flex items-center gap-2">
+              <button
+                onClick={() => document.dispatchEvent(new Event("cg:opensearch"))}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border text-text-muted hover:border-gold/40 hover:text-gold transition-all text-sm"
+                aria-label="CineGenius durchsuchen"
+              >
+                <Search size={14} />
+                <span className="hidden xl:inline">Suchen…</span>
+                <kbd className="hidden xl:inline text-[10px] px-1.5 py-0.5 rounded bg-bg-hover border border-border font-mono">⌘K</kbd>
+              </button>
               <LanguageSwitcher />
               <NotificationCenter />
               {!isLoaded && !profileDisplayName && !profileAvatarUrl && (
