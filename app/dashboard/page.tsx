@@ -32,6 +32,8 @@ type RealConversation = {
   created_at: string;
   updated_at: string;
   messages: RealMessage[];
+  otherName?: string;
+  otherAvatar?: string | null;
 };
 
 type Booking = {
@@ -1068,8 +1070,10 @@ export default function DashboardPage() {
                           className="w-full flex items-center gap-4 px-5 py-4 hover:bg-bg-elevated transition-colors text-left"
                         >
                           <div className="relative shrink-0">
-                            <div className="w-9 h-9 rounded-full bg-gold/15 border border-gold/20 flex items-center justify-center">
-                              <User size={15} className="text-gold" />
+                            <div className="w-9 h-9 rounded-full bg-gold/15 border border-gold/20 flex items-center justify-center overflow-hidden">
+                              {conv.otherAvatar
+                                ? <img src={conv.otherAvatar} alt="" className="w-full h-full object-cover" />
+                                : <User size={15} className="text-gold" />}
                             </div>
                             {hasUnread && (
                               <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-gold rounded-full border-2 border-bg-secondary" />
@@ -1077,9 +1081,11 @@ export default function DashboardPage() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className={`text-sm font-medium truncate ${hasUnread ? "text-text-primary" : "text-text-secondary"}`}>
-                              {conv.listing_title ?? "Nachricht"}
+                              {conv.otherName ?? "Unbekannt"}
                             </p>
-                            <p className="text-xs text-text-muted truncate mt-0.5">{lastMsg?.content ?? "…"}</p>
+                            <p className="text-xs text-text-muted truncate mt-0.5">
+                              {conv.listing_title ? `${conv.listing_title} · ` : ""}{lastMsg?.content ?? "…"}
+                            </p>
                           </div>
                           <div className="shrink-0 text-right">
                             {hasUnread && (
@@ -1790,8 +1796,10 @@ export default function DashboardPage() {
                         }`}
                       >
                         <div className="relative shrink-0">
-                          <div className="w-9 h-9 rounded-full bg-gold/20 border border-gold/30 flex items-center justify-center">
-                            <User size={16} className="text-gold" />
+                          <div className="w-9 h-9 rounded-full bg-gold/20 border border-gold/30 flex items-center justify-center overflow-hidden">
+                            {conv.otherAvatar
+                              ? <img src={conv.otherAvatar} alt="" className="w-full h-full object-cover" />
+                              : <User size={16} className="text-gold" />}
                           </div>
                           {hasUnread && (
                             <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-gold rounded-full border-2 border-bg-secondary" />
@@ -1800,7 +1808,7 @@ export default function DashboardPage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-0.5">
                             <span className="text-xs font-semibold text-text-primary truncate">
-                              {conv.listing_title ?? "Nachricht"}
+                              {conv.otherName ?? "Unbekannt"}
                             </span>
                             <span className="text-[10px] text-text-muted shrink-0 ml-1">
                               {formatMsgTime(conv.updated_at)}
@@ -1844,10 +1852,12 @@ export default function DashboardPage() {
                       </button>
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-text-primary leading-tight truncate">
-                          {conv.listing_title ?? "Konversation"}
+                          {conv.otherName ?? "Unbekannt"}
                         </p>
-                        {conv.listing_type && (
-                          <p className="text-xs text-text-muted mt-0.5">{conv.listing_type}</p>
+                        {(conv.listing_title || conv.listing_type) && (
+                          <p className="text-xs text-text-muted mt-0.5 truncate">
+                            {[conv.listing_type, conv.listing_title].filter(Boolean).join(" · ")}
+                          </p>
                         )}
                       </div>
                     </div>
