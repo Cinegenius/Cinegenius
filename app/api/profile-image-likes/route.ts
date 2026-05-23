@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     const { data: owner } = await db.from("profiles").select("slug").eq("user_id", profile_id).maybeSingle();
     await db.from("notifications").insert({
       user_id: profile_id,
-      type: "review",
+      type: "review_request",
       title: "Foto geliked",
       body: `${name} hat eines deiner Fotos mit einem Herz versehen.`,
       href: `/profile/${owner?.slug ?? profile_id}`,
