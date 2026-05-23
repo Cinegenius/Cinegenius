@@ -464,29 +464,6 @@ export default async function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════
-          PLATFORM PILLARS (compact nav strip)
-      ══════════════════════════════════════════════ */}
-      <section className="py-3 sm:py-4 bg-bg-secondary border-y border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-            {featurePillars.map(({ icon: Icon, title, href }) => (
-              <Link
-                key={href}
-                href={href}
-                className="group flex flex-col sm:flex-row items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2.5 rounded-xl border border-border bg-bg-elevated hover:border-gold/30 hover:bg-bg-hover transition-all text-center sm:text-left"
-              >
-                <div className="w-6 h-6 rounded-md bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
-                  <Icon size={12} className="text-gold" />
-                </div>
-                <span className="text-[11px] sm:text-xs font-semibold text-text-secondary group-hover:text-text-primary transition-colors leading-tight">{title}</span>
-                <ArrowRight size={10} className="hidden sm:block ml-auto text-text-muted/40 group-hover:text-gold transition-colors shrink-0" />
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════
           TARGET AUDIENCES
       ══════════════════════════════════════════════ */}
       <section className="py-8 sm:py-16 bg-bg-secondary border-y border-border">
