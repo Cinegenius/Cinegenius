@@ -10,6 +10,7 @@ import {
   MapPin, MessageSquare, Award, ChevronDown, ChevronUp,
   Pencil, ExternalLink, X, Check, Globe, Building2, UserPlus, UserCheck, Clock,
   Film, Briefcase, Package, Car, Ban, Flag, Users2, MoreHorizontal, Phone, Mail, Heart, Send,
+  Eye, TrendingUp, ArrowRight,
 } from "lucide-react";
 import type { UserProfile, ProfileModule, ProfileImage, FilmographyEntry, ProfileAward, ProjectCredit } from "@/lib/profile-types";
 import ReviewsSection from "@/components/ReviewsSection";
@@ -1869,6 +1870,51 @@ function PhotoGrid({
   );
 }
 
+function OwnerStatsBar({ imageLikes }: { imageLikes: Record<string, number> }) {
+  const [views7, setViews7] = useState<number | null>(null);
+  const [convCount, setConvCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch("/api/profile-views").then(r => r.json()).then(d => setViews7(d.views7 ?? 0)).catch(() => setViews7(0));
+    fetch("/api/conversations").then(r => r.json()).then(d => setConvCount((d.data ?? []).length)).catch(() => setConvCount(0));
+  }, []);
+
+  const totalLikes = Object.values(imageLikes).reduce((s, n) => s + n, 0);
+
+  const stats = [
+    { icon: Eye, label: "Aufrufe diese Woche", value: views7 },
+    { icon: Heart, label: "Foto-Likes gesamt", value: totalLikes },
+    { icon: MessageSquare, label: "Nachrichten", value: convCount },
+  ];
+
+  return (
+    <div className="sticky top-16 z-30 bg-bg-elevated/95 backdrop-blur-md border-b border-border">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 flex items-center gap-4 sm:gap-8 py-2.5">
+        <p className="text-[10px] uppercase tracking-widest text-gold font-semibold shrink-0 hidden sm:block">Dein Profil</p>
+        <div className="flex items-center gap-4 sm:gap-8 flex-1">
+          {stats.map(({ icon: Icon, label, value }) => (
+            <div key={label} className="flex items-center gap-1.5">
+              <Icon size={12} className="text-text-muted shrink-0" />
+              <span className="text-sm font-bold text-text-primary">
+                {value === null ? <span className="inline-block w-6 h-3 bg-bg-hover rounded animate-pulse" /> : value}
+              </span>
+              <span className="text-[10px] text-text-muted hidden sm:inline">{label}</span>
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <Link href="/dashboard?tab=analytics" className="flex items-center gap-1 text-[11px] text-text-muted hover:text-gold transition-colors">
+            <TrendingUp size={11} /> <span className="hidden sm:inline">Analysen</span>
+          </Link>
+          <Link href="/dashboard?tab=settings" className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg bg-gold/10 border border-gold/20 text-gold hover:bg-gold/20 transition-colors">
+            <Pencil size={10} /> Bearbeiten <ArrowRight size={9} />
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 type SimilarProfile = {
   user_id: string;
   display_name: string;
@@ -1964,20 +2010,21 @@ export default function ProfileView({
 }) {
   const category = PROFILE_CATEGORY_MAP[profile.profile_type] ?? "crew";
 
+  const ownerBar = isOwner ? <OwnerStatsBar imageLikes={imageLikes} /> : null;
   const similarSection = !isOwner && similarProfiles.length > 0
     ? <SimilarProfilesSection profiles={similarProfiles} />
     : null;
 
   // Model types get editorial layout
   if (profile.profile_type === "model") {
-    return <><ModelProfile profile={profile} isOwner={isOwner} companyMembership={companyMembership} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
+    return <>{ownerBar}<ModelProfile profile={profile} isOwner={isOwner} companyMembership={companyMembership} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
   }
 
   // Actor/talent types get casting-ready layout
   if (category === "talent") {
-    return <><ActorProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
+    return <>{ownerBar}<ActorProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
   }
 
   // Crew, creative, vendor get generic layout
-  return <><GenericProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
+  return <>{ownerBar}<GenericProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
 }
