@@ -1386,7 +1386,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
             )}
 
             {(languages.length > 0 || profile.day_rate || profile.travel_ready || profile.crew?.experience_years) && (
-              <div className="flex flex-wrap gap-x-6 gap-y-3 pl-3 border-l border-gold/20">
+              <div className="rounded-xl bg-bg-elevated border border-border px-4 py-3 flex flex-wrap gap-x-6 gap-y-3">
                 {languages.length > 0 && <StatPill label="Sprachen" value={languages.join(", ")} />}
                 {profile.day_rate && <StatPill label="Tagesgage" value={`${profile.day_rate} €`} />}
                 {profile.travel_ready && <StatPill label="Reisen" value="Reisebereit" />}
@@ -1436,23 +1436,37 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 gp2.contact_email?.trim() ? { label: gp2.contact_email.trim(), url: `mailto:${gp2.contact_email.trim()}`, contactIcon: "mail" as const } : null,
               ] as const).filter((l): l is NonNullable<typeof l> & { url: string } => l !== null && !!l.url) as { label: string; url: string; contactIcon?: "phone" | "mail" }[];
               if (links.length === 0) return null;
+              const contactLinks = links.filter(l => l.contactIcon);
+              const socialLinks = links.filter(l => !l.contactIcon);
               return (
-                <div>
-                  <div className="flex items-center gap-2 mb-2.5">
+                <div className="rounded-xl bg-bg-elevated border border-gold/25 p-4 space-y-3">
+                  <div className="flex items-center gap-2">
                     <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
                     <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Links & Kontakt</p>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {links.map(({ label, url, contactIcon }) => (
-                      <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-bg-secondary/50 border border-border/60 rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
-                        {contactIcon === "phone" && <Phone size={11} className="shrink-0" />}
-                        {contactIcon === "mail"  && <Mail size={11} className="shrink-0" />}
-                        {label}
-                        {!contactIcon && <ExternalLink size={9} className="shrink-0 opacity-40" />}
-                      </a>
-                    ))}
-                  </div>
+                  {contactLinks.length > 0 && (
+                    <div className="flex flex-col gap-2">
+                      {contactLinks.map(({ label, url, contactIcon }) => (
+                        <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-3 py-2 bg-gold/8 border border-gold/20 rounded-lg text-sm font-medium text-text-primary hover:bg-gold/15 hover:border-gold/40 transition-colors">
+                          {contactIcon === "phone" && <Phone size={13} className="shrink-0 text-gold" />}
+                          {contactIcon === "mail"  && <Mail  size={13} className="shrink-0 text-gold" />}
+                          {label}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                  {socialLinks.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {socialLinks.map(({ label, url }) => (
+                        <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 bg-bg-secondary/60 border border-border/60 rounded-md text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
+                          {label}
+                          <ExternalLink size={9} className="shrink-0 opacity-40" />
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })()}
