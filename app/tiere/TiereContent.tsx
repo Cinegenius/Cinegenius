@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { Search, PawPrint, X, Truck, MapPin, Users } from "lucide-react";
+import { Search, PawPrint, X, Truck, MapPin, Users, Heart } from "lucide-react";
+import { useAuth } from "@clerk/nextjs";
 
 const SPECIES = ["Alle", "Hunde", "Pferde & Ponys", "Katzen", "Vögel", "Reptilien", "Nutztiere", "Exoten", "Sonstige Tiere"];
 const TRAINING = ["Alle", "Kinoprofi", "Erfahren", "Grundgehorsam", "Ungeübt"];
@@ -21,6 +22,7 @@ type Animal = {
   delivery: boolean;
   focalPoint?: { x: number; y: number } | null;
   description?: string;
+  ownerId?: string;
 };
 
 const TRAINING_COLORS: Record<string, string> = {
@@ -31,10 +33,74 @@ const TRAINING_COLORS: Record<string, string> = {
 };
 
 export default function TiereContent({ serverListings }: { serverListings: Animal[] }) {
+  const { isSignedIn } = useAuth();
   const [search, setSearch] = useState("");
   const [species, setSpecies] = useState("Alle");
   const [training, setTraining] = useState("Alle");
   const [deliveryOnly, setDeliveryOnly] = useState(false);
+  const [liveRatings, setLiveRatings] = useState<Record<string, { avg: number; count: number }>>({});
+  const [myRatings, setMyRatings] = useState<Record<string, number>>({});
+  const [eligible, setEligible] = useState<Set<string>>(new Set());
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const ids = serverListings.map(l => l.id).join(",");
+    if (!ids) return;
+    fetch(`/api/listing-ratings?ids=${ids}`)
+      .then(r => r.json())
+      .then(({ ratings, myRatings: my, eligible: elig }) => {
+        setLiveRatings(ratings ?? {});
+        setMyRatings(my ?? {});
+        setEligible(new Set(elig ?? []));
+      })
+      .catch(() => {});
+  }, [serverListings]);
+
+  useEffect(() => {
+    if (!isSignedIn) return;
+    const ids = serverListings.map(l => l.id).join(",");
+    if (!ids) return;
+    fetch(`/api/favorites?ids=${ids}`)
+      .then(r => r.json())
+      .then(({ favorited }) => setFavorites(new Set(favorited ?? [])))
+      .catch(() => {});
+  }, [serverListings, isSignedIn]);
+
+  const handleFavorite = async (e: React.MouseEvent, listingId: string) => {
+    e.preventDefault(); e.stopPropagation();
+    if (!isSignedIn) return;
+    const wasFav = favorites.has(listingId);
+    setFavorites(prev => { const next = new Set(prev); wasFav ? next.delete(listingId) : next.add(listingId); return next; });
+    try {
+      await fetch("/api/favorites", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listing_id: listingId }),
+      });
+    } catch {
+      setFavorites(prev => { const next = new Set(prev); wasFav ? next.add(listingId) : next.delete(listingId); return next; });
+    }
+  };
+
+  const handleRate = async (e: React.MouseEvent, animal: Animal, star: number) => {
+    e.preventDefault(); e.stopPropagation();
+    if (!eligible.has(animal.id)) return;
+    const prev = myRatings[animal.id];
+    setMyRatings(m => ({ ...m, [animal.id]: star }));
+    setLiveRatings(r => {
+      const cur = r[animal.id] ?? { avg: 0, count: 0 };
+      const newCount = prev ? cur.count : cur.count + 1;
+      const newSum = prev ? cur.avg * cur.count - prev + star : cur.avg * cur.count + star;
+      return { ...r, [animal.id]: { avg: Math.round((newSum / newCount) * 10) / 10, count: newCount } };
+    });
+    try {
+      await fetch("/api/listing-ratings", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listing_id: animal.id, owner_id: animal.ownerId, rating: star }),
+      });
+    } catch {
+      setMyRatings(m => { const n = { ...m }; if (prev) n[animal.id] = prev; else delete n[animal.id]; return n; });
+    }
+  };
 
   const filtered = useMemo(() => {
     return serverListings.filter((a) => {
@@ -137,11 +203,19 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
                     <PawPrint size={40} className="text-text-muted/20" />
                   </div>
                 )}
-                {animal.delivery && (
-                  <span className="absolute top-2 right-2 px-2 py-0.5 bg-success/90 text-white text-[10px] font-semibold rounded-full flex items-center gap-1">
-                    <Truck size={9} /> Lieferung
-                  </span>
-                )}
+                <div className="absolute top-2 right-2 flex items-center gap-1">
+                  {animal.delivery && (
+                    <span className="px-2 py-0.5 bg-success/90 text-white text-[10px] font-semibold rounded-full flex items-center gap-1">
+                      <Truck size={9} /> Lieferung
+                    </span>
+                  )}
+                  {isSignedIn && (
+                    <button type="button" onClick={(e) => handleFavorite(e, animal.id)}
+                      className={`w-6 h-6 flex items-center justify-center rounded-full backdrop-blur-sm border transition-all ${favorites.has(animal.id) ? "bg-crimson/20 border-crimson/50 text-crimson-light" : "bg-bg-primary/60 border-border/50 text-text-muted hover:text-crimson-light"}`}>
+                      <Heart size={11} className={favorites.has(animal.id) ? "fill-current" : ""} />
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div className="p-4">
@@ -173,6 +247,34 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
                     {animal.dailyRate > 0 ? `${animal.dailyRate.toLocaleString()} €` : "Auf Anfrage"}
                   </span>
                   {animal.dailyRate > 0 && <span className="text-xs text-text-muted">/Tag</span>}
+                </div>
+                <div className="flex items-center justify-between mt-1.5 pt-1.5 border-t border-border/30"
+                  onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center gap-1 pointer-events-none">
+                    {(liveRatings[animal.id]?.count ?? 0) > 0 ? (
+                      <>
+                        <span className="text-gold text-[10px] font-bold">{liveRatings[animal.id].avg.toFixed(1)}</span>
+                        {[1,2,3,4,5].map((s) => (
+                          <span key={s} className={`text-[9px] ${s <= Math.round(liveRatings[animal.id].avg) ? "text-gold" : "text-text-muted/30"}`}>★</span>
+                        ))}
+                        <span className="text-[9px] text-text-muted">({liveRatings[animal.id].count})</span>
+                      </>
+                    ) : (
+                      <span className="text-[9px] text-text-muted/60">Noch keine Bewertung</span>
+                    )}
+                  </div>
+                  {eligible.has(animal.id) && (
+                    <div className="flex">
+                      {[1,2,3,4,5].map((star) => (
+                        <button key={star} type="button"
+                          onClick={(e) => void handleRate(e, animal, star)}
+                          className="w-5 h-5 flex items-center justify-center text-xs touch-manipulation transition-transform active:scale-125 hover:scale-110"
+                          style={{ color: star <= (myRatings[animal.id] ?? 0) ? "#d4af37" : "rgba(255,255,255,0.2)" }}>
+                          ★
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </Link>

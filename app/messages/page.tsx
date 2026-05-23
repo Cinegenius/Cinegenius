@@ -60,6 +60,8 @@ function MessagesContent() {
   const [recipientName, setRecipientName] = useState("");
   const [loadingRecipient, setLoadingRecipient] = useState(!!toParam);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const activeIdRef = useRef<string | null>(null);
+  useEffect(() => { activeIdRef.current = activeId; }, [activeId]);
 
   // Friend requests
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
@@ -154,7 +156,6 @@ function MessagesContent() {
       }, (payload) => {
         const newMsg = payload.new as Message;
         setMessages(prev => {
-          // Eigene gesendete Nachrichten werden schon optimistisch hinzugefügt — nicht doppeln
           if (prev.some(m => m.id === newMsg.id)) return prev;
           return [...prev, newMsg];
         });
@@ -163,6 +164,32 @@ function MessagesContent() {
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [activeId]);
+
+  // Realtime: Konversationsliste aktualisieren wenn Nachricht in anderer Unterhaltung ankommt
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel(`sidebar:${user.id}`)
+      .on("postgres_changes", {
+        event: "INSERT",
+        schema: "public",
+        table: "messages",
+      }, (payload) => {
+        const msg = payload.new as Message & { conversation_id: string };
+        if (msg.conversation_id !== activeIdRef.current) {
+          loadConversations();
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user, loadConversations]);
+
+  // Refresh beim Window-Focus (Tab-Wechsel)
+  useEffect(() => {
+    const onFocus = () => { loadConversations(); };
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [loadConversations]);
 
   function openConversation(conv: Conversation) {
     setActiveId(conv.id);

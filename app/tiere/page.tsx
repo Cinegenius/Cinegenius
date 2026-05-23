@@ -27,6 +27,7 @@ export default async function TierePage() {
   const serverListings = (data ?? []).map((l: {
     id: string; title: string; city: string | null; price: number;
     category: string | null; image_url: string | null; type: string;
+    user_id?: string | null;
     metadata?: Record<string, unknown> | null;
   }) => ({
     id: l.id,
@@ -42,6 +43,7 @@ export default async function TierePage() {
     delivery: (l.metadata?.delivery as boolean) ?? false,
     focalPoint: (l.metadata?.focal_point as { x: number; y: number } | null) ?? null,
     description: "",
+    ownerId: l.user_id ?? undefined,
   }));
 
   return (
