@@ -1423,35 +1423,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
               </div>
             )}
 
-            {certificates.length > 0 && (
-              <div>
-                <div className="flex items-center gap-2 mb-2.5">
-                  <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
-                  <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Lizenzen & Zertifikate</p>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {certificates.map((c) => (
-                    <span key={c} className="px-2 py-0.5 bg-transparent border border-border/50 rounded-md text-[11px] text-text-muted">{c}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {software.length > 0 && (
-              <div>
-                <div className="flex items-center gap-2 mb-2.5">
-                  <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
-                  <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Software</p>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {software.map((s) => (
-                    <span key={s} className="px-2 py-0.5 bg-transparent border border-border/50 rounded-md text-[11px] text-text-muted">{s}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Social links */}
+            {/* Links & Kontakt — moved above certificates */}
             {(() => {
               const gp2 = profile as unknown as { tiktok_url?: string; vimeo_url?: string; phone?: string; contact_email?: string };
               const links = ([
@@ -1469,7 +1441,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 <div>
                   <div className="flex items-center gap-2 mb-2.5">
                     <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
-                    <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Links</p>
+                    <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Links & Kontakt</p>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {links.map(({ label, url, contactIcon }) => (
@@ -1489,6 +1461,35 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
             {/* Externe Profile */}
             {externalProfiles.length > 0 && (
               <ExternalProfilesDisplay profiles={externalProfiles} />
+            )}
+
+            {software.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
+                  <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Software</p>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {software.map((s) => (
+                    <span key={s} className="px-2 py-0.5 bg-transparent border border-border/50 rounded-md text-[11px] text-text-muted">{s}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Lizenzen & Zertifikate — moved below links */}
+            {certificates.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
+                  <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Lizenzen & Zertifikate</p>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {certificates.map((c) => (
+                    <span key={c} className="px-2 py-0.5 bg-transparent border border-border/50 rounded-md text-[11px] text-text-muted">{c}</span>
+                  ))}
+                </div>
+              </div>
             )}
 
           </div>
