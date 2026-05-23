@@ -1384,8 +1384,8 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           </div>
 
           {/* Compact info */}
-          <div className="space-y-5 pt-1">
-            <CompanyBadge membership={companyMembership} />
+          <div className="flex gap-5 pt-1">
+            <div className="flex-1 space-y-5 min-w-0">
 
             {profile.bio && (
               <div>
@@ -1503,7 +1503,20 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
               </div>
             )}
 
-          </div>
+            </div>{/* end flex-1 info */}
+            {companyMembership?.companies && (
+              <div className="hidden sm:block w-44 shrink-0">
+                <CompanyBadge membership={companyMembership} />
+              </div>
+            )}
+          </div>{/* end flex row */}
+
+          {/* Company on mobile — shown below info */}
+          {companyMembership?.companies && (
+            <div className="sm:hidden mt-4">
+              <CompanyBadge membership={companyMembership} />
+            </div>
+          )}
         </div>
 
         <Divider />
