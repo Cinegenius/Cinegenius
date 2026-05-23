@@ -383,13 +383,13 @@ export default async function HomePage() {
       {/* ══════════════════════════════════════════════
           3-STEP SECTION
       ══════════════════════════════════════════════ */}
-      <section className="py-16 sm:py-20 max-w-7xl mx-auto px-6 sm:px-6 lg:px-8">
-        <div className="text-center sm:text-left mb-8 sm:hidden">
-          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">{t("stepsLabel")}</p>
-          <h2 className="font-display text-2xl font-bold text-text-primary">{t("stepsTitle")}</h2>
+      <section className="py-6 sm:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center sm:text-left mb-3 sm:hidden">
+          <p className="text-[10px] uppercase tracking-widest text-gold font-semibold mb-1">{t("stepsLabel")}</p>
+          <h2 className="font-display text-lg font-bold text-text-primary">{t("stepsTitle")}</h2>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6 lg:gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-4 lg:gap-16 items-start">
           <div className="hidden sm:block">
             <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">{t("stepsLabel")}</p>
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary mb-5 leading-tight">
@@ -404,24 +404,24 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 sm:grid-cols-1 md:grid-cols-3 gap-2 sm:gap-4">
             {[
               { step: "01", icon: Film,   title: t("step1Title"), desc: t("step1Desc") },
               { step: "02", icon: MapPin, title: t("step2Title"), desc: t("step2Desc") },
               { step: "03", icon: Shield, title: t("step3Title"), desc: t("step3Desc") },
             ].map(({ step, icon: Icon, title, desc }) => (
-              <div key={step} className="flex gap-4 p-5 rounded-2xl border border-border bg-bg-secondary sm:flex-col sm:gap-0">
-                <div className="flex items-center gap-3 sm:mb-3 shrink-0">
-                  <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0 relative">
-                    <Icon size={18} className="text-gold" />
-                    <span className="absolute -top-2 -right-2 w-5 h-5 bg-gold text-bg-primary text-[9px] font-bold rounded-full flex items-center justify-center">
+              <div key={step} className="flex flex-col gap-2 p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-border bg-bg-secondary">
+                <div className="flex items-center gap-2 shrink-0">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0 relative">
+                    <Icon size={15} className="text-gold" />
+                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 sm:w-5 sm:h-5 bg-gold text-bg-primary text-[8px] font-bold rounded-full flex items-center justify-center">
                       {step}
                     </span>
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-display text-sm font-bold text-text-primary leading-tight mb-1.5">{title}</h3>
-                  <p className="text-xs text-text-muted leading-relaxed">{desc}</p>
+                  <h3 className="font-display text-xs sm:text-sm font-bold text-text-primary leading-tight mb-1">{title}</h3>
+                  <p className="text-[10px] sm:text-xs text-text-muted leading-relaxed">{desc}</p>
                 </div>
               </div>
             ))}
@@ -432,17 +432,17 @@ export default async function HomePage() {
       {/* ══════════════════════════════════════════════
           TARGET AUDIENCES
       ══════════════════════════════════════════════ */}
-      <section className="py-8 sm:py-16 bg-bg-secondary border-y border-border">
+      <section className="py-6 sm:py-16 bg-bg-secondary border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8 sm:mb-10 text-center sm:text-left">
-            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">{t("audienceLabel")}</p>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-xl mx-auto sm:mx-0">
+          <div className="mb-4 sm:mb-10 text-center sm:text-left">
+            <p className="text-[10px] sm:text-xs uppercase tracking-widest text-gold font-semibold mb-1 sm:mb-2">{t("audienceLabel")}</p>
+            <h2 className="font-display text-lg sm:text-3xl font-bold text-text-primary max-w-xl mx-auto sm:mx-0">
               {t("audienceTitle")}{" "}
               <span className="text-gradient-gold">{t("audienceTitleHighlight")}</span>
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
             {([
               {
                 icon: Film,
@@ -480,26 +480,26 @@ export default async function HomePage() {
                 href: "/inserat",
                 highlight: true,
               },
-            ] as const).map(({ icon: Icon, title, desc, items, cta, href, highlight }, idx) => (
-              <div key={title} className={`rounded-2xl border p-6 flex flex-col ${highlight ? "border-gold/25 bg-gold-subtle" : "border-border bg-bg-elevated"}${idx >= 2 && !highlight ? " hidden sm:flex" : ""}`}>
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${highlight ? "bg-gold/10 border border-gold/20" : "bg-bg-hover border border-border-light"}`}>
-                  <Icon size={18} className={highlight ? "text-gold" : "text-text-secondary"} />
+            ] as const).map(({ icon: Icon, title, desc, items, cta, href, highlight }) => (
+              <div key={title} className={`rounded-xl sm:rounded-2xl border p-3 sm:p-6 flex flex-col ${highlight ? "border-gold/25 bg-gold-subtle" : "border-border bg-bg-elevated"}`}>
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center mb-2 sm:mb-4 ${highlight ? "bg-gold/10 border border-gold/20" : "bg-bg-hover border border-border-light"}`}>
+                  <Icon size={15} className={highlight ? "text-gold" : "text-text-secondary"} />
                 </div>
-                <h3 className="font-display text-base font-bold text-text-primary mb-1.5">{title}</h3>
-                <p className="text-xs text-text-muted mb-4 leading-relaxed">{desc}</p>
-                <ul className="space-y-2 mb-6 flex-1">
+                <h3 className="font-display text-xs sm:text-base font-bold text-text-primary mb-1 sm:mb-1.5 leading-tight">{title}</h3>
+                <p className="hidden sm:block text-xs text-text-muted mb-4 leading-relaxed">{desc}</p>
+                <ul className="space-y-1 sm:space-y-2 mb-2 sm:mb-6 flex-1">
                   {items.map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-xs text-text-secondary">
-                      <CheckCircle size={12} className={`shrink-0 mt-0.5 ${highlight ? "text-gold" : "text-success"}`} />
-                      {item}
+                    <li key={item} className="flex items-start gap-1.5 text-[10px] sm:text-xs text-text-secondary">
+                      <CheckCircle size={10} className={`shrink-0 mt-0.5 ${highlight ? "text-gold" : "text-success"}`} />
+                      <span className="leading-tight">{item}</span>
                     </li>
                   ))}
                 </ul>
                 <Link
                   href={href}
-                  className={`inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg transition-all ${highlight ? "bg-gold text-bg-primary hover:bg-gold-light" : "border border-border-light text-text-secondary hover:border-gold/40 hover:text-gold"}`}
+                  className={`inline-flex items-center gap-1 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs font-semibold rounded-md sm:rounded-lg transition-all ${highlight ? "bg-gold text-bg-primary hover:bg-gold-light" : "border border-border-light text-text-secondary hover:border-gold/40 hover:text-gold"}`}
                 >
-                  {cta} <ArrowRight size={12} />
+                  {cta} <ArrowRight size={10} />
                 </Link>
               </div>
             ))}
