@@ -395,7 +395,7 @@ function CompanyBadge({ membership }: { membership: CompanyMembership }) {
   return (
     <Link
       href={`/companies/${co.slug}`}
-      className="inline-flex items-center gap-2 px-3 py-1.5 bg-bg-secondary border border-border rounded-xl text-xs text-text-secondary hover:border-gold/50 hover:text-gold transition-all group"
+      className="inline-flex items-center gap-2 px-3 py-1.5 bg-bg-elevated border border-border rounded-xl text-xs text-text-primary hover:border-gold/50 hover:text-gold transition-all group"
     >
       {co.logo_url ? (
         // eslint-disable-next-line @next/next/no-img-element
@@ -1445,7 +1445,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                   <div className="flex flex-wrap gap-1.5">
                     {links.map(({ label, url, contactIcon }) => (
                       <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-bg-secondary/50 border border-border/60 rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-bg-elevated border border-border rounded-lg text-xs text-text-primary hover:border-gold/40 hover:text-gold transition-colors">
                         {contactIcon === "phone" && <Phone size={11} className="shrink-0" />}
                         {contactIcon === "mail"  && <Mail size={11} className="shrink-0" />}
                         {label}
