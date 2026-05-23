@@ -50,31 +50,29 @@ export default function HeroSearch() {
       {/* Search bar */}
       <form
         onSubmit={handleSearch}
-        className="flex items-center bg-white rounded-full sm:rounded-xl overflow-hidden border-2 border-white/30 shadow-2xl sm:shadow-xl transition-all focus-within:border-[#C2F135]/70 focus-within:shadow-[0_0_0_3px_rgba(194,241,53,0.25),0_8px_32px_rgba(0,0,0,0.3)] min-h-[52px] sm:min-h-0"
+        className="flex items-center bg-bg-elevated/90 backdrop-blur-md rounded-full sm:rounded-xl overflow-hidden border border-border/60 shadow-2xl transition-all focus-within:border-gold/50 focus-within:shadow-[0_0_0_3px_rgba(194,241,53,0.15),0_8px_32px_rgba(0,0,0,0.4)] min-h-[52px] sm:min-h-0"
       >
         {/* Query */}
-        <div className="flex items-center gap-2 flex-1 px-4 sm:px-4">
-          <Search size={15} className="text-gray-400 shrink-0" />
+        <div className="flex items-center gap-2 flex-1 px-4">
+          <Search size={15} className="text-text-muted shrink-0" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={tab.placeholder}
-            style={{ color: "#111827" }}
-            className="w-full py-3.5 sm:py-4 text-sm bg-transparent focus:outline-none placeholder:text-gray-400 min-w-0 font-medium"
+            className="w-full py-3.5 sm:py-4 text-sm bg-transparent focus:outline-none placeholder:text-text-muted text-text-primary min-w-0 font-medium"
           />
         </div>
 
         {/* City — hidden on mobile */}
-        <div className="hidden sm:flex items-center gap-2 px-4 w-40 border-l border-gray-200">
-          <MapPin size={14} className="text-gray-400 shrink-0" />
+        <div className="hidden sm:flex items-center gap-2 px-4 w-40 border-l border-border/60">
+          <MapPin size={14} className="text-text-muted shrink-0" />
           <input
             type="text"
             value={city}
             onChange={(e) => setCity(e.target.value)}
             placeholder="Stadt"
-            style={{ color: "#111827" }}
-            className="w-full py-4 text-sm bg-transparent focus:outline-none placeholder:text-gray-400"
+            className="w-full py-4 text-sm bg-transparent focus:outline-none placeholder:text-text-muted text-text-primary"
           />
         </div>
 
