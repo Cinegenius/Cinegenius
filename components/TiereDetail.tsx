@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft, Star, CheckCircle, MapPin, Shield,
-  Truck, Expand, Pencil, PawPrint, Users, Zap,
+  Truck, Expand, Pencil, PawPrint, Users, Zap, Calendar,
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import InquiryForm from "@/components/InquiryForm";
@@ -46,11 +47,24 @@ type Animal = {
 
 export default function TiereDetail({ animal }: { animal: Animal }) {
   const { user } = useUser();
+  const router = useRouter();
   const isOwner = !!user && user.id === animal.ownerId;
 
   const [liveRating, setLiveRating] = useState<{ avg: number; count: number } | null>(null);
   const [myRating, setMyRating] = useState(0);
   const [eligible, setEligible] = useState(false);
+  const [bookStart, setBookStart] = useState("");
+  const [bookEnd, setBookEnd] = useState("");
+  const today = new Date().toISOString().split("T")[0];
+  const bookDays = bookStart && bookEnd
+    ? Math.max(1, Math.ceil((new Date(bookEnd).getTime() - new Date(bookStart).getTime()) / 86_400_000))
+    : 0;
+  const bookTotal = animal.dailyRate > 0 && bookDays > 0 ? animal.dailyRate * bookDays : 0;
+  const handleCheckout = () => {
+    const start = bookStart || today;
+    const end = bookEnd || new Date(new Date(start).getTime() + 86_400_000).toISOString().split("T")[0];
+    router.push(`/booking/checkout?type=animal&id=${animal.id}&title=${encodeURIComponent(animal.title)}&price=${animal.dailyRate}&days=${bookDays || 1}&startDate=${start}&endDate=${end}`);
+  };
 
   useEffect(() => {
     fetch(`/api/listing-ratings?ids=${animal.id}`)
@@ -298,17 +312,45 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
                   {animal.dailyRate > 0 && <span className="text-text-muted mb-1">/Tag</span>}
                 </div>
 
-                {animal.ownerId ? (
-                  <InquiryForm listingId={animal.id} listingTitle={animal.title}
-                    listingType="animal" ownerId={animal.ownerId}
-                    ownerName={animal.ownerName ?? "Anbieter"} />
-                ) : (
+                {animal.ownerId && !isOwner ? (
+                  animal.dailyRate > 0 ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Von</label>
+                          <input type="date" value={bookStart} min={today}
+                            onChange={e => { setBookStart(e.target.value); if (bookEnd && bookEnd <= e.target.value) setBookEnd(""); }}
+                            className="w-full py-2 px-3 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-gold transition-colors" />
+                        </div>
+                        <div>
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Bis</label>
+                          <input type="date" value={bookEnd} min={bookStart || today}
+                            onChange={e => setBookEnd(e.target.value)}
+                            className="w-full py-2 px-3 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-gold transition-colors" />
+                        </div>
+                      </div>
+                      {bookDays > 0 && (
+                        <div className="flex justify-between text-sm px-1">
+                          <span className="text-text-muted">{animal.dailyRate.toLocaleString()} € × {bookDays} Tag{bookDays !== 1 ? "e" : ""}</span>
+                          <span className="font-semibold text-text-primary">{bookTotal.toLocaleString()} €</span>
+                        </div>
+                      )}
+                      <button onClick={handleCheckout}
+                        className="w-full py-3 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors flex items-center justify-center gap-2">
+                        <Calendar size={15} /> Buchung anfragen
+                      </button>
+                      <p className="text-center text-xs text-text-muted flex items-center justify-center gap-1">
+                        <Shield size={11} /> Keine Belastung vor Bestätigung
+                      </p>
+                    </div>
+                  ) : (
+                    <InquiryForm listingId={animal.id} listingTitle={animal.title}
+                      listingType="animal" ownerId={animal.ownerId}
+                      ownerName={animal.ownerName ?? "Anbieter"} />
+                  )
+                ) : !animal.ownerId ? (
                   <div className="py-8 text-center text-text-muted text-sm">Kein Anbieter verknüpft.</div>
-                )}
-
-                <p className="text-center text-xs text-text-muted flex items-center justify-center gap-1 mt-4">
-                  <Shield size={11} /> Sichere Zahlung · Keine Belastung vor Bestätigung
-                </p>
+                ) : null}
               </div>
             </div>
           </div>
