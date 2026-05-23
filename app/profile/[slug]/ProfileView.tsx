@@ -1353,7 +1353,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
 
         {/* Sidebar + main layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6 mb-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6 mb-10 lg:items-start">
 
           {/* ── LEFT SIDEBAR ─────────────────────────────────────────── */}
           <div className="lg:sticky lg:top-24 lg:self-start space-y-3">
