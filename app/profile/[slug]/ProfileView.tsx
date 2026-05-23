@@ -1402,7 +1402,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {skills.map((s) => (
-                    <span key={s} className="px-2 py-0.5 bg-transparent border border-gold/15 rounded-md text-[11px] text-text-muted hover:border-gold/30 hover:text-text-secondary transition-colors">{s}</span>
+                    <span key={s} className="px-2.5 py-1 bg-bg-elevated border border-border rounded-md text-xs text-text-primary hover:border-gold/30 transition-colors">{s}</span>
                   ))}
                 </div>
               </div>
@@ -1416,7 +1416,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {memberships.map((m) => (
-                    <span key={m} className="px-2 py-0.5 bg-transparent border border-gold/15 rounded-md text-[11px] text-text-muted hover:border-gold/30 hover:text-text-secondary transition-colors">{m}</span>
+                    <span key={m} className="px-2.5 py-1 bg-bg-elevated border border-border rounded-md text-xs text-text-primary hover:border-gold/30 transition-colors">{m}</span>
                   ))}
                 </div>
               </div>
@@ -1470,7 +1470,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {software.map((s) => (
-                    <span key={s} className="px-2 py-0.5 bg-transparent border border-border/50 rounded-md text-[11px] text-text-muted">{s}</span>
+                    <span key={s} className="px-2.5 py-1 bg-bg-elevated border border-border rounded-md text-xs text-text-primary">{s}</span>
                   ))}
                 </div>
               </div>
@@ -1485,7 +1485,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {certificates.map((c) => (
-                    <span key={c} className="px-2 py-0.5 bg-transparent border border-border/50 rounded-md text-[11px] text-text-muted">{c}</span>
+                    <span key={c} className="px-2.5 py-1 bg-bg-elevated border border-border rounded-md text-xs text-text-primary">{c}</span>
                   ))}
                 </div>
               </div>
