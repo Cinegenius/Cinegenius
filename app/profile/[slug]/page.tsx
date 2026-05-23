@@ -238,25 +238,19 @@ export default async function ProfilePage(
     getPublicListings(profile.user_id),
     userId && !isOwner ? getBlockStatus(userId, profile.user_id) : Promise.resolve(null),
     getPublicCollaborations(profile.user_id),
-    // Fetch star ratings per image
+    // Fetch image likes (binary: liked vs not)
     (async () => {
       const { data } = await db
         .from("profile_image_likes")
-        .select("image_url, liker_id, rating")
+        .select("image_url, liker_id")
         .eq("profile_id", profile.user_id);
-      const agg: Record<string, { sum: number; count: number }> = {};
-      const myRatings: Record<string, number> = {};
+      const likes: Record<string, number> = {};
+      const myLikes: string[] = [];
       for (const row of data ?? []) {
-        if (!agg[row.image_url]) agg[row.image_url] = { sum: 0, count: 0 };
-        agg[row.image_url].sum += row.rating ?? 1;
-        agg[row.image_url].count += 1;
-        if (userId && row.liker_id === userId) myRatings[row.image_url] = row.rating ?? 1;
+        likes[row.image_url] = (likes[row.image_url] ?? 0) + 1;
+        if (userId && row.liker_id === userId) myLikes.push(row.image_url);
       }
-      const ratings: Record<string, { avg: number; count: number }> = {};
-      for (const [url, { sum, count }] of Object.entries(agg)) {
-        ratings[url] = { avg: Math.round((sum / count) * 10) / 10, count };
-      }
-      return { ratings, myRatings };
+      return { likes, myLikes };
     })(),
   ]);
 
@@ -289,8 +283,8 @@ export default async function ProfilePage(
         listings={listings}
         blockStatus={blockStatus}
         collaborations={collaborations}
-        imageRatings={imageLikesData.ratings}
-        myImageRatings={imageLikesData.myRatings}
+        imageLikes={imageLikesData.likes}
+        myImageLikes={imageLikesData.myLikes}
       />
     </>
   );
