@@ -5,7 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import dynamicImport from "next/dynamic";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+import { useUser, useAuth } from "@clerk/nextjs";
+import { Heart } from "lucide-react";
 
 import {
   MapPin, Star, CheckCircle, Search, Zap, LayoutList,
@@ -116,11 +117,13 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
   const searchParams = useSearchParams();
   const t = useTranslations("locations");
   const { user } = useUser();
+  const { isSignedIn } = useAuth();
 
   const allLocations = useMemo(() => serverListings, [serverListings]);
 
   const [liveRatings, setLiveRatings] = useState<Record<string, { avg: number; count: number }>>({});
   const [myRatings, setMyRatings] = useState<Record<string, number>>({});
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const ids = serverListings.map(l => l.id).join(",");
@@ -133,6 +136,32 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
       })
       .catch(() => {});
   }, [serverListings]);
+
+  useEffect(() => {
+    if (!isSignedIn) return;
+    const ids = serverListings.map(l => l.id).join(",");
+    if (!ids) return;
+    fetch(`/api/favorites?ids=${ids}`)
+      .then(r => r.json())
+      .then(({ favorited }) => setFavorites(new Set(favorited ?? [])))
+      .catch(() => {});
+  }, [serverListings, isSignedIn]);
+
+  const handleFavorite = async (e: React.MouseEvent, listingId: string) => {
+    e.preventDefault(); e.stopPropagation();
+    if (!isSignedIn) return;
+    const wasFav = favorites.has(listingId);
+    setFavorites(prev => { const next = new Set(prev); wasFav ? next.delete(listingId) : next.add(listingId); return next; });
+    try {
+      await fetch("/api/favorites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listing_id: listingId }),
+      });
+    } catch {
+      setFavorites(prev => { const next = new Set(prev); wasFav ? next.add(listingId) : next.delete(listingId); return next; });
+    }
+  };
 
   const handleRate = async (listingId: string, ownerId: string | undefined, star: number) => {
     if (!user) return;
@@ -546,11 +575,15 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
                             {loc.isReal && <span className="px-1.5 py-0.5 bg-success text-white text-[10px] font-bold rounded">NEU</span>}
                             {loc.instantBook && <span className="px-1.5 py-0.5 bg-gold text-bg-primary text-[10px] font-bold rounded">Instant</span>}
                           </div>
-                          {loc.verified && (
-                            <div className="absolute top-2 right-2">
-                              <CheckCircle size={14} className="text-success drop-shadow" />
-                            </div>
-                          )}
+                          <div className="absolute top-2 right-2 flex items-center gap-1">
+                            {loc.verified && <CheckCircle size={14} className="text-success drop-shadow" />}
+                            {isSignedIn && (
+                              <button type="button" onClick={(e) => handleFavorite(e, loc.id)}
+                                className={`w-6 h-6 flex items-center justify-center rounded-full backdrop-blur-sm border transition-all ${favorites.has(loc.id) ? "bg-crimson/20 border-crimson/50 text-crimson-light" : "bg-bg-primary/60 border-border/50 text-text-muted hover:text-crimson-light"}`}>
+                                <Heart size={11} className={favorites.has(loc.id) ? "fill-current" : ""} />
+                              </button>
+                            )}
+                          </div>
                         </div>
                         <div className="p-3">
                           <h3 className="font-semibold text-text-primary text-sm leading-snug line-clamp-1 mb-0.5">{loc.title}</h3>
@@ -611,6 +644,12 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
                           {loc.instantBook && <span className="px-2 py-0.5 bg-gold text-bg-primary text-xs font-semibold rounded">Instant</span>}
                           {loc.verified && <span className="px-2 py-0.5 bg-bg-primary/80 border border-border text-xs rounded flex items-center gap-1 text-text-secondary"><CheckCircle size={10} className="text-success" /> Verified</span>}
                         </div>
+                        {isSignedIn && (
+                          <button type="button" onClick={(e) => handleFavorite(e, loc.id)}
+                            className={`absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full backdrop-blur-sm border transition-all ${favorites.has(loc.id) ? "bg-crimson/20 border-crimson/50 text-crimson-light" : "bg-bg-primary/60 border-border/50 text-text-muted hover:text-crimson-light"}`}>
+                            <Heart size={13} className={favorites.has(loc.id) ? "fill-current" : ""} />
+                          </button>
+                        )}
                       </div>
                       <div className="p-4">
                         <h3 className="font-semibold text-text-primary text-sm mb-1">{loc.title}</h3>

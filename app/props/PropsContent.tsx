@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useMemo, useEffect, useRef, Suspense } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useUser, useAuth } from "@clerk/nextjs";
+import { Heart } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
@@ -83,10 +84,11 @@ function SortDropdown({ value, options, onChange }: {
 
 // ─── Prop card ────────────────────────────────────────────────────
 
-function PropCard({ p, list, ratingData, myRating, onRate, canRate }: {
+function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited, onFavorite }: {
   p: Prop; list?: boolean;
   ratingData?: RatingData; myRating?: number;
   onRate?: (star: number) => void; canRate?: boolean;
+  isFavorited?: boolean; onFavorite?: (e: React.MouseEvent) => void;
 }) {
   const tc = useTranslations("common");
   const tp = useTranslations("props");
@@ -137,9 +139,15 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate }: {
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent" />
         <div className="absolute top-2.5 left-2.5 right-2.5 flex items-start justify-between gap-1">
           <span className="px-2 py-0.5 bg-black/50 backdrop-blur-sm border border-white/10 text-white/70 text-[10px] rounded-full truncate max-w-[65%]">{p.category}</span>
-          <div className="flex gap-1 shrink-0">
+          <div className="flex gap-1 shrink-0 items-center">
             {p.isReal && <span className="px-2 py-0.5 bg-gold text-bg-primary text-[10px] font-bold rounded-full">NEU</span>}
             {p.delivery && <span className="flex items-center gap-0.5 px-2 py-0.5 bg-teal-500/25 backdrop-blur-sm border border-teal-400/30 text-teal-300 text-[10px] rounded-full"><Truck size={8} /></span>}
+            {onFavorite && (
+              <button type="button" onClick={onFavorite}
+                className={`w-6 h-6 flex items-center justify-center rounded-full backdrop-blur-sm border transition-all ${isFavorited ? "bg-crimson/20 border-crimson/50 text-crimson-light" : "bg-black/40 border-white/20 text-white/50 hover:text-crimson-light"}`}>
+                <Heart size={11} className={isFavorited ? "fill-current" : ""} />
+              </button>
+            )}
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-3">
@@ -199,6 +207,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const searchParams = useSearchParams();
   const t = useTranslations("props");
   const { user } = useUser();
+  const { isSignedIn } = useAuth();
 
   const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const [selectedDept, setSelectedDept] = useState<string | null>(() => searchParams.get("dept") ?? null);
@@ -208,6 +217,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [liveRatings, setLiveRatings] = useState<Record<string, { avg: number; count: number }>>({});
   const [myRatings, setMyRatings] = useState<Record<string, number>>({});
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   // Batch-fetch listing ratings
   useEffect(() => {
@@ -221,6 +231,32 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
       })
       .catch(() => {});
   }, [serverListings]);
+
+  useEffect(() => {
+    if (!isSignedIn) return;
+    const ids = serverListings.map(l => l.id).join(",");
+    if (!ids) return;
+    fetch(`/api/favorites?ids=${ids}`)
+      .then(r => r.json())
+      .then(({ favorited }) => setFavorites(new Set(favorited ?? [])))
+      .catch(() => {});
+  }, [serverListings, isSignedIn]);
+
+  const handleFavorite = async (e: React.MouseEvent, listingId: string) => {
+    e.preventDefault(); e.stopPropagation();
+    if (!isSignedIn) return;
+    const wasFav = favorites.has(listingId);
+    setFavorites(prev => { const next = new Set(prev); wasFav ? next.delete(listingId) : next.add(listingId); return next; });
+    try {
+      await fetch("/api/favorites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listing_id: listingId }),
+      });
+    } catch {
+      setFavorites(prev => { const next = new Set(prev); wasFav ? next.add(listingId) : next.delete(listingId); return next; });
+    }
+  };
 
   const handleRate = async (listingId: string, ownerId: string | undefined, star: number) => {
     if (!user) return;
@@ -493,6 +529,8 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                       myRating={myRatings[p.id]}
                       canRate={!!user && user.id !== p.ownerId}
                       onRate={(star) => handleRate(p.id, p.ownerId, star)}
+                      isFavorited={favorites.has(p.id)}
+                      onFavorite={isSignedIn ? (e) => handleFavorite(e, p.id) : undefined}
                     />
                   ))}
                 </div>

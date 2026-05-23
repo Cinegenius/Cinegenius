@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
@@ -63,6 +63,39 @@ const AMENITY_ICONS: Record<string, React.ComponentType<{ size?: number; classNa
 export default function LocationDetail({ location }: { location: Location }) {
   const { user } = useUser();
   const isOwner = !!user && user.id === location.ownerId;
+
+  const [liveRating, setLiveRating] = useState<{ avg: number; count: number } | null>(null);
+  const [myRating, setMyRating] = useState<number>(0);
+
+  useEffect(() => {
+    fetch(`/api/listing-ratings?ids=${location.id}`)
+      .then(r => r.json())
+      .then(({ ratings, myRatings }) => {
+        if (ratings?.[location.id]) setLiveRating(ratings[location.id]);
+        if (myRatings?.[location.id]) setMyRating(myRatings[location.id]);
+      })
+      .catch(() => {});
+  }, [location.id]);
+
+  const handleRate = async (star: number) => {
+    if (!user || isOwner) return;
+    const prev = myRating;
+    setMyRating(star);
+    setLiveRating(r => {
+      const cur = r ?? { avg: 0, count: 0 };
+      const newCount = prev ? cur.count : cur.count + 1;
+      const newSum = prev ? cur.avg * cur.count - prev + star : cur.avg * cur.count + star;
+      return { avg: Math.round((newSum / newCount) * 10) / 10, count: newCount };
+    });
+    try {
+      await fetch("/api/listing-ratings", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listing_id: location.id, owner_id: location.ownerId, rating: star }),
+      });
+    } catch {
+      setMyRating(prev);
+    }
+  };
   const [activeImg, setActiveImg] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [bookingStart, setBookingStart] = useState<Date | null>(null);
@@ -179,13 +212,25 @@ export default function LocationDetail({ location }: { location: Location }) {
 
             {/* Rating */}
             <div className="flex items-center gap-3 py-4 border-b border-border mb-6">
-              <div className="flex">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={16} className={i < Math.floor(location.rating) ? "text-gold fill-gold" : "text-border"} />
+              <div className="flex gap-0.5">
+                {[1,2,3,4,5].map((s) => (
+                  <button key={s} type="button"
+                    onClick={() => handleRate(s)}
+                    disabled={!user || isOwner}
+                    className={`transition-transform ${!user || isOwner ? "cursor-default" : "hover:scale-110 active:scale-125"}`}
+                    title={!user ? "Einloggen zum Bewerten" : isOwner ? "Eigene Location" : `${s} Stern${s !== 1 ? "e" : ""}`}>
+                    <Star size={18} className={`transition-colors ${s <= (myRating || Math.round(liveRating?.avg ?? 0)) ? "text-gold fill-gold" : "text-border fill-border"}`} />
+                  </button>
                 ))}
               </div>
-              <span className="font-semibold text-text-primary">{location.rating}</span>
-              <span className="text-text-muted text-sm">({location.reviews} Bewertungen)</span>
+              {liveRating && liveRating.count > 0 ? (
+                <>
+                  <span className="font-semibold text-text-primary">{liveRating.avg.toFixed(1)}</span>
+                  <span className="text-text-muted text-sm">({liveRating.count} Bewertung{liveRating.count !== 1 ? "en" : ""})</span>
+                </>
+              ) : (
+                <span className="text-text-muted text-sm">{user && !isOwner ? "Jetzt als Erste/r bewerten" : "Noch keine Bewertungen"}</span>
+              )}
             </div>
 
             {/* Key specs */}

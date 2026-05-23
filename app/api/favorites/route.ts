@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
   const { userId } = user;
 
   const id = req.nextUrl.searchParams.get("id");
+  const ids = req.nextUrl.searchParams.get("ids");
 
   if (id) {
     const { data } = await db
@@ -36,6 +37,16 @@ export async function GET(req: NextRequest) {
       .eq("listing_id", id)
       .maybeSingle();
     return NextResponse.json({ isFavorited: !!data });
+  }
+
+  if (ids) {
+    const idList = ids.split(",").filter(Boolean).slice(0, 300);
+    const { data } = await db
+      .from("favorites")
+      .select("listing_id")
+      .eq("user_id", userId)
+      .in("listing_id", idList);
+    return NextResponse.json({ favorited: (data ?? []).map((r) => r.listing_id) });
   }
 
   const { data } = await db

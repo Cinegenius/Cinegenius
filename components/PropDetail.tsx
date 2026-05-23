@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -52,6 +52,40 @@ export default function PropDetail({ prop }: { prop: Prop }) {
   const router = useRouter();
   const { user } = useUser();
   const isOwner = !!user && user.id === prop.ownerId;
+
+  const [liveRating, setLiveRating] = useState<{ avg: number; count: number } | null>(null);
+  const [myRating, setMyRating] = useState<number>(0);
+
+  useEffect(() => {
+    fetch(`/api/listing-ratings?ids=${prop.id}`)
+      .then(r => r.json())
+      .then(({ ratings, myRatings }) => {
+        if (ratings?.[prop.id]) setLiveRating(ratings[prop.id]);
+        if (myRatings?.[prop.id]) setMyRating(myRatings[prop.id]);
+      })
+      .catch(() => {});
+  }, [prop.id]);
+
+  const handleRate = async (star: number) => {
+    if (!user || isOwner) return;
+    const prev = myRating;
+    setMyRating(star);
+    setLiveRating(r => {
+      const cur = r ?? { avg: 0, count: 0 };
+      const newCount = prev ? cur.count : cur.count + 1;
+      const newSum = prev ? cur.avg * cur.count - prev + star : cur.avg * cur.count + star;
+      return { avg: Math.round((newSum / newCount) * 10) / 10, count: newCount };
+    });
+    try {
+      await fetch("/api/listing-ratings", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listing_id: prop.id, owner_id: prop.ownerId, rating: star }),
+      });
+    } catch {
+      setMyRating(prev);
+    }
+  };
+
   const [days, setDays] = useState(1);
   const [startDate, setStartDate] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -188,10 +222,33 @@ export default function PropDetail({ prop }: { prop: Prop }) {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 text-sm text-text-muted mb-6">
+            <div className="flex items-center gap-3 text-sm text-text-muted mb-4">
               <span className="flex items-center gap-1"><Package size={14} className="text-gold" /> {prop.vendor}</span>
               <span>·</span>
               <span className="flex items-center gap-1"><MapPin size={14} className="text-gold" /> {prop.location}</span>
+            </div>
+
+            {/* Rating */}
+            <div className="flex items-center gap-3 py-4 border-y border-border mb-6">
+              <div className="flex gap-0.5">
+                {[1,2,3,4,5].map((s) => (
+                  <button key={s} type="button"
+                    onClick={() => handleRate(s)}
+                    disabled={!user || isOwner}
+                    className={`transition-transform ${!user || isOwner ? "cursor-default" : "hover:scale-110 active:scale-125"}`}
+                    title={!user ? "Einloggen zum Bewerten" : isOwner ? "Eigenes Inserat" : `${s} Stern${s !== 1 ? "e" : ""}`}>
+                    <Star size={18} className={`transition-colors ${s <= (myRating || Math.round(liveRating?.avg ?? 0)) ? "text-gold fill-gold" : "text-border fill-border"}`} />
+                  </button>
+                ))}
+              </div>
+              {liveRating && liveRating.count > 0 ? (
+                <>
+                  <span className="font-semibold text-text-primary">{liveRating.avg.toFixed(1)}</span>
+                  <span className="text-text-muted text-sm">({liveRating.count} Bewertung{liveRating.count !== 1 ? "en" : ""})</span>
+                </>
+              ) : (
+                <span className="text-text-muted text-sm">{user && !isOwner ? "Jetzt als Erste/r bewerten" : "Noch keine Bewertungen"}</span>
+              )}
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
