@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import Image from "next/image";
 import Link from "next/link";
-import { Aperture, ArrowRight } from "lucide-react";
+import { Aperture, ArrowRight, Heart } from "lucide-react";
 import { auth } from "@clerk/nextjs/server";
 import BTSMosaicGrid, { type BTSGridItem } from "./BTSMosaicGrid";
 
@@ -21,49 +21,41 @@ const CREW_TYPES = new Set(["camera", "lighting", "sound", "director_of_photogra
 export default async function BTSPage() {
   const { userId } = await auth();
 
-  // Fetch all likes once — used for top-rated section AND mosaic ratings
+  // Fetch all likes — used for top-liked section AND mosaic heart counts
   const { data: likeRows } = await db
     .from("profile_image_likes")
-    .select("image_url, profile_id, liker_id, rating");
+    .select("image_url, profile_id, liker_id");
 
-  // Build aggregate ratings + myRatings
-  const agg: Record<string, { sum: number; count: number; profileId: string }> = {};
-  const myRatings: Record<string, number> = {};
+  const likeCounts: Record<string, number> = {};
+  const likeProfileId: Record<string, string> = {};
+  const myLikes: string[] = [];
 
   for (const row of likeRows ?? []) {
-    if (!agg[row.image_url]) agg[row.image_url] = { sum: 0, count: 0, profileId: row.profile_id };
-    agg[row.image_url].sum += row.rating ?? 1;
-    agg[row.image_url].count += 1;
-    if (userId && row.liker_id === userId) myRatings[row.image_url] = row.rating ?? 1;
+    likeCounts[row.image_url] = (likeCounts[row.image_url] ?? 0) + 1;
+    likeProfileId[row.image_url] = row.profile_id;
+    if (userId && row.liker_id === userId) myLikes.push(row.image_url);
   }
 
-  const allRatings: Record<string, { avg: number; count: number }> = {};
-  for (const [url, { sum, count }] of Object.entries(agg)) {
-    allRatings[url] = { avg: Math.round((sum / count) * 10) / 10, count };
-  }
-
-  // Top 3 rated images
-  const topEntries = Object.entries(agg)
-    .filter(([, v]) => v.count >= 1)
-    .sort((a, b) => b[1].sum / b[1].count - a[1].sum / a[1].count)
+  // Top 3 most-liked images
+  const topEntries = Object.entries(likeCounts)
+    .sort((a, b) => b[1] - a[1])
     .slice(0, 3);
 
-  let topRated: { imageUrl: string; avg: number; count: number; profileSlug: string; authorName: string }[] = [];
+  let topRated: { imageUrl: string; count: number; profileSlug: string; authorName: string }[] = [];
 
   if (topEntries.length > 0) {
-    const topProfileIds = [...new Set(topEntries.map(([, v]) => v.profileId))];
+    const topProfileIds = [...new Set(topEntries.map(([url]) => likeProfileId[url]).filter(Boolean))];
     const { data: topProfiles } = await db
       .from("profiles")
       .select("user_id, display_name, slug")
       .in("user_id", topProfileIds);
     const topProfileMap = Object.fromEntries((topProfiles ?? []).map((p) => [p.user_id, p]));
 
-    topRated = topEntries.map(([imageUrl, { sum, count, profileId }]) => ({
+    topRated = topEntries.map(([imageUrl, count]) => ({
       imageUrl,
-      avg: Math.round((sum / count) * 10) / 10,
       count,
-      profileSlug: topProfileMap[profileId]?.slug ?? profileId,
-      authorName: topProfileMap[profileId]?.display_name ?? "Unbekannt",
+      profileSlug: topProfileMap[likeProfileId[imageUrl]]?.slug ?? likeProfileId[imageUrl] ?? "",
+      authorName: topProfileMap[likeProfileId[imageUrl]]?.display_name ?? "Unbekannt",
     }));
   }
 
@@ -144,23 +136,23 @@ export default async function BTSPage() {
         </div>
       </section>
 
-      {/* Top 3 rated */}
+      {/* Top 3 most-liked */}
       {topRated.length > 0 && (
         <section className="pb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-4">
-            <span className="text-gold text-lg">★</span>
-            <h2 className="text-sm font-bold uppercase tracking-widest text-gold">Top Bewertet</h2>
+            <Heart size={14} className="text-red-400 fill-red-400" />
+            <h2 className="text-sm font-bold uppercase tracking-widest text-red-400">Meistgeliked</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {topRated.map((item, i) => (
               <Link key={item.imageUrl} href={`/profile/${item.profileSlug}`}
-                className="group relative rounded-2xl overflow-hidden aspect-video bg-bg-elevated border border-gold/20">
+                className="group relative rounded-2xl overflow-hidden aspect-video bg-bg-elevated border border-red-400/20">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={item.imageUrl} alt={item.authorName}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-gold/90 rounded-full text-bg-primary text-[11px] font-bold">
-                  #{i + 1} ★ {item.avg.toFixed(1)} <span className="opacity-60">({item.count})</span>
+                <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-red-500/80 rounded-full text-white text-[11px] font-bold backdrop-blur-sm">
+                  #{i + 1} <Heart size={10} className="fill-current" /> {item.count}
                 </div>
                 <div className="absolute bottom-3 left-3">
                   <p className="text-white font-semibold text-sm">{item.authorName}</p>
@@ -176,8 +168,8 @@ export default async function BTSPage() {
         <section className="pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <BTSMosaicGrid
             items={btsItems}
-            initialRatings={allRatings}
-            initialMyRatings={myRatings}
+            initialLikes={likeCounts}
+            initialMyLikes={myLikes}
           />
         </section>
       ) : (

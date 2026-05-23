@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { MapPin, Heart } from "lucide-react";
 import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 
@@ -17,45 +17,35 @@ export interface BTSGridItem {
 
 export default function BTSMosaicGrid({
   items,
-  initialRatings,
-  initialMyRatings,
+  initialLikes,
+  initialMyLikes,
 }: {
   items: BTSGridItem[];
-  initialRatings: Record<string, { avg: number; count: number }>;
-  initialMyRatings: Record<string, number>;
+  initialLikes: Record<string, number>;
+  initialMyLikes: string[];
 }) {
   const { isSignedIn, user } = useUser();
-  const [ratings, setRatings] = useState(initialRatings);
-  const [myRatings, setMyRatings] = useState(initialMyRatings);
-  const [hoverRating, setHoverRating] = useState<{ url: string; star: number } | null>(null);
+  const [likes, setLikes] = useState(initialLikes);
+  const [myLikedSet, setMyLikedSet] = useState(() => new Set(initialMyLikes));
 
-  const rate = async (item: BTSGridItem, star: number, e: React.MouseEvent) => {
+  const toggleLike = async (item: BTSGridItem, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (!isSignedIn || item.profileId === user?.id) return;
 
     const url = item.imageUrl;
-    const prev = myRatings[url];
-    setMyRatings((m) => ({ ...m, [url]: star }));
-    setRatings((r) => {
-      const cur = r[url] ?? { avg: 0, count: 0 };
-      const newCount = prev ? cur.count : cur.count + 1;
-      const newSum = prev ? cur.avg * cur.count - prev + star : cur.avg * cur.count + star;
-      return { ...r, [url]: { avg: Math.round((newSum / newCount) * 10) / 10, count: newCount } };
-    });
+    const wasLiked = myLikedSet.has(url);
+    setMyLikedSet(prev => { const next = new Set(prev); wasLiked ? next.delete(url) : next.add(url); return next; });
+    setLikes(prev => ({ ...prev, [url]: Math.max(0, (prev[url] ?? 0) + (wasLiked ? -1 : 1)) }));
     try {
       await fetch("/api/profile-image-likes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profile_id: item.profileId, image_url: url, rating: star }),
+        body: JSON.stringify({ profile_id: item.profileId, image_url: url }),
       });
     } catch {
-      setMyRatings((m) => {
-        const n = { ...m };
-        if (prev) n[url] = prev;
-        else delete n[url];
-        return n;
-      });
+      setMyLikedSet(prev => { const next = new Set(prev); wasLiked ? next.add(url) : next.delete(url); return next; });
+      setLikes(prev => ({ ...prev, [url]: Math.max(0, (prev[url] ?? 0) + (wasLiked ? 1 : -1)) }));
     }
   };
 
@@ -63,12 +53,10 @@ export default function BTSMosaicGrid({
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 auto-rows-[200px]">
       {items.map((item, i) => {
         const tall = i % 7 === 0;
-        const ratingData = ratings[item.imageUrl];
-        const myR = myRatings[item.imageUrl] ?? 0;
-        const hovering = hoverRating?.url === item.imageUrl;
-        const displayStars = hovering ? hoverRating!.star : myR;
+        const count = likes[item.imageUrl] ?? 0;
+        const liked = myLikedSet.has(item.imageUrl);
         const isOwn = user?.id === item.profileId;
-        const canRate = isSignedIn && !isOwn;
+        const canLike = isSignedIn && !isOwn;
 
         return (
           <div
@@ -89,69 +77,34 @@ export default function BTSMosaicGrid({
             {/* Gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent pointer-events-none z-10" />
 
-            {/* Bottom strip: author + rating */}
+            {/* Bottom strip: author + heart */}
             <div className="absolute bottom-0 left-0 right-0 z-20 px-2.5 pb-1.5 pt-5">
-              {/* Author info — pointer-events-none so clicks go through to Link */}
-              <div className="pointer-events-none mb-1">
-                {item.caption && (
-                  <p className="text-white/70 text-[9px] line-clamp-1">{item.caption}</p>
-                )}
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <p className="text-white font-semibold text-[11px]">{item.authorName}</p>
-                  {item.authorCity && (
-                    <p className="text-white/50 text-[9px] flex items-center gap-0.5">
-                      <MapPin size={7} />{item.authorCity}
-                    </p>
+              <div className="flex items-end justify-between gap-2">
+                {/* Author info */}
+                <div className="pointer-events-none min-w-0">
+                  {item.caption && (
+                    <p className="text-white/70 text-[9px] line-clamp-1">{item.caption}</p>
                   )}
-                </div>
-              </div>
-
-              {/* Rating row */}
-              <div
-                className="flex items-center justify-between gap-1"
-                onMouseLeave={() => setHoverRating(null)}
-              >
-                {/* Left: aggregate score */}
-                <div className="flex items-center gap-1 pointer-events-none">
-                  {ratingData && ratingData.count > 0 ? (
-                    <>
-                      <span className="text-gold text-[10px] font-bold leading-none">{ratingData.avg.toFixed(1)}</span>
-                      <div className="flex">
-                        {[1, 2, 3, 4, 5].map((s) => (
-                          <span key={s} className={`text-[10px] leading-none ${s <= Math.round(ratingData.avg) ? "text-gold" : "text-white/25"}`}>★</span>
-                        ))}
-                      </div>
-                      <span className="text-[9px] text-white/50">({ratingData.count})</span>
-                    </>
-                  ) : (
-                    <span className="text-[9px] text-white/40">Bewerten ↓</span>
-                  )}
-                </div>
-
-                {/* Right: interactive stars */}
-                {canRate && (
-                  <div className="flex" onClick={(e) => e.stopPropagation()}>
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        type="button"
-                        onMouseEnter={() => setHoverRating({ url: item.imageUrl, star })}
-                        onClick={(e) => rate(item, star, e)}
-                        className="w-6 h-6 flex items-center justify-center text-sm leading-none transition-transform active:scale-125 hover:scale-110 cursor-pointer touch-manipulation"
-                        title={`${star} Stern${star > 1 ? "e" : ""}`}
-                        style={{
-                          color: star <= displayStars
-                            ? "#d4af37"
-                            : hovering
-                              ? "rgba(212,175,55,0.3)"
-                              : "rgba(255,255,255,0.25)",
-                        }}
-                      >
-                        ★
-                      </button>
-                    ))}
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <p className="text-white font-semibold text-[11px] truncate">{item.authorName}</p>
+                    {item.authorCity && (
+                      <p className="text-white/50 text-[9px] flex items-center gap-0.5">
+                        <MapPin size={7} />{item.authorCity}
+                      </p>
+                    )}
                   </div>
-                )}
+                </div>
+
+                {/* Heart button */}
+                <button
+                  type="button"
+                  onClick={(e) => void toggleLike(item, e)}
+                  disabled={!canLike}
+                  className={`flex items-center gap-1 shrink-0 transition-transform active:scale-125 ${canLike ? "cursor-pointer" : "cursor-default"} ${liked ? "text-red-400" : "text-white/60 hover:text-red-400"}`}
+                >
+                  <Heart size={13} className={liked ? "fill-current" : ""} />
+                  {count > 0 && <span className="text-[10px] font-semibold">{count}</span>}
+                </button>
               </div>
             </div>
           </div>
