@@ -66,19 +66,23 @@ export default function LocationDetail({ location }: { location: Location }) {
 
   const [liveRating, setLiveRating] = useState<{ avg: number; count: number } | null>(null);
   const [myRating, setMyRating] = useState<number>(0);
+  const [eligible, setEligible] = useState(false);
 
   useEffect(() => {
     fetch(`/api/listing-ratings?ids=${location.id}`)
       .then(r => r.json())
-      .then(({ ratings, myRatings }) => {
+      .then(({ ratings, myRatings, eligible: elig }) => {
         if (ratings?.[location.id]) setLiveRating(ratings[location.id]);
         if (myRatings?.[location.id]) setMyRating(myRatings[location.id]);
+        setEligible((elig ?? []).includes(location.id));
       })
       .catch(() => {});
   }, [location.id]);
 
+  const canRate = !!user && !isOwner && eligible;
+
   const handleRate = async (star: number) => {
-    if (!user || isOwner) return;
+    if (!canRate) return;
     const prev = myRating;
     setMyRating(star);
     setLiveRating(r => {
@@ -216,9 +220,9 @@ export default function LocationDetail({ location }: { location: Location }) {
                 {[1,2,3,4,5].map((s) => (
                   <button key={s} type="button"
                     onClick={() => handleRate(s)}
-                    disabled={!user || isOwner}
-                    className={`transition-transform ${!user || isOwner ? "cursor-default" : "hover:scale-110 active:scale-125"}`}
-                    title={!user ? "Einloggen zum Bewerten" : isOwner ? "Eigene Location" : `${s} Stern${s !== 1 ? "e" : ""}`}>
+                    disabled={!canRate}
+                    className={`transition-transform ${canRate ? "hover:scale-110 active:scale-125" : "cursor-default"}`}
+                    title={!user ? "Einloggen zum Bewerten" : isOwner ? "Eigene Location" : !eligible ? "Erst anfragen, dann bewerten" : `${s} Stern${s !== 1 ? "e" : ""}`}>
                     <Star size={18} className={`transition-colors ${s <= (myRating || Math.round(liveRating?.avg ?? 0)) ? "text-gold fill-gold" : "text-border fill-border"}`} />
                   </button>
                 ))}
@@ -229,7 +233,7 @@ export default function LocationDetail({ location }: { location: Location }) {
                   <span className="text-text-muted text-sm">({liveRating.count} Bewertung{liveRating.count !== 1 ? "en" : ""})</span>
                 </>
               ) : (
-                <span className="text-text-muted text-sm">{user && !isOwner ? "Jetzt als Erste/r bewerten" : "Noch keine Bewertungen"}</span>
+                <span className="text-text-muted text-sm">{canRate ? "Jetzt als Erste/r bewerten" : user && !isOwner ? "Erst anfragen, dann bewerten" : "Noch keine Bewertungen"}</span>
               )}
             </div>
 

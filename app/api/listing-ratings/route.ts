@@ -35,7 +35,18 @@ export async function GET(req: NextRequest) {
     ratings[id] = { avg: Math.round((sum / count) * 10) / 10, count };
   }
 
-  return NextResponse.json({ ratings, myRatings });
+  // Return which listings this user has contacted (eligible to rate)
+  let eligible: string[] = [];
+  if (userId) {
+    const { data: convs } = await db
+      .from("conversations")
+      .select("listing_id")
+      .eq("sender_id", userId)
+      .in("listing_id", idList);
+    eligible = (convs ?? []).map((c) => c.listing_id).filter(Boolean) as string[];
+  }
+
+  return NextResponse.json({ ratings, myRatings, eligible });
 }
 
 // POST /api/listing-ratings  { listing_id, owner_id, rating: 1-5 }
@@ -46,6 +57,15 @@ export async function POST(req: NextRequest) {
   const { listing_id, owner_id, rating } = await req.json().catch(() => ({}));
   if (!listing_id) return NextResponse.json({ error: "listing_id erforderlich" }, { status: 400 });
   if (owner_id && owner_id === userId) return NextResponse.json({ error: "Eigene Inserate können nicht bewertet werden" }, { status: 403 });
+
+  // Only allow rating if the user has previously contacted the owner about this listing
+  const { data: conv } = await db
+    .from("conversations")
+    .select("id")
+    .eq("sender_id", userId)
+    .eq("listing_id", listing_id)
+    .maybeSingle();
+  if (!conv) return NextResponse.json({ error: "Du kannst ein Inserat erst bewerten, nachdem du den Anbieter kontaktiert hast." }, { status: 403 });
 
   const r = Math.min(5, Math.max(1, Math.round(Number(rating) || 5)));
 

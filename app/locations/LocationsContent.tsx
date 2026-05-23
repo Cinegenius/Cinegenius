@@ -123,6 +123,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
 
   const [liveRatings, setLiveRatings] = useState<Record<string, { avg: number; count: number }>>({});
   const [myRatings, setMyRatings] = useState<Record<string, number>>({});
+  const [eligible, setEligible] = useState<Set<string>>(new Set());
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -130,9 +131,10 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
     if (!ids) return;
     fetch(`/api/listing-ratings?ids=${ids}`)
       .then(r => r.json())
-      .then(({ ratings, myRatings: my }) => {
+      .then(({ ratings, myRatings: my, eligible: elig }) => {
         setLiveRatings(ratings ?? {});
         setMyRatings(my ?? {});
+        setEligible(new Set(elig ?? []));
       })
       .catch(() => {});
   }, [serverListings]);
@@ -611,7 +613,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
                                 <span className="text-[9px] text-text-muted/60">Noch keine Bewertung</span>
                               )}
                             </div>
-                            {!!user && user.id !== loc.ownerId && (
+                            {eligible.has(loc.id) && !!user && user.id !== loc.ownerId && (
                               <div className="flex">
                                 {[1,2,3,4,5].map((star) => (
                                   <button key={star} type="button"
@@ -673,7 +675,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
                               <span className="text-[9px] text-text-muted/60">Noch keine Bewertung</span>
                             )}
                           </div>
-                          {!!user && user.id !== loc.ownerId && (
+                          {eligible.has(loc.id) && !!user && user.id !== loc.ownerId && (
                             <div className="flex">
                               {[1,2,3,4,5].map((star) => (
                                 <button key={star} type="button"

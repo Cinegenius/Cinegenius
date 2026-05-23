@@ -217,6 +217,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [liveRatings, setLiveRatings] = useState<Record<string, { avg: number; count: number }>>({});
   const [myRatings, setMyRatings] = useState<Record<string, number>>({});
+  const [eligible, setEligible] = useState<Set<string>>(new Set());
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   // Batch-fetch listing ratings
@@ -225,9 +226,10 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
     if (!ids) return;
     fetch(`/api/listing-ratings?ids=${ids}`)
       .then(r => r.json())
-      .then(({ ratings, myRatings: my }) => {
+      .then(({ ratings, myRatings: my, eligible: elig }) => {
         setLiveRatings(ratings ?? {});
         setMyRatings(my ?? {});
+        setEligible(new Set(elig ?? []));
       })
       .catch(() => {});
   }, [serverListings]);
@@ -527,7 +529,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                     <PropCard key={p.id} p={p} list={viewMode === "list"}
                       ratingData={liveRatings[p.id]}
                       myRating={myRatings[p.id]}
-                      canRate={!!user && user.id !== p.ownerId}
+                      canRate={!!user && user.id !== p.ownerId && eligible.has(p.id)}
                       onRate={(star) => handleRate(p.id, p.ownerId, star)}
                       isFavorited={favorites.has(p.id)}
                       onFavorite={isSignedIn ? (e) => handleFavorite(e, p.id) : undefined}
