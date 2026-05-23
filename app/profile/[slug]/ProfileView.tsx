@@ -392,20 +392,32 @@ type CompanyMembership = {
 function CompanyBadge({ membership }: { membership: CompanyMembership }) {
   if (!membership?.companies) return null;
   const co = membership.companies;
+  const roleLabel = membership.title ?? membership.role ?? null;
   return (
-    <Link
-      href={`/companies/${co.slug}`}
-      className="inline-flex items-center gap-2 px-3 py-1.5 bg-bg-elevated border border-border rounded-xl text-xs text-text-primary hover:border-gold/50 hover:text-gold transition-all group"
-    >
-      {co.logo_url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={co.logo_url} alt="" className="w-4 h-4 rounded object-cover" />
-      ) : (
-        <Building2 size={12} className="text-text-muted group-hover:text-gold" />
-      )}
-      <span className="font-medium">{co.name}</span>
-      {membership.title && <span className="text-text-muted">· {membership.title}</span>}
-    </Link>
+    <div>
+      <div className="flex items-center gap-2 mb-2.5">
+        <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
+        <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Unternehmen</p>
+      </div>
+      <Link
+        href={`/companies/${co.slug}`}
+        className="flex items-center gap-3 p-3 bg-bg-elevated border border-border rounded-xl hover:border-gold/40 transition-all group"
+      >
+        {co.logo_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={co.logo_url} alt={co.name} className="w-10 h-10 rounded-lg object-cover border border-border shrink-0" />
+        ) : (
+          <div className="w-10 h-10 rounded-lg bg-bg-secondary border border-border flex items-center justify-center shrink-0">
+            <Building2 size={18} className="text-text-muted group-hover:text-gold" />
+          </div>
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{co.name}</p>
+          {roleLabel && <p className="text-xs text-text-muted truncate">{roleLabel}</p>}
+        </div>
+        <ExternalLink size={12} className="text-text-muted shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+      </Link>
+    </div>
   );
 }
 
