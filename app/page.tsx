@@ -383,7 +383,7 @@ export default async function HomePage() {
       {/* ══════════════════════════════════════════════
           3-STEP SECTION
       ══════════════════════════════════════════════ */}
-      <section className="py-6 lg:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-6 lg:py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center lg:text-left mb-3 lg:hidden">
           <p className="text-[10px] uppercase tracking-widest text-gold font-semibold mb-1">{t("stepsLabel")}</p>
           <h2 className="font-display text-lg font-bold text-text-primary">{t("stepsTitle")}</h2>
