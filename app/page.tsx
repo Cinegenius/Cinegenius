@@ -442,7 +442,7 @@ export default async function HomePage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
             {([
               {
                 icon: Film,
@@ -481,25 +481,25 @@ export default async function HomePage() {
                 highlight: true,
               },
             ] as const).map(({ icon: Icon, title, desc, items, cta, href, highlight }) => (
-              <div key={title} className={`rounded-xl lg:rounded-2xl border p-3 lg:p-6 flex flex-col ${highlight ? "border-gold/25 bg-gold-subtle" : "border-border bg-bg-elevated"}`}>
-                <div className={`w-8 h-8 lg:w-10 lg:h-10 rounded-lg lg:rounded-xl flex items-center justify-center mb-2 lg:mb-4 ${highlight ? "bg-gold/10 border border-gold/20" : "bg-bg-hover border border-border-light"}`}>
-                  <Icon size={15} className={highlight ? "text-gold" : "text-text-secondary"} />
+              <div key={title} className={`rounded-xl lg:rounded-2xl border p-4 lg:p-6 flex flex-col ${highlight ? "border-gold/25 bg-gold-subtle" : "border-border bg-bg-elevated"}`}>
+                <div className={`w-9 h-9 lg:w-10 lg:h-10 rounded-lg lg:rounded-xl flex items-center justify-center mb-3 lg:mb-4 ${highlight ? "bg-gold/10 border border-gold/20" : "bg-bg-hover border border-border-light"}`}>
+                  <Icon size={16} className={highlight ? "text-gold" : "text-text-secondary"} />
                 </div>
-                <h3 className="font-display text-xs lg:text-base font-bold text-text-primary mb-1 leading-tight">{title}</h3>
+                <h3 className="font-display text-sm lg:text-base font-bold text-text-primary mb-1 leading-tight">{title}</h3>
                 <p className="hidden lg:block text-xs text-text-muted mb-4 leading-relaxed">{desc}</p>
-                <ul className="space-y-1 lg:space-y-2 mb-2 lg:mb-6 flex-1">
+                <ul className="space-y-1.5 lg:space-y-2 mb-3 lg:mb-6 flex-1">
                   {items.map((item) => (
-                    <li key={item} className="flex items-start gap-1.5 text-[10px] lg:text-xs text-text-secondary">
-                      <CheckCircle size={10} className={`shrink-0 mt-0.5 ${highlight ? "text-gold" : "text-success"}`} />
+                    <li key={item} className="flex items-start gap-1.5 text-xs text-text-secondary">
+                      <CheckCircle size={11} className={`shrink-0 mt-0.5 ${highlight ? "text-gold" : "text-success"}`} />
                       <span className="leading-tight">{item}</span>
                     </li>
                   ))}
                 </ul>
                 <Link
                   href={href}
-                  className={`inline-flex items-center gap-1 lg:gap-2 px-2.5 lg:px-4 py-1.5 lg:py-2 text-[10px] lg:text-xs font-semibold rounded-md lg:rounded-lg transition-all ${highlight ? "bg-gold text-bg-primary hover:bg-gold-light" : "border border-border-light text-text-secondary hover:border-gold/40 hover:text-gold"}`}
+                  className={`inline-flex items-center gap-1.5 lg:gap-2 px-3 lg:px-4 py-2 text-xs font-semibold rounded-lg transition-all ${highlight ? "bg-gold text-bg-primary hover:bg-gold-light" : "border border-border-light text-text-secondary hover:border-gold/40 hover:text-gold"}`}
                 >
-                  {cta} <ArrowRight size={10} />
+                  {cta} <ArrowRight size={11} />
                 </Link>
               </div>
             ))}
