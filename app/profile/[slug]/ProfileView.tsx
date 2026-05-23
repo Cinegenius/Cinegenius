@@ -1353,23 +1353,24 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
 
         {/* Sidebar + main layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6 mb-10 lg:items-start">
+        <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] lg:grid-cols-[240px_1fr] gap-5 lg:gap-7 mb-10 items-start">
 
           {/* ── LEFT SIDEBAR ─────────────────────────────────────────── */}
-          <div className="lg:sticky lg:top-24 lg:self-start space-y-3">
+          <div className="sm:sticky sm:top-24 sm:self-start space-y-3">
             {/* Avatar */}
-            <div className="rounded-2xl overflow-hidden border border-border bg-bg-elevated">
+            <div className="rounded-2xl overflow-hidden shadow-xl shadow-black/40 ring-1 ring-white/8 max-w-[200px] sm:max-w-none mx-auto sm:mx-0">
               {profile.avatar_url ? (
                 <div className="relative">
                   <Image src={profile.avatar_url} alt={profile.display_name ?? ""} width={240} height={240}
                     className="w-full aspect-square object-cover" />
-                  <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10">
-                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${profile.available ? "bg-gold" : "bg-red-400"}`} />
-                    <span className={`text-[10px] font-medium ${profile.available ? "text-gold/90" : "text-white/60"}`}>{profile.available ? "Verfügbar" : "Nicht verfügbar"}</span>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10">
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${profile.available ? "bg-gold animate-pulse" : "bg-red-400"}`} />
+                    <span className={`text-[10px] font-semibold ${profile.available ? "text-gold" : "text-white/60"}`}>{profile.available ? "Verfügbar" : "Nicht verfügbar"}</span>
                   </div>
                 </div>
               ) : (
-                <div className="w-full aspect-square bg-bg-hover flex items-center justify-center text-4xl font-bold text-text-muted">
+                <div className="w-full aspect-square bg-bg-elevated flex items-center justify-center text-4xl font-bold text-text-muted">
                   {(profile.display_name ?? "?")[0]}
                 </div>
               )}
@@ -1377,29 +1378,29 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 
             {/* Quick facts */}
             {(languages.length > 0 || profile.day_rate || profile.travel_ready || profile.crew?.experience_years) && (
-              <div className="rounded-xl border border-border bg-bg-elevated p-4 space-y-2.5">
+              <div className="rounded-xl border border-white/6 bg-bg-elevated shadow-sm p-4 space-y-0 divide-y divide-border/40">
                 {profile.day_rate && (
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between py-2.5">
                     <span className="text-[11px] text-text-muted">Tagesgage</span>
-                    <span className="text-sm font-semibold text-gold">{profile.day_rate} €</span>
+                    <span className="text-sm font-bold text-gold">{profile.day_rate} €</span>
                   </div>
                 )}
                 {profile.crew?.experience_years && (
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between py-2.5">
                     <span className="text-[11px] text-text-muted">Erfahrung</span>
-                    <span className="text-xs font-medium text-text-primary">{profile.crew.experience_years} Jahre</span>
+                    <span className="text-xs font-semibold text-text-primary">{profile.crew.experience_years} Jahre</span>
                   </div>
                 )}
                 {languages.length > 0 && (
-                  <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-start justify-between gap-2 py-2.5">
                     <span className="text-[11px] text-text-muted shrink-0">Sprachen</span>
-                    <span className="text-xs font-medium text-text-primary text-right">{languages.join(", ")}</span>
+                    <span className="text-xs font-semibold text-text-primary text-right">{languages.join(", ")}</span>
                   </div>
                 )}
                 {profile.travel_ready && (
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between py-2.5">
                     <span className="text-[11px] text-text-muted">Reisen</span>
-                    <span className="text-xs font-medium text-emerald-400">Reisebereit</span>
+                    <span className="text-xs font-semibold text-emerald-400">Reisebereit ✓</span>
                   </div>
                 )}
               </div>
@@ -1421,18 +1422,20 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
               const hasExt = externalProfiles.length > 0;
               if (links.length === 0 && !hasExt) return null;
               return (
-                <div className="rounded-xl border border-border bg-bg-elevated p-4 space-y-2">
-                  <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-3">Links & Kontakt</p>
-                  {links.map(({ label, url, contactIcon }) => (
-                    <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-xs text-text-secondary hover:text-gold transition-colors py-0.5">
-                      {contactIcon === "phone" && <Phone size={11} className="shrink-0 text-text-muted" />}
-                      {contactIcon === "mail"  && <Mail size={11} className="shrink-0 text-text-muted" />}
-                      {!contactIcon && <ExternalLink size={10} className="shrink-0 text-text-muted" />}
-                      <span className="truncate">{label}</span>
-                    </a>
-                  ))}
-                  {hasExt && <ExternalProfilesDisplay profiles={externalProfiles} />}
+                <div className="rounded-xl border border-white/6 bg-bg-elevated shadow-sm p-4">
+                  <p className="text-[9px] uppercase tracking-widest text-text-muted font-bold mb-3">Links & Kontakt</p>
+                  <div className="space-y-1">
+                    {links.map(({ label, url, contactIcon }) => (
+                      <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-2.5 text-xs text-text-secondary hover:text-gold transition-colors py-1 group">
+                        {contactIcon === "phone" && <Phone size={11} className="shrink-0 text-text-muted group-hover:text-gold transition-colors" />}
+                        {contactIcon === "mail"  && <Mail size={11} className="shrink-0 text-text-muted group-hover:text-gold transition-colors" />}
+                        {!contactIcon && <ExternalLink size={10} className="shrink-0 text-text-muted group-hover:text-gold transition-colors" />}
+                        <span className="truncate">{label}</span>
+                      </a>
+                    ))}
+                  </div>
+                  {hasExt && <div className="mt-3 pt-3 border-t border-border/40"><ExternalProfilesDisplay profiles={externalProfiles} /></div>}
                 </div>
               );
             })()}
@@ -1441,45 +1444,47 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           </div>
 
           {/* ── MAIN CONTENT ─────────────────────────────────────────── */}
-          <div className="space-y-4 min-w-0">
+          <div className="space-y-3 min-w-0">
 
             {/* Bio */}
             {profile.bio && (
-              <div className="rounded-xl border border-border bg-bg-elevated p-5">
-                <p className="text-[10px] uppercase tracking-widest text-gold font-semibold mb-3">Über mich</p>
+              <div className="rounded-xl border border-white/6 bg-bg-elevated shadow-sm p-5 relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-gold/40 via-gold/10 to-transparent" />
+                <p className="text-[9px] uppercase tracking-widest text-gold font-bold mb-3">Über mich</p>
                 <p className="text-text-secondary text-sm leading-relaxed">{profile.bio}</p>
               </div>
             )}
 
             {/* Skills, Software, Mitgliedschaften */}
             {(skills.length > 0 || software.length > 0 || memberships.length > 0) && (
-              <div className="rounded-xl border border-border bg-bg-elevated p-5 space-y-4">
+              <div className="rounded-xl border border-white/6 bg-bg-elevated shadow-sm p-5 space-y-5 relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-gold/40 via-gold/10 to-transparent" />
                 {skills.length > 0 && (
                   <div>
-                    <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2.5">Skills</p>
+                    <p className="text-[9px] uppercase tracking-widest text-text-muted font-bold mb-2.5">Skills</p>
                     <div className="flex flex-wrap gap-1.5">
                       {skills.map((s) => (
-                        <span key={s} className="px-2.5 py-1 bg-bg-secondary border border-border rounded-lg text-xs text-text-secondary hover:border-gold/30 hover:text-text-primary transition-colors">{s}</span>
+                        <span key={s} className="px-2.5 py-1 bg-bg-primary border border-border/60 rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-colors cursor-default">{s}</span>
                       ))}
                     </div>
                   </div>
                 )}
                 {software.length > 0 && (
                   <div>
-                    <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2.5">Software</p>
+                    <p className="text-[9px] uppercase tracking-widest text-text-muted font-bold mb-2.5">Software</p>
                     <div className="flex flex-wrap gap-1.5">
                       {software.map((s) => (
-                        <span key={s} className="px-2.5 py-1 bg-bg-secondary border border-border rounded-lg text-xs text-text-secondary">{s}</span>
+                        <span key={s} className="px-2.5 py-1 bg-bg-primary border border-border/60 rounded-lg text-xs text-text-secondary cursor-default">{s}</span>
                       ))}
                     </div>
                   </div>
                 )}
                 {memberships.length > 0 && (
                   <div>
-                    <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-2.5">Mitgliedschaften</p>
+                    <p className="text-[9px] uppercase tracking-widest text-text-muted font-bold mb-2.5">Mitgliedschaften</p>
                     <div className="flex flex-wrap gap-1.5">
                       {memberships.map((m) => (
-                        <span key={m} className="px-2.5 py-1 bg-bg-secondary border border-border rounded-lg text-xs text-text-secondary">{m}</span>
+                        <span key={m} className="px-2.5 py-1 bg-bg-primary border border-border/60 rounded-lg text-xs text-text-secondary cursor-default">{m}</span>
                       ))}
                     </div>
                   </div>
@@ -1489,11 +1494,12 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 
             {/* Lizenzen & Zertifikate */}
             {certificates.length > 0 && (
-              <div className="rounded-xl border border-border bg-bg-elevated p-5">
-                <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold mb-3">Lizenzen & Zertifikate</p>
-                <div className="flex flex-wrap gap-1.5">
+              <div className="rounded-xl border border-white/6 bg-bg-elevated shadow-sm p-5 relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-gold/40 via-gold/10 to-transparent" />
+                <p className="text-[9px] uppercase tracking-widest text-text-muted font-bold mb-3">Lizenzen & Zertifikate</p>
+                <div className="flex flex-wrap gap-2">
                   {certificates.map((c) => (
-                    <span key={c} className="flex items-center gap-1.5 px-2.5 py-1 bg-bg-secondary border border-border rounded-lg text-xs text-text-secondary">
+                    <span key={c} className="flex items-center gap-1.5 px-3 py-1.5 bg-bg-primary border border-border/60 rounded-lg text-xs text-text-secondary">
                       <Check size={10} className="text-gold shrink-0" />{c}
                     </span>
                   ))}
