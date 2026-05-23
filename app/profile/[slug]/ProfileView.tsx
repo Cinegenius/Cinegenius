@@ -1406,40 +1406,6 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
               </div>
             )}
 
-            {/* Links & Kontakt */}
-            {(() => {
-              const gp2 = profile as unknown as { tiktok_url?: string; vimeo_url?: string; phone?: string; contact_email?: string };
-              const links = ([
-                { label: "Instagram", url: safeLink(profile.instagram_url) },
-                { label: "TikTok",    url: safeLink(gp2.tiktok_url) },
-                { label: "YouTube",   url: safeLink(profile.youtube_url) },
-                { label: "Vimeo",     url: safeLink(gp2.vimeo_url) },
-                { label: "LinkedIn",  url: safeLink(profile.linkedin_url) },
-                { label: "Website",   url: safeLink(profile.website_url) },
-                gp2.phone?.trim()         ? { label: gp2.phone.trim(),         url: `tel:${gp2.phone.trim()}`,             contactIcon: "phone" as const } : null,
-                gp2.contact_email?.trim() ? { label: gp2.contact_email.trim(), url: `mailto:${gp2.contact_email.trim()}`, contactIcon: "mail" as const } : null,
-              ] as const).filter((l): l is NonNullable<typeof l> & { url: string } => l !== null && !!l.url) as { label: string; url: string; contactIcon?: "phone" | "mail" }[];
-              const hasExt = externalProfiles.length > 0;
-              if (links.length === 0 && !hasExt) return null;
-              return (
-                <div className="rounded-xl border border-white/6 bg-bg-elevated shadow-sm p-4">
-                  <p className="text-[9px] uppercase tracking-widest text-text-muted font-bold mb-3">Links & Kontakt</p>
-                  <div className="space-y-1">
-                    {links.map(({ label, url, contactIcon }) => (
-                      <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-2.5 text-xs text-text-secondary hover:text-gold transition-colors py-1 group">
-                        {contactIcon === "phone" && <Phone size={11} className="shrink-0 text-text-muted group-hover:text-gold transition-colors" />}
-                        {contactIcon === "mail"  && <Mail size={11} className="shrink-0 text-text-muted group-hover:text-gold transition-colors" />}
-                        {!contactIcon && <ExternalLink size={10} className="shrink-0 text-text-muted group-hover:text-gold transition-colors" />}
-                        <span className="truncate">{label}</span>
-                      </a>
-                    ))}
-                  </div>
-                  {hasExt && <div className="mt-3 pt-3 border-t border-border/40"><ExternalProfilesDisplay profiles={externalProfiles} /></div>}
-                </div>
-              );
-            })()}
-
             <CompanyBadge membership={companyMembership} />
           </div>
 
@@ -1506,6 +1472,41 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 </div>
               </div>
             )}
+
+            {/* Links & Kontakt + Externe Profile */}
+            {(() => {
+              const gp2 = profile as unknown as { tiktok_url?: string; vimeo_url?: string; phone?: string; contact_email?: string };
+              const links = ([
+                { label: "Instagram", url: safeLink(profile.instagram_url) },
+                { label: "TikTok",    url: safeLink(gp2.tiktok_url) },
+                { label: "YouTube",   url: safeLink(profile.youtube_url) },
+                { label: "Vimeo",     url: safeLink(gp2.vimeo_url) },
+                { label: "LinkedIn",  url: safeLink(profile.linkedin_url) },
+                { label: "Website",   url: safeLink(profile.website_url) },
+                gp2.phone?.trim()         ? { label: gp2.phone.trim(),         url: `tel:${gp2.phone.trim()}`,             contactIcon: "phone" as const } : null,
+                gp2.contact_email?.trim() ? { label: gp2.contact_email.trim(), url: `mailto:${gp2.contact_email.trim()}`, contactIcon: "mail" as const } : null,
+              ] as const).filter((l): l is NonNullable<typeof l> & { url: string } => l !== null && !!l.url) as { label: string; url: string; contactIcon?: "phone" | "mail" }[];
+              const hasExt = externalProfiles.length > 0;
+              if (links.length === 0 && !hasExt) return null;
+              return (
+                <div className="rounded-xl border border-white/6 bg-bg-elevated shadow-sm p-5 relative overflow-hidden">
+                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-gold/40 via-gold/10 to-transparent" />
+                  <p className="text-[9px] uppercase tracking-widest text-text-muted font-bold mb-4">Links & Kontakt</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
+                    {links.map(({ label, url, contactIcon }) => (
+                      <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-2.5 text-xs text-text-secondary hover:text-gold transition-colors py-1.5 group">
+                        {contactIcon === "phone" && <Phone size={11} className="shrink-0 text-text-muted group-hover:text-gold transition-colors" />}
+                        {contactIcon === "mail"  && <Mail size={11} className="shrink-0 text-text-muted group-hover:text-gold transition-colors" />}
+                        {!contactIcon && <ExternalLink size={10} className="shrink-0 text-text-muted group-hover:text-gold transition-colors" />}
+                        <span className="truncate">{label}</span>
+                      </a>
+                    ))}
+                  </div>
+                  {hasExt && <div className="mt-4 pt-4 border-t border-border/40"><ExternalProfilesDisplay profiles={externalProfiles} /></div>}
+                </div>
+              );
+            })()}
 
           </div>
         </div>
