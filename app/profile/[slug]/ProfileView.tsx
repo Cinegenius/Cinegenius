@@ -559,11 +559,29 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
               {/* Top bar: availability + name + CTAs */}
               <div className="flex flex-col sm:flex-row items-start gap-3">
                 <div className="flex-1 min-w-0 w-full">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 flex-wrap mb-2">
                     <span className={`w-2 h-2 rounded-full shrink-0 ${profile.available ? "bg-emerald-400" : "bg-red-400"}`} />
                     <span className="text-xs font-medium text-text-muted">
                       {profile.available ? tc("available") : tc("unavailable")}
                     </span>
+                    {/* Availability config chips */}
+                    {(() => {
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      const ac = profile.availability_config as any;
+                      if (!ac) return null;
+                      const chips = [
+                        ac.weekends    && { label: "Wochenenden" },
+                        ac.night_shoots && { label: "Nachtdrehs" },
+                        ac.short_notice && { label: "Kurzfristig" },
+                        ac.work_radius_km && { label: `${ac.work_radius_km} km` },
+                      ].filter(Boolean) as { label: string }[];
+                      if (!chips.length) return null;
+                      return chips.map((c) => (
+                        <span key={c.label} className="px-1.5 py-0.5 rounded-md bg-bg-elevated border border-border text-[10px] text-text-muted font-medium">
+                          {c.label}
+                        </span>
+                      ));
+                    })()}
                   </div>
                   <h1 className="font-display text-4xl sm:text-5xl font-bold text-text-primary leading-none tracking-tight">
                     {profile.display_name ?? "Unbekannt"}

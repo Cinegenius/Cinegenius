@@ -97,6 +97,8 @@ export default function DashboardPage() {
 
   // Analytics
   const [viewStats, setViewStats] = useState<{ views7: number; views14: number; trend: number; daily: number[] } | null>(null);
+  const [photoStats, setPhotoStats] = useState<{ total: number; avg: number; best: string | null } | null>(null);
+  const { user } = useUser();
 
   useEffect(() => {
     // Profile + Completeness
@@ -134,7 +136,24 @@ export default function DashboardPage() {
       .then((r) => r.json())
       .then((data) => setViewStats(data))
       .catch(() => {});
+
   }, []);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    fetch(`/api/profile-image-likes?profile_id=${user.id}`)
+      .then((r) => r.json())
+      .then(({ ratings }: { ratings: Record<string, { avg: number; count: number }> }) => {
+        const entries = Object.entries(ratings ?? {});
+        if (!entries.length) return;
+        const total = entries.reduce((s, [, v]) => s + v.count, 0);
+        const weightedSum = entries.reduce((s, [, v]) => s + v.avg * v.count, 0);
+        const avg = Math.round((weightedSum / total) * 10) / 10;
+        const best = [...entries].sort((a, b) => b[1].avg - a[1].avg)[0]?.[0] ?? null;
+        setPhotoStats({ total, avg, best });
+      })
+      .catch(() => {});
+  }, [user?.id]);
 
   useEffect(() => {
     if (activeTab !== "listings" && activeTab !== "overview" && activeTab !== "analytics") return;
@@ -238,7 +257,6 @@ export default function DashboardPage() {
     if (l.type === "creator") return `/creators/${l.id}`;
     return "#";
   };
-  const { user } = useUser();
 
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [bookingsLoading, setBookingsLoading] = useState(false);
@@ -791,8 +809,9 @@ export default function DashboardPage() {
               )}
 
               {/* ── Stats-Kacheln ── */}
-              {viewStats && (
+              {(viewStats || photoStats) && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {viewStats && (
                   <div className="p-4 rounded-xl border border-border bg-bg-secondary">
                     <p className="text-xs text-text-muted mb-1 flex items-center gap-1.5">
                       <Eye size={12} /> Profilaufrufe
@@ -816,6 +835,7 @@ export default function DashboardPage() {
                     </div>
                     <p className="text-[10px] text-text-muted mt-1">Letzte 7 Tage</p>
                   </div>
+                  )}
                   <div className="p-4 rounded-xl border border-border bg-bg-secondary">
                     <p className="text-xs text-text-muted mb-1 flex items-center gap-1.5">
                       <List size={12} /> Aktive Inserate
@@ -834,6 +854,15 @@ export default function DashboardPage() {
                     <p className="text-2xl font-bold font-mono text-text-primary">{unreadCount}</p>
                     <p className="text-xs text-text-muted mt-1">ungelesen</p>
                   </div>
+                  {photoStats && (
+                    <div className="p-4 rounded-xl border border-border bg-bg-secondary">
+                      <p className="text-xs text-text-muted mb-1 flex items-center gap-1.5">
+                        <span className="text-gold text-xs leading-none">★</span> Foto-Bewertungen
+                      </p>
+                      <p className="text-2xl font-bold font-mono text-text-primary">{photoStats.avg.toFixed(1)}</p>
+                      <p className="text-xs text-text-muted mt-1">{photoStats.total} Bewertung{photoStats.total !== 1 ? "en" : ""}</p>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -1232,6 +1261,32 @@ export default function DashboardPage() {
                         return <div key={i} className="flex-1 bg-gold/30 rounded-sm hover:bg-gold/60" style={{ height: `${Math.max((v / max) * 100, 8)}%` }} />;
                       })}
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Foto-Bewertungen */}
+              {photoStats && (
+                <div className="p-5 rounded-xl border border-border bg-bg-secondary">
+                  <p className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
+                    <span className="text-gold text-sm">★</span> Foto-Bewertungen
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-3xl font-bold font-display text-text-primary">{photoStats.avg.toFixed(1)}</p>
+                      <div className="flex gap-0.5 mt-1">
+                        {[1,2,3,4,5].map((s) => (
+                          <span key={s} className={`text-sm ${s <= Math.round(photoStats.avg) ? "text-gold" : "text-text-muted/30"}`}>★</span>
+                        ))}
+                      </div>
+                      <p className="text-xs text-text-muted mt-1">{photoStats.total} Bewertung{photoStats.total !== 1 ? "en" : ""} gesamt</p>
+                    </div>
+                    {photoStats.best && (
+                      <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 border border-gold/20">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={photoStats.best} alt="Bestes Foto" className="w-full h-full object-cover" />
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

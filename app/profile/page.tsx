@@ -521,6 +521,10 @@ export default function ProfilePage() {
     imdbUrl: "",
     availableFrom: "",
     travelReady: false,
+    weekends: false,
+    nightShoots: false,
+    shortNotice: false,
+    workRadius: "",
     slug: "",
     phone: "",
     contactEmail: "",
@@ -649,6 +653,10 @@ export default function ProfilePage() {
             imdbUrl:       profile.imdb_url            ?? "",
             availableFrom: profile.available_from      ?? "",
             travelReady:   profile.travel_ready        ?? false,
+            weekends:      (profile.availability_config as any)?.weekends      ?? false,
+            nightShoots:   (profile.availability_config as any)?.night_shoots  ?? false,
+            shortNotice:   (profile.availability_config as any)?.short_notice  ?? false,
+            workRadius:    String((profile.availability_config as any)?.work_radius_km ?? ""),
             slug:          profile.slug                ?? "",
             phone:         profile.phone               ?? "",
             contactEmail:  profile.contact_email       ?? "",
@@ -898,6 +906,12 @@ export default function ProfilePage() {
           reel_url:       videoLinks[0] || null,
           available_from: form.availableFrom || null,
           travel_ready:   form.travelReady,
+          availability_config: {
+            weekends:      form.weekends,
+            night_shoots:  form.nightShoots,
+            short_notice:  form.shortNotice,
+            work_radius_km: form.workRadius ? parseInt(form.workRadius) : null,
+          },
           cover_image_url: coverImageUrl || null,
           instagram_url:  instagramUrl || null,
           tiktok_url:     tiktokUrl || null,
@@ -1505,6 +1519,48 @@ export default function ProfilePage() {
                             <p className="text-xs text-text-muted">{t("fieldTravelReadyDesc")}</p>
                           </div>
                         </div>
+                      </div>
+                    </div>
+
+                    {/* Extra availability options */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-1">
+                      {([
+                        { key: "weekends",    label: "Wochenenden",  desc: "Auch samstags/sonntags" },
+                        { key: "nightShoots", label: "Nachtdrehs",   desc: "Bereit für Nachtaufnahmen" },
+                        { key: "shortNotice", label: "Kurzfristig",  desc: "Verfügbar auf Kurzanfrage" },
+                      ] as const).map(({ key, label, desc }) => (
+                        <button
+                          key={key}
+                          type="button"
+                          onClick={() => setForm((p) => ({ ...p, [key]: !p[key] }))}
+                          className={`flex items-center justify-between gap-2 p-3 rounded-lg border text-left transition-colors ${form[key] ? "border-gold/40 bg-gold/5" : "border-border bg-bg-hover"}`}
+                        >
+                          <div>
+                            <p className="text-xs font-semibold text-text-primary">{label}</p>
+                            <p className="text-[10px] text-text-muted">{desc}</p>
+                          </div>
+                          <div className={`w-8 h-4.5 rounded-full relative transition-colors shrink-0 ${form[key] ? "bg-gold" : "bg-bg-elevated border border-border"}`}
+                            style={{ minWidth: "2rem", height: "1.125rem" }}>
+                            <span className="absolute top-0.5 w-3.5 h-3.5 bg-white rounded-full shadow transition-all"
+                              style={{ left: form[key] ? "calc(100% - 16px)" : "1px" }} />
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="mt-2">
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">Arbeitsradius</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          min="0"
+                          max="5000"
+                          value={form.workRadius}
+                          onChange={(e) => setForm((p) => ({ ...p, workRadius: e.target.value }))}
+                          placeholder="z.B. 100"
+                          className="w-28 bg-bg-elevated border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold transition-colors"
+                        />
+                        <span className="text-xs text-text-muted">km vom Standort (leer = überall)</span>
                       </div>
                     </div>
                   </div>

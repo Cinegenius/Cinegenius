@@ -183,6 +183,7 @@ const ALLOWED_PATCH_KEYS = new Set([
   "reel_url", "imdb_url",
   "instagram_url", "tiktok_url", "youtube_url", "vimeo_url", "linkedin_url",
   "day_rate", "filmography", "video_links",
+  "availability_config",
   "profile_types",
   "profile_type", "modules", "physical", "crew", "creative", "vendor",
   "focal_point", "tagline",
