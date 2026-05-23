@@ -1276,229 +1276,222 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
     <div className="min-h-screen bg-bg-primary text-text-primary">
       {lightbox && <Lightbox src={lightbox} onClose={() => setLightbox(null)} />}
 
-      {/* Hero — cover image + avatar overlap */}
+      {/* Hero */}
       <section className="relative overflow-hidden">
         {bgImage ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-35" />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-bg-primary" />
+            <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-bg-primary" />
           </>
         ) : (
           <div className="absolute inset-0 bg-gradient-to-b from-bg-elevated to-bg-primary" />
         )}
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20">
-          <div className="flex flex-col sm:flex-row items-end gap-6">
-            {/* Avatar */}
-            <div className="shrink-0 translate-y-10 hidden sm:block">
-              {profile.avatar_url ? (
-                <div className="relative w-28 h-28 lg:w-36 lg:h-36 rounded-2xl overflow-hidden ring-4 ring-bg-primary shadow-2xl">
-                  <Image src={profile.avatar_url} alt={profile.display_name ?? ""} fill className="object-cover" sizes="144px" />
-                  <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-full border border-white/10">
-                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${profile.available ? "bg-gold animate-pulse" : "bg-red-400"}`} />
-                    <span className={`text-[9px] font-semibold ${profile.available ? "text-gold" : "text-white/60"}`}>{profile.available ? "Verfügbar" : "Nicht verfügbar"}</span>
-                  </div>
-                </div>
-              ) : (
-                <div className="w-28 h-28 lg:w-36 lg:h-36 rounded-2xl bg-bg-elevated ring-4 ring-bg-primary shadow-2xl flex items-center justify-center text-3xl font-bold text-text-muted">
-                  {(profile.display_name ?? "?")[0]}
-                </div>
-              )}
-            </div>
-
-            {/* Name + role + actions */}
-            <div className="flex-1 min-w-0">
-              <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight drop-shadow-lg">
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-14">
+          <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+            <div className="flex-1 min-w-0 w-full">
+              <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-white leading-tight drop-shadow-lg">
                 {profile.display_name ?? "Unbekannt"}
+                <span className="block h-0.5 w-12 bg-gold mt-3 rounded-full" />
               </h1>
               {(profile.positions?.[0] ?? profile.role) && (() => {
                 const allPos = (profile.positions ?? [profile.role]).filter(Boolean) as string[];
+                const [primary, ...rest] = allPos;
                 return (
-                  <p className="text-white/70 text-sm mt-1.5 drop-shadow-md">
-                    {allPos.map((pos, i) => (
-                      <span key={i}>{pos}{i < allPos.length - 1 && <span className="text-gold/50 mx-2">·</span>}</span>
-                    ))}
-                  </p>
+                  <div className="mt-3">
+                    <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide bg-gold/20 text-gold border border-gold/30 drop-shadow-md">
+                      {primary}
+                    </span>
+                    {rest.length > 0 && (
+                      <p className="text-white/70 text-sm mt-2 font-light tracking-wide drop-shadow-md" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}>
+                        {rest.map((pos, i) => (
+                          <span key={i}>{pos}{i < rest.length - 1 && <span className="text-gold/60 mx-2">·</span>}</span>
+                        ))}
+                      </p>
+                    )}
+                  </div>
                 );
               })()}
               {profile.location && (
-                <p className="text-white/50 text-xs mt-1.5 flex items-center gap-1"><MapPin size={10} />{profile.location}</p>
+                <p className="text-white/60 text-xs mt-2.5 flex items-center gap-1 drop-shadow-md" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.9)" }}>
+                  <MapPin size={10} />{profile.location}
+                </p>
               )}
-              <div className="flex items-center gap-2 flex-wrap mt-4">
-                {!isOwner ? (
-                  <>
-                    {canContact && (
-                      <>
-                        <Link href={`/messages?to=${profile.user_id}`}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors text-xs">
-                          <MessageSquare size={12} /> Nachricht
-                        </Link>
-                        <button onClick={handleFriendAction} disabled={friendLoading}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 text-white font-medium rounded-lg hover:bg-white/20 transition-colors text-xs disabled:opacity-50">
-                          {friendStatus === "friends" ? <><Check size={11} /> Vernetzt</> : friendStatus === "pending_sent" ? "Gesendet" : friendStatus === "pending_received" ? <><UserPlus size={11} /> Annehmen</> : <><UserPlus size={11} /> Vernetzen</>}
-                        </button>
-                        <Link href={`/booking?profile=${profile.user_id}`}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 text-white font-medium rounded-lg hover:bg-white/20 transition-colors text-xs">
-                          Anfrage
-                        </Link>
-                      </>
-                    )}
-                    <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
-                  </>
-                ) : (
-                  <Link href="/profile" className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 text-white font-medium rounded-lg hover:bg-white/20 transition-colors text-xs">
-                    <Pencil size={11} /> Bearbeiten
-                  </Link>
-                )}
-              </div>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap sm:shrink-0 sm:mt-1">
+              {!isOwner ? (
+                <>
+                  {canContact && (
+                    <>
+                      <Link href={`/messages?to=${profile.user_id}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
+                        <MessageSquare size={11} /> Nachricht
+                      </Link>
+                      <button onClick={handleFriendAction} disabled={friendLoading}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs disabled:opacity-50">
+                        {friendStatus === "friends" ? <><Check size={11} /> Vernetzt</> : friendStatus === "pending_sent" ? "Gesendet" : friendStatus === "pending_received" ? <><UserPlus size={11} /> Annehmen</> : <><UserPlus size={11} /> Vernetzen</>}
+                      </button>
+                      <Link href={`/booking?profile=${profile.user_id}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
+                        Anfrage <ExternalLink size={11} />
+                      </Link>
+                    </>
+                  )}
+                  <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
+                </>
+              ) : (
+                <Link href="/profile" className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md text-white text-[10px] font-semibold px-3 py-1.5 rounded-full border border-white/20 hover:bg-white/20 transition-colors">
+                  <Pencil size={10} /> Bearbeiten
+                </Link>
+              )}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Quick-stat strip (below hero, above cards) */}
-      {(languages.length > 0 || profile.day_rate || profile.travel_ready || profile.crew?.experience_years || companyMembership) && (
-        <div className="border-b border-border/50 bg-bg-secondary">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-6 sm:gap-10 py-3.5 overflow-x-auto scrollbar-hide">
-              {/* Mobile avatar inline */}
-              {profile.avatar_url && (
-                <div className="shrink-0 sm:hidden">
-                  <div className="relative w-10 h-10 rounded-xl overflow-hidden ring-2 ring-border">
-                    <Image src={profile.avatar_url} alt="" fill className="object-cover" sizes="40px" />
-                  </div>
-                </div>
-              )}
-              {profile.day_rate && (
-                <div className="shrink-0 flex flex-col">
-                  <span className="text-[9px] uppercase tracking-widest text-text-muted font-semibold">Tagesgage</span>
-                  <span className="text-sm font-bold text-gold">{profile.day_rate} €</span>
-                </div>
-              )}
-              {profile.crew?.experience_years && (
-                <div className="shrink-0 flex flex-col">
-                  <span className="text-[9px] uppercase tracking-widest text-text-muted font-semibold">Erfahrung</span>
-                  <span className="text-sm font-bold text-text-primary">{profile.crew.experience_years} Jahre</span>
-                </div>
-              )}
-              {languages.length > 0 && (
-                <div className="shrink-0 flex flex-col">
-                  <span className="text-[9px] uppercase tracking-widest text-text-muted font-semibold">Sprachen</span>
-                  <span className="text-sm font-bold text-text-primary">{languages.join(", ")}</span>
-                </div>
-              )}
-              {profile.travel_ready && (
-                <div className="shrink-0 flex flex-col">
-                  <span className="text-[9px] uppercase tracking-widest text-text-muted font-semibold">Reisen</span>
-                  <span className="text-sm font-bold text-emerald-400">Reisebereit</span>
-                </div>
-              )}
-              {companyMembership && <CompanyBadge membership={companyMembership} />}
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
 
-        {/* Full-width content cards */}
-        <div className="pt-6 space-y-4 mb-10">
-
-          {/* Bio */}
-          {profile.bio && (
-            <div className="rounded-xl border border-white/6 bg-bg-elevated shadow-sm p-5 sm:p-6 relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-gold/50 via-gold/15 to-transparent" />
-              <p className="text-[9px] uppercase tracking-widest text-gold font-bold mb-3">Über mich</p>
-              <p className="text-text-secondary text-sm leading-relaxed">{profile.bio}</p>
-            </div>
-          )}
-
-          {/* Skills, Software, Mitgliedschaften — 2-column on wide screens */}
-          {(skills.length > 0 || software.length > 0 || memberships.length > 0 || certificates.length > 0) && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {(skills.length > 0 || software.length > 0 || memberships.length > 0) && (
-                <div className="rounded-xl border border-white/6 bg-bg-elevated shadow-sm p-5 relative overflow-hidden space-y-4">
-                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-gold/50 via-gold/15 to-transparent" />
-                  {skills.length > 0 && (
-                    <div>
-                      <p className="text-[9px] uppercase tracking-widest text-text-muted font-bold mb-2.5">Skills</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {skills.map((s) => <span key={s} className="px-2.5 py-1 bg-bg-primary border border-border/60 rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-colors cursor-default">{s}</span>)}
-                      </div>
-                    </div>
-                  )}
-                  {software.length > 0 && (
-                    <div>
-                      <p className="text-[9px] uppercase tracking-widest text-text-muted font-bold mb-2.5">Software</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {software.map((s) => <span key={s} className="px-2.5 py-1 bg-bg-primary border border-border/60 rounded-lg text-xs text-text-secondary cursor-default">{s}</span>)}
-                      </div>
-                    </div>
-                  )}
-                  {memberships.length > 0 && (
-                    <div>
-                      <p className="text-[9px] uppercase tracking-widest text-text-muted font-bold mb-2.5">Mitgliedschaften</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {memberships.map((m) => <span key={m} className="px-2.5 py-1 bg-bg-primary border border-border/60 rounded-lg text-xs text-text-secondary cursor-default">{m}</span>)}
-                      </div>
-                    </div>
-                  )}
+        {/* Two-column: avatar + compact info */}
+        <div className="grid grid-cols-1 sm:grid-cols-[220px_1fr] gap-8 mb-10">
+          {/* Avatar */}
+          <div className="shrink-0">
+            {profile.avatar_url ? (
+              <div className="relative">
+                <Image src={profile.avatar_url} alt={profile.display_name ?? ""} width={200} height={200}
+                  className="w-full aspect-square rounded-2xl object-cover ring-1 ring-white/8 shadow-2xl" />
+                <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10">
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${profile.available ? "bg-gold" : "bg-red-400"}`} />
+                  <span className={`text-[10px] font-medium ${profile.available ? "text-gold/90" : "text-white/60"}`}>{profile.available ? "Verfügbar" : "Nicht verfügbar"}</span>
                 </div>
-              )}
+              </div>
+            ) : (
+              <div className="w-full aspect-square rounded-2xl bg-bg-elevated border border-border flex items-center justify-center text-4xl font-bold text-text-muted">
+                {(profile.display_name ?? "?")[0]}
+              </div>
+            )}
+          </div>
 
-              {/* Lizenzen & Zertifikate */}
-              {certificates.length > 0 && (
-                <div className="rounded-xl border border-white/6 bg-bg-elevated shadow-sm p-5 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-gold/50 via-gold/15 to-transparent" />
-                  <p className="text-[9px] uppercase tracking-widest text-text-muted font-bold mb-3">Lizenzen & Zertifikate</p>
-                  <div className="flex flex-wrap gap-2">
-                    {certificates.map((c) => (
-                      <span key={c} className="flex items-center gap-1.5 px-3 py-1.5 bg-bg-primary border border-border/60 rounded-lg text-xs text-text-secondary">
-                        <Check size={10} className="text-gold shrink-0" />{c}
-                      </span>
+          {/* Compact info */}
+          <div className="space-y-5 pt-1">
+            <CompanyBadge membership={companyMembership} />
+
+            {profile.bio && (
+              <div>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
+                  <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Über mich</p>
+                </div>
+                <p className="text-text-secondary text-[13px] leading-relaxed">{profile.bio}</p>
+              </div>
+            )}
+
+            {(languages.length > 0 || profile.day_rate || profile.travel_ready || profile.crew?.experience_years) && (
+              <div className="flex flex-wrap gap-x-6 gap-y-3 pl-3 border-l border-gold/20">
+                {languages.length > 0 && <StatPill label="Sprachen" value={languages.join(", ")} />}
+                {profile.day_rate && <StatPill label="Tagesgage" value={`${profile.day_rate} €`} />}
+                {profile.travel_ready && <StatPill label="Reisen" value="Reisebereit" />}
+                {profile.crew?.experience_years && <StatPill label="Erfahrung" value={`${profile.crew.experience_years} Jahre`} />}
+              </div>
+            )}
+
+            {skills.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
+                  <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Skills</p>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {skills.map((s) => (
+                    <span key={s} className="px-2 py-0.5 bg-transparent border border-gold/15 rounded-md text-[11px] text-text-muted hover:border-gold/30 hover:text-text-secondary transition-colors">{s}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {memberships.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
+                  <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Mitgliedschaften</p>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {memberships.map((m) => (
+                    <span key={m} className="px-2 py-0.5 bg-transparent border border-gold/15 rounded-md text-[11px] text-text-muted hover:border-gold/30 hover:text-text-secondary transition-colors">{m}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {certificates.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
+                  <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Lizenzen & Zertifikate</p>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {certificates.map((c) => (
+                    <span key={c} className="px-2 py-0.5 bg-transparent border border-border/50 rounded-md text-[11px] text-text-muted">{c}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {software.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
+                  <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Software</p>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {software.map((s) => (
+                    <span key={s} className="px-2 py-0.5 bg-transparent border border-border/50 rounded-md text-[11px] text-text-muted">{s}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Social links */}
+            {(() => {
+              const gp2 = profile as unknown as { tiktok_url?: string; vimeo_url?: string; phone?: string; contact_email?: string };
+              const links = ([
+                { label: "Instagram", url: safeLink(profile.instagram_url) },
+                { label: "TikTok",    url: safeLink(gp2.tiktok_url) },
+                { label: "YouTube",   url: safeLink(profile.youtube_url) },
+                { label: "Vimeo",     url: safeLink(gp2.vimeo_url) },
+                { label: "LinkedIn",  url: safeLink(profile.linkedin_url) },
+                { label: "Website",   url: safeLink(profile.website_url) },
+                gp2.phone?.trim()         ? { label: gp2.phone.trim(),         url: `tel:${gp2.phone.trim()}`,             contactIcon: "phone" as const } : null,
+                gp2.contact_email?.trim() ? { label: gp2.contact_email.trim(), url: `mailto:${gp2.contact_email.trim()}`, contactIcon: "mail" as const } : null,
+              ] as const).filter((l): l is NonNullable<typeof l> & { url: string } => l !== null && !!l.url) as { label: string; url: string; contactIcon?: "phone" | "mail" }[];
+              if (links.length === 0) return null;
+              return (
+                <div>
+                  <div className="flex items-center gap-2 mb-2.5">
+                    <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
+                    <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Links</p>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {links.map(({ label, url, contactIcon }) => (
+                      <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-bg-secondary/50 border border-border/60 rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
+                        {contactIcon === "phone" && <Phone size={11} className="shrink-0" />}
+                        {contactIcon === "mail"  && <Mail size={11} className="shrink-0" />}
+                        {label}
+                        {!contactIcon && <ExternalLink size={9} className="shrink-0 opacity-40" />}
+                      </a>
                     ))}
                   </div>
                 </div>
-              )}
-            </div>
-          )}
+              );
+            })()}
 
-          {/* Links & Kontakt + Externe Profile */}
-          {(() => {
-            const gp2 = profile as unknown as { tiktok_url?: string; vimeo_url?: string; phone?: string; contact_email?: string };
-            const links = ([
-              { label: "Instagram", url: safeLink(profile.instagram_url) },
-              { label: "TikTok",    url: safeLink(gp2.tiktok_url) },
-              { label: "YouTube",   url: safeLink(profile.youtube_url) },
-              { label: "Vimeo",     url: safeLink(gp2.vimeo_url) },
-              { label: "LinkedIn",  url: safeLink(profile.linkedin_url) },
-              { label: "Website",   url: safeLink(profile.website_url) },
-              gp2.phone?.trim()         ? { label: gp2.phone.trim(),         url: `tel:${gp2.phone.trim()}`,             contactIcon: "phone" as const } : null,
-              gp2.contact_email?.trim() ? { label: gp2.contact_email.trim(), url: `mailto:${gp2.contact_email.trim()}`, contactIcon: "mail" as const } : null,
-            ] as const).filter((l): l is NonNullable<typeof l> & { url: string } => l !== null && !!l.url) as { label: string; url: string; contactIcon?: "phone" | "mail" }[];
-            const hasExt = externalProfiles.length > 0;
-            if (links.length === 0 && !hasExt) return null;
-            return (
-              <div className="rounded-xl border border-white/6 bg-bg-elevated shadow-sm p-5 sm:p-6 relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-gold/50 via-gold/15 to-transparent" />
-                <p className="text-[9px] uppercase tracking-widest text-text-muted font-bold mb-4">Links & Kontakt</p>
-                <div className="flex flex-wrap gap-2">
-                  {links.map(({ label, url, contactIcon }) => (
-                    <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-3.5 py-2 bg-bg-primary border border-border/60 rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-colors group">
-                      {contactIcon === "phone" && <Phone size={11} className="shrink-0 text-text-muted group-hover:text-gold transition-colors" />}
-                      {contactIcon === "mail"  && <Mail size={11} className="shrink-0 text-text-muted group-hover:text-gold transition-colors" />}
-                      {!contactIcon && <ExternalLink size={10} className="shrink-0 text-text-muted group-hover:text-gold transition-colors" />}
-                      {label}
-                    </a>
-                  ))}
-                </div>
-                {hasExt && <div className="mt-4 pt-4 border-t border-border/40"><ExternalProfilesDisplay profiles={externalProfiles} /></div>}
-              </div>
-            );
-          })()}
+            {/* Externe Profile */}
+            {externalProfiles.length > 0 && (
+              <ExternalProfilesDisplay profiles={externalProfiles} />
+            )}
 
+          </div>
         </div>
 
         {/* Projekte — grouped by profile position, rest in Weitere */}
