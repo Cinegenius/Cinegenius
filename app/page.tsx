@@ -18,9 +18,9 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 import {
-  MapPin, Briefcase, ShoppingBag, Users,
+  MapPin, Briefcase,
   ArrowRight, Star, CheckCircle, Zap, Shield, Clock,
-  TrendingUp, Film, Play, Building2, Clapperboard, Camera,
+  TrendingUp, Film, Play, Building2, Camera, PawPrint,
 } from "lucide-react";
 import { stats } from "@/lib/data";
 import HeroSearch from "@/components/HeroSearch";
@@ -41,10 +41,6 @@ async function getHomeData() {
     { count: companyCount },
     { data: recentLocations },
     { data: recentJobs },
-    { data: locationImages },
-    { data: crewImages },
-    { data: equipmentImages },
-    { data: jobImages },
     { data: liveCompanies },
     { data: liveProjects },
     { data: userReviewsRaw },
@@ -57,10 +53,6 @@ async function getHomeData() {
     db.from("companies").select("*", { count: "exact", head: true }).eq("published", true),
     db.from("listings").select("id,title,city,price,image_url,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(3),
     db.from("listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
-    db.from("listings").select("image_url").eq("type", "location").eq("published", true).not("image_url", "is", null).limit(20),
-    db.from("profiles").select("avatar_url").not("avatar_url", "is", null).not("display_name", "is", null).limit(20),
-    db.from("listings").select("image_url").in("type", ["prop", "vehicle"]).eq("published", true).not("image_url", "is", null).limit(20),
-    db.from("listings").select("image_url").eq("type", "job").eq("published", true).not("image_url", "is", null).limit(20),
     db.from("companies").select("id,slug,name,logo_url,city").not("logo_url", "is", null).order("created_at", { ascending: false }).limit(12),
     db.from("projects").select("id,title,poster_url,year,type,director").not("poster_url", "is", null).order("created_at", { ascending: false }).limit(8),
     db.from("reviews").select("target_id, rating").eq("target_type", "user"),
@@ -135,23 +127,6 @@ async function getHomeData() {
       }))
     : [];
 
-  function pickRandom(arr: Array<Record<string, string | null | undefined>>): string | null {
-    const urls = arr
-      .map((x) => x.image_url ?? x.avatar_url)
-      .filter((u): u is string => !!u && u.includes("supabase.co/storage"));
-    if (urls.length === 0) return null;
-    return urls[Math.floor(Math.random() * urls.length)];
-  }
-
-  const pillarImages = {
-    location: pickRandom(locationImages ?? []),
-    crew: pickRandom(crewImages ?? []),
-    equipment: pickRandom(equipmentImages ?? []),
-    job: pickRandom(jobImages ?? []),
-    firma: pickRandom((liveCompanies ?? []).map((c) => ({ image_url: c.logo_url }))),
-    projekt: pickRandom((liveProjects ?? []).filter((p) => p.poster_url?.includes("supabase.co/storage")).map((p) => ({ image_url: p.poster_url }))),
-  };
-
   const companies = (liveCompanies ?? []).map((c: { id: string; slug: string | null; name: string; logo_url: string | null; city: string | null }) => ({
     id: c.id,
     slug: c.slug,
@@ -182,7 +157,7 @@ async function getHomeData() {
     }
   } catch { /* table may not exist yet */ }
 
-  return { liveStats, liveLocations, liveJobs, pillarImages, companies, projects, topCreators, btsImage };
+  return { liveStats, liveLocations, liveJobs, companies, projects, topCreators, btsImage };
 }
 
 export default async function HomePage() {
@@ -205,16 +180,7 @@ export default async function HomePage() {
     return tc("weeksAgo", { weeks: Math.floor(diff / 7) });
   }
 
-  const featurePillars = [
-    { icon: MapPin,       title: t("pillarLocationsTitle"),  desc: t("pillarLocationsDesc"),  href: "/locations", pillarKey: "location",  accent: "from-sky-900/70",     insertHref: "/inserat?group=drehorte",   insertLabel: t("pillarLocationsCta"),  imgPos: "50% 50%" },
-    { icon: Users,        title: t("pillarCrewTitle"),        desc: t("pillarCrewDesc"),        href: "/creators",  pillarKey: "crew",      accent: "from-violet-900/70",  insertHref: "/profile",                  insertLabel: t("pillarCrewCta"),       imgPos: "50% 20%" },
-    { icon: ShoppingBag,  title: t("pillarMarketplaceTitle"), desc: t("pillarMarketplaceDesc"), href: "/props",     pillarKey: "equipment", accent: "from-slate-900/70",   insertHref: "/inserat?group=marktplatz", insertLabel: t("pillarMarketplaceCta"), imgPos: "50% 66%" },
-    { icon: Briefcase,    title: t("pillarJobsTitle"),        desc: t("pillarJobsDesc"),        href: "/jobs",      pillarKey: "job",       accent: "from-zinc-900/70",    insertHref: "/inserat?group=jobs",       insertLabel: t("pillarJobsCta"),       imgPos: "50% 50%" },
-    { icon: Building2,    title: t("pillarCompaniesTitle"),   desc: t("pillarCompaniesDesc"),   href: "/companies", pillarKey: "firma",     accent: "from-emerald-900/70", insertHref: "/company-setup",            insertLabel: t("pillarCompaniesCta"), imgPos: "50% 50%" },
-    { icon: Clapperboard, title: t("pillarProjectsTitle"),    desc: t("pillarProjectsDesc"),    href: "/projects",  pillarKey: "projekt",   accent: "from-rose-900/70",    insertHref: "/projects/neu",             insertLabel: t("pillarProjectsCta"),  imgPos: "50% 50%" },
-  ];
-
-  const { liveStats, liveLocations, liveJobs, pillarImages, companies, projects, topCreators, btsImage } = await getHomeData();
+  const { liveStats, liveLocations, liveJobs, companies, projects, topCreators, btsImage } = await getHomeData();
 
   return (
     <>
@@ -304,9 +270,9 @@ export default async function HomePage() {
       ══════════════════════════════════════════════ */}
       <div className="border-b border-border/60">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-4 sm:py-5">
-          <div className="flex items-center justify-between sm:justify-start sm:gap-12">
-            {liveStats.slice(0, 4).map((s) => (
-              <div key={s.label} className="text-center sm:text-left">
+          <div className="flex items-center justify-between sm:justify-start sm:gap-10">
+            {liveStats.map((s, i) => (
+              <div key={s.label} className={`text-center sm:text-left${i >= 4 ? " hidden lg:block" : ""}`}>
                 <div className="text-base sm:text-lg font-medium text-text-secondary leading-none">{s.value}</div>
                 <div className="text-[9px] sm:text-[10px] uppercase tracking-widest text-text-muted mt-1">{s.label}</div>
               </div>
@@ -552,7 +518,7 @@ export default async function HomePage() {
           </h2>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-[200px]">
-          <Link href="/projects" className="relative rounded-2xl overflow-hidden row-span-2 group block">
+          <Link href="/projects" className="relative rounded-2xl overflow-hidden group block">
             <Image src="https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=85" alt="Film Set" fill
               className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
@@ -607,6 +573,17 @@ export default async function HomePage() {
                 <Play size={10} /> {t("showcaseBts")}
               </span>
               <p className="text-white font-semibold text-sm">{t("showcaseBtsDesc")}</p>
+            </div>
+          </Link>
+          <Link href="/tiere" className="relative rounded-2xl overflow-hidden group block">
+            <Image src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=85" alt="Film-Tiere" fill
+              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold mb-1.5">
+                <PawPrint size={10} /> Film-Tiere
+              </span>
+              <p className="text-white font-semibold text-sm">Hunde, Pferde & Exoten</p>
             </div>
           </Link>
         </div>
@@ -768,33 +745,6 @@ export default async function HomePage() {
           <Link href="/inserat" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors">
             {tc("postJob")} <ArrowRight size={13} />
           </Link>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════
-          TESTIMONIALS
-      ══════════════════════════════════════════════ */}
-      <section className="py-8 sm:py-20 bg-bg-secondary border-y border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8 sm:mb-14 text-center sm:text-left">
-            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">{t("reviewsLabel")}</p>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-text-primary max-w-lg mx-auto sm:mx-0">{t("reviewsTitle")}</h2>
-          </div>
-          <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
-            <div className="flex gap-1 mb-1">
-              {[0,1,2,3,4].map((i) => (
-                <Star key={i} size={22} className="text-border fill-border" />
-              ))}
-            </div>
-            <p className="text-text-primary font-semibold text-lg">{t("reviewsEmpty")}</p>
-            <p className="text-text-muted text-sm max-w-xs leading-relaxed">{t("reviewsEmptyDesc")}</p>
-            <Link
-              href="/sign-up"
-              className="mt-2 inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm"
-            >
-              {tc("startNow")} <ArrowRight size={14} />
-            </Link>
-          </div>
         </div>
       </section>
 
