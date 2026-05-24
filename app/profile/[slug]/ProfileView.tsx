@@ -1385,16 +1385,16 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           {/* Avatar */}
           <div className="shrink-0">
             {profile.avatar_url ? (
-              <div className="relative max-w-[200px] sm:max-w-none mx-auto sm:mx-0">
-                <Image src={profile.avatar_url} alt={profile.display_name ?? ""} width={200} height={200}
-                  className="w-full aspect-square rounded-2xl object-cover ring-1 ring-white/8 shadow-2xl" />
+              <div className="relative">
+                <Image src={profile.avatar_url} alt={profile.display_name ?? ""} width={220} height={275}
+                  className="w-full aspect-[4/5] sm:aspect-square rounded-2xl object-cover ring-1 ring-white/8 shadow-2xl" />
                 <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10">
                   <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${profile.available ? "bg-gold" : "bg-red-400"}`} />
                   <span className={`text-[10px] font-medium ${profile.available ? "text-gold/90" : "text-white/60"}`}>{profile.available ? "Verfügbar" : "Nicht verfügbar"}</span>
                 </div>
               </div>
             ) : (
-              <div className="w-full aspect-square rounded-2xl bg-bg-elevated border border-border flex items-center justify-center text-4xl font-bold text-text-muted">
+              <div className="w-full aspect-[4/5] sm:aspect-square rounded-2xl bg-bg-elevated border border-border flex items-center justify-center text-4xl font-bold text-text-muted">
                 {(profile.display_name ?? "?")[0]}
               </div>
             )}
