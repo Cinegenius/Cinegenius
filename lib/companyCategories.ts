@@ -28,6 +28,7 @@ export const COMPANY_CATEGORIES: CompanyCategory[] = [
   { id: "hochzeit",           label: "Hochzeit & Event",     color: "text-rose-300",    bg: "bg-rose-400/10 border-rose-400/20",     examples: "Hochzeitsfilm, Foto, Styling" },
   { id: "werbeagentur",       label: "Werbe-/Contentagentur",color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/20", examples: "TVC, Social, Brand Content" },
   { id: "fahrzeugverleih",    label: "Fahrzeugverleih",      color: "text-yellow-400",  bg: "bg-yellow-500/10 border-yellow-500/20", examples: "Bild-Fahrzeuge, Stunt, Oldtimer" },
+  { id: "equipment-hersteller", label: "Hersteller & Händler", color: "text-orange-300",  bg: "bg-orange-400/10 border-orange-400/20", examples: "Kamera, Licht, Ton, Grip" },
   { id: "tiervermittlung",    label: "Film-Tiere",           color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20", examples: "Hunde, Pferde, Exoten" },
   { id: "talent-agentur",    label: "Talent-Agentur",       color: "text-fuchsia-400", bg: "bg-fuchsia-500/10 border-fuchsia-500/20", examples: "Booking, Management, Vermittlung" },
   { id: "drohnen",           label: "Drohnen & Aerial",     color: "text-sky-300",     bg: "bg-sky-400/10 border-sky-400/20",         examples: "UAV, Helikopter, Kran" },
