@@ -180,7 +180,7 @@ export default async function HomePage() {
     return tc("weeksAgo", { weeks: Math.floor(diff / 7) });
   }
 
-  const { liveStats, liveLocations, liveJobs, companies, projects, topCreators, btsImage } = await getHomeData();
+  const { liveLocations, liveJobs, companies, projects, topCreators, btsImage } = await getHomeData();
 
   return (
     <>
@@ -266,20 +266,82 @@ export default async function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════
-          STATS BAR
+          TARGET AUDIENCES
       ══════════════════════════════════════════════ */}
-      <div className="border-b border-border/60">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-4 sm:py-5">
-          <div className="flex items-center justify-between sm:justify-start sm:gap-10">
-            {liveStats.map((s, i) => (
-              <div key={s.label} className={`text-center sm:text-left${i >= 4 ? " hidden lg:block" : ""}`}>
-                <div className="text-base sm:text-lg font-medium text-text-secondary leading-none">{s.value}</div>
-                <div className="text-[9px] sm:text-[10px] uppercase tracking-widest text-text-muted mt-1">{s.label}</div>
+      <section className="py-6 lg:py-16 bg-bg-secondary border-y border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-4 lg:mb-10 text-center lg:text-left">
+            <p className="text-[10px] uppercase tracking-widest text-gold font-semibold mb-1">{t("audienceLabel")}</p>
+            <h2 className="font-display text-lg lg:text-3xl font-bold text-text-primary max-w-xl mx-auto lg:mx-0">
+              {t("audienceTitle")}{" "}
+              <span className="text-gradient-gold">{t("audienceTitleHighlight")}</span>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+            {([
+              {
+                icon: Film,
+                title: t("audienceFilmTitle"),
+                desc: t("audienceFilmDesc"),
+                items: [t("audienceFilmItem1"), t("audienceFilmItem2"), t("audienceFilmItem3"), t("audienceFilmItem4")],
+                cta: t("audienceFilmCta"),
+                href: "/locations",
+                highlight: false,
+              },
+              {
+                icon: Camera,
+                title: t("audienceFreelanceTitle"),
+                desc: t("audienceFreelanceDesc"),
+                items: [t("audienceFreelanceItem1"), t("audienceFreelanceItem2"), t("audienceFreelanceItem3"), t("audienceFreelanceItem4")],
+                cta: isLoggedIn ? t("ctaDashboard") : t("audienceFreelanceCta"),
+                href: ctaHref,
+                highlight: false,
+              },
+              {
+                icon: Building2,
+                title: t("audienceCompanyTitle"),
+                desc: t("audienceCompanyDesc"),
+                items: [t("audienceCompanyItem1"), t("audienceCompanyItem2"), t("audienceCompanyItem3"), t("audienceCompanyItem4")],
+                cta: t("audienceCompanyCta"),
+                href: "/company-setup",
+                highlight: false,
+              },
+              {
+                icon: TrendingUp,
+                title: t("audiencePassiveTitle"),
+                desc: t("audiencePassiveDesc"),
+                items: [t("audiencePassiveItem1"), t("audiencePassiveItem2"), t("audiencePassiveItem3"), t("audiencePassiveItem4")],
+                cta: t("audiencePassiveCta"),
+                href: "/inserat",
+                highlight: true,
+              },
+            ] as const).map(({ icon: Icon, title, desc, items, cta, href, highlight }) => (
+              <div key={title} className={`rounded-xl lg:rounded-2xl border p-3 lg:p-6 flex flex-col ${highlight ? "border-gold/25 bg-gold-subtle" : "border-border bg-bg-elevated"}`}>
+                <div className={`w-8 h-8 lg:w-10 lg:h-10 rounded-lg lg:rounded-xl flex items-center justify-center mb-2 lg:mb-4 ${highlight ? "bg-gold/10 border border-gold/20" : "bg-bg-hover border border-border-light"}`}>
+                  <Icon size={15} className={highlight ? "text-gold" : "text-text-secondary"} />
+                </div>
+                <h3 className="font-display text-xs lg:text-base font-bold text-text-primary mb-1 leading-tight">{title}</h3>
+                <p className="hidden lg:block text-xs text-text-muted mb-4 leading-relaxed">{desc}</p>
+                <ul className="hidden lg:block space-y-2 mb-6 flex-1">
+                  {items.map((item) => (
+                    <li key={item} className="flex items-start gap-1.5 text-xs text-text-secondary">
+                      <CheckCircle size={11} className={`shrink-0 mt-0.5 ${highlight ? "text-gold" : "text-success"}`} />
+                      <span className="leading-tight">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href={href}
+                  className={`mt-auto inline-flex items-center gap-1 lg:gap-2 px-2.5 lg:px-4 py-1.5 lg:py-2 text-[11px] lg:text-xs font-semibold rounded-lg transition-all ${highlight ? "bg-gold text-bg-primary hover:bg-gold-light" : "border border-border-light text-text-secondary hover:border-gold/40 hover:text-gold"}`}
+                >
+                  {cta} <ArrowRight size={10} />
+                </Link>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
       {/* ══════════════════════════════════════════════
           TRUST BAR
@@ -379,133 +441,6 @@ export default async function HomePage() {
           </div>
         </section>
       )}
-
-      {/* ══════════════════════════════════════════════
-          3-STEP SECTION
-      ══════════════════════════════════════════════ */}
-      <section className="py-6 lg:py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center lg:text-left mb-3 lg:hidden">
-          <p className="text-[10px] uppercase tracking-widest text-gold font-semibold mb-1">{t("stepsLabel")}</p>
-          <h2 className="font-display text-lg font-bold text-text-primary">{t("stepsTitle")}</h2>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-4 lg:gap-16 items-start">
-          <div className="hidden lg:block">
-            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-3">{t("stepsLabel")}</p>
-            <h2 className="font-display text-3xl font-bold text-text-primary mb-5 leading-tight">
-              {t("stepsTitle")}
-            </h2>
-            <p className="text-sm text-text-muted leading-relaxed mb-6">{t("stepsDesc")}</p>
-            <Link
-              href={ctaHref}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-xl transition-all text-sm"
-            >
-              {ctaLabel} <ArrowRight size={14} />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 lg:gap-4">
-            {[
-              { step: "01", icon: Film,   title: t("step1Title"), desc: t("step1Desc") },
-              { step: "02", icon: MapPin, title: t("step2Title"), desc: t("step2Desc") },
-              { step: "03", icon: Shield, title: t("step3Title"), desc: t("step3Desc") },
-            ].map(({ step, icon: Icon, title, desc }) => (
-              <div key={step} className="flex flex-col gap-2 p-3 lg:p-5 rounded-xl lg:rounded-2xl border border-border bg-bg-secondary">
-                <div className="flex items-center gap-2 shrink-0">
-                  <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg lg:rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0 relative">
-                    <Icon size={15} className="text-gold" />
-                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 lg:w-5 lg:h-5 bg-gold text-bg-primary text-[8px] font-bold rounded-full flex items-center justify-center">
-                      {step}
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-display text-xs lg:text-sm font-bold text-text-primary leading-tight mb-1">{title}</h3>
-                  <p className="text-[10px] lg:text-xs text-text-muted leading-relaxed">{desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════
-          TARGET AUDIENCES
-      ══════════════════════════════════════════════ */}
-      <section className="py-6 lg:py-16 bg-bg-secondary border-y border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-4 lg:mb-10 text-center lg:text-left">
-            <p className="text-[10px] uppercase tracking-widest text-gold font-semibold mb-1">{t("audienceLabel")}</p>
-            <h2 className="font-display text-lg lg:text-3xl font-bold text-text-primary max-w-xl mx-auto lg:mx-0">
-              {t("audienceTitle")}{" "}
-              <span className="text-gradient-gold">{t("audienceTitleHighlight")}</span>
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-            {([
-              {
-                icon: Film,
-                title: t("audienceFilmTitle"),
-                desc: t("audienceFilmDesc"),
-                items: [t("audienceFilmItem1"), t("audienceFilmItem2"), t("audienceFilmItem3"), t("audienceFilmItem4")],
-                cta: t("audienceFilmCta"),
-                href: "/locations",
-                highlight: false,
-              },
-              {
-                icon: Camera,
-                title: t("audienceFreelanceTitle"),
-                desc: t("audienceFreelanceDesc"),
-                items: [t("audienceFreelanceItem1"), t("audienceFreelanceItem2"), t("audienceFreelanceItem3"), t("audienceFreelanceItem4")],
-                cta: isLoggedIn ? t("ctaDashboard") : t("audienceFreelanceCta"),
-                href: ctaHref,
-                highlight: false,
-              },
-              {
-                icon: Building2,
-                title: t("audienceCompanyTitle"),
-                desc: t("audienceCompanyDesc"),
-                items: [t("audienceCompanyItem1"), t("audienceCompanyItem2"), t("audienceCompanyItem3"), t("audienceCompanyItem4")],
-                cta: t("audienceCompanyCta"),
-                href: "/company-setup",
-                highlight: false,
-              },
-              {
-                icon: TrendingUp,
-                title: t("audiencePassiveTitle"),
-                desc: t("audiencePassiveDesc"),
-                items: [t("audiencePassiveItem1"), t("audiencePassiveItem2"), t("audiencePassiveItem3"), t("audiencePassiveItem4")],
-                cta: t("audiencePassiveCta"),
-                href: "/inserat",
-                highlight: true,
-              },
-            ] as const).map(({ icon: Icon, title, desc, items, cta, href, highlight }) => (
-              <div key={title} className={`rounded-xl lg:rounded-2xl border p-3 lg:p-6 flex flex-col ${highlight ? "border-gold/25 bg-gold-subtle" : "border-border bg-bg-elevated"}`}>
-                <div className={`w-8 h-8 lg:w-10 lg:h-10 rounded-lg lg:rounded-xl flex items-center justify-center mb-2 lg:mb-4 ${highlight ? "bg-gold/10 border border-gold/20" : "bg-bg-hover border border-border-light"}`}>
-                  <Icon size={15} className={highlight ? "text-gold" : "text-text-secondary"} />
-                </div>
-                <h3 className="font-display text-xs lg:text-base font-bold text-text-primary mb-1 leading-tight">{title}</h3>
-                <p className="hidden lg:block text-xs text-text-muted mb-4 leading-relaxed">{desc}</p>
-                <ul className="hidden lg:block space-y-2 mb-6 flex-1">
-                  {items.map((item) => (
-                    <li key={item} className="flex items-start gap-1.5 text-xs text-text-secondary">
-                      <CheckCircle size={11} className={`shrink-0 mt-0.5 ${highlight ? "text-gold" : "text-success"}`} />
-                      <span className="leading-tight">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href={href}
-                  className={`mt-auto inline-flex items-center gap-1 lg:gap-2 px-2.5 lg:px-4 py-1.5 lg:py-2 text-[11px] lg:text-xs font-semibold rounded-lg transition-all ${highlight ? "bg-gold text-bg-primary hover:bg-gold-light" : "border border-border-light text-text-secondary hover:border-gold/40 hover:text-gold"}`}
-                >
-                  {cta} <ArrowRight size={10} />
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ══════════════════════════════════════════════
           VISUAL SHOWCASE
