@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { stats } from "@/lib/data";
 import HeroSearch from "@/components/HeroSearch";
+import AudienceCards from "@/components/AudienceCards";
 
 function fmtCount(n: number, fallback: string): string {
   if (n === 0) return fallback;
@@ -44,6 +45,10 @@ async function getHomeData() {
     { data: liveCompanies },
     { data: liveProjects },
     { data: userReviewsRaw },
+    { data: profileCovers },
+    { data: profileAvatars },
+    { data: companyPortfolios },
+    { data: locationImagesRaw },
   ] = await Promise.all([
     db.from("listings").select("*", { count: "exact", head: true }).eq("type", "location").eq("published", true),
     db.from("listings").select("*", { count: "exact", head: true }).eq("type", "job").eq("published", true),
@@ -56,6 +61,10 @@ async function getHomeData() {
     db.from("companies").select("id,slug,name,logo_url,city").not("logo_url", "is", null).order("created_at", { ascending: false }).limit(12),
     db.from("projects").select("id,title,poster_url,year,type,director").not("poster_url", "is", null).order("created_at", { ascending: false }).limit(8),
     db.from("reviews").select("target_id, rating").eq("target_type", "user"),
+    db.from("profiles").select("cover_image_url").not("cover_image_url", "is", null).like("cover_image_url", "%supabase.co%").limit(20),
+    db.from("profiles").select("avatar_url").not("avatar_url", "is", null).like("avatar_url", "%supabase.co%").limit(20),
+    db.from("companies").select("portfolio_images").not("portfolio_images", "is", null).eq("published", true).limit(20),
+    db.from("listings").select("image_url").eq("type", "location").eq("published", true).not("image_url", "is", null).like("image_url", "%supabase.co%").limit(20),
   ]);
 
   // Compute top-rated creator IDs from reviews (min 2 reviews)
@@ -157,7 +166,16 @@ async function getHomeData() {
     }
   } catch { /* table may not exist yet */ }
 
-  return { liveStats, liveLocations, liveJobs, companies, projects, topCreators, btsImage };
+  const audienceImagePools = {
+    film: (profileCovers ?? []).map((p: { cover_image_url: string }) => p.cover_image_url).filter(Boolean) as string[],
+    freelance: (profileAvatars ?? []).map((p: { avatar_url: string }) => p.avatar_url).filter(Boolean) as string[],
+    company: (companyPortfolios ?? [])
+      .flatMap((c: { portfolio_images: string[] | null }) => Array.isArray(c.portfolio_images) ? c.portfolio_images : [])
+      .filter(Boolean) as string[],
+    location: (locationImagesRaw ?? []).map((l: { image_url: string }) => l.image_url).filter(Boolean) as string[],
+  };
+
+  return { liveStats, liveLocations, liveJobs, companies, projects, topCreators, btsImage, audienceImagePools };
 }
 
 export default async function HomePage() {
@@ -180,7 +198,7 @@ export default async function HomePage() {
     return tc("weeksAgo", { weeks: Math.floor(diff / 7) });
   }
 
-  const { liveLocations, liveJobs, companies, projects, topCreators, btsImage } = await getHomeData();
+  const { liveLocations, liveJobs, companies, projects, topCreators, btsImage, audienceImagePools } = await getHomeData();
 
   return (
     <>
@@ -288,70 +306,25 @@ export default async function HomePage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-            {([
-              {
-                icon: Film,
-                title: t("audienceFilmTitle"),
-                desc: t("audienceFilmDesc"),
-                cta: t("audienceFilmCta"),
-                href: "/marketplace",
-                image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=80",
-                accent: "#c8f135",
-              },
-              {
-                icon: Camera,
-                title: t("audienceFreelanceTitle"),
-                desc: t("audienceFreelanceDesc"),
-                cta: isLoggedIn ? t("ctaDashboard") : t("audienceFreelanceCta"),
-                href: ctaHref,
-                image: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=800&q=80",
-                accent: "#60a5fa",
-              },
-              {
-                icon: Building2,
-                title: t("audienceCompanyTitle"),
-                desc: t("audienceCompanyDesc"),
-                cta: t("audienceCompanyCta"),
-                href: isLoggedIn ? "/company-setup" : "/sign-up?redirect=/company-setup",
-                image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
-                accent: "#f59e0b",
-              },
-              {
-                icon: TrendingUp,
-                title: t("audiencePassiveTitle"),
-                desc: t("audiencePassiveDesc"),
-                cta: t("audiencePassiveCta"),
-                href: isLoggedIn ? "/inserat" : "/sign-up?redirect=/inserat",
-                image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80",
-                accent: "#c8f135",
-              },
-            ] as const).map(({ icon: Icon, title, desc, cta, href, image, accent }) => (
-              <Link key={title} href={href}
-                className="group relative rounded-xl lg:rounded-2xl overflow-hidden aspect-[3/4] lg:aspect-[3/4] block">
-                <Image src={image} alt={title} fill unoptimized
-                  className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                  sizes="(max-width:640px) 50vw,25vw" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{ background: `linear-gradient(to top, ${accent}40, transparent 60%)` }}
-                />
-                <div className="absolute top-3 left-3 w-8 h-8 rounded-lg flex items-center justify-center backdrop-blur-sm border border-white/10"
-                  style={{ backgroundColor: `${accent}25` }}>
-                  <Icon size={14} style={{ color: accent }} />
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 p-3 lg:p-4">
-                  <h3 className="font-display text-sm lg:text-base font-bold text-white leading-tight mb-1">{title}</h3>
-                  <p className="text-white/60 text-[11px] leading-snug hidden sm:block mb-2">{desc}</p>
-                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold transition-colors"
-                    style={{ color: accent }}>
-                    {cta} <ArrowRight size={10} />
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <AudienceCards
+            pools={audienceImagePools}
+            isLoggedIn={isLoggedIn}
+            labels={{
+              filmTitle: t("audienceFilmTitle"),
+              filmDesc: t("audienceFilmDesc"),
+              filmCta: t("audienceFilmCta"),
+              freelanceTitle: t("audienceFreelanceTitle"),
+              freelanceDesc: t("audienceFreelanceDesc"),
+              freelanceCta: t("audienceFreelanceCta"),
+              ctaDashboard: t("ctaDashboard"),
+              companyTitle: t("audienceCompanyTitle"),
+              companyDesc: t("audienceCompanyDesc"),
+              companyCta: t("audienceCompanyCta"),
+              passiveTitle: t("audiencePassiveTitle"),
+              passiveDesc: t("audiencePassiveDesc"),
+              passiveCta: t("audiencePassiveCta"),
+            }}
+          />
         </div>
       </section>
 
