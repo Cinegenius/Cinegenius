@@ -42,6 +42,9 @@ const SIGNATURES: Array<{
   { mime: "image/webp", ext: "webp", magic: [0x52, 0x49, 0x46, 0x46],          offset: 0 },
   // HEIC/HEIF — 'ftyp' box starts at byte 4
   { mime: "image/heic", ext: "heic", magic: [0x66, 0x74, 0x79, 0x70],          offset: 4 },
+  // SVG — starts with '<svg' or '<?xml'
+  { mime: "image/svg+xml", ext: "svg", magic: [0x3C, 0x73, 0x76, 0x67],        offset: 0 },
+  { mime: "image/svg+xml", ext: "svg", magic: [0x3C, 0x3F, 0x78, 0x6D, 0x6C], offset: 0 },
 ];
 
 /** Allowed MIME types derived from SIGNATURES — single source of truth. */
@@ -64,7 +67,14 @@ const MAGIC_HEADER_BYTES = 16;
  * it requires a separate check.
  */
 function detectMimeFromBytes(header: Uint8Array): string | null {
+  // SVG: text-based, check decoded string for <svg or <?xml prefix
+  const text = new TextDecoder("utf-8", { fatal: false }).decode(header).trimStart();
+  if (text.startsWith("<svg") || text.toLowerCase().startsWith("<svg") || text.startsWith("<?xml")) {
+    return "image/svg+xml";
+  }
+
   for (const sig of SIGNATURES) {
+    if (sig.mime === "image/svg+xml") continue; // handled above
     if (sig.mime === "image/webp") {
       // WebP: RIFF at 0 AND WEBP at 8
       const riff = [0x52, 0x49, 0x46, 0x46];
@@ -134,7 +144,7 @@ export async function validateUpload(
 
   if (!detectedMime) {
     return {
-      error: "Ungültiges Dateiformat. Nur JPG, PNG, WEBP und HEIC sind erlaubt.",
+      error: "Ungültiges Dateiformat. Nur JPG, PNG, WEBP, HEIC und SVG sind erlaubt.",
       status: 415,
     };
   }
