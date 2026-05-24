@@ -366,10 +366,10 @@ function ExternalProfilesDisplay({ profiles }: { profiles: ExternalProfileRow[] 
                   width={14}
                   height={14}
                   className="w-3.5 h-3.5 rounded-sm shrink-0 opacity-80 group-hover:opacity-100"
+                  onError={(e) => { const el = e.target as HTMLImageElement; el.style.display = "none"; el.nextElementSibling?.classList.remove("hidden"); }}
                 />
-              ) : (
-                <span className={`text-[10px] font-bold shrink-0 ${plat.textCls}`}>{plat.abbr}</span>
-              )}
+              ) : null}
+              <span className={`text-[10px] font-bold shrink-0 ${plat.textCls}${faviconDomain ? " hidden" : ""}`}>{plat.abbr}</span>
               <span>{displayName}{entry.custom_label ? ` · ${entry.custom_label}` : ""}</span>
               <ExternalLink size={9} className="shrink-0 opacity-40 group-hover:opacity-70" />
             </a>
@@ -1374,7 +1374,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           {/* Avatar */}
           <div className="shrink-0">
             {profile.avatar_url ? (
-              <div className="relative">
+              <div className="relative max-w-[200px] sm:max-w-none mx-auto sm:mx-0">
                 <Image src={profile.avatar_url} alt={profile.display_name ?? ""} width={200} height={200}
                   className="w-full aspect-square rounded-2xl object-cover ring-1 ring-white/8 shadow-2xl" />
                 <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10">
@@ -1390,7 +1390,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           </div>
 
           {/* Compact info */}
-          <div className="flex gap-5 pt-1">
+          <div className="flex flex-col sm:flex-row gap-5 pt-1">
             <div className="flex-1 space-y-5 min-w-0">
 
             {profile.bio && (
@@ -1511,7 +1511,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 
             </div>{/* end flex-1 info */}
             {companyMembership?.companies && (
-              <div className="w-44 shrink-0">
+              <div className="sm:w-44 sm:shrink-0">
                 <CompanyBadge membership={companyMembership} />
               </div>
             )}
