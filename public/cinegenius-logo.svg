@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 72" width="380" height="72" fill="none">
+  <!-- Icon: lime green rounded square -->
+  <rect width="72" height="72" rx="16" fill="#C2F135"/>
+  <!-- Play triangle centered in 72x72 -->
+  <polygon points="26,18 26,54 54,36" fill="#0A0A0A"/>
+  <!-- Wordmark -->
+  <text x="92" y="51"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+    font-size="44"
+    font-weight="700"
+    letter-spacing="-1.5">
+    <tspan fill="#FFFFFF">Cine</tspan><tspan fill="#C2F135">Genius</tspan>
+  </text>
+</svg>
