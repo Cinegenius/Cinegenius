@@ -206,7 +206,7 @@ function getCompanyMembership(userId: string): Promise<any> {
     async () => {
       const { data } = await db
         .from("company_members")
-        .select("id, role, title, status, company_id, companies(id, slug, name, logo_url)")
+        .select("id, role, title, status, company_id, companies(id, slug, name, logo_url, categories)")
         .eq("user_id", userId)
         .eq("status", "accepted")
         .limit(1)

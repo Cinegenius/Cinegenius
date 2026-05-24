@@ -15,6 +15,7 @@ import type { UserProfile, ProfileModule, ProfileImage, FilmographyEntry, Profil
 import ReviewsSection from "@/components/ReviewsSection";
 import { PROFILE_CATEGORY_MAP } from "@/lib/profile-types";
 import { getPlatform, type ExternalProfileRow } from "@/lib/external-platforms";
+import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -386,13 +387,16 @@ type CompanyMembership = {
   id: string;
   role: string;
   title: string | null;
-  companies: { id: string; slug: string; name: string; logo_url: string | null } | null;
+  companies: { id: string; slug: string; name: string; logo_url: string | null; categories: string[] | null } | null;
 } | null;
 
 function CompanyBadge({ membership }: { membership: CompanyMembership }) {
   if (!membership?.companies) return null;
   const co = membership.companies;
   const roleLabel = membership.title ?? membership.role ?? null;
+  const categoryLabel = co.categories?.[0]
+    ? COMPANY_CATEGORIES.find(c => c.id === co.categories![0])?.label ?? null
+    : null;
   return (
     <div>
       <div className="flex items-center gap-2 mb-2.5">
@@ -410,7 +414,9 @@ function CompanyBadge({ membership }: { membership: CompanyMembership }) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{co.name}</p>
-            {roleLabel && <p className="text-[11px] text-text-muted truncate">{roleLabel}</p>}
+            {categoryLabel
+              ? <p className="text-[11px] text-text-muted truncate">{categoryLabel}</p>
+              : roleLabel && <p className="text-[11px] text-text-muted truncate">{roleLabel}</p>}
           </div>
           <ExternalLink size={11} className="text-text-muted group-hover:text-gold transition-colors shrink-0" />
         </div>
@@ -427,6 +433,7 @@ function CompanyBadge({ membership }: { membership: CompanyMembership }) {
           </div>
           <div className="px-4 py-3 text-center border-t border-border/50">
             <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{co.name}</p>
+            {categoryLabel && <p className="text-[11px] text-gold/70 mt-0.5 truncate">{categoryLabel}</p>}
             {roleLabel && <p className="text-[11px] text-text-muted mt-0.5 truncate">{roleLabel}</p>}
             <p className="text-[10px] text-gold/60 mt-1.5 flex items-center justify-center gap-1">
               <ExternalLink size={9} /> Unternehmensprofil

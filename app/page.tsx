@@ -25,6 +25,7 @@ import {
 import { stats } from "@/lib/data";
 import HeroSearch from "@/components/HeroSearch";
 import AudienceCards from "@/components/AudienceCards";
+import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 
 function fmtCount(n: number, fallback: string): string {
   if (n === 0) return fallback;
@@ -58,7 +59,7 @@ async function getHomeData() {
     db.from("companies").select("*", { count: "exact", head: true }).eq("published", true),
     db.from("listings").select("id,title,city,price,image_url,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(3),
     db.from("listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
-    db.from("companies").select("id,slug,name,logo_url,city").not("logo_url", "is", null).order("created_at", { ascending: false }).limit(12),
+    db.from("companies").select("id,slug,name,logo_url,city,categories").not("logo_url", "is", null).order("created_at", { ascending: false }).limit(12),
     db.from("projects").select("id,title,poster_url,year,type,director").not("poster_url", "is", null).order("created_at", { ascending: false }).limit(8),
     db.from("reviews").select("target_id, rating").eq("target_type", "user"),
     db.from("profiles").select("cover_image_url").not("cover_image_url", "is", null).like("cover_image_url", "%supabase.co%").limit(20),
@@ -136,12 +137,13 @@ async function getHomeData() {
       }))
     : [];
 
-  const companies = (liveCompanies ?? []).map((c: { id: string; slug: string | null; name: string; logo_url: string | null; city: string | null }) => ({
+  const companies = (liveCompanies ?? []).map((c: { id: string; slug: string | null; name: string; logo_url: string | null; city: string | null; categories: string[] | null }) => ({
     id: c.id,
     slug: c.slug,
     name: c.name,
     logo: c.logo_url,
     city: (c.city ?? "").split(",")[0]?.trim() ?? "",
+    category: Array.isArray(c.categories) && c.categories.length > 0 ? c.categories[0] : null,
   }));
 
   const projects = (liveProjects ?? [])
@@ -582,6 +584,11 @@ export default async function HomePage() {
                 </div>
                 <div className="min-w-0 w-full">
                   <h3 className="font-semibold text-text-secondary group-hover:text-text-primary text-[11px] leading-snug truncate transition-colors">{c.name}</h3>
+                  {c.category && (
+                    <p className="text-[10px] text-gold/70 truncate">
+                      {COMPANY_CATEGORIES.find(cat => cat.id === c.category)?.label}
+                    </p>
+                  )}
                   {c.city && <p className="text-[10px] text-text-muted truncate">{c.city}</p>}
                 </div>
               </Link>
