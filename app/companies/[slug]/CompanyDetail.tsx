@@ -248,14 +248,6 @@ export default function CompanyDetail({
                 <Calendar size={11} /> Seit {company.founded_year}
               </span>
             )}
-            {company.website && (
-              <a href={company.website} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-1 hover:text-gold transition-colors">
-                <Globe size={11} />
-                {company.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
-                <ExternalLink size={9} />
-              </a>
-            )}
           </div>
 
           {/* CTA buttons */}
@@ -270,6 +262,12 @@ export default function CompanyDetail({
               <a href={`tel:${company.phone}`}
                 className="inline-flex items-center gap-1.5 px-4 py-2 border border-border bg-bg-elevated rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
                 <Phone size={13} /> {company.phone}
+              </a>
+            )}
+            {company.website && (
+              <a href={company.website} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 border border-border bg-bg-elevated rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
+                <Globe size={13} /> {company.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
               </a>
             )}
             {currentUserId && !isOwner && !localMembership && (
