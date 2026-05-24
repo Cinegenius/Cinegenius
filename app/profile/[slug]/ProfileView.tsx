@@ -399,28 +399,39 @@ function CompanyBadge({ membership }: { membership: CompanyMembership }) {
         <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
         <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Unternehmen</p>
       </div>
-      <Link
-        href={`/companies/${co.slug}`}
-        className="block bg-bg-elevated border border-border rounded-2xl overflow-hidden hover:border-gold/40 transition-all group"
-      >
-        {/* Logo banner */}
-        <div className="relative h-24 bg-gradient-to-br from-bg-secondary to-bg-primary flex items-center justify-center">
-          {co.logo_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={co.logo_url} alt={co.name} className="w-full h-full object-contain p-3" />
-          ) : (
-            <div className="w-16 h-16 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shadow-xl">
-              <Building2 size={28} className="text-text-muted group-hover:text-gold transition-colors" />
-            </div>
-          )}
+      <Link href={`/companies/${co.slug}`} className="block bg-bg-elevated border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-all group">
+        {/* Mobile: compact horizontal row */}
+        <div className="flex sm:hidden items-center gap-3 px-3 py-2.5">
+          <div className="w-14 h-9 shrink-0 rounded-lg overflow-hidden bg-bg-secondary border border-border/50 flex items-center justify-center">
+            {co.logo_url
+              // eslint-disable-next-line @next/next/no-img-element
+              ? <img src={co.logo_url} alt={co.name} className="w-full h-full object-contain p-1" />
+              : <Building2 size={16} className="text-text-muted group-hover:text-gold transition-colors" />}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{co.name}</p>
+            {roleLabel && <p className="text-[11px] text-text-muted truncate">{roleLabel}</p>}
+          </div>
+          <ExternalLink size={11} className="text-text-muted group-hover:text-gold transition-colors shrink-0" />
         </div>
-        {/* Info */}
-        <div className="px-4 py-3 text-center border-t border-border/50">
-          <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{co.name}</p>
-          {roleLabel && <p className="text-[11px] text-text-muted mt-0.5 truncate">{roleLabel}</p>}
-          <p className="text-[10px] text-gold/60 mt-1.5 flex items-center justify-center gap-1">
-            <ExternalLink size={9} /> Unternehmensprofil
-          </p>
+
+        {/* Desktop: vertical card */}
+        <div className="hidden sm:block">
+          <div className="h-24 bg-gradient-to-br from-bg-secondary to-bg-primary flex items-center justify-center">
+            {co.logo_url
+              // eslint-disable-next-line @next/next/no-img-element
+              ? <img src={co.logo_url} alt={co.name} className="w-full h-full object-contain p-3" />
+              : <div className="w-16 h-16 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shadow-xl">
+                  <Building2 size={28} className="text-text-muted group-hover:text-gold transition-colors" />
+                </div>}
+          </div>
+          <div className="px-4 py-3 text-center border-t border-border/50">
+            <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{co.name}</p>
+            {roleLabel && <p className="text-[11px] text-text-muted mt-0.5 truncate">{roleLabel}</p>}
+            <p className="text-[10px] text-gold/60 mt-1.5 flex items-center justify-center gap-1">
+              <ExternalLink size={9} /> Unternehmensprofil
+            </p>
+          </div>
         </div>
       </Link>
     </div>
