@@ -1316,7 +1316,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           <div className="absolute inset-0 bg-gradient-to-b from-bg-elevated to-bg-primary" />
         )}
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-32 pb-8 sm:pb-14">
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 pb-6 sm:pb-8">
           <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
             <div className="flex-1 min-w-0 w-full">
               <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-white leading-tight drop-shadow-lg">
