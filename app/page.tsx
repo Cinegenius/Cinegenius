@@ -62,7 +62,7 @@ async function getHomeData() {
     db.from("companies").select("id,slug,name,logo_url,city,categories").not("logo_url", "is", null).order("created_at", { ascending: false }).limit(12),
     db.from("projects").select("id,title,poster_url,year,type,director").not("poster_url", "is", null).order("created_at", { ascending: false }).limit(8),
     db.from("reviews").select("target_id, rating").eq("target_type", "user"),
-    db.from("profiles").select("portfolio_images").not("portfolio_images", "is", null).like("portfolio_images::text", "%supabase.co%").limit(20),
+    db.from("profiles").select("portfolio_images").not("portfolio_images", "is", null).limit(30),
     db.from("profiles").select("avatar_url").not("avatar_url", "is", null).like("avatar_url", "%supabase.co%").limit(20),
     db.from("companies").select("logo_url").not("logo_url", "is", null).like("logo_url", "%supabase.co%").eq("published", true).limit(12),
     db.from("listings").select("image_url").in("type", ["location", "prop", "vehicle"]).eq("published", true).not("image_url", "is", null).like("image_url", "%supabase.co%").limit(20),
@@ -171,7 +171,7 @@ async function getHomeData() {
   const audienceImagePools = {
     film: (profileCovers ?? [])
       .flatMap((p: { portfolio_images: string[] | null }) => Array.isArray(p.portfolio_images) ? p.portfolio_images : [])
-      .filter(Boolean) as string[],
+      .filter((url: string) => typeof url === "string" && url.includes("supabase.co")) as string[],
     freelance: (profileAvatars ?? []).map((p: { avatar_url: string }) => p.avatar_url).filter(Boolean) as string[],
     company: (companyPortfolios ?? []).map((c: { logo_url: string }) => c.logo_url).filter(Boolean) as string[],
     location: (locationImagesRaw ?? []).map((l: { image_url: string }) => l.image_url).filter(Boolean) as string[],
@@ -261,25 +261,29 @@ export default async function HomePage() {
         {/* Nav clearance on mobile */}
         <div className="sm:hidden h-16 shrink-0" />
 
-        {/* Mobile layout: truly centered in remaining space */}
-        <div className="sm:hidden flex-1 flex flex-col items-center justify-center px-5 text-center">
-          <div className="hero-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[9px] font-semibold uppercase tracking-[0.18em] mb-3 animate-fade-in">
+        {/* Badge near top on mobile */}
+        <div className="sm:hidden relative z-10 flex justify-center pt-4 pb-0 animate-fade-in">
+          <div className="hero-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[9px] font-semibold uppercase tracking-[0.18em]">
             <Zap size={9} /> {t("badgeHero")}
           </div>
+        </div>
+
+        {/* Mobile layout: title + subtitle centered in remaining space */}
+        <div className="sm:hidden flex-1 flex flex-col items-center justify-center px-5 text-center">
           <h1
-            className="hero-title font-display text-[1.9rem] font-bold tracking-tight mb-3 animate-fade-up"
+            className="hero-title font-display text-[2rem] font-bold tracking-tight mb-5 animate-fade-up"
             style={{ lineHeight: "1.1" }}
           >
             {t("heroTitle1")}<br />
             <span className="text-gradient-gold" style={{ lineHeight: "1.15" }}>{t("heroTitle2")}</span>
           </h1>
-          <p className="hero-sub text-sm leading-[1.55] animate-fade-up max-w-[340px]" style={{ opacity: 0.75 }}>
+          <p className="hero-sub text-sm leading-[1.65] animate-fade-up max-w-[340px]" style={{ opacity: 0.75 }}>
             {t("heroSubtitle")}
           </p>
         </div>
 
-        <div className="sm:hidden relative z-10 px-5 pb-5">
-          <div className="mb-2">
+        <div className="sm:hidden relative z-10 px-5 pb-6">
+          <div className="mb-3">
             <HeroSearch />
           </div>
           <div className="flex gap-2">

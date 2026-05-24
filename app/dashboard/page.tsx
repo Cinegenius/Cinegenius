@@ -1688,7 +1688,7 @@ export default function DashboardPage() {
                         <label className={`flex items-center gap-2 px-3 py-2 border border-border rounded-lg text-xs text-text-secondary hover:border-gold hover:text-gold transition-colors cursor-pointer ${editUploading ? "opacity-50 pointer-events-none" : ""}`}>
                           {editUploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
                           {editUploading ? "Wird hochgeladen…" : "Bild ändern"}
-                          <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadEditImage(f); }} />
+                          <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadEditImage(f); }} />
                         </label>
                         {editForm.image_url && (
                           <button onClick={() => setEditForm((p) => ({ ...p, image_url: "" }))} className="text-xs text-red-400 hover:text-red-300 transition-colors">Entfernen</button>

@@ -803,7 +803,7 @@ export default function CompanySetupPage() {
                   </button>
                 )}
               </div>
-              <input ref={portfolioRef} type="file" accept="image/*" multiple className="hidden" onChange={handlePortfolioUpload} />
+              <input ref={portfolioRef} type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={handlePortfolioUpload} />
             </div>
 
             {error && (

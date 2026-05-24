@@ -1254,7 +1254,7 @@ export default function ProfilePage() {
                       </div>
                     </div>
                   </div>
-                  <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+                  <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleAvatarChange} />
                 </div>
 
                 {/* Profilfotos — direkt unter Avatar */}
@@ -1263,7 +1263,7 @@ export default function ProfilePage() {
                     id="profile-images-input"
                     ref={profileImagesRef}
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp"
                     multiple
                     className="hidden"
                     onChange={handleProfileImagesUpload}
@@ -1360,7 +1360,7 @@ export default function ProfilePage() {
                       {coverUploading ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
                       {coverUploading ? t("uploading") : t("uploadCover")}
                     </button>
-                    <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleCoverChange} />
+                    <input ref={coverRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleCoverChange} />
                   </div>
                   {coverImagePreview ? (
                     <>
@@ -1833,7 +1833,7 @@ export default function ProfilePage() {
                             <label className={`flex items-center gap-2 px-3 py-2 bg-bg-secondary border border-dashed border-border rounded-lg cursor-pointer hover:border-gold transition-colors text-sm text-text-muted ${uploadingPoster ? "opacity-60 pointer-events-none" : ""}`}>
                               {uploadingPoster ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}
                               {uploadingPoster ? t("uploading") : t("labelPoster")}
-                              <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                              <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={async (e) => {
                                 const file = e.target.files?.[0];
                                 if (!file) return;
                                 setUploadingPoster(true);

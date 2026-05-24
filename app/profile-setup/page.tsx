@@ -147,7 +147,7 @@ export default function ProfileSetupPage() {
                   </div>
                 )}
               </button>
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatar} />
+              <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleAvatar} />
               <p className="text-xs text-text-muted">Profilfoto — optional</p>
             </div>
 

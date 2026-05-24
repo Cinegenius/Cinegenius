@@ -1059,7 +1059,7 @@ export default function InseratPage() {
                     ))}
                     <label className={`w-20 h-20 flex flex-col items-center justify-center rounded-lg border border-dashed border-border cursor-pointer hover:border-gold transition-colors text-text-muted text-xs ${locExtraUploading ? "opacity-60 pointer-events-none" : ""}`}>
                       {locExtraUploading ? <span className="animate-spin text-gold text-lg">⟳</span> : <><span className="text-2xl leading-none mb-1">+</span><span>Foto</span></>}
-                      <input type="file" accept="image/*" multiple className="hidden" onChange={async (e) => {
+                      <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={async (e) => {
                         const files = Array.from(e.target.files ?? []); if (!files.length) return;
                         setLocExtraUploading(true);
                         for (const file of files) {

@@ -1776,7 +1776,7 @@ function ImageModal({
         {/* Side panel */}
         <div className="md:w-2/5 flex flex-col max-h-[60vh] md:max-h-[90vh]">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
-            <p className="text-sm font-medium text-text-primary truncate">{image.caption || "Foto"}</p>
+            {image.caption && <p className="text-sm font-medium text-text-primary truncate">{image.caption}</p>}
             <button onClick={onClose} className="text-text-muted hover:text-text-primary ml-2 shrink-0"><X size={18} /></button>
           </div>
           {/* Comments scroll */}
