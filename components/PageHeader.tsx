@@ -39,13 +39,13 @@ export default function PageHeader({
 
       {/* Content */}
       <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-4 pb-5 sm:pt-8 sm:pb-8 max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 sm:gap-5">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-3"
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-2"
               style={{ background: g(0.10), border: `1px solid ${g(0.35)}` }}>
               <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: g(1) }}>{badge}</span>
             </div>
-            <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary leading-tight mb-2">
+            <h1 className="font-display text-xl sm:text-3xl lg:text-4xl font-bold text-text-primary leading-tight mb-1.5">
               {title}
               {titleHighlight && <> <span className="text-gradient-gold">{titleHighlight}</span></>}
             </h1>

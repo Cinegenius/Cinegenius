@@ -49,13 +49,13 @@ export default async function ProjectsPage() {
       </div>
 
       {/* Header */}
-      <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-8 pb-8 max-w-7xl mx-auto">
+      <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-4 pb-5 sm:pt-8 sm:pb-8 max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full mb-1.5">
               <span className="text-[11px] text-white/80 font-bold uppercase tracking-widest">{t("badge")}</span>
             </div>
-            <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight mb-2">
+            <h1 className="font-display text-xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight mb-1.5">
               {t("title").split("&")[0]}&amp; <span className="text-gradient-gold">{t("title").split("& ")[1]}</span>
             </h1>
             <p className="text-white/60 text-sm sm:text-base leading-relaxed max-w-xl">

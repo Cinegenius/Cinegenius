@@ -186,7 +186,7 @@ function JobDeptPanel({
           })}
         </div>
         <div className="p-3">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-1.5">
             <h3 className={`text-sm font-semibold ${activeDept.color}`}>{activeDept.label}</h3>
             {selectedDeptId === activeDeptId && (
               <button onClick={() => onSelectRole(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">{clearLabel}</button>
@@ -246,7 +246,7 @@ function JobDeptPanel({
           })}
         </div>
         <div className="flex-1 p-4 overflow-y-auto">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-1.5">
             <h3 className={`text-sm font-semibold ${activeDept.color}`}>{activeDept.label}</h3>
             {selectedDeptId === activeDeptId && (
               <button onClick={() => onSelectRole(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">{clearSelectionLabel}</button>
@@ -428,14 +428,14 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
         <div className="absolute -top-16 -right-16 w-[600px] h-[480px] rounded-full blur-[100px] pointer-events-none"
           style={{ background: "radial-gradient(ellipse at center, rgba(34,211,238,0.40), transparent 70%)" }} />
 
-        <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-8 pb-8 max-w-7xl mx-auto">
+        <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-4 pb-5 sm:pt-8 sm:pb-8 max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-3"
                 style={{ background: "rgba(34,211,238,0.10)", border: "1px solid rgba(34,211,238,0.35)" }}>
                 <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: "rgba(34,211,238,1)" }}>{t("heroBadge")}</span>
               </div>
-              <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary leading-tight mb-2">
+              <h1 className="font-display text-xl sm:text-3xl lg:text-4xl font-bold text-text-primary leading-tight mb-1.5">
                 {t("heroTitle")}{" "}
                 <span className="text-gradient-gold">{t("heroTitleHighlight")}</span>
               </h1>
@@ -741,7 +741,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
                   </div>
 
                   {/* Row 2: badges */}
-                  <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                  <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
                     <span className={`px-2 py-0.5 text-[10px] font-semibold rounded border ${jobTypeBadge.cls}`}>
                       {jobTypeBadge.label}
                     </span>
@@ -758,7 +758,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
 
                   {/* Row 3: description preview */}
                   {descPreview && (
-                    <p className="text-[11px] text-text-muted leading-relaxed line-clamp-1 mb-2">{descPreview}{descPreview.length === 120 ? "…" : ""}</p>
+                    <p className="text-[11px] text-text-muted leading-relaxed line-clamp-1 mb-1.5">{descPreview}{descPreview.length === 120 ? "…" : ""}</p>
                   )}
 
                   {/* Row 4: meta */}
