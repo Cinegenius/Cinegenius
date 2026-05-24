@@ -118,9 +118,9 @@ export default function CompanyDetail({
   const [joinError, setJoinError] = useState("");
   const [showAllTeam, setShowAllTeam] = useState(false);
 
-  const acceptedMembers = localMembers
-    .filter((m) => m.status === "accepted")
-    .sort((a, b) => (a.role === "owner" ? -1 : b.role === "owner" ? 1 : 0));
+  const acceptedMembers = localMembers.filter((m) => m.status === "accepted");
+  const managementMembers = acceptedMembers.filter((m) => m.role === "owner");
+  const regularMembers = acceptedMembers.filter((m) => m.role !== "owner");
   const pendingMembers = localMembers.filter((m) => m.status === "pending");
 
   async function handleJoinRequest() {
@@ -338,51 +338,74 @@ export default function CompanyDetail({
             {(acceptedMembers.length > 0 || isOwner) && (
               <section>
                 <SectionLabel>Team ({acceptedMembers.length})</SectionLabel>
-                <div className="bg-bg-secondary border border-border rounded-2xl overflow-hidden">
-                  <div className="grid grid-cols-[2fr_1fr_90px] gap-4 px-5 py-3 border-b border-border bg-bg-elevated">
-                    <span className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">Name</span>
-                    <span className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">Position</span>
-                    <span className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">Rolle</span>
-                  </div>
-                  <div className="divide-y divide-border">
-                    {(showAllTeam ? acceptedMembers : acceptedMembers.slice(0, 10)).map((m) => {
-                      const slug = m.profile?.slug ?? m.user_id;
-                      const name = m.profile?.display_name ?? "Unbekannt";
-                      const position = m.title ?? m.profile?.role ?? "—";
-                      const isCompanyOwner = m.role === "owner";
-                      return (
-                        <Link key={m.id} href={`/profile/${slug}`}
-                          className="grid grid-cols-[2fr_1fr_90px] gap-4 px-5 py-3.5 hover:bg-bg-elevated transition-colors group items-center">
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div className="relative shrink-0">
-                              <Avatar member={m} size={32} />
-                              {isCompanyOwner && (
-                                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-bg-primary border border-border flex items-center justify-center">
-                                  <Crown size={6} className="text-gold" />
+                <div className="space-y-4">
+
+                  {/* Management */}
+                  {managementMembers.length > 0 && (
+                    <div className="bg-bg-secondary border border-border rounded-2xl overflow-hidden">
+                      <div className="px-5 py-2.5 border-b border-border bg-bg-elevated flex items-center gap-2">
+                        <Crown size={10} className="text-gold" />
+                        <span className="text-[10px] uppercase tracking-widest font-semibold text-gold">Geschäftsführung</span>
+                      </div>
+                      <div className="divide-y divide-border">
+                        {managementMembers.map((m) => {
+                          const slug = m.profile?.slug ?? m.user_id;
+                          const name = m.profile?.display_name ?? "Unbekannt";
+                          const position = m.title ?? m.profile?.role ?? "—";
+                          return (
+                            <Link key={m.id} href={`/profile/${slug}`}
+                              className="grid grid-cols-[2fr_1fr] gap-4 px-5 py-3.5 hover:bg-bg-elevated transition-colors group items-center">
+                              <div className="flex items-center gap-3 min-w-0">
+                                <div className="relative shrink-0">
+                                  <Avatar member={m} size={32} />
+                                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-bg-primary border border-border flex items-center justify-center">
+                                    <Crown size={6} className="text-gold" />
+                                  </div>
                                 </div>
-                              )}
-                            </div>
-                            <span className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{name}</span>
-                          </div>
-                          <span className="text-sm text-text-secondary truncate">{position}</span>
-                          <div>
-                            {isCompanyOwner
-                              ? <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full border bg-gold/10 text-gold border-gold/25">Inhaber</span>
-                              : <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full border bg-bg-elevated text-text-muted border-border">Mitglied</span>
-                            }
-                          </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                  {acceptedMembers.length > 10 && (
-                    <button
-                      onClick={() => setShowAllTeam((v) => !v)}
-                      className="w-full px-5 py-3 border-t border-border bg-bg-secondary hover:bg-bg-elevated text-xs text-text-muted hover:text-gold transition-colors flex items-center justify-center gap-1.5"
-                    >
-                      <Users size={11} />
-                      {showAllTeam ? "Weniger anzeigen" : `Alle ${acceptedMembers.length} Mitglieder anzeigen`}
-                    </button>
+                                <span className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{name}</span>
+                              </div>
+                              <span className="text-sm text-text-secondary truncate">{position}</span>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Team */}
+                  {regularMembers.length > 0 && (
+                    <div className="bg-bg-secondary border border-border rounded-2xl overflow-hidden">
+                      <div className="px-5 py-2.5 border-b border-border bg-bg-elevated flex items-center gap-2">
+                        <Users size={10} className="text-text-muted" />
+                        <span className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">Mitarbeiter</span>
+                      </div>
+                      <div className="divide-y divide-border">
+                        {(showAllTeam ? regularMembers : regularMembers.slice(0, 10)).map((m) => {
+                          const slug = m.profile?.slug ?? m.user_id;
+                          const name = m.profile?.display_name ?? "Unbekannt";
+                          const position = m.title ?? m.profile?.role ?? "—";
+                          return (
+                            <Link key={m.id} href={`/profile/${slug}`}
+                              className="grid grid-cols-[2fr_1fr] gap-4 px-5 py-3.5 hover:bg-bg-elevated transition-colors group items-center">
+                              <div className="flex items-center gap-3 min-w-0">
+                                <Avatar member={m} size={32} />
+                                <span className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{name}</span>
+                              </div>
+                              <span className="text-sm text-text-secondary truncate">{position}</span>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                      {regularMembers.length > 10 && (
+                        <button
+                          onClick={() => setShowAllTeam((v) => !v)}
+                          className="w-full px-5 py-3 border-t border-border bg-bg-secondary hover:bg-bg-elevated text-xs text-text-muted hover:text-gold transition-colors flex items-center justify-center gap-1.5"
+                        >
+                          <Users size={11} />
+                          {showAllTeam ? "Weniger anzeigen" : `Alle ${regularMembers.length} Mitarbeiter anzeigen`}
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
 
