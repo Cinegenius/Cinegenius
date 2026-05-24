@@ -187,7 +187,7 @@ export default async function HomePage() {
       {/* ══════════════════════════════════════════════
           HERO
       ══════════════════════════════════════════════ */}
-      <section className="relative min-h-[80svh] sm:min-h-[88svh] flex flex-col overflow-hidden">
+      <section className="relative min-h-[80svh] sm:min-h-[82svh] flex flex-col overflow-hidden">
         <div className="hero-bg absolute inset-0 bg-cover bg-no-repeat" />
         <div
           className="absolute inset-0 hidden sm:block"
@@ -204,7 +204,7 @@ export default async function HomePage() {
           style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E\")" }}
         />
 
-        <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pt-16 sm:pt-[120px] lg:pt-[140px]">
+        <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pt-16 sm:pt-[90px] lg:pt-[100px]">
           <div className="max-w-[680px] mx-auto sm:mx-0 text-center sm:text-left">
             <div className="hero-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[9px] font-semibold uppercase tracking-[0.18em] mb-2 sm:mb-5 animate-fade-in">
               <Zap size={9} /> {t("badgeHero")}
