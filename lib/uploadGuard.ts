@@ -19,7 +19,7 @@
 // ---------------------------------------------------------------------------
 
 /** Maximum upload size in bytes. */
-export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5 MB
+export const MAX_UPLOAD_BYTES = 12 * 1024 * 1024; // 12 MB
 
 /**
  * Each entry maps a canonical MIME type to:

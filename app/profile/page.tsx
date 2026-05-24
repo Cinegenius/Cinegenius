@@ -731,7 +731,8 @@ export default function ProfilePage() {
     if (preview) setAvatarPreview(preview);
     setAvatarUploading(true);
     try {
-      const compressed = await compressAvatar(file);
+      let compressed: File = file;
+      try { compressed = await compressAvatar(file); } catch { /* use raw */ }
       const fd = new FormData();
       fd.append("file", compressed);
       const res = await fetch("/api/upload", { method: "POST", body: fd });
@@ -770,7 +771,8 @@ export default function ProfilePage() {
     const _cp = safeObjectURL(file); if (_cp) setCoverImagePreview(_cp);
     setCoverUploading(true);
     try {
-      const compressed = await compressImage(file, { maxWidth: 1920, maxHeight: 1080, quality: 0.85 });
+      let compressed: File = file;
+      try { compressed = await compressImage(file, { maxWidth: 1920, maxHeight: 1080, quality: 0.85 }); } catch { /* use raw */ }
       const fd = new FormData();
       fd.append("file", compressed);
       const res = await fetch("/api/upload", { method: "POST", body: fd });
@@ -987,9 +989,11 @@ export default function ProfilePage() {
     try {
       const uploaded: ProfileImage[] = [];
       for (const file of files) {
-        const compressed = await compressImage(file, { maxWidth: 1600, quality: 0.82 });
+        // Try to compress; if anything goes wrong (iOS canvas quirks, HEIC, etc.) use raw file
+        let toUpload: File = file;
+        try { toUpload = await compressImage(file, { maxWidth: 1600, quality: 0.82 }); } catch { /* use raw */ }
         const fd = new FormData();
-        fd.append("file", compressed);
+        fd.append("file", toUpload);
         const res = await fetch("/api/upload", { method: "POST", body: fd });
         const data = await res.json();
         if (!res.ok || data.error) throw new Error(data.error ?? `HTTP ${res.status}`);
