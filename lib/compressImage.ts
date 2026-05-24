@@ -79,11 +79,22 @@ async function tryCompress(
   });
 }
 
+/** MIME types for which URL.createObjectURL is known to throw on some iOS versions. */
+const SKIP_COMPRESS_TYPES = new Set(["image/heic", "image/heif", "image/heic-sequence", "image/heif-sequence"]);
+
 export async function compressImage(
   file: File | Blob,
   options: CompressOptions = {},
 ): Promise<File> {
   const { maxWidth = 1920, maxHeight = 1920, quality = 0.82 } = options;
+
+  // Skip canvas compression for HEIC/HEIF and files with no declared MIME type.
+  // URL.createObjectURL throws a DOMException for these on some iOS Safari versions,
+  // and on others the img element simply fails to load them — upload the original instead.
+  const mime = file instanceof File ? file.type : "";
+  if (!mime || SKIP_COMPRESS_TYPES.has(mime)) {
+    return file instanceof File ? file : new File([file], "image.bin", { type: mime });
+  }
 
   try {
     return await tryCompress(file, maxWidth, maxHeight, quality);

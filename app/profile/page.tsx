@@ -1007,7 +1007,9 @@ export default function ProfilePage() {
       addToast(t("photosSaved", { count: uploaded.length }), "success");
     } catch (err) {
       console.error("[photo upload]", err);
-      addToast(err instanceof Error ? err.message : t("uploadFailed"), "error");
+      // Never leak raw browser DOMException messages (e.g. iOS HEIC errors) to the user
+      const msg = err instanceof Error && err.message && !err.message.includes("did not match") ? err.message : t("uploadFailed");
+      addToast(msg, "error");
     } finally {
       setProfileUploading(false);
       if (profileImagesRef.current) profileImagesRef.current.value = "";
