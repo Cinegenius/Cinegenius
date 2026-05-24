@@ -404,24 +404,15 @@ function CompanyBadge({ membership }: { membership: CompanyMembership }) {
         className="block bg-bg-elevated border border-border rounded-2xl overflow-hidden hover:border-gold/40 transition-all group"
       >
         {/* Logo banner */}
-        <div className="relative h-24 bg-bg-secondary flex items-center justify-center">
+        <div className="relative h-24 bg-gradient-to-br from-bg-secondary to-bg-primary flex items-center justify-center">
           {co.logo_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={co.logo_url} alt={co.name} className="w-full h-full object-cover opacity-20" />
+            <img src={co.logo_url} alt={co.name} className="w-20 h-20 rounded-xl object-contain p-2" />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-gold/5 to-transparent" />
+            <div className="w-16 h-16 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shadow-xl">
+              <Building2 size={28} className="text-text-muted group-hover:text-gold transition-colors" />
+            </div>
           )}
-          {/* Logo centered */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            {co.logo_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={co.logo_url} alt={co.name} className="w-16 h-16 rounded-xl object-contain p-1 bg-bg-elevated border-2 border-white/10 shadow-xl" />
-            ) : (
-              <div className="w-16 h-16 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shadow-xl">
-                <Building2 size={28} className="text-text-muted group-hover:text-gold transition-colors" />
-              </div>
-            )}
-          </div>
         </div>
         {/* Info */}
         <div className="px-4 py-3 text-center border-t border-border/50">
