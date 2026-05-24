@@ -8,13 +8,21 @@ import { Film, Camera, Building2, TrendingUp, ArrowRight } from "lucide-react";
 const FALLBACKS = {
   film: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=80",
   freelance: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=800&q=80",
-  company: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
   location: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80",
 };
 
 function pick(pool: string[], fallback: string): string {
   if (pool.length === 0) return fallback;
   return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
 interface Props {
@@ -37,9 +45,9 @@ export default function AudienceCards({ pools, isLoggedIn, labels }: Props) {
   const images = useMemo(() => ({
     film: pick(pools.film, FALLBACKS.film),
     freelance: pick(pools.freelance, FALLBACKS.freelance),
-    company: pick(pools.company, FALLBACKS.company),
     location: pick(pools.location, FALLBACKS.location),
-  }), []);  // eslint-disable-line react-hooks/exhaustive-deps
+    companyLogos: shuffle(pools.company).slice(0, 6),
+  }), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const ctaHref = isLoggedIn ? "/dashboard" : "/sign-up";
 
@@ -52,6 +60,7 @@ export default function AudienceCards({ pools, isLoggedIn, labels }: Props) {
       href: "/marketplace",
       image: images.film,
       accent: "#c8f135",
+      logoMode: false,
     },
     {
       icon: Camera,
@@ -61,6 +70,7 @@ export default function AudienceCards({ pools, isLoggedIn, labels }: Props) {
       href: ctaHref,
       image: images.freelance,
       accent: "#60a5fa",
+      logoMode: false,
     },
     {
       icon: Building2,
@@ -68,8 +78,9 @@ export default function AudienceCards({ pools, isLoggedIn, labels }: Props) {
       desc: labels.companyDesc,
       cta: labels.companyCta,
       href: isLoggedIn ? "/company-setup" : "/sign-up?redirect=/company-setup",
-      image: images.company,
+      image: "",
       accent: "#f59e0b",
+      logoMode: true,
     },
     {
       icon: TrendingUp,
@@ -79,17 +90,40 @@ export default function AudienceCards({ pools, isLoggedIn, labels }: Props) {
       href: isLoggedIn ? "/inserat" : "/sign-up?redirect=/inserat",
       image: images.location,
       accent: "#c8f135",
+      logoMode: false,
     },
   ] as const;
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-      {cards.map(({ icon: Icon, title, desc, cta, href, image, accent }) => (
+      {cards.map(({ icon: Icon, title, desc, cta, href, image, accent, logoMode }) => (
         <Link key={title} href={href}
-          className="group relative rounded-xl lg:rounded-2xl overflow-hidden aspect-[3/4] lg:aspect-[3/4] block">
-          <Image src={image} alt={title} fill unoptimized
-            className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-            sizes="(max-width:640px) 50vw,25vw" />
+          className="group relative rounded-xl lg:rounded-2xl overflow-hidden aspect-[3/4] block">
+
+          {logoMode ? (
+            /* Company card: logo mosaic on dark background */
+            <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f0f1a]">
+              {images.companyLogos.length > 0 ? (
+                <div className="absolute inset-0 grid grid-cols-2 grid-rows-3 gap-px p-3 opacity-60 group-hover:opacity-80 transition-opacity duration-500">
+                  {images.companyLogos.map((logo, i) => (
+                    <div key={i} className="flex items-center justify-center p-2 bg-white/5 rounded-lg">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={logo} alt="" className="max-w-full max-h-full object-contain" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center opacity-10">
+                  <Building2 size={80} className="text-white" />
+                </div>
+              )}
+            </div>
+          ) : (
+            <Image src={image} alt={title} fill unoptimized
+              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+              sizes="(max-width:640px) 50vw,25vw" />
+          )}
+
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
           <div
             className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"

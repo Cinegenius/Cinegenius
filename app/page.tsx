@@ -62,10 +62,10 @@ async function getHomeData() {
     db.from("companies").select("id,slug,name,logo_url,city,categories").not("logo_url", "is", null).order("created_at", { ascending: false }).limit(12),
     db.from("projects").select("id,title,poster_url,year,type,director").not("poster_url", "is", null).order("created_at", { ascending: false }).limit(8),
     db.from("reviews").select("target_id, rating").eq("target_type", "user"),
-    db.from("profiles").select("cover_image_url").not("cover_image_url", "is", null).like("cover_image_url", "%supabase.co%").limit(20),
+    db.from("profiles").select("portfolio_images").not("portfolio_images", "is", null).like("portfolio_images::text", "%supabase.co%").limit(20),
     db.from("profiles").select("avatar_url").not("avatar_url", "is", null).like("avatar_url", "%supabase.co%").limit(20),
-    db.from("companies").select("portfolio_images").not("portfolio_images", "is", null).eq("published", true).limit(20),
-    db.from("listings").select("image_url").eq("type", "location").eq("published", true).not("image_url", "is", null).like("image_url", "%supabase.co%").limit(20),
+    db.from("companies").select("logo_url").not("logo_url", "is", null).like("logo_url", "%supabase.co%").eq("published", true).limit(12),
+    db.from("listings").select("image_url").in("type", ["location", "prop", "vehicle"]).eq("published", true).not("image_url", "is", null).like("image_url", "%supabase.co%").limit(20),
   ]);
 
   // Compute top-rated creator IDs from reviews (min 2 reviews)
@@ -169,11 +169,11 @@ async function getHomeData() {
   } catch { /* table may not exist yet */ }
 
   const audienceImagePools = {
-    film: (profileCovers ?? []).map((p: { cover_image_url: string }) => p.cover_image_url).filter(Boolean) as string[],
-    freelance: (profileAvatars ?? []).map((p: { avatar_url: string }) => p.avatar_url).filter(Boolean) as string[],
-    company: (companyPortfolios ?? [])
-      .flatMap((c: { portfolio_images: string[] | null }) => Array.isArray(c.portfolio_images) ? c.portfolio_images : [])
+    film: (profileCovers ?? [])
+      .flatMap((p: { portfolio_images: string[] | null }) => Array.isArray(p.portfolio_images) ? p.portfolio_images : [])
       .filter(Boolean) as string[],
+    freelance: (profileAvatars ?? []).map((p: { avatar_url: string }) => p.avatar_url).filter(Boolean) as string[],
+    company: (companyPortfolios ?? []).map((c: { logo_url: string }) => c.logo_url).filter(Boolean) as string[],
     location: (locationImagesRaw ?? []).map((l: { image_url: string }) => l.image_url).filter(Boolean) as string[],
   };
 
