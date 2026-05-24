@@ -46,7 +46,7 @@ export default function AudienceCards({ pools, isLoggedIn, labels }: Props) {
     film: pick(pools.film, FALLBACKS.film),
     freelance: pick(pools.freelance, FALLBACKS.freelance),
     location: pick(pools.location, FALLBACKS.location),
-    companyLogos: shuffle(pools.company).slice(0, 6),
+    companyLogos: shuffle(pools.company).slice(0, 4),
   }), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const ctaHref = isLoggedIn ? "/dashboard" : "/sign-up";
@@ -104,9 +104,9 @@ export default function AudienceCards({ pools, isLoggedIn, labels }: Props) {
             /* Company card: logo mosaic on dark background */
             <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f0f1a]">
               {images.companyLogos.length > 0 ? (
-                <div className="absolute inset-0 grid grid-cols-2 grid-rows-3 gap-px p-3 opacity-60 group-hover:opacity-80 transition-opacity duration-500">
-                  {images.companyLogos.map((logo, i) => (
-                    <div key={i} className="flex items-center justify-center p-2 bg-white/5 rounded-lg">
+                <div className="absolute top-12 left-3 right-3 bottom-24 grid grid-cols-2 grid-rows-2 gap-2 opacity-70 group-hover:opacity-90 transition-opacity duration-500">
+                  {images.companyLogos.slice(0, 4).map((logo, i) => (
+                    <div key={i} className="flex items-center justify-center p-3 bg-white/8 rounded-xl border border-white/10">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={logo} alt="" className="max-w-full max-h-full object-contain" />
                     </div>
