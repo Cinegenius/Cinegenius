@@ -62,7 +62,7 @@ async function getHomeData() {
     db.from("companies").select("id,slug,name,logo_url,city,categories").not("logo_url", "is", null).order("created_at", { ascending: false }).limit(12),
     db.from("projects").select("id,title,poster_url,year,type,director").not("poster_url", "is", null).order("created_at", { ascending: false }).limit(8),
     db.from("reviews").select("target_id, rating").eq("target_type", "user"),
-    db.from("profiles").select("portfolio_images").not("portfolio_images", "is", null).limit(30),
+    db.from("profiles").select("profile_images").not("profile_images", "is", null).limit(30),
     db.from("profiles").select("avatar_url").not("avatar_url", "is", null).like("avatar_url", "%supabase.co%").limit(20),
     db.from("companies").select("logo_url").not("logo_url", "is", null).like("logo_url", "%supabase.co%").eq("published", true).limit(12),
     db.from("listings").select("image_url").in("type", ["location", "prop", "vehicle"]).eq("published", true).not("image_url", "is", null).like("image_url", "%supabase.co%").limit(20),
@@ -170,7 +170,7 @@ async function getHomeData() {
 
   const audienceImagePools = {
     film: (profileCovers ?? [])
-      .flatMap((p: { portfolio_images: string[] | null }) => Array.isArray(p.portfolio_images) ? p.portfolio_images : [])
+      .flatMap((p: { profile_images: string[] | null }) => Array.isArray(p.profile_images) ? p.profile_images : [])
       .filter((url: string) => typeof url === "string" && url.includes("supabase.co")) as string[],
     freelance: (profileAvatars ?? []).map((p: { avatar_url: string }) => p.avatar_url).filter(Boolean) as string[],
     company: (companyPortfolios ?? []).map((c: { logo_url: string }) => c.logo_url).filter(Boolean) as string[],
@@ -249,7 +249,7 @@ export default async function HomePage() {
                 {ctaLabel} <ArrowRight size={13} />
               </Link>
               <Link href="/inserat"
-                className="inline-flex items-center justify-center gap-1.5 px-5 py-3 rounded-lg border border-white/25 text-white/70 font-medium hover:border-white/40 hover:text-white active:scale-[0.98] transition-all text-sm">
+                className="inline-flex items-center justify-center gap-1.5 px-5 py-3 rounded-lg border border-white/40 text-white/85 font-semibold hover:border-white/60 hover:text-white active:scale-[0.98] transition-all text-sm">
                 {t("ctaCreateListing")}
               </Link>
             </div>
@@ -292,7 +292,7 @@ export default async function HomePage() {
               {ctaLabel} <ArrowRight size={13} />
             </Link>
             <Link href="/inserat"
-              className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg border border-white/25 text-white/70 font-medium hover:border-white/40 hover:text-white active:scale-[0.98] transition-all text-sm">
+              className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg border border-white/40 text-white/85 font-semibold hover:border-white/60 hover:text-white active:scale-[0.98] transition-all text-sm">
               {t("ctaCreateListing")}
             </Link>
           </div>
@@ -448,12 +448,11 @@ export default async function HomePage() {
             <Image src="https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=85" alt="Film Set" fill
               className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-            <div className="absolute bottom-5 left-5">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold mb-2">
+            <div className="absolute bottom-4 left-4">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold mb-1.5">
                 <Film size={10} /> {t("showcaseFilm")}
               </span>
               <p className="text-white font-semibold text-sm">{t("showcaseFilmDesc")}</p>
-              <p className="text-white/60 text-xs mt-0.5">{t("showcaseFilmSub")}</p>
             </div>
           </Link>
           <Link href="/photo" className="relative rounded-2xl overflow-hidden group block">
