@@ -291,7 +291,6 @@ export default async function HomePage() {
                 icon: Film,
                 title: t("audienceFilmTitle"),
                 desc: t("audienceFilmDesc"),
-                items: [t("audienceFilmItem1"), t("audienceFilmItem2"), t("audienceFilmItem3"), t("audienceFilmItem4")],
                 cta: t("audienceFilmCta"),
                 href: "/locations",
                 highlight: false,
@@ -300,7 +299,6 @@ export default async function HomePage() {
                 icon: Camera,
                 title: t("audienceFreelanceTitle"),
                 desc: t("audienceFreelanceDesc"),
-                items: [t("audienceFreelanceItem1"), t("audienceFreelanceItem2"), t("audienceFreelanceItem3"), t("audienceFreelanceItem4")],
                 cta: isLoggedIn ? t("ctaDashboard") : t("audienceFreelanceCta"),
                 href: ctaHref,
                 highlight: false,
@@ -309,7 +307,6 @@ export default async function HomePage() {
                 icon: Building2,
                 title: t("audienceCompanyTitle"),
                 desc: t("audienceCompanyDesc"),
-                items: [t("audienceCompanyItem1"), t("audienceCompanyItem2"), t("audienceCompanyItem3"), t("audienceCompanyItem4")],
                 cta: t("audienceCompanyCta"),
                 href: "/company-setup",
                 highlight: false,
@@ -318,31 +315,24 @@ export default async function HomePage() {
                 icon: TrendingUp,
                 title: t("audiencePassiveTitle"),
                 desc: t("audiencePassiveDesc"),
-                items: [t("audiencePassiveItem1"), t("audiencePassiveItem2"), t("audiencePassiveItem3"), t("audiencePassiveItem4")],
                 cta: t("audiencePassiveCta"),
                 href: "/inserat",
                 highlight: true,
               },
-            ] as const).map(({ icon: Icon, title, desc, items, cta, href, highlight }) => (
-              <div key={title} className={`rounded-xl lg:rounded-2xl border p-3 lg:p-6 flex flex-col ${highlight ? "border-gold/25 bg-gold-subtle" : "border-border bg-bg-elevated"}`}>
-                <div className={`w-8 h-8 lg:w-10 lg:h-10 rounded-lg lg:rounded-xl flex items-center justify-center mb-2 lg:mb-4 ${highlight ? "bg-gold/10 border border-gold/20" : "bg-bg-hover border border-border-light"}`}>
-                  <Icon size={15} className={highlight ? "text-gold" : "text-text-secondary"} />
+            ] as const).map(({ icon: Icon, title, desc, cta, href, highlight }) => (
+              <div key={title} className={`rounded-xl lg:rounded-2xl border p-3 lg:p-5 flex flex-col gap-3 ${highlight ? "border-gold/25 bg-gold-subtle" : "border-border bg-bg-elevated"}`}>
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${highlight ? "bg-gold/10 border border-gold/20" : "bg-bg-hover border border-border-light"}`}>
+                  <Icon size={16} className={highlight ? "text-gold" : "text-text-secondary"} />
                 </div>
-                <h3 className="font-display text-xs lg:text-base font-bold text-text-primary mb-1 leading-tight">{title}</h3>
-                <p className="hidden lg:block text-xs text-text-muted mb-4 leading-relaxed">{desc}</p>
-                <ul className="hidden lg:block space-y-2 mb-6 flex-1">
-                  {items.map((item) => (
-                    <li key={item} className="flex items-start gap-1.5 text-xs text-text-secondary">
-                      <CheckCircle size={11} className={`shrink-0 mt-0.5 ${highlight ? "text-gold" : "text-success"}`} />
-                      <span className="leading-tight">{item}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="flex-1">
+                  <h3 className="font-display text-sm lg:text-base font-bold text-text-primary leading-tight mb-1">{title}</h3>
+                  <p className="text-[11px] lg:text-xs text-text-muted leading-relaxed">{desc}</p>
+                </div>
                 <Link
                   href={href}
-                  className={`mt-auto inline-flex items-center gap-1 lg:gap-2 px-2.5 lg:px-4 py-1.5 lg:py-2 text-[11px] lg:text-xs font-semibold rounded-lg transition-all ${highlight ? "bg-gold text-bg-primary hover:bg-gold-light" : "border border-border-light text-text-secondary hover:border-gold/40 hover:text-gold"}`}
+                  className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${highlight ? "bg-gold text-bg-primary hover:bg-gold-light" : "border border-border-light text-text-secondary hover:border-gold/40 hover:text-gold"}`}
                 >
-                  {cta} <ArrowRight size={10} />
+                  {cta} <ArrowRight size={11} />
                 </Link>
               </div>
             ))}
