@@ -70,9 +70,12 @@ export const metadata: Metadata = {
     description: "Locations mieten, Crew buchen, Equipment leihen — für Film, Social Media & Fotografie.",
   },
   icons: {
-    icon: "/icon.svg",
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon", type: "image/png", sizes: "64x64" },
+    ],
     shortcut: "/icon.svg",
-    apple: "/icon.svg",
+    apple: "/icon",
   },
   robots: {
     index: true,
