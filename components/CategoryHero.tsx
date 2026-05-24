@@ -21,7 +21,7 @@ type Props = {
 
 const GRAIN = "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
 const LIME = "194,241,53";
-const heights = { sm: "min-h-[220px]", md: "min-h-[280px]", lg: "min-h-[340px]" };
+const heights = { sm: "min-h-[160px]", md: "min-h-[200px]", lg: "min-h-[260px]" };
 
 export default function CategoryHero({
   badge, title, titleHighlight, description,
@@ -45,20 +45,20 @@ export default function CategoryHero({
         style={{ backgroundImage: GRAIN }} />
 
       {/* Content */}
-      <div className={`relative z-10 w-full px-6 sm:px-8 lg:px-12 py-6 flex flex-col ${isCenter ? "items-center text-center max-w-2xl mx-auto" : "items-start max-w-5xl"}`}>
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-3"
+      <div className={`relative z-10 w-full px-6 sm:px-8 lg:px-12 py-4 flex flex-col ${isCenter ? "items-center text-center max-w-2xl mx-auto" : "items-start max-w-5xl"}`}>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-2"
           style={{ background: g(0.10), border: `1px solid ${g(0.35)}` }}>
           <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: g(1) }}>{badge}</span>
         </div>
 
-        <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary leading-tight mb-2">
+        <h1 className="font-display text-xl sm:text-3xl lg:text-4xl font-bold text-text-primary leading-tight mb-1.5">
           {title}
           {titleHighlight && (
             <> <span className="text-gradient-gold">{titleHighlight}</span></>
           )}
         </h1>
 
-        <p className="text-text-secondary text-sm sm:text-base leading-relaxed mb-6 max-w-xl">
+        <p className="text-text-secondary text-sm sm:text-base leading-relaxed mb-3 max-w-xl">
           {description}
         </p>
 

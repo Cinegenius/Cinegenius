@@ -3750,3 +3750,39 @@ Run kill 46652 to stop it.
 ✓ Compiled in 212ms
 ✓ Compiled in 72ms
 ✓ Compiled in 73ms
+✓ Compiled in 213ms
+ GET /apple-touch-icon-precomposed.png 404 in 1742ms (next.js: 1499ms, application-code: 243ms)
+ GET /apple-touch-icon.png 404 in 1266ms (next.js: 717ms, application-code: 549ms)
+ GET /creators 200 in 2.7s (next.js: 1009ms, proxy.ts: 615ms, application-code: 1074ms)
+✓ Compiled in 365ms
+✓ Compiled in 71ms
+✓ Compiled in 84ms
+✓ Compiled in 299ms
+✓ Compiled in 56ms
+✓ Compiled in 71ms
+✓ Compiled in 68ms
+✓ Compiled in 74ms
+✓ Compiled in 64ms
+✓ Compiled in 146ms
+✓ Compiled in 69ms
+✓ Compiled in 110ms
+✓ Compiled in 74ms
+✓ Compiled in 156ms
+✓ Compiled in 157ms
+✓ Compiled in 159ms
+✓ Compiled in 149ms
+✓ Compiled in 116ms
+✓ Compiled in 151ms
+✓ Compiled in 107ms
+✓ Compiled in 227ms
+✓ Compiled in 135ms
+✓ Compiled in 384ms
+✓ Compiled in 517ms
+✓ Compiled in 167ms
+✓ Compiled in 56ms
+✓ Compiled in 72ms
+✓ Compiled in 219ms
+✓ Compiled in 135ms
+✓ Compiled in 71ms
+✓ Compiled in 85ms
+✓ Compiled in 173ms

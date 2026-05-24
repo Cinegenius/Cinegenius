@@ -187,7 +187,7 @@ export default async function HomePage() {
       {/* ══════════════════════════════════════════════
           HERO
       ══════════════════════════════════════════════ */}
-      <section className="relative min-h-[85svh] sm:min-h-[100svh] flex flex-col overflow-hidden">
+      <section className="relative min-h-[80svh] sm:min-h-[88svh] flex flex-col overflow-hidden">
         <div className="hero-bg absolute inset-0 bg-cover bg-no-repeat" />
         <div
           className="absolute inset-0 hidden sm:block"
@@ -204,7 +204,7 @@ export default async function HomePage() {
           style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E\")" }}
         />
 
-        <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pt-24 sm:pt-[160px] lg:pt-[180px]">
+        <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pt-20 sm:pt-[120px] lg:pt-[140px]">
           <div className="max-w-[680px] mx-auto sm:mx-0 text-center sm:text-left">
             <div className="hero-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[9px] font-semibold uppercase tracking-[0.18em] mb-3 sm:mb-5 animate-fade-in">
               <Zap size={9} /> {t("badgeHero")}
@@ -442,7 +442,7 @@ export default async function HomePage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
             {([
               {
                 icon: Film,
@@ -481,13 +481,13 @@ export default async function HomePage() {
                 highlight: true,
               },
             ] as const).map(({ icon: Icon, title, desc, items, cta, href, highlight }) => (
-              <div key={title} className={`rounded-xl lg:rounded-2xl border p-4 lg:p-6 flex flex-col ${highlight ? "border-gold/25 bg-gold-subtle" : "border-border bg-bg-elevated"}`}>
-                <div className={`w-9 h-9 lg:w-10 lg:h-10 rounded-lg lg:rounded-xl flex items-center justify-center mb-3 lg:mb-4 ${highlight ? "bg-gold/10 border border-gold/20" : "bg-bg-hover border border-border-light"}`}>
-                  <Icon size={16} className={highlight ? "text-gold" : "text-text-secondary"} />
+              <div key={title} className={`rounded-xl lg:rounded-2xl border p-3 lg:p-6 flex flex-col ${highlight ? "border-gold/25 bg-gold-subtle" : "border-border bg-bg-elevated"}`}>
+                <div className={`w-8 h-8 lg:w-10 lg:h-10 rounded-lg lg:rounded-xl flex items-center justify-center mb-2 lg:mb-4 ${highlight ? "bg-gold/10 border border-gold/20" : "bg-bg-hover border border-border-light"}`}>
+                  <Icon size={15} className={highlight ? "text-gold" : "text-text-secondary"} />
                 </div>
-                <h3 className="font-display text-sm lg:text-base font-bold text-text-primary mb-1 leading-tight">{title}</h3>
+                <h3 className="font-display text-xs lg:text-base font-bold text-text-primary mb-1 leading-tight">{title}</h3>
                 <p className="hidden lg:block text-xs text-text-muted mb-4 leading-relaxed">{desc}</p>
-                <ul className="space-y-1.5 lg:space-y-2 mb-3 lg:mb-6 flex-1">
+                <ul className="hidden lg:block space-y-2 mb-6 flex-1">
                   {items.map((item) => (
                     <li key={item} className="flex items-start gap-1.5 text-xs text-text-secondary">
                       <CheckCircle size={11} className={`shrink-0 mt-0.5 ${highlight ? "text-gold" : "text-success"}`} />
@@ -497,9 +497,9 @@ export default async function HomePage() {
                 </ul>
                 <Link
                   href={href}
-                  className={`inline-flex items-center gap-1.5 lg:gap-2 px-3 lg:px-4 py-2 text-xs font-semibold rounded-lg transition-all ${highlight ? "bg-gold text-bg-primary hover:bg-gold-light" : "border border-border-light text-text-secondary hover:border-gold/40 hover:text-gold"}`}
+                  className={`mt-auto inline-flex items-center gap-1 lg:gap-2 px-2.5 lg:px-4 py-1.5 lg:py-2 text-[11px] lg:text-xs font-semibold rounded-lg transition-all ${highlight ? "bg-gold text-bg-primary hover:bg-gold-light" : "border border-border-light text-text-secondary hover:border-gold/40 hover:text-gold"}`}
                 >
-                  {cta} <ArrowRight size={11} />
+                  {cta} <ArrowRight size={10} />
                 </Link>
               </div>
             ))}
@@ -650,19 +650,19 @@ export default async function HomePage() {
               {tc("viewAll")} <ArrowRight size={14} />
             </Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-x-6 gap-y-5">
             {companies.slice(0, 6).map((c) => (
-              <Link key={c.id} href={`/companies/${c.slug ?? c.id}`} className="card-hover group flex flex-col items-center text-center p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 transition-all gap-3">
-                <div className="w-14 h-14 rounded-xl border border-border bg-bg-elevated overflow-hidden flex items-center justify-center shrink-0">
+              <Link key={c.id} href={`/companies/${c.slug ?? c.id}`} className="card-hover group flex flex-col items-center text-center gap-2">
+                <div className="w-full h-10 overflow-hidden flex items-center justify-center">
                   {c.logo ? (
-                    <Image src={c.logo} alt={c.name} width={56} height={56} className="object-contain w-full h-full" />
+                    <Image src={c.logo} alt={c.name} width={120} height={40} className="object-contain max-h-full w-auto max-w-full opacity-70 group-hover:opacity-100 transition-opacity" />
                   ) : (
                     <Building2 size={22} className="text-text-muted" />
                   )}
                 </div>
                 <div className="min-w-0 w-full">
-                  <h3 className="font-semibold text-text-primary text-xs leading-snug truncate">{c.name}</h3>
-                  {c.city && <p className="text-[11px] text-text-muted truncate mt-0.5">{c.city}</p>}
+                  <h3 className="font-semibold text-text-secondary group-hover:text-text-primary text-[11px] leading-snug truncate transition-colors">{c.name}</h3>
+                  {c.city && <p className="text-[10px] text-text-muted truncate">{c.city}</p>}
                 </div>
               </Link>
             ))}
