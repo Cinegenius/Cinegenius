@@ -44,7 +44,9 @@ export async function GET() {
     return { ...c, otherName: p.display_name ?? "Unbekannt", otherAvatar: p.avatar_url ?? null };
   });
 
-  return NextResponse.json({ data: enriched });
+  return NextResponse.json({ data: enriched }, {
+    headers: { "Cache-Control": "no-store" },
+  });
 }
 
 // POST /api/conversations — neue Konversation starten + erste Nachricht

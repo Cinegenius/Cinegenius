@@ -73,7 +73,7 @@ function MessagesContent() {
 
   const loadConversations = useCallback(async () => {
     try {
-      const res = await fetch("/api/conversations");
+      const res = await fetch("/api/conversations", { cache: "no-store" });
       if (!res.ok) throw new Error("fetch failed");
       const { data } = await res.json();
       setConversations(Array.isArray(data) ? data as Conversation[] : []);
@@ -135,10 +135,19 @@ function MessagesContent() {
 
   async function loadMessages(convId: string) {
     try {
-      const res = await fetch(`/api/conversations/${convId}`);
+      const res = await fetch(`/api/conversations/${convId}`, { cache: "no-store" });
       if (!res.ok) return;
       const { messages: msgs } = await res.json();
       setMessages(msgs ?? []);
+      // Immediately clear unread badge in sidebar without waiting for a full list reload
+      setConversations(prev => prev.map(c =>
+        c.id !== convId ? c : {
+          ...c,
+          messages: (c.messages ?? []).map(m =>
+            m.sender_id === user?.id ? m : { ...m, read_at: m.read_at ?? new Date().toISOString() }
+          ),
+        }
+      ));
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
     } catch { /* silent */ }
   }
