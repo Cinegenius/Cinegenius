@@ -217,7 +217,7 @@ export default async function HomePage() {
               <span className="text-gradient-gold" style={{ lineHeight: "1.15" }}>{t("heroTitle2")}</span>
             </h1>
             <p
-              className="hero-sub hidden sm:block text-sm sm:text-lg mb-4 sm:mb-10 leading-[1.55] animate-fade-up max-w-[440px] sm:max-w-[500px] mx-auto sm:mx-0"
+              className="hero-sub text-xs sm:text-lg mb-3 sm:mb-10 leading-[1.5] animate-fade-up max-w-[440px] sm:max-w-[500px] mx-auto sm:mx-0 line-clamp-2 sm:line-clamp-none"
               style={{ opacity: 0.75 }}
             >
               {t("heroSubtitle")}
