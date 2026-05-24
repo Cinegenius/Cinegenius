@@ -238,8 +238,11 @@ export default async function HomePage() {
 
         <div className="hidden sm:block flex-1" />
 
-        {/* Mobile layout: vertically centered text + bottom search */}
-        <div className="sm:hidden flex-1 flex flex-col items-center justify-center px-5 pt-16 text-center">
+        {/* Nav clearance on mobile */}
+        <div className="sm:hidden h-16 shrink-0" />
+
+        {/* Mobile layout: truly centered in remaining space */}
+        <div className="sm:hidden flex-1 flex flex-col items-center justify-center px-5 text-center">
           <div className="hero-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[9px] font-semibold uppercase tracking-[0.18em] mb-3 animate-fade-in">
             <Zap size={9} /> {t("badgeHero")}
           </div>
@@ -250,7 +253,7 @@ export default async function HomePage() {
             {t("heroTitle1")}<br />
             <span className="text-gradient-gold" style={{ lineHeight: "1.15" }}>{t("heroTitle2")}</span>
           </h1>
-          <p className="hero-sub text-sm leading-[1.55] animate-fade-up max-w-[360px]" style={{ opacity: 0.75 }}>
+          <p className="hero-sub text-sm leading-[1.55] animate-fade-up max-w-[340px]" style={{ opacity: 0.75 }}>
             {t("heroSubtitle")}
           </p>
         </div>
