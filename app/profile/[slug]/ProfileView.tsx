@@ -401,21 +401,36 @@ function CompanyBadge({ membership }: { membership: CompanyMembership }) {
       </div>
       <Link
         href={`/companies/${co.slug}`}
-        className="flex items-center gap-3 p-3 bg-bg-elevated border border-border rounded-xl hover:border-gold/40 transition-all group"
+        className="block bg-bg-elevated border border-border rounded-2xl overflow-hidden hover:border-gold/40 transition-all group"
       >
-        {co.logo_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={co.logo_url} alt={co.name} className="w-10 h-10 rounded-lg object-cover border border-border shrink-0" />
-        ) : (
-          <div className="w-10 h-10 rounded-lg bg-bg-secondary border border-border flex items-center justify-center shrink-0">
-            <Building2 size={18} className="text-text-muted group-hover:text-gold" />
+        {/* Logo banner */}
+        <div className="relative h-24 bg-bg-secondary flex items-center justify-center">
+          {co.logo_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={co.logo_url} alt={co.name} className="w-full h-full object-cover opacity-20" />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-gold/5 to-transparent" />
+          )}
+          {/* Logo centered */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            {co.logo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={co.logo_url} alt={co.name} className="w-16 h-16 rounded-xl object-cover border-2 border-white/10 shadow-xl" />
+            ) : (
+              <div className="w-16 h-16 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shadow-xl">
+                <Building2 size={28} className="text-text-muted group-hover:text-gold transition-colors" />
+              </div>
+            )}
           </div>
-        )}
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{co.name}</p>
-          {roleLabel && <p className="text-xs text-text-muted truncate">{roleLabel}</p>}
         </div>
-        <ExternalLink size={12} className="text-text-muted shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+        {/* Info */}
+        <div className="px-4 py-3 text-center border-t border-border/50">
+          <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{co.name}</p>
+          {roleLabel && <p className="text-[11px] text-text-muted mt-0.5 truncate">{roleLabel}</p>}
+          <p className="text-[10px] text-gold/60 mt-1.5 flex items-center justify-center gap-1">
+            <ExternalLink size={9} /> Unternehmensprofil
+          </p>
+        </div>
       </Link>
     </div>
   );
