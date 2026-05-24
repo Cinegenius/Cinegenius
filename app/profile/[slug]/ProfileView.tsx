@@ -1494,7 +1494,14 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
               </div>
             )}
 
-            {/* Lizenzen & Zertifikate — moved below links */}
+            {/* Company badge — mobile only, before Lizenzen */}
+            {companyMembership?.companies && (
+              <div className="sm:hidden">
+                <CompanyBadge membership={companyMembership} />
+              </div>
+            )}
+
+            {/* Lizenzen & Zertifikate */}
             {certificates.length > 0 && (
               <div>
                 <div className="flex items-center gap-2 mb-2.5">
@@ -1511,7 +1518,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 
             </div>{/* end flex-1 info */}
             {companyMembership?.companies && (
-              <div className="sm:w-44 sm:shrink-0">
+              <div className="hidden sm:block sm:w-44 sm:shrink-0">
                 <CompanyBadge membership={companyMembership} />
               </div>
             )}
