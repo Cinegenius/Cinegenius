@@ -151,7 +151,7 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
       </button>
 
       {reportOpen && (
-        <div className="absolute right-0 bottom-10 z-50 bg-[#1e2028] border border-white/10 rounded-xl shadow-2xl py-1 w-52">
+        <div className="absolute right-0 top-full mt-2 z-50 bg-[#1e2028] border border-white/10 rounded-xl shadow-2xl py-1 w-52">
           <button
             onClick={() => { toggleBlock(); setReportOpen(false); }}
             disabled={blockLoading}
@@ -1313,7 +1313,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
       {lightbox && <Lightbox src={lightbox} onClose={() => setLightbox(null)} />}
 
       {/* Hero */}
-      <section className="relative overflow-hidden">
+      <section className="relative">
         {bgImage ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
