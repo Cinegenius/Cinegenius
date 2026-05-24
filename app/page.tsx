@@ -448,68 +448,56 @@ export default async function HomePage() {
             <Image src="https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=85" alt="Film Set" fill
               className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-            <div className="absolute bottom-4 left-4">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold mb-1.5">
-                <Film size={10} /> {t("showcaseFilm")}
-              </span>
-              <p className="text-white font-semibold text-sm">{t("showcaseFilmDesc")}</p>
-            </div>
+            <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold">
+              <Film size={10} /> {t("showcaseFilm")}
+            </span>
+            <p className="absolute bottom-3 left-3 right-3 text-white font-semibold text-sm line-clamp-2">{t("showcaseFilmDesc")}</p>
           </Link>
           <Link href="/photo" className="relative rounded-2xl overflow-hidden group block">
             <Image src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=800&q=85" alt="Fotoshooting" fill
               className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
-            <div className="absolute bottom-4 left-4">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold mb-1.5">
-                <Camera size={10} /> {t("showcasePhoto")}
-              </span>
-              <p className="text-white font-semibold text-sm">{t("showcasePhotoDesc")}</p>
-            </div>
+            <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold">
+              <Camera size={10} /> {t("showcasePhoto")}
+            </span>
+            <p className="absolute bottom-3 left-3 right-3 text-white font-semibold text-sm line-clamp-2">{t("showcasePhotoDesc")}</p>
           </Link>
           <Link href="/social-media" className="relative rounded-2xl overflow-hidden group block">
             <Image src="https://images.unsplash.com/photo-1683721003111-070bcc053d8b?w=800&q=85" alt="Social Media" fill
               className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
-            <div className="absolute bottom-4 left-4">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold mb-1.5">
-                <Zap size={10} /> {t("showcaseSocial")}
-              </span>
-              <p className="text-white font-semibold text-sm">{t("showcaseSocialDesc")}</p>
-            </div>
+            <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold">
+              <Zap size={10} /> {t("showcaseSocial")}
+            </span>
+            <p className="absolute bottom-3 left-3 right-3 text-white font-semibold text-sm line-clamp-2">{t("showcaseSocialDesc")}</p>
           </Link>
           <Link href="/companies" className="relative rounded-2xl overflow-hidden group block">
             <Image src="https://images.unsplash.com/photo-1557858310-9052820906f7?w=800&q=85" alt="Werbung" fill
               className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
-            <div className="absolute bottom-4 left-4">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold mb-1.5">
-                <TrendingUp size={10} /> {t("showcaseAds")}
-              </span>
-              <p className="text-white font-semibold text-sm">{t("showcaseAdsDesc")}</p>
-            </div>
+            <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold">
+              <TrendingUp size={10} /> {t("showcaseAds")}
+            </span>
+            <p className="absolute bottom-3 left-3 right-3 text-white font-semibold text-sm line-clamp-2">{t("showcaseAdsDesc")}</p>
           </Link>
           <Link href="/bts" className="relative rounded-2xl overflow-hidden group block">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={btsImage ?? "https://plus.unsplash.com/premium_photo-1682001110037-50545d73acfa?w=800&q=85"} alt="Behind the scenes"
               className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
-            <div className="absolute bottom-4 left-4">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold mb-1.5">
-                <Play size={10} /> {t("showcaseBts")}
-              </span>
-              <p className="text-white font-semibold text-sm">{t("showcaseBtsDesc")}</p>
-            </div>
+            <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold">
+              <Play size={10} /> {t("showcaseBts")}
+            </span>
+            <p className="absolute bottom-3 left-3 right-3 text-white font-semibold text-sm line-clamp-2">{t("showcaseBtsDesc")}</p>
           </Link>
           <Link href="/tiere" className="relative rounded-2xl overflow-hidden group block">
             <Image src="/tier.jpg" alt="Film-Tiere" fill
               className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" sizes="(max-width:1024px) 50vw,33vw" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
-            <div className="absolute bottom-4 left-4">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold mb-1.5">
-                <PawPrint size={10} /> Film-Tiere
-              </span>
-              <p className="text-white font-semibold text-sm">Hunde, Pferde & Exoten</p>
-            </div>
+            <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold/20 backdrop-blur-sm border border-gold/30 rounded-full text-gold text-xs font-semibold">
+              <PawPrint size={10} /> Film-Tiere
+            </span>
+            <p className="absolute bottom-3 left-3 right-3 text-white font-semibold text-sm line-clamp-2">Hunde, Pferde & Exoten</p>
           </Link>
         </div>
       </section>
