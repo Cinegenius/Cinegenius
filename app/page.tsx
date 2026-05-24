@@ -296,7 +296,8 @@ export default async function HomePage() {
                 desc: t("audienceFilmDesc"),
                 cta: t("audienceFilmCta"),
                 href: "/locations",
-                highlight: false,
+                image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=80",
+                accent: "#c8f135",
               },
               {
                 icon: Camera,
@@ -304,7 +305,8 @@ export default async function HomePage() {
                 desc: t("audienceFreelanceDesc"),
                 cta: isLoggedIn ? t("ctaDashboard") : t("audienceFreelanceCta"),
                 href: ctaHref,
-                highlight: false,
+                image: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=800&q=80",
+                accent: "#60a5fa",
               },
               {
                 icon: Building2,
@@ -312,7 +314,8 @@ export default async function HomePage() {
                 desc: t("audienceCompanyDesc"),
                 cta: t("audienceCompanyCta"),
                 href: "/company-setup",
-                highlight: false,
+                image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
+                accent: "#f59e0b",
               },
               {
                 icon: TrendingUp,
@@ -320,24 +323,33 @@ export default async function HomePage() {
                 desc: t("audiencePassiveDesc"),
                 cta: t("audiencePassiveCta"),
                 href: "/inserat",
-                highlight: true,
+                image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80",
+                accent: "#c8f135",
               },
-            ] as const).map(({ icon: Icon, title, desc, cta, href, highlight }) => (
-              <div key={title} className={`rounded-xl lg:rounded-2xl border p-3 lg:p-5 flex flex-col gap-3 ${highlight ? "border-gold/25 bg-gold-subtle" : "border-border bg-bg-elevated"}`}>
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${highlight ? "bg-gold/10 border border-gold/20" : "bg-bg-hover border border-border-light"}`}>
-                  <Icon size={16} className={highlight ? "text-gold" : "text-text-secondary"} />
+            ] as const).map(({ icon: Icon, title, desc, cta, href, image, accent }) => (
+              <Link key={title} href={href}
+                className="group relative rounded-xl lg:rounded-2xl overflow-hidden aspect-[3/4] lg:aspect-[3/4] block">
+                <Image src={image} alt={title} fill unoptimized
+                  className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                  sizes="(max-width:640px) 50vw,25vw" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: `linear-gradient(to top, ${accent}40, transparent 60%)` }}
+                />
+                <div className="absolute top-3 left-3 w-8 h-8 rounded-lg flex items-center justify-center backdrop-blur-sm border border-white/10"
+                  style={{ backgroundColor: `${accent}25` }}>
+                  <Icon size={14} style={{ color: accent }} />
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-display text-sm lg:text-base font-bold text-text-primary leading-tight mb-1">{title}</h3>
-                  <p className="text-[11px] lg:text-xs text-text-muted leading-relaxed">{desc}</p>
+                <div className="absolute bottom-0 left-0 right-0 p-3 lg:p-4">
+                  <h3 className="font-display text-sm lg:text-base font-bold text-white leading-tight mb-1">{title}</h3>
+                  <p className="text-white/60 text-[11px] leading-snug hidden sm:block mb-2">{desc}</p>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold transition-colors"
+                    style={{ color: accent }}>
+                    {cta} <ArrowRight size={10} />
+                  </span>
                 </div>
-                <Link
-                  href={href}
-                  className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${highlight ? "bg-gold text-bg-primary hover:bg-gold-light" : "border border-border-light text-text-secondary hover:border-gold/40 hover:text-gold"}`}
-                >
-                  {cta} <ArrowRight size={11} />
-                </Link>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
