@@ -91,20 +91,6 @@ const listingTypeLabel: Record<string, string> = {
   job: "Job", prop: "Requisite", vehicle: "Fahrzeug", location: "Location", service: "Service",
 };
 
-const INDUSTRY_COLORS: Record<string, string> = {
-  "Film":            "bg-blue-500/10 text-blue-400 border-blue-500/25",
-  "Werbung":         "bg-purple-500/10 text-purple-400 border-purple-500/25",
-  "Serie":           "bg-indigo-500/10 text-indigo-400 border-indigo-500/25",
-  "Musikvideo":      "bg-pink-500/10 text-pink-400 border-pink-500/25",
-  "Social Content":  "bg-emerald-500/10 text-emerald-400 border-emerald-500/25",
-  "Dokumentarfilm":  "bg-amber-500/10 text-amber-400 border-amber-500/25",
-  "Event":           "bg-orange-500/10 text-orange-400 border-orange-500/25",
-  "Theater":         "bg-rose-500/10 text-rose-400 border-rose-500/25",
-  "Animation":       "bg-cyan-500/10 text-cyan-400 border-cyan-500/25",
-  "VFX / Post":      "bg-violet-500/10 text-violet-400 border-violet-500/25",
-  "Fotografie":      "bg-teal-500/10 text-teal-400 border-teal-500/25",
-  "Corporate Video": "bg-slate-500/10 text-slate-300 border-slate-500/25",
-};
 
 export default function CompanyDetail({
   company, listings, members, services, equipment, myMembership, currentUserId,
@@ -210,7 +196,7 @@ export default function CompanyDetail({
             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-bg-primary border border-border flex items-center justify-center shrink-0 overflow-hidden shadow-xl">
               {company.logo_url
                 // eslint-disable-next-line @next/next/no-img-element
-                ? <img src={company.logo_url} alt={company.name} className="w-full h-full object-contain p-2" />
+                ? <img src={company.logo_url} alt={company.name} className="w-full h-full object-contain p-2" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                 : <Building2 size={28} className="text-text-muted/50" />
               }
             </div>
@@ -246,7 +232,7 @@ export default function CompanyDetail({
           {company.industry_focus?.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-4">
               {company.industry_focus.map((f) => (
-                <span key={f} className={`px-2.5 py-1 text-xs font-medium rounded-full border ${INDUSTRY_COLORS[f] ?? "bg-bg-elevated text-text-muted border-border"}`}>
+                <span key={f} className="px-2.5 py-1 text-xs font-medium rounded-full border bg-bg-elevated text-text-secondary border-border">
                   {f}
                 </span>
               ))}
