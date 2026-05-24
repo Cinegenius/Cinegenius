@@ -2,8 +2,10 @@
  * Client-side image compression via Canvas API.
  * Resizes and converts to WebP before upload — no extra packages needed.
  *
- * Falls back to the original file if the browser cannot compress
- * (e.g. Safari < 16.4 without WebP encoding, HEIC files on old iOS).
+ * Uses FileReader instead of URL.createObjectURL so that iOS Safari never
+ * throws "The string did not match the expected pattern." — a DOMException
+ * that occurs when iOS labels a HEIC file as JPEG before the conversion is
+ * complete and the blob URL mechanism can't handle the raw bytes.
  */
 
 interface CompressOptions {
@@ -12,24 +14,29 @@ interface CompressOptions {
   quality?: number; // 0–1
 }
 
+function readAsDataURL(file: File | Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target?.result as string);
+    reader.onerror = () => reject(new Error("File read failed"));
+    reader.readAsDataURL(file);
+  });
+}
+
 async function tryCompress(
   file: File | Blob,
   maxWidth: number,
   maxHeight: number,
   quality: number,
 ): Promise<File> {
-  // Call createObjectURL BEFORE entering the Promise constructor.
-  // On older iOS Safari, DOMExceptions thrown inside `new Promise()` constructors
-  // are not reliably converted to rejections — they escape as uncaught errors.
-  // Calling it here makes the throw a normal async throw that await/catch handles correctly.
-  const url = URL.createObjectURL(file);
+  // FileReader.readAsDataURL triggers the actual HEIC→JPEG conversion on iOS,
+  // so img.src never sees raw HEIC bytes — no DOMException possible.
+  const dataUrl = await readAsDataURL(file);
 
   return new Promise((resolve, reject) => {
     const img = new Image();
 
     img.onload = () => {
-      URL.revokeObjectURL(url);
-
       let { width, height } = img;
       if (width > maxWidth || height > maxHeight) {
         const ratio = Math.min(maxWidth / width, maxHeight / height);
@@ -54,10 +61,17 @@ async function tryCompress(
         resolve(new File([blob], `${baseName}.${ext}`, { type: mime }));
       };
 
-      // Safari < 16.4 throws synchronously for 'image/webp' — fall back to JPEG.
+      // Safari < 16.4 does not support WebP encoding — fall back to JPEG.
       try {
         canvas.toBlob(
-          (blob) => finish(blob, "webp", "image/webp"),
+          (blob) => {
+            if (!blob) {
+              // WebP not supported (iOS < 16.4) — try JPEG
+              canvas.toBlob((b) => finish(b, "jpg", "image/jpeg"), "image/jpeg", quality);
+            } else {
+              finish(blob, "webp", "image/webp");
+            }
+          },
           "image/webp",
           quality,
         );
@@ -70,17 +84,11 @@ async function tryCompress(
       }
     };
 
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Image load failed"));
-    };
+    img.onerror = () => reject(new Error("Image load failed"));
 
-    img.src = url;
+    img.src = dataUrl;
   });
 }
-
-/** MIME types for which URL.createObjectURL is known to throw on some iOS versions. */
-const SKIP_COMPRESS_TYPES = new Set(["image/heic", "image/heif", "image/heic-sequence", "image/heif-sequence"]);
 
 export async function compressImage(
   file: File | Blob,
@@ -88,19 +96,10 @@ export async function compressImage(
 ): Promise<File> {
   const { maxWidth = 1920, maxHeight = 1920, quality = 0.82 } = options;
 
-  // Skip canvas compression for HEIC/HEIF and files with no declared MIME type.
-  // URL.createObjectURL throws a DOMException for these on some iOS Safari versions,
-  // and on others the img element simply fails to load them — upload the original instead.
-  const mime = file instanceof File ? file.type : "";
-  if (!mime || SKIP_COMPRESS_TYPES.has(mime)) {
-    return file instanceof File ? file : new File([file], "image.bin", { type: mime });
-  }
-
   try {
     return await tryCompress(file, maxWidth, maxHeight, quality);
   } catch {
-    // Compression not possible on this browser/file type — upload original.
-    // The server's size + magic-byte validation still applies.
+    // Compression failed — upload original. Server validates size + magic bytes.
     if (file instanceof File) return file;
     return new File([file], "image.jpg", { type: "image/jpeg" });
   }
@@ -113,7 +112,7 @@ export function compressAvatar(file: File | Blob): Promise<File> {
 
 /**
  * Safe wrapper around URL.createObjectURL — returns null instead of throwing.
- * iOS Safari throws "The string did not match the expected pattern." for HEIC/HEIF.
+ * Used only for instant preview; errors are silently ignored.
  */
 export function safeObjectURL(file: File | Blob): string | null {
   try {
