@@ -407,7 +407,7 @@ function CompanyBadge({ membership }: { membership: CompanyMembership }) {
         <div className="relative h-24 bg-gradient-to-br from-bg-secondary to-bg-primary flex items-center justify-center">
           {co.logo_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={co.logo_url} alt={co.name} className="w-20 h-20 rounded-xl object-contain p-2" />
+            <img src={co.logo_url} alt={co.name} className="w-full h-full object-contain p-3" />
           ) : (
             <div className="w-16 h-16 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shadow-xl">
               <Building2 size={28} className="text-text-muted group-hover:text-gold transition-colors" />

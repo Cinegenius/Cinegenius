@@ -391,7 +391,7 @@ function CompanyCard({ company }: { company: Company }) {
       className="card-hover group block bg-bg-secondary border border-border rounded-2xl p-4">
       {/* Header: logo + name + city */}
       <div className="flex items-start gap-3 mb-3">
-        <div className="w-12 h-12 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shrink-0 overflow-hidden">
+        <div className="w-20 h-12 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shrink-0 overflow-hidden">
           {company.logo_url
             // eslint-disable-next-line @next/next/no-img-element
             ? <img src={company.logo_url} alt={company.name} className="w-full h-full object-contain p-1" />

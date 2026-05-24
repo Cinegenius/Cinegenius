@@ -193,10 +193,10 @@ export default function CompanyDetail({
           {/* Logo + Name */}
           <div className="flex items-start gap-4 sm:gap-5 mb-5">
             {/* Logo */}
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-bg-primary border border-border flex items-center justify-center shrink-0 overflow-hidden shadow-xl">
+            <div className="w-24 h-16 sm:w-32 sm:h-20 rounded-2xl bg-bg-primary border border-border flex items-center justify-center shrink-0 overflow-hidden shadow-xl">
               {company.logo_url
                 // eslint-disable-next-line @next/next/no-img-element
-                ? <img src={company.logo_url} alt={company.name} className="w-full h-full object-contain p-2" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                ? <img src={company.logo_url} alt={company.name} className="w-full h-full object-contain p-1.5" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                 : <Building2 size={28} className="text-text-muted/50" />
               }
             </div>
@@ -230,13 +230,9 @@ export default function CompanyDetail({
 
           {/* Industry focus */}
           {company.industry_focus?.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-4">
-              {company.industry_focus.map((f) => (
-                <span key={f} className="px-2.5 py-1 text-xs font-medium rounded-full border bg-bg-elevated text-text-secondary border-border">
-                  {f}
-                </span>
-              ))}
-            </div>
+            <p className="text-xs text-text-muted mb-4 leading-relaxed">
+              {company.industry_focus.join(" · ")}
+            </p>
           )}
 
           {/* Meta row */}

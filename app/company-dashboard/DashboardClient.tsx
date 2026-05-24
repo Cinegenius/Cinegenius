@@ -67,7 +67,7 @@ export default function DashboardClient({ company }: { company: Company }) {
         {/* Company identity */}
         <div className="p-4 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-bg-elevated border border-border overflow-hidden flex items-center justify-center shrink-0">
+            <div className="w-14 h-9 rounded-lg bg-bg-elevated border border-border overflow-hidden flex items-center justify-center shrink-0">
               {company.logo_url
                 ? <img src={company.logo_url} alt="" className="w-full h-full object-contain p-1" /> // eslint-disable-line @next/next/no-img-element
                 : <Building2 size={16} className="text-text-muted" />
