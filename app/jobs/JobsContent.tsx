@@ -598,7 +598,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
       </div>
 
       {/* ── Results ──────────────────────────────────────── */}
-      <div className="px-4 sm:px-6 lg:px-8 py-8">
+      <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <div className="flex gap-8 items-start">
 
           {/* Left sidebar */}

@@ -78,7 +78,7 @@ export default function VehiclesContent({ serverVehicles }: { serverVehicles: Ve
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <div className="flex flex-col lg:flex-row gap-8">
           <aside className={`lg:w-60 shrink-0 ${showFilters ? "block" : "hidden lg:block"}`}>
             <div className="sticky top-24 space-y-6">

@@ -242,7 +242,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
       </div>
 
       {/* ── Results ──────────────────────────────────────── */}
-      <div className="px-4 sm:px-6 lg:px-8 py-6">
+      <div className="px-4 sm:px-6 lg:px-8 py-3 sm:py-6">
         <div className="flex gap-8 items-start">
 
           {/* Sidebar */}
