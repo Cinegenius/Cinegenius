@@ -18,17 +18,14 @@ async function tryCompress(
   maxHeight: number,
   quality: number,
 ): Promise<File> {
+  // Call createObjectURL BEFORE entering the Promise constructor.
+  // On older iOS Safari, DOMExceptions thrown inside `new Promise()` constructors
+  // are not reliably converted to rejections — they escape as uncaught errors.
+  // Calling it here makes the throw a normal async throw that await/catch handles correctly.
+  const url = URL.createObjectURL(file);
+
   return new Promise((resolve, reject) => {
     const img = new Image();
-
-    let url: string;
-    try {
-      url = URL.createObjectURL(file);
-    } catch (e) {
-      // Safari throws "The string did not match the expected pattern." for
-      // HEIC/HEIF files or files with an unrecognised MIME type.
-      return reject(e);
-    }
 
     img.onload = () => {
       URL.revokeObjectURL(url);

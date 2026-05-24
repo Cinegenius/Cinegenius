@@ -519,7 +519,7 @@ export default function ProjectDetail({
                   ? <label className="flex flex-col items-center gap-2 text-text-muted cursor-pointer hover:text-gold transition-colors w-full h-full justify-center">
                       {uploadingPoster ? <Loader2 size={24} className="animate-spin" /> : <Upload size={24} />}
                       <span className="text-[10px] text-center px-2">{uploadingPoster ? "Wird hochgeladen…" : "Poster hochladen"}</span>
-                      <input type="file" accept="image/*" className="hidden" disabled={uploadingPoster} onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadPoster(f); }} />
+                      <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" disabled={uploadingPoster} onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadPoster(f); }} />
                     </label>
                   : <div className="flex flex-col items-center gap-2 text-text-muted"><Clapperboard size={32} /></div>
               }
@@ -819,7 +819,7 @@ export default function ProjectDetail({
                 <label className="flex items-center gap-2 px-4 py-2.5 bg-gold/10 border border-gold/20 text-gold text-sm font-semibold rounded-xl hover:bg-gold/20 transition-colors cursor-pointer">
                   {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
                   {uploading ? "Wird hochgeladen..." : "Fotos hochladen"}
-                  <input type="file" accept="image/*" multiple className="hidden" onChange={handlePhotoUpload} />
+                  <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={handlePhotoUpload} />
                 </label>
               </div>
             )}
