@@ -1290,6 +1290,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
   const certificates: string[] = profile.crew?.certificates ?? [];
   const software: string[] = profile.crew?.software ?? [];
   const bgImage = profile.cover_image_url ?? (images.find((i) => i.featured)?.url);
+  const coverOpacity = (profile as any).focal_point?.opacity ?? 0.4;
 
   // Filmografie shows only manual entries — linked project credits appear as visual cards in "Projekte"
   const creditTitles = new Set(
@@ -1309,7 +1310,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
         {bgImage ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40" />
+            <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ opacity: coverOpacity }} />
             <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-bg-primary" />
           </>
         ) : (

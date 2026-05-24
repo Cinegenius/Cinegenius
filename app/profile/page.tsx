@@ -546,6 +546,7 @@ export default function ProfilePage() {
   const [coverUploading, setCoverUploading] = useState(false);
   const coverRef = useRef<HTMLInputElement>(null);
   const [focalPoint, setFocalPoint] = useState<FocalPoint>({ x: 50, y: 33 });
+  const [coverOpacity, setCoverOpacity] = useState(0.4);
   const [focalPickerImage, setFocalPickerImage] = useState<string | null>(null);
   const [instagramUrl, setInstagramUrl] = useState("");
   const [tiktokUrl, setTiktokUrl] = useState("");
@@ -675,7 +676,11 @@ export default function ProfilePage() {
             setCoverImagePreview(profile.cover_image_url);
           }
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          if ((profile as any).focal_point) setFocalPoint((profile as any).focal_point);
+          if ((profile as any).focal_point) {
+            const fp = (profile as any).focal_point;
+            setFocalPoint(fp);
+            if (typeof fp.opacity === "number") setCoverOpacity(fp.opacity);
+          }
           setInstagramUrl(profile.instagram_url ?? "");
           setTiktokUrl(profile.tiktok_url ?? "");
           setYoutubeUrl(profile.youtube_url ?? "");
@@ -1069,9 +1074,18 @@ export default function ProfilePage() {
     await fetch("/api/profile", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ focal_point: point }),
+      body: JSON.stringify({ focal_point: { ...point, opacity: coverOpacity } }),
     });
-      addToast(t("focalSaved"), "success");
+    addToast(t("focalSaved"), "success");
+  }
+
+  async function saveCoverOpacity(opacity: number) {
+    setCoverOpacity(opacity);
+    await fetch("/api/profile", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ focal_point: { ...focalPoint, opacity } }),
+    });
   }
 
   return (
@@ -1349,17 +1363,31 @@ export default function ProfilePage() {
                     <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleCoverChange} />
                   </div>
                   {coverImagePreview ? (
-                    <div className="relative rounded-xl overflow-hidden aspect-[3/1] border border-border group">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={coverImagePreview} alt="Cover" className="w-full h-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => { setCoverImagePreview(""); setCoverImageUrl(""); }}
-                        className="absolute top-2 right-2 w-7 h-7 bg-black/60 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-crimson-light"
-                      >
-                        <X size={13} />
-                      </button>
-                    </div>
+                    <>
+                      <div className="relative rounded-xl overflow-hidden aspect-[3/1] border border-border group">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={coverImagePreview} alt="Cover" className="w-full h-full object-cover" style={{ opacity: coverOpacity }} />
+                        <button
+                          type="button"
+                          onClick={() => { setCoverImagePreview(""); setCoverImageUrl(""); }}
+                          className="absolute top-2 right-2 w-7 h-7 bg-black/60 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-crimson-light"
+                        >
+                          <X size={13} />
+                        </button>
+                      </div>
+                      <div className="mt-3 flex items-center gap-3">
+                        <span className="text-xs text-text-muted shrink-0">Helligkeit</span>
+                        <input
+                          type="range" min="0.1" max="1" step="0.05"
+                          value={coverOpacity}
+                          onChange={(e) => setCoverOpacity(parseFloat(e.target.value))}
+                          onMouseUp={(e) => saveCoverOpacity(parseFloat((e.target as HTMLInputElement).value))}
+                          onTouchEnd={(e) => saveCoverOpacity(parseFloat((e.target as HTMLInputElement).value))}
+                          className="flex-1 accent-gold h-1.5 rounded-full cursor-pointer"
+                        />
+                        <span className="text-xs text-text-muted w-8 text-right shrink-0">{Math.round(coverOpacity * 100)}%</span>
+                      </div>
+                    </>
                   ) : (
                     <button
                       type="button"
