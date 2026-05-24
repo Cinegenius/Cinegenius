@@ -436,7 +436,7 @@ function CompanyListRow({ company }: { company: Company }) {
       <div className="w-10 h-10 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shrink-0 overflow-hidden">
         {company.logo_url
           // eslint-disable-next-line @next/next/no-img-element
-          ? <img src={company.logo_url} alt="" className="w-full h-full object-cover" />
+          ? <img src={company.logo_url} alt="" className="w-full h-full object-contain p-1" />
           : <Building2 size={18} className="text-text-muted" />
         }
       </div>

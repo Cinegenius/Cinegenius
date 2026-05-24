@@ -210,7 +210,7 @@ export default function CompanyDetail({
             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-bg-primary border border-border flex items-center justify-center shrink-0 overflow-hidden shadow-xl">
               {company.logo_url
                 // eslint-disable-next-line @next/next/no-img-element
-                ? <img src={company.logo_url} alt={company.name} className="w-full h-full object-cover" />
+                ? <img src={company.logo_url} alt={company.name} className="w-full h-full object-contain p-2" />
                 : <Building2 size={28} className="text-text-muted/50" />
               }
             </div>

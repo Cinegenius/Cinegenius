@@ -298,7 +298,7 @@ export default function CompanySetupPage() {
               >
                 {logoPreview ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={logoPreview} alt="Logo" className="w-full h-full object-cover" />
+                  <img src={logoPreview} alt="Logo" className="w-full h-full object-contain p-2" />
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full gap-1.5">
                     <Upload size={22} className="text-text-muted group-hover:text-gold transition-colors" />
