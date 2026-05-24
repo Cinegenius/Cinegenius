@@ -889,6 +889,7 @@
     "myAccountFree": "Kostenlos · Aktiv",
     "myAccountDesc": "CineGenius ist komplett kostenlos — keine Provision, keine Gebühren, kein Abo.",
     "uploadFailed": "Upload fehlgeschlagen",
+    "uploadTooBig": "Foto zu groß. Bitte ein kleineres Foto wählen (max. 4 MB).",
     "uploadSuccess": "Profilfoto aktualisiert",
     "coverSuccess": "Coverbild aktualisiert",
     "profileSaved": "Profil erfolgreich aktualisiert",

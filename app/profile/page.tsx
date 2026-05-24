@@ -992,6 +992,8 @@ export default function ProfilePage() {
         // Try to compress; if anything goes wrong (iOS canvas quirks, HEIC, etc.) use raw file
         let toUpload: File = file;
         try { toUpload = await compressImage(file, { maxWidth: 1600, quality: 0.82 }); } catch { /* use raw */ }
+        // Vercel function body limit is 4.5 MB — reject before sending if still too large
+        if (toUpload.size > 4 * 1024 * 1024) throw new Error(t("uploadTooBig"));
         const fd = new FormData();
         fd.append("file", toUpload);
         const res = await fetch("/api/upload", { method: "POST", body: fd });
@@ -1010,8 +1012,9 @@ export default function ProfilePage() {
 
       addToast(t("photosSaved", { count: uploaded.length }), "success");
     } catch (err) {
-      console.error("[photo upload]", err);
-      addToast(t("uploadFailed"), "error");
+      const msg = err instanceof Error ? err.message : "";
+      const isBrowserBug = !msg || /did not match|pattern/i.test(msg);
+      addToast(isBrowserBug ? t("uploadFailed") : msg, "error");
     } finally {
       setProfileUploading(false);
       if (profileImagesRef.current) profileImagesRef.current.value = "";

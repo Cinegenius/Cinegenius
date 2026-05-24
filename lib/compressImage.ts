@@ -51,7 +51,12 @@ async function tryCompress(
       const ctx = canvas.getContext("2d");
       if (!ctx) return reject(new Error("Canvas unavailable"));
 
-      ctx.drawImage(img, 0, 0, width, height);
+      try {
+        ctx.drawImage(img, 0, 0, width, height);
+      } catch {
+        // On iOS, canvas can't draw HEIC even when img.onload fired
+        return reject(new Error("Canvas draw failed"));
+      }
 
       const baseName = (file instanceof File ? file.name : "image")
         .replace(/\.[^.]+$/, "");

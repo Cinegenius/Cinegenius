@@ -889,6 +889,7 @@
     "myAccountFree": "Free · Active",
     "myAccountDesc": "CineGenius is completely free — no commission, no fees, no subscription.",
     "uploadFailed": "Upload failed",
+    "uploadTooBig": "Photo too large. Please choose a smaller photo (max. 4 MB).",
     "uploadSuccess": "Profile photo updated",
     "coverSuccess": "Cover image updated",
     "profileSaved": "Profile successfully updated",
