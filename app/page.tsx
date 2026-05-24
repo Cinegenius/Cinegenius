@@ -204,20 +204,20 @@ export default async function HomePage() {
           style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E\")" }}
         />
 
-        <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pt-20 sm:pt-[120px] lg:pt-[140px]">
+        <div className="relative z-10 px-5 sm:px-10 lg:px-[100px] pt-16 sm:pt-[120px] lg:pt-[140px]">
           <div className="max-w-[680px] mx-auto sm:mx-0 text-center sm:text-left">
-            <div className="hero-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[9px] font-semibold uppercase tracking-[0.18em] mb-3 sm:mb-5 animate-fade-in">
+            <div className="hero-badge inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[9px] font-semibold uppercase tracking-[0.18em] mb-2 sm:mb-5 animate-fade-in">
               <Zap size={9} /> {t("badgeHero")}
             </div>
             <h1
-              className="hero-title font-display text-[2rem] sm:text-[3.5rem] lg:text-[5rem] font-bold tracking-tight mb-3 sm:mb-6 animate-fade-up"
+              className="hero-title font-display text-[1.65rem] sm:text-[3.5rem] lg:text-[5rem] font-bold tracking-tight mb-2 sm:mb-6 animate-fade-up"
               style={{ lineHeight: "1.1" }}
             >
               {t("heroTitle1")}<br />
               <span className="text-gradient-gold" style={{ lineHeight: "1.15" }}>{t("heroTitle2")}</span>
             </h1>
             <p
-              className="hero-sub text-sm sm:text-lg mb-4 sm:mb-10 leading-[1.55] animate-fade-up max-w-[440px] sm:max-w-[500px] mx-auto sm:mx-0"
+              className="hero-sub hidden sm:block text-sm sm:text-lg mb-4 sm:mb-10 leading-[1.55] animate-fade-up max-w-[440px] sm:max-w-[500px] mx-auto sm:mx-0"
               style={{ opacity: 0.75 }}
             >
               {t("heroSubtitle")}
@@ -244,20 +244,20 @@ export default async function HomePage() {
 
         <div className="flex-1" />
 
-        <div className="sm:hidden relative z-10 px-5 pb-5">
-          <div className="mb-2.5">
+        <div className="sm:hidden relative z-10 px-5 pb-4">
+          <div className="mb-2">
             <HeroSearch />
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex gap-2">
             <Link
               href={ctaHref}
-              className={`inline-flex items-center justify-center gap-1.5 px-5 py-3 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-lg active:scale-[0.98] transition-all text-sm ${isLoggedIn ? "hidden" : ""}`}
+              className={`flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gold hover:bg-gold-light text-bg-primary font-semibold rounded-lg active:scale-[0.98] transition-all text-sm ${isLoggedIn ? "hidden" : ""}`}
             >
               {ctaLabel} <ArrowRight size={13} />
             </Link>
             <Link
               href="/inserat"
-              className="inline-flex items-center justify-center gap-1.5 px-5 py-3 rounded-lg border border-white/25 text-white/70 font-medium hover:border-white/40 hover:text-white active:scale-[0.98] transition-all text-sm"
+              className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg border border-white/25 text-white/70 font-medium hover:border-white/40 hover:text-white active:scale-[0.98] transition-all text-sm"
             >
               {t("ctaCreateListing")}
             </Link>
