@@ -291,18 +291,18 @@ export default function CompanySetupPage() {
 
             {/* Logo */}
             <div className="flex flex-col items-center gap-3">
-              <button
-                type="button"
-                onClick={() => logoRef.current?.click()}
-                className="relative w-28 h-28 rounded-2xl border-2 border-dashed border-border hover:border-gold transition-colors group overflow-hidden bg-bg-secondary"
+              <input id="logo-upload" ref={logoRef} type="file" accept="image/jpeg,image/png,image/webp,image/heic" className="hidden" onChange={handleLogoUpload} />
+              <label
+                htmlFor="logo-upload"
+                className="relative w-28 h-28 rounded-2xl border-2 border-dashed border-border hover:border-gold transition-colors group overflow-hidden bg-bg-secondary cursor-pointer block"
               >
                 {logoPreview ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={logoPreview} alt="Logo" className="w-full h-full object-cover" />
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full gap-1.5">
-                    <Building2 size={22} className="text-text-muted group-hover:text-gold transition-colors" />
-                    <span className="text-[10px] text-text-muted group-hover:text-gold">Logo</span>
+                    <Upload size={22} className="text-text-muted group-hover:text-gold transition-colors" />
+                    <span className="text-[10px] text-text-muted group-hover:text-gold">Logo hochladen</span>
                   </div>
                 )}
                 {uploadingLogo && (
@@ -310,7 +310,7 @@ export default function CompanySetupPage() {
                     <Loader2 size={18} className="animate-spin text-gold" />
                   </div>
                 )}
-              </button>
+              </label>
               {logoPreview && (
                 <button
                   type="button"
@@ -320,8 +320,7 @@ export default function CompanySetupPage() {
                   <X size={11} /> Entfernen
                 </button>
               )}
-              <p className="text-xs text-text-muted">Firmenlogo hochladen (empfohlen)</p>
-              <input ref={logoRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+              <p className="text-xs text-text-muted">JPG, PNG, WEBP oder HEIC · max. 5 MB</p>
             </div>
 
             {/* Basic info */}
