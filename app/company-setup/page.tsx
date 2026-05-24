@@ -291,7 +291,7 @@ export default function CompanySetupPage() {
 
             {/* Logo */}
             <div className="flex flex-col items-center gap-3">
-              <input id="logo-upload" ref={logoRef} type="file" accept="image/jpeg,image/png,image/webp,image/heic" className="hidden" onChange={handleLogoUpload} />
+              <input id="logo-upload" ref={logoRef} type="file" accept="image/jpeg,image/png,image/webp,image/heic" className="sr-only" onChange={handleLogoUpload} />
               <label
                 htmlFor="logo-upload"
                 className="relative w-28 h-28 rounded-2xl border-2 border-dashed border-border hover:border-gold transition-colors group overflow-hidden bg-bg-secondary cursor-pointer block"
