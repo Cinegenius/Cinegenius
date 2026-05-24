@@ -1383,27 +1383,30 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 
         {/* Two-column: avatar + compact info */}
         <div className="grid grid-cols-1 sm:grid-cols-[220px_1fr] gap-4 sm:gap-8 mb-6 sm:mb-10">
-          {/* Avatar */}
-          <div className="shrink-0">
+          {/* Avatar + company badge */}
+          <div className="shrink-0 space-y-3">
             {profile.avatar_url ? (
               <div className="relative">
-                <Image src={profile.avatar_url} alt={profile.display_name ?? ""} width={220} height={275}
-                  className="w-full aspect-[4/5] sm:aspect-square rounded-2xl object-cover ring-1 ring-white/8 shadow-2xl" />
+                <Image src={profile.avatar_url} alt={profile.display_name ?? ""} width={220} height={220}
+                  className="w-full aspect-square rounded-2xl object-cover ring-1 ring-white/8 shadow-2xl" />
                 <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10">
                   <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${profile.available ? "bg-gold" : "bg-red-400"}`} />
                   <span className={`text-[10px] font-medium ${profile.available ? "text-gold/90" : "text-white/60"}`}>{profile.available ? "Verfügbar" : "Nicht verfügbar"}</span>
                 </div>
               </div>
             ) : (
-              <div className="w-full aspect-[4/5] sm:aspect-square rounded-2xl bg-bg-elevated border border-border flex items-center justify-center text-4xl font-bold text-text-muted">
+              <div className="w-full aspect-square rounded-2xl bg-bg-elevated border border-border flex items-center justify-center text-4xl font-bold text-text-muted">
                 {(profile.display_name ?? "?")[0]}
               </div>
+            )}
+            {companyMembership?.companies && (
+              <CompanyBadge membership={companyMembership} />
             )}
           </div>
 
           {/* Compact info */}
-          <div className="flex flex-col sm:flex-row gap-5 pt-1">
-            <div className="flex-1 space-y-5 min-w-0">
+          <div className="pt-1">
+            <div className="space-y-5 min-w-0">
 
             {profile.bio && (
               <div>
@@ -1506,13 +1509,6 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
               </div>
             )}
 
-            {/* Company badge — mobile only, before Lizenzen */}
-            {companyMembership?.companies && (
-              <div className="sm:hidden">
-                <CompanyBadge membership={companyMembership} />
-              </div>
-            )}
-
             {/* Lizenzen & Zertifikate */}
             {certificates.length > 0 && (
               <div>
@@ -1528,13 +1524,8 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
               </div>
             )}
 
-            </div>{/* end flex-1 info */}
-            {companyMembership?.companies && (
-              <div className="hidden sm:block sm:w-44 sm:shrink-0">
-                <CompanyBadge membership={companyMembership} />
-              </div>
-            )}
-          </div>{/* end flex row */}
+            </div>
+          </div>
         </div>
 
         <Divider />
