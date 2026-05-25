@@ -1118,7 +1118,9 @@ export const DEPT_KEYWORDS: Record<string, string[]> = {
   ],
   ton: [
     "ton", "sound", "audio", "tonmeister", "mixer", "boom operator",
-    "tonassistenz",
+    "tonassistenz", "filmtonmeister", "filmtonassistent", "adr",
+    "synchron angler", "surround sound", "playback operator",
+    "tongeräteassistent", "tonpraktikant",
   ],
   maske: [
     "maske", "make-up", "makeup", "maskenbildner", "hair", "stylist",
@@ -1207,12 +1209,6 @@ export const DEPT_KEYWORDS: Record<string, string[]> = {
     "aerial coordinator", "stunt rigger", "stunt technician",
     "stunt rescue diver", "parkour", "präzisionsfahrer", "precision driver",
     "coachmen", "horse master", "horse trainer", "horse wrangler",
-  ],
-  ton: [
-    "ton", "sound", "audio", "tonmeister", "mixer", "boom operator",
-    "tonassistenz", "filmtonmeister", "filmtonassistent", "adr",
-    "synchron angler", "surround sound", "playback operator",
-    "tongeräteassistent", "tonpraktikant",
   ],
   "ton-post": [
     "ton post", "sound post", "mischtonmeister", "re-recording mixer",
