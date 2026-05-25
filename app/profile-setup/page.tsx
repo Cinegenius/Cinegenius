@@ -217,10 +217,10 @@ export default function ProfileSetupPage() {
 
         {/* ── Form ── */}
         {!done && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div className="text-center mb-2">
               <h1 className="font-display text-2xl font-bold text-text-primary mb-2">
-                Profil erstellen
+                Willkommen bei CineGenius!
               </h1>
               <p className="text-sm text-text-muted">
                 Nur das Nötigste — den Rest kannst du später ergänzen.
@@ -235,66 +235,17 @@ export default function ProfileSetupPage() {
               </div>
             )}
 
-            {/* Avatar */}
-            <div className="flex flex-col items-center gap-2">
-              <button onClick={() => fileRef.current?.click()} disabled={uploading} className="relative">
-                {avatarPreview ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={avatarPreview} alt="" className="w-24 h-24 rounded-full object-cover border-2 border-gold/40" />
-                ) : (
-                  <div className="w-24 h-24 rounded-full bg-gold/10 border-2 border-gold/20 flex flex-col items-center justify-center gap-1">
-                    <Camera size={20} className="text-gold/60" />
-                    <span className="text-[10px] text-gold/60">Foto</span>
-                  </div>
-                )}
-                {uploading && (
-                  <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center">
-                    <Loader2 size={20} className="animate-spin text-white" />
-                  </div>
-                )}
-              </button>
-              <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleAvatar} />
-              <p className="text-xs text-text-muted">Profilfoto — optional</p>
-            </div>
-
-            {/* Name */}
-            <div>
-              <label className="text-xs font-semibold text-text-muted uppercase tracking-widest block mb-1.5">
-                Dein Name <span className="text-gold">*</span>
-              </label>
-              <input
-                value={displayName}
-                onChange={e => { setDisplayName(e.target.value); setErrorMsg(""); }}
-                placeholder="Wie sollen andere dich nennen?"
-                maxLength={100}
-                className="w-full bg-bg-secondary border border-border rounded-2xl px-4 py-3.5 text-base text-text-primary focus:outline-none focus:border-gold transition-colors"
-              />
-            </div>
-
-            {/* Stadt */}
-            <div>
-              <label className="text-xs font-semibold text-text-muted uppercase tracking-widest block mb-1.5">
-                Deine Stadt <span className="text-gold">*</span>
-              </label>
-              <input
-                value={city}
-                onChange={e => { setCity(e.target.value); setErrorMsg(""); }}
-                placeholder="z.B. Wien, München, Berlin …"
-                maxLength={100}
-                className="w-full bg-bg-secondary border border-border rounded-2xl px-4 py-3.5 text-base text-text-primary focus:outline-none focus:border-gold transition-colors"
-              />
-            </div>
-
-            {/* Tätigkeit — Pflichtfeld */}
+            {/* Tätigkeit — als erste Frage prominent */}
             <div id="type-picker">
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-1">
                 <label className="text-xs font-semibold text-text-muted uppercase tracking-widest">
-                  Deine Tätigkeit <span className="text-gold">*</span>
+                  Was machst du? <span className="text-gold">*</span>
                 </label>
                 {selectedTypes.length > 0 && (
                   <span className="text-xs text-gold font-medium">{selectedTypes.length} gewählt</span>
                 )}
               </div>
+              <p className="text-xs text-text-muted mb-4">Wähle alles, was auf dich zutrifft.</p>
 
               {showTypeError && (
                 <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-xl px-3 py-2.5 mb-3">
@@ -332,6 +283,67 @@ export default function ProfileSetupPage() {
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* Name */}
+            <div>
+              <label className="text-xs font-semibold text-text-muted uppercase tracking-widest block mb-1.5">
+                Dein Name <span className="text-gold">*</span>
+              </label>
+              <input
+                value={displayName}
+                onChange={e => { setDisplayName(e.target.value); setErrorMsg(""); }}
+                placeholder="Wie sollen andere dich nennen?"
+                maxLength={100}
+                className="w-full bg-bg-secondary border border-border rounded-2xl px-4 py-3.5 text-base text-text-primary focus:outline-none focus:border-gold transition-colors"
+              />
+            </div>
+
+            {/* Stadt */}
+            <div>
+              <label className="text-xs font-semibold text-text-muted uppercase tracking-widest block mb-1.5">
+                Deine Stadt <span className="text-gold">*</span>
+              </label>
+              <input
+                value={city}
+                onChange={e => { setCity(e.target.value); setErrorMsg(""); }}
+                placeholder="z.B. Wien, München, Berlin …"
+                maxLength={100}
+                className="w-full bg-bg-secondary border border-border rounded-2xl px-4 py-3.5 text-base text-text-primary focus:outline-none focus:border-gold transition-colors"
+              />
+            </div>
+
+            {/* Avatar — zuletzt, da optional */}
+            <div>
+              <label className="text-xs font-semibold text-text-muted uppercase tracking-widest block mb-3">
+                Profilfoto <span className="text-text-muted font-normal normal-case tracking-normal">— optional</span>
+              </label>
+              <div className="flex items-center gap-4">
+                <button onClick={() => fileRef.current?.click()} disabled={uploading} className="relative shrink-0">
+                  {avatarPreview ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={avatarPreview} alt="" className="w-20 h-20 rounded-full object-cover border-2 border-gold/40" />
+                  ) : (
+                    <div className="w-20 h-20 rounded-full bg-bg-secondary border-2 border-border flex flex-col items-center justify-center gap-1">
+                      <Camera size={18} className="text-text-muted" />
+                    </div>
+                  )}
+                  {uploading && (
+                    <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center">
+                      <Loader2 size={20} className="animate-spin text-white" />
+                    </div>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
+                  disabled={uploading}
+                  className="text-sm text-text-muted border border-border rounded-xl px-4 py-2 hover:border-gold/50 hover:text-gold transition-colors"
+                >
+                  {uploading ? "Wird hochgeladen…" : "Foto hochladen"}
+                </button>
+              </div>
+              <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleAvatar} />
             </div>
           </div>
         )}
