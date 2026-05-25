@@ -7,11 +7,71 @@ import { useUser } from "@clerk/nextjs";
 import { Loader2, Camera, CheckCircle, ArrowRight, AlertCircle } from "lucide-react";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 import Link from "next/link";
+import type { ProfileType } from "@/lib/profile-types";
 
 function safeRedirect(value: string | null): string {
   if (!value || !value.startsWith("/") || value.startsWith("//")) return "/dashboard";
   return value;
 }
+
+const TYPE_GROUPS: { label: string; emoji: string; types: { id: ProfileType; label: string }[] }[] = [
+  {
+    label: "Talent",
+    emoji: "🎭",
+    types: [
+      { id: "actor",     label: "Schauspieler/in" },
+      { id: "model",     label: "Model" },
+      { id: "extra",     label: "Komparse" },
+      { id: "host",      label: "Moderator/in" },
+      { id: "dancer",    label: "Tänzer/in" },
+      { id: "stunt",     label: "Stunt" },
+      { id: "voiceover", label: "Sprecher/in" },
+      { id: "creator",   label: "Creator / Influencer" },
+    ],
+  },
+  {
+    label: "Filmcrew",
+    emoji: "🎬",
+    types: [
+      { id: "camera",                  label: "Kamera" },
+      { id: "lighting",                label: "Licht / Gaffer" },
+      { id: "sound",                   label: "Ton" },
+      { id: "director_of_photography", label: "DoP" },
+      { id: "director",                label: "Regie" },
+      { id: "production",              label: "Produktion" },
+      { id: "makeup",                  label: "Maske" },
+      { id: "costume",                 label: "Kostüm" },
+      { id: "postproduction",          label: "Post / Schnitt" },
+      { id: "vfx",                     label: "VFX" },
+      { id: "sfx",                     label: "SFX" },
+      { id: "art_department",          label: "Szenenbild" },
+      { id: "broadcast",               label: "Broadcast" },
+    ],
+  },
+  {
+    label: "Kreativ",
+    emoji: "✏️",
+    types: [
+      { id: "filmmaker",       label: "Regisseur/in" },
+      { id: "writer",          label: "Autor/in" },
+      { id: "photographer",    label: "Fotograf/in" },
+      { id: "editor",          label: "Editor/in" },
+      { id: "motion_designer", label: "Motion Designer" },
+      { id: "art_director",    label: "Art Director" },
+    ],
+  },
+  {
+    label: "Anbieter",
+    emoji: "🏠",
+    types: [
+      { id: "location",  label: "Location" },
+      { id: "equipment", label: "Equipment" },
+      { id: "vehicle",   label: "Fahrzeug" },
+      { id: "studio",    label: "Studio" },
+      { id: "props",     label: "Requisiten" },
+    ],
+  },
+];
 
 export default function ProfileSetupPage() {
   const { user, isLoaded } = useUser();
@@ -22,15 +82,17 @@ export default function ProfileSetupPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [showTypeError, setShowTypeError] = useState(false);
 
   const [displayName, setDisplayName] = useState("");
   const [city, setCity] = useState("");
+  const [selectedTypes, setSelectedTypes] = useState<ProfileType[]>([]);
   const [avatarUrl, setAvatarUrl] = useState("");
   const [avatarPreview, setAvatarPreview] = useState("");
   const [focalPoint, setFocalPoint] = useState<FocalPoint>({ x: 50, y: 33 });
   const [focalPickerImage, setFocalPickerImage] = useState<string | null>(null);
 
-  // Redirect if profile already exists — with abort controller to prevent race conditions
+  // Redirect if profile already exists
   useEffect(() => {
     if (!isLoaded || !user) return;
     const controller = new AbortController();
@@ -39,7 +101,7 @@ export default function ProfileSetupPage() {
       .then(data => {
         if (data?.exists) window.location.replace(safeRedirect(searchParams.get("redirect")));
       })
-      .catch(() => {}); // Network error: stay on page, user can still create profile
+      .catch(() => {});
     return () => controller.abort();
   }, [isLoaded, user]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -50,6 +112,14 @@ export default function ProfileSetupPage() {
       if (full) setDisplayName(full);
     }
   }, [isLoaded, user]);
+
+  function toggleType(id: ProfileType) {
+    setSelectedTypes(prev =>
+      prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]
+    );
+    setShowTypeError(false);
+    setErrorMsg("");
+  }
 
   async function handleAvatar(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -82,8 +152,15 @@ export default function ProfileSetupPage() {
 
   async function handleSave() {
     if (!displayName.trim() || !city.trim()) return;
+    if (selectedTypes.length === 0) {
+      setShowTypeError(true);
+      // Scroll to the type section
+      document.getElementById("type-picker")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
     setSaving(true);
     setErrorMsg("");
+    setShowTypeError(false);
     try {
       const res = await fetch("/api/profile", {
         method: "POST",
@@ -96,7 +173,7 @@ export default function ProfileSetupPage() {
           focal_point: avatarUrl ? focalPoint : undefined,
           skills: [],
           positions: [],
-          profile_types: [],
+          profile_types: selectedTypes,
         }),
       });
       const data = await res.json();
@@ -113,7 +190,7 @@ export default function ProfileSetupPage() {
   }
 
   const redirectTo = safeRedirect(searchParams.get("redirect"));
-  const canSave = displayName.trim().length > 0 && city.trim().length > 0 && !saving && !uploading;
+  const canSave = displayName.trim().length > 0 && city.trim().length > 0 && selectedTypes.length > 0 && !saving && !uploading;
 
   return (
     <div className="min-h-screen bg-bg-primary flex flex-col">
@@ -136,12 +213,12 @@ export default function ProfileSetupPage() {
         <span className="font-display font-bold text-lg text-gold tracking-tight">CineGenius</span>
       </div>
 
-      <div className="flex-1 px-4 pb-32 max-w-lg mx-auto w-full">
+      <div className="flex-1 px-4 pb-36 max-w-lg mx-auto w-full">
 
         {/* ── Form ── */}
         {!done && (
-          <div className="space-y-5">
-            <div className="text-center mb-6">
+          <div className="space-y-6">
+            <div className="text-center mb-2">
               <h1 className="font-display text-2xl font-bold text-text-primary mb-2">
                 Profil erstellen
               </h1>
@@ -150,7 +227,7 @@ export default function ProfileSetupPage() {
               </p>
             </div>
 
-            {/* Error message */}
+            {/* Global error */}
             {errorMsg && (
               <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3">
                 <AlertCircle size={16} className="text-red-400 mt-0.5 shrink-0" />
@@ -183,7 +260,7 @@ export default function ProfileSetupPage() {
             {/* Name */}
             <div>
               <label className="text-xs font-semibold text-text-muted uppercase tracking-widest block mb-1.5">
-                Dein Name *
+                Dein Name <span className="text-gold">*</span>
               </label>
               <input
                 value={displayName}
@@ -197,7 +274,7 @@ export default function ProfileSetupPage() {
             {/* Stadt */}
             <div>
               <label className="text-xs font-semibold text-text-muted uppercase tracking-widest block mb-1.5">
-                Deine Stadt *
+                Deine Stadt <span className="text-gold">*</span>
               </label>
               <input
                 value={city}
@@ -206,6 +283,55 @@ export default function ProfileSetupPage() {
                 maxLength={100}
                 className="w-full bg-bg-secondary border border-border rounded-2xl px-4 py-3.5 text-base text-text-primary focus:outline-none focus:border-gold transition-colors"
               />
+            </div>
+
+            {/* Tätigkeit — Pflichtfeld */}
+            <div id="type-picker">
+              <div className="flex items-center justify-between mb-3">
+                <label className="text-xs font-semibold text-text-muted uppercase tracking-widest">
+                  Deine Tätigkeit <span className="text-gold">*</span>
+                </label>
+                {selectedTypes.length > 0 && (
+                  <span className="text-xs text-gold font-medium">{selectedTypes.length} gewählt</span>
+                )}
+              </div>
+
+              {showTypeError && (
+                <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-xl px-3 py-2.5 mb-3">
+                  <AlertCircle size={14} className="text-red-400 shrink-0" />
+                  <p className="text-xs text-red-400">Bitte wähle mindestens eine Tätigkeit aus.</p>
+                </div>
+              )}
+
+              <div className="space-y-4">
+                {TYPE_GROUPS.map(group => (
+                  <div key={group.label}>
+                    <p className="text-xs text-text-muted font-medium mb-2 flex items-center gap-1.5">
+                      <span>{group.emoji}</span>
+                      <span>{group.label}</span>
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {group.types.map(t => {
+                        const active = selectedTypes.includes(t.id);
+                        return (
+                          <button
+                            key={t.id}
+                            type="button"
+                            onClick={() => toggleType(t.id)}
+                            className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all active:scale-95 ${
+                              active
+                                ? "bg-gold text-bg-primary border-gold"
+                                : "bg-bg-secondary border-border text-text-secondary hover:border-gold/50 hover:text-text-primary"
+                            }`}
+                          >
+                            {t.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -265,7 +391,7 @@ export default function ProfileSetupPage() {
           <div className="max-w-lg mx-auto">
             <button
               onClick={handleSave}
-              disabled={!canSave}
+              disabled={saving || uploading || !displayName.trim() || !city.trim()}
               className={`w-full py-3.5 rounded-2xl font-bold text-base transition-all active:scale-95 flex items-center justify-center gap-2 ${
                 canSave ? "bg-gold text-bg-primary" : "bg-bg-elevated border border-border text-text-muted cursor-not-allowed"
               }`}
@@ -276,6 +402,9 @@ export default function ProfileSetupPage() {
                 "Profil erstellen"
               )}
             </button>
+            {selectedTypes.length === 0 && displayName.trim() && city.trim() && (
+              <p className="text-xs text-text-muted text-center mt-2">Tätigkeit auswählen um fortzufahren</p>
+            )}
           </div>
         </div>
       )}
