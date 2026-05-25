@@ -1308,10 +1308,13 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                             <MapPin size={10} className="shrink-0" />{c.location.split(",")[0]}
                           </p>
                         )}
-                        {/* Rate — only show if a real rate is set */}
-                        {c.dayRate && !c.dayRate.toLowerCase().includes("vereinbarung") && (
-                          <p className="hidden md:block text-xs text-text-secondary shrink-0 w-28 text-right">{c.dayRate}</p>
-                        )}
+                        {/* Rate */}
+                        <p className="hidden md:block text-xs shrink-0 w-28 text-right">
+                          {c.dayRate && !c.dayRate.toLowerCase().includes("vereinbarung")
+                            ? <span className="text-text-secondary">{c.dayRate}</span>
+                            : <span className="text-text-muted/30">–</span>
+                          }
+                        </p>
                       </Link>
                     );
                   })}
