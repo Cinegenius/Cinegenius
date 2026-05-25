@@ -93,9 +93,7 @@ const ROLE_CATEGORIES_META: { id: string; labelKey: string; icon: ElementType; c
   { id: "talent",   labelKey: "catTalentLabel",   icon: Drama,        color: "text-rose-400",    bg: "bg-rose-500/15",    descKey: "catTalentDesc",
     types: [["actor","Schauspieler/in"],["model","Model"],["extra","Komparse / Kleindarsteller"],["host","Moderator/in"],["dancer","Tänzer/in"],["stunt","Stunt Performer"],["voiceover","Synchronsprecher/in"],["creator","Influencer / Creator"]] },
   { id: "crew",     labelKey: "catCrewLabel",     icon: Clapperboard,  color: "text-sky-400",     bg: "bg-sky-500/15",     descKey: "catCrewDesc",
-    types: [["camera","Kamera"],["lighting","Licht / Gaffer"],["sound","Ton"],["director_of_photography","Director of Photography"],["director","Regie"],["production","Produktion"],["makeup","Maske"],["costume","Kostüm"],["postproduction","Postproduktion"],["vfx","VFX"],["sfx","SFX"],["art_department","Szenenbild"],["broadcast","Broadcast"]] },
-  { id: "kreativ",  labelKey: "catKreativLabel",  icon: Palette,       color: "text-violet-400",  bg: "bg-violet-500/15",  descKey: "catKreativDesc",
-    types: [["filmmaker","Regisseur/in"],["writer","Autor/in"],["photographer","Fotograf/in"],["editor","Editor/in"],["motion_designer","Motion Designer"],["art_director","Art Director"]] },
+    types: [["camera","Kamera"],["lighting","Licht / Gaffer"],["sound","Ton"],["director_of_photography","Director of Photography"],["director","Regie"],["production","Produktion"],["makeup","Maske"],["costume","Kostüm"],["postproduction","Postproduktion"],["vfx","VFX"],["sfx","SFX"],["art_department","Szenenbild"],["broadcast","Broadcast"],["filmmaker","Regisseur/in"],["writer","Autor/in"],["photographer","Fotograf/in"],["editor","Editor/in"],["motion_designer","Motion Designer"],["art_director","Art Director"]] },
   { id: "anbieter", labelKey: "catAnbieterLabel", icon: Building2,     color: "text-amber-400",   bg: "bg-amber-500/15",   descKey: "catAnbieterDesc",
     types: [["location","Location"],["equipment","Equipment"],["vehicle","Fahrzeuge"],["studio","Studio"],["props","Requisiten"]] },
 ];
@@ -124,7 +122,7 @@ function RoleAndPositionPicker({
       {ROLE_CATEGORIES.map((cat) => {
         const isOpen = openCat === cat.id;
         const selectedInCat = cat.types.find(([id]) => id === selectedType);
-        const showPositions = (cat.id === "crew" || cat.id === "kreativ") && !!selectedInCat;
+        const showPositions = cat.id === "crew" && !!selectedInCat;
 
         return (
           <div key={cat.id} className="rounded-xl border border-border overflow-hidden">
