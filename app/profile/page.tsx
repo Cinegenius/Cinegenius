@@ -9,9 +9,8 @@ import {
   Camera, CheckCircle, User, Lock, Bell, CreditCard, MapPin, Film,
   Plus, X, Save, Wallet, Upload, ShieldCheck, Clock, AlertCircle, Loader2,
   Globe, Plane, Video, Euro, Clapperboard, Link2, AtSign, PlayCircle, ExternalLink,
-  Drama, Palette, Building2, Users2, Eye, EyeOff, Pencil, Check,
+  Users2, Eye, EyeOff, Pencil, Check,
 } from "lucide-react";
-import type { ElementType } from "react";
 import LicensePicker from "@/components/LicensePicker";
 import ExternalProfilesSection from "@/components/ExternalProfilesSection";
 import { useToast } from "@/contexts/ToastContext";
@@ -87,18 +86,57 @@ function getCompletion(opts: {
   };
 }
 
-// ─── Accordion role picker (same as profile-setup) ───────────────────────────
-// Labels/descs resolved inside component using tP()
-const ROLE_CATEGORIES_META: { id: string; labelKey: string; icon: ElementType; color: string; bg: string; descKey: string; types: readonly (readonly [string, string])[] }[] = [
-  { id: "talent",   labelKey: "catTalentLabel",   icon: Drama,        color: "text-rose-400",    bg: "bg-rose-500/15",    descKey: "catTalentDesc",
-    types: [["actor","Schauspieler/in"],["model","Model"],["extra","Komparse / Kleindarsteller"],["host","Moderator/in"],["dancer","Tänzer/in"],["stunt","Stunt Performer"],["voiceover","Synchronsprecher/in"],["creator","Influencer / Creator"]] },
-  { id: "crew",     labelKey: "catCrewLabel",     icon: Clapperboard,  color: "text-sky-400",     bg: "bg-sky-500/15",     descKey: "catCrewDesc",
-    types: [["camera","Kamera"],["lighting","Licht / Gaffer"],["sound","Ton"],["director_of_photography","Director of Photography"],["director","Regie"],["production","Produktion"],["makeup","Maske"],["costume","Kostüm"],["postproduction","Postproduktion"],["vfx","VFX"],["sfx","SFX"],["art_department","Szenenbild"],["broadcast","Broadcast"],["filmmaker","Regisseur/in"],["writer","Autor/in"],["photographer","Fotograf/in"],["editor","Editor/in"],["motion_designer","Motion Designer"],["art_director","Art Director"]] },
-  { id: "anbieter", labelKey: "catAnbieterLabel", icon: Building2,     color: "text-amber-400",   bg: "bg-amber-500/15",   descKey: "catAnbieterDesc",
-    types: [["location","Location"],["equipment","Equipment"],["vehicle","Fahrzeuge"],["studio","Studio"],["props","Requisiten"]] },
+// ─── Chip-style type picker ───────────────────────────────────────────────────
+const TYPE_CHIP_GROUPS = [
+  { label: "Talent", emoji: "🎭", types: [
+    ["actor",    "Schauspieler/in"],
+    ["model",    "Model"],
+    ["extra",    "Komparse"],
+    ["host",     "Moderator/in"],
+    ["dancer",   "Tänzer/in"],
+    ["stunt",    "Stunt"],
+    ["voiceover","Sprecher/in"],
+    ["creator",  "Creator / Influencer"],
+  ] as [string, string][] },
+  { label: "Filmcrew", emoji: "🎬", types: [
+    ["camera",                "Kamera"],
+    ["lighting",              "Licht / Gaffer"],
+    ["sound",                 "Ton"],
+    ["director_of_photography","DoP"],
+    ["director",              "Regie"],
+    ["production",            "Produktion"],
+    ["makeup",                "Maske"],
+    ["costume",               "Kostüm"],
+    ["postproduction",        "Post / Schnitt"],
+    ["vfx",                   "VFX"],
+    ["sfx",                   "SFX"],
+    ["art_department",        "Szenenbild"],
+    ["broadcast",             "Broadcast"],
+  ] as [string, string][] },
+  { label: "Kreativ", emoji: "✏️", types: [
+    ["filmmaker",     "Regisseur/in"],
+    ["writer",        "Autor/in"],
+    ["photographer",  "Fotograf/in"],
+    ["editor",        "Editor/in"],
+    ["motion_designer","Motion Designer"],
+    ["art_director",  "Art Director"],
+  ] as [string, string][] },
+  { label: "Anbieter", emoji: "🏠", types: [
+    ["location",  "Location"],
+    ["equipment", "Equipment"],
+    ["vehicle",   "Fahrzeug"],
+    ["studio",    "Studio"],
+    ["props",     "Requisiten"],
+  ] as [string, string][] },
 ];
 
-function RoleAndPositionPicker({
+const CREW_KREATIV_TYPES = new Set([
+  "camera","lighting","sound","director_of_photography","director","production",
+  "makeup","costume","postproduction","vfx","sfx","art_department","broadcast",
+  "filmmaker","writer","photographer","editor","motion_designer","art_director",
+]);
+
+function TypeChipPicker({
   selectedType,
   onSelectType,
   positions,
@@ -109,162 +147,102 @@ function RoleAndPositionPicker({
   positions: string[];
   onPositionsChange: (p: string[]) => void;
 }) {
-  const tP = useTranslations("profile");
-  const ROLE_CATEGORIES = ROLE_CATEGORIES_META.map((c) => ({
-    ...c,
-    label: tP(c.labelKey as Parameters<typeof tP>[0]),
-    desc:  tP(c.descKey as Parameters<typeof tP>[0]),
-  }));
-  const [openCat, setOpenCat] = useState<string | null>(null);
+  const showPositions = CREW_KREATIV_TYPES.has(selectedType);
 
   return (
-    <div className="space-y-2">
-      {ROLE_CATEGORIES.map((cat) => {
-        const isOpen = openCat === cat.id;
-        const selectedInCat = cat.types.find(([id]) => id === selectedType);
-        const showPositions = cat.id === "crew" && !!selectedInCat;
+    <div className="space-y-5">
+      {/* Chip groups */}
+      <div className="space-y-4">
+        {TYPE_CHIP_GROUPS.map((group) => (
+          <div key={group.label}>
+            <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted mb-2.5">
+              {group.emoji} {group.label}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {group.types.map(([id, label]) => {
+                const active = selectedType === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => onSelectType(active ? "" : id)}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                      active
+                        ? "bg-gold/15 border-gold/50 text-gold"
+                        : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
 
-        return (
-          <div key={cat.id} className="rounded-xl border border-border overflow-hidden">
-            {/* Header */}
-            <button
-              type="button"
-              onClick={() => setOpenCat(isOpen ? null : cat.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3.5 text-left transition-colors ${
-                isOpen ? "bg-bg-elevated" : "bg-bg-secondary hover:bg-bg-elevated"
-              }`}
-            >
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${cat.bg}`}>
-                <cat.icon size={18} className={cat.color} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-text-primary text-sm">{cat.label}</p>
-                <p className="text-xs text-text-muted truncate">
-                  {selectedInCat ? (
-                    <span className="text-gold">
-                      {selectedInCat[1]}
-                      {showPositions && positions.length > 0
-                        ? ` · ${positions.length} Position${positions.length > 1 ? "en" : ""}`
-                        : ""}
-                    </span>
-                  ) : (
-                    cat.desc
-                  )}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                {selectedInCat && <CheckCircle size={14} className="text-gold" />}
-                <span className={`text-text-muted text-xs transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>▾</span>
-              </div>
-            </button>
-
-            {isOpen && (
-              <div className="border-t border-border bg-bg-primary">
-                {/* Sub-type grid */}
-                <div className="px-3 py-3 grid grid-cols-2 gap-2">
-                  {cat.types.map(([id, label]) => (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => { onSelectType(id === selectedType ? "" : id); setOpenCat(null); }}
-                      className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left transition-all active:scale-95 text-xs font-medium ${
-                        selectedType === id
-                          ? "border-gold bg-gold/10 text-gold"
-                          : "border-border bg-bg-secondary text-text-secondary hover:border-border-light"
-                      }`}
-                    >
-                      <span className="leading-tight">{label}</span>
-                      {selectedType === id && <CheckCircle size={11} className="ml-auto shrink-0 text-gold" />}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Position picker — seamlessly continues for crew/kreativ */}
-                {showPositions && (
-                  <div className="border-t border-border/60 px-4 pb-5 pt-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">{tP("positions")}</p>
-                      {positions.length > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => onPositionsChange([])}
-                          className="text-[10px] text-text-muted hover:text-crimson-light transition-colors"
-                        >
-                          {tP("removeAll")}
-                        </button>
-                      )}
-                    </div>
-
-                    {positions.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mb-4">
-                        {positions.map((p) => (
-                          <span
-                            key={p}
-                            className="flex items-center gap-1 px-2.5 py-1 bg-gold/8 border border-gold/20 rounded-full text-xs text-gold font-medium"
-                          >
-                            {p}
-                            <button
-                              type="button"
-                              onClick={() => onPositionsChange(positions.filter((x) => x !== p))}
-                              className="hover:text-red-400 transition-colors ml-0.5"
-                            >
-                              <X size={9} />
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    <div className="space-y-4">
-                      {departments.map((dept) => {
-                        const colors = deptColors(dept.color);
-                        const deptCount = dept.roles.filter((r) => positions.includes(r)).length;
-                        return (
-                          <div key={dept.id}>
-                            <div className="flex items-center gap-2 mb-2">
-                              <p className={`text-[10px] uppercase tracking-widest font-semibold ${colors.text}`}>{dept.label}</p>
-                              {deptCount > 0 && (
-                                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${colors.bg} ${colors.border} ${colors.text}`}>
-                                  {deptCount}
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex flex-wrap gap-1.5">
-                              {dept.roles.map((job) => {
-                                const isSel = positions.includes(job);
-                                return (
-                                  <button
-                                    key={job}
-                                    type="button"
-                                    onClick={() =>
-                                      onPositionsChange(
-                                        isSel
-                                          ? positions.filter((x) => x !== job)
-                                          : [...positions, job]
-                                      )
-                                    }
-                                    className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
-                                      isSel
-                                        ? `${colors.bg} ${colors.border} ${colors.text}`
-                                        : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"
-                                    }`}
-                                  >
-                                    {job}
-                                  </button>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
+      {/* Position picker — shown for crew/kreativ types */}
+      {showPositions && (
+        <div className="border-t border-border/60 pt-5">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">Positionen</p>
+            {positions.length > 0 && (
+              <button type="button" onClick={() => onPositionsChange([])}
+                className="text-[10px] text-text-muted hover:text-red-400 transition-colors">
+                Alle entfernen
+              </button>
             )}
           </div>
-        );
-      })}
+          {positions.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {positions.map((p) => (
+                <span key={p} className="flex items-center gap-1 px-2.5 py-1 bg-gold/8 border border-gold/20 rounded-full text-xs text-gold font-medium">
+                  {p}
+                  <button type="button" onClick={() => onPositionsChange(positions.filter((x) => x !== p))}
+                    className="hover:text-red-400 transition-colors ml-0.5">
+                    <X size={9} />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="space-y-4">
+            {departments.map((dept) => {
+              const colors = deptColors(dept.color);
+              const deptCount = dept.roles.filter((r) => positions.includes(r)).length;
+              return (
+                <div key={dept.id}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <p className={`text-[10px] uppercase tracking-widest font-semibold ${colors.text}`}>{dept.label}</p>
+                    {deptCount > 0 && (
+                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${colors.bg} ${colors.border} ${colors.text}`}>
+                        {deptCount}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {dept.roles.map((job) => {
+                      const isSel = positions.includes(job);
+                      return (
+                        <button key={job} type="button"
+                          onClick={() => onPositionsChange(isSel ? positions.filter((x) => x !== job) : [...positions, job])}
+                          className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+                            isSel
+                              ? `${colors.bg} ${colors.border} ${colors.text}`
+                              : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"
+                          }`}
+                        >
+                          {job}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1204,11 +1182,12 @@ export default function ProfilePage() {
                   </div>
                 )}
 
-                {/* ── Ich bin & Positionen (unified) ── */}
+                {/* ── Deine Tätigkeit ── */}
                 <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
-                  <h2 className="font-semibold text-text-primary mb-1">{t("sectionIAm")}</h2>
-                  <p className="text-xs text-text-muted mb-4">{t("sectionIAmDesc")}</p>
-                  <RoleAndPositionPicker
+                  <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted mb-4">
+                    Deine Tätigkeit <span className="text-gold">*</span>
+                  </p>
+                  <TypeChipPicker
                     selectedType={currentProfileType}
                     onSelectType={setCurrentProfileType}
                     positions={positions}
