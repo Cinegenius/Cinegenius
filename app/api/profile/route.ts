@@ -205,20 +205,27 @@ export async function PATCH(req: NextRequest) {
 
     // Slug: validate format and check uniqueness to prevent profile hijacking
     if ("slug" in safe) {
-      const slug = String(safe.slug).trim().toLowerCase();
-      if (!/^[a-z0-9_-]{3,64}$/.test(slug)) {
-        return NextResponse.json({ error: "Slug ungültig (3–64 Zeichen, nur a-z, 0-9, _ und -)" }, { status: 400 });
+      const rawSlug = safe.slug;
+      // Guard: null/empty/whitespace → clear slug, no uniqueness check needed.
+      // (Prevents String(null)==="null" being stored as a real slug and blocking all subsequent signups.)
+      if (!rawSlug || (typeof rawSlug === "string" && !rawSlug.trim())) {
+        safe.slug = null;
+      } else {
+        const slug = String(rawSlug).trim().toLowerCase();
+        if (!/^[a-z0-9_-]{3,64}$/.test(slug)) {
+          return NextResponse.json({ error: "Slug ungültig (3–64 Zeichen, nur a-z, 0-9, _ und -)" }, { status: 400 });
+        }
+        const { data: conflict } = await db
+          .from("profiles")
+          .select("user_id")
+          .eq("slug", slug)
+          .neq("user_id", userId)
+          .maybeSingle();
+        if (conflict) {
+          return NextResponse.json({ error: "Slug ist bereits vergeben" }, { status: 409 });
+        }
+        safe.slug = slug;
       }
-      const { data: conflict } = await db
-        .from("profiles")
-        .select("user_id")
-        .or(`slug.eq.${slug},user_id.eq.${slug}`)
-        .neq("user_id", userId)
-        .maybeSingle();
-      if (conflict) {
-        return NextResponse.json({ error: "Slug ist bereits vergeben" }, { status: 409 });
-      }
-      safe.slug = slug;
     }
 
     const updated_at = new Date().toISOString();

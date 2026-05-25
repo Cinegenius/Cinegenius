@@ -656,7 +656,7 @@ export default function ProfilePage() {
             nightShoots:   (profile.availability_config as any)?.night_shoots  ?? false,
             shortNotice:   (profile.availability_config as any)?.short_notice  ?? false,
             workRadius:    String((profile.availability_config as any)?.work_radius_km ?? ""),
-            slug:          profile.slug                ?? "",
+            slug:          (profile.slug && profile.slug !== "null") ? profile.slug : "",
             phone:         profile.phone               ?? "",
             contactEmail:  profile.contact_email       ?? "",
           });
