@@ -33,9 +33,9 @@ export async function GET(req: NextRequest) {
     const primaryType = (p.profile_types?.[0] ?? p.profile_type ?? "") as ProfileType;
     const typeLabel = primaryType ? (PROFILE_TYPE_LABELS[primaryType] ?? "") : "";
     const types: string[] = p.profile_types ?? [];
-    const isCreator = types.some((t) => CREATOR_TYPES.has(t as ProfileType)) ||
-      (types.length === 0 && ((Array.isArray(p.positions) && p.positions.length > 0) || !!p.role?.trim()));
-    if (!isCreator) return null;
+    // Filter out vendor-only profiles; show everyone else (including new users with no types yet)
+    const isVendorOnly = types.length > 0 && types.every((t) => !CREATOR_TYPES.has(t as ProfileType));
+    if (isVendorOnly) return null;
     return {
       id: p.user_id,
       name: p.display_name ?? "Unbekannt",

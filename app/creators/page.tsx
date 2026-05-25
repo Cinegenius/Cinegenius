@@ -108,10 +108,8 @@ export default async function CreatorsPage() {
       const types: string[] = p.profile_types ?? [];
       // Show if any profile type belongs on this page (talent / crew / creative)
       if (types.some((t) => CREATOR_TYPES.has(t as ProfileType))) return true;
-      // Backwards compat: old profiles with no types but with positions / role
-      if (types.length === 0) {
-        return (Array.isArray(p.positions) && p.positions.length > 0) || !!p.role?.trim();
-      }
+      // No profile type set yet (new/incomplete profile) → show by default
+      if (types.length === 0) return true;
       return false;
     })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
