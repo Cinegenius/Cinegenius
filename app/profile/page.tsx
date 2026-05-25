@@ -466,6 +466,7 @@ export default function ProfilePage() {
 
   const [activeTab, setActiveTab] = useState("profile");
   const [profileLoading, setProfileLoading] = useState(true);
+  const [profileExists, setProfileExists] = useState(false);
   const [saving, setSaving] = useState(false);
   const [payoutSaving, setPayoutSaving] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
@@ -618,7 +619,8 @@ export default function ProfilePage() {
   useEffect(() => {
     fetch("/api/profile")
       .then((r) => r.json())
-      .then(({ profile }) => {
+      .then(({ profile, exists }) => {
+        setProfileExists(!!exists);
         if (profile) {
           setForm({
             name:          profile.display_name        ?? "",
@@ -870,45 +872,58 @@ export default function ProfilePage() {
     }
     setSaving(true);
     try {
-      // Basisdaten speichern
+      const location = [form.city.trim(), form.country.trim()].filter(Boolean).join(", ");
+      const commonPayload = {
+        display_name:   form.name,
+        location,
+        bio:            form.bio,
+        role:           positions[0] ?? null,
+        available:      form.available,
+        skills,
+        memberships,
+        positions,
+        languages,
+        profile_images: profileImages,
+        reel_url:       videoLinks[0] || null,
+        available_from: form.availableFrom || null,
+        travel_ready:   form.travelReady,
+        availability_config: {
+          weekends:      form.weekends,
+          night_shoots:  form.nightShoots,
+          short_notice:  form.shortNotice,
+          work_radius_km: form.workRadius ? parseInt(form.workRadius) : null,
+        },
+        cover_image_url: coverImageUrl || null,
+        instagram_url:  instagramUrl || null,
+        tiktok_url:     tiktokUrl || null,
+        youtube_url:    youtubeUrl || null,
+        vimeo_url:      vimeoUrl || null,
+        linkedin_url:   linkedinUrl || null,
+        website_url:    safeLink(form.website) || null,
+        imdb_url:       safeLink(form.imdbUrl) || null,
+        phone:          form.phone.trim() || null,
+        contact_email:  form.contactEmail.trim() || null,
+        day_rate:       dayRate ? parseInt(dayRate) : null,
+        filmography,
+        video_links:    videoLinks,
+        crew: { certificates: crewCertificates },
+      };
+
+      // First-time profile creation uses POST; subsequent edits use PATCH
+      const isNew = !profileExists;
       const res = await fetch("/api/profile", {
-        method: "PATCH",
+        method: isNew ? "POST" : "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          display_name:   form.name,
+        body: JSON.stringify(isNew ? {
+          ...commonPayload,
+          avatar_url:     avatarUrl || null,
+          portfolio_images: [],
+          experience:     "",
+          profile_types:  currentProfileType ? [currentProfileType] : [],
           slug:           form.slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") || null,
-          location:       [form.city.trim(), form.country.trim()].filter(Boolean).join(", "),
-          bio:            form.bio,
-          role:           positions[0] ?? null,
-          available:      form.available,
-          skills,
-          memberships,
-          positions,
-          languages,
-          profile_images: profileImages,
-          reel_url:       videoLinks[0] || null,
-          available_from: form.availableFrom || null,
-          travel_ready:   form.travelReady,
-          availability_config: {
-            weekends:      form.weekends,
-            night_shoots:  form.nightShoots,
-            short_notice:  form.shortNotice,
-            work_radius_km: form.workRadius ? parseInt(form.workRadius) : null,
-          },
-          cover_image_url: coverImageUrl || null,
-          instagram_url:  instagramUrl || null,
-          tiktok_url:     tiktokUrl || null,
-          youtube_url:    youtubeUrl || null,
-          vimeo_url:      vimeoUrl || null,
-          linkedin_url:   linkedinUrl || null,
-          website_url:    safeLink(form.website) || null,
-          imdb_url:       safeLink(form.imdbUrl) || null,
-          phone:          form.phone.trim() || null,
-          contact_email:  form.contactEmail.trim() || null,
-          day_rate:       dayRate ? parseInt(dayRate) : null,
-          filmography,
-          video_links:    videoLinks,
-          crew: { certificates: crewCertificates },
+        } : {
+          ...commonPayload,
+          slug:           form.slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") || null,
         }),
       });
       const baseResult = await res.json();
@@ -917,6 +932,7 @@ export default function ProfilePage() {
         addToast(`Speichern fehlgeschlagen: ${msg}`, "error");
         return;
       }
+      if (isNew) setProfileExists(true);
 
       // Profiltyp + Casting-Daten immer speichern (via RPC, kein Schema-Cache Problem)
       const physical = {
