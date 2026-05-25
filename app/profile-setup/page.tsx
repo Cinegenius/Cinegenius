@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { compressAvatar, safeObjectURL } from "@/lib/compressImage";
 import { useUser } from "@clerk/nextjs";
-import { Loader2, Camera, CheckCircle, ArrowRight } from "lucide-react";
+import { Loader2, Camera, CheckCircle, ArrowRight, AlertCircle } from "lucide-react";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 import Link from "next/link";
 
@@ -21,6 +21,7 @@ export default function ProfileSetupPage() {
   const [done, setDone] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const [displayName, setDisplayName] = useState("");
   const [city, setCity] = useState("");
@@ -29,12 +30,17 @@ export default function ProfileSetupPage() {
   const [focalPoint, setFocalPoint] = useState<FocalPoint>({ x: 50, y: 33 });
   const [focalPickerImage, setFocalPickerImage] = useState<string | null>(null);
 
-  // Redirect if profile already exists
+  // Redirect if profile already exists — with abort controller to prevent race conditions
   useEffect(() => {
     if (!isLoaded || !user) return;
-    fetch("/api/profile").then(r => r.json()).then(({ exists }) => {
-      if (exists) window.location.replace(safeRedirect(searchParams.get("redirect")));
-    });
+    const controller = new AbortController();
+    fetch("/api/profile", { signal: controller.signal })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.exists) window.location.replace(safeRedirect(searchParams.get("redirect")));
+      })
+      .catch(() => {}); // Network error: stay on page, user can still create profile
+    return () => controller.abort();
   }, [isLoaded, user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Pre-fill name from Clerk
@@ -49,18 +55,26 @@ export default function ProfileSetupPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     const objectUrl = safeObjectURL(file);
-    if (objectUrl) setAvatarPreview((prev) => { if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev); return objectUrl; });
+    if (objectUrl) {
+      setAvatarPreview((prev) => { if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev); return objectUrl; });
+    }
     setUploading(true);
+    setErrorMsg("");
     try {
       const compressed = await compressAvatar(file);
       const fd = new FormData();
       fd.append("file", compressed);
       const res = await fetch("/api/upload/avatar", { method: "POST", body: fd });
-      if (!res.ok) throw new Error("Upload fehlgeschlagen");
-      const { url } = await res.json();
-      if (!url) throw new Error("Upload ohne URL");
-      setAvatarUrl(url);
-      setFocalPickerImage(url);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Upload fehlgeschlagen");
+      if (!data.url) throw new Error("Kein URL erhalten");
+      setAvatarUrl(data.url);
+      setFocalPickerImage(data.url);
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Fehler beim Foto-Upload — du kannst trotzdem weitermachen.");
+      setAvatarPreview("");
+      setAvatarUrl("");
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
     } finally {
       setUploading(false);
     }
@@ -69,6 +83,7 @@ export default function ProfileSetupPage() {
   async function handleSave() {
     if (!displayName.trim() || !city.trim()) return;
     setSaving(true);
+    setErrorMsg("");
     try {
       const res = await fetch("/api/profile", {
         method: "POST",
@@ -84,9 +99,15 @@ export default function ProfileSetupPage() {
           profile_types: [],
         }),
       });
-      if (!res.ok) { setSaving(false); return; }
+      const data = await res.json();
+      if (!res.ok) {
+        setErrorMsg(data?.error || "Profil konnte nicht erstellt werden. Bitte versuche es erneut.");
+        return;
+      }
       setDone(true);
     } catch {
+      setErrorMsg("Verbindungsfehler. Bitte prüfe deine Internetverbindung und versuche es erneut.");
+    } finally {
       setSaving(false);
     }
   }
@@ -129,6 +150,14 @@ export default function ProfileSetupPage() {
               </p>
             </div>
 
+            {/* Error message */}
+            {errorMsg && (
+              <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3">
+                <AlertCircle size={16} className="text-red-400 mt-0.5 shrink-0" />
+                <p className="text-sm text-red-400">{errorMsg}</p>
+              </div>
+            )}
+
             {/* Avatar */}
             <div className="flex flex-col items-center gap-2">
               <button onClick={() => fileRef.current?.click()} disabled={uploading} className="relative">
@@ -158,8 +187,9 @@ export default function ProfileSetupPage() {
               </label>
               <input
                 value={displayName}
-                onChange={e => setDisplayName(e.target.value)}
+                onChange={e => { setDisplayName(e.target.value); setErrorMsg(""); }}
                 placeholder="Wie sollen andere dich nennen?"
+                maxLength={100}
                 className="w-full bg-bg-secondary border border-border rounded-2xl px-4 py-3.5 text-base text-text-primary focus:outline-none focus:border-gold transition-colors"
               />
             </div>
@@ -171,8 +201,9 @@ export default function ProfileSetupPage() {
               </label>
               <input
                 value={city}
-                onChange={e => setCity(e.target.value)}
+                onChange={e => { setCity(e.target.value); setErrorMsg(""); }}
                 placeholder="z.B. Wien, München, Berlin …"
+                maxLength={100}
                 className="w-full bg-bg-secondary border border-border rounded-2xl px-4 py-3.5 text-base text-text-primary focus:outline-none focus:border-gold transition-colors"
               />
             </div>

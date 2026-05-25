@@ -105,7 +105,7 @@ export default function DashboardPage() {
   useEffect(() => {
     // Profile + Completeness
     fetch("/api/profile")
-      .then((r) => r.json())
+      .then((r) => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
       .then(({ profile, exists }) => {
         if (!exists) { window.location.replace("/profile-setup"); return; }
         if (profile?.display_name) setProfileDisplayName(profile.display_name);

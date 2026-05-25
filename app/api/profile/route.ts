@@ -3,7 +3,6 @@ import { requireAuth } from "@/lib/auth";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
-import { sendWelcomeEmail } from "@/lib/email";
 
 // Stable columns that always exist in the profiles table
 const PROFILE_COLS = [
@@ -146,18 +145,10 @@ export async function POST(req: NextRequest) {
     await clerk.users.updateUserMetadata(userId, {
       publicMetadata: { profileComplete: true },
     });
-
-    // Send welcome email only for brand-new profiles
-    if (isNewProfile) {
-      const clerkUser = await clerk.users.getUser(userId);
-      const email = clerkUser.emailAddresses[0]?.emailAddress;
-      if (email) {
-        sendWelcomeEmail(email, display_name.trim()).catch(() => {});
-      }
-    }
   } catch (e) {
     console.error("[profile POST] failed to set Clerk metadata:", e);
   }
+  // Welcome email is sent by the Clerk webhook (user.created) — no duplicate here
 
   revalidateTag("profiles", "max");
 
