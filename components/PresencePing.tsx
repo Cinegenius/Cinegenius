@@ -11,11 +11,25 @@ export default function PresencePing() {
   useEffect(() => {
     if (!isSignedIn) return;
 
-    const ping = () => fetch("/api/presence", { method: "POST" }).catch(() => {});
+    // Only ping when the tab is actually visible — prevents showing as online
+    // when the user has the tab open in the background
+    const ping = () => {
+      if (document.visibilityState === "visible") {
+        fetch("/api/presence", { method: "POST" }).catch(() => {});
+      }
+    };
+
     ping();
 
     const id = setInterval(ping, INTERVAL_MS);
-    return () => clearInterval(id);
+
+    // Also ping immediately when user switches back to this tab
+    document.addEventListener("visibilitychange", ping);
+
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", ping);
+    };
   }, [isSignedIn]);
 
   return null;
