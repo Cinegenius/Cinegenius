@@ -87,54 +87,38 @@ function getCompletion(opts: {
 }
 
 // ─── Chip-style type picker ───────────────────────────────────────────────────
-const TYPE_CHIP_GROUPS = [
-  { label: "Talent", emoji: "🎭", types: [
-    ["actor",    "Schauspieler/in"],
-    ["model",    "Model"],
-    ["extra",    "Komparse"],
-    ["host",     "Moderator/in"],
-    ["dancer",   "Tänzer/in"],
-    ["stunt",    "Stunt"],
-    ["voiceover","Sprecher/in"],
-    ["creator",  "Creator / Influencer"],
-  ] as [string, string][] },
-  { label: "Filmcrew", emoji: "🎬", types: [
-    ["camera",                "Kamera"],
-    ["lighting",              "Licht / Gaffer"],
-    ["sound",                 "Ton"],
-    ["director_of_photography","DoP"],
-    ["director",              "Regie"],
-    ["production",            "Produktion"],
-    ["makeup",                "Maske"],
-    ["costume",               "Kostüm"],
-    ["postproduction",        "Post / Schnitt"],
-    ["vfx",                   "VFX"],
-    ["sfx",                   "SFX"],
-    ["art_department",        "Szenenbild"],
-    ["broadcast",             "Broadcast"],
-  ] as [string, string][] },
-  { label: "Kreativ", emoji: "✏️", types: [
-    ["filmmaker",     "Regisseur/in"],
-    ["writer",        "Autor/in"],
-    ["photographer",  "Fotograf/in"],
-    ["editor",        "Editor/in"],
-    ["motion_designer","Motion Designer"],
-    ["art_director",  "Art Director"],
-  ] as [string, string][] },
-  { label: "Anbieter", emoji: "🏠", types: [
-    ["location",  "Location"],
-    ["equipment", "Equipment"],
-    ["vehicle",   "Fahrzeug"],
-    ["studio",    "Studio"],
-    ["props",     "Requisiten"],
-  ] as [string, string][] },
+const TALENT_CHIPS: [string, string][] = [
+  ["actor",     "Schauspieler/in"],
+  ["model",     "Model"],
+  ["extra",     "Komparse"],
+  ["host",      "Moderator/in"],
+  ["dancer",    "Tänzer/in"],
+  ["stunt",     "Stunt Performer"],
+  ["voiceover", "Sprecher/in"],
+  ["creator",   "Creator / Influencer"],
 ];
 
-const CREW_KREATIV_TYPES = new Set([
-  "camera","lighting","sound","director_of_photography","director","production",
-  "makeup","costume","postproduction","vfx","sfx","art_department","broadcast",
-  "filmmaker","writer","photographer","editor","motion_designer","art_director",
-]);
+const ANBIETER_CHIPS: [string, string][] = [
+  ["location",  "Location"],
+  ["equipment", "Equipment"],
+  ["vehicle",   "Fahrzeug"],
+  ["studio",    "Studio"],
+  ["props",     "Requisiten"],
+];
+
+const TALENT_TYPE_IDS  = new Set(TALENT_CHIPS.map(([id]) => id));
+const ANBIETER_TYPE_IDS = new Set(ANBIETER_CHIPS.map(([id]) => id));
+
+// Map department id → profile_type key
+const DEPT_TO_PROFILE_TYPE: Record<string, string> = {
+  kamera: "camera", licht: "lighting", ton: "sound",
+  produktion: "production", regie: "director",
+  art: "art_department", kostuem: "costume", maske: "makeup",
+  post: "postproduction", sfx: "sfx", broadcast: "broadcast",
+  virtual: "vfx", musik: "filmmaker", "set-logistik": "production",
+  redaktion: "filmmaker", social: "creator", foto: "photographer",
+  ki: "filmmaker", cast: "",
+};
 
 function TypeChipPicker({
   selectedType,
@@ -147,102 +131,127 @@ function TypeChipPicker({
   positions: string[];
   onPositionsChange: (p: string[]) => void;
 }) {
-  const showPositions = CREW_KREATIV_TYPES.has(selectedType);
+  function togglePosition(job: string, deptId: string) {
+    const isSel = positions.includes(job);
+    const next = isSel ? positions.filter((x) => x !== job) : [...positions, job];
+    onPositionsChange(next);
+    // Auto-infer profile_type from department when adding a role
+    if (!isSel) {
+      // Only override if not a manually chosen talent/vendor type
+      if (!TALENT_TYPE_IDS.has(selectedType) && !ANBIETER_TYPE_IDS.has(selectedType)) {
+        const mapped = DEPT_TO_PROFILE_TYPE[deptId];
+        if (mapped) onSelectType(mapped);
+      }
+    } else {
+      // Removed a role — re-infer from remaining positions
+      const firstDept = departments.find((d) => d.roles.some((r) => next.includes(r)));
+      if (!firstDept) {
+        if (!TALENT_TYPE_IDS.has(selectedType) && !ANBIETER_TYPE_IDS.has(selectedType)) {
+          onSelectType("");
+        }
+      }
+    }
+  }
 
   return (
-    <div className="space-y-5">
-      {/* Chip groups */}
-      <div className="space-y-4">
-        {TYPE_CHIP_GROUPS.map((group) => (
-          <div key={group.label}>
-            <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted mb-2.5">
-              {group.emoji} {group.label}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {group.types.map(([id, label]) => {
-                const active = selectedType === id;
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => onSelectType(active ? "" : id)}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                      active
-                        ? "bg-gold/15 border-gold/50 text-gold"
-                        : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"
-                    }`}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+    <div className="space-y-6">
+      {/* Talent */}
+      <div>
+        <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted mb-2.5">🎭 Talent</p>
+        <div className="flex flex-wrap gap-2">
+          {TALENT_CHIPS.map(([id, label]) => {
+            const active = selectedType === id;
+            return (
+              <button key={id} type="button"
+                onClick={() => { onSelectType(active ? "" : id); if (!active) onPositionsChange([]); }}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                  active ? "bg-gold/15 border-gold/50 text-gold" : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"
+                }`}>
+                {label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Position picker — shown for crew/kreativ types */}
-      {showPositions && (
-        <div className="border-t border-border/60 pt-5">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">Positionen</p>
-            {positions.length > 0 && (
-              <button type="button" onClick={() => onPositionsChange([])}
-                className="text-[10px] text-text-muted hover:text-red-400 transition-colors">
-                Alle entfernen
-              </button>
-            )}
-          </div>
+      {/* Filmcrew & Kreativ — vollständige Rollen aus departments.ts */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">🎬 Filmcrew & Kreativ</p>
           {positions.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-4">
-              {positions.map((p) => (
-                <span key={p} className="flex items-center gap-1 px-2.5 py-1 bg-gold/8 border border-gold/20 rounded-full text-xs text-gold font-medium">
-                  {p}
-                  <button type="button" onClick={() => onPositionsChange(positions.filter((x) => x !== p))}
-                    className="hover:text-red-400 transition-colors ml-0.5">
-                    <X size={9} />
-                  </button>
-                </span>
-              ))}
-            </div>
+            <button type="button" onClick={() => { onPositionsChange([]); if (!TALENT_TYPE_IDS.has(selectedType) && !ANBIETER_TYPE_IDS.has(selectedType)) onSelectType(""); }}
+              className="text-[10px] text-text-muted hover:text-red-400 transition-colors">
+              Alle entfernen
+            </button>
           )}
-          <div className="space-y-4">
-            {departments.map((dept) => {
-              const colors = deptColors(dept.color);
-              const deptCount = dept.roles.filter((r) => positions.includes(r)).length;
-              return (
-                <div key={dept.id}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <p className={`text-[10px] uppercase tracking-widest font-semibold ${colors.text}`}>{dept.label}</p>
-                    {deptCount > 0 && (
-                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${colors.bg} ${colors.border} ${colors.text}`}>
-                        {deptCount}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {dept.roles.map((job) => {
-                      const isSel = positions.includes(job);
-                      return (
-                        <button key={job} type="button"
-                          onClick={() => onPositionsChange(isSel ? positions.filter((x) => x !== job) : [...positions, job])}
-                          className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
-                            isSel
-                              ? `${colors.bg} ${colors.border} ${colors.text}`
-                              : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"
-                          }`}
-                        >
-                          {job}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         </div>
-      )}
+        {positions.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {positions.map((p) => (
+              <span key={p} className="flex items-center gap-1 px-2.5 py-1 bg-gold/8 border border-gold/20 rounded-full text-xs text-gold font-medium">
+                {p}
+                <button type="button"
+                  onClick={() => {
+                    const next = positions.filter((x) => x !== p);
+                    onPositionsChange(next);
+                    const firstDept = departments.find((d) => d.roles.some((r) => next.includes(r)));
+                    if (!firstDept && !TALENT_TYPE_IDS.has(selectedType) && !ANBIETER_TYPE_IDS.has(selectedType)) onSelectType("");
+                  }}
+                  className="hover:text-red-400 transition-colors ml-0.5">
+                  <X size={9} />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+        {departments.map((dept) => {
+          const colors = deptColors(dept.color);
+          const deptCount = dept.roles.filter((r) => positions.includes(r)).length;
+          return (
+            <div key={dept.id}>
+              <div className="flex items-center gap-2 mb-2">
+                <p className={`text-[10px] uppercase tracking-widest font-semibold ${colors.text}`}>{dept.emoji} {dept.label}</p>
+                {deptCount > 0 && (
+                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${colors.bg} ${colors.border} ${colors.text}`}>{deptCount}</span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {dept.roles.map((job) => {
+                  const isSel = positions.includes(job);
+                  return (
+                    <button key={job} type="button"
+                      onClick={() => togglePosition(job, dept.id)}
+                      className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+                        isSel ? `${colors.bg} ${colors.border} ${colors.text}` : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"
+                      }`}>
+                      {job}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Anbieter */}
+      <div>
+        <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted mb-2.5">🏠 Anbieter</p>
+        <div className="flex flex-wrap gap-2">
+          {ANBIETER_CHIPS.map(([id, label]) => {
+            const active = selectedType === id;
+            return (
+              <button key={id} type="button"
+                onClick={() => { onSelectType(active ? "" : id); if (!active) onPositionsChange([]); }}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                  active ? "bg-gold/15 border-gold/50 text-gold" : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"
+                }`}>
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
