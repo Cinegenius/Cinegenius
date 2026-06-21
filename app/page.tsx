@@ -272,69 +272,6 @@ export default async function HomePage() {
       )}
 
       {/* ══════════════════════════════════════════════
-          JOBS
-      ══════════════════════════════════════════════ */}
-      <section className="py-10 sm:py-14 bg-bg-secondary border-y border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-6">
-            <div>
-              <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("jobsLabel")}</p>
-              <h2 className="font-display text-xl sm:text-2xl font-bold text-text-primary">{t("jobsTitle")}</h2>
-            </div>
-            <Link href="/jobs" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium shrink-0">
-              {tc("viewAll")} <ArrowRight size={14} />
-            </Link>
-          </div>
-          {liveJobs.length > 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              {liveJobs.map((job) => (
-                <Link
-                  key={job.id}
-                  href={`/jobs/${job.id}`}
-                  className="card-hover group flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-elevated hover:border-gold/30 transition-all"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
-                    <Briefcase size={16} className="text-gold" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-text-primary text-sm truncate">{job.title}</h3>
-                    <p className="text-xs text-text-muted truncate">{job.location}</p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-sm font-semibold text-gold">
-                      {job.rawPrice ? `${job.rawPrice.toLocaleString()} €${tc("perDay")}` : tc("onRequest")}
-                    </p>
-                    <p className="text-[11px] text-text-muted flex items-center gap-1 mt-0.5 justify-end">
-                      <Clock size={9} /> {formatDate(job.created_at)}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-10 text-text-muted text-sm">
-              Noch keine Jobs — <Link href="/inserat" className="text-gold hover:text-gold-light">Job ausschreiben</Link>
-            </div>
-          )}
-          <div className="mt-5 flex gap-3 justify-center sm:justify-start">
-            <Link
-              href="/jobs"
-              className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors"
-            >
-              Alle Jobs ansehen <ArrowRight size={13} />
-            </Link>
-            <span className="text-border">·</span>
-            <Link
-              href="/inserat"
-              className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors"
-            >
-              {tc("postJob")} <ArrowRight size={13} />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════
           MARKTPLATZ / PROPS
       ══════════════════════════════════════════════ */}
       {liveProps.length > 0 && (
@@ -439,6 +376,69 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* ══════════════════════════════════════════════
+          JOBS
+      ══════════════════════════════════════════════ */}
+      <section className="py-10 sm:py-14 border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-6">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("jobsLabel")}</p>
+              <h2 className="font-display text-xl sm:text-2xl font-bold text-text-primary">{t("jobsTitle")}</h2>
+            </div>
+            <Link href="/jobs" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium shrink-0">
+              {tc("viewAll")} <ArrowRight size={14} />
+            </Link>
+          </div>
+          {liveJobs.length > 0 ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              {liveJobs.map((job) => (
+                <Link
+                  key={job.id}
+                  href={`/jobs/${job.id}`}
+                  className="card-hover group flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 transition-all"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
+                    <Briefcase size={16} className="text-gold" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-text-primary text-sm truncate">{job.title}</h3>
+                    <p className="text-xs text-text-muted truncate">{job.location}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-semibold text-gold">
+                      {job.rawPrice ? `${job.rawPrice.toLocaleString()} €${tc("perDay")}` : tc("onRequest")}
+                    </p>
+                    <p className="text-[11px] text-text-muted flex items-center gap-1 mt-0.5 justify-end">
+                      <Clock size={9} /> {formatDate(job.created_at)}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-10 text-text-muted text-sm">
+              Noch keine Jobs — <Link href="/inserat" className="text-gold hover:text-gold-light">Job ausschreiben</Link>
+            </div>
+          )}
+          <div className="mt-5 flex gap-3 justify-center sm:justify-start">
+            <Link
+              href="/jobs"
+              className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors"
+            >
+              Alle Jobs ansehen <ArrowRight size={13} />
+            </Link>
+            <span className="text-border">·</span>
+            <Link
+              href="/inserat"
+              className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors"
+            >
+              {tc("postJob")} <ArrowRight size={13} />
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* ══════════════════════════════════════════════
           TOP RATED CREATORS
