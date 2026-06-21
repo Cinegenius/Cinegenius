@@ -162,28 +162,23 @@ export default async function HomePage() {
   return (
     <>
       {/* ══════════════════════════════════════════════
-          HERO — kompakt, kein Vollbild
+          HERO — minimal, kein Leerraum
       ══════════════════════════════════════════════ */}
-      <section className="relative flex flex-col justify-center overflow-hidden bg-bg-primary border-b border-border" style={{ minHeight: "52svh" }}>
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[360px] bg-gold/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 text-center">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-gold/30 bg-gold/5 text-gold text-[10px] font-semibold uppercase tracking-widest mb-6 animate-fade-in">
-            <Zap size={9} /> {t("badgeHero")}
-          </div>
+      <section className="bg-bg-primary border-b border-border">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-9 sm:py-11 text-center">
           <h1
-            className="font-display text-[2.4rem] sm:text-[4rem] font-bold tracking-tight text-text-primary mb-4 animate-fade-up"
-            style={{ lineHeight: "1.1" }}
+            className="font-display text-[2rem] sm:text-[2.8rem] font-bold tracking-tight text-text-primary mb-1 leading-tight"
           >
-            Locations, Jobs &<br />
+            Locations, Jobs &{" "}
             <span className="text-gradient-gold">Marktplatz</span>
           </h1>
-          <p className="text-text-muted text-sm sm:text-base leading-relaxed mb-8 animate-fade-up">
-            {t("heroSubtitle")}
+          <p className="text-text-muted text-sm sm:text-base mb-5">
+            für Film, Foto & Content — kostenlos in der DACH-Region
           </p>
-          <div className="max-w-xl mx-auto mb-8 animate-fade-up">
+          <div className="max-w-xl mx-auto mb-4">
             <HeroSearch />
           </div>
-          <div className="flex flex-wrap justify-center gap-2.5 animate-fade-up">
+          <div className="flex flex-wrap justify-center gap-2">
             <Link
               href="/locations"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-bg-secondary hover:border-gold/40 hover:bg-gold/5 transition-all text-sm font-semibold text-text-primary"
