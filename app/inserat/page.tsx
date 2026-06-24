@@ -203,7 +203,7 @@ const groups: Group[] = [
     border: "border-violet-500/30",
     items: [
       // Film Equipment
-      { id: "mk_fahrzeuge",           label: "Bildfahrzeug vermieten",        sub: "Classic Car, Oldtimer, Stunt, Motorrad…",     icon: Car,         type: "vehicle", category: "Bild-Fahrzeug",          color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/20" },
+      { id: "mk_fahrzeuge",           label: "Bildfahrzeug vermieten",        sub: "Auto, Boot, Flugzeug, Heli, Motorrad…",       icon: Car,         type: "vehicle", category: "Bild-Fahrzeug",          color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/20" },
       { id: "mk_produktionsfahrzeug", label: "Produktionsfahrzeug vermieten", sub: "Kostümbus, Equipmenttransporter, Maske…",     icon: Truck,       type: "vehicle", category: "Produktionsfahrzeug",     color: "text-cyan-400",    bg: "bg-cyan-500/10 border-cyan-500/20" },
       { id: "mk_kostuem",        label: "Kostüme & Kleidung",     sub: "Verkleidungen, Uniformen, Zeitgeist…",     icon: Shirt,       type: "prop",    category: "Kostüme",              color: "text-rose-400",    bg: "bg-rose-500/10 border-rose-500/20" },
       { id: "mk_requisiten",     label: "Objekte & Dekoration",   sub: "Alltagsgegenstände, Kunstwerke, Deko…",    icon: Package,     type: "prop",    category: "Requisiten",           color: "text-violet-400",  bg: "bg-violet-500/10 border-violet-500/20" },
@@ -626,8 +626,7 @@ export default function InseratPage() {
     const { type } = selected;
     const hasCity = form.city.trim() !== "";
     if (type === "vehicle") {
-      const base = (form.make.trim() || form.title.trim()) && hasCity;
-      if (selected.category === "Produktionsfahrzeug") return base && !!form.vehicle_subtype;
+      const base = (form.make.trim() || form.title.trim()) && hasCity && !!form.vehicle_subtype;
       return base;
     }
     if (type === "job") return form.role_label.trim() && form.title.trim() && hasCity && form.shoot_start !== "";
@@ -840,26 +839,27 @@ export default function InseratPage() {
                       className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                 </div>
-                {selected.category === "Produktionsfahrzeug" && (
-                  <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Fahrzeugtyp *</label>
-                    <FormSelect value={form.vehicle_subtype} onChange={(v) => f("vehicle_subtype", v)}
-                      placeholder="Bitte wählen…"
-                      options={["Kostümbus", "Maske & Hair", "Equipment-Transporter", "Kamera-Van", "Generator-Fahrzeug", "Catering / Crafty", "Produktions-Van", "Regisseur-Trailer", "Darsteller-Trailer", "Sonstiges"].map(o => ({ value: o, label: o }))} />
-                  </div>
-                )}
+                <div>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Fahrzeugtyp *</label>
+                  <FormSelect value={form.vehicle_subtype} onChange={(v) => f("vehicle_subtype", v)}
+                    placeholder="Bitte wählen…"
+                    options={(selected.category === "Produktionsfahrzeug"
+                      ? ["Kostümbus", "Maske & Hair", "Equipment-Transporter", "Kamera-Van", "Generator-Fahrzeug", "Catering / Crafty", "Produktions-Van", "Regisseur-Trailer", "Darsteller-Trailer", "Sonstiges"]
+                      : ["PKW / Limousine", "Sportwagen / Cabrio", "SUV / Geländewagen", "Oldtimer / Classic Car", "Motorrad", "Roller / Scooter", "LKW / Truck", "Bus / Reisebus", "Wohnmobil / Camper", "Militärfahrzeug", "Kutsche / Pferdewagen", "Motorboot", "Segelboot / Yacht", "Jet-Ski", "Schiff / Fähre", "U-Boot (Requisite)", "Flugzeug (Prop / Stunt)", "Helikopter / Gyrocopter", "Heißluftballon", "Sonstiges"]
+                    ).map(o => ({ value: o, label: o }))} />
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Kraftstoff</label>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Antrieb / Kraftstoff</label>
                     <FormSelect value={form.fuel_type} onChange={(v) => f("fuel_type", v)}
                       placeholder="Bitte wählen…"
-                      options={["Benzin", "Diesel", "Elektro", "Hybrid", "LPG", "Sonstiges"].map(o => ({ value: o, label: o }))} />
+                      options={["Benzin", "Diesel", "Elektro", "Hybrid", "LPG", "Marine-Diesel", "Kerosin / Avgas", "Wind (Segel)", "Muskelkraft / Ruder", "Sonstiges"].map(o => ({ value: o, label: o }))} />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Führerscheinklasse</label>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Lizenz / Führerschein</label>
                     <FormSelect value={form.license_class} onChange={(v) => f("license_class", v)}
                       placeholder="Bitte wählen…"
-                      options={["B", "BE", "C", "CE", "D", "A", "Keine (stationär / Requisite)"].map(o => ({ value: o, label: o }))} />
+                      options={["B", "BE", "C", "CE", "D", "A", "Bootsführerschein (SBF Binnen)", "Bootsführerschein (SBF See / SKS)", "Sportküstenschifferschein (SKS)", "Privatpilotenlizenz (PPL)", "Berufspilotenlizenz (CPL)", "Keine / Nicht erforderlich"].map(o => ({ value: o, label: o }))} />
                   </div>
                 </div>
                 <label className="flex items-center gap-3 cursor-pointer select-none">
