@@ -844,7 +844,7 @@ export default function InseratPage() {
                   <FormSelect value={form.vehicle_subtype} onChange={(v) => f("vehicle_subtype", v)}
                     placeholder="Bitte wählen…"
                     options={(selected.category === "Produktionsfahrzeug"
-                      ? ["Kostümbus", "Maske & Hair", "Equipment-Transporter", "Kamera-Van", "Generator-Fahrzeug", "Catering / Crafty", "Produktions-Van", "Regisseur-Trailer", "Darsteller-Trailer", "Sonstiges"]
+                      ? ["Kostümbus", "Maske & Hair", "Equipment-Transporter", "Kamera-Van", "Generator-Fahrzeug", "Catering / Crafty", "Produktions-Van", "Regisseur-Trailer", "Darsteller-Trailer", "Motorboot / Tender", "Produktionsschiff", "Helikopter (Transport)", "Kleinflugzeug (Transport)", "Sonstiges"]
                       : ["PKW / Limousine", "Sportwagen / Cabrio", "SUV / Geländewagen", "Oldtimer / Classic Car", "Motorrad", "Roller / Scooter", "LKW / Truck", "Bus / Reisebus", "Wohnmobil / Camper", "Militärfahrzeug", "Kutsche / Pferdewagen", "Motorboot", "Segelboot / Yacht", "Jet-Ski", "Schiff / Fähre", "U-Boot (Requisite)", "Flugzeug (Prop / Stunt)", "Helikopter / Gyrocopter", "Heißluftballon", "Sonstiges"]
                     ).map(o => ({ value: o, label: o }))} />
                 </div>
