@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter, JetBrains_Mono } from "next/font/google";
+import { Playfair_Display, DM_Sans, JetBrains_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -24,10 +24,10 @@ const playfair = Playfair_Display({
   weight: ["400", "600", "700", "800"],
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const jetbrains = JetBrains_Mono({
@@ -119,7 +119,7 @@ export default async function RootLayout({
         lang={htmlLang}
         data-theme="dark"
         suppressHydrationWarning
-        className={`${playfair.variable} ${inter.variable} ${jetbrains.variable}`}
+        className={`${playfair.variable} ${dmSans.variable} ${jetbrains.variable}`}
       >
         <head>
           {/* Clerk JS loads from these domains — early connection cuts auth init time */}
