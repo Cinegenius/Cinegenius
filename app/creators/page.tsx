@@ -116,6 +116,7 @@ export default async function CreatorsPage() {
     .map((p: any) => {
       const phys = p.physical ?? {};
       const avail = p.availability_config ?? {};
+      const types: string[] = p.profile_types ?? [];
       // Pick a human-readable role label from the profile types
       const primaryType = (p.profile_types?.[0] ?? p.profile_type ?? "") as ProfileType;
       const typeLabel = primaryType ? (PROFILE_TYPE_LABELS[primaryType] ?? "") : "";
