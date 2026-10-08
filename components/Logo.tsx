@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-// Open chevron mark — the universal "play / forward / action" symbol.
-// Two clean strokes forming ›, rendered sharp on dark or light backgrounds.
-function ChevronMark({ size = 26 }: { size?: number }) {
+// CineGenius signature chevron: a softened forward mark, kept simple for small headers.
+// A clear forward mark that stays legible in compact headers.
+function ChevronMark({ size = 28 }: { size?: number }) {
   return (
     <svg
       width={size}
@@ -16,9 +16,9 @@ function ChevronMark({ size = 26 }: { size?: number }) {
       className="shrink-0"
     >
       <polyline
-        points="6,4 18,12 6,20"
+        points="5.5,4 18.5,12 5.5,20"
         stroke="var(--color-gold)"
-        strokeWidth="2.8"
+        strokeWidth="3.2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -40,18 +40,18 @@ export function Logo({ href = "/", onClick }: { href?: string; onClick?: () => v
     <Link
       href={href}
       onClick={handleClick}
-      className="flex items-center gap-2 shrink-0 group"
+      className="flex items-center gap-2.5 shrink-0 group"
       aria-label="CineGenius"
     >
-      <ChevronMark size={26} />
-      <span className="font-sans text-[15px] leading-none select-none tracking-tight">
-        <span className="font-normal text-text-secondary">Cine</span>
+      <ChevronMark size={28} />
+      <span className="font-sans text-[16px] leading-none select-none tracking-[-0.035em]">
+        <span className="font-medium text-text-primary">Cine</span>
         <span className="font-bold" style={{ color: "var(--color-gold)" }}>Genius</span>
       </span>
     </Link>
   );
 }
 
-export function LogoMark({ size = 26 }: { size?: number }) {
+export function LogoMark({ size = 28 }: { size?: number }) {
   return <ChevronMark size={size} />;
 }
