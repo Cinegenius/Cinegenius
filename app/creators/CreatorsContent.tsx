@@ -56,6 +56,7 @@ export type ServerCreator = {
   isReal: true;
   // Casting-Felder
   profile_type?: string;
+  profile_types?: string[];
   hair_color?: string;
   eye_color?: string;
   body_type?: string;
@@ -76,6 +77,41 @@ function parseLocation(loc: string): { city: string; country: string } {
 function getPositions(c: ServerCreator): string[] {
   if (Array.isArray(c.positions) && c.positions.length > 0) return c.positions;
   return [c.role];
+}
+
+function hasProfileType(c: ServerCreator, ...types: string[]): boolean {
+  return types.some((type) => c.profile_type === type || c.profile_types?.includes(type));
+}
+
+function mixAreaResults(creators: ServerCreator[]): ServerCreator[] {
+  const groups: Record<"crew" | "locations" | "marketplace", ServerCreator[]> = {
+    crew: [],
+    locations: [],
+    marketplace: [],
+  };
+
+  for (const creator of creators) {
+    if (hasProfileType(creator, "location", "studio")) groups.locations.push(creator);
+    else if (hasProfileType(creator, "equipment", "vehicle", "props")) groups.marketplace.push(creator);
+    else groups.crew.push(creator);
+  }
+
+  const mixed: ServerCreator[] = [];
+  let crewIndex = 0;
+  let locationsIndex = 0;
+  let marketplaceIndex = 0;
+
+  while (
+    crewIndex < groups.crew.length ||
+    locationsIndex < groups.locations.length ||
+    marketplaceIndex < groups.marketplace.length
+  ) {
+    if (crewIndex < groups.crew.length) mixed.push(groups.crew[crewIndex++]);
+    if (locationsIndex < groups.locations.length) mixed.push(groups.locations[locationsIndex++]);
+    if (marketplaceIndex < groups.marketplace.length) mixed.push(groups.marketplace[marketplaceIndex++]);
+  }
+
+  return mixed;
 }
 
 /** Normalize a role label: strip parentheses, split " / " alternatives */
@@ -495,9 +531,9 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
     }
 
     if (sidebarDept === "__locations") {
-      result = result.filter((c) => c.profile_type === "location");
+      result = result.filter((c) => hasProfileType(c, "location", "studio"));
     } else if (sidebarDept === "__marktplatz") {
-      result = result.filter((c) => ["equipment", "vehicle", "studio", "props"].includes(c.profile_type ?? ""));
+      result = result.filter((c) => hasProfileType(c, "equipment", "vehicle", "studio", "props"));
     } else if (sidebarDept) {
       const deptRoles = departments.find((d) => d.id === sidebarDept)?.roles ?? [];
       result = result.filter((c) => deptRoles.some((role) => matchesRole(c, role)));
@@ -538,15 +574,19 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
     if (sortKey === "rating") result.sort((a, b) => b.rating - a.rating);
     if (sortKey === "reviews") result.sort((a, b) => b.reviews - a.reviews);
 
-    // "Alle Bereiche" with no active filters → show only top 20 by rating
+    // "Alle Bereiche" starts with the highest-rated profiles; keep the full
+    // result available so pagination can reveal every department and provider.
     if (isTopMode) {
       result.sort((a, b) => {
         if (b.rating !== a.rating) return b.rating - a.rating;
         if (b.reviews !== a.reviews) return b.reviews - a.reviews;
         return (b.verified ? 1 : 0) - (a.verified ? 1 : 0);
       });
-      return result.slice(0, 20);
     }
+
+    // Keep the default "Alle Bereiche" view visibly mixed so locations and
+    // marketplace providers are present alongside crew from the first cards.
+    if (!sidebarDept && selectedRoles.size === 0) return mixAreaResults(result);
 
     return result;
   }, [query, selectedRoles, sidebarDept, availableOnly, vendorOnly, cityFilter, countryFilter, languageFilter,
@@ -1116,8 +1156,9 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 
       {/* ── Results ─────────────────────────────────────────────────────────── */}
       {(() => {
+        const isAllAreas = sidebarDept === null;
         const isVendorCategory = sidebarDept === "__locations" || sidebarDept === "__marktplatz";
-        const filteredCrew = isVendorCategory ? filtered : filtered.filter((c) => !c.isVendor);
+        const filteredCrew = isAllAreas || isVendorCategory ? filtered : filtered.filter((c) => !c.isVendor);
         const crewVisible  = filteredCrew.slice(0, visibleCount);
 
         return (
@@ -1247,13 +1288,9 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 
             {/* Count */}
             <p className="text-sm text-text-muted mb-5">
-              {isTopMode ? (
-                <span className="text-gold font-semibold">Top 20 nach Bewertung</span>
-              ) : (
-                <span className="text-text-primary font-semibold">
-                  {t("results", { count: filteredCrew.length })}
-                </span>
-              )}
+              <span className="text-text-primary font-semibold">
+                {t("results", { count: filteredCrew.length })}
+              </span>
               {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
             </p>
 

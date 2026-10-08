@@ -2,12 +2,6 @@ import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
 
-const CREATOR_TYPES = new Set(
-  (Object.entries(PROFILE_CATEGORY_MAP) as [ProfileType, string][])
-    .filter(([, cat]) => cat !== "vendor")
-    .map(([type]) => type)
-);
-
 const PAGE_SIZE = 48;
 
 // GET /api/creators?page=1  → next page of profiles (page 0 = first 96 served by SSR)
@@ -33,9 +27,6 @@ export async function GET(req: NextRequest) {
     const primaryType = (p.profile_types?.[0] ?? p.profile_type ?? "") as ProfileType;
     const typeLabel = primaryType ? (PROFILE_TYPE_LABELS[primaryType] ?? "") : "";
     const types: string[] = p.profile_types ?? [];
-    // Filter out vendor-only profiles; show everyone else (including new users with no types yet)
-    const isVendorOnly = types.length > 0 && types.every((t) => !CREATOR_TYPES.has(t as ProfileType));
-    if (isVendorOnly) return null;
     return {
       id: p.user_id,
       name: p.display_name ?? "Unbekannt",
@@ -53,6 +44,8 @@ export async function GET(req: NextRequest) {
       verified: p.verified ?? false,
       isReal: true as const,
       profile_type: primaryType,
+      profile_types: types,
+      isVendor: types.some((type) => PROFILE_CATEGORY_MAP[type as ProfileType] === "vendor"),
       hair_color: phys.hair_color ?? "", eye_color: phys.eye_color ?? "",
       body_type: phys.body_type ?? "",
       playing_age_min: phys.playing_age_min ?? null, playing_age_max: phys.playing_age_max ?? null,
