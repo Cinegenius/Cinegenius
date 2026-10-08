@@ -306,15 +306,17 @@ export default function Navbar() {
 
             {/* Desktop CTA */}
             <div className="hidden lg:flex items-center gap-2">
-              <button
-                onClick={() => document.dispatchEvent(new Event("cg:opensearch"))}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border text-text-muted hover:border-gold/40 hover:text-gold transition-all text-sm"
-                aria-label="CineGenius durchsuchen"
-              >
-                <Search size={14} />
-                <span className="hidden xl:inline">Suchen…</span>
-                <kbd className="hidden xl:inline text-[10px] px-1.5 py-0.5 rounded bg-bg-hover border border-border font-mono">⌘K</kbd>
-              </button>
+              {pathname !== "/" && (
+                <button
+                  onClick={() => document.dispatchEvent(new Event("cg:opensearch"))}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border text-text-muted hover:border-gold/40 hover:text-gold transition-all text-sm"
+                  aria-label="CineGenius durchsuchen"
+                >
+                  <Search size={14} />
+                  <span className="hidden xl:inline">Suchen…</span>
+                  <kbd className="hidden xl:inline text-[10px] px-1.5 py-0.5 rounded bg-bg-hover border border-border font-mono">⌘K</kbd>
+                </button>
+              )}
               <LanguageSwitcher />
               <NotificationCenter />
               {!isLoaded && !profileDisplayName && !profileAvatarUrl && (
@@ -430,13 +432,15 @@ export default function Navbar() {
 
             {/* Mobile: search + notifications + language + menu */}
             <div className="lg:hidden flex items-center gap-1">
-              <button
-                onClick={() => document.dispatchEvent(new Event("cg:opensearch"))}
-                className="w-9 h-9 flex items-center justify-center text-text-secondary hover:text-gold transition-colors"
-                aria-label="CineGenius durchsuchen"
-              >
-                <Search size={20} />
-              </button>
+              {pathname !== "/" && (
+                <button
+                  onClick={() => document.dispatchEvent(new Event("cg:opensearch"))}
+                  className="w-9 h-9 flex items-center justify-center text-text-secondary hover:text-gold transition-colors"
+                  aria-label="CineGenius durchsuchen"
+                >
+                  <Search size={20} />
+                </button>
+              )}
               {!isLoaded && !profileDisplayName && !profileAvatarUrl && (
                 <div className="w-8 h-8 rounded-full bg-bg-elevated border border-border/30 animate-pulse" />
               )}

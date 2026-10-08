@@ -468,13 +468,6 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                 );
               })}
             </nav>
-            <div className="mt-6 pt-5 border-t border-border">
-              <a href="/inserat?group=marktplatz"
-                className="flex items-center gap-2 px-3 py-2 text-sm text-gold hover:bg-gold/10 rounded-lg transition-colors font-medium">
-                <Plus size={14} />
-                Inserat erstellen
-              </a>
-            </div>
           </aside>
 
           {/* Main content */}
@@ -517,9 +510,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               <EmptyState icon={Package}
                 title={serverListings.length === 0 ? t("emptyTitle") : t("emptyTitleFiltered")}
                 description={serverListings.length === 0 ? t("emptyDesc") : t("emptyDescFiltered")}
-                action={serverListings.length === 0
-                  ? { label: t("emptyPost"), onClick: () => { window.location.href = "/inserat?group=marktplatz"; } }
-                  : { label: t("emptyReset"), onClick: clearAll }} />
+                action={serverListings.length === 0 ? undefined : { label: t("emptyReset"), onClick: clearAll }} />
             ) : (
               <>
                 <div className={viewMode === "grid"

@@ -191,18 +191,6 @@ export default function LocationsLanding({
                   </Link>
                 ))}
 
-                {/* "Alle anzeigen" card */}
-                <Link
-                  href={`/locations/suche?q=${encodeURIComponent(city)}`}
-                  className="shrink-0 w-64 h-44 rounded-2xl border border-border border-dashed bg-bg-elevated hover:border-indigo-400/40 hover:bg-bg-secondary transition-all flex flex-col items-center justify-center gap-3 group"
-                >
-                  <div className="w-10 h-10 rounded-full border border-border group-hover:border-indigo-400/40 flex items-center justify-center transition-colors">
-                    <ArrowRight size={16} className="text-text-muted group-hover:text-indigo-400 transition-colors" />
-                  </div>
-                  <p className="text-sm text-text-muted group-hover:text-text-primary transition-colors">
-                    Alle in {city}
-                  </p>
-                </Link>
               </div>
             </section>
           ))
@@ -210,18 +198,20 @@ export default function LocationsLanding({
       </div>
 
       {/* ── CTA banner ────────────────────────────────────────────── */}
-      <div className="mx-4 sm:mx-6 lg:mx-8 mb-16 rounded-2xl border border-border bg-bg-elevated p-8 flex flex-col sm:flex-row items-center justify-between gap-4 max-w-7xl xl:mx-auto">
-        <div>
-          <p className="font-bold text-text-primary text-lg mb-1">Deine Location eintragen</p>
-          <p className="text-text-muted text-sm">Vermiete deinen Space an Filmteams, Fotografen & Creator.</p>
+      {cityGroups.length > 0 && (
+        <div className="mx-4 sm:mx-6 lg:mx-8 mb-16 rounded-2xl border border-border bg-bg-elevated p-8 flex flex-col sm:flex-row items-center justify-between gap-4 max-w-7xl xl:mx-auto">
+          <div>
+            <p className="font-bold text-text-primary text-lg mb-1">Deine Location eintragen</p>
+            <p className="text-text-muted text-sm">Vermiete deinen Space an Filmteams, Fotografen & Creator.</p>
+          </div>
+          <Link
+            href="/inserat?group=drehorte"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-bg-primary font-bold rounded-xl hover:bg-gold-light transition-colors text-sm whitespace-nowrap shrink-0"
+          >
+            Location eintragen <ArrowRight size={14} />
+          </Link>
         </div>
-        <Link
-          href="/inserat?group=drehorte"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-bg-primary font-bold rounded-xl hover:bg-gold-light transition-colors text-sm whitespace-nowrap shrink-0"
-        >
-          Location eintragen <ArrowRight size={14} />
-        </Link>
-      </div>
+      )}
     </div>
   );
 }

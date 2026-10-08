@@ -33,7 +33,6 @@ export default async function CompaniesPage() {
           titleHighlight={t("titleHighlight")}
           description={t("description")}
           accentRgb="251,113,133"
-          ctaSecondary={{ label: t("allBrowse"), href: "/companies" }}
           cta={{ label: t("addCompany"), href: "/company-setup" }}
         />
       <CompaniesContent initialCompanies={data ?? []} />

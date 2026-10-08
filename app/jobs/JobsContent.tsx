@@ -8,7 +8,7 @@ import {
   MapPin, Briefcase, Clock, Search, ChevronRight, Zap, SlidersHorizontal,
   ChevronDown, X, Users2, Clapperboard, Video, Lightbulb, Wrench, Mic,
   Sparkles, Shirt, Palette, Monitor, Share2, Play, Camera, Scissors,
-  Film, Smartphone, Aperture, Globe, ArrowUpDown, Plus,
+  Film, Smartphone, Aperture, Globe, ArrowUpDown,
 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { FILM_DEPARTMENTS, DEPT_KEYWORDS, ALL_ROLES } from "@/lib/filmRoles";
@@ -446,9 +446,6 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
               </p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              <Link href="/jobs" className="inline-flex items-center gap-2 px-4 py-2.5 border border-border text-text-secondary rounded-xl hover:border-gold/40 hover:text-gold transition-all text-sm whitespace-nowrap">
-                {t("allJobs")}
-              </Link>
               <Link href="/inserat" className="inline-flex items-center gap-2 px-4 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm whitespace-nowrap">
                 {t("postJobBtn")}
               </Link>
@@ -637,15 +634,6 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
                 );
               })}
             </nav>
-            <div className="mt-6 pt-5 border-t border-border">
-              <Link
-                href="/inserat?group=jobs"
-                className="flex items-center gap-2 px-3 py-2 text-sm text-gold hover:bg-gold/10 rounded-lg transition-colors font-medium"
-              >
-                <Plus size={14} />
-                Job inserieren
-              </Link>
-            </div>
           </aside>
 
           {/* Main content */}
@@ -694,7 +682,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
             icon={Briefcase}
             title={allJobs.length === 0 ? t("emptyTitle") : t("emptyTitleFiltered")}
             description={allJobs.length === 0 ? t("emptyDesc") : t("emptyDescFiltered")}
-            action={allJobs.length === 0 ? { label: t("emptyPost"), onClick: () => window.location.href = "/inserat?group=jobs" } : { label: t("emptyReset"), onClick: clearAll }}
+            action={allJobs.length === 0 ? undefined : { label: t("emptyReset"), onClick: clearAll }}
           />
         )}
 

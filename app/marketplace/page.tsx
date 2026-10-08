@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   Package, Car, Shirt, Wrench, Clapperboard, Sparkles,
-  Lightbulb, Mic, Zap, Layers, MapPin, Tag, Plus,
+  Lightbulb, Mic, Zap, Layers, MapPin, Tag,
 } from "lucide-react";
 import { db } from "@/lib/db";
 import CategoryHero from "@/components/CategoryHero";
@@ -126,15 +126,6 @@ export default async function MarketplacePage({
               })}
             </nav>
 
-            <div className="mt-6 pt-5 border-t border-border">
-              <Link
-                href="/inserat"
-                className="flex items-center gap-2 px-3 py-2 text-sm text-gold hover:bg-gold/10 rounded-lg transition-colors font-medium"
-              >
-                <Plus size={14} />
-                Inserat erstellen
-              </Link>
-            </div>
           </aside>
 
           {/* ── Main content ── */}
@@ -174,9 +165,6 @@ export default async function MarketplacePage({
             {listings.length === 0 ? (
               <div className="py-20 text-center border border-border rounded-xl bg-bg-secondary">
                 <p className="text-text-muted text-sm">Noch keine Artikel in dieser Kategorie.</p>
-                <Link href="/inserat" className="inline-flex items-center gap-1.5 mt-4 text-gold text-sm hover:underline">
-                  <Plus size={14} /> Erstes Inserat erstellen
-                </Link>
               </div>
             ) : (
               <div className="space-y-2">

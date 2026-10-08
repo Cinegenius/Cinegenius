@@ -22,28 +22,17 @@ import {
   Zap, Shield, Clock, Package2, Building2,
 } from "lucide-react";
 import HeroSearch from "@/components/HeroSearch";
+import CommunityBoard from "@/components/CommunityBoard";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
-
-function fmtCount(n: number, fallback: string): string {
-  if (n === 0) return fallback;
-  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(".", ",")}k+`;
-  return `${n}+`;
-}
 
 async function getHomeData() {
   const [
-    { count: locationCount },
-    { count: jobCount },
-    { count: marketCount },
     { data: recentLocations },
     { data: recentJobs },
     { data: recentProps },
     { data: liveCompanies },
     { data: userReviewsRaw },
   ] = await Promise.all([
-    db.from("listings").select("*", { count: "exact", head: true }).eq("type", "location").eq("published", true),
-    db.from("listings").select("*", { count: "exact", head: true }).eq("type", "job").eq("published", true),
-    db.from("listings").select("*", { count: "exact", head: true }).in("type", ["prop", "vehicle"]).eq("published", true),
     db.from("listings").select("id,title,city,price,image_url,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(3),
     db.from("listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
     db.from("listings").select("id,title,city,price,image_url,type,created_at").in("type", ["prop", "vehicle"]).eq("published", true).not("image_url", "is", null).order("created_at", { ascending: false }).limit(3),
@@ -126,9 +115,6 @@ async function getHomeData() {
   }));
 
   return {
-    locationCount: locationCount ?? 0,
-    jobCount: jobCount ?? 0,
-    marketCount: marketCount ?? 0,
     liveLocations,
     liveJobs,
     liveProps,
@@ -145,8 +131,6 @@ export default async function HomePage() {
   const t = await getTranslations("home");
   const tc = await getTranslations("common");
 
-  const ctaLabel = isLoggedIn ? t("ctaDashboard") : t("ctaSignup");
-
   function formatDate(iso: string): string {
     if (!iso) return "";
     const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
@@ -157,7 +141,7 @@ export default async function HomePage() {
     return tc("weeksAgo", { weeks: Math.floor(diff / 7) });
   }
 
-  const { locationCount, jobCount, marketCount, liveLocations, liveJobs, liveProps, companies, topCreators } = await getHomeData();
+  const { liveLocations, liveJobs, liveProps, companies, topCreators } = await getHomeData();
 
   return (
     <>
@@ -175,43 +159,13 @@ export default async function HomePage() {
           <p className="text-text-muted text-sm sm:text-base mb-5">
             für Film, Foto & Content — kostenlos in der DACH-Region
           </p>
-          <div className="max-w-xl mx-auto mb-4">
+          <div className="max-w-xl mx-auto">
             <HeroSearch />
-          </div>
-          <div className="flex flex-wrap justify-center gap-2">
-            <Link
-              href="/locations"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-bg-secondary hover:border-gold/40 hover:bg-gold/5 transition-all text-sm font-semibold text-text-primary"
-            >
-              <MapPin size={13} className="text-gold" />
-              Locations
-              {locationCount > 0 && <span className="text-[11px] text-text-muted font-normal">{fmtCount(locationCount, "")}</span>}
-            </Link>
-            <Link
-              href="/jobs"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-bg-secondary hover:border-gold/40 hover:bg-gold/5 transition-all text-sm font-semibold text-text-primary"
-            >
-              <Briefcase size={13} className="text-gold" />
-              Jobs
-              {jobCount > 0 && <span className="text-[11px] text-text-muted font-normal">{fmtCount(jobCount, "")}</span>}
-            </Link>
-            <Link
-              href="/props"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-bg-secondary hover:border-gold/40 hover:bg-gold/5 transition-all text-sm font-semibold text-text-primary"
-            >
-              <Package2 size={13} className="text-gold" />
-              Marktplatz
-              {marketCount > 0 && <span className="text-[11px] text-text-muted font-normal">{fmtCount(marketCount, "")}</span>}
-            </Link>
-            <Link
-              href={ctaHref}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gold hover:bg-gold-light text-bg-primary font-semibold transition-all text-sm"
-            >
-              {ctaLabel} <ArrowRight size={13} />
-            </Link>
           </div>
         </div>
       </section>
+
+      <CommunityBoard loggedIn={isLoggedIn} />
 
       {/* ══════════════════════════════════════════════
           FEATURED LOCATIONS
@@ -417,21 +371,6 @@ export default async function HomePage() {
               Noch keine Jobs — <Link href="/inserat" className="text-gold hover:text-gold-light">Job ausschreiben</Link>
             </div>
           )}
-          <div className="mt-5 flex gap-3 justify-center sm:justify-start">
-            <Link
-              href="/jobs"
-              className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors"
-            >
-              Alle Jobs ansehen <ArrowRight size={13} />
-            </Link>
-            <span className="text-border">·</span>
-            <Link
-              href="/inserat"
-              className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors"
-            >
-              {tc("postJob")} <ArrowRight size={13} />
-            </Link>
-          </div>
         </div>
       </section>
 

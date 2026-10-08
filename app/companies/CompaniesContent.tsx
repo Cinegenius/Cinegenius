@@ -8,7 +8,7 @@ import {
   Building2, MapPin, Search, CheckCircle, LayoutGrid, LayoutList,
   ChevronRight, X, Camera, Volume2, Wrench, Shirt,
   Package, Film, Monitor, Users, Sparkles, Megaphone, Car,
-  Lightbulb, ArrowRight, Globe, Zap, Plus, ChevronDown,
+  Lightbulb, ArrowRight, Globe, Zap, ChevronDown,
 } from "lucide-react";
 import { COMPANY_CATEGORIES, COMPANY_CATEGORY_BY_ID } from "@/lib/companyCategories";
 
@@ -281,15 +281,6 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                 );
               })}
             </nav>
-            <div className="mt-6 pt-5 border-t border-border">
-              <Link
-                href="/company-setup"
-                className="flex items-center gap-2 px-3 py-2 text-sm text-gold hover:bg-gold/10 rounded-lg transition-colors font-medium"
-              >
-                <Plus size={14} />
-                Firma registrieren
-              </Link>
-            </div>
           </aside>
 
           {/* Main content */}
@@ -343,9 +334,6 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                   <>
                     <p className="text-text-primary font-semibold mb-1">{t("emptyTitle")}</p>
                     <p className="text-text-muted text-sm mb-5 max-w-xs mx-auto">{t("emptyDesc")}</p>
-                    <Link href="/company-setup" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl text-sm hover:bg-gold-light transition-colors">
-                      {t("emptyCta")} <ArrowRight size={14} />
-                    </Link>
                   </>
                 )}
               </div>
@@ -370,12 +358,6 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
               </div>
             )}
 
-            <p className="mt-10 text-center text-xs text-text-muted">
-              {t("footerCta")}{" "}
-              <Link href="/company-setup" className="text-gold hover:underline font-medium">
-                {t("footerCtaLink")}
-              </Link>
-            </p>
           </div>
         </div>
       </div>

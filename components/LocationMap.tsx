@@ -225,12 +225,11 @@ export default function LocationMap({
         zoomControl: false,
       });
 
-      // CartoDB Dark Matter — CDN-backed, natively dark, no CSS filter needed
+      // OpenStreetMap raster tiles keep working without a provider API key.
       L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+        "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
         {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-          subdomains: ["a", "b", "c", "d"],
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
           maxZoom: 19,
         }
       ).addTo(map);
