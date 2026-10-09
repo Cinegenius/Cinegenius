@@ -8,14 +8,13 @@ function Billboard({ side, href }: { side: "left" | "right"; href: string }) {
   const t = useTranslations("advertising");
   const width = "clamp(156px, 11vw, 180px)";
   const offset = "max(12px, calc(50vw - 832px))";
-  const height = "clamp(480px, calc(100vh - 180px), 880px)";
   const position = side === "left"
-    ? { left: offset, width, height }
-    : { right: offset, width, height };
+    ? { left: offset, width }
+    : { right: offset, width };
 
   return (
     <div
-      className="pointer-events-auto absolute top-1/2 -translate-y-1/2"
+      className="pointer-events-auto absolute bottom-4 top-[84px]"
       style={position}
     >
       <Link
