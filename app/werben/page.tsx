@@ -57,7 +57,7 @@ export default async function AdvertisingPage() {
           <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-text-muted">{t("previewEyebrow")}</p>
           <h2 className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("previewTitle")}</h2>
         </div>
-        <AdPlaceholder mode="side" ctaHref={contactHref} />
+        <AdPlaceholder ctaHref={contactHref} />
       </section>
 
       <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">

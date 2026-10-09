@@ -1365,37 +1365,41 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 
               {/* Grid: large profile cards */}
               {viewMode === "grid" && (
-              <div className={`grid grid-cols-2 gap-3 ${isAllAreas ? "xl:grid-cols-4" : "lg:grid-cols-3"}`}>
+              <div className={`grid grid-cols-2 gap-2.5 sm:gap-3 ${isAllAreas ? "xl:grid-cols-4" : "lg:grid-cols-3"}`}>
                 {crewVisible.map((c) => {
                   const displayPositions = getPositions(c);
                   const href = c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`;
                   return (
                     <Link key={c.id} href={href} suppressHydrationWarning
-                      className="card-hover group rounded-xl border border-border bg-bg-secondary overflow-hidden block">
-                      <div className="aspect-[3/1] overflow-hidden bg-bg-elevated">
+                      className="card-hover group flex min-w-0 items-center gap-2 rounded-xl border border-border bg-bg-secondary p-2.5 sm:gap-3 sm:p-3">
+                      <div className="relative flex h-[88px] w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/60 bg-bg-primary sm:h-24 sm:w-[72px] lg:h-28 lg:w-[84px]">
                         {c.image || c.avatar ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={c.image || c.avatar} alt={c.name} loading="lazy" decoding="async"
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            style={{ objectPosition: c.focal_point ? `${c.focal_point.x}% ${c.focal_point.y}%` : "50% 33%" }} />
+                            className="h-full w-full object-contain p-0.5 transition-transform duration-300 group-hover:scale-[1.03]" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-text-muted/20">
+                          <div className="flex h-full w-full items-center justify-center text-xl font-bold text-text-muted/30">
                             {c.name[0]}
                           </div>
                         )}
                       </div>
-                      <div className="p-3 sm:p-4">
+                      <div className="min-w-0 flex-1 py-0.5">
                         <div className="flex items-start justify-between gap-1 mb-0.5">
-                          <h3 className="font-semibold text-text-primary text-sm leading-snug truncate">{c.name}</h3>
+                          <h3 className="font-semibold text-text-primary text-[13px] leading-snug truncate sm:text-sm">{c.name}</h3>
                           {c.verified && <CheckCircle size={12} className="text-gold/60 shrink-0 mt-0.5" />}
                         </div>
-                        <p className="text-xs text-gold font-medium truncate">{displayPositions[0]}</p>
-                        {c.location && <p className="text-xs text-text-muted truncate mt-1">{c.location.split(",")[0]}</p>}
+                        <p className="line-clamp-2 text-[11px] leading-snug text-gold font-medium sm:text-xs">{displayPositions.slice(0, 2).join(" · ")}</p>
+                        {c.location && (
+                          <p className="mt-1.5 flex min-w-0 items-center gap-1 text-[10px] text-text-muted sm:text-xs">
+                            <MapPin size={11} className="shrink-0" />
+                            <span className="truncate">{c.location.split(",")[0]}</span>
+                          </p>
+                        )}
                         {c.reviews > 0 && (
-                          <div className="flex items-center gap-1.5 mt-2">
-                            <Star size={11} className="text-gold fill-gold" />
-                            <span className="text-xs font-semibold text-text-primary">{c.rating.toFixed(1)}</span>
-                            <span className="text-[11px] text-text-muted">({c.reviews})</span>
+                          <div className="mt-1.5 flex items-center gap-1">
+                            <Star size={10} className="fill-gold text-gold" />
+                            <span className="text-[10px] font-semibold text-text-primary">{c.rating.toFixed(1)}</span>
+                            <span className="text-[10px] text-text-muted">({c.reviews})</span>
                           </div>
                         )}
                       </div>

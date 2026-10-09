@@ -169,7 +169,7 @@ export default async function HomePage() {
       </section>
 
       <CommunityBoard loggedIn={isLoggedIn} />
-      <AdPlaceholder mode="side" />
+      <AdPlaceholder />
 
       {/* ══════════════════════════════════════════════
           FEATURED LOCATIONS
