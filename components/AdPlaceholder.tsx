@@ -8,9 +8,10 @@ function Billboard({ side, href }: { side: "left" | "right"; href: string }) {
   const t = useTranslations("advertising");
   const width = "clamp(156px, 11vw, 180px)";
   const offset = "max(12px, calc(50vw - 832px))";
+  const height = "clamp(480px, calc(100vh - 180px), 880px)";
   const position = side === "left"
-    ? { left: offset, width }
-    : { right: offset, width };
+    ? { left: offset, width, height }
+    : { right: offset, width, height };
 
   return (
     <div
@@ -20,7 +21,7 @@ function Billboard({ side, href }: { side: "left" | "right"; href: string }) {
       <Link
         href={href}
         aria-label={`${t("bannerBadge")}: ${t("bannerTitle")}`}
-        className="group relative flex min-h-[480px] flex-col overflow-hidden rounded-[22px] border border-white/20 bg-[#090b12] p-4 shadow-[0_0_32px_rgba(34,211,238,0.18),0_0_60px_rgba(217,70,239,0.13)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_0_36px_rgba(34,211,238,0.28),0_0_72px_rgba(217,70,239,0.2)]"
+        className="group relative flex h-full flex-col overflow-hidden rounded-[22px] border border-white/20 bg-[#090b12] p-4 shadow-[0_0_32px_rgba(34,211,238,0.18),0_0_60px_rgba(217,70,239,0.13)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_0_36px_rgba(34,211,238,0.28),0_0_72px_rgba(217,70,239,0.2)]"
       >
         <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_15%_10%,rgba(34,211,238,0.28),transparent_45%),radial-gradient(ellipse_at_85%_35%,rgba(217,70,239,0.24),transparent_46%),radial-gradient(ellipse_at_50%_95%,rgba(190,242,37,0.18),transparent_48%)]" />
         <div aria-hidden="true" className="absolute inset-0 opacity-20 [background-image:radial-gradient(rgba(255,255,255,0.75)_0.7px,transparent_0.9px)] [background-size:7px_7px]" />
