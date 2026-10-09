@@ -6,13 +6,15 @@ import { useTranslations } from "next-intl";
 
 function Billboard({ side, href }: { side: "left" | "right"; href: string }) {
   const t = useTranslations("advertising");
+  const width = "min(140px, calc((100vw - 1280px) / 2 - 16px))";
+  const offset = "calc((100vw - 1280px) / 2 - min(140px, (100vw - 1280px) / 2 - 16px) - 8px)";
   const position = side === "left"
-    ? { left: "calc((100vw - 1280px) / 2 - 168px)" }
-    : { right: "calc((100vw - 1280px) / 2 - 168px)" };
+    ? { left: offset, width }
+    : { right: offset, width };
 
   return (
     <div
-      className="pointer-events-auto absolute top-1/2 w-[clamp(120px,9vw,160px)] -translate-y-1/2"
+      className="pointer-events-auto absolute top-1/2 -translate-y-1/2"
       style={position}
     >
       <Link
@@ -30,7 +32,7 @@ function Billboard({ side, href }: { side: "left" | "right"; href: string }) {
               <span aria-hidden="true" className="h-1.5 w-1.5 animate-pulse rounded-full bg-lime-300" />
               {t("bannerBadge")}
             </span>
-            <Megaphone aria-hidden="true" size={15} className="shrink-0 text-cyan-200 drop-shadow-[0_0_7px_rgba(34,211,238,0.8)]" />
+            <Megaphone aria-hidden="true" size={15} className="hidden shrink-0 text-cyan-200 drop-shadow-[0_0_7px_rgba(34,211,238,0.8)] min-[1600px]:block" />
           </div>
 
           <h2 className="font-display text-lg font-bold leading-tight text-white [text-shadow:0_0_14px_rgba(217,70,239,0.38)] sm:text-xl">
@@ -65,14 +67,14 @@ export default function AdPlaceholder({
     <>
       {mode === "side" && (
         /* Vertical digital billboards sit in the outside gutters on wide screens. */
-        <aside aria-label={t("bannerAria")} className="pointer-events-none fixed inset-0 z-30 hidden min-[1700px]:block">
+        <aside aria-label={t("bannerAria")} className="pointer-events-none fixed inset-0 z-30 hidden min-[1472px]:block">
           <Billboard side="left" href={ctaHref} />
           <Billboard side="right" href={ctaHref} />
         </aside>
       )}
 
       {/* Smaller screens keep one compact, in-flow version so the content stays unobstructed. */}
-      <aside aria-label={t("bannerAria")} className={`mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-5 lg:px-8 ${mode === "side" ? "min-[1700px]:hidden" : ""}`}>
+      <aside aria-label={t("bannerAria")} className={`mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-5 lg:px-8 ${mode === "side" ? "min-[1472px]:hidden" : ""}`}>
         <Link
           href={ctaHref}
           className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-cyan-200/25 bg-[#10131d] p-4 shadow-[0_0_24px_rgba(34,211,238,0.1)] transition hover:border-fuchsia-300/45 sm:px-6"
