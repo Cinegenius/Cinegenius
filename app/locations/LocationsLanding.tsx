@@ -105,7 +105,7 @@ export default function LocationsLanding({
         </div>
       </div>
 
-      <AdPlaceholder />
+      <AdPlaceholder mode="side" />
 
       {/* ── City sections ─────────────────────────────────────────── */}
       <div className="pb-20 space-y-14">
