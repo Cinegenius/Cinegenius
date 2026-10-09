@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import HeroSearch from "@/components/HeroSearch";
 import CommunityBoard from "@/components/CommunityBoard";
+import AdPlaceholder from "@/components/AdPlaceholder";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 
 async function getHomeData() {
@@ -168,6 +169,7 @@ export default async function HomePage() {
       </section>
 
       <CommunityBoard loggedIn={isLoggedIn} />
+      <AdPlaceholder />
 
       {/* ══════════════════════════════════════════════
           FEATURED LOCATIONS

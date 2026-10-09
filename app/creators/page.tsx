@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
 import CreatorsContent, { type ServerCreator } from "./CreatorsContent";
 import PageHeader from "@/components/PageHeader";
+import AdPlaceholder from "@/components/AdPlaceholder";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
 import { getTranslations } from "next-intl/server";
 
@@ -195,6 +196,7 @@ export default async function CreatorsPage() {
           accentRgb="251,146,60"
           cta={!hasProfile ? { label: t("heroCta"), href: "/profile" } : undefined}
         />
+      <AdPlaceholder />
       <CreatorsContent serverCreators={serverCreators} hasStrip={true} />
     </div>
   );

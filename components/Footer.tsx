@@ -36,6 +36,7 @@ export default function Footer() {
         { labelKey: "links_help", href: "/help" },
         { labelKey: "links_trust", href: "/trust" },
         { labelKey: "links_pricing", href: "/pricing" },
+        { labelKey: "links_advertising", href: "/werben" },
       ],
     },
   ];

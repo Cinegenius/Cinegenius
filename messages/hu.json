@@ -37,7 +37,8 @@
     "links_pricing": "Árak",
     "links_privacy": "Adatvédelmi irányelvek",
     "links_terms": "Szolgáltatási feltételek",
-    "links_imprint": "Impresszum"
+    "links_imprint": "Impresszum",
+    "links_advertising": "Hirdetés"
   },
   "cookie": {
     "text": "Ez az oldal kizárólag technikailag szükséges sütiket használ a bejelentkezéshez és a nyelvi beállításokhoz — sem nyomkövetési, sem reklám sütiket.",
@@ -949,5 +950,38 @@
     "typeOther": "Egyéb",
     "savingError": "Mentési hiba",
     "unknownError": "Ismeretlen hiba"
+  },
+  "advertising": {
+    "eyebrow": "Hirdess a CineGeniuson",
+    "title": "Érd el a film, fotó és tartalomkészítés szakembereit.",
+    "intro": "Mutasd be cégedet, kölcsönződet vagy ajánlatodat ott, ahol a filmes szakemberek partnereket, helyszíneket és felszerelést keresnek.",
+    "ctaButton": "Hirdetési felület kérése",
+    "companiesLink": "Cégek böngészése",
+    "pricingNote": "Az elhelyezést, kreatívot és időtartamot személyesen egyeztetjük.",
+    "placementsEyebrow": "Az iparág szolgáltatóinak",
+    "placementsTitle": "Hirdetés a megfelelő környezetben",
+    "placement1Title": "A kezdőlapon",
+    "placement1Text": "Tedd láthatóvá ajánlatodat már az első látogatáskor.",
+    "placement2Title": "Kapcsolódó rovatokban",
+    "placement2Text": "Helyezd el a bannert a stáb, állások, helyszínek vagy piactér mellett.",
+    "placement3Title": "A film- és médiaszakmának",
+    "placement3Text": "Érd el a kreatívokat, stúdiókat és kölcsönzőket a DACH-régióban.",
+    "processEyebrow": "Egyeztessünk együtt",
+    "processTitle": "A megkereséstől a bannerig",
+    "processText": "Megbeszéljük, melyik elhelyezés illik az ajánlatodhoz, és meddig fusson a kampány.",
+    "step1": "Írj a cégedről, ajánlatodról és célközönségedről.",
+    "step2": "Egyeztetjük a formátumot, elhelyezést és időpontot.",
+    "step3": "Jóváhagyásod után közzétesszük a bannert.",
+    "disclosure": "A fizetett bannerek egyértelműen „Hirdetés” jelölést kapnak. Automatikus reklámkövetést nem használunk.",
+    "ctaSecondary": "Érdeklődés e-mailben",
+    "emailSubject": "Hirdetés a CineGeniuson",
+    "emailBody": "Kedves CineGenius csapat!\n\nHirdetési felület iránt érdeklődöm.\n\nCég / ajánlat:\nCélközönség:\nKívánt időszak:\nWeboldal:\n\nÜdvözlettel",
+    "bannerAria": "Hirdetési felület a CineGeniuson",
+    "bannerBadge": "Hirdetési felület",
+    "bannerTitle": "Itt lehetne a hirdetésed.",
+    "bannerText": "Érd el a filmes szakembereket és kreatívokat, miközben következő produkciójukhoz keresnek megoldásokat.",
+    "bannerCta": "Hirdetési hely kérése",
+    "previewEyebrow": "ELŐNÉZET",
+    "previewTitle": "Így nézhetne ki egy banner az oldalon"
   }
 }

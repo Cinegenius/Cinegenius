@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { db } from "@/lib/db";
 import CategoryHero from "@/components/CategoryHero";
+import AdPlaceholder from "@/components/AdPlaceholder";
 
 export const metadata: Metadata = {
   title: "Marktplatz — Equipment & Requisiten",
@@ -98,6 +99,8 @@ export default async function MarketplacePage({
         height="sm"
         cta={{ label: "Inserat erstellen →", href: "/inserat" }}
       />
+
+      <AdPlaceholder />
 
       <div className="px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex gap-8 items-start">

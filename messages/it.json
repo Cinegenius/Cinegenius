@@ -37,7 +37,8 @@
     "links_pricing": "Prezzi",
     "links_privacy": "Informativa sulla Privacy",
     "links_terms": "Termini di Servizio",
-    "links_imprint": "Note Legali"
+    "links_imprint": "Note Legali",
+    "links_advertising": "Pubblicità"
   },
   "cookie": {
     "text": "Questo sito utilizza solo cookie tecnicamente necessari per il login e le impostazioni della lingua — nessun cookie di tracciamento o pubblicitario.",
@@ -949,5 +950,38 @@
     "typeOther": "Altro",
     "savingError": "Errore durante il salvataggio",
     "unknownError": "Errore sconosciuto"
+  },
+  "advertising": {
+    "eyebrow": "Pubblicità su CineGenius",
+    "title": "Raggiungi chi lavora in cinema, fotografia e contenuti.",
+    "intro": "Presenta la tua azienda, il tuo noleggio o la tua offerta dove i professionisti cercano partner, location e attrezzature.",
+    "ctaButton": "Richiedi uno spazio pubblicitario",
+    "companiesLink": "Sfoglia le aziende",
+    "pricingNote": "Concordiamo direttamente posizione, creatività e durata.",
+    "placementsEyebrow": "Per aziende del settore",
+    "placementsTitle": "Pubblicità nel contesto giusto",
+    "placement1Title": "Nella homepage",
+    "placement1Text": "Rendi visibile la tua offerta fin dal primo accesso.",
+    "placement2Title": "Nelle sezioni pertinenti",
+    "placement2Text": "Posiziona il tuo banner accanto a crew, lavori, location o marketplace.",
+    "placement3Title": "Per il settore audiovisivo",
+    "placement3Text": "Raggiungi creativi, studi e noleggi nella regione DACH.",
+    "processEyebrow": "Pianifichiamo insieme",
+    "processTitle": "Dalla richiesta al banner",
+    "processText": "Parliamo insieme della posizione più adatta e della durata della campagna.",
+    "step1": "Raccontaci la tua azienda, offerta e pubblico desiderato.",
+    "step2": "Concordiamo formato, posizione e date.",
+    "step3": "Pubblichiamo il banner dopo la tua approvazione.",
+    "disclosure": "I banner a pagamento sono chiaramente contrassegnati come «Pubblicità». Non utilizziamo tracciamento pubblicitario automatico.",
+    "ctaSecondary": "Invia una richiesta via e-mail",
+    "emailSubject": "Pubblicità su CineGenius",
+    "emailBody": "Ciao team CineGenius,\n\nsono interessato a uno spazio pubblicitario.\n\nAzienda / offerta:\nPubblico desiderato:\nDate preferite:\nSito web:\n\nCordiali saluti",
+    "bannerAria": "Spazio pubblicitario su CineGenius",
+    "bannerBadge": "Spazio pubblicitario",
+    "bannerTitle": "La tua pubblicità potrebbe essere qui.",
+    "bannerText": "Raggiungi professionisti del cinema e creativi mentre cercano ciò che serve alla loro prossima produzione.",
+    "bannerCta": "Richiedi uno spazio",
+    "previewEyebrow": "ANTEPRIMA",
+    "previewTitle": "Ecco come potrebbe apparire un banner sul sito"
   }
 }

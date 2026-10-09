@@ -37,7 +37,8 @@
     "links_pricing": "Ceny",
     "links_privacy": "Ochrana osobních údajů",
     "links_terms": "Podmínky služby",
-    "links_imprint": "Impresum"
+    "links_imprint": "Impresum",
+    "links_advertising": "Reklama"
   },
   "cookie": {
     "text": "Tato stránka používá pouze technicky nezbytné cookies pro přihlášení a jazykové nastavení — žádné sledovací ani reklamní cookies.",
@@ -949,5 +950,38 @@
     "typeOther": "Ostatní",
     "savingError": "Chyba při ukládání",
     "unknownError": "Neznámá chyba"
+  },
+  "advertising": {
+    "eyebrow": "Reklama na CineGenius",
+    "title": "Oslov lidi z filmu, fotografie a tvorby obsahu.",
+    "intro": "Představ svou firmu, půjčovnu nebo nabídku tam, kde filmoví profesionálové hledají partnery, lokace a vybavení.",
+    "ctaButton": "Požádat o reklamní prostor",
+    "companiesLink": "Prohlédnout firmy",
+    "pricingNote": "Umístění, podobu a dobu kampaně domluvíme osobně.",
+    "placementsEyebrow": "Pro firmy z oboru",
+    "placementsTitle": "Reklama ve správném kontextu",
+    "placement1Title": "Na hlavní stránce",
+    "placement1Text": "Zviditelni svou nabídku hned při první návštěvě.",
+    "placement2Title": "V odpovídajících sekcích",
+    "placement2Text": "Umísti banner u štábu, práce, lokací nebo tržiště.",
+    "placement3Title": "Pro filmový a mediální obor",
+    "placement3Text": "Oslov kreativce, studia a půjčovny v regionu DACH.",
+    "processEyebrow": "Domluvíme se společně",
+    "processTitle": "Od žádosti k banneru",
+    "processText": "Probereme, které umístění se hodí k tvé nabídce a jak dlouho má kampaň běžet.",
+    "step1": "Napiš nám o své firmě, nabídce a cílové skupině.",
+    "step2": "Společně domluvíme formát, umístění a termín.",
+    "step3": "Banner zveřejníme po tvém schválení.",
+    "disclosure": "Placené bannery jsou jasně označeny jako „Reklama“. Automatické reklamní sledování nepoužíváme.",
+    "ctaSecondary": "Poslat dotaz e-mailem",
+    "emailSubject": "Reklama na CineGenius",
+    "emailBody": "Dobrý den, týme CineGenius,\n\nmám zájem o reklamní prostor.\n\nFirma / nabídka:\nCílová skupina:\nPožadovaný termín:\nWeb:\n\nS pozdravem",
+    "bannerAria": "Reklamní prostor na CineGenius",
+    "bannerBadge": "Reklamní prostor",
+    "bannerTitle": "Tady může být tvoje reklama.",
+    "bannerText": "Oslov filmové profesionály a kreativce, když hledají vše potřebné pro svou další produkci.",
+    "bannerCta": "Požádat o prostor",
+    "previewEyebrow": "NÁHLED",
+    "previewTitle": "Takto by mohl banner na webu vypadat"
   }
 }

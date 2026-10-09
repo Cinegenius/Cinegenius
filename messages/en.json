@@ -37,7 +37,8 @@
     "links_pricing": "Pricing",
     "links_privacy": "Privacy Policy",
     "links_terms": "Terms of Service",
-    "links_imprint": "Legal Notice"
+    "links_imprint": "Legal Notice",
+    "links_advertising": "Advertise"
   },
   "cookie": {
     "text": "This site uses only technically necessary cookies for login and language settings — no tracking or advertising cookies.",
@@ -950,5 +951,38 @@
     "typeOther": "Other",
     "savingError": "Error saving",
     "unknownError": "Unknown error"
+  },
+  "advertising": {
+    "eyebrow": "Advertise on CineGenius",
+    "title": "Reach the people behind film, photography and content.",
+    "intro": "Showcase your company, rental service or offer where film professionals look for the right partners, locations and equipment.",
+    "ctaButton": "Request an ad placement",
+    "companiesLink": "Browse companies",
+    "pricingNote": "We agree on placement, creative and campaign dates directly.",
+    "placementsEyebrow": "For industry providers",
+    "placementsTitle": "Advertising in the right context",
+    "placement1Title": "On the homepage",
+    "placement1Text": "Make your offer visible to visitors as they arrive.",
+    "placement2Title": "In relevant sections",
+    "placement2Text": "Place your banner alongside crew, jobs, locations or the marketplace.",
+    "placement3Title": "For film and media professionals",
+    "placement3Text": "Reach creatives, studios and rental companies across the DACH region.",
+    "processEyebrow": "Planned together",
+    "processTitle": "From request to banner",
+    "processText": "We will discuss which placement fits your offer and how long the campaign should run.",
+    "step1": "Tell us about your company, offer and intended audience.",
+    "step2": "We agree on the format, placement and dates together.",
+    "step3": "We publish the banner after your approval.",
+    "disclosure": "Paid banners are clearly labelled as “Advertisement”. No automatic advertising tracking is used.",
+    "ctaSecondary": "Send an email inquiry",
+    "emailSubject": "Advertising on CineGenius",
+    "emailBody": "Hello CineGenius team,\n\nI am interested in an advertising placement.\n\nCompany / offer:\nIntended audience:\nPreferred dates:\nWebsite:\n\nBest regards",
+    "bannerAria": "Advertising space on CineGenius",
+    "bannerBadge": "Ad space",
+    "bannerTitle": "Your ad could be here.",
+    "bannerText": "Reach film professionals, crews and creatives while they look for what their next production needs.",
+    "bannerCta": "Request ad space",
+    "previewEyebrow": "PREVIEW",
+    "previewTitle": "This is how an ad banner could look on the site"
   }
 }

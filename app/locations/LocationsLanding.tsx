@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Search, MapPin, Star, ArrowRight, Plus } from "lucide-react";
+import AdPlaceholder from "@/components/AdPlaceholder";
 
 type LocationCard = {
   id: string;
@@ -103,6 +104,8 @@ export default function LocationsLanding({
 
         </div>
       </div>
+
+      <AdPlaceholder />
 
       {/* ── City sections ─────────────────────────────────────────── */}
       <div className="pb-20 space-y-14">

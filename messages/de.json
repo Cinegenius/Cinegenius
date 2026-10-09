@@ -37,7 +37,8 @@
     "links_pricing": "Preise",
     "links_privacy": "Datenschutz",
     "links_terms": "AGB",
-    "links_imprint": "Impressum"
+    "links_imprint": "Impressum",
+    "links_advertising": "Werben"
   },
   "cookie": {
     "text": "Diese Seite nutzt technisch notwendige Cookies (Login, Sprache) sowie anonymisierte Nutzungsstatistiken ohne Personenbezug. Keine Werbe-Cookies.",
@@ -950,5 +951,38 @@
     "typeOther": "Sonstiges",
     "savingError": "Fehler beim Speichern",
     "unknownError": "Unbekannter Fehler"
+  },
+  "advertising": {
+    "eyebrow": "Werbung auf CineGenius",
+    "title": "Erreiche die Menschen hinter Film, Foto und Content.",
+    "intro": "Präsentiere dein Unternehmen, deinen Verleih oder dein Angebot dort, wo Filmschaffende nach passenden Partnern, Locations und Equipment suchen.",
+    "ctaButton": "Werbeplatz anfragen",
+    "companiesLink": "Firmenverzeichnis ansehen",
+    "pricingNote": "Platzierung, Motiv und Laufzeit stimmen wir persönlich ab.",
+    "placementsEyebrow": "Für Anbieter aus der Branche",
+    "placementsTitle": "Werbung, die zum Umfeld passt",
+    "placement1Title": "Auf der Startseite",
+    "placement1Text": "Mach dein Angebot für Besucherinnen und Besucher direkt beim Einstieg sichtbar.",
+    "placement2Title": "In passenden Bereichen",
+    "placement2Text": "Platziere deinen Banner im Umfeld von Crew, Jobs, Locations oder Marktplatz.",
+    "placement3Title": "Für die Film- und Medienbranche",
+    "placement3Text": "Sprich gezielt Filmschaffende, Kreative, Studios und Verleiher im DACH-Raum an.",
+    "processEyebrow": "Einfach persönlich abstimmen",
+    "processTitle": "Von der Anfrage bis zum Banner",
+    "processText": "Wir besprechen gemeinsam, welche Platzierung zu deinem Angebot passt und wie lange die Kampagne laufen soll.",
+    "step1": "Schick uns dein Unternehmen, Angebot und gewünschte Zielgruppe.",
+    "step2": "Wir stimmen Format, Platzierung und Zeitraum mit dir ab.",
+    "step3": "Nach deiner Freigabe veröffentlichen wir den Banner.",
+    "disclosure": "Bezahlte Werbebanner werden klar als „Anzeige“ gekennzeichnet. Es gibt keine automatische Werbeverfolgung.",
+    "ctaSecondary": "Anfrage per E-Mail senden",
+    "emailSubject": "Werbung auf CineGenius anfragen",
+    "emailBody": "Hallo CineGenius-Team,\n\nich interessiere mich für einen Werbeplatz.\n\nUnternehmen / Angebot:\nGewünschte Zielgruppe:\nGewünschter Zeitraum:\nWebsite:\n\nViele Grüße",
+    "bannerAria": "Werbeplatz auf CineGenius",
+    "bannerBadge": "Werbeplatz",
+    "bannerTitle": "Hier könnte deine Werbung stehen.",
+    "bannerText": "Erreiche Filmschaffende, Crews und Kreative genau dort, wo sie nach Angeboten für ihre nächste Produktion suchen.",
+    "bannerCta": "Werbeplatz anfragen",
+    "previewEyebrow": "VORSCHAU",
+    "previewTitle": "So könnte ein Werbebanner auf der Seite aussehen"
   }
 }

@@ -1365,14 +1365,14 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 
               {/* Grid: large profile cards */}
               {viewMode === "grid" && (
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className={`grid grid-cols-2 gap-3 ${isAllAreas ? "xl:grid-cols-4" : "lg:grid-cols-3"}`}>
                 {crewVisible.map((c) => {
                   const displayPositions = getPositions(c);
                   const href = c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`;
                   return (
                     <Link key={c.id} href={href} suppressHydrationWarning
                       className="card-hover group rounded-xl border border-border bg-bg-secondary overflow-hidden block">
-                      <div className="aspect-[3/4] overflow-hidden bg-bg-elevated">
+                      <div className="aspect-[3/1] overflow-hidden bg-bg-elevated">
                         {c.image || c.avatar ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={c.image || c.avatar} alt={c.name} loading="lazy" decoding="async"
