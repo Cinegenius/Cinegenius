@@ -6,8 +6,8 @@ import { useTranslations } from "next-intl";
 
 function Billboard({ side, href }: { side: "left" | "right"; href: string }) {
   const t = useTranslations("advertising");
-  const width = "clamp(156px, 11vw, 180px)";
-  const offset = "max(12px, calc(50vw - 832px))";
+  const width = "clamp(190px, 14vw, 230px)";
+  const offset = "max(12px, calc(50vw - 520px - clamp(190px, 14vw, 230px) - 12px))";
   const position = side === "left"
     ? { left: offset, width }
     : { right: offset, width };
@@ -20,7 +20,7 @@ function Billboard({ side, href }: { side: "left" | "right"; href: string }) {
       <Link
         href={href}
         aria-label={`${t("bannerBadge")}: ${t("bannerTitle")}`}
-        className="group relative flex min-h-[420px] flex-col overflow-hidden rounded-[22px] border border-white/20 bg-[#090b12] p-3 shadow-[0_0_32px_rgba(34,211,238,0.18),0_0_60px_rgba(217,70,239,0.13)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_0_36px_rgba(34,211,238,0.28),0_0_72px_rgba(217,70,239,0.2)] min-[1600px]:p-4"
+        className="group relative flex min-h-[480px] flex-col overflow-hidden rounded-[22px] border border-white/20 bg-[#090b12] p-4 shadow-[0_0_32px_rgba(34,211,238,0.18),0_0_60px_rgba(217,70,239,0.13)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_0_36px_rgba(34,211,238,0.28),0_0_72px_rgba(217,70,239,0.2)]"
       >
         <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_15%_10%,rgba(34,211,238,0.28),transparent_45%),radial-gradient(ellipse_at_85%_35%,rgba(217,70,239,0.24),transparent_46%),radial-gradient(ellipse_at_50%_95%,rgba(190,242,37,0.18),transparent_48%)]" />
         <div aria-hidden="true" className="absolute inset-0 opacity-20 [background-image:radial-gradient(rgba(255,255,255,0.75)_0.7px,transparent_0.9px)] [background-size:7px_7px]" />
@@ -35,7 +35,7 @@ function Billboard({ side, href }: { side: "left" | "right"; href: string }) {
             <Megaphone aria-hidden="true" size={15} className="hidden shrink-0 text-cyan-200 drop-shadow-[0_0_7px_rgba(34,211,238,0.8)] min-[1600px]:block" />
           </div>
 
-          <h2 className="font-display text-lg font-bold leading-tight text-white [text-shadow:0_0_14px_rgba(217,70,239,0.38)] min-[1600px]:text-xl">
+          <h2 className="font-display text-xl font-bold leading-tight text-white [text-shadow:0_0_14px_rgba(217,70,239,0.38)]">
             {t("bannerTitle")}
           </h2>
           <p className="mt-3 line-clamp-5 text-xs leading-relaxed text-slate-200/85">
