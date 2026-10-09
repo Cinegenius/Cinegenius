@@ -6,8 +6,8 @@ import { useTranslations } from "next-intl";
 
 function Billboard({ side, href }: { side: "left" | "right"; href: string }) {
   const t = useTranslations("advertising");
-  const width = "clamp(190px, 14vw, 230px)";
-  const offset = "max(12px, calc(50vw - 520px - clamp(190px, 14vw, 230px) - 12px))";
+  const width = "clamp(156px, 11vw, 180px)";
+  const offset = "max(12px, calc(50vw - 832px))";
   const position = side === "left"
     ? { left: offset, width }
     : { right: offset, width };
