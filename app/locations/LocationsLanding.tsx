@@ -46,7 +46,7 @@ export default function LocationsLanding({
   }
 
   return (
-    <div className="min-h-screen bg-bg-primary" style={{ background: "radial-gradient(ellipse at 60% 0%, rgba(99,102,241,0.12) 0%, transparent 55%)" }}>
+    <div className="ad-side-reserved min-h-screen bg-bg-primary" style={{ background: "radial-gradient(ellipse at 60% 0%, rgba(99,102,241,0.12) 0%, transparent 55%)" }}>
 
       {/* ── Hero / Search ─────────────────────────────────────────── */}
       <div className="relative isolate overflow-hidden pt-8 pb-6 px-4">

@@ -6,8 +6,8 @@ import { useTranslations } from "next-intl";
 
 function Billboard({ side, href }: { side: "left" | "right"; href: string }) {
   const t = useTranslations("advertising");
-  const width = "min(140px, calc((100vw - 1280px) / 2 - 16px))";
-  const offset = "calc((100vw - 1280px) / 2 - min(140px, (100vw - 1280px) / 2 - 16px) - 8px)";
+  const width = "clamp(96px, 8vw, 128px)";
+  const offset = "max(12px, calc(50vw - 780px))";
   const position = side === "left"
     ? { left: offset, width }
     : { right: offset, width };
@@ -67,14 +67,14 @@ export default function AdPlaceholder({
     <>
       {mode === "side" && (
         /* Vertical digital billboards sit in the outside gutters on wide screens. */
-        <aside aria-label={t("bannerAria")} className="pointer-events-none fixed inset-0 z-30 hidden min-[1472px]:block">
+        <aside aria-label={t("bannerAria")} className="pointer-events-none fixed inset-0 z-30 hidden min-[1280px]:block">
           <Billboard side="left" href={ctaHref} />
           <Billboard side="right" href={ctaHref} />
         </aside>
       )}
 
       {/* Smaller screens keep one compact, in-flow version so the content stays unobstructed. */}
-      <aside aria-label={t("bannerAria")} className={`mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-5 lg:px-8 ${mode === "side" ? "min-[1472px]:hidden" : ""}`}>
+      <aside aria-label={t("bannerAria")} className={`mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-5 lg:px-8 ${mode === "side" ? "min-[1280px]:hidden" : ""}`}>
         <Link
           href={ctaHref}
           className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-cyan-200/25 bg-[#10131d] p-4 shadow-[0_0_24px_rgba(34,211,238,0.1)] transition hover:border-fuchsia-300/45 sm:px-6"

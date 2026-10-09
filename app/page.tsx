@@ -145,7 +145,7 @@ export default async function HomePage() {
   const { liveLocations, liveJobs, liveProps, companies, topCreators } = await getHomeData();
 
   return (
-    <>
+    <div className="ad-side-reserved">
       {/* ══════════════════════════════════════════════
           HERO — minimal, kein Leerraum
       ══════════════════════════════════════════════ */}
@@ -513,6 +513,6 @@ export default async function HomePage() {
           </p>
         </div>
       </section>
-    </>
+    </div>
   );
 }
