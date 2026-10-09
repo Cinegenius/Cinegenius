@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 6552)
+Total output lines: 548
+
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -72,7 +75,7 @@ body {
 /* Leave a real gutter for the fixed side billboards on desktop. */
 @media (min-width: 1280px) {
   .ad-side-reserved {
-    margin-inline: clamp(120px, calc((100vw - 1040px) / 2), 184px);
+    margin-inline: clamp(176px, calc((100vw - 1040px) / 2), 220px);
   }
 }
 
@@ -172,156 +175,7 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════════════════
    ANIMATIONS
-   ═══════════════════════════════════════════════════════════════════════════ */
-@keyframes grain {
-  0%, 100% { transform: translate(0,    0); }
-  20%       { transform: translate(-1%, -2%); }
-  40%       { transform: translate( 2%,  1%); }
-  60%       { transform: translate(-2%,  2%); }
-  80%       { transform: translate( 1%, -1%); }
-}
-.grain { animation: grain 0.55s steps(1) infinite; }
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-@keyframes shimmer {
-  0%   { background-position: -800px 0; }
-  100% { background-position:  800px 0; }
-}
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(16px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-@keyframes pulse-gold {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.6; }
-}
-
-.animate-fade-up      { animation: fadeUp       0.55s cubic-bezier(0.16,1,0.3,1) both; }
-.animate-fade-in      { animation: fadeIn       0.40s ease-out both; }
-.animate-slide-down   { animation: slideDown    0.20s ease-out both; }
-.animate-slide-right  { animation: slideInRight 0.28s ease-out both; }
-
-.delay-100 { animation-delay: 0.10s; }
-.delay-200 { animation-delay: 0.20s; }
-.delay-300 { animation-delay: 0.30s; }
-.delay-400 { animation-delay: 0.40s; }
-.delay-500 { animation-delay: 0.50s; }
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   SKELETON SHIMMER
-   ═══════════════════════════════════════════════════════════════════════════ */
-.skeleton-shimmer {
-  background: linear-gradient(90deg, #1E2330 25%, #262C3C 50%, #1E2330 75%);
-  background-size: 800px 100%;
-  animation: shimmer 1.4s infinite linear;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   INPUTS — Base
-   ═══════════════════════════════════════════════════════════════════════════ */
-input, select, textarea { color: inherit; }
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   HERO — Theme-aware image & text
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* Dark mode hero */
-.hero-bg {
-  background-image: url('/hero-bg.jpg');
-  background-position: center 40%;
-  background-size: cover;
-}
-/* Light mode: same image, lighter overlay handles the rest */
-[data-theme="light"] .hero-bg {
-  background-image: url('/hero-bg.jpg');
-  background-position: center 40%;
-  background-size: cover;
-}
-/* Mobile: push image to bottom so faces don't sit behind content */
-@media (max-width: 640px) {
-  .hero-bg {
-    background-position: 65% 100%;
-  }
-  [data-theme="light"] .hero-bg {
-    background-position: 65% 100%;
-  }
-}
-
-/* Overlays */
-.hero-overlay-dark  { display: block; }
-.hero-overlay-light { display: none; }
-[data-theme="light"] .hero-overlay-dark  { display: none; }
-[data-theme="light"] .hero-overlay-light { display: block; }
-
-/* Text colors inside the hero */
-.hero-title    { color: #FFFFFF; }
-.hero-sub      { color: rgba(255,255,255,0.68); }
-.hero-stat-val { color: #FFFFFF; }
-.hero-stat-lbl { color: rgba(255,255,255,0.48); }
-.hero-badge    {
-  border-color: rgba(255,255,255,0.22);
-  background:   rgba(255,255,255,0.10);
-  color:        rgba(255,255,255,0.88);
-  backdrop-filter: blur(8px);
-}
-
-[data-theme="light"] .hero-title    { color: #0C1022; }
-[data-theme="light"] .hero-sub      { color: #3A4668; }
-[data-theme="light"] .hero-stat-val { color: #0C1022; }
-[data-theme="light"] .hero-stat-lbl { color: #7886A6; }
-[data-theme="light"] .hero-badge    {
-  border-color: rgba(91, 122, 24, 0.30);
-  background:   rgba(255, 255, 255, 0.65);
-  color:        #5B7A18;
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  font-weight: 700;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   LIGHT THEME — "Cinema Daylight"
-   ═══════════════════════════════════════════════════════════════════════════ */
-[data-theme="light"] {
-  /* Backgrounds */
-  --color-bg-primary:   #F7F3EA;   /* Warm ivory */
-  --color-bg-secondary: #FDFBF5;
-  --color-bg-elevated:  #FFFEFA;
-  --color-bg-hover:     #EEE9DF;
-
-  /* Borders */
-  --color-border:       #DED8CE;
-  --color-border-light: #CEC6B9;
-
-  /* Text */
-  --color-text-primary:   #0C1008;
-  --color-text-secondary: #4B4A43;
-  --color-text-muted:     #78756E;
-
-  /* Electric Lime — darker for light bg readability */
-  --color-gold:        #5B7A18;
-  --color-gold-light:  #7A9C20;
-  --color-gold-dark:   #3D5210;
-  --color-gold-subtle: #F2FADF;
-
-  /* Status */
-  --color-success: #15803D;
-  --color-error:   #C41F1F;
-  --color-crimson:       #C41F1F;
-  --color-crimson-light: #E03030;
-}
-
-/* ── Body: warm mesh gradient ────────────────────────────────────────────── */
+   ════════════════════════════════════════════════…1552 tokens truncated…──────────────── */
 [data-theme="light"] body {
   color: #0C1008;
   background-color: #F7F3EA;
