@@ -409,7 +409,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
     };
   }, [allCreators]);
   const [sortKey, setSortKey] = useState("featured");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   // Neue Casting-Filter
   const [profileTypeFilter, setProfileTypeFilter] = useState("");
@@ -496,6 +496,11 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       next.has(role) ? next.delete(role) : next.add(role);
       return next;
     });
+
+  const chooseSidebarDept = (deptId: string | null) => {
+    setSidebarDept(deptId);
+    if (deptId === null) setViewMode("grid");
+  };
 
   const removeRole = (role: string) =>
     setSelectedRoles((prev) => { const n = new Set(prev); n.delete(role); return n; });
@@ -584,9 +589,9 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       });
     }
 
-    // Keep the default "Alle Bereiche" view visibly mixed so locations and
-    // marketplace providers are present alongside crew from the first cards.
-    if (!sidebarDept && selectedRoles.size === 0) return mixAreaResults(result);
+    // Keep filtered all-area results mixed; the unfiltered default remains
+    // globally sorted by rating so the highest-rated profiles appear first.
+    if (!isTopMode && !sidebarDept && selectedRoles.size === 0) return mixAreaResults(result);
 
     return result;
   }, [query, selectedRoles, sidebarDept, availableOnly, vendorOnly, cityFilter, countryFilter, languageFilter,
@@ -1172,7 +1177,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
               </p>
               <nav className="space-y-0.5">
                 <button
-                  onClick={() => setSidebarDept(null)}
+                  onClick={() => chooseSidebarDept(null)}
                   className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
                     !sidebarDept
                       ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
@@ -1188,7 +1193,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                   return (
                     <button
                       key={dept.id}
-                      onClick={() => setSidebarDept(isActive ? null : dept.id)}
+                      onClick={() => chooseSidebarDept(isActive ? null : dept.id)}
                       className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
                         isActive
                           ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
@@ -1209,7 +1214,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                     return (
                       <button
                         key={id}
-                        onClick={() => setSidebarDept(isActive ? null : id)}
+                        onClick={() => chooseSidebarDept(isActive ? null : id)}
                         className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
                           isActive
                             ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
@@ -1240,7 +1245,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
             {/* Mobile dept pills */}
             <div className="cat-pills gap-2 overflow-x-auto pb-3 mb-4" style={{ scrollbarWidth: "none" }}>
               <button
-                onClick={() => setSidebarDept(null)}
+                onClick={() => chooseSidebarDept(null)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
                   !sidebarDept
                     ? "bg-gold/10 text-gold border-gold/40"
@@ -1254,7 +1259,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                 return (
                   <button
                     key={dept.id}
-                    onClick={() => setSidebarDept(isActive ? null : dept.id)}
+                    onClick={() => chooseSidebarDept(isActive ? null : dept.id)}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
                       isActive
                         ? "bg-gold/10 text-gold border-gold/40"
@@ -1273,7 +1278,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                 return (
                   <button
                     key={id}
-                    onClick={() => setSidebarDept(isActive ? null : id)}
+                    onClick={() => chooseSidebarDept(isActive ? null : id)}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
                       isActive
                         ? "bg-gold/10 text-gold border-gold/40"
@@ -1358,9 +1363,9 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                 </div>
               )}
 
-              {/* Grid: compact portrait cards */}
+              {/* Grid: large profile cards */}
               {viewMode === "grid" && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                 {crewVisible.map((c) => {
                   const displayPositions = getPositions(c);
                   const href = c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`;
@@ -1379,13 +1384,20 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                           </div>
                         )}
                       </div>
-                      <div className="p-2.5">
+                      <div className="p-3 sm:p-4">
                         <div className="flex items-start justify-between gap-1 mb-0.5">
-                          <h3 className="font-semibold text-text-primary text-xs leading-tight truncate">{c.name}</h3>
-                          {c.verified && <CheckCircle size={10} className="text-gold/60 shrink-0 mt-0.5" />}
+                          <h3 className="font-semibold text-text-primary text-sm leading-snug truncate">{c.name}</h3>
+                          {c.verified && <CheckCircle size={12} className="text-gold/60 shrink-0 mt-0.5" />}
                         </div>
-                        <p className="text-[10px] text-gold font-medium truncate">{displayPositions[0]}</p>
-                        {c.location && <p className="text-[10px] text-text-muted truncate mt-0.5">{c.location.split(",")[0]}</p>}
+                        <p className="text-xs text-gold font-medium truncate">{displayPositions[0]}</p>
+                        {c.location && <p className="text-xs text-text-muted truncate mt-1">{c.location.split(",")[0]}</p>}
+                        {c.reviews > 0 && (
+                          <div className="flex items-center gap-1.5 mt-2">
+                            <Star size={11} className="text-gold fill-gold" />
+                            <span className="text-xs font-semibold text-text-primary">{c.rating.toFixed(1)}</span>
+                            <span className="text-[11px] text-text-muted">({c.reviews})</span>
+                          </div>
+                        )}
                       </div>
                     </Link>
                   );

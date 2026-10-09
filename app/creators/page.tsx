@@ -190,6 +190,8 @@ export default async function CreatorsPage() {
           title={t("heroTitle")}
           titleHighlight={t("heroTitleHighlight")}
           description={t("heroDesc")}
+          image="/hero-bg.jpg"
+          imagePosition="center 40%"
           accentRgb="251,146,60"
           cta={!hasProfile ? { label: t("heroCta"), href: "/profile" } : undefined}
         />

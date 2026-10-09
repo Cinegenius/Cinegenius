@@ -424,7 +424,10 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
 
   return (
     <div className="min-h-screen" style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(34,211,238,0.03) 0%, transparent 50%)" }}>
-      <div className="pt-16 relative">
+      <div className="pt-16 relative isolate overflow-hidden">
+        <div aria-hidden="true" className="absolute inset-0 bg-cover bg-[center_42%]" style={{ backgroundImage: "url('/hero-bg.jpg')" }} />
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-bg-primary/90 via-bg-primary/76 to-bg-primary/58" />
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-bg-primary/35 via-transparent to-bg-primary/90" />
         <div className="absolute -top-16 -right-16 w-[600px] h-[480px] rounded-full blur-[100px] pointer-events-none"
           style={{ background: "radial-gradient(ellipse at center, rgba(34,211,238,0.40), transparent 70%)" }} />
 

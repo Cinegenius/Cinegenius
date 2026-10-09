@@ -75,6 +75,8 @@ export default async function PropsPage() {
           title={t("heroTitle")}
           titleHighlight={t("heroTitleHighlight")}
           description={t("heroDesc")}
+          image="/photo-bg.jpg"
+          imagePosition="center 42%"
           accentRgb="52,211,153"
           cta={{ label: t("heroCta"), href: "/inserat" }}
         />

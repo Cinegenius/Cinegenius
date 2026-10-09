@@ -148,8 +148,10 @@ export default async function HomePage() {
       {/* ══════════════════════════════════════════════
           HERO — minimal, kein Leerraum
       ══════════════════════════════════════════════ */}
-      <section className="bg-bg-primary border-b border-border">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-9 sm:py-11 text-center">
+      <section className="relative isolate overflow-hidden border-b border-border bg-bg-primary">
+        <div aria-hidden="true" className="absolute inset-0 bg-cover bg-[center_42%]" style={{ backgroundImage: "url('/hero-bg.jpg')" }} />
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-bg-primary/75 via-bg-primary/75 to-bg-primary/95" />
+        <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-9 sm:py-11 text-center">
           <h1
             className="font-display text-[2rem] sm:text-[2.8rem] font-bold tracking-tight text-text-primary mb-1 leading-tight"
           >

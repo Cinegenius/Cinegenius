@@ -6,12 +6,11 @@ type Props = {
   title: string;
   titleHighlight?: string;
   description: string;
+  /** Local decorative hero image. */
+  image?: string;
+  imagePosition?: string;
   /** RGB values for the accent glow, e.g. "99,102,241". Defaults to lime. */
   accentRgb?: string;
-  /** @deprecated no longer rendered */
-  image?: string;
-  /** @deprecated */
-  imagePosition?: string;
   cta?: { label: string; href: string };
   ctaSecondary?: { label: string; href: string };
 };
@@ -21,13 +20,23 @@ const LIME = "194,241,53";
 
 export default function PageHeader({
   badge, title, titleHighlight, description,
+  image = "/hero-bg.jpg", imagePosition = "center 42%",
   accentRgb = LIME,
   cta, ctaSecondary,
 }: Props) {
   const g = (a: number) => `rgba(${accentRgb},${a})`;
 
   return (
-    <div className="pt-16 relative">
+    <div className="pt-16 relative overflow-hidden">
+
+      {/* Cinematic photo backdrop; dark overlays keep the compact text readable. */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none bg-cover bg-no-repeat"
+        style={{ backgroundImage: `url("${image}")`, backgroundPosition: imagePosition }}
+      />
+      <div aria-hidden="true" className="absolute inset-0 pointer-events-none bg-gradient-to-r from-bg-primary/90 via-bg-primary/75 to-bg-primary/55" />
+      <div aria-hidden="true" className="absolute inset-0 pointer-events-none bg-gradient-to-b from-bg-primary/35 via-transparent to-bg-primary/90" />
 
       {/* Main glow — top right */}
       <div className="absolute -top-16 -right-16 w-[600px] h-[480px] rounded-full blur-[100px] pointer-events-none"

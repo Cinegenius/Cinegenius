@@ -32,6 +32,8 @@ export default async function CompaniesPage() {
           title={t("title")}
           titleHighlight={t("titleHighlight")}
           description={t("description")}
+          image="/photo-bg.jpg"
+          imagePosition="center 42%"
           accentRgb="251,113,133"
           cta={{ label: t("addCompany"), href: "/company-setup" }}
         />

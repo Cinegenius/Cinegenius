@@ -91,6 +91,8 @@ export default async function MarketplacePage({
         title="Requisiten, Kameras,"
         titleHighlight="Licht & Equipment"
         description="Von Privatpersonen und Verleihfirmen — alles für Film, Fotografie und Social Media Produktion."
+        image="/photo-bg.jpg"
+        imagePosition="center 42%"
         accentRgb="168,85,247"
         overlay="left"
         height="sm"

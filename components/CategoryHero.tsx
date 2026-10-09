@@ -6,12 +6,11 @@ type Props = {
   title: string;
   titleHighlight?: string;
   description: string;
+  /** Local decorative hero image. */
+  image?: string;
+  imagePosition?: string;
   /** RGB values for the accent glow, e.g. "99,102,241". Defaults to lime. */
   accentRgb?: string;
-  /** @deprecated no longer rendered */
-  image?: string;
-  /** @deprecated */
-  imagePosition?: string;
   cta?: { label: string; href: string };
   ctaSecondary?: { label: string; href: string };
   stats?: { value: string; label: string }[];
@@ -25,6 +24,7 @@ const heights = { sm: "min-h-[160px]", md: "min-h-[200px]", lg: "min-h-[260px]" 
 
 export default function CategoryHero({
   badge, title, titleHighlight, description,
+  image = "/hero-bg.jpg", imagePosition = "center 42%",
   accentRgb = LIME,
   cta, ctaSecondary, stats,
   overlay = "left", height = "md",
@@ -34,8 +34,17 @@ export default function CategoryHero({
 
   return (
     <div
-      className={`pt-16 relative flex items-center ${heights[height]}`}
+      className={`pt-16 relative flex items-center overflow-hidden ${heights[height]}`}
     >
+      {/* Cinematic photo backdrop; dark overlays keep text readable. */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none bg-cover bg-no-repeat"
+        style={{ backgroundImage: `url("${image}")`, backgroundPosition: imagePosition }}
+      />
+      <div aria-hidden="true" className="absolute inset-0 pointer-events-none bg-gradient-to-r from-bg-primary/90 via-bg-primary/72 to-bg-primary/50" />
+      <div aria-hidden="true" className="absolute inset-0 pointer-events-none bg-gradient-to-b from-bg-primary/35 via-transparent to-bg-primary/90" />
+
       {/* Main glow — top right */}
       <div className="absolute -top-16 -right-16 w-[650px] h-[520px] rounded-full blur-[110px] pointer-events-none"
         style={{ background: `radial-gradient(ellipse at center, ${g(0.40)}, transparent 70%)` }} />

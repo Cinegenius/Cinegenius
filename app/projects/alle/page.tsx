@@ -47,6 +47,8 @@ export default async function AlleProjectsPage() {
         title="Filmprojekte"
         titleHighlight="& Produktionen"
         description="Alle Kategorien — durchsuche und filtere nach Typ, Jahr und Regie."
+        image="/hero-bg.jpg"
+        imagePosition="center 42%"
         accentRgb="234,179,8"
         overlay="left"
         height="sm"
