@@ -145,12 +145,12 @@ export default async function HomePage() {
   const { liveLocations, liveJobs, liveProps, companies, topCreators } = await getHomeData();
 
   return (
-    <div className="ad-side-reserved">
+    <div>
       {/* ══════════════════════════════════════════════
           HERO — minimal, kein Leerraum
       ══════════════════════════════════════════════ */}
-      <section className="relative isolate overflow-hidden border-b border-border bg-bg-primary">
-        <div aria-hidden="true" className="absolute inset-0 bg-cover bg-[center_42%]" style={{ backgroundImage: "url('/hero-bg.jpg')" }} />
+      <section className="relative left-1/2 isolate w-screen max-w-none -translate-x-1/2 overflow-hidden border-b border-border bg-bg-primary">
+        <div aria-hidden="true" className="absolute inset-0 h-full w-full bg-cover bg-[center_42%] bg-no-repeat" style={{ backgroundImage: "url('/hero-bg.jpg')" }} />
         <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-bg-primary/75 via-bg-primary/75 to-bg-primary/95" />
         <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-9 sm:py-11 text-center">
           <h1
@@ -169,7 +169,7 @@ export default async function HomePage() {
       </section>
 
       <CommunityBoard loggedIn={isLoggedIn} />
-      <AdPlaceholder />
+      <AdPlaceholder slotIndex={0} />
 
       {/* ══════════════════════════════════════════════
           FEATURED LOCATIONS
@@ -198,6 +198,12 @@ export default async function HomePage() {
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                         sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw"
                       />
+                    )}
+                    {!loc.image && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-bg-elevated via-bg-secondary to-bg-primary text-text-muted">
+                        <MapPin size={24} className="text-gold/70" />
+                        <span className="text-[11px] font-medium">Noch kein Foto hinterlegt</span>
+                      </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/70 to-transparent" />
                     <div className="absolute bottom-2 left-3 right-3">
@@ -452,6 +458,8 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      <AdPlaceholder slotIndex={1} />
 
       {/* ══════════════════════════════════════════════
           TRUST BAR

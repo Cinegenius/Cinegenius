@@ -13,7 +13,6 @@ import {
 import EmptyState from "@/components/EmptyState";
 import { FILM_DEPARTMENTS, DEPT_KEYWORDS, ALL_ROLES } from "@/lib/filmRoles";
 import { useTranslations } from "next-intl";
-import AdPlaceholder from "@/components/AdPlaceholder";
 
 // ── Department icon map ───────────────────────────────────────────
 const DEPT_ICON_MAP: Record<string, LucideIcon> = {
@@ -458,7 +457,6 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
         </div>
       </div>
 
-      <AdPlaceholder />
 
       {/* ── Filter Bar ───────────────────────────────────── */}
       <div className="bg-transparent border-b border-border/30">

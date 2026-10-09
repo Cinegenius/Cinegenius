@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Search, MapPin, Star, ArrowRight, Plus } from "lucide-react";
-import AdPlaceholder from "@/components/AdPlaceholder";
 
 type LocationCard = {
   id: string;
@@ -46,7 +45,7 @@ export default function LocationsLanding({
   }
 
   return (
-    <div className="ad-side-reserved min-h-screen bg-bg-primary" style={{ background: "radial-gradient(ellipse at 60% 0%, rgba(99,102,241,0.12) 0%, transparent 55%)" }}>
+    <div className="min-h-screen bg-bg-primary" style={{ background: "radial-gradient(ellipse at 60% 0%, rgba(99,102,241,0.12) 0%, transparent 55%)" }}>
 
       {/* ── Hero / Search ─────────────────────────────────────────── */}
       <div className="relative isolate overflow-hidden pt-8 pb-6 px-4">
@@ -104,8 +103,6 @@ export default function LocationsLanding({
 
         </div>
       </div>
-
-      <AdPlaceholder />
 
       {/* ── City sections ─────────────────────────────────────────── */}
       <div className="pb-20 space-y-14">
@@ -167,8 +164,9 @@ export default function LocationsLanding({
                           }
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <MapPin size={28} className="text-text-muted" />
+                        <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-bg-elevated via-bg-secondary to-bg-primary text-text-muted">
+                          <MapPin size={28} className="text-gold/70" />
+                          <span className="text-xs font-medium">Noch kein Foto hinterlegt</span>
                         </div>
                       )}
                     </div>

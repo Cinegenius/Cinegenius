@@ -13,7 +13,7 @@ export default function AgbPage() {
         <div className="mb-10">
           <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-3">Rechtliches</p>
           <h1 className="font-display text-3xl font-bold text-text-primary mb-2">Allgemeine Geschäftsbedingungen</h1>
-          <p className="text-text-muted text-sm">Stand: Mai 2026</p>
+          <p className="text-text-muted text-sm">Stand: Oktober 2026</p>
         </div>
 
         <div className="space-y-8 text-text-secondary">
@@ -21,9 +21,9 @@ export default function AgbPage() {
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-2">§ 1 Geltungsbereich</h2>
             <p className="text-sm leading-relaxed">
-              Diese Allgemeinen Geschäftsbedingungen (nachfolgend „AGB") gelten für die Nutzung der
+              Diese Allgemeinen Geschäftsbedingungen (nachfolgend „AGB&quot;) gelten für die Nutzung der
               Online-Plattform CineGenius unter der Domain cinegenius.co, betrieben von Markus Müller,
-              Plinganserstr. 19, 81369 München (nachfolgend „Betreiber"). Mit der Registrierung oder
+              Plinganserstr. 19, 81369 München (nachfolgend „Betreiber&quot;). Mit der Registrierung oder
               der erstmaligen Nutzung der Plattform erkennst du diese AGB in ihrer jeweils gültigen
               Fassung an. Abweichende Bedingungen der Nutzer gelten nicht, es sei denn, der Betreiber
               stimmt ihrer Geltung ausdrücklich schriftlich zu.
@@ -134,6 +134,14 @@ export default function AgbPage() {
             <p className="text-sm leading-relaxed mt-3">
               Alle Preise verstehen sich inklusive der gesetzlichen Mehrwertsteuer, soweit anwendbar.
               Rechnungen werden per E-Mail oder als Download im Account bereitgestellt.
+            </p>
+            <p className="text-sm leading-relaxed mt-3">
+              Werbebanner können registrierte Nutzer selbst erstellen und veröffentlichen. Die Schaltung
+              ist derzeit für 30 Tage kostenlos. CineGenius kann künftig zusätzliche kostenpflichtige
+              Werbeoptionen anbieten. Preis, Laufzeit und Leistungsumfang werden vor einer kostenpflichtigen
+              Bestellung klar angezeigt; eine Zahlungspflicht entsteht nur, wenn du diese ausdrücklich
+              auswählst und bestellst. Kosten für bereits gebuchte oder abgeschlossene kostenlose Laufzeiten
+              werden nicht nachträglich erhoben.
             </p>
           </section>
 

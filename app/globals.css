@@ -69,13 +69,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Leave a real gutter for the fixed side billboards on desktop. */
-@media (min-width: 1280px) {
-  .ad-side-reserved {
-    margin-inline: clamp(176px, calc((100vw - 1040px) / 2), 220px);
-  }
-}
-
 /* ═══════════════════════════════════════════════════════════════════════════
    SCROLLBAR
    ═══════════════════════════════════════════════════════════════════════════ */
