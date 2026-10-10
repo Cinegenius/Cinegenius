@@ -140,5 +140,9 @@ export const db = {
    *   const { error } = await db.storage.from("listing-images").upload(path, buffer, opts);
    *   const { data }  = db.storage.from("listing-images").getPublicUrl(path);
    */
-  storage: supabaseAdmin.storage,
+  // Keep client creation lazy during Next.js build analysis. Reading this
+  // property at runtime still creates the admin client on first use.
+  get storage() {
+    return supabaseAdmin.storage;
+  },
 };
