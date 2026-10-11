@@ -27,6 +27,18 @@ import AdPlaceholder from "@/components/AdPlaceholder";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 
 async function getHomeData() {
+  // Keep the public homepage renderable in preview environments that do not
+  // have Supabase credentials. Dynamic listings appear once the DB is configured.
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return {
+      liveLocations: [],
+      liveJobs: [],
+      liveProps: [],
+      companies: [],
+      topCreators: [],
+    };
+  }
+
   const [
     { data: recentLocations },
     { data: recentJobs },
