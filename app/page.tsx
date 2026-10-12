@@ -180,8 +180,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <CommunityBoard loggedIn={isLoggedIn} />
       <AdPlaceholder slotIndex={0} />
+      <CommunityBoard loggedIn={isLoggedIn} />
 
       {/* ══════════════════════════════════════════════
           FEATURED LOCATIONS

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ArrowRight, Megaphone } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -17,11 +18,14 @@ type Ad = {
 
 export default function AdPlaceholder({ slotIndex = 0 }: { slotIndex?: 0 | 1 }) {
   const t = useTranslations("advertising");
+  const pathname = usePathname();
+  const isHomepage = pathname.replace(/\/+$/, "") === "";
   const [ads, setAds] = useState<Ad[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [transitionEnabled, setTransitionEnabled] = useState(true);
 
   useEffect(() => {
+    if (!isHomepage) return;
     let cancelled = false;
     fetch("/api/ads", { cache: "no-store" })
       .then((response) => response.ok ? response.json() : { ads: [] })
@@ -32,23 +36,23 @@ export default function AdPlaceholder({ slotIndex = 0 }: { slotIndex?: 0 | 1 }) 
         if (!cancelled) setAds([]);
       });
     return () => { cancelled = true; };
-  }, []);
+  }, [isHomepage]);
 
   useEffect(() => {
-    if (ads.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!isHomepage || ads.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const timer = window.setInterval(() => setActiveIndex((index) => index + 1), 7000);
     return () => window.clearInterval(timer);
-  }, [ads.length]);
+  }, [ads.length, isHomepage]);
 
   useEffect(() => {
-    if (ads.length < 2 || activeIndex !== ads.length) return;
+    if (!isHomepage || ads.length < 2 || activeIndex !== ads.length) return;
     const reset = window.setTimeout(() => {
       setTransitionEnabled(false);
       setActiveIndex(0);
       window.requestAnimationFrame(() => window.requestAnimationFrame(() => setTransitionEnabled(true)));
     }, 550);
     return () => window.clearTimeout(reset);
-  }, [activeIndex, ads.length]);
+  }, [activeIndex, ads.length, isHomepage]);
 
   const slotAds = ads.length > 1
     ? [...ads.slice(slotIndex), ...ads.slice(0, slotIndex)]
@@ -87,6 +91,10 @@ export default function AdPlaceholder({ slotIndex = 0 }: { slotIndex?: 0 | 1 }) 
       </div>
     </div>
   );
+
+  // Keep ad placements confined to the landing page even if this component is
+  // accidentally added to a shared layout or another route in the future.
+  if (!isHomepage) return null;
 
   return (
     <aside aria-label={t("bannerAria")} className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
