@@ -228,9 +228,57 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   INPUTS — Base
+   INPUTS & BROWSE CONTROLS — Clear contrast across the site
    ═══════════════════════════════════════════════════════════════════════════ */
 input, select, textarea { color: inherit; }
+
+input:where(:not([type="checkbox"]):not([type="radio"]):not([type="range"])),
+select,
+textarea {
+  border-color: #3D4963;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #A4AEC0;
+  opacity: 1;
+}
+
+input:where(:not([type="checkbox"]):not([type="radio"]):not([type="range"])):focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  border-color: #C2F135;
+  box-shadow: 0 0 0 3px rgba(194, 241, 53, 0.18);
+  outline: none;
+}
+
+/* Raise the outline on composite search bars without changing their layout. */
+:where(div, label, form):has(> input[placeholder]),
+form:has(input[type="search"]) {
+  border-color: #3D4963;
+}
+
+/* Outlined filter buttons and dropdowns should look tappable at a glance. */
+:where(button, a)[class*="border-border"][class*="rounded"] {
+  border-color: #3D4963;
+}
+
+:where(button, a)[class*="border-border"][class*="text-text-muted"] {
+  background-color: rgba(30, 35, 48, 0.76);
+  color: #B2BBC8;
+}
+
+button[aria-expanded],
+button[aria-haspopup],
+button[aria-pressed] {
+  border-color: #3D4963;
+}
+
+button[aria-expanded="false"],
+button[aria-pressed="false"] {
+  color: #B2BBC8;
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    HERO — Theme-aware image & text
@@ -422,6 +470,21 @@ input, select, textarea { color: inherit; }
 }
 [data-theme="light"] input::placeholder,
 [data-theme="light"] textarea::placeholder { color: #9CAAA0; }
+[data-theme="light"] :where(div, label, form):has(> input[placeholder]),
+[data-theme="light"] form:has(input[type="search"]) {
+  border-color: #C8CCC2;
+}
+[data-theme="light"] :where(button, a)[class*="border-border"][class*="rounded"] {
+  border-color: #C8CCC2;
+}
+[data-theme="light"] :where(button, a)[class*="border-border"][class*="text-text-muted"] {
+  background-color: rgba(255, 255, 255, 0.86);
+  color: #4B4A43;
+}
+[data-theme="light"] button[aria-expanded="false"],
+[data-theme="light"] button[aria-pressed="false"] {
+  color: #4B4A43;
+}
 [data-theme="light"] input:focus,
 [data-theme="light"] select:focus,
 [data-theme="light"] textarea:focus {
