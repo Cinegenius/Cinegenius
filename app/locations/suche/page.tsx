@@ -4,8 +4,6 @@ import { fetchRatings } from "@/lib/ratings";
 import LocationsContent from "../LocationsContent";
 import PageHeader from "@/components/PageHeader";
 import { getTranslations } from "next-intl/server";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 
 export const revalidate = 60;
 
@@ -85,15 +83,17 @@ export default async function LocationsSuchePage() {
   }));
 
   return (
-    <div style={{ background: "radial-gradient(ellipse at 60% 0%, rgba(99,102,241,0.08) 0%, transparent 50%)" }}>
-      <div className="pt-16 bg-transparent border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <Link href="/locations" className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-gold transition-colors">
-            <ArrowLeft size={14} /> Zurück zur Übersicht
-          </Link>
-        </div>
+    <div className="min-h-screen bg-bg-primary">
+      <PageHeader
+        badge="Filmlocations Deutschland"
+        title={t("heroTitle")}
+        titleHighlight={t("heroTitleHighlight")}
+        description={t("heroDesc")}
+        ctaSecondary={{ label: "Zurück zur Übersicht", href: "/locations" }}
+      />
+      <div className="site-content-width">
+        <LocationsContent serverListings={serverListings} vendorProfiles={locationVendors} />
       </div>
-      <LocationsContent serverListings={serverListings} vendorProfiles={locationVendors} />
     </div>
   );
 }

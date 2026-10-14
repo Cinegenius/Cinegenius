@@ -14,6 +14,7 @@ import EmptyState from "@/components/EmptyState";
 import { FILM_DEPARTMENTS, DEPT_KEYWORDS, ALL_ROLES } from "@/lib/filmRoles";
 import { useTranslations } from "next-intl";
 import AdPlaceholder from "@/components/AdPlaceholder";
+import PageHeader from "@/components/PageHeader";
 
 // ── Department icon map ───────────────────────────────────────────
 const DEPT_ICON_MAP: Record<string, LucideIcon> = {
@@ -424,45 +425,20 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   const activeRoleData = selectedRoleId ? ALL_ROLES.find((r) => r.id === selectedRoleId) : null;
 
   return (
-    <div className="min-h-screen" style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(34,211,238,0.03) 0%, transparent 50%)" }}>
-      <div className="pt-16 relative isolate overflow-hidden">
-        <div aria-hidden="true" className="absolute inset-0 bg-cover bg-[center_42%]" style={{ backgroundImage: "url('/hero-bg.jpg')" }} />
-        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-bg-primary/90 via-bg-primary/76 to-bg-primary/58" />
-        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-bg-primary/35 via-transparent to-bg-primary/90" />
-        <div className="absolute -top-16 -right-16 w-[600px] h-[480px] rounded-full blur-[100px] pointer-events-none"
-          style={{ background: "radial-gradient(ellipse at center, rgba(34,211,238,0.40), transparent 70%)" }} />
-
-        <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-4 pb-5 sm:pt-8 sm:pb-8 max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-3"
-                style={{ background: "rgba(34,211,238,0.10)", border: "1px solid rgba(34,211,238,0.35)" }}>
-                <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: "rgba(34,211,238,1)" }}>{t("heroBadge")}</span>
-              </div>
-              <h1 className="font-display text-xl sm:text-3xl lg:text-4xl font-bold text-text-primary leading-tight mb-1.5">
-                {t("heroTitle")}{" "}
-                <span className="text-gradient-gold">{t("heroTitleHighlight")}</span>
-              </h1>
-              <p className="text-text-secondary text-sm sm:text-base leading-relaxed max-w-xl">
-                {allJobs.length > 0
-                  ? t("heroDesc", { count: allJobs.length })
-                  : t("heroDescEmpty")}
-              </p>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <Link href="/inserat" className="inline-flex items-center gap-2 px-4 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm whitespace-nowrap">
-                {t("postJobBtn")}
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-bg-primary">
+      <PageHeader
+        badge={t("heroBadge")}
+        title={t("heroTitle")}
+        titleHighlight={t("heroTitleHighlight")}
+        description={allJobs.length > 0 ? t("heroDesc", { count: allJobs.length }) : t("heroDescEmpty")}
+        cta={{ label: t("postJobBtn"), href: "/inserat" }}
+      />
 
       <AdPlaceholder />
 
       {/* ── Filter Bar ───────────────────────────────────── */}
-      <div className="bg-transparent border-b border-border/30">
-        <div className="px-4 py-2 space-y-2">
+      <div className="browse-toolbar">
+        <div className="site-container py-2 space-y-2">
 
           {/* Row 1: Search + Sort */}
           <div className="flex items-center gap-2">
@@ -601,7 +577,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
       </div>
 
       {/* ── Results ──────────────────────────────────────── */}
-      <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <div className="site-container py-4 sm:py-8">
         <div className="flex gap-8 items-start">
 
           {/* Left sidebar */}
@@ -713,7 +689,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
             return (
               <Link key={job.id} href={`/jobs/${job.id}`}
                 suppressHydrationWarning
-                className="card-hover group flex gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:bg-bg-elevated transition-colors block">
+                className="browse-card card-hover group flex gap-4 p-4 hover:bg-bg-elevated transition-colors block">
 
                 {/* Icon */}
                 <div className="w-10 h-10 rounded-lg bg-bg-elevated border border-border flex items-center justify-center shrink-0 mt-0.5">

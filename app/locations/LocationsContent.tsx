@@ -343,10 +343,10 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
   const hasActiveFilters = query || activeType !== "All Types" || instantOnly || verifiedOnly || minPrice || maxPrice || userLocation || lageFilter !== "Alle" || powerOnly;
 
   return (
-    <div className="min-h-screen flex flex-col h-screen">
+    <div className="flex min-h-[32rem] h-[calc(100dvh-15rem)] flex-col bg-bg-primary">
       {/* ── TOP BAR ── */}
-      <div className="bg-transparent border-b border-border/30 py-2 px-4 shrink-0">
-        <div className="max-w-full mx-auto space-y-2">
+      <div className="browse-toolbar shrink-0">
+        <div className="site-container space-y-2 py-2">
 
           {/* Row 1: Search + View toggle */}
           <div className="flex items-center gap-2">
@@ -634,7 +634,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
                       key={loc.id}
                       href={`/locations/${loc.id}`}
                       suppressHydrationWarning
-                      className="card-hover group rounded-xl border border-border bg-bg-secondary overflow-hidden block"
+                      className="browse-card card-hover group overflow-hidden block"
                     >
                       <div className="relative overflow-hidden aspect-video bg-bg-elevated">
                         {loc.image

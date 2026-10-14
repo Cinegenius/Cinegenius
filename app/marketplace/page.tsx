@@ -6,8 +6,8 @@ import {
   Lightbulb, Mic, Zap, Layers, MapPin, Tag,
 } from "lucide-react";
 import { db } from "@/lib/db";
-import CategoryHero from "@/components/CategoryHero";
 import AdPlaceholder from "@/components/AdPlaceholder";
+import PageHeader from "@/components/PageHeader";
 
 export const metadata: Metadata = {
   title: "Marktplatz — Equipment & Requisiten",
@@ -86,23 +86,18 @@ export default async function MarketplacePage({
   const activeEntry = SIDEBAR.find((s) => s.slug === activeSlug)!;
 
   return (
-    <div className="min-h-screen" style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(168,85,247,0.08) 0%, transparent 50%)" }}>
-      <CategoryHero
+    <div className="min-h-screen bg-bg-primary">
+      <PageHeader
         badge="Marktplatz"
         title="Requisiten, Kameras,"
         titleHighlight="Licht & Equipment"
         description="Von Privatpersonen und Verleihfirmen — alles für Film, Fotografie und Social Media Produktion."
-        image="/photo-bg.jpg"
-        imagePosition="center 42%"
-        accentRgb="168,85,247"
-        overlay="left"
-        height="sm"
-        cta={{ label: "Inserat erstellen →", href: "/inserat" }}
+        cta={{ label: "Inserat erstellen", href: "/inserat" }}
       />
 
       <AdPlaceholder />
 
-      <div className="px-4 sm:px-6 lg:px-8 py-8">
+      <div className="site-container py-4 sm:py-8">
         <div className="flex gap-8 items-start">
 
           {/* ── Left sidebar ── */}
@@ -180,7 +175,7 @@ export default async function MarketplacePage({
                     <Link
                       key={item.id}
                       href={href}
-                      className="flex items-center gap-4 p-3 rounded-xl border border-border bg-bg-elevated hover:border-gold/30 hover:bg-bg-secondary transition-all group"
+                      className="browse-card flex items-center gap-4 p-3 hover:border-gold/30 hover:bg-bg-elevated transition-all group"
                     >
                       {/* Thumbnail */}
                       <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-bg-secondary">

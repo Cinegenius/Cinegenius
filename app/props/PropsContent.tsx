@@ -98,7 +98,7 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
     return (
       <Link href={href}
         suppressHydrationWarning
-        className="card-hover group flex items-center gap-4 p-3 rounded-xl border border-border bg-bg-secondary"
+        className="browse-card card-hover group flex items-center gap-4 p-3"
         data-visible>
         <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-bg-elevated border border-border">
           {p.image
@@ -129,7 +129,7 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
   return (
     <Link href={href}
       suppressHydrationWarning
-      className="card-hover group rounded-xl border border-border bg-bg-secondary overflow-hidden block"
+      className="browse-card card-hover group overflow-hidden block"
       data-visible>
       <div className="relative aspect-[4/3] overflow-hidden bg-bg-elevated">
         {p.image
@@ -344,8 +344,8 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
     <div className="min-h-screen">
 
       {/* ── Filter Bar ───────────────────────────────────────────── */}
-      <div className="bg-transparent border-b border-border/30">
-        <div className="px-4 py-2 space-y-2">
+      <div className="browse-toolbar">
+        <div className="site-container py-2 space-y-2">
 
           {/* Main row */}
           <div className="flex items-center gap-2">
@@ -429,7 +429,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
       </div>
 
       {/* ── Results ──────────────────────────────────────── */}
-      <div className="px-4 sm:px-6 lg:px-8 py-3 sm:py-6">
+      <div className="site-container py-3 sm:py-6">
         <div className="flex gap-8 items-start">
 
           {/* Sidebar */}
@@ -514,7 +514,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
             ) : (
               <>
                 <div className={viewMode === "grid"
-                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+                  ? "grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                   : "space-y-2"}>
                   {filtered.slice(0, visibleCount).map((p) => (
                     <PropCard key={p.id} p={p} list={viewMode === "list"}

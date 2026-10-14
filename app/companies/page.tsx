@@ -26,17 +26,14 @@ export default async function CompaniesPage() {
     .limit(200);
 
   return (
-    <div style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(251,113,133,0.03) 0%, transparent 50%)" }}>
+    <div className="min-h-screen bg-bg-primary">
       <PageHeader
-          badge={t("badge")}
-          title={t("title")}
-          titleHighlight={t("titleHighlight")}
-          description={t("description")}
-          image="/photo-bg.jpg"
-          imagePosition="center 42%"
-          accentRgb="251,113,133"
-          cta={{ label: t("addCompany"), href: "/company-setup" }}
-        />
+        badge={t("badge")}
+        title={t("title")}
+        titleHighlight={t("titleHighlight")}
+        description={t("description")}
+        cta={{ label: t("addCompany"), href: "/company-setup" }}
+      />
       <CompaniesContent initialCompanies={data ?? []} />
     </div>
   );

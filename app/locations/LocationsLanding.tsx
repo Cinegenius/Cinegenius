@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Search, MapPin, Star, ArrowRight, Plus } from "lucide-react";
 import AdPlaceholder from "@/components/AdPlaceholder";
+import PageHeader from "@/components/PageHeader";
 
 type LocationCard = {
   id: string;
@@ -23,10 +24,6 @@ type CityGroup = {
   city: string;
   locations: LocationCard[];
 };
-
-const ACCENT = "99,102,241";
-const g = (a: number) => `rgba(${ACCENT},${a})`;
-
 
 export default function LocationsLanding({
   cityGroups,
@@ -46,69 +43,47 @@ export default function LocationsLanding({
   }
 
   return (
-    <div className="ad-side-reserved min-h-screen bg-bg-primary" style={{ background: "radial-gradient(ellipse at 60% 0%, rgba(99,102,241,0.12) 0%, transparent 55%)" }}>
-
-      {/* ── Hero / Search ─────────────────────────────────────────── */}
-      <div className="relative isolate overflow-hidden pt-8 pb-6 px-4">
-        <div aria-hidden="true" className="absolute inset-0 bg-cover bg-[center_45%]" style={{ backgroundImage: "url('/photo-bg.jpg')" }} />
-        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-bg-primary/80 via-bg-primary/80 to-bg-primary/95" />
-        <div className="absolute -top-20 right-0 w-[900px] h-[600px] rounded-full blur-[140px] pointer-events-none"
-          style={{ background: `radial-gradient(ellipse at center, ${g(0.20)}, transparent 60%)` }} />
-
-        <div className="relative z-10 max-w-2xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-3"
-            style={{ background: g(0.10), border: `1px solid ${g(0.30)}` }}>
-            <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: g(1) }}>
-              Filmlocations Deutschland
-            </span>
-          </div>
-
-          <h1 className="font-display text-2xl sm:text-4xl font-bold text-text-primary mb-2 leading-tight">
-            Finde die perfekte <span className="text-gradient-gold">Location</span>
-          </h1>
-
-          <p className="text-text-muted text-sm mb-4">
-            {totalCount > 0
-              ? `${totalCount.toLocaleString("de-DE")} Locations für Film, Werbung & Foto`
-              : "Apartments, Villen, Studios, Außengelände & mehr"}
-          </p>
-
-          {/* Search bar */}
-          <form onSubmit={handleSearch} className="max-w-xl mx-auto mb-3">
-            <div className="flex items-center bg-bg-elevated border border-border rounded-xl p-1.5 shadow-xl gap-2 focus-within:border-indigo-400/50 transition-colors">
-              <div className="flex items-center gap-2 flex-1 px-3">
-                <Search size={15} className="text-text-muted shrink-0" />
-                <input
-                  type="text"
-                  placeholder="Stadt, Location-Typ oder Stichwort..."
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  className="flex-1 bg-transparent text-text-primary placeholder:text-text-muted outline-none text-sm py-1.5"
-                  autoComplete="off"
-                />
-                {query && (
-                  <button type="button" onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors">
-                    ×
-                  </button>
-                )}
-              </div>
-              <button
-                type="submit"
-                className="px-5 py-2 bg-gold text-bg-primary font-bold rounded-lg hover:bg-gold-light transition-colors text-sm shrink-0"
-              >
-                Suchen →
-              </button>
+    <div className="min-h-screen bg-bg-primary">
+      <PageHeader
+        badge="Filmlocations Deutschland"
+        title="Finde die perfekte"
+        titleHighlight="Location"
+        description={totalCount > 0
+          ? `${totalCount.toLocaleString("de-DE")} Locations für Film, Werbung & Foto`
+          : "Apartments, Villen, Studios, Außengelände & mehr"}
+        ctaSecondary={{ label: "Alle Locations ansehen", href: "/locations/suche" }}
+        cta={{ label: "Location anbieten", href: "/inserat?group=drehorte" }}
+      >
+        <form onSubmit={handleSearch} className="max-w-2xl">
+          <div className="flex items-center gap-2 rounded-xl border border-border bg-bg-elevated p-1.5 transition-colors focus-within:border-gold/50">
+            <div className="flex min-w-0 flex-1 items-center gap-2 px-3">
+              <Search size={15} className="shrink-0 text-text-muted" />
+              <input
+                type="text"
+                placeholder="Stadt, Location-Typ oder Stichwort..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                className="min-w-0 flex-1 bg-transparent py-2 text-sm text-text-primary outline-none placeholder:text-text-muted"
+                autoComplete="off"
+              />
+              {query && (
+                <button type="button" onClick={() => setQuery("")} className="text-text-muted transition-colors hover:text-text-primary">
+                  ×
+                </button>
+              )}
             </div>
-          </form>
-
-        </div>
-      </div>
+            <button type="submit" className="shrink-0 rounded-lg bg-gold px-4 py-2.5 text-sm font-bold text-bg-primary transition-colors hover:bg-gold-light">
+              Suchen <ArrowRight size={14} className="ml-1 inline" />
+            </button>
+          </div>
+        </form>
+      </PageHeader>
 
       <AdPlaceholder />
 
       {/* ── City sections ─────────────────────────────────────────── */}
-      <div className="pb-20 space-y-14">
+      <div className="site-content-width space-y-10 pb-20 sm:space-y-14">
         {cityGroups.length === 0 ? (
           <div className="text-center py-16 px-4">
             <div className="w-16 h-16 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center mx-auto mb-4">
@@ -116,10 +91,7 @@ export default function LocationsLanding({
             </div>
             <p className="text-text-primary font-semibold mb-1">Noch keine Locations</p>
             <p className="text-text-muted text-sm mb-6">Sei der Erste und trage deine Location ein.</p>
-            <Link
-              href="/inserat?group=drehorte"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl text-sm"
-            >
+            <Link href="/inserat?group=drehorte" className="inline-flex items-center gap-2 rounded-xl bg-gold px-5 py-2.5 text-sm font-semibold text-bg-primary">
               <Plus size={14} /> Location eintragen
             </Link>
           </div>
@@ -129,7 +101,7 @@ export default function LocationsLanding({
               {/* Section header */}
               <div className="flex items-center justify-between mb-5 max-w-7xl mx-auto">
                 <h2 className="text-xl sm:text-2xl font-bold text-text-primary flex items-center gap-2">
-                  <MapPin size={16} style={{ color: g(1) }} />
+                  <MapPin size={16} className="text-gold" />
                   Locations in {city}
                 </h2>
                 <Link

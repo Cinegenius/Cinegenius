@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import ProjectsContent from "@/app/projects/ProjectsContent";
-import CategoryHero from "@/components/CategoryHero";
+import PageHeader from "@/components/PageHeader";
 
 export const revalidate = 300;
 
@@ -41,19 +41,18 @@ export default async function AlleProjectsPage() {
   );
 
   return (
-    <div style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(234,179,8,0.08) 0%, transparent 50%)" }}>
-      <CategoryHero
+    <div className="min-h-screen bg-bg-primary">
+      <PageHeader
         badge="Alle Projekte"
         title="Filmprojekte"
         titleHighlight="& Produktionen"
         description="Alle Kategorien — durchsuche und filtere nach Typ, Jahr und Regie."
-        image="/hero-bg.jpg"
-        imagePosition="center 42%"
-        accentRgb="234,179,8"
-        overlay="left"
-        height="sm"
+        ctaSecondary={{ label: "Zur Projektübersicht", href: "/projects" }}
+        cta={{ label: "Projekt erstellen", href: "/projects/neu" }}
       />
-      <ProjectsContent projects={projectsWithCount} />
+      <div className="site-container py-4 sm:py-8">
+        <ProjectsContent projects={projectsWithCount} />
+      </div>
     </div>
   );
 }

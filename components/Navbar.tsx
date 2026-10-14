@@ -157,11 +157,11 @@ const jobItems = jobGroups.flatMap((g) => g.items);
 
 const desktopNavHrefs = [
   { href: "/locations", key: "locations"  },
-  { href: "/props",     key: "marketplace"},
   { href: "/creators",  key: "crew"       },
-  { href: "/companies", key: "companies"  },
-  { href: "/projects",  key: "projects"   },
   { href: "/jobs",      key: "jobs"       },
+  { href: "/props",     key: "marketplace"},
+  { href: "/projects",  key: "projects"   },
+  { href: "/companies", key: "companies"  },
 ] as const;
 
 

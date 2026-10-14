@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
-import CategoryHero from "@/components/CategoryHero";
+import PageHeader from "@/components/PageHeader";
 import TiereContent from "./TiereContent";
 
 export const revalidate = 60;
@@ -47,20 +47,17 @@ export default async function TierePage() {
   }));
 
   return (
-    <div style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(74,222,128,0.03) 0%, transparent 50%)" }}>
-      <CategoryHero
+    <div className="min-h-screen bg-bg-primary">
+      <PageHeader
         badge="Film-Tiere"
         title="Ausgebildete Tiere"
         titleHighlight="für deine Produktion"
         description="Von dressierten Hunden bis zu exotischen Tieren — finde den perfekten vierbeinigen Star für deinen Film, deine Werbung oder dein Fotoshooting."
-        image="/tier.jpg"
-        imagePosition="center 42%"
-        accentRgb="74,222,128"
-        overlay="left"
-        height="sm"
         cta={{ label: "Tier inserieren", href: "/inserat" }}
       />
-      <TiereContent serverListings={serverListings} />
+      <div className="site-container py-4 sm:py-8">
+        <TiereContent serverListings={serverListings} />
+      </div>
     </div>
   );
 }

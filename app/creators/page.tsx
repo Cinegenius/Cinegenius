@@ -185,17 +185,14 @@ export default async function CreatorsPage() {
     .sort((a, b) => a.alt.localeCompare(b.alt));
 
   return (
-    <div style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(251,146,60,0.03) 0%, transparent 50%)" }}>
+    <div className="min-h-screen bg-bg-primary">
       <PageHeader
-          badge="Crew"
-          title={t("heroTitle")}
-          titleHighlight={t("heroTitleHighlight")}
-          description={t("heroDesc")}
-          image="/hero-bg.jpg"
-          imagePosition="center 40%"
-          accentRgb="251,146,60"
-          cta={!hasProfile ? { label: t("heroCta"), href: "/profile" } : undefined}
-        />
+        badge="Crew"
+        title={t("heroTitle")}
+        titleHighlight={t("heroTitleHighlight")}
+        description={t("heroDesc")}
+        cta={!hasProfile ? { label: t("heroCta"), href: "/profile" } : undefined}
+      />
       <AdPlaceholder />
       <CreatorsContent serverCreators={serverCreators} hasStrip={true} />
     </div>

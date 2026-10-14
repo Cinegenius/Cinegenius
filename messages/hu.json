@@ -604,7 +604,7 @@
     "heroDesc": "{count} nyitott pozíció — kameraassisztenstől a közösségi média menedzserig.",
     "heroDescEmpty": "Hirdess állást és találd meg a csapatodat — ingyenes, jutalék nélkül.",
     "allJobs": "Összes állás →",
-    "postJobBtn": "Állás hirdetése →",
+    "postJobBtn": "Állás hirdetése",
     "searchPlaceholder": "Szerep, készség, kulcsszó...",
     "sort": "Rendezés",
     "sortNewest": "Legújabbak először",
