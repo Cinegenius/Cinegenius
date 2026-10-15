@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 
 const failures = [];
 const read = (path) => readFileSync(path, "utf8");
@@ -48,10 +48,39 @@ if (existsSync("components/CategoryHero.tsx")) {
   failures.push("The superseded CategoryHero layout has returned");
 }
 
+const collectUiFiles = (directory) =>
+  readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = `${directory}/${entry.name}`;
+    if (entry.isDirectory()) return collectUiFiles(path);
+    return /\.(?:ts|tsx|css)$/.test(entry.name) ? [path] : [];
+  });
+
+const adUiFiles = [...collectUiFiles("app"), ...collectUiFiles("components")];
+const forbiddenAdvertisingPatterns = [
+  ["ad placeholder component", /\bAdPlaceholder\b/],
+  ["reserved ad layout", /\bad-side-reserved\b/],
+  ["public ad placement copy", /Werbeplatz anfragen|Hier könnte deine Werbung stehen|Werbeplatz auf CineGenius/i],
+  ["public link to the advertising page", /href\s*=\s*["']\/werben(?:["'/?#])/],
+];
+
+for (const path of adUiFiles) {
+  const source = read(path);
+  for (const [label, pattern] of forbiddenAdvertisingPatterns) {
+    if (pattern.test(source)) failures.push(`Found ${label} in ${path}`);
+  }
+}
+
+if (existsSync("components/AdPlaceholder.tsx")) {
+  failures.push("The removed public ad placeholder component has returned");
+}
+if (!read("app/werben/page.tsx").includes('redirect("/")')) {
+  failures.push("The former advertising page must redirect to the homepage");
+}
+
 if (failures.length) {
   console.error("Shared design checks failed:");
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
 
-console.log("Shared design checks passed: all six page headers, nav order, common layout rules, and removed hero variant.");
+console.log("Shared design checks passed: six page headers, nav order, common layout rules, removed hero variant, and no public ad surfaces.");

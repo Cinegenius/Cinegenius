@@ -6,6 +6,8 @@ The current `/projects` page is the source of truth for public directory design.
 
 Use `components/PageHeader.tsx` for page headers and its exported backdrop helper for any page that intentionally extends the image beyond the header. `app/globals.css` owns shared width and surface values: `--site-content-max`, responsive gutters, `site-container`, `browse-toolbar`, and `browse-card`. Keep filters and result lists on the solid background; don’t extend the cinematic image behind them unless the `/projects` reference does so. The former `CategoryHero` component was removed after its remaining routes were migrated.
 
+The homepage keeps `/hero-bg.jpg` as a full-page backdrop using the shared `PageBackdrop` component. Its slightly brighter dark overlay must retain readable copy and clear card surfaces while allowing the image to continue behind homepage sections.
+
 Desktop and mobile navigation use the same order: Locations, Crew, Jobs, Marktplatz, Projekte, Firmen. Keep `components/Navbar.tsx` and `components/BottomNav.tsx` aligned when editing navigation.
 
 ## Design regression checks
@@ -21,6 +23,10 @@ For visual review, capture `/projects`, `/locations`, `/props`, `/creators`, `/c
 - Vercel automatic production deployment from `main` is disabled in `vercel.json`. This prevents an unreviewed Git integration deployment from replacing production.
 - Publish a release only by running `npm run deploy:production` from a clean `main` checkout whose `HEAD` matches `origin/main`. The guarded script checks the branch, clean tree, remote commit, and linked project; then it pulls the linked project's Production settings into the ignored `.vercel` directory, builds for production, and deploys the prebuilt output.
 - Never use a dirty working tree, another branch, a stale project folder, or a direct ad hoc `vercel --prod` command for production. The guard is intended to make those recurring snapshot overwrites fail before deployment.
+
+## Advertising surfaces
+
+Public advertising surfaces are disabled across all routes and screen sizes. Do not add ad banners, reserved slots, placeholders, advertising inquiry links, or booking buttons unless the site owner explicitly asks to add or re-enable them. Keep the `/werben` route redirected to the homepage while this rule is active. `npm run check:design` guards against the removed placeholder, reserved layout, public ad copy, and footer-style links returning; the production release script runs this check before deployment.
 
 ## Cause confirmed during the deployment review
 

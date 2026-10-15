@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import HeroSearch from "@/components/HeroSearch";
 import CommunityBoard from "@/components/CommunityBoard";
-import AdPlaceholder from "@/components/AdPlaceholder";
+import { PageBackdrop } from "@/components/PageHeader";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 
 async function getHomeData() {
@@ -145,13 +145,18 @@ export default async function HomePage() {
   const { liveLocations, liveJobs, liveProps, companies, topCreators } = await getHomeData();
 
   return (
-    <div className="ad-side-reserved">
+    <main className="relative isolate min-h-screen">
+      <PageBackdrop
+        image="/hero-bg.jpg"
+        imagePosition="center 42%"
+        imageOpacity={100}
+        overlayClassName="absolute inset-0 bg-bg-primary/72"
+        className="pointer-events-none fixed inset-0 z-[-1]"
+      />
       {/* ══════════════════════════════════════════════
           HERO — minimal, kein Leerraum
       ══════════════════════════════════════════════ */}
-      <section className="relative isolate overflow-hidden border-b border-border bg-bg-primary">
-        <div aria-hidden="true" className="absolute inset-0 bg-cover bg-[center_42%]" style={{ backgroundImage: "url('/hero-bg.jpg')" }} />
-        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-bg-primary/75 via-bg-primary/75 to-bg-primary/95" />
+      <section className="relative isolate overflow-hidden border-b border-border">
         <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-9 sm:py-11 text-center">
           <h1
             className="font-display text-[2rem] sm:text-[2.8rem] font-bold tracking-tight text-text-primary mb-1 leading-tight"
@@ -169,7 +174,6 @@ export default async function HomePage() {
       </section>
 
       <CommunityBoard loggedIn={isLoggedIn} />
-      <AdPlaceholder />
 
       {/* ══════════════════════════════════════════════
           FEATURED LOCATIONS
@@ -287,7 +291,7 @@ export default async function HomePage() {
           COMPANIES
       ══════════════════════════════════════════════ */}
       {companies.length > 0 && (
-        <section className="py-10 sm:py-14 bg-bg-secondary border-y border-border">
+        <section className="py-10 sm:py-14 bg-bg-secondary/75 border-y border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-end justify-between mb-6">
               <div>
@@ -456,7 +460,7 @@ export default async function HomePage() {
       {/* ══════════════════════════════════════════════
           TRUST BAR
       ══════════════════════════════════════════════ */}
-      <div className="bg-bg-secondary border-y border-border">
+      <div className="bg-bg-secondary/75 border-y border-border">
         <div className="max-w-5xl mx-auto px-6 sm:px-6 py-5">
           <div className="grid grid-cols-2 gap-4 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-5">
             {[
@@ -483,7 +487,7 @@ export default async function HomePage() {
           FINAL CTA
       ══════════════════════════════════════════════ */}
       <section className="py-12 sm:py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-gold-subtle via-bg-primary to-bg-primary" />
+        <div className="absolute inset-0 bg-gradient-to-br from-gold-subtle/80 via-bg-primary/70 to-bg-primary/70" />
         <div className="absolute inset-0 border-t border-b border-gold/10" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-gold/5 rounded-full blur-3xl pointer-events-none" />
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
@@ -513,6 +517,6 @@ export default async function HomePage() {
           </p>
         </div>
       </section>
-    </div>
+    </main>
   );
 }
