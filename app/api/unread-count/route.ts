@@ -5,7 +5,8 @@ import { NextResponse } from "next/server";
 // GET /api/unread-count — Anzahl ungelesener Nachrichten des eingeloggten Nutzers
 export async function GET() {
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ count: 0 });
+  const noStore = { headers: { "Cache-Control": "no-store, max-age=0" } };
+  if (!user) return NextResponse.json({ count: 0 }, noStore);
 
   const { userId } = user;
 
@@ -16,7 +17,7 @@ export async function GET() {
     .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`);
 
   const convIds = (convs ?? []).map((c: { id: string }) => c.id);
-  if (convIds.length === 0) return NextResponse.json({ count: 0 });
+  if (convIds.length === 0) return NextResponse.json({ count: 0 }, noStore);
 
   // Ungelesene Nachrichten vom jeweils anderen zählen
   const { count } = await db
@@ -26,5 +27,5 @@ export async function GET() {
     .neq("sender_id", userId)
     .in("conversation_id", convIds);
 
-  return NextResponse.json({ count: count ?? 0 });
+  return NextResponse.json({ count: count ?? 0 }, noStore);
 }

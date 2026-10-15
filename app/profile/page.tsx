@@ -1,15 +1,16 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import { useTranslations } from "next-intl";
 import { compressImage, compressAvatar, safeObjectURL } from "@/lib/compressImage";
 import {
-  Camera, CheckCircle, User, Lock, Bell, CreditCard, MapPin, Film,
+  Camera, CheckCircle, User, Lock, Bell, CreditCard, Film,
   Plus, X, Save, Wallet, Upload, ShieldCheck, Clock, AlertCircle, Loader2,
   Globe, Plane, Video, Euro, Clapperboard, Link2, AtSign, PlayCircle, ExternalLink,
-  Users2, Eye, EyeOff, Pencil, Check,
+  Users2, Eye, EyeOff, Pencil, Check, Search, ChevronDown,
 } from "lucide-react";
 import LicensePicker from "@/components/LicensePicker";
 import ExternalProfilesSection from "@/components/ExternalProfilesSection";
@@ -17,6 +18,7 @@ import { useToast } from "@/contexts/ToastContext";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 import { departments, deptColors } from "@/lib/departments";
 import RoleDropdown from "@/components/RoleDropdown";
+import { calculateProfileCompletion } from "@/lib/profile-completion";
 
 const ALL_CREW_ROLES = departments.flatMap((d) => d.roles);
 
@@ -31,7 +33,6 @@ function normType(t: string | null | undefined): string | null {
   return PROJECT_TYPE_NORMALIZE[t] ?? t;
 }
 import {
-  PROFILE_CATEGORY_MAP,
   type ProfileImage,
 } from "@/lib/profile-types";
 
@@ -40,51 +41,20 @@ function safeLink(url: string | null | undefined): string | null {
   try { new URL(url); return url; } catch { return null; }
 }
 
-// ─── Completion score ─────────────────────────────────────────────────────────
-
-type CompletionResult = { score: number; missing: string[] };
-
-type CompletionHints = {
-  hintName: string; hintAvatar: string; hintCity: string; hintBio: string;
-  hintType: string; hintPhotos: string; hintVideo: string; hintLanguages: string;
-  hintHeight: string; hintHair: string; hintAge: string; hintRole: string; hintCredits: string;
-};
-
-function getCompletion(opts: {
-  name: string; avatarUrl: string; location: string; bio: string;
-  images: string[]; videoLinks: string[]; profileType: string;
-  physical: { height_cm?: string; hair_color?: string; playing_age_min?: string };
-  crew: { positions: string[]; filmography: unknown[] };
-  languages: string[];
-}, hints: CompletionHints): CompletionResult {
-  const checks: [boolean, string][] = [
-    [!!opts.name,                        hints.hintName],
-    [!!opts.avatarUrl,                   hints.hintAvatar],
-    [!!opts.location,                    hints.hintCity],
-    [!!opts.bio,                         hints.hintBio],
-    [!!opts.profileType,                 hints.hintType],
-    [opts.images.length >= 2,            hints.hintPhotos],
-    [opts.videoLinks.length > 0,         hints.hintVideo],
-    [opts.languages.length > 0,          hints.hintLanguages],
-  ];
-  const type = opts.profileType;
-  const isTalent = ["actor","model","extra","host","dancer","stunt","voiceover","creator"].includes(type);
-  const isCrew   = !isTalent && !!type && !["location","equipment","vehicle","studio","props"].includes(type);
-  if (isTalent) {
-    checks.push([!!opts.physical.height_cm, hints.hintHeight]);
-    checks.push([!!opts.physical.hair_color, hints.hintHair]);
-    if (type === "actor") checks.push([!!opts.physical.playing_age_min, hints.hintAge]);
+async function patchProfile(payload: Record<string, unknown>) {
+  const response = await fetch("/api/profile", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || result.error) {
+    throw new Error(result.error ?? `HTTP ${response.status}`);
   }
-  if (isCrew) {
-    checks.push([opts.crew.positions.length > 0, hints.hintRole]);
-    checks.push([opts.crew.filmography.length > 0, hints.hintCredits]);
-  }
-  const passed = checks.filter(([ok]) => ok).length;
-  return {
-    score: Math.round((passed / checks.length) * 100),
-    missing: checks.filter(([ok]) => !ok).map(([, msg]) => msg).slice(0, 3),
-  };
+  return result;
 }
+
+// The editor and dashboard share one completion calculation.
 
 // ─── Chip-style type picker ───────────────────────────────────────────────────
 const TALENT_CHIPS: [string, string][] = [
@@ -131,6 +101,9 @@ function TypeChipPicker({
   positions: string[];
   onPositionsChange: (p: string[]) => void;
 }) {
+  const [roleSearch, setRoleSearch] = useState("");
+  const [expandedDepartments, setExpandedDepartments] = useState<Record<string, boolean>>({});
+
   function togglePosition(job: string, deptId: string) {
     const isSel = positions.includes(job);
     const next = isSel ? positions.filter((x) => x !== job) : [...positions, job];
@@ -153,8 +126,30 @@ function TypeChipPicker({
     }
   }
 
+  const normalizedQuery = roleSearch.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("de");
+  const visibleDepartments = departments
+    .map((dept) => ({
+      dept,
+      roles: dept.roles.filter((role) =>
+        !normalizedQuery || role.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("de").includes(normalizedQuery),
+      ),
+    }))
+    .filter(({ roles }) => roles.length > 0);
+
   return (
     <div className="space-y-6">
+      <label className="relative block">
+        <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
+        <input
+          type="search"
+          value={roleSearch}
+          onChange={(event) => setRoleSearch(event.target.value)}
+          placeholder="Gewerk oder Rolle suchen …"
+          aria-label="Gewerk oder Rolle suchen"
+          className="w-full rounded-xl border border-border bg-bg-primary py-3 pl-10 pr-4 text-sm text-text-primary placeholder:text-text-muted focus:border-gold focus:outline-none"
+        />
+      </label>
+
       {/* Talent */}
       <div>
         <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted mb-2.5">🎭 Talent</p>
@@ -204,19 +199,33 @@ function TypeChipPicker({
             ))}
           </div>
         )}
-        {departments.map((dept) => {
+        {visibleDepartments.map(({ dept, roles }) => {
           const colors = deptColors(dept.color);
           const deptCount = dept.roles.filter((r) => positions.includes(r)).length;
+          const expanded = normalizedQuery
+            ? expandedDepartments[dept.id] !== false
+            : Boolean(expandedDepartments[dept.id]);
           return (
-            <div key={dept.id}>
-              <div className="flex items-center gap-2 mb-2">
-                <p className={`text-[10px] uppercase tracking-widest font-semibold ${colors.text}`}>{dept.emoji} {dept.label}</p>
-                {deptCount > 0 && (
-                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${colors.bg} ${colors.border} ${colors.text}`}>{deptCount}</span>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {dept.roles.map((job) => {
+            <div key={dept.id} className="rounded-xl border border-border bg-bg-primary/50 overflow-hidden">
+              <button
+                type="button"
+                aria-expanded={expanded}
+                onClick={() => setExpandedDepartments((current) => ({ ...current, [dept.id]: !current[dept.id] }))}
+                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-bg-elevated/60 transition-colors"
+              >
+                <span className="flex min-w-0 items-center gap-2">
+                  <span className={`text-[10px] uppercase tracking-widest font-semibold ${colors.text}`}>{dept.emoji} {dept.label}</span>
+                  <span className="text-[10px] text-text-muted">{roles.length} {roles.length === 1 ? "Rolle" : "Rollen"}</span>
+                </span>
+                <span className="flex shrink-0 items-center gap-2">
+                  {deptCount > 0 && (
+                    <span className={`text-[10px] font-semibold px-2 py-1 rounded-full border ${colors.bg} ${colors.border} ${colors.text}`}>{deptCount} ausgewählt</span>
+                  )}
+                  <ChevronDown size={15} className={`text-text-muted transition-transform ${expanded ? "rotate-180" : ""}`} />
+                </span>
+              </button>
+              {expanded && <div className="flex flex-wrap gap-1.5 border-t border-border px-4 py-3">
+                {roles.map((job) => {
                   const isSel = positions.includes(job);
                   return (
                     <button key={job} type="button"
@@ -228,10 +237,15 @@ function TypeChipPicker({
                     </button>
                   );
                 })}
-              </div>
+              </div>}
             </div>
           );
         })}
+        {visibleDepartments.length === 0 && (
+          <p className="rounded-xl border border-dashed border-border px-4 py-6 text-center text-sm text-text-muted">
+            Kein Gewerk gefunden. Probiere einen anderen Suchbegriff.
+          </p>
+        )}
       </div>
 
       {/* Anbieter */}
@@ -468,6 +482,7 @@ type FilmEntry = { year: number | string; title: string; role: string; type: str
 // ─── Profile Page ─────────────────────────────────────────────────────────────
 
 export default function ProfilePage() {
+  const router = useRouter();
   const { addToast } = useToast();
   const { user, isLoaded } = useUser();
   const t = useTranslations("profile");
@@ -475,10 +490,13 @@ export default function ProfilePage() {
 
   const [activeTab, setActiveTab] = useState("profile");
   const [profileLoading, setProfileLoading] = useState(true);
+  const [profileLoadError, setProfileLoadError] = useState(false);
   const [profileExists, setProfileExists] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [payoutSaving, setPayoutSaving] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [messageEmailsEnabled, setMessageEmailsEnabled] = useState(true);
+  const [notificationLoading, setNotificationLoading] = useState(false);
+  const [notificationError, setNotificationError] = useState("");
 
   // My projects & listings
   type MyProject = { id: string; title: string; year: number | null; type: string | null; poster_url: string | null };
@@ -494,6 +512,7 @@ export default function ProfilePage() {
   type FriendCollab = { friendship_id: string; user_id: string; display_name: string; avatar_url: string | null; role: string; collab_label: string | null; collab_public: boolean };
   const [friends, setFriends] = useState<FriendCollab[]>([]);
   const [friendsLoading, setFriendsLoading] = useState(false);
+  const [friendsError, setFriendsError] = useState("");
   const [collabEdits, setCollabEdits] = useState<Record<string, { label: string; is_public: boolean; saving: boolean }>>({});
   const friendsFetched = useRef(false);
 
@@ -530,6 +549,7 @@ export default function ProfilePage() {
   const [coverImageUrl, setCoverImageUrl] = useState("");
   const [coverImagePreview, setCoverImagePreview] = useState("");
   const [coverUploading, setCoverUploading] = useState(false);
+  const savedCoverOpacity = useRef(0.4);
   const coverRef = useRef<HTMLInputElement>(null);
   const [focalPoint, setFocalPoint] = useState<FocalPoint>({ x: 50, y: 33 });
   const [coverOpacity, setCoverOpacity] = useState(0.4);
@@ -541,7 +561,6 @@ export default function ProfilePage() {
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [dayRate, setDayRate] = useState("");
   const [filmography, setFilmography] = useState<FilmEntry[]>([]);
-  const [newFilm, setNewFilm] = useState<FilmEntry>({ year: "", title: "", role: "", type: "", director: "" });
   const [videoLinks, setVideoLinks] = useState<string[]>([]);
   const [newVideoLink, setNewVideoLink] = useState("");
   const [crewCertificates, setCrewCertificates] = useState<string[]>([]);
@@ -558,23 +577,16 @@ export default function ProfilePage() {
   const [projectResults, setProjectResults] = useState<{ id: string; title: string; year: number | null; type: string | null }[]>([]);
   const [searchingProjects, setSearchingProjects] = useState(false);
   const [joinRole, setJoinRole] = useState("");
+  const [joinCollaborator, setJoinCollaborator] = useState("");
   const [joiningProjectId, setJoiningProjectId] = useState<string | null>(null);
   const [joiningRole, setJoiningRole] = useState(false);
   const [editingCreditId, setEditingCreditId] = useState<string | null>(null);
   const [editingCollaborator, setEditingCollaborator] = useState("");
   const [savingCollaborator, setSavingCollaborator] = useState(false);
   const [showNewProject, setShowNewProject] = useState(false);
-  const [newProject, setNewProject] = useState({ title: "", year: "", type: "", description: "", director: "", myRole: "", poster_url: "", genre: "", productionCompany: "", location: "", equipment: "", link: "", alsoOnCrewUnited: false });
+  const [newProject, setNewProject] = useState({ title: "", year: "", type: "", description: "", director: "", myRole: "", collaborator: "", poster_url: "", genre: "", productionCompany: "", location: "", equipment: "", link: "", alsoOnCrewUnited: false });
   const [creatingProject, setCreatingProject] = useState(false);
   const [uploadingPoster, setUploadingPoster] = useState(false);
-
-  const [payout, setPayout] = useState({
-    accountHolder: "",
-    iban: "",
-    bic: "",
-    bank: "",
-    vatId: "",
-  });
 
   // ── Casting / Physical data ─────────────────────────────────────────────────
   const [currentProfileType, setCurrentProfileType] = useState<string>("");
@@ -609,8 +621,13 @@ export default function ProfilePage() {
     if (activeTab === "netzwerk" && !friendsFetched.current) {
       friendsFetched.current = true;
       setFriendsLoading(true);
+      setFriendsError("");
       fetch("/api/friendships")
-        .then((r) => r.json())
+        .then(async (response) => {
+          const result = await response.json().catch(() => ({}));
+          if (!response.ok || result.error) throw new Error(result.error ?? `HTTP ${response.status}`);
+          return result;
+        })
         .then(({ friends: list }) => {
           const f: FriendCollab[] = list ?? [];
           setFriends(f);
@@ -620,17 +637,75 @@ export default function ProfilePage() {
           });
           setCollabEdits(edits);
         })
+        .catch((error) => setFriendsError(error instanceof Error ? error.message : "Bitte lade die Seite neu."))
         .finally(() => setFriendsLoading(false));
     }
   }, [activeTab]);
 
+  useEffect(() => {
+    if (activeTab !== "notifications") return;
+    let cancelled = false;
+    setNotificationLoading(true);
+    setNotificationError("");
+    fetch("/api/user-settings")
+      .then(async (response) => {
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error ?? `HTTP ${response.status}`);
+        return result;
+      })
+      .then(({ settings }) => {
+        if (!cancelled && settings) setMessageEmailsEnabled(settings.email_new_message !== false);
+      })
+      .catch((err) => {
+        if (!cancelled) setNotificationError(`Benachrichtigungen konnten nicht geladen werden: ${err instanceof Error ? err.message : "Bitte lade die Seite neu."}`);
+      })
+      .finally(() => { if (!cancelled) setNotificationLoading(false); });
+    return () => { cancelled = true; };
+  }, [activeTab]);
+
+  const updateMessageEmails = async () => {
+    const previous = messageEmailsEnabled;
+    const next = !previous;
+    setNotificationError("");
+    setMessageEmailsEnabled(next);
+    setNotificationLoading(true);
+    try {
+      const response = await fetch("/api/user-settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email_new_message: next }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || result.error) throw new Error(result.error ?? `HTTP ${response.status}`);
+      addToast("Benachrichtigungseinstellung gespeichert.", "success");
+    } catch (err) {
+      setMessageEmailsEnabled(previous);
+      setNotificationError(`Einstellung wurde nicht gespeichert: ${err instanceof Error ? err.message : "Bitte versuche es erneut."}`);
+    } finally {
+      setNotificationLoading(false);
+    }
+  };
+
   // ── Load profile from Supabase ──────────────────────────────────────────────
   useEffect(() => {
     fetch("/api/profile")
-      .then((r) => r.json())
-      .then(({ profile, exists }) => {
+      .then(async (r) => {
+        const result = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(result.error ?? `HTTP ${r.status}`);
+        return result;
+      })
+      .then(({ profile, exists, unavailableFields = [] }) => {
+        if (unavailableFields.length > 0) {
+          addToast(`Einige Profilfelder fehlen noch in der Datenbank: ${unavailableFields.join(", ")}. Bitte die Datenbank aktualisieren lassen.`, "error");
+        }
         setProfileExists(!!exists);
         if (profile) {
+          const availabilityConfig = profile.availability_config as {
+            weekends?: boolean;
+            night_shoots?: boolean;
+            short_notice?: boolean;
+            work_radius_km?: number | null;
+          } | null;
           setForm({
             name:          profile.display_name        ?? "",
             city:          (profile.location ?? "").split(",")[0]?.trim() ?? "",
@@ -641,16 +716,16 @@ export default function ProfilePage() {
             imdbUrl:       profile.imdb_url            ?? "",
             availableFrom: profile.available_from      ?? "",
             travelReady:   profile.travel_ready        ?? false,
-            weekends:      (profile.availability_config as any)?.weekends      ?? false,
-            nightShoots:   (profile.availability_config as any)?.night_shoots  ?? false,
-            shortNotice:   (profile.availability_config as any)?.short_notice  ?? false,
-            workRadius:    String((profile.availability_config as any)?.work_radius_km ?? ""),
+            weekends:      availabilityConfig?.weekends      ?? false,
+            nightShoots:   availabilityConfig?.night_shoots  ?? false,
+            shortNotice:   availabilityConfig?.short_notice  ?? false,
+            workRadius:    String(availabilityConfig?.work_radius_km ?? ""),
             slug:          (profile.slug && profile.slug !== "null") ? profile.slug : "",
             phone:         profile.phone               ?? "",
             contactEmail:  profile.contact_email       ?? "",
           });
           setSkills(profile.skills ?? []);
-          setMemberships((profile as any).memberships ?? []);
+          setMemberships(profile.memberships ?? []);
           setPositions(profile.positions ?? []);
           setLanguages(profile.languages ?? []);
           setProfileImages(profile.profile_images ?? []);
@@ -662,11 +737,14 @@ export default function ProfilePage() {
             setCoverImageUrl(profile.cover_image_url);
             setCoverImagePreview(profile.cover_image_url);
           }
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          if ((profile as any).focal_point) {
-            const fp = (profile as any).focal_point;
+          const storedFocalPoint = profile.focal_point as (FocalPoint & { opacity?: number }) | null;
+          if (storedFocalPoint) {
+            const fp = storedFocalPoint;
             setFocalPoint(fp);
-            if (typeof fp.opacity === "number") setCoverOpacity(fp.opacity);
+            if (typeof fp.opacity === "number") {
+              setCoverOpacity(fp.opacity);
+              savedCoverOpacity.current = fp.opacity;
+            }
           }
           setInstagramUrl(profile.instagram_url ?? "");
           setTiktokUrl(profile.tiktok_url ?? "");
@@ -698,7 +776,12 @@ export default function ProfilePage() {
         }
         setProfileLoading(false);
       })
-      .catch(() => setProfileLoading(false));
+      .catch((err) => {
+        console.error("[profile page] failed to load profile", err);
+        setProfileLoadError(true);
+        setProfileLoading(false);
+        addToast("Profil konnte nicht geladen werden. Änderungen sind deshalb gesperrt, damit nichts überschrieben wird.", "error");
+      });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load project credits separately
@@ -714,6 +797,7 @@ export default function ProfilePage() {
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const previousAvatarUrl = avatarUrl;
     const preview = safeObjectURL(file);
     if (preview) setAvatarPreview(preview);
     setAvatarUploading(true);
@@ -724,32 +808,33 @@ export default function ProfilePage() {
       fd.append("file", compressed);
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       const { url, error } = await res.json();
-      if (error) throw new Error(error);
+      if (!res.ok || error) throw new Error(error ?? `HTTP ${res.status}`);
       setAvatarUrl(url);
-      await fetch("/api/profile", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ avatar_url: url }),
-      });
-      addToast(t("uploadSuccess"), "success");
+      setAvatarPreview(url);
+      if (profileExists) await patchProfile({ avatar_url: url });
+      addToast(profileExists ? t("uploadSuccess") : "Foto hochgeladen. Speichere dein Profil, damit es übernommen wird.", "success");
       // Fokuspunkt setzen
       setFocalPickerImage(url);
-    } catch {
-      addToast(t("uploadFailed"), "error");
-      setAvatarPreview(avatarUrl); // revert
+    } catch (err) {
+      addToast(`Profilfoto konnte nicht gespeichert werden: ${err instanceof Error ? err.message : t("uploadFailed")}`, "error");
+      setAvatarUrl(previousAvatarUrl);
+      setAvatarPreview(previousAvatarUrl);
     } finally {
       setAvatarUploading(false);
     }
   };
 
   const removeAvatar = async () => {
+    const previousAvatarUrl = avatarUrl;
     setAvatarPreview("");
     setAvatarUrl("");
-    await fetch("/api/profile", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ avatar_url: null }),
-    });
+    try {
+      if (profileExists) await patchProfile({ avatar_url: null });
+    } catch (err) {
+      setAvatarUrl(previousAvatarUrl);
+      setAvatarPreview(previousAvatarUrl);
+      addToast(`Profilfoto konnte nicht entfernt werden: ${err instanceof Error ? err.message : t("uploadFailed")}`, "error");
+    }
   };
 
   const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -764,13 +849,15 @@ export default function ProfilePage() {
       fd.append("file", compressed);
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       const { url, error } = await res.json();
-      if (error) throw new Error(error);
+      if (!res.ok || error) throw new Error(error ?? `HTTP ${res.status}`);
+      if (profileExists) await patchProfile({ cover_image_url: url });
       setCoverImageUrl(url);
-      addToast(t("coverSuccess"), "success");
+      setCoverImagePreview(url);
+      addToast(profileExists ? t("coverSuccess") : "Titelbild hochgeladen. Speichere dein Profil, damit es übernommen wird.", "success");
       // Fokuspunkt setzen
       setFocalPickerImage(url);
-    } catch {
-      addToast(t("uploadFailed"), "error");
+    } catch (err) {
+      addToast(`Titelbild konnte nicht gespeichert werden: ${err instanceof Error ? err.message : t("uploadFailed")}`, "error");
       setCoverImagePreview(coverImageUrl);
     } finally {
       setCoverUploading(false);
@@ -790,6 +877,24 @@ export default function ProfilePage() {
     }
   };
 
+  const roleCollaboratorHint = (role: string) => {
+    const value = role.toLowerCase();
+    if (/personal assistant|talent assistant|persönliche assistenz/.test(value)) return "z. B. betreute Schauspieler*in: Tom Hardy";
+    if (/driver|fahrer/.test(value)) return "z. B. gefahrene Person: Adam Driver";
+    if (/gaffer|beleucht|licht/.test(value)) return "z. B. Kameramann/-frau: Name";
+    if (/kamera|cinematograph/.test(value)) return "z. B. Regie: Name";
+    if (/kostüm|costume/.test(value)) return "z. B. Kostümbildner*in: Name";
+    if (/runner/.test(value)) return "z. B. Set-Aufnahmeleitung: Name";
+    return "z. B. Funktion: Name der Person";
+  };
+
+  const roleWithCollaborator = (role: string, collaborator: string) => {
+    const cleanRole = role.trim();
+    const cleanCollaborator = collaborator.trim();
+    if (!cleanRole) return "";
+    return cleanCollaborator ? `${cleanRole}||${cleanCollaborator}` : cleanRole;
+  };
+
   const joinProject = async (projectId: string) => {
     if (!joinRole.trim()) return;
     setJoiningRole(true);
@@ -797,7 +902,7 @@ export default function ProfilePage() {
       const r = await fetch("/api/project-credits", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ project_id: projectId, role: joinRole }),
+        body: JSON.stringify({ project_id: projectId, role: roleWithCollaborator(joinRole, joinCollaborator) }),
       });
       const d = await r.json();
       if (!r.ok) { addToast(d.error, "error"); return; }
@@ -807,6 +912,7 @@ export default function ProfilePage() {
       setProjectCredits(d2.credits ?? []);
       setJoiningProjectId(null);
       setJoinRole("");
+      setJoinCollaborator("");
       setProjectSearch("");
       setProjectResults([]);
       addToast(t("joinedProject"), "success");
@@ -846,28 +952,17 @@ export default function ProfilePage() {
       const r = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newProject),
+        body: JSON.stringify({ ...newProject, myRole: roleWithCollaborator(newProject.myRole, newProject.collaborator) }),
       });
       const d = await r.json();
       if (!r.ok) { addToast(d.error, "error"); return; }
-      if (d.credit && newProject.myRole?.trim()) {
-        setProjectCredits((prev) => [{
-          id: d.credit.id,
-          role: newProject.myRole,
-          project_id: d.project.id,
-          projects: {
-            id: d.project.id,
-            title: newProject.title,
-            year: newProject.year ? parseInt(newProject.year) : null,
-            type: newProject.type || null,
-            director: newProject.director?.trim() || null,
-            poster_url: newProject.poster_url || null,
-          },
-        }, ...prev]);
-      }
+      if (!d.draft?.id) throw new Error("Der private Entwurf konnte nicht bestätigt werden.");
       setShowNewProject(false);
-      setNewProject({ title: "", year: "", type: "", description: "", director: "", myRole: "", poster_url: "", genre: "", productionCompany: "", location: "", equipment: "", link: "", alsoOnCrewUnited: false });
-      addToast(t("projectCreated"), "success");
+      setNewProject({ title: "", year: "", type: "", description: "", director: "", myRole: "", collaborator: "", poster_url: "", genre: "", productionCompany: "", location: "", equipment: "", link: "", alsoOnCrewUnited: false });
+      addToast("Privater Entwurf gespeichert", "success");
+      router.push(`/dashboard/projects/drafts/${d.draft.id}`);
+    } catch (error) {
+      addToast(error instanceof Error ? error.message : "Entwurf konnte nicht gespeichert werden.", "error");
     } finally {
       setCreatingProject(false);
     }
@@ -875,6 +970,10 @@ export default function ProfilePage() {
 
   // ── Save profile ────────────────────────────────────────────────────────────
   const handleSave = async () => {
+    if (profileLoadError) {
+      addToast("Profil konnte nicht geladen werden. Lade die Seite neu, bevor du Änderungen speicherst.", "error");
+      return;
+    }
     if (!form.name.trim() || !form.city.trim()) {
       addToast(t("nameAndCityRequired"), "error");
       return;
@@ -886,11 +985,11 @@ export default function ProfilePage() {
         display_name:   form.name,
         location,
         bio:            form.bio,
-        role:           positions[0] ?? null,
         available:      form.available,
         skills,
         memberships,
         positions,
+        profile_types:  currentProfileType ? [currentProfileType] : [],
         languages,
         profile_images: profileImages,
         reel_url:       videoLinks[0] || null,
@@ -903,6 +1002,7 @@ export default function ProfilePage() {
           work_radius_km: form.workRadius ? parseInt(form.workRadius) : null,
         },
         cover_image_url: coverImageUrl || null,
+        focal_point: { ...focalPoint, opacity: coverOpacity },
         instagram_url:  instagramUrl || null,
         tiktok_url:     tiktokUrl || null,
         youtube_url:    youtubeUrl || null,
@@ -928,7 +1028,6 @@ export default function ProfilePage() {
           avatar_url:     avatarUrl || null,
           portfolio_images: [],
           experience:     "",
-          profile_types:  currentProfileType ? [currentProfileType] : [],
           slug:           form.slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") || null,
         } : {
           ...commonPayload,
@@ -942,8 +1041,9 @@ export default function ProfilePage() {
         return;
       }
       if (isNew) setProfileExists(true);
+      const unavailableFields: string[] = baseResult.unavailableFields ?? [];
 
-      // Profiltyp + Casting-Daten immer speichern (via RPC, kein Schema-Cache Problem)
+      // Profiltyp und Casting-Daten separat speichern, damit DB-Fehler sichtbar sind.
       const physical = {
         playing_age_min:   playingAgeMin ? Number(playingAgeMin) : null,
         playing_age_max:   playingAgeMax ? Number(playingAgeMax) : null,
@@ -951,9 +1051,9 @@ export default function ProfilePage() {
         hair_color:        hairColor || null,
         eye_color:         eyeColor || null,
         body_type:         bodyType || null,
-        beard:             beard || null,
-        tattoos:           tattoos || null,
-        tattoos_coverable: tattoosCoverable || null,
+        beard,
+        tattoos,
+        tattoos_coverable: tattoosCoverable,
       };
       const physRes = await fetch("/api/profile/physical", {
         method: "PATCH",
@@ -967,7 +1067,11 @@ export default function ProfilePage() {
         return;
       }
 
-      addToast(t("profileSaved"), "success");
+      if (unavailableFields.length > 0) {
+        addToast(`Profil gespeichert, aber diese Felder fehlen in der Datenbank: ${unavailableFields.join(", ")}.`, "error");
+      } else {
+        addToast(t("profileSaved"), "success");
+      }
     } catch (err) {
       addToast(`Fehler: ${err instanceof Error ? err.message : String(err)}`, "error");
     } finally {
@@ -976,11 +1080,19 @@ export default function ProfilePage() {
   };
 
   const persistProfileImages = async (images: ProfileImage[]) => {
-    await fetch("/api/profile", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ profile_images: images }),
-    });
+    await patchProfile({ profile_images: images });
+  };
+
+  const updateProfileImages = async (images: ProfileImage[]) => {
+    const previousImages = profileImages;
+    setProfileImages(images);
+    if (!profileExists) return;
+    try {
+      await persistProfileImages(images);
+    } catch (err) {
+      setProfileImages(previousImages);
+      throw err;
+    }
   };
 
   const handleProfileImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1006,12 +1118,12 @@ export default function ProfilePage() {
       // Merge with existing, auto-feature first if none set
       const merged = [...profileImages, ...uploaded];
       if (!merged.some((i) => i.featured)) merged[0] = { ...merged[0], featured: true };
-      setProfileImages(merged);
+      // Existing profiles persist immediately; new profiles include the photos in the first save.
+      await updateProfileImages(merged);
 
-      // Immediately persist to DB — don't rely on main save button
-      await persistProfileImages(merged);
-
-      addToast(t("photosSaved", { count: uploaded.length }), "success");
+      addToast(profileExists
+        ? t("photosSaved", { count: uploaded.length })
+        : `${uploaded.length} Foto(s) hochgeladen. Speichere dein Profil, damit sie übernommen werden.`, "success");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "";
       const isBrowserBug = !msg || /did not match|pattern/i.test(msg);
@@ -1051,49 +1163,50 @@ export default function ProfilePage() {
   const profileCategory = getCategory(currentProfileType);
   const showCrewSections = !profileCategory || profileCategory === "crew" || profileCategory === "creative";
   const showTalentSections = profileCategory === "talent";
-  const showVendorSections = profileCategory === "vendor";
 
-  const completion: CompletionResult = profileLoading ? { score: 0, missing: [] } : getCompletion({
-    name: form.name, avatarUrl, location: form.city, bio: form.bio,
-    images: profileImages.map((i) => i.url), videoLinks, profileType: currentProfileType,
-    physical: { height_cm: heightCm, hair_color: hairColor, playing_age_min: playingAgeMin },
-    crew: { positions, filmography },
+  const completion = calculateProfileCompletion({
+    name: form.name,
+    avatarUrl,
+    location: form.city,
+    bio: form.bio,
+    images: profileImages.map((image) => image.url),
+    videoLinks,
+    profileType: currentProfileType,
+    heightCm,
+    hairColor,
+    playingAgeMin,
+    positions,
+    filmography,
     languages,
-  }, {
-    hintName:      t("hintName"),
-    hintAvatar:    t("hintAvatar"),
-    hintCity:      t("hintCity"),
-    hintBio:       t("hintBio"),
-    hintType:      t("hintType"),
-    hintPhotos:    t("hintPhotos"),
-    hintVideo:     t("hintVideo"),
-    hintLanguages: t("hintLanguages"),
-    hintHeight:    t("hintHeight"),
-    hintHair:      t("hintHair"),
-    hintAge:       t("hintAge"),
-    hintRole:      t("hintRole"),
-    hintCredits:   t("hintCredits"),
   });
+  const completionHints: Record<string, string> = {
+    name: t("hintName"), avatar: t("hintAvatar"), city: t("hintCity"), bio: t("hintBio"),
+    type: t("hintType"), photos: t("hintPhotos"), video: t("hintVideo"), languages: t("hintLanguages"),
+    height: t("hintHeight"), hair: t("hintHair"), age: t("hintAge"), role: t("hintRole"), credits: t("hintCredits"),
+  };
+  const completionMissing = completion.missing.slice(0, 3).map((key) => completionHints[key] ?? key);
   const displayAvatarName = form.name || clerkEmail.split("@")[0] || "?";
 
   async function saveFocalPoint(point: FocalPoint) {
-    setFocalPoint(point);
-    setFocalPickerImage(null);
-    await fetch("/api/profile", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ focal_point: { ...point, opacity: coverOpacity } }),
-    });
-    addToast(t("focalSaved"), "success");
+    try {
+      if (profileExists) await patchProfile({ focal_point: { ...point, opacity: coverOpacity } });
+      setFocalPoint(point);
+      setFocalPickerImage(null);
+      addToast(t("focalSaved"), "success");
+    } catch (err) {
+      addToast(`Bildposition konnte nicht gespeichert werden: ${err instanceof Error ? err.message : "Unbekannter Fehler"}`, "error");
+    }
   }
 
   async function saveCoverOpacity(opacity: number) {
-    setCoverOpacity(opacity);
-    await fetch("/api/profile", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ focal_point: { ...focalPoint, opacity } }),
-    });
+    try {
+      if (profileExists) await patchProfile({ focal_point: { ...focalPoint, opacity } });
+      savedCoverOpacity.current = opacity;
+      setCoverOpacity(opacity);
+    } catch (err) {
+      setCoverOpacity(savedCoverOpacity.current);
+      addToast(`Bildhelligkeit konnte nicht gespeichert werden: ${err instanceof Error ? err.message : "Unbekannter Fehler"}`, "error");
+    }
   }
 
   return (
@@ -1195,9 +1308,9 @@ export default function ProfilePage() {
                         style={{ width: `${completion.score}%` }}
                       />
                     </div>
-                    {completion.missing.length > 0 && (
+                    {completionMissing.length > 0 && (
                       <div className="flex flex-wrap gap-2">
-                        {completion.missing.map((hint) => (
+                        {completionMissing.map((hint) => (
                           <span key={hint} className="text-[11px] px-2.5 py-1 bg-bg-elevated border border-border rounded-full text-text-muted">
                             + {hint}
                           </span>
@@ -1308,8 +1421,7 @@ export default function ProfilePage() {
                               title="Als Hauptfoto"
                               onClick={() => {
                                 const next = profileImages.map((im, j) => ({ ...im, featured: j === i }));
-                                setProfileImages(next);
-                                persistProfileImages(next);
+                                void updateProfileImages(next).catch((err) => addToast(`Profilbilder konnten nicht gespeichert werden: ${err instanceof Error ? err.message : "Unbekannter Fehler"}`, "error"));
                               }}
                               className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold transition-colors ${
                                 img.featured ? "bg-gold text-bg-primary" : "bg-black/50 text-white/70 hover:bg-gold hover:text-bg-primary"
@@ -1320,8 +1432,7 @@ export default function ProfilePage() {
                               onClick={() => {
                                 const next = profileImages.filter((_, j) => j !== i);
                                 if (img.featured && next.length > 0 && !next.some((im) => im.featured)) next[0] = { ...next[0], featured: true };
-                                setProfileImages(next);
-                                persistProfileImages(next);
+                                void updateProfileImages(next).catch((err) => addToast(`Profilbilder konnten nicht gespeichert werden: ${err instanceof Error ? err.message : "Unbekannter Fehler"}`, "error"));
                               }}
                               className="w-6 h-6 bg-black/50 rounded-full flex items-center justify-center text-white/70 hover:bg-red-600 hover:text-white transition-colors"
                             ><X size={11} /></button>
@@ -1378,7 +1489,19 @@ export default function ProfilePage() {
                         <img src={coverImagePreview} alt="Cover" className="w-full h-full object-cover" style={{ opacity: coverOpacity }} />
                         <button
                           type="button"
-                          onClick={() => { setCoverImagePreview(""); setCoverImageUrl(""); }}
+                          onClick={async () => {
+                            const previousUrl = coverImageUrl;
+                            const previousPreview = coverImagePreview;
+                            setCoverImagePreview("");
+                            setCoverImageUrl("");
+                            try {
+                              if (profileExists) await patchProfile({ cover_image_url: null });
+                            } catch (err) {
+                              setCoverImageUrl(previousUrl);
+                              setCoverImagePreview(previousPreview);
+                              addToast(`Titelbild konnte nicht entfernt werden: ${err instanceof Error ? err.message : "Unbekannter Fehler"}`, "error");
+                            }
+                          }}
                           className="absolute top-2 right-2 w-7 h-7 bg-black/60 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-crimson-light"
                         >
                           <X size={13} />
@@ -1675,24 +1798,26 @@ export default function ProfilePage() {
                                 </div>
                               </div>
                               {isEditing && (
-                                <div className="px-3 pb-2 flex items-center gap-2 bg-bg-secondary border-t border-border">
-                                  <span className="text-[10px] text-text-muted shrink-0">{baseRole}</span>
-                                  <span className="text-[10px] text-text-muted shrink-0">·</span>
-                                  <input
-                                    type="text"
-                                    value={editingCollaborator}
-                                    onChange={(e) => setEditingCollaborator(e.target.value)}
-                                    placeholder="z.B. Regie: Max Mustermann"
-                                    className="flex-1 bg-transparent text-[11px] py-1.5 focus:outline-none placeholder:text-text-muted/50"
-                                    autoFocus
-                                    onKeyDown={(e) => { if (e.key === "Enter") saveCollaborator(credit.id); if (e.key === "Escape") setEditingCreditId(null); }}
-                                  />
+                                <div className="px-3 py-2 bg-bg-secondary border-t border-border">
+                                  <label className="block text-[10px] text-text-muted mb-1">{baseRole} · Mit wem hast du dabei gearbeitet?</label>
+                                  <div className="flex items-center gap-2">
+                                    <input
+                                      type="text"
+                                      maxLength={160}
+                                      value={editingCollaborator}
+                                      onChange={(e) => setEditingCollaborator(e.target.value)}
+                                      placeholder={roleCollaboratorHint(baseRole)}
+                                      className="flex-1 min-w-0 bg-transparent text-xs py-1.5 focus:outline-none placeholder:text-text-muted/50"
+                                      autoFocus
+                                      onKeyDown={(e) => { if (e.key === "Enter") saveCollaborator(credit.id); if (e.key === "Escape") setEditingCreditId(null); }}
+                                    />
                                   <button type="button" onClick={() => saveCollaborator(credit.id)} disabled={savingCollaborator} className="text-gold hover:text-gold-light transition-colors shrink-0">
                                     {savingCollaborator ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
                                   </button>
                                   <button type="button" onClick={() => setEditingCreditId(null)} className="text-text-muted hover:text-text-primary transition-colors shrink-0">
                                     <X size={12} />
                                   </button>
+                                  </div>
                                 </div>
                               )}
                             </div>
@@ -1739,7 +1864,17 @@ export default function ProfilePage() {
                                 </div>
                                 {joiningProjectId === proj.id ? (
                                   <div className="flex items-center gap-2">
-                                    <RoleDropdown value={joinRole} onChange={setJoinRole} options={[...new Set([...positions, ...ALL_CREW_ROLES])]} className="w-48" />
+                                    <div className="grid grid-cols-1 sm:grid-cols-[minmax(12rem,1fr)_minmax(14rem,1.2fr)_auto_auto] gap-2 sm:items-center sm:min-w-[38rem]">
+                                      <RoleDropdown value={joinRole} onChange={setJoinRole} options={[...new Set([...positions, ...ALL_CREW_ROLES])]} />
+                                      <input
+                                        type="text"
+                                        maxLength={160}
+                                        value={joinCollaborator}
+                                        onChange={(event) => setJoinCollaborator(event.target.value)}
+                                        placeholder={roleCollaboratorHint(joinRole)}
+                                        aria-label="Mit wem hast du in diesem Projekt gearbeitet?"
+                                        className="w-full min-w-0 rounded-lg border border-border bg-bg-secondary px-3 py-2 text-xs text-text-primary placeholder:text-text-muted focus:border-gold focus:outline-none"
+                                      />
                                     <button
                                       type="button"
                                       onClick={() => joinProject(proj.id)}
@@ -1748,15 +1883,16 @@ export default function ProfilePage() {
                                     >
                                       {joiningRole ? <Loader2 size={11} className="animate-spin" /> : <CheckCircle size={11} />}
                                     </button>
-                                    <button type="button" onClick={() => setJoiningProjectId(null)}
+                                    <button type="button" onClick={() => { setJoiningProjectId(null); setJoinRole(""); setJoinCollaborator(""); }}
                                       className="p-1.5 text-text-muted hover:text-crimson-light transition-colors">
                                       <X size={11} />
                                     </button>
+                                    </div>
                                   </div>
                                 ) : (
                                   <button
                                     type="button"
-                                    onClick={() => setJoiningProjectId(proj.id)}
+                                    onClick={() => { setJoiningProjectId(proj.id); setJoinRole(""); setJoinCollaborator(""); }}
                                     className="text-xs text-gold hover:text-gold-light font-medium transition-colors"
                                   >
                                     {t("addToProject")}
@@ -1821,6 +1957,14 @@ export default function ProfilePage() {
                         <div>
                           <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelMyRole")} *</label>
                           <RoleDropdown value={newProject.myRole} onChange={(v) => setNewProject((p) => ({ ...p, myRole: v }))} options={[...new Set([...positions, ...ALL_CREW_ROLES])]} />
+                        </div>
+                        <div className="col-span-2">
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Mit wem hast du dabei gearbeitet?</label>
+                          <input type="text" maxLength={160} value={newProject.collaborator}
+                            onChange={(e) => setNewProject((p) => ({ ...p, collaborator: e.target.value }))}
+                            placeholder={roleCollaboratorHint(newProject.myRole)}
+                            className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
+                          <p className="mt-1 text-[10px] text-text-muted">Name und Funktion, zum Beispiel die Schauspielerin, die du betreut hast, oder die Regie, mit der du gearbeitet hast.</p>
                         </div>
                         <div className="col-span-2">
                           <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelDescription")}</label>
@@ -2229,7 +2373,7 @@ export default function ProfilePage() {
                   );
                 })()}
 
-                <button onClick={handleSave} disabled={saving}
+                <button onClick={handleSave} disabled={saving || profileLoading || profileLoadError}
                   className="w-full py-3 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
                   {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
                   {saving ? t("saving") : t("saveChanges")}
@@ -2364,6 +2508,10 @@ export default function ProfilePage() {
 
                 {friendsLoading ? (
                   <div className="flex justify-center py-12"><Loader2 size={20} className="animate-spin text-text-muted" /></div>
+                ) : friendsError ? (
+                  <p role="alert" className="rounded-xl border border-red-400/30 bg-red-400/5 p-4 text-sm text-red-300">
+                    Verbindungen konnten nicht geladen werden: {friendsError}
+                  </p>
                 ) : friends.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-16 border border-dashed border-border rounded-xl text-center">
                     <Users2 size={32} className="text-text-muted mb-3" />
@@ -2417,14 +2565,16 @@ export default function ProfilePage() {
                               onClick={async () => {
                                 setCollabEdits((prev) => ({ ...prev, [fr.friendship_id]: { ...edit, saving: true } }));
                                 try {
-                                  await fetch(`/api/friendships/${fr.friendship_id}`, {
+                                  const response = await fetch(`/api/friendships/${fr.friendship_id}`, {
                                     method: "PATCH",
                                     headers: { "Content-Type": "application/json" },
                                     body: JSON.stringify({ action: "collab", label: edit.label || null, is_public: edit.is_public }),
                                   });
+                                  const result = await response.json().catch(() => ({}));
+                                  if (!response.ok || result.error) throw new Error(result.error ?? `HTTP ${response.status}`);
                                   addToast(t("collabSaved"), "success");
-                                } catch {
-                                  addToast(t("savingError"), "error");
+                                } catch (err) {
+                                  addToast(`${t("savingError")}: ${err instanceof Error ? err.message : "Unbekannter Fehler"}`, "error");
                                 } finally {
                                   setCollabEdits((prev) => ({ ...prev, [fr.friendship_id]: { ...edit, saving: false } }));
                                 }
@@ -2435,9 +2585,9 @@ export default function ProfilePage() {
                               {t("save")}
                             </button>
                           </div>
-                          {edit.label && edit.is_public && (
+                          {edit.is_public && (
                             <p className="text-[10px] text-text-muted mt-2">
-                              {t("collabPreview")} <span className="text-gold">{fr.display_name}</span> · {edit.label}
+                              {t("collabPreview")} <span className="text-gold">{fr.display_name}</span> · {edit.label.trim() || "Vernetzt"}
                             </p>
                           )}
                         </div>
@@ -2453,73 +2603,34 @@ export default function ProfilePage() {
 
             {/* ── SICHERHEIT ── */}
             {activeTab === "security" && (
-              <div className="space-y-6">
-                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
-                  <h2 className="font-semibold text-text-primary mb-5">{t("securityTitle")}</h2>
-                  <div className="space-y-4 max-w-sm">
-                    {[t("securityCurrentPw"), t("securityNewPw"), t("securityConfirmPw")].map((label) => (
-                      <div key={label}>
-                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{label}</label>
-                        <input type="password" className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
-                      </div>
-                    ))}
-                    <button onClick={() => addToast(t("passwordUpdated"), "success")}
-                      className="px-5 py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors">
-                      {t("securityUpdateBtn")}
-                    </button>
-                  </div>
-                </div>
-                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
-                  <h2 className="font-semibold text-text-primary mb-1">{t("security2FATitle")}</h2>
-                  <p className="text-xs text-text-muted mb-5">{t("security2FADesc")}</p>
-                  <div className="flex items-center justify-between p-4 bg-bg-elevated border border-border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-success/10 rounded-full flex items-center justify-center">
-                        <CheckCircle size={15} className="text-success" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-text-primary">Authentifikator-App</p>
-                        <p className="text-xs text-text-muted">Google Authenticator</p>
-                      </div>
-                    </div>
-                    <span className="text-xs text-success font-medium">{t("security2FAActive")}</span>
-                  </div>
-                </div>
+              <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
+                <h2 className="font-semibold text-text-primary mb-2">Login & Sicherheit</h2>
+                <p className="text-sm text-text-muted leading-relaxed">
+                  Passwort und Zwei-Faktor-Authentifizierung werden über den Anmeldedienst verwaltet. Die früheren Eingabefelder auf dieser Seite waren noch nicht angebunden und haben nichts geändert.
+                </p>
               </div>
             )}
 
             {/* ── BENACHRICHTIGUNGEN ── */}
             {activeTab === "notifications" && (
-              <div className="p-6 bg-bg-secondary border border-border rounded-xl space-y-6">
-                <h2 className="font-semibold text-text-primary">{t("notifTitle")}</h2>
-                {[
-                  { section: t("notifGroupBookings"), items: [t("notifBookingNew"), t("notifBookingConfirmed"), t("notifBookingCancelled")] },
-                  { section: t("notifGroupMessages"), items: [t("notifMessageProvider"), t("notifMessageProduction")] },
-                  { section: t("notifGroupMarketing"), items: [t("notifMarketingUpdates"), t("notifMarketingTips")] },
-                ].map(({ section, items }) => (
-                  <div key={section}>
-                    <h3 className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-3">{section}</h3>
-                    <div className="space-y-3">
-                      {items.map((item) => (
-                        <div key={item} className="flex items-center justify-between">
-                          <span className="text-sm text-text-secondary">{item}</span>
-                          <div className="flex gap-4">
-                            {["E-Mail", "Push"].map((ch) => (
-                              <label key={ch} className="flex items-center gap-1.5 cursor-pointer">
-                                <input type="checkbox" defaultChecked className="accent-gold" />
-                                <span className="text-xs text-text-muted">{ch}</span>
-                              </label>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-                <button onClick={() => addToast(t("settingsSaved"), "success")}
-                  className="px-5 py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors">
-                  {t("notifSave")}
+              <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl space-y-4">
+                <div>
+                  <h2 className="font-semibold text-text-primary mb-1">E-Mail bei neuen Nachrichten</h2>
+                  <p className="text-sm text-text-muted">Diese Einstellung wird gespeichert und steuert die E-Mail-Benachrichtigung bei neuen Nachrichten.</p>
+                </div>
+                {notificationError && <p role="alert" className="text-sm text-red-300">{notificationError}</p>}
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={messageEmailsEnabled}
+                  aria-label="E-Mail bei neuen Nachrichten"
+                  onClick={updateMessageEmails}
+                  disabled={notificationLoading}
+                  className={`relative h-7 w-12 rounded-full transition-colors disabled:opacity-50 ${messageEmailsEnabled ? "bg-gold" : "bg-bg-elevated border border-border"}`}
+                >
+                  <span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-transform ${messageEmailsEnabled ? "translate-x-6" : "translate-x-1"}`} />
                 </button>
+                <p className="text-xs text-text-muted">Weitere Benachrichtigungsarten und Push-Mitteilungen werden derzeit noch nicht gespeichert.</p>
               </div>
             )}
 
@@ -2535,50 +2646,8 @@ export default function ProfilePage() {
                   <p className="text-xs text-text-muted mb-5 leading-relaxed">
                     {t("billingDesc")}
                   </p>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div className="sm:col-span-2">
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{t("billingHolder")}</label>
-                      <input type="text" value={payout.accountHolder}
-                        onChange={(e) => setPayout(p => ({ ...p, accountHolder: e.target.value }))}
-                        placeholder={form.name || "Dein Name"}
-                        className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{t("billingIBAN")}</label>
-                      <input type="text" value={payout.iban}
-                        onChange={(e) => setPayout(p => ({ ...p, iban: e.target.value }))}
-                        placeholder="DE89 3704 0044 ..."
-                        className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-gold transition-colors" />
-                    </div>
-                    <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{t("billingBIC")}</label>
-                      <input type="text" value={payout.bic}
-                        onChange={(e) => setPayout(p => ({ ...p, bic: e.target.value }))}
-                        placeholder="COBADEFFXXX"
-                        className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-gold transition-colors" />
-                    </div>
-                    <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{t("billingBank")}</label>
-                      <input type="text" value={payout.bank}
-                        onChange={(e) => setPayout(p => ({ ...p, bank: e.target.value }))}
-                        className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
-                    </div>
-                    <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{t("billingVAT")} <span className="font-normal normal-case tracking-normal text-text-muted">{t("billingVATOptional")}</span></label>
-                      <input type="text" value={payout.vatId}
-                        onChange={(e) => setPayout(p => ({ ...p, vatId: e.target.value }))}
-                        placeholder="DE123456789"
-                        className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
-                    </div>
-                  </div>
-                  <div className="flex justify-end mt-5 pt-5 border-t border-border">
-                    <button
-                      onClick={async () => { setPayoutSaving(true); await new Promise(r => setTimeout(r, 700)); setPayoutSaving(false); addToast(t("payoutSaved"), "success"); }}
-                      disabled={payoutSaving}
-                      className="flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-60">
-                      {payoutSaving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
-                      {payoutSaving ? t("billingSaving") : t("billingSave")}
-                    </button>
+                  <div className="rounded-lg border border-amber-400/30 bg-amber-400/5 p-4 text-sm text-text-secondary">
+                    Auszahlungsdaten können hier derzeit nicht sicher gespeichert werden. Bitte gib hier keine IBAN oder Bankdaten ein.
                   </div>
                 </div>
 

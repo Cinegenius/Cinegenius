@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import type { Metadata } from "next";
 import PropDetail from "@/components/PropDetail";
+import { parseProductionCredits } from "@/lib/production-credits";
 
 async function getProp(slug: string) {
   try {
@@ -33,6 +34,7 @@ async function getProp(slug: string) {
       era: (data.metadata as { era?: string } | null)?.era ?? null,
       delivery: (data.metadata as { delivery?: boolean } | null)?.delivery ?? false,
       focalPoint: (data.metadata as { focal_point?: { x: number; y: number } | null } | null)?.focal_point ?? null,
+      productionCredits: parseProductionCredits((data.metadata as { production_credits?: unknown } | null)?.production_credits),
       description: data.description ?? "",
       ownerId: data.user_id ?? "",
       ownerName: owner?.display_name ?? "Anbieter",

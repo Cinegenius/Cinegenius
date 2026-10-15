@@ -29,7 +29,9 @@ export async function GET() {
     .order("created_at", { ascending: false })
     .limit(30);
 
-  return NextResponse.json({ notifications: data ?? [] });
+  return NextResponse.json({ notifications: data ?? [] }, {
+    headers: { "Cache-Control": "no-store, max-age=0" },
+  });
 }
 
 // PATCH /api/notifications — mark all as read
@@ -53,14 +55,55 @@ export async function POST(req: NextRequest) {
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
-  const { id } = await req.json();
-  if (!id) return NextResponse.json({ error: "id fehlt" }, { status: 400 });
+  const body = await req.json().catch(() => null);
+  const id = body?.id;
+  if (typeof id !== "string" || !id) return NextResponse.json({ error: "id fehlt" }, { status: 400 });
 
-  await db
+  const { data: notification, error: lookupError } = await db
+    .from("notifications")
+    .select("type, href")
+    .eq("id", id)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (lookupError) return NextResponse.json({ error: "Benachrichtigung konnte nicht geladen werden." }, { status: 500 });
+  if (!notification) return NextResponse.json({ error: "Benachrichtigung nicht gefunden" }, { status: 404 });
+
+  // Beim Öffnen einer Nachricht auch die Nachricht selbst als gelesen markieren.
+  if (notification.type === "new_message") {
+    let conversationId: string | null = null;
+    try {
+      const href = new URL(notification.href, "https://cinegenius.invalid");
+      if (href.pathname === "/messages") conversationId = href.searchParams.get("conv");
+    } catch { /* ungültiger href: nur die Benachrichtigung markieren */ }
+
+    if (conversationId) {
+      const { data: conversation } = await db
+        .from("conversations")
+        .select("id")
+        .eq("id", conversationId)
+        .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+        .maybeSingle();
+
+      if (conversation) {
+        const { error: messageReadError } = await db
+          .from("messages")
+          .update({ read_at: new Date().toISOString() })
+          .eq("conversation_id", conversationId)
+          .neq("sender_id", userId)
+          .is("read_at", null);
+        if (messageReadError) {
+          return NextResponse.json({ error: "Nachricht konnte nicht als gelesen markiert werden." }, { status: 500 });
+        }
+      }
+    }
+  }
+
+  const { error: updateError } = await db
     .from("notifications")
     .update({ read: true })
     .eq("id", id)
     .eq("user_id", userId);
+  if (updateError) return NextResponse.json({ error: "Benachrichtigung konnte nicht markiert werden." }, { status: 500 });
 
   return NextResponse.json({ success: true });
 }

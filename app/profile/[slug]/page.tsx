@@ -1,11 +1,12 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
+import { recordProfileView } from "@/lib/profile-views";
 import { unstable_cache } from "next/cache";
 import JsonLd from "@/components/JsonLd";
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import ProfileView from "./ProfileView";
-import { getBlockStatus } from "@/lib/trust";
+import { canViewProfile, getBlockStatus } from "@/lib/trust";
 import type { UserProfile, ProjectCredit } from "@/lib/profile-types";
 import { getPresetForType, type ProfileModule } from "@/lib/profile-types";
 import type { ExternalProfileRow } from "@/lib/external-platforms";
@@ -85,7 +86,10 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { slug } = await params;
   const profile = await getProfile(slug);
-  if (!profile) return { title: "Profil nicht gefunden" };
+  const { userId } = await auth();
+  if (!profile || !(await canViewProfile(profile.user_id, userId))) {
+    return { title: "Profil nicht gefunden" };
+  }
   const name = profile.display_name ?? "Profil";
   const role = profile.role ?? "";
   return {
@@ -156,32 +160,31 @@ function getPublicCollaborations(userId: string): Promise<PublicCollab[]> {
           .select("receiver_id, sender_collab_label")
           .eq("sender_id", userId)
           .eq("status", "accepted")
-          .eq("sender_collab_public", true)
-          .not("sender_collab_label", "is", null),
+          .eq("sender_collab_public", true),
         db
           .from("friendships")
           .select("sender_id, receiver_collab_label")
           .eq("receiver_id", userId)
           .eq("status", "accepted")
-          .eq("receiver_collab_public", true)
-          .not("receiver_collab_label", "is", null),
+          .eq("receiver_collab_public", true),
       ]);
 
       const collabs: { friendId: string; label: string }[] = [
-        ...(asSender.data ?? []).map((f) => ({ friendId: f.receiver_id, label: f.sender_collab_label as string })),
-        ...(asReceiver.data ?? []).map((f) => ({ friendId: f.sender_id, label: f.receiver_collab_label as string })),
+        ...(asSender.data ?? []).map((f) => ({ friendId: f.receiver_id, label: f.sender_collab_label?.trim() || "Vernetzt" })),
+        ...(asReceiver.data ?? []).map((f) => ({ friendId: f.sender_id, label: f.receiver_collab_label?.trim() || "Vernetzt" })),
       ];
 
       if (collabs.length === 0) return [];
 
-      const ids = [...new Set(collabs.map((c) => c.friendId))];
+      const uniqueCollabs = [...new Map(collabs.map((c) => [c.friendId, c])).values()];
+      const ids = uniqueCollabs.map((c) => c.friendId);
       const { data: profiles } = await db
         .from("profiles")
         .select("user_id, display_name, avatar_url, slug, role, positions")
         .in("user_id", ids);
 
       const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, p]));
-      return collabs.flatMap((c) => {
+      return uniqueCollabs.flatMap((c) => {
         const p = profileMap[c.friendId];
         // Skip if profile not found or has no valid slug — avoids /profile/user_xxx 404s
         if (!p?.slug) return [];
@@ -231,6 +234,7 @@ export default async function ProfilePage(
   if (!profile) notFound();
 
   const isOwner = userId === profile.user_id;
+  if (!isOwner && !(await canViewProfile(profile.user_id, userId))) notFound();
   const [projectCredits, companyMembership, externalProfiles, listings, blockStatus, collaborations, imageLikesData, similarProfiles] = await Promise.all([
     getProjectCredits(profile.user_id),
     getCompanyMembership(profile.user_id),
@@ -273,10 +277,7 @@ export default async function ProfilePage(
   ]);
 
   // Track profile view — awaited so serverless doesn't drop it before .then() runs
-  if (userId && userId !== profile.user_id) {
-    const { error: viewErr } = await db.from("profile_views").insert({ profile_id: profile.user_id, viewer_id: userId });
-    if (viewErr) console.error("[profile_views]", viewErr.message);
-  }
+  await recordProfileView(profile.user_id, userId);
 
   const jsonLd = {
     "@context": "https://schema.org",

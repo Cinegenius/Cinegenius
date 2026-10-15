@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { getPrivateProfileIds } from "@/lib/trust";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -58,7 +59,9 @@ export async function GET(req: NextRequest) {
     available: null as boolean | null,
   }));
 
+  const privateProfileIds = await getPrivateProfileIds((profilesRes.data ?? []).map((profile) => profile.user_id));
   const profiles = (profilesRes.data ?? [])
+    .filter((profile) => !privateProfileIds.has(profile.user_id))
     .filter((p: Record<string, unknown>) => p.display_name)
     .map((p: Record<string, unknown>) => ({
       id: p.user_id as string,

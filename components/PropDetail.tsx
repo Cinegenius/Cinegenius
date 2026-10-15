@@ -18,6 +18,8 @@ import InquiryForm from "@/components/InquiryForm";
 import FavoriteButton from "@/components/FavoriteButton";
 import ReviewsSection from "@/components/ReviewsSection";
 import ReportButton from "@/components/ReportButton";
+import { ProductionCreditsDisplay } from "@/components/ProductionCredits";
+import type { ProductionCredit } from "@/lib/production-credits";
 
 type Prop = {
   id: string;
@@ -37,6 +39,7 @@ type Prop = {
   ownerAvatar?: string | null;
   ownerSlug?: string | null;
   extra_images?: string[];
+  productionCredits?: ProductionCredit[];
 };
 
 
@@ -122,52 +125,77 @@ export default function PropDetail({ prop }: { prop: Prop }) {
         </Link>
 
         {/* Bildergalerie */}
-        <div className="relative grid grid-cols-4 gap-2 rounded-xl overflow-hidden h-72 sm:h-96 mb-8">
-          <div
-            className="col-span-2 relative overflow-hidden cursor-pointer"
-            onClick={() => { setActiveImg(0); setLightboxOpen(true); }}
-          >
-            {images[0] ? (
-              <Image
-                src={images[0]}
-                alt={prop.title}
-                fill
-                className="object-cover hover:scale-105 transition-transform duration-500"
-                style={{ objectPosition: prop.focalPoint ? `${prop.focalPoint.x}% ${prop.focalPoint.y}%` : "50% 66%" }}
-                sizes="50vw"
-                priority
-              />
-            ) : (
-              <div className="w-full h-full bg-bg-elevated flex items-center justify-center">
-                <Package size={48} className="text-text-muted/20" />
+        <div className="mb-8">
+          <div className="relative grid grid-cols-4 gap-2 overflow-hidden rounded-xl sm:h-96">
+            <div className={`relative col-span-4 aspect-[4/3] overflow-hidden bg-bg-secondary sm:aspect-auto sm:h-full ${images.length > 1 ? "sm:col-span-2" : "sm:col-span-4"}`}>
+              {images[activeImg] ? (
+                <button
+                  type="button"
+                  aria-label={images.length > 1 ? `Foto ${activeImg + 1} vergrößern` : "Foto vergrößern"}
+                  className="absolute inset-0 block h-full w-full cursor-zoom-in"
+                  onClick={() => setLightboxOpen(true)}
+                >
+                  <Image
+                    src={images[activeImg]}
+                    alt={prop.title}
+                    fill
+                    className="object-contain sm:object-cover"
+                    style={{ objectPosition: activeImg === 0 && prop.focalPoint ? `${prop.focalPoint.x}% ${prop.focalPoint.y}%` : "50% 50%" }}
+                    sizes={images.length > 1 ? "(min-width: 640px) 50vw, 100vw" : "100vw"}
+                    priority
+                  />
+                </button>
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-bg-elevated">
+                  <Package size={48} className="text-text-muted/20" />
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => setLightboxOpen(true)}
+                className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-lg border border-border bg-bg-primary/85 px-3 py-1.5 text-xs text-text-secondary backdrop-blur-sm transition-all hover:border-gold hover:text-gold"
+              >
+                <Expand size={13} /> {images.length > 1 ? "Alle Fotos anzeigen" : "Foto vergrößern"}
+              </button>
+            </div>
+            {images.length > 1 && (
+              <div className="col-span-2 hidden grid-cols-2 gap-2 sm:grid">
+                {images.slice(1).map((img, i) => (
+                  <button
+                    key={`${img}-${i}`}
+                    type="button"
+                    aria-label={`Foto ${i + 2} vergrößern`}
+                    className={`relative overflow-hidden rounded-sm ${i === 2 ? "col-span-2 h-24" : ""}`}
+                    onClick={() => { setActiveImg(i + 1); setLightboxOpen(true); }}
+                  >
+                    <Image
+                      src={img}
+                      alt=""
+                      fill
+                      className="object-cover transition-transform duration-500 hover:scale-105"
+                      sizes="25vw"
+                    />
+                  </button>
+                ))}
               </div>
             )}
           </div>
           {images.length > 1 && (
-            <div className="col-span-2 grid grid-cols-2 gap-2">
-              {images.slice(1).map((img, i) => (
-                <div
-                  key={i}
-                  className={`relative overflow-hidden cursor-pointer rounded-sm ${i === 2 ? "col-span-2 h-24" : ""}`}
-                  onClick={() => { setActiveImg(i + 1); setLightboxOpen(true); }}
+            <div className="mt-2 flex gap-2 overflow-x-auto pb-1 sm:hidden" aria-label="Produktfotos">
+              {images.map((img, i) => (
+                <button
+                  key={`${img}-${i}`}
+                  type="button"
+                  aria-label={`Foto ${i + 1} auswählen`}
+                  aria-pressed={activeImg === i}
+                  onClick={() => setActiveImg(i)}
+                  className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-bg-secondary ${activeImg === i ? "border-gold" : "border-border"}`}
                 >
-                  <Image
-                    src={img}
-                    alt=""
-                    fill
-                    className="object-cover hover:scale-105 transition-transform duration-500"
-                    sizes="25vw"
-                  />
-                </div>
+                  <Image src={img} alt="" fill className="object-cover" sizes="64px" />
+                </button>
               ))}
             </div>
           )}
-          <button
-            onClick={() => setLightboxOpen(true)}
-            className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1.5 bg-bg-primary/80 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-all backdrop-blur-sm"
-          >
-            <Expand size={13} /> Alle Fotos anzeigen
-          </button>
         </div>
 
         {lightboxOpen && (
@@ -277,6 +305,8 @@ export default function PropDetail({ prop }: { prop: Prop }) {
                 <p className="text-text-muted italic text-sm">Keine Beschreibung vorhanden.</p>
               )}
             </div>
+
+            <ProductionCreditsDisplay credits={prop.productionCredits ?? []} heading="Bei diesen Produktionen im Einsatz" />
 
             <div className="mb-8">
               <h2 className="font-display text-xl font-bold text-text-primary mb-4">Im Lieferumfang enthalten</h2>

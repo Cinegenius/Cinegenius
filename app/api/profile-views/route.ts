@@ -12,14 +12,27 @@ export async function GET() {
   const d7  = new Date(now.getTime() - 7  * 24 * 60 * 60 * 1000).toISOString();
   const d14 = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString();
 
-  const { data } = await db
-    .from("profile_views")
-    .select("viewed_at")
-    .eq("profile_id", userId)
-    .gte("viewed_at", d14)
-    .order("viewed_at", { ascending: true });
+  const [legacyResult, dailyResult] = await Promise.all([
+    db.from("profile_views")
+      .select("viewed_at")
+      .eq("profile_id", userId)
+      .gte("viewed_at", d14)
+      .order("viewed_at", { ascending: true }),
+    db.from("profile_view_daily")
+      .select("viewed_on")
+      .eq("profile_id", userId)
+      .gte("viewed_on", d14.slice(0, 10))
+      .order("viewed_on", { ascending: true }),
+  ]);
 
-  const rows = data ?? [];
+  if (legacyResult.error || (dailyResult.error && !["42P01", "PGRST205"].includes(dailyResult.error.code ?? ""))) {
+    return NextResponse.json({ error: "Profilaufrufe konnten nicht geladen werden" }, { status: 500 });
+  }
+
+  const rows = [
+    ...(legacyResult.data ?? []),
+    ...(!dailyResult.error ? (dailyResult.data ?? []).map((row) => ({ viewed_at: `${row.viewed_on}T12:00:00.000Z` })) : []),
+  ];
 
   const views7  = rows.filter((r) => r.viewed_at >= d7).length;
   const views14 = rows.filter((r) => r.viewed_at < d7).length; // previous 7 days

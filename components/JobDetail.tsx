@@ -26,7 +26,7 @@ type Job = {
   ownerName?: string;
 };
 
-export default function JobDetail({ job }: { job: Job }) {
+export default function JobDetail({ job, preview = false }: { job: Job; preview?: boolean }) {
   const { userId } = useAuth();
   const { openSignIn } = useClerk();
   const [submitted, setSubmitted] = useState(false);
@@ -38,7 +38,7 @@ export default function JobDetail({ job }: { job: Job }) {
 
   const handleApply = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userId) return;
+    if (!userId || preview) return;
     setSubmitting(true);
     setSubmitError("");
     try {
@@ -71,6 +71,18 @@ export default function JobDetail({ job }: { job: Job }) {
           <ArrowLeft size={14} /> Zurück zu Jobs
         </Link>
 
+        {preview && (
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-gold/30 bg-gold/10 px-4 py-3">
+            <div>
+              <p className="text-sm font-semibold text-gold">Private Vorschau · noch nicht veröffentlicht</p>
+              <p className="text-xs text-text-muted mt-0.5">Nur du kannst diesen Job-Entwurf sehen. Bewerbungen und Meldungen sind deaktiviert.</p>
+            </div>
+            <Link href="/dashboard?tab=jobs" className="min-h-11 inline-flex items-center justify-center rounded-lg border border-gold/30 px-4 py-2 text-sm font-medium text-gold hover:bg-gold/10">
+              Zum Dashboard
+            </Link>
+          </div>
+        )}
+
         <div className="flex gap-8 flex-col lg:flex-row">
           {/* Job Info */}
           <div className="flex-1 min-w-0">
@@ -89,15 +101,12 @@ export default function JobDetail({ job }: { job: Job }) {
                 </div>
                 <p className="text-text-secondary">{job.company} &middot; {job.projectType}</p>
               </div>
-              <div className="flex items-center gap-1 shrink-0">
-                <FavoriteButton
-                  listingId={job.id}
-                  listingType="job"
-                  listingTitle={job.title}
-                  listingCity={job.location}
-                />
-                <ReportButton listingId={job.id} />
-              </div>
+              {!preview && (
+                <div className="flex items-center gap-1 shrink-0">
+                  <FavoriteButton listingId={job.id} listingType="job" listingTitle={job.title} listingCity={job.location} />
+                  <ReportButton listingId={job.id} />
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
@@ -185,7 +194,14 @@ export default function JobDetail({ job }: { job: Job }) {
           <div className="lg:w-[340px] shrink-0">
             <div className="sticky top-20">
               <div className="bg-bg-secondary border border-border rounded-xl p-6">
-                {!userId ? (
+                {preview ? (
+                  <div className="text-center py-4 space-y-3">
+                    <Briefcase size={24} className="mx-auto text-gold" />
+                    <p className="text-sm font-semibold text-text-primary">Vorschau des privaten Entwurfs</p>
+                    <p className="text-xs text-text-muted">Dieser Inhalt ist noch nicht öffentlich und kann hier keine Bewerbung oder Anfrage auslösen.</p>
+                  </div>
+                ) : (
+                !userId ? (
                   <div className="text-center py-4 space-y-3">
                     <p className="text-sm text-text-muted">Melde dich an, um dich zu bewerben.</p>
                     <button onClick={() => openSignIn()} className="block w-full py-2.5 bg-gold text-bg-primary font-semibold rounded-lg text-sm text-center hover:bg-gold-light transition-colors">
@@ -273,6 +289,7 @@ export default function JobDetail({ job }: { job: Job }) {
                       </p>
                     </form>
                   </>
+                )
                 )}
               </div>
             </div>

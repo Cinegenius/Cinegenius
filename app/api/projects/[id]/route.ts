@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { requireAuth, assertOwner } from "@/lib/guards";
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
+import { saveProjectDraft } from "@/lib/project-drafts-server";
 
 // GET /api/projects/[id] — public project detail (no auth required)
 export async function GET(
@@ -48,64 +49,19 @@ export async function GET(
   return NextResponse.json({ project, credits: creditsWithProfiles });
 }
 
-// PATCH /api/projects/[id] — update own project
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+// PATCH /api/projects/[id] — save an owner-only working copy; public data changes on publish.
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
-
   const { id } = await params;
-
-  // Fetch project — never trust client on ownership
-  const { data: project } = await db
-    .from("projects")
-    .select("id, created_by")
-    .eq("id", id)
-    .maybeSingle();
-
-  const ownershipError = assertOwner(project?.created_by, userId);
-  if (ownershipError) return ownershipError;
-
-  const body = await req.json();
-
-  // Explicit allowlist — prevents injection of id, created_by, or arbitrary columns
-  const ALLOWED_KEYS = [
-    "title", "year", "type", "description", "director",
-    "poster_url", "images", "metadata",
-    "status", "logline", "production_company", "runtime_minutes", "trailer_url",
-    "release_cinema", "release_streaming", "release_tv",
-    "prep_start", "prep_end", "shoot_start", "shoot_end", "post_start", "post_end",
-  ] as const;
-
-  const updates: Record<string, unknown> = {};
-  for (const key of ALLOWED_KEYS) {
-    if (key in body) updates[key] = body[key];
-  }
-
-  // genre is stored inside metadata — merge rather than writing a phantom top-level column
-  if ("genre" in body) {
-    const existing = (typeof updates.metadata === "object" && updates.metadata !== null)
-      ? updates.metadata as Record<string, unknown>
-      : {};
-    updates.metadata = { ...existing, genre: body.genre };
-  }
-
-  if (Object.keys(updates).length === 0) {
+  const body = await req.json().catch(() => null);
+  if (!body || typeof body !== "object" || Array.isArray(body) || Object.keys(body).length === 0) {
     return NextResponse.json({ error: "Keine gültigen Felder" }, { status: 400 });
   }
-
-  updates["updated_at"] = new Date().toISOString();
-
-  const { error } = await db
-    .from("projects")
-    .update(updates)
-    .eq("id", id);
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ success: true });
+  const result = await saveProjectDraft(userId, { sourceProjectId: id, draftData: body });
+  if (result.error) return NextResponse.json({ error: result.error }, { status: result.status });
+  return NextResponse.json({ success: true, draftId: result.draft.id });
 }
 
 // DELETE /api/projects/[id] — delete own project

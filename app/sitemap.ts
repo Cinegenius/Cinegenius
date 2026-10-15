@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { db } from "@/lib/db";
+import { getPrivateProfileIds } from "@/lib/trust";
 
 const BASE = "https://cinegenius.co";
 
@@ -62,7 +63,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .eq("published", true),
 
       db.from("profiles")
-        .select("slug, updated_at")
+        .select("user_id, slug, updated_at")
         .not("slug", "is", null)
         .not("positions", "is", null)
         .neq("positions", "{}"),
@@ -88,7 +89,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: l.type === "job" ? 0.7 : 0.8,
       }));
 
+    const privateProfileIds = await getPrivateProfileIds((profiles ?? []).map((profile) => profile.user_id));
     profilePages = (profiles ?? [])
+      .filter((profile) => !privateProfileIds.has(profile.user_id))
       .filter((p: { slug: string | null; updated_at: string }) => p.slug)
       .map((p: { slug: string; updated_at: string }) => ({
         url: `${BASE}/profile/${p.slug}`,

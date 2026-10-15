@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
+import { getPrivateProfileIds } from "@/lib/trust";
 
 const PAGE_SIZE = 48;
 
@@ -20,8 +21,10 @@ export async function GET(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
+  const privateProfileIds = await getPrivateProfileIds((profiles ?? []).map((profile) => profile.user_id));
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const creators = (profiles ?? []).map((p: any) => {
+  const creators = (profiles ?? []).filter((profile) => !privateProfileIds.has(profile.user_id)).map((p: any) => {
     const phys = p.physical ?? {};
     const avail = p.availability_config ?? {};
     const primaryType = (p.profile_types?.[0] ?? p.profile_type ?? "") as ProfileType;

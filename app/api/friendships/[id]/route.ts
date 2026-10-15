@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { clerkClient } from "@clerk/nextjs/server";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { sendFriendAcceptedEmail } from "@/lib/email";
 
@@ -36,6 +37,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     const { error } = await db.from("friendships").update(update).eq("id", id);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    revalidateTag("profiles", { expire: 0 });
     return NextResponse.json({ success: true });
   }
 
@@ -63,6 +65,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     .eq("id", id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (status === "accepted") revalidateTag("profiles", { expire: 0 });
 
   // Notify the original sender when accepted (in-app + email)
   if (status === "accepted") {
@@ -113,5 +116,6 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 
   const { error } = await db.from("friendships").delete().eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  revalidateTag("profiles", { expire: 0 });
   return NextResponse.json({ success: true });
 }

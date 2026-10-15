@@ -12,9 +12,18 @@ const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "https://cinegenius.co";
 async function send(to: string, subject: string, html: string) {
   if (!resend) return;
   try {
-    await resend.emails.send({ from: FROM, to, subject, html });
+    const { error } = await resend.emails.send({ from: FROM, to, subject, html });
+    if (error) {
+      // Keep provider failures visible in server logs without recording the
+      // recipient address or message contents.
+      console.error("CineGenius: Transaktions-E-Mail wurde von Resend abgelehnt.", {
+        code: error.name,
+        statusCode: error.statusCode,
+      });
+    }
   } catch {
-    // Never let email failures bubble up to the caller
+    // Email is best-effort; never let provider/network failures break messaging.
+    console.error("CineGenius: Transaktions-E-Mail konnte nicht gesendet werden.");
   }
 }
 
@@ -80,18 +89,85 @@ export async function sendFriendAcceptedEmail(to: string, accepterName: string) 
   );
 }
 
+function escapeHtml(value: string) {
+  return value.replace(/[&<>"']/g, (character) => {
+    switch (character) {
+      case "&": return "&amp;";
+      case "<": return "&lt;";
+      case ">": return "&gt;";
+      case '"': return "&quot;";
+      default: return "&#39;";
+    }
+  });
+}
+
+function normalizedEmailText(value: string) {
+  return value.replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function messageEmailHtml(senderName: string, preview: string, hasMore: boolean, conversationId: string) {
+  const sender = escapeHtml(senderName);
+  const snippet = escapeHtml(preview);
+  const siteUrl = escapeHtml(BASE);
+  const chatUrl = new URL("/messages", BASE);
+  chatUrl.searchParams.set("conv", conversationId);
+  const chatHref = escapeHtml(chatUrl.toString());
+  const preheader = escapeHtml(`${senderName} hat dir auf CineGenius geschrieben.`);
+
+  return `<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="supported-color-schemes" content="dark" />
+</head>
+<body style="margin:0;padding:0;background-color:#0e1016;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;color:#f4f5f7">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">${preheader}</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#0e1016" style="width:100%;background-color:#0e1016">
+    <tr><td align="center" style="padding:32px 16px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#171b24" style="width:100%;max-width:600px;background-color:#171b24;border:1px solid #29344a;border-radius:16px;overflow:hidden">
+        <tr><td style="padding:22px 26px;border-bottom:1px solid #29344a">
+          <a href="${siteUrl}" style="color:#ffffff;font-size:21px;font-weight:700;letter-spacing:-0.6px;text-decoration:none">
+            <span style="color:#c2f135;font-size:25px;vertical-align:-1px">›</span> Cine<span style="color:#c2f135">Genius</span>
+          </a>
+        </td></tr>
+        <tr><td style="padding:32px 26px 28px">
+          <p style="margin:0 0 12px;color:#c2f135;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase">Neue Nachricht</p>
+          <h1 style="margin:0 0 10px;color:#f4f5f7;font-size:25px;line-height:1.25;font-weight:700">${sender} hat dir geschrieben</h1>
+          <p style="margin:0 0 22px;color:#a7afbf;font-size:15px;line-height:1.6">Du hast eine neue Nachricht in deinem CineGenius-Chat.</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#10131b" style="width:100%;background-color:#10131b;border:1px solid #29344a;border-radius:12px">
+            <tr><td style="padding:16px 18px;border-left:3px solid #c2f135;color:#d5d9e2;font-size:15px;line-height:1.65;word-break:break-word">
+              ${snippet}${hasMore ? "…" : ""}
+            </td></tr>
+          </table>
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:24px">
+            <tr><td align="center" bgcolor="#c2f135" style="background-color:#c2f135;border-radius:10px">
+              <a href="${chatHref}" style="display:inline-block;padding:14px 22px;color:#10131b;font-size:15px;font-weight:700;text-decoration:none;border-radius:10px">Chat öffnen&nbsp;&nbsp;→</a>
+            </td></tr>
+          </table>
+          <p style="margin:22px 0 0;color:#7e899d;font-size:12px;line-height:1.6">Falls du nicht angemeldet bist, wirst du zuerst zur Anmeldung weitergeleitet und danach zurück zum Chat.</p>
+        </td></tr>
+        <tr><td style="padding:18px 26px;border-top:1px solid #29344a">
+          <p style="margin:0;color:#7e899d;font-size:12px;line-height:1.6">Du erhältst diese E-Mail, weil E-Mail-Benachrichtigungen für neue Nachrichten aktiviert sind. <a href="${siteUrl}" style="color:#c2f135;text-decoration:none">cinegenius.co</a></p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
 export async function sendNewMessageEmail(to: string, fromName: string, preview: string, conversationId: string) {
+  const safeName = Array.from(normalizedEmailText(fromName)).slice(0, 100).join("") || "Jemand";
+  const previewCharacters = Array.from(normalizedEmailText(preview));
+  const safePreview = previewCharacters.slice(0, 200).join("");
+  const html = messageEmailHtml(safeName, safePreview, previewCharacters.length > 200, conversationId);
+
   await send(
     to,
-    `Neue Nachricht von ${fromName}`,
-    wrap(`
-      ${h1("Neue Nachricht")}
-      ${p(`<strong style="color:#f0f0f0">${fromName}</strong> hat dir geschrieben:`)}
-      <blockquote style="margin:16px 0;padding:12px 16px;background:#1a1a1a;border-left:3px solid #d4a843;border-radius:4px;font-size:14px;color:#ccc;line-height:1.5">
-        ${preview.slice(0, 200)}${preview.length > 200 ? "…" : ""}
-      </blockquote>
-      ${btn("Antworten", `${BASE}/messages`)}
-    `)
+    `Neue Nachricht von ${safeName}`,
+    html,
   );
 }
 

@@ -115,7 +115,8 @@ export async function POST(req: Request) {
       city,
       image_url: image_url ?? null,
       company_id: company_id ?? null,
-      published: true,
+      // Job listings always start private. Publishing is a separate owner-only action.
+      published: type === "job" ? false : true,
       metadata: mergedMetadata,
       ...(blocked_dates !== undefined && { blocked_dates }),
       ...(floor_plan_url !== undefined && { floor_plan_url }),

@@ -23,7 +23,7 @@ export default function SignInPage() {
         </div>
         <Suspense fallback={<SignInSkeleton />}>
           <SignIn
-            forceRedirectUrl="/dashboard"
+            fallbackRedirectUrl="/dashboard"
             appearance={{
               variables: {
                 colorPrimary: "#C2F135",

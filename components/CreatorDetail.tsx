@@ -471,6 +471,7 @@ export default function CreatorDetail({
                   {[...projectCredits]
                     .sort((a, b) => (b.projects?.year ?? 0) - (a.projects?.year ?? 0))
                     .map((credit) => {
+                      const [roleLabel, collaborator] = credit.role?.split("||") ?? ["", ""];
                       const typeClass = filmTypeColors[credit.projects?.type ?? ""] ?? "bg-bg-secondary border-border text-text-muted";
                       return (
                         <Link
@@ -493,7 +494,8 @@ export default function CreatorDetail({
                               )}
                             </div>
                             <div className="text-xs text-text-muted mt-0.5 flex items-center gap-2">
-                              <span>{credit.role}</span>
+                              <span>{roleLabel}</span>
+                              {collaborator && <><span>·</span><span>Mit: {collaborator}</span></>}
                               {credit.projects?.director && <><span>·</span><span>Regie: {credit.projects.director}</span></>}
                             </div>
                           </div>
@@ -599,7 +601,7 @@ export default function CreatorDetail({
                   {recommendations.map((rec) => (
                     <div key={rec.id} className="p-5 bg-bg-secondary border border-border rounded-xl relative group">
                       <Quote size={20} className="text-gold/20 absolute top-4 right-4" />
-                      <p className="text-text-secondary text-sm leading-relaxed mb-4 pr-6">„{rec.content}"</p>
+                      <p className="text-text-secondary text-sm leading-relaxed mb-4 pr-6">„{rec.content}“</p>
                       <div className="flex items-center gap-3">
                         {rec.author_avatar ? (
                           // eslint-disable-next-line @next/next/no-img-element

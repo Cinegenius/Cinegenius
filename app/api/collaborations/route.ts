@@ -13,25 +13,24 @@ export async function GET(req: NextRequest) {
       .select("receiver_id, sender_collab_label")
       .eq("sender_id", userId)
       .eq("status", "accepted")
-      .eq("sender_collab_public", true)
-      .not("sender_collab_label", "is", null),
+      .eq("sender_collab_public", true),
     db
       .from("friendships")
       .select("sender_id, receiver_collab_label")
       .eq("receiver_id", userId)
       .eq("status", "accepted")
-      .eq("receiver_collab_public", true)
-      .not("receiver_collab_label", "is", null),
+      .eq("receiver_collab_public", true),
   ]);
 
   const collabs: { friendId: string; label: string }[] = [
-    ...(asSender.data ?? []).map((f) => ({ friendId: f.receiver_id, label: f.sender_collab_label as string })),
-    ...(asReceiver.data ?? []).map((f) => ({ friendId: f.sender_id, label: f.receiver_collab_label as string })),
+    ...(asSender.data ?? []).map((f) => ({ friendId: f.receiver_id, label: f.sender_collab_label?.trim() || "Vernetzt" })),
+    ...(asReceiver.data ?? []).map((f) => ({ friendId: f.sender_id, label: f.receiver_collab_label?.trim() || "Vernetzt" })),
   ];
 
   if (collabs.length === 0) return NextResponse.json({ collaborations: [] });
 
-  const ids = [...new Set(collabs.map((c) => c.friendId))];
+  const uniqueCollabs = [...new Map(collabs.map((c) => [c.friendId, c])).values()];
+  const ids = uniqueCollabs.map((c) => c.friendId);
   const { data: profiles } = await db
     .from("profiles")
     .select("user_id, display_name, avatar_url, slug, role, positions")
@@ -40,7 +39,7 @@ export async function GET(req: NextRequest) {
   const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, p]));
 
   return NextResponse.json({
-    collaborations: collabs.map((c) => {
+    collaborations: uniqueCollabs.map((c) => {
       const p = profileMap[c.friendId] ?? {};
       return {
         user_id: c.friendId,

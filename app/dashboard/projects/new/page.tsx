@@ -311,7 +311,7 @@ export default function NewProjectPage() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Fehler beim Speichern");
-      router.push(`/projects/${json.project.id}`);
+      router.push(`/dashboard/projects/drafts/${json.draft.id}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Unbekannter Fehler");
       setSaving(false);
@@ -486,7 +486,7 @@ export default function NewProjectPage() {
             <button type="submit" disabled={saving}
               className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm disabled:opacity-60">
               {saving ? <Loader2 size={15} className="animate-spin" /> : <CheckCircle size={15} />}
-              {saving ? "Speichern …" : "Projekt eintragen"}
+              {saving ? "Entwurf wird gespeichert …" : "Als Entwurf speichern"}
             </button>
           </div>
         </form>

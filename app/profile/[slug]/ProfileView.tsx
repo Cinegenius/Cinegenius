@@ -209,7 +209,7 @@ function CollaborationsSection({ collaborations }: { collaborations: PublicColla
   return (
     <>
       <Divider />
-      <SectionLabel>Zusammenarbeit</SectionLabel>
+      <SectionLabel>Vernetzte Personen</SectionLabel>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
         {collaborations.map((c) => (
           <Link
@@ -533,7 +533,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
   const visibleFilms = showAllFilms ? films : films.slice(0, 6);
   const awards: ProfileAward[] = profile.awards ?? [];
   const skills: string[] = profile.skills ?? [];
-  const memberships: string[] = (profile as any).memberships ?? [];
+  const memberships: string[] = profile.memberships ?? [];
   const languages = profile.languages ?? [];
 
   const playingAge = p.playing_age_min || p.playing_age_max
@@ -572,7 +572,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                   <img
                     src={mainShot}
                     alt={profile.display_name ?? ""}
-                    className="w-full h-full object-cover object-top group-hover:scale-[1.03] transition-transform duration-700"
+                    className="w-full h-full object-contain object-top"
                   />
                   {profile.verified && (
                     <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-1 rounded-full">
@@ -656,7 +656,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                       <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
                       {friendStatus === "friends" ? (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-emerald-500/30 text-emerald-400 rounded-lg text-xs font-medium">
-                          <UserCheck size={12} /> Freunde
+                          <UserCheck size={12} /> Vernetzt
                         </span>
                       ) : friendStatus === "pending_sent" ? (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-text-muted rounded-lg text-xs">
@@ -670,7 +670,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                       ) : (
                         <button onClick={handleFriendAction} disabled={friendLoading}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-text-secondary rounded-lg hover:border-gold/50 hover:text-gold transition-all text-xs disabled:opacity-50">
-                          <UserPlus size={12} /> Freund
+                          <UserPlus size={12} /> Vernetzen
                         </button>
                       )}
                     </>
@@ -849,7 +849,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
           const matched: Record<string, typeof credits> = {};
           const unmatched: typeof credits = [];
           for (const c of credits) {
-            const role = c.role?.trim() ?? "";
+            const role = c.role?.split("||")[0]?.trim() ?? "";
             const rl = role.toLowerCase();
             const posIdx = positions.findIndex(p => { const pl = p.toLowerCase(); return pl === rl || pl.includes(rl) || rl.includes(pl); });
             if (posIdx !== -1) {
@@ -882,7 +882,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                             className="group flex items-center gap-3 px-3 py-2 border-b border-border/60 last:border-b-0 hover:bg-bg-elevated/60 transition-colors">
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{proj.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</span>
-                            {collaborator && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[25%] hidden sm:inline">{collaborator}</span>}
+                            {collaborator && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[35%]">Mit: {collaborator}</span>}
                             {normType(proj.type) && <span className="text-[10px] text-text-muted shrink-0 hidden sm:inline">{normType(proj.type)}</span>}
                           </Link>
                         );
@@ -988,7 +988,7 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
   const reelUrl = profile.showreel_url ?? profile.reel_url;
   const reelEmbed = reelUrl ? getVideoEmbed(reelUrl) : null;
   const skills: string[] = profile.skills ?? [];
-  const memberships: string[] = (profile as any).memberships ?? [];
+  const memberships: string[] = profile.memberships ?? [];
   const languages = profile.languages ?? [];
 
   return (
@@ -1003,7 +1003,7 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
             src={heroCoverUrl}
             alt={profile.display_name ?? ""}
             className="absolute inset-0 w-full h-full object-cover"
-            style={{ objectPosition: (profile as any).focal_point ? `${(profile as any).focal_point.x}% ${(profile as any).focal_point.y}%` : "50% 33%" }}
+            style={{ objectPosition: profile.focal_point ? `${profile.focal_point.x}% ${profile.focal_point.y}%` : "50% 33%" }}
           />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-bg-elevated via-bg-primary to-black" />
@@ -1292,12 +1292,12 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
   const films: FilmographyEntry[] = profile.filmography ?? [];
   const awards: ProfileAward[] = profile.awards ?? [];
   const skills: string[] = profile.skills ?? [];
-  const memberships: string[] = (profile as any).memberships ?? [];
+  const memberships: string[] = profile.memberships ?? [];
   const languages = profile.languages ?? [];
   const certificates: string[] = profile.crew?.certificates ?? [];
   const software: string[] = profile.crew?.software ?? [];
   const bgImage = profile.cover_image_url ?? (images.find((i) => i.featured)?.url);
-  const coverOpacity = (profile as any).focal_point?.opacity ?? 0.4;
+  const coverOpacity = profile.focal_point?.opacity ?? 0.4;
 
   // Filmografie shows only manual entries — linked project credits appear as visual cards in "Projekte"
   const creditTitles = new Set(
@@ -1395,7 +1395,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
             {profile.avatar_url ? (
               <div className="relative">
                 <Image src={profile.avatar_url} alt={profile.display_name ?? ""} width={220} height={220}
-                  className="w-full aspect-square rounded-2xl object-cover ring-1 ring-white/8 shadow-2xl" />
+                  className="w-full aspect-square rounded-2xl object-contain bg-bg-secondary ring-1 ring-white/8 shadow-2xl" />
                 <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10">
                   <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${profile.available ? "bg-gold" : "bg-red-400"}`} />
                   <span className={`text-[10px] font-medium ${profile.available ? "text-gold/90" : "text-white/60"}`}>{profile.available ? "Verfügbar" : "Nicht verfügbar"}</span>
@@ -1544,7 +1544,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           const matched: Record<string, typeof credits> = {};
           const unmatched: typeof credits = [];
           for (const c of credits) {
-            const role = c.role?.trim() ?? "";
+            const role = c.role?.split("||")[0]?.trim() ?? "";
             const rl = role.toLowerCase();
             const posIdx = positions.findIndex(p => { const pl = p.toLowerCase(); return pl === rl || pl.includes(rl) || rl.includes(pl); });
             if (posIdx !== -1) {
@@ -1575,7 +1575,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                             className="group flex items-center gap-3 px-3 py-2 border-b border-border/60 last:border-b-0 hover:bg-bg-elevated/60 transition-colors">
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{proj.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</span>
-                            {collaborator && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[25%]">{collaborator}</span>}
+                            {collaborator && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[35%]">Mit: {collaborator}</span>}
                             {normType(proj.type) && <span className="text-[10px] text-text-muted shrink-0 hidden sm:inline">{normType(proj.type)}</span>}
                           </Link>
                         );

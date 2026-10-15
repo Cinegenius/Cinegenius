@@ -33,6 +33,7 @@ export default function ReviewsSection({ targetId, targetType, targetName }: Pro
   const [formOpen, setFormOpen] = useState(false);
   const [canReview, setCanReview] = useState(false);
   const [alreadyReviewed, setAlreadyReviewed] = useState(false);
+  const [ratingSummary, setRatingSummary] = useState<{ avg: number; count: number; ratingOnlyCount: number } | null>(null);
 
   const apiType = toApiType(targetType);
 
@@ -40,7 +41,11 @@ export default function ReviewsSection({ targetId, targetType, targetName }: Pro
     const controller = new AbortController();
     fetch(`/api/reviews?target_id=${targetId}&target_type=${apiType}`, { signal: controller.signal })
       .then((r) => r.ok ? r.json() : null)
-      .then((json) => { if (json && Array.isArray(json.data)) setReviews(json.data); })
+      .then((json) => {
+        if (!json) return;
+        if (Array.isArray(json.data)) setReviews(json.data);
+        if (json.summary) setRatingSummary(json.summary);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
     return () => controller.abort();
@@ -61,9 +66,12 @@ export default function ReviewsSection({ targetId, targetType, targetName }: Pro
     return () => controller.abort();
   }, [user, targetId, apiType]);
 
-  const avgRating = reviews.length
-    ? Math.round((reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) * 10) / 10
-    : null;
+  const avgRating = ratingSummary?.count
+    ? ratingSummary.avg
+    : reviews.length
+      ? Math.round((reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) * 10) / 10
+      : null;
+  const totalRatings = ratingSummary?.count ?? reviews.length;
 
   return (
     <div>
@@ -71,8 +79,8 @@ export default function ReviewsSection({ targetId, targetType, targetName }: Pro
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-display text-xl font-bold text-text-primary flex items-center gap-2">
           Bewertungen
-          {!loading && reviews.length > 0 && (
-            <span className="text-base font-normal text-text-muted">({reviews.length})</span>
+          {!loading && totalRatings > 0 && (
+            <span className="text-base font-normal text-text-muted">({totalRatings})</span>
           )}
         </h2>
         {avgRating !== null && (
@@ -95,9 +103,14 @@ export default function ReviewsSection({ targetId, targetType, targetName }: Pro
       {/* Reviews list */}
       {!loading && (
         <div className="space-y-4">
-          {reviews.length === 0 && (
+          {reviews.length === 0 && !ratingSummary?.ratingOnlyCount && (
             <p className="text-sm text-text-muted italic">
               Noch keine Bewertungen — sei der/die Erste!
+            </p>
+          )}
+          {ratingSummary && ratingSummary.ratingOnlyCount > 0 && (
+            <p className="text-sm text-text-muted italic">
+              {ratingSummary.ratingOnlyCount} Sternebewertung{ratingSummary.ratingOnlyCount === 1 ? "" : "en"} ohne Kommentar.
             </p>
           )}
           {reviews.map((r) => (

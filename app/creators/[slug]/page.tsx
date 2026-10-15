@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { db } from "@/lib/db";
+import { recordProfileView } from "@/lib/profile-views";
 import { unstable_cache } from "next/cache";
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
@@ -108,12 +109,7 @@ export default async function CreatorProfilePage({
   const { userId } = await auth();
 
   // Profilaufruf tracken (nicht eigenes Profil, fire-and-forget)
-  if (creator.ownerId && userId !== creator.ownerId) {
-    void db.from("profile_views").insert({
-      profile_id: creator.ownerId,
-      viewer_id: userId ?? null,
-    });
-  }
+  if (creator.ownerId) await recordProfileView(creator.ownerId, userId);
 
   // Fetch creator's privacy settings
   const { data: settings } = await db

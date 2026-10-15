@@ -2,17 +2,35 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { MapPin, Users, Briefcase, ShoppingBag, Film, Building2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export default function BottomNav() {
   const pathname = usePathname();
   const t = useTranslations("nav");
+  const [chatOpen, setChatOpen] = useState(false);
+
+  useEffect(() => {
+    const syncChatState = () => {
+      setChatOpen(document.body.dataset.messagesChatOpen === "true");
+    };
+    const handleChatState = (event: Event) => {
+      const isOpen = (event as CustomEvent<boolean>).detail;
+      document.body.dataset.messagesChatOpen = String(isOpen);
+      setChatOpen(isOpen);
+    };
+
+    syncChatState();
+    window.addEventListener("cinegenius:messages-chat-state", handleChatState);
+    return () => window.removeEventListener("cinegenius:messages-chat-state", handleChatState);
+  }, []);
 
   if (pathname.startsWith("/dashboard")) return null;
   if (pathname.startsWith("/profile-setup")) return null;
   if (pathname.startsWith("/sign-in")) return null;
   if (pathname.startsWith("/sign-up")) return null;
+  if (pathname.startsWith("/messages") && chatOpen) return null;
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);

@@ -59,8 +59,12 @@ function MessagesContent() {
   const [newConvRecipient, setNewConvRecipient] = useState<string | null>(toParam);
   const [recipientName, setRecipientName] = useState("");
   const [loadingRecipient, setLoadingRecipient] = useState(!!toParam);
+  const [keyboardInset, setKeyboardInset] = useState(0);
+  const [visualViewportTop, setVisualViewportTop] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const activeIdRef = useRef<string | null>(null);
+  const autoOpenedConversationRef = useRef<string | null>(null);
+  const autoOpenedRecipientRef = useRef<string | null>(null);
   useEffect(() => { activeIdRef.current = activeId; }, [activeId]);
 
   // Friend requests
@@ -70,6 +74,38 @@ function MessagesContent() {
 
   // Mobile: true = zeige Chat, false = zeige Liste
   const showChat = !!(activeId || newConvRecipient);
+
+  // Keep the conversation fitted to the visible iOS viewport when the keyboard opens.
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    const updateViewport = () => {
+      const top = viewport?.offsetTop ?? 0;
+      const visibleBottom = top + (viewport?.height ?? window.innerHeight);
+      const coveredBottom = Math.max(0, window.innerHeight - visibleBottom);
+      setVisualViewportTop(top);
+      // Ignore the small difference caused by Safari's browser chrome.
+      setKeyboardInset(coveredBottom > 120 ? coveredBottom : 0);
+    };
+
+    updateViewport();
+    viewport?.addEventListener("resize", updateViewport);
+    viewport?.addEventListener("scroll", updateViewport);
+    window.addEventListener("resize", updateViewport);
+    return () => {
+      viewport?.removeEventListener("resize", updateViewport);
+      viewport?.removeEventListener("scroll", updateViewport);
+      window.removeEventListener("resize", updateViewport);
+    };
+  }, []);
+
+  useEffect(() => {
+    document.body.dataset.messagesChatOpen = String(showChat);
+    window.dispatchEvent(new CustomEvent("cinegenius:messages-chat-state", { detail: showChat }));
+    return () => {
+      document.body.dataset.messagesChatOpen = "false";
+      window.dispatchEvent(new CustomEvent("cinegenius:messages-chat-state", { detail: false }));
+    };
+  }, [showChat]);
 
   const loadConversations = useCallback(async () => {
     try {
@@ -109,11 +145,16 @@ function MessagesContent() {
   }, [toParam]);
 
   useEffect(() => {
-    if (!toParam || loading) return;
+    if (!toParam) {
+      autoOpenedRecipientRef.current = null;
+      return;
+    }
+    if (loading || autoOpenedRecipientRef.current === toParam) return;
     const existing = conversations.find(c =>
       c.sender_id === toParam || c.receiver_id === toParam
     );
     if (existing) {
+      autoOpenedRecipientRef.current = toParam;
       setActiveId(existing.id);
       setNewConvRecipient(null);
       loadMessages(existing.id);
@@ -123,9 +164,14 @@ function MessagesContent() {
 
   // Open a specific conversation by ID (from notification links: ?conv=...)
   useEffect(() => {
-    if (!convParam || loading) return;
+    if (!convParam) {
+      autoOpenedConversationRef.current = null;
+      return;
+    }
+    if (loading || autoOpenedConversationRef.current === convParam) return;
     const existing = conversations.find(c => c.id === convParam);
     if (existing) {
+      autoOpenedConversationRef.current = convParam;
       setActiveId(existing.id);
       setNewConvRecipient(null);
       loadMessages(existing.id);
@@ -140,14 +186,18 @@ function MessagesContent() {
       const { messages: msgs } = await res.json();
       setMessages(msgs ?? []);
       // Immediately clear unread badge in sidebar without waiting for a full list reload
-      setConversations(prev => prev.map(c =>
-        c.id !== convId ? c : {
+      setConversations(prev => {
+        const current = prev.find(c => c.id === convId);
+        if (!current?.messages?.some(m => m.sender_id !== user?.id && !m.read_at)) return prev;
+        const readAt = new Date().toISOString();
+        return prev.map(c => c.id !== convId ? c : {
           ...c,
           messages: (c.messages ?? []).map(m =>
-            m.sender_id === user?.id ? m : { ...m, read_at: m.read_at ?? new Date().toISOString() }
+            m.sender_id === user?.id ? m : { ...m, read_at: m.read_at ?? readAt }
           ),
-        }
-      ));
+        });
+      });
+      window.dispatchEvent(new CustomEvent("cinegenius:messages-read"));
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
     } catch { /* silent */ }
   }
@@ -266,7 +316,7 @@ function MessagesContent() {
         const { message, error } = await res.json();
         if (error) throw new Error(error);
         setText("");
-        setMessages(prev => [...prev, message]);
+        setMessages(prev => prev.some(existing => existing.id === message.id) ? prev : [...prev, message]);
         setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
       }
     } catch (e) {
@@ -285,12 +335,18 @@ function MessagesContent() {
       : null;
 
   return (
-    <div className="fixed inset-0 top-16 bottom-14 lg:bottom-0 bg-bg-primary flex overflow-hidden">
+    <div
+      className={`fixed inset-x-0 top-16 ${showChat ? "bottom-0" : "bottom-14"} lg:bottom-0 bg-bg-primary flex overflow-hidden`}
+      style={{
+        ...(visualViewportTop > 0 ? { top: `${64 + visualViewportTop}px` } : {}),
+        ...(keyboardInset > 0 ? { bottom: `${keyboardInset}px` } : {}),
+      }}
+    >
 
       {/* ── KONVERSATIONSLISTE ── */}
       <div className={`
         ${showChat ? "hidden sm:flex" : "flex"}
-        flex-col w-full sm:w-80 sm:shrink-0 border-r border-border bg-bg-primary
+        flex-col min-w-0 w-full sm:w-80 sm:shrink-0 border-r border-border bg-bg-primary
       `}>
         <div className="px-4 py-4 border-b border-border shrink-0">
           <h1 className="font-display text-lg font-bold text-text-primary flex items-center gap-2">
@@ -432,7 +488,7 @@ function MessagesContent() {
       {/* ── CHAT-BEREICH ── */}
       <div className={`
         ${showChat ? "flex" : "hidden sm:flex"}
-        flex-col flex-1 bg-bg-primary
+        flex-col flex-1 min-w-0 bg-bg-primary
       `}>
         {showChat ? (
           <>
@@ -468,7 +524,7 @@ function MessagesContent() {
             </div>
 
             {/* Nachrichten */}
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
+            <div className="flex-1 min-w-0 overflow-y-auto overscroll-contain px-4 py-4 space-y-1">
               {isNewConv && messages.length === 0 && (
                 <div className="text-center py-16">
                   <div className="w-14 h-14 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center mx-auto mb-3">
@@ -502,8 +558,8 @@ function MessagesContent() {
                           <div className="flex-1 h-px bg-border" />
                         </div>
                       )}
-                      <div className={`flex mb-1 ${isOwn ? "justify-end" : "justify-start"}`}>
-                        <div className={`max-w-[78%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                      <div className={`flex min-w-0 mb-1 ${isOwn ? "justify-end" : "justify-start"}`}>
+                        <div className={`min-w-0 max-w-[78%] break-words [overflow-wrap:anywhere] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                           isOwn
                             ? "bg-gold text-bg-primary rounded-br-sm"
                             : "bg-bg-elevated border border-border text-text-primary rounded-bl-sm"
@@ -534,14 +590,14 @@ function MessagesContent() {
 
             {/* Eingabe */}
             <div className="px-4 py-3 border-t border-border shrink-0 safe-area-pb">
-              <div className="flex gap-2">
+              <div className="flex min-w-0 gap-2">
                 <input
                   type="text"
                   value={text}
                   onChange={e => setText(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && !e.shiftKey && sendMessage()}
                   placeholder="Nachricht schreiben…"
-                  className="flex-1 bg-bg-elevated border border-border rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-gold transition-colors"
+                  className="min-w-0 flex-1 bg-bg-elevated border border-border rounded-2xl px-4 py-3 text-base sm:text-sm focus:outline-none focus:border-gold transition-colors"
                 />
                 <button
                   onClick={sendMessage}

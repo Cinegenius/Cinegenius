@@ -136,38 +136,16 @@ export default function NeuesProjektPage() {
           description: form.description.trim() || null,
           myRole: form.myRole.trim() || null,
           productionCompany: form.productionCompany.trim() || null,
+          crew_entries: teamMembers.map((member) => ({
+            name: member.name,
+            role: member.role,
+          })),
         }),
       });
       const json = await res.json();
       if (!res.ok) { setCreateError(json.error ?? "Fehler"); return; }
-
-      const projectId = json.project.id;
-
-      // Add ghost profile credits for each team member
-      if (teamMembers.length > 0) {
-        await Promise.allSettled(
-          teamMembers.map(async (member) => {
-            const profileRes = await fetch("/api/unclaimed-profiles", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ name: member.name, primary_role: member.role }),
-            });
-            if (!profileRes.ok) return;
-            const profileJson = await profileRes.json();
-            await fetch("/api/project-credits", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                project_id: projectId,
-                role: member.role,
-                unclaimed_profile_id: profileJson.profile.id,
-              }),
-            });
-          })
-        );
-      }
-
-      router.push(`/projects/${projectId}`);
+      if (!json.draft?.id) throw new Error("Der Entwurf konnte nicht bestätigt werden.");
+      router.push(`/dashboard/projects/drafts/${json.draft.id}`);
     } catch {
       setCreateError("Netzwerkfehler — bitte erneut versuchen");
     } finally {

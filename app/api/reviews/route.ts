@@ -4,6 +4,7 @@ import { anyBlockExists } from "@/lib/trust";
 import { rateLimit } from "@/lib/rateLimit";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { fetchRatingSummaries } from "@/lib/ratings";
 
 const VALID_TARGET_TYPES = new Set(["listing", "user"]);
 
@@ -21,15 +22,23 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Ungültiger target_type" }, { status: 400 });
   }
 
-  const { data, error } = await db
-    .from("reviews")
-    .select("id, reviewer_name, rating, text, aspect_ratings, verified, verified_via, created_at")
-    .eq("target_id", target_id)
-    .eq("target_type", target_type)
-    .order("created_at", { ascending: false });
+  const [{ data, error }, summaryMap] = await Promise.all([
+    db
+      .from("reviews")
+      .select("id, reviewer_id, reviewer_name, rating, text, aspect_ratings, verified, verified_via, created_at")
+      .eq("target_id", target_id)
+      .eq("target_type", target_type)
+      .order("created_at", { ascending: false }),
+    fetchRatingSummaries([target_id], target_type),
+  ]);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ data: data ?? [] });
+  const summary = summaryMap[target_id] ?? { rating: 0, reviews: 0, ratingOnly: 0 };
+  const publicReviews = (data ?? []).map(({ reviewer_id: _reviewerId, ...review }) => review);
+  return NextResponse.json({
+    data: publicReviews,
+    summary: { avg: summary.rating, count: summary.reviews, ratingOnlyCount: summary.ratingOnly },
+  });
 }
 
 // POST /api/reviews

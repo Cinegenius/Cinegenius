@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build --webpack",
     "start": "next start",
+    "test": "node --experimental-strip-types --test lib/*.test.mjs",
     "lint": "eslint",
     "check:design": "node scripts/check-design.mjs",
     "deploy": "node scripts/deploy-production.mjs",

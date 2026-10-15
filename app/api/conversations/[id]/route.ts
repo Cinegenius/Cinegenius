@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
-import { anyBlockExists } from "@/lib/trust";
+import { anyBlockExists, areAcceptedFriends } from "@/lib/trust";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { sendNewMessageEmail } from "@/lib/email";
@@ -26,6 +26,30 @@ export async function GET(
 
   if (!conv) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 });
 
+  // Ungelesene Nachrichten des anderen als gelesen markieren
+  const { error: readError } = await db
+    .from("messages")
+    .update({ read_at: new Date().toISOString() })
+    .eq("conversation_id", id)
+    .neq("sender_id", userId)
+    .is("read_at", null);
+  if (readError) {
+    return NextResponse.json({ error: "Nachrichten konnten nicht als gelesen markiert werden." }, { status: 500 });
+  }
+
+  // Die zugehörigen Glocken-Benachrichtigungen ebenfalls als gelesen markieren.
+  const { error: notificationReadError } = await db
+    .from("notifications")
+    .update({ read: true })
+    .eq("user_id", userId)
+    .eq("type", "new_message")
+    .eq("href", `/messages?conv=${id}`)
+    .eq("read", false);
+  if (notificationReadError) {
+    return NextResponse.json({ error: "Benachrichtigung konnte nicht als gelesen markiert werden." }, { status: 500 });
+  }
+
+  // Erst nach dem Update lesen, damit die Antwort den aktuellen Lesestatus enthält.
   const { data: messages } = await db
     .from("messages")
     .select("id, sender_id, content, read_at, created_at")
@@ -33,15 +57,9 @@ export async function GET(
     .order("created_at", { ascending: true })
     .limit(200);
 
-  // Ungelesene Nachrichten des anderen als gelesen markieren
-  await db
-    .from("messages")
-    .update({ read_at: new Date().toISOString() })
-    .eq("conversation_id", id)
-    .neq("sender_id", userId)
-    .is("read_at", null);
-
-  return NextResponse.json({ conversation: conv, messages: messages ?? [] });
+  return NextResponse.json({ conversation: conv, messages: messages ?? [] }, {
+    headers: { "Cache-Control": "no-store, max-age=0" },
+  });
 }
 
 // POST /api/conversations/[id] — Nachricht senden
@@ -77,6 +95,16 @@ export async function POST(
 
   // Block check — deny if either party has blocked the other
   const receiverId = conv.sender_id === userId ? conv.receiver_id : conv.sender_id;
+  const { data: receiverSettings, error: settingsError } = await db
+    .from("user_settings")
+    .select("message_permission")
+    .eq("user_id", receiverId)
+    .maybeSingle();
+  if (settingsError) return NextResponse.json({ error: "Nachrichteneinstellungen konnten nicht geprüft werden." }, { status: 500 });
+  if (receiverSettings?.message_permission === "friends_only" && !(await areAcceptedFriends(userId, receiverId))) {
+    return NextResponse.json({ error: "Diese Person nimmt Nachrichten nur von Freunden an." }, { status: 403 });
+  }
+
   if (await anyBlockExists(userId, receiverId)) {
     return NextResponse.json({ error: "Nachrichten an diesen Nutzer sind nicht möglich" }, { status: 403 });
   }

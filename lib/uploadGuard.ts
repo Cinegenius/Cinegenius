@@ -132,7 +132,7 @@ export async function validateUpload(
     return { error: "Datei ist leer", status: 400 };
   }
   if (file.size > MAX_UPLOAD_BYTES) {
-    return { error: "Datei zu groß (max. 5 MB)", status: 413 };
+    return { error: "Datei zu groß (max. 20 MB)", status: 413 };
   }
 
   // Read file once

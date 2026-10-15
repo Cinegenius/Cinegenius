@@ -18,6 +18,8 @@ import ReviewsSection from "@/components/ReviewsSection";
 import InquiryForm from "@/components/InquiryForm";
 import FavoriteButton from "@/components/FavoriteButton";
 import ReportButton from "@/components/ReportButton";
+import { ProductionCreditsDisplay } from "@/components/ProductionCredits";
+import { parseProductionCredits } from "@/lib/production-credits";
 
 const Lightbox = dynamic(() => import("@/components/Lightbox"), { ssr: false });
 
@@ -30,6 +32,7 @@ interface LocationMeta {
   power_details?: string | null;
   parking_spots?: number | null;
   amenities?: string[];
+  production_credits?: unknown;
 }
 
 type Location = {
@@ -64,7 +67,10 @@ export default function LocationDetail({ location }: { location: Location }) {
   const { user } = useUser();
   const isOwner = !!user && user.id === location.ownerId;
 
-  const [liveRating, setLiveRating] = useState<{ avg: number; count: number } | null>(null);
+  const [liveRating, setLiveRating] = useState<{ avg: number; count: number } | null>(() => ({
+    avg: location.rating,
+    count: location.reviews,
+  }));
   const [myRating, setMyRating] = useState<number>(0);
   const [eligible, setEligible] = useState(false);
 
@@ -80,24 +86,28 @@ export default function LocationDetail({ location }: { location: Location }) {
   }, [location.id]);
 
   const canRate = !!user && !isOwner && eligible;
+  const ratingSummary = liveRating ?? { avg: location.rating, count: location.reviews };
 
   const handleRate = async (star: number) => {
     if (!canRate) return;
     const prev = myRating;
+    const prevSummary = ratingSummary;
     setMyRating(star);
     setLiveRating(r => {
-      const cur = r ?? { avg: 0, count: 0 };
+      const cur = r ?? { avg: location.rating, count: location.reviews };
       const newCount = prev ? cur.count : cur.count + 1;
       const newSum = prev ? cur.avg * cur.count - prev + star : cur.avg * cur.count + star;
       return { avg: Math.round((newSum / newCount) * 10) / 10, count: newCount };
     });
     try {
-      await fetch("/api/listing-ratings", {
+      const response = await fetch("/api/listing-ratings", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ listing_id: location.id, owner_id: location.ownerId, rating: star }),
       });
+      if (!response.ok) throw new Error("Bewertung konnte nicht gespeichert werden");
     } catch {
       setMyRating(prev);
+      setLiveRating(prevSummary);
     }
   };
   const [activeImg, setActiveImg] = useState(0);
@@ -109,6 +119,7 @@ export default function LocationDetail({ location }: { location: Location }) {
 
   const meta = location.metadata ?? {};
   const amenities: string[] = meta.amenities ?? [];
+  const productionCredits = parseProductionCredits(meta.production_credits);
 
   // Images: main + extra
   const allImages = [location.image, ...(location.extra_images ?? [])].filter(Boolean) as string[];
@@ -223,14 +234,14 @@ export default function LocationDetail({ location }: { location: Location }) {
                     disabled={!canRate}
                     className={`transition-transform ${canRate ? "hover:scale-110 active:scale-125" : "cursor-default"}`}
                     title={!user ? "Einloggen zum Bewerten" : isOwner ? "Eigene Location" : !eligible ? "Erst anfragen, dann bewerten" : `${s} Stern${s !== 1 ? "e" : ""}`}>
-                    <Star size={18} className={`transition-colors ${s <= (myRating || Math.round(liveRating?.avg ?? 0)) ? "text-gold fill-gold" : "text-border fill-border"}`} />
+                    <Star size={18} className={`transition-colors ${s <= (myRating || Math.round(ratingSummary.avg)) ? "text-gold fill-gold" : "text-border fill-border"}`} />
                   </button>
                 ))}
               </div>
-              {liveRating && liveRating.count > 0 ? (
+              {ratingSummary.count > 0 ? (
                 <>
-                  <span className="font-semibold text-text-primary">{liveRating.avg.toFixed(1)}</span>
-                  <span className="text-text-muted text-sm">({liveRating.count} Bewertung{liveRating.count !== 1 ? "en" : ""})</span>
+                  <span className="font-semibold text-text-primary">{ratingSummary.avg.toFixed(1)}</span>
+                  <span className="text-text-muted text-sm">({ratingSummary.count} Bewertung{ratingSummary.count !== 1 ? "en" : ""})</span>
                 </>
               ) : (
                 <span className="text-text-muted text-sm">{canRate ? "Jetzt als Erste/r bewerten" : user && !isOwner ? "Erst anfragen, dann bewerten" : "Noch keine Bewertungen"}</span>
@@ -272,6 +283,8 @@ export default function LocationDetail({ location }: { location: Location }) {
                 <p className="text-text-secondary leading-relaxed whitespace-pre-line">{location.description}</p>
               </div>
             )}
+
+            <ProductionCreditsDisplay credits={productionCredits} heading="Hier wurde bereits gedreht" />
 
             {/* Strom */}
             {meta.power_available && (
@@ -329,9 +342,13 @@ export default function LocationDetail({ location }: { location: Location }) {
                   {location.price > 0 && <span className="text-text-muted mb-1">/{location.priceUnit}</span>}
                 </div>
                 <div className="flex items-center gap-1.5 mb-5">
-                  <Star size={13} className="text-gold fill-gold" />
-                  <span className="text-sm font-semibold text-text-primary">{location.rating}</span>
-                  <span className="text-text-muted text-sm">· {location.reviews} Bewertungen</span>
+                  {ratingSummary.count > 0 ? (
+                    <>
+                      <Star size={13} className="text-gold fill-gold" />
+                      <span className="text-sm font-semibold text-text-primary">{ratingSummary.avg.toFixed(1)}</span>
+                      <span className="text-text-muted text-sm">· {ratingSummary.count} Bewertung{ratingSummary.count !== 1 ? "en" : ""}</span>
+                    </>
+                  ) : <span className="text-text-muted text-sm">Noch keine Bewertungen</span>}
                 </div>
 
                 <AvailabilityCalendar
@@ -378,8 +395,12 @@ export default function LocationDetail({ location }: { location: Location }) {
             {location.price > 0 && <span className="text-text-muted font-normal text-sm">/{location.priceUnit}</span>}
           </div>
           <div className="flex items-center gap-1">
-            <Star size={11} className="text-gold fill-gold" />
-            <span className="text-xs text-text-secondary">{location.rating} · {location.reviews} Bewertungen</span>
+            {ratingSummary.count > 0 ? (
+              <>
+                <Star size={11} className="text-gold fill-gold" />
+                <span className="text-xs text-text-secondary">{ratingSummary.avg.toFixed(1)} · {ratingSummary.count} Bewertung{ratingSummary.count !== 1 ? "en" : ""}</span>
+              </>
+            ) : <span className="text-xs text-text-secondary">Noch keine Bewertungen</span>}
           </div>
         </div>
         <button

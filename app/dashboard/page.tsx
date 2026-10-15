@@ -13,6 +13,7 @@ import {
   Building2, AlertCircle, FileText, ArrowLeft, Search,
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
+import { calculateProfileCompletion } from "@/lib/profile-completion";
 
 type RealMessage = {
   id: string;
@@ -94,8 +95,9 @@ export default function DashboardPage() {
   const [profileRole, setProfileRole] = useState("");
   const [profileDisplayName, setProfileDisplayName] = useState("");
   const [profileAvatarUrl, setProfileAvatarUrl] = useState("");
-  const [profileCompleteness, setProfileCompleteness] = useState(100);
+  const [profileCompleteness, setProfileCompleteness] = useState(0);
   const [profileMissingFields, setProfileMissingFields] = useState<string[]>([]);
+  const [profileCompletionChecks, setProfileCompletionChecks] = useState<{ label: string; ok: boolean }[]>([]);
 
   // Analytics
   const [viewStats, setViewStats] = useState<{ views7: number; views14: number; trend: number; daily: number[] } | null>(null);
@@ -113,23 +115,32 @@ export default function DashboardPage() {
         if (profile?.role) setProfileRole(profile.role);
         else if (profile?.positions?.[0]) setProfileRole(profile.positions[0]);
 
-        const checks = [
-          { label: "Anzeigename",           ok: !!profile?.display_name },
-          { label: "Profilfoto",            ok: !!profile?.avatar_url },
-          { label: "Über mich / Bio",       ok: !!profile?.bio },
-          { label: "Standort",              ok: !!profile?.location },
-          { label: "Position / Rolle",      ok: (profile?.positions?.length ?? 0) > 0 },
-          { label: "Fähigkeiten",           ok: (profile?.skills?.length ?? 0) > 0 },
-          { label: "Sprachen",              ok: (profile?.languages?.length ?? 0) > 0 },
-          { label: "Showreel / Reel-Link",  ok: !!(profile?.reel_url || profile?.showreel_url) },
-          { label: "Tagessatz",             ok: !!(profile?.day_rate) },
-          { label: "Filmografie",           ok: (profile?.filmography?.length ?? 0) > 0 },
-          { label: "Verfügbarkeit",         ok: profile?.available !== undefined && profile?.available !== null },
-          { label: "Social Media",          ok: !!(profile?.instagram_url || profile?.youtube_url || profile?.linkedin_url || profile?.tiktok_url) },
-        ];
-        const filled = checks.filter((c) => c.ok).length;
-        setProfileCompleteness(Math.round((filled / checks.length) * 100));
-        setProfileMissingFields(checks.filter((c) => !c.ok).map((c) => c.label));
+        const fieldLabels: Record<string, string> = {
+          name: "Anzeigename", avatar: "Profilfoto", city: "Standort", bio: "Über mich / Bio",
+          type: "Profiltyp", photos: "Portfolio-Fotos", video: "Showreel / Reel-Link", languages: "Sprachen",
+          height: "Körpergröße", hair: "Haarfarbe", age: "Spielalter", role: "Position / Rolle", credits: "Filmografie",
+        };
+        const profileImages = Array.isArray(profile?.profile_images)
+          ? profile.profile_images.map((image: string | { url?: string | null } | null) => typeof image === "string" ? image : image?.url ?? "")
+          : [];
+        const completion = calculateProfileCompletion({
+          name: profile?.display_name,
+          avatarUrl: profile?.avatar_url,
+          location: profile?.location,
+          bio: profile?.bio,
+          profileType: profile?.profile_type,
+          images: profileImages,
+          videoLinks: [...(Array.isArray(profile?.video_links) ? profile.video_links : []), profile?.reel_url, profile?.showreel_url],
+          languages: profile?.languages,
+          heightCm: profile?.physical?.height_cm,
+          hairColor: profile?.physical?.hair_color,
+          playingAgeMin: profile?.physical?.playing_age_min,
+          positions: profile?.positions,
+          filmography: profile?.filmography,
+        });
+        setProfileCompleteness(completion.score);
+        setProfileMissingFields(completion.missing.map((key) => fieldLabels[key] ?? key));
+        setProfileCompletionChecks(completion.checks.map(({ key, complete }) => ({ label: fieldLabels[key] ?? key, ok: complete })));
       })
       .catch(() => {});
 
@@ -171,11 +182,18 @@ export default function DashboardPage() {
   }, [activeTab]);
 
   const togglePublished = async (id: string, current: boolean) => {
-    await fetch(`/api/listings/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ published: !current }),
-    });
+    const response = current
+      ? await fetch(`/api/listings/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ published: false }),
+        })
+      : await fetch(`/api/listings/${id}/publish`, { method: "POST" });
+    if (!response.ok) {
+      const result = await response.json().catch(() => ({}));
+      window.alert(result.error ?? "Status konnte nicht geändert werden.");
+      return;
+    }
     setMyListings((prev) => prev.map((l) => l.id === id ? { ...l, published: !current } : l));
   };
 
@@ -407,6 +425,7 @@ export default function DashboardPage() {
     email_new_message: true,
   });
   const [privacyLoading, setPrivacyLoading] = useState(false);
+  const [privacyError, setPrivacyError] = useState("");
 
   // Verification request state
   const [verifStatus, setVerifStatus] = useState<"none" | "pending" | "approved">("none");
@@ -415,10 +434,20 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (activeTab !== "settings") return;
+    let cancelled = false;
+    setPrivacyLoading(true);
+    setPrivacyError("");
     fetch("/api/user-settings")
-      .then(r => r.json())
-      .then(({ settings }) => { if (settings) setPrivacySettings(settings); })
-      .catch(() => {});
+      .then(async r => {
+        const result = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(result.error ?? `HTTP ${r.status}`);
+        return result;
+      })
+      .then(({ settings }) => { if (!cancelled && settings) setPrivacySettings(settings); })
+      .catch((err) => {
+        if (!cancelled) setPrivacyError(`Einstellungen konnten nicht geladen werden: ${err instanceof Error ? err.message : "Bitte lade die Seite neu."}`);
+      })
+      .finally(() => { if (!cancelled) setPrivacyLoading(false); });
     // Load verification status
     setVerifLoading(true);
     fetch("/api/verification-requests")
@@ -431,17 +460,25 @@ export default function DashboardPage() {
       })
       .catch(() => {})
       .finally(() => setVerifLoading(false));
+    return () => { cancelled = true; };
   }, [activeTab]);
 
   const updatePrivacy = async (key: string, value: string | boolean) => {
+    const previousSettings = privacySettings;
+    setPrivacyError("");
     setPrivacySettings(prev => ({ ...prev, [key]: value }));
     setPrivacyLoading(true);
     try {
-      await fetch("/api/user-settings", {
+      const response = await fetch("/api/user-settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ [key]: value }),
       });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || result.error) throw new Error(result.error ?? `HTTP ${response.status}`);
+    } catch (err) {
+      setPrivacySettings(previousSettings);
+      setPrivacyError(`Einstellung wurde nicht gespeichert: ${err instanceof Error ? err.message : "Bitte versuche es erneut."}`);
     } finally {
       setPrivacyLoading(false);
     }
@@ -537,7 +574,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (activeTab !== "messages" && activeTab !== "overview" && activeTab !== "analytics" && activeTab !== "bookings") return;
     setConvsLoading(true);
-    fetch("/api/conversations")
+    fetch("/api/conversations", { cache: "no-store" })
       .then(r => r.json())
       .then(({ data }) => setConversations(data ?? []))
       .catch(() => {})
@@ -547,15 +584,27 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!selectedConversation) return;
     setMessagesLoading(true);
-    fetch(`/api/conversations/${selectedConversation}`)
-      .then(r => r.json())
+    fetch(`/api/conversations/${selectedConversation}`, { cache: "no-store" })
+      .then(r => {
+        if (!r.ok) throw new Error("conversation fetch failed");
+        return r.json();
+      })
       .then(({ messages }) => {
-        setActiveMessages(messages ?? []);
+        const loadedMessages = Array.isArray(messages) ? messages as RealMessage[] : [];
+        setActiveMessages(loadedMessages);
+        const readAt = new Date().toISOString();
+        setConversations(prev => prev.map(conv => conv.id !== selectedConversation ? conv : {
+          ...conv,
+          messages: conv.messages.map(message =>
+            message.sender_id === user?.id ? message : { ...message, read_at: message.read_at ?? readAt }
+          ),
+        }));
+        window.dispatchEvent(new CustomEvent("cinegenius:messages-read"));
         setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
       })
       .catch(() => {})
       .finally(() => setMessagesLoading(false));
-  }, [selectedConversation]);
+  }, [selectedConversation, user?.id]);
 
   const sendReply = async () => {
     if (!replyText.trim() || !selectedConversation || sending) return;
@@ -1307,17 +1356,7 @@ export default function DashboardPage() {
                   </a>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {[
-                    { label: "Anzeigename",           ok: !!profileDisplayName },
-                    { label: "Profilfoto",            ok: !!(profileAvatarUrl || user?.imageUrl) },
-                    { label: "Bio / Über mich",       ok: !!profileMissingFields && !profileMissingFields.includes("Über mich / Bio") },
-                    { label: "Standort",              ok: !profileMissingFields.includes("Standort") },
-                    { label: "Position / Rolle",      ok: !profileMissingFields.includes("Position / Rolle") },
-                    { label: "Showreel",              ok: !profileMissingFields.includes("Showreel / Reel-Link") },
-                    { label: "Tagessatz",             ok: !profileMissingFields.includes("Tagessatz") },
-                    { label: "Filmografie",           ok: !profileMissingFields.includes("Filmografie") },
-                    { label: "Social Media",          ok: !profileMissingFields.includes("Social Media") },
-                  ].map(({ label, ok }) => (
+                  {profileCompletionChecks.map(({ label, ok }) => (
                     <div key={label} className="flex items-center gap-2 text-xs">
                       {ok
                         ? <CheckCircle size={12} className="text-success shrink-0" />
@@ -2403,6 +2442,11 @@ export default function DashboardPage() {
           {/* ── EINSTELLUNGEN ── */}
           {activeTab === "settings" && (
             <div className="max-w-xl space-y-5">
+              {privacyError && (
+                <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                  {privacyError}
+                </p>
+              )}
 
               {/* Öffentliches Profil */}
               {(() => {

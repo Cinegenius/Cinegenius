@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
+import { fetchRatingSummaries } from "@/lib/ratings";
 
 // GET /api/listing-ratings?ids=id1,id2,...
 export async function GET(req: NextRequest) {
@@ -13,27 +14,28 @@ export async function GET(req: NextRequest) {
 
   const { userId } = await auth();
 
-  const { data, error } = await db
-    .from("listing_ratings")
-    .select("listing_id, liker_id, rating")
-    .in("listing_id", idList);
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
-  const agg: Record<string, { sum: number; count: number }> = {};
   const myRatings: Record<string, number> = {};
-
-  for (const row of data ?? []) {
-    if (!agg[row.listing_id]) agg[row.listing_id] = { sum: 0, count: 0 };
-    agg[row.listing_id].sum += row.rating ?? 1;
-    agg[row.listing_id].count += 1;
+  const [summaryMap, quickResult, reviewResult] = await Promise.all([
+    fetchRatingSummaries(idList, "listing"),
+    db.from("listing_ratings").select("listing_id, liker_id, rating").in("listing_id", idList),
+    db.from("reviews").select("target_id, reviewer_id, rating").eq("target_type", "listing").in("target_id", idList),
+  ]);
+  if (quickResult.error) return NextResponse.json({ error: quickResult.error.message }, { status: 500 });
+  if (reviewResult.error) return NextResponse.json({ error: reviewResult.error.message }, { status: 500 });
+  for (const row of quickResult.data ?? []) {
     if (userId && row.liker_id === userId) myRatings[row.listing_id] = row.rating ?? 1;
   }
-
-  const ratings: Record<string, { avg: number; count: number }> = {};
-  for (const [id, { sum, count }] of Object.entries(agg)) {
-    ratings[id] = { avg: Math.round((sum / count) * 10) / 10, count };
+  for (const row of reviewResult.data ?? []) {
+    if (userId && row.reviewer_id === userId && myRatings[row.target_id] === undefined) {
+      myRatings[row.target_id] = row.rating;
+    }
   }
+
+  const ratings = Object.fromEntries(Object.entries(summaryMap).map(([id, summary]) => [id, {
+    avg: summary.rating,
+    count: summary.reviews,
+    ratingOnlyCount: summary.ratingOnly,
+  }]));
 
   // Return which listings this user has contacted (eligible to rate)
   let eligible: string[] = [];

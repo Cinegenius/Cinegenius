@@ -2,7 +2,9 @@ import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
 
 export async function POST(req: Request) {
   const secret = process.env.CLERK_WEBHOOK_SECRET;
@@ -45,6 +47,10 @@ export async function POST(req: Request) {
     };
 
     if (e.to_email_address && e.subject) {
+      if (!resend) {
+        return new Response("Missing RESEND_API_KEY", { status: 500 });
+      }
+
       let html = e.body ?? "";
 
       if (e.slug === "verification_code" || e.slug === "reset_password_code") {
@@ -90,7 +96,7 @@ export async function POST(req: Request) {
 
     const firstName = user.first_name ?? "";
 
-    if (primaryEmail) {
+    if (primaryEmail && resend) {
       await resend.emails.send({
         from: "CineGenius <willkommen@cinegenius.co>",
         to: primaryEmail,

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Bell, Check, BookOpen, MessageSquare, Star,
   Wallet, ShieldCheck, FileCheck, Briefcase, UserPlus, Users,
@@ -36,6 +37,7 @@ const typeIcons: Record<NotificationType, React.ComponentType<{ size?: number; c
 };
 
 export default function NotificationCenter() {
+  const router = useRouter();
   const tn = useTranslations("notifications");
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
@@ -51,8 +53,8 @@ export default function NotificationCenter() {
     if (!isSignedIn) return;
     try {
       const [msgRes, notifRes] = await Promise.all([
-        fetch("/api/unread-count"),
-        fetch("/api/notifications"),
+        fetch("/api/unread-count", { cache: "no-store" }),
+        fetch("/api/notifications", { cache: "no-store" }),
       ]);
       if (msgRes.ok) {
         const { count } = await msgRes.json();
@@ -72,6 +74,11 @@ export default function NotificationCenter() {
     fetchAll();
     const interval = setInterval(fetchAll, 30_000);
     return () => clearInterval(interval);
+  }, [fetchAll]);
+
+  useEffect(() => {
+    window.addEventListener("cinegenius:messages-read", fetchAll);
+    return () => window.removeEventListener("cinegenius:messages-read", fetchAll);
   }, [fetchAll]);
 
   // Fetch when opening the panel
@@ -98,14 +105,19 @@ export default function NotificationCenter() {
   };
 
   const markRead = async (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
-    await fetch("/api/notifications", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
+    try {
+      const response = await fetch("/api/notifications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      if (!response.ok) return;
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+      );
+    } catch {
+      // Keep the notification unread if the server couldn't persist the read state.
+    }
   };
 
   return (
@@ -197,7 +209,15 @@ export default function NotificationCenter() {
                 <Link
                   key={n.id}
                   href={n.href}
-                  onClick={() => { markRead(n.id); setOpen(false); }}
+                  onClick={async (event) => {
+                    event.preventDefault();
+                    await markRead(n.id);
+                    setOpen(false);
+                    if (n.type === "new_message") {
+                      window.dispatchEvent(new CustomEvent("cinegenius:messages-read"));
+                    }
+                    router.push(n.href);
+                  }}
                   className={`flex items-start gap-3 px-4 py-3.5 hover:bg-bg-hover transition-colors group ${
                     !n.read ? "bg-gold/3" : ""
                   }`}

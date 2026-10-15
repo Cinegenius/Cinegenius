@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
-import { anyBlockExists } from "@/lib/trust";
+import { anyBlockExists, areAcceptedFriends } from "@/lib/trust";
 import { rateLimit } from "@/lib/rateLimit";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -29,7 +29,7 @@ export async function GET() {
     (data ?? []).map((c) => c.sender_id === userId ? c.receiver_id : c.sender_id)
   )];
 
-  let profileMap: Record<string, { display_name?: string; avatar_url?: string }> = {};
+  const profileMap: Record<string, { display_name?: string; avatar_url?: string }> = {};
   if (otherIds.length > 0) {
     const { data: profiles } = await db
       .from("profiles")
@@ -71,6 +71,16 @@ export async function POST(req: NextRequest) {
 
   if (userId === receiver_id) {
     return NextResponse.json({ error: "Du kannst dir selbst keine Nachricht senden" }, { status: 400 });
+  }
+
+  const { data: receiverSettings, error: settingsError } = await db
+    .from("user_settings")
+    .select("message_permission")
+    .eq("user_id", receiver_id)
+    .maybeSingle();
+  if (settingsError) return NextResponse.json({ error: "Nachrichteneinstellungen konnten nicht geprüft werden." }, { status: 500 });
+  if (receiverSettings?.message_permission === "friends_only" && !(await areAcceptedFriends(userId, receiver_id))) {
+    return NextResponse.json({ error: "Diese Person nimmt Nachrichten nur von Freunden an." }, { status: 403 });
   }
 
   // Block check — deny if either party has blocked the other

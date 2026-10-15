@@ -32,7 +32,7 @@ async function geocodeCities(cities: string[]): Promise<Record<string, { lat: nu
 
 export default async function LocationsSuchePage() {
   const t = await getTranslations("locations");
-  const { data } = await db
+  const { data, error } = await db
     .from("listings")
     .select("id, user_id, title, city, price, image_url, category, description, metadata, created_at")
     .eq("published", true)
@@ -40,9 +40,11 @@ export default async function LocationsSuchePage() {
     .order("created_at", { ascending: false })
     .limit(300);
 
+  if (error) throw new Error("Locationsuche: Inserate konnten nicht geladen werden.");
+
   const rows = data ?? [];
   const [ratingsMap, coords] = await Promise.all([
-    fetchRatings(rows.map((l) => l.id), "location"),
+    fetchRatings(rows.map((l) => l.id), "listing"),
     geocodeCities(rows.map((l) => l.city ?? "")),
   ]);
 
@@ -66,13 +68,15 @@ export default async function LocationsSuchePage() {
     };
   });
 
-  const { data: vendorData } = await db
+  const { data: vendorData, error: vendorError } = await db
     .from("profiles")
     .select("user_id, display_name, location, avatar_url, verified, profile_types")
     .contains("profile_types", ["location"])
     .not("display_name", "is", null)
     .neq("display_name", "")
     .limit(50);
+
+  if (vendorError) throw new Error("Locationsuche: Anbieterprofile konnten nicht geladen werden.");
 
   const locationVendors = (vendorData ?? []).map((p: {
     user_id: string; display_name: string; location: string | null;

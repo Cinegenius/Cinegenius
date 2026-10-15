@@ -11,12 +11,14 @@ import {
   User, Users, GraduationCap, Briefcase, Sparkles, Scissors,
   ArrowRight, CheckCircle, Loader2, AlertTriangle, ChevronLeft, ChevronDown,
   Shield, Radio, Coffee, Truck, Monitor, Box, ClipboardList,
-  Film, Palette, Drama, Upload, X, ImageIcon,
+  Film, Palette, Drama, Upload, X, ImageIcon, Search,
   Smartphone, Video, Aperture, PawPrint,
 } from "lucide-react";
 import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
 import { PROP_CATEGORY_FIELDS } from "@/lib/propCategoryFields";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
+import { ProductionCreditsEditor } from "@/components/ProductionCredits";
+import { serializeProductionCredits, type ProductionCreditDraft } from "@/lib/production-credits";
 
 // ─── FormSelect ──────────────────────────────────────────────────────────────
 
@@ -96,6 +98,7 @@ function RoleDropdown({
   placeholder?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -107,12 +110,18 @@ function RoleDropdown({
   }, []);
 
   const selected = options.find((o) => o.label === value);
+  const normalizedQuery = query.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("de");
+  const filteredOptions = options.filter((option) =>
+    !normalizedQuery || `${option.label} ${option.labelEn ?? ""}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("de").includes(normalizedQuery),
+  );
 
   return (
     <div ref={ref} className="relative">
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        onClick={() => { setOpen((o) => !o); setQuery(""); }}
         className={`w-full px-4 py-3 bg-bg-elevated border rounded-xl text-sm flex items-center justify-between transition-colors ${
           open ? "border-gold" : "border-border hover:border-border-hover"
         } ${selected ? "text-text-primary" : "text-text-muted"}`}
@@ -124,25 +133,43 @@ function RoleDropdown({
         />
       </button>
       {open && (
-        <div className="absolute z-50 top-full mt-1.5 left-0 right-0 bg-bg-secondary border border-border rounded-xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto">
-          {options.map((opt) => (
-            <button
-              key={opt.id}
-              type="button"
-              onClick={() => { onChange(opt.label); setOpen(false); }}
-              className={`w-full flex items-center justify-between px-4 py-2.5 text-sm text-left transition-colors hover:bg-bg-elevated ${
-                opt.label === value ? "text-gold bg-gold/5" : "text-text-secondary hover:text-text-primary"
-              }`}
-            >
-              <span>{opt.label}</span>
-              <span className="flex items-center gap-2 shrink-0 ml-2">
-                {opt.labelEn && (
-                  <span className="text-[11px] text-text-muted hidden sm:block">{opt.labelEn}</span>
-                )}
-                {opt.label === value && <CheckCircle size={13} className="text-gold" />}
-              </span>
-            </button>
-          ))}
+        <div className="absolute z-50 top-full mt-1.5 left-0 right-0 bg-bg-secondary border border-border rounded-xl shadow-2xl overflow-hidden">
+          <label className="flex items-center gap-2.5 px-3.5 py-3 border-b border-border bg-bg-elevated">
+            <Search size={15} className="shrink-0 text-gold" />
+            <input
+              autoFocus
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Gewerk oder Rolle suchen …"
+              aria-label="Gewerk oder Rolle suchen"
+              className="w-full bg-transparent text-sm text-text-primary placeholder:text-text-muted focus:outline-none"
+            />
+          </label>
+          <div role="listbox" className="max-h-60 overflow-y-auto">
+            {filteredOptions.length === 0 ? (
+              <p className="px-4 py-5 text-center text-sm text-text-muted">Keine passende Rolle gefunden.</p>
+            ) : filteredOptions.map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                role="option"
+                aria-selected={opt.label === value}
+                onClick={() => { onChange(opt.label); setOpen(false); setQuery(""); }}
+                className={`w-full flex items-center justify-between px-4 py-2.5 text-sm text-left transition-colors hover:bg-bg-elevated ${
+                  opt.label === value ? "text-gold bg-gold/5" : "text-text-secondary hover:text-text-primary"
+                }`}
+              >
+                <span>{opt.label}</span>
+                <span className="flex items-center gap-2 shrink-0 ml-2">
+                  {opt.labelEn && (
+                    <span className="text-[11px] text-text-muted hidden sm:block">{opt.labelEn}</span>
+                  )}
+                  {opt.label === value && <CheckCircle size={13} className="text-gold" />}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -327,6 +354,8 @@ export default function InseratPage() {
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [createdId, setCreatedId] = useState<string | null>(null);
+  const [createdIsDraft, setCreatedIsDraft] = useState(false);
+  const [publishingDraft, setPublishingDraft] = useState(false);
   const [selected, setSelected] = useState<CategoryItem | null>(null);
   const [activeGroup, setActiveGroup] = useState<string | null>(null); // null = main view
   const [dropdownId, setDropdownId] = useState("");
@@ -339,6 +368,7 @@ export default function InseratPage() {
   const [uploading, setUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
   const [focalPoint, setFocalPoint] = useState<FocalPoint | null>(null);
   const [showFocalPicker, setShowFocalPicker] = useState(false);
   const [error, setError] = useState("");
@@ -352,6 +382,7 @@ export default function InseratPage() {
   const [locFloorPlanPreview, setLocFloorPlanPreview] = useState<string | null>(null);
   const [locExtraUploading, setLocExtraUploading] = useState(false);
   const [locFloorUploading, setLocFloorUploading] = useState(false);
+  const [productionCredits, setProductionCredits] = useState<ProductionCreditDraft[]>([]);
   // Calendar state for blocked dates
   const [calYear, setCalYear] = useState(() => new Date().getFullYear());
   const [calMonth, setCalMonth] = useState(() => new Date().getMonth());
@@ -420,6 +451,7 @@ export default function InseratPage() {
   function handleSelect(item: CategoryItem) {
     setSelected(item);
     setCatMeta({});
+    setProductionCredits([]);
     setStep(2);
   }
 
@@ -470,6 +502,7 @@ export default function InseratPage() {
           amenities: locAmenities,
           rooms: locRooms,
           focal_point: focalPoint ?? null,
+          production_credits: serializeProductionCredits(productionCredits),
         },
         blocked_dates: locBlockedDates,
         floor_plan_url: locFloorPlanUrl,
@@ -560,6 +593,7 @@ export default function InseratPage() {
         safety_note: form.safety_note || null,
         ...catMetaFiltered,
         focal_point: focalPoint ?? null,
+        production_credits: serializeProductionCredits(productionCredits),
       },
     };
   }
@@ -569,6 +603,13 @@ export default function InseratPage() {
     if (!file) return;
 
     const _prev = safeObjectURL(file); if (_prev) setImagePreview(_prev);
+    if (selected?.type === "job") {
+      setPendingImageFile(file);
+      setImageUrl(null);
+      setError("");
+      e.target.value = "";
+      return;
+    }
     setUploading(true);
     setError("");
 
@@ -586,6 +627,7 @@ export default function InseratPage() {
   function removeImage() {
     setImageUrl(null);
     setImagePreview(null);
+    setPendingImageFile(null);
   }
 
   async function handleSubmit() {
@@ -599,7 +641,7 @@ export default function InseratPage() {
     const res = await fetch("/api/listings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...payload, image_url: imageUrl, company_id: selectedCompanyId || null }),
+      body: JSON.stringify({ ...payload, image_url: selected?.type === "job" ? null : imageUrl, company_id: selectedCompanyId || null }),
     });
 
     const json = await res.json();
@@ -607,7 +649,33 @@ export default function InseratPage() {
 
     if (!res.ok) { setError(json.error ?? "Fehler beim Speichern"); return; }
     setCreatedId(json.data?.id ?? null);
+    setCreatedIsDraft(selected?.type === "job");
     setStep(3);
+  }
+
+  async function handlePublishDraft() {
+    if (!createdId || !createdIsDraft) return;
+    setPublishingDraft(true);
+    setError("");
+    try {
+      let response: Response;
+      if (pendingImageFile) {
+        const compressed = await compressImage(pendingImageFile, { maxWidth: 1920, quality: 0.85 });
+        const formData = new FormData();
+        formData.append("file", compressed);
+        response = await fetch(`/api/listings/${createdId}/publish`, { method: "POST", body: formData });
+      } else {
+        response = await fetch(`/api/listings/${createdId}/publish`, { method: "POST" });
+      }
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error ?? "Veröffentlichung fehlgeschlagen");
+      setCreatedIsDraft(false);
+      setPendingImageFile(null);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Veröffentlichung fehlgeschlagen");
+    } finally {
+      setPublishingDraft(false);
+    }
   }
 
   const successHref = (id?: string | null) => {
@@ -1271,7 +1339,7 @@ export default function InseratPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-text-primary">Dringend gesucht</p>
-                    <p className="text-xs text-text-muted">Wird mit "Urgent"-Badge hervorgehoben</p>
+                    <p className="text-xs text-text-muted">Wird mit „Urgent“-Badge hervorgehoben</p>
                   </div>
                 </label>
               </div>
@@ -1447,6 +1515,17 @@ export default function InseratPage() {
               />
             </div>
 
+            {(isLocation || selected.type === "prop") && (
+              <ProductionCreditsEditor
+                value={productionCredits}
+                onChange={setProductionCredits}
+                heading={isLocation ? "Drehhistorie dieser Location" : "In Produktionen eingesetzt"}
+                description={isLocation
+                  ? "Zeige, welche Filme, Serien, Werbungen oder Shootings bereits hier gedreht wurden."
+                  : "Zeige, in welchen Filmen, Werbungen oder Shootings dieser Artikel bereits eingesetzt wurde – mit Fotos vom Set."}
+              />
+            )}
+
             {/* ── PRICE + CITY ── */}
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -1557,9 +1636,9 @@ export default function InseratPage() {
               className="w-full py-4 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
             >
               {loading ? (
-                <><Loader2 size={18} className="animate-spin" /> Wird veröffentlicht…</>
+                <><Loader2 size={18} className="animate-spin" /> {selected?.type === "job" ? "Entwurf wird gespeichert…" : "Wird veröffentlicht…"}</>
               ) : (
-                <>Jetzt veröffentlichen <ArrowRight size={18} /></>
+                <>{selected?.type === "job" ? "Als Entwurf speichern" : "Jetzt veröffentlichen"} <ArrowRight size={18} /></>
               )}
             </button>
           </div>
@@ -1580,13 +1659,14 @@ export default function InseratPage() {
   return (<ProfileGuard>
     <div className="pt-16 min-h-screen bg-bg-primary flex items-center justify-center">
       <div className="max-w-md mx-auto px-4 text-center">
-        <div className="w-20 h-20 bg-success/10 border border-success/20 rounded-full flex items-center justify-center mx-auto mb-6">
-          <CheckCircle size={40} className="text-success" />
+        <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${createdIsDraft ? "bg-gold/10 border border-gold/20" : "bg-success/10 border border-success/20"}`}>
+          <CheckCircle size={40} className={createdIsDraft ? "text-gold" : "text-success"} />
         </div>
-        <h2 className="font-display text-3xl font-bold text-text-primary mb-3">Veröffentlicht!</h2>
+        <h2 className="font-display text-3xl font-bold text-text-primary mb-3">{createdIsDraft ? "Entwurf gespeichert" : "Veröffentlicht!"}</h2>
         <p className="text-text-muted mb-8">
-          Dein Inserat ist jetzt live und für Produktionen sichtbar.
+          {createdIsDraft ? "Dieser Job ist nur für dich sichtbar. Prüfe die Vorschau und veröffentliche ihn erst mit deiner ausdrücklichen Freigabe." : "Dein Inserat ist jetzt live und für Produktionen sichtbar."}
         </p>
+        {error && <p role="alert" className="mb-5 text-sm text-red-400">{error}</p>}
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button
             onClick={() => {
@@ -1596,6 +1676,8 @@ export default function InseratPage() {
               setDropdownId("");
               setImageUrl(null);
               setImagePreview(null);
+              setPendingImageFile(null);
+              setCreatedIsDraft(false);
               setForm({ title: "", description: "", price: "", city: "", make: "", model: "", year: "", fuel_type: "", license_class: "", condition: "", vehicle_subtype: "", sqm: "", ceiling_height: "", max_crew: "", indoor_outdoor: "innen", power_available: false, power_details: "", parking_spots: "", company: "", projectType: "", shoot_start: "", shoot_end: "", pay_type: "", role_label: "", urgent: false, content_nudity: false, content_violence: false, content_stunts: false, delivery: false, rental_type: "miete", dimensions: "", safety_note: "", skills: "", experience: "", animal_training: "", animal_handler: true, animal_count: "1 Tier", animal_skills: "" });
               setLocAmenities([]); setLocBlockedDates([]); setLocExtraImages([]); setLocFloorPlanUrl(null); setLocFloorPlanPreview(null);
             }}
@@ -1603,9 +1685,20 @@ export default function InseratPage() {
           >
             Weiteres Inserat
           </button>
-          <a href={successHref(createdId)} className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm">
-            Inserat ansehen
-          </a>
+          {createdIsDraft ? (
+            <>
+              <a href={`${successHref(createdId)}?preview=1`} target="_blank" rel="noreferrer" className="px-6 py-3 border border-border text-text-secondary rounded-xl hover:border-gold hover:text-gold transition-all text-sm font-medium">
+                Vorschau ansehen
+              </a>
+              <button type="button" onClick={handlePublishDraft} disabled={publishingDraft} className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm disabled:opacity-50">
+                {publishingDraft ? "Wird veröffentlicht…" : "Jetzt veröffentlichen"}
+              </button>
+            </>
+          ) : (
+            <a href={successHref(createdId)} className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm">
+              Inserat ansehen
+            </a>
+          )}
         </div>
       </div>
     </div>

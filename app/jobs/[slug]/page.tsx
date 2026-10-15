@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import type { Metadata } from "next";
 import JobDetail from "@/components/JobDetail";
+import { auth } from "@clerk/nextjs/server";
 
 function parseJobDescription(raw: string) {
   const lines = raw.split("\n\n");
@@ -20,20 +21,22 @@ function parseJobDescription(raw: string) {
   };
 }
 
-async function getJob(slug: string) {
-  try {
-    const { data } = await db
-      .from("listings")
-      .select("*")
-      .eq("id", slug)
-      .eq("type", "job")
-      .single();
+async function getJob(slug: string, previewOwnerId?: string) {
+  let query = db
+    .from("listings")
+    .select("*")
+    .eq("id", slug)
+    .eq("type", "job");
+  query = previewOwnerId
+    ? query.eq("user_id", previewOwnerId)
+    : query.eq("published", true);
+  const { data, error } = await query.maybeSingle();
+  if (error) throw new Error(`Job konnte nicht geladen werden: ${error.message}`);
+  if (!data) return null;
 
-    if (!data) return null;
+  const parsed = parseJobDescription(data.description ?? "");
 
-    const parsed = parseJobDescription(data.description ?? "");
-
-    return {
+  return {
       id: data.id,
       title: data.title ?? "Job",
       company: parsed.company ?? "Privatanbieter",
@@ -51,17 +54,19 @@ async function getJob(slug: string) {
       ownerId: data.user_id ?? "",
       ownerName: parsed.company ?? "Anbieter",
       isReal: true,
-    };
-  } catch {
-    return null;
-  }
+  };
 }
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ preview?: string }>;
 }): Promise<Metadata> {
+  if ((await searchParams).preview === "1") {
+    return { robots: { index: false, follow: false } };
+  }
   const { slug } = await params;
   const job = await getJob(slug);
   if (!job) return {};
@@ -77,11 +82,20 @@ export async function generateMetadata({
 
 export default async function JobDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ preview?: string }>;
 }) {
   const { slug } = await params;
-  const job = await getJob(slug);
+  const preview = (await searchParams).preview === "1";
+  let previewOwnerId: string | undefined;
+  if (preview) {
+    const session = await auth();
+    if (!session.userId) notFound();
+    previewOwnerId = session.userId;
+  }
+  const job = await getJob(slug, previewOwnerId);
   if (!job) notFound();
 
   const jsonLd = {
@@ -123,7 +137,7 @@ export default async function JobDetailPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <JobDetail job={job} />
+      <JobDetail job={job} preview={preview} />
     </>
   );
 }

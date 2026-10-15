@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import type { Metadata } from "next";
 import LocationDetail from "@/components/LocationDetail";
+import { fetchRatingSummaries } from "@/lib/ratings";
 
 async function geocodeCity(city: string): Promise<{ lat: number; lng: number }> {
   try {
@@ -19,32 +20,35 @@ async function geocodeCity(city: string): Promise<{ lat: number; lng: number }> 
 }
 
 async function getLocation(slug: string) {
-  try {
-    const { data } = await db
-      .from("listings")
-      .select("*")
-      .eq("id", slug)
-      .eq("type", "location")
-      .single();
+  const { data, error } = await db
+    .from("listings")
+    .select("*")
+    .eq("id", slug)
+    .eq("type", "location")
+    .eq("published", true)
+    .maybeSingle();
 
-    if (!data) return null;
+  if (error) throw new Error(`Location konnte nicht geladen werden: ${error.message}`);
+  if (!data) return null;
 
-    const [{ lat, lng }, ownerRes] = await Promise.all([
-      geocodeCity(data.city ?? ""),
-      data.user_id
-        ? db.from("profiles").select("display_name").eq("user_id", data.user_id).single()
-        : Promise.resolve({ data: null }),
-    ]);
+  const [{ lat, lng }, ownerRes, ratingMap] = await Promise.all([
+    geocodeCity(data.city ?? ""),
+    data.user_id
+      ? db.from("profiles").select("display_name").eq("user_id", data.user_id).maybeSingle()
+      : Promise.resolve({ data: null }),
+    fetchRatingSummaries([data.id], "listing"),
+  ]);
+  const summary = ratingMap[data.id] ?? { rating: 0, reviews: 0, ratingOnly: 0 };
 
-    return {
+  return {
       id: data.id,
       title: data.title ?? "Location",
       type: data.category ?? "Speziallocation",
       city: data.city ?? "",
       price: data.price ?? 0,
       priceUnit: "day" as const,
-      rating: 0,
-      reviews: 0,
+      rating: summary.rating,
+      reviews: summary.reviews,
       image: data.image_url ?? "",
       tags: data.created_at && (Date.now() - new Date(data.created_at as string).getTime() < 3 * 24 * 60 * 60 * 1000) ? ["Neu"] : [],
       instantBook: false,
@@ -63,9 +67,6 @@ async function getLocation(slug: string) {
       floor_plan_url: data.floor_plan_url ?? null,
       extra_images: data.extra_images ?? [],
     };
-  } catch {
-    return null;
-  }
 }
 
 export async function generateMetadata({

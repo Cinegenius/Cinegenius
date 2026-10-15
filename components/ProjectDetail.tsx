@@ -262,7 +262,6 @@ export default function ProjectDetail({
   const [showJoin, setShowJoin] = useState(false);
 
   // Header edit
-  const [uploadingPoster, setUploadingPoster] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({
     title:              project.title,
@@ -278,7 +277,8 @@ export default function ProjectDetail({
     release_cinema:     project.release_cinema ?? "",
   });
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [draftId, setDraftId] = useState<string | null>(null);
+  const [draftError, setDraftError] = useState("");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   // Timeline dates edit
@@ -330,17 +330,23 @@ export default function ProjectDetail({
     }
   };
 
-  const uploadPoster = async (file: File) => {
-    setUploadingPoster(true);
-    try {
-      const fd = new FormData(); fd.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (!res.ok) return;
-      await fetch(`/api/projects/${project.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ poster_url: data.url }) });
-      setProject((p) => ({ ...p, poster_url: data.url }));
-    } finally { setUploadingPoster(false); }
+  const saveDraftPatch = async (patch: Partial<Project>) => {
+    setDraftError("");
+    const res = await fetch(`/api/projects/${project.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setDraftError(data.error ?? "Entwurf konnte nicht gespeichert werden.");
+      return false;
+    }
+    setDraftId(data.draftId);
+    return true;
   };
+
+
 
   const handleJoin = async () => {
     if (!joinRole.trim()) return;
@@ -392,8 +398,7 @@ export default function ProjectDetail({
       trailer_url:        editForm.trailer_url.trim() || null,
       release_cinema:     editForm.release_cinema.trim() || null,
     };
-    const res = await fetch(`/api/projects/${project.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch) });
-    if (res.ok) { setProject((p) => ({ ...p, ...patch })); setEditing(false); }
+    if (await saveDraftPatch(patch)) { setProject((p) => ({ ...p, ...patch })); setEditing(false); }
     setSaving(false);
   };
 
@@ -407,34 +412,15 @@ export default function ProjectDetail({
       post_start:  timelineForm.post_start  || null,
       post_end:    timelineForm.post_end    || null,
     };
-    const res = await fetch(`/api/projects/${project.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch) });
-    if (res.ok) { setProject((p) => ({ ...p, ...patch })); setEditingTimeline(false); }
+    if (await saveDraftPatch(patch)) { setProject((p) => ({ ...p, ...patch })); setEditingTimeline(false); }
     setSavingTimeline(false);
   };
 
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
-    if (!files.length) return;
-    setUploading(true);
-    const uploaded: string[] = [];
-    for (const file of files) {
-      const fd = new FormData(); fd.append("file", file);
-      const r = await fetch("/api/upload", { method: "POST", body: fd });
-      const { url } = await r.json();
-      if (url) uploaded.push(url);
-    }
-    if (uploaded.length > 0) {
-      const newImages = [...project.images, ...uploaded];
-      await fetch(`/api/projects/${project.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ images: newImages }) });
-      setProject((p) => ({ ...p, images: newImages }));
-    }
-    setUploading(false);
-  };
+
 
   const removePhoto = async (url: string) => {
     const newImages = project.images.filter((i) => i !== url);
-    const res = await fetch(`/api/projects/${project.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ images: newImages }) });
-    if (res.ok) setProject((p) => ({ ...p, images: newImages }));
+    if (await saveDraftPatch({ images: newImages })) setProject((p) => ({ ...p, images: newImages }));
   };
 
   const handleAddFestival = async () => {
@@ -457,8 +443,7 @@ export default function ProjectDetail({
   };
 
   const patchDistribution = async (patch: Partial<Project>) => {
-    const res = await fetch(`/api/projects/${project.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch) });
-    if (res.ok) setProject((p) => ({ ...p, ...patch }));
+    if (await saveDraftPatch(patch)) setProject((p) => ({ ...p, ...patch }));
   };
 
   const handleAddStreaming = async () => {
@@ -507,6 +492,14 @@ export default function ProjectDetail({
           <ArrowLeft size={13} /> Alle Projekte
         </Link>
 
+        {draftId && (
+          <div className="mb-6 rounded-xl border border-gold/25 bg-gold/5 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <p className="text-sm text-text-secondary">Deine Änderungen sind privat gespeichert. Die öffentliche Projektseite bleibt bis zur Veröffentlichung unverändert.</p>
+            <Link href={`/dashboard/projects/drafts/${draftId}`} className="min-h-11 shrink-0 inline-flex items-center justify-center rounded-lg bg-gold px-4 text-sm font-semibold text-bg-primary">Vorschau &amp; veröffentlichen</Link>
+          </div>
+        )}
+        {draftError && <p role="alert" className="mb-5 text-sm text-red-400">{draftError}</p>}
+
         {/* ════════ HEADER ════════ */}
         <div className="flex gap-8 mb-10 flex-col sm:flex-row">
           {/* Poster */}
@@ -516,11 +509,10 @@ export default function ProjectDetail({
                 // eslint-disable-next-line @next/next/no-img-element
                 ? <img src={project.poster_url} alt={project.title} className="w-full h-full object-cover object-top" />
                 : isCreator
-                  ? <label className="flex flex-col items-center gap-2 text-text-muted cursor-pointer hover:text-gold transition-colors w-full h-full justify-center">
-                      {uploadingPoster ? <Loader2 size={24} className="animate-spin" /> : <Upload size={24} />}
-                      <span className="text-[10px] text-center px-2">{uploadingPoster ? "Wird hochgeladen…" : "Poster hochladen"}</span>
-                      <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" disabled={uploadingPoster} onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadPoster(f); }} />
-                    </label>
+                  ? <div className="flex flex-col items-center gap-2 text-text-muted w-full h-full justify-center px-4 text-center">
+                      <Upload size={24} />
+                      <span className="text-[10px]">Poster-Uploads sind in privaten Entwürfen vorübergehend deaktiviert.</span>
+                    </div>
                   : <div className="flex flex-col items-center gap-2 text-text-muted"><Clapperboard size={32} /></div>
               }
             </div>
@@ -764,7 +756,7 @@ export default function ProjectDetail({
                     <div className="grid grid-cols-[1fr_1.5fr_1fr] px-5 py-2.5 bg-bg-elevated border-b border-border">
                       <span className="text-[10px] uppercase tracking-widest font-semibold text-text-secondary">Tätigkeit</span>
                       <span className="text-[10px] uppercase tracking-widest font-semibold text-text-secondary">Name</span>
-                      <span className="text-[10px] uppercase tracking-widest font-semibold text-text-secondary">Anmerkung</span>
+                      <span className="text-[10px] uppercase tracking-widest font-semibold text-text-secondary">Zusammenarbeit / Anmerkung</span>
                     </div>
                     {grouped.filter(({ dept }) => dept !== "Besetzung").map(({ dept, members }) => {
                       const s = DEPT_STYLES[dept] ?? DEPT_STYLES["Sonstiges"];
@@ -797,7 +789,7 @@ export default function ProjectDetail({
                                   {credit.ghost && <span className="text-[9px] text-text-muted border border-border rounded px-1 shrink-0 ml-0.5">nicht registriert</span>}
                                   <ExternalLink size={10} className="text-text-muted shrink-0 opacity-0 group-hover/link:opacity-100 transition-opacity ml-0.5" />
                                 </Link>
-                                <span className="text-xs text-text-secondary truncate pl-2">{note ?? ""}</span>
+                                <span className="text-xs text-text-secondary truncate pl-2">{note ? `Mit: ${note}` : ""}</span>
                               </div>
                             );
                           })}
@@ -816,11 +808,7 @@ export default function ProjectDetail({
           <div>
             {isCreator && (
               <div className="flex justify-end mb-5">
-                <label className="flex items-center gap-2 px-4 py-2.5 bg-gold/10 border border-gold/20 text-gold text-sm font-semibold rounded-xl hover:bg-gold/20 transition-colors cursor-pointer">
-                  {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-                  {uploading ? "Wird hochgeladen..." : "Fotos hochladen"}
-                  <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={handlePhotoUpload} />
-                </label>
+                <span className="text-xs text-text-muted">Neue Bilddateien werden erst unterstützt, wenn sie sicher privat im Entwurf abgelegt werden können.</span>
               </div>
             )}
             {project.images.length === 0 ? (

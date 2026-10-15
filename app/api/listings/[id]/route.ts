@@ -18,6 +18,10 @@ export async function PATCH(
 
   const { title, description, price, city, published, image_url } = body;
 
+  if (published === true) {
+    return NextResponse.json({ error: "Zum Veröffentlichen bitte die ausdrückliche Freigabe-Aktion verwenden." }, { status: 400 });
+  }
+
   if (title !== undefined && title.length > 200)
     return NextResponse.json({ error: "Titel zu lang (max. 200 Zeichen)" }, { status: 400 });
   if (city !== undefined && city.length > 100)
@@ -30,7 +34,7 @@ export async function PATCH(
   if (description !== undefined) updates.description = description;
   if (price !== undefined)       updates.price       = Math.max(0, Math.min(Number(price) || 0, 1_000_000));
   if (city !== undefined)        updates.city        = city.trim();
-  if (published !== undefined)   updates.published   = Boolean(published);
+  if (published === false)       updates.published   = false;
   if (image_url !== undefined)   updates.image_url   = image_url || null;
 
   if (Object.keys(updates).length === 0)

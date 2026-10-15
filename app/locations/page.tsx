@@ -22,7 +22,7 @@ type LocationCard = {
 };
 
 export default async function LocationsPage() {
-  const { data } = await db
+  const { data, error } = await db
     .from("listings")
     .select("id, title, city, price, image_url, category, metadata, created_at")
     .eq("published", true)
@@ -30,9 +30,11 @@ export default async function LocationsPage() {
     .order("created_at", { ascending: false })
     .limit(200);
 
+  if (error) throw new Error(`Locations konnten nicht geladen werden: ${error.message}`);
+
   const rows = data ?? [];
 
-  const ratingsMap = await fetchRatings(rows.map((l) => l.id), "location");
+  const ratingsMap = await fetchRatings(rows.map((l) => l.id), "listing");
 
   // Group by city, max 6 per city
   const cityMap = new Map<string, LocationCard[]>();

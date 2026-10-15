@@ -105,20 +105,20 @@ const locationGroups: { heading: string; items: NavItem[] }[] = [
   {
     heading: "Räume & Gebäude",
     items: [
-      { icon: Home,      label: "Wohnen",        desc: "Apartments, Häuser, Lofts",      href: "/locations?type=Wohnen",        iconBg: "bg-sky-500/10 border-sky-500/20",     iconColor: "text-sky-400" },
-      { icon: Building2, label: "Villa",          desc: "Herrenhäuser & Luxusanwesen",    href: "/locations?type=Villa",          iconBg: "bg-violet-500/10 border-violet-500/20", iconColor: "text-violet-400" },
-      { icon: Briefcase, label: "Büro",           desc: "Büros, Co-Working, Konferenz",   href: "/locations?type=Büro",           iconBg: "bg-emerald-500/10 border-emerald-500/20", iconColor: "text-emerald-400" },
-      { icon: Clapperboard, label: "Filmstudio",   desc: "Filmstudios, Greenscreen",       href: "/locations?type=Studio",        iconBg: "bg-gold/10 border-gold/20",           iconColor: "text-gold" },
-      { icon: Aperture,     label: "Fotostudio",  desc: "Fotostudios, Daylight, Zykloren", href: "/locations?type=Fotostudio",    iconBg: "bg-cyan-500/10 border-cyan-500/20",   iconColor: "text-cyan-400" },
+      { icon: Home,      label: "Wohnen",        desc: "Apartments, Häuser, Lofts",      href: "/locations/suche?type=Wohnen",        iconBg: "bg-sky-500/10 border-sky-500/20",     iconColor: "text-sky-400" },
+      { icon: Building2, label: "Villa",          desc: "Herrenhäuser & Luxusanwesen",    href: "/locations/suche?type=Villa",          iconBg: "bg-violet-500/10 border-violet-500/20", iconColor: "text-violet-400" },
+      { icon: Briefcase, label: "Büro",           desc: "Büros, Co-Working, Konferenz",   href: "/locations/suche?type=Büro",           iconBg: "bg-emerald-500/10 border-emerald-500/20", iconColor: "text-emerald-400" },
+      { icon: Clapperboard, label: "Filmstudio",   desc: "Filmstudios, Greenscreen",       href: "/locations/suche?type=Studio",        iconBg: "bg-gold/10 border-gold/20",           iconColor: "text-gold" },
+      { icon: Aperture,     label: "Fotostudio",  desc: "Fotostudios, Daylight, Zykloren", href: "/locations/suche?type=Fotostudio",    iconBg: "bg-cyan-500/10 border-cyan-500/20",   iconColor: "text-cyan-400" },
     ],
   },
   {
     heading: "Außen & Besonderes",
     items: [
-      { icon: Wrench,    label: "Industrie",      desc: "Hallen, Fabriken, Werkstätten",  href: "/locations?type=Industrie",     iconBg: "bg-slate-500/10 border-slate-500/20", iconColor: "text-slate-400" },
-      { icon: TreePine,  label: "Natur",          desc: "Wälder, Felder, Küste",          href: "/locations?type=Natur",         iconBg: "bg-green-500/10 border-green-500/20", iconColor: "text-green-400" },
-      { icon: Coffee,    label: "Gastronomie",    desc: "Restaurants, Bars, Cafés",       href: "/locations?type=Gastronomie",   iconBg: "bg-amber-500/10 border-amber-500/20", iconColor: "text-amber-400" },
-      { icon: Sparkles,  label: "Speziallocation",desc: "Historisch, Kirche, Bahnhof",    href: "/locations?type=Speziallocation", iconBg: "bg-rose-500/10 border-rose-500/20", iconColor: "text-rose-400" },
+      { icon: Wrench,    label: "Industrie",      desc: "Hallen, Fabriken, Werkstätten",  href: "/locations/suche?type=Industrie",     iconBg: "bg-slate-500/10 border-slate-500/20", iconColor: "text-slate-400" },
+      { icon: TreePine,  label: "Natur",          desc: "Wälder, Felder, Küste",          href: "/locations/suche?type=Natur",         iconBg: "bg-green-500/10 border-green-500/20", iconColor: "text-green-400" },
+      { icon: Coffee,    label: "Gastronomie",    desc: "Restaurants, Bars, Cafés",       href: "/locations/suche?type=Gastronomie",   iconBg: "bg-amber-500/10 border-amber-500/20", iconColor: "text-amber-400" },
+      { icon: Sparkles,  label: "Speziallocation",desc: "Historisch, Kirche, Bahnhof",    href: "/locations/suche?type=Speziallocation", iconBg: "bg-rose-500/10 border-rose-500/20", iconColor: "text-rose-400" },
     ],
   },
 ];
@@ -231,9 +231,20 @@ export default function Navbar() {
       .then((json) => { if (json) setUnreadMessages(json.count ?? 0); })
       .catch(() => {});
 
+    const refreshUnreadMessages = () => {
+      fetch("/api/unread-count", { cache: "no-store" })
+        .then(r => r.ok ? r.json() : null)
+        .then((json) => { if (json) setUnreadMessages(json.count ?? 0); })
+        .catch(() => {});
+    };
+    window.addEventListener("cinegenius:messages-read", refreshUnreadMessages);
+
     // Realtime: Badge neu laden wenn neue Nachricht von jemand anderem ankommt
     const currentUserId = user?.id;
-    if (!currentUserId) return () => controller.abort();
+    if (!currentUserId) return () => {
+      controller.abort();
+      window.removeEventListener("cinegenius:messages-read", refreshUnreadMessages);
+    };
     const channel = supabase
       .channel(`unread-nav:${currentUserId}`)
       .on("postgres_changes", {
@@ -249,7 +260,11 @@ export default function Navbar() {
         }
       })
       .subscribe();
-    return () => { controller.abort(); supabase.removeChannel(channel); };
+    return () => {
+      controller.abort();
+      window.removeEventListener("cinegenius:messages-read", refreshUnreadMessages);
+      supabase.removeChannel(channel);
+    };
   }, [isSignedIn, isLoaded]);
 
   useEffect(() => {
