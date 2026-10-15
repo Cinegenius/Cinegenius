@@ -77,6 +77,14 @@ if (!read("app/werben/page.tsx").includes('redirect("/")')) {
   failures.push("The former advertising page must redirect to the homepage");
 }
 
+for (const entry of readdirSync("messages", { withFileTypes: true })) {
+  if (!entry.isFile() || !entry.name.endsWith(".json")) continue;
+  const messages = JSON.parse(read(`messages/${entry.name}`));
+  if (Object.hasOwn(messages, "advertising")) {
+    failures.push(`Obsolete advertising translations remain in messages/${entry.name}`);
+  }
+}
+
 if (failures.length) {
   console.error("Shared design checks failed:");
   for (const failure of failures) console.error(`- ${failure}`);
