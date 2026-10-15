@@ -13,7 +13,6 @@ import {
 import EmptyState from "@/components/EmptyState";
 import { FILM_DEPARTMENTS, DEPT_KEYWORDS, ALL_ROLES } from "@/lib/filmRoles";
 import { useTranslations } from "next-intl";
-import AdPlaceholder from "@/components/AdPlaceholder";
 import PageHeader from "@/components/PageHeader";
 
 // ── Department icon map ───────────────────────────────────────────
@@ -433,8 +432,6 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
         description={allJobs.length > 0 ? t("heroDesc", { count: allJobs.length }) : t("heroDescEmpty")}
         cta={{ label: t("postJobBtn"), href: "/inserat" }}
       />
-
-      <AdPlaceholder />
 
       {/* ── Filter Bar ───────────────────────────────────── */}
       <div className="browse-toolbar">

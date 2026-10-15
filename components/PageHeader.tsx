@@ -9,6 +9,8 @@ export const PROJECTS_BACKDROP_IMAGE =
 type PageBackdropProps = {
   image?: string;
   imagePosition?: string;
+  imageOpacity?: number;
+  overlayClassName?: string;
   className?: string;
 };
 
@@ -16,6 +18,8 @@ type PageBackdropProps = {
 export function PageBackdrop({
   image = PROJECTS_BACKDROP_IMAGE,
   imagePosition = "center 42%",
+  imageOpacity = 20,
+  overlayClassName = "absolute inset-0 bg-gradient-to-b from-bg-primary/60 via-bg-primary/40 to-bg-primary/80",
   className = "absolute inset-0 z-0",
 }: PageBackdropProps) {
   return (
@@ -26,10 +30,10 @@ export function PageBackdrop({
         fill
         unoptimized
         priority
-        className="object-cover opacity-20"
-        style={{ objectPosition: imagePosition }}
+        className="object-cover"
+        style={{ objectPosition: imagePosition, opacity: imageOpacity / 100 }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/60 via-bg-primary/40 to-bg-primary/80" />
+      <div className={overlayClassName} />
     </div>
   );
 }

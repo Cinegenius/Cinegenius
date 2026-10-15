@@ -6,7 +6,6 @@ import {
   Lightbulb, Mic, Zap, Layers, MapPin, Tag,
 } from "lucide-react";
 import { db } from "@/lib/db";
-import AdPlaceholder from "@/components/AdPlaceholder";
 import PageHeader from "@/components/PageHeader";
 
 export const metadata: Metadata = {
@@ -94,8 +93,6 @@ export default async function MarketplacePage({
         description="Von Privatpersonen und Verleihfirmen — alles für Film, Fotografie und Social Media Produktion."
         cta={{ label: "Inserat erstellen", href: "/inserat" }}
       />
-
-      <AdPlaceholder />
 
       <div className="site-container py-4 sm:py-8">
         <div className="flex gap-8 items-start">
