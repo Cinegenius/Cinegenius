@@ -23,6 +23,7 @@ For visual review, capture `/projects`, `/locations`, `/props`, `/creators`, `/c
 - Vercel automatic production deployment from `main` is disabled in `vercel.json`. This prevents an unreviewed Git integration deployment from replacing production.
 - Publish a release only by running `npm run deploy:production` from a clean `main` checkout whose `HEAD` matches `origin/main`. The guarded script checks the branch, clean tree, remote commit, and linked project; then it pulls the linked project's Production settings into the ignored `.vercel` directory, builds for production, and deploys the prebuilt output.
 - Never use a dirty working tree, another branch, a stale project folder, or a direct ad hoc `vercel --prod` command for production. The guard is intended to make those recurring snapshot overwrites fail before deployment.
+- `npm run build` uses Next.js Webpack explicitly. This avoids the reproduced Turbopack Google Font resolver failure in the Vercel CLI production build while keeping local and Vercel builds on the same successful path.
 
 ## Advertising surfaces
 
