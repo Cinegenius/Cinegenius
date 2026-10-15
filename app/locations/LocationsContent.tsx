@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { useTranslations } from "next-intl";
+import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 const LocationMap = dynamicImport(() => import("@/components/LocationMap"), {
   ssr: false,
   loading: () => (
@@ -317,6 +318,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
     setInstantOnly(false); setVerifiedOnly(false);
     setMinPrice(""); setMaxPrice("");
     setLageFilter("Alle"); setPowerOnly(false);
+    setSortKey("featured");
     setUserLocation(null);
     router.replace(pathname, { scroll: false });
   };
@@ -341,11 +343,63 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
   }, [query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, router]);
 
   const hasActiveFilters = query || activeType !== "All Types" || instantOnly || verifiedOnly || minPrice || maxPrice || userLocation || lageFilter !== "Alle" || powerOnly;
+  const mobileChips: BrowseChip[] = [
+    ...(activeType !== "All Types" ? [{ id: "type", label: activeType, onRemove: () => setActiveType("All Types") }] : []),
+    ...(minPrice ? [{ id: "min", label: `ab ${minPrice} €`, onRemove: () => setMinPrice("") }] : []),
+    ...(maxPrice ? [{ id: "max", label: `bis ${maxPrice} €`, onRemove: () => setMaxPrice("") }] : []),
+    ...(lageFilter !== "Alle" ? [{ id: "lage", label: lageFilter, onRemove: () => setLageFilter("Alle") }] : []),
+    ...(instantOnly ? [{ id: "instant", label: t("filterInstant"), onRemove: () => setInstantOnly(false) }] : []),
+    ...(verifiedOnly ? [{ id: "verified", label: t("filterVerified"), onRemove: () => setVerifiedOnly(false) }] : []),
+    ...(powerOnly ? [{ id: "power", label: t("filterPower"), onRemove: () => setPowerOnly(false) }] : []),
+    ...(userLocation ? [{ id: "nearby", label: t("locateActive"), onRemove: clearLocation }] : []),
+  ];
 
   return (
-    <div className="flex min-h-[32rem] h-[calc(100dvh-15rem)] flex-col bg-bg-primary">
+    <div className="flex min-h-[20rem] h-[calc(100dvh-25rem)] flex-col bg-bg-primary xl:min-h-[32rem] xl:h-[calc(100dvh-15rem)]">
+      <MobileBrowseControls
+        query={query}
+        onQueryChange={setQuery}
+        searchPlaceholder={t("searchPlaceholder")}
+        sortValue={sortKey}
+        sortOptions={[{ value: "featured", label: t("sortFeatured") }, { value: "price-asc", label: t("sortPriceAsc") }, { value: "price-desc", label: t("sortPriceDesc") }, { value: "rating", label: t("sortRating") }]}
+        onSortChange={setSortKey}
+        categoryLabel="Location-Typ"
+        allCategoryLabel={t("filterAll") + " Locations"}
+        categories={locationTypes.slice(1).map((value) => ({ value, label: value }))}
+        categoryValue={activeType === "All Types" ? "" : activeType}
+        onCategoryChange={(value) => setActiveType(value || "All Types")}
+        resultSummary={t("results", { count: filtered.length })}
+        filterCount={mobileChips.length}
+        chips={mobileChips}
+        onReset={resetFilters}
+        resetLabel={t("resetFilters")}
+        showResultsLabel={t("results", { count: filtered.length })}
+      >
+        <div className="grid grid-cols-2 gap-3">
+          <MobileFilterField label="Preis ab (€)"><input inputMode="decimal" type="number" min="0" value={minPrice} onChange={(event) => setMinPrice(event.target.value)} placeholder="Beliebig" /></MobileFilterField>
+          <MobileFilterField label="Preis bis (€)"><input inputMode="decimal" type="number" min="0" value={maxPrice} onChange={(event) => setMaxPrice(event.target.value)} placeholder="Beliebig" /></MobileFilterField>
+        </div>
+        <MobileFilterField label="Lage">
+          <MobileFilterSelect value={lageFilter === "Alle" ? "" : lageFilter} onChange={(value) => setLageFilter(value || "Alle")} placeholder="Innen und außen" options={[{ value: "Innen", label: t("filterInnen") }, { value: "Außen", label: t("filterAussen") }, { value: "Innen & Außen", label: t("filterInnenAussen") }]} />
+        </MobileFilterField>
+        <div className="grid gap-1">
+          {[
+            [instantOnly, setInstantOnly, t("filterInstant")],
+            [verifiedOnly, setVerifiedOnly, t("filterVerified")],
+            [powerOnly, setPowerOnly, t("filterPower")],
+          ].map(([checked, setter, label]) => (
+            <label key={String(label)} className="flex min-h-11 items-center gap-3 text-sm text-text-secondary">
+              <input type="checkbox" className="size-4 accent-gold" checked={checked as boolean} onChange={(event) => (setter as (next: boolean) => void)(event.target.checked)} />{label as string}
+            </label>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <button type="button" onClick={userLocation ? clearLocation : handleLocateMe} className="min-h-11 rounded-lg border border-border px-2 text-sm text-text-secondary">{userLocation ? t("locateActive") : t("locateMe")}</button>
+          {userLocation && <MobileFilterField label={t("radiusLabel")}><select value={radiusKm} onChange={(event) => setRadiusKm(Number(event.target.value))}>{[10, 25, 50, 100, 200, 500].map((value) => <option key={value} value={value}>{value} km</option>)}</select></MobileFilterField>}
+        </div>
+      </MobileBrowseControls>
       {/* ── TOP BAR ── */}
-      <div className="browse-toolbar shrink-0">
+      <div className="hidden xl:block browse-toolbar shrink-0">
         <div className="site-container space-y-2 py-2">
 
           {/* Row 1: Search + View toggle */}
@@ -534,9 +588,9 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
         {viewMode !== "map" && (
           <div
             ref={listRef}
-            className={`overflow-y-auto ${viewMode === "split" ? "w-full sm:w-[420px] shrink-0 sm:border-r border-border" : "flex-1"}`}
+            className={`overflow-y-auto pb-[calc(56px+env(safe-area-inset-bottom,0px))] xl:pb-0 ${viewMode === "split" ? "w-full sm:w-[420px] shrink-0 sm:border-r border-border" : "flex-1"}`}
           >
-            <div className="sticky top-0 z-10 bg-bg-primary/90 backdrop-blur-nav border-b border-border px-4 py-2.5 flex items-center justify-between">
+            <div className="hidden xl:flex sticky top-0 z-10 bg-bg-primary/90 backdrop-blur-nav border-b border-border px-4 py-2.5 items-center justify-between">
               <p className="text-xs text-text-muted">
                 <span className="text-text-primary font-semibold">{t("results", { count: filtered.length })}</span>
                 {userLocation && <span className="text-gold"> {t("inRadius", { radius: radiusKm })}</span>}

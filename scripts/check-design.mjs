@@ -18,6 +18,30 @@ for (const [label, path] of sharedPages) {
   }
 }
 
+const mobileBrowsePages = [
+  ["Projects", "app/projects/ProjectsContent.tsx"],
+  ["Locations", "app/locations/LocationsContent.tsx"],
+  ["Marktplatz", "app/props/PropsContent.tsx"],
+  ["Crew", "app/creators/CreatorsContent.tsx"],
+  ["Firmen", "app/companies/CompaniesContent.tsx"],
+  ["Jobs", "app/jobs/JobsContent.tsx"],
+];
+for (const [label, path] of mobileBrowsePages) {
+  const source = read(path);
+  if (!source.includes("<MobileBrowseControls")) {
+    failures.push(`${label} must use the shared mobile browse controls (${path})`);
+  }
+  if (label !== "Locations" && !source.includes("mobile-bottom-nav-clear")) {
+    failures.push(`${label} content must clear the fixed mobile navigation (${path})`);
+  }
+}
+if (!read("app/locations/LocationsContent.tsx").includes("pb-[calc(56px+env(safe-area-inset-bottom,0px))]")) {
+  failures.push("Location results must clear the fixed mobile navigation while scrolling");
+}
+if (!read("app/locations/LocationsLanding.tsx").includes("mobile-bottom-nav-clear")) {
+  failures.push("Location landing content must clear the fixed mobile navigation");
+}
+
 const navbar = read("components/Navbar.tsx");
 const bottomNav = read("components/BottomNav.tsx");
 const expectedDestinations = ["/locations", "/creators", "/jobs", "/props", "/projects", "/companies"];
@@ -40,6 +64,15 @@ if (JSON.stringify(mobileDestinations) !== JSON.stringify(expectedDestinations))
 const styles = read("app/globals.css");
 for (const selector of [".site-container", ".browse-toolbar", ".browse-card"]) {
   if (!styles.includes(selector)) failures.push(`Missing shared design rule ${selector}`);
+}
+for (const selector of [".mobile-browse-controls", ".mobile-filter-panel", ".mobile-filter-apply", ".mobile-bottom-nav-clear"]) {
+  if (!styles.includes(selector)) failures.push(`Missing shared mobile browse rule ${selector}`);
+}
+if (!styles.includes("min-height: 46px") || !styles.includes("min-height: 48px")) {
+  failures.push("Mobile browsing controls must keep 44px or larger touch targets");
+}
+if (!read("components/MobileBrowseControls.tsx").includes('role="dialog" aria-modal="true"')) {
+  failures.push("Mobile filters must remain an accessible dialog");
 }
 if (!styles.includes("background: var(--color-bg-primary)")) {
   failures.push("Browse filters must keep the solid page background");
@@ -83,6 +116,9 @@ for (const entry of readdirSync("messages", { withFileTypes: true })) {
   if (Object.hasOwn(messages, "advertising")) {
     failures.push(`Obsolete advertising translations remain in messages/${entry.name}`);
   }
+  if (Object.keys(messages.footer ?? {}).some((key) => /advertis|werben/i.test(key))) {
+    failures.push(`A retired advertising link remains in messages/${entry.name}`);
+  }
 }
 
 if (failures.length) {
@@ -91,4 +127,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log("Shared design checks passed: six page headers, nav order, common layout rules, removed hero variant, and no public ad surfaces.");
+console.log("Shared design checks passed: six page headers and mobile controls, nav order, common layout rules, removed hero variant, and no public ad surfaces.");

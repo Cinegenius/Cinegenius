@@ -11,6 +11,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { departments, deptColors, getDeptLabel, type Department } from "@/lib/departments";
+import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 
 const DEPT_ICON: Record<string, LucideIcon> = {
   produktion:    Clapperboard,
@@ -639,6 +640,27 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
     !!(ageMinFilter || ageMaxFilter),
   ].filter(Boolean).length + selectedRoles.size;
 
+  const mobileChips: BrowseChip[] = [
+    ...(sidebarDept ? [{ id: "area", label: sidebarDept === "__locations" ? "Locations" : sidebarDept === "__marktplatz" ? "Marktplatz" : getDeptLabel(departments.find((department) => department.id === sidebarDept) ?? departments[0], locale), onRemove: () => chooseSidebarDept(null) }] : []),
+    ...[...selectedRoles].map((role) => ({ id: `role-${role}`, label: role, onRemove: () => removeRole(role) })),
+    ...(cityFilter ? [{ id: "city", label: cityFilter, onRemove: () => setCityFilter("") }] : []),
+    ...(countryFilter ? [{ id: "country", label: countryFilter, onRemove: () => setCountryFilter("") }] : []),
+    ...(languageFilter ? [{ id: "language", label: languageFilter, onRemove: () => setLanguageFilter("") }] : []),
+    ...(profileTypeFilter ? [{ id: "profileType", label: `${t("filterProfileType")}: ${PROFILE_TYPE_MAP[profileTypeFilter] ?? profileTypeFilter}`, onRemove: () => setProfileTypeFilter("") }] : []),
+    ...(hairFilter ? [{ id: "hair", label: `${t("filterHairColor")}: ${hairFilter}`, onRemove: () => setHairFilter("") }] : []),
+    ...(eyeFilter ? [{ id: "eyes", label: `${t("filterEyeColor")}: ${eyeFilter}`, onRemove: () => setEyeFilter("") }] : []),
+    ...(bodyFilter ? [{ id: "body", label: `Körperbau: ${bodyFilter}`, onRemove: () => setBodyFilter("") }] : []),
+    ...(ageMinFilter || ageMaxFilter ? [{ id: "age", label: `${t("filterAge")}: ${ageMinFilter || "1"}–${ageMaxFilter || "99"}`, onRemove: () => { setAgeMinFilter(""); setAgeMaxFilter(""); } }] : []),
+    ...(travelFilter ? [{ id: "travel", label: `${t("filterTravel")}: ${TRAVEL_MAP[travelFilter] ?? travelFilter}`, onRemove: () => setTravelFilter("") }] : []),
+    ...(availableOnly ? [{ id: "available", label: tc("available"), onRemove: () => setAvailableOnly(false) }] : []),
+    ...(vendorOnly ? [{ id: "vendor", label: "Anbieter", onRemove: () => setVendorOnly(false) }] : []),
+  ];
+  const resetMobileFilters = () => {
+    setSelectedRoles(new Set()); setSidebarDept(null); setQuery(""); setCityFilter(""); setCountryFilter(""); setLanguageFilter("");
+    setAvailableOnly(false); setVendorOnly(false); setProfileTypeFilter(""); setHairFilter(""); setEyeFilter(""); setBodyFilter("");
+    setAgeMinFilter(""); setAgeMaxFilter(""); setTravelFilter(""); setSortKey("featured");
+  };
+
   const SORT_OPTIONS = [
     { value: "featured", label: t("sortFeatured") },
     { value: "rating",   label: t("sortRating") },
@@ -646,12 +668,74 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen mobile-bottom-nav-clear">
+
+      <MobileBrowseControls
+        query={query}
+        onQueryChange={setQuery}
+        searchPlaceholder={t("searchPlaceholder")}
+        sortValue={sortKey}
+        sortOptions={SORT_OPTIONS}
+        onSortChange={setSortKey}
+        categoryLabel={t("deptFilter")}
+        allCategoryLabel="Alle Bereiche"
+        categories={[
+          ...departments.map((department) => ({ value: department.id, label: getDeptLabel(department, locale) })),
+          { value: "__locations", label: "Locations" },
+          { value: "__marktplatz", label: "Marktplatz" },
+        ]}
+        categoryValue={sidebarDept ?? ""}
+        onCategoryChange={(value) => { setSelectedRoles(new Set()); chooseSidebarDept(value || null); }}
+        resultSummary={isTopMode ? "Top 20 nach Bewertung" : t("results", { count: filtered.length })}
+        filterCount={secondaryFilterCount + (sidebarDept ? 1 : 0)}
+        chips={mobileChips}
+        onReset={resetMobileFilters}
+        resetLabel={t("resetFilters")}
+        showResultsLabel={t("showResults", { count: filtered.length })}
+      >
+        <MobileFilterField label={t("filterProfileType")}>
+          <MobileFilterSelect value={profileTypeFilter} onChange={setProfileTypeFilter} placeholder={t("filterAll")} options={availableProfileTypes.map((value) => ({ value, label: PROFILE_TYPE_MAP[value] ?? value }))} />
+        </MobileFilterField>
+        <MobileFilterField label="Rolle">
+          <MobileFilterSelect value={[...selectedRoles][0] ?? ""} onChange={(value) => setSelectedRoles(value ? new Set([value]) : new Set())} placeholder="Alle Rollen" options={[...new Set(departments.flatMap((department) => department.roles))].sort((a, b) => a.localeCompare(b, locale)).map((value) => ({ value, label: value }))} />
+        </MobileFilterField>
+        <MobileFilterField label={t("filterCity")}>
+          <MobileFilterSelect value={cityFilter} onChange={setCityFilter} placeholder="Alle Städte" options={availableCities.map((value) => ({ value, label: value }))} />
+        </MobileFilterField>
+        <MobileFilterField label={t("filterCountry")}>
+          <MobileFilterSelect value={countryFilter} onChange={setCountryFilter} placeholder="Alle Länder" options={availableCountries.map((value) => ({ value, label: value }))} />
+        </MobileFilterField>
+        <MobileFilterField label={t("filterLanguage")}>
+          <MobileFilterSelect value={languageFilter} onChange={setLanguageFilter} placeholder={t("filterAll")} options={availableLanguages.map((value) => ({ value, label: value }))} />
+        </MobileFilterField>
+        <div className="grid grid-cols-2 gap-3">
+          <MobileFilterField label={t("filterHairColor")}>
+            <MobileFilterSelect value={hairFilter} onChange={setHairFilter} placeholder={t("filterAll")} options={availableHairColors.map((value) => ({ value, label: value }))} />
+          </MobileFilterField>
+          <MobileFilterField label={t("filterEyeColor")}>
+            <MobileFilterSelect value={eyeFilter} onChange={setEyeFilter} placeholder={t("filterAll")} options={availableEyeColors.map((value) => ({ value, label: value }))} />
+          </MobileFilterField>
+        </div>
+        <MobileFilterField label="Körperbau">
+          <MobileFilterSelect value={bodyFilter} onChange={setBodyFilter} placeholder={t("filterAll")} options={availableBodyTypes.map((value) => ({ value, label: value }))} />
+        </MobileFilterField>
+        <div className="grid grid-cols-2 gap-3">
+          <MobileFilterField label="Alter ab"><input inputMode="numeric" type="number" min="1" max="99" value={ageMinFilter} onChange={(event) => setAgeMinFilter(event.target.value)} placeholder="Beliebig" /></MobileFilterField>
+          <MobileFilterField label="Alter bis"><input inputMode="numeric" type="number" min="1" max="99" value={ageMaxFilter} onChange={(event) => setAgeMaxFilter(event.target.value)} placeholder="Beliebig" /></MobileFilterField>
+        </div>
+        <MobileFilterField label={t("filterTravel")}>
+          <MobileFilterSelect value={travelFilter} onChange={setTravelFilter} placeholder={t("filterAll")} options={Object.entries(TRAVEL_MAP).map(([value, label]) => ({ value, label }))} />
+        </MobileFilterField>
+        <div className="grid gap-1">
+          <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={availableOnly} onChange={(event) => setAvailableOnly(event.target.checked)} />{tc("available")}</label>
+          <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={vendorOnly} onChange={(event) => setVendorOnly(event.target.checked)} />Anbieter</label>
+        </div>
+      </MobileBrowseControls>
 
       {/* ══════════════════════════════════════════════════════════════════════
           MOBILE LAYOUT  (< lg)
           ══════════════════════════════════════════════════════════════════ */}
-      <div className="lg:hidden">
+      <div className="hidden">
 
         {/* Row 1 — Search + View toggle */}
         <div className="browse-toolbar site-container flex items-center gap-2 py-2">
@@ -942,7 +1026,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       {/* ══════════════════════════════════════════════════════════════════════
           DESKTOP LAYOUT  (≥ lg)
           ══════════════════════════════════════════════════════════════════ */}
-      <div className="hidden lg:block browse-toolbar">
+      <div className="hidden xl:block browse-toolbar">
         <div className="site-container py-2 space-y-2">
 
           {/* Row 1: Search + Sort + View toggle */}
@@ -1292,7 +1376,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
             </div>
 
             {/* Count */}
-            <p className="text-sm text-text-muted mb-5">
+            <p className="hidden xl:block text-sm text-text-muted mb-5">
               <span className="text-text-primary font-semibold">
                 {t("results", { count: filteredCrew.length })}
               </span>

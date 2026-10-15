@@ -14,6 +14,7 @@ import EmptyState from "@/components/EmptyState";
 import { FILM_DEPARTMENTS, DEPT_KEYWORDS, ALL_ROLES } from "@/lib/filmRoles";
 import { useTranslations } from "next-intl";
 import PageHeader from "@/components/PageHeader";
+import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 
 // ── Department icon map ───────────────────────────────────────────
 const DEPT_ICON_MAP: Record<string, LucideIcon> = {
@@ -422,9 +423,18 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
 
   const activeDeptData = selectedDeptId ? FILM_DEPARTMENTS.find((d) => d.id === selectedDeptId) : null;
   const activeRoleData = selectedRoleId ? ALL_ROLES.find((r) => r.id === selectedRoleId) : null;
+  const mobileChips: BrowseChip[] = [
+    ...(activeDeptData ? [{ id: "dept", label: activeRoleData ? `${activeDeptData.label} · ${activeRoleData.label}` : activeDeptData.label, onRemove: () => { setSelectedDeptId(null); setSelectedRoleId(null); } }] : []),
+    ...(activeType ? [{ id: "project", label: activeType, onRemove: () => setActiveType("") }] : []),
+    ...(payTypeFilter ? [{ id: "pay", label: payTypeFilter, onRemove: () => setPayTypeFilter("") }] : []),
+    ...(cityFilter ? [{ id: "city", label: cityFilter, onRemove: () => setCityFilter("") }] : []),
+    ...(countryFilter ? [{ id: "country", label: countryFilter, onRemove: () => setCountryFilter("") }] : []),
+    ...(urgentOnly ? [{ id: "urgent", label: t("filterUrgentLabel"), onRemove: () => setUrgentOnly(false) }] : []),
+    ...(jobTypeFilter !== "alle" ? [{ id: "jobtype", label: jobTypeFilter, onRemove: () => setJobTypeFilter("alle") }] : []),
+  ];
 
   return (
-    <div className="min-h-screen bg-bg-primary">
+    <div className="min-h-screen bg-bg-primary mobile-bottom-nav-clear">
       <PageHeader
         badge={t("heroBadge")}
         title={t("heroTitle")}
@@ -433,8 +443,62 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
         cta={{ label: t("postJobBtn"), href: "/inserat" }}
       />
 
+      <MobileBrowseControls
+        query={query}
+        onQueryChange={setQuery}
+        searchPlaceholder={t("searchPlaceholder")}
+        sortValue={sortKey}
+        sortOptions={[
+          { value: "newest", label: t("sortNewest") },
+          { value: "rate-desc", label: t("sortRateDesc") },
+          { value: "urgent", label: t("sortUrgent") },
+        ]}
+        onSortChange={setSortKey}
+        categoryLabel={t("filterDeptRole")}
+        allCategoryLabel={t("filterAll") + " Bereiche"}
+        categories={FILM_DEPARTMENTS.map((dept) => ({ value: dept.id, label: dept.label }))}
+        categoryValue={selectedDeptId ?? ""}
+        onCategoryChange={(value) => { setSelectedDeptId(value || null); setSelectedRoleId(null); }}
+        resultSummary={t("results", { count: filtered.length })}
+        filterCount={mobileChips.length}
+        chips={mobileChips}
+        onReset={clearAll}
+        resetLabel={t("clearAll")}
+        showResultsLabel={t("results", { count: filtered.length })}
+      >
+        <MobileFilterField label={t("filterDeptRole")}>
+          <MobileFilterSelect
+            value={selectedRoleId ? `${selectedDeptId}:${selectedRoleId}` : ""}
+            onChange={(value) => {
+              if (!value) { setSelectedRoleId(null); return; }
+              const [deptId, roleId] = value.split(":");
+              setSelectedDeptId(deptId);
+              setSelectedRoleId(roleId);
+            }}
+            placeholder="Alle Rollen"
+            options={FILM_DEPARTMENTS.flatMap((dept) => dept.roles.map((role) => ({ value: `${dept.id}:${role.id}`, label: `${dept.label} · ${role.label}` })))}
+          />
+        </MobileFilterField>
+        <MobileFilterField label={t("filterProjectType")}>
+          <MobileFilterSelect value={activeType} onChange={setActiveType} placeholder="Alle Projekttypen" options={PROJECT_TYPES.map((value) => ({ value, label: value }))} />
+        </MobileFilterField>
+        <MobileFilterField label={t("filterPay")}>
+          <MobileFilterSelect value={payTypeFilter} onChange={setPayTypeFilter} placeholder="Alle Vergütungsarten" options={PAY_TYPES.map((value) => ({ value, label: value }))} />
+        </MobileFilterField>
+        <MobileFilterField label={t("filterCity")}>
+          <MobileFilterSelect value={cityFilter} onChange={setCityFilter} placeholder="Alle Städte" options={availableCities.map((value) => ({ value, label: value }))} />
+        </MobileFilterField>
+        <MobileFilterField label={t("filterCountry")}>
+          <MobileFilterSelect value={countryFilter} onChange={setCountryFilter} placeholder="Alle Länder" options={["Deutschland", "Österreich", "Schweiz", "Remote"].map((value) => ({ value, label: value }))} />
+        </MobileFilterField>
+        <MobileFilterField label="Anstellungsart">
+          <MobileFilterSelect value={jobTypeFilter === "alle" ? "" : jobTypeFilter} onChange={(value) => setJobTypeFilter((value || "alle") as typeof jobTypeFilter)} placeholder="Alle" options={[{ value: "freelance", label: t("filterFreelance") }, { value: "festanstellung", label: t("filterFulltime") }, { value: "praktikum", label: t("filterInternship") }]} />
+        </MobileFilterField>
+        <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={urgentOnly} onChange={(event) => setUrgentOnly(event.target.checked)} />{t("filterUrgentLabel")}</label>
+      </MobileBrowseControls>
+
       {/* ── Filter Bar ───────────────────────────────────── */}
-      <div className="browse-toolbar">
+      <div className="hidden xl:block browse-toolbar">
         <div className="site-container py-2 space-y-2">
 
           {/* Row 1: Search + Sort */}
@@ -649,7 +713,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
             </div>
 
             {/* Count */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="hidden xl:flex items-center justify-between mb-4">
               <p className="text-sm text-text-muted">
                 <span className="text-text-primary font-semibold">{t("results", { count: filtered.length })}</span>
                 {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}

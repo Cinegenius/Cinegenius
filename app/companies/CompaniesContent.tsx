@@ -11,6 +11,7 @@ import {
   Lightbulb, ArrowRight, Globe, Zap, ChevronDown,
 } from "lucide-react";
 import { COMPANY_CATEGORIES, COMPANY_CATEGORY_BY_ID } from "@/lib/companyCategories";
+import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 
 const PAGE_SIZE = 24;
 
@@ -97,6 +98,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
   const [cityFilter, setCityFilter] = useState("");
   const [countryFilter, setCountryFilter] = useState("");
   const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [sortKey, setSortKey] = useState("newest");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [page, setPage] = useState(1);
 
@@ -123,8 +125,10 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
       else result = result.filter((c) => c.city?.toLowerCase().includes(countryFilter.toLowerCase()));
     }
     if (verifiedOnly) result = result.filter((c) => c.verified);
+    if (sortKey === "newest") result = [...result].sort((a, b) => b.created_at.localeCompare(a.created_at));
+    if (sortKey === "name") result = [...result].sort((a, b) => a.name.localeCompare(b.name, "de"));
     return result;
-  }, [initialCompanies, search, selectedCategory, cityFilter, countryFilter, verifiedOnly]);
+  }, [initialCompanies, search, selectedCategory, cityFilter, countryFilter, verifiedOnly, sortKey]);
 
   useEffect(() => setPage(1), [filtered]);
 
@@ -133,18 +137,59 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
 
   const clearAll = () => {
     setSearch(""); setSelectedCategory(null); setCityFilter("");
-    setCountryFilter(""); setVerifiedOnly(false); setPage(1);
+    setCountryFilter(""); setVerifiedOnly(false); setSortKey("newest"); setPage(1);
   };
 
   const selectedCat = selectedCategory ? COMPANY_CATEGORY_BY_ID[selectedCategory] : null;
   const hasAnyFilter = Boolean(search || selectedCategory || cityFilter || countryFilter || verifiedOnly);
   const hasCatFilter = Boolean(selectedCategory);
+  const mobileChips: BrowseChip[] = [
+    ...(selectedCat ? [{ id: "category", label: selectedCat.label, onRemove: () => setSelectedCategory(null) }] : []),
+    ...(cityFilter ? [{ id: "city", label: cityFilter, onRemove: () => setCityFilter("") }] : []),
+    ...(countryFilter ? [{ id: "country", label: countryFilter, onRemove: () => setCountryFilter("") }] : []),
+    ...(verifiedOnly ? [{ id: "verified", label: t("filterVerified"), onRemove: () => setVerifiedOnly(false) }] : []),
+  ];
 
   return (
-    <div className="min-h-screen bg-bg-primary">
+    <div className="min-h-screen bg-bg-primary mobile-bottom-nav-clear">
+
+      <MobileBrowseControls
+        query={search}
+        onQueryChange={setSearch}
+        searchPlaceholder={t("searchPlaceholder")}
+        sortValue={sortKey}
+        sortOptions={[{ value: "newest", label: "Neueste zuerst" }, { value: "name", label: "Name A–Z" }]}
+        onSortChange={setSortKey}
+        categoryLabel={t("filterCategory")}
+        allCategoryLabel="Alle Firmen"
+        categories={COMPANY_CATEGORIES.map((category) => ({ value: category.id, label: category.label }))}
+        categoryValue={selectedCategory ?? ""}
+        onCategoryChange={(value) => setSelectedCategory(value || null)}
+        resultSummary={`${filtered.length} ${t("resultsCount")}`}
+        filterCount={mobileChips.length}
+        chips={mobileChips}
+        onReset={clearAll}
+        resetLabel={t("resetFilters")}
+        showResultsLabel={`${filtered.length} Unternehmen anzeigen`}
+      >
+        <MobileFilterField label={t("filterCity")}>
+          <MobileFilterSelect value={cityFilter} onChange={setCityFilter} placeholder="Alle Städte" options={availableCities.map((value) => ({ value, label: value }))} />
+        </MobileFilterField>
+        <MobileFilterField label={t("filterCountry")}>
+          <MobileFilterSelect value={countryFilter} onChange={setCountryFilter} placeholder="Alle Länder" options={[t("countryDE"), t("countryAT"), t("countryCH")].map((value) => ({ value, label: value }))} />
+        </MobileFilterField>
+        <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={verifiedOnly} onChange={(event) => setVerifiedOnly(event.target.checked)} />{t("filterVerified")}</label>
+        <div className="mobile-filter-field">
+          <span>Ansicht</span>
+          <div className="grid grid-cols-2 gap-2">
+            <button type="button" onClick={() => setViewMode("grid")} className={`min-h-11 rounded-lg border text-sm ${viewMode === "grid" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>Raster</button>
+            <button type="button" onClick={() => setViewMode("list")} className={`min-h-11 rounded-lg border text-sm ${viewMode === "list" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>Liste</button>
+          </div>
+        </div>
+      </MobileBrowseControls>
 
       {/* ── Filter Bar ───────────────────────────────────── */}
-      <div className="browse-toolbar">
+      <div className="hidden xl:block browse-toolbar">
         <div className="site-container py-2 space-y-2">
 
           {/* Row 1: Search + View toggle */}
@@ -312,7 +357,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
               })}
             </div>
 
-            <p className="text-sm text-text-muted mb-5">
+            <p className="hidden xl:block text-sm text-text-muted mb-5">
               <span className="font-semibold text-text-primary">{filtered.length}</span> {t("resultsCount", { count: filtered.length })}
               {selectedCat && <> in <span className={`font-semibold ${selectedCat.color}`}>{selectedCat.label}</span></>}
             </p>

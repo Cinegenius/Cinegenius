@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 import {
   Search, Clapperboard, Calendar, Users, X, ChevronDown,
   LayoutList, LayoutGrid, Film, MapPin, ArrowUpDown,
@@ -176,13 +177,61 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
 
   const clearAll = () => { setQuery(""); setCategoryChip(null); setTypeFilter(""); setYearFilter(""); setDirectorFilter(""); };
   const hasAnyFilter = Boolean(query || categoryChip || typeFilter || yearFilter || directorFilter);
+  const mobileChips: BrowseChip[] = [
+    ...(categoryChip ? [{ id: "category", label: categoryChip, onRemove: () => setCategoryChip(null) }] : []),
+    ...(typeFilter ? [{ id: "type", label: typeFilter, onRemove: () => setTypeFilter("") }] : []),
+    ...(yearFilter ? [{ id: "year", label: yearFilter, onRemove: () => setYearFilter("") }] : []),
+    ...(directorFilter ? [{ id: "director", label: directorFilter, onRemove: () => setDirectorFilter("") }] : []),
+  ];
 
   return (
-    <div className="min-h-screen bg-bg-primary">
+    <div className="min-h-screen bg-bg-primary mobile-bottom-nav-clear">
+
+      <MobileBrowseControls
+        query={query}
+        onQueryChange={setQuery}
+        searchPlaceholder={t("searchPlaceholder")}
+        sortValue={sort}
+        sortOptions={[
+          { value: "year_desc", label: t("sortNewest") },
+          { value: "year_asc", label: t("sortOldest") },
+          { value: "title_asc", label: t("sortAlpha") },
+          { value: "crew_desc", label: t("sortCrew") },
+        ]}
+        onSortChange={(value) => setSort(value as SortKey)}
+        categoryLabel="Bereich"
+        allCategoryLabel="Alle Projekte"
+        categories={CATEGORY_CHIPS.map((chip) => ({ value: chip.label, label: chip.label }))}
+        categoryValue={categoryChip ?? ""}
+        onCategoryChange={(value) => setCategoryChip(value || null)}
+        resultSummary={t("resultsCount", { count: filtered.length })}
+        filterCount={mobileChips.length}
+        chips={mobileChips}
+        onReset={clearAll}
+        resetLabel={t("clearAllFilters")}
+        showResultsLabel={`${filtered.length} anzeigen`}
+      >
+        <MobileFilterField label={t("filterType")}>
+          <MobileFilterSelect value={typeFilter} onChange={setTypeFilter} placeholder="Alle Projekttypen" options={availableTypes.map((value) => ({ value, label: value }))} />
+        </MobileFilterField>
+        <MobileFilterField label={t("filterYear")}>
+          <MobileFilterSelect value={yearFilter} onChange={setYearFilter} placeholder="Alle Jahre" options={availableYears.map((value) => ({ value, label: value }))} />
+        </MobileFilterField>
+        <MobileFilterField label={t("filterDirector")}>
+          <MobileFilterSelect value={directorFilter} onChange={setDirectorFilter} placeholder="Alle Regisseur:innen" options={availableDirectors.map((value) => ({ value, label: value }))} />
+        </MobileFilterField>
+        <div className="mobile-filter-field">
+          <span>Ansicht</span>
+          <div className="grid grid-cols-2 gap-2">
+            <button type="button" onClick={() => setView("list")} className={`min-h-11 rounded-lg border text-sm ${view === "list" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>Liste</button>
+            <button type="button" onClick={() => setView("grid")} className={`min-h-11 rounded-lg border text-sm ${view === "grid" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>Raster</button>
+          </div>
+        </div>
+      </MobileBrowseControls>
 
 
       {/* ── Filter Bar ───────────────────────────────────── */}
-      <div className="bg-transparent border-b border-border/30">
+      <div className="hidden xl:block bg-transparent border-b border-border/30">
         <div className="px-4 py-2 space-y-2">
 
           {/* Row 1: Search + View toggle */}
@@ -265,7 +314,7 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
 
       {/* ── Results ──────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <p className="text-sm text-text-muted mb-5">
+        <p className="hidden xl:block text-sm text-text-muted mb-5">
           {t("resultsCount", { count: filtered.length })}
         </p>
 

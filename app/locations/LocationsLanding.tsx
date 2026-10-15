@@ -80,7 +80,7 @@ export default function LocationsLanding({
       </PageHeader>
 
       {/* ── City sections ─────────────────────────────────────────── */}
-      <div className="site-content-width space-y-10 pb-20 sm:space-y-14">
+      <div className="site-content-width space-y-10 mobile-bottom-nav-clear sm:space-y-14">
         {cityGroups.length === 0 ? (
           <div className="text-center py-16 px-4">
             <div className="w-16 h-16 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center mx-auto mb-4">

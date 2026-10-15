@@ -6,6 +6,9 @@ The current `/projects` page is the source of truth for public directory design.
 
 Use `components/PageHeader.tsx` for page headers and its exported backdrop helper for any page that intentionally extends the image beyond the header. `app/globals.css` owns shared width and surface values: `--site-content-max`, responsive gutters, `site-container`, `browse-toolbar`, and `browse-card`. Keep filters and result lists on the solid background; don’t extend the cinematic image behind them unless the `/projects` reference does so. The former `CategoryHero` component was removed after its remaining routes were migrated.
 
+All six directory areas (`/projects`, `/locations`, `/props`, `/creators`, `/companies`, `/jobs`) use `components/MobileBrowseControls.tsx` below 1280 CSS px. This shared control provides the full-width search, sort, labeled category select, count, removable filter chips, and scrollable filter panel with reset/apply actions. Page-specific controls belong inside the shared panel; do not add horizontal category strips or standalone mobile filter rows. Keep controls usable at 320 CSS px, ensure touch targets are at least 44×44 CSS px, and account for keyboard viewport resizing and safe-area insets. `app/globals.css` owns the mobile component styles.
+Reserve enough safe-area-aware space for the fixed bottom navigation so the last result card and empty-state actions can scroll completely above it.
+
 The homepage keeps `/hero-bg.jpg` as a full-page backdrop using the shared `PageBackdrop` component. Its slightly brighter dark overlay must retain readable copy and clear card surfaces while allowing the image to continue behind homepage sections.
 
 Desktop and mobile navigation use the same order: Locations, Crew, Jobs, Marktplatz, Projekte, Firmen. Keep `components/Navbar.tsx` and `components/BottomNav.tsx` aligned when editing navigation.
@@ -14,7 +17,7 @@ Desktop and mobile navigation use the same order: Locations, Crew, Jobs, Marktpl
 
 Run `npm run check:design` before each release. It verifies that all six public areas still use `PageHeader`, the desktop and mobile navigation have the same destinations in the same order, the shared page-width and solid-toolbar styles remain present, and the removed `CategoryHero` layout has not returned. The production release script runs this check automatically.
 
-For visual review, capture `/projects`, `/locations`, `/props`, `/creators`, `/companies`, and `/jobs` at identical 390×844, 768×1024, and 1366×900 viewports. Compare each area beside `/projects` at that same size, checking the header, page width, toolbar surface, first card row, and fixed mobile navigation. Also open each route directly, reload it, then navigate across areas. Review both signed-out and signed-in navigation when an authenticated test session is available; production data must not be altered for these checks.
+For visual review, capture `/projects`, `/locations`, `/props`, `/creators`, `/companies`, and `/jobs` at identical 320×740, 375×812, 390×844, 430×932, 768×1024, 1024×768, and 1366×900 viewports. Compare each area beside `/projects` at that same size, checking the header, page width, search/filter stack, first result row, and fixed mobile navigation. Exercise search, category and sort selects, filter combinations, reset/apply, long labels, empty results, orientation, and the keyboard-open filter panel. Check for horizontal overflow. Open each route directly, reload it, then navigate across areas. Review signed-out and signed-in navigation when an authenticated test session is available; production data must not be altered for these checks.
 
 ## Production source and release
 

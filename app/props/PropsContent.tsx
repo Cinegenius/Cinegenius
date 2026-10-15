@@ -16,6 +16,7 @@ import { useTranslations } from "next-intl";
 import EmptyState from "@/components/EmptyState";
 import { DEPARTMENTS, SEARCH_SYNONYMS, deptValues } from "@/lib/marketplaceCategories";
 import { deptColors } from "@/lib/departments";
+import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 
 // ── Icon maps ─────────────────────────────────────────────────────
 const DEPT_ICON_MAP: Record<string, LucideIcon> = {
@@ -339,12 +340,50 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
 
   const activeDeptData = selectedDept ? DEPARTMENTS.find((d) => d.id === selectedDept) : null;
   const chipColors = activeDeptData ? deptColors(activeDeptData.color) : null;
+  const mobileChips: BrowseChip[] = [
+    ...(activeDeptData ? [{ id: "category", label: activeDeptData.label, onRemove: () => setSelectedDept(null) }] : []),
+    ...(rentalTypeFilter !== "alle" ? [{ id: "offer", label: rentalTypeFilter === "miete" ? t("offerRent") : t("offerBuy"), onRemove: () => setRentalTypeFilter("alle") }] : []),
+  ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen mobile-bottom-nav-clear">
+
+      <MobileBrowseControls
+        query={query}
+        onQueryChange={setQuery}
+        searchPlaceholder={t("searchPlaceholder")}
+        sortValue={sortKey}
+        sortOptions={[{ value: "featured", label: t("sortFeatured") }, { value: "price-asc", label: t("sortPriceAsc") }, { value: "price-desc", label: t("sortPriceDesc") }]}
+        onSortChange={setSortKey}
+        categoryLabel={t("categoryBtn")}
+        allCategoryLabel={t("offerAll") + " Artikel"}
+        categories={DEPARTMENTS.map((department) => ({ value: department.id, label: department.label }))}
+        categoryValue={selectedDept ?? ""}
+        onCategoryChange={(value) => setSelectedDept(value || null)}
+        resultSummary={t("results", { count: filtered.length })}
+        filterCount={mobileChips.length}
+        chips={mobileChips}
+        onReset={clearAll}
+        resetLabel={t("clearAllFilters")}
+        showResultsLabel={t("results", { count: filtered.length })}
+      >
+        <MobileFilterField label={t("offerTypeLabel")}>
+          <MobileFilterSelect value={rentalTypeFilter === "alle" ? "" : rentalTypeFilter} onChange={(value) => setRentalTypeFilter((value || "alle") as typeof rentalTypeFilter)} placeholder={t("offerAll")} options={[{ value: "miete", label: t("offerRent") }, { value: "kauf", label: t("offerBuy") }]} />
+        </MobileFilterField>
+        <MobileFilterField label={t("sortLabel")}>
+          <MobileFilterSelect value={sortKey} onChange={setSortKey} placeholder={t("sortFeatured")} options={[{ value: "featured", label: t("sortFeatured") }, { value: "price-asc", label: t("sortPriceAsc") }, { value: "price-desc", label: t("sortPriceDesc") }]} />
+        </MobileFilterField>
+        <div className="mobile-filter-field">
+          <span>Ansicht</span>
+          <div className="grid grid-cols-2 gap-2">
+            <button type="button" onClick={() => setViewMode("grid")} className={`min-h-11 rounded-lg border text-sm ${viewMode === "grid" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>Raster</button>
+            <button type="button" onClick={() => setViewMode("list")} className={`min-h-11 rounded-lg border text-sm ${viewMode === "list" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>Liste</button>
+          </div>
+        </div>
+      </MobileBrowseControls>
 
       {/* ── Filter Bar ───────────────────────────────────────────── */}
-      <div className="browse-toolbar">
+      <div className="hidden xl:block browse-toolbar">
         <div className="site-container py-2 space-y-2">
 
           {/* Main row */}
@@ -494,7 +533,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               })}
             </div>
 
-            <div className="flex items-center justify-between mb-5">
+            <div className="hidden xl:flex items-center justify-between mb-5">
               <p className="text-sm text-text-muted">
                 <span className="text-text-primary font-semibold">{t("results", { count: filtered.length })}</span>
                 {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
