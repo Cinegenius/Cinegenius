@@ -19,7 +19,7 @@ For visual review, capture `/projects`, `/locations`, `/props`, `/creators`, `/c
 - Canonical Git source: `origin/main` in the CineGenius repository.
 - The production Vercel project is linked locally through the ignored `.vercel/project.json`. Check the linked project and production alias in the Vercel dashboard before a release; keep those account-specific identifiers out of the public repository.
 - Vercel automatic production deployment from `main` is disabled in `vercel.json`. This prevents an unreviewed Git integration deployment from replacing production.
-- Publish a release only by running `npm run deploy:production` from a clean `main` checkout whose `HEAD` matches `origin/main`. The guarded script checks the branch, clean tree, remote commit, and linked project; then it builds for production and deploys the prebuilt output.
+- Publish a release only by running `npm run deploy:production` from a clean `main` checkout whose `HEAD` matches `origin/main`. The guarded script checks the branch, clean tree, remote commit, and linked project; then it pulls the linked project's Production settings into the ignored `.vercel` directory, builds for production, and deploys the prebuilt output.
 - Never use a dirty working tree, another branch, a stale project folder, or a direct ad hoc `vercel --prod` command for production. The guard is intended to make those recurring snapshot overwrites fail before deployment.
 
 ## Cause confirmed during the deployment review

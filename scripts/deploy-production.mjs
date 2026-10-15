@@ -34,5 +34,6 @@ if (project.projectName !== expectedProjectName || !project.projectId || !projec
 
 console.log(`Building and deploying CineGenius ${head} to production…`);
 execFileSync("npm", ["run", "check:design"], { stdio: "inherit" });
+execFileSync("npx", ["vercel", "pull", "--yes", "--environment", "production"], { stdio: "inherit" });
 execFileSync("npx", ["vercel", "build", "--prod"], { stdio: "inherit" });
 execFileSync("npx", ["vercel", "deploy", "--prebuilt", "--prod"], { stdio: "inherit" });
