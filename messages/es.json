@@ -604,7 +604,7 @@
     "heroDesc": "{count} puestos abiertos — desde asistente de cámara hasta gestor de redes sociales.",
     "heroDescEmpty": "Publica empleos y encuentra el equipo adecuado — gratis, sin comisión.",
     "allJobs": "Todos los empleos →",
-    "postJobBtn": "Publicar empleo →",
+    "postJobBtn": "Publicar empleo",
     "searchPlaceholder": "Rol, habilidad, palabra clave...",
     "sort": "Ordenar",
     "sortNewest": "Más recientes",

@@ -1,84 +1,105 @@
+import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { ArrowRight } from "lucide-react";
 
-type Props = {
+export const PROJECTS_BACKDROP_IMAGE =
+  "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=1740&auto=format&fit=crop";
+
+type PageBackdropProps = {
+  image?: string;
+  imagePosition?: string;
+  className?: string;
+};
+
+/** Shared cinematic backdrop treatment used by the Projects reference and page heroes. */
+export function PageBackdrop({
+  image = PROJECTS_BACKDROP_IMAGE,
+  imagePosition = "center 42%",
+  className = "absolute inset-0 z-0",
+}: PageBackdropProps) {
+  return (
+    <div aria-hidden="true" className={`pointer-events-none overflow-hidden ${className}`}>
+      <Image
+        src={image}
+        alt=""
+        fill
+        unoptimized
+        priority
+        className="object-cover opacity-20"
+        style={{ objectPosition: imagePosition }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/60 via-bg-primary/40 to-bg-primary/80" />
+    </div>
+  );
+}
+
+type PageHeaderProps = {
   badge: string;
   title: string;
   titleHighlight?: string;
   description: string;
-  /** Local decorative hero image. */
   image?: string;
   imagePosition?: string;
-  /** RGB values for the accent glow, e.g. "99,102,241". Defaults to lime. */
-  accentRgb?: string;
+  /** Turn off when a parent page already extends PageBackdrop behind its full content. */
+  withBackdrop?: boolean;
   cta?: { label: string; href: string };
   ctaSecondary?: { label: string; href: string };
+  children?: ReactNode;
 };
 
-const GRAIN = "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
-const LIME = "194,241,53";
-
 export default function PageHeader({
-  badge, title, titleHighlight, description,
-  image = "/hero-bg.jpg", imagePosition = "center 42%",
-  accentRgb = LIME,
-  cta, ctaSecondary,
-}: Props) {
-  const g = (a: number) => `rgba(${accentRgb},${a})`;
-
+  badge,
+  title,
+  titleHighlight,
+  description,
+  image = PROJECTS_BACKDROP_IMAGE,
+  imagePosition = "center 42%",
+  withBackdrop = true,
+  cta,
+  ctaSecondary,
+  children,
+}: PageHeaderProps) {
   return (
-    <div className="pt-16 relative overflow-hidden">
+    <section className="site-page-hero relative isolate overflow-hidden border-b border-border/40 pt-16">
+      {withBackdrop && <PageBackdrop image={image} imagePosition={imagePosition} />}
 
-      {/* Cinematic photo backdrop; dark overlays keep the compact text readable. */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none bg-cover bg-no-repeat"
-        style={{ backgroundImage: `url("${image}")`, backgroundPosition: imagePosition }}
-      />
-      <div aria-hidden="true" className="absolute inset-0 pointer-events-none bg-gradient-to-r from-bg-primary/90 via-bg-primary/75 to-bg-primary/55" />
-      <div aria-hidden="true" className="absolute inset-0 pointer-events-none bg-gradient-to-b from-bg-primary/35 via-transparent to-bg-primary/90" />
-
-      {/* Main glow — top right */}
-      <div className="absolute -top-16 -right-16 w-[600px] h-[480px] rounded-full blur-[100px] pointer-events-none"
-        style={{ background: `radial-gradient(ellipse at center, ${g(0.40)}, transparent 70%)` }} />
-
-      {/* Film grain */}
-      <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none"
-        style={{ backgroundImage: GRAIN }} />
-
-      {/* Content */}
-      <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-4 pb-5 sm:pt-8 sm:pb-8 max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 sm:gap-5">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-2"
-              style={{ background: g(0.10), border: `1px solid ${g(0.35)}` }}>
-              <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: g(1) }}>{badge}</span>
+      <div className="site-container relative z-10 py-4 sm:py-8">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0">
+            <div className="mb-1.5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 backdrop-blur-sm">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-white/80">{badge}</span>
             </div>
-            <h1 className="font-display text-xl sm:text-3xl lg:text-4xl font-bold text-text-primary leading-tight mb-1.5">
-              {title}
-              {titleHighlight && <> <span className="text-gradient-gold">{titleHighlight}</span></>}
+            <h1 className="mb-1.5 font-display text-xl font-bold leading-tight text-white sm:text-3xl lg:text-4xl">
+              {title}{titleHighlight && <> <span className="text-gradient-gold">{titleHighlight}</span></>}
             </h1>
-            <p className="text-text-secondary text-sm sm:text-base leading-relaxed max-w-xl">{description}</p>
+            <p className="max-w-xl text-sm leading-relaxed text-white/65 sm:text-base">{description}</p>
           </div>
 
           {(cta || ctaSecondary) && (
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
               {ctaSecondary && (
-                <Link href={ctaSecondary.href}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 border border-border text-text-secondary rounded-xl hover:border-gold/40 hover:text-gold transition-all text-sm whitespace-nowrap">
+                <Link
+                  href={ctaSecondary.href}
+                  className="inline-flex min-h-10 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-white/20 px-4 py-2.5 text-sm text-white/75 backdrop-blur-sm transition hover:border-white/40 hover:text-white"
+                >
                   {ctaSecondary.label} <ArrowRight size={13} />
                 </Link>
               )}
               {cta && (
-                <Link href={cta.href}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm whitespace-nowrap">
+                <Link
+                  href={cta.href}
+                  className="inline-flex min-h-10 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-gold px-4 py-2.5 text-sm font-semibold text-bg-primary transition hover:bg-gold-light"
+                >
                   {cta.label} <ArrowRight size={13} />
                 </Link>
               )}
             </div>
           )}
         </div>
+
+        {children && <div className="mt-5">{children}</div>}
       </div>
-    </div>
+    </section>
   );
 }

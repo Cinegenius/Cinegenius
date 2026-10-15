@@ -15,7 +15,7 @@ export default function Footer() {
       titleKey: "col1",
       links: [
         { labelKey: "links_locations", href: "/locations" },
-        { labelKey: "links_marketplace", href: "/marketplace" },
+        { labelKey: "links_marketplace", href: "/props" },
         { labelKey: "links_vehicles", href: "/vehicles" },
         { labelKey: "links_customProps", href: "/marketplace/commission" },
       ],

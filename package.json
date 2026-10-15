@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "deploy": "git add -A && git commit -m \"update\" && git push && npx vercel --prod"
+    "check:design": "node scripts/check-design.mjs",
+    "deploy": "node scripts/deploy-production.mjs",
+    "deploy:production": "node scripts/deploy-production.mjs"
   },
   "dependencies": {
     "@clerk/localizations": "^4.5.3",

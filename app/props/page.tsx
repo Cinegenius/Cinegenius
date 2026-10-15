@@ -69,17 +69,14 @@ export default async function PropsPage() {
   }));
 
   return (
-    <div style={{ background: "radial-gradient(ellipse at 80% 0%, rgba(52,211,153,0.03) 0%, transparent 50%)" }}>
+    <div className="min-h-screen bg-bg-primary">
       <PageHeader
-          badge={t("heroBadge")}
-          title={t("heroTitle")}
-          titleHighlight={t("heroTitleHighlight")}
-          description={t("heroDesc")}
-          image="/photo-bg.jpg"
-          imagePosition="center 42%"
-          accentRgb="52,211,153"
-          cta={{ label: t("heroCta"), href: "/inserat" }}
-        />
+        badge={t("heroBadge")}
+        title={t("heroTitle")}
+        titleHighlight={t("heroTitleHighlight")}
+        description={t("heroDesc")}
+        cta={{ label: t("heroCta"), href: "/inserat" }}
+      />
       <PropsContent serverListings={serverListings} vendorProfiles={equipmentVendors} />
     </div>
   );

@@ -239,7 +239,7 @@ export default async function HomePage() {
                 {tc("viewAll")} <ArrowRight size={14} />
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {liveProps.map((prop) => (
                 <Link
                   key={prop.id}
@@ -252,7 +252,7 @@ export default async function HomePage() {
                       alt={prop.title}
                       fill
                       className="object-cover object-bottom group-hover:scale-105 transition-transform duration-500"
-                      sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw"
+                      sizes="(max-width:640px) 50vw,(max-width:1024px) 50vw,33vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/70 to-transparent" />
                     <div className="absolute top-2 left-2">
@@ -261,18 +261,18 @@ export default async function HomePage() {
                         {prop.type === "vehicle" ? "Fahrzeug" : "Equipment"}
                       </span>
                     </div>
-                    <div className="absolute bottom-2 left-3 right-3">
-                      <h3 className="font-semibold text-white text-sm leading-tight">{prop.title}</h3>
+                    <div className="absolute bottom-2 left-2 right-2 sm:left-3 sm:right-3">
+                      <h3 className="font-semibold text-white text-xs sm:text-sm leading-tight line-clamp-2">{prop.title}</h3>
                       {prop.city && (
-                        <p className="text-xs text-white/70 flex items-center gap-1 mt-0.5">
+                        <p className="text-[10px] sm:text-xs text-white/70 flex items-center gap-1 mt-0.5">
                           <MapPin size={10} /> {prop.city}
                         </p>
                       )}
                     </div>
                   </div>
-                  <div className="px-4 py-3 flex items-center justify-between">
-                    <span className="text-xs text-text-muted">{formatDate(prop.created_at)}</span>
-                    <span className="text-sm font-semibold text-gold">
+                  <div className="px-2.5 py-2 sm:px-4 sm:py-3 flex items-center justify-between gap-1">
+                    <span className="text-[10px] sm:text-xs text-text-muted truncate">{formatDate(prop.created_at)}</span>
+                    <span className="text-xs sm:text-sm font-semibold text-gold whitespace-nowrap">
                       {prop.price > 0 ? `${prop.price.toLocaleString()} €${tc("perDay")}` : tc("onRequest")}
                     </span>
                   </div>

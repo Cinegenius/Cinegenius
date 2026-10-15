@@ -3,8 +3,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import {
-  Film, Tv, Camera, Zap, Music, FileVideo, Building2, Radio, ArrowRight, Plus,
+  Film, Tv, Camera, Zap, Music, FileVideo, Building2, Radio, ArrowRight,
 } from "lucide-react";
+import PageHeader, { PageBackdrop, PROJECTS_BACKDROP_IMAGE } from "@/components/PageHeader";
 
 export const revalidate = 300;
 
@@ -31,57 +32,24 @@ export default async function ProjectsPage() {
     label: t(c.labelKey),
     desc: t(c.descKey),
   }));
+  const [titleLead = "", titleTail = ""] = t("title").split("&");
 
   return (
-    <div className="pt-16 min-h-screen bg-bg-primary relative overflow-hidden">
-
-      {/* Background image */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=1740&auto=format&fit=crop"
-          alt=""
-          fill
-          unoptimized
-          priority
-          className="object-cover opacity-20"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/60 via-bg-primary/40 to-bg-primary/80" />
-      </div>
-
-      {/* Header */}
-      <div className="relative z-10 px-4 sm:px-6 lg:px-8 pt-4 pb-5 sm:pt-8 sm:pb-8 max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full mb-1.5">
-              <span className="text-[11px] text-white/80 font-bold uppercase tracking-widest">{t("badge")}</span>
-            </div>
-            <h1 className="font-display text-xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight mb-1.5">
-              {t("title").split("&")[0]}&amp; <span className="text-gradient-gold">{t("title").split("& ")[1]}</span>
-            </h1>
-            <p className="text-white/60 text-sm sm:text-base leading-relaxed max-w-xl">
-              {t("subtitle")}
-            </p>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <Link
-              href="/projects/alle"
-              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-white/20 text-white/70 rounded-xl hover:border-white/40 hover:text-white transition-all text-sm whitespace-nowrap backdrop-blur-sm"
-            >
-              {t("allBrowse")} <ArrowRight size={13} />
-            </Link>
-            <Link
-              href="/projects/neu"
-              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm whitespace-nowrap"
-            >
-              <Plus size={13} /> {t("addProject")}
-            </Link>
-          </div>
-        </div>
-      </div>
+    <div className="relative isolate min-h-screen overflow-hidden bg-bg-primary">
+      <PageBackdrop image={PROJECTS_BACKDROP_IMAGE} className="absolute inset-0 z-0" />
+      <PageHeader
+        badge={t("badge")}
+        title={`${titleLead.trim()} &`}
+        titleHighlight={titleTail.trim()}
+        description={t("subtitle")}
+        withBackdrop={false}
+        ctaSecondary={{ label: t("allBrowse"), href: "/projects/alle" }}
+        cta={{ label: t("addProject"), href: "/projects/neu" }}
+      />
 
       {/* Category Grid */}
-      <div className="relative z-10 px-4 sm:px-6 lg:px-8 pb-16">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-7xl mx-auto">
+      <div className="relative z-10 site-container pb-16">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {CATEGORIES.map(({ label, desc, href, icon: Icon, image, accent }) => (
             <Link
               key={href}

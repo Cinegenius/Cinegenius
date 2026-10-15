@@ -654,7 +654,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       <div className="lg:hidden">
 
         {/* Row 1 — Search + View toggle */}
-        <div className="bg-transparent border-b border-border/30 px-3 py-2 flex items-center gap-2">
+        <div className="browse-toolbar site-container flex items-center gap-2 py-2">
           <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-xl px-3 focus-within:border-gold/50 transition-colors">
             <Search size={14} className="text-text-muted shrink-0" />
             <input
@@ -683,7 +683,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
         </div>
 
         {/* Row 2 — Verfügbar + Rollen-Chips + Filter-Button (eine scrollbare Zeile) */}
-        <div className="bg-transparent border-b border-border/30 px-3 py-2.5 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+        <div className="browse-toolbar site-container overflow-x-auto py-2.5" style={{ scrollbarWidth: "none" }}>
           <div className="flex gap-2 items-center">
             <button
               onClick={() => setAvailableOnly((v) => !v)}
@@ -715,7 +715,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 
         {/* Row 3 — Active role chips (nur wenn aktiv) */}
         {activeChips.length > 0 && (
-          <div className="bg-transparent border-b border-border/30 px-3 py-2 flex flex-wrap gap-1.5 items-center">
+          <div className="browse-toolbar site-container flex flex-wrap items-center gap-1.5 py-2">
             {activeChips.map(({ role, dept }) => {
               const colors = dept ? deptColors(dept.color) : deptColors("slate");
               return (
@@ -735,7 +735,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
         )}
 
         {/* Row 4 — Ergebnis-Count + Sort */}
-        <div className="px-4 py-2.5 flex items-center justify-between">
+        <div className="site-container flex items-center justify-between py-2.5">
           <p className="text-xs text-text-muted">
             {isTopMode ? (
               <span className="text-gold font-semibold">Top 20 nach Bewertung</span>
@@ -942,8 +942,8 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       {/* ══════════════════════════════════════════════════════════════════════
           DESKTOP LAYOUT  (≥ lg)
           ══════════════════════════════════════════════════════════════════ */}
-      <div className="hidden lg:block bg-transparent border-b border-border/30">
-        <div className="px-4 py-2 space-y-2">
+      <div className="hidden lg:block browse-toolbar">
+        <div className="site-container py-2 space-y-2">
 
           {/* Row 1: Search + Sort + View toggle */}
           <div className="flex items-center gap-2">
@@ -1167,7 +1167,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
         const crewVisible  = filteredCrew.slice(0, visibleCount);
 
         return (
-          <div className="px-4 sm:px-6 lg:px-8 py-3 sm:py-6 pb-24 lg:pb-8">
+          <div className="site-container py-3 pb-24 sm:py-6 lg:pb-8">
             <div className="flex gap-8 items-start">
 
             {/* Left sidebar */}
@@ -1371,7 +1371,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                   const href = c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`;
                   return (
                     <Link key={c.id} href={href} suppressHydrationWarning
-                      className="card-hover group flex min-w-0 items-center gap-2 rounded-xl border border-border bg-bg-secondary p-2.5 sm:gap-3 sm:p-3">
+                      className="browse-card card-hover group flex min-w-0 items-center gap-2 p-2.5 sm:gap-3 sm:p-3">
                       <div className="relative flex h-[88px] w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/60 bg-bg-primary sm:h-24 sm:w-[72px] lg:h-28 lg:w-[84px]">
                         {c.image || c.avatar ? (
                           // eslint-disable-next-line @next/next/no-img-element

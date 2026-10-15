@@ -144,8 +144,8 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
     <div className="min-h-screen bg-bg-primary">
 
       {/* ── Filter Bar ───────────────────────────────────── */}
-      <div className="bg-transparent border-b border-border/30">
-        <div className="px-4 py-2 space-y-2">
+      <div className="browse-toolbar">
+        <div className="site-container py-2 space-y-2">
 
           {/* Row 1: Search + View toggle */}
           <div className="flex items-center gap-2">
@@ -242,7 +242,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
       </div>
 
       {/* ── Results ──────────────────────────────────────── */}
-      <div className="px-4 sm:px-6 lg:px-8 py-3 sm:py-6">
+      <div className="site-container py-3 sm:py-6">
         <div className="flex gap-8 items-start">
 
           {/* Sidebar */}
@@ -338,11 +338,11 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                 )}
               </div>
             ) : viewMode === "grid" ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {paginated.map((company) => <CompanyCard key={company.id} company={company} />)}
               </div>
             ) : (
-              <div className="bg-bg-secondary border border-border rounded-2xl overflow-hidden">
+              <div className="browse-card overflow-hidden">
                 <div className="divide-y divide-border">
                   {paginated.map((company) => <CompanyListRow key={company.id} company={company} />)}
                 </div>
@@ -370,7 +370,7 @@ function CompanyCard({ company }: { company: Company }) {
   const cats = company.categories.slice(0, 2).map((id) => COMPANY_CATEGORY_BY_ID[id]).filter(Boolean);
   return (
     <Link href={`/companies/${company.slug}`}
-      className="card-hover group block bg-bg-secondary border border-border rounded-2xl p-4">
+      className="browse-card card-hover group block p-4">
       {/* Header: logo + name + city */}
       <div className="flex items-start gap-3 mb-3">
         <div className="w-20 h-12 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shrink-0 overflow-hidden">
