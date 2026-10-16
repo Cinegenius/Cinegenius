@@ -23,6 +23,11 @@ For visual review, capture `/projects`, `/locations`, `/props`, `/creators`, `/c
 
 - Canonical Git source: `origin/main` in the CineGenius repository.
 - The production Vercel project is linked locally through the ignored `.vercel/project.json`. Check the linked project and production alias in the Vercel dashboard before a release; keep those account-specific identifiers out of the public repository.
+
+## Authentication redirects
+
+- Protected browser pages must send signed-out visitors to `/sign-in` on the same host as the requested page. Build the URL from `request.url` and pass it as `unauthenticatedUrl` to `auth.protect()` in `proxy.ts`; do not rely on Clerk's default cross-domain redirect unless that hostname is explicitly attached to the production Vercel project and verified.
+- After any auth-routing change, test sign-out, then open `/dashboard` directly while signed out. The redirect must reach the app's sign-in page without a Vercel 404; preserve the requested path in `redirect_url` where applicable.
 - Vercel automatic production deployment from `main` is disabled in `vercel.json`. This prevents an unreviewed Git integration deployment from replacing production.
 - Publish a release only by running `npm run deploy:production` from a clean `main` checkout whose `HEAD` matches `origin/main`. The guarded script checks the branch, clean tree, remote commit, and linked project; then it pulls the linked project's Production settings into the ignored `.vercel` directory, builds for production, and deploys the prebuilt output.
 - Never use a dirty working tree, another branch, a stale project folder, or a direct ad hoc `vercel --prod` command for production. The guard is intended to make those recurring snapshot overwrites fail before deployment.

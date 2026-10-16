@@ -125,14 +125,22 @@ export type UploadValidationError = {
  * to avoid reading the file a second time.
  */
 export async function validateUpload(
-  file: File
+  file: File,
+  options: {
+    maxBytes?: number;
+    allowedMimeTypes?: ReadonlySet<string>;
+    tooLargeMessage?: string;
+    unsupportedTypeMessage?: string;
+  } = {},
 ): Promise<ValidatedUpload | UploadValidationError> {
+  const maxBytes = options.maxBytes ?? MAX_UPLOAD_BYTES;
   // Size check first — avoid reading large files into memory
   if (file.size === 0) {
     return { error: "Datei ist leer", status: 400 };
   }
-  if (file.size > MAX_UPLOAD_BYTES) {
-    return { error: "Datei zu groß (max. 20 MB)", status: 413 };
+  if (file.size > maxBytes) {
+    const maxMb = Math.floor(maxBytes / (1024 * 1024));
+    return { error: options.tooLargeMessage ?? `Datei zu groß (max. ${maxMb} MB)`, status: 413 };
   }
 
   // Read file once
@@ -144,7 +152,13 @@ export async function validateUpload(
 
   if (!detectedMime) {
     return {
-      error: "Ungültiges Dateiformat. Nur JPG, PNG, WEBP, HEIC und SVG sind erlaubt.",
+      error: options.unsupportedTypeMessage ?? "Ungültiges Dateiformat. Nur JPG, PNG, WEBP, HEIC und SVG sind erlaubt.",
+      status: 415,
+    };
+  }
+  if (options.allowedMimeTypes && !options.allowedMimeTypes.has(detectedMime)) {
+    return {
+      error: options.unsupportedTypeMessage ?? "Ungültiges Dateiformat.",
       status: 415,
     };
   }

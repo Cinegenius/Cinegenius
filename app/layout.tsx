@@ -17,6 +17,7 @@ import PresencePing from "@/components/PresencePing";
 import CookieBanner from "@/components/CookieBanner";
 import { ToastProvider } from "@/contexts/ToastContext";
 import GlobalSearch from "@/components/GlobalSearch";
+import AuthSessionBoundary from "@/components/AuthSessionBoundary";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -114,6 +115,7 @@ export default async function RootLayout({
       signUpForceRedirectUrl="/profile"
       signInFallbackRedirectUrl="/dashboard"
       signInForceRedirectUrl="/dashboard"
+      afterMultiSessionSingleSignOutUrl="/"
     >
       <html
         lang={htmlLang}
@@ -132,16 +134,18 @@ export default async function RootLayout({
           <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
             <ToastProvider>
-              <GlobalEffects />
-              <PresencePing />
-              <GlobalSearch />
-              <Navbar />
-              <main className="flex-1 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">{children}</main>
-              <Footer />
-              <CookieBanner />
-              <BottomNav />
-              <Analytics />
-              <SpeedInsights />
+              <AuthSessionBoundary>
+                <GlobalEffects />
+                <PresencePing />
+                <GlobalSearch />
+                <Navbar />
+                <main className="flex-1 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">{children}</main>
+                <Footer />
+                <CookieBanner />
+                <BottomNav />
+                <Analytics />
+                <SpeedInsights />
+              </AuthSessionBoundary>
             </ToastProvider>
           </ThemeProvider>
           </NextIntlClientProvider>

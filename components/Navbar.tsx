@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth, useUser, useClerk } from "@clerk/nextjs";
 import {
-  Menu, X, Film, ChevronDown, Search,
+  Menu, X, Film, ChevronDown, Search, Loader2,
   Car, Shirt, Wrench, Clapperboard, Sparkles, Zap,
   Camera, Mic, Drama, Lightbulb, User, Users, Layers, Briefcase,
   LayoutDashboard, LogOut, MessageSquare, Bell,
@@ -18,6 +18,7 @@ import { Logo } from "@/components/Logo";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { supabase } from "@/lib/supabase";
 import { useTranslations } from "next-intl";
+import { useToast } from "@/contexts/ToastContext";
 
 type NavItem = { icon: React.ElementType; label: string; desc: string; href: string; iconBg: string; iconColor: string };
 
@@ -170,28 +171,33 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [profileDisplayName, setProfileDisplayName] = useState("");
-  const [profileAvatarUrl, setProfileAvatarUrl] = useState("");
-
-  // Read cache immediately after hydration — before Clerk even loads
-  useEffect(() => {
-    try {
-      const n = localStorage.getItem("cg_profile_name");
-      const a = localStorage.getItem("cg_profile_avatar");
-      if (n) setProfileDisplayName(n);
-      if (a) setProfileAvatarUrl(a);
-    } catch { /* */ }
-  }, []);
-  const [unreadMessages, setUnreadMessages] = useState(0);
+  const [profileData, setProfileData] = useState<{
+    userId: string;
+    displayName: string;
+    avatarUrl: string;
+  } | null>(null);
+  const [signingOut, setSigningOut] = useState(false);
+  const signingOutRef = useRef(false);
+  const [unreadData, setUnreadData] = useState<{ userId: string; count: number } | null>(null);
   const pathname = usePathname();
   const { isSignedIn, isLoaded } = useAuth();
   const { user } = useUser();
   const { signOut, openSignIn, openSignUp } = useClerk();
+  const { addToast } = useToast();
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const activeUserId = isSignedIn ? user?.id : null;
+  const profileDisplayName = profileData?.userId === activeUserId ? profileData?.displayName ?? "" : "";
+  const profileAvatarUrl = profileData?.userId === activeUserId ? profileData?.avatarUrl ?? "" : "";
+  const unreadMessages = unreadData?.userId === activeUserId ? unreadData?.count ?? 0 : 0;
 
   const closeAll = () => { setUserMenuOpen(false); };
 
-  useEffect(() => { closeAll(); setOpen(false); }, [pathname]);
+  useEffect(() => {
+    // Route changes must close transient menus, including browser back/forward navigation.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    closeAll();
+    setOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -200,47 +206,46 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (!isSignedIn) {
-      if (!isLoaded) return;
-      setProfileDisplayName("");
-      setProfileAvatarUrl("");
-      setUnreadMessages(0);
-      try { localStorage.removeItem("cg_profile_name"); localStorage.removeItem("cg_profile_avatar"); } catch { /* */ }
-      return;
-    }
+    if (!isLoaded) return;
+
+    try {
+      // Remove the old account-agnostic cache written by previous releases.
+      localStorage.removeItem("cg_profile_name");
+      localStorage.removeItem("cg_profile_avatar");
+    } catch { /* storage can be disabled */ }
+
+    if (!activeUserId) return;
 
     const controller = new AbortController();
     const { signal } = controller;
+    let current = true;
 
     fetch("/api/profile", { signal })
       .then(r => r.ok ? r.json() : null)
       .then((json) => {
-        if (!json) return;
-        if (json.profile?.display_name) {
-          setProfileDisplayName(json.profile.display_name);
-          try { localStorage.setItem("cg_profile_name", json.profile.display_name); } catch { /* */ }
-        }
-        if (json.profile?.avatar_url) {
-          setProfileAvatarUrl(json.profile.avatar_url);
-          try { localStorage.setItem("cg_profile_avatar", json.profile.avatar_url); } catch { /* */ }
-        }
+        if (!current || !json) return;
+        setProfileData({
+          userId: activeUserId,
+          displayName: json.profile?.display_name ?? "",
+          avatarUrl: json.profile?.avatar_url ?? "",
+        });
       })
       .catch(() => {});
     fetch("/api/unread-count", { signal })
       .then(r => r.ok ? r.json() : null)
-      .then((json) => { if (json) setUnreadMessages(json.count ?? 0); })
+      .then((json) => { if (current && json) setUnreadData({ userId: activeUserId, count: json.count ?? 0 }); })
       .catch(() => {});
 
     const refreshUnreadMessages = () => {
-      fetch("/api/unread-count", { cache: "no-store" })
+      fetch("/api/unread-count", { cache: "no-store", signal })
         .then(r => r.ok ? r.json() : null)
-        .then((json) => { if (json) setUnreadMessages(json.count ?? 0); })
+        .then((json) => { if (current && json) setUnreadData({ userId: activeUserId, count: json.count ?? 0 }); })
         .catch(() => {});
     };
     window.addEventListener("cinegenius:messages-read", refreshUnreadMessages);
 
     // Realtime: Badge neu laden wenn neue Nachricht von jemand anderem ankommt
-    const currentUserId = user?.id;
+    const currentUserId = activeUserId;
     if (!currentUserId) return () => {
       controller.abort();
       window.removeEventListener("cinegenius:messages-read", refreshUnreadMessages);
@@ -253,19 +258,41 @@ export default function Navbar() {
         table: "messages",
       }, (payload) => {
         if (payload.new?.sender_id !== currentUserId) {
-          fetch("/api/unread-count")
+          fetch("/api/unread-count", { signal })
             .then(r => r.ok ? r.json() : null)
-            .then((json) => { if (json) setUnreadMessages(json.count ?? 0); })
+            .then((json) => { if (current && json) setUnreadData({ userId: currentUserId, count: json.count ?? 0 }); })
             .catch(() => {});
         }
       })
       .subscribe();
     return () => {
+      current = false;
       controller.abort();
       window.removeEventListener("cinegenius:messages-read", refreshUnreadMessages);
       supabase.removeChannel(channel);
     };
-  }, [isSignedIn, isLoaded]);
+  }, [isLoaded, activeUserId]);
+
+  const handleSignOut = async () => {
+    if (signingOutRef.current) return;
+    signingOutRef.current = true;
+    setSigningOut(true);
+    const slowNoticeTimer = window.setTimeout(() => {
+      addToast(t("signOutSlow"), "info");
+    }, 6000);
+    try {
+      // No sessionId means sign out every CineGenius session active in this
+      // browser, so switching between profiles cannot leave an account active.
+      await signOut({ redirectUrl: "/" });
+    } catch {
+      window.clearTimeout(slowNoticeTimer);
+      signingOutRef.current = false;
+      setSigningOut(false);
+      addToast(t("signOutError"), "error");
+      return;
+    }
+    window.clearTimeout(slowNoticeTimer);
+  };
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -432,10 +459,13 @@ export default function Navbar() {
                         {/* Sign out */}
                         <div className="border-t border-border py-1.5">
                           <button
-                            onClick={() => { setUserMenuOpen(false); signOut(); }}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-red-400 hover:bg-red-500/5 transition-colors"
+                            onClick={() => { setUserMenuOpen(false); void handleSignOut(); }}
+                            disabled={signingOut}
+                            aria-busy={signingOut}
+                            className="w-full min-h-11 flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-red-400 hover:bg-red-500/5 transition-colors disabled:opacity-60"
                           >
-                            <LogOut size={15} className="shrink-0" /> {t("signOut")}
+                            {signingOut ? <Loader2 size={15} className="shrink-0 animate-spin" /> : <LogOut size={15} className="shrink-0" />}
+                            {signingOut ? t("signingOut") : t("signOut")}
                           </button>
                         </div>
                       </div>
@@ -558,10 +588,13 @@ export default function Navbar() {
               {/* Sign out */}
               <div className="pt-2 border-t border-border">
                 <button
-                  onClick={() => { setOpen(false); signOut(); }}
-                  className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-text-secondary hover:text-red-400 rounded-lg transition-colors"
+                  onClick={() => { setOpen(false); void handleSignOut(); }}
+                  disabled={signingOut}
+                  aria-busy={signingOut}
+                  className="w-full min-h-11 flex items-center gap-2 px-3 py-2.5 text-sm text-text-secondary hover:text-red-400 rounded-lg transition-colors disabled:opacity-60"
                 >
-                  <LogOut size={14} /> {t("signOut")}
+                  {signingOut ? <Loader2 size={14} className="animate-spin" /> : <LogOut size={14} />}
+                  {signingOut ? t("signingOut") : t("signOut")}
                 </button>
               </div>
             </>

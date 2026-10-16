@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# clerk configuration (can include secrets)
+/.clerk/
+
+# Local live-user reports may contain account-specific test details
+/docs/test-reports/live-user-journey-*.md

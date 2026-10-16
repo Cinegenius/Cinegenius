@@ -19,6 +19,7 @@ import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker
 import { departments, deptColors } from "@/lib/departments";
 import RoleDropdown from "@/components/RoleDropdown";
 import { calculateProfileCompletion } from "@/lib/profile-completion";
+import { prepareProfileMediaFile, sendProfileMediaFile, PROFILE_MEDIA_ACCEPT, PROFILE_MEDIA_MAX_BYTES, PROFILE_MEDIA_SOURCE_MAX_BYTES } from "@/lib/profile-media-client";
 
 const ALL_CREW_ROLES = departments.flatMap((d) => d.roles);
 
@@ -52,6 +53,21 @@ async function patchProfile(payload: Record<string, unknown>) {
     throw new Error(result.error ?? `HTTP ${response.status}`);
   }
   return result;
+}
+
+type ProfileMediaCopyKey = "uploadEmpty" | "uploadSourceTooBig" | "uploadUnsupported" | "uploadCompressedTooBig";
+
+function profileMediaErrorText(
+  error: "empty" | "source-too-large" | "unsupported" | "compressed-too-large",
+  translate: (key: ProfileMediaCopyKey) => string,
+) {
+  const keys: Record<typeof error, ProfileMediaCopyKey> = {
+    empty: "uploadEmpty",
+    "source-too-large": "uploadSourceTooBig",
+    unsupported: "uploadUnsupported",
+    "compressed-too-large": "uploadCompressedTooBig",
+  };
+  return translate(keys[error]);
 }
 
 // The editor and dashboard share one completion calculation.
@@ -486,6 +502,10 @@ export default function ProfilePage() {
   const { addToast } = useToast();
   const { user, isLoaded } = useUser();
   const t = useTranslations("profile");
+  const profileMediaLimitsText = t("uploadMediaLimits", {
+    sourceMaxMb: PROFILE_MEDIA_SOURCE_MAX_BYTES / (1024 * 1024),
+    compressedMaxMb: PROFILE_MEDIA_MAX_BYTES / (1024 * 1024),
+  });
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [activeTab, setActiveTab] = useState("profile");
@@ -795,6 +815,7 @@ export default function ProfilePage() {
 
   // ── Avatar upload ───────────────────────────────────────────────────────────
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.currentTarget;
     const file = e.target.files?.[0];
     if (!file) return;
     const previousAvatarUrl = avatarUrl;
@@ -802,13 +823,9 @@ export default function ProfilePage() {
     if (preview) setAvatarPreview(preview);
     setAvatarUploading(true);
     try {
-      let compressed: File = file;
-      try { compressed = await compressAvatar(file); } catch { /* use raw */ }
-      const fd = new FormData();
-      fd.append("file", compressed);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const { url, error } = await res.json();
-      if (!res.ok || error) throw new Error(error ?? `HTTP ${res.status}`);
+      const prepared = await prepareProfileMediaFile(file, compressAvatar);
+      if (!prepared.file) throw new Error(profileMediaErrorText(prepared.error, t));
+      const url = await sendProfileMediaFile(prepared.file);
       setAvatarUrl(url);
       setAvatarPreview(url);
       if (profileExists) await patchProfile({ avatar_url: url });
@@ -821,6 +838,7 @@ export default function ProfilePage() {
       setAvatarPreview(previousAvatarUrl);
     } finally {
       setAvatarUploading(false);
+      input.value = "";
     }
   };
 
@@ -838,18 +856,15 @@ export default function ProfilePage() {
   };
 
   const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.currentTarget;
     const file = e.target.files?.[0];
     if (!file) return;
     const _cp = safeObjectURL(file); if (_cp) setCoverImagePreview(_cp);
     setCoverUploading(true);
     try {
-      let compressed: File = file;
-      try { compressed = await compressImage(file, { maxWidth: 1920, maxHeight: 1080, quality: 0.85 }); } catch { /* use raw */ }
-      const fd = new FormData();
-      fd.append("file", compressed);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const { url, error } = await res.json();
-      if (!res.ok || error) throw new Error(error ?? `HTTP ${res.status}`);
+      const prepared = await prepareProfileMediaFile(file, (source) => compressImage(source, { maxWidth: 1920, maxHeight: 1080, quality: 0.85 }));
+      if (!prepared.file) throw new Error(profileMediaErrorText(prepared.error, t));
+      const url = await sendProfileMediaFile(prepared.file);
       if (profileExists) await patchProfile({ cover_image_url: url });
       setCoverImageUrl(url);
       setCoverImagePreview(url);
@@ -861,6 +876,7 @@ export default function ProfilePage() {
       setCoverImagePreview(coverImageUrl);
     } finally {
       setCoverUploading(false);
+      input.value = "";
     }
   };
 
@@ -1096,23 +1112,23 @@ export default function ProfilePage() {
   };
 
   const handleProfileImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.currentTarget;
     const files = Array.from(e.target.files ?? []);
     if (!files.length) return;
     setProfileUploading(true);
     try {
+      const preparedFiles = await Promise.all(files.map((file) => prepareProfileMediaFile(
+        file,
+        (source) => compressImage(source, { maxWidth: 1600, quality: 0.82 }),
+      )));
+      const firstFailure = preparedFiles.find((prepared) => !prepared.file);
+      if (firstFailure && !firstFailure.file) throw new Error(profileMediaErrorText(firstFailure.error, t));
+
       const uploaded: ProfileImage[] = [];
-      for (const file of files) {
-        // Try to compress; if anything goes wrong (iOS canvas quirks, HEIC, etc.) use raw file
-        let toUpload: File = file;
-        try { toUpload = await compressImage(file, { maxWidth: 1600, quality: 0.82 }); } catch { /* use raw */ }
-        // Vercel function body limit is 4.5 MB — reject before sending if still too large
-        if (toUpload.size > 4 * 1024 * 1024) throw new Error(t("uploadTooBig"));
-        const fd = new FormData();
-        fd.append("file", toUpload);
-        const res = await fetch("/api/upload", { method: "POST", body: fd });
-        const data = await res.json();
-        if (!res.ok || data.error) throw new Error(data.error ?? `HTTP ${res.status}`);
-        uploaded.push({ url: data.url, featured: false });
+      for (const prepared of preparedFiles) {
+        if (!prepared.file) continue;
+        const url = await sendProfileMediaFile(prepared.file);
+        uploaded.push({ url, featured: false });
       }
 
       // Merge with existing, auto-feature first if none set
@@ -1130,7 +1146,7 @@ export default function ProfilePage() {
       addToast(isBrowserBug ? t("uploadFailed") : msg, "error");
     } finally {
       setProfileUploading(false);
-      if (profileImagesRef.current) profileImagesRef.current.value = "";
+      input.value = "";
     }
   };
 
@@ -1376,7 +1392,8 @@ export default function ProfilePage() {
                       </div>
                     </div>
                   </div>
-                  <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleAvatarChange} />
+                  <input ref={fileRef} type="file" accept={PROFILE_MEDIA_ACCEPT} className="hidden" onChange={handleAvatarChange} />
+                  <p className="mt-2 text-xs text-text-muted">{profileMediaLimitsText}</p>
                 </div>
 
                 {/* Profilfotos — direkt unter Avatar */}
@@ -1385,7 +1402,7 @@ export default function ProfilePage() {
                     id="profile-images-input"
                     ref={profileImagesRef}
                     type="file"
-                    accept="image/jpeg,image/png,image/webp"
+                    accept={PROFILE_MEDIA_ACCEPT}
                     multiple
                     className="hidden"
                     onChange={handleProfileImagesUpload}
@@ -1399,6 +1416,7 @@ export default function ProfilePage() {
                           ? t("sectionPhotosDescTalent")
                           : t("sectionPhotosDescDefault")}
                       </p>
+                      <p className="mt-1 text-xs text-text-muted">{profileMediaLimitsText}</p>
                     </div>
                     <label
                       htmlFor="profile-images-input"
@@ -1469,7 +1487,8 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <h2 className="font-semibold text-text-primary mb-0.5">{t("sectionCover")}</h2>
-                      <p className="text-xs text-text-muted">{t("sectionCoverDesc")}</p>
+                    <p className="text-xs text-text-muted">{t("sectionCoverDesc")}</p>
+                    <p className="mt-1 text-xs text-text-muted">{profileMediaLimitsText}</p>
                     </div>
                     <button
                       type="button"
@@ -1480,7 +1499,7 @@ export default function ProfilePage() {
                       {coverUploading ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
                       {coverUploading ? t("uploading") : t("uploadCover")}
                     </button>
-                    <input ref={coverRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleCoverChange} />
+                    <input ref={coverRef} type="file" accept={PROFILE_MEDIA_ACCEPT} className="hidden" onChange={handleCoverChange} />
                   </div>
                   {coverImagePreview ? (
                     <>

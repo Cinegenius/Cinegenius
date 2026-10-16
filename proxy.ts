@@ -196,7 +196,19 @@ export default clerkMiddleware(async (auth, request) => {
     if (request.method !== "GET") await auth.protect();
   } else if (!isPublicRoute(request)) {
     // 3c. Session-only protection for all other non-public routes
-    await auth.protect();
+    if (request.method === "GET" && !isApi) {
+      // Keep unauthenticated browser navigation on the app's own host. The
+      // Clerk instance can otherwise send users to accounts.cinegenius.co,
+      // which is not a Vercel deployment domain and currently returns 404.
+      const signInUrl = new URL("/sign-in", request.url);
+      signInUrl.searchParams.set(
+        "redirect_url",
+        `${request.nextUrl.pathname}${request.nextUrl.search}`
+      );
+      await auth.protect({ unauthenticatedUrl: signInUrl.toString() });
+    } else {
+      await auth.protect();
+    }
   }
 
   // 4. Security headers on every response

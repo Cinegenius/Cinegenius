@@ -568,11 +568,14 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                   className="relative w-full aspect-[3/4] rounded-xl overflow-hidden cursor-pointer group bg-bg-elevated"
                   onClick={() => setLightbox(mainShot)}
                 >
+                  {/* Blurred fill keeps the whole source photo visible without adding plain empty bars. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={mainShot} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-55" />
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={mainShot}
                     alt={profile.display_name ?? ""}
-                    className="w-full h-full object-contain object-top"
+                    className="relative z-10 w-full h-full object-contain object-center"
                   />
                   {profile.verified && (
                     <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-1 rounded-full">
@@ -1393,9 +1396,11 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           {/* Avatar + company badge */}
           <div className="shrink-0 space-y-3">
             {profile.avatar_url ? (
-              <div className="relative">
-                <Image src={profile.avatar_url} alt={profile.display_name ?? ""} width={220} height={220}
-                  className="w-full aspect-square rounded-2xl object-contain bg-bg-secondary ring-1 ring-white/8 shadow-2xl" />
+              <div className="relative aspect-square rounded-2xl overflow-hidden bg-bg-secondary ring-1 ring-white/8 shadow-2xl">
+                <Image src={profile.avatar_url} alt="" aria-hidden="true" fill sizes="(max-width:640px) 100vw, 220px"
+                  className="absolute inset-0 object-cover scale-110 blur-2xl opacity-55" />
+                <Image src={profile.avatar_url} alt={profile.display_name ?? ""} fill sizes="(max-width:640px) 100vw, 220px"
+                  className="relative z-10 object-contain p-1" />
                 <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10">
                   <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${profile.available ? "bg-gold" : "bg-red-400"}`} />
                   <span className={`text-[10px] font-medium ${profile.available ? "text-gold/90" : "text-white/60"}`}>{profile.available ? "Verfügbar" : "Nicht verfügbar"}</span>
