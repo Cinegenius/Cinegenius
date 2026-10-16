@@ -34,6 +34,7 @@ if (project.projectName !== expectedProjectName || !project.projectId || !projec
 
 console.log(`Building and deploying CineGenius ${head} to production…`);
 execFileSync("npm", ["run", "check:design"], { stdio: "inherit" });
-execFileSync("npx", ["vercel", "pull", "--yes", "--environment", "production"], { stdio: "inherit" });
-execFileSync("npx", ["vercel", "build", "--prod"], { stdio: "inherit" });
-execFileSync("npx", ["vercel", "deploy", "--prebuilt", "--prod"], { stdio: "inherit" });
+// Build on Vercel so production secrets stay in the project environment. `vercel pull`
+// redacts sensitive values in local files; a prebuilt upload would then compile with
+// placeholders instead of the real production configuration.
+execFileSync("npx", ["vercel", "deploy", "--prod", "--yes", "--logs"], { stdio: "inherit" });
