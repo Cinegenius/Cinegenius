@@ -20,6 +20,7 @@ import { departments, deptColors } from "@/lib/departments";
 import RoleDropdown from "@/components/RoleDropdown";
 import { calculateProfileCompletion } from "@/lib/profile-completion";
 import { prepareProfileMediaFile, sendProfileMediaFile, PROFILE_MEDIA_ACCEPT, PROFILE_MEDIA_MAX_BYTES, PROFILE_MEDIA_SOURCE_MAX_BYTES } from "@/lib/profile-media-client";
+import { validateProfileSave, type ProfileSaveFieldErrors } from "@/lib/profile-save-validation";
 
 const ALL_CREW_ROLES = departments.flatMap((d) => d.roles);
 
@@ -548,6 +549,7 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("profile");
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileLoadError, setProfileLoadError] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<ProfileSaveFieldErrors>({});
   const [profileExists, setProfileExists] = useState(false);
   const [saving, setSaving] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
@@ -1042,14 +1044,21 @@ export default function ProfilePage() {
       addToast("Profil konnte nicht geladen werden. Lade die Seite neu, bevor du Änderungen speicherst.", "error");
       return;
     }
-    if (!form.name.trim() || !form.city.trim()) {
-      addToast(t("nameAndCityRequired"), "error");
+    const validationErrors = validateProfileSave({
+      name: form.name,
+      city: form.city,
+      positions,
+      profileTypes: currentProfileTypes,
+    });
+    setFieldErrors(validationErrors);
+    if (Object.keys(validationErrors).length > 0) {
+      addToast("Bitte korrigiere die markierten Pflichtfelder.", "error");
       return;
     }
     setSaving(true);
     try {
       const location = [form.city.trim(), form.country.trim()].filter(Boolean).join(", ");
-      const physical = {
+      const physicalValues = {
         ...physicalDataRef.current,
         playing_age_min:   playingAgeMin ? Number(playingAgeMin) : null,
         playing_age_max:   playingAgeMax ? Number(playingAgeMax) : null,
@@ -1063,11 +1072,20 @@ export default function ProfilePage() {
         tattoos,
         tattoos_coverable: tattoosCoverable,
       };
-      const performance = {
+      const hasOptionalValue = (value: unknown): boolean => {
+        if (value == null) return false;
+        if (typeof value === "string") return value.trim().length > 0;
+        if (Array.isArray(value)) return value.length > 0;
+        if (typeof value === "object") return Object.values(value).some(hasOptionalValue);
+        return value !== false && value !== 0;
+      };
+      const physical = Object.values(physicalValues).some(hasOptionalValue) ? physicalValues : null;
+      const performanceValues = {
         ...performanceDataRef.current,
         dialects: dialectsText.split(",").map((value) => value.trim()).filter(Boolean),
         driving_licenses: drivingLicensesText.split(",").map((value) => value.trim()).filter(Boolean),
       };
+      const performance = Object.values(performanceValues).some(hasOptionalValue) ? performanceValues : null;
       const commonPayload = {
         display_name:   form.name,
         location,
@@ -1124,8 +1142,16 @@ export default function ProfilePage() {
           slug:           form.slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") || null,
         }),
       });
-      const baseResult = await res.json();
+      const baseResult = await res.json().catch(() => ({}));
       if (!res.ok || baseResult.error) {
+        const serverFieldErrors = baseResult.fieldErrors;
+        if (serverFieldErrors && typeof serverFieldErrors === "object") {
+          setFieldErrors({
+            name: serverFieldErrors.display_name,
+            city: serverFieldErrors.location,
+            activity: serverFieldErrors.activity,
+          });
+        }
         const msg = baseResult.error ?? `HTTP ${res.status}`;
         addToast(`Speichern fehlgeschlagen: ${msg}`, "error");
         return;
@@ -1133,11 +1159,11 @@ export default function ProfilePage() {
       if (isNew) setProfileExists(true);
       const unavailableFields: string[] = baseResult.unavailableFields ?? [];
 
-      physicalDataRef.current = physical;
-      performanceDataRef.current = performance;
+      physicalDataRef.current = physical ?? {};
+      performanceDataRef.current = performance ?? {};
 
       if (unavailableFields.length > 0) {
-        addToast(`Profil gespeichert, aber diese Felder fehlen in der Datenbank: ${unavailableFields.join(", ")}.`, "error");
+        addToast(`Profil gespeichert. Diese Angaben konnten wegen fehlender Datenbankfelder nicht gespeichert werden: ${unavailableFields.join(", ")}.`, "error");
       } else {
         addToast(t("profileSaved"), "success");
       }
@@ -1362,6 +1388,13 @@ export default function ProfilePage() {
             {activeTab === "profile" && !profileLoading && (
               <div className="space-y-8">
 
+                {profileLoadError && (
+                  <div role="alert" className="flex items-start gap-3 rounded-xl border border-error/30 bg-error/10 p-4 text-sm text-text-primary">
+                    <AlertCircle size={17} className="mt-0.5 shrink-0 text-error" />
+                    <p>Dein gespeichertes Profil konnte nicht geladen werden. Das Formular bleibt gesperrt, damit vorhandene Daten nicht überschrieben werden. Lade die Seite neu und versuche es erneut.</p>
+                  </div>
+                )}
+
                 {/* ── Completion Score ── */}
                 {completion.score < 100 && (
                   <div className="p-4 bg-bg-secondary border border-border rounded-xl">
@@ -1396,10 +1429,17 @@ export default function ProfilePage() {
                   </p>
                   <TypeChipPicker
                     selectedTypes={currentProfileTypes}
-                    onTypesChange={setCurrentProfileTypes}
+                    onTypesChange={(next) => {
+                      setCurrentProfileTypes(next);
+                      if (next.length > 0 || positions.length > 0) setFieldErrors((previous) => ({ ...previous, activity: undefined }));
+                    }}
                     positions={positions}
-                    onPositionsChange={setPositions}
+                    onPositionsChange={(next) => {
+                      setPositions(next);
+                      if (next.length > 0 || currentProfileTypes.length > 0) setFieldErrors((previous) => ({ ...previous, activity: undefined }));
+                    }}
                   />
+                  {fieldErrors.activity && <p role="alert" className="mt-3 text-sm text-error">{fieldErrors.activity}</p>}
                 </div>
 
                 {/* Avatar */}
@@ -1615,8 +1655,14 @@ export default function ProfilePage() {
                         {t("fieldName")} <span className="text-crimson-light">*</span>
                       </label>
                       <input type="text" value={form.name}
-                        onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                        aria-invalid={!!fieldErrors.name}
+                        aria-describedby={fieldErrors.name ? "profile-name-error" : undefined}
+                        onChange={(e) => {
+                          setForm((p) => ({ ...p, name: e.target.value }));
+                          if (e.target.value.trim()) setFieldErrors((previous) => ({ ...previous, name: undefined }));
+                        }}
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
+                      {fieldErrors.name && <p id="profile-name-error" role="alert" className="mt-1.5 text-sm text-error">{fieldErrors.name}</p>}
                     </div>
                     <div>
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
@@ -1651,9 +1697,16 @@ export default function ProfilePage() {
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
                         {t("fieldCity")} <span className="text-crimson-light">*</span>
                       </label>
-                      <input type="text" value={form.city} onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))}
+                      <input type="text" value={form.city}
+                        aria-invalid={!!fieldErrors.city}
+                        aria-describedby={fieldErrors.city ? "profile-city-error" : undefined}
+                        onChange={(e) => {
+                          setForm((p) => ({ ...p, city: e.target.value }));
+                          if (e.target.value.trim()) setFieldErrors((previous) => ({ ...previous, city: undefined }));
+                        }}
                         placeholder={t("fieldCityPlaceholder")}
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
+                      {fieldErrors.city && <p id="profile-city-error" role="alert" className="mt-1.5 text-sm text-error">{fieldErrors.city}</p>}
                     </div>
                     <div>
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">

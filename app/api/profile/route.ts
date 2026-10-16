@@ -5,29 +5,32 @@ import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { PROFILE_TYPE_LABELS } from "@/lib/profile-types";
 import { normalizeProfileTypes } from "@/lib/profile-display";
+import {
+  retryWithoutMissingOptionalProfileColumns,
+  selectOptionalProfileColumns,
+} from "@/lib/profile-db-compat";
 
 // Stable columns that always exist in the profiles table
 const PROFILE_COLS = [
   "user_id", "display_name", "display_name_alias", "slug", "phone",
   "avatar_url", "cover_image_url", "role", "positions", "location", "bio",
-  "tagline", "profile_type", "profile_types", "account_type",
+  "tagline", "profile_type", "account_type",
   "verified", "available", "available_from", "day_rate", "languages",
   "travel_ready", "skills", "memberships", "filmography", "portfolio_url", "portfolio_images",
   "profile_images", "showreel_url", "reel_url", "awards", "availability_config",
   "modules", "instagram_url", "tiktok_url", "youtube_url", "vimeo_url",
   "linkedin_url", "website_url", "video_links",
-  "physical", "performance", "model_measurements", "casting", "crew", "creative", "vendor", "agency", "focal_point",
+  "crew", "creative", "vendor", "agency", "focal_point",
   "experience", "updated_at", "created_at",
 ].join(", ");
 
-// Newer optional columns — fetched separately so a missing column doesn't break the whole query
-const PROFILE_COLS_EXTRA = "contact_email";
-const PROFILE_COLS_MEDIA_EXTRA = "imdb_url";
-
-function isMissingColumnError(error: { code?: string; message?: string }): boolean {
-  return error.code === "PGRST204" || error.code === "42703" ||
-    /could not find the .* column|column .* does not exist/i.test(error.message ?? "");
-}
+// Newly added profile fields are isolated from the stable projection so a
+// not-yet-applied database migration cannot disable the entire profile editor.
+const PROFILE_OPTIONAL_COLS = [
+  "profile_types", "physical", "performance", "model_measurements", "casting",
+  "contact_email", "imdb_url",
+] as const;
+const PROFILE_OPTIONAL_COLUMN_SET = new Set<string>(PROFILE_OPTIONAL_COLS);
 
 const PROFILE_TYPE_VALUES = new Set(Object.keys(PROFILE_TYPE_LABELS));
 function isValidProfileType(value: unknown): value is string | null {
@@ -50,33 +53,22 @@ export async function GET() {
 
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 });
 
-  // Merge optional newer columns; report schema gaps and fail on other query errors.
   let data = base;
-  const unavailableFields: string[] = [];
+  let unavailableFields: string[] = [];
   if (base) {
-    const { data: extra, error: extraError } = await db
-      .from("profiles")
-      .select(PROFILE_COLS_EXTRA)
-      .eq("user_id", userId)
-      .maybeSingle();
-    if (extraError) {
-      if (isMissingColumnError(extraError)) unavailableFields.push("contact_email");
-      else return NextResponse.json({ error: extraError.message }, { status: 500 });
+    const optionalResult = await selectOptionalProfileColumns<Record<string, unknown>>(
+      PROFILE_OPTIONAL_COLS,
+      async (projection) => {
+        const result = await db.from("profiles").select(projection).eq("user_id", userId).maybeSingle();
+        return { data: result.data as Record<string, unknown> | null, error: result.error };
+      },
+    );
+    if (optionalResult.error) {
+      console.error("[profile GET] optional profile fields could not be read:", optionalResult.error);
+      return NextResponse.json({ error: optionalResult.error.message ?? "Optionale Profilfelder konnten nicht geladen werden.", code: optionalResult.error.code }, { status: 500 });
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (extra) data = Object.assign({}, base, extra) as any;
-
-    const { data: mediaExtra, error: mediaExtraError } = await db
-      .from("profiles")
-      .select(PROFILE_COLS_MEDIA_EXTRA)
-      .eq("user_id", userId)
-      .maybeSingle();
-    if (mediaExtraError) {
-      if (isMissingColumnError(mediaExtraError)) unavailableFields.push("imdb_url");
-      else return NextResponse.json({ error: mediaExtraError.message }, { status: 500 });
-    }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (mediaExtra) data = Object.assign({}, data, mediaExtra) as any;
+    data = Object.assign({}, base, optionalResult.data ?? {}) as typeof base;
+    unavailableFields = optionalResult.unavailableFields;
   }
 
   // Back-fill Clerk metadata and set cookie for users who had a profile before this flag existed
@@ -121,17 +113,21 @@ export async function POST(req: NextRequest) {
     day_rate, filmography, video_links, focal_point, physical, performance, model_measurements, casting,
   } = body;
 
-  if (!display_name?.trim()) {
-    return NextResponse.json({ error: "Name ist ein Pflichtfeld" }, { status: 400 });
-  }
+  const fieldErrors: Record<string, string> = {};
+  if (typeof display_name !== "string" || !display_name.trim()) fieldErrors.display_name = "Bitte gib deinen Namen ein.";
+  if (typeof location !== "string" || !location.trim()) fieldErrors.location = "Bitte gib deinen Standort ein.";
   if (profile_type !== undefined && !isValidProfileType(profile_type)) {
     return NextResponse.json({ error: "Ungültiger Profiltyp." }, { status: 400 });
   }
   if (profile_types !== undefined && !isValidProfileTypes(profile_types)) {
     return NextResponse.json({ error: "Ungültige Profiltypen." }, { status: 400 });
   }
-
   const normalizedProfileTypes = normalizeProfileTypes(profile_types ?? [], profile_type ?? null);
+  const hasPositions = Array.isArray(positions) && positions.some((position: unknown) => typeof position === "string" && position.trim());
+  if (!hasPositions && normalizedProfileTypes.length === 0) fieldErrors.activity = "Bitte wähle mindestens eine Tätigkeit aus.";
+  if (Object.keys(fieldErrors).length > 0) {
+    return NextResponse.json({ error: "Bitte prüfe die markierten Pflichtfelder.", fieldErrors }, { status: 400 });
+  }
   const requestedPrimary = normalizedProfileTypes[0] ?? null;
 
   let normalizedSlug: string | null = null;
@@ -193,33 +189,20 @@ export async function POST(req: NextRequest) {
     focal_point: focal_point ?? null,
     updated_at: new Date().toISOString(),
   };
-  const unavailableFields: string[] = [];
-  let data: Record<string, unknown> | null = null;
-  for (let attempt = 0; attempt < 20; attempt++) {
-    const result = await db
-      .from("profiles")
-      .upsert(payload, { onConflict: "user_id" })
-      .select()
-      .single();
-
-    if (!result.error) {
-      data = result.data as Record<string, unknown>;
-      break;
-    }
-
-    if (result.error.code === "PGRST204") {
-      const match = result.error.message.match(/Could not find the '([\w]+)' column/);
-      const badCol = match?.[1];
-      if (badCol && badCol in payload) {
-        unavailableFields.push(badCol);
-        delete payload[badCol];
-        continue;
-      }
-    }
-
-    console.error("[profile POST]", result.error);
-    return NextResponse.json({ error: result.error.message }, { status: 500 });
+  const saveResult = await retryWithoutMissingOptionalProfileColumns(
+    payload,
+    PROFILE_OPTIONAL_COLUMN_SET,
+    async (nextPayload) => {
+      const result = await db.from("profiles").upsert(nextPayload, { onConflict: "user_id" }).select().single();
+      return { data: result.data as Record<string, unknown> | null, error: result.error };
+    },
+  );
+  if (saveResult.error) {
+    console.error("[profile POST]", saveResult.error);
+    return NextResponse.json({ error: saveResult.error.message ?? "Profil konnte nicht gespeichert werden.", code: saveResult.error.code }, { status: 500 });
   }
+  const data = saveResult.data;
+  const unavailableFields = saveResult.unavailableFields;
 
   if (!data) {
     return NextResponse.json({ error: "Profil konnte nicht gespeichert werden." }, { status: 500 });
@@ -296,6 +279,22 @@ export async function PATCH(req: NextRequest) {
       safe.profile_types = typeof safe.profile_type === "string" ? [safe.profile_type] : [];
     }
 
+    const fieldErrors: Record<string, string> = {};
+    if ("display_name" in safe && (typeof safe.display_name !== "string" || !safe.display_name.trim())) {
+      fieldErrors.display_name = "Bitte gib deinen Namen ein.";
+    }
+    if ("location" in safe && (typeof safe.location !== "string" || !safe.location.trim())) {
+      fieldErrors.location = "Bitte gib deinen Standort ein.";
+    }
+    if ("positions" in safe || "profile_types" in safe || "profile_type" in safe) {
+      const hasPositions = Array.isArray(safe.positions) && safe.positions.some((position) => typeof position === "string" && position.trim());
+      const types = Array.isArray(safe.profile_types) ? safe.profile_types as string[] : [];
+      if (!hasPositions && types.length === 0) fieldErrors.activity = "Bitte wähle mindestens eine Tätigkeit aus.";
+    }
+    if (Object.keys(fieldErrors).length > 0) {
+      return NextResponse.json({ error: "Bitte prüfe die markierten Pflichtfelder.", fieldErrors }, { status: 400 });
+    }
+
     // Slug: validate format and check uniqueness to prevent profile hijacking
     if ("slug" in safe) {
       const rawSlug = safe.slug;
@@ -322,47 +321,27 @@ export async function PATCH(req: NextRequest) {
     }
 
     const updated_at = new Date().toISOString();
-    let payload: Record<string, unknown> = { ...safe, updated_at };
-    const unavailableFields: string[] = [];
+    const payload: Record<string, unknown> = { ...safe, updated_at };
+    const saveResult = await retryWithoutMissingOptionalProfileColumns(
+      payload,
+      PROFILE_OPTIONAL_COLUMN_SET,
+      async (nextPayload) => {
+        const result = await db.from("profiles").update(nextPayload).eq("user_id", userId).select("user_id").maybeSingle();
+        return { data: result.data as { user_id: string } | null, error: result.error };
+      },
+    );
 
-    // Retry: if PostgREST reports an unknown column, extract name from message and strip it
-    for (let attempt = 0; attempt < 20; attempt++) {
-      const { data, error } = await db
-        .from("profiles")
-        .update(payload)
-        .eq("user_id", userId)
-        .select("user_id")
-        .maybeSingle();
-
-      if (!error) {
-        if (!data) return NextResponse.json({ error: "Profil nicht gefunden. Bitte zuerst das Profil anlegen." }, { status: 404 });
-        revalidateTag("profiles", { expire: 0 });
-        if (unavailableFields.length > 0) {
-          return NextResponse.json({
-            error: `Diese Felder konnten nicht gespeichert werden: ${unavailableFields.join(", ")}. Bitte die Profil-Datenbank aktualisieren lassen.`,
-            unavailableFields,
-          }, { status: 422 });
-        }
-        return NextResponse.json({ success: true });
-      }
-
-      if (error.code === "PGRST204") {
-        const match = error.message.match(/Could not find the '(\w+)' column/);
-        const badCol = match?.[1];
-        if (badCol && badCol in payload) {
-          unavailableFields.push(badCol);
-          const next = { ...payload };
-          delete next[badCol];
-          payload = next;
-          continue;
-        }
-      }
-
-      console.error("[profile PATCH] error:", JSON.stringify(error));
-      return NextResponse.json({ error: error.message, code: error.code }, { status: 500 });
+    if (saveResult.error) {
+      console.error("[profile PATCH] error:", JSON.stringify(saveResult.error));
+      return NextResponse.json({ error: saveResult.error.message ?? "Profil konnte nicht gespeichert werden.", code: saveResult.error.code }, { status: 500 });
     }
+    if (!saveResult.data) return NextResponse.json({ error: "Profil nicht gefunden. Bitte zuerst das Profil anlegen." }, { status: 404 });
 
-    return NextResponse.json({ error: "Profil konnte nicht vollständig gespeichert werden." }, { status: 500 });
+    revalidateTag("profiles", { expire: 0 });
+    if (saveResult.unavailableFields.length > 0) {
+      return NextResponse.json({ success: true, unavailableFields: saveResult.unavailableFields });
+    }
+    return NextResponse.json({ success: true, unavailableFields: [] });
   } catch (err) {
     console.error("[profile PATCH] uncaught:", err);
     return NextResponse.json({ error: String(err) }, { status: 500 });
