@@ -5,6 +5,7 @@ import { fetchRatings } from "@/lib/ratings";
 import CreatorsContent, { type ServerCreator } from "./CreatorsContent";
 import PageHeader from "@/components/PageHeader";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
+import { getProfileDisplayPositions, normalizeProfileTypes } from "@/lib/profile-display";
 import { getTranslations } from "next-intl/server";
 
 // All profile types shown on this page (crew, talent, creative + vendors/renters)
@@ -17,6 +18,30 @@ const VENDOR_TYPES = new Set(
     .filter(([, cat]) => cat === "vendor")
     .map(([type]) => type)
 );
+
+type CreatorProfileRow = {
+  user_id: string;
+  display_name: string | null;
+  location: string | null;
+  bio: string | null;
+  skills: string[] | null;
+  role: string | null;
+  positions: string[] | null;
+  available: boolean | null;
+  avatar_url: string | null;
+  portfolio_images: string[] | null;
+  languages: string[] | null;
+  profile_types: string[] | null;
+  profile_type: string | null;
+  physical: { hair_color?: string | null; eye_color?: string | null; body_type?: string | null; playing_age_min?: number | null; playing_age_max?: number | null; height_cm?: number | null } | null;
+  availability_config: { travel?: string | null } | null;
+  day_rate: number | null;
+  travel_ready: boolean | null;
+  verified: boolean | null;
+  tagline: string | null;
+  focal_point: { x: number; y: number } | null;
+  last_seen_at: string | null;
+};
 
 export const revalidate = 60;
 
@@ -100,31 +125,37 @@ export default async function CreatorsPage() {
     (listings ?? []).map((l: { user_id?: string }) => l.user_id).filter(Boolean)
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const fromProfiles: ServerCreator[] = (profiles ?? [])
-    .filter((p: any) => {
+  const profileRows = (profiles ?? []) as CreatorProfileRow[];
+  const fromProfiles: ServerCreator[] = profileRows
+    .filter((p) => {
       // Don't show a second card for users who already have a creator listing
       if (listingOwnerIds.has(p.user_id)) return false;
-      const types: string[] = p.profile_types ?? [];
+      const types = normalizeProfileTypes(p.profile_types, p.profile_type);
       // Show if any profile type belongs on this page (talent / crew / creative)
       if (types.some((t) => CREATOR_TYPES.has(t as ProfileType))) return true;
       // No profile type set yet (new/incomplete profile) → show by default
       if (types.length === 0) return true;
       return false;
     })
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .map((p: any) => {
+    .map((p) => {
       const phys = p.physical ?? {};
       const avail = p.availability_config ?? {};
-      const types: string[] = p.profile_types ?? [];
+      const types = normalizeProfileTypes(p.profile_types, p.profile_type);
       // Pick a human-readable role label from the profile types
-      const primaryType = (p.profile_types?.[0] ?? p.profile_type ?? "") as ProfileType;
+      const primaryType = (types[0] ?? "") as ProfileType;
       const typeLabel = primaryType ? (PROFILE_TYPE_LABELS[primaryType] ?? "") : "";
+      const displayPositions = getProfileDisplayPositions({
+        positions: p.positions,
+        role: p.role,
+        profileTypes: types,
+        primaryType,
+        labels: PROFILE_TYPE_LABELS,
+      });
       return {
         id: p.user_id,
         name: p.display_name ?? "Unbekannt",
-        role: p.role ?? p.positions?.[0] ?? typeLabel ?? "Filmschaffende/r",
-        positions: p.positions?.length ? p.positions : (typeLabel ? [typeLabel] : []),
+        role: p.role ?? displayPositions[0] ?? typeLabel ?? "Filmschaffende/r",
+        positions: displayPositions,
         location: p.location ?? "",
         // cover: prefer first portfolio image, fall back to avatar
         image: (Array.isArray(p.portfolio_images) && p.portfolio_images.length > 0)
@@ -143,7 +174,7 @@ export default async function CreatorsPage() {
         isReal: true as const,
         profile_type: primaryType,
         profile_types: types,
-        isVendor: types.some((type: string) => VENDOR_TYPES.has(type as ProfileType)) || VENDOR_TYPES.has(primaryType),
+        isVendor: types.some((type) => VENDOR_TYPES.has(type)) || VENDOR_TYPES.has(primaryType),
         hair_color: phys.hair_color ?? "",
         eye_color: phys.eye_color ?? "",
         body_type: phys.body_type ?? "",

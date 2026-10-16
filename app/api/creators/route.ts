@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
+import { getProfileDisplayPositions, normalizeProfileTypes } from "@/lib/profile-display";
 import { getPrivateProfileIds } from "@/lib/trust";
 
 const PAGE_SIZE = 48;
@@ -27,14 +28,21 @@ export async function GET(req: NextRequest) {
   const creators = (profiles ?? []).filter((profile) => !privateProfileIds.has(profile.user_id)).map((p: any) => {
     const phys = p.physical ?? {};
     const avail = p.availability_config ?? {};
-    const primaryType = (p.profile_types?.[0] ?? p.profile_type ?? "") as ProfileType;
+    const types = normalizeProfileTypes(p.profile_types, p.profile_type);
+    const primaryType = (types[0] ?? "") as ProfileType;
     const typeLabel = primaryType ? (PROFILE_TYPE_LABELS[primaryType] ?? "") : "";
-    const types: string[] = p.profile_types ?? [];
+    const displayPositions = getProfileDisplayPositions({
+      positions: p.positions,
+      role: p.role,
+      profileTypes: types,
+      primaryType,
+      labels: PROFILE_TYPE_LABELS,
+    });
     return {
       id: p.user_id,
       name: p.display_name ?? "Unbekannt",
-      role: p.role ?? p.positions?.[0] ?? typeLabel ?? "Filmschaffende/r",
-      positions: p.positions?.length ? p.positions : (typeLabel ? [typeLabel] : []),
+      role: p.role ?? displayPositions[0] ?? typeLabel ?? "Filmschaffende/r",
+      positions: displayPositions,
       location: p.location ?? "",
       image: (Array.isArray(p.portfolio_images) && p.portfolio_images.length > 0) ? p.portfolio_images[0] : (p.avatar_url ?? ""),
       avatar: p.avatar_url ?? "",
@@ -48,7 +56,7 @@ export async function GET(req: NextRequest) {
       isReal: true as const,
       profile_type: primaryType,
       profile_types: types,
-      isVendor: types.some((type) => PROFILE_CATEGORY_MAP[type as ProfileType] === "vendor"),
+      isVendor: types.some((type) => PROFILE_CATEGORY_MAP[type] === "vendor"),
       hair_color: phys.hair_color ?? "", eye_color: phys.eye_color ?? "",
       body_type: phys.body_type ?? "",
       playing_age_min: phys.playing_age_min ?? null, playing_age_max: phys.playing_age_max ?? null,

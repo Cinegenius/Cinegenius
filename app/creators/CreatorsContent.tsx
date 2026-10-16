@@ -275,8 +275,7 @@ function RolePanel({
 
   useEffect(() => {
     inputRef.current?.focus();
-    setSearch("");
-  }, [dept.id]);
+  }, []);
 
   const deptRoles = dept.roles.filter((r) => occupiedRoles.has(r));
 
@@ -428,6 +427,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
     const eye   = new Set<string>();
     const body  = new Set<string>();
     for (const c of allCreators) {
+      for (const type of c.profile_types ?? []) types.add(type);
       if (c.profile_type) types.add(c.profile_type);
       if (c.hair_color)   hair.add(c.hair_color);
       if (c.eye_color)    eye.add(c.eye_color);
@@ -558,7 +558,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       result = result.filter((c) => c.languages?.includes(languageFilter));
     }
 
-    if (profileTypeFilter) result = result.filter(c => c.profile_type === profileTypeFilter);
+    if (profileTypeFilter) result = result.filter(c => hasProfileType(c, profileTypeFilter));
     if (hairFilter)        result = result.filter(c => c.hair_color === hairFilter);
     if (eyeFilter)         result = result.filter(c => c.eye_color === eyeFilter);
     if (bodyFilter)        result = result.filter(c => c.body_type === bodyFilter);
@@ -1183,7 +1183,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                   })}
                 </div>
                 <div className="p-3">
-                  <RolePanel dept={activeDeptData} selectedRoles={selectedRoles} occupiedRoles={occupiedRoles} onToggle={toggleRole} onClose={() => setFilterOpen(false)} locale={locale} />
+                  <RolePanel key={activeDeptData.id} dept={activeDeptData} selectedRoles={selectedRoles} occupiedRoles={occupiedRoles} onToggle={toggleRole} onClose={() => setFilterOpen(false)} locale={locale} />
                 </div>
               </div>
               {/* Desktop: two-panel */}
@@ -1209,7 +1209,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                   })}
                 </div>
                 <div className="flex-1 overflow-y-auto p-3">
-                  <RolePanel dept={activeDeptData} selectedRoles={selectedRoles} occupiedRoles={occupiedRoles} onToggle={toggleRole} onClose={() => setFilterOpen(false)} locale={locale} />
+                  <RolePanel key={activeDeptData.id} dept={activeDeptData} selectedRoles={selectedRoles} occupiedRoles={occupiedRoles} onToggle={toggleRole} onClose={() => setFilterOpen(false)} locale={locale} />
                 </div>
               </div>
             </div>
@@ -1313,13 +1313,13 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                 </div>
               </nav>
               <div className="mt-6 pt-5 border-t border-border">
-                <a
+                <Link
                   href="/profile"
                   className="flex items-center gap-2 px-3 py-2 text-sm text-gold hover:bg-gold/10 rounded-lg transition-colors font-medium"
                 >
                   <Plus size={14} />
                   Profil erstellen
-                </a>
+                </Link>
               </div>
             </aside>
 

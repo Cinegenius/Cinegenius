@@ -9,15 +9,16 @@ import ProfileView from "./ProfileView";
 import { canViewProfile, getBlockStatus } from "@/lib/trust";
 import type { UserProfile, ProjectCredit } from "@/lib/profile-types";
 import { getPresetForType, type ProfileModule } from "@/lib/profile-types";
+import { normalizeProfileTypes } from "@/lib/profile-display";
 import type { ExternalProfileRow } from "@/lib/external-platforms";
 
 // Page is dynamic because of auth(), but data fetches are cached with tags
 export const dynamicParams = true;
 
 // Stable base columns that always exist
-const BASE_FIELDS = "user_id, display_name, avatar_url, cover_image_url, role, positions, location, bio, tagline, slug, profile_type, verified, available, available_from, day_rate, languages, travel_ready, skills, filmography, profile_images, showreel_url, reel_url, awards, availability_config, modules, instagram_url, tiktok_url, youtube_url, vimeo_url, linkedin_url, website_url, video_links, phone";
+const BASE_FIELDS = "user_id, display_name, avatar_url, cover_image_url, role, positions, location, bio, tagline, slug, profile_type, profile_types, verified, available, available_from, day_rate, languages, travel_ready, skills, filmography, profile_images, showreel_url, reel_url, awards, availability_config, modules, instagram_url, tiktok_url, youtube_url, vimeo_url, linkedin_url, website_url, video_links, phone";
 // Newer columns — fetched separately so a missing column doesn't break the whole query
-const EXTRA_FIELDS = "physical, crew, creative, vendor, agency, contact_email";
+const EXTRA_FIELDS = "physical, performance, model_measurements, casting, crew, creative, vendor, agency, contact_email";
 
 async function _getProfile(slug: string): Promise<UserProfile | null> {
   // Validate slug to prevent PostgREST filter injection — allow only slug chars or UUID chars
@@ -51,7 +52,8 @@ async function _getProfile(slug: string): Promise<UserProfile | null> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data = { ...base, ...extra } as any;
 
-  const type = (data.profile_type ?? "actor") as UserProfile["profile_type"];
+  const profileTypes = normalizeProfileTypes(data.profile_types, data.profile_type);
+  const type = (profileTypes[0] ?? "actor") as UserProfile["profile_type"];
 
   // Use stored modules, merged with preset so new module types are never missing
   // preset may be undefined if profile_type is unknown — always fall back to talent preset
@@ -70,7 +72,7 @@ async function _getProfile(slug: string): Promise<UserProfile | null> {
     ? [...stored, ...missing.map((m, i) => ({ ...m, order: stored.length + i, enabled: false }))]
     : stored;
 
-  return { ...data, profile_type: type, modules } as UserProfile;
+  return { ...data, profile_type: type, profile_types: profileTypes, modules } as UserProfile;
 }
 
 function getProfile(slug: string): Promise<UserProfile | null> {

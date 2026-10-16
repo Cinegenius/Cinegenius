@@ -13,7 +13,8 @@ import {
 } from "lucide-react";
 import type { UserProfile, ProfileModule, ProfileImage, FilmographyEntry, ProfileAward, ProjectCredit } from "@/lib/profile-types";
 import ReviewsSection from "@/components/ReviewsSection";
-import { PROFILE_CATEGORY_MAP } from "@/lib/profile-types";
+import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS } from "@/lib/profile-types";
+import { cleanProfileBio, getProfileDisplayPositions, normalizeProfileTypes } from "@/lib/profile-display";
 import { getPlatform, type ExternalProfileRow } from "@/lib/external-platforms";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 
@@ -54,6 +55,35 @@ function StatPill({ label, value }: { label: string; value?: string | number | n
       <span className="text-sm font-semibold text-text-primary leading-snug">{value}</span>
     </div>
   );
+}
+
+function ProfileBio({ value, limit = 360 }: { value: string | null | undefined; limit?: number }) {
+  const [expanded, setExpanded] = useState(false);
+  const text = cleanProfileBio(value);
+  if (!text) return null;
+  const shortened = text.length > limit && !expanded;
+  const visibleText = shortened ? `${text.slice(0, limit).trimEnd()}…` : text;
+  return (
+    <div>
+      <p className="whitespace-pre-line break-words text-text-secondary text-sm leading-relaxed">{visibleText}</p>
+      {text.length > limit && (
+        <button type="button" onClick={() => setExpanded((current) => !current)}
+          className="mt-2 min-h-11 text-xs font-semibold text-gold hover:text-gold-light">
+          {expanded ? "Weniger anzeigen" : "Vollständigen Text anzeigen"}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function displayPositions(profile: UserProfile): string[] {
+  return getProfileDisplayPositions({
+    positions: profile.positions,
+    role: profile.role,
+    profileTypes: profile.profile_types,
+    primaryType: profile.profile_type,
+    labels: PROFILE_TYPE_LABELS,
+  });
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -509,6 +539,14 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const p = (profile.physical ?? {}) as any;
+  const roleLabels = displayPositions(profile);
+  const performance = profile.performance ?? {};
+  const dialects: string[] = performance.dialects ?? [];
+  const drivingLicenses: string[] = performance.driving_licenses ?? [];
+  const crewData = profile.crew ?? {};
+  const crewEquipment = crewData.equipment_known ?? [];
+  const crewSoftware = crewData.software ?? [];
+  const crewCertificates = crewData.certificates ?? [];
 
   // Main headshot = avatar; strip = profile_images
   const mainShot = profile.avatar_url ?? null;
@@ -625,9 +663,9 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                   <h1 className="font-display text-4xl sm:text-5xl font-bold text-text-primary leading-none tracking-tight">
                     {profile.display_name ?? "Unbekannt"}
                   </h1>
-                  {(profile.positions?.[0] ?? profile.role) && (
+                  {roleLabels.length > 0 && (
                     <p className="text-text-muted text-sm mt-2 tracking-wide">
-                      {(profile.positions ?? [profile.role]).filter(Boolean).join(" · ")}
+                      {roleLabels.join(" · ")}
                     </p>
                   )}
                   {profile.tagline && (
@@ -686,24 +724,39 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
               </div>
 
               {/* Stats grid — only non-null values */}
-              {(playingAge || p.height_cm || p.hair_color || p.eye_color || languages.length > 0 || p.body_type || profile.day_rate) && (
+              {(playingAge || p.height_cm || p.clothing_size || p.shoe_size || p.hair_color || p.eye_color || languages.length > 0 || dialects.length > 0 || drivingLicenses.length > 0 || p.body_type || profile.day_rate) && (
                 <div className="grid grid-cols-3 gap-x-4 gap-y-4 py-5 border-y border-border">
                   {playingAge        && <StatPill label="Spielalter" value={playingAge} />}
                   {p.height_cm       && <StatPill label="Größe"      value={`${p.height_cm} cm`} />}
+                  {p.clothing_size   && <StatPill label="Konfektion" value={p.clothing_size} />}
+                  {p.shoe_size       && <StatPill label="Schuhgröße" value={p.shoe_size} />}
                   {p.hair_color      && <StatPill label="Haarfarbe"  value={p.hair_color} />}
                   {p.eye_color       && <StatPill label="Augenfarbe" value={p.eye_color} />}
                   {p.body_type       && <StatPill label="Körperbau"  value={p.body_type} />}
-                  {languages.length > 0 && <StatPill label="Sprachen" value={languages.slice(0, 3).join(", ")} />}
+                  {languages.length > 0 && <StatPill label="Sprachen" value={languages.join(", ")} />}
+                  {dialects.length > 0 && <StatPill label="Dialekte" value={dialects.join(", ")} />}
+                  {drivingLicenses.length > 0 && <StatPill label="Führerschein" value={drivingLicenses.join(", ")} />}
                   {profile.day_rate  && <StatPill label="Tagesgage"  value={`${profile.day_rate} €`} />}
                   {profile.travel_ready && <StatPill label="Reisen" value="Reisebereit" />}
                 </div>
               )}
 
               {/* Bio */}
-              {profile.bio && (
-                <p className="text-text-secondary text-sm leading-relaxed">
-                  {profile.bio.length > 280 ? profile.bio.slice(0, 280) + "…" : profile.bio}
-                </p>
+              {profile.bio && <ProfileBio value={profile.bio} />}
+
+              {(crewData.experience_years || crewData.department || crewEquipment.length > 0 || crewSoftware.length > 0 || crewCertificates.length > 0) && (
+                <div className="rounded-xl border border-border bg-bg-secondary/70 p-4 space-y-3">
+                  <SectionLabel>Berufliche Schwerpunkte</SectionLabel>
+                  {(crewData.department || crewData.experience_years) && (
+                    <div className="flex flex-wrap gap-x-5 gap-y-3">
+                      {crewData.department && <StatPill label="Bereich" value={crewData.department} />}
+                      {crewData.experience_years && <StatPill label="Erfahrung" value={`${crewData.experience_years} Jahre`} />}
+                    </div>
+                  )}
+                  {crewEquipment.length > 0 && <p className="text-xs text-text-secondary"><span className="text-text-muted">Equipment:</span> {crewEquipment.join(", ")}</p>}
+                  {crewSoftware.length > 0 && <p className="text-xs text-text-secondary"><span className="text-text-muted">Software:</span> {crewSoftware.join(", ")}</p>}
+                  {crewCertificates.length > 0 && <p className="text-xs text-text-secondary"><span className="text-text-muted">Nachweise:</span> {crewCertificates.join(", ")}</p>}
+                </div>
               )}
 
 
@@ -975,7 +1028,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
 // MODEL PROFILE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ModelProfile({ profile, isOwner, companyMembership, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { profile: UserProfile; isOwner: boolean; companyMembership: CompanyMembership; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
+function ModelProfile({ profile, isOwner, projectCredits = [], companyMembership, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { profile: UserProfile; isOwner: boolean; projectCredits?: ProjectCredit[]; companyMembership: CompanyMembership; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const [lightbox, setLightbox] = useState<string | null>(null);
 
@@ -983,133 +1036,113 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
   const p = (profile.physical ?? {}) as any;
   const images: ProfileImage[] = profile.profile_images ?? [];
   const heroImg = images.find((i) => i.featured) ?? images[0];
-  const galleryImgs = heroImg ? images.filter((i) => i !== heroImg) : images.slice(1);
-  // Best available cover: featured profile_image → first profile_image → first portfolio_image → avatar
+  const mainPhotoUrl = profile.avatar_url ?? heroImg?.url ?? null;
+  const galleryImgs = images.filter((image) => image.url !== mainPhotoUrl);
+  // Prefer the square profile portrait and use a gallery photo only when no avatar exists.
   const portfolioImages: string[] = (profile as unknown as { portfolio_images?: string[] }).portfolio_images ?? [];
-  const heroCoverUrl: string | null = heroImg?.url ?? portfolioImages[0] ?? null;
+  const resolvedMainPhotoUrl: string | null = mainPhotoUrl ?? portfolioImages[0] ?? null;
+  const galleryPhotos: { url: string; caption?: string | null }[] = galleryImgs.length > 0
+    ? galleryImgs
+    : portfolioImages.filter((url) => url !== resolvedMainPhotoUrl).map((url) => ({ url }));
 
   const reelUrl = profile.showreel_url ?? profile.reel_url;
   const reelEmbed = reelUrl ? getVideoEmbed(reelUrl) : null;
   const skills: string[] = profile.skills ?? [];
   const memberships: string[] = profile.memberships ?? [];
   const languages = profile.languages ?? [];
+  const performance = profile.performance ?? {};
+  const roleLabels = displayPositions(profile);
+  const manualFilms: FilmographyEntry[] = profile.filmography ?? [];
+  const creditedTitles = new Set(projectCredits.filter((credit) => credit.projects).map((credit) => credit.projects!.title.trim().toLocaleLowerCase("de")));
+  const films = manualFilms.filter((film) => film.title?.trim() && !creditedTitles.has(film.title.trim().toLocaleLowerCase("de")));
+  const credits = projectCredits.filter((credit) => credit.projects);
+  const specialSkills: string[] = performance.special_skills ?? [];
+  const playingAge = p.playing_age_min || p.playing_age_max
+    ? `${p.playing_age_min ?? "?"}–${p.playing_age_max ?? "?"} J.`
+    : null;
+  const castingFacts: [string, string | number | null | undefined][] = [
+    ["Spielalter", playingAge],
+    ["Größe", p.height_cm ? `${p.height_cm} cm` : null],
+    ["Konfektion", p.clothing_size],
+    ["Schuhgröße", p.shoe_size],
+    ["Haare", p.hair_color],
+    ["Augen", p.eye_color],
+    ["Sprachen", languages.length ? languages.join(", ") : null],
+    ["Dialekte", performance.dialects?.length ? performance.dialects.join(", ") : null],
+    ["Führerschein", performance.driving_licenses?.length ? performance.driving_licenses.join(", ") : null],
+  ].filter((entry): entry is [string, string | number] => entry[1] !== null && entry[1] !== undefined && entry[1] !== "");
 
   return (
     <div className="min-h-screen bg-bg-primary text-text-primary">
       {lightbox && <Lightbox src={lightbox} onClose={() => setLightbox(null)} />}
 
-      {/* ── HERO (full editorial) ──────────────────────────────────────── */}
-      <section className="relative h-[90vh] min-h-[560px] bg-black">
-        {heroCoverUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={heroCoverUrl}
-            alt={profile.display_name ?? ""}
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ objectPosition: profile.focal_point ? `${profile.focal_point.x}% ${profile.focal_point.y}%` : "50% 33%" }}
-          />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-bg-elevated via-bg-primary to-black" />
-        )}
+      <section className="border-b border-border bg-bg-primary pt-16 sm:pt-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-5 sm:gap-8 lg:gap-12 items-start">
+            <div className="relative mx-auto w-full max-w-[520px] lg:max-w-none">
+              <button type="button" onClick={() => resolvedMainPhotoUrl && setLightbox(resolvedMainPhotoUrl)} disabled={!resolvedMainPhotoUrl}
+                aria-label={resolvedMainPhotoUrl ? "Hauptfoto vergrößern" : undefined}
+                className="relative block w-full aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] max-h-[420px] overflow-hidden rounded-2xl border border-border bg-bg-secondary disabled:cursor-default">
+                {resolvedMainPhotoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={resolvedMainPhotoUrl} alt={profile.display_name ?? ""} className="h-full w-full object-cover"
+                    style={{ objectPosition: profile.focal_point ? `${profile.focal_point.x}% ${profile.focal_point.y}%` : "50% 38%" }} />
+                ) : <span className="flex h-full items-center justify-center font-display text-5xl font-bold text-text-muted/30">{(profile.display_name ?? "?")[0]}</span>}
+                {profile.verified && <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 px-2.5 py-1 text-[10px] font-semibold text-white"><Check size={10} /> Verifiziert</span>}
+              </button>
+            </div>
 
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/88" />
-
-        {/* Top bar — only badges + edit */}
-        <div className="absolute top-0 left-0 right-0 pt-20 px-6 sm:px-10 flex items-start justify-between">
-          {profile.verified && (
-            <span className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md text-white text-[10px] font-semibold px-3 py-1.5 rounded-full border border-white/20">
-              <Check size={10} /> Verified
-            </span>
-          )}
-          {isOwner && (
-            <Link href="/profile" className="ml-auto flex items-center gap-1.5 bg-white/10 backdrop-blur-md text-white text-[10px] font-semibold px-3 py-1.5 rounded-full border border-white/20 hover:bg-white/20 transition-colors">
-              <Pencil size={10} /> Bearbeiten
-            </Link>
-          )}
-        </div>
-
-        {/* Bottom info — pb-20 on mobile to clear the 56px BottomNav */}
-        <div className="absolute bottom-0 left-0 right-0 px-6 sm:px-10 pb-20 lg:pb-10">
-          <p className="text-white/80 text-xs uppercase tracking-[0.2em] mb-2 drop-shadow">
-            {(profile.positions?.[0] ?? profile.role) ?? "Model"}
-          </p>
-          <h1 className="font-display text-5xl sm:text-7xl font-bold text-white leading-none tracking-tight mb-3 drop-shadow-lg">
-            {profile.display_name ?? "Unbekannt"}
-          </h1>
-          <div className="flex items-center gap-3 flex-wrap">
-            {profile.location && (
-              <p className="text-white/80 text-sm flex items-center gap-1.5 drop-shadow">
-                <MapPin size={12} /> {profile.location}
-              </p>
-            )}
-            {!isOwner && canContact && (
-              <div className="flex items-center gap-2 ml-auto">
-                <Link href={`/messages?to=${profile.user_id}`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white rounded-lg hover:bg-white/25 transition-colors text-xs font-medium">
-                  <MessageSquare size={11} /> Nachricht
-                </Link>
-                <Link href={`/booking?profile=${profile.user_id}`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white rounded-lg hover:bg-white/25 transition-colors text-xs font-medium">
-                  Anfrage <ExternalLink size={11} />
-                </Link>
-                <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
+            <div className="min-w-0 space-y-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={`inline-flex items-center gap-2 text-xs font-medium ${profile.available ? "text-emerald-400" : "text-text-muted"}`}>
+                  <span className={`h-2 w-2 rounded-full ${profile.available ? "bg-emerald-400" : "bg-text-muted"}`} />
+                  {profile.available ? "Verfügbar" : "Derzeit nicht verfügbar"}
+                </span>
+                {profile.verified && <span className="rounded-full border border-gold/25 bg-gold/10 px-2.5 py-1 text-[10px] font-semibold text-gold">Verifiziert</span>}
+                {isOwner && <Link href="/profile" className="ml-auto inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-border px-3 text-xs text-text-secondary hover:border-gold/40 hover:text-gold"><Pencil size={12} /> Bearbeiten</Link>}
               </div>
-            )}
-          </div>
-        </div>
-      </section>
+              <div>
+                <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-text-primary">{profile.display_name ?? "Unbekannt"}</h1>
+                {roleLabels.length > 0 && <div className="mt-3 flex flex-wrap gap-2">
+                  {roleLabels.map((label, index) => <span key={`${label}-${index}`} className={`rounded-full border px-3 py-1 text-xs font-medium ${index === 0 ? "border-gold/40 bg-gold/12 text-gold" : "border-border bg-bg-secondary text-text-secondary"}`}>{label}</span>)}
+                </div>}
+                {profile.location && <p className="mt-3 flex items-center gap-1.5 text-sm text-text-muted"><MapPin size={13} /> {profile.location}</p>}
+                {profile.tagline && <p className="mt-2 text-sm italic text-text-secondary">{cleanProfileBio(profile.tagline)}</p>}
+              </div>
 
-      {/* ── MEASUREMENTS STRIP ────────────────────────────────────────── */}
-      {(p.height_cm || p.hair_color || p.eye_color || languages.length > 0) && (
-        <section className="border-b border-border bg-bg-secondary">
-          <div className="max-w-6xl mx-auto px-4 sm:px-10 py-6">
-            <div className="flex flex-wrap gap-x-10 gap-y-3 items-center">
-              {p.height_cm && (
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-bold text-text-primary">{p.height_cm}</span>
-                  <span className="text-xs text-text-muted">cm Größe</span>
-                </div>
-              )}
-              {p.hair_color && (
-                <div className="flex items-baseline gap-2">
-                  <span className="text-sm font-semibold text-text-primary">{p.hair_color}</span>
-                  <span className="text-xs text-text-muted">Haare</span>
-                </div>
-              )}
-              {p.eye_color && (
-                <div className="flex items-baseline gap-2">
-                  <span className="text-sm font-semibold text-text-primary">{p.eye_color}</span>
-                  <span className="text-xs text-text-muted">Augen</span>
-                </div>
-              )}
-              {languages.length > 0 && (
-                <div className="flex items-baseline gap-2">
-                  <span className="text-sm font-semibold text-text-primary">{languages.join(" / ")}</span>
-                  <span className="text-xs text-text-muted">Sprachen</span>
-                </div>
-              )}
-              {profile.available && (
-                <div className="ml-auto flex items-center gap-1.5 text-xs font-medium text-emerald-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  Verfügbar
+              {!isOwner && canContact && <div className="flex flex-wrap gap-2">
+                <Link href={`/booking?profile=${profile.user_id}`} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-gold px-4 text-xs font-semibold text-bg-primary hover:bg-gold-light">Anfrage <ExternalLink size={12} /></Link>
+                <Link href={`/messages?to=${profile.user_id}`} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-bg-secondary px-4 text-xs font-medium text-text-primary hover:border-gold/40"><MessageSquare size={13} /> Nachricht</Link>
+                <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
+              </div>}
+
+              {castingFacts.length > 0 && <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-4 rounded-xl border border-border bg-bg-secondary p-4 sm:p-5">
+                {castingFacts.map(([label, value]) => <StatPill key={label} label={label} value={value} />)}
+              </div>}
+
+              {(skills.length > 0 || profile.crew?.experience_years || profile.crew?.equipment_known?.length || profile.crew?.software?.length) && (
+                <div className="space-y-3 rounded-xl border border-border bg-bg-secondary/70 p-4">
+                  {profile.crew?.experience_years && <StatPill label="Berufserfahrung" value={`${profile.crew.experience_years} Jahre`} />}
+                  {profile.crew?.equipment_known && profile.crew.equipment_known.length > 0 && <p className="text-xs text-text-secondary"><span className="text-text-muted">Equipment:</span> {profile.crew.equipment_known.join(", ")}</p>}
+                  {profile.crew?.software && profile.crew.software.length > 0 && <p className="text-xs text-text-secondary"><span className="text-text-muted">Software:</span> {profile.crew.software.join(", ")}</p>}
+                  {skills.length > 0 && <div className="flex flex-wrap gap-1.5">{skills.slice(0, 8).map((skill) => <span key={skill} className="rounded-full border border-border px-2.5 py-1 text-[11px] text-text-secondary">{skill}</span>)}</div>}
                 </div>
               )}
             </div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* ── PORTFOLIO GRID ────────────────────────────────────────────── */}
-        {images.length > 0 && (
+        {galleryPhotos.length > 0 && (
           <>
             <div className="py-14">
               <SectionLabel>Portfolio</SectionLabel>
               {/* Masonry-style grid */}
               <div className="columns-2 sm:columns-3 gap-2 sm:gap-3 space-y-2 sm:space-y-3">
-                {images.slice(0, 12).map((img, i) => (
+                {galleryPhotos.slice(0, 12).map((img, i) => (
                   <div
                     key={i}
                     className="break-inside-avoid cursor-pointer group overflow-hidden rounded-xl"
@@ -1146,16 +1179,11 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
         )}
 
         {/* ── SPEZIALISIERUNG ───────────────────────────────────────────── */}
-        {(skills.length > 0 || profile.bio) && (
+        {(skills.length > 0 || profile.bio || memberships.length > 0 || specialSkills.length > 0) && (
           <>
             <Divider />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
-              {profile.bio && (
-                <div>
-                  <SectionLabel>Über mich</SectionLabel>
-                  <p className="text-text-secondary text-sm leading-relaxed">{profile.bio}</p>
-                </div>
-              )}
+              {profile.bio && <div><SectionLabel>Über mich</SectionLabel><ProfileBio value={profile.bio} /></div>}
               {skills.length > 0 && (
                 <div>
                   <SectionLabel>Spezialisierung</SectionLabel>
@@ -1165,6 +1193,14 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
                         {s}
                       </span>
                     ))}
+                  </div>
+                </div>
+              )}
+              {specialSkills.length > 0 && (
+                <div>
+                  <SectionLabel>Besondere Fähigkeiten</SectionLabel>
+                  <div className="flex flex-wrap gap-2">
+                    {specialSkills.map((skill) => <span key={skill} className="px-3 py-1.5 bg-bg-secondary border border-border rounded-lg text-xs text-text-secondary">{skill}</span>)}
                   </div>
                 </div>
               )}
@@ -1180,6 +1216,27 @@ function ModelProfile({ profile, isOwner, companyMembership, listings = [], bloc
                   </div>
                 </div>
               )}
+            </div>
+          </>
+        )}
+
+        {(credits.length > 0 || films.length > 0) && (
+          <>
+            <Divider />
+            <SectionLabel>Erfahrung & Referenzen</SectionLabel>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pb-6">
+              {credits.map((credit) => (
+                <article key={credit.id} className="rounded-xl border border-border bg-bg-secondary p-4">
+                  <p className="font-semibold text-sm text-text-primary">{credit.projects!.title}</p>
+                  <p className="mt-1 text-xs text-text-muted">{[credit.role, credit.projects!.year, credit.projects!.type].filter(Boolean).join(" · ")}</p>
+                </article>
+              ))}
+              {films.map((film, index) => (
+                <article key={`${film.title}-${index}`} className="rounded-xl border border-border bg-bg-secondary p-4">
+                  <p className="font-semibold text-sm text-text-primary">{film.title}</p>
+                  <p className="mt-1 text-xs text-text-muted">{[film.role, film.year, film.type].filter(Boolean).join(" · ")}</p>
+                </article>
+              ))}
             </div>
           </>
         )}
@@ -1301,6 +1358,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
   const software: string[] = profile.crew?.software ?? [];
   const bgImage = profile.cover_image_url ?? (images.find((i) => i.featured)?.url);
   const coverOpacity = profile.focal_point?.opacity ?? 0.4;
+  const roleLabels = displayPositions(profile);
 
   // Filmografie shows only manual entries — linked project credits appear as visual cards in "Projekte"
   const creditTitles = new Set(
@@ -1334,8 +1392,8 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 {profile.display_name ?? "Unbekannt"}
                 <span className="block h-0.5 w-12 bg-gold mt-3 rounded-full" />
               </h1>
-              {(profile.positions?.[0] ?? profile.role) && (() => {
-                const allPos = (profile.positions ?? [profile.role]).filter(Boolean) as string[];
+              {roleLabels.length > 0 && (() => {
+                const allPos = roleLabels;
                 const [primary, ...rest] = allPos;
                 return (
                   <div className="mt-3">
@@ -1400,7 +1458,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 <Image src={profile.avatar_url} alt="" aria-hidden="true" fill sizes="(max-width:640px) 100vw, 220px"
                   className="absolute inset-0 object-cover scale-110 blur-2xl opacity-55" />
                 <Image src={profile.avatar_url} alt={profile.display_name ?? ""} fill sizes="(max-width:640px) 100vw, 220px"
-                  className="relative z-10 object-contain p-1" />
+                  className="relative z-10 object-cover" />
                 <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10">
                   <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${profile.available ? "bg-gold" : "bg-red-400"}`} />
                   <span className={`text-[10px] font-medium ${profile.available ? "text-gold/90" : "text-white/60"}`}>{profile.available ? "Verfügbar" : "Nicht verfügbar"}</span>
@@ -1426,7 +1484,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                   <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
                   <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Über mich</p>
                 </div>
-                <p className="text-text-secondary text-[13px] leading-relaxed">{profile.bio}</p>
+                <ProfileBio value={profile.bio} />
               </div>
             )}
 
@@ -2012,19 +2070,21 @@ export default function ProfileView({
   myImageLikes?: string[];
   similarProfiles?: SimilarProfile[];
 }) {
-  const category = PROFILE_CATEGORY_MAP[profile.profile_type] ?? "crew";
+  const profileTypes = normalizeProfileTypes(profile.profile_types, profile.profile_type);
+  const isModel = profileTypes.includes("model");
+  const isTalent = profileTypes.some((type) => PROFILE_CATEGORY_MAP[type] === "talent");
 
   const similarSection = !isOwner && similarProfiles.length > 0
     ? <SimilarProfilesSection profiles={similarProfiles} />
     : null;
 
   // Model types get editorial layout
-  if (profile.profile_type === "model") {
-    return <><ModelProfile profile={profile} isOwner={isOwner} companyMembership={companyMembership} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
+  if (isModel) {
+    return <><ModelProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
   }
 
   // Actor/talent types get casting-ready layout
-  if (category === "talent") {
+  if (isTalent) {
     return <><ActorProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
   }
 

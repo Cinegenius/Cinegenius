@@ -34,8 +34,11 @@ function normType(t: string | null | undefined): string | null {
   return PROJECT_TYPE_NORMALIZE[t] ?? t;
 }
 import {
+  PROFILE_TYPE_LABELS,
   type ProfileImage,
+  type ProfileType,
 } from "@/lib/profile-types";
+import { normalizeProfileTypes } from "@/lib/profile-display";
 
 function safeLink(url: string | null | undefined): string | null {
   if (!url?.trim()) return null;
@@ -107,13 +110,13 @@ const DEPT_TO_PROFILE_TYPE: Record<string, string> = {
 };
 
 function TypeChipPicker({
-  selectedType,
-  onSelectType,
+  selectedTypes,
+  onTypesChange,
   positions,
   onPositionsChange,
 }: {
-  selectedType: string;
-  onSelectType: (t: string) => void;
+  selectedTypes: string[];
+  onTypesChange: (types: string[]) => void;
   positions: string[];
   onPositionsChange: (p: string[]) => void;
 }) {
@@ -124,22 +127,22 @@ function TypeChipPicker({
     const isSel = positions.includes(job);
     const next = isSel ? positions.filter((x) => x !== job) : [...positions, job];
     onPositionsChange(next);
-    // Auto-infer profile_type from department when adding a role
+    const mapped = DEPT_TO_PROFILE_TYPE[deptId];
+    if (!mapped) return;
     if (!isSel) {
-      // Only override if not a manually chosen talent/vendor type
-      if (!TALENT_TYPE_IDS.has(selectedType) && !ANBIETER_TYPE_IDS.has(selectedType)) {
-        const mapped = DEPT_TO_PROFILE_TYPE[deptId];
-        if (mapped) onSelectType(mapped);
-      }
+      if (!selectedTypes.includes(mapped)) onTypesChange([...selectedTypes, mapped]);
     } else {
-      // Removed a role — re-infer from remaining positions
-      const firstDept = departments.find((d) => d.roles.some((r) => next.includes(r)));
-      if (!firstDept) {
-        if (!TALENT_TYPE_IDS.has(selectedType) && !ANBIETER_TYPE_IDS.has(selectedType)) {
-          onSelectType("");
-        }
-      }
+      const stillRepresented = departments.some((department) =>
+        department.roles.some((role) => next.includes(role) && DEPT_TO_PROFILE_TYPE[department.id] === mapped),
+      );
+      if (!stillRepresented) onTypesChange(selectedTypes.filter((type) => type !== mapped));
     }
+  }
+
+  function toggleType(type: string) {
+    onTypesChange(selectedTypes.includes(type)
+      ? selectedTypes.filter((selected) => selected !== type)
+      : [...selectedTypes, type]);
   }
 
   const normalizedQuery = roleSearch.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("de");
@@ -154,6 +157,32 @@ function TypeChipPicker({
 
   return (
     <div className="space-y-6">
+      {selectedTypes.length > 0 && (
+        <div>
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-text-muted">Ausgewählte Tätigkeiten</p>
+          <div className="flex flex-wrap gap-2">
+            {selectedTypes.map((type, index) => (
+              <span key={type} className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 text-xs font-medium text-gold">
+                <span>{PROFILE_TYPE_LABELS[type as ProfileType] ?? type}</span>
+                {index === 0 ? (
+                  <span className="text-[10px] text-gold/70">Haupttätigkeit</span>
+                ) : (
+                  <button type="button" onClick={() => onTypesChange([type, ...selectedTypes.filter((selected) => selected !== type)])}
+                    className="rounded px-1 py-0.5 text-[10px] text-text-muted hover:text-gold" aria-label={`${PROFILE_TYPE_LABELS[type as ProfileType] ?? type} als Haupttätigkeit festlegen`}>
+                    Als Haupt
+                  </button>
+                )}
+                <button type="button" onClick={() => onTypesChange(selectedTypes.filter((selected) => selected !== type))}
+                  className="inline-flex h-6 w-6 items-center justify-center rounded-full hover:bg-red-500/10 hover:text-red-400" aria-label={`${PROFILE_TYPE_LABELS[type as ProfileType] ?? type} entfernen`}>
+                  <X size={12} />
+                </button>
+              </span>
+            ))}
+          </div>
+          <p className="mt-2 text-[11px] text-text-muted">Die erste Tätigkeit ist die Haupttätigkeit. Alle ausgewählten Tätigkeiten erscheinen im Profil und in der Suche.</p>
+        </div>
+      )}
+
       <label className="relative block">
         <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
         <input
@@ -171,10 +200,11 @@ function TypeChipPicker({
         <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted mb-2.5">🎭 Talent</p>
         <div className="flex flex-wrap gap-2">
           {TALENT_CHIPS.map(([id, label]) => {
-            const active = selectedType === id;
+            const active = selectedTypes.includes(id);
             return (
               <button key={id} type="button"
-                onClick={() => { onSelectType(active ? "" : id); if (!active) onPositionsChange([]); }}
+                aria-pressed={active}
+                onClick={() => toggleType(id)}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all ${
                   active ? "bg-gold/15 border-gold/50 text-gold" : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"
                 }`}>
@@ -190,7 +220,10 @@ function TypeChipPicker({
         <div className="flex items-center justify-between">
           <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">🎬 Filmcrew & Kreativ</p>
           {positions.length > 0 && (
-            <button type="button" onClick={() => { onPositionsChange([]); if (!TALENT_TYPE_IDS.has(selectedType) && !ANBIETER_TYPE_IDS.has(selectedType)) onSelectType(""); }}
+            <button type="button" onClick={() => {
+              onPositionsChange([]);
+              onTypesChange(selectedTypes.filter((type) => TALENT_TYPE_IDS.has(type) || ANBIETER_TYPE_IDS.has(type)));
+            }}
               className="text-[10px] text-text-muted hover:text-red-400 transition-colors">
               Alle entfernen
             </button>
@@ -205,8 +238,11 @@ function TypeChipPicker({
                   onClick={() => {
                     const next = positions.filter((x) => x !== p);
                     onPositionsChange(next);
-                    const firstDept = departments.find((d) => d.roles.some((r) => next.includes(r)));
-                    if (!firstDept && !TALENT_TYPE_IDS.has(selectedType) && !ANBIETER_TYPE_IDS.has(selectedType)) onSelectType("");
+                    const representedTypes = new Set(departments
+                      .filter((department) => department.roles.some((role) => next.includes(role)))
+                      .map((department) => DEPT_TO_PROFILE_TYPE[department.id])
+                      .filter(Boolean));
+                    onTypesChange(selectedTypes.filter((type) => TALENT_TYPE_IDS.has(type) || ANBIETER_TYPE_IDS.has(type) || representedTypes.has(type)));
                   }}
                   className="hover:text-red-400 transition-colors ml-0.5">
                   <X size={9} />
@@ -269,10 +305,11 @@ function TypeChipPicker({
         <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted mb-2.5">🏠 Anbieter</p>
         <div className="flex flex-wrap gap-2">
           {ANBIETER_CHIPS.map(([id, label]) => {
-            const active = selectedType === id;
+            const active = selectedTypes.includes(id);
             return (
               <button key={id} type="button"
-                onClick={() => { onSelectType(active ? "" : id); if (!active) onPositionsChange([]); }}
+                aria-pressed={active}
+                onClick={() => toggleType(id)}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all ${
                   active ? "bg-gold/15 border-gold/50 text-gold" : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"
                 }`}>
@@ -609,16 +646,23 @@ export default function ProfilePage() {
   const [uploadingPoster, setUploadingPoster] = useState(false);
 
   // ── Casting / Physical data ─────────────────────────────────────────────────
-  const [currentProfileType, setCurrentProfileType] = useState<string>("");
+  const [currentProfileTypes, setCurrentProfileTypes] = useState<string[]>([]);
+  const primaryProfileType = currentProfileTypes[0] ?? "";
   const [playingAgeMin, setPlayingAgeMin] = useState("");
   const [playingAgeMax, setPlayingAgeMax] = useState("");
   const [heightCm, setHeightCm] = useState("");
+  const [clothingSize, setClothingSize] = useState("");
+  const [shoeSize, setShoeSize] = useState("");
   const [hairColor, setHairColor] = useState("");
   const [eyeColor, setEyeColor] = useState("");
   const [bodyType, setBodyType] = useState("");
+  const [dialectsText, setDialectsText] = useState("");
+  const [drivingLicensesText, setDrivingLicensesText] = useState("");
   const [beard, setBeard] = useState(false);
   const [tattoos, setTattoos] = useState(false);
   const [tattoosCoverable, setTattoosCoverable] = useState(false);
+  const physicalDataRef = useRef<Record<string, unknown>>({});
+  const performanceDataRef = useRef<Record<string, unknown>>({});
 
   // ── Lazy-load my projects, listings & friends ──────────────────────────────
   useEffect(() => {
@@ -782,14 +826,22 @@ export default function ProfilePage() {
             setVideoLinks(storedLinks);
           }
           setCrewCertificates(profile.crew?.certificates ?? []);
-          setCurrentProfileType(profile.profile_type ?? "");
+          const profileTypes = normalizeProfileTypes(profile.profile_types ?? [], profile.profile_type ?? null);
+          setCurrentProfileTypes(profileTypes);
           const phys = profile.physical ?? {};
+          physicalDataRef.current = { ...phys };
+          const performance = profile.performance ?? {};
+          performanceDataRef.current = { ...performance };
           setPlayingAgeMin(phys.playing_age_min ? String(phys.playing_age_min) : "");
           setPlayingAgeMax(phys.playing_age_max ? String(phys.playing_age_max) : "");
           setHeightCm(phys.height_cm ? String(phys.height_cm) : "");
+          setClothingSize(phys.clothing_size ?? "");
+          setShoeSize(phys.shoe_size ? String(phys.shoe_size) : "");
           setHairColor(phys.hair_color ?? "");
           setEyeColor(phys.eye_color ?? "");
           setBodyType(phys.body_type ?? "");
+          setDialectsText((performance.dialects ?? []).join(", "));
+          setDrivingLicensesText((performance.driving_licenses ?? []).join(", "));
           setBeard(phys.beard ?? false);
           setTattoos(phys.tattoos ?? false);
           setTattoosCoverable(phys.tattoos_coverable ?? false);
@@ -997,6 +1049,25 @@ export default function ProfilePage() {
     setSaving(true);
     try {
       const location = [form.city.trim(), form.country.trim()].filter(Boolean).join(", ");
+      const physical = {
+        ...physicalDataRef.current,
+        playing_age_min:   playingAgeMin ? Number(playingAgeMin) : null,
+        playing_age_max:   playingAgeMax ? Number(playingAgeMax) : null,
+        height_cm:         heightCm ? Number(heightCm) : null,
+        clothing_size:     clothingSize.trim() || null,
+        shoe_size:         shoeSize ? Number(shoeSize) : null,
+        hair_color:        hairColor || null,
+        eye_color:         eyeColor || null,
+        body_type:         bodyType || null,
+        beard,
+        tattoos,
+        tattoos_coverable: tattoosCoverable,
+      };
+      const performance = {
+        ...performanceDataRef.current,
+        dialects: dialectsText.split(",").map((value) => value.trim()).filter(Boolean),
+        driving_licenses: drivingLicensesText.split(",").map((value) => value.trim()).filter(Boolean),
+      };
       const commonPayload = {
         display_name:   form.name,
         location,
@@ -1005,7 +1076,10 @@ export default function ProfilePage() {
         skills,
         memberships,
         positions,
-        profile_types:  currentProfileType ? [currentProfileType] : [],
+        profile_types:  currentProfileTypes,
+        profile_type:   primaryProfileType || null,
+        physical,
+        performance,
         languages,
         profile_images: profileImages,
         reel_url:       videoLinks[0] || null,
@@ -1059,29 +1133,8 @@ export default function ProfilePage() {
       if (isNew) setProfileExists(true);
       const unavailableFields: string[] = baseResult.unavailableFields ?? [];
 
-      // Profiltyp und Casting-Daten separat speichern, damit DB-Fehler sichtbar sind.
-      const physical = {
-        playing_age_min:   playingAgeMin ? Number(playingAgeMin) : null,
-        playing_age_max:   playingAgeMax ? Number(playingAgeMax) : null,
-        height_cm:         heightCm ? Number(heightCm) : null,
-        hair_color:        hairColor || null,
-        eye_color:         eyeColor || null,
-        body_type:         bodyType || null,
-        beard,
-        tattoos,
-        tattoos_coverable: tattoosCoverable,
-      };
-      const physRes = await fetch("/api/profile/physical", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profile_type: currentProfileType || null, physical }),
-      });
-      const physResult = await physRes.json();
-      if (!physRes.ok || physResult.error) {
-        const msg = physResult.error ?? `HTTP ${physRes.status}`;
-        addToast(`Casting-Daten: ${msg}`, "error");
-        return;
-      }
+      physicalDataRef.current = physical;
+      performanceDataRef.current = performance;
 
       if (unavailableFields.length > 0) {
         addToast(`Profil gespeichert, aber diese Felder fehlen in der Datenbank: ${unavailableFields.join(", ")}.`, "error");
@@ -1176,9 +1229,9 @@ export default function ProfilePage() {
 
   // Derived values
   const clerkEmail = user?.emailAddresses[0]?.emailAddress ?? "";
-  const profileCategory = getCategory(currentProfileType);
-  const showCrewSections = !profileCategory || profileCategory === "crew" || profileCategory === "creative";
-  const showTalentSections = profileCategory === "talent";
+  const selectedCategories = new Set(currentProfileTypes.map(getCategory).filter(Boolean));
+  const showCrewSections = currentProfileTypes.length === 0 || selectedCategories.has("crew") || selectedCategories.has("creative");
+  const showTalentSections = selectedCategories.has("talent");
 
   const completion = calculateProfileCompletion({
     name: form.name,
@@ -1187,7 +1240,7 @@ export default function ProfilePage() {
     bio: form.bio,
     images: profileImages.map((image) => image.url),
     videoLinks,
-    profileType: currentProfileType,
+    profileType: primaryProfileType,
     heightCm,
     hairColor,
     playingAgeMin,
@@ -1342,8 +1395,8 @@ export default function ProfilePage() {
                     Deine Tätigkeit <span className="text-gold">*</span>
                   </p>
                   <TypeChipPicker
-                    selectedType={currentProfileType}
-                    onSelectType={setCurrentProfileType}
+                    selectedTypes={currentProfileTypes}
+                    onTypesChange={setCurrentProfileTypes}
                     positions={positions}
                     onPositionsChange={setPositions}
                   />
@@ -1377,7 +1430,8 @@ export default function ProfilePage() {
                         {form.name || "—"}
                       </p>
                       <p className="text-xs text-text-muted mb-3">
-                        {[positions[0], form.city].filter(Boolean).join(" · ") || clerkEmail}
+                        {[positions[0] ?? PROFILE_TYPE_LABELS[primaryProfileType as ProfileType], form.city]
+                          .filter(Boolean).join(" · ") || clerkEmail}
                       </p>
                       <div className="flex gap-2">
                         <button onClick={() => fileRef.current?.click()}
@@ -2323,6 +2377,19 @@ export default function ProfilePage() {
                           className="w-32 bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
                       </div>
 
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <label className="block">
+                          <span className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">Konfektionsgröße</span>
+                          <input type="text" value={clothingSize} onChange={(event) => setClothingSize(event.target.value)}
+                            placeholder="z. B. 38 / M" className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
+                        </label>
+                        <label className="block">
+                          <span className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">Schuhgröße</span>
+                          <input type="number" min="20" max="60" value={shoeSize} onChange={(event) => setShoeSize(event.target.value)}
+                            placeholder="z. B. 39" className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
+                        </label>
+                      </div>
+
                       {/* Haarfarbe */}
                       <div>
                         <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">{t("castingHair")}</label>
@@ -2360,6 +2427,19 @@ export default function ProfilePage() {
                               }`}>{b.label}</button>
                           ))}
                         </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <label className="block">
+                          <span className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">Dialekte</span>
+                          <input type="text" value={dialectsText} onChange={(event) => setDialectsText(event.target.value)}
+                            placeholder="z. B. Bayrisch, Berlinerisch" className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
+                        </label>
+                        <label className="block">
+                          <span className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">Führerscheine</span>
+                          <input type="text" value={drivingLicensesText} onChange={(event) => setDrivingLicensesText(event.target.value)}
+                            placeholder="z. B. B, BE" className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
+                        </label>
                       </div>
 
                       {/* Toggles */}

@@ -4,6 +4,7 @@ import { auth, clerkClient } from "@clerk/nextjs/server";
 import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { PROFILE_TYPE_LABELS } from "@/lib/profile-types";
+import { normalizeProfileTypes } from "@/lib/profile-display";
 
 // Stable columns that always exist in the profiles table
 const PROFILE_COLS = [
@@ -15,7 +16,7 @@ const PROFILE_COLS = [
   "profile_images", "showreel_url", "reel_url", "awards", "availability_config",
   "modules", "instagram_url", "tiktok_url", "youtube_url", "vimeo_url",
   "linkedin_url", "website_url", "video_links",
-  "physical", "crew", "creative", "vendor", "agency", "focal_point",
+  "physical", "performance", "model_measurements", "casting", "crew", "creative", "vendor", "agency", "focal_point",
   "experience", "updated_at", "created_at",
 ].join(", ");
 
@@ -117,7 +118,7 @@ export async function POST(req: NextRequest) {
     portfolio_images, profile_images, experience, profile_types, profile_type, slug, phone, contact_email,
     available, available_from, travel_ready, availability_config, languages, reel_url, imdb_url, crew,
     cover_image_url, instagram_url, tiktok_url, youtube_url, vimeo_url, linkedin_url, website_url,
-    day_rate, filmography, video_links, focal_point,
+    day_rate, filmography, video_links, focal_point, physical, performance, model_measurements, casting,
   } = body;
 
   if (!display_name?.trim()) {
@@ -129,6 +130,9 @@ export async function POST(req: NextRequest) {
   if (profile_types !== undefined && !isValidProfileTypes(profile_types)) {
     return NextResponse.json({ error: "Ungültige Profiltypen." }, { status: 400 });
   }
+
+  const normalizedProfileTypes = normalizeProfileTypes(profile_types ?? [], profile_type ?? null);
+  const requestedPrimary = normalizedProfileTypes[0] ?? null;
 
   let normalizedSlug: string | null = null;
   if (slug && String(slug).trim()) {
@@ -160,8 +164,8 @@ export async function POST(req: NextRequest) {
     profile_images: profile_images ?? [],
     experience: experience?.trim() ?? "",
     account_type: "person",
-    profile_types: profile_types ?? [],
-    profile_type: profile_type ?? null,
+    profile_types: normalizedProfileTypes,
+    profile_type: requestedPrimary,
     slug: normalizedSlug,
     phone: phone?.trim() || null,
     contact_email: contact_email?.trim() || null,
@@ -171,6 +175,10 @@ export async function POST(req: NextRequest) {
     availability_config: availability_config ?? null,
     reel_url: reel_url ?? null,
     imdb_url: imdb_url ?? null,
+    physical: physical ?? null,
+    performance: performance ?? null,
+    model_measurements: model_measurements ?? null,
+    casting: casting ?? null,
     crew: crew ?? null,
     cover_image_url: cover_image_url ?? null,
     instagram_url: instagram_url ?? null,
@@ -228,7 +236,7 @@ export async function POST(req: NextRequest) {
   }
   // Welcome email is sent by the Clerk webhook (user.created) — no duplicate here
 
-  revalidateTag("profiles", "max");
+  revalidateTag("profiles", { expire: 0 });
 
   // Set a cookie so the middleware can immediately pass the user through
   // without waiting for the JWT to be re-issued with the new metadata.
@@ -254,7 +262,7 @@ const ALLOWED_PATCH_KEYS = new Set([
   "day_rate", "filmography", "video_links",
   "availability_config",
   "profile_types",
-  "profile_type", "modules", "physical", "crew", "creative", "vendor",
+  "profile_type", "modules", "physical", "performance", "model_measurements", "casting", "crew", "creative", "vendor",
   "focal_point", "tagline",
 ]);
 
@@ -279,6 +287,13 @@ export async function PATCH(req: NextRequest) {
     }
     if ("profile_types" in safe && !isValidProfileTypes(safe.profile_types)) {
       return NextResponse.json({ error: "Ungültige Profiltypen." }, { status: 400 });
+    }
+    if ("profile_types" in safe) {
+      const normalizedTypes = normalizeProfileTypes(safe.profile_types as string[], safe.profile_type as string | null | undefined);
+      safe.profile_types = normalizedTypes;
+      safe.profile_type = normalizedTypes[0] ?? null;
+    } else if ("profile_type" in safe) {
+      safe.profile_types = typeof safe.profile_type === "string" ? [safe.profile_type] : [];
     }
 
     // Slug: validate format and check uniqueness to prevent profile hijacking
@@ -321,7 +336,7 @@ export async function PATCH(req: NextRequest) {
 
       if (!error) {
         if (!data) return NextResponse.json({ error: "Profil nicht gefunden. Bitte zuerst das Profil anlegen." }, { status: 404 });
-        revalidateTag("profiles", "max");
+        revalidateTag("profiles", { expire: 0 });
         if (unavailableFields.length > 0) {
           return NextResponse.json({
             error: `Diese Felder konnten nicht gespeichert werden: ${unavailableFields.join(", ")}. Bitte die Profil-Datenbank aktualisieren lassen.`,
