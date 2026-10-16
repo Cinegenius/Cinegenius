@@ -1,5 +1,6 @@
 import { SignIn } from "@clerk/nextjs";
 import { Suspense } from "react";
+import Link from "next/link";
 
 function SignInSkeleton() {
   return (
@@ -24,6 +25,7 @@ export default function SignInPage() {
         <Suspense fallback={<SignInSkeleton />}>
           <SignIn
             fallbackRedirectUrl="/dashboard"
+            signUpUrl="/sign-up"
             appearance={{
               variables: {
                 colorPrimary: "#C2F135",
@@ -44,6 +46,12 @@ export default function SignInPage() {
             }}
           />
         </Suspense>
+        <p className="mt-6 text-center text-sm text-text-muted">
+          Noch kein Konto?{" "}
+          <Link href="/sign-up" className="font-semibold text-gold hover:text-gold-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-sm">
+            Jetzt registrieren
+          </Link>
+        </p>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { SignUp } from "@clerk/nextjs";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
@@ -18,6 +19,7 @@ function SignUpForm() {
   return (
     <SignUp
       forceRedirectUrl={afterSignUp}
+      signInUrl="/sign-in"
       appearance={{
         variables: {
           colorPrimary: "#C2F135",
@@ -58,6 +60,12 @@ export default function SignUpPage() {
         }>
           <SignUpForm />
         </Suspense>
+        <p className="mt-6 text-center text-sm text-text-muted">
+          Schon registriert?{" "}
+          <Link href="/sign-in" className="font-semibold text-gold hover:text-gold-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-sm">
+            Anmelden
+          </Link>
+        </p>
       </div>
     </div>
   );

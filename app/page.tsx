@@ -27,6 +27,7 @@ import { PageBackdrop } from "@/components/PageHeader";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 
 async function getHomeData() {
+  const currentTime = Date.now();
   const [
     { data: recentLocations },
     { data: recentJobs },
@@ -84,7 +85,7 @@ async function getHomeData() {
     city: (l.city ?? "") as string,
     price: (l.price ?? 0) as number,
     image: (l.image_url ?? "") as string,
-    isNew: l.created_at ? (Date.now() - new Date(l.created_at as string).getTime()) < 3 * 24 * 60 * 60 * 1000 : false,
+    isNew: l.created_at ? (currentTime - new Date(l.created_at as string).getTime()) < 3 * 24 * 60 * 60 * 1000 : false,
     created_at: (l.created_at ?? "") as string,
   }));
 
@@ -121,6 +122,7 @@ async function getHomeData() {
     liveProps,
     companies,
     topCreators,
+    currentTime,
   };
 }
 
@@ -131,10 +133,11 @@ export default async function HomePage() {
 
   const t = await getTranslations("home");
   const tc = await getTranslations("common");
+  const tn = await getTranslations("nav");
 
   function formatDate(iso: string): string {
     if (!iso) return "";
-    const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+    const diff = Math.floor((currentTime - new Date(iso).getTime()) / 86400000);
     if (diff === 0) return tc("today");
     if (diff === 1) return tc("yesterday");
     if (diff < 7) return tc("daysAgo", { days: diff });
@@ -142,7 +145,7 @@ export default async function HomePage() {
     return tc("weeksAgo", { weeks: Math.floor(diff / 7) });
   }
 
-  const { liveLocations, liveJobs, liveProps, companies, topCreators } = await getHomeData();
+  const { liveLocations, liveJobs, liveProps, companies, topCreators, currentTime } = await getHomeData();
 
   return (
     <main className="relative isolate min-h-screen">
@@ -167,6 +170,22 @@ export default async function HomePage() {
           <p className="text-text-muted text-sm sm:text-base mb-5">
             für Film, Foto & Content — kostenlos in der DACH-Region
           </p>
+          {!isLoggedIn && (
+            <div className="mb-5 flex flex-col min-[380px]:flex-row items-stretch justify-center gap-2">
+              <Link
+                href="/sign-up"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gold px-5 py-2.5 text-sm font-bold text-bg-primary shadow-lg shadow-gold/15 transition-colors hover:bg-gold-light"
+              >
+                {tn("signUp")} <ArrowRight size={15} />
+              </Link>
+              <Link
+                href="/sign-in"
+                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-border bg-bg-primary/50 px-5 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:border-gold hover:text-gold"
+              >
+                {tn("signIn")}
+              </Link>
+            </div>
+          )}
           <div className="max-w-xl mx-auto">
             <HeroSearch />
           </div>

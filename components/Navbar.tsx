@@ -182,7 +182,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const { isSignedIn, isLoaded } = useAuth();
   const { user } = useUser();
-  const { signOut, openSignIn, openSignUp } = useClerk();
+  const { signOut } = useClerk();
   const { addToast } = useToast();
   const userMenuRef = useRef<HTMLDivElement>(null);
   const activeUserId = isSignedIn ? user?.id : null;
@@ -370,18 +370,18 @@ export default function Navbar() {
               )}
               {isLoaded && !isSignedIn && (
                 <>
-                  <button
-                    onClick={() => openSignIn()}
+                  <Link
+                    href="/sign-in"
                     className="px-4 py-2 text-sm font-semibold border border-border text-text-secondary hover:border-gold hover:text-gold rounded-md transition-all"
                   >
                     {t("signIn")}
-                  </button>
-                  <button
-                    onClick={() => openSignUp()}
+                  </Link>
+                  <Link
+                    href="/sign-up"
                     className="px-4 py-2 text-sm font-semibold bg-gold text-bg-primary rounded-md hover:bg-gold-light transition-colors"
                   >
                     {t("signUp")}
-                  </button>
+                  </Link>
                 </>
               )}
               {(isLoaded ? isSignedIn : !!(profileDisplayName || profileAvatarUrl)) && (() => {
