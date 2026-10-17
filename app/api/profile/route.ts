@@ -33,6 +33,12 @@ const PROFILE_OPTIONAL_COLS = [
 const PROFILE_OPTIONAL_COLUMN_SET = new Set<string>(PROFILE_OPTIONAL_COLS);
 
 const PROFILE_TYPE_VALUES = new Set(Object.keys(PROFILE_TYPE_LABELS));
+function privateNoStoreJson(body: unknown, status = 200) {
+  const response = NextResponse.json(body, { status });
+  response.headers.set("Cache-Control", "private, no-store, max-age=0");
+  return response;
+}
+
 function isValidProfileType(value: unknown): value is string | null {
   return value === null || (typeof value === "string" && PROFILE_TYPE_VALUES.has(value));
 }
@@ -51,7 +57,7 @@ export async function GET() {
     .eq("user_id", userId)
     .maybeSingle();
 
-  if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 });
+  if (dbError) return privateNoStoreJson({ error: dbError.message }, 500);
 
   let data = base;
   let unavailableFields: string[] = [];
@@ -65,7 +71,7 @@ export async function GET() {
     );
     if (optionalResult.error) {
       console.error("[profile GET] optional profile fields could not be read:", optionalResult.error);
-      return NextResponse.json({ error: optionalResult.error.message ?? "Optionale Profilfelder konnten nicht geladen werden.", code: optionalResult.error.code }, { status: 500 });
+      return privateNoStoreJson({ error: optionalResult.error.message ?? "Optionale Profilfelder konnten nicht geladen werden.", code: optionalResult.error.code }, 500);
     }
     data = Object.assign({}, base, optionalResult.data ?? {}) as typeof base;
     unavailableFields = optionalResult.unavailableFields;
@@ -85,7 +91,7 @@ export async function GET() {
         console.error("[profile GET] failed to back-fill Clerk metadata:", e);
       }
     }
-    const res = NextResponse.json({ profile: data, exists: true, unavailableFields });
+    const res = privateNoStoreJson({ profile: data, exists: true, unavailableFields });
     res.cookies.set("cg_profile_ok", "1", {
       httpOnly: true,
       sameSite: "lax",
@@ -95,7 +101,7 @@ export async function GET() {
     return res;
   }
 
-  return NextResponse.json({ profile: null, exists: false, unavailableFields: [] });
+  return privateNoStoreJson({ profile: null, exists: false, unavailableFields: [] });
 }
 
 export async function POST(req: NextRequest) {

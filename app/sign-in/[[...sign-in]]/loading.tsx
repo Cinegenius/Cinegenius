@@ -1,11 +1,11 @@
+import AuthFormLoading from "@/components/AuthFormLoading";
+
 export default function Loading() {
   return (
-    <div className="pt-16 min-h-screen flex items-center justify-center bg-bg-primary px-4">
-      <div className="w-full max-w-md space-y-3">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-12 rounded-xl bg-bg-elevated animate-pulse" />
-        ))}
-        <div className="h-12 rounded-xl bg-gold/20 animate-pulse" />
+    <div className="min-h-screen bg-bg-primary px-4 pt-28">
+      <div className="mx-auto flex max-w-md flex-col items-center gap-6">
+        <div className="h-9 w-40 animate-pulse rounded-lg bg-bg-elevated" />
+        <AuthFormLoading />
       </div>
     </div>
   );

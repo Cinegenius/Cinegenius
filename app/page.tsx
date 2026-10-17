@@ -174,12 +174,14 @@ export default async function HomePage() {
             <div className="mb-5 flex flex-col min-[380px]:flex-row items-stretch justify-center gap-2">
               <Link
                 href="/sign-up"
+                prefetch
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gold px-5 py-2.5 text-sm font-bold text-bg-primary shadow-lg shadow-gold/15 transition-colors hover:bg-gold-light"
               >
                 {tn("signUp")} <ArrowRight size={15} />
               </Link>
               <Link
                 href="/sign-in"
+                prefetch
                 className="inline-flex min-h-11 items-center justify-center rounded-xl border border-border bg-bg-primary/50 px-5 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:border-gold hover:text-gold"
               >
                 {tn("signIn")}

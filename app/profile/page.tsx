@@ -754,7 +754,7 @@ export default function ProfilePage() {
 
   // ── Load profile from Supabase ──────────────────────────────────────────────
   useEffect(() => {
-    fetch("/api/profile")
+    fetch("/api/profile", { cache: "no-store" })
       .then(async (r) => {
         const result = await r.json().catch(() => ({}));
         if (!r.ok) throw new Error(result.error ?? `HTTP ${r.status}`);
@@ -882,7 +882,12 @@ export default function ProfilePage() {
       const url = await sendProfileMediaFile(prepared.file);
       setAvatarUrl(url);
       setAvatarPreview(url);
-      if (profileExists) await patchProfile({ avatar_url: url });
+      if (profileExists) {
+        await patchProfile({ avatar_url: url });
+        window.dispatchEvent(new CustomEvent("cinegenius:profile-updated", {
+          detail: { userId: user?.id, displayName: form.name, avatarUrl: url },
+        }));
+      }
       addToast(profileExists ? t("uploadSuccess") : "Foto hochgeladen. Speichere dein Profil, damit es übernommen wird.", "success");
       // Fokuspunkt setzen
       setFocalPickerImage(url);
@@ -901,7 +906,12 @@ export default function ProfilePage() {
     setAvatarPreview("");
     setAvatarUrl("");
     try {
-      if (profileExists) await patchProfile({ avatar_url: null });
+      if (profileExists) {
+        await patchProfile({ avatar_url: null });
+        window.dispatchEvent(new CustomEvent("cinegenius:profile-updated", {
+          detail: { userId: user?.id, displayName: form.name, avatarUrl: null },
+        }));
+      }
     } catch (err) {
       setAvatarUrl(previousAvatarUrl);
       setAvatarPreview(previousAvatarUrl);
@@ -1157,6 +1167,9 @@ export default function ProfilePage() {
         return;
       }
       if (isNew) setProfileExists(true);
+      window.dispatchEvent(new CustomEvent("cinegen:profile-updated", {
+        detail: { userId: user?.id, displayName: form.name, avatarUrl: avatarUrl || null },
+      }));
       const unavailableFields: string[] = baseResult.unavailableFields ?? [];
 
       physicalDataRef.current = physical ?? {};

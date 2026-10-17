@@ -13,7 +13,7 @@ function ChevronMark({ size = 28 }: { size?: number }) {
       viewBox="0 0 24 24"
       fill="none"
       aria-hidden
-      className="shrink-0"
+      className="h-7 w-7 shrink-0 max-[360px]:h-5 max-[360px]:w-5"
     >
       <polyline
         points="5.5,4 18.5,12 5.5,20"
@@ -40,11 +40,11 @@ export function Logo({ href = "/", onClick }: { href?: string; onClick?: () => v
     <Link
       href={href}
       onClick={handleClick}
-      className="flex items-center gap-2.5 shrink-0 group"
+      className="flex items-center gap-2.5 max-[420px]:gap-1 shrink-0 group"
       aria-label="CineGenius"
     >
       <ChevronMark size={28} />
-      <span className="font-sans text-[16px] leading-none select-none tracking-[-0.035em]">
+      <span className="font-sans text-[16px] max-[420px]:text-[14px] max-[360px]:text-[13px] leading-none select-none tracking-[-0.035em]">
         <span className="font-medium text-text-primary">Cine</span>
         <span className="font-bold" style={{ color: "var(--color-gold)" }}>Genius</span>
       </span>

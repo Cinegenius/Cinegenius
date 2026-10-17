@@ -13,6 +13,10 @@ The homepage keeps `/hero-bg.jpg` as a full-page backdrop using the shared `Page
 
 Desktop and mobile navigation use the same order: Locations, Crew, Jobs, Marktplatz, Projekte, Firmen. Keep `components/Navbar.tsx` and `components/BottomNav.tsx` aligned when editing navigation.
 
+## Authentication entry points
+
+Keep `/sign-in` and `/sign-up` one click from the homepage. On desktop, show both actions in the header; on phones, show them outside the collapsed menu. Homepage and navigation links prefetch the corresponding direct routes. Each route renders the actual email/password inputs in its first server response, and the client form uses Clerk's supported flow; never add an intermediate welcome or account-type page. Ask only for fields the identity provider marks as required, then defer profile details to onboarding. Keep reciprocal sign-in/register links and send an existing session directly to its requested internal destination. Profile-image changes must dispatch `cinegenius:profile-updated` so the navbar/account menu updates immediately without stale cached profile data.
+
 ## Design regression checks
 
 Run `npm run check:design` before each release. It verifies that all six public areas still use `PageHeader`, the desktop and mobile navigation have the same destinations in the same order, the shared page-width and solid-toolbar styles remain present, and the removed `CategoryHero` layout has not returned. The production release script runs this check automatically.

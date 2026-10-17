@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, DM_Sans, JetBrains_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { deDE, enUS, esES, csCZ, huHU, itIT } from "@clerk/localizations";
@@ -103,7 +104,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
+  const [cookieStore, { userId }] = await Promise.all([cookies(), auth()]);
   const locale = cookieStore.get("cg_locale")?.value ?? "de";
   const clerkLocalization = CLERK_LOCALIZATIONS[locale] ?? deDE;
   const htmlLang = HTML_LANG[locale] ?? "de";
@@ -138,7 +139,7 @@ export default async function RootLayout({
                 <GlobalEffects />
                 <PresencePing />
                 <GlobalSearch />
-                <Navbar />
+                <Navbar initialIsSignedIn={!!userId} />
                 <main className="flex-1 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">{children}</main>
                 <Footer />
                 <CookieBanner />

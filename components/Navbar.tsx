@@ -166,7 +166,7 @@ const desktopNavHrefs = [
 ] as const;
 
 
-export default function Navbar() {
+export default function Navbar({ initialIsSignedIn = false }: { initialIsSignedIn?: boolean }) {
   const t = useTranslations("nav");
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -176,6 +176,7 @@ export default function Navbar() {
     displayName: string;
     avatarUrl: string;
   } | null>(null);
+  const profileUpdateRevision = useRef(0);
   const [signingOut, setSigningOut] = useState(false);
   const signingOutRef = useRef(false);
   const [unreadData, setUnreadData] = useState<{ userId: string; count: number } | null>(null);
@@ -186,6 +187,7 @@ export default function Navbar() {
   const { addToast } = useToast();
   const userMenuRef = useRef<HTMLDivElement>(null);
   const activeUserId = isSignedIn ? user?.id : null;
+  const hasSignedInSession = isLoaded ? !!isSignedIn : initialIsSignedIn;
   const profileDisplayName = profileData?.userId === activeUserId ? profileData?.displayName ?? "" : "";
   const profileAvatarUrl = profileData?.userId === activeUserId ? profileData?.avatarUrl ?? "" : "";
   const unreadMessages = unreadData?.userId === activeUserId ? unreadData?.count ?? 0 : 0;
@@ -219,11 +221,12 @@ export default function Navbar() {
     const controller = new AbortController();
     const { signal } = controller;
     let current = true;
+    const initialProfileRevision = profileUpdateRevision.current;
 
-    fetch("/api/profile", { signal })
+    fetch("/api/profile", { signal, cache: "no-store" })
       .then(r => r.ok ? r.json() : null)
       .then((json) => {
-        if (!current || !json) return;
+        if (!current || !json || initialProfileRevision !== profileUpdateRevision.current) return;
         setProfileData({
           userId: activeUserId,
           displayName: json.profile?.display_name ?? "",
@@ -272,6 +275,21 @@ export default function Navbar() {
       supabase.removeChannel(channel);
     };
   }, [isLoaded, activeUserId]);
+
+  useEffect(() => {
+    const onProfileUpdated = (event: Event) => {
+      const detail = (event as CustomEvent<{ userId?: string; displayName?: string; avatarUrl?: string | null }>).detail;
+      if (!activeUserId || detail?.userId !== activeUserId) return;
+      profileUpdateRevision.current += 1;
+      setProfileData({
+        userId: activeUserId,
+        displayName: detail.displayName ?? "",
+        avatarUrl: detail.avatarUrl ?? "",
+      });
+    };
+    window.addEventListener("cinegenius:profile-updated", onProfileUpdated);
+    return () => window.removeEventListener("cinegenius:profile-updated", onProfileUpdated);
+  }, [activeUserId]);
 
   const handleSignOut = async () => {
     if (signingOutRef.current) return;
@@ -361,30 +379,25 @@ export default function Navbar() {
               )}
               <LanguageSwitcher />
               <NotificationCenter />
-              {!isLoaded && !profileDisplayName && !profileAvatarUrl && (
-                <div className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full border border-border/30 animate-pulse">
-                  <div className="w-7 h-7 rounded-full bg-bg-elevated" />
-                  <div className="w-20 h-3 rounded-full bg-bg-elevated hidden xl:block" />
-                  <div className="w-2.5 h-2.5 rounded bg-bg-elevated" />
-                </div>
-              )}
-              {isLoaded && !isSignedIn && (
+              {!hasSignedInSession && (
                 <>
                   <Link
                     href="/sign-in"
+                    prefetch
                     className="px-4 py-2 text-sm font-semibold border border-border text-text-secondary hover:border-gold hover:text-gold rounded-md transition-all"
                   >
                     {t("signIn")}
                   </Link>
                   <Link
                     href="/sign-up"
+                    prefetch
                     className="px-4 py-2 text-sm font-semibold bg-gold text-bg-primary rounded-md hover:bg-gold-light transition-colors"
                   >
                     {t("signUp")}
                   </Link>
                 </>
               )}
-              {(isLoaded ? isSignedIn : !!(profileDisplayName || profileAvatarUrl)) && (() => {
+              {hasSignedInSession && (() => {
                 const avatarSrc = profileAvatarUrl || user?.imageUrl || "";
                 const displayName = profileDisplayName || user?.firstName || user?.emailAddresses?.[0]?.emailAddress?.split("@")[0] || "";
                 const email = user?.primaryEmailAddress?.emailAddress ?? "";
@@ -475,9 +488,9 @@ export default function Navbar() {
               })()}
             </div>
 
-            {/* Mobile: search + notifications + language + menu */}
+            {/* Mobile: keep both auth destinations visible outside the menu. */}
             <div className="lg:hidden flex items-center gap-1">
-              {pathname !== "/" && (
+              {hasSignedInSession && pathname !== "/" && (
                 <button
                   onClick={() => document.dispatchEvent(new Event("cg:opensearch"))}
                   className="w-9 h-9 flex items-center justify-center text-text-secondary hover:text-gold transition-colors"
@@ -486,10 +499,18 @@ export default function Navbar() {
                   <Search size={20} />
                 </button>
               )}
-              {!isLoaded && !profileDisplayName && !profileAvatarUrl && (
-                <div className="w-8 h-8 rounded-full bg-bg-elevated border border-border/30 animate-pulse" />
+              {!hasSignedInSession && (
+                <div className="flex items-center gap-1">
+                  <Link href="/sign-in" prefetch className="min-h-11 inline-flex items-center justify-center whitespace-nowrap rounded-lg border border-border px-2.5 max-[360px]:px-1.5 text-[11px] max-[360px]:text-[10px] font-semibold text-text-primary hover:border-gold hover:text-gold">
+                    {t("signIn")}
+                  </Link>
+                  <Link href="/sign-up" prefetch className="min-h-11 inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-gold px-2.5 max-[360px]:px-1.5 text-[11px] max-[360px]:text-[10px] font-bold text-bg-primary hover:bg-gold-light">
+                    <span className="max-[420px]:hidden">{t("signUp")}</span>
+                    <span className="min-[421px]:hidden">Registrieren</span>
+                  </Link>
+                </div>
               )}
-              {(isLoaded ? isSignedIn : !!(profileDisplayName || profileAvatarUrl)) && (() => {
+              {hasSignedInSession && (() => {
                 const mobileAvatar = profileAvatarUrl || user?.imageUrl || "";
                 const mobileInitial = (profileDisplayName || user?.firstName || user?.emailAddresses?.[0]?.emailAddress || "?")[0].toUpperCase();
                 return (
@@ -510,9 +531,9 @@ export default function Navbar() {
                   </>
                 );
               })()}
-              <LanguageSwitcher />
+              {hasSignedInSession && <LanguageSwitcher />}
               <button
-                className="w-9 h-9 flex items-center justify-center text-text-secondary hover:text-gold transition-colors"
+                className="w-11 h-11 flex items-center justify-center text-text-secondary hover:text-gold transition-colors"
                 onClick={() => setOpen(!open)}
                 aria-label={t("openMenu")}
               >
@@ -542,7 +563,7 @@ export default function Navbar() {
 
         <nav className="px-4 py-5 overflow-y-auto h-[calc(100%-4rem)] flex flex-col gap-4">
 
-          {(isLoaded ? isSignedIn : !!(profileDisplayName || profileAvatarUrl)) ? (
+          {hasSignedInSession ? (
             <>
               {/* Account links */}
               <div className="space-y-1">
