@@ -4,6 +4,7 @@ import { useAuth, useSignIn, useSignUp } from "@clerk/nextjs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { getMfaResendChannel, getPasswordSignInAction, selectSecondFactor } from "@/lib/sign-in-flow";
 
 type AuthMode = "sign-in" | "sign-up";
 type SignInStep = "credentials" | "email-code" | "mfa" | "reset-code" | "new-password";
@@ -92,10 +93,7 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
 
   const prepareSecondFactor = async () => {
     const supported = signIn.supportedSecondFactors.map((entry) => entry.strategy);
-    const selected = (supported.includes("email_code") ? "email_code"
-      : supported.includes("phone_code") ? "phone_code"
-        : supported.includes("totp") ? "totp"
-          : supported.includes("backup_code") ? "backup_code" : null);
+    const selected = selectSecondFactor(supported);
     if (!selected) {
       setError("Für dieses Konto ist eine zusätzliche Bestätigung nötig, die hier nicht verfügbar ist. Bitte nutze die Kontowiederherstellung.");
       return;
@@ -118,6 +116,27 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
     }
   };
 
+  const resendSecondFactorCode = async () => {
+    if (!signIn || busy) return;
+    const channel = getMfaResendChannel(factor);
+    if (!channel) return;
+    setError("");
+    setMessage("");
+    const fallback = "Der Bestätigungscode konnte nicht erneut gesendet werden.";
+    const result = await runAuthAction(
+      () => channel === "email" ? signIn.mfa.sendEmailCode() : signIn.mfa.sendPhoneCode(),
+      setError,
+      fallback,
+    );
+    if (!result || result.error) {
+      if (result?.error) setError(readableAuthError(result.error, fallback));
+      return;
+    }
+    setMessage(channel === "email"
+      ? "Wir haben einen neuen Bestätigungscode an deine E-Mail-Adresse gesendet."
+      : "Wir haben einen neuen Bestätigungscode an dein Telefon gesendet.");
+  };
+
   const submitPassword = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!signIn || busy) return;
@@ -133,9 +152,10 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
       setError(readableAuthError(result.error, "Anmeldung fehlgeschlagen. Bitte prüfe deine Angaben."));
       return;
     }
-    if (signIn.status === "complete") await completeSignIn();
-    else if (signIn.status === "needs_second_factor" || signIn.status === "needs_client_trust") await prepareSecondFactor();
-    else if (signIn.status === "needs_first_factor") {
+    const nextAction = getPasswordSignInAction(signIn.status);
+    if (nextAction === "complete") await completeSignIn();
+    else if (nextAction === "mfa") await prepareSecondFactor();
+    else if (nextAction === "email-code") {
       const codeResult = await runAuthAction(() => signIn.emailCode.sendCode({ emailAddress: email.trim() }), setError, "Die Anmeldung mit E-Mail-Code ist für dieses Konto nicht verfügbar.");
       if (!codeResult || codeResult.error) {
         if (!codeResult) return;
@@ -295,6 +315,7 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
           </label>
           <button type="submit" disabled={!signIn || busy} className={buttonClass}>{busy ? "Prüfe Code …" : "Code bestätigen"}</button>
           {step === "email-code" && <button type="button" disabled={!signIn || busy} onClick={() => void sendEmailCode()} className={`${secondaryButtonClass} w-full`}>Neuen Code senden</button>}
+          {step === "mfa" && getMfaResendChannel(factor) && <button type="button" disabled={!signIn || busy} onClick={() => void resendSecondFactorCode()} className={`${secondaryButtonClass} w-full`}>Neuen Code senden</button>}
           <button type="button" disabled={busy} onClick={() => void resetFlow()} className="min-h-11 w-full text-sm text-text-muted hover:text-text-primary">Zurück zur Anmeldung</button>
         </form>
       )}
