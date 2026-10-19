@@ -3,10 +3,11 @@ import { db } from "@/lib/db";
 import Image from "next/image";
 import Link from "next/link";
 import { Camera, ArrowRight, MapPin } from "lucide-react";
+import { getPrivateProfileIds } from "@/lib/trust";
 
 export const metadata: Metadata = {
-  title: "Fotografen & Portfolio — CineGenius",
-  description: "Entdecke Fotografen aus der DACH-Region: Portraits, Editorial, Commercial, Lifestyle. Portfolio-Bilder direkt ansehen und buchen.",
+  title: "Fotos & Portfolio — CineGenius",
+  description: "Entdecke öffentliche Portfolio- und Projektfotos aus der CineGenius-Community.",
 };
 
 export const revalidate = 300;
@@ -28,28 +29,32 @@ const ASPECT_CYCLE = ["aspect-square", "aspect-[3/4]", "aspect-[4/3]", "aspect-[
 export default async function PhotoPage() {
   const { data: profiles } = await db
     .from("profiles")
-    .select("user_id, display_name, tagline, location, avatar_url, profile_images, profile_type, profile_types, verified")
+    .select("user_id, slug, display_name, tagline, location, profile_images, portfolio_images")
     .not("display_name", "is", null)
     .neq("display_name", "")
     .order("updated_at", { ascending: false })
     .limit(200);
 
-  const photoProfiles = (profiles ?? []).filter((p: RawProfile) => {
-    const types: string[] = [p.profile_type, ...(Array.isArray(p.profile_types) ? p.profile_types : [])].filter(Boolean);
-    return types.includes("photographer");
-  });
+  const profileRows = (profiles ?? []) as RawProfile[];
+  const privateIds = await getPrivateProfileIds(profileRows.map((profile) => profile.user_id));
+  const photoProfiles = profileRows.filter((profile) => !privateIds.has(profile.user_id));
 
   const gridItems: GridItem[] = [];
   for (const p of photoProfiles) {
     const images = Array.isArray(p.profile_images)
       ? (p.profile_images as Array<{ url?: string; media_type?: string; caption?: string }>)
       : [];
-    const portfolioImgs = images.filter(
+    const galleryImages = images.filter(
       (img) => img.url?.includes("supabase.co/storage") && img.media_type !== "headshot"
     );
+    const legacyPortfolio = Array.isArray(p.portfolio_images)
+      ? p.portfolio_images.filter((url: unknown): url is string => typeof url === "string" && url.includes("supabase.co/storage"))
+      : [];
+    const allImages = [...galleryImages, ...legacyPortfolio.map((url: string) => ({ url, caption: "Portfolio" }))]
+      .filter((img, index, array) => array.findIndex((other) => other.url === img.url) === index);
 
-    if (portfolioImgs.length > 0) {
-      portfolioImgs.slice(0, 4).forEach((img, idx) => {
+    if (allImages.length > 0) {
+      allImages.forEach((img, idx) => {
         gridItems.push({
           imageUrl: img.url!,
           caption: img.caption,
@@ -58,15 +63,6 @@ export default async function PhotoPage() {
           profileId: p.user_id,
           aspectClass: ASPECT_CYCLE[(gridItems.length + idx) % ASPECT_CYCLE.length],
         });
-      });
-    } else if (typeof p.avatar_url === "string" && p.avatar_url.includes("supabase.co/storage")) {
-      gridItems.push({
-        imageUrl: p.avatar_url,
-        caption: p.tagline,
-        photographerName: p.display_name,
-        photographerCity: typeof p.location === "string" ? p.location.split(",")[0]?.trim() : undefined,
-        profileId: p.user_id,
-        aspectClass: ASPECT_CYCLE[gridItems.length % ASPECT_CYCLE.length],
       });
     }
   }
@@ -87,22 +83,22 @@ export default async function PhotoPage() {
       {/* Hero */}
       <section className="pt-28 pb-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold/20 bg-gold/5 text-gold text-xs font-semibold mb-6">
-          <Camera size={11} /> Fotografie
+          <Camera size={11} /> CineGenius Galerie
         </div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
           <div>
             <h1 className="font-display text-4xl sm:text-5xl font-bold text-text-primary mb-3">
-              Fotografen & Portfolio
+              Fotos & Portfolio
             </h1>
             <p className="text-text-muted max-w-xl leading-relaxed">
-              Portraits, Editorial, Commercial, Lifestyle — entdecke Fotografen aus der DACH-Region und buche direkt.
+              Entdecke öffentliche Portfolio- und Projektfotos aus der CineGenius-Community.
             </p>
           </div>
           <Link
             href="/creators"
             className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm"
           >
-            Alle Fotografen <ArrowRight size={14} />
+            Crew entdecken <ArrowRight size={14} />
           </Link>
         </div>
       </section>
@@ -114,7 +110,7 @@ export default async function PhotoPage() {
             {gridItems.map((item, i) => (
               <Link
                 key={`${item.profileId}-${i}`}
-                href={`/profile/${item.profileId}`}
+              href={`/profile/${photoProfiles.find((profile) => profile.user_id === item.profileId)?.slug || item.profileId}#portfolio`}
                 className={`group relative rounded-xl overflow-hidden ${item.aspectClass} bg-bg-elevated border border-border`}
               >
                 <Image
@@ -144,7 +140,7 @@ export default async function PhotoPage() {
           </div>
           <h2 className="font-display text-2xl font-bold text-text-primary mb-3">Sei der Erste</h2>
           <p className="text-text-muted mb-6 max-w-md mx-auto">
-            Noch keine Fotografen-Profile mit Portfolio. Erstelle dein Profil und zeig deine Arbeit.
+            Noch keine öffentlichen Portfoliofotos vorhanden. Erstelle dein Profil und zeig deine Arbeit.
           </p>
           <Link
             href="/sign-up"

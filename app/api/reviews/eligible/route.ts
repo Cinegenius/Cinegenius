@@ -1,117 +1,37 @@
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
+import { anyBlockExists } from "@/lib/trust";
+import { resolveReviewEligibility } from "@/lib/review-eligibility";
 import { NextRequest, NextResponse } from "next/server";
 
-// GET /api/reviews/eligible?target_id=xxx&target_type=xxx
-// Returns whether the current user can leave a review for this target
+// GET /api/reviews/eligible?target_id=xxx&target_type=user|listing
 export async function GET(req: NextRequest) {
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ eligible: false });
+  if (!user) return NextResponse.json({ eligible: false, already_reviewed: false, can_edit: false });
 
   const { userId } = user;
-  const { searchParams } = new URL(req.url);
-  const target_id = searchParams.get("target_id");
-  const target_type = searchParams.get("target_type");
-
-  if (!target_id || !target_type) {
-    return NextResponse.json({ eligible: false });
+  const targetId = req.nextUrl.searchParams.get("target_id");
+  const requestedType = req.nextUrl.searchParams.get("target_type");
+  const targetType = requestedType === "profile" ? "user" : requestedType;
+  if (!targetId || !targetType || (targetType !== "user" && targetType !== "listing")) {
+    return NextResponse.json({ eligible: false, already_reviewed: false, can_edit: false });
   }
 
-  // Check if already reviewed
-  const { data: existing } = await db
-    .from("reviews")
-    .select("id")
-    .eq("target_id", target_id)
-    .eq("reviewer_id", userId)
-    .maybeSingle();
-
-  if (existing) {
-    return NextResponse.json({ eligible: false, already_reviewed: true });
+  let ownerId = targetId;
+  if (targetType === "listing") {
+    const { data: listing } = await db.from("listings").select("user_id").eq("id", targetId).maybeSingle();
+    if (!listing) return NextResponse.json({ eligible: false, already_reviewed: false, can_edit: false });
+    ownerId = listing.user_id;
+  }
+  if (ownerId === userId || await anyBlockExists(userId, ownerId)) {
+    return NextResponse.json({ eligible: false, already_reviewed: false, can_edit: false });
   }
 
-  let eligible = false;
-
-  if (target_type === "location" || target_type === "prop" || target_type === "vehicle") {
-    // Eligible if user has a confirmed booking for this listing
-    const { data } = await db
-      .from("bookings")
-      .select("id")
-      .eq("user_id", userId)
-      .eq("listing_id", target_id)
-      .eq("status", "confirmed")
-      .maybeSingle();
-    eligible = !!data;
-  } else if (target_type === "creator") {
-    // Eligible if user owns a job where this creator had an accepted application
-    const { data: ownedJobs } = await db
-      .from("listings")
-      .select("id")
-      .eq("user_id", userId)
-      .eq("type", "job");
-
-    const jobIds = (ownedJobs ?? []).map((j) => j.id);
-    if (jobIds.length > 0) {
-      const { data } = await db
-        .from("applications")
-        .select("id")
-        .eq("applicant_id", target_id)
-        .in("job_id", jobIds)
-        .eq("status", "accepted")
-        .maybeSingle();
-      eligible = !!data;
-    }
-
-    // Also eligible if creator was booked (for crew bookings)
-    if (!eligible) {
-      const { data } = await db
-        .from("bookings")
-        .select("id")
-        .eq("user_id", userId)
-        .eq("listing_id", target_id)
-        .eq("status", "confirmed")
-        .maybeSingle();
-      eligible = !!data;
-    }
-  } else if (target_type === "profile") {
-    // target_id is the profile owner's user_id
-    // Eligible if current user booked a listing owned by this person
-    const { data: theirListings } = await db
-      .from("listings")
-      .select("id")
-      .eq("user_id", target_id);
-
-    const listingIds = (theirListings ?? []).map((l) => l.id);
-    if (listingIds.length > 0) {
-      const { data } = await db
-        .from("bookings")
-        .select("id")
-        .eq("user_id", userId)
-        .in("listing_id", listingIds)
-        .eq("status", "confirmed")
-        .maybeSingle();
-      eligible = !!data;
-    }
-
-    // Also eligible if current user posted a job where this person had an accepted application
-    if (!eligible) {
-      const { data: ownedJobs } = await db
-        .from("listings")
-        .select("id")
-        .eq("user_id", userId)
-        .eq("type", "job");
-      const jobIds = (ownedJobs ?? []).map((j) => j.id);
-      if (jobIds.length > 0) {
-        const { data } = await db
-          .from("applications")
-          .select("id")
-          .eq("applicant_id", target_id)
-          .in("job_id", jobIds)
-          .eq("status", "accepted")
-          .maybeSingle();
-        eligible = !!data;
-      }
-    }
-  }
-
-  return NextResponse.json({ eligible, already_reviewed: false });
+  const [{ data: existing }, via] = await Promise.all([
+    db.from("reviews").select("id").eq("target_id", targetId).eq("target_type", targetType).eq("reviewer_id", userId).maybeSingle(),
+    resolveReviewEligibility(userId, targetType, targetId, ownerId),
+  ]);
+  const eligible = Boolean(via);
+  const alreadyReviewed = Boolean(existing);
+  return NextResponse.json({ eligible, already_reviewed: alreadyReviewed, can_edit: eligible && alreadyReviewed });
 }

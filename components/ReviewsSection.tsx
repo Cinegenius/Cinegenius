@@ -12,6 +12,7 @@ type Review = {
   text: string;
   created_at: string;
 };
+type OwnReview = { id: string; rating: number; text: string };
 
 type TargetType = "location" | "creator" | "prop" | "vehicle" | "profile" | "animal";
 
@@ -34,6 +35,7 @@ export default function ReviewsSection({ targetId, targetType, targetName }: Pro
   const [canReview, setCanReview] = useState(false);
   const [alreadyReviewed, setAlreadyReviewed] = useState(false);
   const [ratingSummary, setRatingSummary] = useState<{ avg: number; count: number; ratingOnlyCount: number } | null>(null);
+  const [myReview, setMyReview] = useState<OwnReview | null>(null);
 
   const apiType = toApiType(targetType);
 
@@ -45,6 +47,7 @@ export default function ReviewsSection({ targetId, targetType, targetName }: Pro
         if (!json) return;
         if (Array.isArray(json.data)) setReviews(json.data);
         if (json.summary) setRatingSummary(json.summary);
+        setMyReview(json.myReview ?? null);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -136,15 +139,15 @@ export default function ReviewsSection({ targetId, targetType, targetName }: Pro
       )}
 
       {/* Write review button — only shown if eligible */}
-      {user && canReview && !alreadyReviewed && (
+      {user && canReview && (
         <button
           onClick={() => setFormOpen(true)}
           className="mt-5 flex items-center gap-2 px-4 py-2.5 border border-gold/30 text-gold text-sm rounded-lg hover:border-gold hover:bg-gold/5 transition-all"
         >
-          <ShieldCheck size={14} /> Verifizierte Bewertung schreiben
+          <ShieldCheck size={14} /> {alreadyReviewed ? "Eigene Bewertung ändern" : "Verifizierte Bewertung schreiben"}
         </button>
       )}
-      {user && alreadyReviewed && (
+      {user && alreadyReviewed && !canReview && (
         <p className="mt-5 text-xs text-text-muted flex items-center gap-1.5">
           <ShieldCheck size={13} className="text-success" /> Du hast bereits eine Bewertung abgegeben.
         </p>
@@ -156,16 +159,25 @@ export default function ReviewsSection({ targetId, targetType, targetName }: Pro
           targetId={targetId}
           targetName={targetName}
           targetType={targetType}
+          initialReview={myReview}
           onClose={() => setFormOpen(false)}
           onSubmit={(rating, text) => {
-            setReviews((prev) => [{
-              id: String(Date.now()),
-              reviewer_name: "Du",
-              rating,
-              text,
-              created_at: new Date().toISOString(),
-            }, ...prev]);
+            const id = myReview?.id ?? String(Date.now());
+            const updated = { id, reviewer_name: "Du", rating, text, created_at: new Date().toISOString() };
+            setReviews((prev) => myReview ? prev.map((review) => review.id === myReview.id ? updated : review) : [updated, ...prev]);
+            setMyReview({ id, rating, text });
+            setAlreadyReviewed(true);
             setFormOpen(false);
+            const query = new URLSearchParams({ target_id: targetId, target_type: apiType });
+            fetch(`/api/reviews?${query}`)
+              .then((response) => response.ok ? response.json() : null)
+              .then((json) => {
+                if (!json) return;
+                if (Array.isArray(json.data)) setReviews(json.data);
+                if (json.summary) setRatingSummary(json.summary);
+                setMyReview(json.myReview ?? null);
+              })
+              .catch(() => {});
           }}
         />
       )}

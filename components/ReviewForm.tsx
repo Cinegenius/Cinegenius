@@ -7,8 +7,9 @@ interface Props {
   targetId: string;
   targetName: string;
   targetType: "location" | "creator" | "prop" | "vehicle" | "profile" | "animal";
+  initialReview?: { id: string; rating: number; text: string } | null;
   onClose: () => void;
-  onSubmit?: (rating: number, text: string) => void;
+  onSubmit?: (rating: number, text: string, reviewId?: string) => void;
 }
 
 const labels = ["", "Enttäuschend", "Verbesserungswürdig", "Gut", "Sehr gut", "Ausgezeichnet"];
@@ -22,11 +23,11 @@ const aspects: Record<Props["targetType"], string[]> = {
   animal:    ["Dressur-Level", "Verhalten am Set", "Handler-Kommunikation", "Pünktlichkeit", "Wert"],
 };
 
-export default function ReviewForm({ targetId, targetName, targetType, onClose, onSubmit }: Props) {
-  const [overall, setOverall] = useState(0);
+export default function ReviewForm({ targetId, targetName, targetType, initialReview, onClose, onSubmit }: Props) {
+  const [overall, setOverall] = useState(initialReview?.rating ?? 0);
   const [hovered, setHovered] = useState(0);
   const [aspectRatings, setAspectRatings] = useState<Record<string, number>>({});
-  const [text, setText] = useState("");
+  const [text, setText] = useState(initialReview?.text ?? "");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -56,7 +57,7 @@ export default function ReviewForm({ targetId, targetName, targetType, onClose, 
       if (!res.ok) throw new Error(json.error ?? "Fehler beim Speichern");
 
       setSubmitted(true);
-      onSubmit?.(overall, text);
+      onSubmit?.(overall, text, initialReview?.id);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Fehler beim Speichern");
     } finally {
@@ -71,7 +72,7 @@ export default function ReviewForm({ targetId, targetName, targetType, onClose, 
           <div className="w-16 h-16 bg-success/10 border border-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle size={32} className="text-success" />
           </div>
-          <h3 className="font-display text-xl font-bold text-text-primary mb-2">Bewertung gesendet!</h3>
+          <h3 className="font-display text-xl font-bold text-text-primary mb-2">{initialReview ? "Bewertung aktualisiert" : "Bewertung gesendet!"}</h3>
           <p className="text-text-muted text-sm mb-6 leading-relaxed">
             Danke für dein Feedback. Deine Bewertung hilft der Community, bessere Entscheidungen zu treffen.
           </p>
@@ -92,7 +93,7 @@ export default function ReviewForm({ targetId, targetName, targetType, onClose, 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border sticky top-0 bg-bg-elevated">
           <div>
-            <h2 className="font-display text-lg font-bold text-text-primary">Bewertung schreiben</h2>
+            <h2 className="font-display text-lg font-bold text-text-primary">{initialReview ? "Bewertung ändern" : "Bewertung schreiben"}</h2>
             <p className="text-xs text-text-muted">{targetName}</p>
           </div>
           <button onClick={onClose} className="text-text-muted hover:text-gold transition-colors">

@@ -12,6 +12,7 @@ import type { LucideIcon } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { departments, deptColors, getDeptLabel, type Department } from "@/lib/departments";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
+import { rankByRatingConfidence } from "@/lib/rating-ranking";
 
 const DEPT_ICON: Record<string, LucideIcon> = {
   produktion:    Clapperboard,
@@ -408,7 +409,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       availableLanguages:  [...langs].sort(),
     };
   }, [allCreators]);
-  const [sortKey, setSortKey] = useState("featured");
+  const [sortKey, setSortKey] = useState(() => searchParams.get("sort") === "rating" ? "rating" : "featured");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   // Neue Casting-Filter
@@ -577,17 +578,19 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       );
     }
 
-    if (sortKey === "rating") result.sort((a, b) => b.rating - a.rating);
+    if (sortKey === "rating") {
+      const rated = rankByRatingConfidence(result.filter((creator) => creator.reviews > 0), (creator) => creator.rating, (creator) => creator.reviews, (creator) => `${creator.name}:${creator.id}`);
+      const unrated = result.filter((creator) => creator.reviews === 0).sort((a, b) => (b.verified ? 1 : 0) - (a.verified ? 1 : 0) || a.name.localeCompare(b.name, "de"));
+      result = [...rated, ...unrated];
+    }
     if (sortKey === "reviews") result.sort((a, b) => b.reviews - a.reviews);
 
     // "Alle Bereiche" starts with the highest-rated profiles; keep the full
     // result available so pagination can reveal every department and provider.
     if (isTopMode) {
-      result.sort((a, b) => {
-        if (b.rating !== a.rating) return b.rating - a.rating;
-        if (b.reviews !== a.reviews) return b.reviews - a.reviews;
-        return (b.verified ? 1 : 0) - (a.verified ? 1 : 0);
-      });
+      const rated = rankByRatingConfidence(result.filter((creator) => creator.reviews > 0), (creator) => creator.rating, (creator) => creator.reviews, (creator) => `${creator.name}:${creator.id}`);
+      const unrated = result.filter((creator) => creator.reviews === 0).sort((a, b) => (b.verified ? 1 : 0) - (a.verified ? 1 : 0) || a.name.localeCompare(b.name, "de"));
+      result = [...rated, ...unrated];
     }
 
     // Keep filtered all-area results mixed; the unfiltered default remains

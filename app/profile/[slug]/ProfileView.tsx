@@ -818,7 +818,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
           <>
             <Divider />
             <SectionLabel>Portfolio</SectionLabel>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+            <div id="portfolio" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 scroll-mt-24">
               {stripImages.map((img, i) => (
                 <div
                   key={i}
@@ -1950,7 +1950,7 @@ function PhotoGrid({
           onClose={() => setSelectedImage(null)}
         />
       )}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+      <div id="portfolio" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 scroll-mt-24">
         {sorted.map((img) => {
           const count = likes[img.url] ?? 0;
           const isTop = img.url === topUrl && topHasLikes;

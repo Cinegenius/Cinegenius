@@ -2,9 +2,10 @@ import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { anyBlockExists } from "@/lib/trust";
 import { rateLimit } from "@/lib/rateLimit";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { fetchRatingSummaries } from "@/lib/ratings";
+import { resolveReviewEligibility } from "@/lib/review-eligibility";
 
 const VALID_TARGET_TYPES = new Set(["listing", "user"]);
 
@@ -22,7 +23,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Ungültiger target_type" }, { status: 400 });
   }
 
-  const [{ data, error }, summaryMap] = await Promise.all([
+  const [{ data, error }, summaryMap, { userId }] = await Promise.all([
     db
       .from("reviews")
       .select("id, reviewer_id, reviewer_name, rating, text, aspect_ratings, verified, verified_via, created_at")
@@ -30,13 +31,17 @@ export async function GET(req: NextRequest) {
       .eq("target_type", target_type)
       .order("created_at", { ascending: false }),
     fetchRatingSummaries([target_id], target_type),
+    auth(),
   ]);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   const summary = summaryMap[target_id] ?? { rating: 0, reviews: 0, ratingOnly: 0 };
+  const myReviewRow = userId ? (data ?? []).find((review) => review.reviewer_id === userId) : null;
+  const myReview = myReviewRow ? { id: myReviewRow.id, rating: myReviewRow.rating, text: myReviewRow.text } : null;
   const publicReviews = (data ?? []).map(({ reviewer_id: _reviewerId, ...review }) => review);
   return NextResponse.json({
     data: publicReviews,
+    myReview,
     summary: { avg: summary.rating, count: summary.reviews, ratingOnlyCount: summary.ratingOnly },
   });
 }
@@ -87,19 +92,16 @@ export async function POST(req: NextRequest) {
 
   // ── Resolve target owner (listing → owner; user → target itself) ──────────
   let targetOwnerId: string = target_id; // for user reviews owner = target
-  let listingTitle: string | null = null;
-
   if (target_type === "listing") {
     const { data: listing } = await db
       .from("listings")
-      .select("user_id, title")
+      .select("user_id")
       .eq("id", target_id)
       .maybeSingle();
     if (!listing) {
       return NextResponse.json({ error: "Inserat nicht gefunden" }, { status: 404 });
     }
     targetOwnerId = listing.user_id;
-    listingTitle  = listing.title;
   }
 
   // ── Self-review guard ─────────────────────────────────────────────────────
@@ -113,7 +115,7 @@ export async function POST(req: NextRequest) {
   }
 
   // ── Eligibility: must have a real booking or accepted application ─────────
-  const via = await resolveEligibility(userId, target_type, target_id, targetOwnerId);
+  const via = await resolveReviewEligibility(userId, target_type, target_id, targetOwnerId);
   if (!via) {
     return NextResponse.json(
       { error: "Bewertung nur nach einer Buchung oder angenommenen Bewerbung möglich" },
@@ -130,10 +132,6 @@ export async function POST(req: NextRequest) {
     .eq("target_type", target_type)
     .maybeSingle();
 
-  if (existing) {
-    return NextResponse.json({ error: "Du hast diesen Inhalt bereits bewertet" }, { status: 409 });
-  }
-
   // ── Build reviewer name from Clerk ────────────────────────────────────────
   const user = await currentUser();
   const reviewer_name =
@@ -142,19 +140,28 @@ export async function POST(req: NextRequest) {
       : user?.firstName ?? "Anonym";
 
   // ── Insert ────────────────────────────────────────────────────────────────
-  const { data, error } = await db
+  const reviewValues = {
+    target_id,
+    target_type,
+    reviewer_id: userId,
+    reviewer_name,
+    rating,
+    text: text.trim(),
+    aspect_ratings: aspect_ratings ?? null,
+    verified: true,
+    verified_via: via,
+  };
+  const { data, error } = existing
+    ? await db
+      .from("reviews")
+      .update({ rating, text: text.trim(), aspect_ratings: aspect_ratings ?? null, verified: true, verified_via: via, reviewer_name })
+      .eq("id", existing.id)
+      .eq("reviewer_id", userId)
+      .select("id, reviewer_name, rating, text, aspect_ratings, verified, verified_via, created_at")
+      .single()
+    : await db
     .from("reviews")
-    .insert({
-      target_id,
-      target_type,
-      reviewer_id:   userId,
-      reviewer_name,
-      rating,
-      text:          text.trim(),
-      aspect_ratings: aspect_ratings ?? null,
-      verified:      true,
-      verified_via:  via,
-    })
+    .insert(reviewValues)
     .select("id, reviewer_name, rating, text, aspect_ratings, verified, verified_via, created_at")
     .single();
 
@@ -166,7 +173,7 @@ export async function POST(req: NextRequest) {
       ? `/listings/${target_id}`
       : `/profile/${target_id}`;
 
-    if (targetOwnerId !== userId) {
+    if (!existing && targetOwnerId !== userId) {
       await db.from("notifications").insert({
         user_id: targetOwnerId,
         type:    "review_request",
@@ -177,67 +184,5 @@ export async function POST(req: NextRequest) {
     }
   } catch { /* best-effort */ }
 
-  return NextResponse.json({ review: data }, { status: 201 });
-}
-
-// ── Eligibility resolver ──────────────────────────────────────────────────────
-// Returns "booking" | "application" | null
-
-async function resolveEligibility(
-  reviewerId: string,
-  targetType: string,
-  targetId:   string,
-  ownerId:    string
-): Promise<"booking" | "application" | null> {
-
-  if (targetType === "listing") {
-    // Confirmed booking by this reviewer on this exact listing
-    const { data } = await db
-      .from("bookings")
-      .select("id")
-      .eq("user_id",    reviewerId)
-      .eq("listing_id", targetId)
-      .eq("status",     "confirmed")
-      .limit(1)
-      .maybeSingle();
-    return data ? "booking" : null;
-  }
-
-  // target_type === "user"
-  // Check three relationships in parallel:
-  //   A) reviewer applied to owner's job → accepted
-  //   B) owner applied to reviewer's job → accepted
-  //   C) reviewer has confirmed booking on one of owner's listings
-  const [appA, appB, { data: ownerListings }] = await Promise.all([
-    db.from("applications").select("id")
-      .eq("owner_id",     ownerId)
-      .eq("applicant_id", reviewerId)
-      .eq("status",       "accepted")
-      .limit(1).maybeSingle(),
-
-    db.from("applications").select("id")
-      .eq("owner_id",     reviewerId)
-      .eq("applicant_id", ownerId)
-      .eq("status",       "accepted")
-      .limit(1).maybeSingle(),
-
-    db.from("listings").select("id").eq("user_id", ownerId),
-  ]);
-
-  if (appA.data || appB.data) return "application";
-
-  const ownerListingIds = (ownerListings ?? []).map((l: { id: string }) => l.id);
-  if (ownerListingIds.length > 0) {
-    const { data: booking } = await db
-      .from("bookings")
-      .select("id")
-      .eq("user_id", reviewerId)
-      .eq("status",  "confirmed")
-      .in("listing_id", ownerListingIds)
-      .limit(1)
-      .maybeSingle();
-    if (booking) return "booking";
-  }
-
-  return null;
+  return NextResponse.json({ review: data }, { status: existing ? 200 : 201 });
 }

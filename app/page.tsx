@@ -25,6 +25,30 @@ import HeroSearch from "@/components/HeroSearch";
 import CommunityBoard from "@/components/CommunityBoard";
 import { PageBackdrop } from "@/components/PageHeader";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
+import { HomePhotoDiscovery, type DiscoverPhoto } from "@/components/HomePhotoDiscovery";
+import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
+import { getPrivateProfileIds } from "@/lib/trust";
+import { fetchRatingSummaries } from "@/lib/ratings";
+import { extractPublicProfilePhotos } from "@/lib/home-discovery";
+import { rankByRatingConfidence } from "@/lib/rating-ranking";
+import { summarizePhotoRatings } from "@/lib/photo-rating-summary";
+
+type HomeProfileRow = {
+  user_id: string;
+  slug: string | null;
+  display_name: string | null;
+  tagline: string | null;
+  avatar_url: string | null;
+  location: string | null;
+  verified: boolean | null;
+  role: string | null;
+  positions: string[] | null;
+  profile_type: string | null;
+  profile_types: string[] | null;
+  profile_images: unknown;
+  portfolio_images: unknown;
+  created_at?: string | null;
+};
 
 async function getHomeData() {
   const currentTime = Date.now();
@@ -33,51 +57,76 @@ async function getHomeData() {
     { data: recentJobs },
     { data: recentProps },
     { data: liveCompanies },
-    { data: userReviewsRaw },
+    { data: profilesRaw },
   ] = await Promise.all([
     db.from("listings").select("id,title,city,price,image_url,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(3),
     db.from("listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
     db.from("listings").select("id,title,city,price,image_url,type,created_at").in("type", ["prop", "vehicle"]).eq("published", true).not("image_url", "is", null).order("created_at", { ascending: false }).limit(3),
     db.from("companies").select("id,slug,name,logo_url,city,categories").not("logo_url", "is", null).order("created_at", { ascending: false }).limit(6),
-    db.from("reviews").select("target_id, rating").eq("target_type", "user"),
+    db.from("profiles").select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,profile_type,profile_types,profile_images,portfolio_images,created_at").not("display_name", "is", null).neq("display_name", "").order("created_at", { ascending: false }).limit(300),
   ]);
 
-  const ratingMap: Record<string, { sum: number; count: number }> = {};
-  for (const r of (userReviewsRaw ?? []) as Array<{ target_id: string; rating: number }>) {
-    if (!ratingMap[r.target_id]) ratingMap[r.target_id] = { sum: 0, count: 0 };
-    ratingMap[r.target_id].sum += r.rating;
-    ratingMap[r.target_id].count += 1;
-  }
-  const topRatedIds = Object.entries(ratingMap)
-    .filter(([, v]) => v.count >= 2)
-    .sort((a, b) => b[1].sum / b[1].count - a[1].sum / a[1].count)
-    .slice(0, 4)
-    .map(([id]) => id);
+  const profileRows = (profilesRaw ?? []) as HomeProfileRow[];
+  const privateIds = await getPrivateProfileIds(profileRows.map((profile) => profile.user_id));
+  const publicProfiles = profileRows.filter((profile) => !privateIds.has(profile.user_id));
+  const photos = extractPublicProfilePhotos(publicProfiles);
+  const profileIds = publicProfiles.map((profile) => profile.user_id);
+  const [crewRatingSummaries, photoRatingsResult] = await Promise.all([
+    fetchRatingSummaries(profileIds, "user").catch(() => ({} as Awaited<ReturnType<typeof fetchRatingSummaries>>)),
+    profileIds.length
+    ? db.from("profile_image_ratings").select("profile_id,image_url,reviewer_id,rating").in("profile_id", profileIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
 
-  let topCreators: Array<{
-    id: string; name: string; tagline?: string; avatar?: string;
-    city?: string; verified: boolean; rating: number; reviews: number;
-  }> = [];
-  if (topRatedIds.length >= 3) {
-    const { data: topProfiles } = await db
-      .from("profiles")
-      .select("user_id, display_name, tagline, avatar_url, location, verified")
-      .in("user_id", topRatedIds)
-      .not("display_name", "is", null);
-    topCreators = ((topProfiles ?? []) as Array<Record<string, unknown>>)
-      .map((p) => ({
-        id: p.user_id as string,
-        name: p.display_name as string,
-        tagline: p.tagline as string | undefined,
-        avatar: typeof p.avatar_url === "string" && (p.avatar_url as string).includes("supabase.co/storage") ? p.avatar_url as string : undefined,
-        city: typeof p.location === "string" ? (p.location as string).split(",")[0]?.trim() : undefined,
-        verified: (p.verified as boolean) ?? false,
-        rating: Math.round((ratingMap[p.user_id as string].sum / ratingMap[p.user_id as string].count) * 10) / 10,
-        reviews: ratingMap[p.user_id as string].count,
-      }))
-      .sort((a, b) => b.rating - a.rating || b.reviews - a.reviews)
-      .slice(0, 4);
-  }
+  const photosWithRatings: DiscoverPhoto[] = photos.map((photo) => {
+    const rows = (photoRatingsResult.data ?? []).filter((row: { profile_id: string; image_url: string }) => row.profile_id === photo.profileId && row.image_url === photo.imageUrl) as Array<{ reviewer_id: string; rating: number }>;
+    return { ...photo, ...summarizePhotoRatings(rows) };
+  });
+  const ratedPhotos = rankByRatingConfidence(
+    photosWithRatings.filter((photo) => photo.count >= 2),
+    (photo) => photo.rating,
+    (photo) => photo.count,
+    (photo) => `${photo.profileId}:${photo.imageUrl}`,
+  ).slice(0, 4);
+  const newPhotos = photosWithRatings.slice(0, 4);
+
+  const crewTypeLabels = new Set(
+    (Object.entries(PROFILE_TYPE_LABELS) as [ProfileType, string][])
+      .filter(([type]) => PROFILE_CATEGORY_MAP[type] === "crew")
+      .map(([, label]) => label.toLocaleLowerCase("de")),
+  );
+  const crewProfiles = publicProfiles.filter((profile) => {
+    const types = [profile.profile_type, ...(profile.profile_types ?? [])].filter((type): type is string => Boolean(type));
+    if (types.some((type) => PROFILE_CATEGORY_MAP[type as ProfileType] === "crew")) return true;
+    const positions = [...(profile.positions ?? []), profile.role ?? ""].map((position) => position.toLocaleLowerCase("de"));
+    return positions.some((position) => [...crewTypeLabels].some((label) => position === label || position.includes(label)));
+  });
+  const crewSummaries = crewProfiles.map((profile) => {
+    const summary = crewRatingSummaries[profile.user_id] ?? { rating: 0, reviews: 0, ratingOnly: 0 };
+    const positions = [...new Set([...(profile.positions ?? []), ...(profile.role ? [profile.role] : [])].map((position) => position.trim()).filter(Boolean))];
+    return {
+      id: profile.user_id,
+      slug: profile.slug || profile.user_id,
+      name: profile.display_name ?? "CineGenius Mitglied",
+      tagline: profile.tagline ?? undefined,
+      avatar: typeof profile.avatar_url === "string" && profile.avatar_url.includes("supabase.co/storage") ? profile.avatar_url : undefined,
+      city: profile.location?.split(",")[0]?.trim() ?? "",
+      verified: profile.verified ?? false,
+      positions,
+      rating: summary.rating,
+      reviews: summary.reviews,
+      createdAt: profile.created_at ?? "",
+    };
+  });
+  const topCreators = rankByRatingConfidence(
+    crewSummaries.filter((profile) => profile.reviews >= 2),
+    (profile) => profile.rating,
+    (profile) => profile.reviews,
+    (profile) => `${profile.name}:${profile.id}`,
+  ).slice(0, 4);
+  const newCrew = crewSummaries
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || a.name.localeCompare(b.name, "de"))
+    .slice(0, 4);
 
   const liveLocations = (recentLocations ?? []).map((l) => ({
     id: l.id as string,
@@ -122,6 +171,9 @@ async function getHomeData() {
     liveProps,
     companies,
     topCreators,
+    newCrew,
+    ratedPhotos,
+    newPhotos,
     currentTime,
   };
 }
@@ -145,7 +197,7 @@ export default async function HomePage() {
     return tc("weeksAgo", { weeks: Math.floor(diff / 7) });
   }
 
-  const { liveLocations, liveJobs, liveProps, companies, topCreators, currentTime } = await getHomeData();
+  const { liveLocations, liveJobs, liveProps, companies, topCreators, newCrew, ratedPhotos, newPhotos, currentTime } = await getHomeData();
 
   return (
     <main className="relative isolate min-h-screen">
@@ -195,6 +247,8 @@ export default async function HomePage() {
       </section>
 
       <CommunityBoard loggedIn={isLoggedIn} />
+
+      <HomePhotoDiscovery ratedPhotos={ratedPhotos} newPhotos={newPhotos} />
 
       {/* ══════════════════════════════════════════════
           FEATURED LOCATIONS
@@ -406,23 +460,23 @@ export default async function HomePage() {
       {/* ══════════════════════════════════════════════
           TOP RATED CREATORS
       ══════════════════════════════════════════════ */}
-      {topCreators.length >= 3 && (
-        <section className="py-10 sm:py-14">
+      <section className="py-10 sm:py-14">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-end justify-between mb-6">
               <div>
-                <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("topCreatorsLabel")}</p>
-                <h2 className="font-display text-xl sm:text-2xl font-bold text-text-primary">{t("topCreatorsTitle")}</h2>
+                <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{topCreators.length >= 3 ? "Top bewertete Crew" : "Crew neu entdecken"}</p>
+                <h2 className="font-display text-xl sm:text-2xl font-bold text-text-primary">{topCreators.length >= 3 ? t("topCreatorsTitle") : "Menschen aus der Filmwelt"}</h2>
+                {topCreators.length < 3 && <p className="mt-1 text-xs text-text-muted">Für eine Top-Auswahl liegen noch nicht genügend Crew-Bewertungen vor.</p>}
               </div>
-              <Link href="/creators" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium shrink-0">
-                {tc("viewAll")} <ArrowRight size={14} />
+              <Link href="/creators?sort=rating" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium shrink-0">
+                Alle Crewmitglieder entdecken <ArrowRight size={14} />
               </Link>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {topCreators.map((c) => (
+            {(topCreators.length >= 3 || newCrew.length > 0) ? <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {(topCreators.length >= 3 ? topCreators : newCrew).map((c) => (
                 <Link
                   key={c.id}
-                  href={`/profile/${c.id}`}
+                  href={`/profile/${c.slug}`}
                   className="group card-hover rounded-2xl border border-border bg-bg-secondary hover:border-gold/30 transition-all overflow-hidden flex flex-col"
                 >
                   <div className="relative aspect-square bg-bg-elevated overflow-hidden">
@@ -449,6 +503,7 @@ export default async function HomePage() {
                   </div>
                   <div className="p-3 flex flex-col flex-1">
                     <h3 className="font-semibold text-text-primary text-sm leading-snug mb-0.5">{c.name}</h3>
+                    {c.positions.length > 0 && <p className="mb-1 line-clamp-2 text-[11px] leading-snug text-gold">{c.positions.join(" · ")}</p>}
                     {c.city && (
                       <p className="text-[11px] text-text-muted flex items-center gap-1 mb-1.5">
                         <MapPin size={9} /> {c.city}
@@ -457,7 +512,7 @@ export default async function HomePage() {
                     {c.tagline && (
                       <p className="text-xs text-text-secondary leading-relaxed line-clamp-2 flex-1 mb-2">{c.tagline}</p>
                     )}
-                    <div className="flex items-center gap-1.5 mt-auto">
+                    {topCreators.length >= 3 && <div className="flex items-center gap-1.5 mt-auto">
                       <div className="flex items-center gap-0.5">
                         {[1, 2, 3, 4, 5].map((i) => (
                           <Star
@@ -468,15 +523,14 @@ export default async function HomePage() {
                         ))}
                       </div>
                       <span className="text-xs font-semibold text-text-primary">{c.rating.toFixed(1)}</span>
-                      <span className="text-[11px] text-text-muted">({c.reviews})</span>
-                    </div>
+                      <span className="text-[11px] text-text-muted">({c.reviews} {c.reviews === 1 ? "Bewertung" : "Bewertungen"})</span>
+                    </div>}
                   </div>
                 </Link>
               ))}
-            </div>
+            </div> : <div className="rounded-xl border border-border bg-bg-secondary px-4 py-8 text-center text-sm text-text-muted">Aktuell sind noch keine öffentlichen Crewprofile zum Entdecken vorhanden.</div>}
           </div>
-        </section>
-      )}
+      </section>
 
       {/* ══════════════════════════════════════════════
           TRUST BAR
