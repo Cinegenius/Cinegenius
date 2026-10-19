@@ -50,7 +50,7 @@ type HomeProfileRow = {
   created_at?: string | null;
 };
 
-async function getHomeData() {
+async function getHomeData(viewerId: string | null) {
   const currentTime = Date.now();
   const [
     { data: recentLocations },
@@ -71,16 +71,28 @@ async function getHomeData() {
   const publicProfiles = profileRows.filter((profile) => !privateIds.has(profile.user_id));
   const photos = extractPublicProfilePhotos(publicProfiles);
   const profileIds = publicProfiles.map((profile) => profile.user_id);
-  const [crewRatingSummaries, photoRatingsResult] = await Promise.all([
+  const [crewRatingSummaries, photoRatingsResult, photoLikesResult] = await Promise.all([
     fetchRatingSummaries(profileIds, "user").catch(() => ({} as Awaited<ReturnType<typeof fetchRatingSummaries>>)),
     profileIds.length
     ? db.from("profile_image_ratings").select("profile_id,image_url,reviewer_id,rating").in("profile_id", profileIds)
       : Promise.resolve({ data: [], error: null }),
+    profileIds.length
+      ? db.from("profile_image_likes").select("profile_id,image_url,liker_id").in("profile_id", profileIds)
+      : Promise.resolve({ data: [], error: null }),
   ]);
+
+  const photoLikeCounts = new Map<string, number>();
+  const myPhotoLikes = new Set<string>();
+  for (const row of photoLikesResult.data ?? []) {
+    const key = `${row.profile_id}:${row.image_url}`;
+    photoLikeCounts.set(key, (photoLikeCounts.get(key) ?? 0) + 1);
+    if (viewerId && row.liker_id === viewerId) myPhotoLikes.add(key);
+  }
 
   const photosWithRatings: DiscoverPhoto[] = photos.map((photo) => {
     const rows = (photoRatingsResult.data ?? []).filter((row: { profile_id: string; image_url: string }) => row.profile_id === photo.profileId && row.image_url === photo.imageUrl) as Array<{ reviewer_id: string; rating: number }>;
-    return { ...photo, ...summarizePhotoRatings(rows) };
+    const key = `${photo.profileId}:${photo.imageUrl}`;
+    return { ...photo, ...summarizePhotoRatings(rows), likeCount: photoLikeCounts.get(key) ?? 0, likedByMe: myPhotoLikes.has(key) };
   });
   const ratedPhotos = rankByRatingConfidence(
     photosWithRatings.filter((photo) => photo.count >= 2),
@@ -197,7 +209,7 @@ export default async function HomePage() {
     return tc("weeksAgo", { weeks: Math.floor(diff / 7) });
   }
 
-  const { liveLocations, liveJobs, liveProps, companies, topCreators, newCrew, ratedPhotos, newPhotos, currentTime } = await getHomeData();
+  const { liveLocations, liveJobs, liveProps, companies, topCreators, newCrew, ratedPhotos, newPhotos, currentTime } = await getHomeData(userId);
 
   return (
     <main className="relative isolate min-h-screen">

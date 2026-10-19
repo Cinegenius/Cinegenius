@@ -45,6 +45,7 @@ For visual review, capture `/projects`, `/locations`, `/props`, `/creators`, `/c
 - Do not clear unread counts at login or mark an entire thread read. A client marks only IDs from its fetched snapshot, and the server validates membership, sender, conversation, and join boundary before storing receipts.
 - Before production release, apply `supabase/migrations/message_read_receipts.sql` to the linked production Supabase project, verify the new schema/RPCs, then release the matching clean `main` commit through `npm run deploy:production`. Do not deploy the app code before the migration succeeds.
 - Before releasing the homepage photo-rating feature, apply `supabase/migrations/profile_image_ratings.sql` to the linked production Supabase project and verify its unique constraint, RLS, and grants. This migration has been applied and verified on the production `main` database.
+- Before releasing idempotent photo likes, apply `supabase/migrations/profile_image_likes_unique.sql` to the linked production Supabase project. It removes duplicate rows for the same liker/profile/photo while preserving one existing like, then enforces a unique index used by the API's state-setting upsert. Verify the index before deploying the application code.
 
 ## Advertising surfaces
 

@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Aperture, ArrowRight, Heart } from "lucide-react";
 import { auth } from "@clerk/nextjs/server";
 import BTSMosaicGrid, { type BTSGridItem } from "./BTSMosaicGrid";
+import { getPrivateProfileIds } from "@/lib/trust";
+import { markPhotoNavigation, photoHref } from "@/lib/photo-link";
 
 export const metadata: Metadata = {
   title: "Behind the Scenes — Backstage & Set-Fotos | CineGenius",
@@ -21,45 +23,6 @@ const CREW_TYPES = new Set(["camera", "lighting", "sound", "director_of_photogra
 export default async function BTSPage() {
   const { userId } = await auth();
 
-  // Fetch all likes — used for top-liked section AND mosaic heart counts
-  const { data: likeRows } = await db
-    .from("profile_image_likes")
-    .select("image_url, profile_id, liker_id");
-
-  const likeCounts: Record<string, number> = {};
-  const likeProfileId: Record<string, string> = {};
-  const myLikes: string[] = [];
-
-  for (const row of likeRows ?? []) {
-    likeCounts[row.image_url] = (likeCounts[row.image_url] ?? 0) + 1;
-    likeProfileId[row.image_url] = row.profile_id;
-    if (userId && row.liker_id === userId) myLikes.push(row.image_url);
-  }
-
-  // Top 3 most-liked images
-  const topEntries = Object.entries(likeCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3);
-
-  let topRated: { imageUrl: string; count: number; profileSlug: string; authorName: string }[] = [];
-
-  if (topEntries.length > 0) {
-    const topProfileIds = [...new Set(topEntries.map(([url]) => likeProfileId[url]).filter(Boolean))];
-    const { data: topProfiles } = await db
-      .from("profiles")
-      .select("user_id, display_name, slug")
-      .in("user_id", topProfileIds);
-    const topProfileMap = Object.fromEntries((topProfiles ?? []).map((p) => [p.user_id, p]));
-
-    topRated = topEntries.map(([imageUrl, count]) => ({
-      imageUrl,
-      count,
-      profileSlug: topProfileMap[likeProfileId[imageUrl]]?.slug ?? likeProfileId[imageUrl] ?? "",
-      authorName: topProfileMap[likeProfileId[imageUrl]]?.display_name ?? "Unbekannt",
-    }));
-  }
-
-  // Fetch profiles + build btsItems
   const { data: profiles } = await db
     .from("profiles")
     .select("user_id, slug, display_name, tagline, location, avatar_url, profile_images, profile_type, profile_types")
@@ -67,10 +30,46 @@ export default async function BTSPage() {
     .neq("display_name", "")
     .order("updated_at", { ascending: false })
     .limit(300);
+  const profileRows = (profiles ?? []) as RawProfile[];
+  const privateIds = await getPrivateProfileIds(profileRows.map((profile) => profile.user_id));
+  const publicProfiles = profileRows.filter((profile) => !privateIds.has(profile.user_id));
+  const publicProfileIds = publicProfiles.map((profile) => profile.user_id);
+
+  // Fetch likes only for public profiles, keyed by both owner and image URL.
+  const { data: likeRows } = publicProfileIds.length
+    ? await db.from("profile_image_likes").select("image_url, profile_id, liker_id").in("profile_id", publicProfileIds)
+    : { data: [] as Array<{ image_url: string; profile_id: string; liker_id: string }> };
+
+  const likeCounts: Record<string, number> = {};
+  const myLikes: string[] = [];
+
+  for (const row of likeRows ?? []) {
+    const key = `${row.profile_id}:${row.image_url}`;
+    likeCounts[key] = (likeCounts[key] ?? 0) + 1;
+    if (userId && row.liker_id === userId) myLikes.push(key);
+  }
+
+  // Top 3 most-liked publicly visible photos (likes, not star ratings).
+  const topEntries = Object.entries(likeCounts)
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, 3);
+
+  let topRated: { imageUrl: string; profileId: string; count: number; profileSlug: string; authorName: string }[] = [];
+
+  if (topEntries.length > 0) {
+    const visibleProfiles = new Map(publicProfiles.map((p) => [p.user_id, p]));
+    topRated = topEntries.map(([key, count]) => {
+      const colon = key.indexOf(":");
+      const profileId = key.slice(0, colon);
+      const imageUrl = key.slice(colon + 1);
+      const owner = visibleProfiles.get(profileId);
+      return { imageUrl, profileId, count, profileSlug: owner?.slug ?? profileId, authorName: owner?.display_name ?? "Unbekannt" };
+    }).filter((item) => item.authorName !== "Unbekannt");
+  }
 
   const btsItems: BTSGridItem[] = [];
 
-  for (const p of (profiles ?? []) as RawProfile[]) {
+  for (const p of publicProfiles) {
     const images = Array.isArray(p.profile_images)
       ? (p.profile_images as Array<{ url?: string; media_type?: string; caption?: string }>)
       : [];
@@ -145,7 +144,7 @@ export default async function BTSPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {topRated.map((item, i) => (
-              <Link key={item.imageUrl} href={`/profile/${item.profileSlug}`}
+              <Link key={`${item.profileId}:${item.imageUrl}`} href={photoHref(item.profileId, item.imageUrl)} onClick={markPhotoNavigation}
                 className="group relative rounded-2xl overflow-hidden aspect-video bg-bg-elevated border border-red-400/20">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={item.imageUrl} alt={item.authorName}

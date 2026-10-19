@@ -1,5 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { anyBlockExists, canViewProfile, getPrivateProfileIds } from "@/lib/trust";
 import { rateLimit } from "@/lib/rateLimit";
@@ -92,6 +93,8 @@ export async function POST(req: NextRequest) {
     .from("profile_image_ratings")
     .upsert({ profile_id: profileId, reviewer_id: userId, image_url: imageUrl, rating, updated_at: new Date().toISOString() }, { onConflict: "profile_id,image_url,reviewer_id" });
   if (error) return NextResponse.json({ error: "Deine Bewertung konnte nicht gespeichert werden." }, { status: 500 });
+  revalidatePath("/");
+  revalidatePath("/photo");
 
   const { data, error: readError } = await db
     .from("profile_image_ratings")
