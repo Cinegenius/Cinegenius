@@ -20,6 +20,7 @@ type Notification = {
   href: string;
   read: boolean;
   created_at: string;
+  chatUnread?: boolean;
 };
 
 // ─── Config ────────────────────────────────────────────────────────────────────
@@ -148,7 +149,7 @@ function NotifRow({
               )}
             </>
           )}
-          {!notif.read && (
+          {!notif.read && !notif.chatUnread && (
             <button
               onClick={() => onRead(notif.id)}
               className="flex items-center gap-1 text-xs text-text-muted hover:text-text-secondary transition-colors"
@@ -177,11 +178,31 @@ export default function NotificationsPage() {
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const res = await fetch("/api/notifications");
-      if (res.status === 401) { setLoading(false); return; }
-      if (!res.ok) return;
-      const { notifications: data } = await res.json();
-      setNotifications(data ?? []);
+      const [notificationResponse, conversationsResponse] = await Promise.all([
+        fetch("/api/notifications", { cache: "no-store" }),
+        fetch("/api/conversations", { cache: "no-store" }),
+      ]);
+      if (notificationResponse.status === 401) { setLoading(false); return; }
+      if (!notificationResponse.ok || !conversationsResponse.ok) return;
+      const [{ notifications: notificationData }, { data: conversations }] = await Promise.all([
+        notificationResponse.json(),
+        conversationsResponse.json(),
+      ]);
+      const unreadChats: Notification[] = (conversations ?? [])
+        .filter((conversation: { unread_count?: number }) => Number(conversation.unread_count) > 0)
+        .map((conversation: { id: string; kind?: string; group_name?: string | null; otherName?: string; unread_count: number; updated_at: string }) => ({
+          id: `chat-unread:${conversation.id}`,
+          type: "new_message",
+          title: conversation.kind === "group" ? (conversation.group_name ?? "Gruppenchat") : (conversation.otherName ?? "Neue Nachricht"),
+          body: `${conversation.unread_count} ungelesene ${conversation.unread_count === 1 ? "Nachricht" : "Nachrichten"}`,
+          href: `/messages?conv=${conversation.id}`,
+          read: false,
+          created_at: conversation.updated_at,
+          chatUnread: true,
+        }));
+      setNotifications([...(notificationData ?? []), ...unreadChats].sort(
+        (a: Notification, b: Notification) => b.created_at.localeCompare(a.created_at),
+      ));
     } finally {
       setLoading(false);
     }
@@ -210,6 +231,7 @@ export default function NotificationsPage() {
   };
 
   const markAsRead = async (id: string) => {
+    if (id.startsWith("chat-unread:")) return;
     setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, read: true } : n));
     await fetch("/api/notifications", {
       method: "POST",
@@ -220,7 +242,7 @@ export default function NotificationsPage() {
 
   const markAllRead = async () => {
     setMarkingAll(true);
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    setNotifications((prev) => prev.map((n) => n.chatUnread ? n : ({ ...n, read: true })));
     await fetch("/api/notifications", { method: "PATCH" });
     setMarkingAll(false);
   };
@@ -271,7 +293,7 @@ export default function NotificationsPage() {
             </div>
           </div>
 
-          {unreadCount > 0 && (
+          {notifications.some((notification) => !notification.read && !notification.chatUnread) && (
             <button
               onClick={markAllRead}
               disabled={markingAll}

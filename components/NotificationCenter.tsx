@@ -10,6 +10,7 @@ import {
 import { useAuth } from "@clerk/nextjs";
 import { useTranslations } from "next-intl";
 import { timeAgo, notificationMeta, type NotificationType } from "@/lib/notifications";
+import { subscribeToMessageReads } from "@/lib/message-read-sync";
 
 type Notification = {
   id: string;
@@ -39,54 +40,74 @@ const typeIcons: Record<NotificationType, React.ComponentType<{ size?: number; c
 export default function NotificationCenter() {
   const router = useRouter();
   const tn = useTranslations("notifications");
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [snapshot, setSnapshot] = useState<{
+    userId: string;
+    sessionId: string;
+    notifications: Notification[];
+    unreadMessages: number;
+  } | null>(null);
   const [open, setOpen] = useState(false);
-  const [unreadMessages, setUnreadMessages] = useState(0);
   const [loading, setLoading] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const { isSignedIn } = useAuth();
+  const { isSignedIn, userId, sessionId } = useAuth();
+  const activeSessionKey = `${userId ?? ""}:${sessionId ?? ""}`;
+  const activeSessionKeyRef = useRef(activeSessionKey);
 
-  const unreadNotifs = notifications.filter((n) => !n.read).length;
-  const totalUnread = unreadMessages + unreadNotifs;
+  useEffect(() => {
+    activeSessionKeyRef.current = activeSessionKey;
+  }, [activeSessionKey]);
 
-  const fetchAll = useCallback(async () => {
-    if (!isSignedIn) return;
+  const currentSnapshot = isSignedIn && userId && sessionId && snapshot?.userId === userId && snapshot.sessionId === sessionId
+    ? snapshot
+    : null;
+  const currentNotifications = currentSnapshot?.notifications ?? [];
+  const unreadMessagesCount = currentSnapshot?.unreadMessages ?? 0;
+  const unreadNotifs = currentNotifications.filter((n) => !n.read).length;
+  const totalUnread = unreadMessagesCount + unreadNotifs;
+
+  const fetchAll = useCallback(async (showLoading = false) => {
+    if (!isSignedIn || !userId || !sessionId) return;
+    if (showLoading) setLoading(true);
+    const requestedSessionKey = `${userId}:${sessionId}`;
     try {
       const [msgRes, notifRes] = await Promise.all([
         fetch("/api/unread-count", { cache: "no-store" }),
         fetch("/api/notifications", { cache: "no-store" }),
       ]);
-      if (msgRes.ok) {
-        const { count } = await msgRes.json();
-        setUnreadMessages(count ?? 0);
-      }
-      if (notifRes.ok) {
-        const { notifications: data } = await notifRes.json();
-        setNotifications(data ?? []);
-      }
+      if (!msgRes.ok || !notifRes.ok) return;
+      const [{ count }, { notifications: data }] = await Promise.all([msgRes.json(), notifRes.json()]);
+      if (activeSessionKeyRef.current !== requestedSessionKey) return;
+      setSnapshot({
+        userId,
+        sessionId,
+        notifications: Array.isArray(data) ? data : [],
+        unreadMessages: typeof count === "number" ? count : 0,
+      });
     } catch {
       // silently ignore
+    } finally {
+      if (showLoading) setLoading(false);
     }
-  }, [isSignedIn]);
+  }, [isSignedIn, sessionId, userId]);
 
-  // Initial fetch + poll every 30s
+  // Initial fetch + authenticated refresh for message and notification counts.
   useEffect(() => {
-    fetchAll();
-    const interval = setInterval(fetchAll, 30_000);
+    if (!isSignedIn || !userId || !sessionId) return;
+    void fetchAll(true);
+    const interval = setInterval(() => { void fetchAll(); }, 10_000);
     return () => clearInterval(interval);
-  }, [fetchAll]);
+  }, [fetchAll, isSignedIn, sessionId, userId]);
 
   useEffect(() => {
-    window.addEventListener("cinegenius:messages-read", fetchAll);
-    return () => window.removeEventListener("cinegenius:messages-read", fetchAll);
-  }, [fetchAll]);
+    if (!userId) return;
+    return subscribeToMessageReads(userId, fetchAll);
+  }, [fetchAll, userId]);
 
   // Fetch when opening the panel
   const handleOpen = () => {
     setOpen((v) => !v);
     if (!open) {
-      setLoading(true);
-      fetchAll().finally(() => setLoading(false));
+      void fetchAll(true);
     }
   };
 
@@ -100,8 +121,12 @@ export default function NotificationCenter() {
   }, []);
 
   const markAllRead = async () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    await fetch("/api/notifications", { method: "PATCH" });
+    const response = await fetch("/api/notifications", { method: "PATCH" });
+    if (response.ok && userId && sessionId) {
+      setSnapshot((prev) => prev?.userId === userId && prev.sessionId === sessionId
+        ? { ...prev, notifications: prev.notifications.map((n) => ({ ...n, read: true })) }
+        : prev);
+    }
   };
 
   const markRead = async (id: string) => {
@@ -112,9 +137,11 @@ export default function NotificationCenter() {
         body: JSON.stringify({ id }),
       });
       if (!response.ok) return;
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-      );
+      if (userId && sessionId) {
+        setSnapshot((prev) => prev?.userId === userId && prev.sessionId === sessionId
+          ? { ...prev, notifications: prev.notifications.map((n) => (n.id === id ? { ...n, read: true } : n)) }
+          : prev);
+      }
     } catch {
       // Keep the notification unread if the server couldn't persist the read state.
     }
@@ -128,7 +155,7 @@ export default function NotificationCenter() {
         aria-label={tn("ariaLabel")}
       >
         <Bell size={17} />
-        {totalUnread > 0 && (
+        {currentSnapshot && totalUnread > 0 && (
           <span className="absolute top-0.5 right-0.5 w-4 h-4 bg-gold text-bg-primary text-[9px] font-bold rounded-full flex items-center justify-center leading-none">
             {totalUnread > 9 ? "9+" : totalUnread}
           </span>
@@ -160,9 +187,9 @@ export default function NotificationCenter() {
           {/* List */}
           <div className="max-h-[420px] overflow-y-auto divide-y divide-border">
             {/* Real unread messages entry */}
-            {unreadMessages > 0 && (
+            {unreadMessagesCount > 0 && (
               <Link
-                href="/dashboard?tab=messages"
+                href="/messages"
                 onClick={() => setOpen(false)}
                 className="flex items-start gap-3 px-4 py-3.5 hover:bg-bg-hover transition-colors bg-gold/3"
               >
@@ -172,7 +199,7 @@ export default function NotificationCenter() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <p className="text-sm font-medium leading-tight text-text-primary">
-                      {unreadMessages === 1 ? tn("newMessage") : tn("newMessages", { count: unreadMessages })}
+                      {unreadMessagesCount === 1 ? tn("newMessage") : tn("newMessages", { count: unreadMessagesCount })}
                     </p>
                     <span className="w-2 h-2 rounded-full shrink-0 mt-1 bg-gold" />
                   </div>
@@ -184,14 +211,14 @@ export default function NotificationCenter() {
             )}
 
             {/* Loading */}
-            {loading && notifications.length === 0 && (
+            {loading && currentNotifications.length === 0 && (
               <div className="py-8 text-center">
                 <div className="w-5 h-5 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto" />
               </div>
             )}
 
             {/* Empty state */}
-            {!loading && notifications.length === 0 && unreadMessages === 0 && (
+            {!loading && currentNotifications.length === 0 && unreadMessagesCount === 0 && (
               <div className="py-12 text-center">
                 <Bell size={28} className="text-text-muted mx-auto mb-3 opacity-40" />
                 <p className="text-sm text-text-muted">{tn("empty")}</p>
@@ -202,7 +229,7 @@ export default function NotificationCenter() {
             )}
 
             {/* Real notifications */}
-            {notifications.map((n) => {
+            {currentNotifications.map((n) => {
               const Icon = typeIcons[n.type] ?? Bell;
               const meta = notificationMeta[n.type] ?? { color: "text-text-muted", dot: "bg-text-muted" };
               return (
@@ -213,9 +240,6 @@ export default function NotificationCenter() {
                     event.preventDefault();
                     await markRead(n.id);
                     setOpen(false);
-                    if (n.type === "new_message") {
-                      window.dispatchEvent(new CustomEvent("cinegenius:messages-read"));
-                    }
                     router.push(n.href);
                   }}
                   className={`flex items-start gap-3 px-4 py-3.5 hover:bg-bg-hover transition-colors group ${

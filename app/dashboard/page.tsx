@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { calculateProfileCompletion } from "@/lib/profile-completion";
+import { applyReadReceiptTimestamps, incomingUnreadMessageIds } from "@/lib/message-read-state";
+import { notifyMessagesRead, subscribeToMessageReads } from "@/lib/message-read-sync";
 
 type RealMessage = {
   id: string;
@@ -28,11 +30,14 @@ type RealConversation = {
   listing_id: string | null;
   listing_title: string | null;
   listing_type: string | null;
+  kind?: "direct" | "group";
+  group_name?: string | null;
   sender_id: string;
-  receiver_id: string;
+  receiver_id: string | null;
   created_at: string;
   updated_at: string;
   messages: RealMessage[];
+  unread_count: number;
   otherName?: string;
   otherAvatar?: string | null;
 };
@@ -496,6 +501,10 @@ export default function DashboardPage() {
 
   const [conversations, setConversations] = useState<RealConversation[]>([]);
   const [convsLoading, setConvsLoading] = useState(false);
+  const [conversationsReady, setConversationsReady] = useState(false);
+  const [conversationsLoadError, setConversationsLoadError] = useState(false);
+  const conversationsHasLoadedRef = useRef(false);
+  const [unreadMessagesTotal, setUnreadMessagesTotal] = useState(0);
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [activeMessages, setActiveMessages] = useState<RealMessage[]>([]);
   const [messagesLoading, setMessagesLoading] = useState(false);
@@ -571,15 +580,48 @@ export default function DashboardPage() {
     }
   };
 
+  const loadDashboardConversations = useCallback(async () => {
+    if (!conversationsHasLoadedRef.current) {
+      setConvsLoading(true);
+      setConversationsReady(false);
+    }
+    setConversationsLoadError(false);
+    try {
+      const response = await fetch("/api/conversations", { cache: "no-store" });
+      if (!response.ok) throw new Error("conversations fetch failed");
+      const { data, unreadCount } = await response.json();
+      setConversations(data ?? []);
+      setUnreadMessagesTotal(Number(unreadCount) || 0);
+      conversationsHasLoadedRef.current = true;
+      setConversationsReady(true);
+    } catch {
+      setConversationsLoadError(true);
+      if (!conversationsHasLoadedRef.current) {
+        setConversations([]);
+        setUnreadMessagesTotal(0);
+      }
+    } finally {
+      setConvsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (activeTab !== "messages" && activeTab !== "overview" && activeTab !== "analytics" && activeTab !== "bookings") return;
-    setConvsLoading(true);
-    fetch("/api/conversations", { cache: "no-store" })
-      .then(r => r.json())
-      .then(({ data }) => setConversations(data ?? []))
-      .catch(() => {})
-      .finally(() => setConvsLoading(false));
-  }, [activeTab]);
+    void loadDashboardConversations();
+  }, [activeTab, loadDashboardConversations]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    return subscribeToMessageReads(user.id, () => { void loadDashboardConversations(); });
+  }, [user?.id, loadDashboardConversations]);
+
+  useEffect(() => {
+    if (!user?.id || (activeTab !== "overview" && activeTab !== "messages")) return;
+    const interval = window.setInterval(() => {
+      if (document.visibilityState === "visible") void loadDashboardConversations();
+    }, 10_000);
+    return () => window.clearInterval(interval);
+  }, [user?.id, activeTab, loadDashboardConversations]);
 
   useEffect(() => {
     if (!selectedConversation) return;
@@ -589,17 +631,31 @@ export default function DashboardPage() {
         if (!r.ok) throw new Error("conversation fetch failed");
         return r.json();
       })
-      .then(({ messages }) => {
+      .then(async ({ messages }) => {
         const loadedMessages = Array.isArray(messages) ? messages as RealMessage[] : [];
         setActiveMessages(loadedMessages);
-        const readAt = new Date().toISOString();
-        setConversations(prev => prev.map(conv => conv.id !== selectedConversation ? conv : {
-          ...conv,
-          messages: conv.messages.map(message =>
-            message.sender_id === user?.id ? message : { ...message, read_at: message.read_at ?? readAt }
-          ),
-        }));
-        window.dispatchEvent(new CustomEvent("cinegenius:messages-read"));
+        const messageIds = incomingUnreadMessageIds(loadedMessages, user?.id ?? "");
+        if (messageIds.length > 0) {
+          const readResponse = await fetch(`/api/conversations/${selectedConversation}/read`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            cache: "no-store",
+            body: JSON.stringify({ message_ids: messageIds }),
+          });
+          if (readResponse.ok) {
+            const readState = await readResponse.json();
+            const readMessages = Array.isArray(readState.readMessages) ? readState.readMessages : [];
+            setActiveMessages((current) => applyReadReceiptTimestamps(current, readMessages));
+            setConversations((current) => current.map((conversation) => conversation.id !== selectedConversation ? conversation : {
+              ...conversation,
+              unread_count: readState.byConversation?.[selectedConversation] ?? conversation.unread_count,
+              messages: applyReadReceiptTimestamps(conversation.messages, readMessages),
+            }));
+            setUnreadMessagesTotal(Number(readState.count) || 0);
+            setConversationsReady(true);
+            if (user?.id) notifyMessagesRead(user.id);
+          }
+        }
         setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
       })
       .catch(() => {})
@@ -621,7 +677,7 @@ export default function DashboardPage() {
       setActiveMessages(messages ?? []);
       setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
       // refresh conv list to update updated_at
-      fetch("/api/conversations").then(r => r.json()).then(({ data }) => setConversations(data ?? []));
+      void loadDashboardConversations();
     } finally {
       setSending(false);
     }
@@ -641,9 +697,7 @@ export default function DashboardPage() {
     return d.toLocaleDateString("de-DE", { day: "numeric", month: "short" });
   };
 
-  const unreadCount = conversations.filter(c =>
-    c.messages.some(m => m.sender_id !== user?.id && !m.read_at)
-  ).length;
+  const unreadCount = conversationsReady ? unreadMessagesTotal : 0;
 
   const tabTitle = () => {
     const map: Record<string, string> = {
@@ -666,7 +720,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="pt-16 min-h-screen flex">
+    <div className="pt-16 min-h-screen flex w-full min-w-0">
       {/* Sidebar */}
       <aside className="hidden lg:flex w-60 border-r border-border bg-bg-secondary flex-col fixed left-0 top-16 bottom-0 z-40">
         {/* Profil-Karte */}
@@ -723,7 +777,7 @@ export default function DashboardPage() {
             >
               <Icon size={16} />
               {label}
-              {id === "messages" && unreadCount > 0 && (
+              {id === "messages" && conversationsReady && unreadCount > 0 && (
                 <span className="ml-auto w-5 h-5 bg-crimson text-white text-xs rounded-full flex items-center justify-center">
                   {unreadCount}
                 </span>
@@ -756,7 +810,7 @@ export default function DashboardPage() {
       </aside>
 
       {/* Hauptinhalt */}
-      <div className="flex-1 lg:ml-60">
+      <div className="min-w-0 flex-1 lg:ml-60">
         {/* Top-Leiste */}
         <div className="sticky top-16 z-30 bg-bg-primary/80 backdrop-blur-nav border-b border-border px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
           <h1 className="font-display text-sm sm:text-base font-bold text-text-primary truncate">{tabTitle()}</h1>
@@ -769,10 +823,10 @@ export default function DashboardPage() {
 
         {/* Mobile: no top tab bar — navigation is in the bottom nav below */}
 
-        <div className="p-4 sm:p-6 pb-24 lg:pb-6">
+        <div className="min-w-0 w-full p-4 sm:p-6 pb-24 lg:pb-6">
           {/* ── ÜBERSICHT ── */}
           {activeTab === "overview" && (
-            <div className="space-y-8 max-w-4xl">
+            <div className="min-w-0 w-full space-y-8 max-w-4xl">
 
               {/* ── Begrüßung ── */}
               <div>
@@ -862,7 +916,7 @@ export default function DashboardPage() {
 
               {/* ── Stats-Kacheln ── */}
               {(viewStats || photoStats) && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
                   {viewStats && (
                   <div className="p-4 rounded-xl border border-border bg-bg-secondary">
                     <p className="text-xs text-text-muted mb-1 flex items-center gap-1.5">
@@ -903,8 +957,8 @@ export default function DashboardPage() {
                     <p className="text-xs text-text-muted mb-1 flex items-center gap-1.5">
                       <MessageSquare size={12} /> Nachrichten
                     </p>
-                    <p className="text-2xl font-bold font-mono text-text-primary">{unreadCount}</p>
-                    <p className="text-xs text-text-muted mt-1">ungelesen</p>
+                    <p className="text-2xl font-bold font-mono text-text-primary">{conversationsReady ? unreadCount : conversationsLoadError ? "—" : "…"}</p>
+                    <p className="text-xs text-text-muted mt-1">{conversationsReady ? "ungelesen" : conversationsLoadError ? "Nicht verfügbar" : "Lädt…"}</p>
                   </div>
                   {photoStats && (
                     <div className="p-4 rounded-xl border border-border bg-bg-secondary">
@@ -947,7 +1001,7 @@ export default function DashboardPage() {
                   </div>
                   <ChevronRight size={20} className="text-gold shrink-0 group-hover:translate-x-1 transition-transform" />
                 </Link>
-              ) : unreadCount > 0 ? (
+              ) : conversationsReady && unreadCount > 0 ? (
                 <button
                   onClick={() => setActiveTab("messages")}
                   className="group w-full flex items-center gap-5 p-6 rounded-2xl border-2 border-gold/40 bg-gold-subtle hover:border-gold hover:bg-gold/10 transition-all text-left"
@@ -1084,7 +1138,7 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-display text-lg font-bold text-text-primary">
                     Nachrichten & Anfragen
-                    {unreadCount > 0 && (
+                    {conversationsReady && unreadCount > 0 && (
                       <span className="ml-2 px-2 py-0.5 text-xs bg-gold text-bg-primary font-bold rounded-full">{unreadCount}</span>
                     )}
                   </h3>
@@ -1101,7 +1155,13 @@ export default function DashboardPage() {
                   </div>
                 )}
 
-                {!convsLoading && conversations.length === 0 && (
+                {!convsLoading && conversationsLoadError && (
+                  <div role="status" className="p-5 rounded-xl border border-border bg-bg-secondary text-sm text-text-muted">
+                    Nachrichten und Lesestatus konnten nicht geladen werden. Bitte lade die Seite erneut.
+                  </div>
+                )}
+
+                {!convsLoading && conversationsReady && conversations.length === 0 && (
                   <div className="flex items-center gap-4 p-5 rounded-xl border border-dashed border-border text-text-muted">
                     <MessageSquare size={20} className="shrink-0 opacity-40" />
                     <p className="text-sm">Noch keine Nachrichten — sobald jemand schreibt, erscheint es hier.</p>
@@ -1111,8 +1171,8 @@ export default function DashboardPage() {
                 {!convsLoading && conversations.length > 0 && (
                   <div className="rounded-xl border border-border bg-bg-secondary overflow-hidden divide-y divide-border">
                     {conversations.slice(0, 5).map((conv) => {
-                      const lastMsg = conv.messages[conv.messages.length - 1];
-                      const hasUnread = conv.messages.some(m => m.sender_id !== user?.id && !m.read_at);
+                      const lastMsg = conv.messages[0];
+                      const hasUnread = conv.unread_count > 0;
                       return (
                         <button
                           key={conv.id}
@@ -1205,11 +1265,11 @@ export default function DashboardPage() {
               {/* ── Schnellzugriff ── */}
               <div>
                 <h3 className="font-display text-lg font-bold text-text-primary mb-4">Schnellzugriff</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
                   {[
                     { icon: User,         label: "Mein Profil",  sub: `${profileCompleteness}% vollständig`, id: "profil" },
                     { icon: Calendar,     label: "Buchungen",    sub: bookings.length > 0 ? `${bookings.length} gesamt` : "Keine", id: "bookings" },
-                    { icon: MessageSquare,label: "Nachrichten",  sub: unreadCount > 0 ? `${unreadCount} ungelesen` : "Alle gelesen", id: "messages" },
+                    { icon: MessageSquare,label: "Nachrichten",  sub: conversationsLoadError ? "Nicht verfügbar" : !conversationsReady ? "Lädt…" : unreadCount > 0 ? `${unreadCount} ungelesen` : "Alle gelesen", id: "messages" },
                     { icon: BarChart2,    label: "Analysen",     sub: `${conversations.length} Anfragen`, id: "analytics" },
                   ].map(({ icon: Icon, label, sub, id }) => (
                     <button
@@ -1254,13 +1314,13 @@ export default function DashboardPage() {
                       <p className="font-display text-lg font-bold text-text-primary leading-tight">{displayName}</p>
                       <p className="text-sm text-text-muted mt-0.5 mb-4">{profileRole || "CineGenius Mitglied"}</p>
                       <div className="flex flex-wrap gap-2">
-                        <a href="/profile" className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">
+                        <Link href="/profile" className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">
                           <Pencil size={12} /> Profil bearbeiten
-                        </a>
-                        <a href={user?.id ? `/profile/${user.id}` : "/profile"} target="_blank" rel="noopener noreferrer"
+                        </Link>
+                        <Link href={user?.id ? `/profile/${user.id}` : "/profile"} target="_blank" rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-colors">
                           <ExternalLink size={12} /> Öffentlich ansehen
-                        </a>
+                        </Link>
                       </div>
                     </div>
                   </div>
@@ -1284,11 +1344,11 @@ export default function DashboardPage() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {profileMissingFields.map((f) => (
-                    <a key={f} href="/profile"
+                    <Link key={f} href="/profile"
                       className="flex items-center gap-2 text-xs text-text-muted hover:text-gold transition-colors group">
                       <AlertCircle size={12} className="shrink-0 group-hover:text-gold" />
                       <span>{f} fehlt noch</span>
-                    </a>
+                    </Link>
                   ))}
                   {profileMissingFields.length === 0 && (
                     <p className="flex items-center gap-2 text-xs text-success col-span-2">
@@ -1351,9 +1411,9 @@ export default function DashboardPage() {
               <div className="p-5 rounded-xl border border-border bg-bg-secondary">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-sm font-semibold text-text-primary">Checkliste</p>
-                  <a href="/profile" className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">
+                  <Link href="/profile" className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">
                     Alle bearbeiten <ChevronRight size={11} />
-                  </a>
+                  </Link>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {profileCompletionChecks.map(({ label, ok }) => (
@@ -1808,7 +1868,7 @@ export default function DashboardPage() {
               <div className={`w-full sm:w-72 shrink-0 border-r border-border flex-col ${selectedConversation ? "hidden sm:flex" : "flex"}`}>
                 <div className="p-3 border-b border-border flex items-center justify-between">
                   <p className="text-xs uppercase tracking-widest text-text-muted font-semibold">Nachrichten</p>
-                  {unreadCount > 0 && (
+                  {conversationsReady && unreadCount > 0 && (
                     <span className="px-1.5 py-0.5 bg-gold text-bg-primary text-[10px] font-bold rounded-full">
                       {unreadCount}
                     </span>
@@ -1825,8 +1885,8 @@ export default function DashboardPage() {
                     </div>
                   )}
                   {conversations.map((conv) => {
-                    const lastMsg = conv.messages[conv.messages.length - 1];
-                    const hasUnread = conv.messages.some(m => m.sender_id !== user?.id && !m.read_at);
+                    const lastMsg = conv.messages[0];
+                    const hasUnread = conv.unread_count > 0;
                     return (
                       <button
                         key={conv.id}
@@ -1958,7 +2018,7 @@ export default function DashboardPage() {
           {activeTab === "bookings" && (
             <div className="space-y-6">
               {/* Stats row */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                 {[
                   { label: "Meine Buchungen", value: bookingsLoading ? "…" : String(bookings.length) },
                   { label: "Bestätigt", value: bookingsLoading ? "…" : String(bookings.filter(b => b.status === "confirmed").length) },
@@ -2000,7 +2060,7 @@ export default function DashboardPage() {
                             {new Date(b.end_date).toLocaleDateString("de-DE", { day: "numeric", month: "short", year: "numeric" })}
                             {" · "}{b.days} Tag{b.days !== 1 ? "e" : ""}
                           </p>
-                          {b.notes && <p className="text-xs text-text-muted mt-1 italic line-clamp-1">„{b.notes}"</p>}
+                          {b.notes && <p className="text-xs text-text-muted mt-1 italic line-clamp-1">„{b.notes}”</p>}
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           <p className="text-sm font-semibold text-text-primary mr-1">{b.total.toLocaleString()} €</p>
@@ -2261,7 +2321,7 @@ export default function DashboardPage() {
             const totalPaid = confirmed.reduce((s, b) => s + b.total, 0);
             return (
               <div className="space-y-4">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-2">
+                <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-2">
                   {[
                     { label: "Abgeschlossen", value: bookingsLoading ? "…" : String(confirmed.length), color: confirmed.length > 0 ? "text-success" : "text-text-muted" },
                     { label: "Ausstehend", value: bookingsLoading ? "…" : "0", color: "text-text-muted" },
@@ -2333,12 +2393,12 @@ export default function DashboardPage() {
 
             return (
               <div className="space-y-6">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                   {[
                     {
                       label: "Anfragen gesamt",
                       value: listingsLoading || convsLoading ? "…" : String(conversations.length),
-                      sub: unreadCount > 0 ? `${unreadCount} ungelesen` : "Alle gelesen",
+                      sub: conversationsLoadError ? "Nicht verfügbar" : !conversationsReady ? "Lädt…" : unreadCount > 0 ? `${unreadCount} ungelesen` : "Alle gelesen",
                     },
                     {
                       label: "Aktive Inserate",
@@ -2352,8 +2412,8 @@ export default function DashboardPage() {
                     },
                     {
                       label: "Ungelesen",
-                      value: String(unreadCount),
-                      sub: unreadCount > 0 ? "Neue Nachrichten" : "Alles erledigt",
+                      value: conversationsReady ? String(unreadCount) : conversationsLoadError ? "—" : "…",
+                      sub: conversationsLoadError ? "Nicht verfügbar" : !conversationsReady ? "Lädt…" : unreadCount > 0 ? "Neue Nachrichten" : "Alles erledigt",
                     },
                   ].map(({ label, value, sub }) => (
                     <div key={label} className="p-5 rounded-xl border border-border bg-bg-secondary">
@@ -2776,7 +2836,7 @@ export default function DashboardPage() {
                           />
                         </div>
                         {filtered.length === 0 ? (
-                          <p className="text-sm text-text-muted text-center py-8">Keine Ergebnisse für „{friendSearch}"</p>
+                          <p className="text-sm text-text-muted text-center py-8">Keine Ergebnisse für „{friendSearch}”</p>
                         ) : (
                           <div className="space-y-5">
                             {sortedGroups.map(([role, members]) => (
@@ -2974,7 +3034,7 @@ export default function DashboardPage() {
             >
               <div className="relative">
                 <Icon size={20} />
-                {id === "messages" && unreadCount > 0 && (
+                {id === "messages" && conversationsReady && unreadCount > 0 && (
                   <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-crimson text-white text-[9px] font-bold rounded-full flex items-center justify-center">
                     {unreadCount}
                   </span>

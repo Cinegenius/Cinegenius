@@ -61,7 +61,7 @@
 
 * { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; overflow-x: hidden; }
+html { scroll-behavior: smooth; }
 
 
 /* iPhone safe area for bottom nav */
@@ -75,7 +75,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: "kern" 1, "liga" 1;
-  overflow-x: hidden;
 }
 
 /* One content grid and surface system for the public directory pages. */

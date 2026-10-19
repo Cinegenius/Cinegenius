@@ -15,7 +15,7 @@ Desktop and mobile navigation use the same order: Locations, Crew, Jobs, Marktpl
 
 ## Authentication entry points
 
-Keep `/sign-in` and `/sign-up` one click from the homepage. On desktop, show both actions in the header; on phones, show them outside the collapsed menu. Homepage and navigation links prefetch the corresponding direct routes. Each route renders the actual email/password inputs in its first server response, and the client form uses Clerk's supported flow; never add an intermediate welcome or account-type page. Ask only for fields the identity provider marks as required, then defer profile details to onboarding. Keep reciprocal sign-in/register links and send an existing session directly to its requested internal destination. Profile-image changes must dispatch `cinegenius:profile-updated` so the navbar/account menu updates immediately without stale cached profile data.
+Keep `/sign-in` and `/sign-up` one click from the homepage. On desktop, show both actions in the header; on phones, show them outside the collapsed menu. Homepage and navigation links prefetch the corresponding direct routes. Each route renders the actual email/password inputs in its first server response, and the client form uses Clerk's supported flow; never add an intermediate welcome or account-type page. Ask only for fields the identity provider marks as required, then defer profile details to onboarding. Keep reciprocal sign-in/register links and send an existing session directly to its requested internal destination. Header account controls use a stable account icon rather than profile photos, preventing stale or late-loading portraits after sign-in. Profile photos remain visible on profile pages and other intentional profile surfaces.
 
 ## Design regression checks
 
@@ -36,6 +36,14 @@ For visual review, capture `/projects`, `/locations`, `/props`, `/creators`, `/c
 - Publish a release only by running `npm run deploy:production` from a clean `main` checkout whose `HEAD` matches `origin/main`. The guarded script checks the branch, clean tree, remote commit, linked project, and shared design rules, then uploads the checked source for a Vercel-hosted production build. Do not use a local prebuilt release: Vercel intentionally redacts sensitive environment values when pulling them locally, so a local prebuilt can capture placeholder values instead of the real production configuration.
 - Never use a dirty working tree, another branch, a stale project folder, or a direct ad hoc `vercel --prod` command for production. The guard is intended to make those recurring snapshot overwrites fail before deployment.
 - `npm run build` uses Next.js Webpack explicitly. This avoids the reproduced Turbopack Google Font resolver failure in the Vercel CLI production build while keeping local and Vercel builds on the same successful path.
+
+## Messaging and group conversations
+
+- Message reads are stored in `message_reads` per `(message_id, user_id)`. Never use the legacy global `messages.read_at` as the unread source after the receipt migration; it is only backfilled for compatibility. Counts come from `unread_message_counts` and include active members' incoming messages after their current join time.
+- All conversation and message reads, sends, group administration, read receipts, and notifications go through authenticated server routes. Do not subscribe clients directly to raw message rows. Client refreshes must be deduplicated by message ID and scoped to the active Clerk user/session.
+- Group membership is recorded in `conversation_members`. New members see messages from `joined_at` onward. Rejoining resets that boundary. Only active members can read or send; only admins can rename/add/remove. When the last admin leaves, the oldest active member is promoted. A sole remaining admin must add another member before leaving.
+- Do not clear unread counts at login or mark an entire thread read. A client marks only IDs from its fetched snapshot, and the server validates membership, sender, conversation, and join boundary before storing receipts.
+- Before production release, apply `supabase/migrations/message_read_receipts.sql` to the linked production Supabase project, verify the new schema/RPCs, then release the matching clean `main` commit through `npm run deploy:production`. Do not deploy the app code before the migration succeeds.
 
 ## Advertising surfaces
 

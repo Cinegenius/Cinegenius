@@ -99,6 +99,7 @@ export async function POST(req: NextRequest) {
   const { data: existing } = await db
     .from("conversations")
     .select("id")
+    .eq("kind", "direct")
     .eq("listing_id", jobId)
     .eq("sender_id", userId)
     .eq("receiver_id", ownerId)
@@ -114,10 +115,18 @@ export async function POST(req: NextRequest) {
         listing_type: "job",
         sender_id: userId,
         receiver_id: ownerId,
+        kind: "direct",
+        created_by: userId,
       })
       .select("id")
       .single();
     conversationId = conv?.id;
+    if (conversationId) {
+      await db.from("conversation_members").insert([
+        { conversation_id: conversationId, user_id: userId, role: "member" },
+        { conversation_id: conversationId, user_id: ownerId, role: "member" },
+      ]);
+    }
   }
 
   if (conversationId) {
@@ -127,10 +136,10 @@ export async function POST(req: NextRequest) {
       dayRate?.trim() ? `Tagesgage: ${dayRate.trim()}` : null,
     ].filter(Boolean).join("\n\n");
 
-    await db.from("messages").insert({
-      conversation_id: conversationId,
-      sender_id: userId,
-      content: body,
+    await db.rpc("send_conversation_message", {
+      p_conversation_id: conversationId,
+      p_sender_id: userId,
+      p_content: body,
     });
   }
 
@@ -168,7 +177,7 @@ export async function GET(req: NextRequest) {
 
     // Enrich with applicant display_name
     const applicantIds = [...new Set((data ?? []).map((a) => a.applicant_id))];
-    let nameMap: Record<string, { name: string; avatar: string | null }> = {};
+    const nameMap: Record<string, { name: string; avatar: string | null }> = {};
     if (applicantIds.length > 0) {
       const { data: profiles } = await db
         .from("profiles")
