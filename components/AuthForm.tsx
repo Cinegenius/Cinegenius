@@ -155,17 +155,7 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
     const nextAction = getPasswordSignInAction(signIn.status);
     if (nextAction === "complete") await completeSignIn();
     else if (nextAction === "mfa") await prepareSecondFactor();
-    else if (nextAction === "email-code") {
-      const codeResult = await runAuthAction(() => signIn.emailCode.sendCode({ emailAddress: email.trim() }), setError, "Die Anmeldung mit E-Mail-Code ist für dieses Konto nicht verfügbar.");
-      if (!codeResult || codeResult.error) {
-        if (!codeResult) return;
-        setError(readableAuthError(codeResult.error, "Die Anmeldung mit E-Mail-Code ist für dieses Konto nicht verfügbar."));
-      }
-      else {
-        setStep("email-code");
-        setMessage("Wir haben einen Anmeldecode an deine E-Mail-Adresse gesendet.");
-      }
-    } else setError("Die Anmeldung benötigt einen weiteren Schritt. Bitte versuche die Anmeldung mit E-Mail-Code.");
+    else setError("Die Passwortanmeldung wurde nicht abgeschlossen. Prüfe deine Angaben oder wähle ausdrücklich „Mit E-Mail-Code anmelden“.");
   };
 
   const sendEmailCode = async () => {

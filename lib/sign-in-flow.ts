@@ -1,9 +1,8 @@
-export type PasswordSignInAction = "complete" | "mfa" | "email-code" | "unsupported";
+export type PasswordSignInAction = "complete" | "mfa" | "unsupported";
 
 export function getPasswordSignInAction(status: string | null | undefined): PasswordSignInAction {
   if (status === "complete") return "complete";
   if (status === "needs_second_factor" || status === "needs_client_trust") return "mfa";
-  if (status === "needs_first_factor") return "email-code";
   return "unsupported";
 }
 

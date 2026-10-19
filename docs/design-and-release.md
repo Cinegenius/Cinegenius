@@ -17,6 +17,8 @@ Desktop and mobile navigation use the same order: Locations, Crew, Jobs, Marktpl
 
 Keep `/sign-in` and `/sign-up` one click from the homepage. On desktop, show both actions in the header; on phones, show them outside the collapsed menu. Homepage and navigation links prefetch the corresponding direct routes. Each route renders the actual email/password inputs in its first server response, and the client form uses Clerk's supported flow; never add an intermediate welcome or account-type page. Ask only for fields the identity provider marks as required, then defer profile details to onboarding. Keep reciprocal sign-in/register links and send an existing session directly to its requested internal destination. Header account controls use a stable account icon rather than profile photos, preventing stale or late-loading portraits after sign-in. Profile photos remain visible on profile pages and other intentional profile surfaces.
 
+Email-and-password is the default sign-in method. Email-code sign-in is an explicit alternative; never automatically start it when a password attempt returns `needs_first_factor`. Only `needs_second_factor` and `needs_client_trust` should enter the configured security verification flow. Do not weaken Clerk MFA or Device Trust settings to avoid a legitimate challenge.
+
 ## Design regression checks
 
 Run `npm run check:design` before each release. It verifies that all six public areas still use `PageHeader`, the desktop and mobile navigation have the same destinations in the same order, the shared page-width and solid-toolbar styles remain present, and the removed `CategoryHero` layout has not returned. The production release script runs this check automatically.
