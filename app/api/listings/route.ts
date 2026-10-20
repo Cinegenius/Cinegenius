@@ -66,7 +66,7 @@ export async function POST(req: Request) {
 
   const body = await req.json();
   const { type, title, description, price, city, category, image_url, company_id,
-          metadata, blocked_dates, floor_plan_url, extra_images, rental_type } = body;
+          metadata, blocked_dates, floor_plan_url, extra_images, rental_type, draft } = body;
 
   const VALID_LISTING_TYPES = new Set(["job", "location", "prop", "vehicle", "creator", "animal"]);
 
@@ -115,8 +115,8 @@ export async function POST(req: Request) {
       city,
       image_url: image_url ?? null,
       company_id: company_id ?? null,
-      // Job listings always start private. Publishing is a separate owner-only action.
-      published: type === "job" ? false : true,
+      // Jobs and guided onboarding entries start private; publishing is an explicit owner action.
+      published: type === "job" || draft === true ? false : true,
       metadata: mergedMetadata,
       ...(blocked_dates !== undefined && { blocked_dates }),
       ...(floor_plan_url !== undefined && { floor_plan_url }),

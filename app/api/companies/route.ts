@@ -111,6 +111,7 @@ export async function POST(req: NextRequest) {
     categories, services, portfolio_images, owner_title,
     tagline, bio_short, usp, founded_year, legal_form, hq_address, countries, industry_focus,
     social_links,
+    draft,
   } = body;
 
   if (!name?.trim() || !city?.trim()) {
@@ -150,7 +151,7 @@ export async function POST(req: NextRequest) {
         countries: countries ?? [],
         industry_focus: industry_focus ?? [],
         social_links: social_links ?? {},
-        published: true,
+        published: draft === true ? false : true,
         updated_at: new Date().toISOString(),
       })
       .eq("id", id)
@@ -208,7 +209,7 @@ export async function POST(req: NextRequest) {
       countries: countries ?? [],
       industry_focus: industry_focus ?? [],
       social_links: social_links ?? {},
-      published: true,
+      published: draft === true ? false : true,
     })
     .select()
     .single();

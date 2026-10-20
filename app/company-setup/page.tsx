@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import { safeObjectURL } from "@/lib/compressImage";
-import ProfileGuard from "@/components/ProfileGuard";
 
 const MAX_PORTFOLIO = 8;
 
@@ -53,6 +52,11 @@ export default function CompanySetupPage() {
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [guidedSetup, setGuidedSetup] = useState(false);
+  const [companyDraftLoaded, setCompanyDraftLoaded] = useState(false);
+  const [companyDraftStatus, setCompanyDraftStatus] = useState("idle");
+  const [companyStep, setCompanyStep] = useState(1);
+  const [existingPublished, setExistingPublished] = useState(true);
 
   // Extended fields
   const [tagline, setTagline] = useState("");
@@ -83,6 +87,9 @@ export default function CompanySetupPage() {
   }, [isLoaded, user]);
 
   useEffect(() => {
+    const isGuided = new URLSearchParams(window.location.search).get("onboarding") === "1";
+    setGuidedSetup(isGuided);
+    if (isGuided) setExistingPublished(false);
     // Check if user already has a company — fires immediately, no Clerk wait
     fetch("/api/companies?mine=true")
       .then((r) => r.json())
@@ -90,6 +97,7 @@ export default function CompanySetupPage() {
         if (data && data.length > 0) {
           const c = data[0];
           setExistingId(c.id);
+          setExistingPublished(c.published !== false);
           setName(c.name ?? "");
           setCity(c.city ?? "");
           setDescription(c.description ?? "");
@@ -130,7 +138,53 @@ export default function CompanySetupPage() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!guidedSetup || loading || existingId) return;
+    let active = true;
+    fetch("/api/onboarding", { cache: "no-store" }).then(async (response) => {
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error ?? "Der private Entwurf konnte nicht geladen werden.");
+      return result.draft?.companyDraft;
+    }).then((draft) => {
+      if (!active) return;
+      if (draft) {
+        setName(draft.name ?? ""); setCity(draft.city ?? ""); setDescription(draft.description ?? "");
+        setWebsite(draft.website ?? ""); setEmail(draft.email ?? ""); setPhone(draft.phone ?? "");
+        setLogoUrl(draft.logoUrl ?? ""); setLogoPreview(draft.logoUrl ?? "");
+        setPortfolioImages(draft.portfolioImages ?? []); setSelectedCategories(draft.selectedCategories ?? []);
+        setServices(draft.services ?? []); setTagline(draft.tagline ?? ""); setBioShort(draft.bioShort ?? "");
+        setUsp(draft.usp ?? ""); setFoundedYear(draft.foundedYear ?? ""); setLegalForm(draft.legalForm ?? "");
+        setHqAddress(draft.hqAddress ?? ""); setCountries(draft.countries ?? []);
+        setIndustryFocus(draft.industryFocus ?? []); setSocialLinks(draft.socialLinks ?? {}); setOwnerTitle(draft.ownerTitle ?? "");
+        setCompanyStep(Math.min(3, Math.max(1, Number(draft.step) || 1)));
+      }
+      setCompanyDraftLoaded(true);
+    }).catch((cause) => {
+      if (active) { setError(cause instanceof Error ? cause.message : "Der private Entwurf konnte nicht geladen werden."); setCompanyDraftLoaded(true); }
+    });
+    return () => { active = false; };
+  }, [guidedSetup, loading, existingId]);
+
+  useEffect(() => {
+    if (!guidedSetup || !companyDraftLoaded || loading || existingId) return;
+    const timer = setTimeout(async () => {
+      setCompanyDraftStatus("saving");
+      try {
+        const response = await fetch("/api/onboarding", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
+          intent: "company", setupComplete: false, companyDraft: { name, city, description, website, email, phone, logoUrl, portfolioImages, selectedCategories, services, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep, updatedAt: new Date().toISOString() },
+        }) });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error ?? "Der Entwurf konnte nicht gespeichert werden.");
+        setCompanyDraftStatus("saved");
+      } catch (cause) {
+        setCompanyDraftStatus("error");
+        setError(cause instanceof Error ? cause.message : "Der Entwurf konnte nicht gespeichert werden.");
+      }
+    }, 650);
+    return () => clearTimeout(timer);
+  }, [guidedSetup, companyDraftLoaded, loading, existingId, name, city, description, website, email, phone, logoUrl, portfolioImages, selectedCategories, services, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, companyStep]);
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -247,11 +301,13 @@ export default function CompanySetupPage() {
           social_links: Object.fromEntries(
             Object.entries(socialLinks).filter(([, v]) => v?.trim())
           ),
+          draft: guidedSetup && !existingPublished,
         }),
       });
       const { data, error: apiError } = await res.json();
       if (apiError) throw new Error(apiError);
-      router.replace(`/companies/${data.slug}?welcome=1`);
+      if (guidedSetup) await fetch("/api/onboarding?type=company", { method: "DELETE" });
+      router.replace(`/companies/${data.slug}?welcome=1${guidedSetup && !existingPublished ? "&setupDraft=1" : ""}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Fehler beim Speichern.");
       setSaving(false);
@@ -267,7 +323,6 @@ export default function CompanySetupPage() {
   }
 
   return (
-    <ProfileGuard>
       <div className="pt-16 min-h-screen bg-bg-primary">
         <div className="max-w-2xl mx-auto px-4 py-12 sm:py-16">
 
@@ -285,9 +340,79 @@ export default function CompanySetupPage() {
             <p className="text-text-secondary max-w-sm mx-auto leading-relaxed text-sm">
               Präsentiere dein Unternehmen der Filmbranche — von Verleih bis Postproduktion.
             </p>
+            {guidedSetup && !existingId && <p className="mt-3 text-xs text-text-muted">{companyDraftStatus === "saving" ? "Speichert privat …" : companyDraftStatus === "saved" ? "Dein Fortschritt ist privat gespeichert." : companyDraftStatus === "error" ? "Der letzte Stand konnte nicht gespeichert werden." : "Dein Fortschritt wird privat gespeichert."}</p>}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
+            {guidedSetup && !existingId ? (
+              <div className="space-y-6">
+                <div aria-label={`Schritt ${companyStep} von 3`} className="space-y-2">
+                  <div className="flex justify-between text-xs text-text-muted"><span>Firmenprofil</span><span>Schritt {companyStep} von 3</span></div>
+                  <div className="h-1.5 rounded-full bg-bg-elevated overflow-hidden"><div className="h-full rounded-full bg-gold transition-all" style={{ width: `${(companyStep / 3) * 100}%` }} /></div>
+                </div>
+
+                {companyStep === 1 && (
+                  <section className="space-y-5" aria-labelledby="company-step-one">
+                    <div><h2 id="company-step-one" className="font-display text-2xl text-text-primary">Wie heißt dein Unternehmen?</h2><p className="mt-1 text-sm text-text-secondary">Nenne den Namen und den Ort, an dem ihr hauptsächlich arbeitet.</p></div>
+                    <Field label="Firmenname" required>
+                      <input autoComplete="organization" value={name} onChange={(e) => setName(e.target.value)} placeholder="Zum Beispiel: Lichtblick Verleih" required className="w-full rounded-xl border border-border bg-bg-secondary px-4 py-3 text-sm focus:border-gold focus:outline-none" />
+                    </Field>
+                    <Field label="Stadt oder Region" required>
+                      <input autoComplete="address-level2" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Zum Beispiel: Leipzig" required className="w-full rounded-xl border border-border bg-bg-secondary px-4 py-3 text-sm focus:border-gold focus:outline-none" />
+                    </Field>
+                    <fieldset className="space-y-3">
+                      <legend className="text-sm font-medium text-text-primary">Was macht eure Firma? <span className="text-text-muted">(optional)</span></legend>
+                      <div className="flex flex-wrap gap-2">
+                        {COMPANY_CATEGORIES.slice(0, 10).map((category) => {
+                          const active = selectedCategories.includes(category.id);
+                          return <button key={category.id} type="button" aria-pressed={active} onClick={() => toggleCategory(category.id)} className={`min-h-11 rounded-full border px-3 py-2 text-sm transition-colors ${active ? "border-gold/50 bg-gold/10 text-gold" : "border-border bg-bg-secondary text-text-secondary hover:border-gold/40"}`}>{category.label}</button>;
+                        })}
+                      </div>
+                      <p className="text-xs text-text-muted">Weitere Angaben kannst du später im Firmenprofil ergänzen.</p>
+                    </fieldset>
+                  </section>
+                )}
+
+                {companyStep === 2 && (
+                  <section className="space-y-5" aria-labelledby="company-step-two">
+                    <div><h2 id="company-step-two" className="font-display text-2xl text-text-primary">Was sollen andere über euch wissen?</h2><p className="mt-1 text-sm text-text-secondary">Ein kurzer Einblick hilft, eure Firma einzuordnen. Diese Angaben sind optional.</p></div>
+                    <Field label="Kurzvorstellung">
+                      <textarea rows={3} value={bioShort} onChange={(e) => setBioShort(e.target.value)} maxLength={160} placeholder="Wir verleihen Kamera- und Lichtequipment an kleine Filmteams." className="w-full resize-y rounded-xl border border-border bg-bg-secondary px-4 py-3 text-sm focus:border-gold focus:outline-none" />
+                    </Field>
+                    <Field label="Kurzer Leitsatz">
+                      <input value={tagline} onChange={(e) => setTagline(e.target.value)} maxLength={100} placeholder="Zum Beispiel: Technik für gute Geschichten" className="w-full rounded-xl border border-border bg-bg-secondary px-4 py-3 text-sm focus:border-gold focus:outline-none" />
+                    </Field>
+                    <Field label="Mehr über eure Arbeit (optional)">
+                      <textarea rows={5} value={description} onChange={(e) => setDescription(e.target.value)} maxLength={1500} placeholder="Beschreibe kurz eure Leistungen, Arbeitsweise oder Ausstattung." className="w-full resize-y rounded-xl border border-border bg-bg-secondary px-4 py-3 text-sm focus:border-gold focus:outline-none" />
+                    </Field>
+                  </section>
+                )}
+
+                {companyStep === 3 && (
+                  <section className="space-y-5" aria-labelledby="company-step-three">
+                    <div><h2 id="company-step-three" className="font-display text-2xl text-text-primary">Prüfen und als Entwurf speichern</h2><p className="mt-1 text-sm text-text-secondary">Dein Firmenprofil bleibt zunächst unveröffentlicht. Du kannst es danach ansehen und ausdrücklich veröffentlichen.</p></div>
+                    <div className="space-y-3 rounded-2xl border border-border bg-bg-secondary p-4">
+                      <div><p className="text-xs uppercase tracking-wide text-text-muted">Unternehmen</p><p className="mt-1 font-semibold text-text-primary">{name || "Noch kein Firmenname"}</p><p className="text-sm text-text-secondary">{city || "Standort fehlt"}</p></div>
+                      {selectedCategories.length > 0 && <div><p className="text-xs uppercase tracking-wide text-text-muted">Angebot</p><p className="mt-1 text-sm text-text-primary">{selectedCategories.map((id) => COMPANY_CATEGORIES.find((item) => item.id === id)?.label).filter(Boolean).join(", ")}</p></div>}
+                      {bioShort.trim() && <div><p className="text-xs uppercase tracking-wide text-text-muted">Kurzvorstellung</p><p className="mt-1 text-sm text-text-secondary">{bioShort}</p></div>}
+                    </div>
+                    <p className="text-xs leading-relaxed text-text-muted">Logo, Kontaktdaten, weitere Kategorien und Teamangaben kannst du später im Firmenprofil ergänzen.</p>
+                  </section>
+                )}
+
+                {error && <div role="alert" className="rounded-xl border border-crimson/20 bg-crimson/10 p-3 text-sm text-crimson-light">{error}</div>}
+                <div className="flex gap-3 pt-2">
+                  {companyStep > 1 && <button type="button" onClick={() => { setError(""); setCompanyStep((step) => step - 1); }} className="min-h-12 flex-1 rounded-xl border border-border px-4 text-sm font-medium text-text-secondary hover:text-text-primary">Zurück</button>}
+                  {companyStep < 3 ? (
+                    <button type="button" onClick={() => { if (companyStep === 1 && (!name.trim() || !city.trim())) { setError("Bitte Firmenname und Standort ergänzen."); return; } setError(""); setCompanyStep((step) => step + 1); }} className="min-h-12 flex-1 rounded-xl bg-gold px-4 text-sm font-bold text-bg-primary hover:bg-gold-light">Weiter <ArrowRight size={15} className="ml-1 inline" /></button>
+                  ) : (
+                    <button type="submit" disabled={saving || !name.trim() || !city.trim()} className="min-h-12 flex-1 rounded-xl bg-gold px-4 text-sm font-bold text-bg-primary hover:bg-gold-light disabled:opacity-50">{saving ? <><Loader2 size={15} className="mr-2 inline animate-spin" />Wird gespeichert…</> : <>Entwurf speichern <ArrowRight size={15} className="ml-1 inline" /></>}</button>
+                  )}
+                </div>
+                <p className="text-center text-xs text-text-muted">{companyDraftStatus === "saving" ? "Speichert privat …" : companyDraftStatus === "saved" ? "Dein Fortschritt ist privat gespeichert." : companyDraftStatus === "error" ? "Der letzte Stand konnte nicht gespeichert werden." : "Dein Fortschritt wird privat gespeichert."}</p>
+              </div>
+            ) : (
+              <>
 
             {/* Logo */}
             <div className="flex flex-col items-center gap-3">
@@ -825,6 +950,8 @@ export default function CompanySetupPage() {
             <p className="text-center text-xs text-text-muted pt-1">
               Du kannst dein Profil jederzeit bearbeiten.
             </p>
+              </>
+            )}
           </form>
 
           {/* Team management — only shown when editing existing company */}
@@ -891,7 +1018,6 @@ export default function CompanySetupPage() {
           )}
         </div>
       </div>
-    </ProfileGuard>
   );
 }
 

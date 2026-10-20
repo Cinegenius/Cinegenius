@@ -114,7 +114,28 @@ export default function DashboardPage() {
     fetch("/api/profile")
       .then((r) => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
       .then(({ profile, exists }) => {
-        if (!exists) { window.location.replace("/profile"); return; }
+        if (!exists) {
+          setProfileDisplayName(user?.fullName ?? "");
+          setProfileCompleteness(0);
+          fetch("/api/onboarding", { cache: "no-store" })
+            .then((response) => response.ok ? response.json() : null)
+            .then(({ draft } = {}) => {
+              if (!draft || draft.setupComplete) return;
+              const intent = draft.intent;
+              if (intent === "location" || intent === "equipment") {
+                const saved = draft.listingDrafts?.[intent] ?? (draft.listingDraft?.type === intent ? draft.listingDraft : null);
+                window.location.replace(`/guided-listing?type=${intent}${saved ? "&resume=1" : ""}`);
+              } else if (intent === "talent") {
+                window.location.replace(`/guided-profile${draft.profileDraft ? "?resume=1" : ""}`);
+              } else if (intent === "company") {
+                window.location.replace(`/company-setup?onboarding=1${draft.companyDraft ? "&resume=1" : ""}`);
+              } else if (!intent) {
+                window.location.replace("/profile-setup");
+              }
+            })
+            .catch(() => {});
+          return;
+        }
         if (profile?.display_name) setProfileDisplayName(profile.display_name);
         if (profile?.avatar_url) setProfileAvatarUrl(profile.avatar_url);
         if (profile?.role) setProfileRole(profile.role);
@@ -155,7 +176,7 @@ export default function DashboardPage() {
       .then((data) => setViewStats(data))
       .catch(() => {});
 
-  }, []);
+  }, [user?.fullName]);
 
   useEffect(() => {
     if (!user?.id) return;

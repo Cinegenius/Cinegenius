@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { compressImage, safeObjectURL } from "@/lib/compressImage";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
-import ProfileGuard from "@/components/ProfileGuard";
 import {
   Package, Car, Shirt, Camera, Lightbulb, Mic, Layers, Wrench,
   Home, Building2, TreePine, Clapperboard, MapPin,
@@ -763,7 +762,7 @@ export default function InseratPage() {
   const currentGroup = activeGroup ? groups.find((g) => g.id === activeGroup) ?? null : null;
 
   if (step === 1) {
-    return (<ProfileGuard>
+    return (
       <div className="pt-16 min-h-screen bg-bg-primary">
         <div className="max-w-2xl mx-auto px-4 py-10">
 
@@ -837,7 +836,7 @@ export default function InseratPage() {
 
         </div>
       </div>
-    </ProfileGuard>);
+    );
   }
 
   // ── STEP 2 ──────────────────────────────────────────────────────────────────
@@ -853,7 +852,8 @@ export default function InseratPage() {
     const deptId = selected.id.replace(/^(job_|crew_)/, "");
     const dept = FILM_DEPARTMENTS.find((d) => d.id === deptId) ?? null;
 
-    return (<ProfileGuard>
+    return (
+      <>
       <div className="pt-16 min-h-screen bg-bg-primary">
         <div className="max-w-2xl mx-auto px-4 py-10">
 
@@ -1652,11 +1652,12 @@ export default function InseratPage() {
         onClose={() => setShowFocalPicker(false)}
       />
     )}
-    </ProfileGuard>);
+      </>
+    );
   }
 
   // ── STEP 3 — SUCCESS ─────────────────────────────────────────────────────────
-  return (<ProfileGuard>
+  return (
     <div className="pt-16 min-h-screen bg-bg-primary flex items-center justify-center">
       <div className="max-w-md mx-auto px-4 text-center">
         <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${createdIsDraft ? "bg-gold/10 border border-gold/20" : "bg-success/10 border border-success/20"}`}>
@@ -1702,5 +1703,5 @@ export default function InseratPage() {
         </div>
       </div>
     </div>
-  </ProfileGuard>);
+  );
 }
