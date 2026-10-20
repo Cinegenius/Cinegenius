@@ -16,6 +16,23 @@ export type PublicProfilePhoto = {
   count: number;
 };
 
+/** Keeps different creators adjacent as rarely as possible without random ordering. */
+export function orderPhotosByAuthor(photos: readonly PublicProfilePhoto[]): PublicProfilePhoto[] {
+  const remaining = [...photos];
+  const ordered: PublicProfilePhoto[] = [];
+
+  while (remaining.length > 0) {
+    const previousAuthor = ordered.length > 0 ? ordered[ordered.length - 1].profileId : null;
+    const differentAuthorIndex = previousAuthor === null
+      ? 0
+      : remaining.findIndex((photo) => photo.profileId !== previousAuthor);
+    const nextIndex = differentAuthorIndex >= 0 ? differentAuthorIndex : 0;
+    ordered.push(remaining.splice(nextIndex, 1)[0]);
+  }
+
+  return ordered;
+}
+
 const APPROVED_GALLERY_TYPES = new Set(["fullbody", "editorial", "polaroid", "bts", "portfolio", "set_photo", "product"]);
 
 function isUploadedPublicImage(url: unknown): url is string {
