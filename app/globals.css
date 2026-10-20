@@ -297,15 +297,49 @@ body {
   will-change: transform;
 }
 .home-photo-band-track[data-paused="true"] { animation-play-state: paused; }
+.home-photo-band-viewport {
+  overflow: hidden;
+  margin-inline: -12px;
+  padding: 12px;
+}
 .home-photo-band-group {
   display: flex;
   flex: none;
   align-items: stretch;
-  gap: 1rem;
-  padding-right: 1rem;
+  gap: 12px;
+  padding-inline: 12px;
+}
+.home-photo-band-card {
+  z-index: 0;
+  transform-origin: center;
+  transition: transform 240ms cubic-bezier(0.2, 0.75, 0.25, 1), border-color 240ms ease, box-shadow 240ms ease;
+}
+.home-photo-band-card:focus-within {
+  z-index: 2;
+  transform: translateY(-3px) scale(1.07);
+  border-color: rgba(194, 241, 53, 0.65);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.42), 0 0 18px rgba(194, 241, 53, 0.12);
+}
+.home-photo-band-static-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 250px));
+  justify-content: start;
+  gap: 12px;
+}
+.home-photo-band-static-grid .home-photo-band-card { width: 100%; }
+@media (hover: hover) and (pointer: fine) {
+  .home-photo-band-card:hover {
+    z-index: 2;
+    transform: translateY(-3px) scale(1.07);
+    border-color: rgba(194, 241, 53, 0.65);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.42), 0 0 18px rgba(194, 241, 53, 0.12);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .home-photo-band-track { animation: none; transform: none; width: 100%; }
+  .home-photo-band-card,
+  .home-photo-band-card:hover,
+  .home-photo-band-card:focus-within { transition: none; transform: none; box-shadow: none; }
 }
 @keyframes shimmer {
   0%   { background-position: -800px 0; }

@@ -127,9 +127,9 @@ function PhotoBandCard({
 }) {
   const href = photoHref(photo.profileId, photo.imageUrl);
   return (
-    <article aria-hidden={decorative || undefined} inert={decorative || undefined} className={`group relative aspect-[4/3] w-[82vw] max-w-[32rem] shrink-0 overflow-hidden rounded-xl border border-white/10 bg-bg-elevated sm:aspect-[3/2] md:w-[40vw] lg:w-[30vw] xl:w-[25vw] ${decorative ? "pointer-events-none" : ""}`}>
+    <article aria-hidden={decorative || undefined} inert={decorative || undefined} className={`home-photo-band-card group relative aspect-[4/3] w-[165px] shrink-0 overflow-hidden rounded-xl border border-white/10 bg-bg-elevated sm:w-[200px] lg:w-[240px] xl:w-[250px] ${decorative ? "pointer-events-none" : ""}`}>
       {!failed ? <Link href={href} onClick={decorative ? undefined : onPhotoOpen ?? (() => markPhotoNavigation())} aria-label={decorative ? undefined : `Foto öffnen: ${photo.caption || `Portfoliofoto von ${photo.author}`}`} tabIndex={decorative ? -1 : undefined} className="absolute inset-0 block focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold">
-        <Image src={photo.imageUrl} alt={decorative ? "" : photo.caption || `Foto von ${photo.author}`} fill priority={priority} sizes="(max-width: 639px) 82vw, (max-width: 767px) 78vw, (max-width: 1023px) 40vw, (max-width: 1279px) 30vw, 25vw" onError={() => onImageError(photo.imageUrl)} className="object-cover" />
+        <Image src={photo.imageUrl} alt={decorative ? "" : photo.caption || `Foto von ${photo.author}`} fill priority={priority} sizes="(max-width: 639px) 165px, (max-width: 1023px) 200px, (max-width: 1279px) 240px, 250px" onError={() => onImageError(photo.imageUrl)} className="object-cover" />
       </Link> : <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-bg-elevated to-bg-primary text-text-muted"><div className="flex flex-col items-center gap-2"><ImageIcon size={28} /><span className="text-xs">Bild derzeit nicht verfügbar</span></div></div>}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
       {!decorative && <PhotoLikeButton profileId={photo.profileId} imageUrl={photo.imageUrl} initialCount={photo.likeCount ?? 0} initialLiked={photo.likedByMe ?? false} className="absolute right-3 top-3 z-10" />}
@@ -237,9 +237,9 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
   };
 
   return (
-    <section ref={sectionRef} className="border-y border-border bg-bg-primary py-10 sm:py-14">
+    <section ref={sectionRef} className="border-y border-border bg-bg-primary py-6 sm:py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-5 flex flex-wrap items-end justify-between gap-4 sm:mb-7">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-4 sm:mb-5">
           <div className="min-w-0">
             <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-gold">{isRatedSelection ? "Best of CineGenius" : "Neu entdecken"}</p>
             <h2 className="font-display text-xl font-bold text-text-primary sm:text-2xl">{isRatedSelection ? "Fotos, die begeistern" : "Frische Einblicke aus der Community"}</h2>
@@ -251,7 +251,7 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
           </div>
         </div>
         {photos.length > 0 ? <div
-          className="overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-4 focus-visible:ring-offset-bg-primary"
+          className="home-photo-band-viewport outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-4 focus-visible:ring-offset-bg-primary"
           role="region"
           aria-label={staticGallery ? "Fotogalerie" : "Automatisch laufendes Fotoband"}
           aria-roledescription={staticGallery ? undefined : "Fotoband"}
@@ -261,7 +261,7 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
           onFocus={() => setFocused(true)}
           onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false); }}
         >
-          {staticGallery ? <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {staticGallery ? <div className="home-photo-band-static-grid">
             {photos.map((photo, index) => <PhotoBandCard key={`${photo.profileId}:${photo.imageUrl}`} photo={photo} isRatedSelection={isRatedSelection} failed={failedImages.has(photo.imageUrl)} onImageError={markImageFailed} priority={index === 0} onPhotoOpen={markHomePhotoOpen} />)}
           </div> : <div ref={trackRef} className="home-photo-band-track" data-paused={!shouldRun} style={trackStyle}>
             {[0, 1].map((copy) => <div key={`photo-band-copy-${copy}`} ref={copy === 0 ? groupRef : undefined} className="home-photo-band-group" aria-hidden={copy === 1 || undefined} inert={copy === 1 || undefined}>
