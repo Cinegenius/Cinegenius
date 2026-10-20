@@ -327,6 +327,9 @@ body {
   gap: 12px;
 }
 .home-photo-band-static-grid .home-photo-band-card { width: 100%; }
+@media (max-width: 639px) {
+  .home-photo-band-static-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 @media (hover: hover) and (pointer: fine) {
   .home-photo-band-card:hover {
     z-index: 2;
