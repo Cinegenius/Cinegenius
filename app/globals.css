@@ -287,6 +287,26 @@ body {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+@keyframes homePhotoBand {
+  to { transform: translate3d(-50%, 0, 0); }
+}
+.home-photo-band-track {
+  display: flex;
+  width: max-content;
+  animation: homePhotoBand var(--photo-band-duration, 60s) linear infinite;
+  will-change: transform;
+}
+.home-photo-band-track[data-paused="true"] { animation-play-state: paused; }
+.home-photo-band-group {
+  display: flex;
+  flex: none;
+  align-items: stretch;
+  gap: 1rem;
+  padding-right: 1rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-photo-band-track { animation: none; transform: none; width: 100%; }
+}
 @keyframes shimmer {
   0%   { background-position: -800px 0; }
   100% { background-position:  800px 0; }

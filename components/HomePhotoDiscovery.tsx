@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { ArrowRight, ChevronLeft, ChevronRight, Image as ImageIcon, Pause, Play, Star, X, Share2 } from "lucide-react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { ArrowRight, Image as ImageIcon, Pause, Play, Star, X, Share2 } from "lucide-react";
 import PhotoLikeButton from "@/components/PhotoLikeButton";
-import { markPhotoNavigation, photoHref } from "@/lib/photo-link";
-import { orderPhotosByAuthor } from "@/lib/home-discovery";
+import { markPhotoNavigation, markPhotoNavigationWithAnimation, photoHref } from "@/lib/photo-link";
+import { orderPhotosByAuthor, repeatForSeamlessLoop, shouldAnimatePhotoBand } from "@/lib/home-discovery";
 
 export type DiscoverPhoto = {
   profileId: string;
@@ -108,124 +108,168 @@ export function PhotoDialog({ photo, onClose, resumeLike = false }: { photo: Dis
   );
 }
 
+function PhotoBandCard({
+  photo,
+  isRatedSelection,
+  failed,
+  onImageError,
+  onPhotoOpen,
+  decorative = false,
+  priority = false,
+}: {
+  photo: DiscoverPhoto;
+  isRatedSelection: boolean;
+  failed: boolean;
+  onImageError: (imageUrl: string) => void;
+  onPhotoOpen?: () => void;
+  decorative?: boolean;
+  priority?: boolean;
+}) {
+  const href = photoHref(photo.profileId, photo.imageUrl);
+  return (
+    <article aria-hidden={decorative || undefined} inert={decorative || undefined} className={`group relative aspect-[4/3] w-[82vw] max-w-[32rem] shrink-0 overflow-hidden rounded-xl border border-white/10 bg-bg-elevated sm:aspect-[3/2] md:w-[40vw] lg:w-[30vw] xl:w-[25vw] ${decorative ? "pointer-events-none" : ""}`}>
+      {!failed ? <Link href={href} onClick={decorative ? undefined : onPhotoOpen ?? (() => markPhotoNavigation())} aria-label={decorative ? undefined : `Foto öffnen: ${photo.caption || `Portfoliofoto von ${photo.author}`}`} tabIndex={decorative ? -1 : undefined} className="absolute inset-0 block focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold">
+        <Image src={photo.imageUrl} alt={decorative ? "" : photo.caption || `Foto von ${photo.author}`} fill priority={priority} sizes="(max-width: 639px) 82vw, (max-width: 767px) 78vw, (max-width: 1023px) 40vw, (max-width: 1279px) 30vw, 25vw" onError={() => onImageError(photo.imageUrl)} className="object-cover" />
+      </Link> : <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-bg-elevated to-bg-primary text-text-muted"><div className="flex flex-col items-center gap-2"><ImageIcon size={28} /><span className="text-xs">Bild derzeit nicht verfügbar</span></div></div>}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
+      {!decorative && <PhotoLikeButton profileId={photo.profileId} imageUrl={photo.imageUrl} initialCount={photo.likeCount ?? 0} initialLiked={photo.likedByMe ?? false} className="absolute right-3 top-3 z-10" />}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3 text-white sm:p-4">
+        {decorative ? <p className="truncate text-sm font-medium">{photo.author}</p> : <Link href={`/profile/${photo.profileSlug}#portfolio`} className="pointer-events-auto inline-flex min-h-11 max-w-full items-center truncate text-sm font-semibold hover:text-gold sm:text-base">{photo.author}</Link>}
+        <p className="line-clamp-1 text-xs text-white/75 sm:text-sm">{photo.caption || "Portfolio-Einblick"}</p>
+        {isRatedSelection && <div className="mt-1.5 flex items-center gap-2 text-white"><Stars rating={photo.rating} /><span className="text-xs font-semibold">{photo.rating.toFixed(1)}</span><span className="text-[11px] text-white/70">({photo.count})</span></div>}
+      </div>
+    </article>
+  );
+}
+
 export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: DiscoverPhoto[]; newPhotos: DiscoverPhoto[] }) {
   const photos = orderPhotosByAuthor(ratedPhotos.length >= 3 ? ratedPhotos : newPhotos).slice(0, 6) as DiscoverPhoto[];
   const isRatedSelection = ratedPhotos.length >= 3;
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [playing, setPlaying] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const groupRef = useRef<HTMLDivElement>(null);
+  const returnAnimationTime = useRef<number | null>(null);
   const [reducedMotion, setReducedMotion] = useState(true);
+  const [isInView, setIsInView] = useState(false);
+  const [tabVisible, setTabVisible] = useState(true);
+  const [userPaused, setUserPaused] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [cycleDuration, setCycleDuration] = useState(60);
   const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
-  const touchStart = useRef<{ x: number; y: number } | null>(null);
-  const activePhoto = photos[activeIndex];
-  const nextPhoto = photos.length > 1 ? photos[(activeIndex + 1) % photos.length] : null;
+  const loopPhotos = repeatForSeamlessLoop(photos);
+  const animated = shouldAnimatePhotoBand(photos.length, reducedMotion);
+  const shouldRun = animated && isInView && tabVisible && !userPaused && !hovered && !focused;
+  const staticGallery = !animated;
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => {
-      setReducedMotion(media.matches);
-      setPlaying(!media.matches && photos.length > 1);
-    };
+    const update = () => setReducedMotion(media.matches);
     update();
     media.addEventListener("change", update);
     return () => media.removeEventListener("change", update);
-  }, [photos.length]);
+  }, []);
 
   useEffect(() => {
-    if (!playing || hovered || focused || photos.length < 2) return;
-    const timer = window.setInterval(() => setActiveIndex((index) => (index + 1) % photos.length), 6000);
-    return () => window.clearInterval(timer);
-  }, [focused, hovered, photos.length, playing]);
+    try {
+      const stored = window.sessionStorage.getItem("cinegenius-photo-band-time");
+      if (stored !== null) {
+        const time = Number(stored);
+        if (Number.isFinite(time) && time >= 0) returnAnimationTime.current = time;
+        window.sessionStorage.removeItem("cinegenius-photo-band-time");
+      }
+    } catch { /* The animation starts from its natural position when storage is unavailable. */ }
+  }, []);
 
-  function goTo(index: number) {
-    setActiveIndex((index + photos.length) % photos.length);
-    setPlaying(false);
-  }
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    if (typeof IntersectionObserver === "undefined") {
+      const frame = requestAnimationFrame(() => setIsInView(true));
+      return () => cancelAnimationFrame(frame);
+    }
+    const observer = new IntersectionObserver(([entry]) => setIsInView(entry.isIntersecting), { threshold: 0.01 });
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
 
-  function handleKeyDown(event: React.KeyboardEvent<HTMLElement>) {
-    if (event.target !== event.currentTarget || photos.length < 2) return;
-    if (event.key === "ArrowLeft") { event.preventDefault(); goTo(activeIndex - 1); }
-    if (event.key === "ArrowRight") { event.preventDefault(); goTo(activeIndex + 1); }
-  }
+  useEffect(() => {
+    const updateVisibility = () => setTabVisible(document.visibilityState === "visible");
+    updateVisibility();
+    document.addEventListener("visibilitychange", updateVisibility);
+    return () => document.removeEventListener("visibilitychange", updateVisibility);
+  }, []);
 
-  function handleTouchEnd(event: React.TouchEvent<HTMLElement>) {
-    if (!touchStart.current || photos.length < 2) return;
-    const touch = event.changedTouches[0];
-    const dx = touch.clientX - touchStart.current.x;
-    const dy = touch.clientY - touchStart.current.y;
-    touchStart.current = null;
-    if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.25) goTo(activeIndex + (dx < 0 ? 1 : -1));
-  }
+  useEffect(() => {
+    const group = groupRef.current;
+    if (!group || !animated) return;
+    const updateDuration = () => {
+      const width = group.getBoundingClientRect().width;
+      if (width > 0) setCycleDuration(Math.max(36, width / 26));
+    };
+    updateDuration();
+    const observer = new ResizeObserver(updateDuration);
+    observer.observe(group);
+    return () => observer.disconnect();
+  }, [animated, photos.length]);
+
+  useEffect(() => {
+    if (!shouldRun || returnAnimationTime.current === null) return;
+    const frame = window.requestAnimationFrame(() => {
+      const animation = trackRef.current?.getAnimations()[0];
+      if (!animation) return;
+      animation.pause();
+      animation.currentTime = returnAnimationTime.current;
+      returnAnimationTime.current = null;
+      animation.play();
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [shouldRun]);
 
   function markImageFailed(imageUrl: string) {
     setFailedImages((previous) => new Set(previous).add(imageUrl));
   }
 
+  const trackStyle = { "--photo-band-duration": `${cycleDuration}s` } as CSSProperties;
+  const markHomePhotoOpen = () => {
+    const currentTime = trackRef.current?.getAnimations()[0]?.currentTime;
+    markPhotoNavigationWithAnimation(typeof currentTime === "number" ? currentTime : undefined);
+  };
+
   return (
-    <section className="border-y border-border bg-bg-primary py-10 sm:py-14">
+    <section ref={sectionRef} className="border-y border-border bg-bg-primary py-10 sm:py-14">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4 sm:mb-8">
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-4 sm:mb-7">
           <div className="min-w-0">
             <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-gold">{isRatedSelection ? "Best of CineGenius" : "Neu entdecken"}</p>
             <h2 className="font-display text-xl font-bold text-text-primary sm:text-2xl">{isRatedSelection ? "Fotos, die begeistern" : "Frische Einblicke aus der Community"}</h2>
             {!isRatedSelection && <p className="mt-1 text-xs text-text-muted">Sobald genügend echte Bewertungen vorliegen, zeigen wir hier das Best of.</p>}
           </div>
-          <Link href="/photo" className="inline-flex min-h-11 shrink-0 items-center gap-1 text-sm font-medium text-gold hover:text-gold-light">Alle entdecken <ArrowRight size={14} /></Link>
+          <div className="flex items-center gap-2">
+            {animated && <button type="button" onClick={() => setUserPaused((paused) => !paused)} aria-label={userPaused ? "Fotoband fortsetzen" : "Fotoband pausieren"} aria-pressed={userPaused} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-border text-text-muted transition-colors hover:border-gold hover:text-gold">{userPaused ? <Play size={16} /> : <Pause size={16} />}</button>}
+            <Link href="/photo" className="inline-flex min-h-11 shrink-0 items-center gap-1 text-sm font-medium text-gold hover:text-gold-light">Alle entdecken <ArrowRight size={14} /></Link>
+          </div>
         </div>
-        {activePhoto ? <div
-          className="outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-4 focus-visible:ring-offset-bg-primary"
+        {photos.length > 0 ? <div
+          className="overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-4 focus-visible:ring-offset-bg-primary"
           role="region"
-          aria-label="Foto-Slideshow"
-          aria-roledescription="Diashow"
+          aria-label={staticGallery ? "Fotogalerie" : "Automatisch laufendes Fotoband"}
+          aria-roledescription={staticGallery ? undefined : "Fotoband"}
           tabIndex={0}
-          onKeyDown={handleKeyDown}
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
           onFocus={() => setFocused(true)}
           onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false); }}
-          onTouchStart={(event) => { const touch = event.touches[0]; touchStart.current = { x: touch.clientX, y: touch.clientY }; }}
-          onTouchEnd={handleTouchEnd}
         >
-          <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_minmax(180px,24%)] md:gap-4">
-            {photos.map((photo, index) => {
-              const current = index === activeIndex;
-              return <article key={`${photo.profileId}:${photo.imageUrl}`} hidden={!current} className="group relative min-w-0 overflow-hidden rounded-2xl bg-bg-elevated md:col-start-1 md:row-start-1">
-                <div key={`${photo.imageUrl}:${activeIndex}`} className="animate-fade-in relative aspect-[4/3] overflow-hidden bg-bg-elevated motion-reduce:animate-none sm:aspect-[16/9] md:aspect-[2/1]">
-                  {!failedImages.has(photo.imageUrl) ? <Link href={photoHref(photo.profileId, photo.imageUrl)} onClick={markPhotoNavigation} aria-label={`Foto öffnen: ${photo.caption || `Portfoliofoto von ${photo.author}`}`} className="absolute inset-0 block focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold">
-                    <Image src={photo.imageUrl} alt={photo.caption || `Foto von ${photo.author}`} fill priority={index === 0} sizes="(max-width:767px) 100vw, (max-width:1023px) 92vw, 76vw" onError={() => markImageFailed(photo.imageUrl)} className="object-cover transition-opacity duration-700 motion-reduce:transition-none" />
-                  </Link> : <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-bg-elevated to-bg-primary text-text-muted"><div className="flex flex-col items-center gap-2"><ImageIcon size={30} /><span className="text-sm">Bild derzeit nicht verfügbar</span></div></div>}
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-black/5" />
-                  <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-4 sm:p-6 lg:p-8">
-                    <div className="min-w-0 max-w-2xl text-white">
-                      <Link href={`/profile/${photo.profileSlug}#portfolio`} className="pointer-events-auto inline-flex min-h-11 items-center text-base font-semibold hover:text-gold sm:text-lg">{photo.author}</Link>
-                      <p className="line-clamp-2 text-sm text-white/75 sm:text-base">{photo.caption || "Portfolio-Einblick"}</p>
-                      {isRatedSelection && <div className="mt-2 flex flex-wrap items-center gap-2 text-white"><Stars rating={photo.rating} /><span className="text-sm font-semibold">{photo.rating.toFixed(1)}</span><span className="text-xs text-white/65">{photo.count} {photo.count === 1 ? "Bewertung" : "Bewertungen"}</span></div>}
-                    </div>
-                    <Link href={photoHref(photo.profileId, photo.imageUrl)} onClick={markPhotoNavigation} aria-label="Foto in voller Größe öffnen" className="pointer-events-auto hidden h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/30 bg-black/35 text-white backdrop-blur hover:border-gold sm:flex"><ImageIcon size={18} /></Link>
-                  </div>
-                </div>
-                <PhotoLikeButton profileId={photo.profileId} imageUrl={photo.imageUrl} initialCount={photo.likeCount ?? 0} initialLiked={photo.likedByMe ?? false} className="absolute right-3 top-3 z-10" />
-              </article>;
-            })}
-            {nextPhoto && <button type="button" onClick={() => goTo(activeIndex + 1)} aria-label={`Nächstes Foto: ${nextPhoto.caption || nextPhoto.author}`} className="group relative hidden min-w-0 overflow-hidden rounded-2xl bg-bg-elevated text-left md:col-start-2 md:row-start-1 md:block">
-              {!failedImages.has(nextPhoto.imageUrl) ? <Image src={nextPhoto.imageUrl} alt="" fill sizes="(max-width:1023px) 0px, 22vw" onError={() => markImageFailed(nextPhoto.imageUrl)} className="object-cover opacity-70 transition-opacity duration-500 group-hover:opacity-90" /> : <span className="absolute inset-0 bg-bg-elevated" />}
-              <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/5 to-black/10" />
-              <span className="absolute bottom-4 left-4 right-4 line-clamp-2 text-sm font-medium text-white">Als Nächstes · {nextPhoto.author}</span>
-            </button>}
-          </div>
-          {photos.length > 1 && <div className="mt-3 flex items-center justify-between gap-3" aria-label="Slideshow-Steuerung">
-            <div className="flex items-center gap-2">
-              <button type="button" onClick={() => goTo(activeIndex - 1)} aria-label="Vorheriges Foto" className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-text-primary transition-colors hover:border-gold hover:text-gold"><ChevronLeft size={20} /></button>
-              <button type="button" onClick={() => goTo(activeIndex + 1)} aria-label="Nächstes Foto" className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-text-primary transition-colors hover:border-gold hover:text-gold"><ChevronRight size={20} /></button>
-              <button type="button" onClick={() => setPlaying((value) => !value)} aria-label={playing ? "Diashow pausieren" : "Diashow starten"} aria-pressed={playing} className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-text-primary transition-colors hover:border-gold hover:text-gold">{playing ? <Pause size={17} /> : <Play size={17} />}</button>
-            </div>
-            <div className="flex min-w-0 items-center gap-3" aria-live="polite" aria-atomic="true">
-              <div className="flex items-center gap-1" aria-hidden="true">{photos.map((photo, index) => <span key={`${photo.imageUrl}-position`} className={`h-1.5 rounded-full transition-all ${index === activeIndex ? "w-6 bg-gold" : "w-1.5 bg-border"}`} />)}</div>
-              <span className="text-xs tabular-nums text-text-muted">{activeIndex + 1} / {photos.length}</span>
-            </div>
-            {reducedMotion && <span className="sr-only">Automatische Wiedergabe ist wegen der Einstellung für reduzierte Bewegung ausgeschaltet.</span>}
+          {staticGallery ? <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {photos.map((photo, index) => <PhotoBandCard key={`${photo.profileId}:${photo.imageUrl}`} photo={photo} isRatedSelection={isRatedSelection} failed={failedImages.has(photo.imageUrl)} onImageError={markImageFailed} priority={index === 0} onPhotoOpen={markHomePhotoOpen} />)}
+          </div> : <div ref={trackRef} className="home-photo-band-track" data-paused={!shouldRun} style={trackStyle}>
+            {[0, 1].map((copy) => <div key={`photo-band-copy-${copy}`} ref={copy === 0 ? groupRef : undefined} className="home-photo-band-group" aria-hidden={copy === 1 || undefined} inert={copy === 1 || undefined}>
+              {loopPhotos.slice(copy * photos.length, (copy + 1) * photos.length).map((photo, index) => <PhotoBandCard key={`${copy}:${photo.profileId}:${photo.imageUrl}`} photo={photo} isRatedSelection={isRatedSelection} failed={failedImages.has(photo.imageUrl)} onImageError={markImageFailed} decorative={copy === 1} priority={copy === 0 && index === 0} onPhotoOpen={markHomePhotoOpen} />)}
+            </div>)}
           </div>}
+          {!staticGallery && <span className="sr-only" aria-live="polite">{userPaused ? "Fotoband pausiert." : "Fotoband läuft automatisch von rechts nach links."}</span>}
+          {reducedMotion && <span className="sr-only">Wegen der Einstellung für reduzierte Bewegung wird eine statische Galerie angezeigt.</span>}
         </div> : <div className="rounded-xl border border-border bg-bg-secondary px-4 py-8 text-center text-sm text-text-muted">Noch keine öffentlichen Portfoliofotos zum Entdecken vorhanden.</div>}
       </div>
     </section>

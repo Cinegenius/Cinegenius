@@ -33,6 +33,15 @@ export function orderPhotosByAuthor(photos: readonly PublicProfilePhoto[]): Publ
   return ordered;
 }
 
+/** Repeats a stable sequence for a seamless visual loop; UI clones stay decorative. */
+export function repeatForSeamlessLoop<T>(items: readonly T[]): T[] {
+  return [...items, ...items];
+}
+
+export function shouldAnimatePhotoBand(photoCount: number, prefersReducedMotion: boolean): boolean {
+  return photoCount > 1 && !prefersReducedMotion;
+}
+
 const APPROVED_GALLERY_TYPES = new Set(["fullbody", "editorial", "polaroid", "bts", "portfolio", "set_photo", "product"]);
 
 function isUploadedPublicImage(url: unknown): url is string {
