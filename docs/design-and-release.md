@@ -28,6 +28,7 @@ For visual review, capture `/projects`, `/locations`, `/props`, `/creators`, `/c
 ## Production source and release
 
 - Canonical Git source: `origin/main` in the CineGenius repository.
+- Use GitHub Desktop for Git operations that create or publish repository history: stage, commit, push, pull, and resolve synchronization. Do not create commits or push from the terminal. Make code edits in the project normally; after pushing through GitHub Desktop, confirm the working tree is clean and local `main` exactly matches `origin/main` before using the guarded release command.
 - The production Vercel project is linked locally through the ignored `.vercel/project.json`. Check the linked project and production alias in the Vercel dashboard before a release; keep those account-specific identifiers out of the public repository.
 
 ## Authentication redirects
