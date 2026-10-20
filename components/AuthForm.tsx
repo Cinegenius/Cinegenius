@@ -3,8 +3,8 @@
 import { useAuth, useSignIn, useSignUp } from "@clerk/nextjs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useMemo, useState } from "react";
-import { getMfaResendChannel, getPasswordSignInAction, selectSecondFactor } from "@/lib/sign-in-flow";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { getMfaResendChannel, getPasswordSignInAction, selectSecondFactor, shouldFallbackAfterFinalize, shouldRedirectForActiveSession } from "@/lib/sign-in-flow";
 
 type AuthMode = "sign-in" | "sign-up";
 type SignInStep = "credentials" | "email-code" | "mfa" | "reset-code" | "new-password";
@@ -49,13 +49,13 @@ function finishNavigation(destination: string, decorateUrl: (url: string) => str
   try {
     const target = new URL(url, window.location.origin);
     if (target.origin === window.location.origin) {
-      window.location.assign(`${target.pathname}${target.search}${target.hash}`);
+      window.location.replace(`${target.pathname}${target.search}${target.hash}`);
       return;
     }
   } catch {
     // Use the already validated same-origin destination below.
   }
-  window.location.assign(destination);
+  window.location.replace(destination);
 }
 
 export default function AuthForm({ mode, destination, signUpDestination }: AuthFormProps) {
@@ -66,8 +66,7 @@ export default function AuthForm({ mode, destination, signUpDestination }: AuthF
 
 function SignInForm({ destination, signUpDestination }: { destination: string; signUpDestination: string }) {
   const { signIn, errors, fetchStatus } = useSignIn();
-  const { isSignedIn } = useAuth();
-  const router = useRouter();
+  const { isLoaded, isSignedIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
@@ -76,19 +75,58 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
   const [factor, setFactor] = useState<"email_code" | "phone_code" | "totp" | "backup_code" | null>(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const busy = fetchStatus === "fetching";
+  const [submitting, setSubmitting] = useState(false);
+  const submissionInFlight = useRef(false);
+  const signInAttemptStarted = useRef(false);
+  const navigationStarted = useRef(false);
+  const busy = fetchStatus === "fetching" || submitting;
+
+  const navigateOnce = useCallback((url: string) => {
+    if (navigationStarted.current) return;
+    navigationStarted.current = true;
+    finishNavigation(url, (value) => value);
+  }, []);
+
+  const beginSubmission = () => {
+    if (!signIn || busy || submissionInFlight.current) return false;
+    submissionInFlight.current = true;
+    setSubmitting(true);
+    return true;
+  };
+
+  const finishSubmission = () => {
+    submissionInFlight.current = false;
+    setSubmitting(false);
+  };
 
   useEffect(() => {
-    if (isSignedIn) router.replace(destination);
-  }, [destination, isSignedIn, router]);
+    // If Clerk has activated a session but a later finalize step reports an
+    // error, let the active session win and recover to the destination.
+    if (shouldRedirectForActiveSession(isLoaded, !!isSignedIn, signInAttemptStarted.current && !error)) {
+      navigateOnce(destination);
+    }
+  }, [destination, error, isLoaded, isSignedIn, navigateOnce]);
 
   const completeSignIn = async () => {
+    let navigationCallbackCalled = false;
     const result = await runAuthAction(
-      () => signIn.finalize({ navigate: ({ decorateUrl }) => finishNavigation(destination, decorateUrl) }),
+      () => signIn.finalize({ navigate: ({ decorateUrl }) => {
+        navigationCallbackCalled = true;
+        navigateOnce(decorateUrl(destination));
+      } }),
       setError,
       "Anmeldung konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
     );
-    if (result?.error) setError(readableAuthError(result.error, "Anmeldung konnte nicht abgeschlossen werden. Bitte versuche es erneut."));
+    if (!result) {
+      signInAttemptStarted.current = false;
+      return;
+    }
+    if (result.error) {
+      setError(readableAuthError(result.error, "Anmeldung konnte nicht abgeschlossen werden. Bitte versuche es erneut."));
+      signInAttemptStarted.current = false;
+      return;
+    }
+    if (shouldFallbackAfterFinalize(false, navigationCallbackCalled)) navigateOnce(destination);
   };
 
   const prepareSecondFactor = async () => {
@@ -139,64 +177,83 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
 
   const submitPassword = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!signIn || busy) return;
+    if (!beginSubmission()) return;
+    signInAttemptStarted.current = true;
     setError("");
     setMessage("");
-    if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
-      setError("Gib eine gültige E-Mail-Adresse ein.");
-      return;
+    try {
+      if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
+        signInAttemptStarted.current = false;
+        setError("Gib eine gültige E-Mail-Adresse ein.");
+        return;
+      }
+      const result = await runAuthAction(() => signIn.password({ emailAddress: email.trim(), password }), setError, "Anmeldung fehlgeschlagen. Bitte prüfe deine Angaben.");
+      if (!result || result.error) {
+        signInAttemptStarted.current = false;
+        if (result?.error) setError(readableAuthError(result.error, "Anmeldung fehlgeschlagen. Bitte prüfe deine Angaben."));
+        return;
+      }
+      const nextAction = getPasswordSignInAction(signIn.status);
+      if (nextAction === "complete") await completeSignIn();
+      else if (nextAction === "mfa") await prepareSecondFactor();
+      else {
+        signInAttemptStarted.current = false;
+        setError("Die Passwortanmeldung wurde nicht abgeschlossen. Prüfe deine Angaben oder wähle ausdrücklich „Mit E-Mail-Code anmelden“.");
+      }
+    } finally {
+      finishSubmission();
     }
-    const result = await runAuthAction(() => signIn.password({ emailAddress: email.trim(), password }), setError, "Anmeldung fehlgeschlagen. Bitte prüfe deine Angaben.");
-    if (!result || result.error) {
-      if (!result) return;
-      setError(readableAuthError(result.error, "Anmeldung fehlgeschlagen. Bitte prüfe deine Angaben."));
-      return;
-    }
-    const nextAction = getPasswordSignInAction(signIn.status);
-    if (nextAction === "complete") await completeSignIn();
-    else if (nextAction === "mfa") await prepareSecondFactor();
-    else setError("Die Passwortanmeldung wurde nicht abgeschlossen. Prüfe deine Angaben oder wähle ausdrücklich „Mit E-Mail-Code anmelden“.");
   };
 
   const sendEmailCode = async () => {
-    if (!signIn || busy || !email.trim()) return;
+    if (!email.trim() || !beginSubmission()) return;
+    signInAttemptStarted.current = true;
     setError("");
     setMessage("");
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
+      signInAttemptStarted.current = false;
       setError("Gib eine gültige E-Mail-Adresse ein.");
+      finishSubmission();
       return;
     }
-    const result = await runAuthAction(() => signIn.emailCode.sendCode({ emailAddress: email.trim() }), setError, "Der Anmeldecode konnte nicht gesendet werden.");
-    if (!result || result.error) {
-      if (!result) return;
-      setError(readableAuthError(result.error, "Der Anmeldecode konnte nicht gesendet werden."));
-    }
-    else {
-      setStep("email-code");
-      setCode("");
-      setMessage("Wir haben einen Anmeldecode an deine E-Mail-Adresse gesendet.");
+    try {
+      const result = await runAuthAction(() => signIn.emailCode.sendCode({ emailAddress: email.trim() }), setError, "Der Anmeldecode konnte nicht gesendet werden.");
+      if (!result || result.error) {
+        signInAttemptStarted.current = false;
+        if (result?.error) setError(readableAuthError(result.error, "Der Anmeldecode konnte nicht gesendet werden."));
+      }
+      else {
+        setStep("email-code");
+        setCode("");
+        setMessage("Wir haben einen Anmeldecode an deine E-Mail-Adresse gesendet.");
+      }
+    } finally {
+      finishSubmission();
     }
   };
 
   const submitCode = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!signIn || busy) return;
+    if (!beginSubmission()) return;
     setError("");
     setMessage("");
-    const result = await runAuthAction(async () => step === "mfa"
-      ? factor === "email_code" ? await signIn.mfa.verifyEmailCode({ code: code.trim() })
-        : factor === "phone_code" ? await signIn.mfa.verifyPhoneCode({ code: code.trim() })
-          : factor === "totp" ? await signIn.mfa.verifyTOTP({ code: code.trim() })
-            : await signIn.mfa.verifyBackupCode({ code: code.trim() })
-      : await signIn.emailCode.verifyCode({ code: code.trim() }), setError, "Der Code konnte nicht geprüft werden. Bitte versuche es erneut.");
-    if (!result || result.error) {
-      if (!result) return;
-      setError(readableAuthError(result.error, "Der Code stimmt nicht oder ist abgelaufen. Bitte prüfe ihn und versuche es erneut."));
-      return;
+    try {
+      const result = await runAuthAction(async () => step === "mfa"
+        ? factor === "email_code" ? await signIn.mfa.verifyEmailCode({ code: code.trim() })
+          : factor === "phone_code" ? await signIn.mfa.verifyPhoneCode({ code: code.trim() })
+            : factor === "totp" ? await signIn.mfa.verifyTOTP({ code: code.trim() })
+              : await signIn.mfa.verifyBackupCode({ code: code.trim() })
+        : await signIn.emailCode.verifyCode({ code: code.trim() }), setError, "Der Code konnte nicht geprüft werden. Bitte versuche es erneut.");
+      if (!result || result.error) {
+        if (result?.error) setError(readableAuthError(result.error, "Der Code stimmt nicht oder ist abgelaufen. Bitte prüfe ihn und versuche es erneut."));
+        return;
+      }
+      if (signIn.status === "complete") await completeSignIn();
+      else if (signIn.status === "needs_second_factor" || signIn.status === "needs_client_trust") await prepareSecondFactor();
+      else setError("Die Bestätigung ist noch nicht abgeschlossen. Bitte fordere einen neuen Code an oder starte erneut.");
+    } finally {
+      finishSubmission();
     }
-    if (signIn.status === "complete") await completeSignIn();
-    else if (signIn.status === "needs_second_factor") await prepareSecondFactor();
-    else setError("Die Bestätigung ist noch nicht abgeschlossen. Bitte fordere einen neuen Code an oder starte erneut.");
   };
 
   const startPasswordReset = async () => {

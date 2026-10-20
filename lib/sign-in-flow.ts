@@ -1,5 +1,20 @@
 export type PasswordSignInAction = "complete" | "mfa" | "unsupported";
 
+export function shouldRedirectForActiveSession(
+  isLoaded: boolean,
+  isSignedIn: boolean,
+  signInAttemptStarted: boolean,
+): boolean {
+  return isLoaded && isSignedIn && !signInAttemptStarted;
+}
+
+export function shouldFallbackAfterFinalize(
+  hasError: boolean,
+  navigationCallbackCalled: boolean,
+): boolean {
+  return !hasError && !navigationCallbackCalled;
+}
+
 export function getPasswordSignInAction(status: string | null | undefined): PasswordSignInAction {
   if (status === "complete") return "complete";
   if (status === "needs_second_factor" || status === "needs_client_trust") return "mfa";
