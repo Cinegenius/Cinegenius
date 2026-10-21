@@ -10,10 +10,11 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
-import { departments, deptColors, getDeptLabel, getOccupationSearchTerms, matchesDepartmentOccupation, type Department } from "@/lib/departments";
+import { departments, deptColors, getDeptLabel, getOccupationSearchTerms, type Department } from "@/lib/departments";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 import { rankByRatingConfidence } from "@/lib/rating-ranking";
-import { gripSearchTerms, isGripDepartmentSearch, isGripOccupation, matchesGripOccupation, normalizeOccupation } from "@/lib/gripTaxonomy";
+import { gripSearchTerms, isGripDepartmentSearch, isGripOccupation, normalizeOccupation } from "@/lib/gripTaxonomy";
+import { findOccupiedCreatorRoles, matchesCreatorRole } from "@/lib/creator-role-matching";
 
 const DEPT_ICON: Record<string, LucideIcon> = {
   produktion:    Clapperboard,
@@ -165,43 +166,6 @@ function mixAreaResults(creators: ServerCreator[]): ServerCreator[] {
   }
 
   return mixed;
-}
-
-/** Normalize a role label: strip parentheses, split " / " alternatives */
-function normalizeRole(label: string): string[] {
-  return label
-    .toLowerCase()
-    .replace(/\([^)]+\)/g, " ")
-    .split(" / ")
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
-
-/** Match a creator against a department role label.
- *  Only checks positions + role (not skills) to avoid false positives
- *  from generic skill tags like "Kamera" matching "Kamera CCU Operator". */
-function matchesRole(c: ServerCreator, roleLabel: string): boolean {
-  const needles = normalizeRole(roleLabel);
-
-  // Normalize stored positions/role the same way
-  const haystack = [...getPositions(c), c.role]
-    .flatMap((s) => normalizeRole(s));
-
-  if (haystack.some((stored) => matchesDepartmentOccupation(stored, roleLabel))) return true;
-
-  // Grip titles have regional aliases (for example Dollyfahrer / Dolly Grip).
-  if (haystack.some((stored) => matchesGripOccupation(stored, roleLabel))) return true;
-
-  // A stored value matches if it includes the needle OR the needle includes it
-  // BUT only when both sides are at least 4 chars to avoid "ccu".includes("c") style hits
-  return needles.some((needle) =>
-    haystack.some((s) => {
-      if (s === needle) return true;
-      if (needle.length >= 4 && s.includes(needle)) return true;
-      if (s.length >= 4 && needle.includes(s)) return true;
-      return false;
-    })
-  );
 }
 
 // ─── Filter Dropdown ────────────────────────────────────────────────────────
@@ -536,15 +500,7 @@ function CreatorsInner({
 
   // Which department roles actually have at least one creator
   const occupiedRoles = useMemo(() => {
-    const set = new Set<string>();
-    for (const c of allCreators) {
-      for (const dept of departments) {
-        for (const role of dept.roles) {
-          if (!set.has(role) && matchesRole(c, role)) set.add(role);
-        }
-      }
-    }
-    return set;
+    return findOccupiedCreatorRoles(allCreators);
   }, [allCreators]);
 
   // Only show departments that have at least one occupied role
@@ -600,7 +556,7 @@ function CreatorsInner({
 
     if (selectedRoles.size > 0) {
       result = result.filter((c) =>
-        [...selectedRoles].some((role) => matchesRole(c, role))
+        [...selectedRoles].some((role) => matchesCreatorRole(c, role))
       );
     }
 
@@ -610,7 +566,7 @@ function CreatorsInner({
       result = result.filter((c) => hasProfileType(c, "equipment", "vehicle", "studio", "props"));
     } else if (sidebarDept) {
       const deptRoles = departments.find((d) => d.id === sidebarDept)?.roles ?? [];
-      result = result.filter((c) => deptRoles.some((role) => matchesRole(c, role)));
+      result = result.filter((c) => deptRoles.some((role) => matchesCreatorRole(c, role)));
     }
 
     if (vendorOnly) result = result.filter((c) => c.isVendor === true);
