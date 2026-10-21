@@ -380,11 +380,9 @@ function RolePanel({
 
 function CreatorsInner({
   serverCreators,
-  hasStrip,
   initialFilters,
 }: {
   serverCreators: ServerCreator[];
-  hasStrip?: boolean;
   initialFilters: { query: string; city: string; sort: string };
 }) {
   const tc = useTranslations("common");
@@ -514,7 +512,8 @@ function CreatorsInner({
   const toggleRole = (role: string) =>
     setSelectedRoles((prev) => {
       const next = new Set(prev);
-      next.has(role) ? next.delete(role) : next.add(role);
+      if (next.has(role)) next.delete(role);
+      else next.add(role);
       return next;
     });
 
@@ -637,22 +636,6 @@ function CreatorsInner({
   );
 
   // ── Mobile promoted role shortcuts ────────────────────────────────────
-  const ROLE_SHORTCUTS: { label: string; role: string }[] = [
-    { label: "DP / Kamera",  role: "Director of Photography (DoP)" },
-    { label: "Regisseur",    role: "Regisseur"                     },
-    { label: "Schauspieler/in", role: "Schauspieler"                },
-    { label: "Fotograf",     role: "Fotograf/in"                   },
-    { label: "Creator",      role: "Content Creator"               },
-    { label: "Gaffer",       role: "Gaffer (Oberbeleuchter)"       },
-    { label: "Key Grip",     role: "Key Grip"                      },
-    { label: "Dolly Grip",   role: "Dolly Grip / Dollyfahrer*in"   },
-    { label: "Ton",          role: "Production Sound Mixer"        },
-    { label: "Producer",     role: "Producer"                      },
-    { label: "Model",        role: "Model"                         },
-    { label: "Editor",       role: "Editor (Schnitt)"              },
-  ];
-  const mobilePromotedRoles = ROLE_SHORTCUTS.filter((s) => occupiedRoles.has(s.role));
-
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const secondaryFilterCount = [
@@ -1559,12 +1542,10 @@ function CreatorsInner({
 
 export default function CreatorsContent({
   serverCreators,
-  hasStrip,
   initialFilters,
 }: {
   serverCreators: ServerCreator[];
-  hasStrip?: boolean;
   initialFilters: { query: string; city: string; sort: string };
 }) {
-  return <CreatorsInner serverCreators={serverCreators} hasStrip={hasStrip} initialFilters={initialFilters} />;
+  return <CreatorsInner serverCreators={serverCreators} initialFilters={initialFilters} />;
 }

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, CheckCircle, Upload, Calendar, DollarSign, FileText, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle, Upload, Calendar, FileText, Sparkles } from "lucide-react";
 import { useToast } from "@/contexts/ToastContext";
 
 const steps = ["Brief", "Zeitplan & Budget", "Referenzen", "Prüfen & Einreichen"];

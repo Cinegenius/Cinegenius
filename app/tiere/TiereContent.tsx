@@ -1,5 +1,7 @@
 "use client";
 
+import UnoptimizedImage from "@/components/UnoptimizedImage";
+
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Search, PawPrint, X, Truck, MapPin, Users, Heart, ChevronDown } from "lucide-react";
@@ -104,14 +106,24 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
     e.preventDefault(); e.stopPropagation();
     if (!isSignedIn) return;
     const wasFav = favorites.has(listingId);
-    setFavorites(prev => { const next = new Set(prev); wasFav ? next.delete(listingId) : next.add(listingId); return next; });
+    setFavorites((prev) => {
+      const next = new Set(prev);
+      if (wasFav) next.delete(listingId);
+      else next.add(listingId);
+      return next;
+    });
     try {
       await fetch("/api/favorites", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ listing_id: listingId }),
       });
     } catch {
-      setFavorites(prev => { const next = new Set(prev); wasFav ? next.add(listingId) : next.delete(listingId); return next; });
+      setFavorites((prev) => {
+        const next = new Set(prev);
+        if (wasFav) next.add(listingId);
+        else next.delete(listingId);
+        return next;
+      });
     }
   };
 
@@ -219,7 +231,7 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
               className="group bg-bg-secondary border border-border rounded-2xl overflow-hidden hover:border-gold/40 transition-all hover:shadow-lg hover:shadow-gold/5">
               <div className="relative h-48 overflow-hidden bg-bg-elevated">
                 {animal.image ? (
-                  <img
+                  <UnoptimizedImage
                     src={animal.image}
                     alt={animal.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

@@ -239,31 +239,11 @@ export default function AdminPage() {
     }
   };
 
-  const handleDeleteListing = async (listingId: string) => {
-    if (!confirm("Inserat wirklich löschen?")) return;
-    setListingActing(listingId);
-    try {
-      await fetch("/api/admin/listings", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ listingId }),
-      });
-      setListings((prev) => prev.filter((l) => l.id !== listingId));
-    } finally {
-      setListingActing(null);
-    }
-  };
-
   const typeLabel: Record<string, string> = {
     location: "Location", prop: "Requisite", vehicle: "Fahrzeug", job: "Job", creator: "Crew",
   };
 
   const previewCalc = calculateCommission(previewAmount, tiers);
-
-  const handleSaveCommission = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  };
 
   return (
     <div className="pt-16 min-h-screen flex">

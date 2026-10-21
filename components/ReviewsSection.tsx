@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Star, MessageSquare, ShieldCheck } from "lucide-react";
+import { Star, ShieldCheck } from "lucide-react";
 import ReviewForm from "@/components/ReviewForm";
 import { useUser } from "@clerk/nextjs";
 

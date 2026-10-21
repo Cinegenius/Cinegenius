@@ -21,9 +21,9 @@ export default function AgbPage() {
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-2">§ 1 Geltungsbereich</h2>
             <p className="text-sm leading-relaxed">
-              Diese Allgemeinen Geschäftsbedingungen (nachfolgend „AGB") gelten für die Nutzung der
+              Diese Allgemeinen Geschäftsbedingungen (nachfolgend „AGB“) gelten für die Nutzung der
               Online-Plattform CineGenius unter der Domain cinegenius.co, betrieben von Markus Müller,
-              Plinganserstr. 19, 81369 München (nachfolgend „Betreiber"). Mit der Registrierung oder
+              Plinganserstr. 19, 81369 München (nachfolgend „Betreiber“). Mit der Registrierung oder
               der erstmaligen Nutzung der Plattform erkennst du diese AGB in ihrer jeweils gültigen
               Fassung an. Abweichende Bedingungen der Nutzer gelten nicht, es sei denn, der Betreiber
               stimmt ihrer Geltung ausdrücklich schriftlich zu.

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useCallback } from "react";
-import { Check, X, Move } from "lucide-react";
+import { Check, X } from "lucide-react";
 
 export interface FocalPoint { x: number; y: number; opacity?: number }
 

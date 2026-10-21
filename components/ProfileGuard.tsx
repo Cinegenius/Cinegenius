@@ -45,7 +45,7 @@ export default function ProfileGuard({ children }: { children: React.ReactNode }
         const redirect = window.location.pathname + window.location.search;
         router.replace(`/profile-setup?redirect=${encodeURIComponent(redirect)}`);
       });
-  }, [isLoaded, user, router]);
+  }, [isLoaded, user, router, openSignIn]);
 
   if (!isLoaded || !ready) {
     return (

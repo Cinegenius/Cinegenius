@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef, useCallback, Suspense } from "react";
+import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import dynamicImport from "next/dynamic";
@@ -9,8 +9,8 @@ import { useUser, useAuth } from "@clerk/nextjs";
 import { Heart } from "lucide-react";
 
 import {
-  MapPin, Star, CheckCircle, Search, Zap, LayoutList,
-  Map, Navigation, SlidersHorizontal, X, Share2, Film, Users,
+  MapPin, CheckCircle, Search, Zap, LayoutList,
+  Map, Navigation, SlidersHorizontal, X, Share2, Film,
 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { useTranslations } from "next-intl";
@@ -49,8 +49,6 @@ type Location = {
   ownerId?: string;
 };
 
-type RatingData = { avg: number; count: number } | undefined;
-
 function parseLocationMeta(desc: string): { lage?: string; hasPower: boolean } {
   const metaLine = desc.split("\n\n")[0] ?? desc;
   const lage = metaLine.match(/Lage: ([^·\n]+)/)?.[1]?.trim();
@@ -72,47 +70,7 @@ function getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number) {
 
 type ViewMode = "split" | "list" | "map";
 
-type VendorProfile = { id: string; name: string; location: string; avatar: string; verified: boolean };
-
-function VendorSection({ vendors }: { vendors: VendorProfile[] }) {
-  const t = useTranslations("locations");
-  if (!vendors.length) return null;
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-10">
-      <div className="pt-8 border-t border-border/50">
-        <div className="flex items-center gap-2 mb-4">
-          <Users size={13} className="text-gold/60" />
-          <span className="text-[11px] font-bold uppercase tracking-widest text-text-secondary">{t("vendorSection")}</span>
-          <span className="text-[11px] text-text-muted">· {vendors.length}</span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {vendors.map((v) => (
-            <Link key={v.id} href={`/profile/${v.id}`}
-              className="group inline-flex items-center gap-2.5 px-3 py-2 rounded-xl border border-border/50 bg-bg-elevated/40 hover:border-gold/40 hover:bg-bg-elevated transition-all duration-200">
-              {v.avatar ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={v.avatar} alt={v.name} loading="lazy" className="w-8 h-8 rounded-full object-cover border border-border/40 shrink-0" />
-              ) : (
-                <div className="w-8 h-8 rounded-full bg-bg-secondary border border-border/40 flex items-center justify-center text-text-muted text-sm font-bold shrink-0">
-                  {v.name[0]}
-                </div>
-              )}
-              <div className="min-w-0">
-                <div className="flex items-center gap-1">
-                  <p className="text-sm font-semibold text-text-primary whitespace-nowrap group-hover:text-gold transition-colors">{v.name}</p>
-                  {v.verified && <CheckCircle size={11} className="text-gold/60 shrink-0" />}
-                </div>
-                {v.location && <p className="text-[11px] text-text-muted whitespace-nowrap">{v.location.split(",")[0]}</p>}
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListings: Location[]; vendorProfiles?: VendorProfile[] }) {
+function LocationsInner({ serverListings }: { serverListings: Location[] }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -154,7 +112,12 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
     e.preventDefault(); e.stopPropagation();
     if (!isSignedIn) return;
     const wasFav = favorites.has(listingId);
-    setFavorites(prev => { const next = new Set(prev); wasFav ? next.delete(listingId) : next.add(listingId); return next; });
+    setFavorites((prev) => {
+      const next = new Set(prev);
+      if (wasFav) next.delete(listingId);
+      else next.add(listingId);
+      return next;
+    });
     try {
       await fetch("/api/favorites", {
         method: "POST",
@@ -162,7 +125,12 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
         body: JSON.stringify({ listing_id: listingId }),
       });
     } catch {
-      setFavorites(prev => { const next = new Set(prev); wasFav ? next.add(listingId) : next.delete(listingId); return next; });
+      setFavorites((prev) => {
+        const next = new Set(prev);
+        if (wasFav) next.add(listingId);
+        else next.delete(listingId);
+        return next;
+      });
     }
   };
 
@@ -204,7 +172,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
   const [locating, setLocating] = useState(false);
   const [locationError, setLocationError] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [pagination, setPagination] = useState({ filterKey: "", visibleCount: PAGE_SIZE });
   const listRef = useRef<HTMLDivElement>(null);
 
   const handleCopyLink = () => {
@@ -212,22 +180,6 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
-  const updateURL = useCallback((overrides: Record<string, string> = {}) => {
-    const params = new URLSearchParams();
-    const current = { q: query, type: activeType, instant: instantOnly ? "1" : "", verified: verifiedOnly ? "1" : "", min: minPrice, max: maxPrice, sort: sortKey, lage: lageFilter, power: powerOnly ? "1" : "", ...overrides };
-    if (current.q) params.set("q", current.q);
-    if (current.type && current.type !== "All Types") params.set("type", current.type);
-    if (current.instant === "1") params.set("instant", "1");
-    if (current.verified === "1") params.set("verified", "1");
-    if (current.min) params.set("min", current.min);
-    if (current.max) params.set("max", current.max);
-    if (current.sort && current.sort !== "featured") params.set("sort", current.sort);
-    const qs = params.toString();
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  }, [query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, sortKey, router]);
-
-  void updateURL;
 
   const filtered = useMemo(() => {
     let result = [...allLocations];
@@ -279,7 +231,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
     if (sortKey === "rating") result.sort((a, b) => b.rating - a.rating);
 
     return result;
-  }, [serverListings, query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, sortKey, userLocation, radiusKm]);
+  }, [allLocations, query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, userLocation, radiusKm]);
 
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
@@ -311,7 +263,9 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
     el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [activeId]);
 
-  useEffect(() => { setVisibleCount(PAGE_SIZE); }, [filtered]);
+  const filterKey = JSON.stringify([query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, userLocation, radiusKm]);
+  const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
+  const showMore = () => setPagination({ filterKey, visibleCount: visibleCount + PAGE_SIZE });
 
   const resetFilters = () => {
     setQuery(""); setActiveType("All Types");
@@ -340,7 +294,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
       router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     }, 300);
     return () => clearTimeout(timer);
-  }, [query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, router]);
+  }, [query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, router, pathname]);
 
   const hasActiveFilters = query || activeType !== "All Types" || instantOnly || verifiedOnly || minPrice || maxPrice || userLocation || lageFilter !== "Alle" || powerOnly;
   const mobileChips: BrowseChip[] = [
@@ -752,7 +706,7 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
             {visibleCount < filtered.length && (
               <div className="p-4 text-center">
                 <button
-                  onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}
+                  onClick={showMore}
                   className="px-6 py-2.5 bg-bg-secondary border border-border rounded-lg text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors"
                 >
                   {t("loadMore", { count: filtered.length - visibleCount })}
@@ -779,10 +733,10 @@ function LocationsInner({ serverListings, vendorProfiles = [] }: { serverListing
   );
 }
 
-export default function LocationsContent({ serverListings, vendorProfiles = [] }: { serverListings: Location[]; vendorProfiles?: VendorProfile[] }) {
+export default function LocationsContent({ serverListings }: { serverListings: Location[] }) {
   return (
     <Suspense fallback={<div className="pt-16 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" /></div>}>
-      <LocationsInner serverListings={serverListings} vendorProfiles={vendorProfiles} />
+      <LocationsInner serverListings={serverListings} />
     </Suspense>
   );
 }

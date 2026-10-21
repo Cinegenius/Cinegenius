@@ -214,7 +214,7 @@ export default function NotificationsPage() {
       .then(r => r.json())
       .then(({ incoming }) => setFriendRequests(incoming ?? []))
       .catch(() => {});
-  }, [fetchNotifications]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [fetchNotifications]);
 
   const handleFriendRequest = async (friendshipId: string, action: "accepted" | "rejected") => {
     setProcessingIds(prev => new Set(prev).add(friendshipId));

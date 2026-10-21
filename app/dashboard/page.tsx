@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import UnoptimizedImage from "@/components/UnoptimizedImage";
+
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -84,7 +86,6 @@ const navItems = [
 export default function DashboardPage() {
   const searchParams = useSearchParams();
   const isWelcome = searchParams.get("welcome") === "1";
-  const [welcomeDismissed, setWelcomeDismissed] = useState(false);
 
   const VALID_TABS = ["overview","listings","jobs","favorites","messages","bookings","earnings","transactions","friends","firma","settings","analytics"];
   const tabParam = searchParams.get("tab") ?? "";
@@ -369,7 +370,7 @@ export default function DashboardPage() {
       .then(({ favorites: data }) => setFavorites(data ?? []))
       .catch(() => {})
       .finally(() => setFavoritesLoading(false));
-  }, [activeTab]);
+  }, [activeTab, favorites.length]);
 
   const removeFavorite = async (fav: Favorite) => {
     setRemovingFav(fav.listing_id);
@@ -422,7 +423,6 @@ export default function DashboardPage() {
   useEffect(() => {
     if (activeTab !== "friends") return;
     doLoadFriends(true);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   const acceptFriend = async (id: string) => {
@@ -758,7 +758,7 @@ export default function DashboardPage() {
             return (
               <div className="flex items-center gap-3 mb-3">
                 {avatarSrc ? (
-                  <img src={avatarSrc} alt="" className="w-12 h-12 rounded-full object-cover border-2 border-border shrink-0" />
+                  <UnoptimizedImage src={avatarSrc} alt="" className="w-12 h-12 rounded-full object-cover border-2 border-border shrink-0" />
                 ) : (
                   <div className="w-12 h-12 rounded-full bg-gold/20 border-2 border-gold/30 flex items-center justify-center shrink-0">
                     <span className="text-gold font-bold text-base">{initial}</span>
@@ -1122,7 +1122,7 @@ export default function DashboardPage() {
                         {/* Bild */}
                         <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-bg-elevated border border-border">
                           {l.image_url ? (
-                            <img src={l.image_url} alt={l.title} className="w-full h-full object-cover" />
+                            <UnoptimizedImage src={l.image_url} alt={l.title} className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-2xl">
                               {l.type === "location" ? "📍" : l.type === "vehicle" ? "🚗" : l.type === "job" ? "💼" : l.type === "creator" ? "🎬" : "📦"}
@@ -1207,7 +1207,7 @@ export default function DashboardPage() {
                           <div className="relative shrink-0">
                             <div className="w-9 h-9 rounded-full bg-gold/15 border border-gold/20 flex items-center justify-center overflow-hidden">
                               {conv.otherAvatar
-                                ? <img src={conv.otherAvatar} alt="" className="w-full h-full object-cover" />
+                                ? <UnoptimizedImage src={conv.otherAvatar} alt="" className="w-full h-full object-cover" />
                                 : <User size={15} className="text-gold" />}
                             </div>
                             {hasUnread && (
@@ -1265,7 +1265,7 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 hover:bg-bg-elevated transition-all">
                     <div className="w-12 h-12 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shrink-0 overflow-hidden">
                       {myCompany.logo_url
-                        ? <img src={myCompany.logo_url} alt={myCompany.name} className="w-full h-full object-contain p-1" />
+                        ? <UnoptimizedImage src={myCompany.logo_url} alt={myCompany.name} className="w-full h-full object-contain p-1" />
                         : <Building2 size={20} className="text-text-muted opacity-40" />}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -1328,7 +1328,7 @@ export default function DashboardPage() {
                   <div className="flex items-start gap-5 p-6 rounded-2xl border border-border bg-bg-secondary">
                     <div className="shrink-0">
                       {avatarSrc ? (
-                        <img src={avatarSrc} alt="" className="w-16 h-16 rounded-full object-cover border-2 border-gold/30" />
+                        <UnoptimizedImage src={avatarSrc} alt="" className="w-16 h-16 rounded-full object-cover border-2 border-gold/30" />
                       ) : (
                         <div className="w-16 h-16 rounded-full bg-gold/20 border-2 border-gold/30 flex items-center justify-center">
                           <span className="text-gold font-bold text-xl">{displayName[0]?.toUpperCase() ?? "?"}</span>
@@ -1487,7 +1487,7 @@ export default function DashboardPage() {
                   <div className="flex items-start gap-5 p-6 rounded-2xl border border-border bg-bg-secondary">
                     <div className="w-16 h-16 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shrink-0 overflow-hidden">
                       {myCompany.logo_url
-                        ? <img src={myCompany.logo_url} alt={myCompany.name} className="w-full h-full object-contain p-1.5" />
+                        ? <UnoptimizedImage src={myCompany.logo_url} alt={myCompany.name} className="w-full h-full object-contain p-1.5" />
                         : <Building2 size={24} className="text-text-muted opacity-40" />}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -1651,7 +1651,7 @@ export default function DashboardPage() {
                     <div key={a.id} className="p-5 space-y-3">
                       <div className="flex items-start gap-3">
                         {a.applicant_avatar ? (
-                          <img src={a.applicant_avatar} alt="" className="w-9 h-9 rounded-full object-cover border border-border shrink-0" />
+                          <UnoptimizedImage src={a.applicant_avatar} alt="" className="w-9 h-9 rounded-full object-cover border border-border shrink-0" />
                         ) : (
                           <div className="w-9 h-9 rounded-full bg-bg-elevated border border-border flex items-center justify-center shrink-0">
                             <span className="text-xs font-bold text-text-muted">{a.applicant_name[0]?.toUpperCase()}</span>
@@ -1742,7 +1742,7 @@ export default function DashboardPage() {
                 <div className={`flex items-center gap-4 p-5 rounded-xl border bg-bg-secondary transition-colors ${editingId === l.id ? "border-gold/30" : "border-border hover:bg-bg-elevated"}`}>
                   <div className="w-14 h-14 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0 overflow-hidden text-2xl">
                     {l.image_url
-                      ? <img src={l.image_url} alt={l.title} className="w-full h-full object-cover" />
+                      ? <UnoptimizedImage src={l.image_url} alt={l.title} className="w-full h-full object-cover" />
                       : (l.type === "location" ? "📍" : l.type === "vehicle" ? "🚗" : l.type === "job" ? "💼" : l.type === "creator" ? "🎬" : "📦")
                     }
                   </div>
@@ -1807,7 +1807,7 @@ export default function DashboardPage() {
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">Bild</label>
                       <div className="flex items-center gap-3">
                         {editForm.image_url && (
-                          <img src={editForm.image_url} alt="" className="w-16 h-16 rounded-lg object-cover border border-border shrink-0" />
+                          <UnoptimizedImage src={editForm.image_url} alt="" className="w-16 h-16 rounded-lg object-cover border border-border shrink-0" />
                         )}
                         <label className={`flex items-center gap-2 px-3 py-2 border border-border rounded-lg text-xs text-text-secondary hover:border-gold hover:text-gold transition-colors cursor-pointer ${editUploading ? "opacity-50 pointer-events-none" : ""}`}>
                           {editUploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
@@ -1923,7 +1923,7 @@ export default function DashboardPage() {
                         <div className="relative shrink-0">
                           <div className="w-9 h-9 rounded-full bg-gold/20 border border-gold/30 flex items-center justify-center overflow-hidden">
                             {conv.otherAvatar
-                              ? <img src={conv.otherAvatar} alt="" className="w-full h-full object-cover" />
+                              ? <UnoptimizedImage src={conv.otherAvatar} alt="" className="w-full h-full object-cover" />
                               : <User size={16} className="text-gold" />}
                           </div>
                           {hasUnread && (
@@ -2541,7 +2541,7 @@ export default function DashboardPage() {
               <div className="flex items-start gap-5 p-6 rounded-2xl border-2 border-gold/30 bg-gold-subtle">
                 <div className="shrink-0">
                   {avatarSrc ? (
-                    <img src={avatarSrc} alt="" className="w-14 h-14 rounded-full object-cover border-2 border-gold/30" />
+                    <UnoptimizedImage src={avatarSrc} alt="" className="w-14 h-14 rounded-full object-cover border-2 border-gold/30" />
                   ) : (
                     <div className="w-14 h-14 rounded-full bg-gold/20 border-2 border-gold/30 flex items-center justify-center">
                       <span className="text-gold font-bold text-lg">{displayName[0]?.toUpperCase() ?? "?"}</span>
@@ -2800,7 +2800,7 @@ export default function DashboardPage() {
                         <div key={f.friendship_id} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary">
                           <div className="shrink-0">
                             {f.avatar_url ? (
-                              <img src={f.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover border border-border" />
+                              <UnoptimizedImage src={f.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover border border-border" />
                             ) : (
                               <div className="w-11 h-11 rounded-full bg-gold/15 border border-gold/20 flex items-center justify-center">
                                 <span className="text-gold font-bold text-base">{f.display_name[0]?.toUpperCase()}</span>
@@ -2872,7 +2872,7 @@ export default function DashboardPage() {
                                     <div key={f.friendship_id} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 transition-colors">
                                       <div className="shrink-0">
                                         {f.avatar_url ? (
-                                          <img src={f.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover border border-border" />
+                                          <UnoptimizedImage src={f.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover border border-border" />
                                         ) : (
                                           <div className="w-11 h-11 rounded-full bg-gold/15 border border-gold/20 flex items-center justify-center">
                                             <span className="text-gold font-bold text-base">{f.display_name[0]?.toUpperCase()}</span>
@@ -2918,7 +2918,7 @@ export default function DashboardPage() {
                         <div key={f.friendship_id} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary">
                           <div className="shrink-0">
                             {f.avatar_url ? (
-                              <img src={f.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover border border-border" />
+                              <UnoptimizedImage src={f.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover border border-border" />
                             ) : (
                               <div className="w-11 h-11 rounded-full bg-gold/15 border border-gold/20 flex items-center justify-center">
                                 <span className="text-gold font-bold text-base">{f.display_name[0]?.toUpperCase()}</span>
@@ -3002,7 +3002,7 @@ export default function DashboardPage() {
                       <div key={fav.id} className={`flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 transition-all ${isRemoving ? "opacity-50" : ""}`}>
                         <Link href={config.href(fav.listing_id)} className="shrink-0">
                           {fav.listing_image ? (
-                            <img src={fav.listing_image} alt={fav.listing_title ?? ""} className="w-14 h-14 rounded-lg object-cover border border-border hover:opacity-90 transition-opacity" />
+                            <UnoptimizedImage src={fav.listing_image} alt={fav.listing_title ?? ""} className="w-14 h-14 rounded-lg object-cover border border-border hover:opacity-90 transition-opacity" />
                           ) : (
                             <div className="w-14 h-14 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center">
                               <Icon size={20} className={config.color} />

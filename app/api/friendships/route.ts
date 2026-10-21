@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
 
   // Enrich with profile data
   const otherIds = list.map((f) => (f.sender_id === userId ? f.receiver_id : f.sender_id));
-  let profileMap: Record<string, { display_name?: string; avatar_url?: string; role?: string; positions?: string[] }> = {};
+  const profileMap: Record<string, { display_name?: string; avatar_url?: string; role?: string; positions?: string[] }> = {};
 
   if (otherIds.length > 0) {
     const { data: profiles } = await db

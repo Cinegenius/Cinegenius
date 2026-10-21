@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useSyncExternalStore } from "react";
 import { Globe, Check } from "lucide-react";
 
 const LANGUAGES = [
@@ -17,19 +17,21 @@ function getStoredLocale(): string {
   return document.cookie.match(/cg_locale=([^;]+)/)?.[1] ?? "de";
 }
 
+function subscribeToLocale(onChange: () => void) {
+  window.addEventListener("cg-locale-change", onChange);
+  return () => window.removeEventListener("cg-locale-change", onChange);
+}
+
 function setCookieDirect(code: string) {
   document.cookie = `cg_locale=${code}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+  window.dispatchEvent(new Event("cg-locale-change"));
 }
 
 export default function LanguageSwitcher() {
   const [open, setOpen] = useState(false);
-  const [current, setCurrent] = useState("de");
+  const current = useSyncExternalStore(subscribeToLocale, getStoredLocale, () => "de");
   const [loading, setLoading] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setCurrent(getStoredLocale());
-  }, []);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -46,7 +48,6 @@ export default function LanguageSwitcher() {
 
     // Set cookie directly in the browser first — works even without network
     setCookieDirect(code);
-    setCurrent(code);
 
     // Sync to server in the background (best-effort)
     try {

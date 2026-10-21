@@ -103,7 +103,7 @@ export default function DatenschutzPage() {
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">7. Online-Präsenzstatus</h2>
             <p>
-              Wenn du eingeloggt bist, sendet die Plattform alle 30 Sekunden einen anonymen Ping an unsere Server, der deinen Online-Status aktualisiert. Dabei wird ausschließlich deine pseudonymisierte Nutzer-ID sowie ein Zeitstempel gespeichert — keine Inhalte oder Standortdaten. Dieser Status wird anderen Nutzern als „Online"-Indikator angezeigt. Rechtsgrundlage ist das berechtigte Interesse an einer funktionalen Kommunikationsplattform (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO). Der Status wird nach Ablauf der Sitzung automatisch zurückgesetzt.
+              Wenn du eingeloggt bist, sendet die Plattform alle 30 Sekunden einen anonymen Ping an unsere Server, der deinen Online-Status aktualisiert. Dabei wird ausschließlich deine pseudonymisierte Nutzer-ID sowie ein Zeitstempel gespeichert — keine Inhalte oder Standortdaten. Dieser Status wird anderen Nutzern als „Online“-Indikator angezeigt. Rechtsgrundlage ist das berechtigte Interesse an einer funktionalen Kommunikationsplattform (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO). Der Status wird nach Ablauf der Sitzung automatisch zurückgesetzt.
             </p>
           </section>
 

@@ -29,6 +29,8 @@ type DbError = {
   hint?: string;
 };
 
+type BuilderMethod = (this: object, ...args: unknown[]) => unknown;
+
 function logDbError(context: string, error: DbError): void {
   const parts: string[] = [`[db:${context}]`];
   if (error.code)    parts.push(`code=${error.code}`);
@@ -62,7 +64,7 @@ function wrapBuilder<T extends object>(builder: T, context: string): T {
           onFulfilled?: (result: { data: unknown; error: DbError | null }) => unknown,
           onRejected?: (reason: unknown) => unknown
         ) {
-          return (val as Function).call(
+          return (val as BuilderMethod).call(
             target,
             (result: { data: unknown; error: DbError | null }) => {
               if (result?.error) {
@@ -78,7 +80,7 @@ function wrapBuilder<T extends object>(builder: T, context: string): T {
       // ── Pass .catch() and .finally() through ──────────────────────────────
       if (prop === "catch" || prop === "finally") {
         return typeof val === "function"
-          ? (val as Function).bind(target)
+          ? (val as BuilderMethod).bind(target)
           : val;
       }
 
@@ -89,7 +91,7 @@ function wrapBuilder<T extends object>(builder: T, context: string): T {
       if (typeof val !== "function") return val;
 
       return function (...args: unknown[]) {
-        const result = (val as Function).apply(target, args);
+        const result = (val as BuilderMethod).apply(target, args);
         if (
           result != null &&
           typeof result === "object" &&

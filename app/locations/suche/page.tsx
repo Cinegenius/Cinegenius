@@ -61,30 +61,12 @@ export default async function LocationsSuchePage() {
       city: l.city ?? "", price: l.price, priceUnit: "day" as const,
       rating: ratingsMap[l.id]?.rating ?? 0, reviews: ratingsMap[l.id]?.reviews ?? 0,
       image: l.image_url ?? "",
-      tags: l.created_at && (Date.now() - new Date(l.created_at).getTime() < 3 * 24 * 60 * 60 * 1000) ? ["Neu"] : [],
+      tags: l.created_at && (new Date().getTime() - new Date(l.created_at).getTime() < 3 * 24 * 60 * 60 * 1000) ? ["Neu"] : [],
       instantBook: false, verified: false, sqft: 0, capacity: 0, lat, lng,
       focalPoint: ((l.metadata ?? {}) as Record<string, unknown>).focal_point as { x: number; y: number } | null ?? null,
       isReal: true, description: l.description ?? "",
     };
   });
-
-  const { data: vendorData, error: vendorError } = await db
-    .from("profiles")
-    .select("user_id, display_name, location, avatar_url, verified, profile_types")
-    .contains("profile_types", ["location"])
-    .not("display_name", "is", null)
-    .neq("display_name", "")
-    .limit(50);
-
-  if (vendorError) throw new Error("Locationsuche: Anbieterprofile konnten nicht geladen werden.");
-
-  const locationVendors = (vendorData ?? []).map((p: {
-    user_id: string; display_name: string; location: string | null;
-    avatar_url: string | null; verified: boolean | null; profile_types: string[] | null;
-  }) => ({
-    id: p.user_id, name: p.display_name, location: p.location ?? "",
-    avatar: p.avatar_url ?? "", verified: p.verified ?? false,
-  }));
 
   return (
     <div className="min-h-screen bg-bg-primary">
@@ -96,7 +78,7 @@ export default async function LocationsSuchePage() {
         ctaSecondary={{ label: "Zurück zur Übersicht", href: "/locations" }}
       />
       <div className="site-content-width">
-        <LocationsContent serverListings={serverListings} vendorProfiles={locationVendors} />
+        <LocationsContent serverListings={serverListings} />
       </div>
     </div>
   );

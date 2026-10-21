@@ -1,5 +1,7 @@
 "use client";
 
+import UnoptimizedImage from "@/components/UnoptimizedImage";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -93,7 +95,7 @@ export default function ProjectDraftPreviewPage() {
           ) : (
             <div className="p-5 sm:p-8">
               <div className="flex flex-col sm:flex-row gap-6">
-                {poster ? <img src={poster} alt="Projektposter" className="w-36 aspect-[2/3] object-cover rounded-xl border border-border" /> :
+                {poster ? <UnoptimizedImage src={poster} alt="Projektposter" className="w-36 aspect-[2/3] object-cover rounded-xl border border-border" /> :
                   <div className="w-36 aspect-[2/3] rounded-xl border border-border bg-bg-elevated flex items-center justify-center text-text-muted"><Clapperboard size={32} /></div>}
                 <div className="min-w-0 flex-1">
                   <h1 className="font-display text-3xl text-text-primary mb-3">{title}</h1>

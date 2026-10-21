@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
 
     // Fetch profiles for all members
     const userIds = (members ?? []).map((m) => m.user_id);
-    let profiles: Record<string, { display_name: string; avatar_url: string | null; slug: string | null; role: string | null }> = {};
+    const profiles: Record<string, { display_name: string; avatar_url: string | null; slug: string | null; role: string | null }> = {};
 
     if (userIds.length > 0) {
       const { data: pData } = await admin

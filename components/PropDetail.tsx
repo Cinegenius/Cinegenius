@@ -8,9 +8,8 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import {
   ArrowLeft, Star, CheckCircle, Calendar, Clock,
-  MapPin, Package, Shield, Truck, ChevronRight, Phone, Expand, Pencil,
+  MapPin, Package, Shield, Truck, Expand, Pencil,
 } from "lucide-react";
-import { useToast } from "@/contexts/ToastContext";
 import { useUser } from "@clerk/nextjs";
 
 const Lightbox = dynamic(() => import("@/components/Lightbox"), { ssr: false });
@@ -99,7 +98,6 @@ export default function PropDetail({ prop }: { prop: Prop }) {
   const [activeImg, setActiveImg] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const images = [prop.image, ...(prop.extra_images ?? [])].filter(Boolean) as string[];
-  const { addToast } = useToast();
 
   const subtotal = prop.dailyRate * days;
   const deposit = Math.round(subtotal * 0.25);

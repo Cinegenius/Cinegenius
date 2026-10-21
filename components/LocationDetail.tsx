@@ -6,7 +6,7 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import {
   MapPin, Star, CheckCircle, Users, Zap, ArrowLeft,
-  Shield, MessageSquare, ChevronRight, Expand,
+  Shield, MessageSquare, Expand,
   Wifi, Car, Zap as Power, Coffee, DoorOpen, Truck,
   Thermometer, Volume2, Wind, Accessibility, ArrowUpDown,
   FlipHorizontal, Pencil, Maximize2,

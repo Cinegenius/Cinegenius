@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import {
-  MapPin, Briefcase, Clock, Search, ChevronRight, Zap, SlidersHorizontal,
+  MapPin, Briefcase, Clock, Search, ChevronRight, Zap,
   ChevronDown, X, Users2, Clapperboard, Video, Lightbulb, Wrench, Mic,
   Sparkles, Shirt, Palette, Monitor, Share2, Play, Camera, Scissors,
   Film, Smartphone, Aperture, Globe, ArrowUpDown,
@@ -299,7 +299,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   const [cityFilter, setCityFilter] = useState(() => searchParams.get("city") ?? "");
   const [countryFilter, setCountryFilter] = useState(() => searchParams.get("country") ?? "");
   const [sortKey, setSortKey] = useState(() => searchParams.get("sort") ?? "newest");
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [pagination, setPagination] = useState({ filterKey: "", visibleCount: PAGE_SIZE });
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -403,7 +403,9 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
     return result;
   }, [allJobs, query, selectedDeptId, selectedRoleId, activeType, urgentOnly, payTypeFilter, jobTypeFilter, cityFilter, countryFilter, sortKey]);
 
-  useEffect(() => setVisibleCount(PAGE_SIZE), [filtered]);
+  const filterKey = JSON.stringify([query, selectedDeptId, selectedRoleId, activeType, urgentOnly, payTypeFilter, jobTypeFilter, cityFilter, countryFilter, sortKey]);
+  const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
+  const showMore = () => setPagination({ filterKey, visibleCount: visibleCount + PAGE_SIZE });
 
   const handleSelectDept = (deptId: string) => {
     setSelectedDeptId(deptId);
@@ -813,7 +815,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
 
         {visibleCount < filtered.length && (
           <div className="mt-6 text-center">
-            <button onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}
+            <button onClick={showMore}
               className="px-6 py-2.5 bg-bg-secondary border border-border rounded-lg text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors">
               {t("loadMore", { count: filtered.length - visibleCount })}
             </button>

@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   Building2, LayoutDashboard, Package, Users, Settings,
   ExternalLink, Plus, Pencil, Trash2, Loader2, X, Check,
-  ChevronRight, Tag, Euro, Truck, Shield, CheckCircle,
+  Tag, Truck, Shield, CheckCircle,
   Clock, UserMinus, Crown, ArrowUpRight, ToggleLeft, ToggleRight,
   AlertCircle, Briefcase,
 } from "lucide-react";
@@ -888,7 +888,6 @@ function TeamTab({ companyId }: { companyId: string }) {
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(() => {
-    setLoading(true);
     fetch(`/api/company-members?company_id=${companyId}`)
       .then(r => r.json()).then(({ data }) => setMembers(data ?? []))
       .finally(() => setLoading(false));

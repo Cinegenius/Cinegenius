@@ -1,25 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 const STORAGE_KEY = "cg_cookies_ok";
+const CHANGE_EVENT = "cg-cookie-preference-change";
+
+function subscribe(onChange: () => void) {
+  window.addEventListener(CHANGE_EVENT, onChange);
+  window.addEventListener("storage", onChange);
+  return () => {
+    window.removeEventListener(CHANGE_EVENT, onChange);
+    window.removeEventListener("storage", onChange);
+  };
+}
+
+function getSnapshot() {
+  return !localStorage.getItem(STORAGE_KEY);
+}
 
 export default function CookieBanner() {
   const t = useTranslations("cookie");
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    if (!localStorage.getItem(STORAGE_KEY)) {
-      setVisible(true);
-    }
-  }, []);
+  const visible = useSyncExternalStore(subscribe, getSnapshot, () => false);
 
   function dismiss() {
     localStorage.setItem(STORAGE_KEY, "1");
-    setVisible(false);
+    window.dispatchEvent(new Event(CHANGE_EVENT));
   }
 
   if (!visible) return null;

@@ -127,7 +127,7 @@ export default async function JobDetailPage({
       },
     },
     "datePosted": new Date().toISOString().split("T")[0],
-    "validThrough": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    "validThrough": new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
     "directApply": true,
   };
 

@@ -1,5 +1,7 @@
 "use client";
 
+import UnoptimizedImage from "@/components/UnoptimizedImage";
+
 import React, { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import { useUser, useAuth } from "@clerk/nextjs";
 import { Heart } from "lucide-react";
@@ -8,9 +10,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import {
   Search, Package, X, Truck, MapPin, ChevronDown,
-  LayoutGrid, List, CheckCircle, ArrowUpDown, Plus,
+  LayoutGrid, List, ArrowUpDown,
   Camera, Lightbulb, Wrench, Mic, Shirt, Sparkles, Layers, Car, Zap,
-  Monitor, Building2, Briefcase, Palette, Scissors, Users,
+  Monitor, Building2, Briefcase, Palette, Scissors,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import EmptyState from "@/components/EmptyState";
@@ -103,7 +105,7 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
         data-visible>
         <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-bg-elevated border border-border">
           {p.image
-            ? <img src={p.image} alt={p.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} />
+            ? <UnoptimizedImage src={p.image} alt={p.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} />
             : <div className="w-full h-full flex items-center justify-center text-text-muted/30"><svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></div>
           }
           {p.isReal && <div className="absolute top-1 left-1 bg-gold text-bg-primary text-[9px] font-bold px-1.5 py-0.5 rounded">NEU</div>}
@@ -134,7 +136,7 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
       data-visible>
       <div className="relative aspect-[4/3] overflow-hidden bg-bg-elevated">
         {p.image
-          ? <img src={p.image} alt={p.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} />
+          ? <UnoptimizedImage src={p.image} alt={p.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} />
           : <div className="w-full h-full flex items-center justify-center text-text-muted/20"><svg viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></div>
         }
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent" />
@@ -215,7 +217,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const [rentalTypeFilter, setRentalTypeFilter] = useState<"alle" | "miete" | "kauf">("alle");
   const [sortKey, setSortKey] = useState("featured");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [pagination, setPagination] = useState({ filterKey: "", visibleCount: PAGE_SIZE });
   const [liveRatings, setLiveRatings] = useState<Record<string, { avg: number; count: number }>>({});
   const [myRatings, setMyRatings] = useState<Record<string, number>>({});
   const [eligible, setEligible] = useState<Set<string>>(new Set());
@@ -249,7 +251,12 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
     e.preventDefault(); e.stopPropagation();
     if (!isSignedIn) return;
     const wasFav = favorites.has(listingId);
-    setFavorites(prev => { const next = new Set(prev); wasFav ? next.delete(listingId) : next.add(listingId); return next; });
+    setFavorites((prev) => {
+      const next = new Set(prev);
+      if (wasFav) next.delete(listingId);
+      else next.add(listingId);
+      return next;
+    });
     try {
       await fetch("/api/favorites", {
         method: "POST",
@@ -257,7 +264,12 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
         body: JSON.stringify({ listing_id: listingId }),
       });
     } catch {
-      setFavorites(prev => { const next = new Set(prev); wasFav ? next.add(listingId) : next.delete(listingId); return next; });
+      setFavorites((prev) => {
+        const next = new Set(prev);
+        if (wasFav) next.add(listingId);
+        else next.delete(listingId);
+        return next;
+      });
     }
   };
 
@@ -329,7 +341,9 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
     return r;
   }, [serverListings, selectedDept, query, rentalTypeFilter, sortKey]);
 
-  useEffect(() => setVisibleCount(PAGE_SIZE), [filtered]);
+  const filterKey = JSON.stringify([selectedDept, query, rentalTypeFilter, sortKey]);
+  const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
+  const showMore = () => setPagination({ filterKey, visibleCount: visibleCount + PAGE_SIZE });
 
   const clearAll = () => {
     setSelectedDept(null); setQuery(""); setSortKey("featured"); setRentalTypeFilter("alle");
@@ -568,7 +582,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                 </div>
                 {filtered.length > visibleCount && (
                   <div className="mt-10 text-center">
-                    <button onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}
+                    <button onClick={showMore}
                       className="px-8 py-3 border border-border text-sm font-semibold text-text-secondary hover:border-gold hover:text-gold rounded-xl transition-all">
                       {t("loadMore", { count: filtered.length - visibleCount })}
                     </button>
@@ -583,48 +597,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   );
 }
 
-type VendorProfile = { id: string; name: string; location: string; avatar: string; verified: boolean };
-
-function VendorSection({ vendors }: { vendors: VendorProfile[] }) {
-  const t = useTranslations("props");
-  if (!vendors.length) return null;
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-10">
-      <div className="pt-8 border-t border-border/50">
-        <div className="flex items-center gap-2 mb-4">
-          <Users size={13} className="text-gold/60" />
-          <span className="text-[11px] font-bold uppercase tracking-widest text-text-secondary">{t("vendorSection")}</span>
-          <span className="text-[11px] text-text-muted">· {vendors.length}</span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {vendors.map((v) => (
-            <Link key={v.id} href={`/profile/${v.id}`}
-              className="group inline-flex items-center gap-2.5 px-3 py-2 rounded-xl border border-border/50 bg-bg-elevated/40 hover:border-gold/40 hover:bg-bg-elevated transition-all duration-200">
-              {v.avatar ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={v.avatar} alt={v.name} loading="lazy" className="w-8 h-8 rounded-full object-cover border border-border/40 shrink-0" />
-              ) : (
-                <div className="w-8 h-8 rounded-full bg-bg-secondary border border-border/40 flex items-center justify-center text-text-muted text-sm font-bold shrink-0">
-                  {v.name[0]}
-                </div>
-              )}
-              <div className="min-w-0">
-                <div className="flex items-center gap-1">
-                  <p className="text-sm font-semibold text-text-primary whitespace-nowrap group-hover:text-gold transition-colors">{v.name}</p>
-                  {v.verified && <CheckCircle size={11} className="text-gold/60 shrink-0" />}
-                </div>
-                {v.location && <p className="text-[11px] text-text-muted whitespace-nowrap">{v.location.split(",")[0]}</p>}
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default function PropsContent({ serverListings, vendorProfiles = [] }: { serverListings: Prop[]; vendorProfiles?: VendorProfile[] }) {
-  void vendorProfiles;
+export default function PropsContent({ serverListings }: { serverListings: Prop[] }) {
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" /></div>}>
       <PropsInner serverListings={serverListings} />

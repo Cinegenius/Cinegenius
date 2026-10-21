@@ -8,7 +8,7 @@ import {
   Building2, MapPin, Search, CheckCircle, LayoutGrid, LayoutList,
   ChevronRight, X, Camera, Volume2, Wrench, Shirt,
   Package, Film, Monitor, Users, Sparkles, Megaphone, Car,
-  Lightbulb, ArrowRight, Globe, Zap, ChevronDown,
+  Lightbulb, Globe, Zap, ChevronDown,
 } from "lucide-react";
 import { COMPANY_CATEGORIES, COMPANY_CATEGORY_BY_ID } from "@/lib/companyCategories";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
@@ -100,7 +100,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [sortKey, setSortKey] = useState("newest");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [page, setPage] = useState(1);
+  const [pageState, setPageState] = useState({ filterKey: "", page: 1 });
 
   const availableCities = useMemo(() => {
     const cities = initialCompanies.map((c) => c.city?.split(",")[0]?.trim()).filter(Boolean) as string[];
@@ -130,14 +130,18 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
     return result;
   }, [initialCompanies, search, selectedCategory, cityFilter, countryFilter, verifiedOnly, sortKey]);
 
-  useEffect(() => setPage(1), [filtered]);
+  const filterKey = JSON.stringify([search, selectedCategory, cityFilter, countryFilter, verifiedOnly, sortKey]);
+  const page = pageState.filterKey === filterKey ? pageState.page : 1;
+  const resetPage = () => setPageState({ filterKey, page: 1 });
+  const changePage = (next: number | ((current: number) => number)) =>
+    setPageState({ filterKey, page: typeof next === "function" ? next(page) : next });
 
   const paginated = filtered.slice(0, page * PAGE_SIZE);
   const hasMore = paginated.length < filtered.length;
 
   const clearAll = () => {
     setSearch(""); setSelectedCategory(null); setCityFilter("");
-    setCountryFilter(""); setVerifiedOnly(false); setSortKey("newest"); setPage(1);
+    setCountryFilter(""); setVerifiedOnly(false); setSortKey("newest"); resetPage();
   };
 
   const selectedCat = selectedCategory ? COMPANY_CATEGORY_BY_ID[selectedCategory] : null;
@@ -297,7 +301,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
             </p>
             <nav className="space-y-0.5">
               <button
-                onClick={() => { setSelectedCategory(null); setPage(1); }}
+                onClick={() => { setSelectedCategory(null); resetPage(); }}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
                   !selectedCategory
                     ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
@@ -313,7 +317,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                 return (
                   <button
                     key={cat.id}
-                    onClick={() => { setSelectedCategory(isActive ? null : cat.id); setPage(1); }}
+                    onClick={() => { setSelectedCategory(isActive ? null : cat.id); resetPage(); }}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
                       isActive
                         ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
@@ -334,7 +338,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
             {/* Mobile category pills */}
             <div className="cat-pills gap-2 overflow-x-auto pb-3 mb-4" style={{ scrollbarWidth: "none" }}>
               <button
-                onClick={() => { setSelectedCategory(null); setPage(1); }}
+                onClick={() => { setSelectedCategory(null); resetPage(); }}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
                   !selectedCategory ? "bg-gold/10 text-gold border-gold/40" : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
                 }`}
@@ -346,7 +350,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                 return (
                   <button
                     key={cat.id}
-                    onClick={() => { setSelectedCategory(isActive ? null : cat.id); setPage(1); }}
+                    onClick={() => { setSelectedCategory(isActive ? null : cat.id); resetPage(); }}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
                       isActive ? "bg-gold/10 text-gold border-gold/40" : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
                     }`}
@@ -396,7 +400,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
 
             {hasMore && (
               <div className="mt-8 text-center">
-                <button onClick={() => setPage((p) => p + 1)}
+                <button onClick={() => changePage((p) => p + 1)}
                   className="px-6 py-2.5 border border-border rounded-xl text-sm text-text-secondary hover:border-gold hover:text-gold transition-colors">
                   {t("loadMore", { count: filtered.length - paginated.length })}
                 </button>

@@ -49,25 +49,6 @@ export default async function PropsPage() {
     ownerId: l.user_id,
   }));
 
-  const { data: vendorData } = await db
-    .from("profiles")
-    .select("user_id, display_name, location, avatar_url, verified, profile_types")
-    .or("profile_types.cs.{equipment},profile_types.cs.{vehicle},profile_types.cs.{props}")
-    .not("display_name", "is", null)
-    .neq("display_name", "")
-    .limit(50);
-
-  const equipmentVendors = (vendorData ?? []).map((p: {
-    user_id: string; display_name: string; location: string | null;
-    avatar_url: string | null; verified: boolean | null;
-  }) => ({
-    id: p.user_id,
-    name: p.display_name,
-    location: p.location ?? "",
-    avatar: p.avatar_url ?? "",
-    verified: p.verified ?? false,
-  }));
-
   return (
     <div className="min-h-screen bg-bg-primary">
       <PageHeader
@@ -77,7 +58,7 @@ export default async function PropsPage() {
         description={t("heroDesc")}
         cta={{ label: t("heroCta"), href: "/inserat" }}
       />
-      <PropsContent serverListings={serverListings} vendorProfiles={equipmentVendors} />
+      <PropsContent serverListings={serverListings} />
     </div>
   );
 }

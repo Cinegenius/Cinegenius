@@ -3,15 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import ImageStrip from "@/components/ImageStrip";
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import {
   MapPin, MessageSquare, Award, ChevronDown, ChevronUp,
   Pencil, ExternalLink, X, Check, Globe, Building2, UserPlus, UserCheck, Clock,
-  Film, Briefcase, Package, Car, Ban, Flag, Users2, MoreHorizontal, Phone, Mail, Heart, Send,
+  Ban, Users2, MoreHorizontal, Phone, Mail, Send,
 } from "lucide-react";
-import type { UserProfile, ProfileModule, ProfileImage, FilmographyEntry, ProfileAward, ProjectCredit } from "@/lib/profile-types";
+import type { UserProfile, ProfileImage, FilmographyEntry, ProfileAward, ProjectCredit } from "@/lib/profile-types";
 import ReviewsSection from "@/components/ReviewsSection";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS } from "@/lib/profile-types";
 import { cleanProfileBio, getProfileDisplayPositions, normalizeProfileTypes } from "@/lib/profile-display";
@@ -31,11 +30,6 @@ function safeLink(url: string | null | undefined): string | null {
     if (!["http:", "https:"].includes(u.protocol)) return null;
     return normalized;
   } catch { return null; }
-}
-
-function getEnabledModules(modules: ProfileModule[] | null | undefined) {
-  if (!Array.isArray(modules)) return [];
-  return [...modules].filter((m) => m?.enabled).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 }
 
 function getVideoEmbed(url: string): string | null {
@@ -226,6 +220,7 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
             </>
           )}
           {blockError && <p className="px-3 py-1 text-xs text-red-400">{blockError}</p>}
+          {reportError && <p className="px-3 py-1 text-xs text-red-400">{reportError}</p>}
         </div>
       )}
     </div>
@@ -286,10 +281,6 @@ const LISTING_TYPE_META: Record<string, { label: string; color: string; href: (i
   animal:   { label: "Tier",       color: "text-amber-400",    href: (id) => `/tiere/${id}` },
 };
 
-const LISTING_TYPE_ICON: Record<string, React.ElementType> = {
-  job: Briefcase, prop: Package, location: MapPin, vehicle: Car, creator: Film,
-};
-
 function ListingsSection({ listings }: { listings: PublicListing[] }) {
   if (!listings.length) return null;
   const grouped = listings.reduce<Record<string, PublicListing[]>>((acc, l) => {
@@ -303,7 +294,6 @@ function ListingsSection({ listings }: { listings: PublicListing[] }) {
       <div className="space-y-3">
         {Object.entries(grouped).map(([type, items]) => {
           const meta = LISTING_TYPE_META[type] ?? { label: type, color: "text-text-muted", href: (id: string) => `/${type}/${id}` };
-          const Icon = LISTING_TYPE_ICON[type] ?? Briefcase;
           return (
             <div key={type}>
               <p className={`text-[9px] font-bold uppercase tracking-widest mb-2 ${meta.color}`}>{meta.label}</p>
@@ -1030,7 +1020,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
 // MODEL PROFILE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ModelProfile({ profile, isOwner, projectCredits = [], companyMembership, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { profile: UserProfile; isOwner: boolean; projectCredits?: ProjectCredit[]; companyMembership: CompanyMembership; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
+function ModelProfile({ profile, isOwner, projectCredits = [], companyMembership, listings = [], blockStatus = null, collaborations = [] }: { profile: UserProfile; isOwner: boolean; projectCredits?: ProjectCredit[]; companyMembership: CompanyMembership; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[] }) {
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const [lightbox, setLightbox] = useState<string | null>(null);
 
@@ -1306,7 +1296,6 @@ function ModelProfile({ profile, isOwner, projectCredits = [], companyMembership
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function GenericProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
-  const tc = useTranslations("common");
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const { user } = useUser();
   const [lightbox, setLightbox] = useState<string | null>(null);
@@ -1761,16 +1750,6 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 type PublicListing = { id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null; focal_point?: { x: number; y: number } | null };
 
 // ─── Photo grid with likes ────────────────────────────────────────────────────
-function StarRating({ value, max = 5, size = 14 }: { value: number; max?: number; size?: number }) {
-  return (
-    <span className="inline-flex gap-0.5">
-      {Array.from({ length: max }, (_, i) => (
-        <span key={i} style={{ fontSize: size, lineHeight: 1 }} className={i < Math.round(value) ? "text-gold" : "text-white/30"}>★</span>
-      ))}
-    </span>
-  );
-}
-
 type ImageComment = { id: string; author_id: string; author_name: string; author_avatar: string | null; text: string; created_at: string };
 
 function ImageModal({
@@ -2048,7 +2027,7 @@ export default function ProfileView({
 
   // Model types get editorial layout
   if (isModel) {
-    return <><ModelProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
+    return <><ModelProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} listings={listings} blockStatus={blockStatus} collaborations={collaborations} />{similarSection}</>;
   }
 
   // Actor/talent types get casting-ready layout

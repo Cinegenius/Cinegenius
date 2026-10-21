@@ -6,12 +6,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth, useUser, useClerk } from "@clerk/nextjs";
 import {
-  Menu, X, Film, ChevronDown, Search, Loader2,
-  Car, Shirt, Wrench, Clapperboard, Sparkles, Zap,
-  Camera, Mic, Drama, Lightbulb, User, Users, Layers, Briefcase,
+  Menu, X, Film, ChevronDown, Search, Loader2, User,
   LayoutDashboard, LogOut, MessageSquare, Bell,
-  Home, Building2, TreePine, Coffee, Monitor,
-  Smartphone, ImageIcon, Video, Aperture, MapPin, ShoppingBag, PawPrint,
 } from "lucide-react";
 import NotificationCenter from "@/components/NotificationCenter";
 import { Logo } from "@/components/Logo";
@@ -20,151 +16,14 @@ import { useTranslations } from "next-intl";
 import { useToast } from "@/contexts/ToastContext";
 import { subscribeToMessageReads } from "@/lib/message-read-sync";
 
-type NavItem = { icon: React.ElementType; label: string; desc: string; href: string; iconBg: string; iconColor: string };
-
-const crewGroups: { heading: string; platform?: string; items: NavItem[] }[] = [
-  {
-    heading: "🎬 Film — Talent",
-    platform: "film",
-    items: [
-      { icon: Drama,     label: "Schauspieler/in", desc: "Haupt- & Nebenrollen",    href: "/creators?kategorie=vor-der-kamera", iconBg: "bg-rose-500/10 border-rose-500/20",   iconColor: "text-rose-400" },
-      { icon: Users,     label: "Statisten",    desc: "Background & Komparsen",  href: "/creators?kategorie=statisten",    iconBg: "bg-sky-500/10 border-sky-500/20",     iconColor: "text-sky-400" },
-      { icon: User,      label: "Models",       desc: "Fashion, Print & Video",  href: "/creators?kategorie=models",       iconBg: "bg-pink-500/10 border-pink-500/20",   iconColor: "text-pink-400" },
-    ],
-  },
-  {
-    heading: "Film — Regie & Technik",
-    platform: "film",
-    items: [
-      { icon: Clapperboard, label: "Regie",      desc: "Director, AD, Continuity",     href: "/creators?kategorie=regie",      iconBg: "bg-purple-500/10 border-purple-500/20", iconColor: "text-purple-400" },
-      { icon: Camera,    label: "Kamera",     desc: "DP, Kamerafrau/-mann, AC",    href: "/creators?kategorie=kamera",     iconBg: "bg-blue-500/10 border-blue-500/20",     iconColor: "text-blue-400" },
-      { icon: Lightbulb, label: "Licht",      desc: "Gaffer, Best Boy",             href: "/creators?kategorie=licht",      iconBg: "bg-amber-500/10 border-amber-500/20",   iconColor: "text-amber-400" },
-      { icon: Mic,       label: "Ton",        desc: "Mixer, Boom, Designer",        href: "/creators?kategorie=ton",        iconBg: "bg-teal-500/10 border-teal-500/20",     iconColor: "text-teal-400" },
-      { icon: Briefcase, label: "Produktion", desc: "Producer, Koordination",       href: "/creators?kategorie=produktion", iconBg: "bg-emerald-500/10 border-emerald-500/20", iconColor: "text-emerald-400" },
-      { icon: Monitor,   label: "Post",       desc: "Editor, Colorist, VFX",        href: "/creators?kategorie=post",       iconBg: "bg-blue-500/10 border-blue-500/20",     iconColor: "text-blue-400" },
-    ],
-  },
-  {
-    heading: "📱 Social Media",
-    platform: "social",
-    items: [
-      { icon: Smartphone, label: "Content Creator",    desc: "Creator, Influencer, Manager",  href: "/creators?kategorie=content-creation", iconBg: "bg-purple-500/10 border-purple-500/20", iconColor: "text-purple-400" },
-      { icon: Video,      label: "Social Videograf",   desc: "Reels, TikTok, Shortform",      href: "/creators?kategorie=social-video",     iconBg: "bg-fuchsia-500/10 border-fuchsia-500/20", iconColor: "text-fuchsia-400" },
-    ],
-  },
-  {
-    heading: "📷 Fotografie",
-    platform: "photo",
-    items: [
-      { icon: Aperture,   label: "Fotograf/in",        desc: "Mode, Produkt, Event, Portrait", href: "/creators?kategorie=fotografie",      iconBg: "bg-cyan-500/10 border-cyan-500/20",     iconColor: "text-cyan-400" },
-      { icon: ImageIcon,  label: "Foto-Postproduktion",desc: "Retouche, Bildbearbeitung",       href: "/creators?kategorie=foto-post",       iconBg: "bg-lime-500/10 border-lime-500/20",     iconColor: "text-lime-400" },
-    ],
-  },
-];
-
-const crewItems = crewGroups.flatMap((g) => g.items);
-
-const marketGroups: { heading: string; items: NavItem[] }[] = [
-  {
-    heading: "🎬 Film Equipment",
-    items: [
-      { icon: Clapperboard, label: "Kamera",     desc: "Kameras, Objektive, Rigs",  href: "/props?cat=kamera",  iconBg: "bg-sky-500/10 border-sky-500/20",     iconColor: "text-sky-400" },
-      { icon: Lightbulb,    label: "Licht",      desc: "LEDs, HMI, Scheinwerfer",   href: "/props?cat=licht",   iconBg: "bg-amber-500/10 border-amber-500/20", iconColor: "text-amber-400" },
-      { icon: Mic,          label: "Ton",        desc: "Mikrofone, Wireless-Sets",  href: "/props?cat=ton",     iconBg: "bg-teal-500/10 border-teal-500/20",   iconColor: "text-teal-400" },
-      { icon: Wrench,       label: "Rigging",    desc: "Kran, Dolly, Track",        href: "/props?cat=rigging", iconBg: "bg-cyan-500/10 border-cyan-500/20",   iconColor: "text-cyan-400" },
-    ],
-  },
-  {
-    heading: "Ausstattung & Fahrzeuge",
-    items: [
-      { icon: Shirt,    label: "Kostüme",    desc: "Alle Epochen & Stile",      href: "/props?cat=kostueme",     iconBg: "bg-rose-500/10 border-rose-500/20",     iconColor: "text-rose-400" },
-      { icon: Layers,   label: "Requisiten", desc: "Set-Dressing, Möbel, Props", href: "/props",                  iconBg: "bg-violet-500/10 border-violet-500/20", iconColor: "text-violet-400" },
-      { icon: Car,      label: "Fahrzeuge",  desc: "Classic Cars & Stuntautos",  href: "/vehicles",               iconBg: "bg-orange-500/10 border-orange-500/20", iconColor: "text-orange-400" },
-      { icon: Zap,      label: "SFX",        desc: "Pyro, Atmosphäre, Effekte",  href: "/props?cat=sfx",          iconBg: "bg-yellow-500/10 border-yellow-500/20", iconColor: "text-yellow-400" },
-      { icon: PawPrint, label: "Film-Tiere", desc: "Hunde, Pferde, Exoten",      href: "/tiere",                  iconBg: "bg-emerald-500/10 border-emerald-500/20", iconColor: "text-emerald-400" },
-    ],
-  },
-  {
-    heading: "📷 Foto Equipment",
-    items: [
-      { icon: Aperture,  label: "Fotoequipment", desc: "Kameras, Objektive, Blitz",   href: "/props?cat=fotoequipment", iconBg: "bg-cyan-500/10 border-cyan-500/20",   iconColor: "text-cyan-400" },
-      { icon: ImageIcon, label: "Backdrops",     desc: "Hintergründe & Papierrollen", href: "/props?cat=backdrops",     iconBg: "bg-lime-500/10 border-lime-500/20",   iconColor: "text-lime-400" },
-    ],
-  },
-  {
-    heading: "📱 Creator Sets",
-    items: [
-      { icon: Smartphone, label: "Content Sets",      desc: "Creator-Setups, Ringe, Stative",  href: "/props?cat=content-sets",  iconBg: "bg-purple-500/10 border-purple-500/20", iconColor: "text-purple-400" },
-      { icon: Sparkles,   label: "Custom",            desc: "Maßanfertigungen",                 href: "/marketplace/commission",  iconBg: "bg-emerald-500/10 border-emerald-500/20", iconColor: "text-emerald-400" },
-    ],
-  },
-];
-
-const marketItems = marketGroups.flatMap((g) => g.items);
-
-const locationGroups: { heading: string; items: NavItem[] }[] = [
-  {
-    heading: "Räume & Gebäude",
-    items: [
-      { icon: Home,      label: "Wohnen",        desc: "Apartments, Häuser, Lofts",      href: "/locations/suche?type=Wohnen",        iconBg: "bg-sky-500/10 border-sky-500/20",     iconColor: "text-sky-400" },
-      { icon: Building2, label: "Villa",          desc: "Herrenhäuser & Luxusanwesen",    href: "/locations/suche?type=Villa",          iconBg: "bg-violet-500/10 border-violet-500/20", iconColor: "text-violet-400" },
-      { icon: Briefcase, label: "Büro",           desc: "Büros, Co-Working, Konferenz",   href: "/locations/suche?type=Büro",           iconBg: "bg-emerald-500/10 border-emerald-500/20", iconColor: "text-emerald-400" },
-      { icon: Clapperboard, label: "Filmstudio",   desc: "Filmstudios, Greenscreen",       href: "/locations/suche?type=Studio",        iconBg: "bg-gold/10 border-gold/20",           iconColor: "text-gold" },
-      { icon: Aperture,     label: "Fotostudio",  desc: "Fotostudios, Daylight, Zykloren", href: "/locations/suche?type=Fotostudio",    iconBg: "bg-cyan-500/10 border-cyan-500/20",   iconColor: "text-cyan-400" },
-    ],
-  },
-  {
-    heading: "Außen & Besonderes",
-    items: [
-      { icon: Wrench,    label: "Industrie",      desc: "Hallen, Fabriken, Werkstätten",  href: "/locations/suche?type=Industrie",     iconBg: "bg-slate-500/10 border-slate-500/20", iconColor: "text-slate-400" },
-      { icon: TreePine,  label: "Natur",          desc: "Wälder, Felder, Küste",          href: "/locations/suche?type=Natur",         iconBg: "bg-green-500/10 border-green-500/20", iconColor: "text-green-400" },
-      { icon: Coffee,    label: "Gastronomie",    desc: "Restaurants, Bars, Cafés",       href: "/locations/suche?type=Gastronomie",   iconBg: "bg-amber-500/10 border-amber-500/20", iconColor: "text-amber-400" },
-      { icon: Sparkles,  label: "Speziallocation",desc: "Historisch, Kirche, Bahnhof",    href: "/locations/suche?type=Speziallocation", iconBg: "bg-rose-500/10 border-rose-500/20", iconColor: "text-rose-400" },
-    ],
-  },
-];
-
-const locationItems = locationGroups.flatMap((g) => g.items);
-
-const jobGroups: { heading: string; items: NavItem[] }[] = [
-  {
-    heading: "🎬 Film — Kreativ",
-    items: [
-      { icon: Drama,        label: "Vor der Kamera", desc: "Schauspieler/in, Stunt, Sprecher/in",  href: "/jobs?role=Vor+der+Kamera",   iconBg: "bg-rose-500/10 border-rose-500/20",     iconColor: "text-rose-400" },
-      { icon: Clapperboard, label: "Regie",           desc: "Director, AD, Continuity",       href: "/jobs?role=Regie",            iconBg: "bg-violet-500/10 border-violet-500/20", iconColor: "text-violet-400" },
-      { icon: Camera,       label: "Kamera",          desc: "DoP, Kamerafrau/-mann, AC",       href: "/jobs?role=Kamera",           iconBg: "bg-sky-500/10 border-sky-500/20",       iconColor: "text-sky-400" },
-      { icon: Lightbulb,    label: "Licht & Ton",     desc: "Gaffer, Tontechniker/in, Boom",   href: "/jobs?role=Licht",            iconBg: "bg-amber-500/10 border-amber-500/20",   iconColor: "text-amber-400" },
-      { icon: Briefcase,    label: "Produktion",      desc: "Producer, PA, Location",          href: "/jobs?role=Produktion",       iconBg: "bg-emerald-500/10 border-emerald-500/20", iconColor: "text-emerald-400" },
-      { icon: Monitor,      label: "Post",            desc: "Editor, Colorist, VFX",           href: "/jobs?role=Postproduktion",   iconBg: "bg-blue-500/10 border-blue-500/20",     iconColor: "text-blue-400" },
-    ],
-  },
-  {
-    heading: "📱 Social Media Jobs",
-    items: [
-      { icon: Smartphone, label: "Content Creation", desc: "Creator, Influencer, Manager",    href: "/jobs?role=Content+Creation", iconBg: "bg-purple-500/10 border-purple-500/20", iconColor: "text-purple-400" },
-      { icon: Video,      label: "Social Video",     desc: "Reels, TikTok, UGC",              href: "/jobs?role=Social+Video",     iconBg: "bg-fuchsia-500/10 border-fuchsia-500/20", iconColor: "text-fuchsia-400" },
-    ],
-  },
-  {
-    heading: "📷 Foto Jobs",
-    items: [
-      { icon: Aperture,   label: "Fotografie",       desc: "Mode, Produkt, Event, Portrait",  href: "/jobs?role=Fotografie",       iconBg: "bg-cyan-500/10 border-cyan-500/20",     iconColor: "text-cyan-400" },
-      { icon: ImageIcon,  label: "Foto-Post",        desc: "Retouche, Bildbearbeitung",        href: "/jobs?role=Foto-Post",        iconBg: "bg-lime-500/10 border-lime-500/20",     iconColor: "text-lime-400" },
-    ],
-  },
-];
-
-const jobItems = jobGroups.flatMap((g) => g.items);
-
 const desktopNavHrefs = [
-  { href: "/locations", key: "locations"  },
-  { href: "/creators",  key: "crew"       },
-  { href: "/jobs",      key: "jobs"       },
-  { href: "/props",     key: "marketplace"},
-  { href: "/projects",  key: "projects"   },
-  { href: "/companies", key: "companies"  },
+  { href: "/locations", key: "locations" },
+  { href: "/creators", key: "crew" },
+  { href: "/jobs", key: "jobs" },
+  { href: "/props", key: "marketplace" },
+  { href: "/projects", key: "projects" },
+  { href: "/companies", key: "companies" },
 ] as const;
-
 
 export default function Navbar({ initialIsSignedIn = false }: { initialIsSignedIn?: boolean }) {
   const t = useTranslations("nav");
@@ -306,11 +165,6 @@ export default function Navbar({ initialIsSignedIn = false }: { initialIsSignedI
   }, [open]);
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href.split("?")[0] + "/");
-  const isCrewActive = isActive("/creators");
-  const isMarketActive = isActive("/marketplace") || isActive("/props") || isActive("/vehicles") || isActive("/tiere");
-  const isLocationsActive = isActive("/locations");
-  const isJobsActive = isActive("/jobs");
-
   // When not scrolled (over hero), use white text for contrast against dark image overlay
   const navBase   = scrolled ? "text-text-secondary hover:text-gold" : "text-white/80 hover:text-white";
   const navActive = scrolled ? "text-gold" : "text-white";

@@ -10,7 +10,7 @@ function safeLink(url: string | null | undefined): string | null {
   } catch { return null; }
 }
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -20,7 +20,7 @@ import {
   UserRound, Megaphone, BookOpen, Briefcase, Video,
   Lightbulb, Wrench, Mic, Monitor, Shirt, Palette,
   Zap, Music2, Camera, Truck, Globe, Tv, Send, Star,
-  Play, MapPin, ChevronDown, Search,
+  Play, MapPin,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Lightbox from "@/components/Lightbox";

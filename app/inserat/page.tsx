@@ -1,5 +1,7 @@
 "use client";
 
+import UnoptimizedImage from "@/components/UnoptimizedImage";
+
 import React, { useState, useRef, useEffect } from "react";
 import { compressImage, safeObjectURL } from "@/lib/compressImage";
 import { useRouter } from "next/navigation";
@@ -7,10 +9,10 @@ import { useAuth } from "@clerk/nextjs";
 import {
   Package, Car, Shirt, Camera, Lightbulb, Mic, Layers, Wrench,
   Home, Building2, TreePine, Clapperboard, MapPin,
-  User, Users, GraduationCap, Briefcase, Sparkles, Scissors,
+  Users, GraduationCap, Briefcase, Sparkles,
   ArrowRight, CheckCircle, Loader2, AlertTriangle, ChevronLeft, ChevronDown,
-  Shield, Radio, Coffee, Truck, Monitor, Box, ClipboardList,
-  Film, Palette, Drama, Upload, X, ImageIcon, Search,
+  Coffee, Truck, Monitor, Box,
+  Film, Palette, Drama, X, ImageIcon, Search,
   Smartphone, Video, Aperture, PawPrint,
 } from "lucide-react";
 import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
@@ -357,7 +359,6 @@ export default function InseratPage() {
   const [publishingDraft, setPublishingDraft] = useState(false);
   const [selected, setSelected] = useState<CategoryItem | null>(null);
   const [activeGroup, setActiveGroup] = useState<string | null>(null); // null = main view
-  const [dropdownId, setDropdownId] = useState("");
   // Category-specific metadata (dynamic per prop category)
   const [catMeta, setCatMeta] = useState<Record<string, string>>({});
   const setCatField = (key: string, value: string) =>
@@ -858,7 +859,7 @@ export default function InseratPage() {
         <div className="max-w-2xl mx-auto px-4 py-10">
 
           {/* Header */}
-          <button onClick={() => { setStep(1); setSelected(null); setDropdownId(""); setImageUrl(null); setImagePreview(null); }} className="flex items-center gap-1.5 text-text-muted hover:text-text-primary text-sm mb-6 transition-colors">
+          <button onClick={() => { setStep(1); setSelected(null); setImageUrl(null); setImagePreview(null); }} className="flex items-center gap-1.5 text-text-muted hover:text-text-primary text-sm mb-6 transition-colors">
             <ChevronLeft size={16} /> Zurück zur Auswahl
           </button>
 
@@ -1561,7 +1562,7 @@ export default function InseratPage() {
               {imagePreview ? (
                 <div className="space-y-2">
                   <div className="relative rounded-xl overflow-hidden border border-border aspect-video w-full">
-                    <img
+                    <UnoptimizedImage
                       src={imagePreview}
                       alt="Vorschau"
                       className="w-full h-full object-cover"
@@ -1674,7 +1675,6 @@ export default function InseratPage() {
               setStep(1);
               setSelected(null);
               setError("");
-              setDropdownId("");
               setImageUrl(null);
               setImagePreview(null);
               setPendingImageFile(null);

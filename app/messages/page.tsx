@@ -1,5 +1,7 @@
 "use client";
 
+import UnoptimizedImage from "@/components/UnoptimizedImage";
+
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
@@ -201,7 +203,7 @@ function MessagesContent() {
       setMessages([]);
       setNewConvRecipient(null);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [toParam, loading, conversations]);
 
   useEffect(() => {
@@ -236,7 +238,7 @@ function MessagesContent() {
       setMessages([]);
       setNewConvRecipient(null);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [convParam, loading, conversations]);
 
   const loadMessages = useCallback(async (
@@ -586,7 +588,7 @@ function MessagesContent() {
                       <Link href={`/profile/${req.user_id}`} className="shrink-0">
                         <div className="w-10 h-10 rounded-full bg-bg-elevated border border-border flex items-center justify-center overflow-hidden">
                           {req.avatar_url
-                            ? <img src={req.avatar_url} alt="" className="w-full h-full object-cover" />
+                            ? <UnoptimizedImage src={req.avatar_url} alt="" className="w-full h-full object-cover" />
                             : <User size={16} className="text-text-muted" />}
                         </div>
                       </Link>
@@ -676,7 +678,7 @@ function MessagesContent() {
                       {conv.kind === "group"
                         ? <Users size={17} className="text-gold" />
                         : conv.otherAvatar
-                        ? <img src={conv.otherAvatar} alt="" className="w-full h-full object-cover" />
+                        ? <UnoptimizedImage src={conv.otherAvatar} alt="" className="w-full h-full object-cover" />
                         : <User size={16} className="text-text-muted" />}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -716,7 +718,7 @@ function MessagesContent() {
                 {activeConv?.kind === "group"
                   ? <Users size={16} className="text-gold" />
                   : activeConv?.otherAvatar
-                  ? <img src={activeConv.otherAvatar} alt="" className="w-full h-full object-cover" />
+                  ? <UnoptimizedImage src={activeConv.otherAvatar} alt="" className="w-full h-full object-cover" />
                   : <User size={15} className="text-text-muted" />}
               </div>
               <div className="flex-1 min-w-0">
@@ -808,7 +810,7 @@ function MessagesContent() {
                         {activeConv?.kind === "group" && (
                           <div className={`flex items-center gap-1.5 mb-1 ${isOwn ? "justify-end" : "justify-start"}`}>
                             {msg.senderAvatar ? (
-                              <img src={msg.senderAvatar} alt="" className="w-5 h-5 rounded-full object-cover" />
+                              <UnoptimizedImage src={msg.senderAvatar} alt="" className="w-5 h-5 rounded-full object-cover" />
                             ) : (
                               <span className="w-5 h-5 rounded-full bg-bg-elevated border border-border flex items-center justify-center"><User size={11} className="text-text-muted" /></span>
                             )}
@@ -958,7 +960,7 @@ function MessagesContent() {
                     <div key={member.user_id} className="flex items-center gap-3 rounded-xl border border-border bg-bg-elevated/50 p-2.5">
                       <div className="w-9 h-9 rounded-full overflow-hidden bg-bg-elevated border border-border flex items-center justify-center shrink-0">
                         {member.avatar_url
-                          ? <img src={member.avatar_url} alt="" className="w-full h-full object-cover" />
+                          ? <UnoptimizedImage src={member.avatar_url} alt="" className="w-full h-full object-cover" />
                           : <User size={15} className="text-text-muted" />}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -1019,7 +1021,7 @@ function MessagesContent() {
                             className="w-full min-h-12 px-3 py-2 text-left hover:bg-bg-elevated flex items-center gap-3"
                           >
                             <div className="w-8 h-8 rounded-full overflow-hidden bg-bg-elevated border border-border flex items-center justify-center shrink-0">
-                              {person.avatar ? <img src={person.avatar} alt="" className="w-full h-full object-cover" /> : <User size={14} className="text-text-muted" />}
+                              {person.avatar ? <UnoptimizedImage src={person.avatar} alt="" className="w-full h-full object-cover" /> : <User size={14} className="text-text-muted" />}
                             </div>
                             <span className="min-w-0 flex-1">
                               <span className="block truncate text-sm text-text-primary">{person.name}</span>

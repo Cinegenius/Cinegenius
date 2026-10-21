@@ -41,19 +41,23 @@ function ConfirmationContent() {
   const ref = searchParams.get("ref") ?? "";
 
   const [booking, setBooking] = useState<Booking | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loadedRef, setLoadedRef] = useState("");
   const [error, setError] = useState("");
+  const loading = Boolean(ref) && loadedRef !== ref;
 
   useEffect(() => {
-    if (!ref) { setLoading(false); return; }
+    if (!ref) return;
+    let cancelled = false;
     fetch(`/api/bookings?ref=${encodeURIComponent(ref)}`)
       .then((r) => r.json())
       .then(({ booking, error }) => {
+        if (cancelled) return;
         if (error || !booking) setError("Buchung nicht gefunden.");
         else setBooking(booking);
       })
-      .catch(() => setError("Fehler beim Laden der Buchung."))
-      .finally(() => setLoading(false));
+      .catch(() => { if (!cancelled) setError("Fehler beim Laden der Buchung."); })
+      .finally(() => { if (!cancelled) setLoadedRef(ref); });
+    return () => { cancelled = true; };
   }, [ref]);
 
   if (loading) {
@@ -64,12 +68,12 @@ function ConfirmationContent() {
     );
   }
 
-  if (error || !booking) {
+  if (!ref || error || !booking) {
     return (
       <div className="pt-16 min-h-screen">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-20 text-center space-y-4">
           <AlertCircle size={36} className="mx-auto text-text-muted opacity-40" />
-          <p className="text-text-muted">{error || "Buchung konnte nicht geladen werden."}</p>
+          <p className="text-text-muted">{!ref ? "Buchungsreferenz fehlt." : error || "Buchung konnte nicht geladen werden."}</p>
           <Link href="/dashboard?tab=bookings" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-lg text-sm hover:bg-gold-light transition-colors">
             Zu meinen Buchungen
           </Link>

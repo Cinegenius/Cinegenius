@@ -47,7 +47,7 @@ export default function AudienceCards({ pools, isLoggedIn, labels }: Props) {
     freelance: pick(pools.freelance, FALLBACKS.freelance),
     location: pick(pools.location, FALLBACKS.location),
     companyLogos: shuffle(pools.company).slice(0, 4),
-  }), []); // eslint-disable-line react-hooks/exhaustive-deps
+  }), [pools]);
 
   const ctaHref = isLoggedIn ? "/dashboard" : "/sign-up";
 

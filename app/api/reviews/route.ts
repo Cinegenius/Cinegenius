@@ -40,7 +40,11 @@ export async function GET(req: NextRequest) {
   const summary = summaryMap[target_id] ?? { rating: 0, reviews: 0, ratingOnly: 0 };
   const myReviewRow = userId ? (data ?? []).find((review) => review.reviewer_id === userId) : null;
   const myReview = myReviewRow ? { id: myReviewRow.id, rating: myReviewRow.rating, text: myReviewRow.text } : null;
-  const publicReviews = (data ?? []).map(({ reviewer_id: _reviewerId, ...review }) => review);
+  const publicReviews = (data ?? []).map((review) => {
+    const publicReview = { ...review };
+    delete publicReview.reviewer_id;
+    return publicReview;
+  });
   return NextResponse.json({
     data: publicReviews,
     myReview,

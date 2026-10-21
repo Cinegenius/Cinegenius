@@ -5,8 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Search, X, MapPin, Car, Package, Briefcase, Users, User,
-  Loader2, ArrowRight, SlidersHorizontal, ChevronDown, Star,
-  Building2, Film, Filter,
+  Loader2, ArrowRight, Building2,
 } from "lucide-react";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -176,7 +175,6 @@ function SearchContent() {
     } finally {
       setLoading(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   // Run initial search if query from URL
@@ -241,7 +239,7 @@ function SearchContent() {
           <div className="mb-2">
             <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Suche</p>
             <h1 className="font-display text-3xl font-bold text-text-primary">
-              {query ? <>Ergebnisse für <span className="text-gradient-gold">„{query}"</span></> : "Alles durchsuchen"}
+              {query ? <>Ergebnisse für <span className="text-gradient-gold">„{query}“</span></> : "Alles durchsuchen"}
             </h1>
           </div>
 

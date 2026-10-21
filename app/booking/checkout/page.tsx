@@ -8,8 +8,6 @@ import {
   ChevronRight, CheckCircle, ArrowLeft, AlertCircle,
 } from "lucide-react";
 
-const COMMISSION_RATE = 0;
-
 function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();

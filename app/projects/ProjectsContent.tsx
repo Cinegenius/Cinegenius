@@ -173,7 +173,7 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
       return 0;
     });
     return list;
-  }, [allProjects, query, typeFilter, yearFilter, directorFilter, sort]);
+  }, [allProjects, query, categoryChip, typeFilter, yearFilter, directorFilter, sort]);
 
   const clearAll = () => { setQuery(""); setCategoryChip(null); setTypeFilter(""); setYearFilter(""); setDirectorFilter(""); };
   const hasAnyFilter = Boolean(query || categoryChip || typeFilter || yearFilter || directorFilter);

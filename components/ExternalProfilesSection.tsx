@@ -268,7 +268,7 @@ export default function ExternalProfilesSection() {
         <div className="py-8 text-center border border-dashed border-border rounded-xl mb-4">
           <ExternalLink size={20} className="text-text-muted mx-auto mb-2" />
           <p className="text-sm text-text-muted">Noch keine externen Profile hinterlegt.</p>
-          <p className="text-xs text-text-muted mt-1">Klicke oben auf „Profil hinzufügen".</p>
+          <p className="text-xs text-text-muted mt-1">Klicke oben auf „Profil hinzufügen“.</p>
         </div>
       )}
 

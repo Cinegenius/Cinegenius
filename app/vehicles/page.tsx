@@ -49,7 +49,7 @@ export default async function VehiclesPage() {
       vendor: "",
       dailyRate: l.price,
       image: l.image_url ?? "",
-      tags: l.created_at && (Date.now() - new Date(l.created_at).getTime() < 3 * 24 * 60 * 60 * 1000) ? ["Neu"] : [],
+      tags: l.created_at && (new Date().getTime() - new Date(l.created_at).getTime() < 3 * 24 * 60 * 60 * 1000) ? ["Neu"] : [],
       instantBook: false,
       verified: false,
       delivery: (meta.delivery as boolean) ?? false,

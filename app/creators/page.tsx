@@ -253,7 +253,6 @@ export default async function CreatorsPage({
       />
       <CreatorsContent
         serverCreators={serverCreators}
-        hasStrip={true}
         initialFilters={{
           query: Array.isArray(params.q) ? params.q[0] ?? "" : params.q ?? "",
           city: Array.isArray(params.city) ? params.city[0] ?? "" : params.city ?? "",

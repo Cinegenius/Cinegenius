@@ -61,7 +61,6 @@ export async function POST(req: NextRequest) {
   }
   const days         = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / 86_400_000));
   const listingTitle = listing.title;
-  const listingType  = listing.type;
   const dailyRate    = Number(listing.price) || 0;
   const subtotal  = dailyRate * days;
   const platformFee = 0;
@@ -180,7 +179,7 @@ export async function GET(req: NextRequest) {
 
     // Enrich with booker display_name
     const bookerIds = [...new Set((data ?? []).map((b) => b.user_id))];
-    let nameMap: Record<string, string> = {};
+    const nameMap: Record<string, string> = {};
     if (bookerIds.length > 0) {
       const { data: profiles } = await db
         .from("profiles")
