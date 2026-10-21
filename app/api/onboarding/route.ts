@@ -1,6 +1,9 @@
 import { clerkClient } from "@clerk/nextjs/server";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { compressProfileEditorDraft, expandProfileEditorDraft } from "@/lib/profile-editor-private-draft";
+
+export const runtime = "nodejs";
 
 const KEY = "cinegeniusOnboarding";
 const INTENTS = new Set(["location", "equipment", "talent", "search", "company"]);
@@ -19,7 +22,19 @@ export async function GET() {
   try {
     const clerk = await clerkClient();
     const user = await clerk.users.getUser(authResult.userId);
-    return json({ draft: user.privateMetadata?.[KEY] ?? null });
+    const draft = user.privateMetadata?.[KEY] && typeof user.privateMetadata[KEY] === "object"
+      ? { ...(user.privateMetadata[KEY] as Record<string, unknown>) }
+      : null;
+    if (draft && typeof draft.profileEditorDraftEncoded === "string") {
+      try {
+        const decoded = expandProfileEditorDraft(draft.profileEditorDraftEncoded);
+        draft.profileEditorDraft = decoded;
+      } catch {
+        return json({ error: "Der private Profilentwurf konnte nicht gelesen werden." }, 503);
+      }
+      delete draft.profileEditorDraftEncoded;
+    }
+    return json({ draft });
   } catch (error) {
     console.error("[onboarding GET] private progress could not be loaded", error);
     return json({ error: "Dein gespeicherter Fortschritt konnte nicht geladen werden." }, 503);
@@ -30,11 +45,14 @@ export async function PUT(request: NextRequest) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const payload = await request.json().catch(() => null);
-  if (!payload || typeof payload !== "object" || !INTENTS.has(payload.intent)) {
+  const record = payload && typeof payload === "object" ? payload as Record<string, unknown> : null;
+  const isProfileEditorDraft = Boolean(record && Object.hasOwn(record, "profileEditorDraft"));
+  if (!record || (!isProfileEditorDraft && !INTENTS.has(String(record.intent)))) {
     return json({ error: "Bitte wähle einen gültigen Einrichtungsweg aus." }, 400);
   }
-  const encoded = JSON.stringify(payload);
-  if (new TextEncoder().encode(encoded).byteLength > MAX_BYTES) {
+  const encoded = JSON.stringify(record);
+  const maxIncomingBytes = isProfileEditorDraft ? 100_000 : MAX_BYTES;
+  if (new TextEncoder().encode(encoded).byteLength > maxIncomingBytes) {
     return json({ error: "Der Entwurf ist zu umfangreich. Entferne einige optionale Angaben oder Bilder." }, 413);
   }
   try {
@@ -43,8 +61,17 @@ export async function PUT(request: NextRequest) {
     const current = user.privateMetadata?.[KEY] && typeof user.privateMetadata[KEY] === "object"
       ? user.privateMetadata[KEY] as Record<string, unknown>
       : {};
-    const next = { ...current, ...payload } as Record<string, unknown>;
-    const incomingListing = (payload as Record<string, unknown>).listingDraft;
+    const next = { ...current, ...record } as Record<string, unknown>;
+    if (isProfileEditorDraft) {
+      const editorDraft = record.profileEditorDraft;
+      if (!editorDraft || typeof editorDraft !== "object" || Array.isArray(editorDraft)) {
+        return json({ error: "Der Profilentwurf ist ungültig." }, 400);
+      }
+      next.profileEditorDraftEncoded = compressProfileEditorDraft(editorDraft as Record<string, unknown>);
+      next.profileEditorDraftUpdatedAt = new Date().toISOString();
+      delete next.profileEditorDraft;
+    }
+    const incomingListing = record.listingDraft;
     if (incomingListing && typeof incomingListing === "object") {
       const listing = incomingListing as Record<string, unknown>;
       const type = listing.type;
@@ -63,8 +90,8 @@ export async function PUT(request: NextRequest) {
         delete next.listingDraft;
       }
     }
-    if (typeof (payload as Record<string, unknown>).setupComplete === "boolean") {
-      next.setupComplete = (payload as Record<string, unknown>).setupComplete;
+    if (typeof record.setupComplete === "boolean") {
+      next.setupComplete = record.setupComplete;
     }
     const serialized = JSON.stringify(next);
     if (new TextEncoder().encode(serialized).byteLength > MAX_BYTES) {
@@ -111,6 +138,12 @@ export async function DELETE(request: NextRequest) {
     } else if (current && requestedType === "profile") {
       delete current.profileDraft;
       current.setupComplete = true;
+      if (Object.keys(current).length) privateMetadata[KEY] = current;
+      else delete privateMetadata[KEY];
+    } else if (current && requestedType === "profile-edit") {
+      delete current.profileEditorDraft;
+      delete current.profileEditorDraftEncoded;
+      delete current.profileEditorDraftUpdatedAt;
       if (Object.keys(current).length) privateMetadata[KEY] = current;
       else delete privateMetadata[KEY];
     } else {

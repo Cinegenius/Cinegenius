@@ -22,6 +22,7 @@ import RoleDropdown from "@/components/RoleDropdown";
 import { calculateProfileCompletion } from "@/lib/profile-completion";
 import { prepareProfileMediaFile, sendProfileMediaFile, PROFILE_MEDIA_ACCEPT, PROFILE_MEDIA_MAX_BYTES, PROFILE_MEDIA_SOURCE_MAX_BYTES } from "@/lib/profile-media-client";
 import { validateProfileSave, type ProfileSaveFieldErrors } from "@/lib/profile-save-validation";
+import { PROFILE_EDITOR_STEPS, profileEditorRequiredMissing, profileEditorStepForErrors, profileEditorStepForHint, shouldResumeProfileEditorDraft, type ProfileEditorStep } from "@/lib/profile-editor-flow";
 
 const ALL_CREW_ROLES = departments.flatMap((d) => d.roles);
 
@@ -45,19 +46,6 @@ import { normalizeProfileTypes } from "@/lib/profile-display";
 function safeLink(url: string | null | undefined): string | null {
   if (!url?.trim()) return null;
   try { new URL(url); return url; } catch { return null; }
-}
-
-async function patchProfile(payload: Record<string, unknown>) {
-  const response = await fetch("/api/profile", {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  const result = await response.json().catch(() => ({}));
-  if (!response.ok || result.error) {
-    throw new Error(result.error ?? `HTTP ${response.status}`);
-  }
-  return result;
 }
 
 type ProfileMediaCopyKey = "uploadEmpty" | "uploadSourceTooBig" | "uploadUnsupported" | "uploadCompressedTooBig";
@@ -101,11 +89,13 @@ const TALENT_TYPE_IDS  = new Set(TALENT_CHIPS.map(([id]) => id));
 const ANBIETER_TYPE_IDS = new Set(ANBIETER_CHIPS.map(([id]) => id));
 
 function TypeChipPicker({
+  mode,
   selectedTypes,
   onTypesChange,
   positions,
   onPositionsChange,
 }: {
+  mode: "types" | "roles";
   selectedTypes: string[];
   onTypesChange: (types: string[]) => void;
   positions: string[];
@@ -113,11 +103,13 @@ function TypeChipPicker({
 }) {
   const [roleSearch, setRoleSearch] = useState("");
   const [expandedDepartments, setExpandedDepartments] = useState<Record<string, boolean>>({});
+  const [chosenDepartments, setChosenDepartments] = useState<string[]>([]);
 
   function togglePosition(job: string, deptId: string) {
     const isSel = positions.includes(job);
     const next = isSel ? positions.filter((x) => x !== job) : [...positions, job];
     onPositionsChange(next);
+    setChosenDepartments((current) => current.includes(deptId) ? current : [...current, deptId]);
     const mapped = DEPARTMENT_TO_PROFILE_TYPE[deptId];
     if (!mapped) return;
     if (!isSel) {
@@ -137,6 +129,8 @@ function TypeChipPicker({
   }
 
   const normalizedQuery = roleSearch.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("de");
+  const selectedRoleDepartments = departments.filter((dept) => dept.roles.some((role) => positions.includes(role))).map((dept) => dept.id);
+  const activeDepartmentIds = new Set([...chosenDepartments, ...selectedRoleDepartments]);
   const visibleDepartments = departments
     .map((dept) => ({
       dept,
@@ -145,174 +139,98 @@ function TypeChipPicker({
         || (dept.id === "grip" && gripSearchTerms(role).some((term) => normalizeOccupation(term).includes(normalizeOccupation(normalizedQuery)))),
       ),
     }))
-    .filter(({ roles }) => roles.length > 0);
+    .filter(({ dept, roles }) => normalizedQuery ? roles.length > 0 : activeDepartmentIds.has(dept.id));
 
-  return (
-    <div className="space-y-6">
-      {selectedTypes.length > 0 && (
+  if (mode === "types") {
+    return (
+      <div className="space-y-6">
         <div>
-          <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-text-muted">Ausgewählte Tätigkeiten</p>
+          <p className="mb-2.5 text-xs font-semibold text-text-primary">Talent und Anbieter</p>
+          <p className="mb-3 text-xs leading-5 text-text-muted">Wähle alle passenden Bereiche. Filmcrew-Berufe suchst du im nächsten Schritt.</p>
           <div className="flex flex-wrap gap-2">
-            {selectedTypes.map((type, index) => (
-              <span key={type} className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 text-xs font-medium text-gold">
-                <span>{PROFILE_TYPE_LABELS[type as ProfileType] ?? type}</span>
-                {index === 0 ? (
-                  <span className="text-[10px] text-gold/70">Haupttätigkeit</span>
-                ) : (
-                  <button type="button" onClick={() => onTypesChange([type, ...selectedTypes.filter((selected) => selected !== type)])}
-                    className="rounded px-1 py-0.5 text-[10px] text-text-muted hover:text-gold" aria-label={`${PROFILE_TYPE_LABELS[type as ProfileType] ?? type} als Haupttätigkeit festlegen`}>
-                    Als Haupt
-                  </button>
-                )}
-                <button type="button" onClick={() => onTypesChange(selectedTypes.filter((selected) => selected !== type))}
-                  className="inline-flex h-6 w-6 items-center justify-center rounded-full hover:bg-red-500/10 hover:text-red-400" aria-label={`${PROFILE_TYPE_LABELS[type as ProfileType] ?? type} entfernen`}>
-                  <X size={12} />
+            {[...TALENT_CHIPS, ...ANBIETER_CHIPS].map(([id, label]) => {
+              const active = selectedTypes.includes(id);
+              return (
+                <button key={id} type="button" aria-pressed={active} onClick={() => toggleType(id)}
+                  className={`min-h-11 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${active ? "bg-gold/15 border-gold/50 text-gold" : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"}`}>
+                  {label}
                 </button>
-              </span>
-            ))}
+              );
+            })}
           </div>
-          <p className="mt-2 text-[11px] text-text-muted">Die erste Tätigkeit ist die Haupttätigkeit. Alle ausgewählten Tätigkeiten erscheinen im Profil und in der Suche.</p>
         </div>
-      )}
-
-      <label className="relative block">
-        <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
-        <input
-          type="search"
-          value={roleSearch}
-          onChange={(event) => setRoleSearch(event.target.value)}
-          placeholder="Gewerk oder Rolle suchen …"
-          aria-label="Gewerk oder Rolle suchen"
-          className="w-full rounded-xl border border-border bg-bg-primary py-3 pl-10 pr-4 text-sm text-text-primary placeholder:text-text-muted focus:border-gold focus:outline-none"
-        />
-      </label>
-
-      {/* Talent */}
-      <div>
-        <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted mb-2.5">🎭 Talent</p>
-        <div className="flex flex-wrap gap-2">
-          {TALENT_CHIPS.map(([id, label]) => {
-            const active = selectedTypes.includes(id);
-            return (
-              <button key={id} type="button"
-                aria-pressed={active}
-                onClick={() => toggleType(id)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                  active ? "bg-gold/15 border-gold/50 text-gold" : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"
-                }`}>
-                {label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Filmcrew & Kreativ — vollständige Rollen aus departments.ts */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">🎬 Filmcrew & Kreativ</p>
-          {positions.length > 0 && (
-            <button type="button" onClick={() => {
-              onPositionsChange([]);
-              onTypesChange(selectedTypes.filter((type) => TALENT_TYPE_IDS.has(type) || ANBIETER_TYPE_IDS.has(type)));
-            }}
-              className="text-[10px] text-text-muted hover:text-red-400 transition-colors">
-              Alle entfernen
-            </button>
-          )}
-        </div>
-        {positions.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {positions.map((p) => (
-              <span key={p} className="flex items-center gap-1 px-2.5 py-1 bg-gold/8 border border-gold/20 rounded-full text-xs text-gold font-medium">
-                {p}
-                <button type="button"
-                  onClick={() => {
-                    const next = positions.filter((x) => x !== p);
-                    onPositionsChange(next);
-                    const representedTypes = new Set(departments
-                      .filter((department) => department.roles.some((role) => next.includes(role)))
-                      .map((department) => DEPARTMENT_TO_PROFILE_TYPE[department.id])
-                      .filter(Boolean));
-                    onTypesChange(selectedTypes.filter((type) => TALENT_TYPE_IDS.has(type) || ANBIETER_TYPE_IDS.has(type) || representedTypes.has(type)));
-                  }}
-                  className="hover:text-red-400 transition-colors ml-0.5">
-                  <X size={9} />
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
-        {visibleDepartments.map(({ dept, roles }) => {
-          const colors = deptColors(dept.color);
-          const deptCount = dept.roles.filter((r) => positions.includes(r)).length;
-          const expanded = normalizedQuery
-            ? expandedDepartments[dept.id] !== false
-            : Boolean(expandedDepartments[dept.id]);
-          return (
-            <div key={dept.id} className="rounded-xl border border-border bg-bg-primary/50 overflow-hidden">
-              <button
-                type="button"
-                aria-expanded={expanded}
-                onClick={() => setExpandedDepartments((current) => ({ ...current, [dept.id]: !current[dept.id] }))}
-                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-bg-elevated/60 transition-colors"
-              >
-                <span className="flex min-w-0 items-center gap-2">
-                  <span className={`text-[10px] uppercase tracking-widest font-semibold ${colors.text}`}>{dept.emoji} {dept.label}</span>
-                  <span className="text-[10px] text-text-muted">{roles.length} {roles.length === 1 ? "Rolle" : "Rollen"}</span>
-                </span>
-                <span className="flex shrink-0 items-center gap-2">
-                  {deptCount > 0 && (
-                    <span className={`text-[10px] font-semibold px-2 py-1 rounded-full border ${colors.bg} ${colors.border} ${colors.text}`}>{deptCount} ausgewählt</span>
-                  )}
-                  <ChevronDown size={15} className={`text-text-muted transition-transform ${expanded ? "rotate-180" : ""}`} />
-                </span>
-              </button>
-              {expanded && <div className="flex flex-wrap gap-1.5 border-t border-border px-4 py-3">
-                {dept.id === "grip" && <p className="mb-1 w-full text-xs leading-5 text-text-muted">Kamerabühne / Grip richtet und bewegt Kameraunterstützung wie Dolly, Schienen und Kräne ein. Einzelne Zuständigkeiten unterscheiden sich je nach Land und Produktion.</p>}
-                {roles.map((job) => {
-                  const isSel = positions.includes(job);
-                  const explanation = GRIP_OCCUPATIONS.find((occupation) => occupation.label === job)?.description;
-                  return (
-                    <button key={job} type="button"
-                      title={explanation}
-                      onClick={() => togglePosition(job, dept.id)}
-                      className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
-                        isSel ? `${colors.bg} ${colors.border} ${colors.text}` : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"
-                      }`}>
-                      {job}
-                    </button>
-                  );
-                })}
-              </div>}
-            </div>
-          );
-        })}
-        {visibleDepartments.length === 0 && (
-          <p className="rounded-xl border border-dashed border-border px-4 py-6 text-center text-sm text-text-muted">
-            Kein Gewerk gefunden. Probiere einen anderen Suchbegriff.
+        {(selectedTypes.some((type) => !TALENT_TYPE_IDS.has(type) && !ANBIETER_TYPE_IDS.has(type)) || positions.length > 0) && (
+          <p className="rounded-lg border border-border bg-bg-primary/50 p-3 text-sm text-text-secondary">
+            Für deine Crew-Tätigkeiten sind {positions.length} {positions.length === 1 ? "Rolle" : "Rollen"} ausgewählt. Du kannst sie im nächsten Schritt ändern.
           </p>
         )}
       </div>
+    );
+  }
 
-      {/* Anbieter */}
-      <div>
-        <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted mb-2.5">🏠 Anbieter</p>
-        <div className="flex flex-wrap gap-2">
-          {ANBIETER_CHIPS.map(([id, label]) => {
-            const active = selectedTypes.includes(id);
-            return (
-              <button key={id} type="button"
-                aria-pressed={active}
-                onClick={() => toggleType(id)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                  active ? "bg-gold/15 border-gold/50 text-gold" : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"
-                }`}>
-                {label}
-              </button>
-            );
-          })}
+  return (
+    <div className="space-y-5">
+      {positions.length > 0 && (
+        <div>
+          <p className="mb-2 text-xs font-semibold text-text-primary">Ausgewählte Tätigkeiten</p>
+          <div className="flex flex-wrap gap-2">
+            {positions.map((position) => (
+              <span key={position} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-3 text-sm text-gold">
+                {position}
+                <button type="button" onClick={() => {
+                  const dept = departments.find((item) => item.roles.includes(position));
+                  if (dept) togglePosition(position, dept.id);
+                }} className="inline-flex h-7 w-7 items-center justify-center rounded-full hover:bg-red-500/10" aria-label={`${position} entfernen`}><X size={14} /></button>
+              </span>
+            ))}
+          </div>
         </div>
+      )}
+      <label className="relative block">
+        <Search size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
+        <input type="search" value={roleSearch} onChange={(event) => setRoleSearch(event.target.value)}
+          placeholder="Beruf oder Spezialisierung suchen …" aria-label="Beruf oder Spezialisierung suchen"
+          className="w-full rounded-xl border border-border bg-bg-primary py-3 pl-10 pr-4 text-base text-text-primary placeholder:text-text-muted focus:border-gold focus:outline-none" />
+      </label>
+      <label className="block">
+        <span className="mb-1.5 block text-xs font-semibold text-text-secondary">Gewerk auswählen</span>
+        <select value="" onChange={(event) => {
+          const id = event.target.value;
+          if (id) {
+            setChosenDepartments((current) => current.includes(id) ? current : [...current, id]);
+            setExpandedDepartments((current) => ({ ...current, [id]: true }));
+            setRoleSearch("");
+          }
+        }} className="min-h-11 w-full rounded-xl border border-border bg-bg-primary px-3 text-sm text-text-primary focus:border-gold focus:outline-none">
+          <option value="">Gewerk suchen oder auswählen …</option>
+          {departments.map((dept) => <option key={dept.id} value={dept.id}>{dept.emoji} {dept.label}</option>)}
+        </select>
+      </label>
+      <div className="space-y-3">
+        {visibleDepartments.map(({ dept, roles }) => {
+          const colors = deptColors(dept.color);
+          const selectedCount = dept.roles.filter((role) => positions.includes(role)).length;
+          const expanded = normalizedQuery ? expandedDepartments[dept.id] !== false : Boolean(expandedDepartments[dept.id] || selectedCount > 0);
+          return (
+            <section key={dept.id} className="overflow-hidden rounded-xl border border-border bg-bg-primary/50">
+              <button type="button" aria-expanded={expanded} onClick={() => setExpandedDepartments((current) => ({ ...current, [dept.id]: !expanded }))}
+                className="flex min-h-12 w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-bg-elevated/60">
+                <span className="min-w-0"><span className={`text-xs font-semibold uppercase tracking-wider ${colors.text}`}>{dept.emoji} {dept.label}</span><span className="ml-2 text-xs text-text-muted">{roles.length} {roles.length === 1 ? "Tätigkeit" : "Tätigkeiten"}</span></span>
+                <span className="flex shrink-0 items-center gap-2">{selectedCount > 0 && <span className={`rounded-full border px-2 py-1 text-[10px] ${colors.bg} ${colors.border} ${colors.text}`}>{selectedCount} ausgewählt</span>}<ChevronDown size={15} className={`text-text-muted transition-transform ${expanded ? "rotate-180" : ""}`} /></span>
+              </button>
+              {expanded && <div className="flex flex-wrap gap-2 border-t border-border px-4 py-3">
+                {dept.id === "grip" && <p className="mb-1 w-full text-xs leading-5 text-text-muted">Kamerabühne / Grip umfasst Kameraunterstützung wie Dolly, Schienen und Kräne. Zuständigkeiten können sich je nach Land und Produktion unterscheiden.</p>}
+                {roles.map((role) => {
+                  const active = positions.includes(role);
+                  const explanation = GRIP_OCCUPATIONS.find((occupation) => occupation.label === role)?.description;
+                  return <button key={role} type="button" aria-pressed={active} title={explanation} onClick={() => togglePosition(role, dept.id)}
+                    className={`min-h-10 rounded-full border px-3 py-2 text-xs font-medium transition-colors ${active ? `${colors.bg} ${colors.border} ${colors.text}` : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"}`}>{role}</button>;
+                })}
+              </div>}
+            </section>
+          );
+        })}
+        {visibleDepartments.length === 0 && <p className="rounded-xl border border-dashed border-border px-4 py-6 text-center text-sm text-text-muted">{normalizedQuery ? "Kein Gewerk oder Beruf gefunden. Probiere einen anderen Suchbegriff." : "Wähle ein Gewerk aus oder suche nach einer Tätigkeit."}</p>}
       </div>
     </div>
   );
@@ -545,6 +463,20 @@ export default function ProfilePage() {
   const [profileLoadError, setProfileLoadError] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<ProfileSaveFieldErrors>({});
   const [profileExists, setProfileExists] = useState(false);
+  const [profileUpdatedAt, setProfileUpdatedAt] = useState("");
+  const [editorStep, setEditorStep] = useState<ProfileEditorStep>(1);
+  const [draftLoading, setDraftLoading] = useState(true);
+  const [draftLoaded, setDraftLoaded] = useState(false);
+  const [draftLoadError, setDraftLoadError] = useState("");
+  const [draftSaveState, setDraftSaveState] = useState<"idle" | "pending" | "saving" | "saved" | "error">("idle");
+  const [editorRevision, setEditorRevision] = useState(0);
+  const draftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const draftPausedRef = useRef(false);
+  const draftSequenceRef = useRef(0);
+  const draftQueueRef = useRef<Promise<unknown>>(Promise.resolve());
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const cityInputRef = useRef<HTMLInputElement>(null);
+  const activityPickerRef = useRef<HTMLDivElement>(null);
   const [saving, setSaving] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [messageEmailsEnabled, setMessageEmailsEnabled] = useState(true);
@@ -759,7 +691,9 @@ export default function ProfilePage() {
           addToast(`Einige Profilfelder fehlen noch in der Datenbank: ${unavailableFields.join(", ")}. Bitte die Datenbank aktualisieren lassen.`, "error");
         }
         setProfileExists(!!exists);
+        setEditorStep(exists ? 0 : 1);
         if (profile) {
+          setProfileUpdatedAt(typeof profile.updated_at === "string" ? profile.updated_at : "");
           const availabilityConfig = profile.availability_config as {
             weekends?: boolean;
             night_shoots?: boolean;
@@ -876,13 +810,8 @@ export default function ProfilePage() {
       const url = await sendProfileMediaFile(prepared.file);
       setAvatarUrl(url);
       setAvatarPreview(url);
-      if (profileExists) {
-        await patchProfile({ avatar_url: url });
-        window.dispatchEvent(new CustomEvent("cinegenius:profile-updated", {
-          detail: { userId: user?.id, displayName: form.name, avatarUrl: url },
-        }));
-      }
-      addToast(profileExists ? t("uploadSuccess") : "Foto hochgeladen. Speichere dein Profil, damit es übernommen wird.", "success");
+      markEditorChanged();
+      addToast("Foto bereit. Speichere dein Profil, damit es öffentlich übernommen wird.", "success");
       // Fokuspunkt setzen
       setFocalPickerImage(url);
     } catch (err) {
@@ -895,22 +824,9 @@ export default function ProfilePage() {
     }
   };
 
-  const removeAvatar = async () => {
-    const previousAvatarUrl = avatarUrl;
+  const removeAvatar = () => {
     setAvatarPreview("");
     setAvatarUrl("");
-    try {
-      if (profileExists) {
-        await patchProfile({ avatar_url: null });
-        window.dispatchEvent(new CustomEvent("cinegenius:profile-updated", {
-          detail: { userId: user?.id, displayName: form.name, avatarUrl: null },
-        }));
-      }
-    } catch (err) {
-      setAvatarUrl(previousAvatarUrl);
-      setAvatarPreview(previousAvatarUrl);
-      addToast(`Profilfoto konnte nicht entfernt werden: ${err instanceof Error ? err.message : t("uploadFailed")}`, "error");
-    }
   };
 
   const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -923,10 +839,10 @@ export default function ProfilePage() {
       const prepared = await prepareProfileMediaFile(file, (source) => compressImage(source, { maxWidth: 1920, maxHeight: 1080, quality: 0.85 }));
       if (!prepared.file) throw new Error(profileMediaErrorText(prepared.error, t));
       const url = await sendProfileMediaFile(prepared.file);
-      if (profileExists) await patchProfile({ cover_image_url: url });
       setCoverImageUrl(url);
       setCoverImagePreview(url);
-      addToast(profileExists ? t("coverSuccess") : "Titelbild hochgeladen. Speichere dein Profil, damit es übernommen wird.", "success");
+      markEditorChanged();
+      addToast("Titelbild bereit. Speichere dein Profil, damit es öffentlich übernommen wird.", "success");
       // Fokuspunkt setzen
       setFocalPickerImage(url);
     } catch (err) {
@@ -1044,8 +960,16 @@ export default function ProfilePage() {
 
   // ── Save profile ────────────────────────────────────────────────────────────
   const handleSave = async () => {
+    if (avatarUploading || coverUploading || profileUploading) {
+      addToast("Warte bitte, bis alle Fotos hochgeladen sind, bevor du das Profil speicherst.", "error");
+      return;
+    }
     if (profileLoadError) {
       addToast("Profil konnte nicht geladen werden. Lade die Seite neu, bevor du Änderungen speicherst.", "error");
+      return;
+    }
+    if (!draftLoaded) {
+      addToast("Der private Entwurf wird noch geladen. Bitte warte kurz, bevor du speicherst.", "error");
       return;
     }
     const validationErrors = validateProfileSave({
@@ -1056,11 +980,17 @@ export default function ProfilePage() {
     });
     setFieldErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) {
-      addToast("Bitte korrigiere die markierten Pflichtfelder.", "error");
+      const destination = profileEditorStepForErrors(Object.keys(validationErrors) as ("activity" | "name" | "city")[]);
+      setEditorStep(destination);
+      focusEditorField(validationErrors.activity ? "activity" : validationErrors.name ? "name" : "city");
       return;
     }
+    draftPausedRef.current = true;
+    draftSequenceRef.current += 1;
+    if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
     setSaving(true);
     try {
+      await draftQueueRef.current.catch(() => {});
       const location = [form.city.trim(), form.country.trim()].filter(Boolean).join(", ");
       const physicalValues = {
         ...physicalDataRef.current,
@@ -1092,6 +1022,7 @@ export default function ProfilePage() {
       const performance = Object.values(performanceValues).some(hasOptionalValue) ? performanceValues : null;
       const commonPayload = {
         display_name:   form.name,
+        avatar_url:     avatarUrl || null,
         location,
         bio:            form.bio,
         available:      form.available,
@@ -1148,6 +1079,7 @@ export default function ProfilePage() {
       });
       const baseResult = await res.json().catch(() => ({}));
       if (!res.ok || baseResult.error) {
+        draftPausedRef.current = false;
         const serverFieldErrors = baseResult.fieldErrors;
         if (serverFieldErrors && typeof serverFieldErrors === "object") {
           setFieldErrors({
@@ -1155,16 +1087,29 @@ export default function ProfilePage() {
             city: serverFieldErrors.location,
             activity: serverFieldErrors.activity,
           });
+          const destination = profileEditorStepForErrors(Object.keys(serverFieldErrors).flatMap((key) => key === "display_name" ? ["name" as const] : key === "location" ? ["city" as const] : key === "activity" ? ["activity" as const] : []));
+          setEditorStep(destination);
+          focusEditorField(destination === 1 ? "activity" : serverFieldErrors.display_name ? "name" : "city");
         }
         const msg = baseResult.error ?? `HTTP ${res.status}`;
         addToast(`Speichern fehlgeschlagen: ${msg}`, "error");
         return;
       }
       if (isNew) setProfileExists(true);
-      window.dispatchEvent(new CustomEvent("cinegen:profile-updated", {
-        detail: { userId: user?.id, displayName: form.name, avatarUrl: avatarUrl || null },
+      setProfileUpdatedAt(new Date().toISOString());
+      setEditorStep(0);
+      setEditorRevision(0);
+      const url = avatarUrl || null;
+      window.dispatchEvent(new CustomEvent("cinegenius:profile-updated", {
+        detail: { userId: user?.id, displayName: form.name, avatarUrl: url },
       }));
       const unavailableFields: string[] = baseResult.unavailableFields ?? [];
+      try {
+        await fetch("/api/onboarding?type=profile-edit", { method: "DELETE" });
+      } catch {
+        // The newer public profile timestamp prevents an older private draft from being resumed.
+      }
+      setDraftSaveState("idle");
 
       physicalDataRef.current = physical ?? {};
       performanceDataRef.current = performance ?? {};
@@ -1175,26 +1120,16 @@ export default function ProfilePage() {
         addToast(t("profileSaved"), "success");
       }
     } catch (err) {
+      draftPausedRef.current = false;
       addToast(`Fehler: ${err instanceof Error ? err.message : String(err)}`, "error");
     } finally {
       setSaving(false);
+      if (!draftPausedRef.current) markEditorChanged();
     }
   };
 
-  const persistProfileImages = async (images: ProfileImage[]) => {
-    await patchProfile({ profile_images: images });
-  };
-
-  const updateProfileImages = async (images: ProfileImage[]) => {
-    const previousImages = profileImages;
+  const updateProfileImages = (images: ProfileImage[]) => {
     setProfileImages(images);
-    if (!profileExists) return;
-    try {
-      await persistProfileImages(images);
-    } catch (err) {
-      setProfileImages(previousImages);
-      throw err;
-    }
   };
 
   const handleProfileImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1220,12 +1155,10 @@ export default function ProfilePage() {
       // Merge with existing, auto-feature first if none set
       const merged = [...profileImages, ...uploaded];
       if (!merged.some((i) => i.featured)) merged[0] = { ...merged[0], featured: true };
-      // Existing profiles persist immediately; new profiles include the photos in the first save.
-      await updateProfileImages(merged);
+      updateProfileImages(merged);
+      markEditorChanged();
 
-      addToast(profileExists
-        ? t("photosSaved", { count: uploaded.length })
-        : `${uploaded.length} Foto(s) hochgeladen. Speichere dein Profil, damit sie übernommen werden.`, "success");
+      addToast(`${uploaded.length} Foto(s) bereit. Speichere dein Profil, damit sie öffentlich übernommen werden.`, "success");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "";
       const isBrowserBug = !msg || /did not match|pattern/i.test(msg);
@@ -1281,6 +1214,8 @@ export default function ProfilePage() {
     filmography,
     languages,
   });
+  const requiredMissing = profileEditorRequiredMissing({ name: form.name, city: form.city, positions, profileTypes: currentProfileTypes });
+  const visibleFieldErrors = Object.fromEntries(Object.entries(fieldErrors).filter(([, message]) => Boolean(message))) as ProfileSaveFieldErrors;
   const completionHints: Record<string, string> = {
     name: t("hintName"), avatar: t("hintAvatar"), city: t("hintCity"), bio: t("hintBio"),
     type: t("hintType"), photos: t("hintPhotos"), video: t("hintVideo"), languages: t("hintLanguages"),
@@ -1289,26 +1224,196 @@ export default function ProfilePage() {
   const completionMissing = completion.missing.slice(0, 3).map((key) => completionHints[key] ?? key);
   const displayAvatarName = form.name || clerkEmail.split("@")[0] || "?";
 
-  async function saveFocalPoint(point: FocalPoint) {
+  function markEditorChanged() {
+    setDraftSaveState("pending");
+    setEditorRevision((revision) => revision + 1);
+  }
+
+  const buildEditorDraft = () => ({
+    savedAt: new Date().toISOString(),
+    step: editorStep,
+    form,
+    skills,
+    memberships,
+    positions,
+    languages,
+    profileImages,
+    avatarUrl,
+    coverImageUrl,
+    focalPoint,
+    coverOpacity,
+    instagramUrl,
+    tiktokUrl,
+    youtubeUrl,
+    vimeoUrl,
+    linkedinUrl,
+    dayRate,
+    filmography,
+    videoLinks,
+    crewCertificates,
+    currentProfileTypes,
+    physicalData: physicalDataRef.current,
+    performanceData: performanceDataRef.current,
+    playingAgeMin,
+    playingAgeMax,
+    heightCm,
+    clothingSize,
+    shoeSize,
+    hairColor,
+    eyeColor,
+    bodyType,
+    dialectsText,
+    drivingLicensesText,
+    beard,
+    tattoos,
+    tattoosCoverable,
+  });
+
+  async function persistEditorDraft() {
+    const sequence = ++draftSequenceRef.current;
+    setDraftSaveState("saving");
+    const snapshot = buildEditorDraft();
+    const task = draftQueueRef.current.catch(() => {}).then(async () => {
+      const response = await fetch("/api/onboarding", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profileEditorDraft: snapshot }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.saved) throw new Error(result.error ?? `HTTP ${response.status}`);
+    });
+    draftQueueRef.current = task;
     try {
-      if (profileExists) await patchProfile({ focal_point: { ...point, opacity: coverOpacity } });
-      setFocalPoint(point);
-      setFocalPickerImage(null);
-      addToast(t("focalSaved"), "success");
-    } catch (err) {
-      addToast(`Bildposition konnte nicht gespeichert werden: ${err instanceof Error ? err.message : "Unbekannter Fehler"}`, "error");
+      await task;
+      if (sequence === draftSequenceRef.current) setDraftSaveState("saved");
+    } catch (error) {
+      if (sequence === draftSequenceRef.current) {
+        setDraftSaveState("error");
+        addToast(`Privater Entwurf konnte nicht gespeichert werden: ${error instanceof Error ? error.message : "Bitte versuche es erneut."}`, "error");
+      }
+      throw error;
     }
   }
 
-  async function saveCoverOpacity(opacity: number) {
-    try {
-      if (profileExists) await patchProfile({ focal_point: { ...focalPoint, opacity } });
-      savedCoverOpacity.current = opacity;
-      setCoverOpacity(opacity);
-    } catch (err) {
-      setCoverOpacity(savedCoverOpacity.current);
-      addToast(`Bildhelligkeit konnte nicht gespeichert werden: ${err instanceof Error ? err.message : "Unbekannter Fehler"}`, "error");
+  const persistEditorDraftRef = useRef(persistEditorDraft);
+  persistEditorDraftRef.current = persistEditorDraft;
+
+  useEffect(() => {
+    if (profileLoading) return;
+    let cancelled = false;
+    setDraftLoading(true);
+    setDraftLoadError("");
+    fetch("/api/onboarding", { cache: "no-store" })
+      .then(async (response) => {
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error ?? `HTTP ${response.status}`);
+        return result;
+      })
+      .then(({ draft }) => {
+        if (cancelled) return;
+        const saved = draft?.profileEditorDraft;
+        const shouldResume = saved && typeof saved === "object" && shouldResumeProfileEditorDraft({
+          profileExists,
+          draftUpdatedAt: String(draft?.profileEditorDraftUpdatedAt ?? saved?.savedAt ?? ""),
+          profileUpdatedAt,
+        });
+        if (shouldResume) {
+          if (saved.form && typeof saved.form === "object") setForm((current) => ({ ...current, ...(saved.form as Partial<typeof current>) }));
+          if (Array.isArray(saved.skills)) setSkills(saved.skills.filter((item: unknown): item is string => typeof item === "string"));
+          if (Array.isArray(saved.memberships)) setMemberships(saved.memberships.filter((item: unknown): item is string => typeof item === "string"));
+          if (Array.isArray(saved.positions)) setPositions(saved.positions.filter((item: unknown): item is string => typeof item === "string"));
+          if (Array.isArray(saved.languages)) setLanguages(saved.languages.filter((item: unknown): item is string => typeof item === "string"));
+          if (Array.isArray(saved.profileImages)) setProfileImages(saved.profileImages.filter((item: unknown) => !!item && typeof item === "object" && typeof (item as ProfileImage).url === "string"));
+          if (typeof saved.avatarUrl === "string") { setAvatarUrl(saved.avatarUrl); setAvatarPreview(saved.avatarUrl); }
+          if (typeof saved.coverImageUrl === "string") { setCoverImageUrl(saved.coverImageUrl); setCoverImagePreview(saved.coverImageUrl); }
+          if (saved.focalPoint && typeof saved.focalPoint === "object") setFocalPoint(saved.focalPoint as FocalPoint);
+          if (typeof saved.coverOpacity === "number") setCoverOpacity(saved.coverOpacity);
+          if (typeof saved.instagramUrl === "string") setInstagramUrl(saved.instagramUrl);
+          if (typeof saved.tiktokUrl === "string") setTiktokUrl(saved.tiktokUrl);
+          if (typeof saved.youtubeUrl === "string") setYoutubeUrl(saved.youtubeUrl);
+          if (typeof saved.vimeoUrl === "string") setVimeoUrl(saved.vimeoUrl);
+          if (typeof saved.linkedinUrl === "string") setLinkedinUrl(saved.linkedinUrl);
+          if (typeof saved.dayRate === "string") setDayRate(saved.dayRate);
+          if (Array.isArray(saved.filmography)) setFilmography(saved.filmography);
+          if (Array.isArray(saved.videoLinks)) setVideoLinks(saved.videoLinks.filter((item: unknown): item is string => typeof item === "string"));
+          if (Array.isArray(saved.crewCertificates)) setCrewCertificates(saved.crewCertificates.filter((item: unknown): item is string => typeof item === "string"));
+          if (Array.isArray(saved.currentProfileTypes)) setCurrentProfileTypes(saved.currentProfileTypes.filter((item: unknown): item is string => typeof item === "string"));
+          if (saved.physicalData && typeof saved.physicalData === "object") physicalDataRef.current = saved.physicalData as Record<string, unknown>;
+          if (saved.performanceData && typeof saved.performanceData === "object") performanceDataRef.current = saved.performanceData as Record<string, unknown>;
+          for (const [key, setter] of [
+            ["playingAgeMin", setPlayingAgeMin], ["playingAgeMax", setPlayingAgeMax], ["heightCm", setHeightCm],
+            ["clothingSize", setClothingSize], ["shoeSize", setShoeSize], ["hairColor", setHairColor],
+            ["eyeColor", setEyeColor], ["bodyType", setBodyType], ["dialectsText", setDialectsText],
+            ["drivingLicensesText", setDrivingLicensesText],
+          ] as const) if (typeof saved[key] === "string") setter(saved[key] as never);
+          if (typeof saved.beard === "boolean") setBeard(saved.beard);
+          if (typeof saved.tattoos === "boolean") setTattoos(saved.tattoos);
+          if (typeof saved.tattoosCoverable === "boolean") setTattoosCoverable(saved.tattoosCoverable);
+          if ([1, 2, 3, 4, 5, 6].includes(Number(saved.step))) setEditorStep(Number(saved.step) as ProfileEditorStep);
+          setDraftSaveState("saved");
+        }
+        setDraftLoaded(true);
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        const message = error instanceof Error ? error.message : "Bitte lade die Seite neu.";
+        setDraftLoadError(message);
+        setDraftLoaded(false);
+      })
+      .finally(() => { if (!cancelled) setDraftLoading(false); });
+    return () => { cancelled = true; };
+  }, [profileLoading, profileExists, profileUpdatedAt]); // profile is loaded once; the private editor draft is then applied over it
+
+  useEffect(() => {
+    if (!draftLoaded || draftPausedRef.current || editorRevision === 0) return;
+    if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+    draftTimerRef.current = setTimeout(() => { void persistEditorDraftRef.current().catch(() => {}); }, 700);
+    return () => { if (draftTimerRef.current) clearTimeout(draftTimerRef.current); };
+  }, [editorRevision, draftLoaded]);
+
+  function focusEditorField(field: "activity" | "name" | "city") {
+    window.setTimeout(() => {
+      const target = field === "activity" ? activityPickerRef.current : field === "name" ? nameInputRef.current : cityInputRef.current;
+      target?.scrollIntoView({ behavior: "smooth", block: "center" });
+      target?.focus();
+    }, 80);
+  }
+
+  function goToEditorStep(step: ProfileEditorStep, focus?: "activity" | "name" | "city") {
+    if (step > 0) draftPausedRef.current = false;
+    setEditorStep(step);
+    markEditorChanged();
+    if (focus) focusEditorField(focus);
+    else window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function validateEditorStep(step: ProfileEditorStep) {
+    const errors: ProfileSaveFieldErrors = {};
+    if (step === 2 && !positions.length && !currentProfileTypes.length) errors.activity = "Bitte wähle mindestens eine Tätigkeit aus.";
+    if (step === 3) {
+      if (!form.name.trim()) errors.name = "Bitte gib deinen Namen ein.";
+      if (!form.city.trim()) errors.city = "Bitte gib deinen Standort ein.";
     }
+    setFieldErrors((current) => ({ ...current, ...errors }));
+    if (Object.keys(errors).length) {
+      const destination = profileEditorStepForErrors(Object.keys(errors) as ("activity" | "name" | "city")[]);
+      setEditorStep(destination);
+      focusEditorField(errors.activity ? "activity" : errors.name ? "name" : "city");
+      return false;
+    }
+    return true;
+  }
+
+  async function saveFocalPoint(point: FocalPoint) {
+    setFocalPoint(point);
+    setFocalPickerImage(null);
+    markEditorChanged();
+    addToast("Bildposition im Entwurf übernommen. Speichere dein Profil, um sie zu veröffentlichen.", "success");
+  }
+
+  async function saveCoverOpacity(opacity: number) {
+    savedCoverOpacity.current = opacity;
+    setCoverOpacity(opacity);
   }
 
   return (
@@ -1321,7 +1426,7 @@ export default function ProfilePage() {
         onClose={() => setFocalPickerImage(null)}
       />
     )}
-    <div className="pt-16 min-h-screen overflow-x-hidden">
+    <div className="pt-16 min-h-screen">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
 
         {/* ── Header ── */}
@@ -1353,19 +1458,14 @@ export default function ProfilePage() {
         <div className="flex gap-6 flex-col lg:flex-row">
           {/* Sidebar — vertical on desktop, horizontal scroll on mobile */}
           <aside className="lg:w-56 shrink-0">
-            {/* Mobile: horizontal scrollable tabs */}
-            <div className="flex lg:hidden gap-2 overflow-x-auto pb-1 scrollbar-none">
-              {TAB_IDS.map(({ id, labelKey, icon: Icon }) => (
-                <button key={id} onClick={() => setActiveTab(id)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 ${
-                    activeTab === id
-                      ? "bg-gold/10 text-gold border border-gold/20"
-                      : "text-text-secondary bg-bg-secondary border border-border"
-                  }`}>
-                  <Icon size={12} /> {t(labelKey as Parameters<typeof t>[0])}
-                </button>
-              ))}
-            </div>
+            {/* Mobile: one compact, fully visible selector instead of a clipped tab row */}
+            <label className="mb-4 block lg:hidden">
+              <span className="sr-only">Profilbereich auswählen</span>
+              <select value={activeTab} onChange={(event) => setActiveTab(event.target.value as typeof activeTab)}
+                className="min-h-11 w-full rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary focus:border-gold focus:outline-none">
+                {TAB_IDS.map(({ id, labelKey }) => <option key={id} value={id}>{t(labelKey as Parameters<typeof t>[0])}</option>)}
+              </select>
+            </label>
             {/* Desktop: vertical nav */}
             <nav className="hidden lg:block space-y-1">
               {TAB_IDS.map(({ id, labelKey, icon: Icon }) => (
@@ -1393,7 +1493,9 @@ export default function ProfilePage() {
 
             {/* ── PROFIL ── */}
             {activeTab === "profile" && !profileLoading && (
-              <div className="space-y-8">
+              <div className="space-y-6" onChangeCapture={markEditorChanged} onClickCapture={(event) => {
+                if (!(event.target as HTMLElement).closest("[data-no-draft]")) markEditorChanged();
+              }}>
 
                 {profileLoadError && (
                   <div role="alert" className="flex items-start gap-3 rounded-xl border border-error/30 bg-error/10 p-4 text-sm text-text-primary">
@@ -1402,53 +1504,114 @@ export default function ProfilePage() {
                   </div>
                 )}
 
-                {/* ── Completion Score ── */}
-                {completion.score < 100 && (
-                  <div className="p-4 bg-bg-secondary border border-border rounded-xl">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-semibold text-text-primary">{t("completionTitle")}</p>
-                      <span className={`text-sm font-bold tabular-nums ${completion.score >= 70 ? "text-emerald-400" : completion.score >= 40 ? "text-gold" : "text-text-muted"}`}>
-                        {completion.score}%
-                      </span>
+                {profileExists && editorStep === 0 && !draftLoading && !draftLoadError && (
+                  <section className="rounded-xl border border-border bg-bg-secondary p-4 sm:p-6">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <h2 className="font-semibold text-text-primary">Profilübersicht</h2>
+                        <p className="mt-1 text-sm text-text-muted">{requiredMissing.length ? `Pflichtangaben noch offen: ${requiredMissing.map((field) => field === "activity" ? "Tätigkeit" : field === "name" ? "Name" : "Standort").join(", ")}.` : "Pflichtangaben vollständig. Alles Weitere ist freiwillig."}</p>
+                      </div>
+                      <span className="rounded-full border border-border bg-bg-elevated px-3 py-1 text-xs text-text-secondary">Profilvollständigkeit {completion.score}%</span>
                     </div>
-                    <div className="h-1.5 bg-bg-elevated rounded-full overflow-hidden mb-3">
-                      <div
-                        className={`h-full rounded-full transition-all duration-500 ${completion.score >= 70 ? "bg-emerald-400" : "bg-gold"}`}
-                        style={{ width: `${completion.score}%` }}
-                      />
+                    <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                      {[
+                        { step: 1 as ProfileEditorStep, title: "Angebot", summary: currentProfileTypes.map((type) => PROFILE_TYPE_LABELS[type as ProfileType] ?? type).join(", ") || "Noch keine Tätigkeit ausgewählt" },
+                        { step: 2 as ProfileEditorStep, title: "Tätigkeiten", summary: positions.slice(0, 3).join(", ") || "Berufe und Spezialisierungen" },
+                        { step: 3 as ProfileEditorStep, title: "Name und Standort", summary: [form.name, form.city, form.country].filter(Boolean).join(" · ") || "Pflichtangaben ergänzen" },
+                        { step: 4 as ProfileEditorStep, title: "Fotos und Vorstellung", summary: `${profileImages.length + (avatarUrl ? 1 : 0)} Foto(s) · ${form.bio.trim() ? "Vorstellung vorhanden" : "Vorstellung optional"}` },
+                        { step: 5 as ProfileEditorStep, title: "Weitere Angaben", summary: "Verfügbarkeit, Erfahrungen und passende Zusatzangaben" },
+                        { step: 6 as ProfileEditorStep, title: "Prüfen und speichern", summary: "Öffentliche Änderungen erst nach deiner Bestätigung" },
+                      ].map((section) => (
+                        <button key={section.step} type="button" data-no-draft onClick={() => goToEditorStep(section.step, section.step === 3 && !form.name.trim() ? "name" : undefined)}
+                          className="flex min-h-16 items-center justify-between gap-3 rounded-lg border border-border bg-bg-primary px-4 py-3 text-left hover:border-gold/40">
+                          <span className="min-w-0"><span className="block text-sm font-medium text-text-primary">{section.title}</span><span className="mt-1 block break-words text-xs text-text-muted">{section.summary}</span></span>
+                          <Pencil size={15} className="shrink-0 text-text-muted" />
+                        </button>
+                      ))}
                     </div>
                     {completionMissing.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {completionMissing.map((hint) => (
-                          <span key={hint} className="text-[11px] px-2.5 py-1 bg-bg-elevated border border-border rounded-full text-text-muted">
-                            + {hint}
-                          </span>
-                        ))}
+                      <div className="mt-5 border-t border-border pt-4">
+                        <p className="mb-2 text-xs font-semibold text-text-secondary">Freiwillige Profilverbesserungen</p>
+                        <div className="flex flex-wrap gap-2">{completion.missing.slice(0, 5).map((key) => (
+                          <button key={key} type="button" onClick={() => goToEditorStep(profileEditorStepForHint(key))}
+                            className="min-h-10 rounded-full border border-border bg-bg-elevated px-3 py-2 text-xs text-text-muted hover:border-gold/40 hover:text-gold">+ {completionHints[key] ?? key}</button>
+                        ))}</div>
                       </div>
                     )}
+                  </section>
+                )}
+
+                {!profileExists && completion.score < 100 && editorStep > 0 && (
+                  <div className="rounded-xl border border-border bg-bg-secondary p-4">
+                    <div className="flex items-center justify-between text-sm"><span className="font-semibold text-text-primary">Profilfortschritt</span><span className="tabular-nums text-text-muted">{completion.score}%</span></div>
+                    <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-bg-elevated"><div className="h-full rounded-full bg-gold transition-all" style={{ width: `${completion.score}%` }} /></div>
+                    <p className="mt-2 text-xs text-text-muted">Die Prozentzahl umfasst auch freiwillige Angaben. Für die Veröffentlichung brauchst du nur Tätigkeit, Name und Standort.</p>
                   </div>
                 )}
 
-                {/* ── Deine Tätigkeit ── */}
-                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
-                  <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted mb-4">
-                    Deine Tätigkeit <span className="text-gold">*</span>
-                  </p>
-                  <TypeChipPicker
-                    selectedTypes={currentProfileTypes}
-                    onTypesChange={(next) => {
+                {draftLoadError && (
+                  <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-error/30 bg-error/10 p-4 text-sm text-text-primary">
+                    <span>Privater Entwurf konnte nicht geprüft werden: {draftLoadError}. Damit nichts überschrieben wird, lade den Editor bitte neu.</span>
+                    <button type="button" data-no-draft onClick={() => window.location.reload()} className="min-h-11 rounded-lg border border-border px-4 hover:border-gold">Neu laden</button>
+                  </div>
+                )}
+
+                {draftLoading && <div className="flex items-center gap-2 rounded-lg border border-border bg-bg-secondary p-3 text-sm text-text-muted"><Loader2 size={15} className="animate-spin" /> Privaten Entwurf prüfen …</div>}
+
+                {editorStep !== 6 && Object.keys(visibleFieldErrors).length > 1 && !draftLoading && !draftLoadError && (
+                  <div role="alert" className="rounded-lg border border-error/30 bg-error/10 p-4">
+                    <p className="mb-2 text-sm font-semibold text-error">Bitte ergänze noch diese Pflichtangaben:</p>
+                    <ul className="space-y-1 text-sm text-text-primary">{Object.entries(visibleFieldErrors).map(([field, message]) => (
+                      <li key={field}><button type="button" className="min-h-8 text-left underline underline-offset-2" onClick={() => {
+                        const target = field === "activity" ? 1 : 3;
+                        goToEditorStep(target, field === "activity" ? "activity" : field === "name" ? "name" : "city");
+                      }}>{message}</button></li>
+                    ))}</ul>
+                  </div>
+                )}
+
+                {editorStep > 0 && !draftLoading && !draftLoadError && (
+                  <section className="rounded-xl border border-border bg-bg-secondary p-4 sm:p-6">
+                    <div className="flex items-start justify-between gap-4">
+                      <div><p className="text-xs font-semibold uppercase tracking-wider text-gold">Schritt {editorStep} von {PROFILE_EDITOR_STEPS.length}</p><h2 className="mt-1 font-display text-xl font-semibold text-text-primary">{PROFILE_EDITOR_STEPS[editorStep - 1].title}</h2><p className="mt-1 text-sm leading-6 text-text-muted">{PROFILE_EDITOR_STEPS[editorStep - 1].description}</p></div>
+                      <span className="shrink-0 text-xs text-text-muted" aria-live="polite">{draftSaveState === "saving" ? "Entwurf wird gespeichert …" : draftSaveState === "saved" ? "Entwurf gespeichert" : draftSaveState === "error" ? "Entwurf nicht gespeichert" : draftSaveState === "pending" ? "Änderungen noch nicht gespeichert" : "Privater Entwurf"}</span>
+                    </div>
+                    <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-bg-elevated"><div className="h-full rounded-full bg-gold transition-all" style={{ width: `${(editorStep / PROFILE_EDITOR_STEPS.length) * 100}%` }} /></div>
+                    <nav aria-label="Profilabschnitte" className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                      {PROFILE_EDITOR_STEPS.map((step) => <button key={step.id} type="button" aria-current={editorStep === step.id ? "step" : undefined} onClick={() => goToEditorStep(step.id)}
+                        className={`min-h-11 rounded-lg border px-3 py-2 text-left text-xs transition-colors ${editorStep === step.id ? "border-gold/50 bg-gold/10 text-gold" : "border-border text-text-muted hover:border-border-light hover:text-text-primary"}`}><span className="mr-1 font-semibold">{step.id}.</span>{step.title}</button>)}
+                    </nav>
+                  </section>
+                )}
+
+                {editorStep === 1 && !draftLoading && !draftLoadError && (
+                  <div ref={activityPickerRef} tabIndex={-1} className="scroll-mt-28 rounded-xl border border-border bg-bg-secondary p-4 sm:p-6 outline-none focus-visible:ring-2 focus-visible:ring-gold">
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-text-muted">Dein Angebot <span className="text-gold">· Pflichtangabe</span></p>
+                    <p className="mb-4 text-sm text-text-muted">Wähle Talent- oder Anbieterbereiche. Crew-Berufe findest du im nächsten Schritt.</p>
+                    <TypeChipPicker mode="types" selectedTypes={currentProfileTypes} onTypesChange={(next) => {
                       setCurrentProfileTypes(next);
                       if (next.length > 0 || positions.length > 0) setFieldErrors((previous) => ({ ...previous, activity: undefined }));
-                    }}
-                    positions={positions}
-                    onPositionsChange={(next) => {
+                    }} positions={positions} onPositionsChange={setPositions} />
+                    {fieldErrors.activity && <p role="alert" className="mt-3 rounded-lg border border-error/30 bg-error/10 p-3 text-sm text-error">{fieldErrors.activity}</p>}
+                  </div>
+                )}
+                {editorStep === 2 && !draftLoading && !draftLoadError && (
+                  <div ref={activityPickerRef} tabIndex={-1} className="scroll-mt-28 rounded-xl border border-border bg-bg-secondary p-4 sm:p-6 outline-none focus-visible:ring-2 focus-visible:ring-gold">
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-text-muted">Filmcrew und Kreativberufe <span className="text-text-muted">· Weitere Tätigkeiten optional</span></p>
+                    <TypeChipPicker mode="roles" selectedTypes={currentProfileTypes} onTypesChange={setCurrentProfileTypes} positions={positions} onPositionsChange={(next) => {
                       setPositions(next);
                       if (next.length > 0 || currentProfileTypes.length > 0) setFieldErrors((previous) => ({ ...previous, activity: undefined }));
-                    }}
-                  />
-                  {fieldErrors.activity && <p role="alert" className="mt-3 text-sm text-error">{fieldErrors.activity}</p>}
-                </div>
+                    }} />
+                    {fieldErrors.activity && <p role="alert" className="mt-3 rounded-lg border border-error/30 bg-error/10 p-3 text-sm text-error">{fieldErrors.activity}</p>}
+                  </div>
+                )}
 
+                {editorStep === 4 && !draftLoading && !draftLoadError && <div className="space-y-6">
+                <div className="rounded-xl border border-border bg-bg-secondary p-4 sm:p-6">
+                  <div className="mb-2 flex items-center justify-between gap-3"><label htmlFor="profile-bio" className="text-sm font-semibold text-text-primary">{t("fieldBio")}</label><span className="text-xs text-text-muted">Optional</span></div>
+                  <textarea id="profile-bio" rows={4} value={form.bio ?? ""} onChange={(e) => setForm((p) => ({ ...p, bio: e.target.value }))} maxLength={500} placeholder="Ein paar Sätze zu dir und deiner Arbeit …" className="w-full resize-y rounded-lg border border-border bg-bg-elevated px-3 py-2.5 text-sm focus:border-gold focus:outline-none" />
+                  <p className="mt-1 text-right text-xs text-text-muted">{(form.bio ?? "").length} / 500</p>
+                </div>
                 {/* Avatar */}
                 <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-5">{t("sectionAvatar")}</h2>
@@ -1540,7 +1703,7 @@ export default function ProfilePage() {
                               title="Als Hauptfoto"
                               onClick={() => {
                                 const next = profileImages.map((im, j) => ({ ...im, featured: j === i }));
-                                void updateProfileImages(next).catch((err) => addToast(`Profilbilder konnten nicht gespeichert werden: ${err instanceof Error ? err.message : "Unbekannter Fehler"}`, "error"));
+                                updateProfileImages(next);
                               }}
                               className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold transition-colors ${
                                 img.featured ? "bg-gold text-bg-primary" : "bg-black/50 text-white/70 hover:bg-gold hover:text-bg-primary"
@@ -1551,7 +1714,7 @@ export default function ProfilePage() {
                               onClick={() => {
                                 const next = profileImages.filter((_, j) => j !== i);
                                 if (img.featured && next.length > 0 && !next.some((im) => im.featured)) next[0] = { ...next[0], featured: true };
-                                void updateProfileImages(next).catch((err) => addToast(`Profilbilder konnten nicht gespeichert werden: ${err instanceof Error ? err.message : "Unbekannter Fehler"}`, "error"));
+                                updateProfileImages(next);
                               }}
                               className="w-6 h-6 bg-black/50 rounded-full flex items-center justify-center text-white/70 hover:bg-red-600 hover:text-white transition-colors"
                             ><X size={11} /></button>
@@ -1609,18 +1772,9 @@ export default function ProfilePage() {
                         <img src={coverImagePreview} alt="Cover" className="w-full h-full object-cover" style={{ opacity: coverOpacity }} />
                         <button
                           type="button"
-                          onClick={async () => {
-                            const previousUrl = coverImageUrl;
-                            const previousPreview = coverImagePreview;
+                          onClick={() => {
                             setCoverImagePreview("");
                             setCoverImageUrl("");
-                            try {
-                              if (profileExists) await patchProfile({ cover_image_url: null });
-                            } catch (err) {
-                              setCoverImageUrl(previousUrl);
-                              setCoverImagePreview(previousPreview);
-                              addToast(`Titelbild konnte nicht entfernt werden: ${err instanceof Error ? err.message : "Unbekannter Fehler"}`, "error");
-                            }
                           }}
                           className="absolute top-2 right-2 w-7 h-7 bg-black/60 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-crimson-light"
                         >
@@ -1653,6 +1807,9 @@ export default function ProfilePage() {
                   )}
                 </div>}
 
+                </div>}
+
+                {editorStep === 3 && !draftLoading && !draftLoadError && <div className="space-y-6">
                 {/* Basisinformationen */}
                 <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <h2 className="font-semibold text-text-primary mb-5">{t("sectionBasics")}</h2>
@@ -1661,14 +1818,14 @@ export default function ProfilePage() {
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
                         {t("fieldName")} <span className="text-crimson-light">*</span>
                       </label>
-                      <input type="text" value={form.name}
+                      <input ref={nameInputRef} id="profile-name" type="text" value={form.name}
                         aria-invalid={!!fieldErrors.name}
                         aria-describedby={fieldErrors.name ? "profile-name-error" : undefined}
                         onChange={(e) => {
                           setForm((p) => ({ ...p, name: e.target.value }));
                           if (e.target.value.trim()) setFieldErrors((previous) => ({ ...previous, name: undefined }));
                         }}
-                        className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
+                        className={`w-full bg-bg-elevated border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors ${fieldErrors.name ? "border-error" : "border-border"}`} />
                       {fieldErrors.name && <p id="profile-name-error" role="alert" className="mt-1.5 text-sm text-error">{fieldErrors.name}</p>}
                     </div>
                     <div>
@@ -1704,7 +1861,7 @@ export default function ProfilePage() {
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
                         {t("fieldCity")} <span className="text-crimson-light">*</span>
                       </label>
-                      <input type="text" value={form.city}
+                      <input ref={cityInputRef} id="profile-city" type="text" value={form.city}
                         aria-invalid={!!fieldErrors.city}
                         aria-describedby={fieldErrors.city ? "profile-city-error" : undefined}
                         onChange={(e) => {
@@ -1712,7 +1869,7 @@ export default function ProfilePage() {
                           if (e.target.value.trim()) setFieldErrors((previous) => ({ ...previous, city: undefined }));
                         }}
                         placeholder={t("fieldCityPlaceholder")}
-                        className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
+                        className={`w-full bg-bg-elevated border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors ${fieldErrors.city ? "border-error" : "border-border"}`} />
                       {fieldErrors.city && <p id="profile-city-error" role="alert" className="mt-1.5 text-sm text-error">{fieldErrors.city}</p>}
                     </div>
                     <div>
@@ -1749,14 +1906,6 @@ export default function ProfilePage() {
                       </label>
                       <input type="email" value={clerkEmail} readOnly
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm text-text-muted cursor-not-allowed" />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{t("fieldBio")}</label>
-                      <textarea rows={4} value={form.bio ?? ""}
-                        onChange={(e) => setForm((p) => ({ ...p, bio: e.target.value }))}
-                        maxLength={500}
-                        className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors resize-none" />
-                      <p className="text-xs text-text-muted mt-1 text-right">{(form.bio ?? "").length} / 500</p>
                     </div>
                     <div>
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5 flex items-center gap-1.5">
@@ -1859,6 +2008,9 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
+                </div>}
+
+                {editorStep === 5 && !draftLoading && !draftLoadError && <div className="space-y-6">
                 {/* ── Crew / Creative sections ─────────────────────────── */}
                 {showCrewSections && <>
 
@@ -2531,12 +2683,46 @@ export default function ProfilePage() {
                     </div>
                   );
                 })()}
+                {!showCrewSections && !showTalentSections && <p className="rounded-xl border border-border bg-bg-secondary p-4 text-sm leading-6 text-text-muted">Für die ausgewählten Anbieterbereiche gibt es hier keine zusätzlichen Profilfelder. Verfügbarkeit und Kontaktangaben kannst du bei Bedarf in Schritt 3 ergänzen.</p>}
+                </div>}
 
-                <button onClick={handleSave} disabled={saving || profileLoading || profileLoadError}
-                  className="w-full py-3 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
-                  {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
-                  {saving ? t("saving") : t("saveChanges")}
-                </button>
+                {editorStep === 6 && !draftLoading && !draftLoadError && (
+                  <section className="space-y-4 rounded-xl border border-border bg-bg-secondary p-4 sm:p-6">
+                    <div><h2 className="font-semibold text-text-primary">Profil prüfen</h2><p className="mt-1 text-sm text-text-muted">Nur diese Angaben werden nach deiner Bestätigung öffentlich angezeigt.</p></div>
+                    {Object.keys(visibleFieldErrors).length > 0 && <div role="alert" className="rounded-lg border border-error/30 bg-error/10 p-4">
+                      <p className="mb-2 text-sm font-semibold text-error">Bitte prüfe diese Pflichtangaben:</p>
+                      <ul className="space-y-1 text-sm text-text-primary">{Object.entries(visibleFieldErrors).map(([field, message]) => <li key={field}><button type="button" className="underline underline-offset-2" onClick={() => {
+                        const target = field === "activity" ? 1 : 3;
+                        goToEditorStep(target, field === "activity" ? "activity" : field === "name" ? "name" : "city");
+                      }}>{message}</button></li>)}</ul>
+                    </div>}
+                    <dl className="grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-lg border border-border bg-bg-primary p-3"><dt className="text-xs text-text-muted">Tätigkeiten · Pflicht</dt><dd className="mt-1 break-words text-sm text-text-primary">{[...currentProfileTypes.map((type) => PROFILE_TYPE_LABELS[type as ProfileType] ?? type), ...positions].join(", ") || "Noch auswählen"}</dd></div>
+                      <div className="rounded-lg border border-border bg-bg-primary p-3"><dt className="text-xs text-text-muted">Name · Pflicht</dt><dd className="mt-1 break-words text-sm text-text-primary">{form.name || "Noch eingeben"}</dd></div>
+                      <div className="rounded-lg border border-border bg-bg-primary p-3"><dt className="text-xs text-text-muted">Standort · Pflicht</dt><dd className="mt-1 break-words text-sm text-text-primary">{[form.city, form.country].filter(Boolean).join(", ") || "Noch eingeben"}</dd></div>
+                      <div className="rounded-lg border border-border bg-bg-primary p-3"><dt className="text-xs text-text-muted">Fotos und Vorstellung · freiwillig</dt><dd className="mt-1 break-words text-sm text-text-primary">{profileImages.length} Portfoliofoto(s){form.bio.trim() ? " · Vorstellung vorhanden" : ""}</dd></div>
+                    </dl>
+                    <p className="text-xs leading-5 text-text-muted">Unvollständige freiwillige Angaben verhindern das Speichern nicht. Nicht ausgefüllte Bereiche werden nicht angezeigt.</p>
+                  </section>
+                )}
+
+                {editorStep > 0 && !draftLoading && !draftLoadError && (
+                  <footer className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-wrap gap-2">
+                      {profileExists && <button type="button" data-no-draft onClick={() => goToEditorStep(0)} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary hover:border-gold/40">Übersicht</button>}
+                      <button type="button" data-no-draft disabled={draftSaveState === "saving" || !draftLoaded} onClick={() => void persistEditorDraft().catch(() => {})} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary hover:border-gold/40 disabled:opacity-50">{draftSaveState === "saving" ? "Speichert …" : "Privaten Entwurf speichern"}</button>
+                    </div>
+                    <div className="flex flex-wrap justify-end gap-2">
+                      {editorStep > 1 && <button type="button" data-no-draft onClick={() => goToEditorStep((editorStep - 1) as ProfileEditorStep)} className="min-h-11 rounded-lg border border-border px-5 text-sm text-text-secondary hover:border-gold/40">Zurück</button>}
+                      {editorStep < 6 ? <>
+                        {(editorStep === 4 || editorStep === 5) && <button type="button" data-no-draft onClick={() => goToEditorStep((editorStep + 1) as ProfileEditorStep)} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-muted hover:text-text-primary">Überspringen</button>}
+                        <button type="button" data-no-draft onClick={() => { if (validateEditorStep(editorStep)) goToEditorStep((editorStep + 1) as ProfileEditorStep); }} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-gold px-5 text-sm font-semibold text-bg-primary hover:bg-gold-light"><span>Weiter</span><span aria-hidden="true">→</span></button>
+                      </> : <button type="button" data-no-draft onClick={handleSave} disabled={saving || profileLoading || profileLoadError || !draftLoaded || avatarUploading || coverUploading || profileUploading} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-gold px-5 text-sm font-semibold text-bg-primary hover:bg-gold-light disabled:opacity-60">
+                        {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}{saving ? "Wird gespeichert …" : profileExists ? "Änderungen speichern" : "Profil veröffentlichen"}
+                      </button>}
+                    </div>
+                  </footer>
+                )}
               </div>
             )}
 
