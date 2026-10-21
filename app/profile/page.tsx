@@ -17,6 +17,7 @@ import ExternalProfilesSection from "@/components/ExternalProfilesSection";
 import { useToast } from "@/contexts/ToastContext";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 import { departments, deptColors } from "@/lib/departments";
+import { gripSearchTerms, GRIP_OCCUPATIONS, normalizeOccupation } from "@/lib/gripTaxonomy";
 import RoleDropdown from "@/components/RoleDropdown";
 import { calculateProfileCompletion } from "@/lib/profile-completion";
 import { prepareProfileMediaFile, sendProfileMediaFile, PROFILE_MEDIA_ACCEPT, PROFILE_MEDIA_MAX_BYTES, PROFILE_MEDIA_SOURCE_MAX_BYTES } from "@/lib/profile-media-client";
@@ -101,7 +102,7 @@ const ANBIETER_TYPE_IDS = new Set(ANBIETER_CHIPS.map(([id]) => id));
 
 // Map department id → profile_type key
 const DEPT_TO_PROFILE_TYPE: Record<string, string> = {
-  kamera: "camera", licht: "lighting", ton: "sound",
+  kamera: "camera", grip: "camera", licht: "lighting", ton: "sound",
   produktion: "production", regie: "director",
   art: "art_department", kostuem: "costume", maske: "makeup",
   post: "postproduction", sfx: "sfx", broadcast: "broadcast",
@@ -151,7 +152,7 @@ function TypeChipPicker({
     .map((dept) => ({
       dept,
       roles: dept.roles.filter((role) =>
-        !normalizedQuery || role.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("de").includes(normalizedQuery),
+        !normalizedQuery || gripSearchTerms(role).some((term) => normalizeOccupation(term).includes(normalizeOccupation(normalizedQuery))),
       ),
     }))
     .filter(({ roles }) => roles.length > 0);
@@ -278,10 +279,13 @@ function TypeChipPicker({
                 </span>
               </button>
               {expanded && <div className="flex flex-wrap gap-1.5 border-t border-border px-4 py-3">
+                {dept.id === "grip" && <p className="mb-1 w-full text-xs leading-5 text-text-muted">Kamerabühne / Grip richtet und bewegt Kameraunterstützung wie Dolly, Schienen und Kräne ein. Einzelne Zuständigkeiten unterscheiden sich je nach Land und Produktion.</p>}
                 {roles.map((job) => {
                   const isSel = positions.includes(job);
+                  const explanation = GRIP_OCCUPATIONS.find((occupation) => occupation.label === job)?.description;
                   return (
                     <button key={job} type="button"
+                      title={explanation}
                       onClick={() => togglePosition(job, dept.id)}
                       className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
                         isSel ? `${colors.bg} ${colors.border} ${colors.text}` : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"

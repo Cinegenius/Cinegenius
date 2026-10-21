@@ -83,7 +83,7 @@ type Group = { id: string; label: string; desc: string; color: string; border: s
 
 // ─── Custom Role Dropdown ────────────────────────────────────────────────────
 
-type RoleOption = { id: string; label: string; labelEn?: string };
+type RoleOption = { id: string; label: string; labelEn?: string; aliases?: readonly string[]; description?: string };
 
 function RoleDropdown({
   value,
@@ -111,7 +111,7 @@ function RoleDropdown({
   const selected = options.find((o) => o.label === value);
   const normalizedQuery = query.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("de");
   const filteredOptions = options.filter((option) =>
-    !normalizedQuery || `${option.label} ${option.labelEn ?? ""}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("de").includes(normalizedQuery),
+    !normalizedQuery || `${option.label} ${option.labelEn ?? ""} ${(option.aliases ?? []).join(" ")}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("de").includes(normalizedQuery),
   );
 
   return (
@@ -159,7 +159,7 @@ function RoleDropdown({
                   opt.label === value ? "text-gold bg-gold/5" : "text-text-secondary hover:text-text-primary"
                 }`}
               >
-                <span>{opt.label}</span>
+                <span className="min-w-0">{opt.label}{opt.description && <span className="mt-0.5 block whitespace-normal text-[10px] leading-4 text-text-muted">{opt.description}</span>}</span>
                 <span className="flex items-center gap-2 shrink-0 ml-2">
                   {opt.labelEn && (
                     <span className="text-[11px] text-text-muted hidden sm:block">{opt.labelEn}</span>

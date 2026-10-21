@@ -6,18 +6,20 @@ import { useSearchParams } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import {
   MapPin, CheckCircle, Search, X, LayoutGrid, List, SlidersHorizontal, ChevronDown, Users, Globe, Languages, ArrowUpDown, Plus, ShoppingBag,
-  Clapperboard, Video, Lightbulb, Mic, Palette, Shirt, Sparkles, Scissors, Music, Truck, Star, Zap, Tv, MonitorPlay, FileText, Smartphone, Camera, Bot,
+  Clapperboard, Video, Lightbulb, Wrench, Mic, Palette, Shirt, Sparkles, Scissors, Music, Truck, Star, Zap, Tv, MonitorPlay, FileText, Smartphone, Camera, Bot,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { departments, deptColors, getDeptLabel, type Department } from "@/lib/departments";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 import { rankByRatingConfidence } from "@/lib/rating-ranking";
+import { gripSearchTerms, isGripDepartmentSearch, isGripOccupation, matchesGripOccupation, normalizeOccupation } from "@/lib/gripTaxonomy";
 
 const DEPT_ICON: Record<string, LucideIcon> = {
   produktion:    Clapperboard,
   regie:         Clapperboard,
   kamera:        Video,
+  grip:          Wrench,
   licht:         Lightbulb,
   ton:           Mic,
   art:           Palette,
@@ -135,6 +137,9 @@ function matchesRole(c: ServerCreator, roleLabel: string): boolean {
   // Normalize stored positions/role the same way
   const haystack = [...getPositions(c), c.role]
     .flatMap((s) => normalizeRole(s));
+
+  // Grip titles have regional aliases (for example Dollyfahrer / Dolly Grip).
+  if (haystack.some((stored) => matchesGripOccupation(stored, roleLabel))) return true;
 
   // A stored value matches if it includes the needle OR the needle includes it
   // BUT only when both sides are at least 4 chars to avoid "ccu".includes("c") style hits
@@ -522,9 +527,11 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 
     if (query.trim()) {
       const q = query.toLowerCase();
+      const normalizedQuery = normalizeOccupation(query);
       result = result.filter((c) =>
         c.name.toLowerCase().includes(q) ||
-        getPositions(c).some((p) => p.toLowerCase().includes(q)) ||
+        getPositions(c).some((p) => p.toLowerCase().includes(q) || gripSearchTerms(p).some((term) => normalizeOccupation(term).includes(normalizedQuery))) ||
+        (isGripDepartmentSearch(query) && getPositions(c).some(isGripOccupation)) ||
         c.role.toLowerCase().includes(q) ||
         c.location.toLowerCase().includes(q) ||
         c.skills.some((s) => s.toLowerCase().includes(q))
@@ -621,6 +628,8 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
     { label: "Fotograf",     role: "Fotograf/in"                   },
     { label: "Creator",      role: "Content Creator"               },
     { label: "Gaffer",       role: "Gaffer (Oberbeleuchter)"       },
+    { label: "Key Grip",     role: "Key Grip"                      },
+    { label: "Dolly Grip",   role: "Dolly Grip / Dollyfahrer*in"   },
     { label: "Ton",          role: "Production Sound Mixer"        },
     { label: "Producer",     role: "Producer"                      },
     { label: "Model",        role: "Model"                         },

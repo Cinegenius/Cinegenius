@@ -1,3 +1,5 @@
+import { GRIP_DEPARTMENT_LABEL, GRIP_OCCUPATIONS } from "@/lib/gripTaxonomy";
+
 export type Department = {
   id: string;
   label: string;
@@ -96,6 +98,7 @@ export const departments: Department[] = [
       "Steadicam Operator", "Steadicam Assistent*in",
       "Gimbal System Operator",
       "Drohnenpilot / Drone Operator", "Kamera-Drohnen Operator", "Kamera-Drohnen Pilot*in",
+      "Camera Car Driver", "Flugzeugpilot*in (Luftaufnahmen)", "Helikopterpilot*in (Luftaufnahmen)", "Spidercam-Pilot*in",
       "Kamera-Drohnen Assistent*in",
       "Remote Kamera Operator", "Remote Head Operator",
       "Aerial Camera Operator", "Air to Air Operator",
@@ -140,6 +143,14 @@ export const departments: Department[] = [
       "Lichtassistent*in",
       "Licht Praktikant*in",
     ],
+  },
+  {
+    id: "grip",
+    label: GRIP_DEPARTMENT_LABEL,
+    labels: { "de": GRIP_DEPARTMENT_LABEL, "en": "Camera Grip", "es": "Grip de cámara", "it": "Grip camera", "cs": "Kamerová technika", "hu": "Kameragrip" },
+    emoji: "🛠️",
+    color: "slate",
+    roles: GRIP_OCCUPATIONS.map((occupation) => occupation.label),
   },
   {
     id: "ton",

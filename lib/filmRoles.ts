@@ -4,6 +4,8 @@
  * Umfasst Film, Social Media und Fotografie.
  */
 
+import { GRIP_DEPARTMENT_LABEL, GRIP_OCCUPATIONS } from "@/lib/gripTaxonomy";
+
 export type Platform = "film" | "social" | "photo";
 
 export type FilmRole = {
@@ -11,6 +13,8 @@ export type FilmRole = {
   label: string;               // Anzeigename (DE)
   labelEn?: string;            // Englische Entsprechung
   seniority?: "junior" | "senior" | "lead"; // Optional
+  aliases?: readonly string[];
+  description?: string;
 };
 
 export type FilmDepartment = {
@@ -107,6 +111,11 @@ export const FILM_DEPARTMENTS: FilmDepartment[] = [
       { id: "freifall-kamera",    label: "Freifall Kameramann*frau",      labelEn: "Freefall / Skydive Camera Operator" },
       { id: "motion-control-kamera",   label: "Motion Control Kameramann*frau",   labelEn: "Motion Control Camera Operator" },
       { id: "kamera-drohnen-operator", label: "Kamera-Drohnen Operator",          labelEn: "Camera Drone Operator" },
+      // Adjacent camera specialties formerly grouped under Kamerabühne.
+      { id: "camera-car-driver", label: "Camera Car Driver", labelEn: "Camera Car Driver" },
+      { id: "flugzeug-pilot", label: "Flugzeugpilot*in (Luftaufnahmen)", labelEn: "Airplane Pilot (Aerial Filming)" },
+      { id: "helikopter-pilot", label: "Helikopterpilot*in (Luftaufnahmen)", labelEn: "Helicopter Pilot (Aerial Filming)" },
+      { id: "spidercam-pilot", label: "Spidercam-Pilot*in", labelEn: "Spidercam Pilot" },
       { id: "live-kamera",             label: "Live-Kamera Operator",             labelEn: "Live Camera Operator" },
       { id: "remote-kamera",           label: "Remote Kamera Operator",           labelEn: "Remote Camera Operator" },
       { id: "aerial-camera",           label: "Aerial Camera Operator",           labelEn: "Aerial Camera Operator" },
@@ -171,39 +180,18 @@ export const FILM_DEPARTMENTS: FilmDepartment[] = [
   },
   {
     id: "grip",
-    label: "Grip",
+    label: GRIP_DEPARTMENT_LABEL,
     color: "text-slate-400",
     bg: "bg-slate-500/10 border-slate-500/20",
     platform: "film",
-    roles: [
-      { id: "key-grip",           label: "Key Grip",                    labelEn: "Key Grip" },
-      { id: "best-boy-grip",      label: "Best Boy Grip",               labelEn: "Best Boy Grip" },
-      { id: "dolly-grip",         label: "Dolly Grip",                  labelEn: "Dolly Grip" },
-      { id: "kran-operator",      label: "Kran-Operator",               labelEn: "Crane / Jib Operator" },
-      { id: "rigging-grip",       label: "Rigging Grip",                labelEn: "Rigging Grip" },
-    ],
-  },
-  {
-    id: "kamerabuhne",
-    label: "Kamerabühne",
-    color: "text-stone-400",
-    bg: "bg-stone-500/10 border-stone-500/20",
-    platform: "film",
-    roles: [
-      { id: "1-kamerabuhne",           label: "1. Kamerabühne",                  labelEn: "1st Camera Grip" },
-      { id: "2-kamerabuhne",           label: "2. Kamerabühne / Best Boy Grip",  labelEn: "2nd Camera Grip / Best Boy Grip" },
-      { id: "kamerabuhnen-assistent",  label: "Kamerabühnenassistent*in",        labelEn: "Camera Grip Assistant" },
-      { id: "spezial-konstruktionen",  label: "Spezial Konstruktionen",          labelEn: "Special Constructions" },
-      { id: "u-crane",                 label: "U-Crane Operator",                labelEn: "U-Crane Operator" },
-      { id: "remote-head-technician",  label: "Remote Head Technician",          labelEn: "Remote Head Technician" },
-      { id: "stabilized-remote-head",  label: "Stabilized Remote Head Technician", labelEn: "Stabilized Remote Head Technician" },
-      { id: "camera-car-driver",       label: "Camera Car Driver",               labelEn: "Camera Car Driver" },
-      { id: "flugzeug-pilot",          label: "Flugzeug Pilot*in (Luftaufnahmen)", labelEn: "Airplane Pilot (Aerial Filming)" },
-      { id: "helikopter-pilot",        label: "Helikopter Pilot*in (Luftaufnahmen)", labelEn: "Helicopter Pilot (Aerial Filming)" },
-      { id: "kamera-drohnen-pilot",    label: "Kamera-Drohnen Pilot*in",         labelEn: "Camera Drone Pilot" },
-      { id: "spidercam-pilot",         label: "Spidercam Pilot*in",              labelEn: "Spidercam Pilot" },
-      { id: "kamerabuhne-praktikant",  label: "Kamerabühne Praktikant*in",       labelEn: "Camera Grip Intern" },
-    ],
+    roles: GRIP_OCCUPATIONS.map(({ id, label, labelEn, aliases, description, seniority }) => ({
+      id,
+      label,
+      labelEn,
+      aliases,
+      description,
+      seniority,
+    })),
   },
   {
     id: "ton",
@@ -1120,7 +1108,8 @@ export const DEPT_KEYWORDS: Record<string, string[]> = {
     "ballonlicht", "spot operator", "truss", "lichtassistent",
   ],
   grip: [
-    "grip", "key grip", "dolly", "kran", "crane", "jib", "rigging",
+    ...GRIP_OCCUPATIONS.flatMap((occupation) => [occupation.label, occupation.labelEn, ...occupation.aliases]),
+    "grip", "key grip", "dolly", "dollyfahrer", "kamerabühne", "kamerabuhne", "kran", "crane", "jib", "rigging",
   ],
   ton: [
     "ton", "sound", "audio", "tonmeister", "mixer", "boom operator",
@@ -1143,9 +1132,8 @@ export const DEPT_KEYWORDS: Record<string, string[]> = {
     "kostümillustrator", "kostümrecherche", "costume accountant",
   ],
   kamerabuhne: [
-    "kamerabühne", "grip", "crane", "kran", "remote head", "spidercam",
-    "helikopter pilot", "flugzeug pilot", "drohnen pilot", "camera car",
-    "u-crane", "rigging grip",
+    ...GRIP_OCCUPATIONS.flatMap((occupation) => [occupation.label, occupation.labelEn, ...occupation.aliases]),
+    "grip", "key grip", "dolly", "dollyfahrer", "kamerabühne", "kamerabuhne", "kran", "crane", "jib", "rigging",
   ],
   szenenbild: [
     "szenenbild", "production designer", "art director", "set decorator",

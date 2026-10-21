@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import { FILM_DEPARTMENTS, DEPT_KEYWORDS, ALL_ROLES } from "@/lib/filmRoles";
+import { matchesGripOccupation, normalizeGripDepartmentId, normalizeGripRoleId } from "@/lib/gripTaxonomy";
 import { useTranslations } from "next-intl";
 import PageHeader from "@/components/PageHeader";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
@@ -204,6 +205,8 @@ function JobDeptPanel({
                     isSelected ? `${activeDept.bg} ${activeDept.color} font-semibold` : "border-border/60 text-text-muted"
                   }`}>
                   <div className="font-medium leading-tight">{role.label}</div>
+                  {role.labelEn && <div className="mt-0.5 text-[10px] opacity-50">{role.labelEn}</div>}
+                  {role.description && <div className="mt-1 text-[10px] leading-4 opacity-70">{role.description}</div>}
                 </button>
               );
             })}
@@ -265,6 +268,7 @@ function JobDeptPanel({
                   }`}>
                   <div className="font-medium leading-tight">{role.label}</div>
                   {role.labelEn && <div className="text-[10px] opacity-50 mt-0.5">{role.labelEn}</div>}
+                  {role.description && <div className="mt-1 text-[10px] leading-4 opacity-70">{role.description}</div>}
                 </button>
               );
             })}
@@ -284,8 +288,8 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   const allJobs = useMemo(() => serverJobs, [serverJobs]);
 
   const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
-  const [selectedDeptId, setSelectedDeptId] = useState<string | null>(() => searchParams.get("dept") ?? null);
-  const [selectedRoleId, setSelectedRoleId] = useState<string | null>(() => searchParams.get("role") ?? null);
+  const [selectedDeptId, setSelectedDeptId] = useState<string | null>(() => normalizeGripDepartmentId(searchParams.get("dept")));
+  const [selectedRoleId, setSelectedRoleId] = useState<string | null>(() => normalizeGripRoleId(searchParams.get("role")));
   const [activePanelDept, setActivePanelDept] = useState(FILM_DEPARTMENTS[0].id);
   const [panelOpen, setPanelOpen] = useState(false);
   const [activeType, setActiveType] = useState(() => searchParams.get("type") ?? "");
@@ -336,16 +340,16 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
     if (selectedRoleId && selectedDeptId) {
       const role = ALL_ROLES.find((r) => r.id === selectedRoleId);
       if (role) {
-        const roleLabel = role.label.toLowerCase();
-        const roleLabelEn = (role.labelEn ?? "").toLowerCase();
-        const deptKeys = DEPT_KEYWORDS[selectedDeptId] ?? [];
+        const roleLabels = [role.label, role.labelEn, ...(role.aliases ?? [])].filter(Boolean).map((label) => label!.toLowerCase());
         result = result.filter((j) => {
           const t = j.title.toLowerCase();
-          if (t.includes(roleLabel) || (roleLabelEn && t.includes(roleLabelEn))) return true;
+          if (roleLabels.some((label) => t.includes(label))) return true;
           if (j.description) {
             const meta = j.description.split("\n\n")[0] ?? "";
             const roleMeta = meta.match(/Rolle: ([^·\n]+)/)?.[1]?.toLowerCase() ?? "";
-            if (roleMeta && (roleMeta.includes(roleLabel) || deptKeys.some((k) => roleMeta.includes(k)))) return true;
+            if (roleMeta && (role.aliases?.length
+              ? matchesGripOccupation(roleMeta, role.label)
+              : roleLabels.some((label) => roleMeta.includes(label)))) return true;
           }
           return false;
         });
@@ -372,7 +376,8 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
         j.title.toLowerCase().includes(q) ||
         (j.company ?? "").toLowerCase().includes(q) ||
         j.location.toLowerCase().includes(q) ||
-        j.tags.some((t) => t.toLowerCase().includes(q))
+        j.tags.some((t) => t.toLowerCase().includes(q)) ||
+        (j.description ?? "").toLowerCase().includes(q)
       );
     }
     if (activeType) result = result.filter((j) => j.projectType === activeType || (j.projectType ?? "").includes(activeType));

@@ -1,3 +1,5 @@
+import { GRIP_OCCUPATIONS } from "@/lib/gripTaxonomy";
+
 export const FILM_POSITIONS: Record<string, string[]> = {
   "Licht": [
     "Oberbeleuchter", "Beleuchter", "Best Boy Licht", "Lichttechniker", "Gaffer",
@@ -28,9 +30,7 @@ export const FILM_POSITIONS: Record<string, string[]> = {
     "Szenenbildner / Szenenbildnerin", "Art Director",
     "Requisiteur / Requisiteurin", "Set Decorator",
   ],
-  "Grip": [
-    "Key Grip", "Dolly Grip", "Kran-Operator", "Rigging Grip",
-  ],
+  "Kamerabühne / Grip": GRIP_OCCUPATIONS.map((occupation) => occupation.label),
   "Postproduktion": [
     "Cutter / Cutterin", "VFX Artist", "Colorist", "Motion Designer",
     "Compositing Artist",

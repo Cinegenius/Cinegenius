@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, Search } from "lucide-react";
+import { gripSearchTerms, normalizeOccupation } from "@/lib/gripTaxonomy";
 
 export default function RoleDropdown({
   value,
@@ -28,7 +29,10 @@ export default function RoleDropdown({
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const filtered = options.filter(o => o.toLowerCase().includes(query.toLowerCase()));
+  const normalizedQuery = normalizeOccupation(query);
+  const filtered = options.filter((option) =>
+    !normalizedQuery || normalizeOccupation(gripSearchTerms(option).join(" ")).includes(normalizedQuery),
+  );
 
   return (
     <div ref={ref} className={`relative ${className}`}>
