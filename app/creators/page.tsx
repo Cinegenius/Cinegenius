@@ -118,12 +118,17 @@ function parseCreatorDescription(raw: string): { skills: string[]; credits: stri
   return { skills, credits };
 }
 
-export default async function CreatorsPage() {
-  const [t, tCommon, { userId }, directoryData] = await Promise.all([
+export default async function CreatorsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const [t, tCommon, { userId }, directoryData, params] = await Promise.all([
     getTranslations("creators"),
     getTranslations("common"),
     auth(),
     getCreatorDirectoryData(),
+    searchParams,
   ]);
   const { listings, profiles, listingRatings, profileRatings } = directoryData;
 
@@ -246,7 +251,15 @@ export default async function CreatorsPage() {
         description={t("heroDesc")}
         cta={!hasProfile ? { label: t("heroCta"), href: "/profile" } : undefined}
       />
-      <CreatorsContent serverCreators={serverCreators} hasStrip={true} />
+      <CreatorsContent
+        serverCreators={serverCreators}
+        hasStrip={true}
+        initialFilters={{
+          query: Array.isArray(params.q) ? params.q[0] ?? "" : params.q ?? "",
+          city: Array.isArray(params.city) ? params.city[0] ?? "" : params.city ?? "",
+          sort: Array.isArray(params.sort) ? params.sort[0] ?? "" : params.sort ?? "",
+        }}
+      />
     </div>
   );
 }

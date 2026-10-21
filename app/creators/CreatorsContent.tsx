@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, useRef, Suspense } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import {
   MapPin, CheckCircle, Search, X, LayoutGrid, List, SlidersHorizontal, ChevronDown, Users, Globe, Languages, ArrowUpDown, Plus, ShoppingBag,
@@ -415,14 +414,21 @@ function RolePanel({
 
 // ─── Main ────────────────────────────────────────────────────────────────────
 
-function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCreator[]; hasStrip?: boolean }) {
-  const searchParams = useSearchParams();
+function CreatorsInner({
+  serverCreators,
+  hasStrip,
+  initialFilters,
+}: {
+  serverCreators: ServerCreator[];
+  hasStrip?: boolean;
+  initialFilters: { query: string; city: string; sort: string };
+}) {
   const tc = useTranslations("common");
   const t = useTranslations("creators");
   const locale = useLocale();
 
-  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
-  const [cityFilter, setCityFilter] = useState(() => searchParams.get("city") ?? "");
+  const [query, setQuery] = useState(() => initialFilters.query);
+  const [cityFilter, setCityFilter] = useState(() => initialFilters.city);
   const [countryFilter, setCountryFilter] = useState("");
   const [languageFilter, setLanguageFilter] = useState("");
   const [availableOnly, setAvailableOnly] = useState(false);
@@ -466,7 +472,7 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       availableLanguages:  [...langs].sort(),
     };
   }, [allCreators]);
-  const [sortKey, setSortKey] = useState(() => searchParams.get("sort") === "rating" ? "rating" : "featured");
+  const [sortKey, setSortKey] = useState(() => initialFilters.sort === "rating" ? "rating" : "featured");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   // Neue Casting-Filter
@@ -1598,19 +1604,11 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
 export default function CreatorsContent({
   serverCreators,
   hasStrip,
+  initialFilters,
 }: {
   serverCreators: ServerCreator[];
   hasStrip?: boolean;
+  initialFilters: { query: string; city: string; sort: string };
 }) {
-  return (
-    <Suspense
-      fallback={
-        <div className="pt-16 min-h-screen flex items-center justify-center">
-          <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
-        </div>
-      }
-    >
-      <CreatorsInner serverCreators={serverCreators} hasStrip={hasStrip} />
-    </Suspense>
-  );
+  return <CreatorsInner serverCreators={serverCreators} hasStrip={hasStrip} initialFilters={initialFilters} />;
 }
