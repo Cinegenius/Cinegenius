@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
-import { departments, deptColors, getDeptLabel, type Department } from "@/lib/departments";
+import { departments, deptColors, getDeptLabel, getOccupationSearchTerms, matchesDepartmentOccupation, type Department } from "@/lib/departments";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 import { rankByRatingConfidence } from "@/lib/rating-ranking";
 import { gripSearchTerms, isGripDepartmentSearch, isGripOccupation, matchesGripOccupation, normalizeOccupation } from "@/lib/gripTaxonomy";
@@ -187,6 +187,8 @@ function matchesRole(c: ServerCreator, roleLabel: string): boolean {
   // Normalize stored positions/role the same way
   const haystack = [...getPositions(c), c.role]
     .flatMap((s) => normalizeRole(s));
+
+  if (haystack.some((stored) => matchesDepartmentOccupation(stored, roleLabel))) return true;
 
   // Grip titles have regional aliases (for example Dollyfahrer / Dolly Grip).
   if (haystack.some((stored) => matchesGripOccupation(stored, roleLabel))) return true;
@@ -580,7 +582,9 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
       const normalizedQuery = normalizeOccupation(query);
       result = result.filter((c) =>
         c.name.toLowerCase().includes(q) ||
-        getPositions(c).some((p) => p.toLowerCase().includes(q) || gripSearchTerms(p).some((term) => normalizeOccupation(term).includes(normalizedQuery))) ||
+        getPositions(c).some((p) => p.toLowerCase().includes(q)
+          || getOccupationSearchTerms(p).some((term) => normalizeOccupation(term).includes(normalizedQuery))
+          || gripSearchTerms(p).some((term) => normalizeOccupation(term).includes(normalizedQuery))) ||
         (isGripDepartmentSearch(query) && getPositions(c).some(isGripOccupation)) ||
         c.role.toLowerCase().includes(q) ||
         c.location.toLowerCase().includes(q) ||
