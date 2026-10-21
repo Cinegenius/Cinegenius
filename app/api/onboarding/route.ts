@@ -2,6 +2,7 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { compressProfileEditorDraft, expandProfileEditorDraft } from "@/lib/profile-editor-private-draft";
+import { normalizeQuickStartDraft, QUICK_START_INTENTS, validateQuickStartDetails } from "@/lib/quick-start-flow";
 
 export const runtime = "nodejs";
 
@@ -49,6 +50,24 @@ export async function PUT(request: NextRequest) {
   const isProfileEditorDraft = Boolean(record && Object.hasOwn(record, "profileEditorDraft"));
   if (!record || (!isProfileEditorDraft && !INTENTS.has(String(record.intent)))) {
     return json({ error: "Bitte wähle einen gültigen Einrichtungsweg aus." }, 400);
+  }
+  if (Object.hasOwn(record, "quickStart") && record.quickStart !== null) {
+    const raw = record.quickStart;
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+      return json({ error: "Dein Einrichtungsentwurf ist ungültig." }, 400);
+    }
+    const input = raw as Record<string, unknown>;
+    if (!QUICK_START_INTENTS.includes(input.intent as typeof QUICK_START_INTENTS[number])
+      || input.intent !== record.intent
+      || ![1, 2, 3].includes(Number(input.step))) {
+      return json({ error: "Dein Einrichtungsentwurf passt nicht zur gewählten Aufgabe." }, 400);
+    }
+    const normalized = normalizeQuickStartDraft(input);
+    const validation = normalized.step >= 3 ? validateQuickStartDetails(normalized) : null;
+    if (validation) {
+      return json({ error: validation.message }, 400);
+    }
+    record.quickStart = normalized;
   }
   const encoded = JSON.stringify(record);
   const maxIncomingBytes = isProfileEditorDraft ? 100_000 : MAX_BYTES;
@@ -137,6 +156,11 @@ export async function DELETE(request: NextRequest) {
       else delete privateMetadata[KEY];
     } else if (current && requestedType === "profile") {
       delete current.profileDraft;
+      current.setupComplete = true;
+      if (Object.keys(current).length) privateMetadata[KEY] = current;
+      else delete privateMetadata[KEY];
+    } else if (current && requestedType === "quick-start") {
+      delete current.quickStart;
       current.setupComplete = true;
       if (Object.keys(current).length) privateMetadata[KEY] = current;
       else delete privateMetadata[KEY];

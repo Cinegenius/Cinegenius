@@ -537,7 +537,7 @@ function SignUpForm({ destination }: { destination: string }) {
             <span>Ich stimme den <Link href="/agb" target="_blank" className="underline hover:text-gold">Nutzungsbedingungen</Link> und <Link href="/datenschutz" target="_blank" className="underline hover:text-gold">Datenschutzhinweisen</Link> zu.</span>
             {errors.fields.legalAccepted && <span className="text-sm text-red-400">{errors.fields.legalAccepted.message}</span>}
           </label>}
-          <button type="submit" disabled={!signUp || busy || (required.has("legal_accepted") && !legalAccepted)} className={buttonClass}>{busy ? "Konto wird erstellt …" : "Kostenlos registrieren"}</button>
+          <button type="submit" disabled={!signUp || busy || (required.has("legal_accepted") && !legalAccepted)} className={buttonClass}>{busy ? "Konto wird erstellt …" : "Konto erstellen"}</button>
           <p className="text-center text-xs leading-5 text-text-muted">Mit der Registrierung wird nur dein Konto angelegt. Tätigkeiten und Profildetails ergänzt du anschließend.</p>
           <div id="clerk-captcha" />
         </form>

@@ -121,6 +121,10 @@ export default function DashboardPage() {
             .then((response) => response.ok ? response.json() : null)
             .then(({ draft } = {}) => {
               if (!draft || draft.setupComplete) return;
+              if (draft.quickStart && typeof draft.quickStart === "object") {
+                window.location.replace("/profile-setup?resume=1");
+                return;
+              }
               const intent = draft.intent;
               if (intent === "location" || intent === "equipment") {
                 const saved = draft.listingDrafts?.[intent] ?? (draft.listingDraft?.type === intent ? draft.listingDraft : null);

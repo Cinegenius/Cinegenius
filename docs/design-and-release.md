@@ -19,6 +19,8 @@ Keep `/sign-in` and `/sign-up` one click from the homepage. On desktop, show bot
 
 Email-and-password is the default sign-in method. Email-code sign-in is an explicit alternative; never automatically start it when a password attempt returns `needs_first_factor`. Only `needs_second_factor` and `needs_client_trust` should enter the configured security verification flow. Do not weaken Clerk MFA or Device Trust settings to avoid a legitimate challenge.
 
+New users use the shared `/profile-setup` three-step flow: choose what they want to do, enter only the required details for that path, then review and finish. Search-only users go directly to search without a provider profile. The occupation catalogue stays complete and searchable for talent profiles. Progress is stored privately and resumes after reload or sign-in. Location, equipment, and company submissions start as private drafts; a public talent profile is created only after a clearly labeled confirmation. Preserve older unfinished drafts and keep completed existing profiles out of onboarding.
+
 ## Design regression checks
 
 Run `npm run check:design` before each release. It verifies that all six public areas still use `PageHeader`, the desktop and mobile navigation have the same destinations in the same order, the shared page-width and solid-toolbar styles remain present, and the removed `CategoryHero` layout has not returned. The production release script runs this check automatically.
