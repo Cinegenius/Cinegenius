@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import {
@@ -81,6 +82,55 @@ function parseLocation(loc: string): { city: string; country: string } {
 function getPositions(c: ServerCreator): string[] {
   if (Array.isArray(c.positions) && c.positions.length > 0) return c.positions;
   return [c.role];
+}
+
+function isSupabaseStorageImage(src: string): boolean {
+  try {
+    const url = new URL(src);
+    return url.protocol === "https:" && url.hostname.endsWith(".supabase.co") && url.pathname.includes("/storage/v1/object/public/");
+  } catch {
+    return false;
+  }
+}
+
+function DirectoryImage({
+  src,
+  alt,
+  className,
+  objectPosition,
+  size,
+}: {
+  src: string;
+  alt: string;
+  className: string;
+  objectPosition?: string;
+  size: "avatar" | "card";
+}) {
+  const isAvatar = size === "avatar";
+  const dimensions = isAvatar ? { width: 96, height: 96 } : { width: 168, height: 224 };
+  const sizes = isAvatar ? "36px" : "(min-width: 1024px) 84px, (min-width: 640px) 72px, 56px";
+
+  if (isSupabaseStorageImage(src)) {
+    return (
+      <Image
+        src={src}
+        alt={alt}
+        width={dimensions.width}
+        height={dimensions.height}
+        sizes={sizes}
+        quality={75}
+        loading="lazy"
+        decoding="async"
+        className={className}
+        style={objectPosition ? { objectPosition } : undefined}
+      />
+    );
+  }
+
+  // Keep existing support for externally hosted profile images that are not
+  // included in next.config.ts remotePatterns.
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={src} alt={alt} loading="lazy" decoding="async" className={className} style={objectPosition ? { objectPosition } : undefined} />;
 }
 
 function hasProfileType(c: ServerCreator, ...types: string[]): boolean {
@@ -1422,10 +1472,10 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                         className="group flex items-center gap-3 px-4 py-2.5 hover:bg-bg-elevated transition-colors">
                         {/* Avatar */}
                         {c.avatar ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={c.avatar} alt={c.name} loading="lazy" decoding="async"
+                          <DirectoryImage src={c.avatar} alt={c.name}
                             className="w-9 h-9 rounded-full object-cover border border-border/60 shrink-0"
-                            style={{ objectPosition: c.focal_point ? `${c.focal_point.x}% ${c.focal_point.y}%` : "50% 33%" }} />
+                            objectPosition={c.focal_point ? `${c.focal_point.x}% ${c.focal_point.y}%` : "50% 33%"}
+                            size="avatar" />
                         ) : (
                           <div className="w-9 h-9 rounded-full bg-bg-elevated border border-border/60 flex items-center justify-center text-text-muted text-sm font-bold shrink-0">
                             {c.name[0]}
@@ -1470,9 +1520,9 @@ function CreatorsInner({ serverCreators, hasStrip }: { serverCreators: ServerCre
                       className="browse-card card-hover group flex min-w-0 items-center gap-2 p-2.5 sm:gap-3 sm:p-3">
                       <div className="relative flex h-[88px] w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/60 bg-bg-primary sm:h-24 sm:w-[72px] lg:h-28 lg:w-[84px]">
                         {c.image || c.avatar ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={c.image || c.avatar} alt={c.name} loading="lazy" decoding="async"
-                            className="h-full w-full object-contain p-0.5 transition-transform duration-300 group-hover:scale-[1.03]" />
+                          <DirectoryImage src={c.image || c.avatar} alt={c.name}
+                            className="h-full w-full object-contain p-0.5 transition-transform duration-300 group-hover:scale-[1.03]"
+                            size="card" />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center text-xl font-bold text-text-muted/30">
                             {c.name[0]}

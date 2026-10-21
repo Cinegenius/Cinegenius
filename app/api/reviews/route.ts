@@ -4,7 +4,7 @@ import { anyBlockExists } from "@/lib/trust";
 import { rateLimit } from "@/lib/rateLimit";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { fetchRatingSummaries } from "@/lib/ratings";
 import { resolveReviewEligibility } from "@/lib/review-eligibility";
 
@@ -168,6 +168,8 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  revalidateTag("creator-directory", { expire: 0 });
 
   // ── Notify reviewed user / listing owner — fire-and-forget ───────────────
   try {

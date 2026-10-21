@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
+import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
+import { getPrivateProfileIds } from "@/lib/trust";
 import CreatorsContent, { type ServerCreator } from "./CreatorsContent";
 import PageHeader from "@/components/PageHeader";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
@@ -43,6 +45,52 @@ type CreatorProfileRow = {
   last_seen_at: string | null;
 };
 
+type CreatorListingRow = {
+  id: string;
+  user_id: string | null;
+  title: string;
+  category: string | null;
+  city: string | null;
+  price: number | null;
+  image_url: string | null;
+  description: string | null;
+};
+
+const getCreatorDirectoryData = unstable_cache(
+  async () => {
+    const [listingResult, profileResult] = await Promise.all([
+      db
+        .from("listings")
+        .select("id, user_id, title, category, city, price, image_url, description")
+        .eq("published", true)
+        .eq("type", "creator")
+        .order("created_at", { ascending: false })
+        .limit(300),
+      db
+        .from("profiles")
+        .select("user_id, display_name, location, bio, skills, role, positions, available, avatar_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point, last_seen_at")
+        .not("display_name", "is", null)
+        .neq("display_name", "")
+        .order("created_at", { ascending: false })
+        .limit(96),
+    ]);
+
+    if (listingResult.error) throw new Error(`Crew-Inserate konnten nicht geladen werden: ${listingResult.error.message}`);
+    if (profileResult.error) throw new Error(`Crew-Profile konnten nicht geladen werden: ${profileResult.error.message}`);
+
+    const listings = (listingResult.data ?? []) as CreatorListingRow[];
+    const profiles = (profileResult.data ?? []) as CreatorProfileRow[];
+    const [listingRatings, profileRatings] = await Promise.all([
+      fetchRatings(listings.map((listing) => listing.id), "listing"),
+      fetchRatings(profiles.map((profile) => profile.user_id), "user"),
+    ]);
+
+    return { listings, profiles, listingRatings, profileRatings };
+  },
+  ["creator-directory-v1"],
+  { revalidate: 60, tags: ["creator-directory", "profiles", "listings"] },
+);
+
 export const revalidate = 60;
 
 export const metadata: Metadata = {
@@ -71,35 +119,24 @@ function parseCreatorDescription(raw: string): { skills: string[]; credits: stri
 }
 
 export default async function CreatorsPage() {
-  const t = await getTranslations("creators");
-  const tCommon = await getTranslations("common");
-  const { userId } = await auth();
-  let hasProfile = false;
-  if (userId) {
-    const { data } = await db.from("profiles").select("display_name").eq("user_id", userId).single();
-    hasProfile = !!(data?.display_name);
-  }
-  // Fetch creator listings
-  const { data: listings } = await db
-    .from("listings")
-    .select("id, user_id, title, category, city, price, image_url, description")
-    .eq("published", true)
-    .eq("type", "creator")
-    .order("created_at", { ascending: false })
-    .limit(300);
+  const [t, tCommon, { userId }, directoryData] = await Promise.all([
+    getTranslations("creators"),
+    getTranslations("common"),
+    auth(),
+    getCreatorDirectoryData(),
+  ]);
+  const { listings, profiles, listingRatings, profileRatings } = directoryData;
 
+  const profileQuery = userId
+    ? db.from("profiles").select("display_name").eq("user_id", userId).maybeSingle()
+    : Promise.resolve({ data: null, error: null });
+  const [privateProfileIds, ownProfile] = await Promise.all([
+    getPrivateProfileIds(profiles.map((profile) => profile.user_id)),
+    profileQuery,
+  ]);
+  const hasProfile = !!ownProfile.data?.display_name;
 
-  // Fetch profiles — limit initial load to 96 for fast page render
-  const { data: profiles } = await db
-    .from("profiles")
-    .select("user_id, display_name, location, bio, skills, role, positions, available, avatar_url, portfolio_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point, last_seen_at")
-    .not("display_name", "is", null)
-    .neq("display_name", "")
-    .order("created_at", { ascending: false })
-    .limit(96);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const fromListings: ServerCreator[] = (listings ?? []).map((l: any) => {
+  const fromListings: ServerCreator[] = listings.map((l) => {
     const { skills, credits } = parseCreatorDescription(l.description ?? "");
     return {
       id: `listing_${l.id}`,        // prefix to avoid collision with user IDs
@@ -111,7 +148,7 @@ export default async function CreatorsPage() {
       avatar: l.image_url ?? "",
       rating: 0,
       reviews: 0,
-      dayRate: l.price > 0 ? `${l.price} €/Tag` : tCommon("byArrangement"),
+      dayRate: (l.price ?? 0) > 0 ? `${l.price} €/Tag` : tCommon("byArrangement"),
       available: true,
       credits,
       skills,
@@ -122,12 +159,12 @@ export default async function CreatorsPage() {
 
   // User IDs that already have a creator listing → suppress their profile card
   const listingOwnerIds = new Set(
-    (listings ?? []).map((l: { user_id?: string }) => l.user_id).filter(Boolean)
+    listings.map((l) => l.user_id).filter(Boolean)
   );
 
-  const profileRows = (profiles ?? []) as CreatorProfileRow[];
-  const fromProfiles: ServerCreator[] = profileRows
+  const fromProfiles: ServerCreator[] = profiles
     .filter((p) => {
+      if (privateProfileIds.has(p.user_id)) return false;
       // Don't show a second card for users who already have a creator listing
       if (listingOwnerIds.has(p.user_id)) return false;
       const types = normalizeProfileTypes(p.profile_types, p.profile_type);
@@ -187,14 +224,6 @@ export default async function CreatorsPage() {
       };
     });
 
-  // Fetch ratings with correct target_type per source
-  const listingDbIds = (listings ?? []).map((l: { id: string }) => l.id);
-  const profileUserIds = fromProfiles.map((c) => c.id);
-  const [listingRatings, profileRatings] = await Promise.all([
-    fetchRatings(listingDbIds, "listing"),
-    fetchRatings(profileUserIds, "user"),
-  ]);
-
   const serverCreators: ServerCreator[] = [
     ...fromListings.map((c) => ({
       ...c,
@@ -207,12 +236,6 @@ export default async function CreatorsPage() {
       reviews: profileRatings[c.id]?.reviews ?? 0,
     })),
   ];
-
-  // Avatar strip — only real user-uploaded avatars (Supabase storage URLs)
-  const avatarImages = [...fromListings, ...fromProfiles]
-    .filter((c) => c.avatar?.includes("supabase.co/storage"))
-    .map((c) => ({ src: c.avatar, alt: c.name, href: `/creators/${c.id}` }))
-    .sort((a, b) => a.alt.localeCompare(b.alt));
 
   return (
     <div className="min-h-screen bg-bg-primary">
