@@ -76,8 +76,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .select("slug, updated_at"),
 
       db.from("projects")
-        .select("id, updated_at")
-        .eq("published", true),
+        // `projects` contains public records only. Private working copies live
+        // in `project_drafts` and are never included in the sitemap.
+        .select("id, updated_at"),
     ]);
 
     dynamicListings = (listings ?? [])
