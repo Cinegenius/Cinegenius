@@ -16,7 +16,7 @@ import LicensePicker from "@/components/LicensePicker";
 import ExternalProfilesSection from "@/components/ExternalProfilesSection";
 import { useToast } from "@/contexts/ToastContext";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
-import { departments, deptColors } from "@/lib/departments";
+import { departments, deptColors, DEPARTMENT_TO_PROFILE_TYPE, getDepartmentRoleSearchTerms } from "@/lib/departments";
 import { gripSearchTerms, GRIP_OCCUPATIONS, normalizeOccupation } from "@/lib/gripTaxonomy";
 import RoleDropdown from "@/components/RoleDropdown";
 import { calculateProfileCompletion } from "@/lib/profile-completion";
@@ -100,17 +100,6 @@ const ANBIETER_CHIPS: [string, string][] = [
 const TALENT_TYPE_IDS  = new Set(TALENT_CHIPS.map(([id]) => id));
 const ANBIETER_TYPE_IDS = new Set(ANBIETER_CHIPS.map(([id]) => id));
 
-// Map department id → profile_type key
-const DEPT_TO_PROFILE_TYPE: Record<string, string> = {
-  kamera: "camera", grip: "camera", licht: "lighting", ton: "sound",
-  produktion: "production", regie: "director",
-  art: "art_department", kostuem: "costume", maske: "makeup",
-  post: "postproduction", sfx: "sfx", broadcast: "broadcast",
-  virtual: "vfx", musik: "filmmaker", "set-logistik": "production",
-  redaktion: "filmmaker", social: "creator", foto: "photographer",
-  ki: "filmmaker", cast: "",
-};
-
 function TypeChipPicker({
   selectedTypes,
   onTypesChange,
@@ -129,13 +118,13 @@ function TypeChipPicker({
     const isSel = positions.includes(job);
     const next = isSel ? positions.filter((x) => x !== job) : [...positions, job];
     onPositionsChange(next);
-    const mapped = DEPT_TO_PROFILE_TYPE[deptId];
+    const mapped = DEPARTMENT_TO_PROFILE_TYPE[deptId];
     if (!mapped) return;
     if (!isSel) {
       if (!selectedTypes.includes(mapped)) onTypesChange([...selectedTypes, mapped]);
     } else {
       const stillRepresented = departments.some((department) =>
-        department.roles.some((role) => next.includes(role) && DEPT_TO_PROFILE_TYPE[department.id] === mapped),
+        department.roles.some((role) => next.includes(role) && DEPARTMENT_TO_PROFILE_TYPE[department.id] === mapped),
       );
       if (!stillRepresented) onTypesChange(selectedTypes.filter((type) => type !== mapped));
     }
@@ -152,7 +141,8 @@ function TypeChipPicker({
     .map((dept) => ({
       dept,
       roles: dept.roles.filter((role) =>
-        !normalizedQuery || gripSearchTerms(role).some((term) => normalizeOccupation(term).includes(normalizeOccupation(normalizedQuery))),
+        !normalizedQuery || getDepartmentRoleSearchTerms(dept, role).some((term) => normalizeOccupation(term).includes(normalizeOccupation(normalizedQuery)))
+        || (dept.id === "grip" && gripSearchTerms(role).some((term) => normalizeOccupation(term).includes(normalizeOccupation(normalizedQuery)))),
       ),
     }))
     .filter(({ roles }) => roles.length > 0);
@@ -242,7 +232,7 @@ function TypeChipPicker({
                     onPositionsChange(next);
                     const representedTypes = new Set(departments
                       .filter((department) => department.roles.some((role) => next.includes(role)))
-                      .map((department) => DEPT_TO_PROFILE_TYPE[department.id])
+                      .map((department) => DEPARTMENT_TO_PROFILE_TYPE[department.id])
                       .filter(Boolean));
                     onTypesChange(selectedTypes.filter((type) => TALENT_TYPE_IDS.has(type) || ANBIETER_TYPE_IDS.has(type) || representedTypes.has(type)));
                   }}

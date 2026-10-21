@@ -1,4 +1,6 @@
 import { GRIP_DEPARTMENT_LABEL, GRIP_OCCUPATIONS } from "@/lib/gripTaxonomy";
+import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
+import type { ProfileType } from "@/lib/profile-types";
 
 export type Department = {
   id: string;
@@ -7,6 +9,8 @@ export type Department = {
   emoji: string;
   color: string; // tailwind accent (text-*/border-*/bg-*)
   roles: string[];
+  /** Alternate names from the job/project catalogue; kept searchable, not shown as duplicate choices. */
+  roleAliases?: Record<string, string[]>;
 };
 
 export function getDeptLabel(dept: Department, locale: string): string {
@@ -497,6 +501,156 @@ export const departments: Department[] = [
     ],
   },
 ];
+
+/**
+ * Profile editing and crew search historically used `departments`, while jobs and
+ * projects used `FILM_DEPARTMENTS`. Keep both existing catalogues in sync by
+ * folding every job/project title into the profile catalogue at module load.
+ * Exact labels and declared aliases resolve to one visible choice.
+ */
+const FILM_TO_PROFILE_DEPARTMENT: Record<string, string> = {
+  "vor-der-kamera": "cast",
+  regie: "regie",
+  kamera: "kamera",
+  licht: "licht",
+  grip: "grip",
+  ton: "ton",
+  maske: "maske",
+  kostuem: "kostuem",
+  szenenbild: "art",
+  produktion: "produktion",
+  post: "post",
+  vfx: "post",
+  "animation-3d": "post",
+  besetzung: "cast",
+  drehbuch: "drehbuch",
+  filmgeschaeftsfuehrung: "produktion",
+  musik: "musik",
+  producer: "produktion",
+  "sende-veranstaltung": "broadcast",
+  spezialeffekte: "sfx",
+  stunts: "cast",
+  "ton-post": "ton",
+  "tv-web-content": "redaktion",
+  "virtual-production": "virtual",
+  "public-relation": "public-relations",
+  "weitere-crew": "set-logistik",
+  "content-creation": "social",
+  "social-video": "social",
+  fotografie: "foto",
+  "foto-post": "foto",
+};
+
+const ADDITIONAL_DEPARTMENTS: Department[] = [
+  {
+    id: "drehbuch", label: "Drehbuch & Schreiben",
+    labels: { de: "Drehbuch & Schreiben", en: "Writing", es: "Guion", it: "Sceneggiatura", cs: "Scénář", hu: "Forgatókönyv" },
+    emoji: "✍️", color: "lime", roles: [],
+  },
+  {
+    id: "public-relations", label: "Public Relations",
+    labels: { de: "Public Relations", en: "Public Relations", es: "Relaciones públicas", it: "Relazioni pubbliche", cs: "Public relations", hu: "Public relations" },
+    emoji: "📣", color: "pink", roles: [],
+  },
+];
+
+departments.push(...ADDITIONAL_DEPARTMENTS);
+
+function roleKey(value: string): string {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("de").replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+for (const filmDepartment of FILM_DEPARTMENTS) {
+  const targetId = FILM_TO_PROFILE_DEPARTMENT[filmDepartment.id];
+  if (!targetId) continue;
+  const target = departments.find((department) => department.id === targetId);
+  if (!target) continue;
+  target.roleAliases ??= {};
+
+  for (const filmRole of filmDepartment.roles) {
+    const synonyms = [filmRole.labelEn, ...(filmRole.aliases ?? [])].filter((value): value is string => Boolean(value?.trim()));
+    const targetsExisting = target.roles.find((label) => {
+      const currentSynonyms = target.roleAliases?.[label] ?? [];
+      const currentKeys = new Set([label, ...currentSynonyms].map(roleKey));
+      return [filmRole.label, ...synonyms].some((value) => currentKeys.has(roleKey(value)));
+    });
+
+    if (targetsExisting) {
+      const current = target.roleAliases[targetsExisting] ?? [];
+      const alternateLabels = [filmRole.label, ...synonyms].filter((value) => roleKey(value) !== roleKey(targetsExisting));
+      target.roleAliases[targetsExisting] = [...new Set([...current, ...alternateLabels])];
+      continue;
+    }
+
+    target.roles.push(filmRole.label);
+    if (synonyms.length) target.roleAliases[filmRole.label] = [...new Set(synonyms)];
+  }
+}
+
+/** Department -> valid profile type keys, shared by setup and profile editing. */
+export const DEPARTMENT_TO_PROFILE_TYPES: Record<string, ProfileType[]> = {
+  kamera: ["camera"], grip: ["camera"], licht: ["lighting"], ton: ["sound"],
+  produktion: ["production"], regie: ["director"], art: ["art_department"],
+  kostuem: ["costume"], maske: ["makeup"], post: ["postproduction"],
+  sfx: ["sfx"], broadcast: ["broadcast"], virtual: ["vfx"],
+  "set-logistik": ["production"], redaktion: ["filmmaker"], social: ["creator"],
+  foto: ["photographer"], ki: ["filmmaker"], drehbuch: ["writer"],
+  "public-relations": ["creator"], musik: ["filmmaker"],
+};
+
+/** Legacy single-value map retained for callers that assign one type at a time. */
+export const DEPARTMENT_TO_PROFILE_TYPE: Record<string, string> = Object.fromEntries(
+  Object.entries(DEPARTMENT_TO_PROFILE_TYPES).map(([departmentId, types]) => [departmentId, types[0] ?? ""]),
+);
+
+/** Profile type keys inferred from a selected department and its selected roles. */
+export function getProfileTypesForDepartment(departmentId: string, selectedRoles: readonly string[] = []): ProfileType[] {
+  if (departmentId === "cast") {
+    const inferred = new Set<ProfileType>();
+    for (const role of selectedRoles) {
+      const key = roleKey(role);
+      if (key.includes("model")) inferred.add("model");
+      else if (key.includes("komparse") || key.includes("kleindarsteller") || key.includes("statist") || key.includes("background")) inferred.add("extra");
+      else if (key.includes("stunt")) inferred.add("stunt");
+      else if (key.includes("sprecher") || key.includes("voice over") || key.includes("voice actor")) inferred.add("voiceover");
+      else if (key.includes("moderator") || key.includes("host")) inferred.add("host");
+      else inferred.add("actor");
+    }
+    return inferred.size ? [...inferred] : ["actor"];
+  }
+  return DEPARTMENT_TO_PROFILE_TYPES[departmentId] ?? ["filmmaker"];
+}
+
+export function getDepartmentRoleSearchTerms(department: Department, role: string): string[] {
+  return [...new Set([role, ...(department.roleAliases?.[role] ?? [])])];
+}
+
+const occupationSearchIndex = new Map<string, string[]>();
+for (const department of departments) {
+  for (const role of department.roles) {
+    const terms = getDepartmentRoleSearchTerms(department, role);
+    for (const term of terms) {
+      const key = roleKey(term);
+      occupationSearchIndex.set(key, [...new Set([...(occupationSearchIndex.get(key) ?? []), ...terms])]);
+    }
+  }
+}
+
+/** Canonical title plus searchable aliases for a stored role or typed search term. */
+export function getOccupationSearchTerms(value: string): string[] {
+  return occupationSearchIndex.get(roleKey(value)) ?? [value];
+}
+
+/** Match stored profile positions and filters across canonical names and catalogued aliases. */
+export function matchesDepartmentOccupation(value: string, searchTerm: string): boolean {
+  const valueTerms = getOccupationSearchTerms(value).map(roleKey);
+  const searchTerms = getOccupationSearchTerms(searchTerm).map(roleKey);
+  return searchTerms.some((needle) => valueTerms.some((candidate) =>
+    needle === candidate
+    || (needle.length >= 4 && candidate.includes(needle))
+    || (candidate.length >= 4 && needle.includes(candidate)),
+  ));
+}
 
 /** Flatten all roles across all departments for global search */
 export const allRoles: { role: string; dept: Department }[] =
