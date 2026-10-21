@@ -111,11 +111,14 @@ export async function POST(req: NextRequest) {
     categories, services, portfolio_images, owner_title,
     tagline, bio_short, usp, founded_year, legal_form, hq_address, countries, industry_focus,
     social_links,
-    draft,
+    draft, onboarding_request_key,
   } = body;
 
   if (!name?.trim() || !city?.trim()) {
     return NextResponse.json({ error: "Firmenname und Standort sind Pflichtfelder" }, { status: 400 });
+  }
+  if (onboarding_request_key !== undefined && (draft !== true || typeof onboarding_request_key !== "string" || !/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(onboarding_request_key))) {
+    return NextResponse.json({ error: "Ungültiger Einrichtungsauftrag" }, { status: 400 });
   }
 
   // Update existing
@@ -173,16 +176,37 @@ export async function POST(req: NextRequest) {
 
   // Create new — generate unique slug
   const baseSlug = generateSlug(name.trim());
-  const { data: existing } = await db
-    .from("companies")
-    .select("slug")
-    .ilike("slug", `${baseSlug}%`);
-
   let slug = baseSlug;
-  if (existing && existing.length > 0) {
-    const taken = new Set(existing.map((r: { slug: string }) => r.slug));
-    let n = 2;
-    while (taken.has(slug)) { slug = `${baseSlug}-${n++}`; }
+  if (typeof onboarding_request_key === "string") {
+    // Keep retries idempotent without changing the company schema: the private
+    // setup request gets a stable, owner-scoped slug until the draft is edited.
+    slug = `${baseSlug}-start-${onboarding_request_key.replaceAll("-", "").slice(0, 16)}`;
+    const { data: existingRequest, error: lookupError } = await db
+      .from("companies")
+      .select("id, owner_user_id")
+      .eq("slug", slug)
+      .maybeSingle();
+    if (lookupError) return NextResponse.json({ error: "Der gespeicherte Firmenentwurf konnte nicht geprüft werden." }, { status: 500 });
+    if (existingRequest && existingRequest.owner_user_id === userId) {
+      const { data: company, error: companyError } = await db
+        .from("companies")
+        .select(COMPANY_COLS_FULL)
+        .eq("id", existingRequest.id)
+        .single();
+      if (companyError) return NextResponse.json({ error: "Der gespeicherte Firmenentwurf konnte nicht geladen werden." }, { status: 500 });
+      return NextResponse.json({ data: company });
+    }
+    if (existingRequest) return NextResponse.json({ error: "Der Firmenentwurf konnte wegen eines Slug-Konflikts nicht gespeichert werden." }, { status: 409 });
+  } else {
+    const { data: existing } = await db
+      .from("companies")
+      .select("slug")
+      .ilike("slug", `${baseSlug}%`);
+    if (existing && existing.length > 0) {
+      const taken = new Set(existing.map((r: { slug: string }) => r.slug));
+      let n = 2;
+      while (taken.has(slug)) { slug = `${baseSlug}-${n++}`; }
+    }
   }
 
   const { data, error } = await db

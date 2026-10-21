@@ -66,7 +66,7 @@ export async function POST(req: Request) {
 
   const body = await req.json();
   const { type, title, description, price, city, category, image_url, company_id,
-          metadata, blocked_dates, floor_plan_url, extra_images, rental_type, draft } = body;
+          metadata, blocked_dates, floor_plan_url, extra_images, rental_type, draft, onboarding_request_key } = body;
 
   const VALID_LISTING_TYPES = new Set(["job", "location", "prop", "vehicle", "creator", "animal"]);
 
@@ -76,6 +76,9 @@ export async function POST(req: Request) {
 
   if (!VALID_LISTING_TYPES.has(type)) {
     return NextResponse.json({ error: "Ungültiger Inserat-Typ" }, { status: 400 });
+  }
+  if (onboarding_request_key !== undefined && (draft !== true || typeof onboarding_request_key !== "string" || !/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(onboarding_request_key))) {
+    return NextResponse.json({ error: "Ungültiger Einrichtungsauftrag" }, { status: 400 });
   }
 
   // SECURITY: input length limits and price sanitization
@@ -100,8 +103,25 @@ export async function POST(req: Request) {
   // rental_type column doesn't exist — store it inside metadata
   const mergedMetadata = {
     ...(metadata ?? {}),
+    ...(typeof onboarding_request_key === "string" && { onboarding_request_key }),
     ...(rental_type !== undefined && { rental_type }),
   };
+
+  // A private setup draft can be retried after a lost browser response. Reuse
+  // the first row for the persisted request key instead of creating a duplicate.
+  if (typeof onboarding_request_key === "string") {
+    const { data: existing, error: lookupError } = await db
+      .from("listings")
+      .select(LISTING_COLS)
+      .eq("user_id", userId)
+      .contains("metadata", { onboarding_request_key })
+      .maybeSingle();
+    if (lookupError) {
+      console.error("[listings POST] onboarding retry lookup failed", lookupError);
+      return NextResponse.json({ error: "Der gespeicherte Angebotsentwurf konnte nicht geprüft werden." }, { status: 500 });
+    }
+    if (existing) return NextResponse.json({ data: existing });
+  }
 
   const { data, error } = await db
     .from("listings")

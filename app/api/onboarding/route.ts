@@ -2,12 +2,12 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { compressProfileEditorDraft, expandProfileEditorDraft } from "@/lib/profile-editor-private-draft";
-import { normalizeQuickStartDraft, QUICK_START_INTENTS, validateQuickStartDetails } from "@/lib/quick-start-flow";
+import { normalizeQuickStartDraft, QUICK_START_INTENTS, validateQuickStartDraft } from "@/lib/quick-start-flow";
 
 export const runtime = "nodejs";
 
 const KEY = "cinegeniusOnboarding";
-const INTENTS = new Set(["location", "equipment", "talent", "search", "company"]);
+const INTENTS = new Set(["crew", "location", "equipment", "talent", "search", "company"]);
 const MAX_BYTES = 7000;
 
 function json(body: unknown, status = 200) {
@@ -57,13 +57,12 @@ export async function PUT(request: NextRequest) {
       return json({ error: "Dein Einrichtungsentwurf ist ungültig." }, 400);
     }
     const input = raw as Record<string, unknown>;
-    if (!QUICK_START_INTENTS.includes(input.intent as typeof QUICK_START_INTENTS[number])
-      || input.intent !== record.intent
-      || ![1, 2, 3].includes(Number(input.step))) {
+    const normalized = normalizeQuickStartDraft(input);
+    if ((normalized.intents.length > 0 && !normalized.intents.includes(record.intent as typeof QUICK_START_INTENTS[number]))
+      || (input.version === 2 && typeof input.step !== "string")) {
       return json({ error: "Dein Einrichtungsentwurf passt nicht zur gewählten Aufgabe." }, 400);
     }
-    const normalized = normalizeQuickStartDraft(input);
-    const validation = normalized.step >= 3 ? validateQuickStartDetails(normalized) : null;
+    const validation = normalized.step === "review" ? validateQuickStartDraft(normalized) : null;
     if (validation) {
       return json({ error: validation.message }, 400);
     }
