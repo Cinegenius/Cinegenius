@@ -5,8 +5,9 @@ import Link from "next/link";
 import { Aperture, ArrowRight, Heart } from "lucide-react";
 import { auth } from "@clerk/nextjs/server";
 import BTSMosaicGrid, { type BTSGridItem } from "./BTSMosaicGrid";
+import PhotoNavigationLink from "./PhotoNavigationLink";
 import { getPrivateProfileIds } from "@/lib/trust";
-import { markPhotoNavigation, photoHref } from "@/lib/photo-link";
+import { photoHref } from "@/lib/photo-link";
 
 export const metadata: Metadata = {
   title: "Behind the Scenes — Backstage & Set-Fotos | CineGenius",
@@ -144,7 +145,7 @@ export default async function BTSPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {topRated.map((item, i) => (
-              <Link key={`${item.profileId}:${item.imageUrl}`} href={photoHref(item.profileId, item.imageUrl)} onClick={markPhotoNavigation}
+              <PhotoNavigationLink key={`${item.profileId}:${item.imageUrl}`} href={photoHref(item.profileId, item.imageUrl)}
                 className="group relative rounded-2xl overflow-hidden aspect-video bg-bg-elevated border border-red-400/20">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={item.imageUrl} alt={item.authorName}
@@ -156,7 +157,7 @@ export default async function BTSPage() {
                 <div className="absolute bottom-3 left-3">
                   <p className="text-white font-semibold text-sm">{item.authorName}</p>
                 </div>
-              </Link>
+              </PhotoNavigationLink>
             ))}
           </div>
         </section>
