@@ -1,6 +1,8 @@
 import { departments, getDepartmentRoleSearchTerms, getProfileTypesForDepartment } from "@/lib/departments";
 import { gripSearchTerms, normalizeOccupation } from "@/lib/gripTaxonomy";
 import type { ProfileType } from "@/lib/profile-types";
+import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
+import { CATERING_COMPANY_CATEGORY, normalizeCateringCompanyDetails, type CateringCompanyDetails } from "@/lib/catering-taxonomy";
 
 export const QUICK_START_INTENTS = ["crew", "talent", "location", "equipment", "company", "search"] as const;
 export type QuickStartIntent = typeof QUICK_START_INTENTS[number];
@@ -9,7 +11,7 @@ export const QUICK_START_SCREENS = [
   "name", "goals", "crew-departments", "crew-roles", "person-city", "talent-roles", "talent-intro",
   "location-category", "location-details", "location-photo", "location-price",
   "equipment-category", "equipment-details", "equipment-photo", "equipment-price",
-  "company-details", "company-photo", "review",
+  "company-details", "company-categories", "company-catering", "company-photo", "review",
 ] as const;
 export type QuickStartScreen = typeof QUICK_START_SCREENS[number];
 
@@ -24,6 +26,11 @@ export type QuickStartIntentData = {
   priceOnRequest: boolean;
   departmentIds: string[];
   roles: QuickStartRoleSelection[];
+  categoryIds: string[];
+  contactEmail: string;
+  contactPhone: string;
+  website: string;
+  cateringDetails: CateringCompanyDetails;
 };
 export type QuickStartDraft = {
   version: 2;
@@ -78,6 +85,7 @@ export const QUICK_START_CATEGORIES = {
     { label: "Fahrzeug", value: "Bild-Fahrzeug", example: "Fahrzeug für Bild oder Produktion" },
     { label: "Etwas anderes", value: "Produktionsausstattung", example: "Anderes Equipment oder Setzubehör" },
   ],
+  company: COMPANY_CATEGORIES.map(({ label, id, examples }) => ({ label, value: id, example: examples })),
 } as const;
 
 export type QuickStartRole = { departmentId: string; departmentLabel: string; role: string };
@@ -93,7 +101,7 @@ export function getQuickStartDepartments() {
 }
 
 export function createQuickStartIntentData(): QuickStartIntentData {
-  return { category: "", title: "", city: "", description: "", imageUrl: "", price: "", priceOnRequest: true, departmentIds: [], roles: [] };
+  return { category: "", title: "", city: "", description: "", imageUrl: "", price: "", priceOnRequest: true, departmentIds: [], roles: [], categoryIds: [], contactEmail: "", contactPhone: "", website: "", cateringDetails: { serviceTypes: [], serviceAreas: "", capacity: null, dietaryOptions: [], mobileEquipment: [] } };
 }
 
 function normalizeIntentData(value: unknown): QuickStartIntentData {
@@ -120,6 +128,13 @@ function normalizeIntentData(value: unknown): QuickStartIntentData {
     priceOnRequest: input.priceOnRequest !== false,
     departmentIds,
     roles,
+    categoryIds: Array.isArray(input.categoryIds)
+      ? [...new Set(input.categoryIds.filter((id): id is string => typeof id === "string" && COMPANY_CATEGORIES.some((category) => category.id === id)))].slice(0, COMPANY_CATEGORIES.length)
+      : [],
+    contactEmail: typeof input.contactEmail === "string" ? input.contactEmail.slice(0, 200) : "",
+    contactPhone: typeof input.contactPhone === "string" ? input.contactPhone.slice(0, 80) : "",
+    website: typeof input.website === "string" ? input.website.slice(0, 300) : "",
+    cateringDetails: normalizeCateringCompanyDetails(input.cateringDetails),
   };
 }
 
@@ -212,7 +227,9 @@ export function buildQuickStartScreens(draft: QuickStartDraft): QuickStartScreen
     } else if (intent === "equipment") {
       screens.push({ id: "equipment-category", intent }, { id: "equipment-details", intent }, { id: "equipment-photo", intent, optional: true }, { id: "equipment-price", intent, optional: true });
     } else if (intent === "company") {
-      screens.push({ id: "company-details", intent }, { id: "company-photo", intent, optional: true });
+      screens.push({ id: "company-details", intent }, { id: "company-categories", intent });
+      if (draft.sections.company?.categoryIds.includes(CATERING_COMPANY_CATEGORY.id)) screens.push({ id: "company-catering", intent, optional: true });
+      screens.push({ id: "company-photo", intent, optional: true });
     }
   }
   screens.push({ id: "review" });
@@ -232,6 +249,7 @@ function termsFor(item: QuickStartRole): string[] {
 export function findQuickStartRoles(query: string, limit = 18, departmentIds?: readonly string[]): QuickStartRole[] {
   const needle = normalizeOccupation(query.trim());
   if (!needle) return [];
+  const cateringDepartmentSearch = ["catering", "setverpflegung"].includes(needle);
   const allowed = departmentIds ? new Set(departmentIds) : null;
   return roleRecords
     .filter((item) => !allowed || allowed.has(item.departmentId))
@@ -239,7 +257,8 @@ export function findQuickStartRoles(query: string, limit = 18, departmentIds?: r
       const terms = termsFor(item).map(normalizeOccupation);
       const exact = terms.some((term) => term === needle);
       const starts = terms.some((term) => term.startsWith(needle));
-      const matches = exact || starts || terms.some((term) => term.includes(needle) || (needle.length >= 4 && needle.includes(term)));
+      const matches = (cateringDepartmentSearch && item.departmentId === CATERING_COMPANY_CATEGORY.id)
+        || exact || starts || terms.some((term) => term.includes(needle) || (needle.length >= 4 && needle.includes(term)));
       return { item, matches, rank: exact ? 0 : starts ? 1 : 2 };
     })
     .filter((result) => result.matches)
@@ -291,6 +310,7 @@ export function validateQuickStartScreen(draft: QuickStartDraft, screen: QuickSt
     if (!company?.title.trim()) return { field: "company-title", message: "Bitte gib den Namen deiner Firma ein." };
     if (!company.city.trim()) return { field: "company-city", message: "Bitte gib den Firmenstandort an." };
   }
+  if (screen === "company-categories" && !(draft.sections.company?.categoryIds.length)) return { field: "company-categories", message: "Wähle mindestens eine passende Firmenkategorie aus." };
   return null;
 }
 

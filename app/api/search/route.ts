@@ -1,6 +1,11 @@
 import { db } from "@/lib/db";
 import { getPrivateProfileIds } from "@/lib/trust";
 import { NextRequest, NextResponse } from "next/server";
+import {
+  CATERING_COMPANY_CATEGORY,
+  getCateringProfileSearchValues,
+  isCateringSearchQuery,
+} from "@/lib/catering-taxonomy";
 
 export async function GET(req: NextRequest) {
   const raw  = req.nextUrl.searchParams.get("q")?.trim() ?? "";
@@ -15,8 +20,10 @@ export async function GET(req: NextRequest) {
   const wantListings = type === "all" || ["location", "vehicle", "prop", "job", "creator"].includes(type);
   const wantProfiles = type === "all" || type === "profile";
   const wantCompanies = type === "all" || type === "company";
+  const cateringProfileValues = wantProfiles ? getCateringProfileSearchValues(raw) : [];
+  const searchCateringCompanies = wantCompanies && isCateringSearchQuery(raw);
 
-  const [listingsRes, profilesRes, companiesRes] = await Promise.all([
+  const [listingsRes, profilesRes, companiesRes, cateringProfileResults, cateringCompaniesRes] = await Promise.all([
     wantListings
       ? (() => {
           let q2 = db
@@ -48,6 +55,24 @@ export async function GET(req: NextRequest) {
           .or(`name.ilike.${like},city.ilike.${like},description.ilike.${like}`)
           .limit(type === "all" ? 4 : 24)
       : Promise.resolve({ data: [] }),
+
+    cateringProfileValues.length
+      ? Promise.all(cateringProfileValues.map((position) => db
+          .from("profiles")
+          .select("user_id, display_name, location, role, positions, avatar_url, available")
+          .contains("positions", [position])
+          .not("display_name", "is", null)
+          .neq("display_name", "")
+          .limit(type === "all" ? 8 : 24)))
+      : Promise.resolve([]),
+
+    searchCateringCompanies
+      ? db.from("companies")
+          .select("id, slug, name, city, logo_url, categories")
+          .eq("published", true)
+          .contains("categories", [CATERING_COMPANY_CATEGORY.id])
+          .limit(type === "all" ? 8 : 24)
+      : Promise.resolve({ data: [] }),
   ]);
 
   const listings = (listingsRes.data ?? []).map((l: Record<string, unknown>) => ({
@@ -60,8 +85,14 @@ export async function GET(req: NextRequest) {
     available: null as boolean | null,
   }));
 
-  const privateProfileIds = await getPrivateProfileIds((profilesRes.data ?? []).map((profile) => profile.user_id));
-  const profiles = (profilesRes.data ?? [])
+  type ProfileSearchRow = { user_id: string; display_name: string | null; location: string | null; role: string | null; positions: string[] | null; avatar_url: string | null; available: boolean | null };
+  const profileById = new Map<string, ProfileSearchRow>();
+  for (const profile of [...(profilesRes.data ?? []), ...cateringProfileResults.flatMap((result) => result.data ?? [])] as ProfileSearchRow[]) {
+    if (profile?.user_id) profileById.set(profile.user_id, profile);
+  }
+  const profileRows = [...profileById.values()];
+  const privateProfileIds = await getPrivateProfileIds(profileRows.map((profile) => profile.user_id));
+  const profiles = profileRows
     .filter((profile) => !privateProfileIds.has(profile.user_id))
     .filter((p: Record<string, unknown>) => p.display_name)
     .map((p: Record<string, unknown>) => ({
@@ -74,7 +105,12 @@ export async function GET(req: NextRequest) {
       available: p.available as boolean | null,
     }));
 
-  const companies = (companiesRes.data ?? []).map((c: Record<string, unknown>) => ({
+  const companyById = new Map<string, Record<string, unknown>>();
+  for (const company of [...(companiesRes.data ?? []), ...(cateringCompaniesRes.data ?? [])] as Record<string, unknown>[]) {
+    const id = String(company.slug ?? company.id ?? "");
+    if (id) companyById.set(id, company);
+  }
+  const companies = [...companyById.values()].map((c: Record<string, unknown>) => ({
     id: (c.slug ?? c.id) as string,
     title: c.name as string,
     subtitle: (c.city as string) ?? "",

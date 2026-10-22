@@ -5,6 +5,7 @@
  */
 
 import { GRIP_DEPARTMENT_LABEL, GRIP_OCCUPATIONS } from "@/lib/gripTaxonomy";
+import { CATERING_DEPARTMENT_ID, CATERING_DEPARTMENT_LABEL, CATERING_OCCUPATIONS } from "@/lib/catering-taxonomy";
 
 export type Platform = "film" | "social" | "photo";
 
@@ -962,8 +963,6 @@ export const FILM_DEPARTMENTS: FilmDepartment[] = [
       { id: "vertrauensperson",             label: "Vertrauensperson",                           labelEn: "Wellbeing Officer / Person of Trust" },
       { id: "fachkraft-arbeitssicherheit",  label: "Fachkraft für Arbeitssicherheit",            labelEn: "Health & Safety Officer" },
       { id: "hygienebeauftragte",           label: "Hygienebeauftragte*r (Coronaschutz)",        labelEn: "Hygiene Officer (Covid)" },
-      { id: "caterer-setbetreuung",         label: "Caterer (Setbetreuung)",                     labelEn: "Set Caterer" },
-      { id: "caterer-kueche",               label: "Caterer (Setkoch*Setköchin)",                labelEn: "Set Cook / Chef" },
       { id: "tiertrainer",                  label: "Tiertrainer*in",                             labelEn: "Animal Trainer" },
       { id: "tierbetreuer",                 label: "Tierbetreuer*in",                            labelEn: "Animal Handler / Wrangler" },
       { id: "marine-coordinator",           label: "Marine Coordinator",                         labelEn: "Marine Coordinator" },
@@ -998,6 +997,20 @@ export const FILM_DEPARTMENTS: FilmDepartment[] = [
       { id: "personal-assistant-set",       label: "Personal Assistant",                         labelEn: "Personal Assistant (On-Set)" },
       { id: "recherche-allg",               label: "Recherche",                                  labelEn: "Researcher (General)" },
     ],
+  },
+  {
+    id: CATERING_DEPARTMENT_ID,
+    label: CATERING_DEPARTMENT_LABEL,
+    color: "text-orange-300",
+    bg: "bg-orange-400/10 border-orange-400/20",
+    platform: "film",
+    roles: CATERING_OCCUPATIONS.map((occupation) => ({
+      id: occupation.id,
+      label: occupation.label,
+      labelEn: occupation.labelEn,
+      aliases: occupation.aliases,
+      description: occupation.description,
+    })),
   },
 
   // ── SOCIAL MEDIA ─────────────────────────────────────────────────────────
@@ -1080,6 +1093,11 @@ export const ROLE_BY_ID = Object.fromEntries(ALL_ROLES.map((r) => [r.id, r]));
  * Wird in CreatorsContent und JobsContent für Keyword-Matching verwendet.
  */
 export const DEPT_KEYWORDS: Record<string, string[]> = {
+  [CATERING_DEPARTMENT_ID]: [
+    "catering", "filmcatering", "film catering", "set catering", "setverpflegung", "setkoch", "setköchin", "chef",
+    "kitchen assistant", "küchenhilfe", "craft service", "craft services", "food service", "essensausgabe",
+    "catering manager", "catering assistenz", "foodtruck", "kitchen truck", "küchenmobil",
+  ],
   "vor-der-kamera": [
     "schauspieler", "schauspielerin", "actor", "actress", "darsteller",
     "hauptdarsteller", "nebendarsteller", "statist", "komparse", "extra",

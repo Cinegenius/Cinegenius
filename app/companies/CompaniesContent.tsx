@@ -8,9 +8,10 @@ import {
   Building2, MapPin, Search, CheckCircle, LayoutGrid, LayoutList,
   ChevronRight, X, Camera, Volume2, Wrench, Shirt,
   Package, Film, Monitor, Users, Sparkles, Megaphone, Car,
-  Lightbulb, Globe, Zap, ChevronDown,
+  Lightbulb, Globe, Zap, ChevronDown, Utensils,
 } from "lucide-react";
 import { COMPANY_CATEGORIES, COMPANY_CATEGORY_BY_ID } from "@/lib/companyCategories";
+import { CATERING_COMPANY_CATEGORY, getCateringCompanySearchTerms, normalizeCateringCompanyDetails } from "@/lib/catering-taxonomy";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 
 const PAGE_SIZE = 24;
@@ -24,6 +25,7 @@ type Company = {
   city: string;
   categories: string[];
   services: string[];
+  catering_details?: unknown;
   verified: boolean;
   created_at: string;
 };
@@ -45,7 +47,17 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
   "fotostudio":       Camera,
   "werbeagentur":     Megaphone,
   "fahrzeugverleih":  Car,
+  [CATERING_COMPANY_CATEGORY.id]: Utensils,
 };
+
+function cateringSearchText(company: Company): string {
+  const details = normalizeCateringCompanyDetails(company.catering_details);
+  return [
+    ...details.serviceTypes, details.serviceAreas, String(details.capacity ?? ""),
+    ...details.dietaryOptions, ...details.mobileEquipment,
+    ...(company.categories.includes(CATERING_COMPANY_CATEGORY.id) ? getCateringCompanySearchTerms() : []),
+  ].join(" ").toLocaleLowerCase("de");
+}
 
 // ─── FilterDropdown ───────────────────────────────────────────────
 function FilterDropdown({
@@ -115,7 +127,9 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
         c.name.toLowerCase().includes(q) ||
         c.description.toLowerCase().includes(q) ||
         c.city.toLowerCase().includes(q) ||
-        c.services.some((s) => s.toLowerCase().includes(q))
+        c.services.some((s) => s.toLowerCase().includes(q)) ||
+        c.categories.some((id) => (COMPANY_CATEGORY_BY_ID[id]?.label ?? id).toLowerCase().includes(q)) ||
+        cateringSearchText(c).includes(q)
       );
     }
     if (selectedCategory) result = result.filter((c) => c.categories.includes(selectedCategory));

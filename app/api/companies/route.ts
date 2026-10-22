@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
+import { CATERING_COMPANY_CATEGORY, isCateringSearchQuery, normalizeCateringCompanyDetails } from "@/lib/catering-taxonomy";
 
 function revalidateCompanyViews(slug: string) {
   revalidateTag("companies", "max");
@@ -24,13 +25,13 @@ function generateSlug(name: string): string {
 const COMPANY_COLS_FULL =
   "id, slug, owner_user_id, name, logo_url, description, city, website, email, phone, " +
   "categories, services, portfolio_images, tagline, bio_short, usp, founded_year, " +
-  "legal_form, hq_address, countries, industry_focus, social_links, published, " +
+  "legal_form, hq_address, countries, industry_focus, social_links, catering_details, published, " +
   "created_at, updated_at";
 
 // Lighter set for public directory listings.
 const COMPANY_COLS_PUBLIC =
   "id, slug, name, logo_url, description, city, categories, services, tagline, " +
-  "founded_year, published, created_at";
+  "founded_year, catering_details, published, created_at";
 
 // GET — list published companies (with optional filters)
 export async function GET(req: NextRequest) {
@@ -75,6 +76,27 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  if (q && !category && isCateringSearchQuery(q)) {
+    let cateringQuery = db
+      .from("companies")
+      .select(COMPANY_COLS_PUBLIC)
+      .eq("published", true)
+      .contains("categories", [CATERING_COMPANY_CATEGORY.id])
+      .order("created_at", { ascending: false })
+      .range(0, Math.max(to, limit - 1));
+    if (city) cateringQuery = cateringQuery.ilike("city", `%${city.trim().slice(0, 80).replace(/[%,()]/g, "")}%`);
+    const { data: cateringMatches, error: cateringError } = await cateringQuery;
+    if (cateringError) return NextResponse.json({ error: cateringError.message }, { status: 500 });
+    const rows = new Map<string, Record<string, unknown>>();
+    for (const company of [...(data ?? []), ...(cateringMatches ?? [])] as unknown as Record<string, unknown>[]) {
+      const id = String(company.id ?? "");
+      if (id) rows.set(id, company);
+    }
+    const merged = [...rows.values()].sort((left, right) => String(right.created_at).localeCompare(String(left.created_at)));
+    return NextResponse.json({ data: merged.slice(from, to + 1), page, limit });
+  }
+
   return NextResponse.json({ data: data ?? [], page, limit });
 }
 
@@ -120,6 +142,7 @@ export async function POST(req: NextRequest) {
     categories, services, portfolio_images, owner_title,
     tagline, bio_short, usp, founded_year, legal_form, hq_address, countries, industry_focus,
     social_links,
+    catering_details,
     onboarding_request_key,
   } = body;
 
@@ -163,6 +186,7 @@ export async function POST(req: NextRequest) {
         countries: countries ?? [],
         industry_focus: industry_focus ?? [],
         social_links: social_links ?? {},
+        ...(catering_details !== undefined && { catering_details: normalizeCateringCompanyDetails(catering_details) }),
         // Saving a company profile makes it publicly discoverable. Keep this
         // policy server-side so older clients cannot accidentally create drafts.
         published: true,
@@ -248,6 +272,7 @@ export async function POST(req: NextRequest) {
       countries: countries ?? [],
       industry_focus: industry_focus ?? [],
       social_links: social_links ?? {},
+      catering_details: normalizeCateringCompanyDetails(catering_details),
       published: true,
     })
     .select()

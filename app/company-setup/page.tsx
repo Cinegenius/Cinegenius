@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import { safeObjectURL } from "@/lib/compressImage";
+import CateringCompanyFields from "@/components/CateringCompanyFields";
+import { CATERING_COMPANY_CATEGORY, EMPTY_CATERING_COMPANY_DETAILS, normalizeCateringCompanyDetails, type CateringCompanyDetails } from "@/lib/catering-taxonomy";
 
 const MAX_PORTFOLIO = 8;
 
@@ -41,6 +43,7 @@ export default function CompanySetupPage() {
   // Categories
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const [cateringDetails, setCateringDetails] = useState<CateringCompanyDetails>(EMPTY_CATERING_COMPANY_DETAILS);
 
   // Services (free text tags)
   const [services, setServices] = useState<string[]>([]);
@@ -106,6 +109,7 @@ export default function CompanySetupPage() {
           setLogoUrl(c.logo_url ?? "");
           setLogoPreview(c.logo_url ?? "");
           setSelectedCategories(c.categories ?? []);
+          setCateringDetails(normalizeCateringCompanyDetails(c.catering_details));
           setServices(c.services ?? []);
           setPortfolioImages(c.portfolio_images ?? []);
           setTagline(c.tagline ?? "");
@@ -153,6 +157,7 @@ export default function CompanySetupPage() {
         setWebsite(draft.website ?? ""); setEmail(draft.email ?? ""); setPhone(draft.phone ?? "");
         setLogoUrl(draft.logoUrl ?? ""); setLogoPreview(draft.logoUrl ?? "");
         setPortfolioImages(draft.portfolioImages ?? []); setSelectedCategories(draft.selectedCategories ?? []);
+        setCateringDetails(normalizeCateringCompanyDetails(draft.cateringDetails));
         setServices(draft.services ?? []); setTagline(draft.tagline ?? ""); setBioShort(draft.bioShort ?? "");
         setUsp(draft.usp ?? ""); setFoundedYear(draft.foundedYear ?? ""); setLegalForm(draft.legalForm ?? "");
         setHqAddress(draft.hqAddress ?? ""); setCountries(draft.countries ?? []);
@@ -172,7 +177,7 @@ export default function CompanySetupPage() {
       setCompanyDraftStatus("saving");
       try {
         const response = await fetch("/api/onboarding", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
-          intent: "company", setupComplete: false, companyDraft: { name, city, description, website, email, phone, logoUrl, portfolioImages, selectedCategories, services, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep, updatedAt: new Date().toISOString() },
+          intent: "company", setupComplete: false, companyDraft: { name, city, description, website, email, phone, logoUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep, updatedAt: new Date().toISOString() },
         }) });
         const result = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(result.error ?? "Der Entwurf konnte nicht gespeichert werden.");
@@ -183,7 +188,7 @@ export default function CompanySetupPage() {
       }
     }, 650);
     return () => clearTimeout(timer);
-  }, [guidedSetup, companyDraftLoaded, loading, existingId, name, city, description, website, email, phone, logoUrl, portfolioImages, selectedCategories, services, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, companyStep]);
+  }, [guidedSetup, companyDraftLoaded, loading, existingId, name, city, description, website, email, phone, logoUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, companyStep]);
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -231,9 +236,11 @@ export default function CompanySetupPage() {
   };
 
   const toggleCategory = (id: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
-    );
+    setSelectedCategories((prev) => {
+      const isSelected = prev.includes(id);
+      if (isSelected && id === CATERING_COMPANY_CATEGORY.id) setCateringDetails(EMPTY_CATERING_COMPANY_DETAILS);
+      return isSelected ? prev.filter((category) => category !== id) : [...prev, id];
+    });
   };
 
   const addService = () => {
@@ -287,6 +294,7 @@ export default function CompanySetupPage() {
           logo_url: logoUrl || null,
           categories: selectedCategories,
           services,
+          catering_details: selectedCategories.includes(CATERING_COMPANY_CATEGORY.id) ? cateringDetails : EMPTY_CATERING_COMPANY_DETAILS,
           portfolio_images: portfolioImages,
           owner_title: ownerTitle.trim() || null,
           tagline: tagline.trim() || null,
@@ -361,13 +369,17 @@ export default function CompanySetupPage() {
                     <fieldset className="space-y-3">
                       <legend className="text-sm font-medium text-text-primary">Was macht eure Firma? <span className="text-text-muted">(optional)</span></legend>
                       <div className="flex flex-wrap gap-2">
-                        {COMPANY_CATEGORIES.slice(0, 10).map((category) => {
+                        {COMPANY_CATEGORIES.map((category) => {
                           const active = selectedCategories.includes(category.id);
                           return <button key={category.id} type="button" aria-pressed={active} onClick={() => toggleCategory(category.id)} className={`min-h-11 rounded-full border px-3 py-2 text-sm transition-colors ${active ? "border-gold/50 bg-gold/10 text-gold" : "border-border bg-bg-secondary text-text-secondary hover:border-gold/40"}`}>{category.label}</button>;
                         })}
                       </div>
                       <p className="text-xs text-text-muted">Weitere Angaben kannst du später im Firmenprofil ergänzen.</p>
                     </fieldset>
+                    {selectedCategories.includes(CATERING_COMPANY_CATEGORY.id) && <>
+                      <CateringCompanyFields value={cateringDetails} onChange={setCateringDetails} />
+                      <p className="text-xs text-text-muted">Wenn du diese Firmenkategorie abwählst, werden auch ihre Catering-Angaben entfernt.</p>
+                    </>}
                   </section>
                 )}
 
@@ -392,6 +404,7 @@ export default function CompanySetupPage() {
                     <div className="space-y-3 rounded-2xl border border-border bg-bg-secondary p-4">
                       <div><p className="text-xs uppercase tracking-wide text-text-muted">Unternehmen</p><p className="mt-1 font-semibold text-text-primary">{name || "Noch kein Firmenname"}</p><p className="text-sm text-text-secondary">{city || "Standort fehlt"}</p></div>
                       {selectedCategories.length > 0 && <div><p className="text-xs uppercase tracking-wide text-text-muted">Angebot</p><p className="mt-1 text-sm text-text-primary">{selectedCategories.map((id) => COMPANY_CATEGORIES.find((item) => item.id === id)?.label).filter(Boolean).join(", ")}</p></div>}
+                      {selectedCategories.includes(CATERING_COMPANY_CATEGORY.id) && (cateringDetails.serviceTypes.length > 0 || cateringDetails.capacity || cateringDetails.serviceAreas) && <div><p className="text-xs uppercase tracking-wide text-text-muted">Catering</p><p className="mt-1 text-sm text-text-primary">{[...cateringDetails.serviceTypes, cateringDetails.capacity ? `Kapazität: bis ${cateringDetails.capacity} Personen` : "", cateringDetails.serviceAreas].filter(Boolean).join(" · ")}</p></div>}
                       {bioShort.trim() && <div><p className="text-xs uppercase tracking-wide text-text-muted">Kurzvorstellung</p><p className="mt-1 text-sm text-text-secondary">{bioShort}</p></div>}
                     </div>
                     <p className="text-xs leading-relaxed text-text-muted">Logo, Kontaktdaten, weitere Kategorien und Teamangaben kannst du später im Firmenprofil ergänzen.</p>
@@ -537,6 +550,10 @@ export default function CompanySetupPage() {
                   })}
                 </div>
               )}
+              {selectedCategories.includes(CATERING_COMPANY_CATEGORY.id) && <>
+                <CateringCompanyFields value={cateringDetails} onChange={setCateringDetails} />
+                <p className="text-xs text-text-muted">Wenn du diese Firmenkategorie abwählst, werden auch ihre Catering-Angaben entfernt.</p>
+              </>}
             </div>
 
             {/* Tagline / Claim */}

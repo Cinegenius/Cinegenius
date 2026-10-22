@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { COMPANY_CATEGORY_BY_ID } from "@/lib/companyCategories";
+import { CATERING_COMPANY_CATEGORY, normalizeCateringCompanyDetails } from "@/lib/catering-taxonomy";
 import {
   EQUIPMENT_CATEGORY_BY_ID, CONDITION_LABELS, CONDITION_COLORS, SERVICE_TYPE_BY_ID,
 } from "@/lib/equipment-categories";
@@ -78,6 +79,7 @@ type Company = {
   phone: string | null;
   categories: string[];
   services: string[];
+  catering_details?: unknown;
   portfolio_images: string[];
   social_links: Record<string, string> | null;
   verified: boolean;
@@ -115,6 +117,8 @@ export default function CompanyDetail({
 
   const isOwner = user?.id === company.owner_user_id;
   const cats = company.categories.map((id) => COMPANY_CATEGORY_BY_ID[id]).filter(Boolean);
+  const cateringDetails = normalizeCateringCompanyDetails(company.catering_details);
+  const offersCatering = company.categories.includes(CATERING_COMPANY_CATEGORY.id);
 
   const [localMembers, setLocalMembers] = useState<Member[]>(members);
   const [localMembership, setLocalMembership] = useState(myMembership);
@@ -691,6 +695,17 @@ export default function CompanyDetail({
               </section>
             )}
 
+            {offersCatering && (cateringDetails.serviceTypes.length > 0 || cateringDetails.serviceAreas || cateringDetails.capacity || cateringDetails.dietaryOptions.length > 0 || cateringDetails.mobileEquipment.length > 0) && (
+              <section className="space-y-3 rounded-2xl border border-orange-300/20 bg-orange-300/[0.04] p-4 sm:p-5">
+                <SectionLabel>Catering / Setverpflegung</SectionLabel>
+                {cateringDetails.serviceTypes.length > 0 && <DetailLine label="Leistungen" value={cateringDetails.serviceTypes.join(", ")} />}
+                {cateringDetails.serviceAreas && <DetailLine label="Einsatzregion" value={cateringDetails.serviceAreas} />}
+                {cateringDetails.capacity && <DetailLine label="Kapazität" value={`Bis zu ${cateringDetails.capacity} Personen`} />}
+                {cateringDetails.dietaryOptions.length > 0 && <DetailLine label="Ernährungsangebote" value={cateringDetails.dietaryOptions.join(", ")} />}
+                {cateringDetails.mobileEquipment.length > 0 && <DetailLine label="Mobile Ausstattung" value={cateringDetails.mobileEquipment.join(", ")} />}
+              </section>
+            )}
+
           </div>
         </div>
       </div>
@@ -709,6 +724,10 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
       </p>
     </div>
   );
+}
+
+function DetailLine({ label, value }: { label: string; value: string }) {
+  return <p className="break-words text-sm leading-6 text-text-secondary"><span className="font-medium text-text-primary">{label}: </span>{value}</p>;
 }
 
 function Avatar({ member, size = 40 }: { member: Member; size?: number }) {

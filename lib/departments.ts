@@ -1,5 +1,6 @@
 import { GRIP_DEPARTMENT_LABEL, GRIP_OCCUPATIONS } from "@/lib/gripTaxonomy";
 import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
+import { CATERING_DEPARTMENT_ID, CATERING_DEPARTMENT_LABEL } from "@/lib/catering-taxonomy";
 import type { ProfileType } from "@/lib/profile-types";
 
 export type Department = {
@@ -345,7 +346,7 @@ export const departments: Department[] = [
       "Base Runner", "Fahrer (PKW / LKW)", "Motivfahrer",
       "Motivaufnahmeleiter", "Assistant Location Manager",
       "Set Security", "Crowd Control",
-      "Medic / Set-Arzt", "Fire Safety Officer", "Catering", "Craft Service",
+      "Medic / Set-Arzt", "Fire Safety Officer",
     ],
   },
   {
@@ -535,6 +536,7 @@ const FILM_TO_PROFILE_DEPARTMENT: Record<string, string> = {
   "virtual-production": "virtual",
   "public-relation": "public-relations",
   "weitere-crew": "set-logistik",
+  [CATERING_DEPARTMENT_ID]: CATERING_DEPARTMENT_ID,
   "content-creation": "social",
   "social-video": "social",
   fotografie: "foto",
@@ -551,6 +553,12 @@ const ADDITIONAL_DEPARTMENTS: Department[] = [
     id: "public-relations", label: "Public Relations",
     labels: { de: "Public Relations", en: "Public Relations", es: "Relaciones públicas", it: "Relazioni pubbliche", cs: "Public relations", hu: "Public relations" },
     emoji: "📣", color: "pink", roles: [],
+  },
+  {
+    id: CATERING_DEPARTMENT_ID,
+    label: CATERING_DEPARTMENT_LABEL,
+    labels: { de: CATERING_DEPARTMENT_LABEL, en: "Catering / Set Catering", es: "Catering de rodaje", it: "Catering sul set", cs: "Catering na place", hu: "Forgatási catering" },
+    emoji: "🍽️", color: "orange", roles: [],
   },
 ];
 
@@ -591,6 +599,7 @@ for (const filmDepartment of FILM_DEPARTMENTS) {
 export const DEPARTMENT_TO_PROFILE_TYPES: Record<string, ProfileType[]> = {
   kamera: ["camera"], grip: ["camera"], licht: ["lighting"], ton: ["sound"],
   produktion: ["production"], regie: ["director"], art: ["art_department"],
+  [CATERING_DEPARTMENT_ID]: ["production"],
   kostuem: ["costume"], maske: ["makeup"], post: ["postproduction"],
   sfx: ["sfx"], broadcast: ["broadcast"], virtual: ["vfx"],
   "set-logistik": ["production"], redaktion: ["filmmaker"], social: ["creator"],

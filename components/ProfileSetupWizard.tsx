@@ -10,7 +10,7 @@ import {
   Loader2, MapPin, Package, Search, Trash2,
 } from "lucide-react";
 import { compressImage } from "@/lib/compressImage";
-import { departments } from "@/lib/departments";
+import { departments, getDepartmentRoleSearchTerms } from "@/lib/departments";
 import { safeAuthRedirect } from "@/lib/auth-redirect";
 import { shouldSkipProfileSetup } from "@/lib/profile-setup-flow";
 import {
@@ -20,6 +20,8 @@ import {
   validateQuickStartScreen, type QuickStartDraft, type QuickStartIntent, type QuickStartIntentData,
   type QuickStartRoleSelection, type QuickStartScreen,
 } from "@/lib/quick-start-flow";
+import CateringCompanyFields from "@/components/CateringCompanyFields";
+import { CATERING_COMPANY_CATEGORY, EMPTY_CATERING_COMPANY_DETAILS, getCateringCompanySearchTerms } from "@/lib/catering-taxonomy";
 
 const paths: { id: QuickStartIntent; detail: string; Icon: typeof MapPin }[] = [
   { id: "crew", detail: "Für Kamera, Licht, Ton, Regie und viele weitere Gewerke", Icon: Film },
@@ -49,6 +51,8 @@ const screenContent: Record<QuickStartScreen, { title: string; description: stri
   "equipment-photo": { title: "Möchtest du ein Foto hinzufügen?", description: "Ein Foto macht deinen Entwurf anschaulicher. Du kannst es auch später ergänzen." },
   "equipment-price": { title: "Wie möchtest du den Preis angeben?", description: "Du kannst einen Tagespreis nennen oder erst Anfragen sammeln." },
   "company-details": { title: "Wie heißt deine Firma und wo ist sie?", description: "Nach dem Abschluss wird dein Firmenprofil öffentlich angezeigt. Du kannst es anschließend ergänzen." },
+  "company-categories": { title: "Was bietet deine Firma an?", description: "Wähle eine oder mehrere passende Kategorien. Bei Catering fragen wir anschließend nur die dazugehörigen freiwilligen Details ab." },
+  "company-catering": { title: "Welche Catering-Leistungen bietet ihr an?", description: "Diese Angaben sind freiwillig und helfen Produktionen, passende Setverpflegung zu finden." },
   "company-photo": { title: "Möchtest du ein Logo hinzufügen?", description: "Ein Logo ist freiwillig und kann später ergänzt werden." },
   review: { title: "Prüfen und loslegen", description: "Ändere einzelne Angaben, bevor wir dein Profil oder private Angebotsentwürfe anlegen." },
 };
@@ -72,6 +76,7 @@ function screenForField(field: string, draft: QuickStartDraft): QuickStartScreen
   if (field.startsWith("equipment-category")) return "equipment-category";
   if (field.startsWith("equipment-price")) return "equipment-price";
   if (field.startsWith("equipment-")) return "equipment-details";
+  if (field === "company-categories") return "company-categories";
   if (field.startsWith("company-")) return "company-details";
   return buildQuickStartScreens(draft)[0]?.id ?? "name";
 }
@@ -92,6 +97,7 @@ export default function ProfileSetupWizard() {
   const [error, setError] = useState("");
   const [roleSearch, setRoleSearch] = useState("");
   const [departmentSearch, setDepartmentSearch] = useState("");
+  const [companyCategorySearch, setCompanyCategorySearch] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const saveQueue = useRef<Promise<boolean>>(Promise.resolve(true));
 
@@ -172,6 +178,15 @@ export default function ProfileSetupWizard() {
   }, [ready, draft, persist]);
 
   const screens = useMemo(() => buildQuickStartScreens(draft), [draft]);
+  useEffect(() => {
+    if (!ready || screens.some((screen) => screen.id === draft.step)) return;
+    const fallback: QuickStartScreen = draft.step === "company-catering" && screens.some((screen) => screen.id === "company-categories")
+      ? "company-categories"
+      : screens[0]?.id ?? "name";
+    const repaired = { ...draft, step: fallback };
+    setDraft(repaired);
+    void persist(repaired);
+  }, [draft, persist, ready, screens]);
   const currentIndex = Math.max(0, screens.findIndex((screen) => screen.id === draft.step));
   const currentDefinition = screens[currentIndex] ?? screens[0];
   const stepContent = screenContent[currentDefinition?.id ?? "name"];
@@ -186,7 +201,7 @@ export default function ProfileSetupWizard() {
   const roleMatches = useMemo(() => findQuickStartRoles(roleSearch, 50, departmentFilter), [roleSearch, departmentFilter]);
   const filteredDepartments = useMemo(() => {
     const query = departmentSearch.trim().toLocaleLowerCase("de");
-    return crewDepartments.filter((department) => !query || department.label.toLocaleLowerCase("de").includes(query) || department.roles.some((role) => role.toLocaleLowerCase("de").includes(query)));
+    return crewDepartments.filter((department) => !query || department.label.toLocaleLowerCase("de").includes(query) || department.roles.some((role) => getDepartmentRoleSearchTerms(department, role).some((term) => term.toLocaleLowerCase("de").includes(query))));
   }, [departmentSearch]);
 
   function update<K extends keyof QuickStartDraft>(key: K, value: QuickStartDraft[K]) {
@@ -374,7 +389,14 @@ export default function ProfileSetupWizard() {
         const section = progress.sections.company ?? createQuickStartIntentData();
         const response = await fetch("/api/companies", {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: section.title.trim(), city: section.city.trim(), description: section.description.trim(), logo_url: section.imageUrl || null, onboarding_request_key: progress.requestKeys.company }),
+          body: JSON.stringify({
+            name: section.title.trim(), city: section.city.trim(), description: section.description.trim(),
+            logo_url: section.imageUrl || null, categories: section.categoryIds,
+            catering_details: section.cateringDetails,
+            website: section.website.trim() || null, email: section.contactEmail.trim() || null,
+            phone: section.contactPhone.trim() || null,
+            onboarding_request_key: progress.requestKeys.company,
+          }),
         });
         const result = await response.json().catch(() => ({}));
         if (!response.ok || !result.data?.id) throw new Error(result.error ?? "Das Firmenprofil konnte nicht gespeichert werden.");
@@ -493,8 +515,41 @@ export default function ProfileSetupWizard() {
               <div><label htmlFor={`quick-start-${intent}-title`} className="mb-2 block text-sm font-medium text-text-primary">{isCompany ? "Firmenname" : "Name des Angebots"} <span className="text-gold">*</span></label><input id={`quick-start-${intent}-title`} autoComplete={isCompany ? "organization" : "off"} maxLength={200} value={data.title} onChange={(event) => updateSection(intent, { title: event.target.value })} placeholder={isCompany ? "Zum Beispiel Lichtverleih Müller" : intent === "location" ? "Zum Beispiel Altbauwohnung mit Balkon" : "Zum Beispiel LED-Flächenleuchte"} className={inputClass} /></div>
               <div><label htmlFor={`quick-start-${intent}-city`} className="mb-2 block text-sm font-medium text-text-primary">Stadt oder Region <span className="text-gold">*</span></label><input id={`quick-start-${intent}-city`} autoComplete="address-level2" maxLength={100} value={data.city} onChange={(event) => updateSection(intent, { city: event.target.value })} placeholder="Zum Beispiel Leipzig" className={inputClass} /></div>
               <div><label htmlFor={`quick-start-${intent}-description`} className="mb-2 block text-sm font-medium text-text-primary">Kurze Beschreibung <span className="text-text-muted">(freiwillig)</span></label><textarea id={`quick-start-${intent}-description`} rows={4} maxLength={3000} value={data.description} onChange={(event) => updateSection(intent, { description: event.target.value })} placeholder={isCompany ? "Was bietet deine Firma an?" : intent === "location" ? "Was ist an diesem Ort besonders?" : "Was ist enthalten und in welchem Zustand ist es?"} className="w-full rounded-xl border border-border bg-bg-primary p-4 text-base text-text-primary outline-none focus:border-gold" /></div>
+              {isCompany && <div className="grid gap-4 sm:grid-cols-2">
+                <div><label htmlFor="quick-start-company-email" className="mb-2 block text-sm font-medium text-text-primary">Kontakt-E-Mail <span className="text-text-muted">(freiwillig)</span></label><input id="quick-start-company-email" type="email" autoComplete="email" maxLength={200} value={data.contactEmail} onChange={(event) => updateSection(intent, { contactEmail: event.target.value })} placeholder="kontakt@beispiel.de" className={inputClass} /></div>
+                <div><label htmlFor="quick-start-company-phone" className="mb-2 block text-sm font-medium text-text-primary">Telefon <span className="text-text-muted">(freiwillig)</span></label><input id="quick-start-company-phone" type="tel" autoComplete="tel" maxLength={80} value={data.contactPhone} onChange={(event) => updateSection(intent, { contactPhone: event.target.value })} placeholder="Optional" className={inputClass} /></div>
+                <div className="sm:col-span-2"><label htmlFor="quick-start-company-website" className="mb-2 block text-sm font-medium text-text-primary">Webseite <span className="text-text-muted">(freiwillig)</span></label><input id="quick-start-company-website" type="url" autoComplete="url" maxLength={300} value={data.website} onChange={(event) => updateSection(intent, { website: event.target.value })} placeholder="https://…" className={inputClass} /></div>
+              </div>}
             </div>;
           })()}
+
+          {draft.step === "company-categories" && (() => {
+            const company = draft.sections.company ?? createQuickStartIntentData();
+            const query = companyCategorySearch.trim().toLocaleLowerCase("de");
+            const categories = QUICK_START_CATEGORIES.company.filter((category) => {
+              const catalogue = `${category.label} ${category.example} ${category.value === CATERING_COMPANY_CATEGORY.id ? getCateringCompanySearchTerms().join(" ") : ""}`.toLocaleLowerCase("de");
+              return !query || catalogue.includes(query);
+            });
+            return <div>
+              <label htmlFor="quick-start-company-category-search" className="mb-2 block text-sm font-medium text-text-primary">Kategorie suchen</label>
+              <div className="relative mb-4"><Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" /><input id="quick-start-company-category-search" autoComplete="off" value={companyCategorySearch} onChange={(event) => setCompanyCategorySearch(event.target.value)} placeholder="Zum Beispiel Catering, Studio oder Verleih" className={`${inputClass} pl-10`} /></div>
+              <div id="quick-start-company-categories" tabIndex={-1} className="grid gap-2 sm:grid-cols-2">
+                {categories.map((category) => {
+                  const selected = company.categoryIds.includes(category.value);
+                  return <button key={category.value} type="button" aria-pressed={selected} onClick={() => {
+                    const categoryIds = selected ? company.categoryIds.filter((id) => id !== category.value) : [...company.categoryIds, category.value];
+                    updateSection("company", { categoryIds, ...(selected && category.value === CATERING_COMPANY_CATEGORY.id ? { cateringDetails: EMPTY_CATERING_COMPANY_DETAILS } : {}) });
+                  }} className={`min-h-16 min-w-0 rounded-xl border px-4 py-3 text-left ${selected ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/50"}`}>
+                    <span className="block break-words text-sm font-semibold text-text-primary">{category.label}</span><span className="mt-1 block break-words text-xs leading-5 text-text-muted">{category.example}</span>
+                  </button>;
+                })}
+                {!categories.length && <p className="col-span-full rounded-xl border border-border p-4 text-sm text-text-muted">Keine passende Kategorie gefunden.</p>}
+              </div>
+              <p className="mt-3 text-xs leading-5 text-text-muted">Du kannst mehrere Kategorien auswählen. Entfernst du Catering, werden nur die dazugehörigen Catering-Angaben entfernt.</p>
+            </div>;
+          })()}
+
+          {draft.step === "company-catering" && <CateringCompanyFields value={draft.sections.company?.cateringDetails ?? EMPTY_CATERING_COMPANY_DETAILS} onChange={(cateringDetails) => updateSection("company", { cateringDetails })} />}
 
           {(draft.step === "location-photo" || draft.step === "equipment-photo" || draft.step === "company-photo") && (() => {
             const intent: QuickStartIntent = draft.step.startsWith("location") ? "location" : draft.step.startsWith("equipment") ? "equipment" : "company";
@@ -536,7 +591,28 @@ export default function ProfileSetupWizard() {
                 <p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">Wir speichern das Angebot zunächst privat als Entwurf. Erst im nächsten Schritt kannst du es mit „Angebot veröffentlichen“ öffentlich sichtbar machen.</p>
               </ReviewSection>;
             })}
-            {draft.intents.includes("company") && (() => { const data = draft.sections.company ?? createQuickStartIntentData(); return <ReviewSection title={QUICK_START_INTENT_LABELS.company} onEdit={() => reviewEditingIntent("company")}><ReviewRow label="Firma" value={data.title} /><ReviewRow label="Standort" value={data.city} />{data.description && <ReviewRow label="Beschreibung" value={data.description} />}{data.imageUrl && <Image src={data.imageUrl} alt="Vorschau des Firmenlogos" width={320} height={160} sizes="320px" className="max-h-32 rounded-lg object-contain" />}<p className="rounded-xl border border-gold/20 bg-gold/5 p-3 text-xs leading-5 text-text-secondary">Mit „{completionActionLabel}“ wird dein Firmenprofil direkt öffentlich auf CineGenius angezeigt. Firmenprofile kannst du danach jederzeit bearbeiten. Angebote bleiben private Entwürfe, bis du sie selbst veröffentlichst.</p></ReviewSection>; })()}
+            {draft.intents.includes("company") && (() => {
+              const data = draft.sections.company ?? createQuickStartIntentData();
+              const categoryLabels = QUICK_START_CATEGORIES.company.filter((category) => data.categoryIds.includes(category.value)).map((category) => category.label);
+              const catering = data.cateringDetails;
+              return <ReviewSection title={QUICK_START_INTENT_LABELS.company} onEdit={() => reviewEditingIntent("company")}>
+                <ReviewRow label="Firma" value={data.title} /><ReviewRow label="Standort" value={data.city} />
+                {categoryLabels.length > 0 && <ReviewRow label="Kategorien" value={categoryLabels.join(", ")} />}
+                {data.description && <ReviewRow label="Beschreibung" value={data.description} />}
+                {data.contactEmail && <ReviewRow label="Kontakt-E-Mail" value={data.contactEmail} />}
+                {data.contactPhone && <ReviewRow label="Telefon" value={data.contactPhone} />}
+                {data.website && <ReviewRow label="Webseite" value={data.website} />}
+                {data.categoryIds.includes(CATERING_COMPANY_CATEGORY.id) && <>
+                  {catering.serviceTypes.length > 0 && <ReviewRow label="Catering-Leistungen" value={catering.serviceTypes.join(", ")} />}
+                  {catering.serviceAreas && <ReviewRow label="Einsatzregion" value={catering.serviceAreas} />}
+                  {catering.capacity && <ReviewRow label="Kapazität" value={`Bis zu ${catering.capacity} Personen`} />}
+                  {catering.dietaryOptions.length > 0 && <ReviewRow label="Ernährungsangebote" value={catering.dietaryOptions.join(", ")} />}
+                  {catering.mobileEquipment.length > 0 && <ReviewRow label="Mobile Ausstattung" value={catering.mobileEquipment.join(", ")} />}
+                </>}
+                {data.imageUrl && <Image src={data.imageUrl} alt="Vorschau des Firmenlogos" width={320} height={160} sizes="320px" className="max-h-32 rounded-lg object-contain" />}
+                <p className="rounded-xl border border-gold/20 bg-gold/5 p-3 text-xs leading-5 text-text-secondary">Mit „{completionActionLabel}“ wird dein Firmenprofil direkt öffentlich auf CineGenius angezeigt. Firmenprofile kannst du danach jederzeit bearbeiten. Angebote bleiben private Entwürfe, bis du sie selbst veröffentlichst.</p>
+              </ReviewSection>;
+            })()}
             {draft.intents.includes("search") && <p className="rounded-xl border border-border bg-bg-primary p-4 text-sm leading-6 text-text-secondary">Du kannst nach dem Abschluss direkt Personen, Orte und Angebote entdecken.</p>}
           </div>}
         </section>
