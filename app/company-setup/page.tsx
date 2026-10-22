@@ -89,7 +89,6 @@ export default function CompanySetupPage() {
   useEffect(() => {
     const isGuided = new URLSearchParams(window.location.search).get("onboarding") === "1";
     setGuidedSetup(isGuided);
-    if (isGuided) setExistingPublished(false);
     // Check if user already has a company — fires immediately, no Clerk wait
     fetch("/api/companies?mine=true")
       .then((r) => r.json())
@@ -301,13 +300,12 @@ export default function CompanySetupPage() {
           social_links: Object.fromEntries(
             Object.entries(socialLinks).filter(([, v]) => v?.trim())
           ),
-          draft: guidedSetup && !existingPublished,
         }),
       });
       const { data, error: apiError } = await res.json();
       if (apiError) throw new Error(apiError);
       if (guidedSetup) await fetch("/api/onboarding?type=company", { method: "DELETE" });
-      router.replace(`/companies/${data.slug}?welcome=1${guidedSetup && !existingPublished ? "&setupDraft=1" : ""}`);
+      router.replace(`/companies/${data.slug}?welcome=1`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Fehler beim Speichern.");
       setSaving(false);
@@ -340,7 +338,7 @@ export default function CompanySetupPage() {
             <p className="text-text-secondary max-w-sm mx-auto leading-relaxed text-sm">
               Präsentiere dein Unternehmen der Filmbranche — von Verleih bis Postproduktion.
             </p>
-            {guidedSetup && !existingId && <p className="mt-3 text-xs text-text-muted">{companyDraftStatus === "saving" ? "Speichert privat …" : companyDraftStatus === "saved" ? "Dein Fortschritt ist privat gespeichert." : companyDraftStatus === "error" ? "Der letzte Stand konnte nicht gespeichert werden." : "Dein Fortschritt wird privat gespeichert."}</p>}
+            {guidedSetup && !existingId && <p className="mt-3 text-xs text-text-muted">{companyDraftStatus === "saving" ? "Speichert deinen privaten Formularfortschritt …" : companyDraftStatus === "saved" ? "Dein Formularfortschritt ist privat gespeichert." : companyDraftStatus === "error" ? "Der letzte Stand konnte nicht gespeichert werden." : "Dein Formularfortschritt wird privat gespeichert."}</p>}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
@@ -390,7 +388,7 @@ export default function CompanySetupPage() {
 
                 {companyStep === 3 && (
                   <section className="space-y-5" aria-labelledby="company-step-three">
-                    <div><h2 id="company-step-three" className="font-display text-2xl text-text-primary">Prüfen und als Entwurf speichern</h2><p className="mt-1 text-sm text-text-secondary">Dein Firmenprofil bleibt zunächst unveröffentlicht. Du kannst es danach ansehen und ausdrücklich veröffentlichen.</p></div>
+                    <div><h2 id="company-step-three" className="font-display text-2xl text-text-primary">Prüfen und Firma eintragen</h2><p className="mt-1 text-sm text-text-secondary">Nach dem Speichern wird dein Firmenprofil öffentlich auf CineGenius angezeigt. Du kannst es anschließend jederzeit bearbeiten.</p></div>
                     <div className="space-y-3 rounded-2xl border border-border bg-bg-secondary p-4">
                       <div><p className="text-xs uppercase tracking-wide text-text-muted">Unternehmen</p><p className="mt-1 font-semibold text-text-primary">{name || "Noch kein Firmenname"}</p><p className="text-sm text-text-secondary">{city || "Standort fehlt"}</p></div>
                       {selectedCategories.length > 0 && <div><p className="text-xs uppercase tracking-wide text-text-muted">Angebot</p><p className="mt-1 text-sm text-text-primary">{selectedCategories.map((id) => COMPANY_CATEGORIES.find((item) => item.id === id)?.label).filter(Boolean).join(", ")}</p></div>}
@@ -406,10 +404,10 @@ export default function CompanySetupPage() {
                   {companyStep < 3 ? (
                     <button type="button" onClick={() => { if (companyStep === 1 && (!name.trim() || !city.trim())) { setError("Bitte Firmenname und Standort ergänzen."); return; } setError(""); setCompanyStep((step) => step + 1); }} className="min-h-12 flex-1 rounded-xl bg-gold px-4 text-sm font-bold text-bg-primary hover:bg-gold-light">Weiter <ArrowRight size={15} className="ml-1 inline" /></button>
                   ) : (
-                    <button type="submit" disabled={saving || !name.trim() || !city.trim()} className="min-h-12 flex-1 rounded-xl bg-gold px-4 text-sm font-bold text-bg-primary hover:bg-gold-light disabled:opacity-50">{saving ? <><Loader2 size={15} className="mr-2 inline animate-spin" />Wird gespeichert…</> : <>Entwurf speichern <ArrowRight size={15} className="ml-1 inline" /></>}</button>
+                    <button type="submit" disabled={saving || !name.trim() || !city.trim()} className="min-h-12 flex-1 rounded-xl bg-gold px-4 text-sm font-bold text-bg-primary hover:bg-gold-light disabled:opacity-50">{saving ? <><Loader2 size={15} className="mr-2 inline animate-spin" />Wird gespeichert…</> : <>Firma öffentlich eintragen <ArrowRight size={15} className="ml-1 inline" /></>}</button>
                   )}
                 </div>
-                <p className="text-center text-xs text-text-muted">{companyDraftStatus === "saving" ? "Speichert privat …" : companyDraftStatus === "saved" ? "Dein Fortschritt ist privat gespeichert." : companyDraftStatus === "error" ? "Der letzte Stand konnte nicht gespeichert werden." : "Dein Fortschritt wird privat gespeichert."}</p>
+                <p className="text-center text-xs text-text-muted">{companyDraftStatus === "saving" ? "Speichert deinen privaten Formularfortschritt …" : companyDraftStatus === "saved" ? "Dein Formularfortschritt ist privat gespeichert." : companyDraftStatus === "error" ? "Der letzte Stand konnte nicht gespeichert werden." : "Dein Formularfortschritt wird privat gespeichert."}</p>
               </div>
             ) : (
               <>
@@ -935,6 +933,12 @@ export default function CompanySetupPage() {
               <div className="p-3 bg-crimson/10 border border-crimson/20 rounded-xl text-sm text-crimson-light">{error}</div>
             )}
 
+            <p className="rounded-xl border border-gold/20 bg-gold/5 px-4 py-3 text-sm leading-6 text-text-secondary">
+              {existingId && !existingPublished
+                ? "Dieses bisher private Firmenprofil wird mit dem Speichern öffentlich auffindbar."
+                : "Das Firmenprofil wird nach dem Speichern öffentlich auf CineGenius angezeigt."}
+            </p>
+
             <button
               type="submit"
               disabled={saving || uploadingLogo || uploadingPortfolio || !name.trim() || !city.trim()}
@@ -947,8 +951,8 @@ export default function CompanySetupPage() {
               )}
             </button>
 
-            <p className="text-center text-xs text-text-muted pt-1">
-              Du kannst dein Profil jederzeit bearbeiten.
+              <p className="text-center text-xs text-text-muted pt-1">
+              Du kannst dein öffentliches Profil jederzeit bearbeiten.
             </p>
               </>
             )}

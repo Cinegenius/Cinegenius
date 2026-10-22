@@ -195,8 +195,8 @@ export default function CompanyDetail({
       {isOwner && !companyPublished && (
         <div className="border-b border-gold/20 bg-gold/10">
           <div className="mx-auto flex max-w-4xl flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <div><p className="text-sm font-semibold text-gold">Privater Firmenentwurf</p><p className="mt-1 text-xs text-text-muted">Nur du kannst dieses Profil sehen. Veröffentliche es, wenn du bereit bist.</p>{publishError && <p role="alert" className="mt-2 text-xs text-red-300">{publishError}</p>}</div>
-            <button onClick={() => void publishCompany()} disabled={publishingCompany} className="min-h-11 rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary disabled:opacity-60">{publishingCompany ? "Wird veröffentlicht …" : "Firmenprofil veröffentlichen"}</button>
+            <div><p className="text-sm font-semibold text-gold">Bisher privater Firmenentwurf</p><p className="mt-1 text-xs text-text-muted">Dieses ältere Profil ist noch privat. Wenn du es im Formular speicherst, wird es automatisch öffentlich. Du kannst es auch direkt hier veröffentlichen.</p>{publishError && <p role="alert" className="mt-2 text-xs text-red-300">{publishError}</p>}</div>
+            <button onClick={() => void publishCompany()} disabled={publishingCompany} className="min-h-11 rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary disabled:opacity-60">{publishingCompany ? "Wird veröffentlicht …" : "Jetzt öffentlich anzeigen"}</button>
           </div>
         </div>
       )}

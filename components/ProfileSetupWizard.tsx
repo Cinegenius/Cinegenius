@@ -48,7 +48,7 @@ const screenContent: Record<QuickStartScreen, { title: string; description: stri
   "equipment-details": { title: "Wie heißt dein Angebot und wo ist es?", description: "Ein kurzer Titel und die Stadt reichen für den Anfang." },
   "equipment-photo": { title: "Möchtest du ein Foto hinzufügen?", description: "Ein Foto macht deinen Entwurf anschaulicher. Du kannst es auch später ergänzen." },
   "equipment-price": { title: "Wie möchtest du den Preis angeben?", description: "Du kannst einen Tagespreis nennen oder erst Anfragen sammeln." },
-  "company-details": { title: "Wie heißt deine Firma und wo ist sie?", description: "Wir legen einen privaten Firmenentwurf an, den du später ergänzen kannst." },
+  "company-details": { title: "Wie heißt deine Firma und wo ist sie?", description: "Nach dem Abschluss wird dein Firmenprofil öffentlich angezeigt. Du kannst es anschließend ergänzen." },
   "company-photo": { title: "Möchtest du ein Logo hinzufügen?", description: "Ein Logo ist freiwillig und kann später ergänzt werden." },
   review: { title: "Prüfen und loslegen", description: "Ändere einzelne Angaben, bevor wir dein Profil oder private Angebotsentwürfe anlegen." },
 };
@@ -369,18 +369,18 @@ export default function ProfileSetupWizard() {
         if (!progress.requestKeys.company) {
           progress = { ...progress, requestKeys: { ...progress.requestKeys, company: crypto.randomUUID() } };
           setDraft(progress);
-          if (!(await persist(progress))) throw new Error("Dein Fortschritt konnte vor dem Speichern des Firmenentwurfs nicht gesichert werden.");
+          if (!(await persist(progress))) throw new Error("Dein Fortschritt konnte vor dem Speichern des Firmenprofils nicht gesichert werden.");
         }
         const section = progress.sections.company ?? createQuickStartIntentData();
         const response = await fetch("/api/companies", {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: section.title.trim(), city: section.city.trim(), description: section.description.trim(), logo_url: section.imageUrl || null, draft: true, onboarding_request_key: progress.requestKeys.company }),
+          body: JSON.stringify({ name: section.title.trim(), city: section.city.trim(), description: section.description.trim(), logo_url: section.imageUrl || null, onboarding_request_key: progress.requestKeys.company }),
         });
         const result = await response.json().catch(() => ({}));
-        if (!response.ok || !result.data?.id) throw new Error(result.error ?? "Der private Firmenentwurf konnte nicht gespeichert werden.");
+        if (!response.ok || !result.data?.id) throw new Error(result.error ?? "Das Firmenprofil konnte nicht gespeichert werden.");
         progress = { ...progress, completed: { ...progress.completed, company: String(result.data.id) } };
         setDraft(progress);
-        if (!(await persist(progress))) throw new Error("Der Firmenentwurf wurde gespeichert, aber dein Einrichtungsstand konnte nicht aktualisiert werden. Bitte versuche es erneut.");
+        if (!(await persist(progress))) throw new Error("Das Firmenprofil wurde gespeichert, aber dein Einrichtungsstand konnte nicht aktualisiert werden. Bitte versuche es erneut.");
       }
 
       await clearAndContinue(progress);
@@ -390,6 +390,17 @@ export default function ProfileSetupWizard() {
   }
 
   const selectedIntentTitles = draft.intents.map((intent) => QUICK_START_INTENT_LABELS[intent]);
+  const hasProfileIntent = draft.intents.includes("crew") || draft.intents.includes("talent");
+  const hasCompanyIntent = draft.intents.includes("company");
+  const hasOfferIntent = draft.intents.includes("location") || draft.intents.includes("equipment");
+  const completionActionLabel = hasProfileIntent
+    ? hasCompanyIntent && hasOfferIntent ? "Profil & Firma erstellen, Angebote speichern"
+      : hasCompanyIntent ? "Profil & Firma öffentlich erstellen"
+      : hasOfferIntent ? "Profil öffentlich erstellen & Angebote speichern"
+      : "Profil öffentlich erstellen"
+    : hasCompanyIntent
+      ? hasOfferIntent ? "Firma öffentlich eintragen & Angebote speichern" : "Firma öffentlich eintragen"
+      : hasOfferIntent ? "Private Angebotsentwürfe speichern" : "Los zur Suche";
   const reviewEditingIntent = (intent: QuickStartIntent) => { void goTo(getFirstScreenForIntent(draft, intent)); };
 
   if (!ready) return <main className="min-h-screen bg-bg-primary px-4 pt-32 text-center text-sm text-text-muted"><Loader2 className="mx-auto mb-3 animate-spin" />Dein Start wird geladen …</main>;
@@ -525,7 +536,7 @@ export default function ProfileSetupWizard() {
                 <p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">Wir speichern das Angebot zunächst privat als Entwurf. Erst im nächsten Schritt kannst du es mit „Angebot veröffentlichen“ öffentlich sichtbar machen.</p>
               </ReviewSection>;
             })}
-            {draft.intents.includes("company") && (() => { const data = draft.sections.company ?? createQuickStartIntentData(); return <ReviewSection title={QUICK_START_INTENT_LABELS.company} onEdit={() => reviewEditingIntent("company")}><ReviewRow label="Firma" value={data.title} /><ReviewRow label="Standort" value={data.city} />{data.description && <ReviewRow label="Beschreibung" value={data.description} />}{data.imageUrl && <Image src={data.imageUrl} alt="Vorschau des Firmenlogos" width={320} height={160} sizes="320px" className="max-h-32 rounded-lg object-contain" />}<p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">Der Firmenbereich wird als privater Entwurf angelegt und erst nach deiner späteren Freigabe veröffentlicht.</p></ReviewSection>; })()}
+            {draft.intents.includes("company") && (() => { const data = draft.sections.company ?? createQuickStartIntentData(); return <ReviewSection title={QUICK_START_INTENT_LABELS.company} onEdit={() => reviewEditingIntent("company")}><ReviewRow label="Firma" value={data.title} /><ReviewRow label="Standort" value={data.city} />{data.description && <ReviewRow label="Beschreibung" value={data.description} />}{data.imageUrl && <Image src={data.imageUrl} alt="Vorschau des Firmenlogos" width={320} height={160} sizes="320px" className="max-h-32 rounded-lg object-contain" />}<p className="rounded-xl border border-gold/20 bg-gold/5 p-3 text-xs leading-5 text-text-secondary">Mit „{completionActionLabel}“ wird dein Firmenprofil direkt öffentlich auf CineGenius angezeigt. Firmenprofile kannst du danach jederzeit bearbeiten. Angebote bleiben private Entwürfe, bis du sie selbst veröffentlichst.</p></ReviewSection>; })()}
             {draft.intents.includes("search") && <p className="rounded-xl border border-border bg-bg-primary p-4 text-sm leading-6 text-text-secondary">Du kannst nach dem Abschluss direkt Personen, Orte und Angebote entdecken.</p>}
           </div>}
         </section>
@@ -537,7 +548,7 @@ export default function ProfileSetupWizard() {
           {draft.step !== "review" ? <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
             {currentDefinition?.optional && <button type="button" disabled={saving || uploading} onClick={() => void skipOptional()} className="min-h-12 rounded-xl border border-border px-4 text-sm text-text-secondary disabled:opacity-50">Später ergänzen</button>}
             <button type="button" disabled={saving || uploading} onClick={() => void next()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary disabled:opacity-50">{saving ? <><Loader2 size={16} className="animate-spin" /> Speichert …</> : <>Weiter <ArrowRight size={16} /></>}</button>
-          </div> : <button type="button" disabled={saving || uploading} onClick={() => void finish()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary disabled:opacity-50">{saving ? <><Loader2 size={16} className="animate-spin" /> Wird gespeichert …</> : <><CheckCircle2 size={17} /> {draft.intents.includes("crew") || draft.intents.includes("talent") ? draft.intents.some((intent) => ["location", "equipment", "company"].includes(intent)) ? "Profil öffentlich erstellen & Entwürfe speichern" : "Profil öffentlich erstellen" : draft.intents.some((intent) => intent !== "search") ? "Private Entwürfe speichern" : "Los zur Suche"}</>}</button>}
+          </div> : <button type="button" disabled={saving || uploading} onClick={() => void finish()} className="inline-flex min-h-12 flex-wrap items-center justify-center gap-2 rounded-xl bg-gold px-5 py-3 text-center text-sm font-semibold leading-5 text-bg-primary disabled:opacity-50">{saving ? <><Loader2 size={16} className="shrink-0 animate-spin" /><span>Wird gespeichert …</span></> : <><CheckCircle2 size={17} className="shrink-0" /><span>{completionActionLabel}</span></>}</button>}
         </div>
         <p className="mt-4 text-center text-xs leading-5 text-text-muted">Dein Fortschritt wird privat gespeichert. Du kannst später an dieser Stelle weitermachen.</p>
       </div>
