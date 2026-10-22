@@ -128,8 +128,8 @@ async function getHomeData(viewerId: string | null) {
     (photo) => photo.rating,
     (photo) => photo.count,
     (photo) => `${photo.profileId}:${photo.imageUrl}`,
-  ).slice(0, 4);
-  const newPhotos = photosWithRatings.slice(0, 4);
+  ).slice(0, 6);
+  const newPhotos = photosWithRatings.slice(0, 6);
 
   const crewTypeLabels = new Set(
     (Object.entries(PROFILE_TYPE_LABELS) as [ProfileType, string][])
@@ -341,6 +341,8 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      <HomePhotoDiscovery ratedPhotos={ratedPhotos} newPhotos={newPhotos} />
 
       {/* ══════════════════════════════════════════════
           FEATURED LOCATIONS
@@ -659,8 +661,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      <HomePhotoDiscovery ratedPhotos={ratedPhotos} newPhotos={newPhotos} />
 
       {/* Community-Ergänzung steht bewusst nach den Verzeichnissen und dem Fotoband. */}
       <CommunityBoard loggedIn={isLoggedIn} />

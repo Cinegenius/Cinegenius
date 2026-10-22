@@ -146,10 +146,11 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
   const photos = orderPhotosByAuthor(ratedPhotos.length >= 3 ? ratedPhotos : newPhotos).slice(0, 6) as DiscoverPhoto[];
   const isRatedSelection = ratedPhotos.length >= 3;
   const sectionRef = useRef<HTMLElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const groupRef = useRef<HTMLDivElement>(null);
-  const returnAnimationTime = useRef<number | null>(null);
-  const pointerRef = useRef<{ id: number; lastX: number; startX: number; startY: number; moved: boolean } | null>(null);
+  const bandViewportRef = useRef<HTMLDivElement>(null);
+  const trackRefs = useRef<Array<HTMLDivElement | null>>([null, null]);
+  const groupRefs = useRef<Array<HTMLDivElement | null>>([null, null]);
+  const returnAnimationTimes = useRef<Array<number | null>>([null, null]);
+  const pointerRef = useRef<{ id: number; row: number; lastX: number; startX: number; startY: number; moved: boolean } | null>(null);
   const suppressClickRef = useRef(false);
   const suppressClickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [reducedMotion, setReducedMotion] = useState(true);
@@ -159,9 +160,9 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [cycleDuration, setCycleDuration] = useState(60);
+  const [cycleDurations, setCycleDurations] = useState<[number, number]>([60, 60]);
+  const [groupMinWidths, setGroupMinWidths] = useState<[number, number]>([0, 0]);
   const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
-  const loopPhotos = repeatForSeamlessLoop(photos);
   const animated = shouldAnimatePhotoBand(photos.length, reducedMotion);
   const shouldRun = animated && isInView && tabVisible && !userPaused && !hovered && !focused && !isDragging;
   const staticGallery = !animated;
@@ -179,8 +180,14 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
       const stored = window.sessionStorage.getItem("cinegenius-photo-band-time");
       if (stored !== null) {
         const time = Number(stored);
-        if (Number.isFinite(time) && time >= 0) returnAnimationTime.current = time;
+        if (Number.isFinite(time) && time >= 0) returnAnimationTimes.current[0] = time;
         window.sessionStorage.removeItem("cinegenius-photo-band-time");
+      }
+      const reverseStored = window.sessionStorage.getItem("cinegenius-photo-band-time-reverse");
+      if (reverseStored !== null) {
+        const time = Number(reverseStored);
+        if (Number.isFinite(time) && time >= 0) returnAnimationTimes.current[1] = time;
+        window.sessionStorage.removeItem("cinegenius-photo-band-time-reverse");
       }
     } catch { /* The animation starts from its natural position when storage is unavailable. */ }
   }, []);
@@ -205,15 +212,32 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
   }, []);
 
   useEffect(() => {
-    const group = groupRef.current;
-    if (!group || !animated) return;
+    const groups = groupRefs.current.filter((group): group is HTMLDivElement => group !== null);
+    const viewport = bandViewportRef.current;
+    if (groups.length === 0 || !viewport || !animated) return;
     const updateDuration = () => {
-      const width = group.getBoundingClientRect().width;
-      if (width > 0) setCycleDuration(Math.max(36, width / 26));
+      const viewportWidth = viewport.clientWidth;
+      setGroupMinWidths((current) => current[0] === viewportWidth && current[1] === viewportWidth ? current : [viewportWidth, viewportWidth]);
+      setCycleDurations((current) => {
+        const next: [number, number] = [...current];
+        let changed = false;
+        for (const row of [0, 1] as const) {
+          const width = groupRefs.current[row]?.getBoundingClientRect().width ?? 0;
+          if (width > 0) {
+            const duration = Math.max(36, width / 26);
+            if (next[row] !== duration) {
+              next[row] = duration;
+              changed = true;
+            }
+          }
+        }
+        return changed ? next : current;
+      });
     };
     updateDuration();
     const observer = new ResizeObserver(updateDuration);
-    observer.observe(group);
+    groups.forEach((group) => observer.observe(group));
+    observer.observe(viewport);
     return () => observer.disconnect();
   }, [animated, photos.length]);
 
@@ -222,14 +246,16 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
   }, []);
 
   useEffect(() => {
-    if (!shouldRun || returnAnimationTime.current === null) return;
+    if (!shouldRun || !returnAnimationTimes.current.some((time) => time !== null)) return;
     const frame = window.requestAnimationFrame(() => {
-      const animation = trackRef.current?.getAnimations()[0];
-      if (!animation) return;
-      animation.pause();
-      animation.currentTime = returnAnimationTime.current;
-      returnAnimationTime.current = null;
-      animation.play();
+      returnAnimationTimes.current.forEach((time, row) => {
+        const animation = trackRefs.current[row]?.getAnimations()[0];
+        if (time === null || !animation) return;
+        animation.pause();
+        animation.currentTime = time;
+        returnAnimationTimes.current[row] = null;
+        animation.play();
+      });
     });
     return () => window.cancelAnimationFrame(frame);
   }, [shouldRun]);
@@ -242,14 +268,16 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
     if (!animated || !event.isPrimary || event.button !== 0) return;
     if ((event.target as HTMLElement).closest("button, input, textarea, select")) return;
 
+    const track = (event.target as HTMLElement).closest<HTMLElement>("[data-photo-band-row]");
+    const row = track ? Number(track.dataset.photoBandRow) : event.clientY < event.currentTarget.getBoundingClientRect().top + event.currentTarget.clientHeight / 2 ? 0 : 1;
     pointerRef.current = {
       id: event.pointerId,
+      row: row === 1 ? 1 : 0,
       lastX: event.clientX,
       startX: event.clientX,
       startY: event.clientY,
       moved: false,
     };
-    trackRef.current?.getAnimations()[0]?.pause();
     event.currentTarget.setPointerCapture(event.pointerId);
     setIsDragging(true);
   }
@@ -268,12 +296,13 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
     }
 
     pointer.moved = true;
-    const cycleWidth = groupRef.current?.getBoundingClientRect().width ?? 0;
-    const animation = trackRef.current?.getAnimations()[0];
-    const durationMs = cycleDuration * 1000;
+    const cycleWidth = groupRefs.current[pointer.row]?.getBoundingClientRect().width ?? 0;
+    const animation = trackRefs.current[pointer.row]?.getAnimations()[0];
+    const durationMs = cycleDurations[pointer.row] * 1000;
     if (cycleWidth > 0 && durationMs > 0 && animation && typeof animation.currentTime === "number") {
       const deltaX = event.clientX - pointer.lastX;
-      const nextTime = animation.currentTime - (deltaX / cycleWidth) * durationMs;
+      const direction = pointer.row === 0 ? -1 : 1;
+      const nextTime = animation.currentTime + direction * (deltaX / cycleWidth) * durationMs;
       animation.currentTime = ((nextTime % durationMs) + durationMs) % durationMs;
     }
     pointer.lastX = event.clientX;
@@ -305,10 +334,12 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
     suppressClickTimerRef.current = null;
   }
 
-  const trackStyle = { "--photo-band-duration": `${cycleDuration}s` } as CSSProperties;
   const markHomePhotoOpen = () => {
-    const currentTime = trackRef.current?.getAnimations()[0]?.currentTime;
-    markPhotoNavigationWithAnimation(typeof currentTime === "number" ? currentTime : undefined);
+    const currentTimes = trackRefs.current.map((track) => track?.getAnimations()[0]?.currentTime);
+    markPhotoNavigationWithAnimation(typeof currentTimes[0] === "number" ? currentTimes[0] : undefined);
+    try {
+      if (typeof currentTimes[1] === "number") window.sessionStorage.setItem("cinegenius-photo-band-time-reverse", String(currentTimes[1]));
+    } catch { /* A blocked session store must not prevent opening a photo. */ }
   };
 
   return (
@@ -321,17 +352,18 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
             {!isRatedSelection && <p className="mt-1 text-xs text-text-muted">Sobald genügend echte Bewertungen vorliegen, zeigen wir hier das Best of.</p>}
           </div>
           <div className="flex items-center gap-2">
-            {animated && <button type="button" onClick={() => setUserPaused((paused) => !paused)} aria-label={userPaused ? "Fotoband fortsetzen" : "Fotoband pausieren"} aria-pressed={userPaused} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-border text-text-muted transition-colors hover:border-gold hover:text-gold">{userPaused ? <Play size={16} /> : <Pause size={16} />}</button>}
+            {animated && <button type="button" onClick={() => setUserPaused((paused) => !paused)} aria-label={userPaused ? "Fotobänder fortsetzen" : "Fotobänder pausieren"} aria-pressed={userPaused} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-border text-text-muted transition-colors hover:border-gold hover:text-gold">{userPaused ? <Play size={16} /> : <Pause size={16} />}</button>}
             <Link href="/photo" className="inline-flex min-h-11 shrink-0 items-center gap-1 text-sm font-medium text-gold hover:text-gold-light">Alle entdecken <ArrowRight size={14} /></Link>
           </div>
         </div>
         {photos.length > 0 ? <div
+          ref={bandViewportRef}
           className="home-photo-band-viewport outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-4 focus-visible:ring-offset-bg-primary"
           data-dragging={isDragging ? "true" : "false"}
           data-draggable={animated ? "true" : "false"}
           role="region"
-          aria-label={staticGallery ? "Fotogalerie" : "Automatisch laufendes Fotoband. Mit Finger wischen oder Maus ziehen."}
-          aria-roledescription={staticGallery ? undefined : "Fotoband"}
+          aria-label={staticGallery ? "Fotogalerie" : "Zwei automatisch gegenläufige Fotobänder. Mit Finger wischen oder Maus ziehen."}
+          aria-roledescription={staticGallery ? undefined : "Fotobänder"}
           tabIndex={0}
           onPointerDown={beginPointerDrag}
           onPointerMove={movePointerDrag}
@@ -346,12 +378,19 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
         >
           {staticGallery ? <div className="home-photo-band-static-grid">
             {photos.map((photo, index) => <PhotoBandCard key={`${photo.profileId}:${photo.imageUrl}`} photo={photo} isRatedSelection={isRatedSelection} failed={failedImages.has(photo.imageUrl)} onImageError={markImageFailed} priority={index === 0} onPhotoOpen={markHomePhotoOpen} />)}
-          </div> : <div ref={trackRef} className="home-photo-band-track" data-paused={!shouldRun} style={trackStyle}>
-            {[0, 1].map((copy) => <div key={`photo-band-copy-${copy}`} ref={copy === 0 ? groupRef : undefined} className="home-photo-band-group" aria-hidden={copy === 1 || undefined} inert={copy === 1 || undefined}>
-              {loopPhotos.slice(copy * photos.length, (copy + 1) * photos.length).map((photo, index) => <PhotoBandCard key={`${copy}:${photo.profileId}:${photo.imageUrl}`} photo={photo} isRatedSelection={isRatedSelection} failed={failedImages.has(photo.imageUrl)} onImageError={markImageFailed} decorative={copy === 1} priority={copy === 0 && index === 0} onPhotoOpen={markHomePhotoOpen} />)}
-            </div>)}
+          </div> : <div className="home-photo-band-stack">
+            {[0, 1].map((row) => {
+              const rowPhotos = photos.filter((_, index) => index % 2 === row);
+              if (row === 1) rowPhotos.reverse();
+              const rowLoopPhotos = repeatForSeamlessLoop(rowPhotos);
+              return <div key={`photo-band-row-${row}`} ref={(element) => { trackRefs.current[row] = element; }} className={`home-photo-band-track ${row === 0 ? "home-photo-band-track--left" : "home-photo-band-track--right"}`} data-paused={!shouldRun} data-photo-band-row={row} style={{ "--photo-band-duration": `${cycleDurations[row]}s` } as CSSProperties}>
+                {[0, 1].map((copy) => <div key={`photo-band-row-${row}-copy-${copy}`} ref={(element) => { if (copy === 0) groupRefs.current[row] = element; }} className="home-photo-band-group" style={{ "--photo-band-group-min-width": `${groupMinWidths[row]}px` } as CSSProperties} aria-hidden={copy === 1 || undefined} inert={copy === 1 || undefined}>
+                  {rowLoopPhotos.slice(copy * rowPhotos.length, (copy + 1) * rowPhotos.length).map((photo, index) => <PhotoBandCard key={`${row}:${copy}:${photo.profileId}:${photo.imageUrl}`} photo={photo} isRatedSelection={isRatedSelection} failed={failedImages.has(photo.imageUrl)} onImageError={markImageFailed} decorative={copy === 1} priority={copy === 0 && index === 0} onPhotoOpen={markHomePhotoOpen} />)}
+                </div>)}
+              </div>;
+            })}
           </div>}
-          {!staticGallery && <span className="sr-only" aria-live="polite">{userPaused ? "Fotoband pausiert." : "Fotoband läuft automatisch von rechts nach links."}</span>}
+          {!staticGallery && <span className="sr-only" aria-live="polite">{userPaused ? "Fotobänder pausiert." : "Fotobänder laufen automatisch in entgegengesetzte Richtungen."}</span>}
           {reducedMotion && <span className="sr-only">Wegen der Einstellung für reduzierte Bewegung wird eine statische Galerie angezeigt.</span>}
         </div> : <div className="rounded-xl border border-border bg-bg-secondary px-4 py-8 text-center text-sm text-text-muted">Noch keine öffentlichen Portfoliofotos zum Entdecken vorhanden.</div>}
         {photos.length > 1 && animated && <p className="mt-1 flex items-center justify-center gap-1.5 text-[11px] text-text-muted sm:justify-end"><span aria-hidden="true">↔</span> Mit dem Finger wischen oder mit der Maus ziehen</p>}

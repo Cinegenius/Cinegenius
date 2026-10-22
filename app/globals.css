@@ -287,15 +287,24 @@ body {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-@keyframes homePhotoBand {
+@keyframes homePhotoBandLeft {
   to { transform: translate3d(-50%, 0, 0); }
 }
+@keyframes homePhotoBandRight {
+  from { transform: translate3d(-50%, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+.home-photo-band-stack { display: flex; flex-direction: column; gap: 8px; }
 .home-photo-band-track {
   display: flex;
   width: max-content;
-  animation: homePhotoBand var(--photo-band-duration, 60s) linear infinite;
+  animation-duration: var(--photo-band-duration, 60s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
   will-change: transform;
 }
+.home-photo-band-track--left { animation-name: homePhotoBandLeft; }
+.home-photo-band-track--right { animation-name: homePhotoBandRight; }
 .home-photo-band-track[data-paused="true"] { animation-play-state: paused; }
 .home-photo-band-viewport {
   overflow: hidden;
@@ -315,7 +324,9 @@ body {
   display: flex;
   flex: none;
   align-items: stretch;
+  justify-content: space-evenly;
   gap: 12px;
+  min-width: var(--photo-band-group-min-width, 0px);
   padding-inline: 12px;
 }
 .home-photo-band-card {
