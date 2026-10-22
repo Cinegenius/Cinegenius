@@ -113,7 +113,7 @@ export default async function RootLayout({
   return (
     <ClerkProvider
       localization={clerkLocalization}
-      signUpForceRedirectUrl="/profile"
+      signUpForceRedirectUrl="/profile-setup?welcome=1"
       signInFallbackRedirectUrl="/"
       afterMultiSessionSingleSignOutUrl="/"
     >

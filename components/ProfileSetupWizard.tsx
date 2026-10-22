@@ -12,6 +12,7 @@ import {
 import { compressImage } from "@/lib/compressImage";
 import { departments } from "@/lib/departments";
 import { safeAuthRedirect } from "@/lib/auth-redirect";
+import { shouldSkipProfileSetup } from "@/lib/profile-setup-flow";
 import {
   buildQuickStartScreens, createQuickStartIntentData, findQuickStartRoles, getFirstScreenForIntent, getQuickStartDepartments,
   getQuickStartProfileTypesForRoles, normalizeQuickStartDraft, QUICK_START_CATEGORIES,
@@ -79,6 +80,7 @@ export default function ProfileSetupWizard() {
   const router = useRouter();
   const params = useSearchParams();
   const { user } = useUser();
+  const isNewRegistration = params.get("welcome") === "1";
   const redirectTo = safeAuthRedirect(params.get("redirect") ?? undefined, "", ["/sign-in", "/sign-up", "/profile-setup", "/guided-profile", "/guided-listing", "/company-setup"]);
   const [draft, setDraft] = useState<QuickStartDraft>(START_QUICK_START_DRAFT);
   const [ready, setReady] = useState(false);
@@ -113,11 +115,18 @@ export default function ProfileSetupWizard() {
         router.replace(saved.intent === "search" ? (redirectTo ?? "/search") : (redirectTo ?? "/dashboard"));
         return;
       }
-      if (profile?.exists && !hasInProgressDraft) {
+      if (shouldSkipProfileSetup({
+        hasExistingProfile: profile?.exists === true,
+        hasInProgressDraft,
+        isNewRegistration,
+      })) {
         router.replace(redirectTo ?? "/dashboard");
         return;
       }
-      setDraft(hasInProgressDraft ? normalizeQuickStartDraft(saved.quickStart) : START_QUICK_START_DRAFT);
+      const existingName = typeof profile?.profile?.display_name === "string" ? profile.profile.display_name : user?.fullName ?? "";
+      setDraft(hasInProgressDraft
+        ? normalizeQuickStartDraft(saved.quickStart)
+        : { ...START_QUICK_START_DRAFT, name: existingName });
       setReady(true);
     }).catch((cause) => {
       if (!active) return;
@@ -125,7 +134,7 @@ export default function ProfileSetupWizard() {
       setReady(true);
     });
     return () => { active = false; };
-  }, [loadAttempt, redirectTo, router]);
+  }, [isNewRegistration, loadAttempt, redirectTo, router, user?.fullName]);
 
   useEffect(() => {
     if (!ready || draft.name || !user?.fullName) return;

@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import AuthForm from "@/components/AuthForm";
-import { safeAuthRedirect } from "@/lib/auth-redirect";
+import { getSignUpSetupDestination, safeAuthRedirect } from "@/lib/auth-redirect";
 
 type SearchParams = Promise<{
   redirect_url?: string | string[];
@@ -13,9 +13,7 @@ export default async function SignUpPage({ searchParams }: { searchParams: Searc
   const destination = safeAuthRedirect(query.redirect_url ?? query.redirect, "/dashboard", ["/sign-in", "/sign-up"]);
   if (userId) redirect(destination);
 
-  const afterSignUp = destination === "/dashboard"
-    ? "/profile-setup"
-    : `/profile-setup?redirect=${encodeURIComponent(destination)}`;
+  const afterSignUp = getSignUpSetupDestination(destination);
 
   return (
     <div className="pt-16 min-h-screen flex items-center justify-center bg-bg-primary px-4">

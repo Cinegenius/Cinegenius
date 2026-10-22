@@ -22,3 +22,10 @@ export function safeAuthRedirect(
     return fallback;
   }
 }
+
+/** Keep new accounts in the resumable setup wizard before honoring a return path. */
+export function getSignUpSetupDestination(destination: string): string {
+  const params = new URLSearchParams({ welcome: "1" });
+  if (destination !== "/dashboard") params.set("redirect", destination);
+  return `/profile-setup?${params.toString()}`;
+}
