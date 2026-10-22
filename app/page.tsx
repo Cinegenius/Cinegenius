@@ -62,7 +62,7 @@ async function getHomeData(viewerId: string | null) {
     db.from("listings").select("id,title,city,price,image_url,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(3),
     db.from("listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
     db.from("listings").select("id,title,city,price,image_url,type,created_at").in("type", ["prop", "vehicle"]).eq("published", true).not("image_url", "is", null).order("created_at", { ascending: false }).limit(3),
-    db.from("companies").select("id,slug,name,logo_url,city,categories").not("logo_url", "is", null).order("created_at", { ascending: false }).limit(6),
+    db.from("companies").select("id,slug,name,logo_url,city,categories").eq("published", true).not("logo_url", "is", null).order("created_at", { ascending: false }).limit(6),
     db.from("profiles").select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,profile_type,profile_types,profile_images,portfolio_images,created_at").not("display_name", "is", null).neq("display_name", "").order("created_at", { ascending: false }).limit(300),
   ]);
 

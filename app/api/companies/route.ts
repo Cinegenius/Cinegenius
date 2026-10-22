@@ -1,6 +1,15 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
+
+function revalidateCompanyViews(slug: string) {
+  revalidateTag("companies", "max");
+  revalidateTag("profiles", "max");
+  revalidatePath("/");
+  revalidatePath("/companies");
+  revalidatePath(`/companies/${slug}`);
+}
 
 function generateSlug(name: string): string {
   return name
@@ -171,6 +180,8 @@ export async function POST(req: NextRequest) {
         { onConflict: "company_id,user_id" }
       );
 
+    revalidateCompanyViews(data.slug);
+
     return NextResponse.json({ data });
   }
 
@@ -253,6 +264,8 @@ export async function POST(req: NextRequest) {
     .from("profiles")
     .update({ account_type: "company", updated_at: new Date().toISOString() })
     .eq("user_id", userId);
+
+  revalidateCompanyViews(data.slug);
 
   return NextResponse.json({ data });
 }

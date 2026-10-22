@@ -21,6 +21,9 @@ export async function POST(_request: Request, context: { params: Promise<{ slug:
     .eq("id", company.id).eq("owner_user_id", authResult.userId).eq("published", false);
   if (error) return NextResponse.json({ error: "Das Firmenprofil konnte nicht veröffentlicht werden." }, { status: 500 });
   revalidateTag("companies", "max");
+  revalidateTag("profiles", "max");
+  revalidatePath("/");
+  revalidatePath("/companies");
   revalidatePath(`/companies/${slug}`);
   return NextResponse.json({ published: true });
 }

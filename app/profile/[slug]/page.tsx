@@ -211,13 +211,13 @@ function getCompanyMembership(userId: string): Promise<any> {
     async () => {
       const { data } = await db
         .from("company_members")
-        .select("id, role, title, status, company_id, companies(id, slug, name, logo_url, categories)")
+        .select("id, role, title, status, company_id, companies(id, slug, name, logo_url, categories, published)")
         .eq("user_id", userId)
         .eq("status", "accepted")
         .limit(1)
         .maybeSingle();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return data as any ?? null;
+      const company = data?.companies as unknown as { published?: boolean } | null;
+      return company?.published === false ? null : data;
     },
     ["profile-company", userId],
     { revalidate: 300, tags: ["profiles"] }

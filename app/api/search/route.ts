@@ -44,6 +44,7 @@ export async function GET(req: NextRequest) {
       ? db
           .from("companies")
           .select("id, slug, name, city, logo_url, categories")
+          .eq("published", true)
           .or(`name.ilike.${like},city.ilike.${like},description.ilike.${like}`)
           .limit(type === "all" ? 4 : 24)
       : Promise.resolve({ data: [] }),
