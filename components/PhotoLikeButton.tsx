@@ -26,6 +26,7 @@ export default function PhotoLikeButton({
   disabled = false,
   resumeLike = false,
   className = "",
+  tabIndex,
 }: {
   profileId: string;
   imageUrl: string;
@@ -34,6 +35,7 @@ export default function PhotoLikeButton({
   disabled?: boolean;
   resumeLike?: boolean;
   className?: string;
+  tabIndex?: number;
 }) {
   const { isLoaded, isSignedIn, user } = useUser();
   const [count, setCount] = useState(initialCount);
@@ -120,6 +122,7 @@ export default function PhotoLikeButton({
         type="button"
         onClick={(event) => { event.preventDefault(); event.stopPropagation(); void toggleLike(); }}
         disabled={!isLoaded || saving || disabled || isOwner}
+        tabIndex={tabIndex}
         aria-label={liked ? `Like entfernen, ${count} Likes` : `Foto liken, ${count} Likes`}
         aria-pressed={liked}
         title={isOwner ? "Eigene Fotos kannst du nicht liken" : undefined}

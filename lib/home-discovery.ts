@@ -38,6 +38,14 @@ export function repeatForSeamlessLoop<T>(items: readonly T[]): T[] {
   return [...items, ...items];
 }
 
+/** Adds whole repeated passes so a continuous photo row always fills its viewport. */
+export function getPhotoBandFillerCount(viewportWidth: number, cardWidth: number, photosPerPass: number): number {
+  if (![viewportWidth, cardWidth, photosPerPass].every(Number.isFinite) || viewportWidth <= 0 || cardWidth <= 0 || photosPerPass <= 0) return 0;
+  const passWidth = cardWidth * photosPerPass;
+  const passCount = Math.max(1, Math.ceil(viewportWidth / passWidth));
+  return (passCount - 1) * photosPerPass;
+}
+
 export function shouldAnimatePhotoBand(photoCount: number, prefersReducedMotion: boolean): boolean {
   return photoCount > 1 && !prefersReducedMotion;
 }

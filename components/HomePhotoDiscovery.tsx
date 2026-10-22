@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, type CSSProperties, type MouseEvent as Rea
 import { ArrowRight, Image as ImageIcon, Pause, Play, Star, X, Share2 } from "lucide-react";
 import PhotoLikeButton from "@/components/PhotoLikeButton";
 import { markPhotoNavigation, markPhotoNavigationWithAnimation, photoHref } from "@/lib/photo-link";
-import { orderPhotosByAuthor, repeatForSeamlessLoop, shouldAnimatePhotoBand } from "@/lib/home-discovery";
+import { getPhotoBandFillerCount, orderPhotosByAuthor, repeatForSeamlessLoop, shouldAnimatePhotoBand } from "@/lib/home-discovery";
 
 export type DiscoverPhoto = {
   profileId: string;
@@ -114,7 +114,7 @@ function PhotoBandCard({
   failed,
   onImageError,
   onPhotoOpen,
-  decorative = false,
+  pointerOnly = false,
   priority = false,
 }: {
   photo: DiscoverPhoto;
@@ -122,19 +122,19 @@ function PhotoBandCard({
   failed: boolean;
   onImageError: (imageUrl: string) => void;
   onPhotoOpen?: () => void;
-  decorative?: boolean;
+  pointerOnly?: boolean;
   priority?: boolean;
 }) {
   const href = photoHref(photo.profileId, photo.imageUrl);
   return (
-    <article aria-hidden={decorative || undefined} inert={decorative || undefined} className={`home-photo-band-card group relative aspect-[4/3] w-[165px] shrink-0 overflow-hidden rounded-xl border border-white/10 bg-bg-elevated sm:w-[200px] lg:w-[240px] xl:w-[250px] ${decorative ? "pointer-events-none" : ""}`}>
-      {!failed ? <Link href={href} onClick={decorative ? undefined : onPhotoOpen ?? (() => markPhotoNavigation())} aria-label={decorative ? undefined : `Foto öffnen: ${photo.caption || `Portfoliofoto von ${photo.author}`}`} tabIndex={decorative ? -1 : undefined} className="absolute inset-0 block focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold">
-        <Image src={photo.imageUrl} alt={decorative ? "" : photo.caption || `Foto von ${photo.author}`} fill priority={priority} sizes="(max-width: 639px) 165px, (max-width: 1023px) 200px, (max-width: 1279px) 240px, 250px" onError={() => onImageError(photo.imageUrl)} draggable={false} className="object-cover" />
+    <article aria-hidden={pointerOnly || undefined} className="home-photo-band-card group relative aspect-[4/3] w-[165px] shrink-0 overflow-hidden rounded-xl border border-white/10 bg-bg-elevated sm:w-[200px] lg:w-[240px] xl:w-[250px]">
+      {!failed ? <Link href={href} onClick={onPhotoOpen ?? (() => markPhotoNavigation())} aria-label={pointerOnly ? undefined : `Foto öffnen: ${photo.caption || `Portfoliofoto von ${photo.author}`}`} tabIndex={pointerOnly ? -1 : undefined} className="absolute inset-0 block focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold">
+        <Image src={photo.imageUrl} alt={pointerOnly ? "" : photo.caption || `Foto von ${photo.author}`} fill priority={priority} sizes="(max-width: 639px) 165px, (max-width: 1023px) 200px, (max-width: 1279px) 240px, 250px" onError={() => onImageError(photo.imageUrl)} draggable={false} className="object-cover" />
       </Link> : <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-bg-elevated to-bg-primary text-text-muted"><div className="flex flex-col items-center gap-2"><ImageIcon size={28} /><span className="text-xs">Bild derzeit nicht verfügbar</span></div></div>}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
-      {!decorative && <PhotoLikeButton profileId={photo.profileId} imageUrl={photo.imageUrl} initialCount={photo.likeCount ?? 0} initialLiked={photo.likedByMe ?? false} className="absolute right-3 top-3 z-10" />}
+      <PhotoLikeButton profileId={photo.profileId} imageUrl={photo.imageUrl} initialCount={photo.likeCount ?? 0} initialLiked={photo.likedByMe ?? false} tabIndex={pointerOnly ? -1 : undefined} className="absolute right-3 top-3 z-10" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3 text-white sm:p-4">
-        {decorative ? <p className="truncate text-sm font-medium">{photo.author}</p> : <Link href={`/profile/${photo.profileSlug}#portfolio`} className="pointer-events-auto inline-flex min-h-11 max-w-full items-center truncate text-sm font-semibold hover:text-gold sm:text-base">{photo.author}</Link>}
+        <Link href={`/profile/${photo.profileSlug}#portfolio`} tabIndex={pointerOnly ? -1 : undefined} className="pointer-events-auto inline-flex min-h-11 max-w-full items-center truncate text-sm font-semibold hover:text-gold sm:text-base">{photo.author}</Link>
         <p className="line-clamp-1 text-xs text-white/75 sm:text-sm">{photo.caption || "Portfolio-Einblick"}</p>
         {isRatedSelection && <div className="mt-1.5 flex items-center gap-2 text-white"><Stars rating={photo.rating} /><span className="text-xs font-semibold">{photo.rating.toFixed(1)}</span><span className="text-[11px] text-white/70">({photo.count})</span></div>}
       </div>
@@ -144,6 +144,7 @@ function PhotoBandCard({
 
 export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: DiscoverPhoto[]; newPhotos: DiscoverPhoto[] }) {
   const photos = orderPhotosByAuthor(ratedPhotos.length >= 3 ? ratedPhotos : newPhotos).slice(0, 6) as DiscoverPhoto[];
+  const photoTotal = photos.length;
   const isRatedSelection = ratedPhotos.length >= 3;
   const sectionRef = useRef<HTMLElement>(null);
   const bandViewportRef = useRef<HTMLDivElement>(null);
@@ -161,7 +162,10 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
   const [focused, setFocused] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [cycleDurations, setCycleDurations] = useState<[number, number]>([60, 60]);
-  const [groupMinWidths, setGroupMinWidths] = useState<[number, number]>([0, 0]);
+  const [fillerCardCounts, setFillerCardCounts] = useState<[number, number]>(() => [
+    getPhotoBandFillerCount(1320, 250, Math.ceil(photoTotal / 2)),
+    getPhotoBandFillerCount(1320, 250, Math.floor(photoTotal / 2)),
+  ]);
   const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
   const animated = shouldAnimatePhotoBand(photos.length, reducedMotion);
   const shouldRun = animated && isInView && tabVisible && !userPaused && !hovered && !focused && !isDragging;
@@ -217,7 +221,21 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
     if (groups.length === 0 || !viewport || !animated) return;
     const updateDuration = () => {
       const viewportWidth = viewport.clientWidth;
-      setGroupMinWidths((current) => current[0] === viewportWidth && current[1] === viewportWidth ? current : [viewportWidth, viewportWidth]);
+      setFillerCardCounts((current) => {
+        const next: [number, number] = [...current];
+        let changed = false;
+        for (const row of [0, 1] as const) {
+          const group = groupRefs.current[row];
+          const cardWidth = group?.firstElementChild?.getBoundingClientRect().width ?? 0;
+          const photoCount = row === 0 ? Math.ceil(photoTotal / 2) : Math.floor(photoTotal / 2);
+          const fillerCount = getPhotoBandFillerCount(viewportWidth, cardWidth, photoCount);
+          if (next[row] !== fillerCount) {
+            next[row] = fillerCount;
+            changed = true;
+          }
+        }
+        return changed ? next : current;
+      });
       setCycleDurations((current) => {
         const next: [number, number] = [...current];
         let changed = false;
@@ -239,7 +257,7 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
     groups.forEach((group) => observer.observe(group));
     observer.observe(viewport);
     return () => observer.disconnect();
-  }, [animated, photos.length]);
+  }, [animated, photoTotal]);
 
   useEffect(() => () => {
     if (suppressClickTimerRef.current) clearTimeout(suppressClickTimerRef.current);
@@ -382,10 +400,12 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
             {[0, 1].map((row) => {
               const rowPhotos = photos.filter((_, index) => index % 2 === row);
               if (row === 1) rowPhotos.reverse();
-              const rowLoopPhotos = repeatForSeamlessLoop(rowPhotos);
+              const fillerPhotos = Array.from({ length: fillerCardCounts[row] }, (_, index) => rowPhotos[index % rowPhotos.length]);
+              const filledRowPhotos = [...rowPhotos, ...fillerPhotos];
+              const rowLoopPhotos = repeatForSeamlessLoop(filledRowPhotos);
               return <div key={`photo-band-row-${row}`} ref={(element) => { trackRefs.current[row] = element; }} className={`home-photo-band-track ${row === 0 ? "home-photo-band-track--left" : "home-photo-band-track--right"}`} data-paused={!shouldRun} data-photo-band-row={row} style={{ "--photo-band-duration": `${cycleDurations[row]}s` } as CSSProperties}>
-                {[0, 1].map((copy) => <div key={`photo-band-row-${row}-copy-${copy}`} ref={(element) => { if (copy === 0) groupRefs.current[row] = element; }} className="home-photo-band-group" style={{ "--photo-band-group-min-width": `${groupMinWidths[row]}px` } as CSSProperties} aria-hidden={copy === 1 || undefined} inert={copy === 1 || undefined}>
-                  {rowLoopPhotos.slice(copy * rowPhotos.length, (copy + 1) * rowPhotos.length).map((photo, index) => <PhotoBandCard key={`${row}:${copy}:${photo.profileId}:${photo.imageUrl}`} photo={photo} isRatedSelection={isRatedSelection} failed={failedImages.has(photo.imageUrl)} onImageError={markImageFailed} decorative={copy === 1} priority={copy === 0 && index === 0} onPhotoOpen={markHomePhotoOpen} />)}
+                {[0, 1].map((copy) => <div key={`photo-band-row-${row}-copy-${copy}`} ref={(element) => { if (copy === 0) groupRefs.current[row] = element; }} className="home-photo-band-group" aria-hidden={copy === 1 || undefined}>
+                  {rowLoopPhotos.slice(copy * filledRowPhotos.length, (copy + 1) * filledRowPhotos.length).map((photo, index) => <PhotoBandCard key={`${row}:${copy}:${index}:${photo.profileId}:${photo.imageUrl}`} photo={photo} isRatedSelection={isRatedSelection} failed={failedImages.has(photo.imageUrl)} onImageError={markImageFailed} pointerOnly={copy === 1 || index >= rowPhotos.length} priority={copy === 0 && index === 0} onPhotoOpen={markHomePhotoOpen} />)}
                 </div>)}
               </div>;
             })}

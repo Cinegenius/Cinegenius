@@ -294,7 +294,7 @@ body {
   from { transform: translate3d(-50%, 0, 0); }
   to { transform: translate3d(0, 0, 0); }
 }
-.home-photo-band-stack { display: flex; flex-direction: column; gap: 8px; }
+.home-photo-band-stack { display: flex; flex-direction: column; gap: 0; }
 .home-photo-band-track {
   display: flex;
   width: max-content;
@@ -324,16 +324,16 @@ body {
   display: flex;
   flex: none;
   align-items: stretch;
-  justify-content: space-evenly;
-  gap: 12px;
-  min-width: var(--photo-band-group-min-width, 0px);
-  padding-inline: 12px;
+  justify-content: flex-start;
+  gap: 0;
 }
 .home-photo-band-card {
   z-index: 0;
+  border-radius: 0;
   transform-origin: center;
   transition: transform 240ms cubic-bezier(0.2, 0.75, 0.25, 1), border-color 240ms ease, box-shadow 240ms ease;
 }
+.home-photo-band-group .home-photo-band-card { border-radius: 0; }
 .home-photo-band-card:focus-within {
   z-index: 2;
   transform: translateY(-3px) scale(1.07);
@@ -344,9 +344,10 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 250px));
   justify-content: start;
-  gap: 12px;
+  gap: 0;
 }
 .home-photo-band-static-grid .home-photo-band-card { width: 100%; }
+.home-photo-band-static-grid .home-photo-band-card { border-radius: 0; }
 @media (max-width: 639px) {
   .home-photo-band-static-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
