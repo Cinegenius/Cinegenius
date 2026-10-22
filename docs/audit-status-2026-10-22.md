@@ -51,4 +51,4 @@ Ein gezielter Regressionstest prüft beide Zuordnungen. Version `c604da57ea53c1b
 
 Für den Abschluss des vollständigen Funktionsaudits werden ein kontrolliertes zweites Konto für Nachrichten und ein klar abgegrenzter Testinhalt benötigt; das vorhandene Konto enthält bereits echte Inserate, die unangetastet bleiben. Offen sind: Registrierung und frischer Login samt Einrichtung, Marketplace-Foto-Upload mit dem betroffenen Fehler, Erstellen/Bearbeiten/Veröffentlichen/Löschen eines eigenen Testangebots, Nachrichten und Gruppen zwischen Testkonten, Lesestatus nach Ab-/Anmeldung, Likes/Bewertungen/Favoriten, Kontakt- und Buchungsabläufe im sicheren Testmodus sowie echte oder simulierte mobile Geräteprüfungen.
 
-Die Icon-Korrektur ist veröffentlicht. Das vollständige Funktionsaudit bleibt wegen der oben genannten fehlenden stabilen Anmeldung und Testkonten offen.
+Die Icon-Korrektur ist veröffentlicht. Das vollständige Funktionsaudit bleibt offen, weil Schreibabläufe mit einem separaten Testinhalt und Nachrichten mit einem kontrollierten Gegenkonto noch nicht praktisch ausgeführt wurden.
