@@ -302,6 +302,15 @@ body {
   margin-inline: -12px;
   padding: 12px;
 }
+.home-photo-band-viewport[data-draggable="true"] {
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.home-photo-band-viewport[data-draggable="true"] .home-photo-band-card button { cursor: pointer; }
+.home-photo-band-viewport[data-dragging="true"] { cursor: grabbing; }
+.home-photo-band-viewport[data-dragging="true"] .home-photo-band-card a { cursor: grabbing; }
 .home-photo-band-group {
   display: flex;
   flex: none;

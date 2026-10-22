@@ -6,8 +6,8 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 
 export const metadata: Metadata = {
-  title: "CineGenius — Locations, Crew & Equipment für Film, Foto und Content",
-  description: "Locations mieten, Crew buchen, Equipment leihen, Jobs finden — der Marktplatz für Kreative. Für Film, Fotografie, Werbung und Content-Produktion in der DACH-Region.",
+  title: "CineGenius — Film, Fotografie und Content",
+  description: "Finde Drehorte, Crew, Talente, Equipment und Dienstleister für dein nächstes Projekt – oder präsentiere deine Arbeit und dein Angebot.",
   keywords: ["Location mieten", "Crew buchen", "Fotostudio mieten", "Equipment leihen", "Content Production", "Filmproduktion", "Fotoshooting Location", "Creative Hub DACH"],
   openGraph: {
     title: "CineGenius — Der Marktplatz für Kreative",
@@ -19,7 +19,7 @@ export const revalidate = 60;
 
 import {
   MapPin, Briefcase, ArrowRight, Star, CheckCircle,
-  Zap, Shield, Clock, Package2, Building2,
+  Zap, Shield, Clock, Package2, Building2, UsersRound, Film,
 } from "lucide-react";
 import HeroSearch from "@/components/HeroSearch";
 import CommunityBoard from "@/components/CommunityBoard";
@@ -52,18 +52,47 @@ type HomeProfileRow = {
 
 async function getHomeData(viewerId: string | null) {
   const currentTime = Date.now();
+  const hasSupabaseCredentials = Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY,
+  );
+
+  // Local copy-only previews should still render the homepage when the Vercel
+  // Development environment has no database credentials. Production keeps
+  // the normal failure behavior, and this mode never connects to live data.
+  if (
+    process.env.NODE_ENV === "development" &&
+    process.env.CINEGENIUS_LOCAL_PREVIEW === "1" &&
+    !hasSupabaseCredentials
+  ) {
+    console.info("[homepage] Local preview without Supabase: dynamic sections are empty.");
+    return {
+      liveLocations: [],
+      liveJobs: [],
+      liveProps: [],
+      companies: [],
+      projects: [],
+      topCreators: [],
+      newCrew: [],
+      ratedPhotos: [],
+      newPhotos: [],
+      currentTime,
+    };
+  }
+
   const [
     { data: recentLocations },
     { data: recentJobs },
     { data: recentProps },
     { data: liveCompanies },
     { data: profilesRaw },
+    { data: recentProjects },
   ] = await Promise.all([
     db.from("listings").select("id,title,city,price,image_url,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(3),
     db.from("listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
     db.from("listings").select("id,title,city,price,image_url,type,created_at").in("type", ["prop", "vehicle"]).eq("published", true).not("image_url", "is", null).order("created_at", { ascending: false }).limit(3),
     db.from("companies").select("id,slug,name,logo_url,city,categories").eq("published", true).not("logo_url", "is", null).order("created_at", { ascending: false }).limit(6),
     db.from("profiles").select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,profile_type,profile_types,profile_images,portfolio_images,created_at").not("display_name", "is", null).neq("display_name", "").order("created_at", { ascending: false }).limit(300),
+    db.from("projects").select("id,title,year,type,director,poster_url").order("year", { ascending: false }).limit(3),
   ]);
 
   const profileRows = (profilesRaw ?? []) as HomeProfileRow[];
@@ -177,11 +206,20 @@ async function getHomeData(viewerId: string | null) {
     category: Array.isArray(c.categories) && c.categories.length > 0 ? c.categories[0] : null,
   }));
 
+  const projects = (recentProjects ?? []).map((project: { id: string; title: string; year: number | null; type: string | null; director: string | null }) => ({
+    id: project.id,
+    title: project.title,
+    year: project.year,
+    type: project.type,
+    director: project.director,
+  }));
+
   return {
     liveLocations,
     liveJobs,
     liveProps,
     companies,
+    projects,
     topCreators,
     newCrew,
     ratedPhotos,
@@ -197,7 +235,6 @@ export default async function HomePage() {
 
   const t = await getTranslations("home");
   const tc = await getTranslations("common");
-  const tn = await getTranslations("nav");
 
   function formatDate(iso: string): string {
     if (!iso) return "";
@@ -209,7 +246,14 @@ export default async function HomePage() {
     return tc("weeksAgo", { weeks: Math.floor(diff / 7) });
   }
 
-  const { liveLocations, liveJobs, liveProps, companies, topCreators, newCrew, ratedPhotos, newPhotos, currentTime } = await getHomeData(userId);
+  const { liveLocations, liveJobs, liveProps, companies, projects, topCreators, newCrew, ratedPhotos, newPhotos, currentTime } = await getHomeData(userId);
+
+  const findCards = [
+    { title: t("findLocationsTitle"), description: t("findLocationsDescription"), href: "/locations", icon: MapPin },
+    { title: t("findCrewTitle"), description: t("findCrewDescription"), href: "/creators", icon: UsersRound },
+    { title: t("findEquipmentTitle"), description: t("findEquipmentDescription"), href: "/props", icon: Package2 },
+    { title: t("findCompaniesTitle"), description: t("findCompaniesDescription"), href: "/companies", icon: Building2 },
+  ];
 
   return (
     <main className="relative isolate min-h-screen">
@@ -225,42 +269,78 @@ export default async function HomePage() {
       ══════════════════════════════════════════════ */}
       <section className="relative isolate overflow-hidden border-b border-border">
         <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-9 sm:py-11 text-center">
-          <h1
-            className="font-display text-[2rem] sm:text-[2.8rem] font-bold tracking-tight text-text-primary mb-1 leading-tight"
-          >
-            Locations, Jobs &{" "}
-            <span className="text-gradient-gold">Marktplatz</span>
+          <h1 className="font-display text-[2rem] sm:text-[2.8rem] font-bold tracking-tight text-text-primary mb-2 leading-tight">
+            {t("homepageTitle")}
           </h1>
-          <p className="text-text-muted text-sm sm:text-base mb-5">
-            für Film, Foto & Content — kostenlos in der DACH-Region
+          <p className="mx-auto mb-5 max-w-2xl text-text-muted text-sm sm:text-base">
+            {t("homepageDescription")}
           </p>
-          {!isLoggedIn && (
-            <div className="mb-5 flex flex-col min-[380px]:flex-row items-stretch justify-center gap-2">
-              <Link
-                href="/sign-up"
-                prefetch
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gold px-5 py-2.5 text-sm font-bold text-bg-primary shadow-lg shadow-gold/15 transition-colors hover:bg-gold-light"
-              >
-                {tn("signUp")} <ArrowRight size={15} />
-              </Link>
-              <Link
-                href="/sign-in"
-                prefetch
-                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-border bg-bg-primary/50 px-5 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:border-gold hover:text-gold"
-              >
-                {tn("signIn")}
-              </Link>
-            </div>
-          )}
+          <div className="mb-5 flex flex-col min-[440px]:flex-row items-stretch justify-center gap-2">
+            <Link href="/search" prefetch className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gold px-5 py-2.5 text-sm font-bold text-bg-primary shadow-lg shadow-gold/15 transition-colors hover:bg-gold-light">
+              {t("heroSearchAction")} <ArrowRight size={15} />
+            </Link>
+            <Link href={ctaHref} prefetch className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-bg-primary/50 px-5 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:border-gold hover:text-gold">
+              {isLoggedIn ? t("heroManageAction") : t("heroPresentAction")} <ArrowRight size={15} />
+            </Link>
+          </div>
           <div className="max-w-xl mx-auto">
             <HeroSearch />
           </div>
         </div>
       </section>
 
-      <CommunityBoard loggedIn={isLoggedIn} />
+      {/* Finden: kompakte, direkte Einstiege in die bestehenden Verzeichnisse */}
+      <section className="py-8 sm:py-10" aria-labelledby="home-find-title">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-4">
+            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("findLabel")}</p>
+            <h2 id="home-find-title" className="font-display text-xl sm:text-2xl font-bold text-text-primary">{t("findTitle")}</h2>
+          </div>
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+            {findCards.map(({ title, description, href, icon: Icon }) => (
+              <Link key={href} href={href} className="group min-w-0 rounded-xl border border-border bg-bg-secondary/90 p-3.5 transition-colors hover:border-gold/40 sm:p-4">
+                <Icon size={18} className="mb-2 text-gold" />
+                <h3 className="text-sm font-semibold leading-snug text-text-primary group-hover:text-gold">{title}</h3>
+                <p className="mt-1 text-xs leading-relaxed text-text-muted">{description}</p>
+              </Link>
+            ))}
+            <div className="col-span-2 min-w-0 rounded-xl border border-border bg-bg-secondary/90 p-3.5 sm:p-4 lg:col-span-1">
+              <Film size={18} className="mb-2 text-gold" />
+              <h3 className="text-sm font-semibold leading-snug text-text-primary">{t("findJobsTitle")}</h3>
+              <p className="mt-1 text-xs leading-relaxed text-text-muted">{t("findJobsDescription")}</p>
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold">
+                <Link href="/jobs" className="inline-flex min-h-8 items-center gap-1 text-gold hover:text-gold-light">{t("findJobsLink")} <ArrowRight size={12} /></Link>
+                <Link href="/projects/alle" className="inline-flex min-h-8 items-center gap-1 text-gold hover:text-gold-light">{t("findProjectsLink")} <ArrowRight size={12} /></Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <HomePhotoDiscovery ratedPhotos={ratedPhotos} newPhotos={newPhotos} />
+      {/* Anbieter verständlich ansprechen, ohne neue Produktwege zu erfinden */}
+      <section className="border-y border-border bg-bg-secondary/55 py-8 sm:py-10" aria-labelledby="home-offer-title">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-4">
+            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("offerLabel")}</p>
+            <h2 id="home-offer-title" className="font-display text-xl sm:text-2xl font-bold text-text-primary">{t("offerTitle")}</h2>
+          </div>
+          <div className="grid gap-3 md:grid-cols-3">
+            {[
+              { title: t("offerLocationTitle"), description: t("offerLocationDescription"), action: t("offerLocationAction"), href: isLoggedIn ? "/inserat" : "/sign-up", icon: MapPin },
+              { title: t("offerTalentTitle"), description: t("offerTalentDescription"), action: t("offerTalentAction"), href: isLoggedIn ? "/profile" : "/sign-up", icon: UsersRound },
+              { title: t("offerEquipmentTitle"), description: t("offerEquipmentDescription"), action: t("offerEquipmentAction"), href: isLoggedIn ? "/inserat" : "/sign-up", serviceAction: t("offerServicesAction"), serviceHref: isLoggedIn ? "/company-setup" : "/sign-up", icon: Package2 },
+            ].map(({ title, description, action, href, serviceAction, serviceHref, icon: Icon }) => (
+              <article key={title} className="min-w-0 rounded-xl border border-border bg-bg-primary/70 p-4 sm:p-5">
+                <Icon size={18} className="mb-2 text-gold" />
+                <h3 className="font-semibold text-text-primary">{title}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-text-muted">{description}</p>
+                <Link href={href} className="mt-3 inline-flex min-h-10 items-center gap-1.5 text-sm font-semibold text-gold hover:text-gold-light">{action} <ArrowRight size={14} /></Link>
+                {serviceAction && serviceHref && <Link href={serviceHref} className="mt-1 inline-flex min-h-10 items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-gold">{serviceAction} <ArrowRight size={14} /></Link>}
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ══════════════════════════════════════════════
           FEATURED LOCATIONS
@@ -314,6 +394,82 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* ══════════════════════════════════════════════
+          TOP RATED CREATORS
+      ══════════════════════════════════════════════ */}
+      <section className="py-10 sm:py-14">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-end justify-between mb-6">
+              <div>
+                <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{topCreators.length >= 3 ? t("topCreatorsLabel") : t("newCrewLabel")}</p>
+                <h2 className="font-display text-xl sm:text-2xl font-bold text-text-primary">{topCreators.length >= 3 ? t("topCreatorsTitle") : t("newCrewTitle")}</h2>
+                {topCreators.length < 3 && <p className="mt-1 text-xs text-text-muted">{t("newCrewDescription")}</p>}
+              </div>
+              <Link href="/creators?sort=rating" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium shrink-0">
+                {t("discoverCrew")} <ArrowRight size={14} />
+              </Link>
+            </div>
+            {(topCreators.length >= 3 || newCrew.length > 0) ? <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {(topCreators.length >= 3 ? topCreators : newCrew).map((c) => (
+                <Link
+                  key={c.id}
+                  href={`/profile/${c.slug}`}
+                  className="group card-hover rounded-2xl border border-border bg-bg-secondary hover:border-gold/30 transition-all overflow-hidden flex flex-col"
+                >
+                  <div className="relative aspect-square bg-bg-elevated overflow-hidden">
+                    {c.avatar ? (
+                      <Image
+                        src={c.avatar}
+                        alt={c.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                        sizes="(max-width:640px) 50vw,25vw"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-gold/10 to-bg-elevated flex items-center justify-center">
+                        <span className="text-4xl font-display font-bold text-gold/40">
+                          {c.name.slice(0, 2).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                    {c.verified && (
+                      <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-gold flex items-center justify-center">
+                        <CheckCircle size={11} className="text-bg-primary" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-3 flex flex-col flex-1">
+                    <h3 className="font-semibold text-text-primary text-sm leading-snug mb-0.5">{c.name}</h3>
+                    {c.positions.length > 0 && <p className="mb-1 line-clamp-2 text-[11px] leading-snug text-gold">{c.positions.join(" · ")}</p>}
+                    {c.city && (
+                      <p className="text-[11px] text-text-muted flex items-center gap-1 mb-1.5">
+                        <MapPin size={9} /> {c.city}
+                      </p>
+                    )}
+                    {c.tagline && (
+                      <p className="text-xs text-text-secondary leading-relaxed line-clamp-2 flex-1 mb-2">{c.tagline}</p>
+                    )}
+                    {topCreators.length >= 3 && <div className="flex items-center gap-1.5 mt-auto">
+                      <div className="flex items-center gap-0.5">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <Star
+                            key={i}
+                            size={11}
+                            className={i <= Math.round(c.rating) ? "text-gold fill-gold" : "text-border fill-border"}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-xs font-semibold text-text-primary">{c.rating.toFixed(1)}</span>
+                      <span className="text-[11px] text-text-muted">({c.reviews} {c.reviews === 1 ? "Bewertung" : "Bewertungen"})</span>
+                    </div>}
+                  </div>
+                </Link>
+              ))}
+            </div> : <div className="rounded-xl border border-border bg-bg-secondary px-4 py-8 text-center text-sm text-text-muted">{t("noCrewProfiles")}</div>}
+          </div>
+      </section>
+
 
       {/* ══════════════════════════════════════════════
           MARKTPLATZ / PROPS
@@ -424,7 +580,7 @@ export default async function HomePage() {
       {/* ══════════════════════════════════════════════
           JOBS
       ══════════════════════════════════════════════ */}
-      <section className="py-10 sm:py-14 border-b border-border">
+      {liveJobs.length > 0 && <section className="py-10 sm:py-14 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between mb-6">
             <div>
@@ -435,7 +591,6 @@ export default async function HomePage() {
               {tc("viewAll")} <ArrowRight size={14} />
             </Link>
           </div>
-          {liveJobs.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               {liveJobs.map((job) => (
                 <Link
@@ -461,88 +616,54 @@ export default async function HomePage() {
                 </Link>
               ))}
             </div>
-          ) : (
-            <div className="text-center py-10 text-text-muted text-sm">
-              Noch keine Jobs — <Link href="/inserat" className="text-gold hover:text-gold-light">Job ausschreiben</Link>
+        </div>
+      </section>}
+
+      {projects.length > 0 && <section className="py-8 sm:py-10 border-b border-border" aria-labelledby="home-projects-title">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-4 flex items-end justify-between gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("projectsLabel")}</p>
+              <h2 id="home-projects-title" className="font-display text-xl sm:text-2xl font-bold text-text-primary">{t("projectsTitle")}</h2>
             </div>
-          )}
+            <Link href="/projects/alle" className="inline-flex min-h-10 shrink-0 items-center gap-1 text-sm font-medium text-gold hover:text-gold-light">{tc("viewAll")} <ArrowRight size={14} /></Link>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {projects.map((project) => <Link key={project.id} href={`/projects/${project.id}`} className="card-hover group flex min-w-0 items-start gap-3 rounded-xl border border-border bg-bg-secondary p-4 hover:border-gold/30">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gold/20 bg-gold/10"><Film size={17} className="text-gold" /></div>
+              <div className="min-w-0">
+                <h3 className="truncate text-sm font-semibold text-text-primary group-hover:text-gold">{project.title}</h3>
+                <p className="mt-1 truncate text-xs text-text-muted">{[project.type, project.year, project.director].filter(Boolean).join(" · ")}</p>
+              </div>
+            </Link>)}
+          </div>
+        </div>
+      </section>}
+
+
+      <section className="border-y border-border bg-bg-secondary/55 py-8 sm:py-10" aria-labelledby="home-how-title">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-4">
+            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("howLabel")}</p>
+            <h2 id="home-how-title" className="font-display text-xl sm:text-2xl font-bold text-text-primary">{t("howTitle")}</h2>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            <article className="rounded-xl border border-border bg-bg-primary/70 p-4 sm:p-5">
+              <h3 className="font-semibold text-text-primary">{t("howSearchTitle")}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-text-secondary">{t("howSearchSteps")}</p>
+            </article>
+            <article className="rounded-xl border border-border bg-bg-primary/70 p-4 sm:p-5">
+              <h3 className="font-semibold text-text-primary">{t("howOfferTitle")}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-text-secondary">{t("howOfferSteps")}</p>
+            </article>
+          </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════
-          TOP RATED CREATORS
-      ══════════════════════════════════════════════ */}
-      <section className="py-10 sm:py-14">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-end justify-between mb-6">
-              <div>
-                <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{topCreators.length >= 3 ? "Top bewertete Crew" : "Crew neu entdecken"}</p>
-                <h2 className="font-display text-xl sm:text-2xl font-bold text-text-primary">{topCreators.length >= 3 ? t("topCreatorsTitle") : "Menschen aus der Filmwelt"}</h2>
-                {topCreators.length < 3 && <p className="mt-1 text-xs text-text-muted">Für eine Top-Auswahl liegen noch nicht genügend Crew-Bewertungen vor.</p>}
-              </div>
-              <Link href="/creators?sort=rating" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium shrink-0">
-                Alle Crewmitglieder entdecken <ArrowRight size={14} />
-              </Link>
-            </div>
-            {(topCreators.length >= 3 || newCrew.length > 0) ? <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {(topCreators.length >= 3 ? topCreators : newCrew).map((c) => (
-                <Link
-                  key={c.id}
-                  href={`/profile/${c.slug}`}
-                  className="group card-hover rounded-2xl border border-border bg-bg-secondary hover:border-gold/30 transition-all overflow-hidden flex flex-col"
-                >
-                  <div className="relative aspect-square bg-bg-elevated overflow-hidden">
-                    {c.avatar ? (
-                      <Image
-                        src={c.avatar}
-                        alt={c.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                        sizes="(max-width:640px) 50vw,25vw"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-gold/10 to-bg-elevated flex items-center justify-center">
-                        <span className="text-4xl font-display font-bold text-gold/40">
-                          {c.name.slice(0, 2).toUpperCase()}
-                        </span>
-                      </div>
-                    )}
-                    {c.verified && (
-                      <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-gold flex items-center justify-center">
-                        <CheckCircle size={11} className="text-bg-primary" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-3 flex flex-col flex-1">
-                    <h3 className="font-semibold text-text-primary text-sm leading-snug mb-0.5">{c.name}</h3>
-                    {c.positions.length > 0 && <p className="mb-1 line-clamp-2 text-[11px] leading-snug text-gold">{c.positions.join(" · ")}</p>}
-                    {c.city && (
-                      <p className="text-[11px] text-text-muted flex items-center gap-1 mb-1.5">
-                        <MapPin size={9} /> {c.city}
-                      </p>
-                    )}
-                    {c.tagline && (
-                      <p className="text-xs text-text-secondary leading-relaxed line-clamp-2 flex-1 mb-2">{c.tagline}</p>
-                    )}
-                    {topCreators.length >= 3 && <div className="flex items-center gap-1.5 mt-auto">
-                      <div className="flex items-center gap-0.5">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <Star
-                            key={i}
-                            size={11}
-                            className={i <= Math.round(c.rating) ? "text-gold fill-gold" : "text-border fill-border"}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-xs font-semibold text-text-primary">{c.rating.toFixed(1)}</span>
-                      <span className="text-[11px] text-text-muted">({c.reviews} {c.reviews === 1 ? "Bewertung" : "Bewertungen"})</span>
-                    </div>}
-                  </div>
-                </Link>
-              ))}
-            </div> : <div className="rounded-xl border border-border bg-bg-secondary px-4 py-8 text-center text-sm text-text-muted">Aktuell sind noch keine öffentlichen Crewprofile zum Entdecken vorhanden.</div>}
-          </div>
-      </section>
+      <HomePhotoDiscovery ratedPhotos={ratedPhotos} newPhotos={newPhotos} />
+
+      {/* Community-Ergänzung steht bewusst nach den Verzeichnissen und dem Fotoband. */}
+      <CommunityBoard loggedIn={isLoggedIn} />
 
       {/* ══════════════════════════════════════════════
           TRUST BAR
@@ -583,14 +704,14 @@ export default async function HomePage() {
             <span className="text-gradient-gold">{t("ctaTitleHighlight")}</span>
           </h2>
           <p className="text-text-muted text-sm leading-relaxed max-w-sm mx-auto mb-8">
-            {t("ctaDesc")}
+            {isLoggedIn ? t("ctaLoggedInDesc") : t("ctaDesc")}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               href={ctaHref}
               className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-gold hover:bg-gold-light text-bg-primary font-bold rounded-xl transition-all text-sm shadow-lg shadow-gold/20"
             >
-              {t("ctaPrimary")} <ArrowRight size={15} />
+              {isLoggedIn ? t("heroManageAction") : t("ctaPrimary")} <ArrowRight size={15} />
             </Link>
             <Link
               href="/inserat"
@@ -599,9 +720,7 @@ export default async function HomePage() {
               {t("ctaSecondary")}
             </Link>
           </div>
-          <p className="text-[11px] text-text-muted mt-4">
-            {t("ctaFootnote")}
-          </p>
+          {!isLoggedIn && <p className="text-[11px] text-text-muted mt-4">{t("ctaFootnote")}</p>}
         </div>
       </section>
     </main>

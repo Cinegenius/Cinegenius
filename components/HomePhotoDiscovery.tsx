@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent } from "react";
 import { ArrowRight, Image as ImageIcon, Pause, Play, Star, X, Share2 } from "lucide-react";
 import PhotoLikeButton from "@/components/PhotoLikeButton";
 import { markPhotoNavigation, markPhotoNavigationWithAnimation, photoHref } from "@/lib/photo-link";
@@ -129,7 +129,7 @@ function PhotoBandCard({
   return (
     <article aria-hidden={decorative || undefined} inert={decorative || undefined} className={`home-photo-band-card group relative aspect-[4/3] w-[165px] shrink-0 overflow-hidden rounded-xl border border-white/10 bg-bg-elevated sm:w-[200px] lg:w-[240px] xl:w-[250px] ${decorative ? "pointer-events-none" : ""}`}>
       {!failed ? <Link href={href} onClick={decorative ? undefined : onPhotoOpen ?? (() => markPhotoNavigation())} aria-label={decorative ? undefined : `Foto öffnen: ${photo.caption || `Portfoliofoto von ${photo.author}`}`} tabIndex={decorative ? -1 : undefined} className="absolute inset-0 block focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold">
-        <Image src={photo.imageUrl} alt={decorative ? "" : photo.caption || `Foto von ${photo.author}`} fill priority={priority} sizes="(max-width: 639px) 165px, (max-width: 1023px) 200px, (max-width: 1279px) 240px, 250px" onError={() => onImageError(photo.imageUrl)} className="object-cover" />
+        <Image src={photo.imageUrl} alt={decorative ? "" : photo.caption || `Foto von ${photo.author}`} fill priority={priority} sizes="(max-width: 639px) 165px, (max-width: 1023px) 200px, (max-width: 1279px) 240px, 250px" onError={() => onImageError(photo.imageUrl)} draggable={false} className="object-cover" />
       </Link> : <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-bg-elevated to-bg-primary text-text-muted"><div className="flex flex-col items-center gap-2"><ImageIcon size={28} /><span className="text-xs">Bild derzeit nicht verfügbar</span></div></div>}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
       {!decorative && <PhotoLikeButton profileId={photo.profileId} imageUrl={photo.imageUrl} initialCount={photo.likeCount ?? 0} initialLiked={photo.likedByMe ?? false} className="absolute right-3 top-3 z-10" />}
@@ -149,17 +149,21 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
   const trackRef = useRef<HTMLDivElement>(null);
   const groupRef = useRef<HTMLDivElement>(null);
   const returnAnimationTime = useRef<number | null>(null);
+  const pointerRef = useRef<{ id: number; lastX: number; startX: number; startY: number; moved: boolean } | null>(null);
+  const suppressClickRef = useRef(false);
+  const suppressClickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [reducedMotion, setReducedMotion] = useState(true);
   const [isInView, setIsInView] = useState(false);
   const [tabVisible, setTabVisible] = useState(true);
   const [userPaused, setUserPaused] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [cycleDuration, setCycleDuration] = useState(60);
   const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
   const loopPhotos = repeatForSeamlessLoop(photos);
   const animated = shouldAnimatePhotoBand(photos.length, reducedMotion);
-  const shouldRun = animated && isInView && tabVisible && !userPaused && !hovered && !focused;
+  const shouldRun = animated && isInView && tabVisible && !userPaused && !hovered && !focused && !isDragging;
   const staticGallery = !animated;
 
   useEffect(() => {
@@ -213,6 +217,10 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
     return () => observer.disconnect();
   }, [animated, photos.length]);
 
+  useEffect(() => () => {
+    if (suppressClickTimerRef.current) clearTimeout(suppressClickTimerRef.current);
+  }, []);
+
   useEffect(() => {
     if (!shouldRun || returnAnimationTime.current === null) return;
     const frame = window.requestAnimationFrame(() => {
@@ -228,6 +236,73 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
 
   function markImageFailed(imageUrl: string) {
     setFailedImages((previous) => new Set(previous).add(imageUrl));
+  }
+
+  function beginPointerDrag(event: ReactPointerEvent<HTMLDivElement>) {
+    if (!animated || !event.isPrimary || event.button !== 0) return;
+    if ((event.target as HTMLElement).closest("button, input, textarea, select")) return;
+
+    pointerRef.current = {
+      id: event.pointerId,
+      lastX: event.clientX,
+      startX: event.clientX,
+      startY: event.clientY,
+      moved: false,
+    };
+    trackRef.current?.getAnimations()[0]?.pause();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setIsDragging(true);
+  }
+
+  function movePointerDrag(event: ReactPointerEvent<HTMLDivElement>) {
+    const pointer = pointerRef.current;
+    if (!pointer || pointer.id !== event.pointerId) return;
+
+    const totalX = event.clientX - pointer.startX;
+    const totalY = event.clientY - pointer.startY;
+    if (!pointer.moved && Math.max(Math.abs(totalX), Math.abs(totalY)) < 6) return;
+    if (!pointer.moved && Math.abs(totalY) > Math.abs(totalX)) {
+      pointerRef.current = null;
+      setIsDragging(false);
+      return;
+    }
+
+    pointer.moved = true;
+    const cycleWidth = groupRef.current?.getBoundingClientRect().width ?? 0;
+    const animation = trackRef.current?.getAnimations()[0];
+    const durationMs = cycleDuration * 1000;
+    if (cycleWidth > 0 && durationMs > 0 && animation && typeof animation.currentTime === "number") {
+      const deltaX = event.clientX - pointer.lastX;
+      const nextTime = animation.currentTime - (deltaX / cycleWidth) * durationMs;
+      animation.currentTime = ((nextTime % durationMs) + durationMs) % durationMs;
+    }
+    pointer.lastX = event.clientX;
+  }
+
+  function endPointerDrag(event: ReactPointerEvent<HTMLDivElement>) {
+    const pointer = pointerRef.current;
+    if (!pointer || pointer.id !== event.pointerId) return;
+
+    if (pointer.moved) {
+      suppressClickRef.current = true;
+      if (suppressClickTimerRef.current) clearTimeout(suppressClickTimerRef.current);
+      suppressClickTimerRef.current = setTimeout(() => {
+        suppressClickRef.current = false;
+        suppressClickTimerRef.current = null;
+      }, 400);
+    }
+    pointerRef.current = null;
+    setIsDragging(false);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+  }
+
+  function suppressDraggedClick(event: ReactMouseEvent<HTMLDivElement>) {
+    if (!suppressClickRef.current) return;
+    event.preventDefault();
+    event.stopPropagation();
+    suppressClickRef.current = false;
+    if (suppressClickTimerRef.current) clearTimeout(suppressClickTimerRef.current);
+    suppressClickTimerRef.current = null;
   }
 
   const trackStyle = { "--photo-band-duration": `${cycleDuration}s` } as CSSProperties;
@@ -252,10 +327,18 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
         </div>
         {photos.length > 0 ? <div
           className="home-photo-band-viewport outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-4 focus-visible:ring-offset-bg-primary"
+          data-dragging={isDragging ? "true" : "false"}
+          data-draggable={animated ? "true" : "false"}
           role="region"
-          aria-label={staticGallery ? "Fotogalerie" : "Automatisch laufendes Fotoband"}
+          aria-label={staticGallery ? "Fotogalerie" : "Automatisch laufendes Fotoband. Mit Finger wischen oder Maus ziehen."}
           aria-roledescription={staticGallery ? undefined : "Fotoband"}
           tabIndex={0}
+          onPointerDown={beginPointerDrag}
+          onPointerMove={movePointerDrag}
+          onPointerUp={endPointerDrag}
+          onPointerCancel={endPointerDrag}
+          onClickCapture={suppressDraggedClick}
+          onDragStart={(event) => event.preventDefault()}
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
           onFocus={() => setFocused(true)}
@@ -271,6 +354,7 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
           {!staticGallery && <span className="sr-only" aria-live="polite">{userPaused ? "Fotoband pausiert." : "Fotoband läuft automatisch von rechts nach links."}</span>}
           {reducedMotion && <span className="sr-only">Wegen der Einstellung für reduzierte Bewegung wird eine statische Galerie angezeigt.</span>}
         </div> : <div className="rounded-xl border border-border bg-bg-secondary px-4 py-8 text-center text-sm text-text-muted">Noch keine öffentlichen Portfoliofotos zum Entdecken vorhanden.</div>}
+        {photos.length > 1 && animated && <p className="mt-1 flex items-center justify-center gap-1.5 text-[11px] text-text-muted sm:justify-end"><span aria-hidden="true">↔</span> Mit dem Finger wischen oder mit der Maus ziehen</p>}
       </div>
     </section>
   );
