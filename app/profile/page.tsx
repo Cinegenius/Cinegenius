@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import { useTranslations } from "next-intl";
-import { compressImage, compressAvatar, safeObjectURL } from "@/lib/compressImage";
+import { compressImage, compressAvatar, MAX_FUNCTION_UPLOAD_BYTES, safeObjectURL } from "@/lib/compressImage";
 import {
   Camera, CheckCircle, User, Lock, Bell, CreditCard, Film,
   Plus, X, Save, Wallet, Upload, ShieldCheck, Clock, AlertCircle, Loader2,
@@ -836,7 +836,7 @@ export default function ProfilePage() {
     const _cp = safeObjectURL(file); if (_cp) setCoverImagePreview(_cp);
     setCoverUploading(true);
     try {
-      const prepared = await prepareProfileMediaFile(file, (source) => compressImage(source, { maxWidth: 1920, maxHeight: 1080, quality: 0.85 }));
+      const prepared = await prepareProfileMediaFile(file, (source) => compressImage(source, { maxWidth: 1920, maxHeight: 1080, quality: 0.85, maxBytes: MAX_FUNCTION_UPLOAD_BYTES }));
       if (!prepared.file) throw new Error(profileMediaErrorText(prepared.error, t));
       const url = await sendProfileMediaFile(prepared.file);
       setCoverImageUrl(url);
@@ -1140,7 +1140,7 @@ export default function ProfilePage() {
     try {
       const preparedFiles = await Promise.all(files.map((file) => prepareProfileMediaFile(
         file,
-        (source) => compressImage(source, { maxWidth: 1600, quality: 0.82 }),
+        (source) => compressImage(source, { maxWidth: 1600, quality: 0.82, maxBytes: MAX_FUNCTION_UPLOAD_BYTES }),
       )));
       const firstFailure = preparedFiles.find((prepared) => !prepared.file);
       if (firstFailure && !firstFailure.file) throw new Error(profileMediaErrorText(firstFailure.error, t));

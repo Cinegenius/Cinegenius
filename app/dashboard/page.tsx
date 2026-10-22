@@ -18,6 +18,7 @@ import { useUser } from "@clerk/nextjs";
 import { calculateProfileCompletion } from "@/lib/profile-completion";
 import { applyReadReceiptTimestamps, incomingUnreadMessageIds } from "@/lib/message-read-state";
 import { notifyMessagesRead, subscribeToMessageReads } from "@/lib/message-read-sync";
+import { compressImage, MAX_FUNCTION_UPLOAD_BYTES } from "@/lib/compressImage";
 
 type RealMessage = {
   id: string;
@@ -248,17 +249,26 @@ export default function DashboardPage() {
 
   const uploadEditImage = async (file: File) => {
     setEditUploading(true);
+    setEditError("");
     try {
+      const compressed = await compressImage(file, { maxWidth: 1920, quality: 0.82, maxBytes: MAX_FUNCTION_UPLOAD_BYTES });
       const fd = new FormData();
-      fd.append("file", file);
+      fd.append("file", compressed);
       const r = await fetch("/api/upload", { method: "POST", body: fd });
-      const d = await r.json();
-      if (d.url) setEditForm((p) => ({ ...p, image_url: d.url }));
-    } catch { /* ignore */ } finally { setEditUploading(false); }
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || !d.url) {
+        throw new Error(r.status === 413
+          ? "Das Bild ist zu groß. Bitte wähle ein kleineres Foto."
+          : d.error ?? "Das Bild konnte nicht hochgeladen werden.");
+      }
+      setEditForm((p) => ({ ...p, image_url: d.url }));
+    } catch (cause) {
+      setEditError(cause instanceof Error ? cause.message : "Das Bild konnte nicht hochgeladen werden. Bitte versuche es erneut.");
+    } finally { setEditUploading(false); }
   };
 
   const saveEdit = async () => {
-    if (!editingId) return;
+    if (!editingId || editUploading) return;
     if (!editForm.title.trim() || !editForm.city.trim()) {
       setEditError("Titel und Stadt sind Pflichtfelder");
       return;
@@ -1812,7 +1822,7 @@ export default function DashboardPage() {
                         <label className={`flex items-center gap-2 px-3 py-2 border border-border rounded-lg text-xs text-text-secondary hover:border-gold hover:text-gold transition-colors cursor-pointer ${editUploading ? "opacity-50 pointer-events-none" : ""}`}>
                           {editUploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
                           {editUploading ? "Wird hochgeladen…" : "Bild ändern"}
-                          <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadEditImage(f); }} />
+                          <input type="file" accept="image/jpeg,image/png,image/webp,image/heic" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) void uploadEditImage(f); e.currentTarget.value = ""; }} />
                         </label>
                         {editForm.image_url && (
                           <button onClick={() => setEditForm((p) => ({ ...p, image_url: "" }))} className="text-xs text-red-400 hover:text-red-300 transition-colors">Entfernen</button>
@@ -1872,7 +1882,7 @@ export default function DashboardPage() {
                       </button>
                       <button
                         onClick={saveEdit}
-                        disabled={editSaving}
+                        disabled={editSaving || editUploading}
                         className="px-4 py-2 text-xs font-semibold bg-gold text-bg-primary rounded-lg hover:bg-gold-light transition-colors flex items-center gap-1.5 disabled:opacity-60"
                       >
                         {editSaving ? <Loader2 size={11} className="animate-spin" /> : <Save size={11} />}

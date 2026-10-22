@@ -9,7 +9,7 @@ import {
   ArrowLeft, ArrowRight, Building2, Camera, CheckCircle2, Film, ImagePlus,
   Loader2, MapPin, Package, Search, Trash2,
 } from "lucide-react";
-import { compressImage } from "@/lib/compressImage";
+import { compressImage, MAX_FUNCTION_UPLOAD_BYTES } from "@/lib/compressImage";
 import { departments, getDepartmentRoleSearchTerms } from "@/lib/departments";
 import { safeAuthRedirect } from "@/lib/auth-redirect";
 import { shouldSkipProfileSetup } from "@/lib/profile-setup-flow";
@@ -289,7 +289,7 @@ export default function ProfileSetupWizard() {
     setUploading(true);
     setError("");
     try {
-      const compressed = await compressImage(file, { maxWidth: 1920, quality: 0.82 });
+      const compressed = await compressImage(file, { maxWidth: 1920, quality: 0.82, maxBytes: MAX_FUNCTION_UPLOAD_BYTES });
       const form = new FormData();
       form.append("file", compressed);
       const response = await fetch("/api/upload", { method: "POST", body: form });
@@ -555,7 +555,7 @@ export default function ProfileSetupWizard() {
             const intent: QuickStartIntent = draft.step.startsWith("location") ? "location" : draft.step.startsWith("equipment") ? "equipment" : "company";
             const data = draft.sections[intent] ?? createQuickStartIntentData();
             return <div>
-              {data.imageUrl ? <div className="space-y-3"><Image src={data.imageUrl} alt={intent === "company" ? "Vorschau des Firmenlogos" : "Vorschau des Angebotsfotos"} width={960} height={640} sizes="(max-width: 640px) 100vw, 720px" className="max-h-64 w-full rounded-xl border border-border object-cover" /><button type="button" onClick={() => updateSection(intent, { imageUrl: "" })} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm text-text-secondary"><Trash2 size={15} /> Foto entfernen</button></div> : <label className={`flex min-h-40 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-bg-primary p-5 text-center hover:border-gold/50 ${uploading ? "pointer-events-none opacity-60" : ""}`}><ImagePlus className="text-gold" /><span className="text-sm font-medium text-text-primary">{uploading ? "Foto wird hochgeladen …" : intent === "company" ? "Logo auswählen" : "Foto auswählen"}</span><span className="text-xs text-text-muted">JPG, PNG oder WEBP</span><input type="file" accept="image/jpeg,image/png,image/webp,image/heic" className="sr-only" onChange={(event) => void upload(event.target.files?.[0], intent)} /></label>}
+              {data.imageUrl ? <div className="space-y-3"><Image src={data.imageUrl} alt={intent === "company" ? "Vorschau des Firmenlogos" : "Vorschau des Angebotsfotos"} width={960} height={640} sizes="(max-width: 640px) 100vw, 720px" className="max-h-64 w-full rounded-xl border border-border object-cover" /><button type="button" onClick={() => updateSection(intent, { imageUrl: "" })} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm text-text-secondary"><Trash2 size={15} /> Foto entfernen</button></div> : <label className={`flex min-h-40 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-bg-primary p-5 text-center hover:border-gold/50 ${uploading ? "pointer-events-none opacity-60" : ""}`}><ImagePlus className="text-gold" /><span className="text-sm font-medium text-text-primary">{uploading ? "Foto wird hochgeladen …" : intent === "company" ? "Logo auswählen" : "Foto auswählen"}</span><span className="text-xs text-text-muted">JPG, PNG, WEBP oder HEIC</span><input type="file" accept="image/jpeg,image/png,image/webp,image/heic" className="sr-only" onChange={(event) => void upload(event.target.files?.[0], intent)} /></label>}
               {uploading && <p role="status" className="mt-3 flex items-center gap-2 text-xs text-text-muted"><Loader2 size={14} className="animate-spin" /> Upload läuft …</p>}
             </div>;
           })()}

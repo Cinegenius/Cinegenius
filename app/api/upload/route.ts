@@ -15,7 +15,12 @@ export async function POST(req: NextRequest) {
   if (!allowed) return NextResponse.json({ error: "Zu viele Uploads. Bitte kurz warten." }, { status: 429 });
 
   // 3. Parse form data
-  const formData = await req.formData();
+  let formData: FormData;
+  try {
+    formData = await req.formData();
+  } catch {
+    return NextResponse.json({ error: "Die Upload-Anfrage war ungültig oder zu groß. Bitte wähle ein kleineres Foto." }, { status: 400 });
+  }
   const file = formData.get("file");
 
   if (!(file instanceof File)) {

@@ -2,7 +2,7 @@
 
 import { useState, type ChangeEvent, type Dispatch, type SetStateAction } from "react";
 import { ImagePlus, Loader2, Plus, Trash2 } from "lucide-react";
-import { compressImage } from "@/lib/compressImage";
+import { compressImage, MAX_FUNCTION_UPLOAD_BYTES } from "@/lib/compressImage";
 import {
   createProductionCreditDraft,
   PRODUCTION_FORMATS,
@@ -36,7 +36,7 @@ export function ProductionCreditsEditor({
     setUploadError("");
     try {
       for (const file of files) {
-        const compressed = await compressImage(file, { maxWidth: 1600, quality: 0.82 });
+        const compressed = await compressImage(file, { maxWidth: 1600, quality: 0.82, maxBytes: MAX_FUNCTION_UPLOAD_BYTES });
         const body = new FormData();
         body.append("file", compressed);
         const response = await fetch("/api/upload", { method: "POST", body });

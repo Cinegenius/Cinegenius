@@ -14,12 +14,16 @@
  *   overwrite attacks and path traversal.
  */
 
+import { MAX_UPLOAD_BYTES } from "./upload-limits";
+
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
 
 /** Maximum upload size in bytes. */
-export const MAX_UPLOAD_BYTES = 20 * 1024 * 1024; // 20 MB
+// Vercel rejects Function request bodies above 4.5 MB before this route runs.
+// Keep the file itself below that limit to leave room for multipart framing.
+export { MAX_UPLOAD_BYTES };
 
 /**
  * Each entry maps a canonical MIME type to:

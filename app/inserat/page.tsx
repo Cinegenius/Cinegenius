@@ -3,7 +3,7 @@
 import UnoptimizedImage from "@/components/UnoptimizedImage";
 
 import React, { useState, useRef, useEffect } from "react";
-import { compressImage, safeObjectURL } from "@/lib/compressImage";
+import { compressImage, MAX_FUNCTION_UPLOAD_BYTES, safeObjectURL } from "@/lib/compressImage";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import {
@@ -599,6 +599,7 @@ export default function InseratPage() {
   }
 
   async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const input = e.currentTarget;
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -607,21 +608,32 @@ export default function InseratPage() {
       setPendingImageFile(file);
       setImageUrl(null);
       setError("");
-      e.target.value = "";
+      input.value = "";
       return;
     }
     setUploading(true);
     setError("");
-
-    const compressed = await compressImage(file, { maxWidth: 1920, quality: 0.85 });
-    const fd = new FormData();
-    fd.append("file", compressed);
-    const res = await fetch("/api/upload", { method: "POST", body: fd });
-    const json = await res.json();
-    setUploading(false);
-
-    if (!res.ok) { setError(json.error ?? "Upload fehlgeschlagen"); setImagePreview(null); return; }
-    setImageUrl(json.url);
+    try {
+      const compressed = await compressImage(file, { maxWidth: 1920, quality: 0.85, maxBytes: MAX_FUNCTION_UPLOAD_BYTES });
+      const fd = new FormData();
+      fd.append("file", compressed);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.url) {
+        throw new Error(res.status === 413
+          ? "Das Foto war für den Upload zu groß. Bitte wähle ein kleineres Bild."
+          : json.error ?? "Das Foto konnte nicht hochgeladen werden.");
+      }
+      setImageUrl(json.url);
+      setImagePreview(json.url);
+    } catch (cause) {
+      setImageUrl(null);
+      setImagePreview(null);
+      setError(cause instanceof Error ? cause.message : "Das Foto konnte nicht hochgeladen werden. Bitte versuche es erneut.");
+    } finally {
+      setUploading(false);
+      input.value = "";
+    }
   }
 
   function removeImage() {
@@ -660,7 +672,7 @@ export default function InseratPage() {
     try {
       let response: Response;
       if (pendingImageFile) {
-        const compressed = await compressImage(pendingImageFile, { maxWidth: 1920, quality: 0.85 });
+        const compressed = await compressImage(pendingImageFile, { maxWidth: 1920, quality: 0.85, maxBytes: MAX_FUNCTION_UPLOAD_BYTES });
         const formData = new FormData();
         formData.append("file", compressed);
         response = await fetch(`/api/listings/${createdId}/publish`, { method: "POST", body: formData });
@@ -1605,7 +1617,7 @@ export default function InseratPage() {
                   </div>
                   <div className="text-center">
                     <p className="text-sm font-medium text-text-primary">Bild auswählen</p>
-                    <p className="text-xs text-text-muted mt-0.5">JPG, PNG oder WEBP · max. 10 MB</p>
+                    <p className="text-xs text-text-muted mt-0.5">JPG, PNG, WEBP oder HEIC · wird automatisch verkleinert</p>
                   </div>
                   <input
                     type="file"

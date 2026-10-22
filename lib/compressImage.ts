@@ -8,11 +8,18 @@
  * complete and the blob URL mechanism can't handle the raw bytes.
  */
 
+import { MAX_UPLOAD_BYTES } from "./upload-limits";
+
 interface CompressOptions {
   maxWidth?: number;
   maxHeight?: number;
   quality?: number; // 0–1
+  /** Keep the output below the request payload limit used by server uploads. */
+  maxBytes?: number;
 }
+
+export const MAX_FUNCTION_UPLOAD_BYTES = MAX_UPLOAD_BYTES;
+const PASSTHROUGH_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"]);
 
 function readAsDataURL(file: File | Blob): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -100,19 +107,58 @@ export async function compressImage(
   options: CompressOptions = {},
 ): Promise<File> {
   const { maxWidth = 1920, maxHeight = 1920, quality = 0.82 } = options;
+  const { maxBytes } = options;
+
+  if (maxBytes !== undefined && file.size <= maxBytes && file instanceof File && PASSTHROUGH_MIME_TYPES.has(file.type)) {
+    return file;
+  }
 
   try {
-    return await tryCompress(file, maxWidth, maxHeight, quality);
-  } catch {
-    // Compression failed — upload original. Server validates size + magic bytes.
-    if (file instanceof File) return file;
-    return new File([file], "image.jpg", { type: "image/jpeg" });
+    if (maxBytes === undefined) {
+      return await tryCompress(file, maxWidth, maxHeight, quality);
+    }
+
+    // Vercel Functions reject request bodies larger than 4.5 MB before our
+    // upload route can respond. Leave room for multipart boundaries and
+    // progressively reduce dimensions/quality until the file is safely below
+    // the shared 4 MB upload cap.
+    const attempts = [
+      { scale: 1, quality },
+      { scale: 1, quality: Math.min(quality, 0.72) },
+      { scale: 0.85, quality: Math.min(quality, 0.68) },
+      { scale: 0.7, quality: Math.min(quality, 0.62) },
+      { scale: 0.55, quality: Math.min(quality, 0.56) },
+      { scale: 0.45, quality: Math.min(quality, 0.5) },
+    ];
+
+    for (const attempt of attempts) {
+      const compressed = await tryCompress(
+        file,
+        Math.max(320, Math.round(maxWidth * attempt.scale)),
+        Math.max(320, Math.round(maxHeight * attempt.scale)),
+        attempt.quality,
+      );
+      if (compressed.size <= maxBytes) return compressed;
+    }
+
+    throw new Error("Bild überschreitet Uploadgröße");
+  } catch (cause) {
+    // Keep the legacy fallback only when no request-body limit is configured.
+    if (maxBytes === undefined) {
+      if (file instanceof File) return file;
+      return new File([file], "image.jpg", { type: "image/jpeg" });
+    }
+    if (file instanceof File && file.size <= maxBytes && PASSTHROUGH_MIME_TYPES.has(file.type)) return file;
+    if (cause instanceof Error && cause.message === "Bild überschreitet Uploadgröße") {
+      throw new Error("Das Foto ist zu groß für den Upload. Bitte wähle ein kleineres Bild oder exportiere es als JPG, PNG oder WEBP.");
+    }
+    throw new Error("Das Foto konnte im Browser nicht verkleinert werden. Bitte wähle ein kleineres JPG-, PNG- oder WEBP-Bild.");
   }
 }
 
 /** Convenience wrapper for avatar uploads — smaller max size. */
 export function compressAvatar(file: File | Blob): Promise<File> {
-  return compressImage(file, { maxWidth: 500, maxHeight: 500, quality: 0.88 });
+  return compressImage(file, { maxWidth: 500, maxHeight: 500, quality: 0.88, maxBytes: MAX_FUNCTION_UPLOAD_BYTES });
 }
 
 /**
