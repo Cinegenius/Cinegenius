@@ -459,6 +459,14 @@ export default function ProfilePage() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [activeTab, setActiveTab] = useState("profile");
+  useEffect(() => {
+    const requestedTab = new URLSearchParams(window.location.search).get("tab");
+    if (requestedTab && TAB_IDS.some(({ id }) => id === requestedTab)) setActiveTab(requestedTab);
+  }, []);
+  const selectProfileTab = (tab: string) => {
+    setActiveTab(tab);
+    router.replace(`/profile?tab=${encodeURIComponent(tab)}`, { scroll: false });
+  };
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileLoadError, setProfileLoadError] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<ProfileSaveFieldErrors>({});
@@ -1461,15 +1469,16 @@ export default function ProfilePage() {
             {/* Mobile: one compact, fully visible selector instead of a clipped tab row */}
             <label className="mb-4 block lg:hidden">
               <span className="sr-only">Profilbereich auswählen</span>
-              <select value={activeTab} onChange={(event) => setActiveTab(event.target.value as typeof activeTab)}
+              <select value={activeTab} onChange={(event) => selectProfileTab(event.target.value)}
                 className="min-h-11 w-full rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary focus:border-gold focus:outline-none">
                 {TAB_IDS.map(({ id, labelKey }) => <option key={id} value={id}>{t(labelKey as Parameters<typeof t>[0])}</option>)}
               </select>
             </label>
             {/* Desktop: vertical nav */}
-            <nav className="hidden lg:block space-y-1">
+            <nav aria-label="Profil- und Kontobereiche" className="hidden lg:block space-y-1">
+              <p className="px-4 pb-2 text-[11px] font-semibold uppercase tracking-widest text-text-muted">Profil &amp; Konto</p>
               {TAB_IDS.map(({ id, labelKey, icon: Icon }) => (
-                <button key={id} onClick={() => setActiveTab(id)}
+                <button key={id} onClick={() => selectProfileTab(id)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-left ${
                     activeTab === id
                       ? "bg-gold/10 text-gold border border-gold/20"

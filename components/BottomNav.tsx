@@ -28,6 +28,8 @@ export default function BottomNav() {
 
   if (pathname.startsWith("/dashboard")) return null;
   if (pathname.startsWith("/profile-setup")) return null;
+  if (pathname === "/profile") return null;
+  if (["/messages", "/favorites", "/notifications", "/invoices", "/company-dashboard"].includes(pathname)) return null;
   if (pathname.startsWith("/sign-in")) return null;
   if (pathname.startsWith("/sign-up")) return null;
   if (pathname.startsWith("/messages") && chatOpen) return null;

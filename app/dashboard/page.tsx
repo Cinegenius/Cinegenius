@@ -3,13 +3,13 @@
 import UnoptimizedImage from "@/components/UnoptimizedImage";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
-  LayoutDashboard, List, Calendar, MessageSquare,
-  BarChart2, Settings, Plus, Eye,
+  List, Calendar, MessageSquare,
+  BarChart2, Plus, Eye,
   Briefcase, CheckCircle, ChevronRight, ExternalLink,
-  User, Wallet, ArrowDownCircle, Receipt, Send,
+  User, ArrowDownCircle, Receipt, Send,
   Pencil, Save, Loader2, Upload, Heart, MapPin, Car, Package, Trash2,
   Users, UserPlus, Check, X, Globe, Lock, Clock, ShieldCheck,
   Building2, AlertCircle, FileText, ArrowLeft, Search,
@@ -66,29 +66,14 @@ type IncomingBooking = Booking & {
   booker_name: string;
 };
 
-const navItems = [
-  { icon: LayoutDashboard, label: "Übersicht",      id: "overview" },
-  { icon: User,            label: "Mein Profil",    id: "profil" },
-  { icon: Building2,       label: "Meine Firma",    id: "firma" },
-  { icon: List,            label: "Meine Inserate", id: "listings" },
-  { icon: Briefcase,       label: "Jobs verwalten", id: "jobs" },
-  { icon: Heart,           label: "Merkliste",      id: "favorites" },
-  { icon: Users,           label: "Freunde",        id: "friends" },
-  { icon: MessageSquare,   label: "Nachrichten",    id: "messages" },
-  { icon: Calendar,        label: "Buchungen",      id: "bookings" },
-  { icon: Wallet,          label: "Einnahmen",      id: "earnings" },
-  { icon: ArrowDownCircle, label: "Auszahlungen",   id: "payouts" },
-  { icon: Receipt,         label: "Transaktionen",  id: "transactions" },
-  { icon: BarChart2,       label: "Analysen",       id: "analytics" },
-  { icon: Settings,        label: "Einstellungen",  id: "settings" },
-];
+const VALID_TABS = ["overview", "listings", "jobs", "favorites", "messages", "bookings", "earnings", "payouts", "transactions", "friends", "firma", "settings", "analytics"];
 
 
 export default function DashboardPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const isWelcome = searchParams.get("welcome") === "1";
 
-  const VALID_TABS = ["overview","listings","jobs","favorites","messages","bookings","earnings","transactions","friends","firma","settings","analytics"];
   const tabParam = searchParams.get("tab") ?? "";
   const [activeTab, setActiveTab] = useState(VALID_TABS.includes(tabParam) ? tabParam : "overview");
   const [onboardingDismissed, setOnboardingDismissed] = useState(false);
@@ -110,6 +95,19 @@ export default function DashboardPage() {
   const [viewStats, setViewStats] = useState<{ views7: number; views14: number; trend: number; daily: number[] } | null>(null);
   const [photoStats, setPhotoStats] = useState<{ total: number; avg: number; best: string | null } | null>(null);
   const { user } = useUser();
+
+  useEffect(() => {
+    if (tabParam === "profil") {
+      router.replace("/profile");
+      return;
+    }
+    setActiveTab(VALID_TABS.includes(tabParam) ? tabParam : "overview");
+  }, [router, tabParam]);
+
+  const navigateDashboardTab = (tab: string) => {
+    setActiveTab(tab);
+    router.replace(`/dashboard?tab=${encodeURIComponent(tab)}`, { scroll: false });
+  };
 
   useEffect(() => {
     // Profile + Completeness
@@ -524,16 +522,6 @@ export default function DashboardPage() {
     }
   };
 
-  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
-
-  const bottomNavItems = [
-    { icon: LayoutDashboard, label: "Übersicht",   id: "overview" },
-    { icon: User,            label: "Profil",       id: "profil" },
-    { icon: MessageSquare,   label: "Nachrichten",  id: "messages" },
-    { icon: List,            label: "Inserate",     id: "listings" },
-  ];
-  const moreNavItems = navItems.filter(n => !bottomNavItems.some(b => b.id === n.id));
-
   const [conversations, setConversations] = useState<RealConversation[]>([]);
   const [convsLoading, setConvsLoading] = useState(false);
   const [conversationsReady, setConversationsReady] = useState(false);
@@ -736,15 +724,15 @@ export default function DashboardPage() {
 
   const tabTitle = () => {
     const map: Record<string, string> = {
-      overview: "Dashboard-Übersicht",
+      overview: "Übersicht",
       profil: "Mein Profil",
       firma: "Meine Firma",
-      listings: "Meine Inserate",
-      jobs: "Jobs verwalten",
+      listings: "Meine Angebote",
+      jobs: "Meine Angebote",
       bookings: "Buchungen",
-      earnings: "Einnahmen",
-      payouts: "Auszahlungen",
-      transactions: "Transaktionen",
+      earnings: "Zahlungen",
+      payouts: "Zahlungen",
+      transactions: "Zahlungen",
       messages: "Nachrichten",
       analytics: "Analysen",
       favorites: "Merkliste",
@@ -756,107 +744,42 @@ export default function DashboardPage() {
 
   return (
     <div className="pt-16 min-h-screen flex w-full min-w-0">
-      {/* Sidebar */}
-      <aside className="hidden lg:flex w-60 border-r border-border bg-bg-secondary flex-col fixed left-0 top-16 bottom-0 z-40">
-        {/* Profil-Karte */}
-        <div className="p-4 border-b border-border">
-          {/* Avatar + Name */}
-          {(() => {
-            const avatarSrc = profileAvatarUrl || user?.imageUrl || "";
-            const displayName = profileDisplayName || (user ? [user.firstName, user.lastName].filter(Boolean).join(" ") : "") || user?.emailAddresses[0]?.emailAddress?.split("@")[0] || "—";
-            const initial = displayName[0]?.toUpperCase() ?? "?";
-            return (
-              <div className="flex items-center gap-3 mb-3">
-                {avatarSrc ? (
-                  <UnoptimizedImage src={avatarSrc} alt="" className="w-12 h-12 rounded-full object-cover border-2 border-border shrink-0" />
-                ) : (
-                  <div className="w-12 h-12 rounded-full bg-gold/20 border-2 border-gold/30 flex items-center justify-center shrink-0">
-                    <span className="text-gold font-bold text-base">{initial}</span>
-                  </div>
-                )}
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-text-primary truncate leading-tight">{displayName}</p>
-                  <p className="text-xs text-text-muted truncate mt-0.5">{profileRole || "CineGenius Mitglied"}</p>
-                </div>
-              </div>
-            );
-          })()}
-          {/* Profil-Buttons */}
-          <div className="grid grid-cols-2 gap-1.5">
-            <Link
-              href={user?.id ? `/profile/${user.id}` : "/profile"}
-              className="flex items-center justify-center gap-1 px-2 py-1.5 text-[11px] font-medium border border-border text-text-secondary rounded-md hover:border-gold hover:text-gold transition-all"
-            >
-              <Eye size={10} /> Ansehen
-            </Link>
-            <Link
-              href="/profile"
-              className="flex items-center justify-center gap-1 px-2 py-1.5 text-[11px] font-medium border border-gold/30 text-gold bg-gold/5 rounded-md hover:bg-gold/15 transition-all"
-            >
-              <Pencil size={10} /> Bearbeiten
-            </Link>
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 min-h-0 p-3 space-y-1 overflow-y-auto">
-          {navItems.map(({ icon: Icon, label, id }) => (
-            <button
-              key={id}
-              onClick={() => setActiveTab(id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                activeTab === id
-                  ? "bg-gold-subtle text-gold border-l-2 border-gold pl-2.5"
-                  : "text-text-secondary hover:text-text-primary hover:bg-bg-elevated"
-              }`}
-            >
-              <Icon size={16} />
-              {label}
-              {id === "messages" && conversationsReady && unreadCount > 0 && (
-                <span className="ml-auto w-5 h-5 bg-crimson text-white text-xs rounded-full flex items-center justify-center">
-                  {unreadCount}
-                </span>
-              )}
-              {id === "bookings" && incomingBookings.filter(b => b.status === "pending").length > 0 && (
-                <span className="ml-auto w-5 h-5 bg-gold text-bg-primary text-xs rounded-full flex items-center justify-center">
-                  {incomingBookings.filter(b => b.status === "pending").length}
-                </span>
-              )}
-              {id === "favorites" && favorites.length > 0 && (
-                <span className="ml-auto text-[10px] text-text-muted font-medium">{favorites.length}</span>
-              )}
-              {id === "friends" && friendsIncoming.length > 0 && (
-                <span className="ml-auto w-5 h-5 bg-gold text-bg-primary text-xs rounded-full flex items-center justify-center">
-                  {friendsIncoming.length}
-                </span>
-              )}
-            </button>
-          ))}
-        </nav>
-
-        <div className="p-3 border-t border-border">
-          <div className="p-3 bg-success/10 border border-success/20 rounded-lg">
-            <p className="text-xs font-semibold text-success mb-1 flex items-center gap-1">
-              <CheckCircle size={11} /> Kostenlos nutzen
-            </p>
-            <p className="text-xs text-text-muted">Immer kostenlos</p>
-          </div>
-        </div>
-      </aside>
-
       {/* Hauptinhalt */}
-      <div className="min-w-0 flex-1 lg:ml-60">
+      <div className="min-w-0 flex-1">
         {/* Top-Leiste */}
-        <div className="sticky top-16 z-30 bg-bg-primary/80 backdrop-blur-nav border-b border-border px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+        <div className="sticky top-16 z-30 bg-bg-primary/80 backdrop-blur-nav border-b border-border px-4 sm:px-6 py-3 flex items-center justify-between gap-3 lg:top-28">
           <h1 className="font-display text-sm sm:text-base font-bold text-text-primary truncate">{tabTitle()}</h1>
           <div className="flex items-center gap-2 shrink-0">
             <Link href="/inserat" className="px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg flex items-center gap-1.5 hover:bg-gold-light transition-colors whitespace-nowrap">
-              <Plus size={13} /> <span className="hidden sm:inline">Neues </span>Inserat
+              <Plus size={13} /> <span className="hidden sm:inline">Neues </span>Angebot
             </Link>
           </div>
         </div>
 
-        {/* Mobile: no top tab bar — navigation is in the bottom nav below */}
+        {(activeTab === "listings" || activeTab === "jobs") && (
+          <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3 sm:px-6">
+            <button onClick={() => navigateDashboardTab("listings")} className={`min-h-10 rounded-lg border px-3 text-sm font-medium transition-colors ${activeTab === "listings" ? "border-gold/40 bg-gold/10 text-gold" : "border-border text-text-secondary hover:text-text-primary"}`}>Inserate</button>
+            <button onClick={() => navigateDashboardTab("jobs")} className={`min-h-10 rounded-lg border px-3 text-sm font-medium transition-colors ${activeTab === "jobs" ? "border-gold/40 bg-gold/10 text-gold" : "border-border text-text-secondary hover:text-text-primary"}`}>Jobanzeigen</button>
+            <Link href="/company-dashboard" className="ml-auto inline-flex min-h-10 items-center gap-2 rounded-lg border border-border px-3 text-sm text-text-secondary transition-colors hover:border-gold/40 hover:text-gold">
+              <Building2 size={15} /> Firma verwalten
+            </Link>
+          </div>
+        )}
+
+        {(activeTab === "earnings" || activeTab === "payouts" || activeTab === "transactions") && (
+          <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3 sm:px-6">
+            {[
+              { id: "earnings", label: "Einnahmen" },
+              { id: "payouts", label: "Auszahlungen" },
+              { id: "transactions", label: "Transaktionen" },
+            ].map(({ id, label }) => (
+              <button key={id} onClick={() => navigateDashboardTab(id)} className={`min-h-10 rounded-lg border px-3 text-sm font-medium transition-colors ${activeTab === id ? "border-gold/40 bg-gold/10 text-gold" : "border-border text-text-secondary hover:text-text-primary"}`}>{label}</button>
+            ))}
+            <Link href="/invoices" className="ml-auto inline-flex min-h-10 items-center gap-2 rounded-lg border border-border px-3 text-sm text-text-secondary transition-colors hover:border-gold/40 hover:text-gold">
+              <Receipt size={15} /> Rechnungsübersicht
+            </Link>
+          </div>
+        )}
 
         <div className="min-w-0 w-full p-4 sm:p-6 pb-24 lg:pb-6">
           {/* ── ÜBERSICHT ── */}
@@ -872,6 +795,32 @@ export default function DashboardPage() {
                   {new Date().toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" })}
                 </p>
               </div>
+
+              {(unreadCount > 0 || incomingBookings.some((booking) => booking.status === "pending") || profileMissingFields.length > 0) && (
+                <section aria-label="Nächste Aufgaben" className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                  {unreadCount > 0 && (
+                    <Link href="/messages" className="flex min-h-20 items-center gap-3 rounded-xl border border-gold/30 bg-gold/5 p-4 transition-colors hover:border-gold/60">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold/10 text-gold"><MessageSquare size={18} /></span>
+                      <span className="min-w-0"><span className="block text-sm font-semibold text-text-primary">{unreadCount} neue Nachricht{unreadCount === 1 ? "" : "en"}</span><span className="block text-xs text-text-muted">Öffnen und antworten</span></span>
+                      <ChevronRight size={15} className="ml-auto shrink-0 text-gold" />
+                    </Link>
+                  )}
+                  {incomingBookings.some((booking) => booking.status === "pending") && (
+                    <button onClick={() => navigateDashboardTab("bookings")} className="flex min-h-20 items-center gap-3 rounded-xl border border-border bg-bg-secondary p-4 text-left transition-colors hover:border-gold/40">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold/10 text-gold"><Calendar size={18} /></span>
+                      <span className="min-w-0"><span className="block text-sm font-semibold text-text-primary">Offene Anfragen</span><span className="block text-xs text-text-muted">Buchungen prüfen</span></span>
+                      <ChevronRight size={15} className="ml-auto shrink-0 text-text-muted" />
+                    </button>
+                  )}
+                  {profileMissingFields.length > 0 && (
+                    <Link href="/profile" className="flex min-h-20 items-center gap-3 rounded-xl border border-border bg-bg-secondary p-4 transition-colors hover:border-gold/40">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold/10 text-gold"><User size={18} /></span>
+                      <span className="min-w-0"><span className="block text-sm font-semibold text-text-primary">Profil ergänzen</span><span className="block truncate text-xs text-text-muted">Als Nächstes: {profileMissingFields[0]}</span></span>
+                      <ChevronRight size={15} className="ml-auto shrink-0 text-text-muted" />
+                    </Link>
+                  )}
+                </section>
+              )}
 
               {/* ── Onboarding Checklist ── */}
               {!onboardingDismissed && !listingsLoading && (isWelcome || (profileCompleteness < 70 && myListings.length === 0)) && (
@@ -1038,7 +987,7 @@ export default function DashboardPage() {
                 </Link>
               ) : conversationsReady && unreadCount > 0 ? (
                 <button
-                  onClick={() => setActiveTab("messages")}
+                  onClick={() => navigateDashboardTab("messages")}
                   className="group w-full flex items-center gap-5 p-6 rounded-2xl border-2 border-gold/40 bg-gold-subtle hover:border-gold hover:bg-gold/10 transition-all text-left"
                 >
                   <div className="w-14 h-14 rounded-xl bg-gold text-bg-primary flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform relative">
@@ -1094,10 +1043,10 @@ export default function DashboardPage() {
               {/* ── Meine Inserate ── */}
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-display text-lg font-bold text-text-primary">Meine Inserate</h3>
+                  <h3 className="font-display text-lg font-bold text-text-primary">Meine Angebote</h3>
                   <div className="flex items-center gap-2">
                     {myListings.length > 0 && (
-                      <button onClick={() => setActiveTab("listings")} className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">
+                      <button onClick={() => navigateDashboardTab("listings")} className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">
                         Alle verwalten <ChevronRight size={12} />
                       </button>
                     )}
@@ -1160,7 +1109,7 @@ export default function DashboardPage() {
                       </Link>
                     ))}
                     {myListings.length > 4 && (
-                      <button onClick={() => setActiveTab("listings")} className="w-full py-3 rounded-xl border border-dashed border-border text-xs text-text-muted hover:border-gold hover:text-gold transition-colors">
+                      <button onClick={() => navigateDashboardTab("listings")} className="w-full py-3 rounded-xl border border-dashed border-border text-xs text-text-muted hover:border-gold hover:text-gold transition-colors">
                         + {myListings.length - 4} weitere Inserate anzeigen
                       </button>
                     )}
@@ -1178,7 +1127,7 @@ export default function DashboardPage() {
                     )}
                   </h3>
                   {conversations.length > 0 && (
-                    <button onClick={() => setActiveTab("messages")} className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">
+                    <button onClick={() => navigateDashboardTab("messages")} className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">
                       Alle öffnen <ChevronRight size={12} />
                     </button>
                   )}
@@ -1211,7 +1160,7 @@ export default function DashboardPage() {
                       return (
                         <button
                           key={conv.id}
-                          onClick={() => { setActiveTab("messages"); setSelectedConversation(conv.id); }}
+                          onClick={() => { navigateDashboardTab("messages"); setSelectedConversation(conv.id); }}
                           className="w-full flex items-center gap-4 px-5 py-4 hover:bg-bg-elevated transition-colors text-left"
                         >
                           <div className="relative shrink-0">
@@ -1249,9 +1198,9 @@ export default function DashboardPage() {
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-display text-lg font-bold text-text-primary">Firmenprofil</h3>
-                  <button onClick={() => setActiveTab("firma")} className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">
+                  <Link href="/company-dashboard" className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">
                     Verwalten <ChevronRight size={12} />
-                  </button>
+                  </Link>
                 </div>
                 {myCompany === "loading" && (
                   <div className="flex items-center gap-3 text-sm text-text-muted py-4">
@@ -1259,7 +1208,7 @@ export default function DashboardPage() {
                   </div>
                 )}
                 {myCompany === null && (
-                  <button onClick={() => setActiveTab("firma")}
+                  <Link href="/company-setup"
                     className="group flex items-center gap-4 w-full p-4 rounded-xl border border-dashed border-border hover:border-gold/40 hover:bg-bg-elevated transition-all text-left">
                     <div className="w-10 h-10 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shrink-0">
                       <Building2 size={18} className="text-text-muted group-hover:text-gold transition-colors" />
@@ -1269,7 +1218,7 @@ export default function DashboardPage() {
                       <p className="text-xs text-text-muted mt-0.5">Firmenprofil erstellen → Werde sichtbar für Produktionen</p>
                     </div>
                     <ChevronRight size={14} className="text-text-muted group-hover:text-gold transition-colors ml-auto shrink-0" />
-                  </button>
+                  </Link>
                 )}
                 {myCompany && myCompany !== "loading" && (
                   <div className="flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 hover:bg-bg-elevated transition-all">
@@ -1288,7 +1237,7 @@ export default function DashboardPage() {
                       {myCompany.city && <p className="text-xs text-text-muted">{myCompany.city}</p>}
                     </div>
                     <div className="flex flex-col gap-1.5 shrink-0">
-                      <button onClick={() => setActiveTab("firma")} className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all">Verwalten</button>
+                      <Link href="/company-dashboard" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all">Verwalten</Link>
                       <a href={`/companies/${myCompany.slug}`} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all text-center flex items-center gap-1 justify-center">
                         <ExternalLink size={10} /> Ansehen
                       </a>
@@ -1309,7 +1258,7 @@ export default function DashboardPage() {
                   ].map(({ icon: Icon, label, sub, id }) => (
                     <button
                       key={id}
-                      onClick={() => setActiveTab(id)}
+                      onClick={() => id === "profil" ? router.push("/profile") : navigateDashboardTab(id)}
                       className="flex flex-col items-start gap-2 p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/40 hover:bg-bg-elevated transition-all text-left"
                     >
                       <div className="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center">
@@ -1354,7 +1303,7 @@ export default function DashboardPage() {
                         </Link>
                         <Link href={user?.id ? `/profile/${user.id}` : "/profile"} target="_blank" rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-colors">
-                          <ExternalLink size={12} /> Öffentlich ansehen
+                          <ExternalLink size={12} /> Öffentliches Profil ansehen
                         </Link>
                       </div>
                     </div>
@@ -2572,7 +2521,7 @@ export default function DashboardPage() {
                       href={user?.id ? `/profile/${user.id}` : "/profile"}
                       className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-colors"
                     >
-                      <ExternalLink size={12} /> Öffentlich ansehen
+                      <ExternalLink size={12} /> Öffentliches Profil ansehen
                     </Link>
                   </div>
                 </div>
@@ -3056,91 +3005,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ── Mobile Bottom Navigation ── */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-bg-secondary border-t border-border safe-area-pb">
-        <div className="flex items-stretch h-16">
-          {bottomNavItems.map(({ icon: Icon, label, id }) => (
-            <button
-              key={id}
-              onClick={() => { setActiveTab(id); setMobileMoreOpen(false); }}
-              className={`flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors relative ${
-                activeTab === id && !mobileMoreOpen ? "text-gold" : "text-text-muted"
-              }`}
-            >
-              <div className="relative">
-                <Icon size={20} />
-                {id === "messages" && conversationsReady && unreadCount > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-crimson text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                    {unreadCount}
-                  </span>
-                )}
-              </div>
-              <span className="text-[10px] font-medium leading-none">{label}</span>
-              {activeTab === id && !mobileMoreOpen && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-gold rounded-full" />
-              )}
-            </button>
-          ))}
-          {/* Mehr Button */}
-          <button
-            onClick={() => setMobileMoreOpen(v => !v)}
-            className={`flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors relative ${
-              mobileMoreOpen ? "text-gold" : "text-text-muted"
-            }`}
-          >
-            <div className="relative">
-              <Settings size={20} />
-              {friendsIncoming.length > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-gold text-bg-primary text-[9px] font-bold rounded-full flex items-center justify-center">
-                  {friendsIncoming.length}
-                </span>
-              )}
-            </div>
-            <span className="text-[10px] font-medium leading-none">Mehr</span>
-            {mobileMoreOpen && (
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-gold rounded-full" />
-            )}
-          </button>
-        </div>
-      </nav>
-
-      {/* ── Mobile "Mehr" Drawer ── */}
-      {mobileMoreOpen && (
-        <>
-          <div
-            className="lg:hidden fixed inset-0 z-40 bg-black/50"
-            onClick={() => setMobileMoreOpen(false)}
-          />
-          <div className="lg:hidden fixed bottom-16 left-0 right-0 z-50 bg-bg-secondary border-t border-border rounded-t-2xl shadow-2xl safe-area-pb">
-            <div className="p-4">
-              <div className="w-10 h-1 bg-border rounded-full mx-auto mb-4" />
-              <div className="grid grid-cols-3 gap-2">
-                {moreNavItems.map(({ icon: Icon, label, id }) => (
-                  <button
-                    key={id}
-                    onClick={() => { setActiveTab(id); setMobileMoreOpen(false); }}
-                    className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all ${
-                      activeTab === id
-                        ? "border-gold bg-gold/10 text-gold"
-                        : "border-border bg-bg-elevated text-text-secondary"
-                    }`}
-                  >
-                    <div className="relative">
-                      <Icon size={20} />
-                      {id === "friends" && friendsIncoming.length > 0 && (
-                        <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-gold text-bg-primary text-[9px] font-bold rounded-full flex items-center justify-center">
-                          {friendsIncoming.length}
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-[11px] font-medium leading-tight text-center">{label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </>
-      )}
 
     </div>
   );

@@ -15,6 +15,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useTranslations } from "next-intl";
 import { useToast } from "@/contexts/ToastContext";
 import { subscribeToMessageReads } from "@/lib/message-read-sync";
+import { publishUnreadCount } from "@/lib/unread-count-store";
 
 const desktopNavHrefs = [
   { href: "/locations", key: "locations" },
@@ -48,6 +49,10 @@ export default function Navbar({ initialIsSignedIn = false }: { initialIsSignedI
   const hasSignedInSession = isLoaded ? !!isSignedIn : initialIsSignedIn;
   const profileDisplayName = profileData?.userId === activeUserId ? profileData?.displayName ?? "" : "";
   const unreadMessages = unreadData?.userId === activeUserId ? unreadData?.count ?? 0 : 0;
+
+  useEffect(() => {
+    publishUnreadCount(activeUserId ?? null, unreadMessages);
+  }, [activeUserId, unreadMessages]);
 
   const closeAll = () => { setUserMenuOpen(false); };
 
@@ -269,7 +274,7 @@ export default function Navbar({ initialIsSignedIn = false }: { initialIsSignedI
                             onClick={() => setUserMenuOpen(false)}
                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
                           >
-                            <LayoutDashboard size={15} className="text-text-muted shrink-0" /> {t("dashboard")}
+                            <LayoutDashboard size={15} className="text-text-muted shrink-0" /> {t("personalArea")}
                           </Link>
                           <Link
                             href="/messages"
@@ -289,7 +294,7 @@ export default function Navbar({ initialIsSignedIn = false }: { initialIsSignedI
                             onClick={() => setUserMenuOpen(false)}
                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
                           >
-                            <User size={15} className="text-text-muted shrink-0" /> {t("myProfile")}
+                            <User size={15} className="text-text-muted shrink-0" /> {t("publicProfile")}
                           </Link>
                         </div>
 
@@ -341,8 +346,8 @@ export default function Navbar({ initialIsSignedIn = false }: { initialIsSignedI
                     <Link
                       href="/dashboard"
                       className="w-9 h-9 rounded-full border border-gold/30 shrink-0 flex items-center justify-center bg-gold/10"
-                      title="Mein Profil"
-                      aria-label="Mein Profil"
+                      title={t("personalArea")}
+                      aria-label={t("personalArea")}
                     >
                       <User size={18} className="text-gold" aria-hidden="true" />
                     </Link>
@@ -386,11 +391,11 @@ export default function Navbar({ initialIsSignedIn = false }: { initialIsSignedI
               {/* Account links */}
               <div className="space-y-1">
                 {[
-                  { href: "/dashboard",     icon: LayoutDashboard, label: t("dashboard")      },
-                  { href: "/dashboard",     icon: Film,            label: t("myListings")      },
+                  { href: "/dashboard",     icon: LayoutDashboard, label: t("personalArea")    },
+                  { href: "/dashboard?tab=listings", icon: Film,    label: t("myOffers")        },
                   { href: "/messages",      icon: MessageSquare,   label: t("messages")        },
                   { href: "/notifications", icon: Bell,            label: t("notifications")   },
-                  { href: user?.id ? `/profile/${user.id}` : "/profile", icon: User, label: t("myProfile") },
+                  { href: user?.id ? `/profile/${user.id}` : "/profile", icon: User, label: t("publicProfile") },
                 ].map(({ href, icon: Icon, label }) => (
                   <Link
                     key={label}

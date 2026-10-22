@@ -19,6 +19,7 @@ import CookieBanner from "@/components/CookieBanner";
 import { ToastProvider } from "@/contexts/ToastContext";
 import GlobalSearch from "@/components/GlobalSearch";
 import AuthSessionBoundary from "@/components/AuthSessionBoundary";
+import PersonalAreaNavigation from "@/components/PersonalAreaNavigation";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -139,7 +140,9 @@ export default async function RootLayout({
                 <PresencePing />
                 <GlobalSearch />
                 <Navbar initialIsSignedIn={!!userId} />
-                <main className="flex-1 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">{children}</main>
+                <main className="flex-1 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
+                  <PersonalAreaNavigation>{children}</PersonalAreaNavigation>
+                </main>
                 <Footer />
                 <CookieBanner />
                 <BottomNav />
