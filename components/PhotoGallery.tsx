@@ -8,7 +8,7 @@ import { DiscoverPhoto, PhotoDialog } from "@/components/HomePhotoDiscovery";
 import { photoHref } from "@/lib/photo-link";
 import PhotoLikeButton from "@/components/PhotoLikeButton";
 
-type GalleryItem = DiscoverPhoto & { aspectClass?: string };
+type GalleryItem = DiscoverPhoto;
 
 export function PhotoGallery({
   items,
@@ -34,31 +34,30 @@ export function PhotoGallery({
     <>
       {selectedPhoto && <PhotoDialog photo={selectedPhoto} onClose={closePhoto} resumeLike={resumeLike} />}
       {items.length > 0 ? (
-        <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {items.map((item, index) => (
-              <article key={`${item.profileId}-${item.imageUrl}`} className={`group relative overflow-hidden rounded-xl border border-border bg-bg-elevated ${item.aspectClass ?? "aspect-[4/3]"}`}>
+        <section aria-label="Öffentliche Portfoliofotos" className="site-container pb-24">
+          <div role="list" className="columns-2 gap-3 sm:gap-4 md:columns-3 xl:columns-4">
+            {items.map((item) => (
+              <article role="listitem" key={`${item.profileId}-${item.imageUrl}`} className="group relative mb-3 inline-block w-full break-inside-avoid overflow-hidden rounded-xl border border-border bg-bg-elevated sm:mb-4">
                 <Link
                   href={photoHref(item.profileId, item.imageUrl)}
                   onClick={() => { try { sessionStorage.setItem("cinegenius-photo-return", "1"); } catch {} }}
-                  aria-label={`Foto von ${item.author} öffnen`}
-                  className="absolute inset-0 z-0"
+                  aria-label={`Foto von ${item.author} öffnen${item.caption ? `: ${item.caption}` : ""}`}
+                  className="relative block focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold focus-visible:outline-offset-2"
                 >
-                  <Image src={item.imageUrl} alt={item.caption || item.author} fill sizes="(max-width:640px) 50vw,(max-width:1024px) 33vw,25vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-70 group-hover:opacity-100" />
-                  <div className="absolute bottom-0 left-0 right-0 p-3 pr-14 text-white">
-                    <p className="truncate text-xs font-semibold">{item.author}</p>
-                    <p className="mt-0.5 line-clamp-1 text-[10px] text-white/75">{item.caption || "Portfoliofoto"}</p>
+                  <Image src={item.imageUrl} alt={item.caption || `Foto von ${item.author}`} width={1200} height={900} sizes="(max-width:767px) 50vw,(max-width:1279px) 33vw,25vw" className="block h-auto w-full transition-transform duration-500 group-hover:scale-105" />
+                  <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-70 transition-opacity group-hover:opacity-100" />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3 text-white sm:p-4">
+                    <p className="line-clamp-2 break-words text-xs font-semibold sm:text-sm">{item.author}</p>
+                    <p className="mt-1 line-clamp-2 break-words text-[11px] text-white/80 sm:text-xs">{item.caption || "Portfoliofoto"}</p>
                   </div>
                 </Link>
                 <PhotoLikeButton profileId={item.profileId} imageUrl={item.imageUrl} initialCount={item.likeCount ?? 0} initialLiked={item.likedByMe ?? false} className="absolute right-2 top-2 z-10" />
-                <span className="sr-only">Foto {index + 1}</span>
               </article>
             ))}
           </div>
         </section>
       ) : (
-        <section className="mx-auto max-w-7xl px-4 pb-24 text-center sm:px-6 lg:px-8">
+        <section className="site-container pb-24 text-center">
           <p className="rounded-xl border border-border bg-bg-secondary/70 px-4 py-8 text-sm text-text-muted">Noch keine öffentlichen Portfoliofotos zum Entdecken vorhanden.</p>
         </section>
       )}

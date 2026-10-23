@@ -20,10 +20,7 @@ type RawProfile = Record<string, any>;
 
 interface GridItem extends DiscoverPhoto {
   photographerCity?: string;
-  aspectClass: string;
 }
-
-const ASPECT_CYCLE = ["aspect-square", "aspect-[3/4]", "aspect-[4/3]", "aspect-[3/4]", "aspect-square", "aspect-[4/3]"];
 
 export default async function PhotoPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const params = await searchParams;
@@ -65,7 +62,6 @@ export default async function PhotoPage({ searchParams }: { searchParams: Promis
         likeCount: 0,
         likedByMe: false,
         photographerCity: typeof profile.location === "string" ? profile.location.split(",")[0]?.trim() : undefined,
-        aspectClass: ASPECT_CYCLE[candidates.length % ASPECT_CYCLE.length],
       });
     }
   }
@@ -96,10 +92,10 @@ export default async function PhotoPage({ searchParams }: { searchParams: Promis
       <Image src="/photo-bg.jpg" alt="" fill priority unoptimized className="object-cover object-top" />
       <div className="absolute inset-0 bg-black/70" />
       <div className="relative z-10">
-        <section className="mx-auto max-w-7xl px-4 pb-10 pt-28 sm:px-6 sm:pb-14 lg:px-8">
+        <section className="site-container pb-8 pt-32 sm:pb-10 sm:pt-36">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-gold/20 bg-gold/5 px-3 py-1.5 text-xs font-semibold text-gold"><Camera size={11} /> CineGenius Galerie</div>
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-            <div>
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-end sm:gap-6">
+            <div className="min-w-0">
               <h1 className="mb-3 font-display text-4xl font-bold text-text-primary sm:text-5xl">Fotos & Portfolio</h1>
               <p className="max-w-xl leading-relaxed text-text-muted">Entdecke öffentliche Portfolio- und Projektfotos aus der CineGenius-Community.</p>
             </div>
