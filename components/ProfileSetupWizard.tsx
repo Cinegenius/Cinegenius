@@ -14,48 +14,37 @@ import { departments, getDepartmentRoleSearchTerms } from "@/lib/departments";
 import { safeAuthRedirect } from "@/lib/auth-redirect";
 import { shouldSkipProfileSetup } from "@/lib/profile-setup-flow";
 import {
-  buildQuickStartScreens, createQuickStartIntentData, findQuickStartRoles, getFirstScreenForIntent, getQuickStartDepartments,
+  buildQuickStartScreens, createQuickStartIntentData, findQuickStartRoles, getQuickStartDepartments, getQuickStartIntroIntents,
   getQuickStartProfileTypesForRoles, normalizeQuickStartDraft, QUICK_START_CATEGORIES,
-  QUICK_START_INTENT_LABELS, START_QUICK_START_DRAFT, validateQuickStartDraft,
-  validateQuickStartScreen, type QuickStartDraft, type QuickStartIntent, type QuickStartIntentData,
+  QUICK_START_INTENT_LABELS, START_QUICK_START_DRAFT,
+  validateQuickStartDraft, validateQuickStartScreen, validateQuickStartIntentDetails,
+  type QuickStartDraft, type QuickStartIntent, type QuickStartIntentData,
   type QuickStartRoleSelection, type QuickStartScreen,
+  type QuickStartProviderIntent,
 } from "@/lib/quick-start-flow";
 import CateringCompanyFields from "@/components/CateringCompanyFields";
 import { CATERING_COMPANY_CATEGORY, EMPTY_CATERING_COMPANY_DETAILS, getCateringCompanySearchTerms } from "@/lib/catering-taxonomy";
 
 const paths: { id: QuickStartIntent; detail: string; Icon: typeof MapPin }[] = [
   { id: "crew", detail: "Für Kamera, Licht, Ton, Regie und viele weitere Gewerke", Icon: Film },
-  { id: "talent", detail: "Für Schauspiel, Model, Komparserie und ähnliche Tätigkeiten", Icon: Camera },
+  { id: "talent", detail: "Schauspiel, Model oder Komparserie", Icon: Camera },
   { id: "location", detail: "Zum Beispiel Wohnung, Haus, Café oder Studio", Icon: MapPin },
-  { id: "equipment", detail: "Zum Beispiel Kamera, Licht, Kostüm oder Fahrzeug", Icon: Package },
-  { id: "company", detail: "Zum Beispiel Verleih, Studio oder Agentur", Icon: Building2 },
+  { id: "equipment", detail: "Technik, Fahrzeuge oder Requisiten", Icon: Package },
+  { id: "company", detail: "Zum Beispiel Catering, Verleih oder Studio", Icon: Building2 },
   { id: "search", detail: "Menschen, Orte oder Dinge für ein Projekt entdecken", Icon: Search },
 ];
 const crewDepartments = getQuickStartDepartments();
 const castDepartment = departments.find((department) => department.id === "cast");
 const inputClass = "min-h-12 w-full rounded-xl border border-border bg-bg-primary px-4 text-base text-text-primary outline-none focus:border-gold focus:ring-2 focus:ring-gold/20";
-const screenContent: Record<QuickStartScreen, { title: string; description: string }> = {
-  name: { title: "Wie heißt du?", description: "Mit diesem Namen wirst du auf CineGenius angesprochen." },
-  goals: { title: "Was möchtest du auf CineGenius machen?", description: "Wähle alles aus, was zu dir passt. Du kannst später jederzeit weitere Bereiche ergänzen." },
-  "crew-departments": { title: "In welchen Bereichen arbeitest du?", description: "Wähle ein oder mehrere Gewerke. Danach zeigen wir dir nur die passenden Tätigkeiten." },
-  "crew-roles": { title: "Was machst du in diesen Bereichen?", description: "Wähle alle Tätigkeiten aus, unter denen andere dich finden sollen." },
-  "person-city": { title: "Wo bist du tätig?", description: "Eine Stadt oder Region genügt. Eine genaue Privatadresse ist nicht nötig." },
-  "talent-roles": { title: "Welche Rollen passen zu dir?", description: "Wähle eine oder mehrere Tätigkeiten. Du kannst sie später jederzeit ergänzen." },
-  "talent-intro": { title: "Möchtest du etwas über dich erzählen?", description: "Ein kurzer Satz hilft anderen, dich einzuordnen. Dieser Schritt ist freiwillig." },
-  "location-category": { title: "Was für einen Ort bietest du an?", description: "Wähle die Beschreibung, die am besten passt." },
-  "location-details": { title: "Erzähl uns das Wichtigste über den Ort", description: "Name und Stadt sind nötig. Eine kurze Beschreibung kannst du hinzufügen." },
-  "location-photo": { title: "Möchtest du ein Foto hinzufügen?", description: "Ein Foto macht deinen Entwurf anschaulicher. Du kannst es auch später ergänzen." },
-  "location-price": { title: "Wie möchtest du den Preis angeben?", description: "Du kannst einen Tagespreis nennen oder erst Anfragen sammeln." },
-  "equipment-category": { title: "Was möchtest du anbieten?", description: "Wähle die passende Art von Equipment oder Gegenstand." },
-  "equipment-details": { title: "Wie heißt dein Angebot und wo ist es?", description: "Ein kurzer Titel und die Stadt reichen für den Anfang." },
-  "equipment-photo": { title: "Möchtest du ein Foto hinzufügen?", description: "Ein Foto macht deinen Entwurf anschaulicher. Du kannst es auch später ergänzen." },
-  "equipment-price": { title: "Wie möchtest du den Preis angeben?", description: "Du kannst einen Tagespreis nennen oder erst Anfragen sammeln." },
-  "company-details": { title: "Wie heißt deine Firma und wo ist sie?", description: "Nach dem Abschluss wird dein Firmenprofil öffentlich angezeigt. Du kannst es anschließend ergänzen." },
-  "company-categories": { title: "Was bietet deine Firma an?", description: "Wähle eine oder mehrere passende Kategorien. Bei Catering fragen wir anschließend nur die dazugehörigen freiwilligen Details ab." },
-  "company-catering": { title: "Welche Catering-Leistungen bietet ihr an?", description: "Diese Angaben sind freiwillig und helfen Produktionen, passende Setverpflegung zu finden." },
-  "company-photo": { title: "Möchtest du ein Logo hinzufügen?", description: "Ein Logo ist freiwillig und kann später ergänzt werden." },
-  review: { title: "Prüfen und loslegen", description: "Ändere einzelne Angaben, bevor wir dein Profil oder private Angebotsentwürfe anlegen." },
+const stepContent: Record<QuickStartScreen, { title: string; description: string }> = {
+  name: { title: "Willkommen bei CineGenius! Schön, dass du dabei bist. Wie heißt du?", description: "Dein Name wird für dein CineGenius-Profil verwendet." },
+  location: { title: "Wo bist du zu Hause?", description: "Stadt und Land helfen dabei, dich und deine Angebote in deiner Region zu finden. Für ein Angebot kannst du später einen anderen Ort angeben." },
+  goals: { title: "Was möchtest du auf CineGenius machen?", description: "Du kannst später jederzeit weitere Bereiche ergänzen." },
+  details: { title: "Was passt zu deiner Auswahl?", description: "Wir zeigen nur die Angaben für den Bereich, den du gerade einrichtest." },
+  intro: { title: "Foto und kurze Vorstellung", description: "Diese Ergänzungen sind freiwillig. Du kannst sie jederzeit später hinzufügen." },
+  review: { title: "Prüfen und abschließen", description: "Sieh dir an, was angelegt wird. Über „Ändern“ springst du direkt zum passenden Abschnitt." },
 };
+const countries = ["Deutschland", "Österreich", "Schweiz"];
 
 type SaveState = "idle" | "saving" | "saved" | "error";
 
@@ -63,22 +52,24 @@ function primaryIntent(draft: QuickStartDraft): QuickStartIntent {
   return draft.intents.find((intent) => intent !== "search") ?? "search";
 }
 
-function screenForField(field: string, draft: QuickStartDraft): QuickStartScreen {
+function intentForField(field: string): QuickStartIntent | null {
+  if (field.startsWith("crew-")) return "crew";
+  if (field.startsWith("talent-")) return "talent";
+  if (field.startsWith("location-")) return "location";
+  if (field.startsWith("equipment-")) return "equipment";
+  if (field.startsWith("company-")) return "company";
+  return null;
+}
+
+function screenForField(field: string): QuickStartScreen {
   if (field === "name") return "name";
+  if (field === "personCity" || field === "personCountry") return "location";
   if (field === "goals") return "goals";
-  if (field === "crew-departments") return "crew-departments";
-  if (field === "crew-roles") return "crew-roles";
-  if (field === "talent-roles") return "talent-roles";
-  if (field === "personCity") return "person-city";
-  if (field.startsWith("location-category")) return "location-category";
-  if (field.startsWith("location-price")) return "location-price";
-  if (field.startsWith("location-")) return "location-details";
-  if (field.startsWith("equipment-category")) return "equipment-category";
-  if (field.startsWith("equipment-price")) return "equipment-price";
-  if (field.startsWith("equipment-")) return "equipment-details";
-  if (field === "company-categories") return "company-categories";
-  if (field.startsWith("company-")) return "company-details";
-  return buildQuickStartScreens(draft)[0]?.id ?? "name";
+  if (field.endsWith("-price")) return "intro";
+  if (field.startsWith("company-catering")) return "intro";
+  if (field.startsWith("company-photo") || field.startsWith("location-photo") || field.startsWith("equipment-photo")) return "intro";
+  if (intentForField(field)) return "details";
+  return "review";
 }
 
 export default function ProfileSetupWizard() {
@@ -98,6 +89,7 @@ export default function ProfileSetupWizard() {
   const [roleSearch, setRoleSearch] = useState("");
   const [departmentSearch, setDepartmentSearch] = useState("");
   const [companyCategorySearch, setCompanyCategorySearch] = useState("");
+  const [countryOther, setCountryOther] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const saveQueue = useRef<Promise<boolean>>(Promise.resolve(true));
 
@@ -121,18 +113,16 @@ export default function ProfileSetupWizard() {
         router.replace(saved.intent === "search" ? (redirectTo ?? "/search") : (redirectTo ?? "/dashboard"));
         return;
       }
-      if (shouldSkipProfileSetup({
-        hasExistingProfile: profile?.exists === true,
-        hasInProgressDraft,
-        isNewRegistration,
-      })) {
+      if (shouldSkipProfileSetup({ hasExistingProfile: profile?.exists === true, hasInProgressDraft, isNewRegistration })) {
         router.replace(redirectTo ?? "/dashboard");
         return;
       }
       const existingName = typeof profile?.profile?.display_name === "string" ? profile.profile.display_name : user?.fullName ?? "";
-      setDraft(hasInProgressDraft
+      const nextDraft = hasInProgressDraft
         ? normalizeQuickStartDraft(saved.quickStart)
-        : { ...START_QUICK_START_DRAFT, name: existingName });
+        : { ...START_QUICK_START_DRAFT, name: existingName };
+      setDraft(nextDraft);
+      setCountryOther(!countries.includes(nextDraft.personCountry));
       setReady(true);
     }).catch((cause) => {
       if (!active) return;
@@ -178,31 +168,41 @@ export default function ProfileSetupWizard() {
   }, [ready, draft, persist]);
 
   const screens = useMemo(() => buildQuickStartScreens(draft), [draft]);
-  useEffect(() => {
-    if (!ready || screens.some((screen) => screen.id === draft.step)) return;
-    const fallback: QuickStartScreen = draft.step === "company-catering" && screens.some((screen) => screen.id === "company-categories")
-      ? "company-categories"
-      : screens[0]?.id ?? "name";
-    const repaired = { ...draft, step: fallback };
-    setDraft(repaired);
-    void persist(repaired);
-  }, [draft, persist, ready, screens]);
   const currentIndex = Math.max(0, screens.findIndex((screen) => screen.id === draft.step));
-  const currentDefinition = screens[currentIndex] ?? screens[0];
-  const stepContent = screenContent[currentDefinition?.id ?? "name"];
+  const currentContent = stepContent[draft.step];
   const saveLabel = saveState === "saving" ? "Speichert …" : saveState === "saved" ? "Gespeichert" : saveState === "error" ? "Speichern fehlgeschlagen" : "";
+  const detailIntents = draft.intents.filter((intent): intent is QuickStartProviderIntent => intent !== "search");
+  const introIntents = getQuickStartIntroIntents(draft.intents);
+  const activeIntent = draft.activeIntent && draft.intents.includes(draft.activeIntent)
+    ? draft.activeIntent
+    : detailIntents[0] ?? "search";
+  const activeDetailIndex = activeIntent === "search" ? 0 : Math.max(0, detailIntents.indexOf(activeIntent));
+  const activeIntroIndex = Math.max(0, introIntents.indexOf(activeIntent));
+  useEffect(() => {
+    setRoleSearch("");
+    setDepartmentSearch("");
+    setCompanyCategorySearch("");
+  }, [activeIntent]);
   const selectedRoles = useMemo(() => [
     ...(draft.sections.crew?.roles ?? []),
     ...(draft.sections.talent?.roles ?? []),
   ].filter((role, index, list) => list.findIndex((other) => other.departmentId === role.departmentId && other.role === role.role) === index), [draft.sections.crew?.roles, draft.sections.talent?.roles]);
-  const departmentFilter = useMemo(() => draft.step === "talent-roles"
-    ? (castDepartment ? [castDepartment.id] : [])
-    : (draft.sections.crew?.departmentIds ?? []), [draft.step, draft.sections.crew?.departmentIds]);
-  const roleMatches = useMemo(() => findQuickStartRoles(roleSearch, 50, departmentFilter), [roleSearch, departmentFilter]);
   const filteredDepartments = useMemo(() => {
     const query = departmentSearch.trim().toLocaleLowerCase("de");
     return crewDepartments.filter((department) => !query || department.label.toLocaleLowerCase("de").includes(query) || department.roles.some((role) => getDepartmentRoleSearchTerms(department, role).some((term) => term.toLocaleLowerCase("de").includes(query))));
   }, [departmentSearch]);
+  const selectedIntentTitles = draft.intents.map((intent) => QUICK_START_INTENT_LABELS[intent]);
+  const hasProfileIntent = draft.intents.includes("crew") || draft.intents.includes("talent");
+  const hasCompanyIntent = draft.intents.includes("company");
+  const hasOfferIntent = draft.intents.includes("location") || draft.intents.includes("equipment");
+  const completionActionLabel = hasProfileIntent
+    ? hasCompanyIntent && hasOfferIntent ? "Profil und Firma erstellen, Angebote speichern"
+      : hasCompanyIntent ? "Profil und Firma erstellen"
+        : hasOfferIntent ? "Profil erstellen und Angebote speichern"
+          : "Profil erstellen"
+    : hasCompanyIntent
+      ? hasOfferIntent ? "Firma eintragen und Angebote speichern" : "Firma eintragen"
+      : hasOfferIntent ? "Private Angebotsentwürfe speichern" : "Los zur Suche";
 
   function update<K extends keyof QuickStartDraft>(key: K, value: QuickStartDraft[K]) {
     setDraft((current) => ({ ...current, [key]: value }));
@@ -210,20 +210,20 @@ export default function ProfileSetupWizard() {
   }
 
   function updateSection(intent: QuickStartIntent, value: Partial<QuickStartIntentData>) {
-    setDraft((current) => ({
-      ...current,
-      sections: {
-        ...current.sections,
-        [intent]: { ...createQuickStartIntentData(), ...current.sections[intent], ...value },
-      },
-    }));
+    setDraft((current) => ({ ...current, sections: { ...current.sections, [intent]: { ...createQuickStartIntentData(), ...current.sections[intent], ...value } } }));
     setError("");
   }
 
   function toggleIntent(intent: QuickStartIntent) {
     setDraft((current) => {
       const selected = current.intents.includes(intent);
-      return { ...current, intents: selected ? current.intents.filter((item) => item !== intent) : [...current.intents, intent] };
+      const intents = selected ? current.intents.filter((item) => item !== intent) : [...current.intents, intent];
+      const active = current.activeIntent && intents.includes(current.activeIntent)
+        ? current.activeIntent
+        : intents.find((item) => item !== "search") ?? "search";
+      return { ...current, intents, activeIntent: active, sections: !selected && !current.sections[intent]
+        ? { ...current.sections, [intent]: createQuickStartIntentData() }
+        : current.sections };
     });
     setError("");
   }
@@ -237,50 +237,100 @@ export default function ProfileSetupWizard() {
     });
   }
 
-  function toggleRole(item: QuickStartRoleSelection) {
-    const intent = draft.step === "talent-roles" ? "talent" : "crew";
+  function toggleRole(item: QuickStartRoleSelection, intent: "crew" | "talent") {
     const data = draft.sections[intent] ?? createQuickStartIntentData();
     const alreadySelected = data.roles.some((role) => role.departmentId === item.departmentId && role.role === item.role);
-    updateSection(intent, { roles: alreadySelected ? data.roles.filter((role) => role.departmentId !== item.departmentId || role.role !== item.role) : [...data.roles, item] });
+    const departmentIds = intent === "crew" && !data.departmentIds.includes(item.departmentId)
+      ? [...data.departmentIds, item.departmentId]
+      : data.departmentIds;
+    updateSection(intent, {
+      departmentIds,
+      roles: alreadySelected ? data.roles.filter((role) => role.departmentId !== item.departmentId || role.role !== item.role) : [...data.roles, item],
+    });
   }
 
   function focusValidation(field: string) {
     requestAnimationFrame(() => {
-      const target = document.getElementById(`quick-start-${field}`) ?? document.querySelector<HTMLElement>("[data-quick-start-invalid='true']");
+      const fieldIds: Record<string, string> = {
+        personCity: "quick-start-person-city",
+        personCountry: "quick-start-person-country",
+        "crew-roles": "quick-start-crew-role-search",
+        "talent-roles": "quick-start-talent-role-search",
+      };
+      const target = document.getElementById(fieldIds[field] ?? `quick-start-${field}`) ?? document.querySelector<HTMLElement>("[data-quick-start-invalid='true']");
       target?.scrollIntoView({ behavior: "smooth", block: "center" });
       target?.focus({ preventScroll: true });
     });
   }
 
-  async function goTo(step: QuickStartScreen) {
+  async function transition(step: QuickStartScreen, intent = activeIntent) {
+    if (saving) return;
     setError("");
-    const next = { ...draft, step };
-    if (await persist(next)) setDraft(next);
+    const next = { ...draft, step, activeIntent: intent };
+    setSaving(true);
+    try {
+      if (await persist(next)) {
+        setDraft(next);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function next() {
     setError("");
-    const validation = validateQuickStartScreen(draft, draft.step);
+    const validation = draft.step === "details"
+      ? validateQuickStartIntentDetails(draft, activeIntent)
+      : validateQuickStartScreen(draft, draft.step, activeIntent);
     if (validation) {
       setError(validation.message);
+      const matchingIntent = intentForField(validation.field) ?? activeIntent;
+      if (matchingIntent !== activeIntent) setDraft((current) => ({ ...current, activeIntent: matchingIntent }));
       focusValidation(validation.field);
       return;
     }
-    const nextScreen = screens[Math.min(currentIndex + 1, screens.length - 1)]?.id ?? "review";
-    const nextDraft = { ...draft, step: nextScreen };
-    if (await persist(nextDraft)) setDraft(nextDraft);
+
+    if (draft.step === "details") {
+      if (activeDetailIndex < detailIntents.length - 1) {
+        await transition("details", detailIntents[activeDetailIndex + 1]);
+      } else {
+        await transition("intro", introIntents[0] ?? "search");
+      }
+      return;
+    }
+    if (draft.step === "intro") {
+      if (activeIntroIndex < introIntents.length - 1) await transition("intro", introIntents[activeIntroIndex + 1]);
+      else await transition("review", detailIntents[0] ?? "search");
+      return;
+    }
+    await transition(screens[Math.min(currentIndex + 1, screens.length - 1)]?.id ?? "review", detailIntents[0] ?? "search");
   }
 
   async function back() {
-    if (currentIndex === 0) return;
-    const previousScreen = screens[currentIndex - 1]?.id ?? "name";
-    await goTo(previousScreen);
+    if (draft.step === "details" && activeDetailIndex > 0) {
+      await transition("details", detailIntents[activeDetailIndex - 1]);
+      return;
+    }
+    if (draft.step === "intro" && activeIntroIndex > 0) {
+      await transition("intro", introIntents[activeIntroIndex - 1]);
+      return;
+    }
+    if (draft.step === "intro") {
+      await transition("details", detailIntents.at(-1) ?? "search");
+      return;
+    }
+    if (draft.step === "review") {
+      await transition("intro", introIntents.at(-1) ?? "search");
+      return;
+    }
+    if (currentIndex > 0) await transition(screens[currentIndex - 1].id, detailIntents[0] ?? "search");
   }
 
   async function skipOptional() {
-    if (!currentDefinition?.optional) return;
-    const nextScreen = screens[Math.min(currentIndex + 1, screens.length - 1)]?.id ?? "review";
-    await goTo(nextScreen);
+    if (draft.step !== "intro") return;
+    if (activeIntroIndex < introIntents.length - 1) await transition("intro", introIntents[activeIntroIndex + 1]);
+    else await transition("review", detailIntents[0] ?? "search");
   }
 
   async function upload(file: File | undefined, intent: QuickStartIntent) {
@@ -295,12 +345,9 @@ export default function ProfileSetupWizard() {
       const response = await fetch("/api/upload", { method: "POST", body: form });
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.url) throw new Error(result.error ?? "Das Foto konnte nicht hochgeladen werden.");
-      const nextDraft = {
-        ...draft,
-        sections: { ...draft.sections, [intent]: { ...createQuickStartIntentData(), ...draft.sections[intent], imageUrl: result.url } },
-      };
+      const nextDraft = { ...draft, sections: { ...draft.sections, [intent]: { ...createQuickStartIntentData(), ...draft.sections[intent], imageUrl: result.url } } };
       setDraft(nextDraft);
-      if (!(await persist(nextDraft))) setError("Das Foto wurde hochgeladen, aber der Fortschritt konnte nicht gespeichert werden. Bitte bleib auf dieser Seite und versuche es erneut.");
+      if (!(await persist(nextDraft))) setError("Das Foto wurde hochgeladen, aber dein Fortschritt konnte nicht gespeichert werden. Bitte bleib auf dieser Seite und versuche es erneut.");
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Das Foto konnte nicht hochgeladen werden.");
     } finally { setUploading(false); }
@@ -310,16 +357,18 @@ export default function ProfileSetupWizard() {
     const response = await fetch("/api/onboarding?type=quick-start", { method: "DELETE" });
     const body = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(body.error ?? "Dein Einrichtungsstand konnte nicht abgeschlossen werden.");
-    const destination = completedDraft.intents.some((intent) => intent !== "search") ? (redirectTo ?? "/dashboard") : (redirectTo ?? "/search");
+    const hasSearchOnly = completedDraft.intents.every((intent) => intent === "search");
+    const destination = hasSearchOnly ? (redirectTo ?? "/search") : (redirectTo ?? "/dashboard?tab=listings");
     router.replace(destination);
   }
 
   async function finish() {
     const validation = validateQuickStartDraft(draft);
     if (validation) {
-      const firstBadScreen = screenForField(validation.field, draft);
+      const firstBadScreen = screenForField(validation.field);
       setError(validation.message);
-      const corrected = { ...draft, step: firstBadScreen };
+      const matchingIntent = intentForField(validation.field) ?? activeIntent;
+      const corrected = { ...draft, step: firstBadScreen, activeIntent: matchingIntent };
       setDraft(corrected);
       focusValidation(validation.field);
       return;
@@ -328,22 +377,20 @@ export default function ProfileSetupWizard() {
     setSaving(true);
     setError("");
     try {
-      let progress: QuickStartDraft = {
-        ...draft,
-        step: "review",
-        completed: { ...draft.completed, listings: { ...draft.completed.listings } },
-      };
+      let progress: QuickStartDraft = { ...draft, step: "review", completed: { ...draft.completed, listings: { ...draft.completed.listings } } };
       if (!(await persist(progress))) return;
 
       if ((progress.intents.includes("crew") || progress.intents.includes("talent")) && !progress.completed.profile) {
         const positions = selectedRoles.map((role) => role.role);
         const profileTypes = getQuickStartProfileTypesForRoles(selectedRoles);
+        const profilePhoto = progress.sections.crew?.imageUrl || progress.sections.talent?.imageUrl || null;
         const response = await fetch("/api/profile", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            display_name: progress.name.trim(), location: progress.personCity.trim(),
+            display_name: progress.name.trim(),
+            location: [progress.personCity.trim(), progress.personCountry.trim()].filter(Boolean).join(", "),
             profile_types: profileTypes, profile_type: profileTypes[0] ?? null,
-            positions, bio: progress.talentIntro.trim(), available: true,
+            positions, bio: progress.talentIntro.trim(), avatar_url: profilePhoto, available: true,
           }),
         });
         const result = await response.json().catch(() => ({}));
@@ -404,232 +451,168 @@ export default function ProfileSetupWizard() {
         setDraft(progress);
         if (!(await persist(progress))) throw new Error("Das Firmenprofil wurde gespeichert, aber dein Einrichtungsstand konnte nicht aktualisiert werden. Bitte versuche es erneut.");
       }
-
       await clearAndContinue(progress);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Deine Angaben konnten nicht vollständig gespeichert werden.");
     } finally { setSaving(false); }
   }
 
-  const selectedIntentTitles = draft.intents.map((intent) => QUICK_START_INTENT_LABELS[intent]);
-  const hasProfileIntent = draft.intents.includes("crew") || draft.intents.includes("talent");
-  const hasCompanyIntent = draft.intents.includes("company");
-  const hasOfferIntent = draft.intents.includes("location") || draft.intents.includes("equipment");
-  const completionActionLabel = hasProfileIntent
-    ? hasCompanyIntent && hasOfferIntent ? "Profil & Firma erstellen, Angebote speichern"
-      : hasCompanyIntent ? "Profil & Firma öffentlich erstellen"
-      : hasOfferIntent ? "Profil öffentlich erstellen & Angebote speichern"
-      : "Profil öffentlich erstellen"
-    : hasCompanyIntent
-      ? hasOfferIntent ? "Firma öffentlich eintragen & Angebote speichern" : "Firma öffentlich eintragen"
-      : hasOfferIntent ? "Private Angebotsentwürfe speichern" : "Los zur Suche";
-  const reviewEditingIntent = (intent: QuickStartIntent) => { void goTo(getFirstScreenForIntent(draft, intent)); };
+  function editReview(step: QuickStartScreen, intent?: QuickStartIntent) {
+    void transition(step, intent ?? activeIntent);
+  }
 
-  if (!ready) return <main className="min-h-screen bg-bg-primary px-4 pt-32 text-center text-sm text-text-muted"><Loader2 className="mx-auto mb-3 animate-spin" />Dein Start wird geladen …</main>;
-  if (loadError) return <main className="min-h-[75vh] bg-bg-primary px-4 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-24 sm:pt-28"><section className="mx-auto max-w-xl rounded-2xl border border-border bg-bg-secondary p-6 text-center"><p role="alert" className="text-sm leading-6 text-red-300">{loadError}</p><p className="mt-2 text-xs leading-5 text-text-muted">Damit kein gespeicherter Fortschritt verloren geht, starte bitte erst weiter, wenn der Status geladen wurde.</p><button type="button" onClick={() => { setReady(false); setLoadError(""); setLoadAttempt((value) => value + 1); }} className="mt-5 min-h-12 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary">Erneut versuchen</button></section></main>;
+  function renderPhotoInput(intent: QuickStartIntent, label: string) {
+    const data = draft.sections[intent] ?? createQuickStartIntentData();
+    return <div className="space-y-3">
+      {data.imageUrl ? <div className="space-y-3"><Image src={data.imageUrl} alt={label} width={960} height={640} sizes="(max-width: 640px) 100vw, 720px" className="max-h-64 w-full rounded-xl border border-border object-contain" /><button type="button" onClick={() => updateSection(intent, { imageUrl: "" })} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm text-text-secondary"><Trash2 size={15} /> Foto entfernen</button></div> : <label className={`flex min-h-40 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-bg-primary p-5 text-center hover:border-gold/50 ${uploading ? "pointer-events-none opacity-60" : ""}`}><ImagePlus className="text-gold" /><span className="text-sm font-medium text-text-primary">{uploading ? "Foto wird hochgeladen …" : label}</span><span className="text-xs text-text-muted">JPG, PNG, WEBP oder HEIC · freiwillig</span><input type="file" accept="image/jpeg,image/png,image/webp,image/heic" className="sr-only" onChange={(event) => { void upload(event.target.files?.[0], intent); event.currentTarget.value = ""; }} /></label>}
+      {uploading && <p role="status" className="flex items-center gap-2 text-xs text-text-muted"><Loader2 size={14} className="animate-spin" /> Upload läuft …</p>}
+    </div>;
+  }
 
-  return (
-    <main className="min-h-[75vh] bg-bg-primary px-4 pb-[calc(7rem+env(safe-area-inset-bottom))] pt-24 sm:pt-28">
-      <div className="mx-auto w-full max-w-3xl">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-gold">Dein Start auf CineGenius</p>
-        <h1 className="mb-2 break-words font-display text-3xl font-bold text-text-primary sm:text-4xl">{stepContent.title}</h1>
-        <p className="mb-6 max-w-2xl text-sm leading-6 text-text-muted">{stepContent.description}</p>
-
-        <div className="mb-6" aria-label={`Schritt ${currentIndex + 1} von ${screens.length}`}>
-          <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs text-text-muted">
-            <span>Schritt {currentIndex + 1} von {screens.length} · {currentDefinition?.id === "review" ? "Vorschau" : currentDefinition?.intent ? QUICK_START_INTENT_LABELS[currentDefinition.intent] : currentDefinition?.id === "goals" ? "Deine Auswahl" : "Dein Name"}</span>
-            <span role="status" aria-live="polite">{saveLabel}</span>
-          </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-bg-elevated"><div className="h-full rounded-full bg-gold transition-all" style={{ width: `${((currentIndex + 1) / screens.length) * 100}%` }} /></div>
+  function renderRolePicker(intent: "crew" | "talent") {
+    const data = draft.sections[intent] ?? createQuickStartIntentData();
+    const activeDepartments = intent === "crew" ? data.departmentIds : (castDepartment ? [castDepartment.id] : []);
+    const roleFilter = intent === "crew" && activeDepartments.length ? activeDepartments : intent === "talent" ? activeDepartments : undefined;
+    const matches = findQuickStartRoles(roleSearch, 50, roleFilter);
+    return <div className="space-y-4">
+      {intent === "crew" && <>
+        <label htmlFor="quick-start-department-search" className="block text-sm font-medium text-text-primary">1. Gewerk oder Hauptgruppe wählen</label>
+        <div className="relative"><Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" /><input id="quick-start-department-search" value={departmentSearch} onChange={(event) => setDepartmentSearch(event.target.value)} placeholder="Zum Beispiel Kamera, Ton oder Grip" className={`${inputClass} pl-10`} /></div>
+        <div id="quick-start-crew-departments" tabIndex={-1} className="grid max-h-56 gap-2 overflow-y-auto pr-1 sm:grid-cols-2">
+          {filteredDepartments.map((department) => {
+            const selected = data.departmentIds.includes(department.id);
+            return <button key={department.id} type="button" aria-pressed={selected} onClick={() => toggleDepartment(department.id)} className={`flex min-h-12 min-w-0 items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left ${selected ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/50"}`}><span className="min-w-0 break-words text-sm text-text-primary">{department.emoji} {department.label}</span><span className="shrink-0 text-xs text-text-muted">{department.roles.length}</span></button>;
+          })}
+          {!filteredDepartments.length && <p className="col-span-full rounded-xl border border-border p-3 text-sm text-text-muted">Kein Gewerk gefunden.</p>}
         </div>
-
-        <section className="min-w-0 rounded-2xl border border-border bg-bg-secondary p-4 sm:p-7">
-          {draft.step === "name" && <div>
-            <label htmlFor="quick-start-name" className="mb-2 block text-sm font-medium text-text-primary">Dein Name <span className="text-gold">*</span></label>
-            <input id="quick-start-name" autoComplete="name" maxLength={120} value={draft.name} onChange={(event) => update("name", event.target.value)} placeholder="Vor- und Nachname oder Künstlername" className={inputClass} aria-describedby="quick-start-name-help" />
-            <p id="quick-start-name-help" className="mt-2 text-xs leading-5 text-text-muted">Du kannst später festlegen, welche Angaben öffentlich sichtbar sind.</p>
-          </div>}
-
-          {draft.step === "goals" && <div id="quick-start-goals" tabIndex={-1} className="grid gap-3 sm:grid-cols-2">
-            {paths.map(({ id, detail, Icon }) => {
-              const selected = draft.intents.includes(id);
-              return <button key={id} type="button" aria-pressed={selected} onClick={() => toggleIntent(id)} className={`flex min-h-24 min-w-0 items-start gap-3 rounded-xl border p-4 text-left transition-colors ${selected ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/50"}`}>
-                <span className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${selected ? "bg-gold/15 text-gold" : "bg-bg-elevated text-text-muted"}`}><Icon size={19} /></span>
-                <span className="min-w-0 flex-1"><span className="block break-words text-sm font-semibold text-text-primary">{QUICK_START_INTENT_LABELS[id]}</span><span className="mt-1 block break-words text-xs leading-5 text-text-muted">{detail}</span></span>
-                <span aria-hidden="true" className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-xs ${selected ? "border-gold bg-gold text-bg-primary" : "border-border text-transparent"}`}>✓</span>
-              </button>;
-            })}
-          </div>}
-
-          {draft.step === "crew-departments" && <div>
-            <label htmlFor="quick-start-department-search" className="mb-2 block text-sm font-medium text-text-primary">Gewerk suchen</label>
-            <div className="relative mb-4"><Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" /><input id="quick-start-department-search" value={departmentSearch} onChange={(event) => setDepartmentSearch(event.target.value)} placeholder="Zum Beispiel Kamera, Ton oder Grip" className={`${inputClass} pl-10`} /></div>
-            {draft.sections.crew?.departmentIds.length ? <p className="mb-3 text-xs leading-5 text-text-muted">Ausgewählt: {draft.sections.crew.departmentIds.map((id) => departments.find((item) => item.id === id)?.label).filter(Boolean).join(", " )}. Wenn du ein Gewerk entfernst, werden nur dessen Tätigkeiten abgewählt.</p> : null}
-            <div id="quick-start-crew-departments" tabIndex={-1} className="grid gap-2 sm:grid-cols-2">
-              {filteredDepartments.map((department) => {
-                const selected = draft.sections.crew?.departmentIds.includes(department.id) ?? false;
-                return <button key={department.id} type="button" aria-pressed={selected} onClick={() => toggleDepartment(department.id)} className={`flex min-h-14 min-w-0 items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left ${selected ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/50"}`}><span className="min-w-0 break-words text-sm font-medium text-text-primary">{department.emoji} {department.label}</span><span className="shrink-0 text-xs text-text-muted">{department.roles.length} Tätigkeiten</span></button>;
-              })}
-              {!filteredDepartments.length && <p className="col-span-full rounded-xl border border-border p-4 text-sm text-text-muted">Kein Gewerk gefunden. Suche nach einer Tätigkeit oder einem anderen Begriff.</p>}
-            </div>
-          </div>}
-
-          {(draft.step === "crew-roles" || draft.step === "talent-roles") && <div>
-            {draft.step === "crew-roles" && <div className="mb-4 flex flex-wrap gap-2">{(draft.sections.crew?.departmentIds ?? []).map((id) => { const department = departments.find((item) => item.id === id); return department ? <span key={id} className="rounded-full border border-gold/35 bg-gold/10 px-3 py-2 text-xs text-gold">{department.emoji} {department.label}</span> : null; })}</div>}
-            <label htmlFor="quick-start-role-search" className="mb-2 block text-sm font-medium text-text-primary">Tätigkeit suchen</label>
-            <div className="relative mb-4"><Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" /><input id="quick-start-role-search" autoComplete="off" value={roleSearch} onChange={(event) => setRoleSearch(event.target.value)} placeholder="Zum Beispiel Key Grip, Schnitt oder Model" className={`${inputClass} pl-10`} /></div>
-            {roleSearch.trim() ? <div className="mb-4 max-h-72 space-y-1 overflow-y-auto rounded-xl border border-border bg-bg-primary p-2">
-              {roleMatches.map((item, index) => {
-                const data = draft.step === "talent-roles" ? draft.sections.talent : draft.sections.crew;
-                const selected = data?.roles.some((role) => role.departmentId === item.departmentId && role.role === item.role) ?? false;
-                return <button id={index === 0 ? `quick-start-${draft.step}` : undefined} key={`${item.departmentId}:${item.role}`} type="button" aria-pressed={selected} onClick={() => toggleRole(item)} className={`flex min-h-12 w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left ${selected ? "bg-gold/10 text-gold" : "text-text-primary hover:bg-bg-elevated"}`}><span className="min-w-0"><span className="block break-words text-sm font-medium">{item.role}</span><span className="block text-xs text-text-muted">{item.departmentLabel}</span></span><span aria-hidden="true" className="shrink-0">{selected ? "✓" : "+"}</span></button>;
-              })}
-              {!roleMatches.length && <p className="px-3 py-4 text-sm text-text-muted">Keine passende Tätigkeit gefunden. Versuche einen anderen Begriff.</p>}
-            </div> : draft.step === "talent-roles" ? <div id="quick-start-talent-roles" tabIndex={-1} className="grid gap-2 sm:grid-cols-2">{(castDepartment?.roles ?? []).map((role) => { const selected = draft.sections.talent?.roles.some((item) => item.role === role) ?? false; return <button key={role} type="button" aria-pressed={selected} onClick={() => toggleRole({ departmentId: "cast", role })} className={`flex min-h-12 items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left text-sm ${selected ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-primary text-text-primary"}`}><span className="break-words">{role}</span><span className="shrink-0">{selected ? "✓" : "+"}</span></button>; })}</div> : <div className="space-y-3" id="quick-start-crew-roles" tabIndex={-1}>
-              {(draft.sections.crew?.departmentIds ?? []).map((id) => {
-                const department = departments.find((item) => item.id === id);
-                if (!department) return null;
-                const roleOptions = [...new Set(department.roles)];
-                return <details key={id} className="group rounded-xl border border-border bg-bg-primary" open={(draft.sections.crew?.departmentIds.length ?? 0) === 1 ? true : undefined}><summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-text-primary"><span className="break-words">{department.emoji} {department.label}</span><span className="shrink-0 text-xs font-normal text-text-muted">{roleOptions.length} Tätigkeiten</span></summary><div className="max-h-72 space-y-1 overflow-y-auto border-t border-border p-2">{roleOptions.map((role) => { const selected = draft.sections.crew?.roles.some((item) => item.departmentId === id && item.role === role) ?? false; return <button key={role} type="button" aria-pressed={selected} onClick={() => toggleRole({ departmentId: id, role })} className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm ${selected ? "bg-gold/10 text-gold" : "text-text-secondary hover:bg-bg-elevated"}`}><span className="break-words">{role}</span><span className="shrink-0">{selected ? "✓" : "+"}</span></button>; })}</div></details>;
-              })}
-            </div>}
-            <div className="mt-4 flex flex-wrap gap-2">{(draft.step === "talent-roles" ? draft.sections.talent?.roles : draft.sections.crew?.roles)?.map((item) => <span key={`${item.departmentId}:${item.role}`} className="inline-flex max-w-full items-center gap-2 rounded-full border border-gold/35 bg-gold/10 px-3 py-2 text-xs text-gold"><span className="break-words">{item.role}</span><button type="button" aria-label={`${item.role} entfernen`} onClick={() => toggleRole(item)} className="min-h-6 min-w-6 rounded-full hover:bg-bg-elevated">×</button></span>)}</div>
-          </div>}
-
-          {draft.step === "person-city" && <div><label htmlFor="quick-start-person-city" className="mb-2 block text-sm font-medium text-text-primary">Stadt oder Region <span className="text-gold">*</span></label><input id="quick-start-person-city" autoComplete="address-level2" maxLength={100} value={draft.personCity} onChange={(event) => update("personCity", event.target.value)} placeholder="Zum Beispiel Leipzig" className={inputClass} /></div>}
-
-          {draft.step === "talent-intro" && <div><label htmlFor="quick-start-talent-intro" className="mb-2 block text-sm font-medium text-text-primary">Kurze Vorstellung <span className="text-text-muted">(freiwillig)</span></label><textarea id="quick-start-talent-intro" rows={5} maxLength={1200} value={draft.talentIntro} onChange={(event) => update("talentIntro", event.target.value)} placeholder="Was sollten andere über dich wissen?" className="w-full rounded-xl border border-border bg-bg-primary p-4 text-base text-text-primary outline-none focus:border-gold" /></div>}
-
-          {(draft.step === "location-category" || draft.step === "equipment-category") && (() => {
-            const intent = draft.step.startsWith("location") ? "location" : "equipment";
-            const options = QUICK_START_CATEGORIES[intent];
-            const category = draft.sections[intent]?.category;
-            return <div id={`quick-start-${intent}-category`} tabIndex={-1} className="grid gap-2 sm:grid-cols-2">{options.map((option) => <button key={option.value} type="button" aria-pressed={category === option.value} onClick={() => updateSection(intent, { category: option.value })} className={`min-h-16 min-w-0 rounded-xl border px-4 py-3 text-left ${category === option.value ? "border-gold bg-gold/10" : "border-border bg-bg-primary"}`}><span className="block break-words text-sm font-semibold text-text-primary">{option.label}</span><span className="mt-1 block break-words text-xs text-text-muted">{option.example}</span></button>)}</div>;
-          })()}
-
-          {(draft.step === "location-details" || draft.step === "equipment-details" || draft.step === "company-details") && (() => {
-            const intent = draft.step.startsWith("location") ? "location" : draft.step.startsWith("equipment") ? "equipment" : "company";
-            const data = draft.sections[intent] ?? createQuickStartIntentData();
-            const isCompany = intent === "company";
-            return <div className="space-y-4">
-              <div><label htmlFor={`quick-start-${intent}-title`} className="mb-2 block text-sm font-medium text-text-primary">{isCompany ? "Firmenname" : "Name des Angebots"} <span className="text-gold">*</span></label><input id={`quick-start-${intent}-title`} autoComplete={isCompany ? "organization" : "off"} maxLength={200} value={data.title} onChange={(event) => updateSection(intent, { title: event.target.value })} placeholder={isCompany ? "Zum Beispiel Lichtverleih Müller" : intent === "location" ? "Zum Beispiel Altbauwohnung mit Balkon" : "Zum Beispiel LED-Flächenleuchte"} className={inputClass} /></div>
-              <div><label htmlFor={`quick-start-${intent}-city`} className="mb-2 block text-sm font-medium text-text-primary">Stadt oder Region <span className="text-gold">*</span></label><input id={`quick-start-${intent}-city`} autoComplete="address-level2" maxLength={100} value={data.city} onChange={(event) => updateSection(intent, { city: event.target.value })} placeholder="Zum Beispiel Leipzig" className={inputClass} /></div>
-              <div><label htmlFor={`quick-start-${intent}-description`} className="mb-2 block text-sm font-medium text-text-primary">Kurze Beschreibung <span className="text-text-muted">(freiwillig)</span></label><textarea id={`quick-start-${intent}-description`} rows={4} maxLength={3000} value={data.description} onChange={(event) => updateSection(intent, { description: event.target.value })} placeholder={isCompany ? "Was bietet deine Firma an?" : intent === "location" ? "Was ist an diesem Ort besonders?" : "Was ist enthalten und in welchem Zustand ist es?"} className="w-full rounded-xl border border-border bg-bg-primary p-4 text-base text-text-primary outline-none focus:border-gold" /></div>
-              {isCompany && <div className="grid gap-4 sm:grid-cols-2">
-                <div><label htmlFor="quick-start-company-email" className="mb-2 block text-sm font-medium text-text-primary">Kontakt-E-Mail <span className="text-text-muted">(freiwillig)</span></label><input id="quick-start-company-email" type="email" autoComplete="email" maxLength={200} value={data.contactEmail} onChange={(event) => updateSection(intent, { contactEmail: event.target.value })} placeholder="kontakt@beispiel.de" className={inputClass} /></div>
-                <div><label htmlFor="quick-start-company-phone" className="mb-2 block text-sm font-medium text-text-primary">Telefon <span className="text-text-muted">(freiwillig)</span></label><input id="quick-start-company-phone" type="tel" autoComplete="tel" maxLength={80} value={data.contactPhone} onChange={(event) => updateSection(intent, { contactPhone: event.target.value })} placeholder="Optional" className={inputClass} /></div>
-                <div className="sm:col-span-2"><label htmlFor="quick-start-company-website" className="mb-2 block text-sm font-medium text-text-primary">Webseite <span className="text-text-muted">(freiwillig)</span></label><input id="quick-start-company-website" type="url" autoComplete="url" maxLength={300} value={data.website} onChange={(event) => updateSection(intent, { website: event.target.value })} placeholder="https://…" className={inputClass} /></div>
-              </div>}
-            </div>;
-          })()}
-
-          {draft.step === "company-categories" && (() => {
-            const company = draft.sections.company ?? createQuickStartIntentData();
-            const query = companyCategorySearch.trim().toLocaleLowerCase("de");
-            const categories = QUICK_START_CATEGORIES.company.filter((category) => {
-              const catalogue = `${category.label} ${category.example} ${category.value === CATERING_COMPANY_CATEGORY.id ? getCateringCompanySearchTerms().join(" ") : ""}`.toLocaleLowerCase("de");
-              return !query || catalogue.includes(query);
-            });
-            return <div>
-              <label htmlFor="quick-start-company-category-search" className="mb-2 block text-sm font-medium text-text-primary">Kategorie suchen</label>
-              <div className="relative mb-4"><Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" /><input id="quick-start-company-category-search" autoComplete="off" value={companyCategorySearch} onChange={(event) => setCompanyCategorySearch(event.target.value)} placeholder="Zum Beispiel Catering, Studio oder Verleih" className={`${inputClass} pl-10`} /></div>
-              <div id="quick-start-company-categories" tabIndex={-1} className="grid gap-2 sm:grid-cols-2">
-                {categories.map((category) => {
-                  const selected = company.categoryIds.includes(category.value);
-                  return <button key={category.value} type="button" aria-pressed={selected} onClick={() => {
-                    const categoryIds = selected ? company.categoryIds.filter((id) => id !== category.value) : [...company.categoryIds, category.value];
-                    updateSection("company", { categoryIds, ...(selected && category.value === CATERING_COMPANY_CATEGORY.id ? { cateringDetails: EMPTY_CATERING_COMPANY_DETAILS } : {}) });
-                  }} className={`min-h-16 min-w-0 rounded-xl border px-4 py-3 text-left ${selected ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/50"}`}>
-                    <span className="block break-words text-sm font-semibold text-text-primary">{category.label}</span><span className="mt-1 block break-words text-xs leading-5 text-text-muted">{category.example}</span>
-                  </button>;
-                })}
-                {!categories.length && <p className="col-span-full rounded-xl border border-border p-4 text-sm text-text-muted">Keine passende Kategorie gefunden.</p>}
-              </div>
-              <p className="mt-3 text-xs leading-5 text-text-muted">Du kannst mehrere Kategorien auswählen. Entfernst du Catering, werden nur die dazugehörigen Catering-Angaben entfernt.</p>
-            </div>;
-          })()}
-
-          {draft.step === "company-catering" && <CateringCompanyFields value={draft.sections.company?.cateringDetails ?? EMPTY_CATERING_COMPANY_DETAILS} onChange={(cateringDetails) => updateSection("company", { cateringDetails })} />}
-
-          {(draft.step === "location-photo" || draft.step === "equipment-photo" || draft.step === "company-photo") && (() => {
-            const intent: QuickStartIntent = draft.step.startsWith("location") ? "location" : draft.step.startsWith("equipment") ? "equipment" : "company";
-            const data = draft.sections[intent] ?? createQuickStartIntentData();
-            return <div>
-              {data.imageUrl ? <div className="space-y-3"><Image src={data.imageUrl} alt={intent === "company" ? "Vorschau des Firmenlogos" : "Vorschau des Angebotsfotos"} width={960} height={640} sizes="(max-width: 640px) 100vw, 720px" className="max-h-64 w-full rounded-xl border border-border object-cover" /><button type="button" onClick={() => updateSection(intent, { imageUrl: "" })} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm text-text-secondary"><Trash2 size={15} /> Foto entfernen</button></div> : <label className={`flex min-h-40 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-bg-primary p-5 text-center hover:border-gold/50 ${uploading ? "pointer-events-none opacity-60" : ""}`}><ImagePlus className="text-gold" /><span className="text-sm font-medium text-text-primary">{uploading ? "Foto wird hochgeladen …" : intent === "company" ? "Logo auswählen" : "Foto auswählen"}</span><span className="text-xs text-text-muted">JPG, PNG, WEBP oder HEIC</span><input type="file" accept="image/jpeg,image/png,image/webp,image/heic" className="sr-only" onChange={(event) => void upload(event.target.files?.[0], intent)} /></label>}
-              {uploading && <p role="status" className="mt-3 flex items-center gap-2 text-xs text-text-muted"><Loader2 size={14} className="animate-spin" /> Upload läuft …</p>}
-            </div>;
-          })()}
-
-          {(draft.step === "location-price" || draft.step === "equipment-price") && (() => {
-            const intent = draft.step.startsWith("location") ? "location" : "equipment";
-            const data = draft.sections[intent] ?? createQuickStartIntentData();
-            return <div className="space-y-3">
-              <button type="button" aria-pressed={data.priceOnRequest} onClick={() => updateSection(intent, { priceOnRequest: true })} className={`min-h-14 w-full rounded-xl border px-4 text-left text-sm ${data.priceOnRequest ? "border-gold bg-gold/10 text-text-primary" : "border-border bg-bg-primary text-text-secondary"}`}>Preis auf Anfrage</button>
-              <button type="button" aria-pressed={!data.priceOnRequest} onClick={() => updateSection(intent, { priceOnRequest: false })} className={`min-h-14 w-full rounded-xl border px-4 text-left text-sm ${!data.priceOnRequest ? "border-gold bg-gold/10 text-text-primary" : "border-border bg-bg-primary text-text-secondary"}`}>Tagespreis angeben</button>
-              {!data.priceOnRequest && <div><label htmlFor={`quick-start-${intent}-price`} className="mb-2 block text-sm font-medium text-text-primary">Preis pro Tag in Euro</label><input id={`quick-start-${intent}-price`} type="number" min="0" step="1" value={data.price} onChange={(event) => updateSection(intent, { price: event.target.value })} placeholder="Zum Beispiel 150" className={inputClass} /></div>}
-            </div>;
-          })()}
-
-          {draft.step === "review" && <div className="space-y-4">
-            <ReviewSection title="Dein Name" onEdit={() => void goTo("name")}><ReviewRow label="Name" value={draft.name} /></ReviewSection>
-            <ReviewSection title="Deine Auswahl" onEdit={() => void goTo("goals")}><p className="break-words text-sm text-text-primary">{selectedIntentTitles.join(" · ") || "—"}</p></ReviewSection>
-            {(draft.intents.includes("crew") || draft.intents.includes("talent")) && <ReviewSection title="Dein Profil" onEdit={() => reviewEditingIntent(draft.intents.includes("crew") ? "crew" : "talent")}>
-              <ReviewRow label="Tätigkeiten" value={selectedRoles.map((role) => role.role).join(", ")} />
-              <ReviewRow label="Standort" value={draft.personCity} />
-              {draft.talentIntro.trim() && <ReviewRow label="Vorstellung" value={draft.talentIntro} />}
-              <p className="rounded-xl border border-amber-400/25 bg-amber-500/5 p-3 text-xs leading-5 text-text-muted">Mit „Profil öffentlich erstellen“ werden deine Angaben für andere Mitglieder sichtbar. Du kannst dein Profil danach weiterbearbeiten.</p>
-            </ReviewSection>}
-            {draft.intents.filter((intent) => intent === "location" || intent === "equipment").map((intent) => {
-              const data = draft.sections[intent] ?? createQuickStartIntentData();
-              const categoryOptions = QUICK_START_CATEGORIES[intent];
-              const categoryName = categoryOptions.find((item) => item.value === data.category)?.label ?? data.category;
-              return <ReviewSection key={intent} title={QUICK_START_INTENT_LABELS[intent]} onEdit={() => reviewEditingIntent(intent)}>
-                <ReviewRow label="Art" value={categoryName} /><ReviewRow label="Angebot" value={data.title} /><ReviewRow label="Standort" value={data.city} />
-                {data.description.trim() && <ReviewRow label="Beschreibung" value={data.description} />}
-                <ReviewRow label="Preis" value={data.priceOnRequest ? "Auf Anfrage" : `${data.price} € pro Tag`} />
-                {data.imageUrl && <Image src={data.imageUrl} alt="Vorschau des Angebotsfotos" width={720} height={480} sizes="(max-width: 640px) 100vw, 640px" className="max-h-40 w-full rounded-lg object-cover" />}
-                <p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">Wir speichern das Angebot zunächst privat als Entwurf. Erst im nächsten Schritt kannst du es mit „Angebot veröffentlichen“ öffentlich sichtbar machen.</p>
-              </ReviewSection>;
-            })}
-            {draft.intents.includes("company") && (() => {
-              const data = draft.sections.company ?? createQuickStartIntentData();
-              const categoryLabels = QUICK_START_CATEGORIES.company.filter((category) => data.categoryIds.includes(category.value)).map((category) => category.label);
-              const catering = data.cateringDetails;
-              return <ReviewSection title={QUICK_START_INTENT_LABELS.company} onEdit={() => reviewEditingIntent("company")}>
-                <ReviewRow label="Firma" value={data.title} /><ReviewRow label="Standort" value={data.city} />
-                {categoryLabels.length > 0 && <ReviewRow label="Kategorien" value={categoryLabels.join(", ")} />}
-                {data.description && <ReviewRow label="Beschreibung" value={data.description} />}
-                {data.contactEmail && <ReviewRow label="Kontakt-E-Mail" value={data.contactEmail} />}
-                {data.contactPhone && <ReviewRow label="Telefon" value={data.contactPhone} />}
-                {data.website && <ReviewRow label="Webseite" value={data.website} />}
-                {data.categoryIds.includes(CATERING_COMPANY_CATEGORY.id) && <>
-                  {catering.serviceTypes.length > 0 && <ReviewRow label="Catering-Leistungen" value={catering.serviceTypes.join(", ")} />}
-                  {catering.serviceAreas && <ReviewRow label="Einsatzregion" value={catering.serviceAreas} />}
-                  {catering.capacity && <ReviewRow label="Kapazität" value={`Bis zu ${catering.capacity} Personen`} />}
-                  {catering.dietaryOptions.length > 0 && <ReviewRow label="Ernährungsangebote" value={catering.dietaryOptions.join(", ")} />}
-                  {catering.mobileEquipment.length > 0 && <ReviewRow label="Mobile Ausstattung" value={catering.mobileEquipment.join(", ")} />}
-                </>}
-                {data.imageUrl && <Image src={data.imageUrl} alt="Vorschau des Firmenlogos" width={320} height={160} sizes="320px" className="max-h-32 rounded-lg object-contain" />}
-                <p className="rounded-xl border border-gold/20 bg-gold/5 p-3 text-xs leading-5 text-text-secondary">Mit „{completionActionLabel}“ wird dein Firmenprofil direkt öffentlich auf CineGenius angezeigt. Firmenprofile kannst du danach jederzeit bearbeiten. Angebote bleiben private Entwürfe, bis du sie selbst veröffentlichst.</p>
-              </ReviewSection>;
-            })()}
-            {draft.intents.includes("search") && <p className="rounded-xl border border-border bg-bg-primary p-4 text-sm leading-6 text-text-secondary">Du kannst nach dem Abschluss direkt Personen, Orte und Angebote entdecken.</p>}
-          </div>}
-        </section>
-
-        {error && <p role="alert" className="mt-4 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm leading-6 text-red-300">{error}</p>}
-
-        <div className="mt-5 flex flex-col-reverse items-stretch justify-between gap-3 sm:flex-row sm:items-center">
-          <button type="button" disabled={saving || uploading || currentIndex === 0} onClick={() => void back()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-border px-4 text-sm text-text-primary disabled:cursor-not-allowed disabled:opacity-40"><ArrowLeft size={16} /> Zurück</button>
-          {draft.step !== "review" ? <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
-            {currentDefinition?.optional && <button type="button" disabled={saving || uploading} onClick={() => void skipOptional()} className="min-h-12 rounded-xl border border-border px-4 text-sm text-text-secondary disabled:opacity-50">Später ergänzen</button>}
-            <button type="button" disabled={saving || uploading} onClick={() => void next()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary disabled:opacity-50">{saving ? <><Loader2 size={16} className="animate-spin" /> Speichert …</> : <>Weiter <ArrowRight size={16} /></>}</button>
-          </div> : <button type="button" disabled={saving || uploading} onClick={() => void finish()} className="inline-flex min-h-12 flex-wrap items-center justify-center gap-2 rounded-xl bg-gold px-5 py-3 text-center text-sm font-semibold leading-5 text-bg-primary disabled:opacity-50">{saving ? <><Loader2 size={16} className="shrink-0 animate-spin" /><span>Wird gespeichert …</span></> : <><CheckCircle2 size={17} className="shrink-0" /><span>{completionActionLabel}</span></>}</button>}
-        </div>
-        <p className="mt-4 text-center text-xs leading-5 text-text-muted">Dein Fortschritt wird privat gespeichert. Du kannst später an dieser Stelle weitermachen.</p>
+      </>}
+      <div>
+        <label htmlFor={`quick-start-${intent}-role-search`} className="mb-2 block text-sm font-medium text-text-primary">{intent === "crew" ? "2. Tätigkeit auswählen" : "Tätigkeit auswählen"}</label>
+        <div className="relative"><Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" /><input id={`quick-start-${intent}-role-search`} autoComplete="off" value={roleSearch} onChange={(event) => setRoleSearch(event.target.value)} placeholder={intent === "crew" ? "Zum Beispiel Key Grip oder Schnitt" : "Zum Beispiel Schauspiel, Model oder Komparserie"} className={`${inputClass} pl-10`} /></div>
+        {roleSearch.trim() ? <div className="mt-3 max-h-56 space-y-1 overflow-y-auto rounded-xl border border-border bg-bg-primary p-2">
+          {matches.map((item) => {
+            const selected = data.roles.some((role) => role.departmentId === item.departmentId && role.role === item.role);
+            return <button key={`${item.departmentId}:${item.role}`} type="button" aria-pressed={selected} onClick={() => toggleRole(item, intent)} className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left ${selected ? "bg-gold/10 text-gold" : "text-text-primary hover:bg-bg-elevated"}`}><span className="min-w-0"><span className="block break-words text-sm font-medium">{item.role}</span><span className="block text-xs text-text-muted">{item.departmentLabel}</span></span><span className="shrink-0">{selected ? "✓" : "+"}</span></button>;
+          })}
+          {!matches.length && <p className="px-3 py-4 text-sm text-text-muted">Keine passende Tätigkeit gefunden. Versuche einen anderen Begriff.</p>}
+        </div> : intent === "talent" ? <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          {(castDepartment?.roles ?? []).map((role) => { const selected = data.roles.some((item) => item.role === role); return <button key={role} type="button" aria-pressed={selected} onClick={() => toggleRole({ departmentId: "cast", role }, intent)} className={`flex min-h-11 items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left text-sm ${selected ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-primary text-text-primary"}`}><span className="break-words">{role}</span><span className="shrink-0">{selected ? "✓" : "+"}</span></button>; })}
+        </div> : <div className="mt-3 space-y-2">
+          {data.departmentIds.map((id, index) => {
+            const department = departments.find((item) => item.id === id);
+            if (!department) return null;
+            const selectedCount = data.roles.filter((role) => role.departmentId === id).length;
+            return <details key={id} className="rounded-xl border border-border bg-bg-primary" open={index === 0}><summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-text-primary"><span className="break-words">{department.emoji} {department.label}</span><span className="shrink-0 text-xs font-normal text-text-muted">{selectedCount ? `${selectedCount} gewählt` : `${department.roles.length} Tätigkeiten`}</span></summary><div className="max-h-48 space-y-1 overflow-y-auto border-t border-border p-2">{[...new Set(department.roles)].map((role) => { const selected = data.roles.some((item) => item.departmentId === id && item.role === role); return <button key={role} type="button" aria-pressed={selected} onClick={() => toggleRole({ departmentId: id, role }, intent)} className={`flex min-h-10 w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm ${selected ? "bg-gold/10 text-gold" : "text-text-secondary hover:bg-bg-elevated"}`}><span className="break-words">{role}</span><span className="shrink-0">{selected ? "✓" : "+"}</span></button>; })}</div></details>;
+          })}
+          {!data.departmentIds.length && <p className="rounded-xl border border-border bg-bg-primary p-3 text-sm text-text-muted">Wähle zuerst ein Gewerk. Du kannst auch oben direkt nach einer Tätigkeit suchen.</p>}
+        </div>}
+        <div className="mt-3 flex flex-wrap gap-2">{data.roles.map((item) => <span key={`${item.departmentId}:${item.role}`} className="inline-flex max-w-full items-center gap-2 rounded-full border border-gold/35 bg-gold/10 px-3 py-2 text-xs text-gold"><span className="break-words">{item.role}</span><button type="button" aria-label={`${item.role} entfernen`} onClick={() => toggleRole(item, intent)} className="min-h-6 min-w-6 rounded-full hover:bg-bg-elevated">×</button></span>)}</div>
       </div>
-    </main>
-  );
+    </div>;
+  }
+
+  function renderDetails() {
+    if (activeIntent === "crew") return renderRolePicker("crew");
+    if (activeIntent === "talent") return renderRolePicker("talent");
+    if (activeIntent === "search") return <p className="rounded-xl border border-border bg-bg-primary p-5 text-sm leading-6 text-text-secondary">Du möchtest suchen. Dafür musst du kein eigenes Profil und kein Angebot anlegen. Wähle im nächsten Schritt nur, ob du noch freiwillige Angaben ergänzen möchtest.</p>;
+    const intent = activeIntent;
+    const data = draft.sections[intent] ?? createQuickStartIntentData();
+    if (intent === "location" || intent === "equipment") {
+      const choices = QUICK_START_CATEGORIES[intent];
+      return <div className="space-y-5">
+        <div><p className="mb-2 text-sm font-medium text-text-primary">Welche Art möchtest du anbieten?</p><div id={`quick-start-${intent}-category`} tabIndex={-1} className="grid gap-2 sm:grid-cols-2">{choices.map((item) => <button key={item.value} type="button" aria-pressed={data.category === item.value} onClick={() => updateSection(intent, { category: item.value })} className={`min-h-14 min-w-0 rounded-xl border px-4 py-3 text-left ${data.category === item.value ? "border-gold bg-gold/10" : "border-border bg-bg-primary"}`}><span className="block break-words text-sm font-semibold text-text-primary">{item.label}</span><span className="mt-1 block break-words text-xs text-text-muted">{item.example}</span></button>)}</div></div>
+        <div><label htmlFor={`quick-start-${intent}-title`} className="mb-2 block text-sm font-medium text-text-primary">Wie soll dein Angebot heißen? <span className="text-gold">*</span></label><input id={`quick-start-${intent}-title`} maxLength={200} value={data.title} onChange={(event) => updateSection(intent, { title: event.target.value })} placeholder={intent === "location" ? "Zum Beispiel Altbauwohnung mit Balkon" : "Zum Beispiel LED-Flächenleuchte"} className={inputClass} /></div>
+        <div><label htmlFor={`quick-start-${intent}-city`} className="mb-2 block text-sm font-medium text-text-primary">Wo ist es? <span className="text-gold">*</span></label><input id={`quick-start-${intent}-city`} autoComplete="address-level2" maxLength={100} value={data.city} onChange={(event) => updateSection(intent, { city: event.target.value })} placeholder="Stadt oder Region" className={inputClass} /></div>
+      </div>;
+    }
+    const company = draft.sections.company ?? createQuickStartIntentData();
+    const query = companyCategorySearch.trim().toLocaleLowerCase("de");
+    const categories = QUICK_START_CATEGORIES.company.filter((category) => {
+      const terms = `${category.label} ${category.example} ${category.value === CATERING_COMPANY_CATEGORY.id ? getCateringCompanySearchTerms().join(" ") : ""}`.toLocaleLowerCase("de");
+      return !query || terms.includes(query);
+    });
+    return <div className="space-y-4">
+      <div><label htmlFor="quick-start-company-title" className="mb-2 block text-sm font-medium text-text-primary">Wie heißt deine Firma oder Dienstleistung? <span className="text-gold">*</span></label><input id="quick-start-company-title" autoComplete="organization" maxLength={200} value={company.title} onChange={(event) => updateSection("company", { title: event.target.value })} placeholder="Zum Beispiel Selection Catering" className={inputClass} /></div>
+      <div><label htmlFor="quick-start-company-city" className="mb-2 block text-sm font-medium text-text-primary">Wo ist dein Firmenstandort? <span className="text-gold">*</span></label><input id="quick-start-company-city" autoComplete="address-level2" maxLength={100} value={company.city} onChange={(event) => updateSection("company", { city: event.target.value })} placeholder="Stadt oder Region" className={inputClass} /></div>
+      <div><label htmlFor="quick-start-company-category-search" className="mb-2 block text-sm font-medium text-text-primary">Welche Branche passt? <span className="text-gold">*</span></label><div className="relative mb-3"><Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" /><input id="quick-start-company-category-search" autoComplete="off" value={companyCategorySearch} onChange={(event) => setCompanyCategorySearch(event.target.value)} placeholder="Catering, Studio, Verleih …" className={`${inputClass} pl-10`} /></div>
+        <div id="quick-start-company-categories" tabIndex={-1} className="grid max-h-56 gap-2 overflow-y-auto pr-1 sm:grid-cols-2">{categories.map((category) => { const selected = company.categoryIds.includes(category.value); return <button key={category.value} type="button" aria-pressed={selected} onClick={() => { const categoryIds = selected ? company.categoryIds.filter((id) => id !== category.value) : [...company.categoryIds, category.value]; updateSection("company", { categoryIds, ...(selected && category.value === CATERING_COMPANY_CATEGORY.id ? { cateringDetails: EMPTY_CATERING_COMPANY_DETAILS } : {}) }); }} className={`min-h-14 min-w-0 rounded-xl border px-4 py-3 text-left ${selected ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/50"}`}><span className="block break-words text-sm font-semibold text-text-primary">{category.label}</span><span className="mt-1 block break-words text-xs leading-5 text-text-muted">{category.example}</span></button>; })}{!categories.length && <p className="col-span-full rounded-xl border border-border p-4 text-sm text-text-muted">Keine passende Branche gefunden.</p>}</div>
+        <p className="mt-2 text-xs leading-5 text-text-muted">Du kannst mehrere Branchen auswählen.</p>
+      </div>
+    </div>;
+  }
+
+  function renderOptionalDetails() {
+    if (activeIntent === "search") return <div className="rounded-xl border border-border bg-bg-primary p-5"><p className="text-sm leading-6 text-text-secondary">Für die Suche sind keine weiteren Angaben nötig. Du kannst direkt zur Zusammenfassung gehen.</p></div>;
+    if (activeIntent === "crew" || activeIntent === "talent") {
+      const intent = activeIntent;
+      const data = draft.sections[intent] ?? createQuickStartIntentData();
+      return <div className="space-y-5"><div><p className="mb-3 text-sm font-medium text-text-primary">Profilfoto <span className="text-text-muted">(freiwillig)</span></p>{renderPhotoInput(intent, "Profilfoto auswählen")}</div><div><label htmlFor="quick-start-talent-intro" className="mb-2 block text-sm font-medium text-text-primary">Kurze Vorstellung <span className="text-text-muted">(freiwillig)</span></label><textarea id="quick-start-talent-intro" rows={4} maxLength={1200} value={draft.talentIntro} onChange={(event) => update("talentIntro", event.target.value)} placeholder="Was sollten andere über dich wissen?" className="w-full rounded-xl border border-border bg-bg-primary p-4 text-base text-text-primary outline-none focus:border-gold" /><p className="mt-1 text-xs text-text-muted">Die Vorstellung gehört zu deinem persönlichen Profil.</p></div>{data.imageUrl && <p className="text-xs text-text-muted">Das Foto wird deinem persönlichen Profil zugeordnet.</p>}</div>;
+    }
+    const intent = activeIntent;
+    const data = draft.sections[intent] ?? createQuickStartIntentData();
+    const isCompany = intent === "company";
+    return <div className="space-y-5">
+      <div><label htmlFor={`quick-start-${intent}-description`} className="mb-2 block text-sm font-medium text-text-primary">Kurze Beschreibung <span className="text-text-muted">(freiwillig)</span></label><textarea id={`quick-start-${intent}-description`} rows={4} maxLength={3000} value={data.description} onChange={(event) => updateSection(intent, { description: event.target.value })} placeholder={isCompany ? "Was bietet deine Firma an?" : intent === "location" ? "Was ist an diesem Ort besonders?" : "Was ist enthalten und in welchem Zustand ist es?"} className="w-full rounded-xl border border-border bg-bg-primary p-4 text-base text-text-primary outline-none focus:border-gold" /><p className="mt-1 text-xs text-text-muted">Die Beschreibung gehört zu {isCompany ? "deinem Firmenprofil" : "diesem Angebotsentwurf"}.</p></div>
+      <div><p className="mb-3 text-sm font-medium text-text-primary">{isCompany ? "Firmenlogo" : "Foto für dein Angebot"} <span className="text-text-muted">(freiwillig)</span></p>{renderPhotoInput(intent, isCompany ? "Firmenlogo auswählen" : "Angebotsfoto auswählen")}</div>
+      {isCompany ? <div className="space-y-4 rounded-xl border border-border bg-bg-primary p-4"><p className="text-sm font-medium text-text-primary">Kontaktangaben <span className="text-text-muted">(freiwillig)</span></p><div><label htmlFor="quick-start-company-email" className="mb-2 block text-sm text-text-primary">Kontakt-E-Mail</label><input id="quick-start-company-email" type="email" autoComplete="email" maxLength={200} value={data.contactEmail} onChange={(event) => updateSection("company", { contactEmail: event.target.value })} placeholder="kontakt@beispiel.de" className={inputClass} /></div><div><label htmlFor="quick-start-company-phone" className="mb-2 block text-sm text-text-primary">Telefon</label><input id="quick-start-company-phone" type="tel" autoComplete="tel" maxLength={80} value={data.contactPhone} onChange={(event) => updateSection("company", { contactPhone: event.target.value })} placeholder="Optional" className={inputClass} /></div><div><label htmlFor="quick-start-company-website" className="mb-2 block text-sm text-text-primary">Webseite</label><input id="quick-start-company-website" type="url" autoComplete="url" maxLength={300} value={data.website} onChange={(event) => updateSection("company", { website: event.target.value })} placeholder="https://…" className={inputClass} /></div></div> : <div className="rounded-xl border border-border bg-bg-primary p-4"><p className="mb-3 text-sm text-text-primary">Preis <span className="text-text-muted">(freiwillig)</span></p><div className="space-y-2"><button type="button" aria-pressed={data.priceOnRequest} onClick={() => updateSection(intent, { priceOnRequest: true })} className={`min-h-12 w-full rounded-xl border px-4 text-left text-sm ${data.priceOnRequest ? "border-gold bg-gold/10 text-text-primary" : "border-border text-text-secondary"}`}>Preis auf Anfrage</button><button type="button" aria-pressed={!data.priceOnRequest} onClick={() => updateSection(intent, { priceOnRequest: false })} className={`min-h-12 w-full rounded-xl border px-4 text-left text-sm ${!data.priceOnRequest ? "border-gold bg-gold/10 text-text-primary" : "border-border text-text-secondary"}`}>Tagespreis angeben</button>{!data.priceOnRequest && <div><label htmlFor={`quick-start-${intent}-price`} className="mb-2 mt-3 block text-sm text-text-primary">Preis pro Tag in Euro</label><input id={`quick-start-${intent}-price`} type="number" min="0" step="1" value={data.price} onChange={(event) => updateSection(intent, { price: event.target.value })} placeholder="Zum Beispiel 150" className={inputClass} /></div>}</div></div>}
+      {isCompany && data.categoryIds.includes(CATERING_COMPANY_CATEGORY.id) && <div className="rounded-xl border border-border bg-bg-primary p-4"><p className="mb-3 text-sm font-medium text-text-primary">Catering-Leistungen <span className="text-text-muted">(freiwillig)</span></p><CateringCompanyFields value={data.cateringDetails} onChange={(cateringDetails) => updateSection("company", { cateringDetails })} /></div>}
+    </div>;
+  }
+
+  if (!ready) return <div className="min-h-screen bg-bg-primary px-4 pt-20 text-center text-sm text-text-muted"><Loader2 className="mx-auto mb-3 animate-spin" />Dein Start wird geladen …</div>;
+  if (loadError) return <div className="min-h-[75vh] bg-bg-primary px-4 pb-8 pt-8 sm:pt-12"><section className="mx-auto max-w-xl rounded-2xl border border-border bg-bg-secondary p-6 text-center"><p role="alert" className="text-sm leading-6 text-red-300">{loadError}</p><p className="mt-2 text-xs leading-5 text-text-muted">Damit kein gespeicherter Fortschritt verloren geht, starte bitte erst weiter, wenn der Status geladen wurde.</p><button type="button" onClick={() => { setReady(false); setLoadError(""); setLoadAttempt((value) => value + 1); }} className="mt-5 min-h-12 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary">Erneut versuchen</button></section></div>;
+
+  return <div className="min-h-screen bg-bg-primary px-4 pb-[calc(7rem+env(safe-area-inset-bottom))] pt-6 sm:pt-10">
+    <div className="mx-auto w-full max-w-2xl">
+      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-gold">Dein Start auf CineGenius</p>
+      <div className="mb-5 flex items-center justify-between gap-4" aria-label={`Schritt ${currentIndex + 1} von 6`}><span className="text-sm font-semibold text-text-secondary">Schritt {currentIndex + 1} von 6</span><span role="status" aria-live="polite" className="text-xs text-text-muted">{saveLabel}</span></div>
+      <div className="mb-6 h-1.5 overflow-hidden rounded-full bg-bg-elevated"><div className="h-full rounded-full bg-gold transition-all" style={{ width: `${((currentIndex + 1) / 6) * 100}%` }} /></div>
+      <h1 className="mb-2 break-words font-display text-2xl font-bold text-text-primary sm:text-3xl">{currentContent.title}</h1>
+      <p className="mb-6 max-w-2xl text-sm leading-6 text-text-muted">{currentContent.description}</p>
+
+      <section className="min-w-0 rounded-2xl border border-border bg-bg-secondary p-4 sm:p-7">
+        {draft.step === "name" && <div><label htmlFor="quick-start-name" className="mb-2 block text-sm font-medium text-text-primary">Vor- und Nachname oder Künstlername <span className="text-gold">*</span></label><input id="quick-start-name" autoComplete="name" maxLength={120} value={draft.name} onChange={(event) => update("name", event.target.value)} placeholder="Dein Name" className={inputClass} aria-describedby="quick-start-name-help" /><p id="quick-start-name-help" className="mt-2 text-xs leading-5 text-text-muted">Du kannst später festlegen, welche Angaben öffentlich sichtbar sind.</p></div>}
+
+        {draft.step === "location" && <div className="space-y-4"><div><label htmlFor="quick-start-person-city" className="mb-2 block text-sm font-medium text-text-primary">Stadt oder Region {hasProfileIntent && <span className="text-gold">*</span>}</label><input id="quick-start-person-city" autoComplete="address-level2" maxLength={100} value={draft.personCity} onChange={(event) => update("personCity", event.target.value)} placeholder="Zum Beispiel Leipzig" className={inputClass} /></div><div><label htmlFor="quick-start-person-country" className="mb-2 block text-sm font-medium text-text-primary">Land {hasProfileIntent && <span className="text-gold">*</span>}</label><select id="quick-start-person-country" value={countryOther ? "Andere" : draft.personCountry || "Deutschland"} onChange={(event) => { const other = event.target.value === "Andere"; setCountryOther(other); update("personCountry", other ? "" : event.target.value); }} className={inputClass}><option>Deutschland</option><option>Österreich</option><option>Schweiz</option><option value="Andere">Anderes Land</option></select>{countryOther && <input aria-label="Land eingeben" autoComplete="country-name" maxLength={100} value={draft.personCountry} onChange={(event) => update("personCountry", event.target.value)} placeholder="Land eingeben" className={`${inputClass} mt-3`} />}</div>{!hasProfileIntent && <p className="text-xs leading-5 text-text-muted">Diese Angabe ist freiwillig, wenn du nur suchen möchtest.</p>}</div>}
+
+        {draft.step === "goals" && <div id="quick-start-goals" tabIndex={-1} className="grid gap-3 sm:grid-cols-2">{paths.map(({ id, detail, Icon }) => { const selected = draft.intents.includes(id); return <button key={id} type="button" aria-pressed={selected} onClick={() => toggleIntent(id)} className={`flex min-h-24 min-w-0 items-start gap-3 rounded-xl border p-4 text-left transition-colors ${selected ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/50"}`}><span className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${selected ? "bg-gold/15 text-gold" : "bg-bg-elevated text-text-muted"}`}><Icon size={19} /></span><span className="min-w-0 flex-1"><span className="block break-words text-sm font-semibold text-text-primary">{QUICK_START_INTENT_LABELS[id]}</span><span className="mt-1 block break-words text-xs leading-5 text-text-muted">{detail}</span></span><span aria-hidden="true" className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-xs ${selected ? "border-gold bg-gold text-bg-primary" : "border-border text-transparent"}`}>✓</span></button>; })}</div>}
+
+        {draft.step === "details" && <div>
+          {detailIntents.length > 1 && <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-bg-primary px-3 py-2"><span className="text-xs text-text-muted">Bereich {activeDetailIndex + 1} von {detailIntents.length}</span><span className="text-xs font-medium text-text-primary">{QUICK_START_INTENT_LABELS[activeIntent]}</span></div>}
+          {renderDetails()}
+        </div>}
+
+        {draft.step === "intro" && <div>
+          {introIntents.length > 1 && <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-bg-primary px-3 py-2"><span className="text-xs text-text-muted">Ergänzung {activeIntroIndex + 1} von {introIntents.length}</span><span className="text-xs font-medium text-text-primary">{activeIntent === "crew" && draft.intents.includes("talent") ? "Dein persönliches Profil" : QUICK_START_INTENT_LABELS[activeIntent]}</span></div>}
+          {renderOptionalDetails()}
+        </div>}
+
+        {draft.step === "review" && <div className="space-y-4">
+          <ReviewSection title="Dein Name" onEdit={() => editReview("name")}><ReviewRow label="Name" value={draft.name} /></ReviewSection>
+          <ReviewSection title="Dein Ort" onEdit={() => editReview("location")}><ReviewRow label="Standort" value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} /></ReviewSection>
+          <ReviewSection title="Deine Auswahl" onEdit={() => editReview("goals")}><p className="break-words text-sm text-text-primary">{selectedIntentTitles.join(" · ") || "—"}</p></ReviewSection>
+          {(draft.intents.includes("crew") || draft.intents.includes("talent")) && <>
+            <ReviewSection title="Dein persönliches Profil" onEdit={() => editReview("details", draft.intents.includes("crew") ? "crew" : "talent")}><ReviewRow label="Tätigkeiten" value={selectedRoles.map((role) => role.role).join(", ")} /><ReviewRow label="Standort" value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} /><p className="rounded-xl border border-amber-400/25 bg-amber-500/5 p-3 text-xs leading-5 text-text-muted">Mit „Profil erstellen“ werden deine Angaben öffentlich auf CineGenius sichtbar.</p></ReviewSection>
+            <ReviewSection title="Foto und Vorstellung" onEdit={() => editReview("intro", draft.intents.includes("crew") ? "crew" : "talent")}>{draft.sections.crew?.imageUrl && <Image src={draft.sections.crew.imageUrl} alt="Profilfoto" width={240} height={240} className="h-20 w-20 rounded-xl object-cover" />}{draft.sections.talent?.imageUrl && <Image src={draft.sections.talent.imageUrl} alt="Profilfoto" width={240} height={240} className="h-20 w-20 rounded-xl object-cover" />}<ReviewRow label="Vorstellung" value={draft.talentIntro} /></ReviewSection>
+          </>}
+          {draft.intents.filter((intent) => intent === "location" || intent === "equipment").map((intent) => { const data = draft.sections[intent] ?? createQuickStartIntentData(); const categoryName = QUICK_START_CATEGORIES[intent].find((item) => item.value === data.category)?.label ?? data.category; return <div key={intent} className="space-y-3"><ReviewSection title={QUICK_START_INTENT_LABELS[intent]} onEdit={() => editReview("details", intent)}><ReviewRow label="Art" value={categoryName} /><ReviewRow label="Angebot" value={data.title} /><ReviewRow label="Standort" value={data.city} /></ReviewSection><ReviewSection title={`${QUICK_START_INTENT_LABELS[intent]}: Ergänzungen`} onEdit={() => editReview("intro", intent)}>{data.description && <ReviewRow label="Beschreibung" value={data.description} />}<ReviewRow label="Preis" value={data.priceOnRequest ? "Auf Anfrage" : `${data.price} € pro Tag`} />{data.imageUrl && <Image src={data.imageUrl} alt="Angebotsfoto" width={720} height={480} sizes="(max-width: 640px) 100vw, 640px" className="max-h-40 w-full rounded-lg object-contain" />}<p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">Dein Angebot wird als privater Entwurf gespeichert. Du entscheidest später ausdrücklich, ob du es veröffentlichst.</p></ReviewSection></div>; })}
+          {draft.intents.includes("company") && (() => { const data = draft.sections.company ?? createQuickStartIntentData(); const categoryLabels = QUICK_START_CATEGORIES.company.filter((category) => data.categoryIds.includes(category.value)).map((category) => category.label); const catering = data.cateringDetails; return <>
+            <ReviewSection title="Deine Firma oder Dienstleistung" onEdit={() => editReview("details", "company")}><ReviewRow label="Name" value={data.title} /><ReviewRow label="Standort" value={data.city} /><ReviewRow label="Branchen" value={categoryLabels.join(", ")} /></ReviewSection>
+            <ReviewSection title="Firmenbeschreibung und Kontakt" onEdit={() => editReview("intro", "company")}>{data.description && <ReviewRow label="Beschreibung" value={data.description} />}{data.contactEmail && <ReviewRow label="Kontakt-E-Mail" value={data.contactEmail} />}{data.contactPhone && <ReviewRow label="Telefon" value={data.contactPhone} />}{data.website && <ReviewRow label="Webseite" value={data.website} />}{data.categoryIds.includes(CATERING_COMPANY_CATEGORY.id) && catering.serviceTypes.length > 0 && <ReviewRow label="Catering-Leistungen" value={catering.serviceTypes.join(", ")} />}{data.imageUrl && <Image src={data.imageUrl} alt="Firmenlogo" width={320} height={160} sizes="320px" className="max-h-32 rounded-lg object-contain" />}</ReviewSection>
+            <ReviewSection title="Sichtbarkeit deiner Firma" onEdit={() => editReview("details", "company")}><p className="rounded-xl border border-gold/20 bg-gold/5 p-3 text-xs leading-5 text-text-secondary">Wenn du abschließt, wird dein Firmenprofil öffentlich auf CineGenius angezeigt. Firmenprofile kannst du danach bearbeiten. Etwaige Location- und Marktplatzangebote bleiben private Entwürfe, bis du sie ausdrücklich veröffentlichst.</p></ReviewSection>
+          </>; })()}
+          {draft.intents.includes("search") && <p className="rounded-xl border border-border bg-bg-primary p-4 text-sm leading-6 text-text-secondary">Du kannst nach dem Abschluss direkt Personen, Orte und Angebote entdecken.</p>}
+        </div>}
+      </section>
+
+      {error && <p role="alert" className="mt-4 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm leading-6 text-red-300">{error}</p>}
+      <div className="sticky bottom-0 z-30 -mx-4 mt-5 flex flex-col-reverse items-stretch justify-between gap-3 border-t border-border bg-bg-primary/95 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur sm:static sm:mx-0 sm:flex-row sm:items-center sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+        <button type="button" disabled={saving || uploading || currentIndex === 0} onClick={() => void back()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-border px-4 text-sm text-text-primary disabled:cursor-not-allowed disabled:opacity-40"><ArrowLeft size={16} /> Zurück</button>
+        {draft.step !== "review" ? <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">{draft.step === "intro" && <button type="button" disabled={saving || uploading} onClick={() => void skipOptional()} className="min-h-12 rounded-xl border border-border px-4 text-sm text-text-secondary disabled:opacity-50">Später ergänzen</button>}<button type="button" disabled={saving || uploading} onClick={() => void next()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary disabled:opacity-50">{saving ? <><Loader2 size={16} className="animate-spin" /> Speichert …</> : <>Weiter <ArrowRight size={16} /></>}</button></div> : <button type="button" disabled={saving || uploading} onClick={() => void finish()} className="inline-flex min-h-12 flex-wrap items-center justify-center gap-2 rounded-xl bg-gold px-5 py-3 text-center text-sm font-semibold leading-5 text-bg-primary disabled:opacity-50">{saving ? <><Loader2 size={17} className="shrink-0 animate-spin" /><span>Wird gespeichert …</span></> : <><CheckCircle2 size={17} className="shrink-0" /><span>{completionActionLabel}</span></>}</button>}
+      </div>
+      <p className="mt-4 text-center text-xs leading-5 text-text-muted">Dein Fortschritt wird privat gespeichert. Nach einer Unterbrechung geht es hier weiter.</p>
+    </div>
+  </div>;
 }
 
 function ReviewSection({ title, onEdit, children }: { title: string; onEdit: () => void; children: ReactNode }) {

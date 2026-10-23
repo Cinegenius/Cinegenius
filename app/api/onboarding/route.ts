@@ -59,7 +59,7 @@ export async function PUT(request: NextRequest) {
     const input = raw as Record<string, unknown>;
     const normalized = normalizeQuickStartDraft(input);
     if ((normalized.intents.length > 0 && !normalized.intents.includes(record.intent as typeof QUICK_START_INTENTS[number]))
-      || (input.version === 2 && typeof input.step !== "string")) {
+      || ((input.version === 2 || input.version === 3) && typeof input.step !== "string")) {
       return json({ error: "Dein Einrichtungsentwurf passt nicht zur gewählten Aufgabe." }, 400);
     }
     const validation = normalized.step === "review" ? validateQuickStartDraft(normalized) : null;

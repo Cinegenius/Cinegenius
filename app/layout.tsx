@@ -9,9 +9,7 @@ import { cookies } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import BottomNav from "@/components/BottomNav";
-import Footer from "@/components/Footer";
+import AppChrome from "@/components/AppChrome";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import GlobalEffects from "@/components/GlobalEffects";
 import PresencePing from "@/components/PresencePing";
@@ -19,7 +17,6 @@ import CookieBanner from "@/components/CookieBanner";
 import { ToastProvider } from "@/contexts/ToastContext";
 import GlobalSearch from "@/components/GlobalSearch";
 import AuthSessionBoundary from "@/components/AuthSessionBoundary";
-import PersonalAreaNavigation from "@/components/PersonalAreaNavigation";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -139,13 +136,8 @@ export default async function RootLayout({
                 <GlobalEffects />
                 <PresencePing />
                 <GlobalSearch />
-                <Navbar initialIsSignedIn={!!userId} />
-                <main className="flex-1 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
-                  <PersonalAreaNavigation>{children}</PersonalAreaNavigation>
-                </main>
-                <Footer />
+                <AppChrome initialIsSignedIn={!!userId}>{children}</AppChrome>
                 <CookieBanner />
-                <BottomNav />
                 <Analytics />
                 <SpeedInsights />
               </AuthSessionBoundary>

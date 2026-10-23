@@ -6,13 +6,11 @@ import { CATERING_COMPANY_CATEGORY, normalizeCateringCompanyDetails, type Cateri
 
 export const QUICK_START_INTENTS = ["crew", "talent", "location", "equipment", "company", "search"] as const;
 export type QuickStartIntent = typeof QUICK_START_INTENTS[number];
+export type QuickStartProviderIntent = Exclude<QuickStartIntent, "search">;
 
-export const QUICK_START_SCREENS = [
-  "name", "goals", "crew-departments", "crew-roles", "person-city", "talent-roles", "talent-intro",
-  "location-category", "location-details", "location-photo", "location-price",
-  "equipment-category", "equipment-details", "equipment-photo", "equipment-price",
-  "company-details", "company-categories", "company-catering", "company-photo", "review",
-] as const;
+/** The registration wizard always has the same six named steps. Intent-specific
+ * detail panels are subviews within steps 4 and 5, not extra progress steps. */
+export const QUICK_START_SCREENS = ["name", "location", "goals", "details", "intro", "review"] as const;
 export type QuickStartScreen = typeof QUICK_START_SCREENS[number];
 
 export type QuickStartRoleSelection = { departmentId: string; role: string };
@@ -33,11 +31,13 @@ export type QuickStartIntentData = {
   cateringDetails: CateringCompanyDetails;
 };
 export type QuickStartDraft = {
-  version: 2;
+  version: 3;
   step: QuickStartScreen;
   intents: QuickStartIntent[];
   name: string;
   personCity: string;
+  personCountry: string;
+  activeIntent: QuickStartIntent | null;
   talentIntro: string;
   sections: Partial<Record<QuickStartIntent, QuickStartIntentData>>;
   completed: { profile: boolean; listings: Partial<Record<"location" | "equipment", string>>; company?: string };
@@ -45,11 +45,13 @@ export type QuickStartDraft = {
 };
 
 export const START_QUICK_START_DRAFT: QuickStartDraft = {
-  version: 2,
+  version: 3,
   step: "name",
   intents: [],
   name: "",
   personCity: "",
+  personCountry: "Deutschland",
+  activeIntent: null,
   talentIntro: "",
   sections: {},
   completed: { profile: false, listings: {} },
@@ -58,11 +60,11 @@ export const START_QUICK_START_DRAFT: QuickStartDraft = {
 
 export const QUICK_START_INTENT_LABELS: Record<QuickStartIntent, string> = {
   crew: "Als Crewmitglied arbeiten",
-  talent: "Als Schauspieler, Model oder Komparse mitmachen",
-  location: "Eine Location anbieten",
-  equipment: "Equipment, Fahrzeuge oder Requisiten anbieten",
-  company: "Eine Firma präsentieren",
-  search: "Personen oder Angebote für ein Projekt suchen",
+  talent: "Vor der Kamera mitmachen: Schauspiel, Model oder Komparserie",
+  location: "Eine Location oder ein Studio anbieten",
+  equipment: "Etwas im Marktplatz anbieten: Equipment, Fahrzeuge oder Requisiten",
+  company: "Eine Firma oder Dienstleistung anbieten, zum Beispiel Catering",
+  search: "Für ein Projekt suchen oder Unterstützung finden",
 };
 
 export const QUICK_START_CATEGORIES = {
@@ -145,9 +147,10 @@ function isQuickStartIntent(value: unknown): value is QuickStartIntent {
 export function normalizeQuickStartDraft(value: unknown): QuickStartDraft {
   if (!value || typeof value !== "object" || Array.isArray(value)) return START_QUICK_START_DRAFT;
   const input = value as Partial<QuickStartDraft> & Record<string, unknown>;
+  const inputVersion = (input as Record<string, unknown>).version;
 
-  // Migrate the previous three-screen quick-start draft without discarding its entries.
-  if (input.version !== 2) {
+  // Migrate the older single-intent draft without discarding its entries.
+  if (inputVersion !== 2 && inputVersion !== 3) {
     const oldIntent = input.intent;
     const intent: QuickStartIntent | null = oldIntent === "talent" ? "talent"
       : oldIntent === "location" || oldIntent === "equipment" || oldIntent === "company" || oldIntent === "search" ? oldIntent : null;
@@ -159,17 +162,14 @@ export function normalizeQuickStartDraft(value: unknown): QuickStartDraft {
       roles: typeof input.departmentId === "string" && typeof input.role === "string" ? [{ departmentId: input.departmentId, role: input.role }] : [],
     });
     const legacyStep = (input as Record<string, unknown>).step;
-    const step: QuickStartScreen = legacyStep === 3 ? "review"
-      : intent === "talent" ? "talent-roles"
-        : intent === "location" ? "location-category"
-          : intent === "equipment" ? "equipment-category"
-            : "name";
+    const step: QuickStartScreen = legacyStep === 3 ? "review" : "name";
     return {
       ...START_QUICK_START_DRAFT,
       step,
       intents: intent ? [intent] : [],
       name: typeof input.name === "string" ? input.name.slice(0, 120) : "",
       personCity: intent === "talent" ? legacyData.city : "",
+      activeIntent: intent,
       sections: intent ? { [intent]: legacyData } : {},
     };
   }
@@ -188,12 +188,34 @@ export function normalizeQuickStartDraft(value: unknown): QuickStartDraft {
     const value = rawRequestKeys[key];
     if (typeof value === "string" && /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(value)) requestKeys[key] = value;
   }
+  const rawStep = (input as Record<string, unknown>).step;
+  const legacyStep = typeof rawStep === "string" ? rawStep : "name";
+  const migratedStep: QuickStartScreen = validScreenSet.has(legacyStep)
+    ? legacyStep as QuickStartScreen
+    : legacyStep === "goals" ? "goals"
+      : legacyStep === "person-city" ? "location"
+        : legacyStep === "review" ? "review"
+          : ["talent-intro", "location-photo", "location-price", "equipment-photo", "equipment-price", "company-photo", "company-catering"].includes(legacyStep) ? "intro"
+            : ["crew-departments", "crew-roles", "talent-roles", "location-category", "location-details", "equipment-category", "equipment-details", "company-details", "company-categories"].includes(legacyStep) ? "details"
+              : "name";
+  const rawActiveIntent = input.activeIntent;
+  const oldStepIntent = legacyStep.startsWith("crew-") ? "crew"
+    : legacyStep.startsWith("talent-") ? "talent"
+      : legacyStep.startsWith("location-") ? "location"
+        : legacyStep.startsWith("equipment-") ? "equipment"
+          : legacyStep.startsWith("company-") ? "company" : null;
+  const activeIntent = isQuickStartIntent(rawActiveIntent)
+    ? rawActiveIntent
+    : oldStepIntent && intents.includes(oldStepIntent) ? oldStepIntent
+      : intents.find((intent) => intent !== "search") ?? null;
   return {
-    version: 2,
-    step: typeof input.step === "string" && validScreenSet.has(input.step) ? input.step as QuickStartScreen : "name",
+    version: 3,
+    step: migratedStep,
     intents,
     name: typeof input.name === "string" ? input.name.slice(0, 120) : "",
     personCity: typeof input.personCity === "string" ? input.personCity.slice(0, 100) : "",
+    personCountry: typeof input.personCountry === "string" ? input.personCountry.slice(0, 100) : "Deutschland",
+    activeIntent,
     talentIntro: typeof input.talentIntro === "string" ? input.talentIntro.slice(0, 1200) : "",
     sections,
     completed: {
@@ -211,33 +233,25 @@ export function normalizeQuickStartDraft(value: unknown): QuickStartDraft {
 export type QuickStartScreenDefinition = { id: QuickStartScreen; intent?: QuickStartIntent; optional?: boolean };
 
 export function buildQuickStartScreens(draft: QuickStartDraft): QuickStartScreenDefinition[] {
-  const screens: QuickStartScreenDefinition[] = [{ id: "name" }, { id: "goals" }];
-  let personCityAdded = false;
-  for (const intent of draft.intents) {
-    if (intent === "search") continue;
-    if (intent === "crew") {
-      screens.push({ id: "crew-departments", intent }, { id: "crew-roles", intent });
-      if (!personCityAdded) { screens.push({ id: "person-city", intent }); personCityAdded = true; }
-    } else if (intent === "talent") {
-      screens.push({ id: "talent-roles", intent });
-      if (!personCityAdded) { screens.push({ id: "person-city", intent }); personCityAdded = true; }
-      screens.push({ id: "talent-intro", intent, optional: true });
-    } else if (intent === "location") {
-      screens.push({ id: "location-category", intent }, { id: "location-details", intent }, { id: "location-photo", intent, optional: true }, { id: "location-price", intent, optional: true });
-    } else if (intent === "equipment") {
-      screens.push({ id: "equipment-category", intent }, { id: "equipment-details", intent }, { id: "equipment-photo", intent, optional: true }, { id: "equipment-price", intent, optional: true });
-    } else if (intent === "company") {
-      screens.push({ id: "company-details", intent }, { id: "company-categories", intent });
-      if (draft.sections.company?.categoryIds.includes(CATERING_COMPANY_CATEGORY.id)) screens.push({ id: "company-catering", intent, optional: true });
-      screens.push({ id: "company-photo", intent, optional: true });
-    }
+  void draft;
+  return QUICK_START_SCREENS.map((id) => ({ id, optional: id === "intro" }));
+}
+
+/** A person may choose both crew and talent, but their profile photo and short
+ * introduction are shared. Keep one personal-profile panel in step five. */
+export function getQuickStartIntroIntents(intents: readonly QuickStartIntent[]): QuickStartIntent[] {
+  const selected = new Set(intents);
+  const result: QuickStartIntent[] = [];
+  if (selected.has("crew")) result.push("crew");
+  else if (selected.has("talent")) result.push("talent");
+  for (const intent of intents) {
+    if (intent !== "crew" && intent !== "talent" && intent !== "search" && !result.includes(intent)) result.push(intent);
   }
-  screens.push({ id: "review" });
-  return screens;
+  return result;
 }
 
 export function getFirstScreenForIntent(draft: QuickStartDraft, intent: QuickStartIntent): QuickStartScreen {
-  return buildQuickStartScreens(draft).find((screen) => screen.intent === intent)?.id ?? "goals";
+  return draft.intents.includes(intent) ? "details" : "goals";
 }
 
 function termsFor(item: QuickStartRole): string[] {
@@ -283,42 +297,66 @@ export function getQuickStartProfileTypesForRoles(roles: readonly QuickStartRole
 
 export type QuickStartValidation = { field: string; message: string };
 
-export function validateQuickStartScreen(draft: QuickStartDraft, screen: QuickStartScreen): QuickStartValidation | null {
+export function validateQuickStartIntentDetails(draft: QuickStartDraft, intent: QuickStartIntent): QuickStartValidation | null {
+  if (intent === "search") return null;
+  const section = draft.sections[intent];
+  if (intent === "crew") {
+    if (!section?.departmentIds.length) return { field: "crew-departments", message: "Wähle mindestens ein Gewerk aus." };
+    if (!section.roles.length) return { field: "crew-roles", message: "Wähle mindestens eine passende Tätigkeit aus." };
+  }
+  if (intent === "talent" && !section?.roles.length) return { field: "talent-roles", message: "Wähle mindestens eine passende Tätigkeit aus." };
+  if (intent === "location" || intent === "equipment") {
+    const choices = QUICK_START_CATEGORIES[intent];
+    if (!choices.some((item) => item.value === section?.category)) {
+      return { field: `${intent}-category`, message: intent === "location" ? "Wähle eine passende Art der Location aus." : "Wähle eine passende Angebotskategorie aus." };
+    }
+    if (!section?.title.trim()) return { field: `${intent}-title`, message: "Bitte gib deinem Angebot einen kurzen Namen." };
+    if (!section.city.trim()) return { field: `${intent}-city`, message: "Bitte gib den Standort des Angebots an." };
+  }
+  if (intent === "company") {
+    if (!section?.title.trim()) return { field: "company-title", message: "Bitte gib den Namen deiner Firma ein." };
+    if (!section.city.trim()) return { field: "company-city", message: "Bitte gib den Firmenstandort an." };
+    if (!section.categoryIds.length) return { field: "company-categories", message: "Wähle mindestens eine passende Firmenkategorie aus." };
+  }
+  return null;
+}
+
+export function validateQuickStartScreen(draft: QuickStartDraft, screen: QuickStartScreen, activeIntent?: QuickStartIntent | null): QuickStartValidation | null {
   if (screen === "name" && !draft.name.trim()) return { field: "name", message: "Wie dürfen wir dich nennen? Bitte gib deinen Namen ein." };
   if (screen === "goals" && draft.intents.length === 0) return { field: "goals", message: "Wähle mindestens einen Bereich aus, damit wir dich passend weiterführen können." };
-  if (screen === "crew-departments" && !(draft.sections.crew?.departmentIds.length)) return { field: "crew-departments", message: "Wähle mindestens ein Gewerk aus." };
-  if (screen === "crew-roles" && !(draft.sections.crew?.roles.length)) return { field: "crew-roles", message: "Wähle mindestens eine Tätigkeit aus." };
-  if (screen === "talent-roles" && !(draft.sections.talent?.roles.length)) return { field: "talent-roles", message: "Wähle mindestens eine passende Tätigkeit aus." };
-  if (screen === "person-city" && !draft.personCity.trim()) return { field: "personCity", message: "Bitte gib eine Stadt oder Region an." };
-  if (screen === "location-category" && !QUICK_START_CATEGORIES.location.some((item) => item.value === draft.sections.location?.category)) return { field: "location-category", message: "Wähle eine passende Art der Location aus." };
-  if (screen === "equipment-category" && !QUICK_START_CATEGORIES.equipment.some((item) => item.value === draft.sections.equipment?.category)) return { field: "equipment-category", message: "Wähle aus, welche Art von Dingen du anbietest." };
-  if (screen === "location-details" || screen === "equipment-details") {
-    const intent = screen.startsWith("location") ? "location" : "equipment";
-    const section = draft.sections[intent];
-    if (!section?.title.trim()) return { field: `${intent}-title`, message: "Bitte gib deinem Angebot einen kurzen Namen." };
-    if (!section.city.trim()) return { field: `${intent}-city`, message: "Bitte gib die Stadt oder Region an." };
+  if (screen === "location" && (draft.intents.includes("crew") || draft.intents.includes("talent"))) {
+    if (!draft.personCity.trim()) return { field: "personCity", message: "Bitte gib deine Stadt oder Region an." };
+    if (!draft.personCountry.trim()) return { field: "personCountry", message: "Bitte wähle dein Land aus." };
   }
-  if (screen === "location-price" || screen === "equipment-price") {
-    const intent = screen.startsWith("location") ? "location" : "equipment";
-    const section = draft.sections[intent];
-    if (section && !section.priceOnRequest && (!section.price.trim() || !Number.isFinite(Number(section.price)) || Number(section.price) < 0)) {
-      return { field: `${intent}-price`, message: "Gib einen gültigen Preis in Euro an oder wähle ‚Preis auf Anfrage‘." };
+  if (screen === "details") {
+    const intent = activeIntent && draft.intents.includes(activeIntent)
+      ? activeIntent
+      : draft.intents.find((item) => item !== "search");
+    if (intent) return validateQuickStartIntentDetails(draft, intent);
+  }
+  if (screen === "intro") {
+    for (const intent of ["location", "equipment"] as const) {
+      const section = draft.sections[intent];
+      if (draft.intents.includes(intent) && section && !section.priceOnRequest && (!section.price.trim() || !Number.isFinite(Number(section.price)) || Number(section.price) < 0)) {
+        return { field: `${intent}-price`, message: "Gib einen gültigen Preis in Euro an oder wähle ‚Preis auf Anfrage‘." };
+      }
     }
   }
-  if (screen === "company-details") {
-    const company = draft.sections.company;
-    if (!company?.title.trim()) return { field: "company-title", message: "Bitte gib den Namen deiner Firma ein." };
-    if (!company.city.trim()) return { field: "company-city", message: "Bitte gib den Firmenstandort an." };
-  }
-  if (screen === "company-categories" && !(draft.sections.company?.categoryIds.length)) return { field: "company-categories", message: "Wähle mindestens eine passende Firmenkategorie aus." };
   return null;
 }
 
 export function validateQuickStartDraft(draft: QuickStartDraft): QuickStartValidation | null {
-  for (const screen of buildQuickStartScreens(draft)) {
-    if (screen.id === "review" || screen.optional) continue;
-    const validation = validateQuickStartScreen(draft, screen.id);
-    if (validation) return validation;
+  const name = validateQuickStartScreen(draft, "name");
+  if (name) return name;
+  const goals = validateQuickStartScreen(draft, "goals");
+  if (goals) return goals;
+  const location = validateQuickStartScreen(draft, "location");
+  if (location) return location;
+  for (const intent of draft.intents) {
+    const details = validateQuickStartIntentDetails(draft, intent);
+    if (details) return details;
   }
+  const intro = validateQuickStartScreen(draft, "intro");
+  if (intro) return intro;
   return null;
 }
