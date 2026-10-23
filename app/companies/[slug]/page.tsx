@@ -131,7 +131,7 @@ export default async function CompanyPage({
     // Check current user's membership status
     userId && !isOwner
       ? db.from("company_members")
-          .select("id, status, role")
+          .select("id, status, role, title, public_titles")
           .eq("company_id", company.id)
           .eq("user_id", userId)
           .maybeSingle()

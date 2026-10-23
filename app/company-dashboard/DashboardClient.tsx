@@ -987,7 +987,7 @@ function TeamTab({ companyId, permissionRole, canManageTeam, currentUserId }: { 
                 <MemberAvatar member={m} size={38} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-text-primary">{m.profile?.display_name ?? "Unbekannt"}</p>
-                  {(m.public_titles?.length || m.title) && <p className="text-xs text-text-muted">Funktion: {(m.public_titles?.length ? m.public_titles : [m.title!]).join(" · ")}</p>}
+                  <p className="text-xs text-text-muted">Funktion: {(m.public_titles?.length ? m.public_titles : m.title ? [m.title] : []).join(" · ") || "noch nicht angegeben"}</p>
                 </div>
                 <div className="flex gap-2 shrink-0">
                   <button onClick={() => handleAccept(m.id)}

@@ -84,6 +84,7 @@ export async function POST(req: NextRequest) {
   if (existing?.status === "pending") return privateJson({ data: existing });
 
   const publicTitles = normalizeCompanyPublicTitles(body.public_titles ?? body.title);
+  if (!publicTitles.length) return privateJson({ error: "Bitte gib an, mit welcher öffentlichen Funktion du dem Team beitreten möchtest." }, 400);
   const { data, error } = await admin.from("company_members").insert({
     company_id: companyId,
     user_id: userId,
@@ -108,7 +109,7 @@ export async function POST(req: NextRequest) {
       user_id: co.owner_user_id,
       type: "company_join_request",
       title: "Neue Beitrittsanfrage",
-      body: `${profile.display_name} möchte ${co.name} beitreten.`,
+      body: `${profile.display_name} möchte ${co.name} als ${publicTitles.join(" · ")} beitreten.`,
       href: `/companies/${co.slug}`,
     });
   } catch { /* In-app notification is best effort. */ }
