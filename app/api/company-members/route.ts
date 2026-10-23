@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
   if (existing?.status === "pending") return privateJson({ data: existing });
 
   const publicTitles = normalizeCompanyPublicTitles(body.public_titles ?? body.title);
-  if (!publicTitles.length) return privateJson({ error: "Bitte gib an, mit welcher öffentlichen Funktion du dem Team beitreten möchtest." }, 400);
+  if (!publicTitles.length) return privateJson({ error: "Bitte lade die Firmenseite neu und wähle deine öffentliche Funktion aus, bevor du die Beitrittsanfrage sendest." }, 400);
   const { data, error } = await admin.from("company_members").insert({
     company_id: companyId,
     user_id: userId,

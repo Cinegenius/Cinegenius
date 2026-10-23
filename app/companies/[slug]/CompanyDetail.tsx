@@ -125,7 +125,11 @@ export default function CompanyDetail({
   const [localMembership, setLocalMembership] = useState(myMembership);
   const [joining, setJoining] = useState(false);
   const [joinError, setJoinError] = useState("");
-  const [joinFormOpen, setJoinFormOpen] = useState(false);
+  const [joinFormOpen, setJoinFormOpen] = useState(() => myMembership?.status === "pending"
+    && !normalizeCompanyPublicTitles(myMembership.public_titles?.length ? myMembership.public_titles : myMembership.title).length);
+  const [withdrawing, setWithdrawing] = useState(false);
+  const [membershipError, setMembershipError] = useState("");
+  const [membershipSuccess, setMembershipSuccess] = useState("");
   const [joinTitles, setJoinTitles] = useState<string[]>([]);
   const [joinCustomTitle, setJoinCustomTitle] = useState("");
   const [showAllTeam, setShowAllTeam] = useState(false);
@@ -173,7 +177,7 @@ export default function CompanyDetail({
         body: JSON.stringify({ company_id: company.id, public_titles }),
       });
       const { data, error } = await res.json();
-      if (error) throw new Error(error);
+      if (!res.ok || error) throw new Error(error ?? "Die Beitrittsanfrage konnte nicht gesendet werden. Bitte versuche es erneut.");
       setLocalMembership({ id: data.id, status: data.status, public_titles: data.public_titles ?? public_titles, title: data.title ?? public_titles[0] });
       setJoinFormOpen(false);
     } catch (e: unknown) {
@@ -213,8 +217,24 @@ export default function CompanyDetail({
 
   async function handleLeave() {
     if (!localMembership) return;
-    const res = await fetch(`/api/company-members?id=${localMembership.id}`, { method: "DELETE" });
-    if (res.ok) { setLocalMembership(null); setLocalMembers((p) => p.filter((m) => m.id !== localMembership.id)); }
+    setWithdrawing(true);
+    setMembershipError("");
+    setMembershipSuccess("");
+    try {
+      const res = await fetch(`/api/company-members?id=${encodeURIComponent(localMembership.id)}`, { method: "DELETE" });
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(result.error ?? "Die Anfrage konnte nicht zurückgezogen werden. Bitte lade die Seite neu und versuche es erneut.");
+      setLocalMembership(null);
+      setLocalMembers((current) => current.filter((member) => member.id !== localMembership.id));
+      setJoinFormOpen(false);
+      setMembershipSuccess(localMembership.status === "pending"
+        ? "Deine Beitrittsanfrage wurde zurückgezogen."
+        : "Du hast die Firma verlassen.");
+    } catch (cause) {
+      setMembershipError(cause instanceof Error ? cause.message : "Die Anfrage konnte nicht zurückgezogen werden.");
+    } finally {
+      setWithdrawing(false);
+    }
   }
 
   async function publishCompany() {
@@ -366,17 +386,12 @@ export default function CompanyDetail({
                 <Globe size={13} /> {company.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
               </a>
             )}
-            {currentUserId && !isOwner && !localMembership && !joinFormOpen && (
-              <button onClick={openJoinForm} disabled={joining}
-                className="inline-flex min-h-10 items-center gap-1.5 px-4 py-2 border border-border bg-bg-elevated rounded-lg text-xs text-text-muted hover:border-gold/40 hover:text-gold transition-colors disabled:opacity-50">
-                <UserPlus size={13} /> Team beitreten
-              </button>
-            )}
-            {currentUserId && !isOwner && joinFormOpen && (
+            {currentUserId && !isOwner && (!localMembership || (localMembership.status === "pending" && joinFormOpen)) && (
               <div className="w-full max-w-2xl rounded-xl border border-border bg-bg-secondary p-4 sm:p-5 space-y-4">
                 <div>
-                  <p className="text-sm font-semibold text-text-primary">Als was möchtest du im Team mitarbeiten?</p>
-                  <p className="mt-1 text-xs leading-relaxed text-text-muted">Wähle bis zu fünf passende Funktionen. Sie werden öffentlich bei deinem Namen angezeigt und verleihen keine Verwaltungsrechte.</p>
+                  <p className="text-sm font-semibold text-text-primary">{localMembership?.status === "pending" ? "Funktion deiner Anfrage ändern" : "Möchtest du hier mitarbeiten?"}</p>
+                  <p className="mt-1 text-xs text-text-muted">Wähle aus, welche Aufgabe du im Team übernimmst.</p>
+                  <p className="mt-2 text-xs leading-relaxed text-text-muted">Wähle bis zu fünf passende Funktionen. Sie werden öffentlich bei deinem Namen angezeigt und verleihen keine Verwaltungsrechte.</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {COMPANY_PUBLIC_TITLE_SUGGESTIONS.map((title) => {
@@ -399,10 +414,13 @@ export default function CompanyDetail({
                 <div className="flex flex-wrap items-center gap-2">
                   <button onClick={localMembership?.status === "pending" ? handleUpdateJoinTitles : handleJoinRequest} disabled={joining}
                     className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-gold px-4 py-2 text-xs font-semibold text-bg-primary transition-colors hover:bg-gold-light disabled:opacity-50">
-                    <UserPlus size={13} /> {joining ? "Wird gespeichert…" : localMembership?.status === "pending" ? "Funktion speichern" : "Anfrage senden"}
+                    {localMembership?.status === "pending" ? <Check size={13} /> : <UserPlus size={13} />}
+                    {joining ? "Wird gespeichert…" : localMembership?.status === "pending" ? "Funktion speichern" : "Team beitreten – Anfrage senden"}
                   </button>
-                  <button onClick={() => { setJoinFormOpen(false); setJoinError(""); }} disabled={joining}
-                    className="min-h-10 rounded-lg px-3 py-2 text-xs text-text-muted transition-colors hover:text-text-primary disabled:opacity-50">Abbrechen</button>
+                  {localMembership?.status === "pending" && (
+                    <button onClick={() => { setJoinFormOpen(false); setJoinError(""); }} disabled={joining}
+                      className="min-h-10 rounded-lg px-3 py-2 text-xs text-text-muted transition-colors hover:text-text-primary disabled:opacity-50">Abbrechen</button>
+                  )}
                 </div>
               </div>
             )}
@@ -413,16 +431,18 @@ export default function CompanyDetail({
                   {!!(localMembership.public_titles?.length || localMembership.title) && <span className="text-xs text-text-muted">Funktion: {(localMembership.public_titles?.length ? localMembership.public_titles : [localMembership.title!]).join(" · ")}</span>}
                 </div>
                 {!joinFormOpen && <button onClick={openJoinForm} className="text-xs text-gold hover:text-gold-light transition-colors">Funktion ändern</button>}
-                <button onClick={handleLeave} className="text-xs text-text-muted hover:text-crimson-light transition-colors flex items-center gap-1">
-                  <UserMinus size={11} /> Zurückziehen
+                <button onClick={handleLeave} disabled={withdrawing} className="text-xs text-text-muted hover:text-crimson-light transition-colors flex items-center gap-1 disabled:opacity-50">
+                  <UserMinus size={11} /> {withdrawing ? "Wird zurückgezogen …" : "Anfrage zurückziehen"}
                 </button>
               </div>
             )}
+            {membershipError && <p role="alert" className="w-full text-xs text-crimson-light">{membershipError}</p>}
+            {membershipSuccess && <p role="status" className="w-full text-xs text-success">{membershipSuccess}</p>}
             {currentUserId && !isOwner && localMembership?.status === "accepted" && (
               <div className="flex items-center gap-3">
                 <span className="text-xs text-success flex items-center gap-1.5"><CheckCircle size={11} /> Du bist Teammitglied</span>
-                <button onClick={handleLeave} className="text-xs text-text-muted hover:text-crimson-light transition-colors flex items-center gap-1">
-                  <UserMinus size={11} /> Firma verlassen
+                <button onClick={handleLeave} disabled={withdrawing} className="text-xs text-text-muted hover:text-crimson-light transition-colors flex items-center gap-1 disabled:opacity-50">
+                  <UserMinus size={11} /> {withdrawing ? "Wird beendet …" : "Firma verlassen"}
                 </button>
               </div>
             )}
