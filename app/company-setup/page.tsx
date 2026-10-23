@@ -11,11 +11,47 @@ import {
   Quote, Globe2,
 } from "lucide-react";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
-import { safeObjectURL } from "@/lib/compressImage";
+import { compressImage, MAX_FUNCTION_UPLOAD_BYTES, safeObjectURL } from "@/lib/compressImage";
+import { MAX_COMPANY_GALLERY_IMAGES, moveCompanyGalleryImage } from "@/lib/company-media";
+import { COMPANY_PUBLIC_TITLE_SUGGESTIONS, normalizeCompanyPublicTitles } from "@/lib/company-roles";
 import CateringCompanyFields from "@/components/CateringCompanyFields";
 import { CATERING_COMPANY_CATEGORY, EMPTY_CATERING_COMPANY_DETAILS, normalizeCateringCompanyDetails, type CateringCompanyDetails } from "@/lib/catering-taxonomy";
 
-const MAX_PORTFOLIO = 8;
+const MAX_PORTFOLIO = MAX_COMPANY_GALLERY_IMAGES;
+
+type PendingCompanyImage = { id: string; file: File; previewUrl: string; status: "compressing" | "uploading" | "failed"; progress: number; replaceIndex?: number; error?: string };
+
+function uploadCompanyImage(file: File, onProgress: (progress: number) => void): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    const form = new FormData();
+    form.append("file", file);
+    request.open("POST", "/api/upload");
+    request.timeout = 120_000;
+    request.upload.onprogress = (event) => {
+      if (event.lengthComputable) onProgress(Math.max(5, Math.min(95, Math.round(event.loaded / event.total * 100))));
+    };
+    request.onerror = () => reject(new Error("Netzwerkfehler beim Upload. Bitte dieses Foto erneut versuchen."));
+    request.onabort = () => reject(new Error("Upload abgebrochen. Bitte dieses Foto erneut versuchen."));
+    request.ontimeout = () => reject(new Error("Der Upload dauert zu lange. Prüfe deine Verbindung und versuche dieses Foto erneut."));
+    request.onload = () => {
+      let result: { url?: string; error?: string } = {};
+      try { result = JSON.parse(request.responseText); } catch { /* handled below */ }
+      if (request.status < 200 || request.status >= 300 || !result.url) {
+        reject(new Error(result.error ?? "Upload fehlgeschlagen. Bitte dieses Foto erneut versuchen."));
+        return;
+      }
+      onProgress(100);
+      resolve(result.url);
+    };
+    request.send(form);
+  });
+}
+
+async function prepareCompanyImage(file: File, dimensions: { maxWidth: number; maxHeight: number }): Promise<File> {
+  if (file.type === "image/svg+xml") return file;
+  return compressImage(file, { ...dimensions, quality: 0.84, maxBytes: MAX_FUNCTION_UPLOAD_BYTES, forceCompression: true });
+}
 
 export default function CompanySetupPage() {
   const { user, isLoaded } = useUser();
@@ -33,12 +69,22 @@ export default function CompanySetupPage() {
   const [logoUrl, setLogoUrl] = useState("");
   const [logoPreview, setLogoPreview] = useState("");
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [logoProgress, setLogoProgress] = useState(0);
   const logoRef = useRef<HTMLInputElement>(null);
+
+  const [coverUrl, setCoverUrl] = useState("");
+  const [coverPreview, setCoverPreview] = useState("");
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [coverProgress, setCoverProgress] = useState(0);
+  const coverRef = useRef<HTMLInputElement>(null);
 
   // Portfolio images
   const [portfolioImages, setPortfolioImages] = useState<string[]>([]);
   const [uploadingPortfolio, setUploadingPortfolio] = useState(false);
+  const [portfolioUploads, setPortfolioUploads] = useState<PendingCompanyImage[]>([]);
+  const [replacePortfolioIndex, setReplacePortfolioIndex] = useState<number | null>(null);
   const portfolioRef = useRef<HTMLInputElement>(null);
+  const replacePortfolioInputRef = useRef<HTMLInputElement>(null);
 
   // Categories
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -81,6 +127,9 @@ export default function CompanySetupPage() {
   // Team management
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [teamLoading, setTeamLoading] = useState(false);
+  const [companyAccessRole, setCompanyAccessRole] = useState<"owner" | "admin" | "editor" | "member" | null>(null);
+  const canManageTeam = companyAccessRole === "owner" || companyAccessRole === "admin";
+  const isCompanyOwner = companyAccessRole === "owner";
 
   // Pre-fill email from Clerk once loaded
   useEffect(() => {
@@ -92,12 +141,14 @@ export default function CompanySetupPage() {
   useEffect(() => {
     const isGuided = new URLSearchParams(window.location.search).get("onboarding") === "1";
     setGuidedSetup(isGuided);
-    // Check if user already has a company — fires immediately, no Clerk wait
-    fetch("/api/companies?mine=true")
+    // Editors open their assigned company explicitly; owners keep the legacy shortcut.
+    const requestedCompany = new URLSearchParams(window.location.search).get("company_id");
+    fetch(requestedCompany ? `/api/companies?company_id=${encodeURIComponent(requestedCompany)}` : "/api/companies?mine=true")
       .then((r) => r.json())
-      .then(({ data }) => {
+      .then(({ data, permissionRole }) => {
         if (data && data.length > 0) {
           const c = data[0];
+          setCompanyAccessRole(permissionRole ?? (c.owner_user_id ? "owner" : null));
           setExistingId(c.id);
           setExistingPublished(c.published !== false);
           setName(c.name ?? "");
@@ -108,6 +159,8 @@ export default function CompanySetupPage() {
           setPhone(c.phone ?? "");
           setLogoUrl(c.logo_url ?? "");
           setLogoPreview(c.logo_url ?? "");
+          setCoverUrl(c.cover_url ?? "");
+          setCoverPreview(c.cover_url ?? "");
           setSelectedCategories(c.categories ?? []);
           setCateringDetails(normalizeCateringCompanyDetails(c.catering_details));
           setServices(c.services ?? []);
@@ -133,14 +186,14 @@ export default function CompanySetupPage() {
                 const ownerEntry = members.find(
                   (m: { role: string; user_id: string }) => m.role === "owner"
                 );
-                if (ownerEntry?.title) setOwnerTitle(ownerEntry.title);
+                if (ownerEntry) setOwnerTitle((ownerEntry.public_titles?.length ? ownerEntry.public_titles : ownerEntry.title ? [ownerEntry.title] : []).join(", "));
               }
             })
             .finally(() => setTeamLoading(false));
         }
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((cause) => { setError(cause instanceof Error ? cause.message : "Das Firmenprofil konnte nicht geladen werden."); setLoading(false); });
   }, []);
 
   useEffect(() => {
@@ -156,6 +209,7 @@ export default function CompanySetupPage() {
         setName(draft.name ?? ""); setCity(draft.city ?? ""); setDescription(draft.description ?? "");
         setWebsite(draft.website ?? ""); setEmail(draft.email ?? ""); setPhone(draft.phone ?? "");
         setLogoUrl(draft.logoUrl ?? ""); setLogoPreview(draft.logoUrl ?? "");
+        setCoverUrl(draft.coverUrl ?? ""); setCoverPreview(draft.coverUrl ?? "");
         setPortfolioImages(draft.portfolioImages ?? []); setSelectedCategories(draft.selectedCategories ?? []);
         setCateringDetails(normalizeCateringCompanyDetails(draft.cateringDetails));
         setServices(draft.services ?? []); setTagline(draft.tagline ?? ""); setBioShort(draft.bioShort ?? "");
@@ -177,7 +231,7 @@ export default function CompanySetupPage() {
       setCompanyDraftStatus("saving");
       try {
         const response = await fetch("/api/onboarding", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
-          intent: "company", setupComplete: false, companyDraft: { name, city, description, website, email, phone, logoUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep, updatedAt: new Date().toISOString() },
+          intent: "company", setupComplete: false, companyDraft: { name, city, description, website, email, phone, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep, updatedAt: new Date().toISOString() },
         }) });
         const result = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(result.error ?? "Der Entwurf konnte nicht gespeichert werden.");
@@ -188,51 +242,88 @@ export default function CompanySetupPage() {
       }
     }, 650);
     return () => clearTimeout(timer);
-  }, [guidedSetup, companyDraftLoaded, loading, existingId, name, city, description, website, email, phone, logoUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, companyStep]);
+  }, [guidedSetup, companyDraftLoaded, loading, existingId, name, city, description, website, email, phone, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, companyStep]);
 
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleSingleImageUpload = async (file: File | undefined, kind: "logo" | "cover") => {
     if (!file) return;
-    const _lp = safeObjectURL(file); if (_lp) setLogoPreview(_lp);
-    setUploadingLogo(true);
+    const oldUrl = kind === "logo" ? logoUrl : coverUrl;
+    const previewUrl = safeObjectURL(file);
+    if (kind === "logo") { if (previewUrl) setLogoPreview(previewUrl); setUploadingLogo(true); setLogoProgress(0); }
+    else { if (previewUrl) setCoverPreview(previewUrl); setUploadingCover(true); setCoverProgress(0); }
+    setError("");
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const { url, error: err } = await res.json();
-      if (err) throw new Error(err);
-      setLogoUrl(url);
-    } catch {
-      setError("Logo-Upload fehlgeschlagen.");
-      setLogoPreview(logoUrl);
+      const prepared = await prepareCompanyImage(file, kind === "logo" ? { maxWidth: 1200, maxHeight: 1200 } : { maxWidth: 2200, maxHeight: 1400 });
+      const url = await uploadCompanyImage(prepared, (value) => kind === "logo" ? setLogoProgress(value) : setCoverProgress(value));
+      if (kind === "logo") { setLogoUrl(url); setLogoPreview(url); }
+      else { setCoverUrl(url); setCoverPreview(url); }
+      if (previewUrl?.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Das Foto konnte nicht hochgeladen werden.");
+      if (kind === "logo") setLogoPreview(oldUrl);
+      else setCoverPreview(oldUrl);
+      if (previewUrl?.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
     } finally {
-      setUploadingLogo(false);
+      if (kind === "logo") setUploadingLogo(false);
+      else setUploadingCover(false);
     }
   };
 
-  const handlePortfolioUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
-    if (!files.length) return;
-    const remaining = MAX_PORTFOLIO - portfolioImages.length;
-    const toUpload = files.slice(0, remaining);
-    setUploadingPortfolio(true);
+  const uploadPortfolioEntry = async (entry: PendingCompanyImage) => {
+    const updateEntry = (change: Partial<PendingCompanyImage>) => setPortfolioUploads((current) => current.map((item) => item.id === entry.id ? { ...item, ...change } : item));
+    updateEntry({ status: "compressing", progress: 0, error: undefined });
     try {
-      const urls: string[] = [];
-      for (const file of toUpload) {
-        const fd = new FormData();
-        fd.append("file", file);
-        const res = await fetch("/api/upload", { method: "POST", body: fd });
-        const { url, error: err } = await res.json();
-        if (err) throw new Error(err);
-        urls.push(url);
+      const prepared = await prepareCompanyImage(entry.file, { maxWidth: 2200, maxHeight: 1800 });
+      updateEntry({ status: "uploading", progress: 3 });
+      const url = await uploadCompanyImage(prepared, (progress) => updateEntry({ progress }));
+      if (entry.replaceIndex !== undefined) {
+        setPortfolioImages((current) => current.map((old, index) => index === entry.replaceIndex ? url : old));
+      } else {
+        setPortfolioImages((current) => [...current, url]);
       }
-      setPortfolioImages((prev) => [...prev, ...urls]);
-    } catch {
-      setError("Portfolio-Upload fehlgeschlagen.");
-    } finally {
-      setUploadingPortfolio(false);
-      e.target.value = "";
+      setPortfolioUploads((current) => current.filter((item) => item.id !== entry.id));
+      if (entry.previewUrl.startsWith("blob:")) URL.revokeObjectURL(entry.previewUrl);
+    } catch (cause) {
+      updateEntry({ status: "failed", error: cause instanceof Error ? cause.message : "Upload fehlgeschlagen. Bitte dieses Foto erneut versuchen." });
     }
+  };
+
+  const handlePortfolioUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? []);
+    event.target.value = "";
+    if (!files.length) return;
+    const pendingCount = portfolioUploads.filter((item) => item.replaceIndex === undefined).length;
+    const remaining = Math.max(0, MAX_PORTFOLIO - portfolioImages.length - pendingCount);
+    if (files.length > remaining) setError(`Du kannst noch ${remaining} ${remaining === 1 ? "Foto" : "Fotos"} auswählen (maximal ${MAX_PORTFOLIO}).`);
+    const entries = files.slice(0, remaining).map((file) => ({ id: crypto.randomUUID(), file, previewUrl: safeObjectURL(file) ?? "", status: "compressing" as const, progress: 0 }));
+    if (!entries.length) return;
+    setPortfolioUploads((current) => [...current, ...entries]);
+    setUploadingPortfolio(true);
+    for (const entry of entries) await uploadPortfolioEntry(entry);
+    setUploadingPortfolio(false);
+  };
+
+  const retryPortfolioUpload = async (entry: PendingCompanyImage) => {
+    setUploadingPortfolio(true);
+    await uploadPortfolioEntry(entry);
+    setUploadingPortfolio(false);
+  };
+
+  const replacePortfolioImage = (index: number) => {
+    setReplacePortfolioIndex(index);
+    replacePortfolioInputRef.current?.click();
+  };
+
+  const handleReplacePortfolioUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    const replaceIndex = replacePortfolioIndex;
+    setReplacePortfolioIndex(null);
+    if (!file || replaceIndex === null) return;
+    const entry: PendingCompanyImage = { id: crypto.randomUUID(), file, previewUrl: safeObjectURL(file) ?? "", status: "compressing", progress: 0, replaceIndex };
+    setPortfolioUploads((current) => [...current, entry]);
+    setUploadingPortfolio(true);
+    await uploadPortfolioEntry(entry);
+    setUploadingPortfolio(false);
   };
 
   const toggleCategory = (id: string) => {
@@ -270,11 +361,18 @@ export default function CompanySetupPage() {
   };
 
   const handleUpdateTitle = async (id: string, title: string) => {
-    await fetch("/api/company-members", {
+    const public_titles = normalizeCompanyPublicTitles(title);
+    const response = await fetch("/api/company-members", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, title }),
+      body: JSON.stringify({ id, public_titles }),
     });
+    if (!response.ok) {
+      const result = await response.json().catch(() => ({}));
+      setError(result.error ?? "Die Firmenfunktion konnte nicht gespeichert werden.");
+      return;
+    }
+    setTeamMembers((current) => current.map((member) => member.id === id ? { ...member, public_titles, title: public_titles[0] ?? null } : member));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -297,6 +395,8 @@ export default function CompanySetupPage() {
           catering_details: selectedCategories.includes(CATERING_COMPANY_CATEGORY.id) ? cateringDetails : EMPTY_CATERING_COMPANY_DETAILS,
           portfolio_images: portfolioImages,
           owner_title: ownerTitle.trim() || null,
+          owner_titles: normalizeCompanyPublicTitles(ownerTitle),
+          cover_url: coverUrl || null,
           tagline: tagline.trim() || null,
           bio_short: bioShort.trim() || null,
           usp: usp.trim() || null,
@@ -350,6 +450,9 @@ export default function CompanySetupPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
+            <datalist id="company-title-suggestions">
+              {COMPANY_PUBLIC_TITLE_SUGGESTIONS.map((title) => <option key={title} value={title} />)}
+            </datalist>
             {guidedSetup && !existingId ? (
               <div className="space-y-6">
                 <div aria-label={`Schritt ${companyStep} von 3`} className="space-y-2">
@@ -427,7 +530,7 @@ export default function CompanySetupPage() {
 
             {/* Logo */}
             <div className="flex flex-col items-center gap-3">
-              <input id="logo-upload" ref={logoRef} type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/svg+xml" className="sr-only" onChange={handleLogoUpload} />
+              <input id="logo-upload" ref={logoRef} type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,image/svg+xml" className="sr-only" onChange={(event) => { void handleSingleImageUpload(event.target.files?.[0], "logo"); event.currentTarget.value = ""; }} />
               <label
                 htmlFor="logo-upload"
                 className="relative w-28 h-28 rounded-2xl border-2 border-dashed border-border hover:border-gold transition-colors group overflow-hidden bg-bg-secondary cursor-pointer block"
@@ -441,11 +544,7 @@ export default function CompanySetupPage() {
                     <span className="text-[10px] text-text-muted group-hover:text-gold">Logo hochladen</span>
                   </div>
                 )}
-                {uploadingLogo && (
-                  <div className="absolute inset-0 bg-bg-primary/70 flex items-center justify-center">
-                    <Loader2 size={18} className="animate-spin text-gold" />
-                  </div>
-                )}
+                {uploadingLogo && <div className="absolute inset-0 bg-bg-primary/80 flex flex-col items-center justify-center gap-2"><Loader2 size={18} className="animate-spin text-gold" /><span className="text-[10px] text-text-primary">{logoProgress}%</span></div>}
               </label>
               {logoPreview && (
                 <button
@@ -456,7 +555,20 @@ export default function CompanySetupPage() {
                   <X size={11} /> Entfernen
                 </button>
               )}
-              <p className="text-xs text-text-muted">JPG, PNG, WEBP, HEIC oder SVG · max. 5 MB</p>
+              <p className="text-xs text-text-muted">JPG, PNG, WEBP, HEIC oder SVG · wird für den Upload optimiert</p>
+            </div>
+
+            {/* Company cover image */}
+            <div className="space-y-3">
+              <SectionDivider label="Titelbild" />
+              <p className="text-xs text-text-muted">Ein Titelbild zeigt eure Räume, euer Team oder eure Arbeit. JPG, PNG, WEBP und HEIC werden passend verarbeitet.</p>
+              <input ref={coverRef} type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" className="sr-only" onChange={(event) => { void handleSingleImageUpload(event.target.files?.[0], "cover"); event.currentTarget.value = ""; }} />
+              <button type="button" onClick={() => coverRef.current?.click()} disabled={uploadingCover} className="relative block min-h-36 w-full overflow-hidden rounded-xl border border-dashed border-border bg-bg-secondary text-left hover:border-gold/50 disabled:opacity-60">
+                {coverPreview ? <img src={coverPreview} alt="Vorschau des Firmentitelbilds" className="absolute inset-0 h-full w-full object-cover" /> : <span className="flex min-h-36 flex-col items-center justify-center gap-2 text-sm text-text-muted"><ImageIcon size={20} /> Titelbild auswählen</span>}
+                {coverPreview && !uploadingCover && <span className="absolute bottom-2 left-2 rounded-lg bg-bg-primary/85 px-3 py-2 text-xs text-text-primary">Titelbild ersetzen</span>}
+                {uploadingCover && <span className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-bg-primary/75 text-sm text-text-primary"><Loader2 size={18} className="animate-spin text-gold" />Upload {coverProgress}%</span>}
+              </button>
+              {coverPreview && !uploadingCover && <button type="button" onClick={() => { setCoverPreview(""); setCoverUrl(""); }} className="inline-flex min-h-10 items-center gap-2 text-xs text-text-muted hover:text-crimson-light"><X size={13} /> Titelbild entfernen</button>}
             </div>
 
             {/* Basic info */}
@@ -467,6 +579,7 @@ export default function CompanySetupPage() {
                 <div className="flex items-center gap-2 bg-bg-secondary border border-border rounded-xl px-3.5 focus-within:border-gold transition-colors">
                   <Building2 size={15} className="text-text-muted shrink-0" />
                   <input
+                    list="company-title-suggestions"
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -721,24 +834,24 @@ export default function CompanySetupPage() {
             </div>
 
             {/* Owner position */}
-            <div className="space-y-4">
-              <SectionDivider label="Deine Rolle" />
-              <Field label="Meine Position / Funktion in der Firma">
+            {isCompanyOwner && <div className="space-y-4">
+              <SectionDivider label="Deine Funktion" />
+              <Field label="Meine öffentliche Funktion in der Firma">
                 <div className="flex items-center gap-2 bg-bg-secondary border border-border rounded-xl px-3.5 focus-within:border-gold transition-colors">
                   <Briefcase size={15} className="text-text-muted shrink-0" />
                   <input
                     type="text"
                     value={ownerTitle}
                     onChange={(e) => setOwnerTitle(e.target.value)}
-                    placeholder="z.B. Geschäftsführer/in, Produzent/in, Creative Director..."
+                    placeholder="z.B. Geschäftsführer/in, Produzent/in"
                     className="bg-transparent border-none py-3 text-sm flex-1 focus:outline-none"
-                    maxLength={80}
+                    maxLength={400}
                   />
                   {ownerTitle && <CheckCircle size={15} className="text-success shrink-0" />}
                 </div>
-                <p className="text-[11px] text-text-muted mt-1">Erscheint auf deinem Profil und im Team-Bereich der Firma.</p>
+                <p className="text-[11px] text-text-muted mt-1">Erscheint öffentlich auf deinem Profil und im Team der Firma. Mehrere Funktionen kannst du mit Komma trennen. Das verleiht keine Verwaltungsrechte.</p>
               </Field>
-            </div>
+            </div>}
 
             {/* Description */}
             <div className="space-y-4">
@@ -906,44 +1019,38 @@ export default function CompanySetupPage() {
               </div>
             </div>
 
-            {/* Portfolio images */}
+            {/* Company gallery */}
             <div className="space-y-3">
-              <SectionDivider label="Portfolio-Bilder" />
-              <p className="text-xs text-text-muted">Bis zu {MAX_PORTFOLIO} Bilder — zeigt eure Arbeit, euer Studio, euer Equipment.</p>
-
-              <div className="grid grid-cols-4 gap-2">
-                {portfolioImages.map((url, i) => (
-                  <div key={i} className="relative aspect-square rounded-xl overflow-hidden bg-bg-secondary">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={url} alt="" className="w-full h-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => setPortfolioImages((prev) => prev.filter((_, j) => j !== i))}
-                      className="absolute top-1 right-1 p-1 bg-bg-primary/80 rounded-full hover:bg-crimson/80 transition-colors"
-                    >
-                      <Trash2 size={10} className="text-text-primary" />
-                    </button>
+              <SectionDivider label="Firmen-Galerie" />
+              <p className="text-xs text-text-muted">Bis zu {MAX_PORTFOLIO} Fotos von Team, Räumen, Equipment oder Arbeitsbeispielen. Das erste Foto steht vorne im öffentlichen Profil. {portfolioImages.length}/{MAX_PORTFOLIO}</p>
+              <input ref={portfolioRef} type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple className="sr-only" onChange={(event) => void handlePortfolioUpload(event)} />
+              <input ref={replacePortfolioInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" className="sr-only" onChange={(event) => void handleReplacePortfolioUpload(event)} />
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {portfolioImages.map((url, index) => (
+                  <div key={`${index}-${url}`} className="relative aspect-square overflow-hidden rounded-xl border border-border bg-bg-secondary">
+                    <img src={url} alt={`Firmenfoto ${index + 1}`} className="h-full w-full object-cover" />
+                    <span className="absolute bottom-2 left-2 rounded-md bg-bg-primary/85 px-2 py-1 text-[10px] font-semibold text-text-primary">{index === 0 ? "Hauptfoto" : `Foto ${index + 1}`}</span>
+                    <div className="absolute right-2 top-2 flex gap-1">
+                      <button type="button" onClick={() => setPortfolioImages((current) => moveCompanyGalleryImage(current, index, index - 1))} disabled={index === 0 || uploadingPortfolio} aria-label={`Foto ${index + 1} nach vorne verschieben`} className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-primary/90 text-text-primary disabled:opacity-40"><ChevronUp size={15} /></button>
+                      <button type="button" onClick={() => setPortfolioImages((current) => moveCompanyGalleryImage(current, index, index + 1))} disabled={index === portfolioImages.length - 1 || uploadingPortfolio} aria-label={`Foto ${index + 1} nach hinten verschieben`} className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-primary/90 text-text-primary disabled:opacity-40"><ChevronDown size={15} /></button>
+                    </div>
+                    <div className="absolute inset-x-2 bottom-2 flex justify-end gap-2">
+                      <button type="button" onClick={() => replacePortfolioImage(index)} disabled={uploadingPortfolio} className="min-h-9 rounded-lg bg-bg-primary/90 px-2.5 text-[10px] font-semibold text-text-primary disabled:opacity-50">Ersetzen</button>
+                      <button type="button" onClick={() => setPortfolioImages((current) => current.filter((_, itemIndex) => itemIndex !== index))} disabled={uploadingPortfolio} aria-label={`Foto ${index + 1} entfernen`} className="flex h-9 w-9 items-center justify-center rounded-lg bg-bg-primary/90 text-text-primary hover:text-crimson-light"><Trash2 size={13} /></button>
+                    </div>
                   </div>
                 ))}
-                {portfolioImages.length < MAX_PORTFOLIO && (
-                  <button
-                    type="button"
-                    onClick={() => portfolioRef.current?.click()}
-                    disabled={uploadingPortfolio}
-                    className="aspect-square rounded-xl border-2 border-dashed border-border hover:border-gold transition-colors flex flex-col items-center justify-center gap-1 bg-bg-secondary disabled:opacity-50"
-                  >
-                    {uploadingPortfolio ? (
-                      <Loader2 size={18} className="animate-spin text-gold" />
-                    ) : (
-                      <>
-                        <ImageIcon size={18} className="text-text-muted" />
-                        <span className="text-[9px] text-text-muted">Hinzufügen</span>
-                      </>
-                    )}
-                  </button>
-                )}
+                {portfolioImages.length + portfolioUploads.filter((item) => item.replaceIndex === undefined).length < MAX_PORTFOLIO && <button type="button" onClick={() => portfolioRef.current?.click()} disabled={uploadingPortfolio} className="flex aspect-square flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border text-text-muted hover:border-gold/50 hover:text-gold disabled:opacity-50"><Plus size={20} /><span className="text-xs">Fotos hinzufügen</span></button>}
+                {portfolioUploads.map((item) => (
+                  <div key={item.id} className="relative aspect-square overflow-hidden rounded-xl border border-border bg-bg-secondary">
+                    {item.previewUrl && <img src={item.previewUrl} alt="Ausgewähltes Firmenfoto" className="h-full w-full object-cover opacity-60" />}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-bg-primary/75 p-3 text-center">
+                      {item.status === "failed" ? <><p role="alert" className="text-[11px] text-crimson-light">{item.error}</p><button type="button" onClick={() => void retryPortfolioUpload(item)} disabled={uploadingPortfolio} className="min-h-9 rounded-lg bg-gold px-3 text-xs font-bold text-bg-primary">Erneut versuchen</button></> : <><Loader2 size={18} className="animate-spin text-gold" /><span className="text-xs text-text-primary">{item.status === "compressing" ? "Foto wird vorbereitet …" : `Upload ${item.progress}%`}</span><div className="h-1.5 w-full overflow-hidden rounded-full bg-bg-elevated"><div className="h-full bg-gold transition-[width]" style={{ width: `${item.status === "compressing" ? 10 : item.progress}%` }} /></div></>}
+                    </div>
+                    {item.status === "failed" && <button type="button" onClick={() => { if (item.previewUrl.startsWith("blob:")) URL.revokeObjectURL(item.previewUrl); setPortfolioUploads((current) => current.filter((upload) => upload.id !== item.id)); }} aria-label="Fehlgeschlagenen Upload entfernen" className="absolute right-2 top-2 flex h-9 w-9 items-center justify-center rounded-full bg-bg-primary text-text-primary"><X size={14} /></button>}
+                  </div>
+                ))}
               </div>
-              <input ref={portfolioRef} type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={handlePortfolioUpload} />
             </div>
 
             {error && (
@@ -958,7 +1065,7 @@ export default function CompanySetupPage() {
 
             <button
               type="submit"
-              disabled={saving || uploadingLogo || uploadingPortfolio || !name.trim() || !city.trim()}
+              disabled={saving || uploadingLogo || uploadingCover || uploadingPortfolio || !name.trim() || !city.trim()}
               className="w-full py-4 bg-gold text-bg-primary font-bold rounded-xl hover:bg-gold-light transition-colors flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? (
@@ -976,7 +1083,7 @@ export default function CompanySetupPage() {
           </form>
 
           {/* Team management — only shown when editing existing company */}
-          {existingId && (
+          {existingId && canManageTeam && (
             <div className="mt-12 space-y-6">
               <div className="flex items-center gap-2">
                 <div className="h-px flex-1 bg-border" />
@@ -1047,6 +1154,7 @@ type TeamMember = {
   user_id: string;
   role: string;
   title: string | null;
+  public_titles?: string[] | null;
   status: string;
   profile: { display_name: string; avatar_url: string | null; slug: string | null; role: string | null } | null;
 };
@@ -1062,7 +1170,7 @@ function TeamMemberRow({
   onRemove: () => void;
   onTitleChange: (t: string) => void;
 }) {
-  const [title, setTitle] = useState(member.title ?? "");
+  const [title, setTitle] = useState((member.public_titles?.length ? member.public_titles : member.title ? [member.title] : []).join(", "));
   const [editing, setEditing] = useState(false);
 
   const name = member.profile?.display_name ?? member.user_id;
@@ -1084,13 +1192,14 @@ function TeamMemberRow({
         <p className="text-sm font-semibold text-text-primary truncate">{name}</p>
         {editing ? (
           <div className="flex items-center gap-1 mt-0.5">
-            <input
+          <input
+              list="company-title-suggestions"
               autoFocus
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               onBlur={() => { onTitleChange(title); setEditing(false); }}
-              onKeyDown={(e) => { if (e.key === "Enter") { onTitleChange(title); setEditing(false); } }}
-              placeholder="Titel / Position..."
+              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); onTitleChange(title); setEditing(false); } }}
+              placeholder="Mehrere Funktionen mit Komma trennen …"
               className="bg-transparent border-b border-gold text-xs text-text-primary focus:outline-none flex-1"
             />
           </div>
@@ -1099,7 +1208,7 @@ function TeamMemberRow({
             onClick={() => setEditing(true)}
             className="text-xs text-text-muted hover:text-gold transition-colors truncate block"
           >
-            {title || member.profile?.role || "Titel hinzufügen…"}
+            {title || member.profile?.role || "Funktion hinzufügen…"}
           </button>
         )}
       </div>

@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   Building2, LayoutDashboard, Package, Users, Settings,
   ExternalLink, Plus, Pencil, Trash2, Loader2, X, Check,
-  Tag, Truck, Shield, CheckCircle,
+  Truck, Shield, CheckCircle,
   Clock, UserMinus, Crown, ArrowUpRight, ToggleLeft, ToggleRight,
   AlertCircle, Briefcase,
 } from "lucide-react";
@@ -13,6 +13,7 @@ import {
   EQUIPMENT_CATEGORIES, EQUIPMENT_CATEGORY_BY_ID,
   CONDITION_LABELS, CONDITION_COLORS, SERVICE_TYPES, SERVICE_TYPE_BY_ID,
 } from "@/lib/equipment-categories";
+import { canCompanyRoleManageTarget, normalizeCompanyPublicTitles, COMPANY_PUBLIC_TITLE_SUGGESTIONS } from "@/lib/company-roles";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -40,7 +41,7 @@ type EquipmentItem = {
 };
 
 type Member = {
-  id: string; user_id: string; role: string; title: string | null; status: string;
+  id: string; user_id: string; role?: string; title: string | null; public_titles?: string[]; status: string;
   profile: { display_name: string; avatar_url: string | null; slug: string | null; role: string | null } | null;
 };
 
@@ -48,8 +49,16 @@ type Tab = "overview" | "services" | "equipment" | "team";
 
 // ─── Main component ────────────────────────────────────────────────────────────
 
-export default function DashboardClient({ company }: { company: Company }) {
+export default function DashboardClient({ company, permissionRole, companyOptions = [], currentUserId }: {
+  company: Company;
+  permissionRole: "owner" | "admin" | "editor" | "member";
+  companyOptions?: Array<Pick<Company, "id" | "name" | "slug" | "logo_url" | "city">>;
+  currentUserId: string;
+}) {
   const [tab, setTab] = useState<Tab>("overview");
+  const isOwner = permissionRole === "owner";
+  const canManageTeam = permissionRole === "owner" || permissionRole === "admin";
+  const canEditCompany = permissionRole !== "member";
 
   const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
     { id: "overview",  label: "Übersicht",  icon: LayoutDashboard },
@@ -97,10 +106,10 @@ export default function DashboardClient({ company }: { company: Company }) {
 
         {/* Footer links */}
         <div className="p-2 border-t border-border space-y-0.5">
-          <Link href="/company-setup"
+          {canEditCompany && <Link href={`/company-setup?company_id=${company.id}`}
             className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-text-muted hover:text-text-primary hover:bg-bg-elevated transition-colors">
             <Settings size={14} /> Einstellungen
-          </Link>
+          </Link>}
           <Link href={`/companies/${company.slug}`}
             className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-text-muted hover:text-text-primary hover:bg-bg-elevated transition-colors">
             <ExternalLink size={14} /> Profil ansehen
@@ -110,6 +119,16 @@ export default function DashboardClient({ company }: { company: Company }) {
 
       {/* ── MAIN ──────────────────────────────────────────────────────────── */}
       <div className="flex-1 min-w-0">
+        {companyOptions.length > 1 && (
+          <div className="border-b border-border bg-bg-primary px-4 py-3 sm:px-6 lg:px-8">
+            <label className="flex min-h-11 max-w-xl items-center gap-3 text-xs text-text-muted">
+              <span className="shrink-0">Firma wechseln</span>
+              <select value={company.id} onChange={(event) => window.location.assign(`/company-dashboard?company_id=${encodeURIComponent(event.target.value)}`)} className="min-h-11 min-w-0 flex-1 rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary">
+                {companyOptions.map((option) => <option key={option.id} value={option.id}>{option.name}{option.city ? ` · ${option.city}` : ""}</option>)}
+              </select>
+            </label>
+          </div>
+        )}
 
         {/* Mobile tab bar */}
         <div className="lg:hidden flex border-b border-border bg-bg-secondary overflow-x-auto">
@@ -126,10 +145,10 @@ export default function DashboardClient({ company }: { company: Company }) {
         </div>
 
         <div className="p-6 lg:p-8 max-w-3xl">
-          {tab === "overview"  && <OverviewTab  company={company} setTab={setTab} />}
-          {tab === "services"  && <ServicesTab  companyId={company.id} />}
-          {tab === "equipment" && <EquipmentTab companyId={company.id} />}
-          {tab === "team"      && <TeamTab      companyId={company.id} />}
+          {tab === "overview"  && <OverviewTab company={company} setTab={setTab} canDelete={isOwner} />}
+          {tab === "services"  && <ServicesTab companyId={company.id} canEdit={canEditCompany} />}
+          {tab === "equipment" && <EquipmentTab companyId={company.id} canEdit={canEditCompany} />}
+          {tab === "team"      && <TeamTab companyId={company.id} permissionRole={permissionRole} canManageTeam={canManageTeam} currentUserId={currentUserId} />}
         </div>
       </div>
     </div>
@@ -138,7 +157,7 @@ export default function DashboardClient({ company }: { company: Company }) {
 
 // ─── Overview Tab ──────────────────────────────────────────────────────────────
 
-function OverviewTab({ company, setTab }: { company: Company; setTab: (t: Tab) => void }) {
+function OverviewTab({ company, setTab, canDelete }: { company: Company; setTab: (t: Tab) => void; canDelete: boolean }) {
   const [stats, setStats] = useState({ services: 0, equipment: 0, members: 0 });
   const [deleteModal, setDeleteModal] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");
@@ -242,7 +261,7 @@ function OverviewTab({ company, setTab }: { company: Company; setTab: (t: Tab) =
       </div>
 
       {/* Danger zone */}
-      <div className="border border-red-500/20 rounded-xl p-4 bg-red-500/5">
+      {canDelete && <div className="border border-red-500/20 rounded-xl p-4 bg-red-500/5">
         <p className="text-sm font-semibold text-red-400 mb-1">Gefahrenzone</p>
         <p className="text-xs text-text-muted mb-3">
           Firma dauerhaft löschen — alle Services, Equipment und Teammitglieder werden entfernt. Diese Aktion kann nicht rückgängig gemacht werden.
@@ -253,7 +272,7 @@ function OverviewTab({ company, setTab }: { company: Company; setTab: (t: Tab) =
         >
           <Trash2 size={13} /> Firma löschen
         </button>
-      </div>
+      </div>}
 
       {/* Delete confirmation modal */}
       {deleteModal && (
@@ -324,7 +343,7 @@ function OverviewTab({ company, setTab }: { company: Company; setTab: (t: Tab) =
 
 const BLANK_SERVICE = { type: "equipment_rental", title: "", description: "", use_cases: [] as string[], price_on_request: true, price_note: "" };
 
-function ServicesTab({ companyId }: { companyId: string }) {
+function ServicesTab({ companyId, canEdit }: { companyId: string; canEdit: boolean }) {
   const [items, setItems] = useState<ServiceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<"list" | "form">("list");
@@ -387,7 +406,7 @@ function ServicesTab({ companyId }: { companyId: string }) {
     setItems(p => p.filter(x => x.id !== id));
   }
 
-  if (view === "form") return (
+  if (view === "form" && canEdit) return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <button onClick={() => setView("list")} className="text-text-muted hover:text-text-primary transition-colors">
@@ -480,10 +499,10 @@ function ServicesTab({ companyId }: { companyId: string }) {
           <h2 className="font-display text-xl font-bold text-text-primary">Services</h2>
           <p className="text-sm text-text-muted mt-0.5">Was bietet deine Firma an?</p>
         </div>
-        <button onClick={openNew}
+        {canEdit && <button onClick={openNew}
           className="flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary rounded-xl text-sm font-semibold hover:bg-gold-light transition-colors">
           <Plus size={14} /> Hinzufügen
-        </button>
+        </button>}
       </div>
 
       {loading ? (
@@ -493,8 +512,8 @@ function ServicesTab({ companyId }: { companyId: string }) {
           icon={Briefcase}
           title="Noch keine Services"
           description="Zeige der Filmbranche, was du anbietest."
-          action="Service hinzufügen"
-          onAction={openNew}
+          action={canEdit ? "Service hinzufügen" : undefined}
+          onAction={canEdit ? openNew : undefined}
         />
       ) : (
         <div className="space-y-3">
@@ -519,14 +538,14 @@ function ServicesTab({ companyId }: { companyId: string }) {
                   </div>
                 )}
               </div>
-              <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+              {canEdit && <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button onClick={() => openEdit(item)} className="p-1.5 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-gold transition-colors">
                   <Pencil size={13} />
                 </button>
                 <button onClick={() => handleDelete(item.id)} className="p-1.5 rounded-lg hover:bg-crimson/10 text-text-muted hover:text-crimson-light transition-colors">
                   <Trash2 size={13} />
                 </button>
-              </div>
+              </div>}
             </div>
           ))}
         </div>
@@ -546,7 +565,7 @@ const BLANK_EQUIPMENT = {
   quantity: "1",
 };
 
-function EquipmentTab({ companyId }: { companyId: string }) {
+function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: boolean }) {
   const [items, setItems] = useState<EquipmentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [catFilter, setCatFilter] = useState("alle");
@@ -645,7 +664,7 @@ function EquipmentTab({ companyId }: { companyId: string }) {
 
   const set = (k: string, v: unknown) => setForm((p: typeof BLANK_EQUIPMENT) => ({ ...p, [k]: v }));
 
-  if (view === "form") return (
+  if (view === "form" && canEdit) return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <button onClick={() => setView("list")} className="text-text-muted hover:text-text-primary transition-colors"><X size={18} /></button>
@@ -798,10 +817,10 @@ function EquipmentTab({ companyId }: { companyId: string }) {
           <h2 className="font-display text-xl font-bold text-text-primary">Equipment</h2>
           <p className="text-sm text-text-muted mt-0.5">{items.length} {items.length === 1 ? "Eintrag" : "Einträge"}</p>
         </div>
-        <button onClick={openNew}
+        {canEdit && <button onClick={openNew}
           className="flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary rounded-xl text-sm font-semibold hover:bg-gold-light transition-colors">
           <Plus size={14} /> Hinzufügen
-        </button>
+        </button>}
       </div>
 
       {/* Category filter */}
@@ -830,8 +849,8 @@ function EquipmentTab({ companyId }: { companyId: string }) {
           icon={Package}
           title={catFilter === "alle" ? "Noch kein Equipment" : "Nichts in dieser Kategorie"}
           description="Trage Equipment und Inventar ein, das du vermietest oder einsetzt."
-          action="Equipment hinzufügen"
-          onAction={openNew}
+          action={canEdit ? "Equipment hinzufügen" : undefined}
+          onAction={canEdit ? openNew : undefined}
         />
       ) : (
         <div className="space-y-2">
@@ -859,18 +878,18 @@ function EquipmentTab({ companyId }: { companyId: string }) {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <button onClick={() => toggleAvailable(item)} title={item.available ? "Verfügbar" : "Nicht verfügbar"}
+                  {canEdit && <button onClick={() => toggleAvailable(item)} title={item.available ? "Verfügbar" : "Nicht verfügbar"}
                     className={`text-xs px-2 py-1 rounded-full border font-medium transition-colors ${item.available ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" : "text-text-muted bg-bg-elevated border-border"}`}>
                     {item.available ? "Verfügbar" : "Nicht verfügbar"}
-                  </button>
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  </button>}
+                  {canEdit && <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button onClick={() => openEdit(item)} className="p-1.5 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-gold transition-colors">
                       <Pencil size={12} />
                     </button>
                     <button onClick={() => handleDelete(item.id)} className="p-1.5 rounded-lg hover:bg-crimson/10 text-text-muted hover:text-crimson-light transition-colors">
                       <Trash2 size={12} />
                     </button>
-                  </div>
+                  </div>}
                 </div>
               </div>
             );
@@ -883,9 +902,15 @@ function EquipmentTab({ companyId }: { companyId: string }) {
 
 // ─── Team Tab ──────────────────────────────────────────────────────────────────
 
-function TeamTab({ companyId }: { companyId: string }) {
+function TeamTab({ companyId, permissionRole, canManageTeam, currentUserId }: { companyId: string; permissionRole: "owner" | "admin" | "editor" | "member"; canManageTeam: boolean; currentUserId: string }) {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
+  const [inviteRole, setInviteRole] = useState<"admin" | "editor" | "member">("member");
+  const [inviteTitles, setInviteTitles] = useState("");
+  const [inviteUrl, setInviteUrl] = useState("");
+  const [inviteBusy, setInviteBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
 
   const load = useCallback(() => {
     fetch(`/api/company-members?company_id=${companyId}`)
@@ -899,18 +924,45 @@ function TeamTab({ companyId }: { companyId: string }) {
   const pending  = members.filter(m => m.status === "pending");
 
   async function handleAccept(id: string) {
-    await fetch("/api/company-members", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, status: "accepted" }) });
-    setMembers(p => p.map(m => m.id === id ? { ...m, status: "accepted" } : m));
+    const response = await fetch("/api/company-members", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, status: "accepted" }) });
+    if (!response.ok) { const result = await response.json().catch(() => ({})); setError(result.error ?? "Anfrage konnte nicht bestätigt werden."); return; }
+    setMembers((current) => current.map((member) => member.id === id ? { ...member, status: "accepted" } : member));
   }
 
   async function handleRemove(id: string) {
-    await fetch(`/api/company-members?id=${id}`, { method: "DELETE" });
-    setMembers(p => p.filter(m => m.id !== id));
+    const response = await fetch(`/api/company-members?id=${id}`, { method: "DELETE" });
+    if (!response.ok) { const result = await response.json().catch(() => ({})); setError(result.error ?? "Mitglied konnte nicht entfernt werden."); return; }
+    setMembers((current) => current.filter((member) => member.id !== id));
   }
 
   async function handleRoleChange(id: string, role: string) {
-    await fetch("/api/company-members", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, role }) });
-    setMembers(p => p.map(m => m.id === id ? { ...m, role } : m));
+    const response = await fetch("/api/company-members", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, role }) });
+    if (!response.ok) { const result = await response.json().catch(() => ({})); setError(result.error ?? "Berechtigung konnte nicht geändert werden."); return; }
+    setMembers((current) => current.map((member) => member.id === id ? { ...member, role } : member));
+  }
+
+  async function handleTitlesChange(id: string, rawTitles: string) {
+    const public_titles = normalizeCompanyPublicTitles(rawTitles);
+    const response = await fetch("/api/company-members", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, public_titles }) });
+    if (!response.ok) { const result = await response.json().catch(() => ({})); setError(result.error ?? "Öffentliche Funktion konnte nicht gespeichert werden."); return; }
+    setMembers((current) => current.map((member) => member.id === id ? { ...member, public_titles, title: public_titles[0] ?? null } : member));
+  }
+
+  async function createInvite() {
+    setInviteBusy(true); setError(""); setNotice(""); setInviteUrl("");
+    try {
+      const response = await fetch("/api/company-invitations", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ company_id: companyId, permission_role: inviteRole, public_titles: normalizeCompanyPublicTitles(inviteTitles) }) });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error ?? "Einladung konnte nicht erstellt werden.");
+      setInviteUrl(result.invite_url);
+      setNotice("Einladungslink erstellt. Er läuft in 14 Tagen ab und wird erst nach deiner Bestätigung als Teammitglied sichtbar.");
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Einladung konnte nicht erstellt werden."); }
+    finally { setInviteBusy(false); }
+  }
+
+  async function copyInvite() {
+    try { await navigator.clipboard.writeText(inviteUrl); setNotice("Einladungslink kopiert."); }
+    catch { setError("Der Link konnte nicht kopiert werden. Du kannst ihn markieren und kopieren."); }
   }
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 size={20} className="animate-spin text-gold" /></div>;
@@ -919,8 +971,9 @@ function TeamTab({ companyId }: { companyId: string }) {
     <div className="space-y-8">
       <div>
         <h2 className="font-display text-xl font-bold text-text-primary">Team</h2>
-        <p className="text-sm text-text-muted mt-0.5">Mitglieder erscheinen auf dem öffentlichen Firmenprofil.</p>
+        <p className="text-sm text-text-muted mt-0.5">Öffentliche Funktion und Verwaltungsrechte werden getrennt verwaltet.</p>
       </div>
+      {error && <p role="alert" className="rounded-xl border border-crimson/20 bg-crimson/10 p-3 text-sm text-crimson-light">{error}</p>}
 
       {/* Pending requests */}
       {pending.length > 0 && (
@@ -934,7 +987,7 @@ function TeamTab({ companyId }: { companyId: string }) {
                 <MemberAvatar member={m} size={38} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-text-primary">{m.profile?.display_name ?? "Unbekannt"}</p>
-                  {m.profile?.role && <p className="text-xs text-text-muted">{m.profile.role}</p>}
+                  {(m.public_titles?.length || m.title) && <p className="text-xs text-text-muted">Funktion: {(m.public_titles?.length ? m.public_titles : [m.title!]).join(" · ")}</p>}
                 </div>
                 <div className="flex gap-2 shrink-0">
                   <button onClick={() => handleAccept(m.id)}
@@ -973,40 +1026,46 @@ function TeamTab({ companyId }: { companyId: string }) {
                     </Link>
                     {m.role === "owner" && <Crown size={11} className="text-gold shrink-0" />}
                   </div>
-                  <p className="text-xs text-text-muted truncate">{m.title ?? m.profile?.role ?? ""}</p>
+                  <p className="text-xs text-text-muted truncate">Öffentliche Funktion: {(m.public_titles?.length ? m.public_titles : m.title ? [m.title] : []).join(" · ") || "noch nicht angegeben"}</p>
+                  {(canManageTeam || m.user_id === currentUserId) && <PublicTitlesEditor member={m} onSave={(value) => void handleTitlesChange(m.id, value)} />}
                 </div>
-                {m.role !== "owner" && (
+                <div className="flex items-center gap-2 shrink-0">
+                {permissionRole === "owner" && m.role !== "owner" && (
                   <div className="flex items-center gap-2 shrink-0">
                     <select value={m.role} onChange={e => handleRoleChange(m.id, e.target.value)}
-                      className="text-xs bg-bg-elevated border border-border rounded-lg px-2 py-1 focus:outline-none focus:border-gold transition-colors opacity-0 group-hover:opacity-100">
-                      <option value="admin">Admin</option>
-                      <option value="manager">Manager</option>
-                      <option value="member">Member</option>
+                      aria-label={`Verwaltungsrechte für ${m.profile?.display_name ?? "Mitglied"}`}
+                      className="text-xs bg-bg-elevated border border-border rounded-lg px-2 py-2 focus:outline-none focus:border-gold transition-colors">
+                      <option value="admin">Administrator</option>
+                      <option value="editor">Bearbeiter/in</option>
+                      <option value="member">Teammitglied</option>
                     </select>
-                    <button onClick={() => handleRemove(m.id)}
-                      className="p-1.5 rounded-lg hover:bg-crimson/10 text-text-muted hover:text-crimson-light transition-colors opacity-0 group-hover:opacity-100">
-                      <UserMinus size={13} />
-                    </button>
                   </div>
                 )}
+                {m.role !== "owner" && canCompanyRoleManageTarget(permissionRole, m.role) && <button onClick={() => void handleRemove(m.id)} aria-label={`${m.profile?.display_name ?? "Mitglied"} entfernen`} className="flex h-10 w-10 items-center justify-center rounded-lg text-text-muted hover:bg-crimson/10 hover:text-crimson-light"><UserMinus size={14} /></button>}
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* Invite hint */}
-      <div className="p-4 bg-bg-secondary border border-border rounded-xl">
-        <p className="text-xs font-semibold text-text-primary mb-1">Team einladen</p>
-        <p className="text-xs text-text-muted mb-3">Teile den Link zu deinem Firmenprofil. Mitglieder können dort eine Beitrittsanfrage stellen.</p>
-        <button
-          onClick={() => navigator.clipboard.writeText(window.location.origin + `/companies/${companyId}`)}
-          className="text-xs text-gold hover:underline flex items-center gap-1">
-          <Tag size={11} /> Profillink kopieren
-        </button>
-      </div>
+      {canManageTeam && <div className="space-y-3 rounded-xl border border-border bg-bg-secondary p-4">
+        <h3 className="text-sm font-semibold text-text-primary">Teammitglied einladen</h3>
+        <p className="text-xs leading-5 text-text-muted">Erstelle einen privaten, einmal verwendbaren Link. Die eingeladene Person kann sich anmelden oder neu registrieren; du bestätigst danach den Beitritt. Der Link wird nicht automatisch per E-Mail versendet.</p>
+        <label className="block text-xs text-text-secondary">CineGenius-Funktion (optional, mehrere mit Komma trennen)<input list="company-public-title-options" value={inviteTitles} onChange={(event) => setInviteTitles(event.target.value)} maxLength={400} placeholder="z.B. Catering-Leitung, Setkoch" className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary" /></label>
+        <datalist id="company-public-title-options">{COMPANY_PUBLIC_TITLE_SUGGESTIONS.map((title) => <option key={title} value={title} />)}</datalist>
+        <label className="block text-xs text-text-secondary">Verwaltungsrecht<select value={inviteRole} onChange={(event) => setInviteRole(event.target.value as "admin" | "editor" | "member")} className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary"><option value="member">Teammitglied – ansehen</option><option value="editor">Bearbeiter/in – Firmendaten und Angebote bearbeiten</option>{permissionRole === "owner" && <option value="admin">Administrator/in – Team verwalten</option>}</select></label>
+        <button onClick={() => void createInvite()} disabled={inviteBusy} className="min-h-11 rounded-lg bg-gold px-4 text-sm font-bold text-bg-primary disabled:opacity-50">{inviteBusy ? "Wird erstellt …" : "Einladungslink erstellen"}</button>
+        {inviteUrl && <div className="space-y-2"><input readOnly value={inviteUrl} aria-label="Einladungslink" className="min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-xs text-text-primary" /><button onClick={() => void copyInvite()} className="min-h-10 rounded-lg border border-border px-3 text-xs text-gold">Link kopieren</button></div>}
+        {notice && <p role="status" className="text-xs text-success">{notice}</p>}
+      </div>}
     </div>
   );
+}
+
+function PublicTitlesEditor({ member, onSave }: { member: Member; onSave: (value: string) => void }) {
+  const [value, setValue] = useState((member.public_titles?.length ? member.public_titles : member.title ? [member.title] : []).join(", "));
+  return <label className="mt-2 block text-[11px] text-text-muted">Funktion(en), öffentlich sichtbar<input list="company-public-title-options" value={value} onChange={(event) => setValue(event.target.value)} onBlur={() => onSave(value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); onSave(value); } }} maxLength={400} placeholder="z.B. Technische Leitung, Oberbeleuchter" className="mt-1 min-h-10 w-full rounded-lg border border-border bg-bg-primary px-3 text-xs text-text-primary" /></label>;
 }
 
 // ─── Shared helpers ────────────────────────────────────────────────────────────
@@ -1023,7 +1082,7 @@ function FormField({ label, required, children }: { label: string; required?: bo
 }
 
 function EmptyState({ icon: Icon, title, description, action, onAction }: {
-  icon: React.ElementType; title: string; description: string; action: string; onAction: () => void;
+  icon: React.ElementType; title: string; description: string; action?: string; onAction?: () => void;
 }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -1031,11 +1090,11 @@ function EmptyState({ icon: Icon, title, description, action, onAction }: {
         <Icon size={20} className="text-text-muted" />
       </div>
       <p className="text-sm font-semibold text-text-primary mb-1">{title}</p>
-      <p className="text-xs text-text-muted mb-5 max-w-xs">{description}</p>
-      <button onClick={onAction}
+      <p className={`text-xs text-text-muted max-w-xs ${action ? "mb-5" : ""}`}>{description}</p>
+      {action && onAction && <button onClick={onAction}
         className="flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary rounded-xl text-sm font-semibold hover:bg-gold-light transition-colors">
         <Plus size={14} /> {action}
-      </button>
+      </button>}
     </div>
   );
 }

@@ -10,7 +10,6 @@ import {
   UserMinus, Crown, ChevronRight, ExternalLink,
   Calendar, Scale, Globe2, Quote,
 } from "lucide-react";
-import { useUser } from "@clerk/nextjs";
 import { COMPANY_CATEGORY_BY_ID } from "@/lib/companyCategories";
 import { CATERING_COMPANY_CATEGORY, normalizeCateringCompanyDetails } from "@/lib/catering-taxonomy";
 import {
@@ -39,8 +38,9 @@ type MemberProfile = {
 type Member = {
   id: string;
   user_id: string;
-  role: string;
   title: string | null;
+  public_titles?: string[];
+  is_company_owner?: boolean;
   status: string;
   created_at: string;
   profile: MemberProfile;
@@ -64,6 +64,7 @@ type Company = {
   owner_user_id: string;
   name: string;
   logo_url: string | null;
+  cover_url?: string | null;
   description: string;
   bio_short: string | null;
   tagline: string | null;
@@ -103,10 +104,9 @@ export default function CompanyDetail({
   members: Member[];
   services: ServiceItem[];
   equipment: EquipmentItem[];
-  myMembership: { id: string; status: string } | null;
+  myMembership: { id: string; status: string; role?: string } | null;
   currentUserId: string | null;
 }) {
-  const { user } = useUser();
   const searchParams = useSearchParams();
   const isWelcome = searchParams.get("welcome") === "1";
   const [welcomeDismissed, setWelcomeDismissed] = useState(false);
@@ -115,7 +115,7 @@ export default function CompanyDetail({
   const [publishError, setPublishError] = useState("");
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
-  const isOwner = user?.id === company.owner_user_id;
+  const isOwner = currentUserId === company.owner_user_id;
   const cats = company.categories.map((id) => COMPANY_CATEGORY_BY_ID[id]).filter(Boolean);
   const cateringDetails = normalizeCateringCompanyDetails(company.catering_details);
   const offersCatering = company.categories.includes(CATERING_COMPANY_CATEGORY.id);
@@ -125,10 +125,11 @@ export default function CompanyDetail({
   const [joining, setJoining] = useState(false);
   const [joinError, setJoinError] = useState("");
   const [showAllTeam, setShowAllTeam] = useState(false);
+  const canEditCompany = isOwner || (localMembership?.status === "accepted" && ["admin", "editor", "manager"].includes(localMembership.role ?? ""));
 
   const acceptedMembers = localMembers.filter((m) => m.status === "accepted");
-  const managementMembers = acceptedMembers.filter((m) => m.role === "owner");
-  const regularMembers = acceptedMembers.filter((m) => m.role !== "owner");
+  const managementMembers = acceptedMembers.filter((m) => m.is_company_owner || m.user_id === company.owner_user_id);
+  const regularMembers = acceptedMembers.filter((m) => !m.is_company_owner && m.user_id !== company.owner_user_id);
   const pendingMembers = localMembers.filter((m) => m.status === "pending");
 
   async function handleJoinRequest() {
@@ -207,15 +208,17 @@ export default function CompanyDetail({
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden border-b border-border">
-        {/* Gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-bg-elevated to-bg-primary" />
+        <div className="absolute inset-0 bg-gradient-to-b from-bg-elevated to-bg-primary">
+          {company.cover_url && <img src={company.cover_url} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />}
+          <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/60 via-bg-primary/75 to-bg-primary" />
+        </div>
 
         <div className="relative z-10 mx-auto w-full min-w-0 max-w-4xl px-4 sm:px-6 pt-10 pb-8 sm:pb-10">
 
           {/* Edit button */}
-          {isOwner && (
+          {canEditCompany && (
             <div className="flex justify-end mb-6">
-              <Link href="/company-setup"
+              <Link href={`/company-setup?company_id=${company.id}`}
                 className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-xs text-text-muted hover:text-gold hover:border-gold/40 transition-colors bg-bg-primary/60 backdrop-blur-sm">
                 <Pencil size={12} /> Bearbeiten
               </Link>
@@ -375,13 +378,13 @@ export default function CompanyDetail({
                     <div className="bg-bg-secondary border border-border rounded-2xl overflow-hidden">
                       <div className="px-5 py-2.5 border-b border-border bg-bg-elevated flex items-center gap-2">
                         <Crown size={10} className="text-gold" />
-                        <span className="text-[10px] uppercase tracking-widest font-semibold text-gold">Geschäftsführung</span>
+                        <span className="text-[10px] uppercase tracking-widest font-semibold text-gold">Inhaberschaft</span>
                       </div>
                       <div className="divide-y divide-border">
                         {managementMembers.map((m) => {
                           const slug = m.profile?.slug ?? m.user_id;
                           const name = m.profile?.display_name ?? "Unbekannt";
-                          const position = m.title ?? m.profile?.role ?? "—";
+                          const position = m.public_titles?.join(" · ") || m.title || "Inhaber/in";
                           return (
                             <Link key={m.id} href={`/profile/${slug}`}
                               className="grid min-w-0 grid-cols-1 gap-1 px-4 py-3.5 hover:bg-bg-elevated transition-colors group items-start sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] sm:items-center sm:gap-4 sm:px-5">
@@ -407,13 +410,13 @@ export default function CompanyDetail({
                     <div className="bg-bg-secondary border border-border rounded-2xl overflow-hidden">
                       <div className="px-5 py-2.5 border-b border-border bg-bg-elevated flex items-center gap-2">
                         <Users size={10} className="text-text-muted" />
-                        <span className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">Mitarbeiter</span>
+                        <span className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">Team</span>
                       </div>
                       <div className="divide-y divide-border">
                         {(showAllTeam ? regularMembers : regularMembers.slice(0, 10)).map((m) => {
                           const slug = m.profile?.slug ?? m.user_id;
                           const name = m.profile?.display_name ?? "Unbekannt";
-                          const position = m.title ?? m.profile?.role ?? "—";
+                          const position = m.public_titles?.join(" · ") || m.title || "Teammitglied";
                           return (
                             <Link key={m.id} href={`/profile/${slug}`}
                               className="grid min-w-0 grid-cols-1 gap-1 px-4 py-3.5 hover:bg-bg-elevated transition-colors group items-start sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] sm:items-center sm:gap-4 sm:px-5">
@@ -432,7 +435,7 @@ export default function CompanyDetail({
                           className="w-full px-5 py-3 border-t border-border bg-bg-secondary hover:bg-bg-elevated text-xs text-text-muted hover:text-gold transition-colors flex items-center justify-center gap-1.5"
                         >
                           <Users size={11} />
-                          {showAllTeam ? "Weniger anzeigen" : `Alle ${regularMembers.length} Mitarbeiter anzeigen`}
+                          {showAllTeam ? "Weniger anzeigen" : `Alle ${regularMembers.length} Teammitglieder anzeigen`}
                         </button>
                       )}
                     </div>

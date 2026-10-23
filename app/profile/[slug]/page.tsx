@@ -205,19 +205,37 @@ function getPublicCollaborations(userId: string): Promise<PublicCollab[]> {
   )();
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getCompanyMembership(userId: string): Promise<any> {
+function getCompanyMembership(userId: string): Promise<Array<{
+  id: string;
+  title: string | null;
+  public_titles: string[];
+  is_company_owner: boolean;
+  companies: { id: string; slug: string; name: string; logo_url: string | null; categories: string[] | null };
+}>> {
   return unstable_cache(
     async () => {
       const { data } = await db
         .from("company_members")
-        .select("id, role, title, status, company_id, companies(id, slug, name, logo_url, categories, published)")
+        .select("id, user_id, title, public_titles, status, company_id, companies(id, slug, name, logo_url, categories, published, owner_user_id)")
         .eq("user_id", userId)
         .eq("status", "accepted")
-        .limit(1)
-        .maybeSingle();
-      const company = data?.companies as unknown as { published?: boolean } | null;
-      return company?.published === false ? null : data;
+        .order("created_at", { ascending: true });
+      return (data ?? []).flatMap((member) => {
+        const company = member.companies as unknown as {
+          id: string; slug: string; name: string; logo_url: string | null;
+          categories: string[] | null; published: boolean; owner_user_id: string;
+        } | null;
+        if (!company?.published) return [];
+        return [{
+          id: member.id,
+          title: member.title,
+          public_titles: Array.isArray(member.public_titles) && member.public_titles.length
+            ? member.public_titles
+            : member.title ? [member.title] : [],
+          is_company_owner: company.owner_user_id === userId,
+          companies: { id: company.id, slug: company.slug, name: company.name, logo_url: company.logo_url, categories: company.categories },
+        }];
+      });
     },
     ["profile-company", userId],
     { revalidate: 300, tags: ["profiles"] }

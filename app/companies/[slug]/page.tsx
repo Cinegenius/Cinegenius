@@ -16,14 +16,14 @@ const getCompany = unstable_cache(
 );
 
 const getCompanyPublicData = unstable_cache(
-  async (companyId: string) => {
+  async (companyId: string, ownerUserId: string) => {
     const [listingsRes, rawMembersRes, servicesRes, equipmentRes] = await Promise.all([
       db.from("listings")
         .select("id, title, type, category, price, city, image_url, created_at")
         .eq("company_id", companyId)
         .order("created_at", { ascending: false }),
       db.from("company_members")
-        .select("id, user_id, role, title, status, created_at")
+        .select("id, user_id, role, title, public_titles, status, created_at")
         .eq("company_id", companyId)
         .eq("status", "accepted")
         .order("created_at", { ascending: true }),
@@ -45,7 +45,16 @@ const getCompanyPublicData = unstable_cache(
         .select("user_id, display_name, avatar_url, slug, role")
         .in("user_id", rawMembers.map((m) => m.user_id));
       const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, p]));
-      members = rawMembers.map((m) => ({ ...m, profile: profileMap[m.user_id] ?? null }));
+      members = rawMembers.map((m) => ({
+        id: m.id,
+        user_id: m.user_id,
+        title: m.title,
+        public_titles: m.public_titles?.length ? m.public_titles : m.title ? [m.title] : [],
+        status: m.status,
+        created_at: m.created_at,
+        is_company_owner: m.user_id === ownerUserId,
+        profile: profileMap[m.user_id] ?? null,
+      }));
     }
 
     return {
@@ -100,11 +109,11 @@ export default async function CompanyPage({
 
   // Public data from cache + owner's pending members fetched fresh
   const [publicData, ownerPendingMembers, myMembership] = await Promise.all([
-    getCompanyPublicData(company.id),
+    getCompanyPublicData(company.id, company.owner_user_id),
     // Owner sees pending members too — fetched fresh (not cached)
     isOwner
       ? db.from("company_members")
-          .select("id, user_id, role, title, status, created_at")
+          .select("id, user_id, role, title, public_titles, status, created_at")
           .eq("company_id", company.id)
           .eq("status", "pending")
           .order("created_at", { ascending: true })
@@ -122,7 +131,7 @@ export default async function CompanyPage({
     // Check current user's membership status
     userId && !isOwner
       ? db.from("company_members")
-          .select("id, status")
+          .select("id, status, role")
           .eq("company_id", company.id)
           .eq("user_id", userId)
           .maybeSingle()
@@ -130,7 +139,11 @@ export default async function CompanyPage({
       : Promise.resolve(null),
   ]);
 
-  const allMembers = [...publicData.members, ...ownerPendingMembers] as object[];
+  const allMembers = [...publicData.members, ...ownerPendingMembers.map((member) => ({
+    ...member,
+    public_titles: member.public_titles?.length ? member.public_titles : member.title ? [member.title] : [],
+    is_company_owner: member.user_id === company.owner_user_id,
+  }))] as object[];
 
   const normalised = {
     ...company,

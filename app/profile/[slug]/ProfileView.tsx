@@ -409,62 +409,61 @@ function ExternalProfilesDisplay({ profiles }: { profiles: ExternalProfileRow[] 
 
 type CompanyMembership = {
   id: string;
-  role: string;
   title: string | null;
-  companies: { id: string; slug: string; name: string; logo_url: string | null; categories: string[] | null } | null;
-} | null;
+  public_titles: string[];
+  is_company_owner: boolean;
+  companies: { id: string; slug: string; name: string; logo_url: string | null; categories: string[] | null };
+};
+type CompanyMemberships = CompanyMembership[] | null;
 
-function CompanyBadge({ membership }: { membership: CompanyMembership }) {
-  if (!membership?.companies) return null;
-  const co = membership.companies;
-  const roleLabel = membership.title ?? membership.role ?? null;
-  const categoryLabel = co.categories?.[0]
-    ? COMPANY_CATEGORIES.find(c => c.id === co.categories![0])?.label ?? null
-    : null;
+function CompanyBadge({ membership }: { membership: CompanyMemberships }) {
+  if (!membership?.length) return null;
   return (
     <div>
       <div className="flex items-center gap-2 mb-2.5">
         <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
         <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Unternehmen</p>
       </div>
-      <Link href={`/companies/${co.slug}`} className="block bg-bg-elevated border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-all group">
-        {/* Mobile: compact horizontal row */}
-        <div className="flex sm:hidden items-center gap-3 px-3 py-2.5">
-          <div className="w-14 h-9 shrink-0 rounded-lg overflow-hidden bg-bg-secondary border border-border/50 flex items-center justify-center">
-            {co.logo_url
-              // eslint-disable-next-line @next/next/no-img-element
-              ? <img src={co.logo_url} alt={co.name} className="w-full h-full object-contain p-1" />
-              : <Building2 size={16} className="text-text-muted group-hover:text-gold transition-colors" />}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{co.name}</p>
-            {categoryLabel
-              ? <p className="text-[11px] text-text-muted truncate">{categoryLabel}</p>
-              : roleLabel && <p className="text-[11px] text-text-muted truncate">{roleLabel}</p>}
-          </div>
-          <ExternalLink size={11} className="text-text-muted group-hover:text-gold transition-colors shrink-0" />
-        </div>
-
-        {/* Desktop: vertical card */}
-        <div className="hidden sm:block">
-          <div className="h-24 bg-gradient-to-br from-bg-secondary to-bg-primary flex items-center justify-center">
-            {co.logo_url
-              // eslint-disable-next-line @next/next/no-img-element
-              ? <img src={co.logo_url} alt={co.name} className="w-full h-full object-contain p-3" />
-              : <div className="w-16 h-16 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shadow-xl">
-                  <Building2 size={28} className="text-text-muted group-hover:text-gold transition-colors" />
-                </div>}
-          </div>
-          <div className="px-4 py-3 text-center border-t border-border/50">
-            <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{co.name}</p>
-            {categoryLabel && <p className="text-[11px] text-gold/70 mt-0.5 truncate">{categoryLabel}</p>}
-            {roleLabel && <p className="text-[11px] text-text-muted mt-0.5 truncate">{roleLabel}</p>}
-            <p className="text-[10px] text-gold/60 mt-1.5 flex items-center justify-center gap-1">
-              <ExternalLink size={9} /> Unternehmensprofil
-            </p>
-          </div>
-        </div>
-      </Link>
+      <div className="space-y-2.5">
+        {membership.map((entry) => {
+          const co = entry.companies;
+          const roleLabel = entry.public_titles.join(" · ") || (entry.is_company_owner ? "Inhaber/in" : "Teammitglied");
+          const categoryLabel = co.categories?.[0]
+            ? COMPANY_CATEGORIES.find(c => c.id === co.categories![0])?.label ?? null
+            : null;
+          return (
+            <Link key={entry.id} href={`/companies/${co.slug}`} className="block bg-bg-elevated border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-all group">
+              <div className="flex sm:hidden items-center gap-3 px-3 py-2.5">
+                <div className="w-14 h-9 shrink-0 rounded-lg overflow-hidden bg-bg-secondary border border-border/50 flex items-center justify-center">
+                  {co.logo_url
+                    // eslint-disable-next-line @next/next/no-img-element
+                    ? <img src={co.logo_url} alt={co.name} className="w-full h-full object-contain p-1" />
+                    : <Building2 size={16} className="text-text-muted group-hover:text-gold transition-colors" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{co.name}</p>
+                  <p className="text-[11px] text-text-muted truncate">{roleLabel}{categoryLabel ? ` · ${categoryLabel}` : ""}</p>
+                </div>
+                <ExternalLink size={11} className="text-text-muted group-hover:text-gold transition-colors shrink-0" />
+              </div>
+              <div className="hidden sm:block">
+                <div className="h-24 bg-gradient-to-br from-bg-secondary to-bg-primary flex items-center justify-center">
+                  {co.logo_url
+                    // eslint-disable-next-line @next/next/no-img-element
+                    ? <img src={co.logo_url} alt={co.name} className="w-full h-full object-contain p-3" />
+                    : <div className="w-16 h-16 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shadow-xl"><Building2 size={28} className="text-text-muted group-hover:text-gold transition-colors" /></div>}
+                </div>
+                <div className="px-4 py-3 text-center border-t border-border/50">
+                  <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{co.name}</p>
+                  {categoryLabel && <p className="text-[11px] text-gold/70 mt-0.5 truncate">{categoryLabel}</p>}
+                  <p className="text-[11px] text-text-muted mt-0.5 truncate">{roleLabel}</p>
+                  <p className="text-[10px] text-gold/60 mt-1.5 flex items-center justify-center gap-1"><ExternalLink size={9} /> Unternehmensprofil</p>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -473,7 +472,7 @@ function CompanyBadge({ membership }: { membership: CompanyMembership }) {
 // ACTOR PROFILE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ActorProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
+function ActorProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMemberships; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
   const tc = useTranslations("common");
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const { user } = useUser();
@@ -1012,7 +1011,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
 // MODEL PROFILE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ModelProfile({ profile, isOwner, projectCredits = [], companyMembership, listings = [], blockStatus = null, collaborations = [] }: { profile: UserProfile; isOwner: boolean; projectCredits?: ProjectCredit[]; companyMembership: CompanyMembership; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[] }) {
+function ModelProfile({ profile, isOwner, projectCredits = [], companyMembership, listings = [], blockStatus = null, collaborations = [] }: { profile: UserProfile; isOwner: boolean; projectCredits?: ProjectCredit[]; companyMembership: CompanyMemberships; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[] }) {
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const [lightbox, setLightbox] = useState<string | null>(null);
 
@@ -1229,7 +1228,7 @@ function ModelProfile({ profile, isOwner, projectCredits = [], companyMembership
         )}
 
 
-        {companyMembership?.companies && (
+        {companyMembership?.length && (
           <>
             <Divider />
             <CompanyBadge membership={companyMembership} />
@@ -1290,7 +1289,7 @@ function ModelProfile({ profile, isOwner, projectCredits = [], companyMembership
 // GENERIC PROFILE (Crew, Creative, Vendor etc.)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function GenericProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMembership; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
+function GenericProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMemberships; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const { user } = useUser();
   const [lightbox, setLightbox] = useState<string | null>(null);
@@ -1435,7 +1434,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 {(profile.display_name ?? "?")[0]}
               </div>
             )}
-            {companyMembership?.companies && (
+            {companyMembership?.length && (
               <CompanyBadge membership={companyMembership} />
             )}
           </div>
@@ -1981,7 +1980,7 @@ export default function ProfileView({
   profile: UserProfile;
   isOwner: boolean;
   projectCredits?: ProjectCredit[];
-  companyMembership?: CompanyMembership;
+  companyMembership?: CompanyMemberships;
   externalProfiles?: ExternalProfileRow[];
   listings?: PublicListing[];
   blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null;
