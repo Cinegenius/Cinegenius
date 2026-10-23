@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { unstable_cache } from "next/cache";
 import type { Metadata } from "next";
 import CompanyDetail from "./CompanyDetail";
+import { isPublicCompanyMembership } from "@/lib/company-membership-requests";
 
 // Cache public company data for 5 minutes
 const getCompany = unstable_cache(
@@ -37,7 +38,7 @@ const getCompanyPublicData = unstable_cache(
         .order("created_at", { ascending: false }),
     ]);
 
-    const rawMembers = rawMembersRes.data ?? [];
+    const rawMembers = (rawMembersRes.data ?? []).filter((member) => isPublicCompanyMembership(member.status));
     let members: object[] = [];
     if (rawMembers.length > 0) {
       const { data: profiles } = await db
@@ -107,27 +108,10 @@ export default async function CompanyPage({
 
   const isOwner = userId === company.owner_user_id;
 
-  // Public data from cache + owner's pending members fetched fresh
-  const [publicData, ownerPendingMembers, myMembership] = await Promise.all([
+  // Public data is accepted-only. Pending requests are private and only shown
+  // in the company dashboard to authorized team managers.
+  const [publicData, myMembership, myTitleChangeRequest] = await Promise.all([
     getCompanyPublicData(company.id, company.owner_user_id),
-    // Owner sees pending members too — fetched fresh (not cached)
-    isOwner
-      ? db.from("company_members")
-          .select("id, user_id, role, title, public_titles, status, created_at")
-          .eq("company_id", company.id)
-          .eq("status", "pending")
-          .order("created_at", { ascending: true })
-          .then(async (res) => {
-            const pending = res.data ?? [];
-            if (!pending.length) return [];
-            const { data: profiles } = await db
-              .from("profiles")
-              .select("user_id, display_name, avatar_url, slug, role")
-              .in("user_id", pending.map((m) => m.user_id));
-            const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, p]));
-            return pending.map((m) => ({ ...m, profile: profileMap[m.user_id] ?? null }));
-          })
-      : Promise.resolve([]),
     // Check current user's membership status
     userId && !isOwner
       ? db.from("company_members")
@@ -137,13 +121,16 @@ export default async function CompanyPage({
           .maybeSingle()
           .then((r) => r.data ?? null)
       : Promise.resolve(null),
+    userId && !isOwner
+      ? db.from("company_member_title_change_requests")
+          .select("id, status, created_at")
+          .eq("company_id", company.id)
+          .eq("user_id", userId)
+          .eq("status", "pending")
+          .maybeSingle()
+          .then((r) => r.data ?? null)
+      : Promise.resolve(null),
   ]);
-
-  const allMembers = [...publicData.members, ...ownerPendingMembers.map((member) => ({
-    ...member,
-    public_titles: member.public_titles?.length ? member.public_titles : member.title ? [member.title] : [],
-    is_company_owner: member.user_id === company.owner_user_id,
-  }))] as object[];
 
   const normalised = {
     ...company,
@@ -163,10 +150,11 @@ export default async function CompanyPage({
       company={normalised as any}
       listings={publicData.listings}
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      members={allMembers as any[]}
+      members={publicData.members as any[]}
       services={publicData.services}
       equipment={publicData.equipment}
       myMembership={myMembership}
+      myTitleChangeRequest={myTitleChangeRequest}
       currentUserId={userId ?? null}
     />
   );

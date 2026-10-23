@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   Building2, LayoutDashboard, Package, Users, Settings,
   ExternalLink, Plus, Pencil, Trash2, Loader2, X, Check,
@@ -42,6 +43,14 @@ type EquipmentItem = {
 
 type Member = {
   id: string; user_id: string; role?: string; title: string | null; public_titles?: string[]; status: string;
+  request_message?: string; created_at?: string;
+  profile: { display_name: string; avatar_url: string | null; slug: string | null; role: string | null } | null;
+};
+
+type TitleChangeRequest = {
+  id: string; company_id: string; company_member_id: string; user_id: string;
+  requested_public_titles: string[]; current_public_titles: string[]; message: string;
+  status: string; created_at: string;
   profile: { display_name: string; avatar_url: string | null; slug: string | null; role: string | null } | null;
 };
 
@@ -49,13 +58,13 @@ type Tab = "overview" | "services" | "equipment" | "team";
 
 // ─── Main component ────────────────────────────────────────────────────────────
 
-export default function DashboardClient({ company, permissionRole, companyOptions = [], currentUserId }: {
+export default function DashboardClient({ company, permissionRole, companyOptions = [] }: {
   company: Company;
   permissionRole: "owner" | "admin" | "editor" | "member";
   companyOptions?: Array<Pick<Company, "id" | "name" | "slug" | "logo_url" | "city">>;
-  currentUserId: string;
 }) {
-  const [tab, setTab] = useState<Tab>("overview");
+  const searchParams = useSearchParams();
+  const [tab, setTab] = useState<Tab>(() => searchParams.get("tab") === "team" ? "team" : "overview");
   const isOwner = permissionRole === "owner";
   const canManageTeam = permissionRole === "owner" || permissionRole === "admin";
   const canEditCompany = permissionRole !== "member";
@@ -148,7 +157,7 @@ export default function DashboardClient({ company, permissionRole, companyOption
           {tab === "overview"  && <OverviewTab company={company} setTab={setTab} canDelete={isOwner} />}
           {tab === "services"  && <ServicesTab companyId={company.id} canEdit={canEditCompany} />}
           {tab === "equipment" && <EquipmentTab companyId={company.id} canEdit={canEditCompany} />}
-          {tab === "team"      && <TeamTab companyId={company.id} permissionRole={permissionRole} canManageTeam={canManageTeam} currentUserId={currentUserId} />}
+          {tab === "team"      && <TeamTab companyId={company.id} permissionRole={permissionRole} canManageTeam={canManageTeam} />}
         </div>
       </div>
     </div>
@@ -902,8 +911,10 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
 
 // ─── Team Tab ──────────────────────────────────────────────────────────────────
 
-function TeamTab({ companyId, permissionRole, canManageTeam, currentUserId }: { companyId: string; permissionRole: "owner" | "admin" | "editor" | "member"; canManageTeam: boolean; currentUserId: string }) {
+function TeamTab({ companyId, permissionRole, canManageTeam }: { companyId: string; permissionRole: "owner" | "admin" | "editor" | "member"; canManageTeam: boolean }) {
   const [members, setMembers] = useState<Member[]>([]);
+  const [titleChangeRequests, setTitleChangeRequests] = useState<TitleChangeRequest[]>([]);
+  const [teamView, setTeamView] = useState<"members" | "requests">(canManageTeam ? "requests" : "members");
   const [loading, setLoading] = useState(true);
   const [inviteRole, setInviteRole] = useState<"admin" | "editor" | "member">("member");
   const [inviteTitles, setInviteTitles] = useState("");
@@ -912,27 +923,47 @@ function TeamTab({ companyId, permissionRole, canManageTeam, currentUserId }: { 
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
 
-  const load = useCallback(() => {
-    fetch(`/api/company-members?company_id=${companyId}`)
-      .then(r => r.json()).then(({ data }) => setMembers(data ?? []))
-      .finally(() => setLoading(false));
-  }, [companyId]);
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [membersResponse, titleRequestsResponse] = await Promise.all([
+        fetch(`/api/company-members?company_id=${companyId}`),
+        canManageTeam ? fetch(`/api/company-member-title-change-requests?company_id=${companyId}`) : Promise.resolve(null),
+      ]);
+      const [memberResult, titleRequestResult] = await Promise.all([
+        membersResponse.json().catch(() => ({})),
+        titleRequestsResponse?.json().catch(() => ({})) ?? Promise.resolve({}),
+      ]);
+      if (!membersResponse.ok) throw new Error(memberResult.error ?? "Teamdaten konnten nicht geladen werden.");
+      setMembers(memberResult.data ?? []);
+      if (titleRequestsResponse?.ok) setTitleChangeRequests(titleRequestResult.data ?? []);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Teamdaten konnten nicht geladen werden.");
+    } finally { setLoading(false); }
+  }, [canManageTeam, companyId]);
 
   useEffect(() => { load(); }, [load]);
 
   const accepted = members.filter(m => m.status === "accepted").sort((a, b) => a.role === "owner" ? -1 : b.role === "owner" ? 1 : 0);
   const pending  = members.filter(m => m.status === "pending");
+  const requestCount = pending.length + titleChangeRequests.length;
 
-  async function handleAccept(id: string) {
-    const response = await fetch("/api/company-members", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, status: "accepted" }) });
+  async function handleAccept(id: string, rawTitles: string) {
+    const public_titles = normalizeCompanyPublicTitles(rawTitles);
+    if (!public_titles.length) { setError("Bitte lege mindestens eine öffentliche Funktion fest."); return; }
+    const response = await fetch("/api/company-members", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, status: "accepted", public_titles }) });
     if (!response.ok) { const result = await response.json().catch(() => ({})); setError(result.error ?? "Anfrage konnte nicht bestätigt werden."); return; }
-    setMembers((current) => current.map((member) => member.id === id ? { ...member, status: "accepted" } : member));
+    const result = await response.json().catch(() => ({}));
+    setMembers((current) => current.map((member) => member.id === id ? { ...member, status: "accepted", public_titles, title: public_titles[0] } : member));
+    setNotice(result.data?.public_titles?.join(" · ") ? `Beitritt bestätigt. Freigegebene Funktion: ${result.data.public_titles.join(" · ")}.` : "Beitritt bestätigt.");
   }
 
   async function handleRemove(id: string) {
+    const pendingRequest = members.some((member) => member.id === id && member.status === "pending");
     const response = await fetch(`/api/company-members?id=${id}`, { method: "DELETE" });
     if (!response.ok) { const result = await response.json().catch(() => ({})); setError(result.error ?? "Mitglied konnte nicht entfernt werden."); return; }
     setMembers((current) => current.filter((member) => member.id !== id));
+    setNotice(pendingRequest ? "Beitrittsanfrage abgelehnt. Die Person wurde informiert." : "Mitglied wurde aus dem Team entfernt.");
   }
 
   async function handleRoleChange(id: string, role: string) {
@@ -946,6 +977,24 @@ function TeamTab({ companyId, permissionRole, canManageTeam, currentUserId }: { 
     const response = await fetch("/api/company-members", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, public_titles }) });
     if (!response.ok) { const result = await response.json().catch(() => ({})); setError(result.error ?? "Öffentliche Funktion konnte nicht gespeichert werden."); return; }
     setMembers((current) => current.map((member) => member.id === id ? { ...member, public_titles, title: public_titles[0] ?? null } : member));
+  }
+
+  async function handleTitleRequestDecision(id: string, status: "accepted" | "rejected", rawTitles = "") {
+    const public_titles = status === "accepted" ? normalizeCompanyPublicTitles(rawTitles) : undefined;
+    if (status === "accepted" && !public_titles?.length) { setError("Lege mindestens eine öffentliche Funktion fest."); return; }
+    const response = await fetch("/api/company-member-title-change-requests", {
+      method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, status, ...(public_titles ? { public_titles } : {}) }),
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) { setError(result.error ?? "Funktionsanfrage konnte nicht bearbeitet werden."); return; }
+    setTitleChangeRequests((current) => current.filter((request) => request.id !== id));
+    if (status === "accepted" && result.data?.company_member_id) {
+      setMembers((current) => current.map((member) => member.id === result.data.company_member_id
+        ? { ...member, public_titles: public_titles ?? [], title: public_titles?.[0] ?? null }
+        : member));
+    }
+    setNotice(status === "accepted" ? "Funktionsänderung bestätigt. Die betroffene Person wurde informiert." : "Funktionsanfrage abgelehnt. Die bisherige Funktion bleibt bestehen.");
   }
 
   async function createInvite() {
@@ -975,38 +1024,37 @@ function TeamTab({ companyId, permissionRole, canManageTeam, currentUserId }: { 
       </div>
       {error && <p role="alert" className="rounded-xl border border-crimson/20 bg-crimson/10 p-3 text-sm text-crimson-light">{error}</p>}
 
-      {/* Pending requests */}
-      {pending.length > 0 && (
+      <div className="flex flex-wrap gap-2 border-b border-border pb-3" role="tablist" aria-label="Teamverwaltung">
+        <button type="button" role="tab" aria-selected={teamView === "members"} onClick={() => setTeamView("members")}
+          className={`min-h-11 rounded-lg px-4 text-sm font-medium ${teamView === "members" ? "bg-bg-elevated text-gold" : "text-text-muted hover:bg-bg-secondary hover:text-text-primary"}`}>
+          Teammitglieder ({accepted.length})
+        </button>
+        {canManageTeam && <button type="button" role="tab" aria-selected={teamView === "requests"} onClick={() => setTeamView("requests")}
+          className={`min-h-11 rounded-lg px-4 text-sm font-medium ${teamView === "requests" ? "bg-bg-elevated text-gold" : "text-text-muted hover:bg-bg-secondary hover:text-text-primary"}`}>
+          Anfragen ({requestCount})
+        </button>}
+      </div>
+      {canManageTeam && <datalist id="company-public-title-options">{COMPANY_PUBLIC_TITLE_SUGGESTIONS.map((title) => <option key={title} value={title} />)}</datalist>}
+
+      {notice && <p role="status" className="rounded-xl border border-success/20 bg-success/5 p-3 text-sm text-success">{notice}</p>}
+
+      {teamView === "requests" && canManageTeam && (
         <div>
           <p className="text-[10px] uppercase tracking-[0.14em] text-amber-400 font-semibold mb-3 flex items-center gap-1.5">
-            <Clock size={10} /> Beitrittsanfragen ({pending.length})
+            <Clock size={10} /> Ausstehende Firmenanfragen ({requestCount})
           </p>
-          <div className="space-y-2">
-            {pending.map(m => (
-              <div key={m.id} className="flex items-center gap-3 p-3.5 bg-amber-500/5 border border-amber-500/20 rounded-xl">
-                <MemberAvatar member={m} size={38} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-text-primary">{m.profile?.display_name ?? "Unbekannt"}</p>
-                  <p className="text-xs text-text-muted">Funktion: {(m.public_titles?.length ? m.public_titles : m.title ? [m.title] : []).join(" · ") || "noch nicht angegeben"}</p>
-                </div>
-                <div className="flex gap-2 shrink-0">
-                  <button onClick={() => handleAccept(m.id)}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-success/10 hover:bg-success/20 text-success rounded-lg text-xs font-semibold transition-colors">
-                    <Check size={12} /> Annehmen
-                  </button>
-                  <button onClick={() => handleRemove(m.id)}
-                    className="flex items-center gap-1 px-3 py-1.5 hover:bg-crimson/10 text-text-muted hover:text-crimson-light rounded-lg text-xs transition-colors">
-                    <X size={12} /> Ablehnen
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+          {requestCount === 0 ? <p className="rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-muted">Zurzeit gibt es keine offenen Anfragen.</p> : <div className="space-y-3">
+            {pending.map((member) => <JoinRequestCard key={member.id} member={member}
+              onAccept={(titles) => void handleAccept(member.id, titles)} onReject={() => void handleRemove(member.id)} />)}
+            {titleChangeRequests.map((request) => <TitleChangeRequestCard key={request.id} request={request}
+              onAccept={(titles) => void handleTitleRequestDecision(request.id, "accepted", titles)}
+              onReject={() => void handleTitleRequestDecision(request.id, "rejected")} />)}
+          </div>}
         </div>
       )}
 
-      {/* Active members */}
-      <div>
+      {teamView === "members" && <div className="space-y-6">
+        <div>
         <p className="text-[10px] uppercase tracking-[0.14em] text-text-muted font-semibold mb-3">
           Aktive Mitglieder ({accepted.length})
         </p>
@@ -1027,7 +1075,7 @@ function TeamTab({ companyId, permissionRole, canManageTeam, currentUserId }: { 
                     {m.role === "owner" && <Crown size={11} className="text-gold shrink-0" />}
                   </div>
                   <p className="text-xs text-text-muted truncate">Öffentliche Funktion: {(m.public_titles?.length ? m.public_titles : m.title ? [m.title] : []).join(" · ") || "noch nicht angegeben"}</p>
-                  {(canManageTeam || m.user_id === currentUserId) && <PublicTitlesEditor member={m} onSave={(value) => void handleTitlesChange(m.id, value)} />}
+                  {canManageTeam && <PublicTitlesEditor member={m} onSave={(value) => void handleTitlesChange(m.id, value)} />}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                 {permissionRole === "owner" && m.role !== "owner" && (
@@ -1047,20 +1095,84 @@ function TeamTab({ companyId, permissionRole, canManageTeam, currentUserId }: { 
             ))}
           </div>
         )}
-      </div>
+        </div>
 
       {canManageTeam && <div className="space-y-3 rounded-xl border border-border bg-bg-secondary p-4">
         <h3 className="text-sm font-semibold text-text-primary">Teammitglied einladen</h3>
         <p className="text-xs leading-5 text-text-muted">Erstelle einen privaten, einmal verwendbaren Link. Die eingeladene Person kann sich anmelden oder neu registrieren; du bestätigst danach den Beitritt. Der Link wird nicht automatisch per E-Mail versendet.</p>
         <label className="block text-xs text-text-secondary">CineGenius-Funktion (optional, mehrere mit Komma trennen)<input list="company-public-title-options" value={inviteTitles} onChange={(event) => setInviteTitles(event.target.value)} maxLength={400} placeholder="z.B. Catering-Leitung, Setkoch" className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary" /></label>
-        <datalist id="company-public-title-options">{COMPANY_PUBLIC_TITLE_SUGGESTIONS.map((title) => <option key={title} value={title} />)}</datalist>
         <label className="block text-xs text-text-secondary">Verwaltungsrecht<select value={inviteRole} onChange={(event) => setInviteRole(event.target.value as "admin" | "editor" | "member")} className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary"><option value="member">Teammitglied – ansehen</option><option value="editor">Bearbeiter/in – Firmendaten und Angebote bearbeiten</option>{permissionRole === "owner" && <option value="admin">Administrator/in – Team verwalten</option>}</select></label>
         <button onClick={() => void createInvite()} disabled={inviteBusy} className="min-h-11 rounded-lg bg-gold px-4 text-sm font-bold text-bg-primary disabled:opacity-50">{inviteBusy ? "Wird erstellt …" : "Einladungslink erstellen"}</button>
         {inviteUrl && <div className="space-y-2"><input readOnly value={inviteUrl} aria-label="Einladungslink" className="min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-xs text-text-primary" /><button onClick={() => void copyInvite()} className="min-h-10 rounded-lg border border-border px-3 text-xs text-gold">Link kopieren</button></div>}
         {notice && <p role="status" className="text-xs text-success">{notice}</p>}
       </div>}
+      </div>}
     </div>
   );
+}
+
+function JoinRequestCard({ member, onAccept, onReject }: { member: Member; onAccept: (titles: string) => void; onReject: () => void }) {
+  const [titles, setTitles] = useState((member.public_titles?.length ? member.public_titles : member.title ? [member.title] : []).join(", "));
+  const name = member.profile?.display_name ?? "Unbekannt";
+  const profileHref = `/profile/${member.profile?.slug ?? member.user_id}`;
+  return (
+    <article className="space-y-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
+      <div className="flex items-start gap-3">
+        <MemberAvatar member={member} size={40} />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <Link href={profileHref} className="text-sm font-semibold text-text-primary hover:text-gold">{name}</Link>
+            <span className="text-[11px] text-amber-400">Ausstehend{member.created_at ? ` · ${formatRequestDate(member.created_at)}` : ""}</span>
+          </div>
+          {member.profile?.role && <p className="text-xs text-text-muted">{member.profile.role}</p>}
+        </div>
+      </div>
+      {member.request_message && <p className="rounded-lg border border-border bg-bg-primary/60 p-3 text-sm leading-relaxed text-text-secondary">„{member.request_message}“</p>}
+      <label className="block text-xs text-text-secondary">
+        Funktion(en) für die Freigabe überprüfen oder anpassen
+        <input list="company-public-title-options" value={titles} onChange={(event) => setTitles(event.target.value)} maxLength={400}
+          className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary" />
+      </label>
+      <div className="flex flex-wrap justify-end gap-2">
+        <button type="button" onClick={onReject} className="min-h-11 rounded-lg px-3 text-sm text-text-muted hover:bg-crimson/10 hover:text-crimson-light">Ablehnen</button>
+        <button type="button" onClick={() => onAccept(titles)} className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-success/10 px-3 text-sm font-semibold text-success hover:bg-success/20"><Check size={14} /> Annehmen</button>
+      </div>
+    </article>
+  );
+}
+
+function TitleChangeRequestCard({ request, onAccept, onReject }: { request: TitleChangeRequest; onAccept: (titles: string) => void; onReject: () => void }) {
+  const [titles, setTitles] = useState(request.requested_public_titles.join(", "));
+  const name = request.profile?.display_name ?? "Unbekannt";
+  return (
+    <article className="space-y-3 rounded-xl border border-border bg-bg-secondary p-4">
+      <div className="flex items-start gap-3">
+        <MemberAvatar member={{ ...request, title: null, public_titles: request.requested_public_titles, status: request.status }} size={40} />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <Link href={`/profile/${request.profile?.slug ?? request.user_id}`} className="text-sm font-semibold text-text-primary hover:text-gold">{name}</Link>
+            <span className="text-[11px] text-amber-400">Ausstehend · {formatRequestDate(request.created_at)}</span>
+          </div>
+          <p className="mt-1 text-xs text-text-muted">Bisher bestätigt: {request.current_public_titles.join(" · ") || "keine Funktion hinterlegt"}</p>
+        </div>
+      </div>
+      {request.message && <p className="rounded-lg border border-border bg-bg-primary/60 p-3 text-sm leading-relaxed text-text-secondary">„{request.message}“</p>}
+      <label className="block text-xs text-text-secondary">
+        Neue Funktion(en) prüfen oder anpassen
+        <input list="company-public-title-options" value={titles} onChange={(event) => setTitles(event.target.value)} maxLength={400}
+          className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary" />
+      </label>
+      <div className="flex flex-wrap justify-end gap-2">
+        <button type="button" onClick={onReject} className="min-h-11 rounded-lg px-3 text-sm text-text-muted hover:bg-crimson/10 hover:text-crimson-light">Ablehnen</button>
+        <button type="button" onClick={() => onAccept(titles)} className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-success/10 px-3 text-sm font-semibold text-success hover:bg-success/20"><Check size={14} /> Annehmen</button>
+      </div>
+    </article>
+  );
+}
+
+function formatRequestDate(value: string) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "Datum unbekannt" : new Intl.DateTimeFormat("de-DE", { dateStyle: "medium" }).format(date);
 }
 
 function PublicTitlesEditor({ member, onSave }: { member: Member; onSave: (value: string) => void }) {

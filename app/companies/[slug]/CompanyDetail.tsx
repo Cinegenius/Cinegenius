@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
   Building2, MapPin, Globe, Mail, Phone, CheckCircle,
   Package, Briefcase, Car, Home, Clapperboard, X,
   Pencil, Users, UserPlus, Clock, Check,
-  UserMinus, Crown, ChevronRight, ExternalLink,
+  Crown, ChevronRight, ExternalLink, MoreHorizontal,
   Calendar, Scale, Globe2, Quote,
 } from "lucide-react";
 import { COMPANY_CATEGORY_BY_ID } from "@/lib/companyCategories";
@@ -44,6 +44,7 @@ type Member = {
   is_company_owner?: boolean;
   status: string;
   created_at: string;
+  request_message?: string;
   profile: MemberProfile;
 };
 
@@ -98,7 +99,7 @@ const listingTypeLabel: Record<string, string> = {
 
 
 export default function CompanyDetail({
-  company, listings, members, services, equipment, myMembership, currentUserId,
+  company, listings, members, services, equipment, myMembership, myTitleChangeRequest, currentUserId,
 }: {
   company: Company;
   listings: Listing[];
@@ -106,6 +107,7 @@ export default function CompanyDetail({
   services: ServiceItem[];
   equipment: EquipmentItem[];
   myMembership: { id: string; status: string; role?: string; title?: string | null; public_titles?: string[] } | null;
+  myTitleChangeRequest: { id: string; status: string; created_at: string } | null;
   currentUserId: string | null;
 }) {
   const searchParams = useSearchParams();
@@ -125,35 +127,48 @@ export default function CompanyDetail({
   const [localMembership, setLocalMembership] = useState(myMembership);
   const [joining, setJoining] = useState(false);
   const [joinError, setJoinError] = useState("");
-  const [joinFormOpen, setJoinFormOpen] = useState(() => myMembership?.status === "pending"
-    && !normalizeCompanyPublicTitles(myMembership.public_titles?.length ? myMembership.public_titles : myMembership.title).length);
+  const [joinDialogMode, setJoinDialogMode] = useState<"join" | "title_change" | null>(null);
+  const membershipDialogRef = useRef<HTMLElement | null>(null);
+  const [actionMenuOpen, setActionMenuOpen] = useState(false);
   const [withdrawing, setWithdrawing] = useState(false);
   const [membershipError, setMembershipError] = useState("");
   const [membershipSuccess, setMembershipSuccess] = useState("");
   const [joinTitles, setJoinTitles] = useState<string[]>([]);
   const [joinCustomTitle, setJoinCustomTitle] = useState("");
+  const [joinMessage, setJoinMessage] = useState("");
+  const [titleChangeRequest, setTitleChangeRequest] = useState(myTitleChangeRequest);
   const [showAllTeam, setShowAllTeam] = useState(false);
   const canEditCompany = isOwner || (localMembership?.status === "accepted" && ["admin", "editor", "manager"].includes(localMembership.role ?? ""));
+
+  useEffect(() => {
+    if (!joinDialogMode) return;
+    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    membershipDialogRef.current?.focus();
+    return () => previouslyFocused?.focus();
+  }, [joinDialogMode]);
 
   const acceptedMembers = localMembers.filter((m) => m.status === "accepted");
   const managementMembers = acceptedMembers.filter((m) => m.is_company_owner || m.user_id === company.owner_user_id);
   const regularMembers = acceptedMembers.filter((m) => !m.is_company_owner && m.user_id !== company.owner_user_id);
-  const pendingMembers = localMembers.filter((m) => m.status === "pending");
 
   function selectedJoinTitles() {
-    return normalizeCompanyPublicTitles([...joinTitles, joinCustomTitle]);
+    return normalizeCompanyPublicTitles([...joinTitles, ...joinCustomTitle.split(",")]);
   }
 
-  function openJoinForm() {
-    const existingTitles = normalizeCompanyPublicTitles(localMembership?.public_titles?.length ? localMembership.public_titles : localMembership?.title);
+  function openJoinForm(mode: "join" | "title_change" = "join") {
+    const existingTitles = mode === "title_change"
+      ? normalizeCompanyPublicTitles(localMembership?.public_titles?.length ? localMembership.public_titles : localMembership?.title)
+      : [];
     setJoinTitles(existingTitles.filter((title) => COMPANY_PUBLIC_TITLE_SUGGESTIONS.includes(title as (typeof COMPANY_PUBLIC_TITLE_SUGGESTIONS)[number])));
-    setJoinCustomTitle(existingTitles.find((title) => !COMPANY_PUBLIC_TITLE_SUGGESTIONS.includes(title as (typeof COMPANY_PUBLIC_TITLE_SUGGESTIONS)[number])) ?? "");
+    setJoinCustomTitle(existingTitles.filter((title) => !COMPANY_PUBLIC_TITLE_SUGGESTIONS.includes(title as (typeof COMPANY_PUBLIC_TITLE_SUGGESTIONS)[number])).join(", "));
+    setJoinMessage("");
     setJoinError("");
-    setJoinFormOpen(true);
+    setJoinDialogMode(mode);
+    setActionMenuOpen(false);
   }
 
   function toggleJoinTitle(title: string) {
-    if (!joinTitles.includes(title) && joinTitles.length + Number(Boolean(joinCustomTitle.trim())) >= 5) {
+    if (!joinTitles.includes(title) && joinTitles.length + normalizeCompanyPublicTitles(joinCustomTitle.split(",")).length >= 5) {
       setJoinError("Du kannst bis zu fünf Funktionen angeben.");
       return;
     }
@@ -163,56 +178,53 @@ export default function CompanyDetail({
       : normalizeCompanyPublicTitles([...current, title]));
   }
 
-  async function handleJoinRequest() {
+  async function handleSubmitMembershipAction() {
     const public_titles = selectedJoinTitles();
     if (!public_titles.length) {
-      setJoinError("Wähle mindestens eine öffentliche Funktion aus oder gib eine eigene Bezeichnung ein.");
+      setJoinError("Wähle mindestens eine Funktion aus oder gib eine eigene Bezeichnung ein.");
       return;
     }
+    if (joinDialogMode === "title_change" && !localMembership) return;
     setJoining(true); setJoinError("");
     try {
-      const res = await fetch("/api/company-members", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ company_id: company.id, public_titles }),
-      });
-      const { data, error } = await res.json();
-      if (!res.ok || error) throw new Error(error ?? "Die Beitrittsanfrage konnte nicht gesendet werden. Bitte versuche es erneut.");
-      setLocalMembership({ id: data.id, status: data.status, public_titles: data.public_titles ?? public_titles, title: data.title ?? public_titles[0] });
-      setJoinFormOpen(false);
-    } catch (e: unknown) {
-      setJoinError(e instanceof Error ? e.message : "Fehler");
+      const response = joinDialogMode === "title_change"
+        ? await fetch("/api/company-member-title-change-requests", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ member_id: localMembership!.id, public_titles, message: joinMessage }),
+          })
+        : await fetch("/api/company-members", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ company_id: company.id, public_titles, message: joinMessage }),
+          });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error ?? "Deine Anfrage konnte nicht gesendet werden.");
+      if (joinDialogMode === "title_change") setTitleChangeRequest(result.data);
+      else setLocalMembership({ id: result.data.id, status: result.data.status });
+      setJoinDialogMode(null);
+      setMembershipSuccess(joinDialogMode === "title_change"
+        ? "Funktionsänderung angefragt – die Bestätigung durch die Firma steht aus."
+        : "Anfrage gesendet – Bestätigung durch die Firma ausstehend.");
+    } catch (cause: unknown) {
+      setJoinError(cause instanceof Error ? cause.message : "Deine Anfrage konnte nicht gesendet werden.");
     } finally {
       setJoining(false);
     }
   }
 
-  async function handleUpdateJoinTitles() {
-    if (!localMembership) return;
-    const public_titles = selectedJoinTitles();
-    if (!public_titles.length) {
-      setJoinError("Wähle mindestens eine öffentliche Funktion aus oder gib eine eigene Bezeichnung ein.");
-      return;
-    }
-    setJoining(true); setJoinError("");
+  async function withdrawTitleChangeRequest() {
+    if (!titleChangeRequest) return;
+    setWithdrawing(true); setMembershipError(""); setMembershipSuccess("");
     try {
-      const res = await fetch("/api/company-members", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: localMembership.id, public_titles }),
-      });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error ?? "Deine Funktion konnte nicht gespeichert werden.");
-      setLocalMembership({ ...localMembership, public_titles, title: public_titles[0] ?? null });
-      setLocalMembers((current) => current.map((member) => member.id === localMembership.id
-        ? { ...member, public_titles, title: public_titles[0] ?? null }
-        : member));
-      setJoinFormOpen(false);
-    } catch (e: unknown) {
-      setJoinError(e instanceof Error ? e.message : "Deine Funktion konnte nicht gespeichert werden.");
-    } finally {
-      setJoining(false);
-    }
+      const response = await fetch(`/api/company-member-title-change-requests?id=${encodeURIComponent(titleChangeRequest.id)}`, { method: "DELETE" });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error ?? "Die Anfrage konnte nicht zurückgezogen werden.");
+      setTitleChangeRequest(null);
+      setMembershipSuccess("Deine Funktionsänderungsanfrage wurde zurückgezogen.");
+    } catch (cause) {
+      setMembershipError(cause instanceof Error ? cause.message : "Die Anfrage konnte nicht zurückgezogen werden.");
+    } finally { setWithdrawing(false); }
   }
 
   async function handleLeave() {
@@ -226,7 +238,7 @@ export default function CompanyDetail({
       if (!res.ok) throw new Error(result.error ?? "Die Anfrage konnte nicht zurückgezogen werden. Bitte lade die Seite neu und versuche es erneut.");
       setLocalMembership(null);
       setLocalMembers((current) => current.filter((member) => member.id !== localMembership.id));
-      setJoinFormOpen(false);
+      setJoinDialogMode(null);
       setMembershipSuccess(localMembership.status === "pending"
         ? "Deine Beitrittsanfrage wurde zurückgezogen."
         : "Du hast die Firma verlassen.");
@@ -250,20 +262,6 @@ export default function CompanyDetail({
     } finally {
       setPublishingCompany(false);
     }
-  }
-
-  async function handleAccept(id: string) {
-    const res = await fetch("/api/company-members", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, status: "accepted" }),
-    });
-    if (res.ok) setLocalMembers((p) => p.map((m) => m.id === id ? { ...m, status: "accepted" } : m));
-  }
-
-  async function handleReject(id: string) {
-    const res = await fetch(`/api/company-members?id=${id}`, { method: "DELETE" });
-    if (res.ok) setLocalMembers((p) => p.filter((m) => m.id !== id));
   }
 
   return (
@@ -386,67 +384,138 @@ export default function CompanyDetail({
                 <Globe size={13} /> {company.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
               </a>
             )}
-            {currentUserId && !isOwner && (!localMembership || (localMembership.status === "pending" && joinFormOpen)) && (
-              <div className="w-full max-w-2xl rounded-xl border border-border bg-bg-secondary p-4 sm:p-5 space-y-4">
-                <div>
-                  <p className="text-sm font-semibold text-text-primary">{localMembership?.status === "pending" ? "Funktion deiner Anfrage ändern" : "Möchtest du hier mitarbeiten?"}</p>
-                  <p className="mt-1 text-xs text-text-muted">Wähle aus, welche Aufgabe du im Team übernimmst.</p>
-                  <p className="mt-2 text-xs leading-relaxed text-text-muted">Wähle bis zu fünf passende Funktionen. Sie werden öffentlich bei deinem Namen angezeigt und verleihen keine Verwaltungsrechte.</p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {COMPANY_PUBLIC_TITLE_SUGGESTIONS.map((title) => {
-                    const selected = joinTitles.includes(title);
-                    return (
-                      <button key={title} type="button" aria-pressed={selected} onClick={() => toggleJoinTitle(title)}
-                        className={`inline-flex min-h-10 items-center gap-2 rounded-full border px-3 py-2 text-xs transition-colors ${selected ? "border-gold/50 bg-gold/10 text-gold" : "border-border bg-bg-elevated text-text-secondary hover:border-gold/40"}`}>
-                        {selected && <Check size={12} />} {title}
+            {!isOwner && (
+              <div className="relative">
+                <button type="button" aria-expanded={actionMenuOpen} aria-controls="company-membership-actions-menu"
+                  onClick={() => setActionMenuOpen((open) => !open)}
+                  className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-bg-elevated px-3 py-2 text-xs text-text-secondary transition-colors hover:border-gold/40 hover:text-gold">
+                  <MoreHorizontal size={14} /> Weitere Aktionen
+                </button>
+                {actionMenuOpen && (
+                  <div id="company-membership-actions-menu" role="group" aria-label="Weitere Firmenaktionen" className="absolute right-0 top-full z-30 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-border bg-bg-secondary p-2 shadow-2xl">
+                    {!currentUserId ? (
+                      <Link href={`/sign-in?redirect_url=${encodeURIComponent(`/companies/${company.slug}`)}`}
+                        className="flex min-h-11 items-center rounded-lg px-3 py-2.5 text-left text-sm text-text-primary hover:bg-bg-elevated">
+                        Anmelden, um Firmenzugehörigkeit anzufragen
+                      </Link>
+                    ) : !localMembership ? (
+                      <button type="button" onClick={() => openJoinForm("join")}
+                        className="flex min-h-11 w-full items-center rounded-lg px-3 py-2.5 text-left text-sm text-text-primary hover:bg-bg-elevated">
+                        Firmenzugehörigkeit anfragen
                       </button>
-                    );
-                  })}
-                </div>
-                <label className="block space-y-1.5">
-                  <span className="text-xs font-medium text-text-secondary">Andere Funktion (optional)</span>
-                  <input value={joinCustomTitle} onChange={(event) => { setJoinCustomTitle(event.target.value); setJoinError(""); }} maxLength={80} disabled={joinTitles.length >= 5}
-                    placeholder="z. B. Catering-Leitung oder Oberbeleuchter/in"
-                    className="min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary placeholder:text-text-muted focus:border-gold/50 focus:outline-none disabled:opacity-50" />
-                </label>
-                {joinError && <p role="alert" className="text-xs text-crimson-light">{joinError}</p>}
-                <div className="flex flex-wrap items-center gap-2">
-                  <button onClick={localMembership?.status === "pending" ? handleUpdateJoinTitles : handleJoinRequest} disabled={joining}
-                    className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-gold px-4 py-2 text-xs font-semibold text-bg-primary transition-colors hover:bg-gold-light disabled:opacity-50">
-                    {localMembership?.status === "pending" ? <Check size={13} /> : <UserPlus size={13} />}
-                    {joining ? "Wird gespeichert…" : localMembership?.status === "pending" ? "Funktion speichern" : "Team beitreten – Anfrage senden"}
-                  </button>
-                  {localMembership?.status === "pending" && (
-                    <button onClick={() => { setJoinFormOpen(false); setJoinError(""); }} disabled={joining}
-                      className="min-h-10 rounded-lg px-3 py-2 text-xs text-text-muted transition-colors hover:text-text-primary disabled:opacity-50">Abbrechen</button>
-                  )}
-                </div>
+                    ) : localMembership.status === "pending" ? (
+                      <div className="space-y-1">
+                        <p className="px-3 py-2 text-xs leading-relaxed text-text-muted">Anfrage gesendet – Bestätigung durch die Firma ausstehend.</p>
+                        <button type="button" onClick={() => void handleLeave()} disabled={withdrawing}
+                          className="flex min-h-11 w-full items-center rounded-lg px-3 py-2.5 text-left text-sm text-text-secondary hover:bg-bg-elevated disabled:opacity-50">
+                          {withdrawing ? "Wird zurückgezogen …" : "Anfrage zurückziehen"}
+                        </button>
+                      </div>
+                    ) : titleChangeRequest?.status === "pending" ? (
+                      <div className="space-y-1">
+                        <p className="px-3 py-2 text-xs leading-relaxed text-text-muted">Funktionsänderung ausstehend. Deine bestätigte Funktion bleibt bis zur Freigabe bestehen.</p>
+                        <button type="button" onClick={() => void withdrawTitleChangeRequest()} disabled={withdrawing}
+                          className="flex min-h-11 w-full items-center rounded-lg px-3 py-2.5 text-left text-sm text-text-secondary hover:bg-bg-elevated disabled:opacity-50">
+                          {withdrawing ? "Wird zurückgezogen …" : "Anfrage zurückziehen"}
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <button type="button" onClick={() => openJoinForm("title_change")}
+                          className="flex min-h-11 w-full items-center rounded-lg px-3 py-2.5 text-left text-sm text-text-primary hover:bg-bg-elevated">
+                          Funktion ändern anfragen
+                        </button>
+                        <button type="button" onClick={() => void handleLeave()} disabled={withdrawing}
+                          className="flex min-h-11 w-full items-center rounded-lg px-3 py-2.5 text-left text-sm text-text-secondary hover:bg-bg-elevated disabled:opacity-50">
+                          {withdrawing ? "Wird beendet …" : "Firma verlassen"}
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             )}
             {currentUserId && !isOwner && localMembership?.status === "pending" && (
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <span className="text-xs text-amber-400 flex items-center gap-1.5"><Clock size={11} /> Anfrage ausstehend</span>
-                  {!!(localMembership.public_titles?.length || localMembership.title) && <span className="text-xs text-text-muted">Funktion: {(localMembership.public_titles?.length ? localMembership.public_titles : [localMembership.title!]).join(" · ")}</span>}
-                </div>
-                {!joinFormOpen && <button onClick={openJoinForm} className="text-xs text-gold hover:text-gold-light transition-colors">Funktion ändern</button>}
-                <button onClick={handleLeave} disabled={withdrawing} className="text-xs text-text-muted hover:text-crimson-light transition-colors flex items-center gap-1 disabled:opacity-50">
-                  <UserMinus size={11} /> {withdrawing ? "Wird zurückgezogen …" : "Anfrage zurückziehen"}
-                </button>
-              </div>
+              <p role="status" className="w-full text-xs text-amber-400"><Clock size={11} className="mr-1 inline" />Anfrage gesendet – Bestätigung durch die Firma ausstehend.</p>
             )}
             {membershipError && <p role="alert" className="w-full text-xs text-crimson-light">{membershipError}</p>}
             {membershipSuccess && <p role="status" className="w-full text-xs text-success">{membershipSuccess}</p>}
             {currentUserId && !isOwner && localMembership?.status === "accepted" && (
               <div className="flex items-center gap-3">
                 <span className="text-xs text-success flex items-center gap-1.5"><CheckCircle size={11} /> Du bist Teammitglied</span>
-                <button onClick={handleLeave} disabled={withdrawing} className="text-xs text-text-muted hover:text-crimson-light transition-colors flex items-center gap-1 disabled:opacity-50">
-                  <UserMinus size={11} /> {withdrawing ? "Wird beendet …" : "Firma verlassen"}
-                </button>
               </div>
             )}
           </div>
+
+          {joinDialogMode && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-bg-primary/80 p-4 backdrop-blur-sm" onClick={() => !joining && setJoinDialogMode(null)}>
+              <section role="dialog" aria-modal="true" aria-labelledby="company-membership-dialog-title"
+                ref={membershipDialogRef} tabIndex={-1}
+                onClick={(event) => event.stopPropagation()}
+                onKeyDown={(event) => {
+                  if (event.key === "Escape" && !joining) { setJoinDialogMode(null); return; }
+                  if (event.key !== "Tab") return;
+                  const focusable = event.currentTarget.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled]), textarea:not([disabled]), a[href]');
+                  const first = focusable[0]; const last = focusable[focusable.length - 1];
+                  if (!first || !last) return;
+                  if (event.shiftKey && (document.activeElement === first || document.activeElement === event.currentTarget)) { event.preventDefault(); last.focus(); }
+                  else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+                }}
+                className="max-h-[min(90dvh,720px)] w-full max-w-xl overflow-y-auto rounded-2xl border border-border bg-bg-secondary p-5 shadow-2xl sm:p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h2 id="company-membership-dialog-title" className="font-display text-xl font-bold text-text-primary">
+                      {joinDialogMode === "join" ? "Firmenzugehörigkeit anfragen" : "Funktion ändern anfragen"}
+                    </h2>
+                    <p className="mt-2 text-sm leading-relaxed text-text-muted">
+                      {joinDialogMode === "join"
+                        ? "Du arbeitest bereits für diese Firma? Frage hier die Verknüpfung mit deinem Profil an. Das ist keine Bewerbung auf einen Job."
+                        : "Bitte die Firma darum, deine öffentliche Funktion im Teamprofil zu ändern. Bis zur Bestätigung bleibt deine bisherige Funktion sichtbar."}
+                    </p>
+                  </div>
+                  <button type="button" aria-label="Dialog schließen" onClick={() => !joining && setJoinDialogMode(null)} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-text-muted hover:bg-bg-elevated hover:text-text-primary"><X size={16} /></button>
+                </div>
+                <p className="mt-3 rounded-lg border border-border bg-bg-primary/60 p-3 text-xs leading-relaxed text-text-muted">
+                  Die Angaben erscheinen erst nach der Bestätigung durch die Firma öffentlich. Öffentliche Funktionen vergeben keine Verwaltungsrechte. Ohne zuständige Firmenverwaltung wird nichts automatisch freigegeben; zur Klärung erreichst du uns unter <a className="text-gold underline underline-offset-2" href="mailto:support@cinegenius.co">support@cinegenius.co</a>.
+                </p>
+                <div className="mt-5 space-y-4">
+                  <div>
+                    <p className="mb-2 text-xs font-medium text-text-secondary">Welche Funktion(en) hast du? Wähle bis zu fünf.</p>
+                    <div className="flex flex-wrap gap-2">
+                      {COMPANY_PUBLIC_TITLE_SUGGESTIONS.map((title) => {
+                        const selected = joinTitles.includes(title);
+                        return <button key={title} type="button" aria-pressed={selected} onClick={() => toggleJoinTitle(title)}
+                          className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-3 py-2 text-xs transition-colors ${selected ? "border-gold/50 bg-gold/10 text-gold" : "border-border bg-bg-elevated text-text-secondary hover:border-gold/40"}`}>
+                          {selected && <Check size={12} />} {title}
+                        </button>;
+                      })}
+                    </div>
+                  </div>
+                  <label className="block space-y-1.5">
+                    <span className="text-xs font-medium text-text-secondary">Weitere Berufsbezeichnung(en) (optional, mehrere mit Komma trennen)</span>
+                    <input value={joinCustomTitle} onChange={(event) => { setJoinCustomTitle(event.target.value); setJoinError(""); }} maxLength={400} disabled={joinTitles.length >= 5}
+                      placeholder="z. B. Catering-Leitung oder Oberbeleuchter/in"
+                      className="min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary placeholder:text-text-muted focus:border-gold/50 focus:outline-none disabled:opacity-50" />
+                  </label>
+                  <label className="block space-y-1.5">
+                    <span className="text-xs font-medium text-text-secondary">Nachricht an die Firma (optional)</span>
+                    <textarea value={joinMessage} onChange={(event) => setJoinMessage(event.target.value)} maxLength={500} rows={3}
+                      placeholder="Zum Beispiel: Seit wann du für die Firma arbeitest."
+                      className="w-full resize-y rounded-lg border border-border bg-bg-primary px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-gold/50 focus:outline-none" />
+                    <span className="block text-right text-[11px] text-text-muted">{joinMessage.length}/500</span>
+                  </label>
+                  {joinError && <p role="alert" className="text-xs text-crimson-light">{joinError}</p>}
+                  <div className="flex flex-wrap justify-end gap-2 border-t border-border pt-4">
+                    <button type="button" onClick={() => setJoinDialogMode(null)} disabled={joining} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary hover:bg-bg-elevated disabled:opacity-50">Abbrechen</button>
+                    <button type="button" onClick={() => void handleSubmitMembershipAction()} disabled={joining}
+                      className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-gold px-4 text-sm font-semibold text-bg-primary transition-colors hover:bg-gold-light disabled:opacity-50">
+                      <UserPlus size={14} /> {joining ? "Wird gesendet …" : "Anfrage senden"}
+                    </button>
+                  </div>
+                </div>
+              </section>
+            </div>
+          )}
 
         </div>
       </section>
@@ -558,34 +627,6 @@ export default function CompanyDetail({
                   )}
                 </div>
 
-                {/* Pending requests — owner only */}
-                {isOwner && pendingMembers.length > 0 && (
-                  <div className="mt-4 space-y-2">
-                    <p className="text-[10px] uppercase tracking-[0.12em] text-amber-400 font-semibold flex items-center gap-1">
-                      <Clock size={10} /> Beitrittsanfragen ({pendingMembers.length})
-                    </p>
-                    {pendingMembers.map((m) => (
-                      <div key={m.id} className="flex items-center gap-3 px-4 py-3 bg-bg-secondary border border-border rounded-xl">
-                        <Avatar member={m} size={32} />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-text-primary truncate">{m.profile?.display_name ?? "Unbekannt"}</p>
-                          {m.profile?.role && <p className="text-[11px] text-text-muted truncate">{m.profile.role}</p>}
-                          <p className="mt-1 text-xs text-gold">Funktion: {(m.public_titles?.length ? m.public_titles : m.title ? [m.title] : []).join(" · ") || "noch nicht angegeben"}</p>
-                        </div>
-                        <div className="flex gap-1 shrink-0">
-                          <button onClick={() => handleAccept(m.id)} title="Annehmen"
-                            className="p-1.5 rounded-lg bg-success/10 hover:bg-success/20 text-success transition-colors">
-                            <Check size={12} />
-                          </button>
-                          <button onClick={() => handleReject(m.id)} title="Ablehnen"
-                            className="p-1.5 rounded-lg hover:bg-crimson/10 text-text-muted hover:text-crimson-light transition-colors">
-                            <X size={12} />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </section>
             )}
 
