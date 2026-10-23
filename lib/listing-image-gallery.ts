@@ -1,4 +1,5 @@
 export const MAX_LISTING_IMAGES = 10;
+export const LISTING_GALLERY_PREVIEW_LIMIT = 4;
 
 export type ListingImageGallery = {
   imageUrl: string | null;
@@ -8,6 +9,34 @@ export type ListingImageGallery = {
 export type GalleryValidation =
   | { ok: true; gallery: ListingImageGallery }
   | { ok: false; error: string };
+
+export type ListingGalleryPreview = {
+  activeImage: string | null;
+  thumbnails: { url: string; index: number }[];
+  additionalCount: number;
+};
+
+/** Build a bounded preview while keeping every image reachable in the lightbox. */
+export function getListingGalleryPreview(
+  images: readonly string[],
+  activeIndex = 0,
+  limit = LISTING_GALLERY_PREVIEW_LIMIT,
+): ListingGalleryPreview {
+  const uniqueImages = [...new Set(images.filter((url) => typeof url === "string").map((url) => url.trim()).filter(Boolean))];
+  if (uniqueImages.length === 0) return { activeImage: null, thumbnails: [], additionalCount: 0 };
+
+  const safeIndex = Math.min(Math.max(activeIndex, 0), uniqueImages.length - 1);
+  const thumbnails = uniqueImages
+    .map((url, index) => ({ url, index }))
+    .filter((image) => image.index !== safeIndex)
+    .slice(0, Math.max(0, limit));
+
+  return {
+    activeImage: uniqueImages[safeIndex],
+    thumbnails,
+    additionalCount: Math.max(0, uniqueImages.length - thumbnails.length - 1),
+  };
+}
 
 /** Keep the database's legacy main-image column as the first image in the gallery. */
 export function normalizeListingImageGallery(

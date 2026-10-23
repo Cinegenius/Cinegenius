@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback, useRef, useState } from "react";
 import type { TouchEvent as ReactTouchEvent } from "react";
 import Image from "next/image";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, ImageOff } from "lucide-react";
 
 interface LightboxProps {
   images: string[];
@@ -22,23 +22,27 @@ export default function Lightbox({
   onNext,
   alt = "",
 }: LightboxProps) {
+  const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
   const touchStartX = useRef<number | null>(null);
   const didSwipe = useRef(false);
+  const safeIndex = Math.min(Math.max(activeIndex, 0), Math.max(0, images.length - 1));
+  const currentImage = images[safeIndex];
   const handleKey = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
-      if (e.key === "ArrowLeft") onPrev();
-      if (e.key === "ArrowRight") onNext();
+      if (e.key === "ArrowLeft" && images.length > 1) onPrev();
+      if (e.key === "ArrowRight" && images.length > 1) onNext();
     },
-    [onClose, onPrev, onNext]
+    [images.length, onClose, onPrev, onNext]
   );
 
   useEffect(() => {
     document.addEventListener("keydown", handleKey);
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", handleKey);
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflow;
     };
   }, [handleKey]);
 
@@ -57,8 +61,8 @@ export default function Lightbox({
   };
 
   const selectImage = (index: number) => {
-    const forward = (index - activeIndex + images.length) % images.length;
-    const backward = (activeIndex - index + images.length) % images.length;
+    const forward = (index - safeIndex + images.length) % images.length;
+    const backward = (safeIndex - index + images.length) % images.length;
     if (forward <= backward) {
       for (let step = 0; step < forward; step += 1) onNext();
     } else {
@@ -66,9 +70,14 @@ export default function Lightbox({
     }
   };
 
+  if (!currentImage) return null;
+
   return (
     <div
       className="fixed inset-0 z-[300] flex items-center justify-center bg-black/95 animate-fade-in"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Fotogalerie"
       style={{ touchAction: "pan-y" }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
@@ -84,7 +93,9 @@ export default function Lightbox({
     >
       {/* Close */}
       <button
+        type="button"
         onClick={onClose}
+        aria-label="Fotogalerie schließen"
         className="absolute top-4 right-4 w-10 h-10 bg-bg-elevated border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-gold hover:border-gold transition-all z-10"
       >
         <X size={18} />
@@ -92,13 +103,15 @@ export default function Lightbox({
 
       {/* Counter */}
       <div className="absolute top-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-bg-elevated border border-border rounded-full text-xs text-text-muted">
-        {activeIndex + 1} / {images.length}
+        {safeIndex + 1} / {images.length}
       </div>
 
       {/* Prev */}
       {images.length > 1 && (
         <button
+          type="button"
           onClick={(e) => { e.stopPropagation(); onPrev(); }}
+          aria-label="Vorheriges Foto"
           className="absolute left-4 w-12 h-12 bg-bg-elevated border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-gold hover:border-gold transition-all"
         >
           <ChevronLeft size={22} />
@@ -107,24 +120,35 @@ export default function Lightbox({
 
       {/* Image */}
       <div
-        className="max-w-5xl max-h-[85vh] px-20"
+        className="flex max-h-[72vh] max-w-5xl items-center justify-center px-14 sm:px-20"
         onClick={(e) => e.stopPropagation()}
       >
-        <Image
-          src={images[activeIndex]}
-          alt={alt ?? ""}
-          width={1200}
-          height={800}
-          className="max-w-full max-h-[85vh] w-auto object-contain rounded-lg shadow-2xl"
-          sizes="90vw"
-          priority
-        />
+        {failedImages.has(currentImage) ? (
+          <div role="img" aria-label={alt ? `${alt}: Foto derzeit nicht erreichbar` : "Foto derzeit nicht erreichbar"} className="flex h-64 max-h-[85vh] w-[min(80vw,48rem)] flex-col items-center justify-center gap-3 rounded-xl border border-white/10 bg-bg-elevated px-6 text-center text-sm text-text-secondary">
+            <ImageOff size={28} className="text-text-muted" aria-hidden="true" />
+            <span>Dieses Foto ist derzeit nicht erreichbar.</span>
+          </div>
+        ) : (
+          <Image
+            key={currentImage}
+            src={currentImage}
+            alt={alt ?? ""}
+            width={1600}
+            height={1200}
+            onError={() => setFailedImages((current) => new Set(current).add(currentImage))}
+            className="block max-h-[72vh] max-w-full w-auto rounded-lg object-contain shadow-2xl"
+            sizes="90vw"
+            priority
+          />
+        )}
       </div>
 
       {/* Next */}
       {images.length > 1 && (
         <button
+          type="button"
           onClick={(e) => { e.stopPropagation(); onNext(); }}
+          aria-label="Nächstes Foto"
           className="absolute right-4 w-12 h-12 bg-bg-elevated border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-gold hover:border-gold transition-all"
         >
           <ChevronRight size={22} />
@@ -142,10 +166,10 @@ export default function Lightbox({
               key={i}
               type="button"
               aria-label={`Foto ${i + 1} anzeigen`}
-              aria-pressed={i === activeIndex}
+              aria-pressed={i === safeIndex}
               onClick={() => selectImage(i)}
               className={`relative h-8 w-12 shrink-0 rounded overflow-hidden border-2 transition-all ${
-                i === activeIndex ? "border-gold" : "border-transparent opacity-50 hover:opacity-80"
+                i === safeIndex ? "border-gold" : "border-transparent opacity-50 hover:opacity-80"
               }`}
             >
               <Image src={img} alt="" fill className="object-cover" sizes="48px" />

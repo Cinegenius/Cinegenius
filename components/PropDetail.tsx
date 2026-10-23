@@ -1,25 +1,22 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import type { TouchEvent as ReactTouchEvent } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import Image from "next/image";
-import dynamic from "next/dynamic";
 import {
   ArrowLeft, Star, CheckCircle, Calendar, Clock,
-  MapPin, Package, Shield, Truck, Expand, Pencil,
+  MapPin, Package, Shield, Truck, Pencil,
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 
-const Lightbox = dynamic(() => import("@/components/Lightbox"), { ssr: false });
 import InquiryForm from "@/components/InquiryForm";
 import FavoriteButton from "@/components/FavoriteButton";
 import ReviewsSection from "@/components/ReviewsSection";
 import ReportButton from "@/components/ReportButton";
 import { ProductionCreditsDisplay } from "@/components/ProductionCredits";
 import type { ProductionCredit } from "@/lib/production-credits";
+import ListingPhotoGallery from "@/components/ListingPhotoGallery";
 
 type Prop = {
   id: string;
@@ -96,24 +93,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
   const [days, setDays] = useState(1);
   const [startDate, setStartDate] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [activeImg, setActiveImg] = useState(0);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const touchStartX = useRef<number | null>(null);
-  const didSwipe = useRef(false);
   const images = [prop.image, ...(prop.extra_images ?? [])].filter(Boolean) as string[];
-
-  const handleGalleryTouchStart = (event: ReactTouchEvent) => {
-    touchStartX.current = event.touches[0]?.clientX ?? null;
-  };
-  const handleGalleryTouchEnd = (event: ReactTouchEvent) => {
-    const startX = touchStartX.current;
-    touchStartX.current = null;
-    const endX = event.changedTouches[0]?.clientX;
-    if (startX === null || endX === undefined || Math.abs(endX - startX) < 48 || images.length < 2) return;
-    didSwipe.current = true;
-    setActiveImg((index) => endX < startX ? (index + 1) % images.length : (index - 1 + images.length) % images.length);
-    window.setTimeout(() => { didSwipe.current = false; }, 450);
-  };
 
   const subtotal = prop.dailyRate * days;
   const deposit = Math.round(subtotal * 0.25);
@@ -138,101 +118,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
           <ArrowLeft size={14} /> Zurück zu Requisiten & Verleih
         </Link>
 
-        {/* Bildergalerie */}
-        <div className="mb-8">
-          <div
-            className="relative grid grid-cols-4 gap-2 overflow-hidden rounded-xl sm:h-96"
-            style={{ touchAction: "pan-y" }}
-            onTouchStart={handleGalleryTouchStart}
-            onTouchEnd={handleGalleryTouchEnd}
-            onClickCapture={(event) => {
-              if (!didSwipe.current) return;
-              event.preventDefault();
-              event.stopPropagation();
-              didSwipe.current = false;
-            }}
-          >
-            <div className={`relative col-span-4 aspect-[4/3] overflow-hidden bg-bg-secondary sm:aspect-auto sm:h-full ${images.length > 1 ? "sm:col-span-2" : "sm:col-span-4"}`}>
-              {images[activeImg] ? (
-                <button
-                  type="button"
-                  aria-label={images.length > 1 ? `Foto ${activeImg + 1} vergrößern` : "Foto vergrößern"}
-                  className="absolute inset-0 block h-full w-full cursor-zoom-in"
-                  onClick={() => setLightboxOpen(true)}
-                >
-                  <Image
-                    src={images[activeImg]}
-                    alt={prop.title}
-                    fill
-                    className="object-contain"
-                    style={{ objectPosition: activeImg === 0 && prop.focalPoint ? `${prop.focalPoint.x}% ${prop.focalPoint.y}%` : "50% 50%" }}
-                    sizes={images.length > 1 ? "(min-width: 640px) 50vw, 100vw" : "100vw"}
-                    priority
-                  />
-                </button>
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-bg-elevated">
-                  <Package size={48} className="text-text-muted/20" />
-                </div>
-              )}
-              <button
-                type="button"
-                onClick={() => setLightboxOpen(true)}
-                className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-lg border border-border bg-bg-primary/85 px-3 py-1.5 text-xs text-text-secondary backdrop-blur-sm transition-all hover:border-gold hover:text-gold"
-              >
-                <Expand size={13} /> {images.length > 1 ? "Alle Fotos anzeigen" : "Foto vergrößern"}
-              </button>
-            </div>
-            {images.length > 1 && (
-              <div className="col-span-2 hidden grid-cols-2 gap-2 sm:grid">
-                {images.slice(1).map((img, i) => (
-                  <button
-                    key={`${img}-${i}`}
-                    type="button"
-                    aria-label={`Foto ${i + 2} vergrößern`}
-                    className={`relative overflow-hidden rounded-sm ${i === 2 ? "col-span-2 h-24" : ""}`}
-                    onClick={() => { setActiveImg(i + 1); setLightboxOpen(true); }}
-                  >
-                    <Image
-                      src={img}
-                      alt=""
-                      fill
-                      className="object-cover transition-transform duration-500 hover:scale-105"
-                      sizes="25vw"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-          {images.length > 1 && (
-            <div className="mt-2 flex gap-2 overflow-x-auto pb-1 sm:hidden" aria-label="Produktfotos">
-              {images.map((img, i) => (
-                <button
-                  key={`${img}-${i}`}
-                  type="button"
-                  aria-label={`Foto ${i + 1} auswählen`}
-                  aria-pressed={activeImg === i}
-                  onClick={() => { setActiveImg(i); setLightboxOpen(true); }}
-                  className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-bg-secondary ${activeImg === i ? "border-gold" : "border-border"}`}
-                >
-                  <Image src={img} alt="" fill className="object-cover" sizes="64px" />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {lightboxOpen && (
-          <Lightbox
-            images={images}
-            activeIndex={activeImg}
-            alt={prop.title}
-            onClose={() => setLightboxOpen(false)}
-            onPrev={() => setActiveImg((i) => (i - 1 + images.length) % images.length)}
-            onNext={() => setActiveImg((i) => (i + 1) % images.length)}
-          />
-        )}
+        <ListingPhotoGallery images={images} title={prop.title} label="Artikelgalerie" focalPoint={prop.focalPoint} />
 
         <div className="flex gap-10 flex-col lg:flex-row">
           {/* LEFT */}

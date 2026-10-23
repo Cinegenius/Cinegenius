@@ -44,6 +44,7 @@ import {
   type ProfileType,
 } from "@/lib/profile-types";
 import { normalizeProfileTypes } from "@/lib/profile-display";
+import ResilientPublicImage from "@/components/ResilientPublicImage";
 
 function safeLink(url: string | null | undefined): string | null {
   if (!url?.trim()) return null;
@@ -1746,8 +1747,7 @@ export default function ProfilePage() {
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                       {profileImages.map((img, i) => (
                         <div key={img.url + i} className="relative aspect-[3/4] rounded-xl overflow-hidden border border-border bg-bg-elevated">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={img.url} alt={`Foto ${i + 1}`} className="w-full h-full object-cover object-top" />
+                          <ResilientPublicImage src={img.url} alt={`Foto ${i + 1}`} className="absolute inset-0" imageClassName="h-full w-full object-cover object-top" />
                           <div className="absolute inset-x-0 top-0 flex items-center justify-between p-1.5 bg-gradient-to-b from-black/60 to-transparent">
                             <button
                               type="button"

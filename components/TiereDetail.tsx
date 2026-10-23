@@ -2,12 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft, Star, CheckCircle, MapPin, Shield,
-  Truck, Expand, Pencil, PawPrint, Users, Zap, Calendar,
+  Truck, Pencil, PawPrint, Users, Zap, Calendar,
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import InquiryForm from "@/components/InquiryForm";
@@ -15,7 +13,7 @@ import FavoriteButton from "@/components/FavoriteButton";
 import ReviewsSection from "@/components/ReviewsSection";
 import ReportButton from "@/components/ReportButton";
 
-const Lightbox = dynamic(() => import("@/components/Lightbox"), { ssr: false });
+import ListingPhotoGallery from "@/components/ListingPhotoGallery";
 
 const TRAINING_COLORS: Record<string, string> = {
   "Kinoprofi": "text-gold border-gold/30 bg-gold-subtle",
@@ -99,8 +97,6 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
     }
   };
 
-  const [activeImg, setActiveImg] = useState(0);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
   const images = [animal.image, ...(animal.extra_images ?? [])].filter(Boolean) as string[];
 
   return (
@@ -110,43 +106,13 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
           <ArrowLeft size={14} /> Zurück zu Film-Tieren
         </Link>
 
-        {/* Gallery */}
-        <div className="relative grid grid-cols-4 gap-2 rounded-xl overflow-hidden h-72 sm:h-96 mb-8">
-          <div className="col-span-2 relative overflow-hidden cursor-pointer"
-            onClick={() => { setActiveImg(0); setLightboxOpen(true); }}>
-            {images[0] ? (
-              <Image src={images[0]} alt={animal.title} fill priority
-                className="object-cover hover:scale-105 transition-transform duration-500"
-                style={{ objectPosition: animal.focalPoint ? `${animal.focalPoint.x}% ${animal.focalPoint.y}%` : "50% 40%" }}
-                sizes="50vw" />
-            ) : (
-              <div className="w-full h-full bg-bg-elevated flex items-center justify-center">
-                <PawPrint size={48} className="text-text-muted/20" />
-              </div>
-            )}
-          </div>
-          {images.length > 1 && (
-            <div className="col-span-2 grid grid-cols-2 gap-2">
-              {images.slice(1).map((img, i) => (
-                <div key={i} className={`relative overflow-hidden cursor-pointer rounded-sm ${i === 2 ? "col-span-2 h-24" : ""}`}
-                  onClick={() => { setActiveImg(i + 1); setLightboxOpen(true); }}>
-                  <Image src={img} alt="" fill className="object-cover hover:scale-105 transition-transform duration-500" sizes="25vw" />
-                </div>
-              ))}
-            </div>
-          )}
-          <button onClick={() => setLightboxOpen(true)}
-            className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1.5 bg-bg-primary/80 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-all backdrop-blur-sm">
-            <Expand size={13} /> Alle Fotos anzeigen
-          </button>
-        </div>
-
-        {lightboxOpen && (
-          <Lightbox images={images} activeIndex={activeImg} alt={animal.title}
-            onClose={() => setLightboxOpen(false)}
-            onPrev={() => setActiveImg((i) => (i - 1 + images.length) % images.length)}
-            onNext={() => setActiveImg((i) => (i + 1) % images.length)} />
-        )}
+        <ListingPhotoGallery
+          images={images}
+          title={animal.title}
+          label="Tiergalerie"
+          focalPoint={animal.focalPoint}
+          fallback={<PawPrint size={48} className="text-text-muted/20" />}
+        />
 
         <div className="flex gap-10 flex-col lg:flex-row">
           {/* LEFT */}

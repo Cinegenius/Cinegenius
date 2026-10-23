@@ -19,6 +19,7 @@ import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import PhotoLikeButton from "@/components/PhotoLikeButton";
 import { markPhotoNavigation, photoHref } from "@/lib/photo-link";
 import ProfileRoles from "./ProfileRoles";
+import ResilientPublicImage from "@/components/ResilientPublicImage";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -599,15 +600,9 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                   className="relative w-full aspect-[3/4] rounded-xl overflow-hidden cursor-pointer group bg-bg-elevated"
                   onClick={() => setLightbox(mainShot)}
                 >
-                  {/* Blurred fill keeps the whole source photo visible without adding plain empty bars. */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={mainShot} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-55" />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={mainShot}
-                    alt={profile.display_name ?? ""}
-                    className="relative z-10 w-full h-full object-contain object-center"
-                  />
+                  {/* Blurred fill keeps the source photo visible without cropping the foreground. */}
+                  <ResilientPublicImage src={mainShot} alt="" className="absolute inset-0 scale-110 blur-2xl opacity-55" imageClassName="h-full w-full object-cover" />
+                  <ResilientPublicImage src={mainShot} alt={profile.display_name ?? ""} className="relative z-10" imageClassName="h-full w-full object-contain object-center" loading="eager" />
                   {profile.verified && (
                     <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-1 rounded-full">
                       <Check size={9} /> Verified
@@ -814,11 +809,11 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                   className="relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer group bg-bg-elevated"
                   onClick={() => setLightbox(img.url)}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <ResilientPublicImage
                     src={img.url}
                     alt={img.caption ?? `Foto ${i + 1}`}
-                    className="w-full h-full object-cover object-top group-hover:scale-[1.04] transition-transform duration-500"
+                    className="absolute inset-0"
+                    imageClassName="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]"
                   />
                   {img.caption && (
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1073,9 +1068,14 @@ function ModelProfile({ profile, isOwner, projectCredits = [], companyMembership
                 aria-label={resolvedMainPhotoUrl ? "Hauptfoto vergrößern" : undefined}
                 className="relative block w-full aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] max-h-[420px] overflow-hidden rounded-2xl border border-border bg-bg-secondary disabled:cursor-default">
                 {resolvedMainPhotoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={resolvedMainPhotoUrl} alt={profile.display_name ?? ""} className="h-full w-full object-cover"
-                    style={{ objectPosition: profile.focal_point ? `${profile.focal_point.x}% ${profile.focal_point.y}%` : "50% 38%" }} />
+                  <ResilientPublicImage
+                    src={resolvedMainPhotoUrl}
+                    alt={profile.display_name ?? ""}
+                    className="absolute inset-0"
+                    imageClassName="h-full w-full object-cover"
+                    loading="eager"
+                    style={{ objectPosition: profile.focal_point ? `${profile.focal_point.x}% ${profile.focal_point.y}%` : "50% 38%" }}
+                  />
                 ) : <span className="flex h-full items-center justify-center font-display text-5xl font-bold text-text-muted/30">{(profile.display_name ?? "?")[0]}</span>}
                 {profile.verified && <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 px-2.5 py-1 text-[10px] font-semibold text-white"><Check size={10} /> Verifiziert</span>}
               </button>
@@ -1135,11 +1135,11 @@ function ModelProfile({ profile, isOwner, projectCredits = [], companyMembership
                     className="break-inside-avoid cursor-pointer group overflow-hidden rounded-xl"
                     onClick={() => setLightbox(img.url)}
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <ResilientPublicImage
                       src={img.url}
-                      alt={img.caption ?? ""}
-                      className="w-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                      alt={img.caption ?? `Portfoliofoto ${i + 1}`}
+                      className="w-full break-inside-avoid"
+                      imageClassName="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                       style={{ aspectRatio: i % 3 === 0 ? "3/4" : i % 5 === 0 ? "1/1" : "2/3" }}
                     />
                   </div>
@@ -1363,8 +1363,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
       <section className="relative">
         {bgImage ? (
           <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ opacity: coverOpacity }} />
+            <ResilientPublicImage src={bgImage} alt="" className="absolute inset-0" imageClassName="h-full w-full object-cover" style={{ opacity: coverOpacity }} />
             <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-bg-primary" />
           </>
         ) : (
@@ -1424,10 +1423,8 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           <div className="min-w-0 max-w-full space-y-3">
             {profile.avatar_url ? (
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-bg-secondary ring-1 ring-white/8 shadow-2xl">
-                <Image src={profile.avatar_url} alt="" aria-hidden="true" fill sizes="(max-width:640px) 100vw, 220px"
-                  className="absolute inset-0 object-cover scale-110 blur-2xl opacity-55" />
-                <Image src={profile.avatar_url} alt={profile.display_name ?? ""} fill sizes="(max-width:640px) 100vw, 220px"
-                  className="relative z-10 object-cover" />
+                <ResilientPublicImage src={profile.avatar_url} alt="" className="absolute inset-0 scale-110 blur-2xl opacity-55" imageClassName="h-full w-full object-cover" />
+                <ResilientPublicImage src={profile.avatar_url} alt={profile.display_name ?? ""} className="relative z-10" imageClassName="h-full w-full object-cover" loading="eager" />
                 <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10">
                   <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${profile.available ? "bg-gold" : "bg-red-400"}`} />
                   <span className={`text-[10px] font-medium ${profile.available ? "text-gold/90" : "text-white/60"}`}>{profile.available ? "Verfügbar" : "Nicht verfügbar"}</span>
@@ -1790,8 +1787,7 @@ function ImageModal({
       <div className="relative w-full max-w-4xl flex flex-col md:flex-row rounded-2xl overflow-hidden bg-bg-secondary border border-border shadow-2xl max-h-[90vh]" onClick={e => e.stopPropagation()}>
         {/* Image */}
         <div className="md:w-3/5 bg-black flex items-center justify-center min-h-[240px]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={image.url} alt={image.caption ?? ""} className="w-full h-full max-h-[90vh] md:max-h-[90vh] object-contain" />
+          <ResilientPublicImage src={image.url} alt={image.caption ?? "Portfoliofoto"} className="h-full min-h-[240px] w-full" imageClassName="h-full max-h-[90vh] w-full object-contain" loading="eager" />
         </div>
         {/* Side panel */}
         <div className="md:w-2/5 flex flex-col max-h-[60vh] md:max-h-[90vh]">
@@ -1886,8 +1882,7 @@ function PhotoGrid({
           return (
             <div key={img.url} className="relative aspect-[4/3] overflow-hidden rounded-xl group border border-border/50 bg-bg-elevated">
               <Link href={photoHref(profileId, img.url)} onClick={markPhotoNavigation} aria-label={`Foto von ${img.caption ?? ""} öffnen`} className="absolute inset-0 z-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={img.url} alt={img.caption ?? ""} className="w-full h-full object-cover transition-all duration-500 group-hover:brightness-110 group-hover:scale-[1.03]" loading="lazy" />
+              <ResilientPublicImage src={img.url} alt={img.caption ?? "Portfoliofoto"} className="absolute inset-0" imageClassName="h-full w-full object-cover transition-all duration-500 group-hover:brightness-110 group-hover:scale-[1.03]" />
               {isTop && (
                 <div className="absolute top-2 left-2 px-2 py-0.5 bg-gold/90 rounded-full text-bg-primary text-[10px] font-bold">♥ Top</div>
               )}
