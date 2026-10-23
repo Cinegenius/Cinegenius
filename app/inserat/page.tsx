@@ -18,6 +18,7 @@ import {
 import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
 import { PROP_CATEGORY_FIELDS } from "@/lib/propCategoryFields";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
+import ListingImageManager from "@/components/ListingImageManager";
 import { ProductionCreditsEditor } from "@/components/ProductionCredits";
 import { serializeProductionCredits, type ProductionCreditDraft } from "@/lib/production-credits";
 
@@ -368,6 +369,8 @@ export default function InseratPage() {
   const [uploading, setUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [articleImages, setArticleImages] = useState<string[]>([]);
+  const [articleGalleryState, setArticleGalleryState] = useState({ uploading: false, failed: 0 });
   const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
   const [focalPoint, setFocalPoint] = useState<FocalPoint | null>(null);
   const [showFocalPicker, setShowFocalPicker] = useState(false);
@@ -644,6 +647,15 @@ export default function InseratPage() {
 
   async function handleSubmit() {
     if (!userId) { router.push("/sign-in"); return; }
+    const usesArticleGallery = selected?.type === "prop" || selected?.type === "vehicle";
+    if (usesArticleGallery && articleGalleryState.uploading) {
+      setError("Bitte warte, bis alle Artikelbilder fertig hochgeladen sind.");
+      return;
+    }
+    if (usesArticleGallery && articleGalleryState.failed > 0) {
+      setError("Bitte lade fehlgeschlagene Artikelbilder erneut hoch oder entferne sie.");
+      return;
+    }
     const payload = buildPayload();
     if (!payload) return;
 
@@ -653,7 +665,12 @@ export default function InseratPage() {
     const res = await fetch("/api/listings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...payload, image_url: selected?.type === "job" ? null : imageUrl, company_id: selectedCompanyId || null }),
+      body: JSON.stringify({
+        ...payload,
+        image_url: selected?.type === "job" ? null : (selected?.type === "prop" || selected?.type === "vehicle") ? articleImages[0] ?? null : imageUrl,
+        ...((selected?.type === "prop" || selected?.type === "vehicle") ? { extra_images: articleImages.slice(1) } : {}),
+        company_id: selectedCompanyId || null,
+      }),
     });
 
     const json = await res.json();
@@ -871,7 +888,7 @@ export default function InseratPage() {
         <div className="max-w-2xl mx-auto px-4 py-10">
 
           {/* Header */}
-          <button onClick={() => { setStep(1); setSelected(null); setImageUrl(null); setImagePreview(null); }} className="flex items-center gap-1.5 text-text-muted hover:text-text-primary text-sm mb-6 transition-colors">
+          <button disabled={articleGalleryState.uploading} onClick={() => { setStep(1); setSelected(null); setImageUrl(null); setImagePreview(null); }} className="flex items-center gap-1.5 text-text-muted hover:text-text-primary text-sm mb-6 transition-colors disabled:cursor-not-allowed disabled:opacity-50">
             <ChevronLeft size={16} /> Zurück zur Auswahl
           </button>
 
@@ -1568,6 +1585,30 @@ export default function InseratPage() {
 
             {/* ── IMAGE UPLOAD ── */}
             <div>
+              {selected?.type === "prop" || selected?.type === "vehicle" ? (
+                <div className="space-y-3">
+                  <ListingImageManager
+                    value={articleImages}
+                    onChange={(urls) => {
+                      if (articleImages[0] !== urls[0]) setFocalPoint(null);
+                      setArticleImages(urls);
+                    }}
+                    onStatusChange={setArticleGalleryState}
+                    label="Artikelbilder"
+                  />
+                  {articleImages[0] && (
+                    <button
+                      type="button"
+                      onClick={() => setShowFocalPicker(true)}
+                      className="flex min-h-10 items-center gap-2 rounded-lg border border-gold/30 px-3 py-2 text-xs text-gold transition-colors hover:border-gold"
+                    >
+                      <ImageIcon size={12} />
+                      {focalPoint ? "Fokuspunkt des Hauptbilds ändern" : "Fokuspunkt für das Hauptbild setzen"}
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <>
               <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
                 Titelbild
               </label>
@@ -1627,6 +1668,8 @@ export default function InseratPage() {
                   />
                 </label>
               )}
+                </>
+              )}
             </div>
 
             {/* ── HINT ── */}
@@ -1645,7 +1688,7 @@ export default function InseratPage() {
             {/* ── SUBMIT ── */}
             <button
               onClick={handleSubmit}
-              disabled={!canSubmit() || loading || uploading}
+              disabled={!canSubmit() || loading || uploading || ((selected?.type === "prop" || selected?.type === "vehicle") && (articleGalleryState.uploading || articleGalleryState.failed > 0))}
               className="w-full py-4 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
             >
               {loading ? (
@@ -1657,9 +1700,9 @@ export default function InseratPage() {
           </div>
         </div>
       </div>
-    {showFocalPicker && imageUrl && (
+    {showFocalPicker && (imageUrl || articleImages[0]) && (
       <FocalPointPicker
-        imageUrl={imageUrl}
+        imageUrl={articleImages[0] ?? imageUrl ?? ""}
         initial={focalPoint ?? undefined}
         onSave={(pt) => { setFocalPoint(pt); setShowFocalPicker(false); }}
         onClose={() => setShowFocalPicker(false)}

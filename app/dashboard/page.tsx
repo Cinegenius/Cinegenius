@@ -19,6 +19,7 @@ import { calculateProfileCompletion } from "@/lib/profile-completion";
 import { applyReadReceiptTimestamps, incomingUnreadMessageIds } from "@/lib/message-read-state";
 import { notifyMessagesRead, subscribeToMessageReads } from "@/lib/message-read-sync";
 import { compressImage, MAX_FUNCTION_UPLOAD_BYTES } from "@/lib/compressImage";
+import ListingImageManager from "@/components/ListingImageManager";
 
 type RealMessage = {
   id: string;
@@ -79,7 +80,7 @@ export default function DashboardPage() {
   const [onboardingDismissed, setOnboardingDismissed] = useState(false);
 
   // Real listings from Supabase
-  const [myListings, setMyListings] = useState<{ id: string; type: string; title: string; city: string; price: number; published: boolean; created_at: string; image_url: string | null; description: string }[]>([]);
+  const [myListings, setMyListings] = useState<{ id: string; type: string; title: string; city: string; price: number; published: boolean; created_at: string; image_url: string | null; extra_images?: string[] | null; description: string }[]>([]);
   const [listingsLoading, setListingsLoading] = useState(false);
   const [listingsError, setListingsError] = useState("");
 
@@ -235,6 +236,8 @@ export default function DashboardPage() {
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ title: "", description: "", price: "", city: "", image_url: "" });
+  const [editGallery, setEditGallery] = useState<string[]>([]);
+  const [editGalleryState, setEditGalleryState] = useState({ uploading: false, failed: 0 });
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState("");
   const [editUploading, setEditUploading] = useState(false);
@@ -242,6 +245,8 @@ export default function DashboardPage() {
   const startEdit = (l: typeof myListings[number]) => {
     setEditingId(l.id);
     setEditForm({ title: l.title, description: l.description ?? "", price: String(l.price), city: l.city, image_url: l.image_url ?? "" });
+    setEditGallery([l.image_url, ...(l.extra_images ?? [])].filter((url): url is string => typeof url === "string" && !!url));
+    setEditGalleryState({ uploading: false, failed: 0 });
     setEditError("");
   };
 
@@ -266,7 +271,11 @@ export default function DashboardPage() {
   };
 
   const saveEdit = async () => {
-    if (!editingId || editUploading) return;
+    if (!editingId || editUploading || editGalleryState.uploading) return;
+    if (editGalleryState.failed > 0) {
+      setEditError("Bitte lade fehlgeschlagene Bilder erneut hoch oder entferne sie.");
+      return;
+    }
     if (!editForm.title.trim() || !editForm.city.trim()) {
       setEditError("Titel und Stadt sind Pflichtfelder");
       return;
@@ -274,6 +283,8 @@ export default function DashboardPage() {
     setEditSaving(true);
     setEditError("");
     try {
+      const editingListing = myListings.find((listing) => listing.id === editingId);
+      const usesGallery = editingListing?.type === "prop" || editingListing?.type === "vehicle";
       const res = await fetch(`/api/listings/${editingId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -282,14 +293,22 @@ export default function DashboardPage() {
           description: editForm.description,
           price: parseFloat(editForm.price) || 0,
           city: editForm.city.trim(),
-          image_url: editForm.image_url || null,
+          image_url: usesGallery ? editGallery[0] ?? null : editForm.image_url || null,
+          ...(usesGallery ? { extra_images: editGallery.slice(1) } : {}),
         }),
       });
       const { error } = await res.json();
       if (error) throw new Error(error);
       setMyListings((prev) => prev.map((l) =>
         l.id === editingId
-          ? { ...l, title: editForm.title.trim(), description: editForm.description, city: editForm.city.trim(), price: parseFloat(editForm.price) || 0 }
+          ? {
+              ...l,
+              title: editForm.title.trim(),
+              description: editForm.description,
+              city: editForm.city.trim(),
+              price: parseFloat(editForm.price) || 0,
+              ...(l.type === "prop" || l.type === "vehicle" ? { image_url: editGallery[0] ?? null, extra_images: editGallery.slice(1) } : { image_url: editForm.image_url || null }),
+            }
           : l
       ));
       setEditingId(null);
@@ -1727,6 +1746,7 @@ export default function DashboardPage() {
                     </Link>
                     <button
                       onClick={() => editingId === l.id ? setEditingId(null) : startEdit(l)}
+                      disabled={editingId === l.id && (editGalleryState.uploading || editUploading)}
                       className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all flex items-center justify-center gap-1 ${
                         editingId === l.id
                           ? "border border-gold bg-gold/10 text-gold"
@@ -1762,7 +1782,16 @@ export default function DashboardPage() {
                       <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{editError}</p>
                     )}
                     {/* Image upload */}
-                    <div>
+                    {l.type === "prop" || l.type === "vehicle" ? (
+                      <ListingImageManager
+                        value={editGallery}
+                        onChange={(urls) => {
+                          setEditGallery(urls);
+                          setEditForm((current) => ({ ...current, image_url: urls[0] ?? "" }));
+                        }}
+                        onStatusChange={setEditGalleryState}
+                      />
+                    ) : <div>
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">Bild</label>
                       <div className="flex items-center gap-3">
                         {editForm.image_url && (
@@ -1777,7 +1806,7 @@ export default function DashboardPage() {
                           <button onClick={() => setEditForm((p) => ({ ...p, image_url: "" }))} className="text-xs text-red-400 hover:text-red-300 transition-colors">Entfernen</button>
                         )}
                       </div>
-                    </div>
+                    </div>}
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
@@ -1825,13 +1854,14 @@ export default function DashboardPage() {
                     <div className="flex gap-2 justify-end">
                       <button
                         onClick={() => setEditingId(null)}
+                        disabled={editGalleryState.uploading || editUploading}
                         className="px-4 py-2 text-xs font-medium border border-border text-text-secondary hover:text-text-primary rounded-lg transition-all"
                       >
                         Abbrechen
                       </button>
                       <button
                         onClick={saveEdit}
-                        disabled={editSaving || editUploading}
+                        disabled={editSaving || editUploading || editGalleryState.uploading || editGalleryState.failed > 0}
                         className="px-4 py-2 text-xs font-semibold bg-gold text-bg-primary rounded-lg hover:bg-gold-light transition-colors flex items-center gap-1.5 disabled:opacity-60"
                       >
                         {editSaving ? <Loader2 size={11} className="animate-spin" /> : <Save size={11} />}

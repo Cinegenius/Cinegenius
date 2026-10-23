@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import type { TouchEvent as ReactTouchEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -97,7 +98,22 @@ export default function PropDetail({ prop }: { prop: Prop }) {
   const [submitted, setSubmitted] = useState(false);
   const [activeImg, setActiveImg] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const touchStartX = useRef<number | null>(null);
+  const didSwipe = useRef(false);
   const images = [prop.image, ...(prop.extra_images ?? [])].filter(Boolean) as string[];
+
+  const handleGalleryTouchStart = (event: ReactTouchEvent) => {
+    touchStartX.current = event.touches[0]?.clientX ?? null;
+  };
+  const handleGalleryTouchEnd = (event: ReactTouchEvent) => {
+    const startX = touchStartX.current;
+    touchStartX.current = null;
+    const endX = event.changedTouches[0]?.clientX;
+    if (startX === null || endX === undefined || Math.abs(endX - startX) < 48 || images.length < 2) return;
+    didSwipe.current = true;
+    setActiveImg((index) => endX < startX ? (index + 1) % images.length : (index - 1 + images.length) % images.length);
+    window.setTimeout(() => { didSwipe.current = false; }, 450);
+  };
 
   const subtotal = prop.dailyRate * days;
   const deposit = Math.round(subtotal * 0.25);
@@ -124,7 +140,18 @@ export default function PropDetail({ prop }: { prop: Prop }) {
 
         {/* Bildergalerie */}
         <div className="mb-8">
-          <div className="relative grid grid-cols-4 gap-2 overflow-hidden rounded-xl sm:h-96">
+          <div
+            className="relative grid grid-cols-4 gap-2 overflow-hidden rounded-xl sm:h-96"
+            style={{ touchAction: "pan-y" }}
+            onTouchStart={handleGalleryTouchStart}
+            onTouchEnd={handleGalleryTouchEnd}
+            onClickCapture={(event) => {
+              if (!didSwipe.current) return;
+              event.preventDefault();
+              event.stopPropagation();
+              didSwipe.current = false;
+            }}
+          >
             <div className={`relative col-span-4 aspect-[4/3] overflow-hidden bg-bg-secondary sm:aspect-auto sm:h-full ${images.length > 1 ? "sm:col-span-2" : "sm:col-span-4"}`}>
               {images[activeImg] ? (
                 <button
@@ -137,7 +164,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
                     src={images[activeImg]}
                     alt={prop.title}
                     fill
-                    className="object-contain sm:object-cover"
+                    className="object-contain"
                     style={{ objectPosition: activeImg === 0 && prop.focalPoint ? `${prop.focalPoint.x}% ${prop.focalPoint.y}%` : "50% 50%" }}
                     sizes={images.length > 1 ? "(min-width: 640px) 50vw, 100vw" : "100vw"}
                     priority
@@ -186,7 +213,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
                   type="button"
                   aria-label={`Foto ${i + 1} auswählen`}
                   aria-pressed={activeImg === i}
-                  onClick={() => setActiveImg(i)}
+                  onClick={() => { setActiveImg(i); setLightboxOpen(true); }}
                   className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-bg-secondary ${activeImg === i ? "border-gold" : "border-border"}`}
                 >
                   <Image src={img} alt="" fill className="object-cover" sizes="64px" />

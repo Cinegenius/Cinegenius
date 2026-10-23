@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
+import { normalizeListingImageGallery } from "@/lib/listing-image-gallery";
 
 // PATCH /api/listings/[id] — edit own listing
 export async function PATCH(
@@ -16,7 +17,7 @@ export async function PATCH(
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Ungültige Anfrage" }, { status: 400 });
 
-  const { title, description, price, city, published, image_url } = body;
+  const { title, description, price, city, published, image_url, extra_images } = body;
 
   if (published === true) {
     return NextResponse.json({ error: "Zum Veröffentlichen bitte die ausdrückliche Freigabe-Aktion verwenden." }, { status: 400 });
@@ -28,6 +29,8 @@ export async function PATCH(
     return NextResponse.json({ error: "Stadt zu lang (max. 100 Zeichen)" }, { status: 400 });
   if (description !== undefined && description.length > 5000)
     return NextResponse.json({ error: "Beschreibung zu lang (max. 5000 Zeichen)" }, { status: 400 });
+  if (image_url !== undefined && image_url !== null && (typeof image_url !== "string" || image_url.length > 2048))
+    return NextResponse.json({ error: "Das Bild ist ungültig." }, { status: 400 });
 
   const updates: Record<string, unknown> = {};
   if (title !== undefined)       updates.title       = title.trim();
@@ -35,7 +38,33 @@ export async function PATCH(
   if (price !== undefined)       updates.price       = Math.max(0, Math.min(Number(price) || 0, 1_000_000));
   if (city !== undefined)        updates.city        = city.trim();
   if (published === false)       updates.published   = false;
-  if (image_url !== undefined)   updates.image_url   = image_url || null;
+  if (image_url !== undefined || extra_images !== undefined) {
+    const { data: current, error: currentError } = await db
+      .from("listings")
+      .select("type, image_url, extra_images")
+      .eq("id", id)
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (currentError || !current) {
+      return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
+    }
+
+    if (current.type === "prop" || current.type === "vehicle") {
+      const gallery = normalizeListingImageGallery(
+        image_url !== undefined ? image_url : current.image_url,
+        extra_images !== undefined ? extra_images : current.extra_images,
+      );
+      if (!gallery.ok) return NextResponse.json({ error: gallery.error }, { status: 400 });
+      updates.image_url = gallery.gallery.imageUrl;
+      updates.extra_images = gallery.gallery.extraImages;
+    } else {
+      if (extra_images !== undefined) {
+        return NextResponse.json({ error: "Eine Bildergalerie kann nur bei Marktplatzartikeln geändert werden." }, { status: 400 });
+      }
+      if (image_url !== undefined) updates.image_url = image_url || null;
+    }
+  }
 
   if (Object.keys(updates).length === 0)
     return NextResponse.json({ error: "Keine Änderungen" }, { status: 400 });

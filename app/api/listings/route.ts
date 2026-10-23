@@ -4,6 +4,7 @@ import { rateLimit } from "@/lib/rateLimit";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
+import { normalizeListingImageGallery } from "@/lib/listing-image-gallery";
 
 // Explicit column list — avoids SELECT * sending unused data over the wire.
 // Update this list if new listing columns are added.
@@ -68,6 +69,9 @@ export async function POST(req: Request) {
   const { type, title, description, price, city, category, image_url, company_id,
           metadata, blocked_dates, floor_plan_url, extra_images, rental_type, draft, onboarding_request_key } = body;
 
+  let storedImageUrl = image_url ?? null;
+  let storedExtraImages = extra_images;
+
   const VALID_LISTING_TYPES = new Set(["job", "location", "prop", "vehicle", "creator", "animal"]);
 
   if (!type || !title || !city) {
@@ -76,6 +80,12 @@ export async function POST(req: Request) {
 
   if (!VALID_LISTING_TYPES.has(type)) {
     return NextResponse.json({ error: "Ungültiger Inserat-Typ" }, { status: 400 });
+  }
+  if (type === "prop" || type === "vehicle") {
+    const gallery = normalizeListingImageGallery(image_url, extra_images);
+    if (!gallery.ok) return NextResponse.json({ error: gallery.error }, { status: 400 });
+    storedImageUrl = gallery.gallery.imageUrl;
+    storedExtraImages = gallery.gallery.extraImages;
   }
   if (onboarding_request_key !== undefined && (draft !== true || typeof onboarding_request_key !== "string" || !/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(onboarding_request_key))) {
     return NextResponse.json({ error: "Ungültiger Einrichtungsauftrag" }, { status: 400 });
@@ -133,14 +143,16 @@ export async function POST(req: Request) {
       description: description ?? "",
       price: safePrice,
       city,
-      image_url: image_url ?? null,
+      image_url: storedImageUrl,
       company_id: company_id ?? null,
       // Jobs and guided onboarding entries start private; publishing is an explicit owner action.
       published: type === "job" || draft === true ? false : true,
       metadata: mergedMetadata,
       ...(blocked_dates !== undefined && { blocked_dates }),
       ...(floor_plan_url !== undefined && { floor_plan_url }),
-      ...(extra_images !== undefined && { extra_images }),
+      ...((type === "prop" || type === "vehicle")
+        ? { extra_images: storedExtraImages }
+        : extra_images !== undefined && { extra_images }),
     })
     .select()
     .single();
