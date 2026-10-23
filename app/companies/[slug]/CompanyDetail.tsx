@@ -185,7 +185,7 @@ export default function CompanyDetail({
   }
 
   return (
-    <div className="pt-16 min-h-screen bg-bg-primary text-text-primary overflow-x-hidden">
+    <div className="pt-16 min-h-screen min-w-0 max-w-full bg-bg-primary text-text-primary [overflow-wrap:anywhere]">
 
       {isWelcome && !welcomeDismissed && (
         <div className="bg-gold/10 border-b border-gold/20">
@@ -210,7 +210,7 @@ export default function CompanyDetail({
         {/* Gradient background */}
         <div className="absolute inset-0 bg-gradient-to-b from-bg-elevated to-bg-primary" />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-10 pb-8 sm:pb-10">
+        <div className="relative z-10 mx-auto w-full min-w-0 max-w-4xl px-4 sm:px-6 pt-10 pb-8 sm:pb-10">
 
           {/* Edit button */}
           {isOwner && (
@@ -223,7 +223,7 @@ export default function CompanyDetail({
           )}
 
           {/* Logo + Name */}
-          <div className="flex items-start gap-4 sm:gap-5 mb-5">
+          <div className="flex min-w-0 max-w-full items-start gap-4 sm:gap-5 mb-5">
             {/* Logo */}
             <div className="w-24 h-16 sm:w-32 sm:h-20 rounded-2xl bg-bg-primary border border-border flex items-center justify-center shrink-0 overflow-hidden shadow-xl">
               {company.logo_url
@@ -245,8 +245,8 @@ export default function CompanyDetail({
                 </div>
               )}
 
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="font-display text-2xl sm:text-3xl font-bold text-text-primary leading-tight">
+              <div className="flex min-w-0 max-w-full items-center gap-2 flex-wrap">
+                <h1 className="min-w-0 max-w-full break-words font-display text-2xl sm:text-3xl font-bold text-text-primary leading-tight [overflow-wrap:anywhere]">
                   {company.name}
                 </h1>
                 {company.verified && (
@@ -255,14 +255,14 @@ export default function CompanyDetail({
               </div>
 
               {company.tagline && (
-                <p className="text-text-muted text-sm mt-1 leading-snug">{company.tagline}</p>
+                <p className="min-w-0 max-w-full break-words text-text-muted text-sm mt-1 leading-snug [overflow-wrap:anywhere]">{company.tagline}</p>
               )}
             </div>
           </div>
 
           {/* Industry focus */}
           {company.industry_focus?.length > 0 && (
-            <p className="text-xs text-text-muted mb-4 leading-relaxed">
+            <p className="min-w-0 max-w-full break-words text-xs text-text-muted mb-4 leading-relaxed [overflow-wrap:anywhere]">
               {company.industry_focus.join(" · ")}
             </p>
           )}
@@ -283,7 +283,7 @@ export default function CompanyDetail({
           </div>
 
           {/* CTA buttons */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex min-w-0 max-w-full flex-wrap gap-2">
             {company.email && (
               <a href={`mailto:${company.email}`}
                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors text-xs">
@@ -298,7 +298,7 @@ export default function CompanyDetail({
             )}
             {company.website && (
               <a href={company.website} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-4 py-2 border border-border bg-bg-elevated rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
+                className="inline-flex min-w-0 max-w-full items-center gap-1.5 whitespace-normal break-words px-4 py-2 border border-border bg-bg-elevated rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-colors [overflow-wrap:anywhere]">
                 <Globe size={13} /> {company.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
               </a>
             )}
@@ -333,8 +333,8 @@ export default function CompanyDetail({
       </section>
 
       {/* ── BODY ─────────────────────────────────────────────────────────── */}
-      <div className="max-w-4xl mx-auto px-4 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-10">
+      <div className="mx-auto w-full min-w-0 max-w-4xl px-4 py-10">
+        <div className="grid min-w-0 max-w-full grid-cols-1 lg:grid-cols-[minmax(0,1fr)_240px] gap-10">
 
           {/* ── LEFT ──────────────────────────────────────────────────── */}
           <div className="space-y-10 min-w-0">
@@ -384,7 +384,7 @@ export default function CompanyDetail({
                           const position = m.title ?? m.profile?.role ?? "—";
                           return (
                             <Link key={m.id} href={`/profile/${slug}`}
-                              className="grid grid-cols-[2fr_1fr] gap-4 px-5 py-3.5 hover:bg-bg-elevated transition-colors group items-center">
+                              className="grid min-w-0 grid-cols-1 gap-1 px-4 py-3.5 hover:bg-bg-elevated transition-colors group items-start sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] sm:items-center sm:gap-4 sm:px-5">
                               <div className="flex items-center gap-3 min-w-0">
                                 <div className="relative shrink-0">
                                   <Avatar member={m} size={32} />
@@ -392,9 +392,9 @@ export default function CompanyDetail({
                                     <Crown size={6} className="text-gold" />
                                   </div>
                                 </div>
-                                <span className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{name}</span>
+                              <span className="min-w-0 max-w-full break-words text-sm font-semibold text-text-primary group-hover:text-gold transition-colors [overflow-wrap:anywhere]">{name}</span>
                               </div>
-                              <span className="text-sm text-text-secondary truncate">{position}</span>
+                              <span className="min-w-0 max-w-full break-words text-sm text-text-secondary [overflow-wrap:anywhere]">{position}</span>
                             </Link>
                           );
                         })}
@@ -416,12 +416,12 @@ export default function CompanyDetail({
                           const position = m.title ?? m.profile?.role ?? "—";
                           return (
                             <Link key={m.id} href={`/profile/${slug}`}
-                              className="grid grid-cols-[2fr_1fr] gap-4 px-5 py-3.5 hover:bg-bg-elevated transition-colors group items-center">
+                              className="grid min-w-0 grid-cols-1 gap-1 px-4 py-3.5 hover:bg-bg-elevated transition-colors group items-start sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] sm:items-center sm:gap-4 sm:px-5">
                               <div className="flex items-center gap-3 min-w-0">
                                 <Avatar member={m} size={32} />
-                                <span className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{name}</span>
+                                <span className="min-w-0 max-w-full break-words text-sm font-semibold text-text-primary group-hover:text-gold transition-colors [overflow-wrap:anywhere]">{name}</span>
                               </div>
-                              <span className="text-sm text-text-secondary truncate">{position}</span>
+                              <span className="min-w-0 max-w-full break-words text-sm text-text-secondary [overflow-wrap:anywhere]">{position}</span>
                             </Link>
                           );
                         })}

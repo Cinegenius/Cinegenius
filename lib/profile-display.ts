@@ -37,6 +37,19 @@ export function getProfileDisplayPositions({
   });
 }
 
+/** Keeps long occupation lists compact on profile pages without dropping saved roles. */
+export const PROFILE_POSITIONS_PREVIEW_LIMIT = 5;
+
+export function getProfilePositionsPreview(
+  positions: readonly string[],
+  expanded: boolean,
+  visibleCount = PROFILE_POSITIONS_PREVIEW_LIMIT,
+): { visible: string[]; remaining: number } {
+  const limit = Math.max(1, Number.isFinite(visibleCount) ? Math.floor(visibleCount) : PROFILE_POSITIONS_PREVIEW_LIMIT);
+  const visible = expanded ? [...positions] : positions.slice(0, limit);
+  return { visible, remaining: Math.max(0, positions.length - visible.length) };
+}
+
 export function hasProfileType(
   profileTypes: readonly string[] | null | undefined,
   primaryType: string | null | undefined,

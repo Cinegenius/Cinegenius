@@ -18,6 +18,7 @@ import { getPlatform, type ExternalProfileRow } from "@/lib/external-platforms";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import PhotoLikeButton from "@/components/PhotoLikeButton";
 import { markPhotoNavigation, photoHref } from "@/lib/photo-link";
+import ProfileRoles from "./ProfileRoles";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -46,9 +47,9 @@ function getVideoEmbed(url: string): string | null {
 function StatPill({ label, value }: { label: string; value?: string | number | null }) {
   if (!value && value !== 0) return null;
   return (
-    <div className="flex flex-col gap-0.5">
+    <div className="flex min-w-0 max-w-full flex-col gap-0.5">
       <span className="text-[9px] uppercase tracking-[0.15em] text-gold font-bold">{label}</span>
-      <span className="text-sm font-semibold text-text-primary leading-snug">{value}</span>
+      <span className="min-w-0 max-w-full break-words text-sm font-semibold text-text-primary leading-snug [overflow-wrap:anywhere]">{value}</span>
     </div>
   );
 }
@@ -583,7 +584,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
   ] as const).filter((l): l is NonNullable<typeof l> & { url: string } => l !== null && !!l.url) as { label: string; url: string; icon?: boolean; contactIcon?: "phone" | "mail" }[];
 
   return (
-    <div className="min-h-screen bg-bg-primary text-text-primary">
+    <div className="min-h-screen min-w-0 max-w-full bg-bg-primary text-text-primary [overflow-wrap:anywhere]">
       {lightbox && <Lightbox src={lightbox} onClose={() => setLightbox(null)} />}
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
@@ -652,21 +653,17 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                       ));
                     })()}
                   </div>
-                  <h1 className="font-display text-4xl sm:text-5xl font-bold text-text-primary leading-none tracking-tight">
+                  <h1 className="min-w-0 max-w-full break-words font-display text-4xl sm:text-5xl font-bold text-text-primary leading-tight tracking-tight [overflow-wrap:anywhere]">
                     {profile.display_name ?? "Unbekannt"}
                   </h1>
-                  {roleLabels.length > 0 && (
-                    <p className="text-text-muted text-sm mt-2 tracking-wide">
-                      {roleLabels.join(" · ")}
-                    </p>
-                  )}
+                  <ProfileRoles positions={roleLabels} />
                   {profile.tagline && (
-                    <p className="text-text-secondary text-sm mt-1 italic">
+                    <p className="min-w-0 max-w-full break-words text-text-secondary text-sm mt-1 italic [overflow-wrap:anywhere]">
                       {profile.tagline}
                     </p>
                   )}
                   {profile.location && (
-                    <p className="text-text-muted/60 text-xs mt-1 flex items-center gap-1">
+                    <p className="min-w-0 max-w-full break-words text-text-muted/60 text-xs mt-1 flex items-center gap-1 [overflow-wrap:anywhere]">
                       <MapPin size={10} /> {profile.location}
                     </p>
                   )}
@@ -1065,7 +1062,7 @@ function ModelProfile({ profile, isOwner, projectCredits = [], companyMembership
   ].filter((entry): entry is [string, string | number] => entry[1] !== null && entry[1] !== undefined && entry[1] !== "");
 
   return (
-    <div className="min-h-screen bg-bg-primary text-text-primary">
+    <div className="min-h-screen min-w-0 max-w-full bg-bg-primary text-text-primary [overflow-wrap:anywhere]">
       {lightbox && <Lightbox src={lightbox} onClose={() => setLightbox(null)} />}
 
       <section className="border-b border-border bg-bg-primary pt-16 sm:pt-20">
@@ -1095,9 +1092,7 @@ function ModelProfile({ profile, isOwner, projectCredits = [], companyMembership
               </div>
               <div>
                 <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-text-primary">{profile.display_name ?? "Unbekannt"}</h1>
-                {roleLabels.length > 0 && <div className="mt-3 flex flex-wrap gap-2">
-                  {roleLabels.map((label, index) => <span key={`${label}-${index}`} className={`rounded-full border px-3 py-1 text-xs font-medium ${index === 0 ? "border-gold/40 bg-gold/12 text-gold" : "border-border bg-bg-secondary text-text-secondary"}`}>{label}</span>)}
-                </div>}
+                <ProfileRoles positions={roleLabels} />
                 {profile.location && <p className="mt-3 flex items-center gap-1.5 text-sm text-text-muted"><MapPin size={13} /> {profile.location}</p>}
                 {profile.tagline && <p className="mt-2 text-sm italic text-text-secondary">{cleanProfileBio(profile.tagline)}</p>}
               </div>
@@ -1361,7 +1356,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
     .sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
 
   return (
-    <div className="min-h-screen bg-bg-primary text-text-primary">
+    <div className="min-h-screen min-w-0 max-w-full bg-bg-primary text-text-primary [overflow-wrap:anywhere]">
       {lightbox && <Lightbox src={lightbox} onClose={() => setLightbox(null)} />}
 
       {/* Hero */}
@@ -1376,33 +1371,16 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           <div className="absolute inset-0 bg-gradient-to-b from-bg-elevated to-bg-primary" />
         )}
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 pb-6 sm:pb-8">
-          <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
-            <div className="flex-1 min-w-0 w-full">
-              <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-white leading-tight drop-shadow-lg">
+        <div className="relative z-10 mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 pb-6 sm:pb-8">
+          <div className="flex min-w-0 max-w-full flex-col sm:flex-row items-start gap-3 sm:gap-4">
+            <div className="flex-1 min-w-0 w-full max-w-full [overflow-wrap:anywhere]">
+              <h1 className="min-w-0 max-w-full break-words font-display text-4xl sm:text-5xl font-bold tracking-tight text-white leading-tight drop-shadow-lg [overflow-wrap:anywhere]">
                 {profile.display_name ?? "Unbekannt"}
                 <span className="block h-0.5 w-12 bg-gold mt-3 rounded-full" />
               </h1>
-              {roleLabels.length > 0 && (() => {
-                const allPos = roleLabels;
-                const [primary, ...rest] = allPos;
-                return (
-                  <div className="mt-3">
-                    <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide bg-gold/20 text-gold border border-gold/30 drop-shadow-md">
-                      {primary}
-                    </span>
-                    {rest.length > 0 && (
-                      <p className="text-white/70 text-sm mt-2 font-light tracking-wide drop-shadow-md" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}>
-                        {rest.map((pos, i) => (
-                          <span key={i}>{pos}{i < rest.length - 1 && <span className="text-gold/60 mx-2">·</span>}</span>
-                        ))}
-                      </p>
-                    )}
-                  </div>
-                );
-              })()}
+              <ProfileRoles positions={roleLabels} tone="hero" />
               {profile.location && (
-                <p className="text-white/60 text-xs mt-2.5 flex items-center gap-1 drop-shadow-md" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.9)" }}>
+                <p className="min-w-0 max-w-full break-words text-white/60 text-xs mt-2.5 flex items-center gap-1 drop-shadow-md [overflow-wrap:anywhere]" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.9)" }}>
                   <MapPin size={10} />{profile.location}
                 </p>
               )}
@@ -1438,12 +1416,12 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
         </div>
       </section>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <div className="mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 pb-16">
 
         {/* Two-column: avatar + compact info */}
-        <div className="grid grid-cols-1 sm:grid-cols-[220px_1fr] gap-4 sm:gap-8 mb-6 sm:mb-10">
+        <div className="grid min-w-0 max-w-full grid-cols-1 sm:grid-cols-[220px_minmax(0,1fr)] gap-4 sm:gap-8 mb-6 sm:mb-10">
           {/* Avatar + company badge */}
-          <div className="shrink-0 space-y-3">
+          <div className="min-w-0 max-w-full space-y-3">
             {profile.avatar_url ? (
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-bg-secondary ring-1 ring-white/8 shadow-2xl">
                 <Image src={profile.avatar_url} alt="" aria-hidden="true" fill sizes="(max-width:640px) 100vw, 220px"
@@ -1466,8 +1444,8 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           </div>
 
           {/* Compact info */}
-          <div className="pt-1">
-            <div className="space-y-5 min-w-0">
+          <div className="min-w-0 max-w-full pt-1 [overflow-wrap:anywhere]">
+            <div className="min-w-0 max-w-full space-y-5 [overflow-wrap:anywhere]">
 
             {profile.bio && (
               <div>
@@ -1496,7 +1474,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {skills.map((s) => (
-                    <span key={s} className="px-2.5 py-1 bg-bg-elevated border border-border rounded-md text-xs text-text-primary hover:border-gold/30 transition-colors">{s}</span>
+                    <span key={s} className="min-w-0 max-w-full break-words px-2.5 py-1 bg-bg-elevated border border-border rounded-md text-xs text-text-primary hover:border-gold/30 transition-colors [overflow-wrap:anywhere]">{s}</span>
                   ))}
                 </div>
               </div>
@@ -1942,20 +1920,20 @@ function SimilarProfilesSection({ profiles }: { profiles: SimilarProfile[] }) {
   return (
     <section className="border-t border-border bg-bg-secondary py-10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex min-w-0 max-w-full items-center justify-between mb-5">
           <h2 className="font-display text-lg font-bold text-text-primary">Ähnliche Profile</h2>
           <Link href="/creators" className="text-xs text-gold hover:text-gold-light transition-colors font-semibold">
             Alle entdecken →
           </Link>
         </div>
-        <div className="flex gap-3 overflow-x-auto pb-2 sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:overflow-visible scrollbar-hide">
+        <div className="flex min-w-0 max-w-full gap-3 overflow-x-auto overscroll-x-contain pb-2 sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:overflow-visible scrollbar-hide">
           {profiles.map((p) => {
             const city = typeof p.location === "string" ? p.location.split(",")[0]?.trim() : null;
             return (
               <Link
                 key={p.user_id}
                 href={`/profile/${p.slug}`}
-                className="group shrink-0 w-36 sm:w-auto flex flex-col items-center text-center p-3 rounded-xl border border-border bg-bg-elevated hover:border-gold/40 transition-all"
+                className="group min-w-0 shrink-0 w-36 sm:w-auto flex flex-col items-center text-center p-3 rounded-xl border border-border bg-bg-elevated hover:border-gold/40 transition-all"
               >
                 <div className="relative w-14 h-14 rounded-full overflow-hidden bg-bg-hover border border-border mb-2.5">
                   {p.avatar_url ? (
