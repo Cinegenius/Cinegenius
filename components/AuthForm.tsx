@@ -4,7 +4,9 @@ import { useAuth, useSignIn, useSignUp } from "@clerk/nextjs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { finalizeThenNavigate, getMfaResendChannel, getPasswordSignInAction, resolveAuthNavigationUrl, selectSecondFactor, shouldRedirectForActiveSession } from "@/lib/sign-in-flow";
+import { classifyPasswordResetError, getPasswordResetRequestErrorMessage, PASSWORD_RESET_NEUTRAL_MESSAGE, PASSWORD_RESET_RESEND_COOLDOWN_SECONDS, validateNewPassword } from "@/lib/password-reset-flow";
 
 type AuthMode = "sign-in" | "sign-up";
 type SignInStep = "credentials" | "email-code" | "mfa" | "reset-code" | "new-password";
@@ -61,6 +63,15 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
+  const [resetEmailError, setResetEmailError] = useState("");
+  const [resetCodeError, setResetCodeError] = useState("");
+  const [newPasswordError, setNewPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [resetCooldownSeconds, setResetCooldownSeconds] = useState(0);
+  const [resetRequestInProgress, setResetRequestInProgress] = useState(false);
   const [step, setStep] = useState<SignInStep>("credentials");
   const [factor, setFactor] = useState<"email_code" | "phone_code" | "totp" | "backup_code" | null>(null);
   const [message, setMessage] = useState("");
@@ -70,6 +81,14 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
   const signInAttemptStarted = useRef(false);
   const navigationStarted = useRef(false);
   const busy = fetchStatus === "fetching" || submitting;
+
+  useEffect(() => {
+    if (resetCooldownSeconds <= 0) return;
+    const timer = window.setTimeout(() => {
+      setResetCooldownSeconds((seconds) => Math.max(0, seconds - 1));
+    }, 1000);
+    return () => window.clearTimeout(timer);
+  }, [resetCooldownSeconds]);
 
   const navigateOnce = useCallback((url: string) => {
     if (navigationStarted.current) return;
@@ -246,72 +265,227 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
   };
 
   const startPasswordReset = async () => {
-    if (!signIn || busy || !email.trim()) {
-      setError("Gib zuerst deine E-Mail-Adresse ein.");
+    if (!signIn || busy) return;
+    if (resetCooldownSeconds > 0) {
+      setResetEmailError(`Bitte warte noch ${resetCooldownSeconds} Sekunden, bevor du es erneut versuchst.`);
+      return;
+    }
+    if (!email.trim()) {
+      setResetEmailError("Gib zuerst deine E-Mail-Adresse ein.");
       return;
     }
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
-      setError("Gib eine gültige E-Mail-Adresse ein.");
+      setResetEmailError("Gib eine gültige E-Mail-Adresse ein.");
       return;
     }
+    if (!beginSubmission()) return;
+    setResetRequestInProgress(true);
+    signInAttemptStarted.current = false;
     setError("");
     setMessage("");
-    const startResult = await runAuthAction(() => signIn.create({ identifier: email.trim() }), setError, "Die Wiederherstellung konnte nicht gestartet werden.");
-    if (!startResult || startResult.error) {
-      if (!startResult) return;
-      setError(readableAuthError(startResult.error, "Die Wiederherstellung konnte nicht gestartet werden."));
-      return;
+    setResetEmailError("");
+    setResetCodeError("");
+    try {
+      const resetResult = await signIn.reset();
+      if (resetResult.error) {
+        setError("Die Wiederherstellung konnte nicht vorbereitet werden. Bitte versuche es erneut.");
+        return;
+      }
+
+      const startResult = await signIn.create({ identifier: email.trim() });
+      if (startResult.error) {
+        const kind = classifyPasswordResetError(startResult.error);
+        if (kind === "account-unavailable") {
+          setStep("reset-code");
+          setCode("");
+          setResetCooldownSeconds(PASSWORD_RESET_RESEND_COOLDOWN_SECONDS);
+          setMessage(PASSWORD_RESET_NEUTRAL_MESSAGE);
+        } else {
+          setError(getPasswordResetRequestErrorMessage(kind));
+          if (kind === "rate-limited") setResetCooldownSeconds(PASSWORD_RESET_RESEND_COOLDOWN_SECONDS);
+        }
+        return;
+      }
+
+      const codeResult = await signIn.resetPasswordEmailCode.sendCode();
+      if (codeResult.error) {
+        const kind = classifyPasswordResetError(codeResult.error);
+        if (kind === "account-unavailable") {
+          setStep("reset-code");
+          setCode("");
+          setResetCooldownSeconds(PASSWORD_RESET_RESEND_COOLDOWN_SECONDS);
+          setMessage(PASSWORD_RESET_NEUTRAL_MESSAGE);
+        } else {
+          setError(getPasswordResetRequestErrorMessage(kind));
+          if (kind === "rate-limited") setResetCooldownSeconds(PASSWORD_RESET_RESEND_COOLDOWN_SECONDS);
+        }
+        return;
+      }
+
+      setStep("reset-code");
+      setCode("");
+      setResetCooldownSeconds(PASSWORD_RESET_RESEND_COOLDOWN_SECONDS);
+      setMessage(PASSWORD_RESET_NEUTRAL_MESSAGE);
+    } catch {
+      setError(getPasswordResetRequestErrorMessage("temporary"));
+    } finally {
+      setResetRequestInProgress(false);
+      finishSubmission();
     }
-    const codeResult = await runAuthAction(() => signIn.resetPasswordEmailCode.sendCode(), setError, "Der Wiederherstellungscode konnte nicht gesendet werden.");
-    if (!codeResult || codeResult.error) {
-      if (!codeResult) return;
-      setError(readableAuthError(codeResult.error, "Der Wiederherstellungscode konnte nicht gesendet werden."));
-      return;
-    }
-    setStep("reset-code");
-    setCode("");
-    setMessage("Wir haben einen Wiederherstellungscode an deine E-Mail-Adresse gesendet.");
   };
 
   const submitResetCode = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!signIn || busy) return;
+    if (!signIn || !beginSubmission()) return;
     setError("");
     setMessage("");
-    const result = await runAuthAction(() => signIn.resetPasswordEmailCode.verifyCode({ code: code.trim() }), setError, "Der Code konnte nicht geprüft werden.");
-    if (!result || result.error) {
-      if (!result) return;
-      setError(readableAuthError(result.error, "Der Code stimmt nicht oder ist abgelaufen."));
+    setResetCodeError("");
+    if (!code.trim()) {
+      setResetCodeError("Gib den Code aus der E-Mail ein.");
+      finishSubmission();
+      return;
     }
-    else if (signIn.status === "needs_new_password") setStep("new-password");
-    else setError("Der Code wurde nicht akzeptiert. Bitte fordere einen neuen Code an.");
+    try {
+      const result = await signIn.resetPasswordEmailCode.verifyCode({ code: code.trim() });
+      if (result.error) setResetCodeError("Der Code ist ungültig oder abgelaufen. Prüfe ihn oder fordere einen neuen an.");
+      else if (signIn.status === "needs_new_password") setStep("new-password");
+      else setResetCodeError("Der Code konnte nicht bestätigt werden. Fordere einen neuen Code an und versuche es erneut.");
+    } catch {
+      setResetCodeError("Der Code konnte gerade nicht geprüft werden. Bitte versuche es erneut.");
+    } finally {
+      finishSubmission();
+    }
+  };
+
+  const resendPasswordResetCode = async () => {
+    if (!signIn || busy) return;
+    if (resetCooldownSeconds > 0) {
+      setError(`Bitte warte noch ${resetCooldownSeconds} Sekunden, bevor du einen neuen Code anforderst.`);
+      return;
+    }
+    if (!beginSubmission()) return;
+    setError("");
+    setMessage("");
+    setResetCodeError("");
+    try {
+      const resetResult = await signIn.reset();
+      if (resetResult.error) {
+        setError("Die Wiederherstellung konnte nicht vorbereitet werden. Bitte versuche es erneut.");
+        return;
+      }
+      const startResult = await signIn.create({ identifier: email.trim() });
+      if (startResult.error) {
+        const kind = classifyPasswordResetError(startResult.error);
+        if (kind === "account-unavailable") setMessage(PASSWORD_RESET_NEUTRAL_MESSAGE);
+        else setError(getPasswordResetRequestErrorMessage(kind));
+        if (kind === "rate-limited") setResetCooldownSeconds(PASSWORD_RESET_RESEND_COOLDOWN_SECONDS);
+        return;
+      }
+      const result = await signIn.resetPasswordEmailCode.sendCode();
+      if (result.error) {
+        const kind = classifyPasswordResetError(result.error);
+        if (kind === "account-unavailable") setMessage(PASSWORD_RESET_NEUTRAL_MESSAGE);
+        else setError(getPasswordResetRequestErrorMessage(kind));
+        if (kind === "rate-limited") setResetCooldownSeconds(PASSWORD_RESET_RESEND_COOLDOWN_SECONDS);
+        return;
+      }
+      setCode("");
+      setResetCooldownSeconds(PASSWORD_RESET_RESEND_COOLDOWN_SECONDS);
+      setMessage(PASSWORD_RESET_NEUTRAL_MESSAGE);
+    } catch {
+      setError(getPasswordResetRequestErrorMessage("temporary"));
+    } finally {
+      finishSubmission();
+    }
+  };
+
+  const startEmailCodeSignIn = async () => {
+    if (!signIn || !beginSubmission()) return;
+    setError("");
+    setMessage("");
+    try {
+      const resetResult = await signIn.reset();
+      if (resetResult.error) {
+        setError("Der alternative Anmeldeweg konnte nicht vorbereitet werden. Bitte versuche es erneut.");
+        return;
+      }
+      const result = await signIn.emailCode.sendCode({ emailAddress: email.trim() });
+      if (result.error) {
+        setError(readableAuthError(result.error, "Der Anmeldecode konnte nicht gesendet werden."));
+        return;
+      }
+      setStep("email-code");
+      setCode("");
+      setMessage("Wir haben einen Anmeldecode angefordert. Prüfe dein Postfach und den Spam-Ordner.");
+    } catch {
+      setError("Der alternative Anmeldecode konnte gerade nicht angefordert werden. Bitte versuche es erneut.");
+    } finally {
+      finishSubmission();
+    }
   };
 
   const submitNewPassword = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!signIn || busy) return;
+    if (!signIn || !beginSubmission()) return;
     setError("");
-    if (newPassword.length < 8) {
-      setError("Das neue Passwort muss mindestens 8 Zeichen enthalten.");
+    setMessage("");
+    setNewPasswordError("");
+    setConfirmPasswordError("");
+    const validation = validateNewPassword(newPassword, confirmNewPassword);
+    if (validation.passwordError || validation.confirmationError) {
+      setNewPasswordError(validation.passwordError);
+      setConfirmPasswordError(validation.confirmationError);
+      finishSubmission();
       return;
     }
-    const result = await runAuthAction(() => signIn.resetPasswordEmailCode.submitPassword({ password: newPassword }), setError, "Das neue Passwort konnte nicht gespeichert werden.");
-    if (!result || result.error) {
-      if (!result) return;
-      setError(readableAuthError(result.error, "Das neue Passwort konnte nicht gespeichert werden."));
+    signInAttemptStarted.current = true;
+    try {
+      const result = await signIn.resetPasswordEmailCode.submitPassword({ password: newPassword });
+      if (result.error) {
+        signInAttemptStarted.current = false;
+        setNewPasswordError(readableAuthError(result.error, "Das neue Passwort konnte nicht gespeichert werden."));
+        return;
+      }
+      const nextAction = getPasswordSignInAction(signIn.status);
+      if (nextAction === "complete") {
+        setMessage("Das Passwort wurde geändert. Du wirst jetzt angemeldet …");
+        await completeSignIn();
+      } else if (nextAction === "mfa") {
+        setMessage("Das Passwort wurde aktualisiert. Schließe noch die Sicherheitsprüfung ab.");
+        await prepareSecondFactor();
+      } else {
+        signInAttemptStarted.current = false;
+        setError("Die Passwortänderung wurde vom Anmeldedienst noch nicht bestätigt. Bitte versuche es erneut.");
+      }
+    } catch {
+      signInAttemptStarted.current = false;
+      setError("Das neue Passwort konnte gerade nicht gespeichert werden. Bitte versuche es erneut.");
+    } finally {
+      finishSubmission();
     }
-    else if (signIn.status === "complete") await completeSignIn();
-    else setError("Die Passwortänderung ist noch nicht abgeschlossen.");
   };
 
   const resetFlow = async () => {
-    const result = await runAuthAction(() => signIn.reset(), setError, "Der Anmeldevorgang konnte nicht zurückgesetzt werden.");
-    if (!result || result.error) return;
-    setStep("credentials");
-    setCode("");
-    setNewPassword("");
-    setMessage("");
-    setError("");
+    if (!signIn || !beginSubmission()) return;
+    try {
+      const result = await signIn.reset();
+      if (result.error) {
+        setError("Der Anmeldevorgang konnte nicht zurückgesetzt werden. Bitte versuche es erneut.");
+        return;
+      }
+      setStep("credentials");
+      setCode("");
+      setNewPassword("");
+      setConfirmNewPassword("");
+      setResetCodeError("");
+      setNewPasswordError("");
+      setConfirmPasswordError("");
+      setResetCooldownSeconds(0);
+      setMessage("");
+      setError("");
+    } finally {
+      finishSubmission();
+    }
   };
 
   return (
@@ -320,8 +494,9 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
         <form onSubmit={submitPassword} className="space-y-5" noValidate>
           <label className="block text-sm font-medium text-text-primary">
             E-Mail-Adresse
-            <input autoComplete="email" autoCapitalize="none" autoCorrect="off" type="email" inputMode="email" required value={email} onChange={(event) => setEmail(event.target.value)} className={inputClass} placeholder="name@beispiel.de" />
+            <input id="sign-in-email" autoComplete="email" autoCapitalize="none" autoCorrect="off" type="email" inputMode="email" required value={email} onChange={(event) => { setEmail(event.target.value); setResetEmailError(""); }} className={inputClass} placeholder="name@beispiel.de" aria-invalid={!!resetEmailError} aria-describedby={resetEmailError ? "reset-email-error" : undefined} />
             {errors.fields.identifier && <span className="mt-1 block text-sm text-red-400">{errors.fields.identifier.message}</span>}
+            {resetEmailError && <span id="reset-email-error" className="mt-1 block text-sm text-red-400">{resetEmailError}</span>}
           </label>
           <label className="block text-sm font-medium text-text-primary">
             Passwort
@@ -332,8 +507,8 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
             {busy ? "Anmeldung läuft …" : "Anmelden"}
           </button>
           <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
-            <button type="button" disabled={!signIn || busy || !email.trim()} onClick={() => void startPasswordReset()} className="min-h-11 text-text-muted underline-offset-4 hover:text-gold hover:underline disabled:opacity-50">
-              Passwort vergessen?
+            <button type="button" disabled={!signIn || busy || !email.trim() || resetCooldownSeconds > 0} onClick={() => void startPasswordReset()} className="min-h-11 text-text-muted underline-offset-4 hover:text-gold hover:underline disabled:opacity-50">
+              {resetRequestInProgress ? "Wiederherstellung läuft …" : resetCooldownSeconds > 0 ? `Erneut versuchen in ${resetCooldownSeconds} s` : "Passwort vergessen?"}
             </button>
             <button type="button" disabled={!signIn || busy || !email.trim()} onClick={() => void sendEmailCode()} className="min-h-11 text-gold underline-offset-4 hover:underline disabled:opacity-50">
               Mit E-Mail-Code anmelden
@@ -357,23 +532,50 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
       )}
 
       {step === "reset-code" && (
-        <form onSubmit={submitResetCode} className="space-y-5">
+        <form onSubmit={submitResetCode} className="space-y-5" noValidate>
+          <p className="text-sm leading-relaxed text-text-muted">Gib den Wiederherstellungscode ein, falls du eine E-Mail erhalten hast. Sieh auch im Spam-Ordner nach. Wenn kein Code eintrifft, nutze die alternative Anmeldemethode.</p>
           <label className="block text-sm font-medium text-text-primary">Wiederherstellungscode
-            <input autoComplete="one-time-code" inputMode="numeric" required value={code} onChange={(event) => setCode(event.target.value)} className={inputClass} placeholder="Code aus der E-Mail" />
+            <input autoComplete="one-time-code" inputMode="numeric" required value={code} onChange={(event) => { setCode(event.target.value); setResetCodeError(""); }} className={inputClass} placeholder="Code aus der E-Mail" aria-invalid={!!resetCodeError} />
             {errors.fields.code && <span className="mt-1 block text-sm text-red-400">{errors.fields.code.message}</span>}
+            {resetCodeError && <span className="mt-1 block text-sm text-red-400">{resetCodeError}</span>}
           </label>
           <button type="submit" disabled={!signIn || busy} className={buttonClass}>{busy ? "Prüfe Code …" : "Code bestätigen"}</button>
+          <button type="button" disabled={!signIn || busy || resetCooldownSeconds > 0} onClick={() => void resendPasswordResetCode()} className={`${secondaryButtonClass} w-full`}>
+            {busy ? "Sende Code …" : resetCooldownSeconds > 0 ? `Neuen Code in ${resetCooldownSeconds} s anfordern` : "Neuen Code anfordern"}
+          </button>
+          <button type="button" disabled={!signIn || busy} onClick={() => void startEmailCodeSignIn()} className="min-h-11 w-full text-sm font-semibold text-gold hover:underline">
+            Stattdessen mit E-Mail-Code anmelden
+          </button>
           <button type="button" disabled={busy} onClick={() => void resetFlow()} className="min-h-11 w-full text-sm text-text-muted hover:text-text-primary">Zurück zur Anmeldung</button>
         </form>
       )}
 
       {step === "new-password" && (
-        <form onSubmit={submitNewPassword} className="space-y-5">
-          <label className="block text-sm font-medium text-text-primary">Neues Passwort
-            <input autoComplete="new-password" type="password" minLength={8} required value={newPassword} onChange={(event) => setNewPassword(event.target.value)} className={inputClass} placeholder="Mindestens 8 Zeichen" />
+        <form onSubmit={submitNewPassword} className="space-y-5" noValidate>
+          <div>
+            <label htmlFor="reset-new-password" className="block text-sm font-medium text-text-primary">Neues Passwort</label>
+            <div className="relative">
+              <input id="reset-new-password" autoComplete="new-password" type={showNewPassword ? "text" : "password"} minLength={8} required value={newPassword} onChange={(event) => { setNewPassword(event.target.value); setNewPasswordError(""); setError(""); }} className={`${inputClass} pr-12`} placeholder="Mindestens 8 Zeichen" aria-invalid={!!newPasswordError} aria-describedby="reset-password-requirement reset-password-error" />
+              <button type="button" onClick={() => setShowNewPassword((visible) => !visible)} aria-label={showNewPassword ? "Passwort verbergen" : "Passwort anzeigen"} aria-pressed={showNewPassword} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-2 text-text-muted hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
+                {showNewPassword ? <EyeOff aria-hidden="true" size={18} /> : <Eye aria-hidden="true" size={18} />}
+              </button>
+            </div>
+            <span id="reset-password-requirement" className="mt-1 block text-xs text-text-muted">Mindestens 8 Zeichen. Weitere Sicherheitsregeln prüft Clerk beim Speichern.</span>
             {errors.fields.password && <span className="mt-1 block text-sm text-red-400">{errors.fields.password.message}</span>}
-          </label>
+            {newPasswordError && <span id="reset-password-error" className="mt-1 block text-sm text-red-400">{newPasswordError}</span>}
+          </div>
+          <div>
+            <label htmlFor="reset-confirm-password" className="block text-sm font-medium text-text-primary">Passwort wiederholen</label>
+            <div className="relative">
+              <input id="reset-confirm-password" autoComplete="new-password" type={showConfirmNewPassword ? "text" : "password"} required value={confirmNewPassword} onChange={(event) => { setConfirmNewPassword(event.target.value); setConfirmPasswordError(""); setError(""); }} className={`${inputClass} pr-12`} placeholder="Neues Passwort erneut eingeben" aria-invalid={!!confirmPasswordError} aria-describedby="reset-confirm-password-error" />
+              <button type="button" onClick={() => setShowConfirmNewPassword((visible) => !visible)} aria-label={showConfirmNewPassword ? "Passwort verbergen" : "Passwort anzeigen"} aria-pressed={showConfirmNewPassword} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-2 text-text-muted hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
+                {showConfirmNewPassword ? <EyeOff aria-hidden="true" size={18} /> : <Eye aria-hidden="true" size={18} />}
+              </button>
+            </div>
+            {confirmPasswordError && <span id="reset-confirm-password-error" className="mt-1 block text-sm text-red-400">{confirmPasswordError}</span>}
+          </div>
           <button type="submit" disabled={!signIn || busy} className={buttonClass}>{busy ? "Speichere Passwort …" : "Passwort speichern und anmelden"}</button>
+          <button type="button" disabled={busy} onClick={() => void resetFlow()} className="min-h-11 w-full text-sm text-text-muted hover:text-text-primary">Abbrechen und zur Anmeldung</button>
         </form>
       )}
 
