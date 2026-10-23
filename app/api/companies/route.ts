@@ -3,6 +3,9 @@ import { requireAuth } from "@/lib/auth";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { CATERING_COMPANY_CATEGORY, isCateringSearchQuery, normalizeCateringCompanyDetails } from "@/lib/catering-taxonomy";
+import { getCompanyAccess } from "@/lib/company-access";
+import { canCompanyRole, normalizeCompanyPublicTitles } from "@/lib/company-roles";
+import { canPersistCompanyImages, isCompanyImageUrlOwnedByUser } from "@/lib/company-media";
 
 function revalidateCompanyViews(slug: string) {
   revalidateTag("companies", "max");
@@ -23,7 +26,7 @@ function generateSlug(name: string): string {
 
 // Full company data — needed for the company editor/dashboard.
 const COMPANY_COLS_FULL =
-  "id, slug, owner_user_id, name, logo_url, description, city, website, email, phone, " +
+  "id, slug, owner_user_id, name, logo_url, cover_url, description, city, website, email, phone, " +
   "categories, services, portfolio_images, tagline, bio_short, usp, founded_year, " +
   "legal_form, hq_address, countries, industry_focus, social_links, catering_details, published, " +
   "created_at, updated_at";
@@ -36,6 +39,7 @@ const COMPANY_COLS_PUBLIC =
 // GET — list published companies (with optional filters)
 export async function GET(req: NextRequest) {
   const mine     = req.nextUrl.searchParams.get("mine") === "true";
+  const companyId = req.nextUrl.searchParams.get("company_id");
   const category = req.nextUrl.searchParams.get("category");
   const city     = req.nextUrl.searchParams.get("city");
   const q        = req.nextUrl.searchParams.get("q");
@@ -43,6 +47,16 @@ export async function GET(req: NextRequest) {
   const limit    = Math.min(100, Math.max(1, parseInt(req.nextUrl.searchParams.get("limit") ?? "24", 10)));
   const from     = (page - 1) * limit;
   const to       = from + limit - 1;
+
+  if (companyId) {
+    const authResult = await requireAuth();
+    if (authResult instanceof NextResponse) return authResult;
+    const access = await getCompanyAccess(companyId, authResult.userId);
+    if (!access || !canCompanyRole(access.role, "edit_company")) return NextResponse.json({ error: "Keine Berechtigung, diese Firmendaten zu bearbeiten." }, { status: 403 });
+    const { data, error } = await db.from("companies").select(COMPANY_COLS_FULL).eq("id", companyId).single();
+    if (error || !data) return NextResponse.json({ error: "Firma nicht gefunden" }, { status: 404 });
+    return NextResponse.json({ data: [data], permissionRole: access.role }, { headers: { "Cache-Control": "private, no-store" } });
+  }
 
   if (mine) {
     const authResult = await requireAuth();
@@ -56,8 +70,8 @@ export async function GET(req: NextRequest) {
       .order("created_at", { ascending: false })
       .limit(50);           // a user realistically owns < 50 companies
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    return NextResponse.json({ data: data ?? [] });
+    if (error) return NextResponse.json({ error: error.message }, { status: 500, headers: { "Cache-Control": "private, no-store" } });
+    return NextResponse.json({ data: data ?? [] }, { headers: { "Cache-Control": "private, no-store" } });
   }
 
   let query = db
@@ -138,8 +152,8 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json();
   const {
-    id, name, logo_url, description, city, website, email, phone,
-    categories, services, portfolio_images, owner_title,
+    id, name, logo_url, cover_url, description, city, website, email, phone,
+    categories, services, portfolio_images, owner_title, owner_titles,
     tagline, bio_short, usp, founded_year, legal_form, hq_address, countries, industry_focus,
     social_links,
     catering_details,
@@ -153,22 +167,43 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ungültiger Einrichtungsauftrag" }, { status: 400 });
   }
 
+  if (!id) {
+    const storageUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+    const allowedSingleImage = (candidate: unknown) => candidate == null || candidate === "" || (typeof candidate === "string" && candidate.length <= 2048 && isCompanyImageUrlOwnedByUser(candidate, userId, storageUrl));
+    if (!allowedSingleImage(logo_url) || !allowedSingleImage(cover_url) || !canPersistCompanyImages(portfolio_images ?? [], [], userId, storageUrl)) {
+      return NextResponse.json({ error: "Bitte verwende für Logo, Titelbild und Galerie ausschließlich eigene CineGenius-Uploads (maximal 12 Galeriefotos)." }, { status: 400 });
+    }
+  }
+
   // Update existing
   if (id) {
     const { data: existing } = await db
       .from("companies")
-      .select("id")
+      .select("id, slug, owner_user_id, logo_url, cover_url, portfolio_images")
       .eq("id", id)
-      .eq("owner_user_id", userId)
       .single();
 
     if (!existing) return NextResponse.json({ error: "Firma nicht gefunden oder keine Berechtigung" }, { status: 403 });
+    const access = await getCompanyAccess(id, userId);
+    if (!access || !canCompanyRole(access.role, "edit_company")) return NextResponse.json({ error: "Keine Berechtigung, dieses Firmenprofil zu bearbeiten." }, { status: 403 });
+    const storageUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+    const nextLogo = logo_url === undefined ? existing.logo_url : logo_url;
+    const nextCover = cover_url === undefined ? existing.cover_url : cover_url;
+    const nextPortfolio = portfolio_images === undefined ? existing.portfolio_images : portfolio_images;
+    const allowedSingleImage = (candidate: unknown, previous: string | null) => candidate == null || candidate === "" || (typeof candidate === "string" && candidate.length <= 2048 && (candidate === previous || isCompanyImageUrlOwnedByUser(candidate, userId, storageUrl)));
+    if (!allowedSingleImage(nextLogo, existing.logo_url) || !allowedSingleImage(nextCover, existing.cover_url)) {
+      return NextResponse.json({ error: "Logo und Titelbild müssen aus einem eigenen CineGenius-Upload stammen." }, { status: 400 });
+    }
+    if (!canPersistCompanyImages(nextPortfolio, existing.portfolio_images, userId, storageUrl)) {
+      return NextResponse.json({ error: "Die Galerie enthält ungültige Bilder oder überschreitet das Limit von 12 Fotos." }, { status: 400 });
+    }
 
     const { data, error } = await db
       .from("companies")
       .update({
         name: name.trim(),
-        logo_url: logo_url ?? null,
+        logo_url: nextLogo ?? null,
+        cover_url: nextCover ?? null,
         description: description?.trim() ?? "",
         city: city.trim(),
         website: website?.trim() || null,
@@ -176,7 +211,7 @@ export async function POST(req: NextRequest) {
         phone: phone?.trim() || null,
         categories: categories ?? [],
         services: services ?? [],
-        portfolio_images: portfolio_images ?? [],
+        portfolio_images: nextPortfolio,
         tagline: tagline?.trim() || null,
         bio_short: bio_short?.trim() || null,
         usp: usp?.trim() || null,
@@ -198,13 +233,14 @@ export async function POST(req: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-    // Keep owner's company_members entry in sync (upsert with their title)
-    await db
-      .from("company_members")
-      .upsert(
-        { company_id: id, user_id: userId, role: "owner", status: "accepted", title: owner_title?.trim() || null },
+    // Only the actual account owner can update the owner's public job title.
+    if (existing.owner_user_id === userId) {
+      const ownerTitles = normalizeCompanyPublicTitles(owner_titles ?? owner_title);
+      await db.from("company_members").upsert(
+        { company_id: id, user_id: userId, role: "owner", status: "accepted", title: ownerTitles[0] ?? null, public_titles: ownerTitles },
         { onConflict: "company_id,user_id" }
       );
+    }
 
     revalidateCompanyViews(data.slug);
 
@@ -255,6 +291,7 @@ export async function POST(req: NextRequest) {
       slug,
       name: name.trim(),
       logo_url: logo_url ?? null,
+      cover_url: cover_url ?? null,
       description: description?.trim() ?? "",
       city: city.trim(),
       website: website?.trim() || null,
@@ -284,7 +321,7 @@ export async function POST(req: NextRequest) {
   await db
     .from("company_members")
     .upsert(
-      { company_id: data.id, user_id: userId, role: "owner", status: "accepted", title: owner_title?.trim() || null },
+      { company_id: data.id, user_id: userId, role: "owner", status: "accepted", title: normalizeCompanyPublicTitles(owner_titles ?? owner_title)[0] ?? null, public_titles: normalizeCompanyPublicTitles(owner_titles ?? owner_title) },
       { onConflict: "company_id,user_id" }
     );
 
