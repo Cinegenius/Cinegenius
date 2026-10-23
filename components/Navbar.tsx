@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import type React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuth, useUser, useClerk } from "@clerk/nextjs";
 import {
@@ -16,6 +17,7 @@ import { useTranslations } from "next-intl";
 import { useToast } from "@/contexts/ToastContext";
 import { subscribeToMessageReads } from "@/lib/message-read-sync";
 import { publishUnreadCount } from "@/lib/unread-count-store";
+import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
 
 const desktopNavHrefs = [
   { href: "/locations", key: "locations" },
@@ -34,6 +36,7 @@ export default function Navbar({ initialIsSignedIn = false }: { initialIsSignedI
   const [profileData, setProfileData] = useState<{
     userId: string;
     displayName: string;
+    avatarUrl: string;
   } | null>(null);
   const profileUpdateRevision = useRef(0);
   const [signingOut, setSigningOut] = useState(false);
@@ -48,6 +51,7 @@ export default function Navbar({ initialIsSignedIn = false }: { initialIsSignedI
   const activeUserId = isSignedIn ? user?.id : null;
   const hasSignedInSession = isLoaded ? !!isSignedIn : initialIsSignedIn;
   const profileDisplayName = profileData?.userId === activeUserId ? profileData?.displayName ?? "" : "";
+  const profileAvatarUrl = profileData?.userId === activeUserId ? profileData?.avatarUrl ?? "" : "";
   const unreadMessages = unreadData?.userId === activeUserId ? unreadData?.count ?? 0 : 0;
 
   useEffect(() => {
@@ -94,6 +98,7 @@ export default function Navbar({ initialIsSignedIn = false }: { initialIsSignedI
         setProfileData({
           userId: activeUserId,
           displayName: json.profile?.display_name ?? "",
+          avatarUrl: json.profile?.avatar_url ?? "",
         });
       })
       .catch(() => {});
@@ -122,17 +127,17 @@ export default function Navbar({ initialIsSignedIn = false }: { initialIsSignedI
   }, [isLoaded, activeUserId]);
 
   useEffect(() => {
-    const onProfileUpdated = (event: Event) => {
-      const detail = (event as CustomEvent<{ userId?: string; displayName?: string }>).detail;
+    return subscribeToProfileUpdated((detail) => {
       if (!activeUserId || detail?.userId !== activeUserId) return;
       profileUpdateRevision.current += 1;
-      setProfileData({
+      setProfileData((current) => ({
         userId: activeUserId,
-        displayName: detail.displayName ?? "",
-      });
-    };
-    window.addEventListener("cinegenius:profile-updated", onProfileUpdated);
-    return () => window.removeEventListener("cinegenius:profile-updated", onProfileUpdated);
+        displayName: detail.displayName ?? (current?.userId === activeUserId ? current.displayName : ""),
+        avatarUrl: detail.avatarUrl !== undefined
+          ? detail.avatarUrl ?? ""
+          : current?.userId === activeUserId ? current.avatarUrl : "",
+      }));
+    });
   }, [activeUserId]);
 
   const handleSignOut = async () => {
@@ -245,8 +250,10 @@ export default function Navbar({ initialIsSignedIn = false }: { initialIsSignedI
                       onClick={() => setUserMenuOpen(v => !v)}
                       className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full border border-border hover:border-gold/50 hover:bg-bg-elevated transition-all group"
                     >
-                      <span className="w-7 h-7 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center" aria-hidden="true">
-                        <User size={15} className="text-gold" />
+                      <span className="relative w-7 h-7 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center overflow-hidden" aria-hidden="true">
+                        {profileAvatarUrl
+                          ? <Image src={profileAvatarUrl} alt="" width={28} height={28} unoptimized className="h-full w-full object-cover" />
+                          : <User size={15} className="text-gold" />}
                       </span>
                       <span className="text-sm font-medium text-text-secondary group-hover:text-text-primary transition-colors max-w-[100px] truncate hidden xl:block">
                         {displayName}
@@ -258,8 +265,10 @@ export default function Navbar({ initialIsSignedIn = false }: { initialIsSignedI
                       <div className="absolute top-full right-0 mt-2 w-56 bg-bg-elevated border border-border rounded-2xl shadow-2xl overflow-hidden animate-fade-in z-50">
                         {/* Identity */}
                         <div className="px-4 py-3.5 border-b border-border flex items-center gap-3">
-                          <span className="w-9 h-9 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0" aria-hidden="true">
-                            <User size={18} className="text-gold" />
+                          <span className="relative w-9 h-9 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0 overflow-hidden" aria-hidden="true">
+                            {profileAvatarUrl
+                              ? <Image src={profileAvatarUrl} alt="" width={36} height={36} unoptimized className="h-full w-full object-cover" />
+                              : <User size={18} className="text-gold" />}
                           </span>
                           <div className="min-w-0">
                             <p className="text-sm font-semibold text-text-primary truncate leading-tight">{displayName}</p>
@@ -345,11 +354,13 @@ export default function Navbar({ initialIsSignedIn = false }: { initialIsSignedI
                     <NotificationCenter />
                     <Link
                       href="/dashboard"
-                      className="w-9 h-9 rounded-full border border-gold/30 shrink-0 flex items-center justify-center bg-gold/10"
+                      className="relative w-9 h-9 rounded-full border border-gold/30 shrink-0 flex items-center justify-center bg-gold/10 overflow-hidden"
                       title={t("personalArea")}
                       aria-label={t("personalArea")}
                     >
-                      <User size={18} className="text-gold" aria-hidden="true" />
+                      {profileAvatarUrl
+                        ? <Image src={profileAvatarUrl} alt="" width={36} height={36} unoptimized className="h-full w-full object-cover" />
+                        : <User size={18} className="text-gold" aria-hidden="true" />}
                     </Link>
                   </>
                 );

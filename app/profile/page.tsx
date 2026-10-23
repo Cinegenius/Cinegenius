@@ -21,6 +21,8 @@ import { gripSearchTerms, GRIP_OCCUPATIONS, normalizeOccupation } from "@/lib/gr
 import RoleDropdown from "@/components/RoleDropdown";
 import { calculateProfileCompletion } from "@/lib/profile-completion";
 import { prepareProfileMediaFile, sendProfileMediaFile, PROFILE_MEDIA_ACCEPT, PROFILE_MEDIA_MAX_BYTES, PROFILE_MEDIA_SOURCE_MAX_BYTES } from "@/lib/profile-media-client";
+import { publishProfileUpdated } from "@/lib/profile-update-events";
+import { isAvatarUploadAssociated } from "@/lib/profile-avatar-persistence";
 import { validateProfileSave, type ProfileSaveFieldErrors } from "@/lib/profile-save-validation";
 import { PROFILE_EDITOR_STEPS, profileEditorRequiredMissing, profileEditorStepForErrors, profileEditorStepForHint, shouldResumeProfileEditorDraft, type ProfileEditorStep } from "@/lib/profile-editor-flow";
 
@@ -809,24 +811,65 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
     const previousAvatarUrl = avatarUrl;
+    let uploadId: string | null = null;
     const preview = safeObjectURL(file);
     if (preview) setAvatarPreview(preview);
     setAvatarUploading(true);
     try {
       const prepared = await prepareProfileMediaFile(file, compressAvatar);
       if (!prepared.file) throw new Error(profileMediaErrorText(prepared.error, t));
-      const url = await sendProfileMediaFile(prepared.file);
+      let url: string;
+      if (profileExists) {
+        const body = new FormData();
+        body.append("file", prepared.file);
+        uploadId = crypto.randomUUID().replace(/-/g, "");
+        body.append("uploadId", uploadId);
+        const response = await fetch("/api/profile/avatar", { method: "POST", body, cache: "no-store" });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || !result.url || result.saved !== true) {
+          throw new Error(result.error ?? `HTTP ${response.status}`);
+        }
+        url = result.url as string;
+      } else {
+        // A not-yet-created profile has no row to associate yet. Keep the
+        // upload as a draft and persist its URL with the first profile save.
+        url = await sendProfileMediaFile(prepared.file);
+      }
       setAvatarUrl(url);
       setAvatarPreview(url);
       markEditorChanged();
-      addToast("Foto bereit. Speichere dein Profil, damit es öffentlich übernommen wird.", "success");
+      if (profileExists) {
+        publishProfileUpdated({ userId: user?.id, displayName: form.name, avatarUrl: url, previousAvatarUrl });
+        addToast("Profilfoto gespeichert und deinem Profil zugeordnet.", "success");
+      } else {
+        addToast("Foto bereit. Es wird mit deinem Profil gespeichert, sobald du die Profildaten sicherst.", "success");
+      }
       // Fokuspunkt setzen
       setFocalPickerImage(url);
     } catch (err) {
+      if (profileExists && uploadId) {
+        try {
+          const response = await fetch("/api/profile", { cache: "no-store" });
+          const result = await response.json().catch(() => ({}));
+          const savedUrl = result?.profile?.avatar_url;
+          if (response.ok && isAvatarUploadAssociated(savedUrl, uploadId)) {
+            setAvatarUrl(savedUrl);
+            setAvatarPreview(savedUrl);
+            markEditorChanged();
+            publishProfileUpdated({ userId: user?.id, displayName: form.name, avatarUrl: savedUrl, previousAvatarUrl });
+            addToast("Profilfoto wurde gespeichert. Die Bestätigung der Upload-Antwort war unterbrochen.", "success");
+            return;
+          }
+        } catch {
+          // If both the upload response and confirmation are unavailable, retain
+          // the previous photo and let the user retry without losing it.
+        }
+      }
       addToast(`Profilfoto konnte nicht gespeichert werden: ${err instanceof Error ? err.message : t("uploadFailed")}`, "error");
       setAvatarUrl(previousAvatarUrl);
       setAvatarPreview(previousAvatarUrl);
     } finally {
+      if (preview) URL.revokeObjectURL(preview);
       setAvatarUploading(false);
       input.value = "";
     }
@@ -1108,9 +1151,7 @@ export default function ProfilePage() {
       setEditorStep(0);
       setEditorRevision(0);
       const url = avatarUrl || null;
-      window.dispatchEvent(new CustomEvent("cinegenius:profile-updated", {
-        detail: { userId: user?.id, displayName: form.name, avatarUrl: url },
-      }));
+      publishProfileUpdated({ userId: user?.id, displayName: form.name, avatarUrl: url });
       const unavailableFields: string[] = baseResult.unavailableFields ?? [];
       try {
         await fetch("/api/onboarding?type=profile-edit", { method: "DELETE" });
@@ -1654,8 +1695,9 @@ export default function ProfilePage() {
                       </p>
                       <div className="flex gap-2">
                         <button onClick={() => fileRef.current?.click()}
+                          disabled={avatarUploading}
                           className="px-3 py-1.5 text-xs border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-colors">
-                          {t("photoUpload")}
+                          {avatarUploading ? "Foto wird gespeichert …" : t("photoUpload")}
                         </button>
                         {avatarPreview && (
                           <button onClick={removeAvatar} className="px-3 py-1.5 text-xs text-text-muted hover:text-crimson-light transition-colors">

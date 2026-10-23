@@ -20,6 +20,7 @@ import { applyReadReceiptTimestamps, incomingUnreadMessageIds } from "@/lib/mess
 import { notifyMessagesRead, subscribeToMessageReads } from "@/lib/message-read-sync";
 import { compressImage, MAX_FUNCTION_UPLOAD_BYTES } from "@/lib/compressImage";
 import ListingImageManager from "@/components/ListingImageManager";
+import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
 
 type RealMessage = {
   id: string;
@@ -91,6 +92,7 @@ export default function DashboardPage() {
   const [profileCompleteness, setProfileCompleteness] = useState(0);
   const [profileMissingFields, setProfileMissingFields] = useState<string[]>([]);
   const [profileCompletionChecks, setProfileCompletionChecks] = useState<{ label: string; ok: boolean }[]>([]);
+  const profileUpdateRevision = useRef(0);
 
   // Analytics
   const [viewStats, setViewStats] = useState<{ views7: number; views14: number; trend: number; daily: number[] } | null>(null);
@@ -111,10 +113,21 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
+    return subscribeToProfileUpdated((detail) => {
+      if (!user?.id || detail.userId !== user.id) return;
+      profileUpdateRevision.current += 1;
+      if (typeof detail.displayName === "string") setProfileDisplayName(detail.displayName);
+      if (detail.avatarUrl !== undefined) setProfileAvatarUrl(detail.avatarUrl ?? "");
+    });
+  }, [user?.id]);
+
+  useEffect(() => {
     // Profile + Completeness
+    const initialProfileUpdateRevision = profileUpdateRevision.current;
     fetch("/api/profile")
       .then((r) => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
       .then(({ profile, exists }) => {
+        if (initialProfileUpdateRevision !== profileUpdateRevision.current) return;
         if (!exists) {
           setProfileDisplayName(user?.fullName ?? "");
           setProfileCompleteness(0);

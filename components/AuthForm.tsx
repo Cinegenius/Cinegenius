@@ -4,7 +4,7 @@ import { useAuth, useSignIn, useSignUp } from "@clerk/nextjs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getMfaResendChannel, getPasswordSignInAction, selectSecondFactor, shouldFallbackAfterFinalize, shouldRedirectForActiveSession } from "@/lib/sign-in-flow";
+import { finalizeThenNavigate, getMfaResendChannel, getPasswordSignInAction, resolveAuthNavigationUrl, selectSecondFactor, shouldRedirectForActiveSession } from "@/lib/sign-in-flow";
 
 type AuthMode = "sign-in" | "sign-up";
 type SignInStep = "credentials" | "email-code" | "mfa" | "reset-code" | "new-password";
@@ -44,18 +44,8 @@ async function runAuthAction<T>(action: () => Promise<T>, setError: (message: st
   }
 }
 
-function finishNavigation(destination: string, decorateUrl: (url: string) => string) {
-  const url = decorateUrl(destination);
-  try {
-    const target = new URL(url, window.location.origin);
-    if (target.origin === window.location.origin) {
-      window.location.replace(`${target.pathname}${target.search}${target.hash}`);
-      return;
-    }
-  } catch {
-    // Use the already validated same-origin destination below.
-  }
-  window.location.replace(destination);
+function finishNavigation(url: string, fallback: string) {
+  window.location.replace(resolveAuthNavigationUrl(url, window.location.origin, fallback));
 }
 
 export default function AuthForm({ mode, destination, signUpDestination }: AuthFormProps) {
@@ -84,8 +74,8 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
   const navigateOnce = useCallback((url: string) => {
     if (navigationStarted.current) return;
     navigationStarted.current = true;
-    finishNavigation(url, (value) => value);
-  }, []);
+    finishNavigation(url, destination);
+  }, [destination]);
 
   const beginSubmission = () => {
     if (!signIn || busy || submissionInFlight.current) return false;
@@ -108,12 +98,12 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
   }, [destination, error, isLoaded, isSignedIn, navigateOnce]);
 
   const completeSignIn = async () => {
-    let navigationCallbackCalled = false;
     const result = await runAuthAction(
-      () => signIn.finalize({ navigate: ({ decorateUrl }) => {
-        navigationCallbackCalled = true;
-        navigateOnce(decorateUrl(destination));
-      } }),
+      () => finalizeThenNavigate(
+        (params) => signIn.finalize(params),
+        destination,
+        navigateOnce,
+      ),
       setError,
       "Anmeldung konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
     );
@@ -126,7 +116,6 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
       signInAttemptStarted.current = false;
       return;
     }
-    if (shouldFallbackAfterFinalize(false, navigationCallbackCalled)) navigateOnce(destination);
   };
 
   const prepareSecondFactor = async () => {
@@ -400,7 +389,7 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
 
 function SignUpForm({ destination }: { destination: string }) {
   const { signUp, errors, fetchStatus } = useSignUp();
-  const { isSignedIn } = useAuth();
+  const { isLoaded, isSignedIn } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -412,21 +401,29 @@ function SignUpForm({ destination }: { destination: string }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [legalAccepted, setLegalAccepted] = useState(false);
+  const signUpAttemptStarted = useRef(false);
   const busy = fetchStatus === "fetching";
 
   const required = useMemo(() => new Set([...(signUp?.requiredFields ?? []), ...requiredFields]), [requiredFields, signUp]);
 
   useEffect(() => {
-    if (isSignedIn) router.replace(destination);
-  }, [destination, isSignedIn, router]);
+    if (isLoaded && isSignedIn && !signUpAttemptStarted.current) router.replace(destination);
+  }, [destination, isLoaded, isSignedIn, router]);
 
   const finalizeSignUp = async () => {
     const result = await runAuthAction(
-      () => signUp.finalize({ navigate: ({ decorateUrl }) => finishNavigation(destination, decorateUrl) }),
+      () => finalizeThenNavigate(
+        (params) => signUp.finalize(params),
+        destination,
+        (url) => finishNavigation(url, destination),
+      ),
       setError,
       "Konto konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
     );
-    if (result?.error) setError(readableAuthError(result.error, "Konto konnte nicht abgeschlossen werden. Bitte versuche es erneut."));
+    if (!result || result.error) {
+      signUpAttemptStarted.current = false;
+      if (result?.error) setError(readableAuthError(result.error, "Konto konnte nicht abgeschlossen werden. Bitte versuche es erneut."));
+    }
   };
 
   const submitSignUp = async (event: FormEvent<HTMLFormElement>) => {
@@ -442,6 +439,7 @@ function SignUpForm({ destination }: { destination: string }) {
       setError("Das Passwort muss mindestens 8 Zeichen enthalten.");
       return;
     }
+    signUpAttemptStarted.current = true;
     const additionalFields = {
       ...(required.has("first_name") && firstName.trim() ? { firstName: firstName.trim() } : {}),
       ...(required.has("last_name") && lastName.trim() ? { lastName: lastName.trim() } : {}),
@@ -449,6 +447,7 @@ function SignUpForm({ destination }: { destination: string }) {
     };
     const result = await runAuthAction(() => signUp.password({ emailAddress: email.trim(), password, ...additionalFields }), setError, "Registrierung fehlgeschlagen. Bitte prüfe deine Angaben.");
     if (!result || result.error) {
+      signUpAttemptStarted.current = false;
       if (!result) return;
       setRequiredFields(signUp.missingFields);
       setError(readableAuthError(result.error, "Registrierung fehlgeschlagen. Bitte prüfe deine Angaben."));

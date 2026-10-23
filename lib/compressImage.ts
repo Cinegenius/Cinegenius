@@ -16,10 +16,12 @@ interface CompressOptions {
   quality?: number; // 0–1
   /** Keep the output below the request payload limit used by server uploads. */
   maxBytes?: number;
+  /** Re-encode even small files, for surfaces that need predictable dimensions. */
+  forceCompression?: boolean;
 }
 
 export const MAX_FUNCTION_UPLOAD_BYTES = MAX_UPLOAD_BYTES;
-const PASSTHROUGH_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"]);
+const PASSTHROUGH_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 function readAsDataURL(file: File | Blob): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -106,10 +108,11 @@ export async function compressImage(
   file: File | Blob,
   options: CompressOptions = {},
 ): Promise<File> {
-  const { maxWidth = 1920, maxHeight = 1920, quality = 0.82 } = options;
+  const { maxWidth = 1920, maxHeight = 1920, quality = 0.82, forceCompression = false } = options;
   const { maxBytes } = options;
+  const requiresDecode = file instanceof File && (file.type === "image/heic" || file.type === "image/heif");
 
-  if (maxBytes !== undefined && file.size <= maxBytes && file instanceof File && PASSTHROUGH_MIME_TYPES.has(file.type)) {
+  if (!forceCompression && !requiresDecode && maxBytes !== undefined && file.size <= maxBytes && file instanceof File && PASSTHROUGH_MIME_TYPES.has(file.type)) {
     return file;
   }
 
@@ -158,7 +161,7 @@ export async function compressImage(
 
 /** Convenience wrapper for avatar uploads — smaller max size. */
 export function compressAvatar(file: File | Blob): Promise<File> {
-  return compressImage(file, { maxWidth: 500, maxHeight: 500, quality: 0.88, maxBytes: MAX_FUNCTION_UPLOAD_BYTES });
+  return compressImage(file, { maxWidth: 500, maxHeight: 500, quality: 0.88, maxBytes: MAX_FUNCTION_UPLOAD_BYTES, forceCompression: true });
 }
 
 /**

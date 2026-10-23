@@ -10,7 +10,7 @@ type SearchParams = Promise<{
 
 export default async function SignInPage({ searchParams }: { searchParams: SearchParams }) {
   const [{ userId }, query] = await Promise.all([auth(), searchParams]);
-  const destination = safeAuthRedirect(query.redirect_url ?? query.redirect, "/", ["/sign-in", "/sign-up"]);
+  const destination = safeAuthRedirect(query.redirect_url ?? query.redirect, "/dashboard", ["/sign-in", "/sign-up"]);
   if (userId) redirect(destination);
 
   return (

@@ -115,7 +115,7 @@ export default async function RootLayout({
     <ClerkProvider
       localization={clerkLocalization}
       signUpForceRedirectUrl="/profile-setup?welcome=1"
-      signInFallbackRedirectUrl="/"
+      signInFallbackRedirectUrl="/dashboard"
       afterMultiSessionSingleSignOutUrl="/"
     >
       <html

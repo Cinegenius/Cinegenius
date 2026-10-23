@@ -187,9 +187,11 @@ export async function validateUpload(
 export function buildStoragePath(
   userId: string,
   ext: string,
-  prefix?: string
+  prefix?: string,
+  fileId?: string,
 ): string {
-  const uuid = crypto.randomUUID().replace(/-/g, "");
+  const uuid = fileId ?? crypto.randomUUID().replace(/-/g, "");
+  if (!/^[a-f0-9]{32}$/i.test(uuid)) throw new Error("Invalid storage file id");
   const filename = `${uuid}.${ext}`;
   return prefix ? `${prefix}/${userId}/${filename}` : `${userId}/${filename}`;
 }

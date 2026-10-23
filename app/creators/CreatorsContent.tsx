@@ -15,6 +15,7 @@ import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type Brows
 import { rankByRatingConfidence } from "@/lib/rating-ranking";
 import { gripSearchTerms, isGripDepartmentSearch, isGripOccupation, normalizeOccupation } from "@/lib/gripTaxonomy";
 import { findOccupiedCreatorRoles, matchesCreatorRole } from "@/lib/creator-role-matching";
+import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
 
 const DEPT_ICON: Record<string, LucideIcon> = {
   produktion:    Clapperboard,
@@ -400,6 +401,16 @@ function CreatorsInner({
   const [apiPage, setApiPage] = useState(1);
   const [hasMoreFromApi, setHasMoreFromApi] = useState(serverCreators.length >= 96);
   const [loadingMore, setLoadingMore] = useState(false);
+
+  useEffect(() => subscribeToProfileUpdated(({ userId, avatarUrl, previousAvatarUrl }) => {
+    if (!userId || avatarUrl === undefined) return;
+    setAllCreators((current) => current.map((creator) => {
+      if (creator.id !== userId) return creator;
+      const imageUsedAvatar = creator.image === creator.avatar || creator.image === previousAvatarUrl;
+      const nextAvatar = avatarUrl ?? "";
+      return { ...creator, avatar: nextAvatar, ...(imageUsedAvatar ? { image: nextAvatar } : {}) };
+    }));
+  }), []);
 
   async function loadMoreFromApi() {
     if (loadingMore || !hasMoreFromApi) return;
