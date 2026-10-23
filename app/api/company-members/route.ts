@@ -79,12 +79,20 @@ export async function POST(req: NextRequest) {
   if (!company || !company.published) return privateJson({ error: "Firma nicht gefunden" }, 404);
   if (company.owner_user_id === userId) return privateJson({ error: "Du bist bereits Inhaber dieser Firma" }, 400);
 
-  const { data: existing } = await admin.from("company_members").select("id, status").eq("company_id", companyId).eq("user_id", userId).maybeSingle();
-  if (existing?.status === "accepted") return privateJson({ error: "Du bist bereits Mitglied dieser Firma.", data: existing }, 409);
-  if (existing?.status === "pending") return privateJson({ data: existing });
-
   const publicTitles = normalizeCompanyPublicTitles(body.public_titles ?? body.title);
   if (!publicTitles.length) return privateJson({ error: "Bitte lade die Firmenseite neu und wähle deine öffentliche Funktion aus, bevor du die Beitrittsanfrage sendest." }, 400);
+
+  const { data: existing } = await admin.from("company_members").select("id, status").eq("company_id", companyId).eq("user_id", userId).maybeSingle();
+  if (existing?.status === "accepted") return privateJson({ error: "Du bist bereits Mitglied dieser Firma.", data: existing }, 409);
+  if (existing?.status === "pending") {
+    const { data: updated, error: updateError } = await admin.from("company_members").update({
+      title: publicTitles[0] ?? null,
+      public_titles: publicTitles,
+    }).eq("id", existing.id).select().single();
+    if (updateError) return privateJson({ error: "Deine Funktion konnte nicht gespeichert werden. Bitte versuche es erneut." }, 500);
+    revalidateCompany(company.slug);
+    return privateJson({ data: updated, alreadyRequested: true });
+  }
   const { data, error } = await admin.from("company_members").insert({
     company_id: companyId,
     user_id: userId,
