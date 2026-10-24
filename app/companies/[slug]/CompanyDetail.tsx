@@ -286,7 +286,7 @@ export default function CompanyDetail({
       )}
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-b border-border">
+      <section className={`relative border-b border-border ${actionMenuOpen ? "z-30 overflow-visible" : "overflow-hidden"}`}>
         <div className="absolute inset-0 bg-gradient-to-b from-bg-elevated to-bg-primary">
           {company.cover_url && <img src={company.cover_url} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />}
           <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/60 via-bg-primary/75 to-bg-primary" />
