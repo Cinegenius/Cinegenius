@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { NextRequest, NextResponse } from "next/server";
+import { finishAdminAudit, startAdminAudit, validateAdminReason } from "@/lib/admin-audit";
 
 // GET /api/admin/users — list all profiles for admin user management
 export async function GET(req: NextRequest) {
@@ -18,7 +19,9 @@ export async function GET(req: NextRequest) {
     .order("created_at", { ascending: false })
     .range((page - 1) * pageSize, page * pageSize - 1);
 
-  if (search) {
+  if (search.startsWith("user_")) {
+    query = query.eq("user_id", search.slice(0, 100));
+  } else if (search) {
     query = query.ilike("display_name", `%${search}%`);
   }
 
@@ -33,17 +36,25 @@ export async function PATCH(req: NextRequest) {
   const guard = await requireAdmin();
   if (guard instanceof NextResponse) return guard;
 
-  const { targetUserId, verified } = await req.json();
-  if (!targetUserId || typeof verified !== "boolean") {
-    return NextResponse.json({ error: "Ungültige Parameter" }, { status: 400 });
+  const body = await req.json().catch(() => null);
+  const { targetUserId, verified } = body ?? {};
+  const reason = validateAdminReason(body?.reason);
+  if (typeof targetUserId !== "string" || !targetUserId || typeof verified !== "boolean" || !reason) {
+    return NextResponse.json({ error: "Nutzer-ID, Status und eine Begründung (5–500 Zeichen) sind erforderlich." }, { status: 400 });
   }
 
-  const { error } = await db
+  const audit = await startAdminAudit({ actorUserId: guard.userId, action: verified ? "profile_verify" : "profile_unverify", entityType: "profile", entityId: targetUserId, reason });
+  if (!audit) return NextResponse.json({ error: "Aktion aus Sicherheitsgründen gestoppt: Das Adminprotokoll ist nicht verfügbar." }, { status: 503 });
+  const { data, error } = await db
     .from("profiles")
     .update({ verified })
-    .eq("user_id", targetUserId);
+    .eq("user_id", targetUserId)
+    .select("user_id, verified")
+    .maybeSingle();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: error.message }, { status: 500 }); }
+  if (!data) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Profil nicht gefunden." }, { status: 404 }); }
 
-  return NextResponse.json({ success: true });
+  const auditLogged = await finishAdminAudit(audit, "succeeded");
+  return NextResponse.json({ success: true, auditLogged });
 }

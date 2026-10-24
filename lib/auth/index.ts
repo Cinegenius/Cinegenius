@@ -27,15 +27,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-
-function getAdminIds(): Set<string> {
-  return new Set(
-    (process.env.ADMIN_USER_IDS ?? "")
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean)
-  );
-}
+import { isConfiguredAdmin } from "@/lib/admin-policy";
 
 /**
  * Returns the current user's ID, or null if not authenticated.
@@ -67,7 +59,7 @@ export async function requireAdmin(): Promise<{ userId: string } | NextResponse>
   if (!userId) {
     return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
   }
-  if (!getAdminIds().has(userId)) {
+  if (!isConfiguredAdmin(userId, process.env.ADMIN_USER_IDS)) {
     return NextResponse.json({ error: "Kein Zugriff" }, { status: 403 });
   }
   return { userId };
@@ -80,7 +72,7 @@ export async function requireAdmin(): Promise<{ userId: string } | NextResponse>
 export async function isAdminSession(): Promise<boolean> {
   const { userId } = await auth();
   if (!userId) return false;
-  return getAdminIds().has(userId);
+  return isConfiguredAdmin(userId, process.env.ADMIN_USER_IDS);
 }
 
 /**

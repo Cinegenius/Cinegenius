@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/guards";
 import { NextRequest, NextResponse } from "next/server";
+import { finishAdminAudit, startAdminAudit, validateAdminReason } from "@/lib/admin-audit";
 
 // GET /api/admin/projects?search=&page=1
 export async function GET(req: NextRequest) {
@@ -19,7 +20,7 @@ export async function GET(req: NextRequest) {
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
-  if (search) query = query.ilike("title", `%${search}%`);
+  if (search) query = query.ilike("title", `%${search.slice(0, 80).replace(/[%,()]/g, " ")}%`);
 
   const { data: projects, count, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -51,13 +52,22 @@ export async function PATCH(req: NextRequest) {
   if (adminResult instanceof NextResponse) return adminResult;
 
   const body = await req.json().catch(() => null);
-  if (!body?.projectId) return NextResponse.json({ error: "projectId fehlt" }, { status: 400 });
+  const reason = validateAdminReason(body?.reason);
+  if (typeof body?.projectId !== "string" || typeof body?.verified !== "boolean" || !reason) {
+    return NextResponse.json({ error: "Projekt, Status und eine Begründung (5–500 Zeichen) sind erforderlich." }, { status: 400 });
+  }
 
-  const { error } = await db
+  const audit = await startAdminAudit({ actorUserId: adminResult.userId, action: body.verified ? "project_verify" : "project_unverify", entityType: "project", entityId: body.projectId, reason });
+  if (!audit) return NextResponse.json({ error: "Aktion aus Sicherheitsgründen gestoppt: Das Adminprotokoll ist nicht verfügbar." }, { status: 503 });
+  const { data, error } = await db
     .from("projects")
     .update({ verified: body.verified })
-    .eq("id", body.projectId);
+    .eq("id", body.projectId)
+    .select("id, verified")
+    .maybeSingle();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ success: true });
+  if (error) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: error.message }, { status: 500 }); }
+  if (!data) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Projekt nicht gefunden." }, { status: 404 }); }
+  const auditLogged = await finishAdminAudit(audit, "succeeded");
+  return NextResponse.json({ success: true, auditLogged });
 }

@@ -1,9 +1,10 @@
 import { db } from "@/lib/db";
 import { requireAuth, isAdminSession } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { finishAdminAudit, startAdminAudit, validateAdminReason } from "@/lib/admin-audit";
 
 // GET /api/verification-requests — user: own status | admin: all requests
-export async function GET() {
+export async function GET(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -12,12 +13,15 @@ export async function GET() {
 
   // Admin gets all
   if (isAdmin) {
-    const { data, error } = await db
+    const pageSize = 50;
+    const page = Math.max(1, Number.parseInt(req.nextUrl.searchParams.get("page") ?? "1", 10) || 1);
+    const { data, error, count } = await db
       .from("verification_requests")
-      .select("id, user_id, display_name, status, notes, submitted_at, reviewed_at")
-      .order("submitted_at", { ascending: false });
+      .select("id, user_id, display_name, status, notes, submitted_at, reviewed_at", { count: "exact" })
+      .order("submitted_at", { ascending: false })
+      .range((page - 1) * pageSize, page * pageSize - 1);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    return NextResponse.json({ data: data ?? [] });
+    return NextResponse.json({ data: (data ?? []).slice(0, pageSize), total: count ?? 0, page });
   }
 
   // Regular user gets own latest request
@@ -88,27 +92,36 @@ export async function PATCH(req: NextRequest) {
   const isAdmin = await isAdminSession();
   if (!isAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { requestId, action, notes } = await req.json() as { requestId: string; action: "approve" | "reject"; notes?: string };
-  if (!requestId || !action) return NextResponse.json({ error: "Missing params" }, { status: 400 });
+  const body = await req.json().catch(() => null);
+  const { requestId, action } = body ?? {};
+  const reason = validateAdminReason(body?.reason);
+  if (typeof requestId !== "string" || !requestId || !["approve", "reject"].includes(action) || !reason) {
+    return NextResponse.json({ error: "Anfrage, Aktion und eine Begründung (5–500 Zeichen) sind erforderlich." }, { status: 400 });
+  }
 
   const status = action === "approve" ? "approved" : "rejected";
+  const audit = await startAdminAudit({ actorUserId: userId, action: `verification_${status}`, entityType: "verification_request", entityId: requestId, reason });
+  if (!audit) return NextResponse.json({ error: "Aktion aus Sicherheitsgründen gestoppt: Das Adminprotokoll ist nicht verfügbar." }, { status: 503 });
 
-  const { data: request } = await db
+  const { data: request, error: requestError } = await db
     .from("verification_requests")
-    .update({ status, notes: notes ?? null, reviewed_at: new Date().toISOString(), reviewed_by: userId })
+    .update({ status, reviewed_at: new Date().toISOString(), reviewed_by: userId })
     .eq("id", requestId)
     .select("user_id")
     .single();
 
-  if (!request) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (requestError) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Die Anfrage konnte nicht aktualisiert werden." }, { status: 500 }); }
+  if (!request) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Anfrage nicht gefunden." }, { status: 404 }); }
 
   // If approved, set verified on profile
   if (action === "approve") {
-    await db
+    const { error: profileError } = await db
       .from("profiles")
       .update({ verified: true })
       .eq("user_id", request.user_id);
+    if (profileError) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Anfrage wurde aktualisiert, aber das Profil konnte nicht verifiziert werden. Bitte Status prüfen." }, { status: 500 }); }
   }
 
-  return NextResponse.json({ ok: true });
+  const auditLogged = await finishAdminAudit(audit, "succeeded");
+  return NextResponse.json({ ok: true, auditLogged });
 }
