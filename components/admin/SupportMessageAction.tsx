@@ -48,6 +48,7 @@ export function SupportMessageAction({ targetType, targetId }: { targetType: Tar
   const [templates, setTemplates] = useState<Template[]>([]);
   const [templateKey, setTemplateKey] = useState("");
   const [message, setMessage] = useState("");
+  const submitting = useRef(false);
   const idempotency = useRef<{ content: string; key: string } | null>(null);
   const selected = templates.find((template) => template.template_key === templateKey);
   const needsFields = selected?.body.includes("{{fehlendeAngaben}}") ?? false;
@@ -56,6 +57,7 @@ export function SupportMessageAction({ targetType, targetId }: { targetType: Tar
   const linkOkay = !selected?.body.includes("{{Bearbeitungslink}}") || (Boolean(linkUrl) && message.includes(linkUrl));
 
   async function openModal() {
+    if (success) idempotency.current = null;
     setOpen(true); setLoading(true); setError(""); setSuccess("");
     try {
       const [resolved, templateList] = await Promise.all([
@@ -81,26 +83,26 @@ export function SupportMessageAction({ targetType, targetId }: { targetType: Tar
     if (template && target) setMessage(fillSupportTemplate(template.body, target, window.location.origin));
   }
   async function submit() {
-    if (!target || !selected || sending || !message.trim() || unresolved || !linkOkay) return;
+    if (!target || !selected || submitting.current || success || !message.trim() || unresolved || !linkOkay) return;
     if (needsFields && !target.missingFields.length) {
       setError("Keine fehlenden Pflichtangaben gefunden. Freiwillige Ergänzungen stellen wir nicht als Pflicht dar.");
       return;
     }
+    submitting.current = true;
     setSending(true); setError(""); setSuccess("");
     try {
       const content = message.trim();
       if (!idempotency.current || idempotency.current.content !== content) {
         idempotency.current = { content, key: crypto.randomUUID() };
       }
-      const result = await fetchJson<{ duplicate: boolean }>("/api/admin/support/threads", {
+      const result = await fetchJson<{ success: boolean; duplicate: boolean; conversationId: string }>("/api/admin/support/threads", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ targetType, targetId, templateKey, content, idempotencyKey: idempotency.current.key }),
       });
-      setSuccess(result.duplicate ? "Diese Nachricht wurde bereits gespeichert." : "Supportnachricht wurde gespeichert und gesendet.");
-      idempotency.current = null;
-      window.setTimeout(() => setOpen(false), 1400);
-    } catch (cause) { setError(cause instanceof Error ? cause.message : "Nachricht konnte nicht gesendet werden."); }
-    finally { setSending(false); }
+      if (!result.success || !result.conversationId) throw new Error("Die Speicherung konnte nicht bestätigt werden. Bitte sicher erneut versuchen; dieselbe Nachricht wird nicht doppelt gespeichert.");
+      setSuccess(result.duplicate ? "Nachricht bereits erfolgreich gesendet. Es wurde kein Duplikat erstellt." : "Nachricht erfolgreich gesendet.");
+    } catch (cause) { setError(cause instanceof TypeError ? "Keine Versandbestätigung erhalten. Bitte erneut versuchen. Deine Nachricht bleibt erhalten; der erneute Versuch erzeugt keine doppelte Nachricht." : cause instanceof Error ? cause.message : "Nachricht konnte nicht gesendet werden."); }
+    finally { submitting.current = false; setSending(false); }
   }
 
   return <>
@@ -111,23 +113,23 @@ export function SupportMessageAction({ targetType, targetId }: { targetType: Tar
       <section role="dialog" aria-modal="true" aria-labelledby="support-compose-title" className="flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-border bg-bg-primary shadow-2xl">
         <header className="flex items-start justify-between gap-3 border-b border-border p-4 sm:p-5"><div><h2 id="support-compose-title" className="font-display text-xl font-bold text-text-primary">Supportnachricht senden</h2><p className="mt-1 text-xs text-text-muted">Einzelversand im Namen von CineGenius Support</p></div><button type="button" onClick={() => setOpen(false)} disabled={sending} aria-label="Fenster schließen" className="rounded-lg p-2 text-text-muted hover:bg-bg-elevated"><X size={18} /></button></header>
         <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4 sm:p-5">
-          {loading ? <div className="flex items-center gap-2 py-10 text-sm text-text-muted"><Loader2 className="animate-spin" size={17} /> Empfänger und Profil werden geprüft…</div> : target && <>
+          {success && <div role="status" aria-live="polite" className="rounded-xl border border-success/30 bg-success/10 p-4 sm:p-5"><div className="flex items-center gap-3 text-success"><Check size={24} /><h3 className="text-lg font-semibold">{success}</h3></div><p className="mt-2 text-sm text-text-primary">Die Nachricht an {target?.recipientName} ist dauerhaft gespeichert und im Nachrichtenbereich des Mitglieds verfügbar.</p><p className="mt-2 text-xs text-text-secondary">Du findest die Unterhaltung unter Admin → Support. Dieses Fenster bleibt bis zum Schließen geöffnet.</p><p className="mt-4 whitespace-pre-wrap break-words border-t border-success/30 pt-4 text-sm leading-6 text-text-primary">{message}</p></div>}
+          {!success && (loading ? <div className="flex items-center gap-2 py-10 text-sm text-text-muted"><Loader2 className="animate-spin" size={17} /> Empfänger und Profil werden geprüft…</div> : target && <>
             <div className="rounded-xl border border-border bg-bg-secondary p-3 sm:p-4">
               <div className="flex items-center gap-3">{target.recipientAvatarUrl ? <UnoptimizedImage src={target.recipientAvatarUrl} alt="" className="h-10 w-10 rounded-full object-cover" /> : <div className="flex h-10 w-10 items-center justify-center rounded-full bg-bg-elevated text-text-muted"><Mail size={16} /></div>}<div className="min-w-0 flex-1"><p className="text-xs text-text-muted">Empfänger</p>{target.recipientProfileUrl ? <a href={target.recipientProfileUrl} target="_blank" rel="noreferrer" className="block truncate text-sm font-semibold text-text-primary hover:text-gold">{target.recipientName}</a> : <p className="text-sm font-semibold text-text-primary">{target.recipientName}</p>}</div></div>
               <p className="mt-3 border-t border-border pt-3 text-xs text-text-muted">Betroffen: <strong className="text-text-secondary">{target.targetLabel}</strong>{target.isDraft ? " · Entwurf" : ""}</p>
               {target.missingFields.length > 0 && <p className="mt-1 text-xs text-gold">Ermittelte fehlende Pflichtangaben: {target.missingFields.join(", ")}</p>}
               {previous.length > 0 && <div className="mt-3 border-t border-border pt-3"><p className="text-xs font-semibold text-text-secondary">Bisherige Supportkontakte dieses Mitglieds</p><ul className="mt-1 space-y-1">{previous.map((item) => <li key={item.id} className="text-xs text-text-muted">{new Date(item.updated_at).toLocaleString("de-DE")} · {item.support_target_label}</li>)}</ul></div>}
             </div>
-            <label className="block text-xs font-medium text-text-secondary">Nachrichtenvorlage<select value={templateKey} onChange={(event) => selectTemplate(event.target.value)} className="mt-1.5 min-h-11 w-full rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary">{templates.map((template) => <option key={template.template_key} value={template.template_key}>{template.label}</option>)}</select></label>
+            <label className="block text-xs font-medium text-text-secondary">Nachrichtenvorlage<select disabled={sending} value={templateKey} onChange={(event) => selectTemplate(event.target.value)} className="mt-1.5 min-h-11 w-full rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary">{templates.map((template) => <option key={template.template_key} value={template.template_key}>{template.label}</option>)}</select></label>
             {needsFields && !target.missingFields.length && <p role="status" className="rounded-lg border border-gold/30 bg-gold/10 p-3 text-xs text-gold">Diese Vorlage passt nicht: Es fehlen keine Pflichtangaben. Wähle eine Nachfrage oder eine optionale Fotovorlage.</p>}
-            <label className="block text-xs font-medium text-text-secondary">Nachricht bearbeiten<textarea value={message} onChange={(event) => setMessage(event.target.value)} maxLength={5000} rows={7} className="mt-1.5 w-full resize-y rounded-lg border border-border bg-bg-secondary p-3 text-sm leading-6 text-text-primary outline-none focus:border-gold" /></label>
+            <label className="block text-xs font-medium text-text-secondary">Nachricht bearbeiten<textarea disabled={sending} value={message} onChange={(event) => setMessage(event.target.value)} maxLength={5000} rows={7} className="mt-1.5 w-full resize-y rounded-lg border border-border bg-bg-secondary p-3 text-sm leading-6 text-text-primary outline-none focus:border-gold" /></label>
             <div className="rounded-xl border border-border bg-bg-secondary p-3 sm:p-4"><p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-muted">Vorschau</p><p className="whitespace-pre-wrap break-words text-sm leading-6 text-text-primary">{message || "Die Nachrichtenvorschau erscheint hier."}</p><p className="mt-3 flex items-center gap-2 border-t border-border pt-3 text-xs text-text-muted"><UnoptimizedImage src="/cinegenius-logo.svg" alt="" className="h-5 w-5 object-contain" />CineGenius Support</p></div>
             <p className="text-[11px] leading-5 text-text-muted">Antworten landen im geschützten Support-Postfach. Private Kontaktdaten des Administrators werden nicht angezeigt.</p>
-          </>}
+          </>)}
           {error && <p role="alert" className="rounded-lg border border-crimson/30 bg-crimson/10 p-3 text-sm text-crimson-light">{error}</p>}
-          {success && <p role="status" className="flex items-center gap-2 rounded-lg border border-success/30 bg-success/10 p-3 text-sm text-success"><Check size={15} />{success}</p>}
         </div>
-        <footer className="flex flex-wrap justify-end gap-2 border-t border-border p-4"><button type="button" onClick={() => setOpen(false)} disabled={sending} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary">Abbrechen</button><button type="button" onClick={() => void submit()} disabled={loading || sending || !selected || !message.trim() || unresolved || !linkOkay || (needsFields && !target?.missingFields.length)} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-gold px-4 text-sm font-semibold text-bg-primary disabled:cursor-not-allowed disabled:opacity-50">{sending ? <><Loader2 size={15} className="animate-spin" /> Wird gespeichert…</> : <><Send size={15} /> Nachricht senden</>}</button></footer>
+        <footer className="flex flex-wrap justify-end gap-2 border-t border-border p-4"><button type="button" onClick={() => setOpen(false)} disabled={sending} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary">{success ? "Schließen" : "Abbrechen"}</button>{!success && <button type="button" onClick={() => void submit()} disabled={loading || sending || !selected || !message.trim() || unresolved || !linkOkay || (needsFields && !target?.missingFields.length)} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-gold px-4 text-sm font-semibold text-bg-primary disabled:cursor-not-allowed disabled:opacity-50">{sending ? <><Loader2 size={15} className="animate-spin" /> Wird gespeichert…</> : <><Send size={15} /> Nachricht senden</>}</button>}</footer>
       </section>
     </div>}
   </>;

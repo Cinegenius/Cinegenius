@@ -31,11 +31,13 @@ export function AdminSupportCenter() {
   const [reply, setReply] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [sendSuccess, setSendSuccess] = useState("");
+  const submitting = useRef(false);
   const [error, setError] = useState("");
   const [templateError, setTemplateError] = useState("");
   const [templateSaving, setTemplateSaving] = useState<string | null>(null);
   const [edits, setEdits] = useState<Record<string, { label: string; body: string; enabled: boolean }>>({});
-  const replyIdempotency = useRef<{ content: string; key: string } | null>(null);
+  const replyIdempotency = useRef<{ conversationId: string; content: string; key: string } | null>(null);
 
   const loadInbox = useCallback(async () => {
     setLoading(true); setError("");
@@ -82,22 +84,25 @@ export function AdminSupportCenter() {
   }, [activeId, openThread, tab]);
 
   async function sendReply() {
-    if (!activeId || !reply.trim() || sending) return;
+    if (!activeId || !reply.trim() || submitting.current) return;
+    submitting.current = true;
+    setSendSuccess("");
     setSending(true); setError("");
     try {
       const content = reply.trim();
-      if (!replyIdempotency.current || replyIdempotency.current.content !== content) {
-        replyIdempotency.current = { content, key: crypto.randomUUID() };
+      if (!replyIdempotency.current || replyIdempotency.current.content !== content || replyIdempotency.current.conversationId !== activeId) {
+        replyIdempotency.current = { conversationId: activeId, content, key: crypto.randomUUID() };
       }
       await fetchJson("/api/admin/support/threads/" + activeId, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content, idempotencyKey: replyIdempotency.current.key }),
       });
+      setSendSuccess("Antwort erfolgreich gesendet und dauerhaft gespeichert.");
       setReply("");
       replyIdempotency.current = null;
       await Promise.all([openThread(activeId), loadInbox()]);
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Antwort konnte nicht gesendet werden."); }
-    finally { setSending(false); }
+    finally { submitting.current = false; setSending(false); }
   }
   async function saveTemplate(template: Template) {
     const edit = edits[template.template_key];
@@ -128,11 +133,12 @@ export function AdminSupportCenter() {
         {!activeId || !detail ? <div className="flex flex-1 items-center justify-center p-6 text-center text-sm text-text-muted">Wähle eine Supportunterhaltung aus.</div> : <>
           <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-3 sm:p-4"><div className="flex min-w-0 items-center gap-3">{detail.thread.userAvatarUrl ? <UnoptimizedImage src={detail.thread.userAvatarUrl} alt="" className="h-9 w-9 rounded-full object-cover" /> : <div className="h-9 w-9 rounded-full bg-bg-elevated" />}<div className="min-w-0"><p className="truncate text-sm font-semibold text-text-primary">{detail.thread.userName}</p><p className="truncate text-xs text-text-muted">{detail.thread.targetLabel}</p></div></div><div className="flex gap-2">{detail.thread.userProfileUrl && <a href={detail.thread.userProfileUrl} target="_blank" rel="noreferrer" className="rounded-lg border border-border px-3 py-2 text-xs text-text-secondary">Profil öffnen</a>}<a href={detail.thread.editUrl} target="_blank" rel="noreferrer" className="rounded-lg border border-gold/30 px-3 py-2 text-xs text-gold">Bearbeitungsziel</a></div></header>
           <div className="flex-1 space-y-3 overflow-y-auto p-3 sm:p-4">{detail.messages.map((message) => <article key={message.id} className={"max-w-[88%] rounded-xl border p-3 " + (message.fromSupport ? "ml-auto border-gold/30 bg-gold/10" : "border-border bg-bg-primary")}><p className="mb-1 text-[11px] font-semibold text-text-muted">{message.senderName}</p><p className="whitespace-pre-wrap break-words text-sm leading-6 text-text-primary">{message.content}</p><time className="mt-2 block text-right text-[10px] text-text-muted">{new Date(message.createdAt).toLocaleString("de-DE")}</time></article>)}</div>
-          <div className="border-t border-border p-3 sm:p-4"><div className="flex items-end gap-2"><textarea value={reply} onChange={(event) => setReply(event.target.value)} maxLength={5000} rows={2} placeholder="Als CineGenius Support antworten…" className="min-h-11 min-w-0 flex-1 resize-y rounded-lg border border-border bg-bg-primary p-3 text-sm text-text-primary" /><button onClick={() => void sendReply()} disabled={!reply.trim() || sending} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg bg-gold px-3 text-sm font-semibold text-bg-primary disabled:opacity-50">{sending ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}<span className="hidden sm:inline">Antworten</span></button></div></div>
+          <div className="border-t border-border p-3 sm:p-4"><div className="flex items-end gap-2"><textarea disabled={sending} value={reply} onChange={(event) => { setReply(event.target.value); setSendSuccess(""); }} maxLength={5000} rows={2} placeholder="Als CineGenius Support antworten…" className="min-h-11 min-w-0 flex-1 resize-y rounded-lg border border-border bg-bg-primary p-3 text-sm text-text-primary" /><button onClick={() => void sendReply()} disabled={!reply.trim() || sending} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg bg-gold px-3 text-sm font-semibold text-bg-primary disabled:opacity-50">{sending ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}<span className="hidden sm:inline">Antworten</span></button></div></div>
         </>}
       </section>
     </div>}
     {tab === "templates" && <div className="space-y-3"><div className="rounded-xl border border-border bg-bg-secondary p-4 text-xs leading-5 text-text-muted">Vorlagen gelten zentral für berechtigte Administratoren. Platzhalter: {"{{Vorname}}"}, {"{{fehlendeAngaben}}"}, {"{{Bearbeitungslink}}"}, {"{{Inserattitel}}"}, {"{{Firmenname}}"}. Vor dem Versand bleibt jede Nachricht bearbeitbar.</div>{templateError && <p role="alert" className="rounded-lg border border-crimson/30 bg-crimson/10 p-3 text-sm text-crimson-light">{templateError}</p>}{templates.map((template) => { const edit = edits[template.template_key] ?? { label: template.label, body: template.body, enabled: template.enabled }; return <article key={template.template_key} className="rounded-xl border border-border bg-bg-secondary p-4"><div className="flex flex-wrap items-center justify-between gap-2"><label className="min-w-0 flex-1 text-xs text-text-muted">Name<input value={edit.label} onChange={(event) => setEdits((current) => ({ ...current, [template.template_key]: { ...edit, label: event.target.value } }))} className="mt-1 min-h-10 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary" /></label><label className="inline-flex min-h-10 items-center gap-2 text-xs text-text-secondary"><input type="checkbox" checked={edit.enabled} onChange={(event) => setEdits((current) => ({ ...current, [template.template_key]: { ...edit, enabled: event.target.checked } }))} /> Aktiv</label></div><label className="mt-3 block text-xs text-text-muted">Text<textarea value={edit.body} maxLength={5000} rows={4} onChange={(event) => setEdits((current) => ({ ...current, [template.template_key]: { ...edit, body: event.target.value } }))} className="mt-1 min-h-24 w-full rounded-lg border border-border bg-bg-primary p-3 text-sm leading-6 text-text-primary" /></label><div className="mt-3 flex justify-end"><button disabled={templateSaving === template.template_key} onClick={() => void saveTemplate(template)} className="min-h-10 rounded-lg border border-gold/30 px-3 text-xs font-semibold text-gold disabled:opacity-50">{templateSaving === template.template_key ? "Speichern…" : "Vorlage speichern"}</button></div></article>; })}</div>}
+    {sendSuccess && <p role="status" aria-live="polite" className="rounded-lg border border-success/30 bg-success/10 p-4 text-sm font-semibold text-success">{sendSuccess}</p>}
     {error && <p role="alert" className="rounded-lg border border-crimson/30 bg-crimson/10 p-3 text-sm text-crimson-light">{error}</p>}
   </div>;
 }
