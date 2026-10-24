@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getListingProvider } from "@/lib/listing-provider";
 import { listingDetailPath } from "@/lib/listing-routes";
 import { validateListingPublication } from "@/lib/listing-publication";
+import { canEditListing } from "@/lib/listing-access";
 
 const PATHS: Record<string, string> = {
   job: "/jobs", location: "/locations", prop: "/props", vehicle: "/vehicles", creator: "/creators", animal: "/tiere",
@@ -22,10 +23,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     .from("listings")
     .select("id, user_id, company_id, type, title, description, city, category, image_url, published")
     .eq("id", id)
-    .eq("user_id", userId)
     .maybeSingle();
   if (listingError) return NextResponse.json({ error: "Inserat konnte nicht geladen werden" }, { status: 500 });
   if (!listing) return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
+  try {
+    if (!(await canEditListing(userId, listing))) return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
+  } catch {
+    return NextResponse.json({ error: "Berechtigung zur Firmenverwaltung konnte nicht geprüft werden." }, { status: 500 });
+  }
   if (listing.published) return NextResponse.json({ success: true, alreadyPublished: true });
 
   if (listing.type === "job") {
@@ -83,7 +88,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     .from("listings")
     .update(updates)
     .eq("id", id)
-    .eq("user_id", userId)
     .eq("published", false)
     .select("id, type")
     .maybeSingle();

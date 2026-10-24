@@ -3,6 +3,7 @@ import { requireAuth } from "@/lib/auth";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { maxImagesForListingType, normalizeListingImageGallery } from "@/lib/listing-image-gallery";
+import { canEditListing } from "@/lib/listing-access";
 
 // PATCH /api/listings/[id] — edit own listing
 export async function PATCH(
@@ -14,6 +15,16 @@ export async function PATCH(
   const { userId } = authResult;
 
   const { id } = await params;
+  const { data: current, error: currentError } = await db.from("listings")
+    .select("id, user_id, company_id, type, image_url, extra_images, metadata, blocked_dates")
+    .eq("id", id).maybeSingle();
+  if (currentError) return NextResponse.json({ error: "Inserat konnte nicht geprüft werden." }, { status: 500 });
+  if (!current) return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
+  try {
+    if (!(await canEditListing(userId, current))) return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
+  } catch {
+    return NextResponse.json({ error: "Berechtigung zur Firmenverwaltung konnte nicht geprüft werden." }, { status: 500 });
+  }
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Ungültige Anfrage" }, { status: 400 });
 
@@ -39,17 +50,6 @@ export async function PATCH(
   if (city !== undefined)        updates.city        = city.trim();
   if (published === false)       updates.published   = false;
   if (image_url !== undefined || extra_images !== undefined || metadata !== undefined || blocked_dates !== undefined) {
-    const { data: current, error: currentError } = await db
-      .from("listings")
-      .select("type, image_url, extra_images, metadata")
-      .eq("id", id)
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (currentError || !current) {
-      return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
-    }
-
     if (blocked_dates !== undefined) {
       const hasInvalidBlockedDate = Array.isArray(blocked_dates) && blocked_dates.some((date) => {
         if (typeof date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return true;
@@ -125,7 +125,6 @@ export async function PATCH(
     .from("listings")
     .update(updates)
     .eq("id", id)
-    .eq("user_id", userId)
     .select("id, type")
     .single();
 
@@ -158,16 +157,20 @@ export async function DELETE(
 
   const { data: listing } = await db
     .from("listings")
-    .select("type")
-    .eq("id", id)
-    .eq("user_id", userId)
-    .single();
+    .select("id, type, user_id, company_id")
+    .eq("id", id).maybeSingle();
+
+  if (!listing) return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
+  try {
+    if (!(await canEditListing(userId, listing))) return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
+  } catch {
+    return NextResponse.json({ error: "Berechtigung zur Firmenverwaltung konnte nicht geprüft werden." }, { status: 500 });
+  }
 
   const { error } = await db
     .from("listings")
     .delete()
-    .eq("id", id)
-    .eq("user_id", userId);
+    .eq("id", id);
 
   if (error) {
     console.error("[listings DELETE]", error);

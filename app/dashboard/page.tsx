@@ -36,7 +36,7 @@ type RealConversation = {
   listing_id: string | null;
   listing_title: string | null;
   listing_type: string | null;
-  kind?: "direct" | "group";
+  kind?: "direct" | "group" | "support";
   group_name?: string | null;
   sender_id: string;
   receiver_id: string | null;
@@ -78,6 +78,7 @@ export default function DashboardPage() {
   const isWelcome = searchParams.get("welcome") === "1";
 
   const tabParam = searchParams.get("tab") ?? "";
+  const editListingParam = searchParams.get("editListing");
   const [activeTab, setActiveTab] = useState(VALID_TABS.includes(tabParam) ? tabParam : "overview");
   const [onboardingDismissed, setOnboardingDismissed] = useState(false);
 
@@ -264,7 +265,7 @@ export default function DashboardPage() {
   const [editError, setEditError] = useState("");
   const [editUploading, setEditUploading] = useState(false);
 
-  const startEdit = (l: typeof myListings[number]) => {
+  const startEdit = useCallback((l: typeof myListings[number]) => {
     setEditingId(l.id);
     setEditForm({ title: l.title, description: l.description ?? "", price: String(l.price), city: l.city, image_url: l.image_url ?? "" });
     setEditGallery([l.image_url, ...(l.extra_images ?? [])].filter((url): url is string => typeof url === "string" && !!url));
@@ -291,7 +292,16 @@ export default function DashboardPage() {
     });
     setEditGalleryState({ uploading: false, failed: 0 });
     setEditError("");
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!editListingParam || activeTab !== "listings" || listingsLoading || editingId) return;
+    const listing = myListings.find((item) => item.id === editListingParam);
+    if (!listing) return;
+    startEdit(listing);
+    router.replace("/dashboard?tab=listings", { scroll: false });
+    window.setTimeout(() => document.getElementById(`listing-${editListingParam}`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 0);
+  }, [activeTab, editListingParam, editingId, listingsLoading, myListings, router, startEdit]);
 
   const uploadEditImage = async (file: File) => {
     setEditUploading(true);
@@ -1800,7 +1810,7 @@ export default function DashboardPage() {
               )}
 
               {myListings.map((l) => (
-                <div key={l.id}>
+                <div key={l.id} id={`listing-${l.id}`}>
                 <div className={`flex items-center gap-4 p-5 rounded-xl border bg-bg-secondary transition-colors ${editingId === l.id ? "border-gold/30" : "border-border hover:bg-bg-elevated"}`}>
                   <div className="w-14 h-14 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0 overflow-hidden text-2xl">
                     {l.image_url

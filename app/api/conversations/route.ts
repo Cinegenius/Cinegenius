@@ -8,6 +8,8 @@ import { sendNewMessageEmail } from "@/lib/email";
 import { applyParticipantReadReceipts } from "@/lib/message-read-state";
 import { getUnreadMessageCounts } from "@/lib/unread-message-counts";
 
+const SUPPORT_ACTOR_ID = "cinegenius-support";
+
 // The membership table is the access-control source for both direct and group
 // conversations. It lets a user participate in many-member conversations
 // without exposing other conversations through the service-role DB client.
@@ -68,7 +70,7 @@ export async function GET() {
   const directOtherIds = (conversations ?? [])
     .filter((conversation) => conversation.kind !== "group")
     .map((conversation) => conversation.sender_id === userId ? conversation.receiver_id : conversation.sender_id)
-    .filter((id): id is string => typeof id === "string" && id !== userId);
+    .filter((id): id is string => typeof id === "string" && id !== userId && id !== SUPPORT_ACTOR_ID);
   const profileIds = [...new Set([...directOtherIds, ...groupMembers.map((member) => member.user_id)])];
   const profileMap: Record<string, { display_name?: string | null; avatar_url?: string | null }> = {};
   if (profileIds.length > 0) {
@@ -86,7 +88,7 @@ export async function GET() {
       .from("message_reads")
       .select("message_id, user_id, read_at")
       .in("message_id", messageIds)
-      .in("user_id", [...new Set([userId, ...profileIds])]);
+      .in("user_id", [...new Set([userId, SUPPORT_ACTOR_ID, ...profileIds])]);
     if (readsError) return NextResponse.json({ error: "Lesestatus konnte nicht geladen werden." }, { status: 500 });
     receipts = data ?? [];
   }
@@ -120,6 +122,23 @@ export async function GET() {
         members,
         memberCount: members.length,
         isAdmin: members.some((member) => member.user_id === userId && member.role === "admin"),
+      };
+    }
+
+    if (conversation.kind === "support") {
+      return {
+        ...conversation,
+        messages: applyParticipantReadReceipts(messages, receipts, userId, SUPPORT_ACTOR_ID).map((message) => ({
+          ...message,
+          senderName: message.sender_id === SUPPORT_ACTOR_ID ? "CineGenius Support" : profileMap[message.sender_id]?.display_name ?? "Du",
+          senderAvatar: message.sender_id === SUPPORT_ACTOR_ID ? "/cinegenius-logo.svg" : profileMap[message.sender_id]?.avatar_url ?? null,
+        })),
+        unread_count: unreadCount,
+        otherName: "CineGenius Support",
+        otherAvatar: "/cinegenius-logo.svg",
+        members: [],
+        memberCount: 2,
+        isAdmin: false,
       };
     }
 
@@ -158,6 +177,7 @@ export async function POST(req: NextRequest) {
   }
   if (content.length > 5000) return NextResponse.json({ error: "Nachricht zu lang (max. 5000 Zeichen)" }, { status: 400 });
   if (userId === receiver_id) return NextResponse.json({ error: "Du kannst dir selbst keine Nachricht senden" }, { status: 400 });
+  if (receiver_id === SUPPORT_ACTOR_ID) return NextResponse.json({ error: "CineGenius Support kann nur aus dem geschützten Supportpostfach schreiben." }, { status: 403 });
 
   const { data: receiverSettings, error: settingsError } = await db
     .from("user_settings")

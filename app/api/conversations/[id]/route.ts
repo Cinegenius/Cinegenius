@@ -105,11 +105,19 @@ export async function GET(
   } else {
     const otherId = memberRows.find((member) => member.user_id !== userId)?.user_id ?? "";
     messages = applyParticipantReadReceipts(page, receipts, userId, otherId);
+    if (conversation.kind === "support") {
+      messages = messages.map((message) => ({
+        ...message,
+        senderName: message.sender_id === "cinegenius-support" ? "CineGenius Support" : "Du",
+        senderAvatar: message.sender_id === "cinegenius-support" ? "/cinegenius-logo.svg" : null,
+      }));
+    }
   }
 
   return NextResponse.json({
     conversation: {
       ...conversation,
+      ...(conversation.kind === "support" ? { otherName: "CineGenius Support", otherAvatar: "/cinegenius-logo.svg" } : {}),
       members,
       memberCount: members.length,
       isAdmin: members.some((member) => member.user_id === userId && member.role === "admin"),
@@ -156,6 +164,9 @@ export async function POST(
     .maybeSingle();
   if (membershipError) return NextResponse.json({ error: "Mitgliedschaft konnte nicht geprüft werden." }, { status: 500 });
   if (!membership) return NextResponse.json({ error: "Kein Zugriff" }, { status: 404 });
+  if (conversation.kind === "support" && conversation.receiver_id !== userId) {
+    return NextResponse.json({ error: "Kein Zugriff" }, { status: 404 });
+  }
 
   const { data: activeMembers, error: membersError } = await db
     .from("conversation_members")
@@ -165,7 +176,7 @@ export async function POST(
   if (membersError) return NextResponse.json({ error: "Teilnehmer konnten nicht geprüft werden." }, { status: 500 });
   const recipientIds = (activeMembers ?? []).map((member) => member.user_id).filter((memberId) => memberId !== userId);
 
-  if (conversation.kind !== "group") {
+  if (conversation.kind !== "group" && conversation.kind !== "support") {
     const receiverId = recipientIds[0];
     if (!receiverId) return NextResponse.json({ error: "Empfänger ist nicht mehr verfügbar." }, { status: 404 });
     const { data: receiverSettings, error: settingsError } = await db
@@ -195,6 +206,10 @@ export async function POST(
   }
   const message = Array.isArray(inserted) ? inserted[0] : inserted;
   if (!message) return NextResponse.json({ error: "Nachricht konnte nicht bestätigt werden." }, { status: 500 });
+
+  if (conversation.kind === "support") {
+    return NextResponse.json({ message: { ...message, senderName: "Du", senderAvatar: null, read_by: [] } });
+  }
 
   try {
     // Read recipients again after the atomic insert so a member removed just

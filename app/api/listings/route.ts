@@ -5,6 +5,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { maxImagesForListingType, normalizeListingImageGallery } from "@/lib/listing-image-gallery";
+import { editableCompanyIdsForUser } from "@/lib/listing-access";
 
 // Explicit column list — avoids SELECT * sending unused data over the wire.
 // Update this list if new listing columns are added.
@@ -38,18 +39,25 @@ export async function GET(req: NextRequest) {
     if (authResult instanceof NextResponse) return authResult;
     const { userId } = authResult;
 
-    const { data, error } = await db
-      .from("listings")
-      .select(LISTING_COLS)
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(200);           // safety cap — dashboard doesn't need more
-
-    if (error) {
+    try {
+      const companyIds = await editableCompanyIdsForUser(userId);
+      const [ownResult, companyResult] = await Promise.all([
+        db.from("listings").select(LISTING_COLS).eq("user_id", userId).order("created_at", { ascending: false }).limit(200),
+        companyIds.length
+          ? db.from("listings").select(LISTING_COLS).in("company_id", companyIds).order("created_at", { ascending: false }).limit(200)
+          : Promise.resolve({ data: [], error: null }),
+      ]);
+      if (ownResult.error || companyResult.error) throw new Error("Inserate konnten nicht geladen werden.");
+      // The generated Supabase schema types lag the live listing table here;
+      // normalize the selected row shape before merging the two result sets.
+      const rows = [...(ownResult.data ?? []), ...(companyResult.data ?? [])] as unknown as Array<Record<string, unknown> & { id: string; created_at: string }>;
+      const byId = new Map(rows.map((listing) => [listing.id, listing]));
+      const data = [...byId.values()].sort((left, right) => Date.parse(right.created_at) - Date.parse(left.created_at)).slice(0, 200);
+      return privateNoStoreJson({ data });
+    } catch (error) {
       console.error("[listings GET mine]", error);
-      return privateNoStoreJson({ error: error.message }, 500);
+      return privateNoStoreJson({ error: error instanceof Error ? error.message : "Inserate konnten nicht geladen werden." }, 500);
     }
-    return privateNoStoreJson({ data });
   }
 
   let query = db

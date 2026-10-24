@@ -13,6 +13,9 @@ export async function POST(
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
   const { id } = await params;
+  const { data: conversation, error: conversationError } = await db.from("conversations").select("kind").eq("id", id).maybeSingle();
+  if (conversationError) return NextResponse.json({ error: "Unterhaltung konnte nicht geprüft werden." }, { status: 500 });
+  if (conversation?.kind !== "group") return NextResponse.json({ error: "Nur Gruppengespräche können verwaltet werden." }, { status: 404 });
   const body = await request.json().catch(() => null);
   const action = body?.action;
   const targetUserId = typeof body?.user_id === "string" ? body.user_id : null;

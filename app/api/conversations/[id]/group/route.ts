@@ -10,6 +10,9 @@ export async function PATCH(
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
   const { id } = await params;
+  const { data: conversation, error: conversationError } = await db.from("conversations").select("kind").eq("id", id).maybeSingle();
+  if (conversationError) return NextResponse.json({ error: "Unterhaltung konnte nicht geprüft werden." }, { status: 500 });
+  if (conversation?.kind !== "group") return NextResponse.json({ error: "Nur Gruppengespräche können verwaltet werden." }, { status: 404 });
   const body = await request.json().catch(() => null);
   const name = typeof body?.name === "string" ? body.name.trim() : "";
   if (name.length < 1 || name.length > 80) return NextResponse.json({ error: "Der Gruppenname muss 1 bis 80 Zeichen lang sein." }, { status: 400 });

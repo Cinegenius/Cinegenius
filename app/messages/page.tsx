@@ -26,7 +26,7 @@ type Message = {
 
 type Conversation = {
   id: string;
-  kind?: "direct" | "group";
+  kind?: "direct" | "group" | "support";
   group_name?: string | null;
   sender_id: string;
   receiver_id: string | null;
@@ -35,7 +35,7 @@ type Conversation = {
   messages: Message[];
   unread_count?: number;
   otherName?: string;
-  otherAvatar?: string;
+  otherAvatar?: string | null;
   memberCount?: number;
   isAdmin?: boolean;
   members?: Array<{ user_id: string; display_name: string; avatar_url: string | null; role: "admin" | "member"; joined_at: string }>;
@@ -683,7 +683,7 @@ function MessagesContent() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-semibold text-text-primary truncate">{conv.otherName}{conv.kind === "group" && conv.memberCount ? ` · ${conv.memberCount}` : ""}</p>
+                        <p className="flex min-w-0 items-center gap-1.5 text-sm font-semibold text-text-primary"><span className="truncate">{conv.otherName}{conv.kind === "group" && conv.memberCount ? ` · ${conv.memberCount}` : ""}</span>{conv.kind === "support" && <span className="shrink-0 rounded-full border border-gold/30 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-gold">Support</span>}</p>
                         {lastMsg && <span className="text-[10px] text-text-muted shrink-0 ml-1">{formatTime(lastMsg.created_at)}</span>}
                       </div>
                       <p className="text-xs text-text-muted truncate">{lastMsg?.content ?? "Keine Nachrichten"}</p>
@@ -725,6 +725,7 @@ function MessagesContent() {
                 <p className="text-sm font-semibold text-text-primary truncate">
                   {isNewConv ? (loadingRecipient ? "Lädt..." : recipientName) : (activeConv?.otherName ?? "Gespräch")}
                 </p>
+                {activeConv?.kind === "support" && <p className="text-[11px] text-gold">Offizieller CineGenius Support</p>}
               {activeConv?.kind === "group" && (
                 <p className="text-xs text-text-muted truncate">{activeConv.memberCount ?? 0} Mitglieder</p>
               )}
