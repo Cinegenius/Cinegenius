@@ -13,6 +13,9 @@ import FavoriteButton from "@/components/FavoriteButton";
 import ReviewsSection from "@/components/ReviewsSection";
 import ReportButton from "@/components/ReportButton";
 import VehicleImageGallery from "@/components/VehicleImageGallery";
+import ListingProviderCard from "@/components/ListingProviderCard";
+import { getListingProvider } from "@/lib/listing-provider";
+import { getCompanyAccess } from "@/lib/company-access";
 
 async function getVehicle(slug: string, viewerId?: string | null) {
   try {
@@ -20,17 +23,19 @@ async function getVehicle(slug: string, viewerId?: string | null) {
       .from("listings")
       .select("*")
       .eq("id", slug)
-      .single();
+      .maybeSingle();
 
-    if (error) console.error("[getVehicle] db error:", error.message, "slug:", slug);
+    if (error) throw new Error(`Fahrzeug konnte nicht geladen werden: ${error.message}`);
     if (!data) { console.error("[getVehicle] no listing found for slug:", slug); return null; }
     if (data.type !== "vehicle") { console.error("[getVehicle] wrong type:", data.type, "slug:", slug); return null; }
-    if (data.published === false && data.user_id !== viewerId) return null;
+    if (data.published !== true) {
+      const ownsPersonalListing = !!viewerId && !data.company_id && data.user_id === viewerId;
+      const hasCompanyAccess = !!viewerId && !!data.company_id && !!(await getCompanyAccess(data.company_id, viewerId));
+      if (!ownsPersonalListing && !hasCompanyAccess) return null;
+    }
 
-  const ownerRes = data.user_id
-    ? await db.from("profiles").select("display_name").eq("user_id", data.user_id).single()
-    : { data: null };
-  const ownerName = (ownerRes as { data: { display_name: string | null } | null }).data?.display_name ?? "Anbieter";
+  const provider = await getListingProvider(data.user_id, data.company_id, viewerId ?? null);
+  const ownerName = provider.name;
 
   const meta = (data.metadata ?? {}) as Record<string, unknown>;
 
@@ -54,12 +59,14 @@ async function getVehicle(slug: string, viewerId?: string | null) {
     delivery: (meta.delivery as boolean) ?? false,
     focalPoint: (meta.focal_point as { x: number; y: number } | null) ?? null,
     description: data.description ?? "",
-    ownerId: data.user_id ?? "",
+    ownerId: provider.contactUserId ?? "",
     ownerName,
+    provider,
     extra_images: data.extra_images ?? [],
   };
-  } catch {
-    return null;
+  } catch (error) {
+    console.error("[getVehicle] failed:", error);
+    throw error;
   }
 }
 
@@ -111,7 +118,7 @@ export default async function VehicleDetailPage({
       "price": vehicle.dailyRate,
       "priceCurrency": "EUR",
       "availability": "https://schema.org/InStock",
-      "seller": { "@type": "Person", "name": vehicle.ownerName },
+    "seller": { "@type": vehicle.provider.kind === "company" ? "Organization" : "Person", "name": vehicle.ownerName },
     },
   };
 
@@ -240,12 +247,12 @@ export default async function VehicleDetailPage({
                   <span className="text-text-muted text-sm"> / Tag</span>
                 </div>
 
-                <Link
+                {vehicle.ownerId ? <Link
                   href={`/booking/checkout?type=vehicle&id=${vehicle.id}&title=${encodeURIComponent(vehicle.title)}&price=${vehicle.dailyRate}`}
                   className="block w-full py-3.5 bg-gold text-bg-primary font-semibold text-center rounded-xl hover:bg-gold-light transition-colors flex items-center justify-center gap-2 mb-3"
                 >
                   <Calendar size={16} /> Jetzt buchen
-                </Link>
+                </Link> : <p className="mb-3 rounded-lg border border-gold/30 bg-gold/10 p-3 text-xs leading-5 text-text-secondary">Buchungs- und Kontaktanfragen sind vorübergehend nicht möglich, weil der Anbieter noch nicht zugeordnet ist.</p>}
 
                 {"ownerId" in vehicle && vehicle.ownerId ? (
                   <InquiryForm
@@ -265,17 +272,9 @@ export default async function VehicleDetailPage({
                 )}
               </div>
 
-              <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                <h3 className="font-semibold text-text-primary mb-3 text-sm">Anbieter</h3>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-gold/20 border border-gold/30 flex items-center justify-center font-bold text-gold">
-                    {vehicle.vendor[0]}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-text-primary">{vehicle.vendor}</p>
-                    <p className="text-xs text-text-muted">Inserat-Anbieter</p>
-                  </div>
-                </div>
+              <div className="space-y-3">
+                <h3 className="font-semibold text-text-primary text-sm">Anbieter</h3>
+                <ListingProviderCard provider={vehicle.provider} />
               </div>
             </div>
           </div>

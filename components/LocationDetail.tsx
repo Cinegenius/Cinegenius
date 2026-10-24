@@ -20,6 +20,8 @@ import FavoriteButton from "@/components/FavoriteButton";
 import ReportButton from "@/components/ReportButton";
 import { ProductionCreditsDisplay } from "@/components/ProductionCredits";
 import { parseProductionCredits } from "@/lib/production-credits";
+import ListingProviderCard from "@/components/ListingProviderCard";
+import type { ListingProvider } from "@/lib/listing-provider";
 
 const Lightbox = dynamic(() => import("@/components/Lightbox"), { ssr: false });
 
@@ -41,6 +43,7 @@ type Location = {
   image: string; tags: string[]; instantBook: boolean; verified: boolean;
   description?: string;
   ownerId?: string; ownerName?: string;
+  provider: ListingProvider;
   metadata?: LocationMeta | null;
   blocked_dates?: string[];
   floor_plan_url?: string | null;
@@ -357,9 +360,9 @@ export default function LocationDetail({ location }: { location: Location }) {
                   blockedDates={location.blocked_dates}
                 />
 
-                <button onClick={handleBook} disabled={!bookingStart || !bookingEnd}
+                <button onClick={handleBook} disabled={!location.ownerId || !bookingStart || !bookingEnd}
                   className={`w-full mt-4 py-3 font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 ${
-                    bookingStart && bookingEnd ? "bg-gold text-bg-primary hover:bg-gold-light cursor-pointer" : "bg-border text-text-muted cursor-not-allowed"
+                    location.ownerId && bookingStart && bookingEnd ? "bg-gold text-bg-primary hover:bg-gold-light cursor-pointer" : "bg-border text-text-muted cursor-not-allowed"
                   }`}>
                   {location.instantBook ? <><Zap size={15} /> Sofort buchen</> : <><MessageSquare size={15} /> Buchung anfragen</>}
                 </button>
@@ -368,20 +371,9 @@ export default function LocationDetail({ location }: { location: Location }) {
                 </p>
               </div>
 
-              {location.ownerId ? (
-                <InquiryForm listingId={location.id} listingTitle={location.title} listingType="location"
-                  ownerId={location.ownerId} ownerName={location.ownerName ?? "Anbieter"} />
-              ) : (
-                <div className="p-4 bg-bg-secondary border border-border rounded-xl flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gold/20 border border-gold/30 flex items-center justify-center shrink-0">
-                    <Users size={16} className="text-gold" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-text-primary">Frage an den Anbieter?</p>
-                    <p className="text-xs text-text-muted">Konditionen privat verhandeln</p>
-                  </div>
-                </div>
-              )}
+              <ListingProviderCard provider={location.provider} />
+              {location.ownerId ? <InquiryForm listingId={location.id} listingTitle={location.title} listingType="location"
+                ownerId={location.ownerId} ownerName={location.ownerName ?? "Anbieter"} /> : <p className="rounded-xl border border-gold/30 bg-gold/10 p-4 text-xs leading-5 text-text-secondary">Kontaktanfragen sind vorübergehend nicht verfügbar, weil der Anbieter noch nicht zugeordnet ist.</p>}
             </div>
           </div>
         </div>

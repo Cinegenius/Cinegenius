@@ -139,6 +139,7 @@ function getPublicListings(userId: string): Promise<{ id: string; type: string; 
         .from("listings")
         .select("id, type, title, category, price, city, image_url, metadata")
         .eq("user_id", userId)
+        .is("company_id", null)
         .eq("published", true)
         .order("created_at", { ascending: false });
       return (data ?? []).map((l: { id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null; metadata?: Record<string, unknown> | null }) => ({

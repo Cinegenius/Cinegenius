@@ -17,6 +17,7 @@ import {
 } from "@/lib/equipment-categories";
 import { COMPANY_PUBLIC_TITLE_SUGGESTIONS, normalizeCompanyPublicTitles } from "@/lib/company-roles";
 import Lightbox from "@/components/Lightbox";
+import { listingDetailPath } from "@/lib/listing-routes";
 
 type Listing = {
   id: string;
@@ -746,7 +747,7 @@ export default function CompanyDetail({
                 <div className="divide-y divide-border">
                   {listings.map((listing) => {
                     const Icon = listingTypeIcons[listing.type] ?? Package;
-                    const href = listing.type === "job" ? `/jobs/${listing.id}` : `/props/${listing.id}`;
+                    const href = listingDetailPath(listing.type, listing.id, company.slug) ?? `/companies/${company.slug}`;
                     return (
                       <Link key={listing.id} href={href}
                         className="flex items-center gap-3 py-3 group -mx-1 px-1 rounded-lg hover:bg-bg-secondary/60 transition-colors">

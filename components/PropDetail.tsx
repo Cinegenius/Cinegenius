@@ -1,12 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import {
-  ArrowLeft, Star, CheckCircle, Calendar, Clock,
-  MapPin, Package, Shield, Truck, Pencil,
+  ArrowLeft, Star, CheckCircle,
+  MapPin, Package, Truck, Pencil,
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 
@@ -17,6 +16,8 @@ import ReportButton from "@/components/ReportButton";
 import { ProductionCreditsDisplay } from "@/components/ProductionCredits";
 import type { ProductionCredit } from "@/lib/production-credits";
 import ListingPhotoGallery from "@/components/ListingPhotoGallery";
+import ListingProviderCard from "@/components/ListingProviderCard";
+import type { ListingProvider } from "@/lib/listing-provider";
 
 type Prop = {
   id: string;
@@ -33,8 +34,7 @@ type Prop = {
   description?: string;
   ownerId?: string;
   ownerName?: string;
-  ownerAvatar?: string | null;
-  ownerSlug?: string | null;
+  provider: ListingProvider;
   extra_images?: string[];
   productionCredits?: ProductionCredit[];
 };
@@ -49,7 +49,6 @@ const conditionColors: Record<string, string> = {
 
 export default function PropDetail({ prop }: { prop: Prop }) {
   const tc = useTranslations("common");
-  const router = useRouter();
   const { user } = useUser();
   const isOwner = !!user && user.id === prop.ownerId;
 
@@ -90,26 +89,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
     }
   };
 
-  const [days, setDays] = useState(1);
-  const [startDate, setStartDate] = useState("");
-  const [submitted, setSubmitted] = useState(false);
   const images = [prop.image, ...(prop.extra_images ?? [])].filter(Boolean) as string[];
-
-  const subtotal = prop.dailyRate * days;
-  const deposit = Math.round(subtotal * 0.25);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const today = new Date();
-    const start = startDate || today.toISOString().split("T")[0];
-    const end = new Date(new Date(start).getTime() + days * 86_400_000).toISOString().split("T")[0];
-    router.push(
-      `/booking/checkout?type=prop&id=${prop.id}` +
-      `&title=${encodeURIComponent(prop.title)}` +
-      `&price=${prop.dailyRate}&days=${days}` +
-      `&startDate=${start}&endDate=${end}`
-    );
-  };
 
   return (
     <div className="pt-16 min-h-screen">
@@ -247,36 +227,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
               />
             </div>
 
-            {prop.ownerSlug ? (
-              <Link href={`/profile/${prop.ownerSlug}`}
-                className="group p-5 bg-bg-secondary border border-border rounded-xl flex items-center gap-4 hover:border-gold/40 hover:bg-bg-elevated transition-all">
-                <div className="w-12 h-12 rounded-full bg-gold/10 border border-gold/20 overflow-hidden flex items-center justify-center shrink-0">
-                  {prop.ownerAvatar
-                    // eslint-disable-next-line @next/next/no-img-element
-                    ? <img src={prop.ownerAvatar} alt={prop.vendor} className="w-full h-full object-cover" />
-                    : <Package size={20} className="text-gold" />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-text-primary group-hover:text-gold transition-colors">{prop.vendor}</p>
-                  <p className="text-xs text-text-muted flex items-center gap-1 mt-0.5">
-                    <MapPin size={11} /> {prop.location}
-                  </p>
-                </div>
-                <span className="text-xs text-text-muted group-hover:text-gold transition-colors shrink-0">Profil →</span>
-              </Link>
-            ) : (
-              <div className="p-5 bg-bg-secondary border border-border rounded-xl flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
-                  <Package size={20} className="text-gold" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-text-primary">{prop.vendor}</p>
-                  <p className="text-xs text-text-muted flex items-center gap-1 mt-0.5">
-                    <MapPin size={11} /> {prop.location}
-                  </p>
-                </div>
-              </div>
-            )}
+            <ListingProviderCard provider={prop.provider} />
           </div>
 
           {/* BOOKING SIDEBAR */}
@@ -296,91 +247,8 @@ export default function PropDetail({ prop }: { prop: Prop }) {
                     ownerId={prop.ownerId}
                     ownerName={prop.ownerName ?? "Anbieter"}
                   />
-                ) : submitted ? (
-                  <div className="text-center py-8">
-                    <div className="w-14 h-14 bg-success/10 border border-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <CheckCircle size={28} className="text-success" />
-                    </div>
-                    <h3 className="font-display text-xl font-bold text-text-primary mb-2">Anfrage gesendet!</h3>
-                    <p className="text-text-muted text-sm leading-relaxed mb-4">
-                      {prop.vendor} bestätigt die Verfügbarkeit innerhalb von 24 Stunden.
-                    </p>
-                    <button onClick={() => setSubmitted(false)} className="text-xs text-gold hover:text-gold-light transition-colors">
-                      Weitere Anfrage stellen
-                    </button>
-                  </div>
                 ) : (
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">Startdatum</label>
-                      <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold transition-colors">
-                        <Calendar size={15} className="text-text-muted" />
-                        <input
-                          type="date"
-                          value={startDate}
-                          onChange={(e) => setStartDate(e.target.value)}
-                          className="bg-transparent border-none py-2.5 text-sm flex-1 focus:outline-none"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">Mietdauer</label>
-                      <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold transition-colors">
-                        <Clock size={15} className="text-text-muted" />
-                        <select
-                          value={days}
-                          onChange={(e) => setDays(Number(e.target.value))}
-                          className="bg-transparent border-none py-2.5 text-sm flex-1 focus:outline-none"
-                        >
-                          {[1, 2, 3, 4, 5, 7, 10, 14, 21, 28].map((d) => (
-                            <option key={d} value={d}>
-                              {d} {d === 1 ? "Tag" : "Tage"}{d === 7 ? " (1 Woche)" : d === 14 ? " (2 Wochen)" : ""}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    {prop.delivery && (
-                      <div>
-                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">Abholmethode</label>
-                        <select className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors">
-                          <option>Selbst abholen ({prop.location})</option>
-                          <option>Lieferung (Angebot auf Anfrage)</option>
-                        </select>
-                      </div>
-                    )}
-
-                    <div className="pt-4 border-t border-border space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-text-muted">{prop.dailyRate} € × {days} {days === 1 ? "Tag" : "Tage"}</span>
-                        <span className="text-text-primary">{subtotal.toLocaleString()} €</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-text-muted">Kaution (25%)</span>
-                        <span className="text-text-primary">{deposit.toLocaleString()} €</span>
-                      </div>
-                      <div className="flex justify-between font-semibold text-text-primary pt-2 border-t border-border">
-                        <span>Heute fällig</span>
-                        <span className="text-gold font-display text-lg">{deposit.toLocaleString()} €</span>
-                      </div>
-                      <p className="text-xs text-text-muted">
-                        Verbleibende {(subtotal - deposit).toLocaleString()} € bei Abholung fällig.
-                      </p>
-                    </div>
-
-                    <button
-                      type="submit"
-                      className="w-full py-3 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors flex items-center justify-center gap-2"
-                    >
-                      <Package size={15} /> Miete anfragen
-                    </button>
-                    <p className="text-center text-xs text-text-muted flex items-center justify-center gap-1">
-                      <Shield size={11} /> Sichere Zahlung · Keine Belastung vor Bestätigung
-                    </p>
-                  </form>
+                  <div className="rounded-xl border border-gold/30 bg-gold/10 p-4 text-sm leading-6 text-text-secondary">Kontakt und Buchungsanfrage sind vorübergehend nicht verfügbar, weil der Anbieter noch nicht zugeordnet ist.</div>
                 )}
               </div>
             </div>

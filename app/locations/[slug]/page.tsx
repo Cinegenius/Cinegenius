@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import type { Metadata } from "next";
 import LocationDetail from "@/components/LocationDetail";
 import { fetchRatingSummaries } from "@/lib/ratings";
+import { getListingProvider } from "@/lib/listing-provider";
+import { auth } from "@clerk/nextjs/server";
 
 async function geocodeCity(city: string): Promise<{ lat: number; lng: number }> {
   try {
@@ -19,7 +21,7 @@ async function geocodeCity(city: string): Promise<{ lat: number; lng: number }> 
   return { lat: 48.1351, lng: 11.5820 };
 }
 
-async function getLocation(slug: string) {
+async function getLocation(slug: string, viewerId: string | null = null) {
   const { data, error } = await db
     .from("listings")
     .select("*")
@@ -31,11 +33,9 @@ async function getLocation(slug: string) {
   if (error) throw new Error(`Location konnte nicht geladen werden: ${error.message}`);
   if (!data) return null;
 
-  const [{ lat, lng }, ownerRes, ratingMap] = await Promise.all([
+  const [{ lat, lng }, provider, ratingMap] = await Promise.all([
     geocodeCity(data.city ?? ""),
-    data.user_id
-      ? db.from("profiles").select("display_name").eq("user_id", data.user_id).maybeSingle()
-      : Promise.resolve({ data: null }),
+    getListingProvider(data.user_id, data.company_id, viewerId),
     fetchRatingSummaries([data.id], "listing"),
   ]);
   const summary = ratingMap[data.id] ?? { rating: 0, reviews: 0, ratingOnly: 0 };
@@ -58,8 +58,9 @@ async function getLocation(slug: string) {
       lat,
       lng,
       description: data.description ?? "",
-      ownerId: data.user_id ?? "",
-      ownerName: (ownerRes as { data: { display_name: string | null } | null }).data?.display_name ?? "Anbieter",
+      ownerId: provider.contactUserId ?? "",
+      ownerName: provider.name,
+      provider,
       isReal: true,
       focalPoint: (data.metadata as { focal_point?: { x: number; y: number } | null } | null)?.focal_point ?? null,
       metadata: data.metadata ?? null,
@@ -75,7 +76,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const location = await getLocation(slug);
+  const { userId } = await auth();
+  const location = await getLocation(slug, userId);
   if (!location) return {};
   return {
     title: location.title,

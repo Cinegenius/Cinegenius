@@ -13,7 +13,7 @@ const getCompany = unstable_cache(
     return data;
   },
   ["company-slug"],
-  { revalidate: 300, tags: ["companies"] }
+  { revalidate: 300, tags: ["companies", "listings"] }
 );
 
 const getCompanyPublicData = unstable_cache(
@@ -22,6 +22,7 @@ const getCompanyPublicData = unstable_cache(
       db.from("listings")
         .select("id, title, type, category, price, city, image_url, created_at")
         .eq("company_id", companyId)
+        .eq("published", true)
         .order("created_at", { ascending: false }),
       db.from("company_members")
         .select("id, user_id, role, title, public_titles, status, created_at")

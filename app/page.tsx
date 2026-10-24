@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
+import { getListingProviders } from "@/lib/listing-provider";
+import { listingDetailPath } from "@/lib/listing-routes";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import Image from "next/image";
@@ -89,7 +91,7 @@ async function getHomeData(viewerId: string | null) {
   ] = await Promise.all([
     db.from("listings").select("id,title,city,price,image_url,metadata,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(3),
     db.from("listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
-    db.from("listings").select("id,title,city,price,image_url,type,metadata,created_at").in("type", ["prop", "vehicle"]).eq("published", true).not("image_url", "is", null).order("created_at", { ascending: false }).limit(3),
+    db.from("listings").select("id,user_id,company_id,title,city,price,image_url,type,metadata,created_at").in("type", ["prop", "vehicle"]).eq("published", true).not("image_url", "is", null).order("created_at", { ascending: false }).limit(3),
     db.from("companies").select("id,slug,name,logo_url,city,categories").eq("published", true).not("logo_url", "is", null).order("created_at", { ascending: false }).limit(6),
     db.from("profiles").select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,profile_type,profile_types,profile_images,portfolio_images,created_at").not("display_name", "is", null).neq("display_name", "").order("created_at", { ascending: false }).limit(300),
     db.from("projects").select("id,title,year,type,director,poster_url").order("year", { ascending: false }).limit(3),
@@ -188,7 +190,8 @@ async function getHomeData(viewerId: string | null) {
     created_at: (j.created_at ?? "") as string,
   }));
 
-  const liveProps = (recentProps ?? []).map((p) => ({
+  const propProviders = await getListingProviders((recentProps ?? []).map((p) => ({ user_id: p.user_id, company_id: p.company_id })));
+  const liveProps = (recentProps ?? []).map((p, index) => ({
     id: p.id as string,
     title: p.title as string,
     city: (p.city ?? "") as string,
@@ -196,6 +199,8 @@ async function getHomeData(viewerId: string | null) {
     image: (p.image_url ?? "") as string,
     focalPoint: (((p.metadata ?? {}) as Record<string, unknown>).focal_point as { x: number; y: number } | null) ?? null,
     type: (p.type ?? "prop") as string,
+    providerName: propProviders[index]?.name ?? "Anbieter wird geprüft",
+    detailHref: listingDetailPath(p.type ?? "prop", p.id),
     created_at: (p.created_at ?? "") as string,
   }));
 
@@ -495,7 +500,7 @@ export default async function HomePage() {
               {liveProps.map((prop) => (
                 <Link
                   key={prop.id}
-                  href={`/props/${prop.id}`}
+                  href={prop.detailHref ?? "/props"}
                   className="card-hover group rounded-xl border border-border bg-bg-elevated overflow-hidden block"
                 >
                   <div className="relative overflow-hidden aspect-video bg-bg-elevated">
@@ -521,6 +526,7 @@ export default async function HomePage() {
                           <MapPin size={10} /> {prop.city}
                         </p>
                       )}
+                      <p className="mt-1 truncate text-[10px] text-white/75">Anbieter: {prop.providerName}</p>
                     </div>
                   </div>
                   <div className="px-2.5 py-2 sm:px-4 sm:py-3 flex items-center justify-between gap-1">

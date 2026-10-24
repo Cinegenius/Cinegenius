@@ -3,30 +3,36 @@ import { db } from "@/lib/db";
 import type { Metadata } from "next";
 import PropDetail from "@/components/PropDetail";
 import { parseProductionCredits } from "@/lib/production-credits";
+import { auth } from "@clerk/nextjs/server";
+import { getListingProvider } from "@/lib/listing-provider";
+import { getCompanyAccess } from "@/lib/company-access";
 
-async function getProp(slug: string) {
+async function getProp(slug: string, viewerId?: string | null) {
   try {
-    const { data } = await db
+    const { data, error } = await db
       .from("listings")
       .select("*")
       .eq("id", slug)
       .eq("type", "prop")
-      .single();
+      .maybeSingle();
+
+    if (error) throw new Error(`Requisite konnte nicht geladen werden: ${error.message}`);
 
     if (!data) return null;
 
-    const ownerRes = data.user_id
-      ? await db.from("profiles").select("display_name, avatar_url, slug").eq("user_id", data.user_id).single()
-      : { data: null };
+    if (data.published !== true) {
+      const ownsPersonalListing = !!viewerId && !data.company_id && data.user_id === viewerId;
+      const hasCompanyAccess = !!viewerId && !!data.company_id && !!(await getCompanyAccess(data.company_id, viewerId));
+      if (!ownsPersonalListing && !hasCompanyAccess) return null;
+    }
 
-    type OwnerRow = { display_name: string | null; avatar_url: string | null; slug: string | null } | null;
-    const owner = (ownerRes as { data: OwnerRow }).data;
+    const provider = await getListingProvider(data.user_id, data.company_id, viewerId ?? null);
 
     return {
       id: data.id,
       title: data.title ?? "Requisite",
       category: data.category ?? "Requisiten",
-      vendor: owner?.display_name ?? "Privatanbieter",
+      vendor: provider.name,
       location: data.city ?? "",
       dailyRate: data.price ?? 0,
       image: data.image_url ?? "",
@@ -36,14 +42,14 @@ async function getProp(slug: string) {
       focalPoint: (data.metadata as { focal_point?: { x: number; y: number } | null } | null)?.focal_point ?? null,
       productionCredits: parseProductionCredits((data.metadata as { production_credits?: unknown } | null)?.production_credits),
       description: data.description ?? "",
-      ownerId: data.user_id ?? "",
-      ownerName: owner?.display_name ?? "Anbieter",
-      ownerAvatar: owner?.avatar_url ?? null,
-      ownerSlug: owner?.slug ?? data.user_id ?? null,
+      ownerId: provider.contactUserId ?? "",
+      ownerName: provider.name,
+      provider,
       extra_images: data.extra_images ?? [],
     };
-  } catch {
-    return null;
+  } catch (error) {
+    console.error("[getProp] listing load failed:", error);
+    throw error;
   }
 }
 
@@ -72,7 +78,8 @@ export default async function PropDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const prop = await getProp(slug);
+  const { userId } = await auth();
+  const prop = await getProp(slug, userId);
   if (!prop) notFound();
 
   const jsonLd = {

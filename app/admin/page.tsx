@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import {
   Activity, BadgeCheck, Building2, Check, ChevronDown, ChevronLeft,
@@ -22,7 +22,7 @@ const navItems: { icon: typeof LayoutDashboard; label: string; id: TabId }[] = [
   { icon: Activity, label: "Adminprotokoll", id: "audit" },
 ];
 
-type Listing = { id: string; company_id: string | null; company_slug: string | null; type: string; title: string; city: string | null; price: number | null; published: boolean; created_at: string };
+type Listing = { id: string; user_id: string | null; company_id: string | null; company_slug: string | null; type: string; title: string; city: string | null; price: number | null; published: boolean; created_at: string; provider_name: string; provider_href: string | null; provider_image: string | null; provider_missing: boolean; detail_href: string | null };
 type AdminProfile = { user_id: string; display_name: string | null; slug: string | null; location: string | null; avatar_url: string | null; profile_types: string[] | null; verified: boolean; created_at: string; tagline: string | null };
 type AdminProject = { id: string; title: string; year: number | null; type: string | null; verified: boolean; created_at: string; director: string | null; crew_count: number };
 type AdminCredit = { id: string; project_id: string; user_id: string | null; unclaimed_profile_id: string | null; role: string; created_at: string; name: string; type: "user" | "ghost" };
@@ -87,6 +87,60 @@ function StatusBadge({ children, tone = "muted" }: { children: React.ReactNode; 
     danger: "border-crimson/30 bg-crimson/10 text-crimson-light",
   };
   return <span className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-medium ${styles[tone]}`}>{children}</span>;
+}
+
+type ProviderOption = { id: string; kind: "person" | "company"; label: string; detail: string; imageUrl: string | null };
+
+function ListingProviderControls({ listing, onSaved, onError }: { listing: Listing; onSaved: () => void; onError: (message: string) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [kind, setKind] = useState<"person" | "company">("person");
+  const [search, setSearch] = useState("");
+  const [results, setResults] = useState<ProviderOption[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const onErrorRef = useRef(onError);
+  onErrorRef.current = onError;
+
+  useEffect(() => {
+    if (!editing || search.trim().length < 2) { setResults([]); return; }
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      setLoading(true);
+      fetchJson<{ results: ProviderOption[] }>(`/api/admin/listing-providers?type=${kind}&q=${encodeURIComponent(search.trim())}`, { signal: controller.signal })
+        .then((data) => setResults(data.results))
+        .catch((error: Error) => { if (error.name !== "AbortError") onErrorRef.current(error.message); })
+        .finally(() => setLoading(false));
+    }, 250);
+    return () => { clearTimeout(timer); controller.abort(); };
+  }, [editing, kind, search]);
+
+  async function choose(option: ProviderOption) {
+    const reason = adminReason(`Anbieter für „${listing.title}” zuordnen: ${option.label}`);
+    if (!reason) return;
+    setSaving(true);
+    try {
+      await fetchJson("/api/admin/listings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ listingId: listing.id, providerType: option.kind, providerId: option.id, reason }) });
+      setEditing(false);
+      setSearch("");
+      onSaved();
+    } catch (error) { onErrorRef.current((error as Error).message); }
+    finally { setSaving(false); }
+  }
+
+  return <div className="mt-3 rounded-lg border border-border bg-bg-primary/60 p-3">
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      <p className="min-w-0 text-xs text-text-secondary">Anbieter: {listing.provider_href ? <a href={listing.provider_href} target="_blank" rel="noreferrer" className="font-medium text-gold hover:underline">{listing.provider_name}</a> : <span className={listing.provider_missing ? "font-semibold text-gold" : "font-medium text-text-primary"}>{listing.provider_name}</span>}</p>
+      {listing.provider_missing && <StatusBadge tone="warning">Zuordnung prüfen</StatusBadge>}
+      <button onClick={() => setEditing((value) => !value)} className="rounded-md border border-border px-2.5 py-1.5 text-[11px] font-medium text-text-secondary hover:border-gold hover:text-gold">{editing ? "Schließen" : listing.provider_missing ? "Anbieter zuordnen" : "Anbieter ändern"}</button>
+    </div>
+    {listing.company_id && listing.user_id && <p className="mt-2 break-all text-[10px] text-text-muted">Technisches Eintragskonto: {listing.user_id} · Firmenanbieter wird separat angezeigt.</p>}
+    {editing && <div className="mt-3 space-y-2">
+      <p className="text-xs text-text-muted">Wähle das tatsächliche öffentliche Anbieterprofil. Die Admin-Freigabe ist nicht automatisch die Anbieteridentität.</p>
+      <div className="flex gap-2"><button onClick={() => { setKind("person"); setSearch(""); }} className={`min-h-10 rounded-lg border px-3 text-xs ${kind === "person" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>Person</button><button onClick={() => { setKind("company"); setSearch(""); }} className={`min-h-10 rounded-lg border px-3 text-xs ${kind === "company" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>Firma</button></div>
+      <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={kind === "person" ? "Öffentliches Personenprofil suchen…" : "Öffentliche Firma suchen…"} className="min-h-11 w-full rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary" />
+      {search.trim().length >= 2 && <div className="max-h-56 overflow-y-auto rounded-lg border border-border">{loading ? <p className="p-3 text-xs text-text-muted">Suche…</p> : !results.length ? <p className="p-3 text-xs text-text-muted">Keine passenden öffentlichen Anbieter gefunden.</p> : results.map((option) => <button key={option.id} disabled={saving} onClick={() => void choose(option)} className="flex min-h-12 w-full items-center gap-3 border-b border-border px-3 py-2 text-left last:border-0 hover:bg-bg-elevated disabled:opacity-50"><span className="min-w-0 flex-1"><span className="block truncate text-sm text-text-primary">{option.label}</span><span className="block truncate text-[11px] text-text-muted">{option.detail}</span></span><span className="shrink-0 text-[11px] text-gold">{saving ? "Speichern…" : "Auswählen"}</span></button>)}</div>}
+    </div>}
+  </div>;
 }
 
 export default function AdminPage() {
@@ -488,7 +542,7 @@ export default function AdminPage() {
           {activeTab === "listings" && <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2"><div className="relative min-w-[220px] flex-1"><Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" /><input value={listingsSearch} onChange={(e) => { setListingsSearch(e.target.value); setListingsPage(1); }} placeholder="Titel suchen…" className="w-full rounded-lg border border-border bg-bg-secondary py-2 pl-9 pr-3 text-sm text-text-primary" /></div><select value={listingsType} onChange={(e) => { setListingsType(e.target.value); setListingsPage(1); }} className="rounded-lg border border-border bg-bg-secondary px-3 py-2 text-sm text-text-primary"><option value="all">Alle Bereiche</option>{Object.entries(typeLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select><select value={listingsStatus} onChange={(e) => { setListingsStatus(e.target.value); setListingsPage(1); }} className="rounded-lg border border-border bg-bg-secondary px-3 py-2 text-sm text-text-primary"><option value="all">Alle Status</option><option value="published">Öffentlich</option><option value="draft">Entwurf / verborgen</option></select><span className="text-sm text-text-muted">{listingsTotal} Einträge</span></div>
             {listingsError && <ErrorBox text={listingsError} onRetry={() => setRefreshKey((key) => key + 1)} />}
-            {listingsLoading ? <p className="py-10 text-center text-sm text-text-muted">Inserate werden geladen…</p> : !listings.length ? <Empty title="Keine Inserate in dieser Auswahl" /> : <div className="space-y-2">{listings.map((listing) => { const routeSegment = ({ location: "locations", prop: "props", vehicle: "vehicles", job: "jobs", creator: "creators" } as Record<string, string>)[listing.type]; const target = routeSegment ? `/${routeSegment}/${listing.id}` : listing.company_slug ? `/companies/${listing.company_slug}` : null; return <Panel key={listing.id} className="flex flex-wrap items-center gap-3 p-4"><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="font-medium text-text-primary">{listing.title}</p><StatusBadge tone={listing.published ? "success" : "muted"}>{listing.published ? "Öffentlich" : "Entwurf / verborgen"}</StatusBadge></div><p className="mt-1 text-xs text-text-muted">{typeLabels[listing.type] ?? listing.type} · {listing.city || "Kein Ort"} · {listing.price ? `${Number(listing.price).toLocaleString("de-DE")} €` : "Preis auf Anfrage"} · {new Date(listing.created_at).toLocaleDateString("de-DE")}</p><p className="mt-1 font-mono text-[10px] text-text-muted">ID {listing.id}</p></div>{target && <a href={target} target="_blank" rel="noreferrer" className="rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold"><Eye className="mr-1 inline" size={12} />Öffnen</a>}<button disabled={listingActing === listing.id} onClick={() => toggleListing(listing)} className={`rounded-lg border px-3 py-2 text-xs font-medium disabled:opacity-50 ${listing.published ? "border-crimson/30 text-crimson-light" : "border-success/30 text-success"}`}>{listingActing === listing.id ? "Speichern…" : listing.published ? "Ausblenden" : "Veröffentlichen"}</button></Panel>; })}</div>}
+            {listingsLoading ? <p className="py-10 text-center text-sm text-text-muted">Inserate werden geladen…</p> : !listings.length ? <Empty title="Keine Inserate in dieser Auswahl" /> : <div className="space-y-2">{listings.map((listing) => <Panel key={listing.id} className="p-4"><div className="flex flex-wrap items-center gap-3"><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="font-medium text-text-primary">{listing.title}</p><StatusBadge tone={listing.published ? "success" : "muted"}>{listing.published ? "Öffentlich" : "Entwurf / verborgen"}</StatusBadge></div><p className="mt-1 text-xs text-text-muted">{typeLabels[listing.type] ?? listing.type} · {listing.city || "Kein Ort"} · {listing.price ? `${Number(listing.price).toLocaleString("de-DE")} €` : "Preis auf Anfrage"} · {new Date(listing.created_at).toLocaleDateString("de-DE")}</p><p className="mt-1 font-mono text-[10px] text-text-muted">ID {listing.id}</p></div>{listing.published && listing.detail_href && <a href={listing.detail_href} target="_blank" rel="noreferrer" className="rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold"><Eye className="mr-1 inline" size={12} />Öffentlich ansehen</a>}<button disabled={listingActing === listing.id} onClick={() => toggleListing(listing)} className={`rounded-lg border px-3 py-2 text-xs font-medium disabled:opacity-50 ${listing.published ? "border-crimson/30 text-crimson-light" : "border-success/30 text-success"}`}>{listingActing === listing.id ? "Speichern…" : listing.published ? "Ausblenden" : "Veröffentlichen"}</button></div><ListingProviderControls listing={listing} onSaved={() => setRefreshKey((key) => key + 1)} onError={(text) => setActionMessage({ text, error: true })} />{!listing.detail_href && <p className="mt-2 text-xs text-crimson-light">Für diesen Angebotstyp ist keine öffentliche Detailadresse eingerichtet.</p>}</Panel>)}</div>}
             <Pager page={listingsPage} total={listingsTotal} pageSize={50} onPage={setListingsPage} />
           </div>}
 
