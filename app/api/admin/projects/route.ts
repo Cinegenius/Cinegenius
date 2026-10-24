@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/guards";
 import { NextRequest, NextResponse } from "next/server";
 import { finishAdminAudit, startAdminAudit, validateAdminReason } from "@/lib/admin-audit";
+import { projectRecordWithDetails } from "@/lib/project-record";
 
 // GET /api/admin/projects?search=&page=1
 export async function GET(req: NextRequest) {
@@ -16,7 +17,7 @@ export async function GET(req: NextRequest) {
 
   let query = db
     .from("projects")
-    .select("id, title, year, type, verified, created_at, created_by, director", { count: "exact" })
+    .select("id, title, year, type, created_at, created_by, director, metadata", { count: "exact" })
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
@@ -38,10 +39,20 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  const result = (projects ?? []).map((p: Record<string, unknown>) => ({
-    ...p,
-    crew_count: crewCounts[p.id as string] ?? 0,
-  }));
+  const result = (projects ?? []).map((p: Record<string, unknown>) => {
+    const details = projectRecordWithDetails(p);
+    return {
+      id: p.id,
+      title: p.title,
+      year: p.year,
+      type: p.type,
+      verified: details.verified === true,
+      created_at: p.created_at,
+      created_by: p.created_by,
+      director: p.director,
+      crew_count: crewCounts[p.id as string] ?? 0,
+    };
+  });
 
   return NextResponse.json({ projects: result, total: count ?? 0 });
 }
@@ -59,15 +70,29 @@ export async function PATCH(req: NextRequest) {
 
   const audit = await startAdminAudit({ actorUserId: adminResult.userId, action: body.verified ? "project_verify" : "project_unverify", entityType: "project", entityId: body.projectId, reason });
   if (!audit) return NextResponse.json({ error: "Aktion aus Sicherheitsgründen gestoppt: Das Adminprotokoll ist nicht verfügbar." }, { status: 503 });
-  const { data, error } = await db
+  const { data: current, error: currentError } = await db
     .from("projects")
-    .update({ verified: body.verified })
+    .select("id, metadata")
     .eq("id", body.projectId)
-    .select("id, verified")
     .maybeSingle();
 
+  if (currentError) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: currentError.message }, { status: 500 }); }
+  if (!current) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Projekt nicht gefunden." }, { status: 404 }); }
+
+  const currentMetadata = current.metadata && typeof current.metadata === "object" && !Array.isArray(current.metadata)
+    ? current.metadata as Record<string, unknown>
+    : {};
+  const currentDetails = currentMetadata.project_details && typeof currentMetadata.project_details === "object" && !Array.isArray(currentMetadata.project_details)
+    ? currentMetadata.project_details as Record<string, unknown>
+    : {};
+  const metadata = { ...currentMetadata, project_details: { ...currentDetails, verified: body.verified } };
+  const { data, error } = await db.from("projects")
+    .update({ metadata, updated_at: new Date().toISOString() })
+    .eq("id", body.projectId)
+    .select("id")
+    .maybeSingle();
   if (error) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: error.message }, { status: 500 }); }
-  if (!data) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Projekt nicht gefunden." }, { status: 404 }); }
+  if (!data) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Projekt wurde nicht aktualisiert." }, { status: 404 }); }
   const auditLogged = await finishAdminAudit(audit, "succeeded");
   return NextResponse.json({ success: true, auditLogged });
 }

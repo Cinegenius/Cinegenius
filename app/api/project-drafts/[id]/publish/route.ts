@@ -4,12 +4,6 @@ import { projectDraftMetadata } from "@/lib/project-drafts";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
-const PROJECT_FIELDS = [
-  "year", "type", "description", "director", "poster_url", "images", "status", "logline",
-  "production_company", "runtime_minutes", "trailer_url", "release_cinema", "release_streaming", "release_tv",
-  "prep_start", "prep_end", "shoot_start", "shoot_end", "post_start", "post_end",
-] as const;
-
 function slugifyName(name: string) {
   return name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 50);
@@ -65,10 +59,19 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "Bitte wähle eine Produktionsart aus" }, { status: 400 });
   }
   let projectId: string | null = null;
+  const parsedYear = data.year == null || data.year === "" ? null : Number.parseInt(String(data.year), 10);
+  const baseProjectFields = {
+    title,
+    year: parsedYear !== null && Number.isFinite(parsedYear) ? parsedYear : null,
+    type: typeof data.type === "string" && data.type.trim() ? data.type.trim() : null,
+    description: typeof data.description === "string" && data.description.trim() ? data.description : null,
+    director: typeof data.director === "string" && data.director.trim() ? data.director : null,
+    poster_url: typeof data.poster_url === "string" && data.poster_url.trim() ? data.poster_url : null,
+    images: Array.isArray(data.images) ? data.images.filter((image): image is string => typeof image === "string") : [],
+  };
 
   if (draft.source_project_id) {
-    const updates: Record<string, unknown> = { title, updated_at: new Date().toISOString() };
-    for (const field of PROJECT_FIELDS) if (field in data) updates[field] = data[field];
+    const updates: Record<string, unknown> = { ...baseProjectFields, updated_at: new Date().toISOString() };
     updates.metadata = projectDraftMetadata(data, id);
     delete (updates.metadata as Record<string, unknown>).draft_id;
     const { data: project, error } = await db.from("projects").update(updates)
@@ -84,17 +87,10 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
 
     if (!projectId) {
       const insert: Record<string, unknown> = {
-        title,
-        year: data.year ? Number.parseInt(String(data.year), 10) : null,
-        type: data.type || null,
-        description: data.description || null,
-        director: data.director || null,
-        poster_url: data.poster_url || null,
-        images: Array.isArray(data.images) ? data.images : [],
+        ...baseProjectFields,
         created_by: userId,
         metadata: projectDraftMetadata(data, id),
       };
-      for (const field of PROJECT_FIELDS) if (field in data) insert[field] = data[field];
       const { data: created, error } = await db.from("projects").insert(insert).select("id").single();
       if (created) projectId = created.id;
       if (error && error.code === "23505") {

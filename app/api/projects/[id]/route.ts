@@ -3,6 +3,8 @@ import { requireAuth, assertOwner } from "@/lib/guards";
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { saveProjectDraft } from "@/lib/project-drafts-server";
+import { getProjectRecord } from "@/lib/project-records-server";
+import { toPublicProjectRecord } from "@/lib/project-record";
 
 // GET /api/projects/[id] — public project detail (no auth required)
 export async function GET(
@@ -10,31 +12,26 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const projectResult = await getProjectRecord(id);
+  if (projectResult.kind === "not_found") return NextResponse.json({ error: "Projekt nicht gefunden" }, { status: 404 });
+  if (projectResult.kind === "error") return NextResponse.json({ error: "Projekt konnte nicht geladen werden." }, { status: 500 });
 
-  const { data: project, error } = await db
-    .from("projects")
-    .select("id, title, year, type, description, director, poster_url, images, verified, created_at, updated_at, status, logline, production_company, runtime_minutes, trailer_url, release_cinema, release_streaming, release_tv, prep_start, prep_end, shoot_start, shoot_end, post_start, post_end")
-    .eq("id", id)
-    .single();
-
-  if (error || !project) {
-    return NextResponse.json({ error: "Projekt nicht gefunden" }, { status: 404 });
-  }
-
-  const { data: credits } = await db
+  const { data: credits, error: creditsError } = await db
     .from("project_credits")
     .select("id, user_id, role, created_at")
     .eq("project_id", id)
     .order("created_at", { ascending: true });
+  if (creditsError) return NextResponse.json({ error: "Projektmitwirkende konnten nicht geladen werden." }, { status: 500 });
 
   const userIds = (credits ?? []).map((c) => c.user_id);
   let profiles: Record<string, { display_name: string; avatar_url: string | null; role: string | null }> = {};
 
   if (userIds.length > 0) {
-    const { data: profileData } = await db
+    const { data: profileData, error: profilesError } = await db
       .from("profiles")
       .select("user_id, display_name, avatar_url, role")
       .in("user_id", userIds);
+    if (profilesError) return NextResponse.json({ error: "Mitwirkendenprofile konnten nicht geladen werden." }, { status: 500 });
 
     profiles = Object.fromEntries(
       (profileData ?? []).map((p) => [p.user_id, p])
@@ -52,7 +49,7 @@ export async function GET(
     } : null,
   }));
 
-  return NextResponse.json({ project, credits: creditsWithProfiles });
+  return NextResponse.json({ project: toPublicProjectRecord(projectResult.project), credits: creditsWithProfiles });
 }
 
 // PATCH /api/projects/[id] — save an owner-only working copy; public data changes on publish.

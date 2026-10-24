@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { sanitizeProjectDraftData } from "@/lib/project-drafts";
+import { PROJECT_RECORD_COLUMNS, projectRecordWithDetails } from "@/lib/project-record";
 
 export async function saveProjectDraft(userId: string, input: {
   sourceProjectId?: string | null;
@@ -12,11 +13,11 @@ export async function saveProjectDraft(userId: string, input: {
   let sourceProject: Record<string, unknown> | null = null;
   if (input.sourceProjectId) {
     const { data, error } = await db.from("projects")
-      .select("id, title, year, type, description, director, poster_url, images, metadata, status, logline, production_company, runtime_minutes, trailer_url, release_cinema, release_streaming, release_tv, prep_start, prep_end, shoot_start, shoot_end, post_start, post_end")
+      .select(PROJECT_RECORD_COLUMNS)
       .eq("id", input.sourceProjectId).eq("created_by", userId).maybeSingle();
     if (error) return { error: "Projekt konnte nicht geladen werden." as const, status: 500 as const };
     if (!data) return { error: "Projekt nicht gefunden oder keine Berechtigung." as const, status: 404 as const };
-    sourceProject = data as Record<string, unknown>;
+    sourceProject = projectRecordWithDetails(data as Record<string, unknown>);
   }
 
   let existingDraft: { id: string; draft_data: Record<string, unknown> | null } | null = null;

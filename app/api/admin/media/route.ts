@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
   if (type === "profiles") query = db.from("profiles").select("user_id, display_name, slug, avatar_url, cover_image_url, profile_images, portfolio_images, updated_at", { count: "exact" }).order("updated_at", { ascending: false }).range(...range);
   else if (type === "companies") query = db.from("companies").select("id, slug, name, logo_url, cover_url, portfolio_images, published, updated_at", { count: "exact" }).order("updated_at", { ascending: false }).range(...range);
   else if (type === "listings") query = db.from("listings").select("id, title, type, image_url, extra_images, floor_plan_url, published, created_at", { count: "exact" }).order("created_at", { ascending: false }).range(...range);
-  else query = db.from("projects").select("id, title, poster_url, images, status, updated_at", { count: "exact" }).order("updated_at", { ascending: false }).range(...range);
+  else query = db.from("projects").select("id, title, poster_url, images, updated_at", { count: "exact" }).order("updated_at", { ascending: false }).range(...range);
 
   const { data, error, count } = await query;
   if (error) return NextResponse.json({ error: "Medienverweise konnten nicht geladen werden." }, { status: 500 });
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
           ? [record.image_url, ...toUrls(record.extra_images), record.floor_plan_url]
           : [record.poster_url, ...toUrls(record.images)];
     const media = [...new Set(urls.filter((url): url is string => typeof url === "string" && url.trim().length > 0))];
-    return { id, title, slug: record.slug ?? null, published: record.published ?? record.status ?? null, media };
+    return { id, title, slug: record.slug ?? null, published: type === "projects" ? true : record.published ?? null, media };
   });
   return NextResponse.json({ entities, total: count ?? 0, page, pageSize, type }, { headers: { "Cache-Control": "private, no-store" } });
 }

@@ -6,6 +6,8 @@ import { auth } from "@clerk/nextjs/server";
 import { isAdminSession } from "@/lib/guards";
 import ProjectDetail from "@/components/ProjectDetail";
 import { departments } from "@/lib/departments";
+import { getProjectRecord } from "@/lib/project-records-server";
+import { toPublicProjectRecord } from "@/lib/project-record";
 
 const ALL_CREW_ROLES = departments.flatMap((d) => d.roles);
 
@@ -14,48 +16,39 @@ export const dynamicParams = true;
 type RawCredit = {
   id: string;
   user_id: string | null;
-  unclaimed_profile_id: string | null;
   role: string;
   created_at: string;
 };
 
-const PUBLIC_PROJECT_FIELDS = "id, title, alt_title, year, type, description, director, poster_url, images, verified, created_at, status, logline, synopsis, genres, language, country, runtime_minutes, production_company, co_producers, shoot_locations, prep_start, prep_end, shoot_start, shoot_end, post_start, post_end, release_cinema, release_cinema_countries, release_streaming, release_tv, trailer_url, teaser_url";
-
 async function _getProject(id: string) {
-  const [{ data: project }, { data: credits }, { data: festivals }] = await Promise.all([
-    db.from("projects").select(`${PUBLIC_PROJECT_FIELDS}, created_by`).eq("id", id).single(),
-    db.from("project_credits").select("id, project_id, user_id, unclaimed_profile_id, role, created_at").eq("project_id", id).order("created_at", { ascending: true }),
+  const projectResult = await getProjectRecord(id);
+  if (projectResult.kind === "not_found") return null;
+  if (projectResult.kind === "error") {
+    throw new Error(`Projekt konnte nicht geladen werden (Datenbankfehler ${projectResult.error.code ?? "unbekannt"}).`);
+  }
+
+  const project = projectResult.project;
+  const [{ data: credits }, { data: festivals }] = await Promise.all([
+    db.from("project_credits").select("id, project_id, user_id, role, created_at").eq("project_id", id).order("created_at", { ascending: true }),
     db.from("project_festivals").select("id, project_id, festival_name, year, section, status, award_name, notes").eq("project_id", id).order("year", { ascending: false }),
   ]);
-
-  if (!project) return null;
 
   const rawCredits = (credits ?? []) as RawCredit[];
 
   const userIds = rawCredits.filter((c) => c.user_id).map((c) => c.user_id as string);
-  const unclaimedIds = rawCredits.filter((c) => c.unclaimed_profile_id).map((c) => c.unclaimed_profile_id as string);
 
-  const [profilesMap, ghostsMap] = await Promise.all([
-    userIds.length > 0
-      ? db.from("profiles").select("user_id, display_name, avatar_url, role, slug").in("user_id", userIds).then(
+  const profilesMap = userIds.length > 0
+      ? await db.from("profiles").select("user_id, display_name, avatar_url, role, slug").in("user_id", userIds).then(
           ({ data }) => Object.fromEntries(
             (data ?? []).map((p: { user_id: string; display_name: string; avatar_url: string | null; role: string | null; slug: string | null }) => [p.user_id, { display_name: p.display_name, avatar_url: p.avatar_url, role: p.role, slug: p.slug }])
           )
         )
-      : Promise.resolve({} as Record<string, { display_name: string; avatar_url: string | null; role: string | null; slug: string | null }>),
-    unclaimedIds.length > 0
-      ? db.from("unclaimed_profiles").select("id, name, slug, avatar_url, primary_role").in("id", unclaimedIds).then(
-          ({ data }) => Object.fromEntries(
-            (data ?? []).map((p: { id: string; name: string; slug: string; avatar_url: string | null; primary_role: string | null }) => [p.id, p])
-          )
-        )
-      : Promise.resolve({} as Record<string, { name: string; slug: string; avatar_url: string | null; primary_role: string | null }>),
-  ]);
+      : {} as Record<string, { display_name: string; avatar_url: string | null; role: string | null; slug: string | null }>;
 
   const creditsWithProfiles = rawCredits.map((c) => ({
     ...c,
     profile: c.user_id ? (profilesMap[c.user_id] ?? null) : null,
-    ghost: c.unclaimed_profile_id ? (ghostsMap[c.unclaimed_profile_id] ?? null) : null,
+    ghost: null,
   }));
 
   return { project, credits: creditsWithProfiles, festivals: festivals ?? [] };
@@ -94,7 +87,8 @@ export default async function ProjectPage({
 
   const [{ userId }, isAdmin] = await Promise.all([auth(), isAdminSession()]);
   const myRawCredit = data.credits.find((c) => c.user_id && c.user_id === userId) ?? null;
-  const { created_by: projectCreatorId, ...publicProject } = data.project;
+  const projectCreatorId = data.project.created_by as string | null;
+  const publicProject = toPublicProjectRecord(data.project);
   const publicCredits = data.credits.map((credit) => ({
     id: credit.id,
     role: credit.role,
