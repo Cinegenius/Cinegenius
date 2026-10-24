@@ -41,17 +41,16 @@ type Profile = {
   primary_role: string | null;
   avatar_url: string | null;
   bio: string | null;
-  claimed_by: string | null;
 };
 
 export default function PersonView({
   profile,
   credits,
-  currentUserId,
+  isSignedIn,
 }: {
   profile: Profile;
   credits: Credit[];
-  currentUserId: string | null;
+  isSignedIn: boolean;
 }) {
   const router = useRouter();
   const [claiming, setClaiming] = useState(false);
@@ -71,8 +70,6 @@ export default function PersonView({
       setClaiming(false);
     }
   }
-
-  const isSignedIn = !!currentUserId;
 
   return (
     <div className="pt-16 min-h-screen bg-bg-primary">

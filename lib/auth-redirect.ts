@@ -29,3 +29,9 @@ export function getSignUpSetupDestination(destination: string): string {
   if (destination !== "/dashboard") params.set("redirect", destination);
   return `/profile-setup?${params.toString()}`;
 }
+
+/** Preserve the intended destination when switching between sign-in and sign-up. */
+export function getAuthSwitchDestination(mode: "sign-in" | "sign-up", destination: string): string {
+  const params = new URLSearchParams({ redirect_url: destination });
+  return `/${mode}?${params.toString()}`;
+}

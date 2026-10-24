@@ -8,10 +8,10 @@ import { MapPin, MessageCircle, Pin, Plus, Search, Send, Trash2, X } from "lucid
 import { useUser } from "@clerk/nextjs";
 
 type Kind = "question" | "recommendation" | "request" | "offer";
-type Reply = { id: string; body: string; created_at: string; author_name: string; author_avatar: string | null };
+type Reply = { id: string; body: string; created_at: string; author_name: string; author_avatar: string | null; is_mine?: boolean };
 type Post = {
-  id: string; author_id: string; kind: Kind; title: string; body: string; city: string | null; created_at: string;
-  author_name: string; author_avatar: string | null; reply_count: number;
+  id: string; kind: Kind; title: string; body: string; city: string | null; created_at: string;
+  author_name: string; author_avatar: string | null; reply_count: number; is_mine?: boolean;
 };
 
 const KINDS: Kind[] = ["question", "recommendation", "request", "offer"];
@@ -43,7 +43,8 @@ const KIND_CARD_STYLE: Record<Kind, { card: string; accent: string }> = {
 export default function CommunityBoard({ loggedIn = false, fullPage = false }: { loggedIn?: boolean; fullPage?: boolean }) {
   const t = useTranslations("home");
   const locale = useLocale();
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
+  const activeLoggedIn = isLoaded ? Boolean(user) : loggedIn;
   const [posts, setPosts] = useState<Post[]>([]);
   const [kind, setKind] = useState<Kind | "all">("all");
   const [query, setQuery] = useState("");
@@ -139,7 +140,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
   }
 
   const formatDate = (date: string) => new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(date));
-  const composerContent = loggedIn ? <form onSubmit={event => void submitPost(event)} className="space-y-4">
+  const composerContent = activeLoggedIn ? <form onSubmit={event => void submitPost(event)} className="space-y-4">
     <label className="block text-sm font-medium text-text-secondary">{t("boardTypeLabel")}<select value={form.kind} onChange={event => setForm(current => ({ ...current, kind: event.target.value as Kind }))} className="mt-1.5 h-11 w-full rounded-xl border border-border bg-bg-primary px-3 text-sm text-text-primary outline-none focus:border-gold/60">{KINDS.map(value => <option key={value} value={value}>{t(`boardKind_${value}`)}</option>)}</select></label>
     <label className="block text-sm font-medium text-text-secondary">{t("boardTitleLabel")}<input required minLength={5} maxLength={140} value={form.title} onChange={event => setForm(current => ({ ...current, title: event.target.value }))} placeholder={t("boardTitlePlaceholder")} className="mt-1.5 h-11 w-full rounded-xl border border-border bg-bg-primary px-3 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-gold/60" /></label>
     <label className="block text-sm font-medium text-text-secondary">{t("boardTextLabel")}<textarea required minLength={10} maxLength={3000} rows={5} value={form.body} onChange={event => setForm(current => ({ ...current, body: event.target.value }))} placeholder={t(form.kind === "question" ? "boardQuestionPlaceholder" : "boardBodyPlaceholder")} className="mt-1.5 w-full resize-y rounded-xl border border-border bg-bg-primary px-3 py-2.5 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-gold/60" /></label>
@@ -185,7 +186,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
               <span className={`rounded-full border px-2.5 py-1 text-[11px] font-bold tracking-wide sm:px-3 sm:py-1.5 sm:text-xs ${KIND_STYLE[post.kind]}`}>{t(`boardKind_${post.kind}`)}</span>
               <div className="flex items-center gap-3">
                 <time className="text-xs text-text-muted" dateTime={post.created_at}>{formatDate(post.created_at)}</time>
-                {loggedIn && user?.id === post.author_id && <button type="button" onClick={() => void deletePost(post.id)} disabled={deleting === post.id} aria-label={t("boardDelete")} title={t("boardDelete")} className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-red-300/20 bg-red-400/[0.06] px-2.5 text-xs font-semibold text-red-200/80 transition-colors hover:border-red-300/40 hover:bg-red-400/15 hover:text-red-100 disabled:opacity-50"><Trash2 size={14} />{deleting === post.id ? t("boardDeleting") : t("boardDelete")}</button>}
+                {activeLoggedIn && post.is_mine && <button type="button" onClick={() => void deletePost(post.id)} disabled={deleting === post.id} aria-label={t("boardDelete")} title={t("boardDelete")} className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-red-300/20 bg-red-400/[0.06] px-2.5 text-xs font-semibold text-red-200/80 transition-colors hover:border-red-300/40 hover:bg-red-400/15 hover:text-red-100 disabled:opacity-50"><Trash2 size={14} />{deleting === post.id ? t("boardDeleting") : t("boardDelete")}</button>}
               </div>
             </div>
             <h3 className="break-words font-display text-lg font-bold leading-snug text-white [overflow-wrap:anywhere] sm:text-xl">{post.title}</h3>
@@ -203,7 +204,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
                 {(replies[post.id] ?? []).map(reply => <div key={reply.id} className="flex gap-2.5 text-sm"><span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-bg-elevated text-[10px] text-text-secondary">{reply.author_name.slice(0, 1).toUpperCase()}</span><div><p className="font-medium text-text-primary">{reply.author_name} <time className="ml-1 text-[11px] font-normal text-text-muted">{formatDate(reply.created_at)}</time></p><p className="mt-0.5 whitespace-pre-wrap text-text-secondary">{reply.body}</p></div></div>)}
                 {!replies[post.id]?.length && <p className="text-xs text-text-muted">{t("boardNoReplies")}</p>}
               </div>
-              {loggedIn ? <form onSubmit={event => void submitReply(event, post.id)} className="mt-3 flex gap-2"><input value={replyDrafts[post.id] ?? ""} onChange={event => setReplyDrafts(current => ({ ...current, [post.id]: event.target.value }))} maxLength={1000} placeholder={t("boardReplyPlaceholder")} className="h-10 min-w-0 flex-1 rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-gold/60" /><button aria-label={t("boardSendReply")} disabled={busy || !(replyDrafts[post.id] ?? "").trim()} className="flex h-10 w-10 items-center justify-center rounded-lg bg-gold text-bg-primary disabled:opacity-50"><Send size={15} /></button></form> : <Link href="/sign-in?redirect_url=%2Fcommunity" className="mt-3 inline-block text-sm font-medium text-gold">{t("boardLogin")}</Link>}
+              {activeLoggedIn ? <form onSubmit={event => void submitReply(event, post.id)} className="mt-3 flex gap-2"><input value={replyDrafts[post.id] ?? ""} onChange={event => setReplyDrafts(current => ({ ...current, [post.id]: event.target.value }))} maxLength={1000} placeholder={t("boardReplyPlaceholder")} className="h-10 min-w-0 flex-1 rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-gold/60" /><button aria-label={t("boardSendReply")} disabled={busy || !(replyDrafts[post.id] ?? "").trim()} className="flex h-10 w-10 items-center justify-center rounded-lg bg-gold text-bg-primary disabled:opacity-50"><Send size={15} /></button></form> : <Link href="/sign-in?redirect_url=%2Fcommunity" className="mt-3 inline-block text-sm font-medium text-gold">{t("boardLogin")}</Link>}
             </div>}
           </article>)}
         </div> : <div className="rounded-2xl border border-dashed border-border bg-bg-primary/30 px-4 py-8 text-center sm:px-6">

@@ -7,10 +7,10 @@ import { fetchRatingSummaries } from "@/lib/ratings";
 // GET /api/listing-ratings?ids=id1,id2,...
 export async function GET(req: NextRequest) {
   const ids = req.nextUrl.searchParams.get("ids");
-  if (!ids) return NextResponse.json({ ratings: {}, myRatings: {} });
+  if (!ids) return NextResponse.json({ ratings: {}, myRatings: {} }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 
   const idList = ids.split(",").filter(Boolean).slice(0, 300);
-  if (!idList.length) return NextResponse.json({ ratings: {}, myRatings: {} });
+  if (!idList.length) return NextResponse.json({ ratings: {}, myRatings: {} }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 
   const { userId } = await auth();
 
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
     eligible = (convs ?? []).map((c) => c.listing_id).filter(Boolean) as string[];
   }
 
-  return NextResponse.json({ ratings, myRatings, eligible });
+  return NextResponse.json({ ratings, myRatings, eligible }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 }
 
 // POST /api/listing-ratings  { listing_id, owner_id, rating: 1-5 }

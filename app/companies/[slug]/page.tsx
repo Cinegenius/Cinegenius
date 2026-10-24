@@ -6,15 +6,25 @@ import type { Metadata } from "next";
 import CompanyDetail from "./CompanyDetail";
 import { isPublicCompanyMembership } from "@/lib/company-membership-requests";
 
-// Cache public company data for 5 minutes
-const getCompany = unstable_cache(
-  async (slug: string) => {
-    const { data } = await db.from("companies").select("*").eq("slug", slug).maybeSingle();
-    return data;
-  },
-  ["company-slug"],
-  { revalidate: 300, tags: ["companies", "listings"] }
-);
+async function getCompany(slug: string) {
+  const { data } = await db.from("companies")
+    .select("id, slug, owner_user_id, name, logo_url, cover_url, description, city, website, email_public, phone_public, categories, services, portfolio_images, tagline, bio_short, usp, founded_year, legal_form, hq_address_public, countries, industry_focus, social_links, catering_details, published, verified, created_at")
+    .eq("slug", slug).maybeSingle();
+  if (!data) return null;
+
+  // Contact consent can change at any time; keep it out of shared cached data.
+  const publicContactColumns = [
+    ...(data.email_public === true ? ["email"] : []),
+    ...(data.phone_public === true ? ["phone"] : []),
+    ...(data.hq_address_public === true ? ["hq_address"] : []),
+  ];
+  if (publicContactColumns.length === 0) return data;
+  const { data: publicContacts } = await db.from("companies")
+    .select(publicContactColumns.join(", "))
+    .eq("id", data.id)
+    .maybeSingle();
+  return { ...data, ...((publicContacts ?? {}) as Record<string, unknown>) };
+}
 
 const getCompanyPublicData = unstable_cache(
   async (companyId: string, ownerUserId: string) => {
@@ -30,11 +40,11 @@ const getCompanyPublicData = unstable_cache(
         .eq("status", "accepted")
         .order("created_at", { ascending: true }),
       db.from("company_services")
-        .select("*")
+        .select("id, type, title, description, use_cases, price_on_request, price_note")
         .eq("company_id", companyId)
         .order("order", { ascending: true }),
       db.from("company_equipment")
-        .select("*")
+        .select("id, category, subcategory, name, brand, model, condition, available, price_day, price_week, price_on_request, pickup_available, delivery_available, insured, quantity")
         .eq("company_id", companyId)
         .order("created_at", { ascending: false }),
     ]);
@@ -46,10 +56,14 @@ const getCompanyPublicData = unstable_cache(
         .from("profiles")
         .select("user_id, display_name, avatar_url, slug, role")
         .in("user_id", rawMembers.map((m) => m.user_id));
-      const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, p]));
+      const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, {
+        display_name: p.display_name,
+        avatar_url: p.avatar_url,
+        slug: p.slug,
+        role: p.role,
+      }]));
       members = rawMembers.map((m) => ({
         id: m.id,
-        user_id: m.user_id,
         title: m.title,
         public_titles: m.public_titles?.length ? m.public_titles : m.title ? [m.title] : [],
         status: m.status,
@@ -77,7 +91,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const company = await getCompany(slug);
-  if (!company) return {};
+  if (!company || company.published !== true) return {};
 
   const cats = Array.isArray(company.categories) ? (company.categories as string[]).join(", ") : "";
   const description = company.description
@@ -105,7 +119,7 @@ export default async function CompanyPage({
 
   const company = await getCompany(slug);
 
-  if (!company || (company.published === false && userId !== company.owner_user_id)) notFound();
+  if (!company || (company.published !== true && userId !== company.owner_user_id)) notFound();
 
   const isOwner = userId === company.owner_user_id;
 
@@ -133,8 +147,16 @@ export default async function CompanyPage({
       : Promise.resolve(null),
   ]);
 
+  const publicCompany = { ...company };
+  delete (publicCompany as Record<string, unknown>).owner_user_id;
   const normalised = {
-    ...company,
+    ...publicCompany,
+    email: company.email_public === true ? (company as typeof company & { email?: string | null }).email ?? null : null,
+    phone: company.phone_public === true ? (company as typeof company & { phone?: string | null }).phone ?? null : null,
+    hq_address: company.hq_address_public === true ? (company as typeof company & { hq_address?: string | null }).hq_address ?? null : null,
+    contact_requires_sign_in: Boolean(!userId && (
+      company.email_public !== true || company.phone_public !== true || company.hq_address_public !== true
+    )),
     portfolio_images: Array.isArray(company.portfolio_images) ? company.portfolio_images as string[] : [],
     categories:       Array.isArray(company.categories)       ? company.categories       as string[] : [],
     services:         Array.isArray(company.services)         ? company.services         as string[] : [],
@@ -157,6 +179,7 @@ export default async function CompanyPage({
       myMembership={myMembership}
       myTitleChangeRequest={myTitleChangeRequest}
       currentUserId={userId ?? null}
+      initialIsOwner={isOwner}
     />
   );
 }

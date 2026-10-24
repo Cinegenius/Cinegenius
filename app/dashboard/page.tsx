@@ -489,10 +489,12 @@ export default function DashboardPage() {
   };
 
   // Privacy settings
-  const [privacySettings, setPrivacySettings] = useState<{ profile_visibility: string; message_permission: string; email_new_message: boolean }>({
+  const [privacySettings, setPrivacySettings] = useState<{ profile_visibility: string; message_permission: string; email_new_message: boolean; phone_visibility: string; contact_email_visibility: string }>({
     profile_visibility: "public",
     message_permission: "everyone",
     email_new_message: true,
+    phone_visibility: "hidden",
+    contact_email_visibility: "hidden",
   });
   const [privacyLoading, setPrivacyLoading] = useState(false);
   const [privacyError, setPrivacyError] = useState("");
@@ -2644,6 +2646,31 @@ export default function DashboardPage() {
                       <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${privacySettings.message_permission === "friends_only" ? "translate-x-5" : "translate-x-1"}`} />
                     </button>
                   </label>
+                  <div className="border-t border-border" />
+                  <div>
+                    <p className="text-sm text-text-secondary font-medium">Kontaktdaten auf deinem Profil</p>
+                    <p className="mt-1 text-xs leading-relaxed text-text-muted">Deine Login-E-Mail wird nie angezeigt. Hier steuerst du nur die separate Kontakt-E-Mail und Telefonnummer deines Profils.</p>
+                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                      {([
+                        ["contact_email_visibility", "Kontakt-E-Mail"],
+                        ["phone_visibility", "Telefonnummer"],
+                      ] as const).map(([key, label]) => (
+                        <label key={key} className="block text-xs text-text-muted">
+                          <span className="mb-1.5 block">{label}</span>
+                          <select
+                            value={privacySettings[key]}
+                            onChange={(event) => updatePrivacy(key, event.target.value)}
+                            disabled={privacyLoading}
+                            className="min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary outline-none focus:border-gold/60 disabled:opacity-60"
+                          >
+                            <option value="hidden">Niemand außer mir</option>
+                            <option value="members">Angemeldete Mitglieder</option>
+                            <option value="public">Alle Besucher</option>
+                          </select>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
 

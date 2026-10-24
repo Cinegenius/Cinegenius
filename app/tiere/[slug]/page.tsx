@@ -7,12 +7,13 @@ async function getAnimal(slug: string) {
   try {
     const { data, error } = await db
       .from("listings")
-      .select("*")
+      .select("id, user_id, type, title, category, city, price, image_url, description, metadata, extra_images, published")
       .eq("id", slug)
+      .eq("type", "animal")
+      .eq("published", true)
       .single();
 
     if (error || !data) return null;
-    if (data.type !== "animal") return null;
 
     const ownerRes = data.user_id
       ? await db.from("profiles").select("display_name, avatar_url, slug").eq("user_id", data.user_id).single()

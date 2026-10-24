@@ -3,8 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import {
   MapPin, MessageSquare, Award, ChevronDown, ChevronUp,
   Pencil, ExternalLink, X, Check, Globe, Building2, UserPlus, UserCheck, Clock,
@@ -97,6 +98,19 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function Divider() {
   return <div className="h-px bg-border my-12" />;
+}
+
+function ContactSignInPrompt({ profile }: { profile: UserProfile }) {
+  const { isLoaded, isSignedIn } = useUser();
+  if (!isLoaded || isSignedIn || !profile.contact_requires_sign_in) return null;
+  const destination = `/profile/${profile.slug || profile.user_id}`;
+  return (
+    <p className="mt-2 text-xs text-text-muted">
+      <Link href={`/sign-in?redirect_url=${encodeURIComponent(destination)}`} className="font-medium text-gold hover:text-gold-light underline underline-offset-2">
+        Anmelden, um Kontakt aufzunehmen
+      </Link>
+    </p>
+  );
 }
 
 // ─── Block / Report Bar ───────────────────────────────────────────────────────
@@ -231,7 +245,7 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
 
 // ─── Collaborations Section ───────────────────────────────────────────────────
 
-type PublicCollab = { user_id: string; label: string; display_name: string; avatar_url: string | null; slug: string; role: string | null };
+type PublicCollab = { label: string; display_name: string; avatar_url: string | null; slug: string; role: string | null };
 
 function CollaborationsSection({ collaborations }: { collaborations: PublicCollab[] }) {
   if (!collaborations.length) return null;
@@ -242,7 +256,7 @@ function CollaborationsSection({ collaborations }: { collaborations: PublicColla
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
         {collaborations.map((c) => (
           <Link
-            key={c.user_id}
+            key={c.slug}
             href={`/profile/${c.slug}`}
             className="group flex flex-col items-center gap-2 p-4 bg-bg-secondary border border-border rounded-xl hover:border-gold/40 hover:bg-bg-elevated transition-all text-center"
           >
@@ -760,6 +774,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
                   ))}
                 </div>
               )}
+              <ContactSignInPrompt profile={profile} />
 
               {/* Externe Profile */}
               {externalProfiles.length > 0 && (
@@ -1247,22 +1262,23 @@ function ModelProfile({ profile, isOwner, projectCredits = [], companyMembership
             gp.phone?.trim()         ? { label: gp.phone.trim(),         url: `tel:${gp.phone.trim()}`,             contactIcon: "phone" as const } : null,
             gp.contact_email?.trim() ? { label: gp.contact_email.trim(), url: `mailto:${gp.contact_email.trim()}`, contactIcon: "mail" as const } : null,
           ] as const).filter((l): l is NonNullable<typeof l> & { url: string } => l !== null && !!l.url) as { label: string; url: string; contactIcon?: "phone" | "mail" }[];
-          if (links.length === 0) return null;
+          if (links.length === 0 && !profile.contact_requires_sign_in) return null;
           return (
             <>
               <Divider />
               <SectionLabel>Links</SectionLabel>
-              <div className="flex flex-wrap gap-2 pb-4">
-                {links.map(({ label, url, contactIcon }) => (
-                  <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-bg-secondary border border-border rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
-                    {contactIcon === "phone" && <Phone size={11} />}
-                    {contactIcon === "mail"  && <Mail size={11} />}
-                    {label}
-                    {!contactIcon && <ExternalLink size={9} className="opacity-50" />}
-                  </a>
-                ))}
-              </div>
+              {links.length > 0 && <div className="flex flex-wrap gap-2 pb-4">
+                  {links.map(({ label, url, contactIcon }) => (
+                    <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-bg-secondary border border-border rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
+                      {contactIcon === "phone" && <Phone size={11} />}
+                      {contactIcon === "mail"  && <Mail size={11} />}
+                      {label}
+                      {!contactIcon && <ExternalLink size={9} className="opacity-50" />}
+                    </a>
+                  ))}
+                </div>}
+              <ContactSignInPrompt profile={profile} />
             </>
           );
         })()}
@@ -1503,24 +1519,25 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 gp2.phone?.trim()         ? { label: gp2.phone.trim(),         url: `tel:${gp2.phone.trim()}`,             contactIcon: "phone" as const } : null,
                 gp2.contact_email?.trim() ? { label: gp2.contact_email.trim(), url: `mailto:${gp2.contact_email.trim()}`, contactIcon: "mail" as const } : null,
               ] as const).filter((l): l is NonNullable<typeof l> & { url: string } => l !== null && !!l.url) as { label: string; url: string; contactIcon?: "phone" | "mail" }[];
-              if (links.length === 0) return null;
+              if (links.length === 0 && !profile.contact_requires_sign_in) return null;
               return (
                 <div>
                   <div className="flex items-center gap-2 mb-2.5">
                     <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
                     <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Links & Kontakt</p>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {links.map(({ label, url, contactIcon }) => (
-                      <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-bg-elevated border border-border rounded-lg text-xs text-text-primary hover:border-gold/40 hover:text-gold transition-colors">
-                        {contactIcon === "phone" && <Phone size={11} className="shrink-0" />}
-                        {contactIcon === "mail"  && <Mail size={11} className="shrink-0" />}
-                        {label}
-                        {!contactIcon && <ExternalLink size={9} className="shrink-0 opacity-40" />}
-                      </a>
-                    ))}
-                  </div>
+                  {links.length > 0 && <div className="flex flex-wrap gap-1.5">
+                      {links.map(({ label, url, contactIcon }) => (
+                        <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-bg-elevated border border-border rounded-lg text-xs text-text-primary hover:border-gold/40 hover:text-gold transition-colors">
+                          {contactIcon === "phone" && <Phone size={11} className="shrink-0" />}
+                          {contactIcon === "mail"  && <Mail size={11} className="shrink-0" />}
+                          {label}
+                          {!contactIcon && <ExternalLink size={9} className="shrink-0 opacity-40" />}
+                        </a>
+                      ))}
+                    </div>}
+                  <ContactSignInPrompt profile={profile} />
                 </div>
               );
             })()}
@@ -1989,24 +2006,53 @@ export default function ProfileView({
   myImageLikes?: string[];
   similarProfiles?: SimilarProfile[];
 }) {
-  const profileTypes = normalizeProfileTypes(profile.profile_types, profile.profile_type);
+  const { user, isLoaded } = useUser();
+  const router = useRouter();
+  const activeViewerId = isLoaded ? user?.id ?? null : null;
+  const effectiveOwner = isOwner && (!isLoaded || user?.id === profile.user_id);
+  const previousViewerId = useRef<string | null | undefined>(undefined);
+
+  // Clerk synchronizes session changes between tabs. Refresh the server payload
+  // on account changes and derive contact visibility from the live session so
+  // owner/member-only contacts disappear immediately after sign-out.
+  useEffect(() => {
+    if (!isLoaded) return;
+    const previous = previousViewerId.current;
+    previousViewerId.current = activeViewerId;
+    if (previous !== undefined && previous !== activeViewerId) router.refresh();
+  }, [activeViewerId, isLoaded, router]);
+
+  const phoneVisibility = profile.visibility?.phone ?? "hidden";
+  const emailVisibility = profile.visibility?.contact_email ?? "hidden";
+  const canSeePhone = phoneVisibility === "public" || (phoneVisibility === "members" && !!activeViewerId) || effectiveOwner;
+  const canSeeEmail = emailVisibility === "public" || (emailVisibility === "members" && !!activeViewerId) || effectiveOwner;
+  const visibleProfile: UserProfile = {
+    ...profile,
+    phone: canSeePhone ? profile.phone ?? null : null,
+    contact_email: canSeeEmail ? profile.contact_email ?? null : null,
+    contact_requires_sign_in: Boolean(!activeViewerId && (
+      (profile.phone && !canSeePhone) || (profile.contact_email && !canSeeEmail)
+    )),
+  };
+
+  const profileTypes = normalizeProfileTypes(visibleProfile.profile_types, visibleProfile.profile_type);
   const isModel = profileTypes.includes("model");
   const isTalent = profileTypes.some((type) => PROFILE_CATEGORY_MAP[type] === "talent");
 
-  const similarSection = !isOwner && similarProfiles.length > 0
+  const similarSection = !effectiveOwner && similarProfiles.length > 0
     ? <SimilarProfilesSection profiles={similarProfiles} />
     : null;
 
   // Model types get editorial layout
   if (isModel) {
-    return <><ModelProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} listings={listings} blockStatus={blockStatus} collaborations={collaborations} />{similarSection}</>;
+    return <><ModelProfile profile={visibleProfile} isOwner={effectiveOwner} projectCredits={projectCredits} companyMembership={companyMembership} listings={listings} blockStatus={blockStatus} collaborations={collaborations} />{similarSection}</>;
   }
 
   // Actor/talent types get casting-ready layout
   if (isTalent) {
-    return <><ActorProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
+    return <><ActorProfile profile={visibleProfile} isOwner={effectiveOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
   }
 
   // Crew, creative, vendor get generic layout
-  return <><GenericProfile profile={profile} isOwner={isOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
+  return <><GenericProfile profile={visibleProfile} isOwner={effectiveOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
 }

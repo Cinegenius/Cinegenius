@@ -1,5 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { isProtectedCreatePath, isPublicProfilePath } from "@/lib/public-access";
 
 function generateNonce(): string {
   const bytes = new Uint8Array(16);
@@ -114,7 +115,6 @@ const isPublicRoute = createRouteMatcher([
   "/",
   "/sign-in(.*)",
   "/sign-up(.*)",
-  "/profile/(.*)",
   "/companies(.*)",
   "/projects(.*)",
   "/locations(.*)",
@@ -137,6 +137,8 @@ const isPublicRoute = createRouteMatcher([
   "/marketplace(.*)",
 ]);
 
+// A single profile slug is public. The profile editor at /profile and any
+// nested management routes must require a session.
 // Webhook routes — completely bypass Clerk auth; each handler must verify
 // the provider signature (Stripe, Clerk, etc.) independently.
 const isWebhookRoute = createRouteMatcher(["/api/webhooks/(.*)"]);
@@ -149,6 +151,10 @@ const isPublicApiGet = createRouteMatcher([
   "/api/search(.*)",
   "/api/external-profiles(.*)",
   "/api/projects(.*)",
+  "/api/companies",
+  "/api/companies/(.*)",
+  "/api/community-posts(.*)",
+  "/api/creators(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
@@ -194,7 +200,7 @@ export default clerkMiddleware(async (auth, request) => {
     // 3b. Public-GET API — only protect mutations so a missed handler check
     //     doesn't silently open write access to unauthenticated callers.
     if (request.method !== "GET") await auth.protect();
-  } else if (!isPublicRoute(request)) {
+  } else if (isProtectedCreatePath(request.nextUrl.pathname) || (!isPublicRoute(request) && !isPublicProfilePath(request.nextUrl.pathname))) {
     // 3c. Session-only protection for all other non-public routes
     if (request.method === "GET" && !isApi) {
       // Keep unauthenticated browser navigation on the app's own host. The

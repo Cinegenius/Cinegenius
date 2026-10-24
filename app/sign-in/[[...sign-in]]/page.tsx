@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import AuthForm from "@/components/AuthForm";
-import { safeAuthRedirect } from "@/lib/auth-redirect";
+import { getAuthSwitchDestination, safeAuthRedirect } from "@/lib/auth-redirect";
 
 type SearchParams = Promise<{
   redirect_url?: string | string[];
@@ -20,7 +20,11 @@ export default async function SignInPage({ searchParams }: { searchParams: Searc
           <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Willkommen zurück</p>
           <h1 className="font-display text-3xl font-bold text-text-primary">Anmelden</h1>
         </div>
-        <AuthForm mode="sign-in" destination={destination} />
+        <AuthForm
+          mode="sign-in"
+          destination={destination}
+          signUpDestination={getAuthSwitchDestination("sign-up", destination)}
+        />
       </div>
     </div>
   );

@@ -10,15 +10,21 @@ export async function GET() {
 
   const { data, error } = await db
     .from("user_settings")
-    .select("profile_visibility, message_permission, email_new_message")
+    .select("profile_visibility, message_permission, email_new_message, phone_visibility, contact_email_visibility")
     .eq("user_id", userId)
     .maybeSingle();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json({
-    settings: data ?? { profile_visibility: "public", message_permission: "everyone", email_new_message: true },
-  });
+    settings: data ?? {
+      profile_visibility: "public",
+      message_permission: "everyone",
+      email_new_message: true,
+      phone_visibility: "hidden",
+      contact_email_visibility: "hidden",
+    },
+  }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 }
 
 // PATCH /api/user-settings
@@ -51,6 +57,14 @@ export async function PATCH(req: NextRequest) {
     }
     update.email_new_message = body.email_new_message;
   }
+  for (const field of ["phone_visibility", "contact_email_visibility"] as const) {
+    if (body[field] !== undefined) {
+      if (!["public", "members", "hidden"].includes(body[field])) {
+        return NextResponse.json({ error: "Ungültige Sichtbarkeit der Kontaktdaten." }, { status: 400 });
+      }
+      update[field] = body[field];
+    }
+  }
   if (Object.keys(update).length === 2) {
     return NextResponse.json({ error: "Keine unterstützte Einstellung erhalten." }, { status: 400 });
   }
@@ -58,9 +72,9 @@ export async function PATCH(req: NextRequest) {
   const { data: saved, error } = await db
     .from("user_settings")
     .upsert(update, { onConflict: "user_id" })
-    .select("profile_visibility, message_permission, email_new_message")
+    .select("profile_visibility, message_permission, email_new_message, phone_visibility, contact_email_visibility")
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ success: true, settings: saved });
+  return NextResponse.json({ success: true, settings: saved }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 }

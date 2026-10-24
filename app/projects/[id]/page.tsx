@@ -19,11 +19,13 @@ type RawCredit = {
   created_at: string;
 };
 
+const PUBLIC_PROJECT_FIELDS = "id, title, alt_title, year, type, description, director, poster_url, images, verified, created_at, status, logline, synopsis, genres, language, country, runtime_minutes, production_company, co_producers, shoot_locations, prep_start, prep_end, shoot_start, shoot_end, post_start, post_end, release_cinema, release_cinema_countries, release_streaming, release_tv, trailer_url, teaser_url";
+
 async function _getProject(id: string) {
   const [{ data: project }, { data: credits }, { data: festivals }] = await Promise.all([
-    db.from("projects").select("*").eq("id", id).single(),
-    db.from("project_credits").select("*").eq("project_id", id).order("created_at", { ascending: true }),
-    db.from("project_festivals").select("*").eq("project_id", id).order("year", { ascending: false }),
+    db.from("projects").select(`${PUBLIC_PROJECT_FIELDS}, created_by`).eq("id", id).single(),
+    db.from("project_credits").select("id, project_id, user_id, unclaimed_profile_id, role, created_at").eq("project_id", id).order("created_at", { ascending: true }),
+    db.from("project_festivals").select("id, project_id, festival_name, year, section, status, award_name, notes").eq("project_id", id).order("year", { ascending: false }),
   ]);
 
   if (!project) return null;
@@ -35,12 +37,12 @@ async function _getProject(id: string) {
 
   const [profilesMap, ghostsMap] = await Promise.all([
     userIds.length > 0
-      ? db.from("profiles").select("user_id, display_name, avatar_url, role").in("user_id", userIds).then(
+      ? db.from("profiles").select("user_id, display_name, avatar_url, role, slug").in("user_id", userIds).then(
           ({ data }) => Object.fromEntries(
-            (data ?? []).map((p: { user_id: string; display_name: string; avatar_url: string | null; role: string | null }) => [p.user_id, p])
+            (data ?? []).map((p: { user_id: string; display_name: string; avatar_url: string | null; role: string | null; slug: string | null }) => [p.user_id, { display_name: p.display_name, avatar_url: p.avatar_url, role: p.role, slug: p.slug }])
           )
         )
-      : Promise.resolve({} as Record<string, { display_name: string; avatar_url: string | null; role: string | null }>),
+      : Promise.resolve({} as Record<string, { display_name: string; avatar_url: string | null; role: string | null; slug: string | null }>),
     unclaimedIds.length > 0
       ? db.from("unclaimed_profiles").select("id, name, slug, avatar_url, primary_role").in("id", unclaimedIds).then(
           ({ data }) => Object.fromEntries(
@@ -91,7 +93,17 @@ export default async function ProjectPage({
   if (!data) notFound();
 
   const [{ userId }, isAdmin] = await Promise.all([auth(), isAdminSession()]);
-  const myCredit = data.credits.find((c) => c.user_id && c.user_id === userId) ?? null;
+  const myRawCredit = data.credits.find((c) => c.user_id && c.user_id === userId) ?? null;
+  const { created_by: projectCreatorId, ...publicProject } = data.project;
+  const publicCredits = data.credits.map((credit) => ({
+    id: credit.id,
+    role: credit.role,
+    created_at: credit.created_at,
+    isCurrentUser: Boolean(userId && credit.user_id === userId),
+    profile: credit.profile,
+    ghost: credit.ghost,
+  }));
+  const myCredit = myRawCredit ? publicCredits.find((credit) => credit.id === myRawCredit.id) ?? null : null;
 
   let userPositions: string[] = [];
   let userProfile: { display_name: string | null; avatar_url: string | null } | null = null;
@@ -110,10 +122,11 @@ export default async function ProjectPage({
 
   return (
     <ProjectDetail
-      project={data.project}
-      credits={data.credits}
+      project={publicProject}
+      credits={publicCredits}
       festivals={data.festivals}
       currentUserId={userId ?? null}
+      initialIsCreator={Boolean(userId && projectCreatorId === userId)}
       myCredit={myCredit}
       userPositions={roleOptions}
       userProfile={userProfile}

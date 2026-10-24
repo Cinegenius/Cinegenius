@@ -24,9 +24,10 @@ async function _getCreator(slug: string) {
     // Try listings first
     const { data: listing } = await db
       .from("listings")
-      .select("*")
+      .select("id, user_id, type, title, category, city, price, image_url, description, published")
       .eq("id", slug)
       .eq("type", "creator")
+      .eq("published", true)
       .single();
 
     if (listing) {

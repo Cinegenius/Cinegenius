@@ -3,6 +3,12 @@ import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { saveProjectDraft } from "@/lib/project-drafts-server";
 
+function privateNoStoreJson(body: unknown, status = 200) {
+  const response = NextResponse.json(body, { status });
+  response.headers.set("Cache-Control", "private, no-store, max-age=0");
+  return response;
+}
+
 // GET /api/projects?q=titel&limit=10&mine=true
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -18,16 +24,16 @@ export async function GET(req: NextRequest) {
 
     const { data, error } = await db
       .from("projects")
-      .select("id, title, year, type, director, poster_url, metadata")
+      .select("id, title, year, type, director, poster_url")
       .eq("created_by", userId)
       .order("created_at", { ascending: false });
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    return NextResponse.json({ projects: data ?? [] });
+    if (error) return privateNoStoreJson({ error: error.message }, 500);
+    return privateNoStoreJson({ projects: data ?? [] });
   }
 
   let query = db
     .from("projects")
-    .select("id, title, year, type, director, poster_url, metadata")
+    .select("id, title, year, type, director, poster_url")
     .order("year", { ascending: false })
     .limit(limit);
 
@@ -37,7 +43,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ projects: data ?? [] });
+  return NextResponse.json({ projects: data ?? [] }, { headers: { "Cache-Control": "public, max-age=30, s-maxage=60, stale-while-revalidate=300" } });
 }
 
 // POST /api/projects — create a private draft; publication is a separate action.
@@ -50,6 +56,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ungültige Anfrage" }, { status: 400 });
   }
   const result = await saveProjectDraft(userId, { draftData: body });
-  if (result.error) return NextResponse.json({ error: result.error }, { status: result.status });
-  return NextResponse.json({ draft: result.draft, status: "draft" }, { status: 201 });
+  if (result.error) return privateNoStoreJson({ error: result.error }, result.status);
+  return privateNoStoreJson({ draft: result.draft, status: "draft" }, 201);
 }

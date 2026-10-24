@@ -11,6 +11,7 @@ function safeLink(url: string | null | undefined): string | null {
 }
 
 import { useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -28,14 +29,14 @@ import RoleDropdown from "@/components/RoleDropdown";
 
 type Credit = {
   id: string;
-  user_id: string | null;
-  unclaimed_profile_id?: string | null;
+  isCurrentUser?: boolean;
   role: string;
   created_at: string;
   profile: {
     display_name: string;
     avatar_url: string | null;
     role: string | null;
+    slug: string | null;
   } | null;
   ghost?: {
     name: string;
@@ -70,7 +71,6 @@ type Project = {
   poster_url: string | null;
   verified?: boolean | null;
   images: string[];
-  created_by: string | null;
   // Status & story
   status?: string | null;
   logline?: string | null;
@@ -111,6 +111,12 @@ type FestivalEntry = {
   award_name: string | null;
   notes: string | null;
 };
+
+function CreditProfileLink({ href, className, children }: { href: string | null; className: string; children: React.ReactNode }) {
+  return href
+    ? <Link href={href} className={className}>{children}</Link>
+    : <span className={className}>{children}</span>;
+}
 
 // ─── Department mapping ───────────────────────────────────────────────────────
 const DEPT_ORDER = [
@@ -233,6 +239,7 @@ export default function ProjectDetail({
   credits: initialCredits,
   festivals: initialFestivals,
   currentUserId,
+  initialIsCreator = false,
   myCredit: initialMyCredit,
   userPositions = [],
   userProfile = null,
@@ -242,6 +249,7 @@ export default function ProjectDetail({
   credits: Credit[];
   festivals: FestivalEntry[];
   currentUserId: string | null;
+  initialIsCreator?: boolean;
   myCredit: Credit | null;
   userPositions?: string[];
   userProfile?: { display_name: string | null; avatar_url: string | null } | null;
@@ -308,8 +316,10 @@ export default function ProjectDetail({
   const [savingTv, setSavingTv] = useState(false);
 
   const router = useRouter();
-  const isCreator = currentUserId === project.created_by;
-  const isLoggedIn = !!currentUserId;
+  const { userId: liveUserIdFromClerk, isLoaded } = useAuth();
+  const liveUserId = isLoaded ? liveUserIdFromClerk ?? null : currentUserId;
+  const isCreator = initialIsCreator && (!isLoaded || liveUserId === currentUserId);
+  const isLoggedIn = !!liveUserId;
   const typeColor = project.type ? (TYPE_COLORS[project.type] ?? "bg-gold/10 text-gold border-gold/20") : "";
   const statusMeta = project.status ? STATUS_META[project.status] : null;
   const grouped = groupCredits(credits);
@@ -362,11 +372,10 @@ export default function ProjectDetail({
       // Add the new credit directly to local state — no second fetch needed
       const newCredit: Credit = {
         id: data.credit.id,
-        user_id: currentUserId,
-        unclaimed_profile_id: null,
+        isCurrentUser: true,
         role: roleValue,
         created_at: data.credit.created_at,
-        profile: userProfile ? { display_name: userProfile.display_name ?? "", avatar_url: userProfile.avatar_url, role: null } : null,
+        profile: userProfile ? { display_name: userProfile.display_name ?? "", avatar_url: userProfile.avatar_url, role: null, slug: null } : null,
         ghost: null,
       };
       setCredits((prev) => [...prev, newCredit]);
@@ -380,7 +389,7 @@ export default function ProjectDetail({
     if (!confirm("Aus diesem Projekt austragen?")) return;
     await fetch(`/api/project-credits?project_id=${project.id}`, { method: "DELETE" });
     setMyCredit(null);
-    setCredits((prev) => prev.filter((c) => c.user_id !== currentUserId));
+    setCredits((prev) => prev.filter((c) => !c.isCurrentUser));
   };
 
   const handleSaveEdit = async () => {
@@ -726,8 +735,8 @@ export default function ProjectDetail({
                             ? <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border shrink-0 w-8 text-center ${badge.cls}`}>{badge.text}</span>
                             : <span className="text-[10px] text-text-muted shrink-0 w-8 truncate text-center" title={roleLabel}>{roleLabel?.substring(0, 3).toUpperCase()}</span>
                           }
-                          <Link
-                            href={credit.ghost ? `/person/${credit.ghost.slug}` : `/profile/${credit.user_id}`}
+                          <CreditProfileLink
+                            href={credit.ghost ? `/person/${credit.ghost.slug}` : credit.profile?.slug ? `/profile/${credit.profile.slug}` : null}
                             className="flex items-center gap-2 min-w-0 flex-1 group/link"
                           >
                             <div className="w-6 h-6 rounded-full overflow-hidden bg-bg-elevated border border-border shrink-0">
@@ -740,7 +749,7 @@ export default function ProjectDetail({
                             <span className="text-sm text-text-primary group-hover/link:text-rose-300 transition-colors truncate">{credit.profile?.display_name ?? credit.ghost?.name ?? "Unbekannt"}</span>
                             {credit.ghost && <span className="text-[9px] text-text-muted border border-border rounded px-1 shrink-0">nicht registriert</span>}
                             <ExternalLink size={10} className="text-text-muted shrink-0 opacity-0 group-hover/link:opacity-100 transition-opacity" />
-                          </Link>
+                          </CreditProfileLink>
                           {characterName
                             ? <span className="text-xs text-rose-400/80 shrink-0 truncate max-w-[140px]">als {characterName}</span>
                             : <span className="w-[140px] shrink-0" />
@@ -774,8 +783,8 @@ export default function ProjectDetail({
                             return (
                               <div key={credit.id} className="grid grid-cols-[1fr_1.5fr_1fr] px-5 py-2.5 border-t border-border/30 hover:bg-bg-elevated/40 transition-colors items-center">
                                 <span className="text-xs text-text-secondary truncate pr-4">{roleLabel}</span>
-                                <Link
-                                  href={credit.ghost ? `/person/${credit.ghost.slug}` : `/profile/${credit.user_id}`}
+                                <CreditProfileLink
+                                  href={credit.ghost ? `/person/${credit.ghost.slug}` : credit.profile?.slug ? `/profile/${credit.profile.slug}` : null}
                                   className="flex items-center gap-2.5 min-w-0 group/link"
                                 >
                                   <div className="w-6 h-6 rounded-full overflow-hidden bg-bg-elevated border border-border shrink-0">
@@ -788,7 +797,7 @@ export default function ProjectDetail({
                                   <span className="text-sm text-text-primary group-hover/link:text-gold transition-colors truncate">{credit.profile?.display_name ?? credit.ghost?.name ?? "Unbekannt"}</span>
                                   {credit.ghost && <span className="text-[9px] text-text-muted border border-border rounded px-1 shrink-0 ml-0.5">nicht registriert</span>}
                                   <ExternalLink size={10} className="text-text-muted shrink-0 opacity-0 group-hover/link:opacity-100 transition-opacity ml-0.5" />
-                                </Link>
+                                </CreditProfileLink>
                                 <span className="text-xs text-text-secondary truncate pl-2">{note ? `Mit: ${note}` : ""}</span>
                               </div>
                             );

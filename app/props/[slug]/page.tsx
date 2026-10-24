@@ -11,7 +11,7 @@ async function getProp(slug: string, viewerId?: string | null) {
   try {
     const { data, error } = await db
       .from("listings")
-      .select("*")
+      .select("id, user_id, company_id, type, category, title, city, price, created_at, image_url, description, metadata, extra_images, published")
       .eq("id", slug)
       .eq("type", "prop")
       .maybeSingle();
@@ -28,6 +28,13 @@ async function getProp(slug: string, viewerId?: string | null) {
 
     const provider = await getListingProvider(data.user_id, data.company_id, viewerId ?? null);
 
+    const rawMetadata = data.metadata && typeof data.metadata === "object" && !Array.isArray(data.metadata)
+      ? data.metadata as Record<string, unknown>
+      : {};
+    const focalPoint = rawMetadata.focal_point && typeof rawMetadata.focal_point === "object"
+      ? rawMetadata.focal_point as { x?: unknown; y?: unknown }
+      : null;
+
     return {
       id: data.id,
       title: data.title ?? "Requisite",
@@ -36,11 +43,13 @@ async function getProp(slug: string, viewerId?: string | null) {
       location: data.city ?? "",
       dailyRate: data.price ?? 0,
       image: data.image_url ?? "",
-      condition: (data.metadata as { condition?: string } | null)?.condition ?? "Gut",
-      era: (data.metadata as { era?: string } | null)?.era ?? null,
-      delivery: (data.metadata as { delivery?: boolean } | null)?.delivery ?? false,
-      focalPoint: (data.metadata as { focal_point?: { x: number; y: number } | null } | null)?.focal_point ?? null,
-      productionCredits: parseProductionCredits((data.metadata as { production_credits?: unknown } | null)?.production_credits),
+      condition: typeof rawMetadata.condition === "string" ? rawMetadata.condition : "Gut",
+      era: typeof rawMetadata.era === "string" ? rawMetadata.era : null,
+      delivery: rawMetadata.delivery === true,
+      focalPoint: typeof focalPoint?.x === "number" && typeof focalPoint?.y === "number"
+        ? { x: focalPoint.x, y: focalPoint.y }
+        : null,
+      productionCredits: parseProductionCredits(rawMetadata.production_credits),
       description: data.description ?? "",
       ownerId: provider.contactUserId ?? "",
       ownerName: provider.name,

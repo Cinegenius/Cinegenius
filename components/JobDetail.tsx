@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth, useClerk } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, MapPin, Clock, Briefcase, CheckCircle, Users, Calendar, Shield, AlertTriangle, DollarSign } from "lucide-react";
 import FavoriteButton from "@/components/FavoriteButton";
@@ -28,7 +29,7 @@ type Job = {
 
 export default function JobDetail({ job, preview = false }: { job: Job; preview?: boolean }) {
   const { userId } = useAuth();
-  const { openSignIn } = useClerk();
+  const router = useRouter();
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -204,7 +205,10 @@ export default function JobDetail({ job, preview = false }: { job: Job; preview?
                 !userId ? (
                   <div className="text-center py-4 space-y-3">
                     <p className="text-sm text-text-muted">Melde dich an, um dich zu bewerben.</p>
-                    <button onClick={() => openSignIn()} className="block w-full py-2.5 bg-gold text-bg-primary font-semibold rounded-lg text-sm text-center hover:bg-gold-light transition-colors">
+                    <button onClick={() => {
+                      const destination = `${window.location.pathname}${window.location.search}`;
+                      router.push(`/sign-in?redirect_url=${encodeURIComponent(destination)}`);
+                    }} className="block w-full py-2.5 bg-gold text-bg-primary font-semibold rounded-lg text-sm text-center hover:bg-gold-light transition-colors">
                       Anmelden
                     </button>
                   </div>

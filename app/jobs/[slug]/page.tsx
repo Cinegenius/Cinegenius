@@ -24,7 +24,7 @@ function parseJobDescription(raw: string) {
 async function getJob(slug: string, previewOwnerId?: string) {
   let query = db
     .from("listings")
-    .select("*")
+    .select("id, user_id, type, title, city, price, description, created_at, published")
     .eq("id", slug)
     .eq("type", "job");
   query = previewOwnerId

@@ -15,6 +15,7 @@ type AuthFormProps = {
   mode: AuthMode;
   destination: string;
   signUpDestination?: string;
+  signInDestination?: string;
 };
 
 type ClerkErrorLike = {
@@ -50,10 +51,10 @@ function finishNavigation(url: string, fallback: string) {
   window.location.replace(resolveAuthNavigationUrl(url, window.location.origin, fallback));
 }
 
-export default function AuthForm({ mode, destination, signUpDestination }: AuthFormProps) {
+export default function AuthForm({ mode, destination, signUpDestination, signInDestination }: AuthFormProps) {
   return mode === "sign-in"
     ? <SignInForm destination={destination} signUpDestination={signUpDestination ?? "/sign-up"} />
-    : <SignUpForm destination={destination} />;
+    : <SignUpForm destination={destination} signInDestination={signInDestination ?? "/sign-in"} />;
 }
 
 function SignInForm({ destination, signUpDestination }: { destination: string; signUpDestination: string }) {
@@ -589,7 +590,7 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
   );
 }
 
-function SignUpForm({ destination }: { destination: string }) {
+function SignUpForm({ destination, signInDestination }: { destination: string; signInDestination: string }) {
   const { signUp, errors, fetchStatus } = useSignUp();
   const { isLoaded, isSignedIn } = useAuth();
   const router = useRouter();
@@ -757,7 +758,7 @@ function SignUpForm({ destination }: { destination: string }) {
       {error && <p role="alert" className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</p>}
       <p className="mt-6 text-center text-sm text-text-muted">
         Schon registriert?{" "}
-        <Link prefetch href="/sign-in" className="font-semibold text-gold hover:text-gold-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-sm">Anmelden</Link>
+        <Link prefetch href={signInDestination} className="font-semibold text-gold hover:text-gold-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-sm">Anmelden</Link>
       </p>
     </div>
   );

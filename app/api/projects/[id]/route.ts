@@ -13,7 +13,7 @@ export async function GET(
 
   const { data: project, error } = await db
     .from("projects")
-    .select("id, title, year, type, description, director, poster_url, images, metadata, verified, created_at, updated_at, status, logline, production_company, runtime_minutes, trailer_url, release_cinema, release_streaming, release_tv, prep_start, prep_end, shoot_start, shoot_end, post_start, post_end")
+    .select("id, title, year, type, description, director, poster_url, images, verified, created_at, updated_at, status, logline, production_company, runtime_minutes, trailer_url, release_cinema, release_streaming, release_tv, prep_start, prep_end, shoot_start, shoot_end, post_start, post_end")
     .eq("id", id)
     .single();
 
@@ -42,8 +42,14 @@ export async function GET(
   }
 
   const creditsWithProfiles = (credits ?? []).map((c) => ({
-    ...c,
-    profile: profiles[c.user_id] ?? null,
+    id: c.id,
+    role: c.role,
+    created_at: c.created_at,
+    profile: profiles[c.user_id] ? {
+      display_name: profiles[c.user_id].display_name,
+      avatar_url: profiles[c.user_id].avatar_url,
+      role: profiles[c.user_id].role,
+    } : null,
   }));
 
   return NextResponse.json({ project, credits: creditsWithProfiles });

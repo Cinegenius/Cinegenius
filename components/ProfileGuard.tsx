@@ -1,6 +1,6 @@
 "use client";
 
-import { useUser, useClerk } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Film } from "lucide-react";
@@ -15,7 +15,6 @@ import { useTranslations } from "next-intl";
 export default function ProfileGuard({ children }: { children: React.ReactNode }) {
   const { user, isLoaded } = useUser();
   const router = useRouter();
-  const { openSignIn } = useClerk();
   const [ready, setReady] = useState(false);
   const t = useTranslations("common");
 
@@ -23,7 +22,8 @@ export default function ProfileGuard({ children }: { children: React.ReactNode }
     if (!isLoaded) return;
 
     if (!user) {
-      openSignIn();
+      const destination = window.location.pathname + window.location.search;
+      router.replace(`/sign-in?redirect_url=${encodeURIComponent(destination)}`);
       return;
     }
 
@@ -45,7 +45,7 @@ export default function ProfileGuard({ children }: { children: React.ReactNode }
         const redirect = window.location.pathname + window.location.search;
         router.replace(`/profile-setup?redirect=${encodeURIComponent(redirect)}`);
       });
-  }, [isLoaded, user, router, openSignIn]);
+  }, [isLoaded, user, router]);
 
   if (!isLoaded || !ready) {
     return (

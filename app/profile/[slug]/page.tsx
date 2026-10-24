@@ -6,7 +6,8 @@ import JsonLd from "@/components/JsonLd";
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import ProfileView from "./ProfileView";
-import { canViewProfile, getBlockStatus } from "@/lib/trust";
+import { canViewProfile, getBlockStatus, getProfileContactVisibility } from "@/lib/trust";
+import { projectProfileContacts, visibleProfileContactFields } from "@/lib/contact-visibility";
 import type { UserProfile, ProjectCredit } from "@/lib/profile-types";
 import { getPresetForType, type ProfileModule } from "@/lib/profile-types";
 import { normalizeProfileTypes } from "@/lib/profile-display";
@@ -16,9 +17,9 @@ import type { ExternalProfileRow } from "@/lib/external-platforms";
 export const dynamicParams = true;
 
 // Stable base columns that always exist
-const BASE_FIELDS = "user_id, display_name, avatar_url, cover_image_url, role, positions, location, bio, tagline, slug, profile_type, profile_types, verified, available, available_from, day_rate, languages, travel_ready, skills, filmography, profile_images, showreel_url, reel_url, awards, availability_config, modules, instagram_url, tiktok_url, youtube_url, vimeo_url, linkedin_url, website_url, video_links, phone";
+const BASE_FIELDS = "user_id, display_name, avatar_url, cover_image_url, role, positions, location, bio, tagline, slug, profile_type, profile_types, verified, available, available_from, day_rate, languages, travel_ready, skills, filmography, profile_images, showreel_url, reel_url, awards, availability_config, modules, instagram_url, tiktok_url, youtube_url, vimeo_url, linkedin_url, website_url, video_links";
 // Newer columns — fetched separately so a missing column doesn't break the whole query
-const EXTRA_FIELDS = "physical, performance, model_measurements, casting, crew, creative, vendor, agency, contact_email";
+const EXTRA_FIELDS = "physical, performance, model_measurements, casting, crew, creative, vendor, agency";
 
 async function _getProfile(slug: string): Promise<UserProfile | null> {
   // Validate slug to prevent PostgREST filter injection — allow only slug chars or UUID chars
@@ -107,7 +108,7 @@ export async function generateMetadata(
 async function getProjectCredits(userId: string): Promise<ProjectCredit[]> {
   const { data, error } = await db
     .from("project_credits")
-    .select("id, role, project_id, projects(id, title, year, type, director, poster_url, metadata)")
+    .select("id, role, project_id, projects(id, title, year, type, director, poster_url)")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(50);
@@ -132,7 +133,7 @@ function getExternalProfiles(userId: string): Promise<ExternalProfileRow[]> {
   )();
 }
 
-function getPublicListings(userId: string): Promise<{ id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null }[]> {
+function getPublicListings(userId: string): Promise<Array<{ id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null; focal_point: { x: number; y: number } | null }>> {
   return unstable_cache(
     async () => {
       const { data } = await db
@@ -143,7 +144,13 @@ function getPublicListings(userId: string): Promise<{ id: string; type: string; 
         .eq("published", true)
         .order("created_at", { ascending: false });
       return (data ?? []).map((l: { id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null; metadata?: Record<string, unknown> | null }) => ({
-        ...l,
+        id: l.id,
+        type: l.type,
+        title: l.title,
+        category: l.category,
+        price: l.price,
+        city: l.city,
+        image_url: l.image_url,
         focal_point: (l.metadata?.focal_point as { x: number; y: number } | null) ?? null,
       }));
     },
@@ -152,7 +159,7 @@ function getPublicListings(userId: string): Promise<{ id: string; type: string; 
   )();
 }
 
-type PublicCollab = { user_id: string; label: string; display_name: string; avatar_url: string | null; slug: string; role: string | null };
+type PublicCollab = { label: string; display_name: string; avatar_url: string | null; slug: string; role: string | null };
 
 function getPublicCollaborations(userId: string): Promise<PublicCollab[]> {
   return unstable_cache(
@@ -192,7 +199,6 @@ function getPublicCollaborations(userId: string): Promise<PublicCollab[]> {
         // Skip if profile not found or has no valid slug — avoids /profile/user_xxx 404s
         if (!p?.slug) return [];
         return [{
-          user_id: c.friendId,
           label: c.label,
           display_name: p.display_name ?? "Unbekannt",
           avatar_url: p.avatar_url ?? null,
@@ -217,7 +223,7 @@ function getCompanyMembership(userId: string): Promise<Array<{
     async () => {
       const { data } = await db
         .from("company_members")
-        .select("id, user_id, title, public_titles, status, company_id, companies(id, slug, name, logo_url, categories, published, owner_user_id)")
+        .select("id, title, public_titles, status, companies(id, slug, name, logo_url, categories, published, owner_user_id)")
         .eq("user_id", userId)
         .eq("status", "accepted")
         .order("created_at", { ascending: true });
@@ -256,6 +262,27 @@ export default async function ProfilePage(
 
   const isOwner = userId === profile.user_id;
   if (!isOwner && !(await canViewProfile(profile.user_id, userId))) notFound();
+  const contactVisibility = await getProfileContactVisibility(profile.user_id);
+  const contactColumns = visibleProfileContactFields(contactVisibility, userId, isOwner);
+  let contactData: { phone?: string | null; contact_email?: string | null } = {};
+  if (contactColumns.length > 0) {
+    const { data: visibleContacts, error } = await db
+      .from("profiles")
+      .select(contactColumns.join(", "))
+      .eq("user_id", profile.user_id)
+      .maybeSingle();
+    if (error) {
+      console.error("[profile contact visibility] permitted contact fields could not be loaded:", error.message);
+    } else if (visibleContacts) {
+      contactData = visibleContacts as typeof contactData;
+    }
+  }
+  const contactFields = projectProfileContacts(contactData, contactVisibility, userId, isOwner);
+  const visibleProfile: UserProfile = {
+    ...profile,
+    ...contactFields,
+    visibility: { ...profile.visibility, ...contactVisibility },
+  };
   const [projectCredits, companyMembership, externalProfiles, listings, blockStatus, collaborations, imageLikesData, similarProfiles] = await Promise.all([
     getProjectCredits(profile.user_id),
     getCompanyMembership(profile.user_id),
@@ -315,7 +342,7 @@ export default async function ProfilePage(
     <>
       <JsonLd data={jsonLd} />
       <ProfileView
-        profile={profile}
+        profile={visibleProfile}
         isOwner={isOwner}
         projectCredits={projectCredits}
         companyMembership={companyMembership}

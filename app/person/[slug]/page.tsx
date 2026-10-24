@@ -26,7 +26,7 @@ type Credit = {
 async function getData(slug: string) {
   const { data: profile } = await db
     .from("unclaimed_profiles")
-    .select("*")
+    .select("id, name, slug, avatar_url, primary_role, bio, claimed_by")
     .eq("slug", slug)
     .maybeSingle();
 
@@ -80,9 +80,16 @@ export default async function PersonPage({
 
   return (
     <PersonView
-      profile={data.profile}
+      profile={{
+        id: data.profile.id,
+        name: data.profile.name,
+        slug: data.profile.slug,
+        avatar_url: data.profile.avatar_url,
+        primary_role: data.profile.primary_role,
+        bio: data.profile.bio,
+      }}
       credits={data.credits}
-      currentUserId={userId ?? null}
+      isSignedIn={Boolean(userId)}
     />
   );
 }

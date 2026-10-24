@@ -13,6 +13,18 @@ const LISTING_COLS =
   "image_url, company_id, published, metadata, blocked_dates, " +
   "floor_plan_url, extra_images, created_at";
 
+// Public callers only need fields used by listings and search cards. Keep
+// internal ownership IDs, arbitrary metadata and private availability data on
+// authenticated owner endpoints.
+const LISTING_COLS_PUBLIC =
+  "id, type, category, title, description, price, city, image_url, published, extra_images, created_at";
+
+function privateNoStoreJson(body: unknown, status = 200) {
+  const response = NextResponse.json(body, { status });
+  response.headers.set("Cache-Control", "private, no-store, max-age=0");
+  return response;
+}
+
 export async function GET(req: NextRequest) {
   const type  = req.nextUrl.searchParams.get("type");
   const mine  = req.nextUrl.searchParams.get("mine") === "true";
@@ -35,14 +47,14 @@ export async function GET(req: NextRequest) {
 
     if (error) {
       console.error("[listings GET mine]", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return privateNoStoreJson({ error: error.message }, 500);
     }
-    return NextResponse.json({ data });
+    return privateNoStoreJson({ data });
   }
 
   let query = db
     .from("listings")
-    .select(LISTING_COLS)
+    .select(LISTING_COLS_PUBLIC)
     .eq("published", true)
     .order("created_at", { ascending: false })
     .range(from, to);
@@ -54,7 +66,7 @@ export async function GET(req: NextRequest) {
     console.error("[listings GET]", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  return NextResponse.json({ data, page, limit });
+  return NextResponse.json({ data, page, limit }, { headers: { "Cache-Control": "public, max-age=30, s-maxage=60, stale-while-revalidate=300" } });
 }
 
 export async function POST(req: Request) {

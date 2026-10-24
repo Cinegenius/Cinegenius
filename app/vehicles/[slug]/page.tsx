@@ -21,13 +21,13 @@ async function getVehicle(slug: string, viewerId?: string | null) {
   try {
     const { data, error } = await db
       .from("listings")
-      .select("*")
+      .select("id, user_id, company_id, type, category, title, city, price, created_at, image_url, description, metadata, extra_images, published")
       .eq("id", slug)
+      .eq("type", "vehicle")
       .maybeSingle();
 
     if (error) throw new Error(`Fahrzeug konnte nicht geladen werden: ${error.message}`);
     if (!data) { console.error("[getVehicle] no listing found for slug:", slug); return null; }
-    if (data.type !== "vehicle") { console.error("[getVehicle] wrong type:", data.type, "slug:", slug); return null; }
     if (data.published !== true) {
       const ownsPersonalListing = !!viewerId && !data.company_id && data.user_id === viewerId;
       const hasCompanyAccess = !!viewerId && !!data.company_id && !!(await getCompanyAccess(data.company_id, viewerId));
@@ -37,7 +37,12 @@ async function getVehicle(slug: string, viewerId?: string | null) {
   const provider = await getListingProvider(data.user_id, data.company_id, viewerId ?? null);
   const ownerName = provider.name;
 
-  const meta = (data.metadata ?? {}) as Record<string, unknown>;
+  const rawMetadata = data.metadata && typeof data.metadata === "object" && !Array.isArray(data.metadata)
+    ? data.metadata as Record<string, unknown>
+    : {};
+  const focalPoint = rawMetadata.focal_point && typeof rawMetadata.focal_point === "object"
+    ? rawMetadata.focal_point as { x?: unknown; y?: unknown }
+    : null;
 
   return {
     id: data.id,
@@ -45,10 +50,10 @@ async function getVehicle(slug: string, viewerId?: string | null) {
     type: data.category ?? "Fahrzeug",
     make: ownerName,
     model: data.title,
-    year: (meta.year as number) ?? 0,
-    color: (meta.color as string) ?? "",
-    era: (meta.era as string) ?? null,
-    condition: (meta.condition as string) ?? "Gut",
+    year: typeof rawMetadata.year === "number" ? rawMetadata.year : 0,
+    color: typeof rawMetadata.color === "string" ? rawMetadata.color : "",
+    era: typeof rawMetadata.era === "string" ? rawMetadata.era : null,
+    condition: typeof rawMetadata.condition === "string" ? rawMetadata.condition : "Gut",
     location: data.city ?? "",
     vendor: ownerName,
     dailyRate: data.price ?? 0,
@@ -56,8 +61,10 @@ async function getVehicle(slug: string, viewerId?: string | null) {
     tags: (data.created_at && (Date.now() - new Date(data.created_at as string).getTime() < 3 * 24 * 60 * 60 * 1000) ? ["Neu"] : []) as string[],
     instantBook: false,
     verified: false,
-    delivery: (meta.delivery as boolean) ?? false,
-    focalPoint: (meta.focal_point as { x: number; y: number } | null) ?? null,
+    delivery: rawMetadata.delivery === true,
+    focalPoint: typeof focalPoint?.x === "number" && typeof focalPoint?.y === "number"
+      ? { x: focalPoint.x, y: focalPoint.y }
+      : null,
     description: data.description ?? "",
     ownerId: provider.contactUserId ?? "",
     ownerName,

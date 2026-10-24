@@ -24,7 +24,7 @@ async function geocodeCity(city: string): Promise<{ lat: number; lng: number }> 
 async function getLocation(slug: string, viewerId: string | null = null) {
   const { data, error } = await db
     .from("listings")
-    .select("*")
+    .select("id, user_id, company_id, type, category, title, city, price, created_at, image_url, description, metadata, blocked_dates, floor_plan_url, extra_images, published")
     .eq("id", slug)
     .eq("type", "location")
     .eq("published", true)
@@ -39,6 +39,17 @@ async function getLocation(slug: string, viewerId: string | null = null) {
     fetchRatingSummaries([data.id], "listing"),
   ]);
   const summary = ratingMap[data.id] ?? { rating: 0, reviews: 0, ratingOnly: 0 };
+  const rawMetadata = data.metadata && typeof data.metadata === "object" && !Array.isArray(data.metadata)
+    ? data.metadata as Record<string, unknown>
+    : {};
+  const publicMetadata = Object.fromEntries(
+    ["sqm", "ceiling_height_m", "max_crew", "indoor_outdoor", "power_available", "power_details", "parking_spots", "amenities", "production_credits"]
+      .filter((key) => key in rawMetadata)
+      .map((key) => [key, rawMetadata[key]])
+  );
+  const focalPoint = rawMetadata.focal_point && typeof rawMetadata.focal_point === "object"
+    ? rawMetadata.focal_point as { x?: unknown; y?: unknown }
+    : null;
 
   return {
       id: data.id,
@@ -62,8 +73,10 @@ async function getLocation(slug: string, viewerId: string | null = null) {
       ownerName: provider.name,
       provider,
       isReal: true,
-      focalPoint: (data.metadata as { focal_point?: { x: number; y: number } | null } | null)?.focal_point ?? null,
-      metadata: data.metadata ?? null,
+      focalPoint: typeof focalPoint?.x === "number" && typeof focalPoint?.y === "number"
+        ? { x: focalPoint.x, y: focalPoint.y }
+        : null,
+      metadata: publicMetadata,
       blocked_dates: data.blocked_dates ?? [],
       floor_plan_url: data.floor_plan_url ?? null,
       extra_images: data.extra_images ?? [],

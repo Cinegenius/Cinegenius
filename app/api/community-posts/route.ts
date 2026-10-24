@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { rateLimit } from "@/lib/rateLimit";
+import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 const POST_KINDS = ["question", "recommendation", "request", "offer"] as const;
@@ -14,8 +15,7 @@ export async function GET(request: NextRequest) {
   const queryText = (params.get("q") ?? "").trim().slice(0, 80);
   const now = new Date().toISOString();
 
-  // Remove expired posts (and their replies) as people open the board.
-  await db.from("community_posts").delete().lte("expires_at", now);
+  const { userId } = await auth();
 
   let query = db
     .from("community_posts")
@@ -44,17 +44,26 @@ export async function GET(request: NextRequest) {
   const replyCounts = new Map<string, number>();
   for (const reply of replies ?? []) replyCounts.set(reply.post_id, (replyCounts.get(reply.post_id) ?? 0) + 1);
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     posts: data.map((post) => {
       const profile = profileById.get(post.author_id);
       return {
-        ...post,
+        id: post.id,
+        kind: post.kind,
+        title: post.title,
+        body: post.body,
+        city: post.city,
+        created_at: post.created_at,
+        expires_at: post.expires_at,
         author_name: profile?.display_name ?? "Mitglied",
         author_avatar: profile?.avatar_url ?? null,
         reply_count: replyCounts.get(post.id) ?? 0,
+        is_mine: Boolean(userId && post.author_id === userId),
       };
     }),
   });
+  response.headers.set("Cache-Control", "private, no-store, max-age=0");
+  return response;
 }
 
 export async function POST(request: NextRequest) {
@@ -88,12 +97,12 @@ export async function POST(request: NextRequest) {
   const { data, error } = await db
     .from("community_posts")
     .insert({ author_id: userId, kind, title, body, city: city || null, expires_at: expiresAt })
-    .select("id,author_id,kind,title,body,city,created_at,expires_at")
+    .select("id,kind,title,body,city,created_at,expires_at")
     .single();
   if (error || !data) return NextResponse.json({ error: "Aushang konnte nicht gespeichert werden." }, { status: 500 });
 
   const { data: profile } = await db.from("profiles").select("display_name,avatar_url").eq("user_id", userId).maybeSingle();
   return NextResponse.json({
-    post: { ...data, author_name: profile?.display_name ?? "Mitglied", author_avatar: profile?.avatar_url ?? null, reply_count: 0 },
-  }, { status: 201 });
+    post: { ...data, author_name: profile?.display_name ?? "Mitglied", author_avatar: profile?.avatar_url ?? null, reply_count: 0, is_mine: true },
+  }, { status: 201, headers: { "Cache-Control": "private, no-store, max-age=0" } });
 }

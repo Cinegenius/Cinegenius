@@ -1,5 +1,30 @@
 import "server-only";
 import { db } from "@/lib/db";
+import { normalizeContactVisibility, type ProfileContactVisibility } from "@/lib/contact-visibility";
+
+const HIDDEN_CONTACTS: ProfileContactVisibility = { phone: "hidden", contact_email: "hidden" };
+
+/** Resolve per-field contact consent. Owners can always see their own values. */
+export async function getProfileContactVisibility(
+  ownerId: string,
+): Promise<ProfileContactVisibility> {
+  const { data, error } = await db
+    .from("user_settings")
+    .select("phone_visibility, contact_email_visibility")
+    .eq("user_id", ownerId)
+    .maybeSingle();
+
+  if (error) {
+    // Fail closed if settings or the new columns are unavailable during rollout.
+    console.error("[profile contact visibility] settings lookup failed:", error.message);
+    return HIDDEN_CONTACTS;
+  }
+
+  return {
+    phone: normalizeContactVisibility(data?.phone_visibility),
+    contact_email: normalizeContactVisibility(data?.contact_email_visibility),
+  };
+}
 
 /**
  * Returns true if `blockerId` has blocked `blockedId`.

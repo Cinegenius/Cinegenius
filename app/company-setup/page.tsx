@@ -54,7 +54,7 @@ async function prepareCompanyImage(file: File, dimensions: { maxWidth: number; m
 }
 
 export default function CompanySetupPage() {
-  const { user, isLoaded } = useUser();
+  const { isLoaded } = useUser();
   const router = useRouter();
 
   // Basic info
@@ -64,6 +64,9 @@ export default function CompanySetupPage() {
   const [website, setWebsite] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [emailPublic, setEmailPublic] = useState(false);
+  const [phonePublic, setPhonePublic] = useState(false);
+  const [hqAddressPublic, setHqAddressPublic] = useState(false);
 
   // Logo
   const [logoUrl, setLogoUrl] = useState("");
@@ -131,13 +134,6 @@ export default function CompanySetupPage() {
   const canManageTeam = companyAccessRole === "owner" || companyAccessRole === "admin";
   const isCompanyOwner = companyAccessRole === "owner";
 
-  // Pre-fill email from Clerk once loaded
-  useEffect(() => {
-    if (!isLoaded || !user) return;
-    const primaryEmail = user.primaryEmailAddress?.emailAddress;
-    if (primaryEmail) setEmail((prev) => prev || primaryEmail);
-  }, [isLoaded, user]);
-
   useEffect(() => {
     const isGuided = new URLSearchParams(window.location.search).get("onboarding") === "1";
     setGuidedSetup(isGuided);
@@ -157,6 +153,9 @@ export default function CompanySetupPage() {
           setWebsite(c.website ?? "");
           setEmail(c.email ?? "");
           setPhone(c.phone ?? "");
+          setEmailPublic(c.email_public === true);
+          setPhonePublic(c.phone_public === true);
+          setHqAddressPublic(c.hq_address_public === true);
           setLogoUrl(c.logo_url ?? "");
           setLogoPreview(c.logo_url ?? "");
           setCoverUrl(c.cover_url ?? "");
@@ -208,6 +207,7 @@ export default function CompanySetupPage() {
       if (draft) {
         setName(draft.name ?? ""); setCity(draft.city ?? ""); setDescription(draft.description ?? "");
         setWebsite(draft.website ?? ""); setEmail(draft.email ?? ""); setPhone(draft.phone ?? "");
+        setEmailPublic(draft.emailPublic === true); setPhonePublic(draft.phonePublic === true); setHqAddressPublic(draft.hqAddressPublic === true);
         setLogoUrl(draft.logoUrl ?? ""); setLogoPreview(draft.logoUrl ?? "");
         setCoverUrl(draft.coverUrl ?? ""); setCoverPreview(draft.coverUrl ?? "");
         setPortfolioImages(draft.portfolioImages ?? []); setSelectedCategories(draft.selectedCategories ?? []);
@@ -231,7 +231,7 @@ export default function CompanySetupPage() {
       setCompanyDraftStatus("saving");
       try {
         const response = await fetch("/api/onboarding", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
-          intent: "company", setupComplete: false, companyDraft: { name, city, description, website, email, phone, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep, updatedAt: new Date().toISOString() },
+          intent: "company", setupComplete: false, companyDraft: { name, city, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep, updatedAt: new Date().toISOString() },
         }) });
         const result = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(result.error ?? "Der Entwurf konnte nicht gespeichert werden.");
@@ -242,7 +242,7 @@ export default function CompanySetupPage() {
       }
     }, 650);
     return () => clearTimeout(timer);
-  }, [guidedSetup, companyDraftLoaded, loading, existingId, name, city, description, website, email, phone, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, companyStep]);
+  }, [guidedSetup, companyDraftLoaded, loading, existingId, name, city, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, companyStep]);
 
   const handleSingleImageUpload = async (file: File | undefined, kind: "logo" | "cover") => {
     if (!file) return;
@@ -389,6 +389,7 @@ export default function CompanySetupPage() {
         body: JSON.stringify({
           id: existingId,
           name, city, description, website, email, phone,
+          email_public: emailPublic, phone_public: phonePublic, hq_address_public: hqAddressPublic,
           logo_url: logoUrl || null,
           categories: selectedCategories,
           services,
@@ -775,6 +776,10 @@ export default function CompanySetupPage() {
                   />
                 </div>
               </Field>
+              <label className="flex items-start gap-2.5 text-xs text-text-muted">
+                <input type="checkbox" checked={hqAddressPublic} onChange={(event) => setHqAddressPublic(event.target.checked)} className="mt-0.5 accent-gold" />
+                <span>Genaue Geschäftsadresse auf dem öffentlichen Firmenprofil anzeigen. Ohne Auswahl bleibt sie privat.</span>
+              </label>
               <Field label="Tätigkeitsländer">
                 <div className="space-y-2">
                   {countries.length > 0 && (
@@ -987,6 +992,17 @@ export default function CompanySetupPage() {
                   </div>
                 </Field>
               </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label className="flex items-start gap-2.5 text-xs text-text-muted">
+                  <input type="checkbox" checked={emailPublic} onChange={(event) => setEmailPublic(event.target.checked)} className="mt-0.5 accent-gold" />
+                  <span>Diese geschäftliche E-Mail öffentlich anzeigen.</span>
+                </label>
+                <label className="flex items-start gap-2.5 text-xs text-text-muted">
+                  <input type="checkbox" checked={phonePublic} onChange={(event) => setPhonePublic(event.target.checked)} className="mt-0.5 accent-gold" />
+                  <span>Diese geschäftliche Telefonnummer öffentlich anzeigen.</span>
+                </label>
+              </div>
+              <p className="text-[11px] text-text-muted">Deine Anmelde-E-Mail wird nicht übernommen. Nur die hier eingetragenen Firmendaten können mit deiner ausdrücklichen Auswahl öffentlich erscheinen.</p>
             </div>
 
             {/* Social Media */}

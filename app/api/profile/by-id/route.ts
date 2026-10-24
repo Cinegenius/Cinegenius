@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
   const { userId } = await auth();
   if (!(await canViewProfile(id, userId))) {
-    return NextResponse.json({ profile: null });
+    return NextResponse.json({ profile: null }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
   }
 
   const { data } = await db
@@ -20,5 +20,5 @@ export async function GET(req: NextRequest) {
     .eq("user_id", id)
     .maybeSingle();
 
-  return NextResponse.json({ profile: data ?? null });
+  return NextResponse.json({ profile: data ?? null }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 }

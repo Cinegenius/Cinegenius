@@ -4,7 +4,7 @@ import { anyBlockExists } from "@/lib/trust";
 import { rateLimit } from "@/lib/rateLimit";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { fetchRatingSummaries } from "@/lib/ratings";
 import { resolveReviewEligibility } from "@/lib/review-eligibility";
 
@@ -36,7 +36,6 @@ export async function GET(req: NextRequest) {
   ]);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  if (target_type === "user") revalidatePath("/");
   const summary = summaryMap[target_id] ?? { rating: 0, reviews: 0, ratingOnly: 0 };
   const myReviewRow = userId ? (data ?? []).find((review) => review.reviewer_id === userId) : null;
   const myReview = myReviewRow ? { id: myReviewRow.id, rating: myReviewRow.rating, text: myReviewRow.text } : null;
@@ -49,7 +48,7 @@ export async function GET(req: NextRequest) {
     data: publicReviews,
     myReview,
     summary: { avg: summary.rating, count: summary.reviews, ratingOnlyCount: summary.ratingOnly },
-  });
+  }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 }
 
 // POST /api/reviews

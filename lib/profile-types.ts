@@ -395,6 +395,7 @@ export interface VisibilitySettings {
   weight?: "public" | "hidden";
   day_rate?: "public" | "on_request" | "hidden";
   phone?: "public" | "members" | "hidden";
+  contact_email?: "public" | "members" | "hidden";
   exact_location?: "public" | "city_only" | "hidden";
 }
 
@@ -413,6 +414,9 @@ export interface UserProfile {
   tagline: string | null;
   bio: string | null;
   slug: string | null;
+  phone?: string | null;
+  contact_email?: string | null;
+  contact_requires_sign_in?: boolean;
 
   // Profiltyp
   profile_type: ProfileType;

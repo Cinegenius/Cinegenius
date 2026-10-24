@@ -29,7 +29,7 @@ const COMPANY_COLS_FULL =
   "id, slug, owner_user_id, name, logo_url, cover_url, description, city, website, email, phone, " +
   "categories, services, portfolio_images, tagline, bio_short, usp, founded_year, " +
   "legal_form, hq_address, countries, industry_focus, social_links, catering_details, published, " +
-  "created_at, updated_at";
+  "email_public, phone_public, hq_address_public, created_at, updated_at";
 
 // Lighter set for public directory listings.
 const COMPANY_COLS_PUBLIC =
@@ -155,6 +155,7 @@ export async function POST(req: NextRequest) {
     id, name, logo_url, cover_url, description, city, website, email, phone,
     categories, services, portfolio_images, owner_title, owner_titles,
     tagline, bio_short, usp, founded_year, legal_form, hq_address, countries, industry_focus,
+    email_public, phone_public, hq_address_public,
     social_links,
     catering_details,
     onboarding_request_key,
@@ -165,6 +166,11 @@ export async function POST(req: NextRequest) {
   }
   if (onboarding_request_key !== undefined && (typeof onboarding_request_key !== "string" || !/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(onboarding_request_key))) {
     return NextResponse.json({ error: "Ungültiger Einrichtungsauftrag" }, { status: 400 });
+  }
+  for (const [field, value] of [["email_public", email_public], ["phone_public", phone_public], ["hq_address_public", hq_address_public]] as const) {
+    if (value !== undefined && typeof value !== "boolean") {
+      return NextResponse.json({ error: `Ungültige Veröffentlichungseinstellung: ${field}` }, { status: 400 });
+    }
   }
 
   if (!id) {
@@ -179,7 +185,7 @@ export async function POST(req: NextRequest) {
   if (id) {
     const { data: existing } = await db
       .from("companies")
-      .select("id, slug, owner_user_id, logo_url, cover_url, portfolio_images")
+      .select("id, slug, owner_user_id, logo_url, cover_url, portfolio_images, email_public, phone_public, hq_address_public")
       .eq("id", id)
       .single();
 
@@ -209,6 +215,9 @@ export async function POST(req: NextRequest) {
         website: website?.trim() || null,
         email: email?.trim() || null,
         phone: phone?.trim() || null,
+        email_public: typeof email_public === "boolean" ? email_public : existing.email_public === true,
+        phone_public: typeof phone_public === "boolean" ? phone_public : existing.phone_public === true,
+        hq_address_public: typeof hq_address_public === "boolean" ? hq_address_public : existing.hq_address_public === true,
         categories: categories ?? [],
         services: services ?? [],
         portfolio_images: nextPortfolio,
@@ -244,7 +253,7 @@ export async function POST(req: NextRequest) {
 
     revalidateCompanyViews(data.slug);
 
-    return NextResponse.json({ data });
+    return NextResponse.json({ data }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
   }
 
   // Create new — generate unique slug
@@ -297,6 +306,9 @@ export async function POST(req: NextRequest) {
       website: website?.trim() || null,
       email: email?.trim() || null,
       phone: phone?.trim() || null,
+      email_public: email_public === true,
+      phone_public: phone_public === true,
+      hq_address_public: hq_address_public === true,
       categories: categories ?? [],
       services: services ?? [],
       portfolio_images: portfolio_images ?? [],
@@ -333,5 +345,5 @@ export async function POST(req: NextRequest) {
 
   revalidateCompanyViews(data.slug);
 
-  return NextResponse.json({ data });
+  return NextResponse.json({ data }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 }

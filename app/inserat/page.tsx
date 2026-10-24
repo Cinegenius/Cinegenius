@@ -646,7 +646,11 @@ export default function InseratPage() {
   }
 
   async function handleSubmit() {
-    if (!userId) { router.push("/sign-in"); return; }
+    if (!userId) {
+      const destination = `${window.location.pathname}${window.location.search}`;
+      router.push(`/sign-in?redirect_url=${encodeURIComponent(destination)}`);
+      return;
+    }
     const usesArticleGallery = selected?.type === "prop" || selected?.type === "vehicle";
     if (usesArticleGallery && articleGalleryState.uploading) {
       setError("Bitte warte, bis alle Artikelbilder fertig hochgeladen sind.");
@@ -731,7 +735,11 @@ export default function InseratPage() {
     return form.title.trim() && hasCity;
   };
 
-  if (isLoaded && !userId) { router.push("/sign-in"); return null; }
+  if (isLoaded && !userId) {
+    const destination = `${window.location.pathname}${window.location.search}`;
+    router.push(`/sign-in?redirect_url=${encodeURIComponent(destination)}`);
+    return null;
+  }
 
   // ── STEP 1 ──────────────────────────────────────────────────────────────────
 

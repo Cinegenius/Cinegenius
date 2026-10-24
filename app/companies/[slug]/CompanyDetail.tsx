@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -39,7 +40,6 @@ type MemberProfile = {
 
 type Member = {
   id: string;
-  user_id: string;
   title: string | null;
   public_titles?: string[];
   is_company_owner?: boolean;
@@ -64,7 +64,6 @@ type EquipmentItem = {
 type Company = {
   id: string;
   slug: string;
-  owner_user_id: string;
   name: string;
   logo_url: string | null;
   cover_url?: string | null;
@@ -81,6 +80,10 @@ type Company = {
   website: string | null;
   email: string | null;
   phone: string | null;
+  email_public?: boolean;
+  phone_public?: boolean;
+  hq_address_public?: boolean;
+  contact_requires_sign_in?: boolean;
   categories: string[];
   services: string[];
   catering_details?: unknown;
@@ -100,7 +103,7 @@ const listingTypeLabel: Record<string, string> = {
 
 
 export default function CompanyDetail({
-  company, listings, members, services, equipment, myMembership, myTitleChangeRequest, currentUserId,
+  company, listings, members, services, equipment, myMembership, myTitleChangeRequest, currentUserId: initialUserId, initialIsOwner,
 }: {
   company: Company;
   listings: Listing[];
@@ -110,7 +113,10 @@ export default function CompanyDetail({
   myMembership: { id: string; status: string; role?: string; title?: string | null; public_titles?: string[] } | null;
   myTitleChangeRequest: { id: string; status: string; created_at: string } | null;
   currentUserId: string | null;
+  initialIsOwner: boolean;
 }) {
+  const { user, isLoaded } = useUser();
+  const currentUserId = isLoaded ? user?.id ?? null : initialUserId;
   const searchParams = useSearchParams();
   const isWelcome = searchParams.get("welcome") === "1";
   const [welcomeDismissed, setWelcomeDismissed] = useState(false);
@@ -119,7 +125,7 @@ export default function CompanyDetail({
   const [publishError, setPublishError] = useState("");
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
-  const isOwner = currentUserId === company.owner_user_id;
+  const isOwner = initialIsOwner && !!initialUserId && currentUserId === initialUserId;
   const cats = company.categories.map((id) => COMPANY_CATEGORY_BY_ID[id]).filter(Boolean);
   const cateringDetails = normalizeCateringCompanyDetails(company.catering_details);
   const offersCatering = company.categories.includes(CATERING_COMPANY_CATEGORY.id);
@@ -138,6 +144,15 @@ export default function CompanyDetail({
   const [joinCustomTitle, setJoinCustomTitle] = useState("");
   const [joinMessage, setJoinMessage] = useState("");
   const [titleChangeRequest, setTitleChangeRequest] = useState(myTitleChangeRequest);
+
+  useEffect(() => {
+    if (isLoaded && currentUserId !== initialUserId) {
+      setLocalMembership(null);
+      setTitleChangeRequest(null);
+      setJoinDialogMode(null);
+      setMembershipSuccess("");
+    }
+  }, [currentUserId, initialUserId, isLoaded]);
   const [showAllTeam, setShowAllTeam] = useState(false);
   const canEditCompany = isOwner || (localMembership?.status === "accepted" && ["admin", "editor", "manager"].includes(localMembership.role ?? ""));
 
@@ -149,8 +164,8 @@ export default function CompanyDetail({
   }, [joinDialogMode]);
 
   const acceptedMembers = localMembers.filter((m) => m.status === "accepted");
-  const managementMembers = acceptedMembers.filter((m) => m.is_company_owner || m.user_id === company.owner_user_id);
-  const regularMembers = acceptedMembers.filter((m) => !m.is_company_owner && m.user_id !== company.owner_user_id);
+  const managementMembers = acceptedMembers.filter((m) => m.is_company_owner);
+  const regularMembers = acceptedMembers.filter((m) => !m.is_company_owner);
 
   function selectedJoinTitles() {
     return normalizeCompanyPublicTitles([...joinTitles, ...joinCustomTitle.split(",")]);
@@ -385,6 +400,12 @@ export default function CompanyDetail({
                 <Globe size={13} /> {company.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
               </a>
             )}
+            {company.contact_requires_sign_in && !currentUserId && (
+              <Link href={`/sign-in?redirect_url=${encodeURIComponent(`/companies/${company.slug}`)}`}
+                className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-border bg-bg-elevated px-4 py-2 text-xs text-text-secondary hover:border-gold/40 hover:text-gold">
+                <Mail size={13} /> Anmelden, um Kontakt aufzunehmen
+              </Link>
+            )}
             {!isOwner && (
               <div className="relative">
                 <button type="button" aria-expanded={actionMenuOpen} aria-controls="company-membership-actions-menu"
@@ -568,7 +589,8 @@ export default function CompanyDetail({
                       </div>
                       <div className="divide-y divide-border">
                         {managementMembers.map((m) => {
-                          const slug = m.profile?.slug ?? m.user_id;
+                          const slug = m.profile?.slug;
+                          if (!slug) return <div key={m.id} className="text-sm text-text-secondary">{m.profile?.display_name ?? "Teammitglied"}</div>;
                           const name = m.profile?.display_name ?? "Unbekannt";
                           const position = m.public_titles?.join(" · ") || m.title || "Inhaber/in";
                           return (
@@ -600,7 +622,8 @@ export default function CompanyDetail({
                       </div>
                       <div className="divide-y divide-border">
                         {(showAllTeam ? regularMembers : regularMembers.slice(0, 10)).map((m) => {
-                          const slug = m.profile?.slug ?? m.user_id;
+                          const slug = m.profile?.slug;
+                          if (!slug) return <div key={m.id} className="text-sm text-text-secondary">{m.profile?.display_name ?? "Teammitglied"}</div>;
                           const name = m.profile?.display_name ?? "Unbekannt";
                           const position = m.public_titles?.join(" · ") || m.title || "Teammitglied";
                           return (
