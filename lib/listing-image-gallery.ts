@@ -1,5 +1,10 @@
 export const MAX_LISTING_IMAGES = 10;
+export const MAX_LOCATION_IMAGES = 20;
 export const LISTING_GALLERY_PREVIEW_LIMIT = 4;
+
+export function maxImagesForListingType(type: string): number {
+  return type === "location" ? MAX_LOCATION_IMAGES : MAX_LISTING_IMAGES;
+}
 
 export type ListingImageGallery = {
   imageUrl: string | null;
@@ -42,6 +47,7 @@ export function getListingGalleryPreview(
 export function normalizeListingImageGallery(
   imageUrl: unknown,
   extraImages: unknown,
+  maxImages = MAX_LISTING_IMAGES,
 ): GalleryValidation {
   if (imageUrl !== undefined && imageUrl !== null && typeof imageUrl !== "string") {
     return { ok: false, error: "Das Hauptbild ist ungültig." };
@@ -61,8 +67,8 @@ export function normalizeListingImageGallery(
     .filter(Boolean);
   const urls = [...new Set(raw)];
 
-  if (urls.length > MAX_LISTING_IMAGES) {
-    return { ok: false, error: `Pro Artikel sind höchstens ${MAX_LISTING_IMAGES} Bilder erlaubt.` };
+  if (urls.length > maxImages) {
+    return { ok: false, error: `Pro Angebot sind höchstens ${maxImages} Bilder erlaubt.` };
   }
   if (urls.some((url) => url.length > 2048)) {
     return { ok: false, error: "Ein Bildlink ist zu lang." };

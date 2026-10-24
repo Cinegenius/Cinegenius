@@ -48,7 +48,8 @@ export async function PUT(request: NextRequest) {
   const payload = await request.json().catch(() => null);
   const record = payload && typeof payload === "object" ? payload as Record<string, unknown> : null;
   const isProfileEditorDraft = Boolean(record && Object.hasOwn(record, "profileEditorDraft"));
-  if (!record || (!isProfileEditorDraft && !INTENTS.has(String(record.intent)))) {
+  const isLocationFormDraft = Boolean(record && Object.hasOwn(record, "locationFormDraft"));
+  if (!record || (!isProfileEditorDraft && !isLocationFormDraft && !INTENTS.has(String(record.intent)))) {
     return json({ error: "Bitte wähle einen gültigen Einrichtungsweg aus." }, 400);
   }
   if (Object.hasOwn(record, "quickStart") && record.quickStart !== null) {
@@ -68,6 +69,17 @@ export async function PUT(request: NextRequest) {
     }
     record.quickStart = normalized;
   }
+  if (isLocationFormDraft) {
+    const raw = record.locationFormDraft;
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return json({ error: "Der Locationentwurf ist ungültig." }, 400);
+    const draft = raw as Record<string, unknown>;
+    const imageUrls = draft.imageUrls;
+    if (draft.version !== 1 || typeof draft.categoryId !== "string" || draft.categoryId.length > 80
+      || !Array.isArray(imageUrls) || imageUrls.length > 20
+      || imageUrls.some((url) => typeof url !== "string" || url.length > 2048)) {
+      return json({ error: "Der Locationentwurf enthält ungültige Angaben oder zu viele Fotos." }, 400);
+    }
+  }
   const encoded = JSON.stringify(record);
   const maxIncomingBytes = isProfileEditorDraft ? 100_000 : MAX_BYTES;
   if (new TextEncoder().encode(encoded).byteLength > maxIncomingBytes) {
@@ -80,6 +92,7 @@ export async function PUT(request: NextRequest) {
       ? user.privateMetadata[KEY] as Record<string, unknown>
       : {};
     const next = { ...current, ...record } as Record<string, unknown>;
+    if (isLocationFormDraft) next.locationFormDraftUpdatedAt = new Date().toISOString();
     if (isProfileEditorDraft) {
       const editorDraft = record.profileEditorDraft;
       if (!editorDraft || typeof editorDraft !== "object" || Array.isArray(editorDraft)) {
@@ -167,6 +180,11 @@ export async function DELETE(request: NextRequest) {
       delete current.profileEditorDraft;
       delete current.profileEditorDraftEncoded;
       delete current.profileEditorDraftUpdatedAt;
+      if (Object.keys(current).length) privateMetadata[KEY] = current;
+      else delete privateMetadata[KEY];
+    } else if (current && requestedType === "location-form") {
+      delete current.locationFormDraft;
+      delete current.locationFormDraftUpdatedAt;
       if (Object.keys(current).length) privateMetadata[KEY] = current;
       else delete privateMetadata[KEY];
     } else {

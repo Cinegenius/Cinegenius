@@ -26,6 +26,7 @@ type Props = {
   onChange: (images: string[]) => void;
   onStatusChange?: (state: UploadState) => void;
   label?: string;
+  maxImages?: number;
 };
 
 function makeId() {
@@ -65,7 +66,7 @@ function uploadFile(file: File, onProgress: (progress: number) => void): Promise
   });
 }
 
-export default function ListingImageManager({ value, onChange, onStatusChange, label = "Artikelbilder" }: Props) {
+export default function ListingImageManager({ value, onChange, onStatusChange, label = "Artikelbilder", maxImages = MAX_LISTING_IMAGES }: Props) {
   const initial = uniqueUrls(value).map((url) => ({
     id: `saved:${url}`,
     url,
@@ -210,14 +211,14 @@ export default function ListingImageManager({ value, onChange, onStatusChange, l
 
   const handleAddFiles = async (files: FileList | null) => {
     if (!files?.length || busyRef.current) return;
-    const remaining = Math.max(0, MAX_LISTING_IMAGES - entriesRef.current.length);
+    const remaining = Math.max(0, maxImages - entriesRef.current.length);
     if (!remaining) {
-      setNotice(`Du kannst höchstens ${MAX_LISTING_IMAGES} Bilder hinzufügen.`);
+      setNotice(`Du kannst höchstens ${maxImages} Bilder hinzufügen.`);
       return;
     }
     const selected = Array.from(files);
     const accepted = selected.slice(0, remaining);
-    setNotice(selected.length > remaining ? `Es wurden nur ${remaining} weitere Bilder ausgewählt. Insgesamt sind maximal ${MAX_LISTING_IMAGES} erlaubt.` : "");
+    setNotice(selected.length > remaining ? `Es wurden nur ${remaining} weitere Bilder ausgewählt. Insgesamt sind maximal ${maxImages} erlaubt.` : "");
     const additions = accepted.map((file) => {
       const previewUrl = safeObjectURL(file);
       return {
@@ -284,7 +285,7 @@ export default function ListingImageManager({ value, onChange, onStatusChange, l
           <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest">{label}</label>
           <p className="mt-1 text-xs text-text-muted">JPG, PNG, WebP oder HEIC/HEIF · große Fotos werden automatisch verkleinert (max. 4 MB pro Foto nach der Verkleinerung).</p>
         </div>
-        <span className="text-xs text-text-muted">{entries.length} / {MAX_LISTING_IMAGES} Bilder</span>
+        <span className="text-xs text-text-muted">{entries.length} / {maxImages} Bilder</span>
       </div>
 
       {entries.length > 0 && (
@@ -364,11 +365,11 @@ export default function ListingImageManager({ value, onChange, onStatusChange, l
       )}
 
       <div className="flex flex-wrap items-center gap-3">
-        <button type="button" disabled={isBusy || entries.length >= MAX_LISTING_IMAGES} onClick={() => fileInputRef.current?.click()} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm text-text-secondary transition-colors hover:border-gold hover:text-gold disabled:cursor-not-allowed disabled:opacity-50">
+        <button type="button" disabled={isBusy || entries.length >= maxImages} onClick={() => fileInputRef.current?.click()} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm text-text-secondary transition-colors hover:border-gold hover:text-gold disabled:cursor-not-allowed disabled:opacity-50">
           {isBusy ? <Loader2 size={15} className="animate-spin" /> : <Upload size={15} />}
           {isBusy ? "Upload läuft…" : "Bilder hinzufügen"}
         </button>
-        <input ref={fileInputRef} type="file" multiple accept="image/jpeg,image/png,image/webp,image/heic,image/heif" className="sr-only" disabled={isBusy || entries.length >= MAX_LISTING_IMAGES} onChange={(event) => {
+        <input ref={fileInputRef} type="file" multiple accept="image/jpeg,image/png,image/webp,image/heic,image/heif" className="sr-only" disabled={isBusy || entries.length >= maxImages} onChange={(event) => {
           void handleAddFiles(event.currentTarget.files);
           event.currentTarget.value = "";
         }} />

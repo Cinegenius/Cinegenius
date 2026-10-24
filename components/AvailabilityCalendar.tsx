@@ -28,24 +28,6 @@ function diffDays(a: Date, b: Date) {
   return Math.round(Math.abs(b.getTime() - a.getTime()) / 86_400_000) + 1;
 }
 
-// Mock belegte Daten — in Produktion von API
-function getMockedBookedKeys(baseYear: number, baseMonth: number): Set<string> {
-  const booked = new Set<string>();
-  const ranges = [
-    { start: new Date(baseYear, baseMonth, 7),  len: 2 },
-    { start: new Date(baseYear, baseMonth, 14), len: 3 },
-    { start: new Date(baseYear, baseMonth, 22), len: 1 },
-    { start: new Date(baseYear, baseMonth + 1, 4),  len: 4 },
-    { start: new Date(baseYear, baseMonth + 1, 19), len: 2 },
-  ];
-  for (const { start, len } of ranges) {
-    for (let i = 0; i < len; i++) {
-      booked.add(toKey(addDays(start, i)));
-    }
-  }
-  return booked;
-}
-
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
@@ -71,9 +53,8 @@ export default function AvailabilityCalendar({ dailyRate, currency = "€", onSe
   const [hover, setHover] = useState<Date | null>(null);
 
   const bookedKeys = useMemo(() => {
-    if (blockedDates && blockedDates.length > 0) return new Set(blockedDates);
-    return getMockedBookedKeys(today.getFullYear(), today.getMonth());
-  }, [blockedDates, today]);
+    return new Set(blockedDates ?? []);
+  }, [blockedDates]);
 
   const isBooked = (d: Date) => bookedKeys.has(toKey(d));
   const isPast   = (d: Date) => d.getTime() < today.getTime();

@@ -2,11 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import dynamic from "next/dynamic";
 import {
   MapPin, Star, CheckCircle, Users, Zap, ArrowLeft,
-  Shield, MessageSquare, Expand,
+  Shield, MessageSquare,
   Wifi, Car, Zap as Power, Coffee, DoorOpen, Truck,
   Thermometer, Volume2, Wind, Accessibility, ArrowUpDown,
   FlipHorizontal, Pencil, Maximize2,
@@ -21,9 +19,8 @@ import ReportButton from "@/components/ReportButton";
 import { ProductionCreditsDisplay } from "@/components/ProductionCredits";
 import { parseProductionCredits } from "@/lib/production-credits";
 import ListingProviderCard from "@/components/ListingProviderCard";
+import ListingPhotoGallery from "@/components/ListingPhotoGallery";
 import type { ListingProvider } from "@/lib/listing-provider";
-
-const Lightbox = dynamic(() => import("@/components/Lightbox"), { ssr: false });
 
 interface LocationMeta {
   sqm?: number | null;
@@ -34,6 +31,13 @@ interface LocationMeta {
   power_details?: string | null;
   parking_spots?: number | null;
   amenities?: string[];
+  rooms?: string[];
+  natural_light?: boolean;
+  blackout_possible?: boolean;
+  loading_access?: boolean;
+  access_notes?: string | null;
+  shooting_hours?: string | null;
+  availability_notes?: string | null;
   production_credits?: unknown;
 }
 
@@ -113,8 +117,6 @@ export default function LocationDetail({ location }: { location: Location }) {
       setLiveRating(prevSummary);
     }
   };
-  const [activeImg, setActiveImg] = useState(0);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [bookingStart, setBookingStart] = useState<Date | null>(null);
   const [bookingEnd, setBookingEnd]     = useState<Date | null>(null);
   const [bookingDays, setBookingDays]   = useState(0);
@@ -125,7 +127,7 @@ export default function LocationDetail({ location }: { location: Location }) {
   const productionCredits = parseProductionCredits(meta.production_credits);
 
   // Images: main + extra
-  const allImages = [location.image, ...(location.extra_images ?? [])].filter(Boolean) as string[];
+  const allImages = [...new Set([location.image, ...(location.extra_images ?? [])].filter((image): image is string => typeof image === "string" && !!image.trim()))];
 
   const handleCalendarSelect = (start: Date, end: Date, days: number) => {
     setBookingStart(start); setBookingEnd(end); setBookingDays(days);
@@ -156,41 +158,16 @@ export default function LocationDetail({ location }: { location: Location }) {
         </Link>
       </div>
 
-      {/* Image gallery */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-        <div className={`relative grid gap-2 rounded-xl overflow-hidden h-80 sm:h-[420px] ${allImages.length > 1 ? "grid-cols-4" : "grid-cols-1"}`}>
-          <div className={`${allImages.length > 1 ? "col-span-2 row-span-2" : "col-span-4"} relative overflow-hidden cursor-pointer`}
-            onClick={() => { setActiveImg(0); setLightboxOpen(true); }}>
-            {allImages[0] ? (
-              <Image src={allImages[0]} alt={location.title} fill className="object-cover hover:scale-105 transition-transform duration-500" style={{ objectPosition: location.focalPoint ? `${location.focalPoint.x}% ${location.focalPoint.y}%` : "50% 50%" }} sizes="50vw" priority />
-            ) : (
-              <div className="w-full h-full bg-bg-elevated flex items-center justify-center text-text-muted/20">
-                <MapPin size={48} />
-              </div>
-            )}
-          </div>
-          {allImages.slice(1, 5).map((img, i) => (
-            <div key={i} className="relative overflow-hidden cursor-pointer"
-              onClick={() => { setActiveImg(i + 1); setLightboxOpen(true); }}>
-              <Image src={img} alt="" fill className="object-cover hover:scale-105 transition-transform duration-500" sizes="25vw" />
-            </div>
-          ))}
-          {allImages.length > 1 && (
-            <button onClick={() => setLightboxOpen(true)}
-              className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1.5 bg-bg-primary/80 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-all backdrop-blur-sm">
-              <Expand size={13} /> Alle {allImages.length} Fotos
-            </button>
-          )}
-        </div>
+        <ListingPhotoGallery
+          images={allImages}
+          title={location.title}
+          label="Locationgalerie"
+          alt={`Fotos von ${location.title}`}
+          focalPoint={location.focalPoint}
+          fallback={<MapPin size={42} aria-hidden="true" />}
+        />
       </div>
-
-      {/* Lightbox */}
-      {lightboxOpen && (
-        <Lightbox images={allImages} activeIndex={activeImg} alt={location.title}
-          onClose={() => setLightboxOpen(false)}
-          onPrev={() => setActiveImg((i) => (i - 1 + allImages.length) % allImages.length)}
-          onNext={() => setActiveImg((i) => (i + 1) % allImages.length)} />
-      )}
 
       {/* Content + sidebar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-28 lg:pb-20">
@@ -268,6 +245,9 @@ export default function LocationDetail({ location }: { location: Location }) {
                   meta.max_crew && { label: "Max. Crew", value: `${meta.max_crew} Personen` },
                   meta.parking_spots != null && { label: "Parkplätze", value: String(meta.parking_spots) },
                   lageLabel && { label: "Lage", value: lageLabel },
+                  meta.natural_light && { label: "Tageslicht", value: "Vorhanden" },
+                  meta.blackout_possible && { label: "Verdunkelung", value: "Möglich" },
+                  meta.loading_access && { label: "Be-/Entladung", value: "Gut möglich" },
                   location.price > 0 && { label: "Preis", value: `${location.price.toLocaleString()} €/Tag` },
                 ].filter((x): x is { label: string; value: string } => !!x).map(({ label, value }) => (
                   <div key={label} className="p-3 bg-bg-secondary border border-border rounded-xl flex flex-col items-center gap-1.5 text-center">
@@ -318,15 +298,40 @@ export default function LocationDetail({ location }: { location: Location }) {
               </div>
             )}
 
+            {Array.isArray(meta.rooms) && meta.rooms.length > 0 && (
+              <div className="mb-8">
+                <h2 className="font-display text-xl font-bold text-text-primary mb-4">Räume & Bereiche</h2>
+                <div className="flex flex-wrap gap-2">
+                  {meta.rooms.map((room) => (
+                    <span key={room} className="rounded-full border border-border bg-bg-secondary px-3 py-1.5 text-xs text-text-secondary">
+                      {room.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toLocaleUpperCase("de-DE"))}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {(meta.shooting_hours || meta.access_notes || meta.availability_notes) && (
+              <div className="mb-8 rounded-xl border border-border bg-bg-secondary p-4 sm:p-5">
+                <h2 className="font-display text-xl font-bold text-text-primary mb-3">Drehbedingungen</h2>
+                <dl className="space-y-3 text-sm">
+                  {meta.shooting_hours && <div><dt className="text-xs text-text-muted">Mögliche Drehzeiten</dt><dd className="mt-0.5 text-text-secondary">{meta.shooting_hours}</dd></div>}
+                  {meta.access_notes && <div><dt className="text-xs text-text-muted">Anfahrt und Zugang</dt><dd className="mt-0.5 text-text-secondary">{meta.access_notes}</dd></div>}
+                  {meta.availability_notes && <div><dt className="text-xs text-text-muted">Verfügbarkeit und Einschränkungen</dt><dd className="mt-0.5 whitespace-pre-line text-text-secondary">{meta.availability_notes}</dd></div>}
+                </dl>
+              </div>
+            )}
+
             {/* Grundriss */}
             {location.floor_plan_url && (
               <div className="mb-8">
                 <h2 className="font-display text-xl font-bold text-text-primary mb-4">
                   <FlipHorizontal size={18} className="inline mr-2 text-gold" />Grundriss
                 </h2>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={location.floor_plan_url} alt="Grundriss" className="w-full max-w-lg rounded-xl border border-border object-contain cursor-pointer hover:opacity-90 transition-opacity"
-                  onClick={() => { setActiveImg(allImages.length); setLightboxOpen(true); }} />
+                <a href={location.floor_plan_url} target="_blank" rel="noreferrer" className="block w-full max-w-lg overflow-hidden rounded-xl border border-border hover:opacity-90 transition-opacity" aria-label="Grundriss in voller Größe öffnen">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={location.floor_plan_url} alt="Grundriss in voller Größe öffnen" className="max-h-96 w-full object-contain" />
+                </a>
               </div>
             )}
 

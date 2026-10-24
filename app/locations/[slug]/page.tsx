@@ -43,7 +43,7 @@ async function getLocation(slug: string, viewerId: string | null = null) {
     ? data.metadata as Record<string, unknown>
     : {};
   const publicMetadata = Object.fromEntries(
-    ["sqm", "ceiling_height_m", "max_crew", "indoor_outdoor", "power_available", "power_details", "parking_spots", "amenities", "production_credits"]
+    ["sqm", "ceiling_height_m", "max_crew", "indoor_outdoor", "power_available", "power_details", "parking_spots", "amenities", "rooms", "natural_light", "blackout_possible", "loading_access", "access_notes", "shooting_hours", "availability_notes", "price_on_request", "production_credits"]
       .filter((key) => key in rawMetadata)
       .map((key) => [key, rawMetadata[key]])
   );
@@ -56,7 +56,7 @@ async function getLocation(slug: string, viewerId: string | null = null) {
       title: data.title ?? "Location",
       type: data.category ?? "Speziallocation",
       city: data.city ?? "",
-      price: data.price ?? 0,
+      price: rawMetadata.price_on_request === true ? 0 : data.price ?? 0,
       priceUnit: "day" as const,
       rating: summary.rating,
       reviews: summary.reviews,
@@ -94,7 +94,7 @@ export async function generateMetadata({
   if (!location) return {};
   return {
     title: location.title,
-    description: `${location.type} in ${location.city} — ab ${location.price.toLocaleString()} € / Tag.`,
+    description: `${location.type} in ${location.city} — ${location.price > 0 ? `${location.price.toLocaleString()} € pro Tag` : "Preis auf Anfrage"}.`,
     openGraph: {
       title: `${location.title} | CineGenius`,
       description: `${location.type} in ${location.city} — jetzt für Film & Foto buchen.`,
@@ -123,7 +123,7 @@ export default async function LocationPage({
       "addressCountry": "DE",
     },
     "image": location.image || undefined,
-    "offers": {
+    ...(location.price > 0 ? { "offers": {
       "@type": "Offer",
       "price": location.price,
       "priceCurrency": "EUR",
@@ -133,7 +133,7 @@ export default async function LocationPage({
         "priceCurrency": "EUR",
         "unitText": "DAY",
       },
-    },
+    } } : {}),
   };
 
   return (

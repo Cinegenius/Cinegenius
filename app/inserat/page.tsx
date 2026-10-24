@@ -2,7 +2,7 @@
 
 import UnoptimizedImage from "@/components/UnoptimizedImage";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { compressImage, MAX_FUNCTION_UPLOAD_BYTES, safeObjectURL } from "@/lib/compressImage";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
@@ -19,6 +19,7 @@ import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
 import { PROP_CATEGORY_FIELDS } from "@/lib/propCategoryFields";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 import ListingImageManager from "@/components/ListingImageManager";
+import { MAX_LOCATION_IMAGES } from "@/lib/listing-image-gallery";
 import { ProductionCreditsEditor } from "@/components/ProductionCredits";
 import { serializeProductionCredits, type ProductionCreditDraft } from "@/lib/production-credits";
 
@@ -371,6 +372,7 @@ export default function InseratPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [articleImages, setArticleImages] = useState<string[]>([]);
   const [articleGalleryState, setArticleGalleryState] = useState({ uploading: false, failed: 0 });
+  const [locationGalleryState, setLocationGalleryState] = useState({ uploading: false, failed: 0 });
   const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
   const [focalPoint, setFocalPoint] = useState<FocalPoint | null>(null);
   const [showFocalPicker, setShowFocalPicker] = useState(false);
@@ -381,11 +383,16 @@ export default function InseratPage() {
   const [locRooms, setLocRooms] = useState<string[]>([]);
   const [locBlockedDates, setLocBlockedDates] = useState<string[]>([]);
   const [locExtraImages, setLocExtraImages] = useState<string[]>([]);
+  const [locPriceOnRequest, setLocPriceOnRequest] = useState(true);
   const [locFloorPlanUrl, setLocFloorPlanUrl] = useState<string | null>(null);
   const [locFloorPlanPreview, setLocFloorPlanPreview] = useState<string | null>(null);
-  const [locExtraUploading, setLocExtraUploading] = useState(false);
   const [locFloorUploading, setLocFloorUploading] = useState(false);
   const [productionCredits, setProductionCredits] = useState<ProductionCreditDraft[]>([]);
+  const [locationDraftReady, setLocationDraftReady] = useState(false);
+  const [locationDraftStatus, setLocationDraftStatus] = useState<"loading" | "idle" | "saving" | "saved" | "error">("loading");
+  const locationDraftTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const locationDraftQueue = useRef<Promise<void>>(Promise.resolve());
+  const locationDraftRevision = useRef(0);
   // Calendar state for blocked dates
   const [calYear, setCalYear] = useState(() => new Date().getFullYear());
   const [calMonth, setCalMonth] = useState(() => new Date().getMonth());
@@ -416,6 +423,12 @@ export default function InseratPage() {
     power_available: false,
     power_details: "",
     parking_spots: "",
+    natural_light: false,
+    blackout_possible: false,
+    loading_access: false,
+    access_notes: "",
+    shooting_hours: "",
+    availability_notes: "",
     // job
     company: "",
     projectType: "",
@@ -440,6 +453,135 @@ export default function InseratPage() {
   const [myCompanies, setMyCompanies] = useState<{ id: string; name: string; logo_url: string | null }[]>([]);
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>("");
 
+  const buildLocationDraft = useCallback(() => ({
+    version: 1,
+    categoryId: selected?.type === "location" ? selected.id : "",
+    groupId: activeGroup ?? "drehorte",
+    step,
+    form: {
+      title: form.title, description: form.description, city: form.city, price: form.price,
+        price_on_request: locPriceOnRequest,
+      sqm: form.sqm, ceiling_height: form.ceiling_height, max_crew: form.max_crew,
+      indoor_outdoor: form.indoor_outdoor, power_available: form.power_available,
+      power_details: form.power_details, parking_spots: form.parking_spots,
+      natural_light: form.natural_light, blackout_possible: form.blackout_possible,
+      loading_access: form.loading_access, access_notes: form.access_notes,
+      shooting_hours: form.shooting_hours, availability_notes: form.availability_notes,
+    },
+    amenities: locAmenities,
+    rooms: locRooms,
+    blockedDates: locBlockedDates,
+    imageUrls: locExtraImages,
+    floorPlanUrl: locFloorPlanUrl,
+    selectedCompanyId,
+    focalPoint,
+    productionCredits,
+  }), [selected, activeGroup, step, form, locAmenities, locRooms, locBlockedDates, locExtraImages, locFloorPlanUrl, locPriceOnRequest, selectedCompanyId, focalPoint, productionCredits]);
+
+  const persistLocationDraft = useCallback(async (draft: ReturnType<typeof buildLocationDraft>) => {
+    const revision = ++locationDraftRevision.current;
+    setLocationDraftStatus("saving");
+    const task = locationDraftQueue.current.catch(() => undefined).then(async () => {
+      const response = await fetch("/api/onboarding", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ locationFormDraft: draft }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error ?? "Der Locationentwurf konnte nicht gespeichert werden.");
+    });
+    locationDraftQueue.current = task.then(() => undefined, () => undefined);
+    try {
+      await task;
+      if (revision === locationDraftRevision.current) setLocationDraftStatus("saved");
+      return true;
+    } catch (cause) {
+      if (revision === locationDraftRevision.current) setLocationDraftStatus("error");
+      throw cause;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (!userId) {
+      setLocationDraftReady(true);
+      setLocationDraftStatus("idle");
+      return;
+    }
+
+    let active = true;
+    setLocationDraftReady(false);
+    setLocationDraftStatus("loading");
+    fetch("/api/onboarding", { cache: "no-store" })
+      .then(async (response) => {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error ?? "Der gespeicherte Locationentwurf konnte nicht geladen werden.");
+        return data.draft?.locationFormDraft as Record<string, unknown> | undefined;
+      })
+      .then((saved) => {
+        if (!active) return;
+        if (saved?.version === 1 && typeof saved.categoryId === "string") {
+          const item = groups.flatMap((group) => group.items).find((candidate) => candidate.id === saved.categoryId && candidate.type === "location");
+          if (item) {
+            const savedForm = saved.form && typeof saved.form === "object" && !Array.isArray(saved.form)
+              ? saved.form as Record<string, unknown>
+              : {};
+            const text = (key: string) => typeof savedForm[key] === "string" ? String(savedForm[key]).slice(0, key === "description" ? 5000 : 500) : "";
+            setSelected(item);
+            setActiveGroup(typeof saved.groupId === "string" && groups.some((group) => group.id === saved.groupId) ? saved.groupId : "drehorte");
+            setStep(2);
+            setForm((current) => ({
+              ...current,
+              title: text("title"), description: text("description"), city: text("city"), price: text("price"),
+              sqm: text("sqm"), ceiling_height: text("ceiling_height"), max_crew: text("max_crew"),
+              indoor_outdoor: ["innen", "außen", "beides"].includes(String(savedForm.indoor_outdoor)) ? savedForm.indoor_outdoor as "innen" | "außen" | "beides" : "innen",
+              power_available: savedForm.power_available === true, power_details: text("power_details"), parking_spots: text("parking_spots"),
+              natural_light: savedForm.natural_light === true, blackout_possible: savedForm.blackout_possible === true,
+              loading_access: savedForm.loading_access === true, access_notes: text("access_notes"),
+              shooting_hours: text("shooting_hours"), availability_notes: text("availability_notes"),
+            }));
+            setLocAmenities(Array.isArray(saved.amenities) ? saved.amenities.filter((value): value is string => typeof value === "string").slice(0, 80) : []);
+            setLocRooms(Array.isArray(saved.rooms) ? saved.rooms.filter((value): value is string => typeof value === "string").slice(0, 80) : []);
+            setLocBlockedDates(Array.isArray(saved.blockedDates) ? saved.blockedDates.filter((value): value is string => typeof value === "string").slice(0, 500) : []);
+            const imageUrls = Array.isArray(saved.imageUrls) ? saved.imageUrls.filter((value): value is string => typeof value === "string" && value.startsWith("https://")).slice(0, MAX_LOCATION_IMAGES) : [];
+            setLocExtraImages(imageUrls);
+            setLocPriceOnRequest(savedForm.price_on_request !== false);
+            const floorPlanUrl = typeof saved.floorPlanUrl === "string" && saved.floorPlanUrl.startsWith("https://") ? saved.floorPlanUrl : null;
+            setLocFloorPlanUrl(floorPlanUrl);
+            setLocFloorPlanPreview(floorPlanUrl);
+            setSelectedCompanyId(typeof saved.selectedCompanyId === "string" ? saved.selectedCompanyId.slice(0, 100) : "");
+            const point = saved.focalPoint && typeof saved.focalPoint === "object" ? saved.focalPoint as Record<string, unknown> : null;
+            setFocalPoint(point && typeof point.x === "number" && typeof point.y === "number" && point.x >= 0 && point.x <= 100 && point.y >= 0 && point.y <= 100 ? { x: point.x, y: point.y } : null);
+            setProductionCredits(Array.isArray(saved.productionCredits) ? saved.productionCredits.slice(0, 20) as ProductionCreditDraft[] : []);
+            setLocationDraftStatus("saved");
+          }
+        }
+        setLocationDraftReady(true);
+      })
+      .catch(() => {
+        if (!active) return;
+        setLocationDraftReady(true);
+        setLocationDraftStatus("error");
+      });
+    return () => { active = false; };
+  }, [isLoaded, userId]);
+
+  useEffect(() => {
+    if (!isLoaded || !userId || !locationDraftReady || selected?.type !== "location" || step !== 2 || createdId) return;
+    if (locationDraftTimer.current) clearTimeout(locationDraftTimer.current);
+    const draft = buildLocationDraft();
+    locationDraftTimer.current = setTimeout(() => {
+      void persistLocationDraft(draft).catch(() => {});
+    }, 700);
+    return () => {
+      if (locationDraftTimer.current) clearTimeout(locationDraftTimer.current);
+    };
+  }, [isLoaded, userId, locationDraftReady, selected, step, createdId, buildLocationDraft, persistLocationDraft]);
+
+  useEffect(() => () => {
+    if (locationDraftTimer.current) clearTimeout(locationDraftTimer.current);
+  }, []);
+
   useEffect(() => {
     if (!userId) return;
     fetch("/api/companies?mine=true&limit=50")
@@ -452,6 +594,10 @@ export default function InseratPage() {
     setForm((prev) => ({ ...prev, [field]: value }));
 
   function handleSelect(item: CategoryItem) {
+    if (item.type === "location" && !locationDraftReady) {
+      setError("Einen gespeicherten Locationentwurf prüfen wir gerade. Bitte versuche es gleich noch einmal.");
+      return;
+    }
     setSelected(item);
     setCatMeta({});
     setProductionCredits([]);
@@ -492,7 +638,7 @@ export default function InseratPage() {
         category,
         title: form.title,
         description: form.description || "",
-        price: parseFloat(form.price) || 0,
+        price: locPriceOnRequest ? 0 : parseFloat(form.price) || 0,
         city: form.city,
         metadata: {
           sqm: form.sqm ? parseFloat(form.sqm) : null,
@@ -502,6 +648,13 @@ export default function InseratPage() {
           power_available: form.power_available,
           power_details: form.power_details || null,
           parking_spots: form.parking_spots ? parseInt(form.parking_spots) : null,
+          natural_light: form.natural_light,
+          blackout_possible: form.blackout_possible,
+          loading_access: form.loading_access,
+          access_notes: form.access_notes || null,
+          shooting_hours: form.shooting_hours || null,
+          availability_notes: form.availability_notes || null,
+          price_on_request: locPriceOnRequest,
           amenities: locAmenities,
           rooms: locRooms,
           focal_point: focalPoint ?? null,
@@ -509,7 +662,7 @@ export default function InseratPage() {
         },
         blocked_dates: locBlockedDates,
         floor_plan_url: locFloorPlanUrl,
-        extra_images: locExtraImages,
+        extra_images: locExtraImages.slice(1),
       };
     }
 
@@ -651,38 +804,66 @@ export default function InseratPage() {
       router.push(`/sign-in?redirect_url=${encodeURIComponent(destination)}`);
       return;
     }
-    const usesArticleGallery = selected?.type === "prop" || selected?.type === "vehicle";
-    if (usesArticleGallery && articleGalleryState.uploading) {
-      setError("Bitte warte, bis alle Artikelbilder fertig hochgeladen sind.");
+    const usesGallery = selected?.type === "prop" || selected?.type === "vehicle" || selected?.type === "location";
+    const galleryState = selected?.type === "location" ? locationGalleryState : articleGalleryState;
+    if (usesGallery && galleryState.uploading) {
+      setError("Bitte warte, bis alle Bilder fertig hochgeladen sind.");
       return;
     }
-    if (usesArticleGallery && articleGalleryState.failed > 0) {
-      setError("Bitte lade fehlgeschlagene Artikelbilder erneut hoch oder entferne sie.");
+    if (usesGallery && galleryState.failed > 0) {
+      setError("Bitte lade fehlgeschlagene Bilder erneut hoch oder entferne sie.");
       return;
     }
-    const payload = buildPayload();
-    if (!payload) return;
-
     setLoading(true);
     setError("");
+    if (selected?.type === "location") {
+      if (locationDraftTimer.current) clearTimeout(locationDraftTimer.current);
+      try {
+        await persistLocationDraft(buildLocationDraft());
+      } catch (cause) {
+        setLoading(false);
+        setError(cause instanceof Error ? cause.message : "Der private Locationentwurf konnte nicht gesichert werden.");
+        return;
+      }
+    }
+    const payload = buildPayload();
+    if (!payload) { setLoading(false); return; }
 
-    const res = await fetch("/api/listings", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...payload,
-        image_url: selected?.type === "job" ? null : (selected?.type === "prop" || selected?.type === "vehicle") ? articleImages[0] ?? null : imageUrl,
-        ...((selected?.type === "prop" || selected?.type === "vehicle") ? { extra_images: articleImages.slice(1) } : {}),
-        company_id: selectedCompanyId || null,
-      }),
-    });
-
-    const json = await res.json();
+    let json: { error?: string; data?: { id?: string } } = {};
+    try {
+      const res = await fetch("/api/listings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...payload,
+          image_url: selected?.type === "job" ? null
+            : selected?.type === "location" ? locExtraImages[0] ?? null
+            : (selected?.type === "prop" || selected?.type === "vehicle") ? articleImages[0] ?? null
+            : imageUrl,
+          ...((selected?.type === "location") ? { extra_images: locExtraImages.slice(1) }
+            : (selected?.type === "prop" || selected?.type === "vehicle") ? { extra_images: articleImages.slice(1) } : {}),
+          company_id: selectedCompanyId || null,
+          draft: selected?.type === "job" || selected?.type === "location",
+        }),
+      });
+      json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(json.error ?? "Fehler beim Speichern");
+        setLoading(false);
+        return;
+      }
+    } catch {
+      setError("Speichern fehlgeschlagen. Deine Eingaben sind weiterhin als privater Entwurf gesichert. Bitte versuche es erneut.");
+      setLoading(false);
+      return;
+    }
     setLoading(false);
-
-    if (!res.ok) { setError(json.error ?? "Fehler beim Speichern"); return; }
     setCreatedId(json.data?.id ?? null);
-    setCreatedIsDraft(selected?.type === "job");
+    setCreatedIsDraft(selected?.type === "job" || selected?.type === "location");
+    if (selected?.type === "location") {
+      const cleared = await fetch("/api/onboarding?type=location-form", { method: "DELETE" }).catch(() => null);
+      if (!cleared?.ok) setError("Die Location ist sicher als Entwurf gespeichert. Der private Formularstand konnte noch nicht bereinigt werden.");
+    }
     setStep(3);
   }
 
@@ -732,6 +913,7 @@ export default function InseratPage() {
     }
     if (type === "job") return form.role_label.trim() && form.title.trim() && hasCity && form.shoot_start !== "";
     if (type === "creator") return form.title.trim() && hasCity;
+    if (type === "location") return form.title.trim() && hasCity && locExtraImages.length > 0;
     return form.title.trim() && hasCity;
   };
 
@@ -821,6 +1003,9 @@ export default function InseratPage() {
             <p className="text-text-muted text-sm">
               {activeGroup ? "Wähle eine Kategorie aus." : "Wähle einen Bereich — der Rest passt sich an."}
             </p>
+            {activeGroup === "drehorte" && locationDraftStatus === "loading" && (
+              <p role="status" className="mt-3 text-xs text-text-muted">Gespeicherten Locationfortschritt prüfen …</p>
+            )}
           </div>
 
           {/* Main category tiles */}
@@ -906,6 +1091,7 @@ export default function InseratPage() {
             </div>
             <div>
               <p className="text-xs uppercase tracking-widest text-gold font-semibold">Inserat erstellen</p>
+              {isLocation && <p role="status" className="mt-1 text-xs text-text-muted">{locationDraftStatus === "loading" ? "Entwurf wird geladen …" : locationDraftStatus === "saving" ? "Entwurf wird privat gespeichert …" : locationDraftStatus === "saved" ? "Fortschritt privat gespeichert" : locationDraftStatus === "error" ? "Speichern fehlgeschlagen — bitte Verbindung prüfen" : ""}</p>}
               <h1 className="font-display text-2xl font-bold text-text-primary">{label}</h1>
             </div>
           </div>
@@ -1083,6 +1269,43 @@ export default function InseratPage() {
                   )}
                 </div>
 
+                <div>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">Licht und Anlieferung</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    {([
+                      ["natural_light", "Tageslicht vorhanden"],
+                      ["blackout_possible", "Verdunkelbar"],
+                      ["loading_access", "Gute Be-/Entladung"],
+                    ] as const).map(([key, label]) => (
+                      <button key={key} type="button" aria-pressed={form[key]} onClick={() => f(key, !form[key])}
+                        className={`min-h-11 rounded-xl border px-3 py-2 text-left text-xs transition-colors ${form[key] ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-elevated text-text-secondary hover:border-gold/40"}`}>
+                        {form[key] ? "✓ " : ""}{label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Mögliche Drehzeiten</label>
+                    <input value={form.shooting_hours} onChange={(e) => f("shooting_hours", e.target.value)} maxLength={160}
+                      placeholder="z. B. werktags ab 9 Uhr, nach Absprache"
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Anfahrt und Zugang</label>
+                    <input value={form.access_notes} onChange={(e) => f("access_notes", e.target.value)} maxLength={240}
+                      placeholder="z. B. Zufahrt über den Innenhof"
+                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Verfügbarkeit oder Einschränkungen</label>
+                  <textarea value={form.availability_notes} onChange={(e) => f("availability_notes", e.target.value)} maxLength={500} rows={2}
+                    placeholder="z. B. nicht an Sonn- und Feiertagen, Belegung bitte anfragen"
+                    className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm resize-y" />
+                </div>
+
                 {/* Räume — kategoriespezifisch */}
                 {selected?.category && LOCATION_ROOMS[selected.category] && (
                   <div>
@@ -1149,36 +1372,6 @@ export default function InseratPage() {
                       }} />
                     </label>
                   )}
-                </div>
-
-                {/* Weitere Fotos */}
-                <div>
-                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Weitere Fotos</label>
-                  <div className="flex flex-wrap gap-2">
-                    {locExtraImages.map((url, i) => (
-                      <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden border border-border">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={url} alt="" className="w-full h-full object-cover" />
-                        <button type="button" onClick={() => setLocExtraImages(prev => prev.filter((_, j) => j !== i))}
-                          className="absolute top-0.5 right-0.5 w-5 h-5 bg-bg-primary/80 rounded-full flex items-center justify-center text-[10px] text-text-muted hover:text-crimson-light">✕</button>
-                      </div>
-                    ))}
-                    <label className={`w-20 h-20 flex flex-col items-center justify-center rounded-lg border border-dashed border-border cursor-pointer hover:border-gold transition-colors text-text-muted text-xs ${locExtraUploading ? "opacity-60 pointer-events-none" : ""}`}>
-                      {locExtraUploading ? <span className="animate-spin text-gold text-lg">⟳</span> : <><span className="text-2xl leading-none mb-1">+</span><span>Foto</span></>}
-                      <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={async (e) => {
-                        const files = Array.from(e.target.files ?? []); if (!files.length) return;
-                        setLocExtraUploading(true);
-                        for (const file of files) {
-                          const fd = new FormData(); fd.append("file", file);
-                          const res = await fetch("/api/upload", { method: "POST", body: fd });
-                          const json = await res.json();
-                          if (json.url) setLocExtraImages(prev => [...prev, json.url]);
-                        }
-                        setLocExtraUploading(false);
-                        if (e.target) e.target.value = "";
-                      }} />
-                    </label>
-                  </div>
                 </div>
 
                 {/* Verfügbarkeit / Gesperrte Tage */}
@@ -1567,16 +1760,25 @@ export default function InseratPage() {
             {/* ── PRICE + CITY ── */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
-                  {isJob ? "Gage / Tag (€) — 0 = Auf Anfrage" : isCreator ? "Tagesrate (€)" : form.rental_type === "kauf" ? "Kaufpreis (€) *" : "Preis / Tag (€) *"}
-                </label>
-                <input
-                  type="number" min="0"
-                  value={form.price}
-                  onChange={(e) => f("price", e.target.value)}
-                  placeholder={isJob || isCreator ? "z.B. 500" : form.rental_type === "kauf" ? "z.B. 1200" : "z.B. 800"}
-                  className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors"
-                />
+                {isLocation ? (
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest">Preis</label>
+                    <div className="flex flex-wrap gap-2">
+                      <button type="button" aria-pressed={locPriceOnRequest} onClick={() => setLocPriceOnRequest(true)} className={`min-h-10 rounded-lg border px-3 text-xs ${locPriceOnRequest ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>Preis auf Anfrage</button>
+                      <button type="button" aria-pressed={!locPriceOnRequest} onClick={() => setLocPriceOnRequest(false)} className={`min-h-10 rounded-lg border px-3 text-xs ${!locPriceOnRequest ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>Tagespreis angeben</button>
+                    </div>
+                    {!locPriceOnRequest && <label className="block text-xs text-text-muted">Preis pro Drehtag (€)
+                      <input type="number" min="0" value={form.price} onChange={(e) => f("price", e.target.value)} placeholder="z. B. 500" className="mt-1 w-full rounded-xl border border-border bg-bg-elevated px-4 py-3 text-sm text-text-primary placeholder:text-text-muted transition-colors focus:border-gold focus:outline-none" />
+                    </label>}
+                  </div>
+                ) : (
+                  <>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
+                      {isJob ? "Gage / Tag (€) — 0 = Auf Anfrage" : isCreator ? "Tagesrate (€)" : form.rental_type === "kauf" ? "Kaufpreis (€) *" : "Preis / Tag (€) *"}
+                    </label>
+                    <input type="number" min="0" value={form.price} onChange={(e) => f("price", e.target.value)} placeholder={isJob || isCreator ? "z. B. 500" : form.rental_type === "kauf" ? "z. B. 1200" : "z. B. 800"} className="w-full rounded-xl border border-border bg-bg-elevated px-4 py-3 text-sm text-text-primary placeholder:text-text-muted transition-colors focus:border-gold focus:outline-none" />
+                  </>
+                )}
               </div>
               <div>
                 <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
@@ -1614,6 +1816,21 @@ export default function InseratPage() {
                       {focalPoint ? "Fokuspunkt des Hauptbilds ändern" : "Fokuspunkt für das Hauptbild setzen"}
                     </button>
                   )}
+                </div>
+              ) : selected?.type === "location" ? (
+                <div className="space-y-2">
+                  <ListingImageManager
+                    value={locExtraImages}
+                    maxImages={MAX_LOCATION_IMAGES}
+                    onChange={(urls) => {
+                      if (locExtraImages[0] !== urls[0]) setFocalPoint(null);
+                      setLocExtraImages(urls);
+                    }}
+                    onStatusChange={setLocationGalleryState}
+                    label="Locationfotos"
+                  />
+                  <p className="text-xs text-text-muted">Für die Veröffentlichung wird mindestens ein Foto benötigt. Bis zu 20 Bilder; das erste ist das Hauptbild.</p>
+                  {locExtraImages[0] && <button type="button" onClick={() => setShowFocalPicker(true)} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-gold/30 px-3 py-2 text-xs text-gold transition-colors hover:border-gold"><ImageIcon size={12} />{focalPoint ? "Fokuspunkt des Hauptbilds ändern" : "Fokuspunkt des Hauptbilds setzen"}</button>}
                 </div>
               ) : (
                 <>
@@ -1696,21 +1913,21 @@ export default function InseratPage() {
             {/* ── SUBMIT ── */}
             <button
               onClick={handleSubmit}
-              disabled={!canSubmit() || loading || uploading || ((selected?.type === "prop" || selected?.type === "vehicle") && (articleGalleryState.uploading || articleGalleryState.failed > 0))}
+              disabled={!canSubmit() || loading || uploading || ((selected?.type === "prop" || selected?.type === "vehicle") && (articleGalleryState.uploading || articleGalleryState.failed > 0)) || (selected?.type === "location" && (locationGalleryState.uploading || locationGalleryState.failed > 0))}
               className="w-full py-4 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
             >
               {loading ? (
-                <><Loader2 size={18} className="animate-spin" /> {selected?.type === "job" ? "Entwurf wird gespeichert…" : "Wird veröffentlicht…"}</>
+                <><Loader2 size={18} className="animate-spin" /> {selected?.type === "job" || selected?.type === "location" ? "Entwurf wird gespeichert…" : "Wird veröffentlicht…"}</>
               ) : (
-                <>{selected?.type === "job" ? "Als Entwurf speichern" : "Jetzt veröffentlichen"} <ArrowRight size={18} /></>
+                <>{selected?.type === "job" ? "Als Entwurf speichern" : selected?.type === "location" ? "Entwurf speichern und prüfen" : "Jetzt veröffentlichen"} <ArrowRight size={18} /></>
               )}
             </button>
           </div>
         </div>
       </div>
-    {showFocalPicker && (imageUrl || articleImages[0]) && (
+    {showFocalPicker && (imageUrl || articleImages[0] || locExtraImages[0]) && (
       <FocalPointPicker
-        imageUrl={articleImages[0] ?? imageUrl ?? ""}
+        imageUrl={articleImages[0] ?? locExtraImages[0] ?? imageUrl ?? ""}
         initial={focalPoint ?? undefined}
         onSave={(pt) => { setFocalPoint(pt); setShowFocalPicker(false); }}
         onClose={() => setShowFocalPicker(false)}
@@ -1729,7 +1946,7 @@ export default function InseratPage() {
         </div>
         <h2 className="font-display text-3xl font-bold text-text-primary mb-3">{createdIsDraft ? "Entwurf gespeichert" : "Veröffentlicht!"}</h2>
         <p className="text-text-muted mb-8">
-          {createdIsDraft ? "Dieser Job ist nur für dich sichtbar. Prüfe die Vorschau und veröffentliche ihn erst mit deiner ausdrücklichen Freigabe." : "Dein Inserat ist jetzt live und für Produktionen sichtbar."}
+          {createdIsDraft ? selected?.type === "location" ? "Diese Location ist nur für dich sichtbar. Prüfe deine Angaben und veröffentliche sie erst mit deiner ausdrücklichen Freigabe." : "Dieser Job ist nur für dich sichtbar. Prüfe die Vorschau und veröffentliche ihn erst mit deiner ausdrücklichen Freigabe." : "Dein Inserat ist jetzt live und für Produktionen sichtbar."}
         </p>
         {error && <p role="alert" className="mb-5 text-sm text-red-400">{error}</p>}
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -1741,9 +1958,12 @@ export default function InseratPage() {
               setImageUrl(null);
               setImagePreview(null);
               setPendingImageFile(null);
+              setCreatedId(null);
               setCreatedIsDraft(false);
-              setForm({ title: "", description: "", price: "", city: "", make: "", model: "", year: "", fuel_type: "", license_class: "", condition: "", vehicle_subtype: "", sqm: "", ceiling_height: "", max_crew: "", indoor_outdoor: "innen", power_available: false, power_details: "", parking_spots: "", company: "", projectType: "", shoot_start: "", shoot_end: "", pay_type: "", role_label: "", urgent: false, content_nudity: false, content_violence: false, content_stunts: false, delivery: false, rental_type: "miete", dimensions: "", safety_note: "", skills: "", experience: "", animal_training: "", animal_handler: true, animal_count: "1 Tier", animal_skills: "" });
+              setForm({ title: "", description: "", price: "", city: "", make: "", model: "", year: "", fuel_type: "", license_class: "", condition: "", vehicle_subtype: "", sqm: "", ceiling_height: "", max_crew: "", indoor_outdoor: "innen", power_available: false, power_details: "", parking_spots: "", natural_light: false, blackout_possible: false, loading_access: false, access_notes: "", shooting_hours: "", availability_notes: "", company: "", projectType: "", shoot_start: "", shoot_end: "", pay_type: "", role_label: "", urgent: false, content_nudity: false, content_violence: false, content_stunts: false, delivery: false, rental_type: "miete", dimensions: "", safety_note: "", skills: "", experience: "", animal_training: "", animal_handler: true, animal_count: "1", animal_skills: "" });
               setLocAmenities([]); setLocBlockedDates([]); setLocExtraImages([]); setLocFloorPlanUrl(null); setLocFloorPlanPreview(null);
+              setLocRooms([]); setLocPriceOnRequest(true); setSelectedCompanyId(""); setFocalPoint(null);
+              setArticleImages([]); setLocationGalleryState({ uploading: false, failed: 0 }); setArticleGalleryState({ uploading: false, failed: 0 });
             }}
             className="px-6 py-3 border border-border text-text-secondary rounded-xl hover:border-gold hover:text-gold transition-all text-sm font-medium"
           >
@@ -1751,9 +1971,11 @@ export default function InseratPage() {
           </button>
           {createdIsDraft ? (
             <>
-              <a href={`${successHref(createdId)}?preview=1`} target="_blank" rel="noreferrer" className="px-6 py-3 border border-border text-text-secondary rounded-xl hover:border-gold hover:text-gold transition-all text-sm font-medium">
-                Vorschau ansehen
-              </a>
+              {selected?.type === "location" ? (
+                <a href="/dashboard?tab=listings" className="px-6 py-3 border border-border text-text-secondary rounded-xl hover:border-gold hover:text-gold transition-all text-sm font-medium">Später im Dashboard bearbeiten</a>
+              ) : (
+                <a href={`${successHref(createdId)}?preview=1`} target="_blank" rel="noreferrer" className="px-6 py-3 border border-border text-text-secondary rounded-xl hover:border-gold hover:text-gold transition-all text-sm font-medium">Vorschau ansehen</a>
+              )}
               <button type="button" onClick={handlePublishDraft} disabled={publishingDraft} className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm disabled:opacity-50">
                 {publishingDraft ? "Wird veröffentlicht…" : "Jetzt veröffentlichen"}
               </button>

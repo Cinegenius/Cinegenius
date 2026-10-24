@@ -20,6 +20,7 @@ import { applyReadReceiptTimestamps, incomingUnreadMessageIds } from "@/lib/mess
 import { notifyMessagesRead, subscribeToMessageReads } from "@/lib/message-read-sync";
 import { compressImage, MAX_FUNCTION_UPLOAD_BYTES } from "@/lib/compressImage";
 import ListingImageManager from "@/components/ListingImageManager";
+import { MAX_LOCATION_IMAGES, MAX_LISTING_IMAGES } from "@/lib/listing-image-gallery";
 import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
 
 type RealMessage = {
@@ -81,7 +82,7 @@ export default function DashboardPage() {
   const [onboardingDismissed, setOnboardingDismissed] = useState(false);
 
   // Real listings from Supabase
-  const [myListings, setMyListings] = useState<{ id: string; type: string; title: string; city: string; price: number; published: boolean; created_at: string; image_url: string | null; extra_images?: string[] | null; description: string }[]>([]);
+  const [myListings, setMyListings] = useState<{ id: string; type: string; title: string; city: string; price: number; published: boolean; created_at: string; image_url: string | null; extra_images?: string[] | null; blocked_dates?: string[] | null; description: string; metadata?: Record<string, unknown> | null }[]>([]);
   const [listingsLoading, setListingsLoading] = useState(false);
   const [listingsError, setListingsError] = useState("");
 
@@ -250,6 +251,14 @@ export default function DashboardPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ title: "", description: "", price: "", city: "", image_url: "" });
   const [editGallery, setEditGallery] = useState<string[]>([]);
+  const [editBlockedDates, setEditBlockedDates] = useState<string[]>([]);
+  const [newBlockedDate, setNewBlockedDate] = useState("");
+  const [editLocationMeta, setEditLocationMeta] = useState({
+    indoor_outdoor: "innen", sqm: "", ceiling_height_m: "", max_crew: "", parking_spots: "",
+    power_available: false, power_details: "", natural_light: false, blackout_possible: false,
+    loading_access: false, access_notes: "", shooting_hours: "", availability_notes: "", price_on_request: true,
+    rooms: [] as string[], amenities: [] as string[],
+  });
   const [editGalleryState, setEditGalleryState] = useState({ uploading: false, failed: 0 });
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState("");
@@ -259,6 +268,27 @@ export default function DashboardPage() {
     setEditingId(l.id);
     setEditForm({ title: l.title, description: l.description ?? "", price: String(l.price), city: l.city, image_url: l.image_url ?? "" });
     setEditGallery([l.image_url, ...(l.extra_images ?? [])].filter((url): url is string => typeof url === "string" && !!url));
+    setEditBlockedDates(Array.isArray(l.blocked_dates) ? l.blocked_dates.filter((date): date is string => typeof date === "string") : []);
+    setNewBlockedDate("");
+    const meta = l.metadata ?? {};
+    setEditLocationMeta({
+      indoor_outdoor: typeof meta.indoor_outdoor === "string" ? meta.indoor_outdoor : "innen",
+      sqm: meta.sqm == null ? "" : String(meta.sqm),
+      ceiling_height_m: meta.ceiling_height_m == null ? "" : String(meta.ceiling_height_m),
+      max_crew: meta.max_crew == null ? "" : String(meta.max_crew),
+      parking_spots: meta.parking_spots == null ? "" : String(meta.parking_spots),
+      power_available: meta.power_available === true,
+      power_details: typeof meta.power_details === "string" ? meta.power_details : "",
+      natural_light: meta.natural_light === true,
+      blackout_possible: meta.blackout_possible === true,
+      loading_access: meta.loading_access === true,
+      access_notes: typeof meta.access_notes === "string" ? meta.access_notes : "",
+      shooting_hours: typeof meta.shooting_hours === "string" ? meta.shooting_hours : "",
+      availability_notes: typeof meta.availability_notes === "string" ? meta.availability_notes : "",
+      price_on_request: meta.price_on_request === true || l.price <= 0,
+      rooms: Array.isArray(meta.rooms) ? meta.rooms.filter((value): value is string => typeof value === "string") : [],
+      amenities: Array.isArray(meta.amenities) ? meta.amenities.filter((value): value is string => typeof value === "string") : [],
+    });
     setEditGalleryState({ uploading: false, failed: 0 });
     setEditError("");
   };
@@ -297,17 +327,36 @@ export default function DashboardPage() {
     setEditError("");
     try {
       const editingListing = myListings.find((listing) => listing.id === editingId);
-      const usesGallery = editingListing?.type === "prop" || editingListing?.type === "vehicle";
+      const usesGallery = editingListing?.type === "prop" || editingListing?.type === "vehicle" || editingListing?.type === "location";
       const res = await fetch(`/api/listings/${editingId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: editForm.title.trim(),
           description: editForm.description,
-          price: parseFloat(editForm.price) || 0,
+          price: editingListing?.type === "location" && editLocationMeta.price_on_request ? 0 : parseFloat(editForm.price) || 0,
           city: editForm.city.trim(),
           image_url: usesGallery ? editGallery[0] ?? null : editForm.image_url || null,
           ...(usesGallery ? { extra_images: editGallery.slice(1) } : {}),
+          ...(editingListing?.type === "location" ? { blocked_dates: editBlockedDates } : {}),
+          ...(editingListing?.type === "location" ? { metadata: {
+            indoor_outdoor: editLocationMeta.indoor_outdoor,
+            sqm: editLocationMeta.sqm ? Number(editLocationMeta.sqm) : null,
+            ceiling_height_m: editLocationMeta.ceiling_height_m ? Number(editLocationMeta.ceiling_height_m) : null,
+            max_crew: editLocationMeta.max_crew ? Number(editLocationMeta.max_crew) : null,
+            parking_spots: editLocationMeta.parking_spots ? Number(editLocationMeta.parking_spots) : null,
+            power_available: editLocationMeta.power_available,
+            power_details: editLocationMeta.power_details,
+            natural_light: editLocationMeta.natural_light,
+            blackout_possible: editLocationMeta.blackout_possible,
+            loading_access: editLocationMeta.loading_access,
+            access_notes: editLocationMeta.access_notes,
+            shooting_hours: editLocationMeta.shooting_hours,
+            availability_notes: editLocationMeta.availability_notes,
+            price_on_request: editLocationMeta.price_on_request,
+            rooms: editLocationMeta.rooms,
+            amenities: editLocationMeta.amenities,
+          } } : {}),
         }),
       });
       const { error } = await res.json();
@@ -319,8 +368,28 @@ export default function DashboardPage() {
               title: editForm.title.trim(),
               description: editForm.description,
               city: editForm.city.trim(),
-              price: parseFloat(editForm.price) || 0,
-              ...(l.type === "prop" || l.type === "vehicle" ? { image_url: editGallery[0] ?? null, extra_images: editGallery.slice(1) } : { image_url: editForm.image_url || null }),
+              price: l.type === "location" && editLocationMeta.price_on_request ? 0 : parseFloat(editForm.price) || 0,
+              ...(l.type === "location" ? { metadata: {
+                ...(l.metadata ?? {}),
+                indoor_outdoor: editLocationMeta.indoor_outdoor,
+                sqm: editLocationMeta.sqm ? Number(editLocationMeta.sqm) : null,
+                ceiling_height_m: editLocationMeta.ceiling_height_m ? Number(editLocationMeta.ceiling_height_m) : null,
+                max_crew: editLocationMeta.max_crew ? Number(editLocationMeta.max_crew) : null,
+                parking_spots: editLocationMeta.parking_spots ? Number(editLocationMeta.parking_spots) : null,
+                power_available: editLocationMeta.power_available,
+                power_details: editLocationMeta.power_details,
+                natural_light: editLocationMeta.natural_light,
+                blackout_possible: editLocationMeta.blackout_possible,
+                loading_access: editLocationMeta.loading_access,
+                access_notes: editLocationMeta.access_notes,
+                shooting_hours: editLocationMeta.shooting_hours,
+                availability_notes: editLocationMeta.availability_notes,
+                price_on_request: editLocationMeta.price_on_request,
+                rooms: editLocationMeta.rooms,
+                amenities: editLocationMeta.amenities,
+              } } : {}),
+              ...(l.type === "location" ? { blocked_dates: editBlockedDates } : {}),
+              ...(l.type === "prop" || l.type === "vehicle" || l.type === "location" ? { image_url: editGallery[0] ?? null, extra_images: editGallery.slice(1) } : { image_url: editForm.image_url || null }),
             }
           : l
       ));
@@ -1797,14 +1866,16 @@ export default function DashboardPage() {
                       <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{editError}</p>
                     )}
                     {/* Image upload */}
-                    {l.type === "prop" || l.type === "vehicle" ? (
+                    {l.type === "prop" || l.type === "vehicle" || l.type === "location" ? (
                       <ListingImageManager
                         value={editGallery}
+                        maxImages={l.type === "location" ? MAX_LOCATION_IMAGES : MAX_LISTING_IMAGES}
                         onChange={(urls) => {
                           setEditGallery(urls);
                           setEditForm((current) => ({ ...current, image_url: urls[0] ?? "" }));
                         }}
                         onStatusChange={setEditGalleryState}
+                        label={l.type === "location" ? "Locationfotos" : "Artikelbilder"}
                       />
                     ) : <div>
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">Bild</label>
@@ -1822,6 +1893,56 @@ export default function DashboardPage() {
                         )}
                       </div>
                     </div>}
+
+                    {l.type === "location" && (
+                      <div className="space-y-3 rounded-lg border border-border bg-bg-secondary p-3">
+                        <p className="text-xs font-semibold uppercase tracking-widest text-text-muted">Ausstattung und Drehbedingungen</p>
+                        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                          {([
+                            ["sqm", "Fläche (m²)"], ["ceiling_height_m", "Deckenhöhe (m)"],
+                            ["max_crew", "Max. Crew"], ["parking_spots", "Parkplätze"],
+                          ] as const).map(([key, label]) => (
+                            <label key={key} className="text-[11px] text-text-muted">{label}
+                              <input type="number" min="0" step={key === "ceiling_height_m" ? "0.1" : "1"} value={editLocationMeta[key]} onChange={(event) => setEditLocationMeta((current) => ({ ...current, [key]: event.target.value }))} className="mt-1 min-h-10 w-full rounded-lg border border-border bg-bg-elevated px-2.5 text-sm text-text-primary" />
+                            </label>
+                          ))}
+                          <label className="text-[11px] text-text-muted">Innen / Außen
+                            <select value={editLocationMeta.indoor_outdoor} onChange={(event) => setEditLocationMeta((current) => ({ ...current, indoor_outdoor: event.target.value }))} className="mt-1 min-h-10 w-full rounded-lg border border-border bg-bg-elevated px-2.5 text-sm text-text-primary">
+                              <option value="innen">Innen</option><option value="außen">Außen</option><option value="beides">Innen & Außen</option>
+                            </select>
+                          </label>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {([
+                            ["power_available", "Stromanschluss"], ["natural_light", "Tageslicht"],
+                            ["blackout_possible", "Verdunkelbar"], ["loading_access", "Be-/Entladung"],
+                          ] as const).map(([key, label]) => (
+                            <button key={key} type="button" aria-pressed={editLocationMeta[key]} onClick={() => setEditLocationMeta((current) => ({ ...current, [key]: !current[key] }))} className={`min-h-10 rounded-lg border px-3 text-xs ${editLocationMeta[key] ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{editLocationMeta[key] ? "✓ " : ""}{label}</button>
+                          ))}
+                        </div>
+                        {editLocationMeta.power_available && <input maxLength={160} value={editLocationMeta.power_details} onChange={(event) => setEditLocationMeta((current) => ({ ...current, power_details: event.target.value }))} placeholder="Stromdetails, z. B. CEE 32A" className="min-h-10 w-full rounded-lg border border-border bg-bg-elevated px-3 text-sm text-text-primary" />}
+                        <div className="grid gap-2 sm:grid-cols-2">
+                          <input maxLength={160} value={editLocationMeta.shooting_hours} onChange={(event) => setEditLocationMeta((current) => ({ ...current, shooting_hours: event.target.value }))} placeholder="Mögliche Drehzeiten" className="min-h-10 rounded-lg border border-border bg-bg-elevated px-3 text-sm text-text-primary" />
+                          <input maxLength={240} value={editLocationMeta.access_notes} onChange={(event) => setEditLocationMeta((current) => ({ ...current, access_notes: event.target.value }))} placeholder="Anfahrt und Zugang, keine Privatadresse" className="min-h-10 rounded-lg border border-border bg-bg-elevated px-3 text-sm text-text-primary" />
+                        </div>
+                        <textarea maxLength={500} rows={2} value={editLocationMeta.availability_notes} onChange={(event) => setEditLocationMeta((current) => ({ ...current, availability_notes: event.target.value }))} placeholder="Verfügbarkeit und Einschränkungen" className="w-full rounded-lg border border-border bg-bg-elevated p-3 text-sm text-text-primary" />
+                        <div>
+                          <label className="mb-2 block text-xs text-text-muted">Gesperrte Drehtage</label>
+                          <div className="flex flex-wrap gap-2">
+                            <input type="date" value={newBlockedDate} onChange={(event) => setNewBlockedDate(event.target.value)} className="min-h-10 rounded-lg border border-border bg-bg-elevated px-3 text-sm text-text-primary" />
+                            <button type="button" disabled={!newBlockedDate || editBlockedDates.includes(newBlockedDate)} onClick={() => { setEditBlockedDates((dates) => [...dates, newBlockedDate].sort()); setNewBlockedDate(""); }} className="min-h-10 rounded-lg border border-border px-3 text-xs text-text-secondary hover:border-gold hover:text-gold disabled:opacity-50">Tag sperren</button>
+                          </div>
+                          {editBlockedDates.length > 0 ? <div className="mt-2 flex flex-wrap gap-2">{editBlockedDates.map((date) => <button key={date} type="button" onClick={() => setEditBlockedDates((dates) => dates.filter((item) => item !== date))} aria-label={`${date} freigeben`} className="min-h-8 rounded-full border border-crimson/30 bg-crimson/10 px-3 text-xs text-crimson-light">{new Date(`${date}T00:00:00`).toLocaleDateString("de-DE")} ×</button>)}</div> : <p className="mt-2 text-[11px] text-text-muted">Keine Tage manuell gesperrt.</p>}
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                          {[["restrooms", "WC / Sanitär"], ["green_room", "Aufenthaltsraum"], ["kitchen", "Küche"], ["changing_room", "Umkleide"], ["loading_bay", "Laderampe"], ["wifi", "Wi-Fi"]].map(([key, label]) => {
+                            const active = editLocationMeta.amenities.includes(key);
+                            return <button key={key} type="button" aria-pressed={active} onClick={() => setEditLocationMeta((current) => ({ ...current, amenities: active ? current.amenities.filter((item) => item !== key) : [...current.amenities, key] }))} className={`min-h-10 rounded-lg border px-2 text-xs ${active ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{active ? "✓ " : ""}{label}</button>;
+                          })}
+                        </div>
+                        {editLocationMeta.rooms.length > 0 && <p className="text-[11px] text-text-muted">Bereiche: {editLocationMeta.rooms.map((room) => room.replaceAll("_", " ")).join(" · ")}</p>}
+                      </div>
+                    )}
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
@@ -1846,15 +1967,11 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">Preis / Tag (€)</label>
-                      <input
-                        type="number"
-                        min="0"
-                        value={editForm.price}
-                        onChange={(e) => setEditForm((p) => ({ ...p, price: e.target.value }))}
-                        className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold transition-colors"
-                        placeholder="z. B. 500"
-                      />
+                      {l.type === "location" && <button type="button" aria-pressed={editLocationMeta.price_on_request} onClick={() => setEditLocationMeta((current) => ({ ...current, price_on_request: !current.price_on_request }))} className={`mb-2 min-h-10 rounded-lg border px-3 text-xs ${editLocationMeta.price_on_request ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{editLocationMeta.price_on_request ? "✓ " : ""}Preis auf Anfrage</button>}
+                      {!editLocationMeta.price_on_request || l.type !== "location" ? <>
+                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">{l.type === "location" ? "Preis pro Drehtag (€)" : "Preis / Tag (€)"}</label>
+                        <input type="number" min="0" value={editForm.price} onChange={(e) => { setEditLocationMeta((current) => ({ ...current, price_on_request: false })); setEditForm((p) => ({ ...p, price: e.target.value })); }} className="w-full rounded-lg border border-border bg-bg-elevated px-3 py-2 text-sm transition-colors focus:border-gold focus:outline-none" placeholder="z. B. 500" />
+                      </> : <p className="text-xs text-text-muted">Der Preis wird öffentlich als „Auf Anfrage“ angezeigt.</p>}
                     </div>
                     <div>
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">Beschreibung</label>

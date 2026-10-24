@@ -13,6 +13,7 @@ type LocationCard = {
   type: string;
   city: string;
   price: number;
+  priceOnRequest: boolean;
   image: string;
   rating: number;
   reviews: number;
@@ -158,8 +159,9 @@ export default function LocationsLanding({
                         <span className="text-xs text-text-muted/40">Neu</span>
                       )}
                       <span className="text-sm font-bold text-gold">
-                        {loc.price.toLocaleString("de-DE")} €
-                        <span className="text-xs text-text-muted font-normal">/Tag</span>
+                        {loc.priceOnRequest
+                          ? "Preis auf Anfrage"
+                          : <>{loc.price.toLocaleString("de-DE")} €<span className="text-xs text-text-muted font-normal">/Tag</span></>}
                       </span>
                     </div>
                   </Link>

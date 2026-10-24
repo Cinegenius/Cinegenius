@@ -10,9 +10,9 @@ export async function POST(req: NextRequest) {
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
-  // A ten-image listing may use ten uploads in one batch. Leave room for
-  // isolated retries without removing the per-user abuse limit.
-  const { allowed } = await rateLimit(`upload:${userId}`, 20, 60);
+  // A location may use twenty uploads in one batch. Leave room for retries
+  // and replacement uploads while keeping a per-user abuse limit.
+  const { allowed } = await rateLimit(`upload:${userId}`, 40, 60);
   if (!allowed) return NextResponse.json({ error: "Zu viele Uploads. Bitte kurz warten." }, { status: 429 });
 
   // 3. Parse form data

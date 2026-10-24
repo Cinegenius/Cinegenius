@@ -4,7 +4,7 @@ import { rateLimit } from "@/lib/rateLimit";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
-import { normalizeListingImageGallery } from "@/lib/listing-image-gallery";
+import { maxImagesForListingType, normalizeListingImageGallery } from "@/lib/listing-image-gallery";
 
 // Explicit column list — avoids SELECT * sending unused data over the wire.
 // Update this list if new listing columns are added.
@@ -93,8 +93,8 @@ export async function POST(req: Request) {
   if (!VALID_LISTING_TYPES.has(type)) {
     return NextResponse.json({ error: "Ungültiger Inserat-Typ" }, { status: 400 });
   }
-  if (type === "prop" || type === "vehicle") {
-    const gallery = normalizeListingImageGallery(image_url, extra_images);
+  if (type === "location" || type === "prop" || type === "vehicle") {
+    const gallery = normalizeListingImageGallery(image_url, extra_images, maxImagesForListingType(type));
     if (!gallery.ok) return NextResponse.json({ error: gallery.error }, { status: 400 });
     storedImageUrl = gallery.gallery.imageUrl;
     storedExtraImages = gallery.gallery.extraImages;

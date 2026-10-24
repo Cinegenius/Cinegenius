@@ -64,7 +64,7 @@ export default async function LocationsSuchePage() {
       tags: l.created_at && (new Date().getTime() - new Date(l.created_at).getTime() < 3 * 24 * 60 * 60 * 1000) ? ["Neu"] : [],
       instantBook: false, verified: false, sqft: 0, capacity: 0, lat, lng,
       focalPoint: ((l.metadata ?? {}) as Record<string, unknown>).focal_point as { x: number; y: number } | null ?? null,
-      isReal: true, description: l.description ?? "",
+      isReal: true, description: l.description ?? "", metadata: l.metadata ?? {},
     };
   });
 

@@ -1,21 +1,33 @@
 "use client";
 
-import UnoptimizedImage from "@/components/UnoptimizedImage";
-
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, ArrowRight, CheckCircle2, ImagePlus, Loader2, MapPin, Package, Trash2 } from "lucide-react";
-import { compressImage, MAX_FUNCTION_UPLOAD_BYTES } from "@/lib/compressImage";
+import { ArrowLeft, ArrowRight, CheckCircle2, Loader2, MapPin, Package } from "lucide-react";
 import { listingDetailPath } from "@/lib/listing-routes";
+import ListingImageManager from "@/components/ListingImageManager";
+import { MAX_LOCATION_IMAGES, MAX_LISTING_IMAGES } from "@/lib/listing-image-gallery";
 
 type Kind = "location" | "equipment";
-type Draft = { type: Kind; step: number; category: string; city: string; title: string; description: string; price: string; priceOnRequest: boolean; imageUrl: string };
-const initial: Draft = { type: "location", step: 1, category: "", city: "", title: "", description: "", price: "", priceOnRequest: true, imageUrl: "" };
+type Draft = {
+  type: Kind; step: number; category: string; city: string; title: string; description: string;
+  price: string; priceOnRequest: boolean; imageUrls: string[];
+  sqm: string; ceilingHeight: string; maxCrew: string; parkingSpots: string;
+  indoorOutdoor: "innen" | "außen" | "beides"; powerAvailable: boolean; naturalLight: boolean;
+  blackoutPossible: boolean; loadingAccess: boolean; accessNotes: string; shootingHours: string;
+  availabilityNotes: string; amenities: string[];
+};
+const initial: Draft = {
+  type: "location", step: 1, category: "", city: "", title: "", description: "", price: "", priceOnRequest: true, imageUrls: [],
+  sqm: "", ceilingHeight: "", maxCrew: "", parkingSpots: "", indoorOutdoor: "innen", powerAvailable: false,
+  naturalLight: false, blackoutPossible: false, loadingAccess: false, accessNotes: "", shootingHours: "", availabilityNotes: "", amenities: [],
+};
 const options: Record<Kind, { label: string; category: string; help: string }[]> = {
   location: [
     { label: "Wohnung oder Haus", category: "Wohnen", help: "Innenräume, Garten oder Terrasse" },
+    { label: "Villa oder besonderes Wohnhaus", category: "Villa", help: "Große Räume, Garten, Pool oder besondere Ausstattung" },
     { label: "Café oder Gastronomie", category: "Gastronomie", help: "Café, Restaurant, Bar oder Küche" },
     { label: "Büro oder Gewerberaum", category: "Büro", help: "Arbeitsräume, Laden oder Werkstatt" },
+    { label: "Halle oder Industriefläche", category: "Industrie", help: "Lagerhalle, Werkstatt oder Produktionsfläche" },
     { label: "Außenfläche oder Grundstück", category: "Natur", help: "Hof, Garten, Feld oder freie Fläche" },
     { label: "Filmstudio", category: "Studio", help: "Studio oder Produktionsfläche" },
     { label: "Fotostudio", category: "Fotostudio", help: "Studio für Foto- und Videoaufnahmen" },
@@ -44,7 +56,22 @@ function normalizeDraft(value: unknown, kind: Kind): Draft {
     description: typeof input.description === "string" ? input.description.slice(0, 3000) : "",
     price: typeof input.price === "string" ? input.price.slice(0, 20) : "",
     priceOnRequest: input.priceOnRequest !== false,
-    imageUrl: typeof input.imageUrl === "string" ? input.imageUrl.slice(0, 1000) : "",
+    sqm: typeof input.sqm === "string" ? input.sqm.slice(0, 20) : "",
+    ceilingHeight: typeof input.ceilingHeight === "string" ? input.ceilingHeight.slice(0, 20) : "",
+    maxCrew: typeof input.maxCrew === "string" ? input.maxCrew.slice(0, 20) : "",
+    parkingSpots: typeof input.parkingSpots === "string" ? input.parkingSpots.slice(0, 20) : "",
+    indoorOutdoor: ["innen", "außen", "beides"].includes(String(input.indoorOutdoor)) ? input.indoorOutdoor as Draft["indoorOutdoor"] : "innen",
+    powerAvailable: input.powerAvailable === true,
+    naturalLight: input.naturalLight === true,
+    blackoutPossible: input.blackoutPossible === true,
+    loadingAccess: input.loadingAccess === true,
+    accessNotes: typeof input.accessNotes === "string" ? input.accessNotes.slice(0, 240) : "",
+    shootingHours: typeof input.shootingHours === "string" ? input.shootingHours.slice(0, 160) : "",
+    availabilityNotes: typeof input.availabilityNotes === "string" ? input.availabilityNotes.slice(0, 500) : "",
+    amenities: Array.isArray(input.amenities) ? input.amenities.filter((value): value is string => typeof value === "string").slice(0, 80) : [],
+    imageUrls: Array.isArray(input.imageUrls)
+      ? input.imageUrls.filter((url): url is string => typeof url === "string").slice(0, kind === "location" ? MAX_LOCATION_IMAGES : MAX_LISTING_IMAGES)
+      : typeof (input as { imageUrl?: unknown }).imageUrl === "string" ? [(input as { imageUrl: string }).imageUrl.slice(0, 1000)] : [],
   };
 }
 
@@ -56,7 +83,7 @@ export default function GuidedListingWizard() {
   const [ready, setReady] = useState(false);
   const [saveState, setSaveState] = useState("idle");
   const [error, setError] = useState("");
-  const [uploading, setUploading] = useState(false);
+  const [galleryState, setGalleryState] = useState({ uploading: false, failed: 0 });
   const [savingListing, setSavingListing] = useState(false);
   const [createdId, setCreatedId] = useState<string | null>(null);
   const [published, setPublished] = useState(false);
@@ -107,36 +134,43 @@ export default function GuidedListingWizard() {
     setForm(next); await persist(next); setError("");
   }
   async function next() {
+    if (form.step === 3 && (galleryState.uploading || galleryState.failed > 0)) {
+      setError(galleryState.uploading ? "Bitte warte, bis die Fotos hochgeladen sind." : "Bitte lade fehlgeschlagene Fotos erneut hoch oder entferne sie.");
+      return;
+    }
     if (form.step === 1 && !form.category) { setError("Bitte wähle eine passende Kategorie."); return; }
     if (form.step === 2 && !form.city.trim()) { setError("Bitte gib eine Stadt oder einen Ort an."); return; }
     if (form.step === 4 && !form.title.trim()) { setError("Bitte gib deinem Angebot einen kurzen Titel."); return; }
     await go(Math.min(6, form.step + 1));
   }
-  async function upload(file?: File) {
-    if (!file) return;
-    if (!file.type.startsWith("image/")) { setError("Bitte wähle ein Bild aus."); return; }
-    setUploading(true); setError("");
-    try {
-      const compressed = await compressImage(file, { maxWidth: 1920, quality: 0.82, maxBytes: MAX_FUNCTION_UPLOAD_BYTES });
-      const body = new FormData(); body.append("file", compressed);
-      const response = await fetch("/api/upload", { method: "POST", body });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok || !data.url) throw new Error(data.error ?? "Der Bild-Upload ist fehlgeschlagen.");
-      const nextForm = { ...form, imageUrl: data.url };
-      setForm(nextForm); await persist(nextForm);
-    } catch (cause) { setError(cause instanceof Error ? cause.message : "Der Bild-Upload ist fehlgeschlagen."); }
-    finally { setUploading(false); }
-  }
   async function saveListing() {
     if (!form.category || !form.city.trim() || !form.title.trim()) { setError("Bitte prüfe Kategorie, Ort und Titel."); return; }
+    if (galleryState.uploading || galleryState.failed > 0) { setError(galleryState.uploading ? "Bitte warte, bis die Fotos hochgeladen sind." : "Bitte lade fehlgeschlagene Fotos erneut hoch oder entferne sie."); return; }
     setSavingListing(true); setError("");
     try {
       const vehicle = kind === "equipment" && form.category === "Bild-Fahrzeug";
       const response = await fetch("/api/listings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         type: vehicle ? "vehicle" : kind === "location" ? "location" : "prop", category: form.category,
         title: form.title.trim(), city: form.city.trim(), description: form.description.trim(),
-        price: form.priceOnRequest ? 0 : Number(form.price) || 0, image_url: form.imageUrl || null,
-        draft: true, metadata: { price_on_request: form.priceOnRequest },
+        price: form.priceOnRequest ? 0 : Number(form.price) || 0, image_url: form.imageUrls[0] || null,
+        extra_images: form.imageUrls.slice(1),
+        draft: true,
+        metadata: kind === "location" ? {
+          price_on_request: form.priceOnRequest,
+          sqm: form.sqm ? Number(form.sqm) : null,
+          ceiling_height_m: form.ceilingHeight ? Number(form.ceilingHeight) : null,
+          max_crew: form.maxCrew ? Number(form.maxCrew) : null,
+          parking_spots: form.parkingSpots ? Number(form.parkingSpots) : null,
+          indoor_outdoor: form.indoorOutdoor,
+          power_available: form.powerAvailable,
+          natural_light: form.naturalLight,
+          blackout_possible: form.blackoutPossible,
+          loading_access: form.loadingAccess,
+          access_notes: form.accessNotes,
+          shooting_hours: form.shootingHours,
+          availability_notes: form.availabilityNotes,
+          amenities: form.amenities,
+        } : { price_on_request: form.priceOnRequest },
       }) });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.data?.id) throw new Error(data.error ?? "Der private Entwurf konnte nicht gespeichert werden.");
@@ -170,13 +204,13 @@ export default function GuidedListingWizard() {
     <section className="rounded-2xl border border-border bg-bg-secondary p-5 sm:p-7">
       {form.step === 1 && <><p className="mb-5 text-sm text-text-muted">{kind === "location" ? "Wähle die Beschreibung, die am besten passt." : "Wähle die passende Art. Du kannst später weitere Angebote ergänzen."}</p><div className="grid gap-2 sm:grid-cols-2">{options[kind].map((item) => <button key={item.category} onClick={() => update("category", item.category)} className={`min-h-16 rounded-xl border p-4 text-left transition ${form.category === item.category ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/40"}`}><strong className="block text-sm text-text-primary">{item.label}</strong><span className="mt-1 block text-xs text-text-muted">{item.help}</span></button>)}</div></>}
       {form.step === 2 && <><p className="mb-4 text-sm leading-6 text-text-muted">Gib bitte nur Stadt oder Ort an. Eine genaue Privatadresse wird hier nicht benötigt oder veröffentlicht.</p><label htmlFor="city" className="mb-2 block text-sm font-medium text-text-primary">Stadt oder Ort <span className="text-gold">*</span></label><input id="city" autoComplete="address-level2" value={form.city} onChange={(event) => update("city", event.target.value)} placeholder="Zum Beispiel Augsburg" className="min-h-12 w-full rounded-xl border border-border bg-bg-primary px-4 text-sm text-text-primary outline-none focus:border-gold" />{kind === "location" && <p className="mt-3 text-xs text-text-muted">Die Stadt wird im Angebot angezeigt. Eine genaue Adresse kannst du später direkt mit Interessenten teilen.</p>}</>}
-      {form.step === 3 && <><p className="mb-4 text-sm leading-6 text-text-muted">Ein klares Foto hilft anderen, sich dein Angebot vorzustellen. Es ist optional und kann später ergänzt werden.</p>{form.imageUrl ? <div className="relative overflow-hidden rounded-xl border border-border"><UnoptimizedImage src={form.imageUrl} alt="Vorschau des ausgewählten Bildes" className="max-h-72 w-full object-cover" /><button onClick={() => update("imageUrl", "")} className="absolute right-3 top-3 flex min-h-11 items-center gap-2 rounded-full bg-bg-primary/90 px-3 text-xs text-text-primary"><Trash2 size={14} /> Entfernen</button></div> : <label className={`flex min-h-40 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-bg-primary text-center hover:border-gold/50 ${uploading ? "pointer-events-none opacity-60" : ""}`}><ImagePlus className="text-gold" /><span className="text-sm text-text-primary">{uploading ? "Foto wird hochgeladen …" : "Foto auswählen"}</span><span className="text-xs text-text-muted">JPG, PNG, WEBP oder HEIC</span><input type="file" accept="image/jpeg,image/png,image/webp,image/heic" className="sr-only" onChange={(event) => void upload(event.target.files?.[0])} /></label>}{uploading && <p className="mt-3 flex items-center gap-2 text-xs text-text-muted"><Loader2 size={14} className="animate-spin" /> Upload läuft …</p>}</>}
-      {form.step === 4 && <div className="space-y-5"><p className="text-sm leading-6 text-text-muted">Ein kurzer, klarer Titel reicht. Du kannst Einzelheiten später ergänzen.</p><div><label htmlFor="title" className="mb-2 block text-sm font-medium text-text-primary">Titel <span className="text-gold">*</span></label><input id="title" maxLength={200} value={form.title} onChange={(event) => update("title", event.target.value)} placeholder={kind === "location" ? "Zum Beispiel Helle Altbauwohnung mit Balkon" : "Zum Beispiel LED-Flächenleuchte"} className="min-h-12 w-full rounded-xl border border-border bg-bg-primary px-4 text-sm text-text-primary outline-none focus:border-gold" /></div><div><label htmlFor="description" className="mb-2 block text-sm font-medium text-text-primary">Kurze Beschreibung <span className="text-text-muted">(optional)</span></label><textarea id="description" rows={5} maxLength={3000} value={form.description} onChange={(event) => update("description", event.target.value)} placeholder={kind === "location" ? "Was sollte man über den Ort wissen?" : "Was ist enthalten und in welchem Zustand ist es?"} className="w-full rounded-xl border border-border bg-bg-primary p-4 text-sm text-text-primary outline-none focus:border-gold" /></div></div>}
+      {form.step === 3 && <><p className="mb-4 text-sm leading-6 text-text-muted">Wähle bis zu {kind === "location" ? MAX_LOCATION_IMAGES : MAX_LISTING_IMAGES} Fotos aus. Das erste Bild wird als Hauptbild verwendet. Für eine Location brauchst du vor der Veröffentlichung mindestens ein Foto; du kannst es auch später im Entwurf ergänzen.</p><ListingImageManager value={form.imageUrls} maxImages={kind === "location" ? MAX_LOCATION_IMAGES : MAX_LISTING_IMAGES} label={kind === "location" ? "Locationfotos" : "Angebotsfotos"} onChange={(imageUrls) => update("imageUrls", imageUrls)} onStatusChange={setGalleryState} /></>}
+      {form.step === 4 && <div className="space-y-5"><p className="text-sm leading-6 text-text-muted">Ein kurzer, klarer Titel reicht. Die zusätzlichen Locationangaben sind freiwillig und helfen Produktionen bei der Planung.</p><div><label htmlFor="title" className="mb-2 block text-sm font-medium text-text-primary">Titel <span className="text-gold">*</span></label><input id="title" maxLength={200} value={form.title} onChange={(event) => update("title", event.target.value)} placeholder={kind === "location" ? "Zum Beispiel Helle Altbauwohnung mit Balkon" : "Zum Beispiel LED-Flächenleuchte"} className="min-h-12 w-full rounded-xl border border-border bg-bg-primary px-4 text-sm text-text-primary outline-none focus:border-gold" /></div><div><label htmlFor="description" className="mb-2 block text-sm font-medium text-text-primary">Kurze Beschreibung <span className="text-text-muted">(optional)</span></label><textarea id="description" rows={5} maxLength={3000} value={form.description} onChange={(event) => update("description", event.target.value)} placeholder={kind === "location" ? "Was sollte man über den Ort wissen?" : "Was ist enthalten und in welchem Zustand ist es?"} className="w-full rounded-xl border border-border bg-bg-primary p-4 text-sm text-text-primary outline-none focus:border-gold" /></div>{kind === "location" && <div className="space-y-4 rounded-xl border border-border bg-bg-primary p-4"><h2 className="text-sm font-semibold text-text-primary">Ausstattung und Drehbedingungen <span className="font-normal text-text-muted">(optional)</span></h2><div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{([["sqm", "Fläche (m²)"], ["ceilingHeight", "Deckenhöhe (m)"], ["maxCrew", "Crewgröße"], ["parkingSpots", "Parkplätze"]] as const).map(([key, label]) => <label key={key} className="text-xs text-text-muted">{label}<input type="number" min="0" step={key === "ceilingHeight" ? "0.1" : "1"} value={form[key]} onChange={(event) => update(key, event.target.value)} className="mt-1 min-h-10 w-full rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary" /></label>)}</div><label className="block text-xs text-text-muted">Innen- und Außenbereich<select value={form.indoorOutdoor} onChange={(event) => update("indoorOutdoor", event.target.value as Draft["indoorOutdoor"])} className="mt-1 min-h-10 w-full rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary"><option value="innen">Innen</option><option value="außen">Außen</option><option value="beides">Innen & Außen</option></select></label><div className="flex flex-wrap gap-2">{([["powerAvailable", "Strom"], ["naturalLight", "Tageslicht"], ["blackoutPossible", "Verdunkelbar"], ["loadingAccess", "Be-/Entladung"]] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={form[key]} onClick={() => update(key, !form[key])} className={`min-h-10 rounded-lg border px-3 text-xs ${form[key] ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{form[key] ? "✓ " : ""}{label}</button>)}</div><input maxLength={160} value={form.shootingHours} onChange={(event) => update("shootingHours", event.target.value)} placeholder="Mögliche Drehzeiten" className="min-h-10 w-full rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary" /><input maxLength={240} value={form.accessNotes} onChange={(event) => update("accessNotes", event.target.value)} placeholder="Anfahrt und Zugang, keine Privatadresse" className="min-h-10 w-full rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary" /><textarea maxLength={500} rows={2} value={form.availabilityNotes} onChange={(event) => update("availabilityNotes", event.target.value)} placeholder="Verfügbarkeit und Einschränkungen" className="w-full rounded-lg border border-border bg-bg-secondary p-3 text-sm text-text-primary" /></div>}</div>}
       {form.step === 5 && <><p className="mb-5 text-sm leading-6 text-text-muted">Du kannst einen Tagespreis nennen oder zuerst Anfragen sammeln.</p><div className="space-y-3"><button onClick={() => update("priceOnRequest", true)} className={`min-h-14 w-full rounded-xl border px-4 text-left text-sm ${form.priceOnRequest ? "border-gold bg-gold/10 text-text-primary" : "border-border bg-bg-primary text-text-secondary"}`}>Preis auf Anfrage</button><button onClick={() => update("priceOnRequest", false)} className={`min-h-14 w-full rounded-xl border px-4 text-left text-sm ${!form.priceOnRequest ? "border-gold bg-gold/10 text-text-primary" : "border-border bg-bg-primary text-text-secondary"}`}>Tagespreis angeben</button>{!form.priceOnRequest && <div><label htmlFor="price" className="mb-2 block text-sm font-medium text-text-primary">Preis pro Tag in Euro</label><input id="price" type="number" min="0" step="1" value={form.price} onChange={(event) => update("price", event.target.value)} placeholder="Zum Beispiel 150" className="min-h-12 w-full rounded-xl border border-border bg-bg-primary px-4 text-sm text-text-primary outline-none focus:border-gold" /></div>}</div></>}
-      {form.step === 6 && <><p className="mb-5 text-sm leading-6 text-text-muted">Prüfe die Angaben. Zuerst wird ein privater Entwurf gespeichert, den nur du sehen kannst. Veröffentlichen kannst du ihn anschließend ausdrücklich.</p><div className="space-y-3 rounded-xl border border-border bg-bg-primary p-4 text-sm"><div><span className="text-xs text-text-muted">Art</span><p className="text-text-primary">{selected?.label ?? form.category}</p></div><div><span className="text-xs text-text-muted">Ort</span><p className="text-text-primary">{form.city}</p></div><div><span className="text-xs text-text-muted">Titel</span><p className="text-text-primary">{form.title}</p></div><div><span className="text-xs text-text-muted">Preis</span><p className="text-text-primary">{form.priceOnRequest ? "Preis auf Anfrage" : `${form.price || "0"} € pro Tag`}</p></div>{form.description && <div><span className="text-xs text-text-muted">Beschreibung</span><p className="whitespace-pre-wrap text-text-primary">{form.description}</p></div>}{form.imageUrl && <UnoptimizedImage src={form.imageUrl} alt="Angebotsfoto" className="max-h-40 rounded-lg object-cover" />}</div></>}
+      {form.step === 6 && <><p className="mb-5 text-sm leading-6 text-text-muted">Prüfe die Angaben. Zuerst wird ein privater Entwurf gespeichert, den nur du sehen kannst. Veröffentlichen kannst du ihn anschließend ausdrücklich.</p><div className="space-y-3 rounded-xl border border-border bg-bg-primary p-4 text-sm"><div><span className="text-xs text-text-muted">Art</span><p className="text-text-primary">{selected?.label ?? form.category}</p></div><div><span className="text-xs text-text-muted">Ort</span><p className="text-text-primary">{form.city}</p></div><div><span className="text-xs text-text-muted">Titel</span><p className="text-text-primary">{form.title}</p></div><div><span className="text-xs text-text-muted">Preis</span><p className="text-text-primary">{form.priceOnRequest ? "Preis auf Anfrage" : `${form.price || "0"} € pro Tag`}</p></div>{kind === "location" && <div><span className="text-xs text-text-muted">Drehbedingungen</span><p className="text-text-primary">{[form.sqm && `${form.sqm} m²`, form.indoorOutdoor === "beides" ? "Innen & Außen" : form.indoorOutdoor, form.powerAvailable && "Strom", form.naturalLight && "Tageslicht", form.blackoutPossible && "Verdunkelbar", form.loadingAccess && "Be-/Entladung"].filter(Boolean).join(" · ") || "Noch keine freiwilligen Angaben"}</p>{form.availabilityNotes && <p className="mt-1 whitespace-pre-wrap text-xs text-text-muted">{form.availabilityNotes}</p>}</div>}{form.description && <div><span className="text-xs text-text-muted">Beschreibung</span><p className="whitespace-pre-wrap text-text-primary">{form.description}</p></div>}{form.imageUrls.length > 0 && <p className="text-text-secondary">{form.imageUrls.length} Foto{form.imageUrls.length === 1 ? "" : "s"} gespeichert</p>}</div></>}
     </section>
     {error && <p role="alert" className="mt-4 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">{error}</p>}
-    <div className="mt-5 flex items-center justify-between gap-3"><button onClick={() => form.step === 1 ? router.push("/profile-setup") : void go(form.step - 1)} className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-border px-4 text-sm text-text-primary"><ArrowLeft size={16} /> Zurück</button>{form.step < 6 ? <button disabled={uploading} onClick={() => void next()} className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary disabled:opacity-50">Weiter <ArrowRight size={16} /></button> : <button disabled={savingListing || uploading} onClick={() => void saveListing()} className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary disabled:opacity-50">{savingListing ? <><Loader2 size={16} className="animate-spin" /> Wird gespeichert …</> : <>Privaten Entwurf speichern <ArrowRight size={16} /></>}</button>}</div>
+    <div className="mt-5 flex items-center justify-between gap-3"><button onClick={() => form.step === 1 ? router.push("/profile-setup") : void go(form.step - 1)} className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-border px-4 text-sm text-text-primary"><ArrowLeft size={16} /> Zurück</button>{form.step < 6 ? <button disabled={galleryState.uploading} onClick={() => void next()} className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary disabled:opacity-50">Weiter <ArrowRight size={16} /></button> : <button disabled={savingListing || galleryState.uploading || galleryState.failed > 0} onClick={() => void saveListing()} className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary disabled:opacity-50">{savingListing ? <><Loader2 size={16} className="animate-spin" /> Wird gespeichert …</> : <>Privaten Entwurf speichern <ArrowRight size={16} /></>}</button>}</div>
     <p className="mt-4 text-center text-xs text-text-muted">Nicht alles fertig? Dein Fortschritt wird privat gespeichert.</p>
   </div></main>;
 }

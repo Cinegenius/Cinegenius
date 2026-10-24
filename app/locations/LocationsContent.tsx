@@ -47,7 +47,12 @@ type Location = {
   sqft: number; capacity: number; lat: number; lng: number; isReal?: boolean;
   focalPoint?: { x: number; y: number } | null; description?: string;
   ownerId?: string;
+  metadata?: Record<string, unknown>;
 };
+
+function isPriceOnRequest(location: Location) {
+  return location.metadata?.price_on_request === true || location.price <= 0;
+}
 
 function parseLocationMeta(desc: string): { lage?: string; hasPower: boolean } {
   const metaLine = desc.split("\n\n")[0] ?? desc;
@@ -203,8 +208,8 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
     if (maxPrice) result = result.filter((l) => l.price <= Number(maxPrice));
     if (lageFilter !== "Alle") {
       result = result.filter((l) => {
-        if (!l.description) return true;
-        const { lage } = parseLocationMeta(l.description);
+        const structuredLage = l.metadata?.indoor_outdoor;
+        const lage = structuredLage === "innen" ? "Innen" : structuredLage === "außen" ? "Außen" : structuredLage === "beides" ? "Innen & Außen" : l.description ? parseLocationMeta(l.description).lage : undefined;
         if (!lage) return true; // no meta = legacy listing, include
         if (lageFilter === "Innen") return lage === "Innen" || lage === "Innen & Außen";
         if (lageFilter === "Außen") return lage === "Außen" || lage === "Innen & Außen";
@@ -214,7 +219,8 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
     }
     if (powerOnly) {
       result = result.filter((l) => {
-        if (!l.description) return true;
+        if (typeof l.metadata?.power_available === "boolean") return l.metadata.power_available;
+        if (!l.description) return false;
         return parseLocationMeta(l.description).hasPower;
       });
     }
@@ -602,8 +608,8 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                           </p>
                           <div className="flex items-center justify-between mb-1.5">
                             <span className="text-sm font-bold text-gold">
-                              {loc.price > 0 ? `${loc.price.toLocaleString()} €` : "Auf Anfrage"}
-                              {loc.price > 0 && <span className="text-text-muted font-normal text-xs">/{loc.priceUnit}</span>}
+                              {!isPriceOnRequest(loc) ? `${loc.price.toLocaleString()} €` : "Auf Anfrage"}
+                              {!isPriceOnRequest(loc) && <span className="text-text-muted font-normal text-xs">/{loc.priceUnit}</span>}
                             </span>
                           </div>
                           <div className="flex items-center justify-between pt-1.5 border-t border-border/30"
@@ -666,7 +672,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                         <p className="text-xs text-text-muted mb-2 flex items-center gap-1"><MapPin size={11} /> {loc.city}</p>
                         <div className="flex items-center justify-between pt-2 border-t border-border mb-1.5">
                           <span className="text-xs text-text-muted">{loc.type}</span>
-                          <span className="text-sm font-bold text-gold">{loc.price.toLocaleString()} €<span className="text-text-muted font-normal text-xs">/{loc.priceUnit}</span></span>
+                          <span className="text-sm font-bold text-gold">{!isPriceOnRequest(loc) ? <>{loc.price.toLocaleString()} €<span className="text-text-muted font-normal text-xs">/{loc.priceUnit}</span></> : "Auf Anfrage"}</span>
                         </div>
                         <div className="flex items-center justify-between pt-1.5 border-t border-border/30"
                           onClick={(e) => e.stopPropagation()}>

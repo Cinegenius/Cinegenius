@@ -17,6 +17,7 @@ export const metadata: Metadata = {
 
 type LocationCard = {
   id: string; title: string; type: string; city: string; price: number;
+  priceOnRequest: boolean;
   image: string; rating: number; reviews: number;
   focalPoint?: { x: number; y: number } | null;
 };
@@ -53,6 +54,7 @@ export default async function LocationsPage() {
         type: l.category ?? "Speziallocation",
         city,
         price: l.price,
+        priceOnRequest: ((l.metadata ?? {}) as Record<string, unknown>).price_on_request === true || l.price <= 0,
         image: l.image_url ?? "",
         rating: ratingsMap[l.id]?.rating ?? 0,
         reviews: ratingsMap[l.id]?.reviews ?? 0,
