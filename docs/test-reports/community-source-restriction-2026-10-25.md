@@ -15,7 +15,7 @@ Die bisherige Datenbankansicht verband Profile und Firmen mit Angeboten, Projekt
 
 ## Tatsächlich bestandene Prüfungen
 
-**17 gezielte Tests, 0 Fehler**, davon neun Bild-/Quellenprüfungen und zwei Serverabfrageprüfungen; die sechs bestehenden Teamregressionen im gemeinsamen Testmodul bleiben ebenfalls grün.
+**18 gezielte Tests, 0 Fehler**, davon zehn Bild-/Quellenprüfungen einschließlich Abfrageaufwand und zwei Serverabfrageprüfungen; die sechs bestehenden Teamregressionen im gemeinsamen Testmodul bleiben ebenfalls grün.
 
 - Tatsächliche Migrationen mit PostgreSQL-Engine PGlite und ausschließlich synthetischen Daten ausgeführt.
 - Erlaubte Profil-/Firmenbildarten, alte und neue Galeriefelder, korrekte Profil-/Firmenziele und Logo-`contain` geprüft.
@@ -28,3 +28,9 @@ Die bisherige Datenbankansicht verband Profile und Firmen mit Angeboten, Projekt
 ## Veröffentlichung
 
 Die Migration ist auf der produktiven Datenbank angewendet; PostgREST-Schemaaktualisierung angefordert. Der reale Abgleich liefert ausschließlich 86 Profilbilder und 7 Firmenbilder (93 insgesamt); direkter anonymer Zugriff auf die Ansicht bleibt gesperrt. Der Live-Browsertest folgt nach Veröffentlichung der abhängigen Website-Version. Die bisherigen Darstellungsprüfungen der unveränderten Slideshow werden hier nicht als neue Gerätetests ausgegeben.
+
+## Fehler bei der Live-Prüfung und Wiederherstellung
+
+Die erste Quellenmigration verursachte in Produktion einen Datenbank-Timeout. Die Pfaddekodierung wurde im Storagevergleich wiederholt statt einmal pro Bild ausgewertet; die tatsächliche Abfrage brauchte rund 22,5 Sekunden. Startseite und Galerie waren dadurch vorübergehend nicht verfügbar. Eine höhere Zeitgrenze oder geänderte Sicherheitseinstellung wurde nicht verwendet.
+
+Die nachfolgende Migration `20261025151000_bound_discovery_query.sql` berechnet und materialisiert erlaubte Einträge samt dekodierter Dateipfade vor dem Storagevergleich. Gemessen in Produktion: 38,331 ms für die 24-Bilder-Auswahl und 32,266 ms für die Gesamtzahl. Beide Seiten wurden danach als öffentlicher Besucher erfolgreich geöffnet; die Galerie zeigte 93 Einblicke. Ein zusätzlicher Regressionstest zählt bei 2.000 unbeteiligten Storageobjekten genau zwei Dekodierungen für zwei Kandidaten. Originaldateien, Quellenbeschränkung und Zugriffsrechte bleiben unverändert.
