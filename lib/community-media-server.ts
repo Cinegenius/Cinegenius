@@ -1,9 +1,9 @@
 import "server-only";
 import { db } from "@/lib/db";
-import { communityPhotoFromRow, isOwnPublicStorageUrl, type CommunityMediaRow } from "@/lib/community-media";
+import { COMMUNITY_ALLOWED_SOURCE_TYPES, communityPhotoFromRow, isOwnPublicStorageUrl, type CommunityMediaRow } from "@/lib/community-media";
 
 export async function getCommunityMedia({ page = 1, limit = 48, ownerId, imageUrl, viewerId = null, diverse = false }: { page?: number; limit?: number; ownerId?: string; imageUrl?: string; viewerId?: string | null; diverse?: boolean } = {}) {
-  let query = db.from("public_community_media").select("*", { count: "exact" });
+  let query = db.from("public_community_media").select("*", { count: "exact" }).in("source_type", [...COMMUNITY_ALLOWED_SOURCE_TYPES]);
   if (diverse) query = query.order("contributor_rank", { ascending: true });
   query = query.order("uploaded_at", { ascending: false }).order("storage_id", { ascending: false });
   if (ownerId) query = query.eq("owner_id", ownerId);

@@ -7,7 +7,7 @@ import { PhotoGallery } from "@/components/PhotoGallery";
 
 export const metadata: Metadata = {
   title: "Fotos & Portfolio — CineGenius",
-  description: "Entdecke öffentliche Profilfotos, Arbeitsproben, Firmen, Locations, Angebote und Projekte aus der CineGenius-Community.",
+  description: "Entdecke öffentliche Profilfotos, Arbeitsproben und Bilder aus Firmenprofilen der CineGenius-Community.",
 };
 
 export const revalidate = 300;
@@ -35,7 +35,7 @@ export default async function PhotoPage({ searchParams }: { searchParams: Promis
           <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-end sm:gap-6">
             <div className="min-w-0">
               <h1 className="mb-3 font-display text-4xl font-bold text-text-primary sm:text-5xl">Fotos & Portfolio</h1>
-              <p className="max-w-xl leading-relaxed text-text-muted">Entdecke öffentliche Profilfotos, Arbeitsproben, Firmen, Locations, Angebote und Projekte aus der CineGenius-Community.</p>
+              <p className="max-w-xl leading-relaxed text-text-muted">Entdecke öffentliche Profilfotos, Arbeitsproben und Bilder aus Firmenprofilen der CineGenius-Community.</p>
             </div>
             <Link href="/creators" className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl bg-gold px-5 py-2.5 text-sm font-semibold text-bg-primary transition-colors hover:bg-gold-light">Crew entdecken <ArrowRight size={14} /></Link>
           </div>

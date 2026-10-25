@@ -1,7 +1,6 @@
+export const COMMUNITY_ALLOWED_SOURCE_TYPES = ["profile", "company"] as const;
 export const COMMUNITY_IMAGE_LABELS: Record<string, string> = {
-  profile: "Portfolio / Arbeitsprobe", company: "Firmenfoto", location: "Locationfoto",
-  marketplace: "Marktplatzfoto", company_equipment: "Firmen-Equipment", project: "Projektbild", board: "Schwarzes Brett",
-  job: "Jobbild", company_service: "Firmen-Dienstleistung",
+  profile: "Portfolio / Arbeitsprobe", company: "Firmenfoto",
 };
 export type CommunityMediaRow = {
   source_type: string; source_id: string; owner_id: string | null; author: string;
