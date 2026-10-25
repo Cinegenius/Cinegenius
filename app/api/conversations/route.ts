@@ -13,10 +13,23 @@ const SUPPORT_ACTOR_ID = "cinegenius-support";
 // The membership table is the access-control source for both direct and group
 // conversations. It lets a user participate in many-member conversations
 // without exposing other conversations through the service-role DB client.
-export async function GET() {
+export async function GET(request: NextRequest) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
+
+  const contactId = request.nextUrl.searchParams.get("with_user");
+  if (contactId) {
+    if (!/^[a-zA-Z0-9_-]{1,128}$/.test(contactId) || contactId === userId) return NextResponse.json({ error: "Ungültiger Kontakt." }, { status: 400 });
+    const { data, error } = await db.from("conversations")
+      .select("id,conversation_members!inner(user_id,left_at)")
+      .eq("kind", "direct")
+      .or(`and(sender_id.eq.${userId},receiver_id.eq.${contactId}),and(sender_id.eq.${contactId},receiver_id.eq.${userId})`)
+      .eq("conversation_members.user_id", userId).is("conversation_members.left_at", null)
+      .order("listing_id", { nullsFirst: true }).order("updated_at", { ascending: false }).limit(1).maybeSingle();
+    if (error) return NextResponse.json({ error: "Unterhaltung konnte nicht gesucht werden." }, { status: 500 });
+    return NextResponse.json({ conversationId: data?.id ?? null }, { headers: { "Cache-Control": "private, no-store" } });
+  }
 
   const { data: memberships, error: membershipError } = await db
     .from("conversation_members")
@@ -49,6 +62,7 @@ export async function GET() {
       messages(id, sender_id, content, read_at, created_at)
     `)
     .in("id", conversationIds)
+    .or(`sender_id.neq.${userId},hidden_for_sender_at.is.null`, { referencedTable: "messages" })
     .order("updated_at", { ascending: false })
     .order("created_at", { ascending: false, referencedTable: "messages" })
     .limit(1, { referencedTable: "messages" })

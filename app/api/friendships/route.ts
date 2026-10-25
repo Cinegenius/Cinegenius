@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
     friends:  list.filter((f) => f.status === "accepted").map(enrich),
     incoming: list.filter((f) => f.status === "pending" && f.receiver_id === userId).map(enrich),
     outgoing: list.filter((f) => f.status === "pending" && f.sender_id  === userId).map(enrich),
-  });
+  }, { headers: { "Cache-Control": "private, no-store" } });
 }
 
 // POST /api/friendships  → send friend request

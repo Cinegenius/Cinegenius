@@ -6,11 +6,12 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
-import { Send, ArrowLeft, MessageSquare, Loader2, User, UserPlus, Check, X, Users, Pencil, UserMinus, Plus } from "lucide-react";
+import { Send, ArrowLeft, MessageSquare, Loader2, User, UserPlus, Check, X, Users, Pencil, UserMinus, Plus, Trash2 } from "lucide-react";
 import { Suspense } from "react";
 import { applyReadReceiptTimestamps, incomingUnreadMessageIds } from "@/lib/message-read-state";
 import { notifyMessagesRead, subscribeToMessageReads } from "@/lib/message-read-sync";
 import { mergeMessagesById } from "@/lib/conversation-logic";
+import { findContactConversation, mergeVisibleMessagePage } from "@/lib/message-actions";
 
 type Message = {
   id: string;
@@ -31,6 +32,7 @@ type Conversation = {
   sender_id: string;
   receiver_id: string | null;
   listing_title: string | null;
+  listing_id?: string | null;
   updated_at: string;
   messages: Message[];
   unread_count?: number;
@@ -48,6 +50,7 @@ type FriendRequest = {
   user_id: string;
   display_name: string;
   avatar_url: string | null;
+  role?: string;
 };
 
 function formatTime(iso: string) {
@@ -101,6 +104,20 @@ function MessagesContent() {
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
+  const [contacts, setContacts] = useState<FriendRequest[]>([]);
+  const [contactsLoading, setContactsLoading] = useState(true);
+  const [contactsError, setContactsError] = useState("");
+  const [contactSearch, setContactSearch] = useState("");
+  const [sidebarView, setSidebarView] = useState<"chats" | "contacts">("chats");
+  const [openingContact, setOpeningContact] = useState<string | null>(null);
+  const [deletingMessage, setDeletingMessage] = useState<string | null>(null);
+  const [messageNotice, setMessageNotice] = useState("");
+  const contactOpeningRef = useRef(false);
+  const deletePendingRef = useRef(false);
+  const hiddenMessageIds = useRef(new Set<string>());
+  const messageRequestSequence = useRef(0);
+  const currentUserRef = useRef(user?.id);
+  currentUserRef.current = user?.id;
 
   // Mobile: true = zeige Chat, false = zeige Liste
   const showChat = !!(activeId || newConvRecipient);
@@ -138,13 +155,16 @@ function MessagesContent() {
   }, [showChat]);
 
   const loadConversations = useCallback(async () => {
+    const owner = currentUserRef.current;
+    if (!owner) return;
     try {
       const res = await fetch("/api/conversations", { cache: "no-store" });
       if (!res.ok) throw new Error("fetch failed");
       const { data } = await res.json();
+      if (currentUserRef.current !== owner) return;
       setConversations(Array.isArray(data) ? data as Conversation[] : []);
     } catch { /* silent — UI shows empty state */ } finally {
-      setLoading(false);
+      if (currentUserRef.current === owner) setLoading(false);
     }
   }, []);
 
@@ -161,30 +181,48 @@ function MessagesContent() {
   }, [user?.id, loadConversations]);
 
   const loadFriendRequests = useCallback(async () => {
+    const owner = currentUserRef.current;
+    if (!owner) return;
+    setContactsLoading(true); setContactsError("");
     try {
-      const res = await fetch("/api/friendships");
-      if (!res.ok) return;
-      const { incoming } = await res.json();
+      const res = await fetch("/api/friendships", { cache: "no-store" });
+      if (!res.ok) throw new Error("Kontakte konnten nicht geladen werden.");
+      const { incoming, friends } = await res.json();
+      if (currentUserRef.current !== owner) return;
       if (Array.isArray(incoming)) setFriendRequests(incoming);
-    } catch { /* ignore */ }
+      setContacts(Array.isArray(friends) ? [...new Map((friends as FriendRequest[]).filter(f => f.user_id !== owner).map(f => [f.user_id, f])).values()].sort((a,b) => a.display_name.localeCompare(b.display_name,"de")) : []);
+    } catch { if (currentUserRef.current === owner) setContactsError("Kontakte konnten nicht geladen werden. Bitte versuche es erneut."); }
+    finally { if (currentUserRef.current === owner) setContactsLoading(false); }
   }, []);
 
   useEffect(() => {
-    if (!user) return;
+    setConversations([]); setContacts([]); setFriendRequests([]); setMessages([]);
+    setActiveId(null); activeIdRef.current = null; messagesRef.current = [];
+    setNewConvRecipient(toParam); setRecipientName(""); setLoadingRecipient(Boolean(toParam));
+    hiddenMessageIds.current.clear(); setMessageNotice(""); setText("");
+    messageRequestSequence.current += 1;
+    setSendError(""); setContactSearch(""); setGroupModalMode(null);
+    setDismissedIds(new Set());
+    autoOpenedConversationRef.current = null; autoOpenedRecipientRef.current = null;
+    if (!user?.id) return;
+    setLoading(true);
     loadConversations();
     loadFriendRequests();
-  }, [user, loadConversations, loadFriendRequests]);
+  }, [user?.id, toParam, loadConversations, loadFriendRequests]);
 
   useEffect(() => {
     if (!toParam) return;
-    fetch(`/api/profile/by-id?id=${toParam}`)
+    const controller = new AbortController();
+    fetch(`/api/profile/by-id?id=${encodeURIComponent(toParam)}`, { signal: controller.signal, cache: "no-store" })
       .then(r => r.json())
       .then(({ profile }) => {
+        if (controller.signal.aborted) return;
         setRecipientName(profile?.display_name ?? "Unbekannt");
         setLoadingRecipient(false);
       })
-      .catch(() => setLoadingRecipient(false));
-  }, [toParam]);
+      .catch(() => { if (!controller.signal.aborted) setLoadingRecipient(false); });
+    return () => controller.abort();
+  }, [toParam, user?.id]);
 
   useEffect(() => {
     if (!toParam) {
@@ -192,9 +230,7 @@ function MessagesContent() {
       return;
     }
     if (loading || autoOpenedRecipientRef.current === toParam) return;
-    const existing = conversations.find(c =>
-      c.sender_id === toParam || c.receiver_id === toParam
-    );
+    const existing = findContactConversation(conversations, user?.id ?? "", toParam);
     if (existing) {
       autoOpenedRecipientRef.current = toParam;
       activeIdRef.current = existing.id;
@@ -204,7 +240,7 @@ function MessagesContent() {
       setNewConvRecipient(null);
     }
 
-  }, [toParam, loading, conversations]);
+  }, [toParam, loading, conversations, user?.id]);
 
   useEffect(() => {
     const query = groupSearch.trim();
@@ -245,6 +281,9 @@ function MessagesContent() {
     convId: string,
     options: { scroll?: boolean; before?: { before: string; before_id: string } } = {},
   ) => {
+    const owner = currentUserRef.current;
+    if (!owner) return;
+    const requestSequence = options.before ? null : ++messageRequestSequence.current;
     const olderViewport = options.before ? messagesViewportRef.current : null;
     const previousScrollHeight = olderViewport?.scrollHeight ?? 0;
     const previousScrollTop = olderViewport?.scrollTop ?? 0;
@@ -254,13 +293,14 @@ function MessagesContent() {
         : "";
       const res = await fetch(`/api/conversations/${convId}${query}`, { cache: "no-store" });
       if (!res.ok) return;
-      const { messages: msgs, hasOlder } = await res.json();
+      const { messages: msgs, hasOlder, conversation } = await res.json();
       const snapshot = Array.isArray(msgs) ? msgs as Message[] : [];
-      if (activeIdRef.current !== convId) return;
+      if (currentUserRef.current !== owner || activeIdRef.current !== convId || (requestSequence !== null && requestSequence !== messageRequestSequence.current)) return;
       setHasOlderMessages(Boolean(hasOlder));
       const currentIds = new Set(messagesRef.current.map((message) => message.id));
       const hasNewVisibleMessage = snapshot.some((message) => !currentIds.has(message.id));
-      setMessages((current) => mergeMessagesById(current, snapshot));
+      setMessages((current) => mergeVisibleMessagePage(current, snapshot, hiddenMessageIds.current, !options.before));
+      if (conversation?.id === convId) setConversations(current => current.some(c => c.id === convId) ? current : [{ ...conversation, messages: snapshot, updated_at: snapshot.at(-1)?.created_at ?? "" }, ...current]);
       const messageIds = incomingUnreadMessageIds(snapshot, user?.id ?? "");
       if (messageIds.length > 0 && user?.id) {
         const readResponse = await fetch(`/api/conversations/${convId}/read`, {
@@ -271,6 +311,7 @@ function MessagesContent() {
         });
         if (readResponse.ok) {
           const readState = await readResponse.json();
+          if (currentUserRef.current !== owner || activeIdRef.current !== convId) return;
           const readMessages = Array.isArray(readState.readMessages) ? readState.readMessages : [];
           setMessages((current) => applyReadReceiptTimestamps(current, readMessages));
           setConversations((current) => current.map((conversation) => conversation.id !== convId ? conversation : {
@@ -308,10 +349,10 @@ function MessagesContent() {
 
   // Refresh beim Window-Focus (Tab-Wechsel)
   useEffect(() => {
-    const onFocus = () => { loadConversations(); };
+    const onFocus = () => { loadConversations(); loadFriendRequests(); };
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);
-  }, [loadConversations]);
+  }, [loadConversations, loadFriendRequests]);
 
   function openConversation(conv: Conversation) {
     activeIdRef.current = conv.id;
@@ -320,6 +361,53 @@ function MessagesContent() {
     setMessages([]);
     setHasOlderMessages(false);
     setNewConvRecipient(null);
+    setSendError(""); setMessageNotice("");
+  }
+
+  async function openContact(contact: FriendRequest) {
+    if (!user?.id || contactOpeningRef.current) return;
+    contactOpeningRef.current = true; setOpeningContact(contact.user_id); setContactsError("");
+    const owner = user.id;
+    try {
+      const existing = findContactConversation(conversations, owner, contact.user_id);
+      let id = existing?.id;
+      if (!id) {
+        const response = await fetch(`/api/conversations?with_user=${encodeURIComponent(contact.user_id)}`, { cache: "no-store" });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.error ?? "Unterhaltung konnte nicht geöffnet werden.");
+        id = payload.conversationId;
+      }
+      if (currentUserRef.current !== owner) return;
+      autoOpenedRecipientRef.current = toParam;
+      autoOpenedConversationRef.current = convParam;
+      setText(""); setSendError(""); setMessageNotice(""); setHasOlderMessages(false);
+      activeIdRef.current = id ?? null; messagesRef.current = []; setMessages([]); setActiveId(id ?? null);
+      setNewConvRecipient(id ? null : contact.user_id);
+      setRecipientName(contact.display_name); setLoadingRecipient(false);
+    } catch (error) { if (currentUserRef.current === owner) setContactsError(error instanceof Error ? error.message : "Unterhaltung konnte nicht geöffnet werden."); }
+    finally { contactOpeningRef.current = false; setOpeningContact(null); }
+  }
+
+  async function hideOwnMessage(message: Message) {
+    if (!activeId || message.sender_id !== user?.id || deletePendingRef.current) return;
+    deletePendingRef.current = true;
+    if (!window.confirm("Nachricht nur für dich löschen?\n\nSie wird aus deiner Ansicht entfernt. Für die anderen Teilnehmer bleibt sie erhalten.")) { deletePendingRef.current = false; return; }
+    const conversationId = activeId;
+    const owner = user.id;
+    setDeletingMessage(message.id); setSendError(""); setMessageNotice("");
+    try {
+      const response = await fetch(`/api/conversations/${conversationId}?message_id=${encodeURIComponent(message.id)}`, { method: "DELETE" });
+      const result = await response.json();
+      if (!response.ok || result.hiddenMessageId !== message.id) throw new Error(result.error ?? "Nachricht konnte nicht für dich gelöscht werden.");
+      if (currentUserRef.current !== owner) return;
+      hiddenMessageIds.current.add(message.id);
+      messageRequestSequence.current += 1;
+      setMessages(current => current.filter(m => m.id !== message.id));
+      setConversations(current => current.map(c => c.id !== conversationId ? c : { ...c, messages: c.messages.filter(m => m.id !== message.id) }));
+      if (activeIdRef.current === conversationId) setMessageNotice("Nachricht für dich gelöscht. Andere Teilnehmer sehen sie weiterhin.");
+      await loadConversations();
+    } catch (error) { if (currentUserRef.current === owner && activeIdRef.current === conversationId) setSendError(error instanceof Error ? error.message : "Nachricht konnte nicht gelöscht werden."); }
+    finally { deletePendingRef.current = false; setDeletingMessage(null); }
   }
 
   function closeChat() {
@@ -477,6 +565,7 @@ function MessagesContent() {
         return;
       }
       setFriendRequests(prev => prev.filter(r => r.friendship_id !== friendshipId));
+      await loadFriendRequests();
     } catch (e) {
       console.error("[handleFriendRequest] network error", e);
     } finally {
@@ -519,6 +608,7 @@ function MessagesContent() {
         });
         const { message, error } = await res.json().catch(() => ({}));
         if (!res.ok || error || !message?.id) throw new Error(error ?? "Nachricht konnte nicht bestätigt werden.");
+        messageRequestSequence.current += 1;
         setText("");
         setMessages(prev => mergeMessagesById(prev, [message]));
         atBottomRef.current = true;
@@ -566,7 +656,24 @@ function MessagesContent() {
           </button>
         </div>
 
-        {loading ? (
+        <div className="flex shrink-0 gap-2 border-b border-border px-4 py-2" aria-label="Nachrichtenansicht">
+          <button type="button" aria-pressed={sidebarView === "chats"} onClick={() => setSidebarView("chats")} className={`min-h-11 flex-1 rounded-lg px-2 text-sm ${sidebarView === "chats" ? "bg-bg-elevated text-gold" : "text-text-muted"}`}>Unterhaltungen</button>
+          <button type="button" aria-pressed={sidebarView === "contacts"} onClick={() => setSidebarView("contacts")} className={`min-h-11 flex-1 rounded-lg px-2 text-sm ${sidebarView === "contacts" ? "bg-bg-elevated text-gold" : "text-text-muted"}`}>Kontakte ({contacts.length})</button>
+        </div>
+
+        {sidebarView === "contacts" ? <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
+          <label className="block text-xs text-text-muted">Freunde und Kontakte suchen<input type="search" value={contactSearch} onChange={event => setContactSearch(event.target.value)} placeholder="Name oder Tätigkeit" className="my-2 min-h-11 w-full rounded-xl border border-border bg-bg-elevated px-3 text-base text-text-primary sm:text-sm" /></label>
+          {contactsError && <div role="alert" className="mb-3 text-sm text-red-400"><p>{contactsError}</p><button type="button" onClick={() => void loadFriendRequests()} className="min-h-11 text-gold">Erneut laden</button></div>}
+          {contactsLoading ? <p role="status" className="py-4 text-sm text-text-muted">Kontakte werden geladen…</p> : <div className="space-y-1">
+            {contacts.filter(contact => `${contact.display_name} ${contact.role ?? ""}`.toLocaleLowerCase("de").includes(contactSearch.trim().toLocaleLowerCase("de"))).map(contact => <button type="button" key={contact.user_id} disabled={Boolean(openingContact)} onClick={() => void openContact(contact)} className="flex min-h-16 w-full items-center gap-3 rounded-xl px-2 py-3 text-left hover:bg-bg-elevated disabled:opacity-60">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-bg-elevated">{contact.avatar_url ? <UnoptimizedImage src={contact.avatar_url} alt="" className="h-full w-full object-cover" /> : <User size={18} className="text-text-muted" />}</span>
+              <span className="min-w-0 flex-1"><strong className="block break-words text-sm text-text-primary">{contact.display_name}</strong><span className="block break-words text-xs text-text-muted">{contact.role ?? "CineGenius Mitglied"}</span></span>
+              {openingContact === contact.user_id ? <Loader2 size={17} className="shrink-0 animate-spin text-gold" /> : <MessageSquare size={17} className="shrink-0 text-gold" />}
+            </button>)}
+            {!contacts.length && <p className="py-4 text-sm text-text-muted">Noch keine bestätigten Kontakte. Angenommene Freundschaftsanfragen erscheinen hier.</p>}
+            {contacts.length > 0 && !contacts.some(contact => `${contact.display_name} ${contact.role ?? ""}`.toLocaleLowerCase("de").includes(contactSearch.trim().toLocaleLowerCase("de"))) && <p className="py-4 text-sm text-text-muted">Keine passenden Kontakte gefunden.</p>}
+          </div>}
+        </div> : loading ? (
           <div className="flex-1 flex items-center justify-center">
             <Loader2 size={20} className="animate-spin text-text-muted" />
           </div>
@@ -710,7 +817,8 @@ function MessagesContent() {
             <div className="px-4 py-3.5 border-b border-border flex items-center gap-3 shrink-0">
               <button
                 onClick={closeChat}
-                className="p-1.5 -ml-1 text-text-muted hover:text-text-primary active:scale-95 transition-all"
+                aria-label="Zurück zur Nachrichtenliste"
+                className="flex min-h-11 min-w-11 -ml-1 items-center justify-center text-text-muted hover:text-text-primary active:scale-95 transition-all"
               >
                 <ArrowLeft size={20} />
               </button>
@@ -824,9 +932,12 @@ function MessagesContent() {
                             : "bg-bg-elevated border border-border text-text-primary rounded-bl-sm"
                         }`}>
                           {msg.content}
-                          <p className={`text-[10px] mt-1 ${isOwn ? "text-bg-primary/60" : "text-text-muted"}`}>
+                          <div className="mt-1 flex items-center justify-between gap-2">
+                          <p className={`text-[10px] ${isOwn ? "text-bg-primary/60" : "text-text-muted"}`}>
                             {formatTime(msg.created_at)}
                           </p>
+                          {isOwn && <button type="button" title="Für mich löschen" aria-label="Eigene Nachricht für mich löschen" disabled={Boolean(deletingMessage)} onClick={() => void hideOwnMessage(msg)} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg text-bg-primary/70 hover:bg-black/10 disabled:opacity-50">{deletingMessage === msg.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}</button>}
+                          </div>
         </div>
       </div>
 
@@ -856,6 +967,7 @@ function MessagesContent() {
             {/* Eingabe */}
             <div className="px-4 py-3 border-t border-border shrink-0 safe-area-pb">
               {sendError && <p role="alert" className="text-xs text-red-400 mb-2">{sendError}</p>}
+              {messageNotice && <p role="status" className="mb-2 text-xs text-gold">{messageNotice}</p>}
               <div className="flex min-w-0 gap-2">
                 <input
                   type="text"
@@ -867,6 +979,7 @@ function MessagesContent() {
                 />
                 <button
                   onClick={sendMessage}
+                  aria-label="Nachricht senden"
                   disabled={!text.trim() || sending}
                   className="w-11 h-11 bg-gold text-bg-primary rounded-2xl flex items-center justify-center hover:bg-gold-light transition-colors disabled:opacity-40 shrink-0"
                 >

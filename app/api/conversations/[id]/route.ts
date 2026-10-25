@@ -58,7 +58,8 @@ export async function GET(
   let query = db
     .from("messages")
     .select("id, conversation_id, sender_id, content, read_at, created_at")
-    .eq("conversation_id", id);
+    .eq("conversation_id", id)
+    .or(`sender_id.neq.${userId},hidden_for_sender_at.is.null`);
   if (conversation.kind === "group") query = query.gte("created_at", membership.joined_at);
   if (before && beforeId) query = query.or(`created_at.lt.${before},and(created_at.eq.${before},id.lt.${beforeId})`);
 
@@ -117,6 +118,10 @@ export async function GET(
   return NextResponse.json({
     conversation: {
       ...conversation,
+      ...(conversation.kind === "direct" ? {
+        otherName: members.find(member => member.user_id !== userId)?.display_name ?? "Unbekannt",
+        otherAvatar: members.find(member => member.user_id !== userId)?.avatar_url ?? null,
+      } : {}),
       ...(conversation.kind === "support" ? { otherName: "CineGenius Support", otherAvatar: "/cinegenius-logo.svg" } : {}),
       members,
       memberCount: members.length,
@@ -129,6 +134,20 @@ export async function GET(
       ? { before: page[0].created_at, before_id: page[0].id }
       : null,
   }, { headers: { "Cache-Control": "no-store, max-age=0" } });
+}
+
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const caller = await requireAuth();
+  if (caller instanceof NextResponse) return caller;
+  const { id } = await params;
+  const messageId = request.nextUrl.searchParams.get("message_id") ?? "";
+  const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuid.test(id) || !uuid.test(messageId)) return NextResponse.json({ error: "Ungültige Nachricht." }, { status: 400 });
+  const { allowed } = await rateLimit(`hide-message:${caller.userId}`, 60, 60);
+  if (!allowed) return NextResponse.json({ error: "Bitte warte kurz und versuche es erneut." }, { status: 429 });
+  const { data, error } = await db.rpc("hide_own_conversation_message", { p_actor: caller.userId, p_conversation: id, p_message: messageId });
+  if (error || data !== messageId) return NextResponse.json({ error: error?.code === "42501" ? "Diese Nachricht ist nicht verfügbar oder stammt nicht von dir." : "Die Nachricht konnte nicht für dich gelöscht werden." }, { status: error?.code === "42501" ? 404 : 500 });
+  return NextResponse.json({ hiddenMessageId: data }, { headers: { "Cache-Control": "private, no-store" } });
 }
 
 export async function POST(
