@@ -1315,6 +1315,7 @@ export default function DashboardPage() {
                     Verwalten <ChevronRight size={12} />
                   </Link>
                 </div>
+                <Link href="/company-invitations" className="mb-4 inline-flex min-h-11 items-center text-sm text-gold hover:text-gold-light">Meine Teameinladungen ansehen →</Link>
                 {myCompany === "loading" && (
                   <div className="flex items-center gap-3 text-sm text-text-muted py-4">
                     <Loader2 size={16} className="animate-spin" /> Lädt...

@@ -10,8 +10,8 @@ const admin = db;
 const privateJson = (body: unknown, status = 200) => NextResponse.json(body, { status, headers: { "Cache-Control": "private, no-store" } });
 
 function revalidateCompany(slug?: string | null) {
-  revalidateTag("companies", "max");
-  revalidateTag("profiles", "max");
+  revalidateTag("companies", { expire: 0 });
+  revalidateTag("profiles", { expire: 0 });
   if (slug) revalidatePath(`/companies/${slug}`);
 }
 
@@ -109,6 +109,10 @@ export async function POST(req: NextRequest) {
     ? await admin.from("company_members").update(requestData).eq("id", existing.id).select().single()
     : await admin.from("company_members").insert(requestData).select().single();
   if (error) {
+    if (error.code === "23505") {
+      const { data: invite } = await admin.from("company_invitations").select("id").eq("company_id", companyId).eq("recipient_user_id", userId).eq("status", "pending").gt("expires_at", new Date().toISOString()).maybeSingle();
+      if (invite) return privateJson({ error: "Du hast bereits eine Einladung dieser Firma. Öffne deine Teameinladungen und antworte dort.", invitationHref: "/company-invitations" }, 409);
+    }
     const { data: raced } = await admin.from("company_members").select("id, status").eq("company_id", companyId).eq("user_id", userId).maybeSingle();
     if (raced?.status === "pending") return privateJson({ data: raced, alreadyRequested: true });
     if (raced?.status === "accepted") return privateJson({ error: "Du bist bereits Mitglied dieser Firma.", data: raced }, 409);
@@ -119,7 +123,7 @@ export async function POST(req: NextRequest) {
     const [{ data: profile }, { data: co }, { data: admins }] = await Promise.all([
       admin.from("profiles").select("display_name, slug").eq("user_id", userId).maybeSingle(),
       admin.from("companies").select("name, slug, owner_user_id").eq("id", companyId).single(),
-      admin.from("company_members").select("user_id").eq("company_id", companyId).eq("status", "accepted").in("role", ["admin", "manager"]),
+      admin.from("company_members").select("user_id").eq("company_id", companyId).eq("status", "accepted").in("role", ["admin"]),
     ]);
     if (profile && co) {
       const recipients = [...new Set([co.owner_user_id, ...(admins ?? []).map((item) => item.user_id)].filter(Boolean))];

@@ -5,10 +5,19 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent } from "react";
 import { ArrowRight, Image as ImageIcon, Pause, Play, Star, X, Share2 } from "lucide-react";
 import PhotoLikeButton from "@/components/PhotoLikeButton";
+import ResilientPublicImage from "@/components/ResilientPublicImage";
 import { markPhotoNavigation, markPhotoNavigationWithAnimation, photoHref } from "@/lib/photo-link";
 import { getPhotoBandFillerCount, orderPhotosByAuthor, repeatForSeamlessLoop, shouldAnimatePhotoBand } from "@/lib/home-discovery";
 
 export type DiscoverPhoto = {
+  authorHref?: string | null;
+  sourceHref?: string;
+  sourceTitle?: string;
+  imageKind?: string;
+  fit?: "contain" | "cover";
+  canLike?: boolean;
+  canRate?: boolean;
+  uploadedAt?: string;
   profileId: string;
   profileSlug: string;
   author: string;
@@ -34,6 +43,7 @@ export function PhotoDialog({ photo, onClose, resumeLike = false }: { photo: Dis
   const [shareMessage, setShareMessage] = useState("");
 
   useEffect(() => {
+    if (photo.canRate === false) return;
     const controller = new AbortController();
     const query = new URLSearchParams({ profile_id: photo.profileId, image_url: photo.imageUrl });
     fetch(`/api/profile-image-ratings?${query}`, { signal: controller.signal })
@@ -44,7 +54,7 @@ export function PhotoDialog({ photo, onClose, resumeLike = false }: { photo: Dis
       })
       .catch(() => {});
     return () => controller.abort();
-  }, [photo.profileId, photo.imageUrl]);
+  }, [photo.profileId, photo.imageUrl, photo.canRate]);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) { if (event.key === "Escape") onClose(); }
@@ -79,21 +89,21 @@ export function PhotoDialog({ photo, onClose, resumeLike = false }: { photo: Dis
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-3 sm:p-6" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
       <section className="relative flex max-h-[94dvh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-border bg-bg-secondary shadow-2xl" role="dialog" aria-modal="true" aria-label={`Foto von ${photo.author}`}>
         <button type="button" onClick={onClose} aria-label="Foto schließen" className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/70 text-white hover:border-gold"><X size={20} /></button>
-        <div className="relative flex min-h-0 flex-1 items-center justify-center bg-black p-2 sm:p-4">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={photo.imageUrl} alt={photo.caption || `Portfoliofoto von ${photo.author}`} className="max-h-[68dvh] max-w-full object-contain" />
+        <div className="relative flex h-[62dvh] min-h-0 shrink items-center justify-center bg-black px-2 pb-2 pt-14 sm:px-4 sm:pb-4">
+          <ResilientPublicImage src={photo.imageUrl} alt={photo.caption || `${photo.imageKind || "Foto"} von ${photo.author}`} imageClassName="h-full w-full object-contain" loading="eager" />
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-4 p-4 sm:px-6">
+        <div className="flex max-h-[28dvh] shrink-0 flex-wrap items-center justify-between gap-4 overflow-y-auto p-4 sm:px-6">
           <div className="min-w-0">
-            <p className="break-words font-semibold text-text-primary">{photo.caption || "Portfoliofoto"}</p>
-            <Link href={`/profile/${photo.profileSlug}#portfolio`} className="mt-1 inline-flex min-h-11 items-center gap-1 text-sm text-gold hover:text-gold-light">{photo.author} <ArrowRight size={14} /> Profil ansehen</Link>
+            <p className="break-words font-semibold text-text-primary">{photo.caption || photo.imageKind || "Portfoliofoto"}</p>
+            {photo.authorHref === null ? <p className="mt-2 text-sm text-text-secondary">{photo.author}</p> : <Link href={photo.authorHref ?? `/profile/${photo.profileSlug}#portfolio`} className="mt-1 inline-flex min-h-11 items-center gap-1 text-sm text-gold hover:text-gold-light">{photo.author} <ArrowRight size={14} /> Profil ansehen</Link>}
+            {photo.sourceHref && <Link href={photo.sourceHref} className="flex min-h-11 items-center gap-1 text-sm text-gold">{photo.sourceTitle} <ArrowRight size={14} /> Inhalt ansehen</Link>}
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <PhotoLikeButton profileId={photo.profileId} imageUrl={photo.imageUrl} initialCount={photo.likeCount ?? 0} initialLiked={photo.likedByMe ?? false} resumeLike={resumeLike} />
+            <PhotoLikeButton profileId={photo.profileId} imageUrl={photo.imageUrl} initialCount={photo.likeCount ?? 0} initialLiked={photo.likedByMe ?? false} resumeLike={resumeLike} disabled={photo.canLike === false} />
             <button type="button" onClick={() => void sharePhoto()} aria-label="Fotolink teilen" className="flex min-h-11 items-center gap-2 rounded-full border border-border px-3 text-sm text-text-primary hover:border-gold"><Share2 size={16} /> Teilen</button>
             {shareMessage && <span role="status" className="text-xs text-text-muted">{shareMessage}</span>}
           </div>
-          <div className="flex min-w-[180px] flex-col items-start gap-2 sm:items-end">
+          {photo.canRate !== false && <div className="flex min-w-[180px] flex-col items-start gap-2 sm:items-end">
             {summary && summary.count > 0 ? <div className="flex items-center gap-2"><Stars rating={summary.avg} /><span className="text-sm text-text-primary">{summary.avg.toFixed(1)}</span><span className="text-xs text-text-muted">({summary.count} {summary.count === 1 ? "Bewertung" : "Bewertungen"})</span></div> : <span className="text-sm text-text-muted">Noch keine Bewertungen</span>}
             {summary?.eligible && <div className="flex flex-wrap items-center gap-2" aria-label="Foto bewerten">
               <div className="flex" role="group" aria-label="Sterne auswählen">{[1, 2, 3, 4, 5].map((star) => <button key={star} type="button" onClick={() => setSelected(star)} aria-label={`${star} Sterne`} aria-pressed={selected === star} className="flex h-9 w-9 items-center justify-center rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold"><Star size={19} className={star <= (selected ?? 0) ? "fill-gold text-gold" : "text-text-muted"} /></button>)}</div>
@@ -101,7 +111,7 @@ export function PhotoDialog({ photo, onClose, resumeLike = false }: { photo: Dis
             </div>}
             {summary && !summary.eligible && <p className="text-[11px] text-text-muted">Bewertungen sind nach bestätigter Zusammenarbeit möglich.</p>}
             {error && <p role="alert" className="text-xs text-red-300">{error}</p>}
-          </div>
+          </div>}
         </div>
       </section>
     </div>
@@ -129,13 +139,13 @@ function PhotoBandCard({
   return (
     <article aria-hidden={pointerOnly || undefined} className="home-photo-band-card group relative aspect-[4/3] w-[165px] shrink-0 overflow-hidden rounded-xl border border-white/10 bg-bg-elevated sm:w-[200px] lg:w-[240px] xl:w-[250px]">
       {!failed ? <Link href={href} onClick={onPhotoOpen ?? (() => markPhotoNavigation())} aria-label={pointerOnly ? undefined : `Foto öffnen: ${photo.caption || `Portfoliofoto von ${photo.author}`}`} tabIndex={pointerOnly ? -1 : undefined} className="absolute inset-0 block focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold">
-        <Image src={photo.imageUrl} alt={pointerOnly ? "" : photo.caption || `Foto von ${photo.author}`} fill priority={priority} sizes="(max-width: 639px) 165px, (max-width: 1023px) 200px, (max-width: 1279px) 240px, 250px" onError={() => onImageError(photo.imageUrl)} draggable={false} className="object-cover" />
+        <Image src={photo.imageUrl} alt={pointerOnly ? "" : photo.caption || `Foto von ${photo.author}`} fill priority={priority} sizes="(max-width: 639px) 165px, (max-width: 1023px) 200px, (max-width: 1279px) 240px, 250px" onError={() => onImageError(photo.imageUrl)} draggable={false} className={photo.fit === "contain" ? "object-contain p-4" : "object-cover"} />
       </Link> : <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-bg-elevated to-bg-primary text-text-muted"><div className="flex flex-col items-center gap-2"><ImageIcon size={28} /><span className="text-xs">Bild derzeit nicht verfügbar</span></div></div>}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
-      <PhotoLikeButton profileId={photo.profileId} imageUrl={photo.imageUrl} initialCount={photo.likeCount ?? 0} initialLiked={photo.likedByMe ?? false} tabIndex={pointerOnly ? -1 : undefined} className="absolute right-3 top-3 z-10" />
+      <PhotoLikeButton profileId={photo.profileId} imageUrl={photo.imageUrl} initialCount={photo.likeCount ?? 0} initialLiked={photo.likedByMe ?? false} disabled={photo.canLike === false} tabIndex={pointerOnly ? -1 : undefined} className="absolute right-3 top-3 z-10" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3 text-white sm:p-4">
-        <Link href={`/profile/${photo.profileSlug}#portfolio`} tabIndex={pointerOnly ? -1 : undefined} className="pointer-events-auto inline-flex min-h-11 max-w-full items-center truncate text-sm font-semibold hover:text-gold sm:text-base">{photo.author}</Link>
-        <p className="line-clamp-1 text-xs text-white/75 sm:text-sm">{photo.caption || "Portfolio-Einblick"}</p>
+        {photo.authorHref === null ? <span className="inline-flex min-h-11 max-w-full items-center truncate text-sm font-semibold sm:text-base">{photo.author}</span> : <Link href={photo.authorHref ?? `/profile/${photo.profileSlug}#portfolio`} tabIndex={pointerOnly ? -1 : undefined} className="pointer-events-auto inline-flex min-h-11 max-w-full items-center truncate text-sm font-semibold hover:text-gold sm:text-base">{photo.author}</Link>}
+        <p className="line-clamp-1 text-xs text-white/75 sm:text-sm">{[photo.imageKind, photo.sourceTitle !== photo.author ? photo.sourceTitle : photo.caption].filter(Boolean).join(" · ") || "Portfolio-Einblick"}</p>
         {isRatedSelection && <div className="mt-1.5 flex items-center gap-2 text-white"><Stars rating={photo.rating} /><span className="text-xs font-semibold">{photo.rating.toFixed(1)}</span><span className="text-[11px] text-white/70">({photo.count})</span></div>}
       </div>
     </article>
@@ -367,11 +377,11 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
           <div className="min-w-0">
             <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-gold">{isRatedSelection ? "Best of CineGenius" : "Neu entdecken"}</p>
             <h2 className="font-display text-xl font-bold text-text-primary sm:text-2xl">{isRatedSelection ? "Fotos, die begeistern" : "Frische Einblicke aus der Community"}</h2>
-            {!isRatedSelection && <p className="mt-1 text-xs text-text-muted">Sobald genügend echte Bewertungen vorliegen, zeigen wir hier das Best of.</p>}
+            {!isRatedSelection && <p className="mt-1 text-xs text-text-muted">Neue öffentliche Bilder aus der gesamten CineGenius-Community.</p>}
           </div>
           <div className="flex items-center gap-2">
             {animated && <button type="button" onClick={() => setUserPaused((paused) => !paused)} aria-label={userPaused ? "Fotobänder fortsetzen" : "Fotobänder pausieren"} aria-pressed={userPaused} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-border text-text-muted transition-colors hover:border-gold hover:text-gold">{userPaused ? <Play size={16} /> : <Pause size={16} />}</button>}
-            <Link href="/photo" className="inline-flex min-h-11 shrink-0 items-center gap-1 text-sm font-medium text-gold hover:text-gold-light">Alle entdecken <ArrowRight size={14} /></Link>
+            <Link href="/photo" className="inline-flex min-h-11 shrink-0 items-center gap-1 text-sm font-medium text-gold hover:text-gold-light">Alle Einblicke ansehen <ArrowRight size={14} /></Link>
           </div>
         </div>
         {photos.length > 0 ? <div

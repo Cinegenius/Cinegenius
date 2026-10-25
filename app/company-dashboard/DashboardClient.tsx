@@ -14,6 +14,7 @@ import {
   EQUIPMENT_CATEGORIES, EQUIPMENT_CATEGORY_BY_ID,
   CONDITION_LABELS, CONDITION_COLORS, SERVICE_TYPES, SERVICE_TYPE_BY_ID,
 } from "@/lib/equipment-categories";
+import { CompanyMemberInvitations } from "@/components/CompanyMemberInvitations";
 import { canCompanyRoleManageTarget, normalizeCompanyPublicTitles, COMPANY_PUBLIC_TITLE_SUGGESTIONS } from "@/lib/company-roles";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -914,7 +915,7 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
 function TeamTab({ companyId, permissionRole, canManageTeam }: { companyId: string; permissionRole: "owner" | "admin" | "editor" | "member"; canManageTeam: boolean }) {
   const [members, setMembers] = useState<Member[]>([]);
   const [titleChangeRequests, setTitleChangeRequests] = useState<TitleChangeRequest[]>([]);
-  const [teamView, setTeamView] = useState<"members" | "requests">(canManageTeam ? "requests" : "members");
+  const [teamView, setTeamView] = useState<"members" | "requests" | "invitations" | "add">(canManageTeam ? "requests" : "members");
   const [loading, setLoading] = useState(true);
   const [inviteRole, setInviteRole] = useState<"admin" | "editor" | "member">("member");
   const [inviteTitles, setInviteTitles] = useState("");
@@ -1034,6 +1035,11 @@ function TeamTab({ companyId, permissionRole, canManageTeam }: { companyId: stri
           Anfragen ({requestCount})
         </button>}
       </div>
+      {canManageTeam && <div className="flex flex-wrap gap-2">
+        <button type="button" onClick={() => setTeamView("add")} className="min-h-11 rounded-lg border border-gold/30 px-4 text-sm text-gold">Mitglied hinzufügen</button>
+        <button type="button" onClick={() => setTeamView("invitations")} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary">Ausstehende Einladungen</button>
+      </div>}
+      {canManageTeam && (teamView === "add" || teamView === "invitations") && <CompanyMemberInvitations companyId={companyId} mode={teamView === "add" ? "add" : "list"} />}
       {canManageTeam && <datalist id="company-public-title-options">{COMPANY_PUBLIC_TITLE_SUGGESTIONS.map((title) => <option key={title} value={title} />)}</datalist>}
 
       {notice && <p role="status" className="rounded-xl border border-success/20 bg-success/5 p-3 text-sm text-success">{notice}</p>}
@@ -1053,6 +1059,15 @@ function TeamTab({ companyId, permissionRole, canManageTeam }: { companyId: stri
         </div>
       )}
 
+      {teamView === "add" && canManageTeam && <details className="space-y-3 rounded-xl border border-border bg-bg-secondary p-4">
+        <summary className="min-h-11 cursor-pointer text-sm font-semibold text-text-primary">Person ohne Konto per privatem Link einladen</summary>
+        <p className="text-xs leading-5 text-text-muted">Erstelle einen privaten, einmal verwendbaren Link. Die eingeladene Person kann sich anmelden oder neu registrieren; du bestätigst danach den Beitritt. Der Link wird nicht automatisch per E-Mail versendet.</p>
+        <label className="block text-xs text-text-secondary">CineGenius-Funktion (optional, mehrere mit Komma trennen)<input list="company-public-title-options" value={inviteTitles} onChange={(event) => setInviteTitles(event.target.value)} maxLength={400} placeholder="z.B. Catering-Leitung, Setkoch" className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary" /></label>
+        <label className="block text-xs text-text-secondary">Verwaltungsrecht<select value={inviteRole} onChange={(event) => setInviteRole(event.target.value as "admin" | "editor" | "member")} className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary"><option value="member">Teammitglied – ansehen</option><option value="editor">Bearbeiter/in – Firmendaten und Angebote bearbeiten</option>{permissionRole === "owner" && <option value="admin">Administrator/in – Team verwalten</option>}</select></label>
+        <button onClick={() => void createInvite()} disabled={inviteBusy} className="min-h-11 rounded-lg bg-gold px-4 text-sm font-bold text-bg-primary disabled:opacity-50">{inviteBusy ? "Wird erstellt …" : "Einladungslink erstellen"}</button>
+        {inviteUrl && <div className="space-y-2"><input readOnly value={inviteUrl} aria-label="Einladungslink" className="min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-xs text-text-primary" /><button onClick={() => void copyInvite()} className="min-h-10 rounded-lg border border-border px-3 text-xs text-gold">Link kopieren</button></div>}
+        {notice && <p role="status" className="text-xs text-success">{notice}</p>}
+      </details>}
       {teamView === "members" && <div className="space-y-6">
         <div>
         <p className="text-[10px] uppercase tracking-[0.14em] text-text-muted font-semibold mb-3">
@@ -1097,15 +1112,7 @@ function TeamTab({ companyId, permissionRole, canManageTeam }: { companyId: stri
         )}
         </div>
 
-      {canManageTeam && <div className="space-y-3 rounded-xl border border-border bg-bg-secondary p-4">
-        <h3 className="text-sm font-semibold text-text-primary">Teammitglied einladen</h3>
-        <p className="text-xs leading-5 text-text-muted">Erstelle einen privaten, einmal verwendbaren Link. Die eingeladene Person kann sich anmelden oder neu registrieren; du bestätigst danach den Beitritt. Der Link wird nicht automatisch per E-Mail versendet.</p>
-        <label className="block text-xs text-text-secondary">CineGenius-Funktion (optional, mehrere mit Komma trennen)<input list="company-public-title-options" value={inviteTitles} onChange={(event) => setInviteTitles(event.target.value)} maxLength={400} placeholder="z.B. Catering-Leitung, Setkoch" className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary" /></label>
-        <label className="block text-xs text-text-secondary">Verwaltungsrecht<select value={inviteRole} onChange={(event) => setInviteRole(event.target.value as "admin" | "editor" | "member")} className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary"><option value="member">Teammitglied – ansehen</option><option value="editor">Bearbeiter/in – Firmendaten und Angebote bearbeiten</option>{permissionRole === "owner" && <option value="admin">Administrator/in – Team verwalten</option>}</select></label>
-        <button onClick={() => void createInvite()} disabled={inviteBusy} className="min-h-11 rounded-lg bg-gold px-4 text-sm font-bold text-bg-primary disabled:opacity-50">{inviteBusy ? "Wird erstellt …" : "Einladungslink erstellen"}</button>
-        {inviteUrl && <div className="space-y-2"><input readOnly value={inviteUrl} aria-label="Einladungslink" className="min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-xs text-text-primary" /><button onClick={() => void copyInvite()} className="min-h-10 rounded-lg border border-border px-3 text-xs text-gold">Link kopieren</button></div>}
-        {notice && <p role="status" className="text-xs text-success">{notice}</p>}
-      </div>}
+
       </div>}
     </div>
   );

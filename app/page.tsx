@@ -31,9 +31,8 @@ import { HomePhotoDiscovery, type DiscoverPhoto } from "@/components/HomePhotoDi
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
 import { getPrivateProfileIds } from "@/lib/trust";
 import { fetchRatingSummaries } from "@/lib/ratings";
-import { extractPublicProfilePhotos } from "@/lib/home-discovery";
+import { getCommunityMedia } from "@/lib/community-media-server";
 import { rankByRatingConfidence } from "@/lib/rating-ranking";
-import { summarizePhotoRatings } from "@/lib/photo-rating-summary";
 
 type HomeProfileRow = {
   user_id: string;
@@ -100,38 +99,10 @@ async function getHomeData(viewerId: string | null) {
   const profileRows = (profilesRaw ?? []) as HomeProfileRow[];
   const privateIds = await getPrivateProfileIds(profileRows.map((profile) => profile.user_id));
   const publicProfiles = profileRows.filter((profile) => !privateIds.has(profile.user_id));
-  const photos = extractPublicProfilePhotos(publicProfiles);
+  const { photos } = await getCommunityMedia({ limit: 24, viewerId, diverse: true });
   const profileIds = publicProfiles.map((profile) => profile.user_id);
-  const [crewRatingSummaries, photoRatingsResult, photoLikesResult] = await Promise.all([
-    fetchRatingSummaries(profileIds, "user").catch(() => ({} as Awaited<ReturnType<typeof fetchRatingSummaries>>)),
-    profileIds.length
-    ? db.from("profile_image_ratings").select("profile_id,image_url,reviewer_id,rating").in("profile_id", profileIds)
-      : Promise.resolve({ data: [], error: null }),
-    profileIds.length
-      ? db.from("profile_image_likes").select("profile_id,image_url,liker_id").in("profile_id", profileIds)
-      : Promise.resolve({ data: [], error: null }),
-  ]);
-
-  const photoLikeCounts = new Map<string, number>();
-  const myPhotoLikes = new Set<string>();
-  for (const row of photoLikesResult.data ?? []) {
-    const key = `${row.profile_id}:${row.image_url}`;
-    photoLikeCounts.set(key, (photoLikeCounts.get(key) ?? 0) + 1);
-    if (viewerId && row.liker_id === viewerId) myPhotoLikes.add(key);
-  }
-
-  const photosWithRatings: DiscoverPhoto[] = photos.map((photo) => {
-    const rows = (photoRatingsResult.data ?? []).filter((row: { profile_id: string; image_url: string }) => row.profile_id === photo.profileId && row.image_url === photo.imageUrl) as Array<{ reviewer_id: string; rating: number }>;
-    const key = `${photo.profileId}:${photo.imageUrl}`;
-    return { ...photo, ...summarizePhotoRatings(rows), likeCount: photoLikeCounts.get(key) ?? 0, likedByMe: myPhotoLikes.has(key) };
-  });
-  const ratedPhotos = rankByRatingConfidence(
-    photosWithRatings.filter((photo) => photo.count >= 2),
-    (photo) => photo.rating,
-    (photo) => photo.count,
-    (photo) => `${photo.profileId}:${photo.imageUrl}`,
-  ).slice(0, 6);
-  const newPhotos = photosWithRatings.slice(0, 6);
+  const crewRatingSummaries = await fetchRatingSummaries(profileIds, "user").catch(() => ({} as Awaited<ReturnType<typeof fetchRatingSummaries>>));
+  const newPhotos: DiscoverPhoto[] = photos.slice(0, 24);
 
   const crewTypeLabels = new Set(
     (Object.entries(PROFILE_TYPE_LABELS) as [ProfileType, string][])
@@ -229,7 +200,7 @@ async function getHomeData(viewerId: string | null) {
     projects,
     topCreators,
     newCrew,
-    ratedPhotos,
+    ratedPhotos: [],
     newPhotos,
     currentTime,
   };
@@ -253,7 +224,7 @@ export default async function HomePage() {
     return tc("weeksAgo", { weeks: Math.floor(diff / 7) });
   }
 
-  const { liveLocations, liveJobs, liveProps, companies, projects, topCreators, newCrew, ratedPhotos, newPhotos, currentTime } = await getHomeData(userId);
+  const { liveLocations, liveJobs, liveProps, companies, projects, topCreators, newCrew, newPhotos, currentTime } = await getHomeData(userId);
 
   const findCards = [
     { title: t("findLocationsTitle"), description: t("findLocationsDescription"), href: "/locations", icon: MapPin },
@@ -349,7 +320,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <HomePhotoDiscovery ratedPhotos={ratedPhotos} newPhotos={newPhotos} />
+      <HomePhotoDiscovery ratedPhotos={[]} newPhotos={newPhotos} />
 
       {/* ══════════════════════════════════════════════
           FEATURED LOCATIONS

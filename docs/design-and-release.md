@@ -52,6 +52,13 @@ For visual review, capture `/projects`, `/locations`, `/props`, `/creators`, `/c
 - Before releasing the homepage photo-rating feature, apply `supabase/migrations/profile_image_ratings.sql` to the linked production Supabase project and verify its unique constraint, RLS, and grants. This migration has been applied and verified on the production `main` database.
 - Before releasing idempotent photo likes, apply `supabase/migrations/profile_image_likes_unique.sql` to the linked production Supabase project. It removes duplicate rows for the same liker/profile/photo while preserving one existing like, then enforces a unique index used by the API's state-setting upsert. Verify the index before deploying the application code.
 
+## Public community media and direct company invitations
+
+- Before releasing the expanded public image collection and targeted member invitations, apply `supabase/migrations/20261024190000_public_community_media.sql` and `supabase/migrations/20261024191000_direct_company_invitations.sql` to the linked Supabase database. A successful rollback-only compatibility test does not mean the migrations are installed.
+- Verify the server-only view, public-storage joins, helper grants, `recipient_user_id`, invitation status constraint, pair guards, and the three invitation/search RPCs. Ensure PostgREST has refreshed its schema before releasing dependent server routes.
+- Keep `public_community_media` and the trusted RPCs inaccessible to direct anonymous/authenticated database clients. The app server checks Clerk identity and company permissions; a public job title must never become an authorization role.
+- Do not ship temporary test routes or Clerk bypasses. Preserve existing memberships and photo-like records. See `docs/test-reports/community-media-team-2026-10-25.md` for tested flows and remaining real-account/device checks.
+
 ## Advertising surfaces
 
 Public advertising surfaces are disabled across all routes and screen sizes. Do not add ad banners, reserved slots, placeholders, advertising inquiry links, or booking buttons unless the site owner explicitly asks to add or re-enable them. Keep the `/werben` route redirected to the homepage while this rule is active. `npm run check:design` guards against the removed placeholder, reserved layout, public ad copy, and footer-style links returning; the production release script runs this check before deployment.

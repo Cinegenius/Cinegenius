@@ -1,92 +1,30 @@
 import type { Metadata } from "next";
-import { db } from "@/lib/db";
 import Image from "next/image";
 import Link from "next/link";
 import { Camera, ArrowRight } from "lucide-react";
-import { getPrivateProfileIds } from "@/lib/trust";
 import { auth } from "@clerk/nextjs/server";
 import { PhotoGallery } from "@/components/PhotoGallery";
-import type { DiscoverPhoto } from "@/components/HomePhotoDiscovery";
 
 export const metadata: Metadata = {
   title: "Fotos & Portfolio — CineGenius",
-  description: "Entdecke öffentliche Portfolio- und Projektfotos aus der CineGenius-Community.",
+  description: "Entdecke öffentliche Profilfotos, Arbeitsproben, Firmen, Locations, Angebote und Projekte aus der CineGenius-Community.",
 };
 
 export const revalidate = 300;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type RawProfile = Record<string, any>;
-
-interface GridItem extends DiscoverPhoto {
-  photographerCity?: string;
-}
+import { getCommunityMedia } from "@/lib/community-media-server";
+export const dynamic = "force-dynamic";
 
 export default async function PhotoPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const params = await searchParams;
   const profileParam = typeof params.profile_id === "string" ? params.profile_id : "";
   const imageParam = typeof params.image_url === "string" ? params.image_url : "";
   const resumeLike = params.action === "like";
-  const [{ data: profiles }, { userId }] = await Promise.all([
-    db.from("profiles")
-      .select("user_id, slug, display_name, tagline, location, profile_images, portfolio_images")
-      .not("display_name", "is", null)
-      .neq("display_name", "")
-      .order("updated_at", { ascending: false })
-      .limit(200),
-    auth(),
-  ]);
-
-  const profileRows = (profiles ?? []) as RawProfile[];
-  const privateIds = await getPrivateProfileIds(profileRows.map((profile) => profile.user_id));
-  const photoProfiles = profileRows.filter((profile) => !privateIds.has(profile.user_id));
-  const candidates: GridItem[] = [];
-  for (const profile of photoProfiles) {
-    const images = Array.isArray(profile.profile_images) ? profile.profile_images as Array<{ url?: string; media_type?: string; caption?: string }> : [];
-    const galleryImages = images.filter((image) => image.url?.includes("supabase.co/storage") && image.media_type !== "headshot");
-    const legacyPortfolio = Array.isArray(profile.portfolio_images)
-      ? profile.portfolio_images.filter((url: unknown): url is string => typeof url === "string" && url.includes("supabase.co/storage"))
-      : [];
-    const allImages = [...galleryImages, ...legacyPortfolio.map((url: string) => ({ url, caption: "Portfolio" }))]
-      .filter((image, index, all) => all.findIndex((other) => other.url === image.url) === index);
-    for (const image of allImages) {
-      if (!image.url) continue;
-      candidates.push({
-        profileId: profile.user_id,
-        profileSlug: profile.slug || profile.user_id,
-        author: profile.display_name,
-        imageUrl: image.url,
-        caption: image.caption ?? "",
-        rating: 0,
-        count: 0,
-        likeCount: 0,
-        likedByMe: false,
-        photographerCity: typeof profile.location === "string" ? profile.location.split(",")[0]?.trim() : undefined,
-      });
-    }
-  }
-
-  // Resolve a photo permalink only against the public images collected above.
-  const selectedPhoto = candidates.find((photo) => photo.profileId === profileParam && photo.imageUrl === imageParam) ?? null;
-  const profileIds = [...new Set(candidates.map((photo) => photo.profileId))];
-  const { data: likeRows } = profileIds.length
-    ? await db.from("profile_image_likes").select("profile_id,image_url,liker_id").in("profile_id", profileIds)
-    : { data: [] as Array<{ profile_id: string; image_url: string; liker_id: string }> };
-  const counts = new Map<string, number>();
-  const myLikes = new Set<string>();
-  for (const row of likeRows ?? []) {
-    const key = `${row.profile_id}:${row.image_url}`;
-    counts.set(key, (counts.get(key) ?? 0) + 1);
-    if (userId && row.liker_id === userId) myLikes.add(key);
-  }
-  const gridItems = candidates.map((photo) => {
-    const key = `${photo.profileId}:${photo.imageUrl}`;
-    return { ...photo, likeCount: counts.get(key) ?? 0, likedByMe: myLikes.has(key) };
-  });
-  const selectedWithLikes = selectedPhoto
-    ? gridItems.find((photo) => photo.profileId === selectedPhoto.profileId && photo.imageUrl === selectedPhoto.imageUrl) ?? null
-    : null;
-
+  const page = Math.max(1, Number.parseInt(typeof params.page === "string" ? params.page : "1", 10) || 1);
+  const { userId } = await auth();
+  const { photos: gridItems, total } = await getCommunityMedia({ page, viewerId: userId });
+  const selectedWithLikes = profileParam && imageParam
+    ? (await getCommunityMedia({ ownerId: profileParam.startsWith("media:") ? undefined : profileParam, imageUrl: imageParam, limit: 1, viewerId: userId })).photos[0] ?? null : null;
   return (
     <div className="relative min-h-screen">
       <Image src="/photo-bg.jpg" alt="" fill priority unoptimized className="object-cover object-top" />
@@ -97,12 +35,18 @@ export default async function PhotoPage({ searchParams }: { searchParams: Promis
           <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-end sm:gap-6">
             <div className="min-w-0">
               <h1 className="mb-3 font-display text-4xl font-bold text-text-primary sm:text-5xl">Fotos & Portfolio</h1>
-              <p className="max-w-xl leading-relaxed text-text-muted">Entdecke öffentliche Portfolio- und Projektfotos aus der CineGenius-Community.</p>
+              <p className="max-w-xl leading-relaxed text-text-muted">Entdecke öffentliche Profilfotos, Arbeitsproben, Firmen, Locations, Angebote und Projekte aus der CineGenius-Community.</p>
             </div>
             <Link href="/creators" className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl bg-gold px-5 py-2.5 text-sm font-semibold text-bg-primary transition-colors hover:bg-gold-light">Crew entdecken <ArrowRight size={14} /></Link>
           </div>
         </section>
+        {imageParam && !selectedWithLikes && <p role="status" className="site-container mb-6 text-sm text-text-muted">Dieses Foto ist nicht mehr öffentlich verfügbar. Hier findest du die aktuellen Einblicke.</p>}
         <PhotoGallery items={gridItems} selectedPhoto={selectedWithLikes} resumeLike={resumeLike} />
+        <nav aria-label="Galerieseiten" className="site-container flex items-center justify-between gap-3 pb-24 text-sm text-gold">
+          {page > 1 ? <Link href={`/photo?page=${page - 1}`} className="min-h-11 p-3">Zurück</Link> : <span />}
+          <span className="text-text-muted">Seite {page} · {total} Einblicke</span>
+          {page * 48 < total ? <Link href={`/photo?page=${page + 1}`} className="min-h-11 p-3">Weitere Einblicke</Link> : <span />}
+        </nav>
       </div>
     </div>
   );
