@@ -1,3 +1,4 @@
+import { SUPPORT_ACTOR_ID, SUPPORT_NAME } from "@/lib/support-identity";
 import { NextRequest, NextResponse } from "next/server";
 import { clerkClient } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
@@ -6,7 +7,6 @@ import { resolveAdminSupportTarget, SupportTargetError } from "@/lib/admin-suppo
 import { sendNewMessageEmail } from "@/lib/email";
 import { rateLimit } from "@/lib/rateLimit";
 
-const SUPPORT_ACTOR_ID = "cinegenius-support";
 const PAGE_SIZE = 30;
 
 export async function GET(request: NextRequest) {
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
         unreadCount: unreadMap.get(thread.id) ?? 0,
         latest: latest ? {
           id: latest.id, content: latest.content, createdAt: latest.created_at,
-          senderName: latest.sender_id === SUPPORT_ACTOR_ID ? "CineGenius Support" : (user?.display_name ?? "Mitglied"),
+          senderName: latest.sender_id === SUPPORT_ACTOR_ID ? SUPPORT_NAME : (user?.display_name ?? "Mitglied"),
           fromSupport: latest.sender_id === SUPPORT_ACTOR_ID,
         } : null,
       };
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
         const client = await clerkClient();
         const member = await client.users.getUser(target.recipientUserId);
         const email = member.emailAddresses[0]?.emailAddress;
-        if (email) await sendNewMessageEmail(email, "CineGenius Support", content, result.conversation_id);
+        if (email) await sendNewMessageEmail(email, SUPPORT_NAME, content, result.conversation_id);
       }
     } catch { /* in-app message remains the durable source; email is optional */ }
   }

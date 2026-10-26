@@ -11,6 +11,7 @@ import { Suspense } from "react";
 import { applyReadReceiptTimestamps, incomingUnreadMessageIds } from "@/lib/message-read-state";
 import { notifyMessagesRead, subscribeToMessageReads } from "@/lib/message-read-sync";
 import { mergeMessagesById } from "@/lib/conversation-logic";
+import { conversationPeerProfileHref, SUPPORT_AVATAR_URL, SUPPORT_NAME } from "@/lib/support-identity";
 import { findContactConversation, mergeVisibleMessagePage } from "@/lib/message-actions";
 
 type Message = {
@@ -623,11 +624,7 @@ function MessagesContent() {
 
   const activeConv = conversations.find(c => c.id === activeId);
   const isNewConv = !!newConvRecipient && !activeId;
-  const otherUserId = isNewConv
-    ? newConvRecipient
-    : activeConv && activeConv.kind !== "group"
-      ? (activeConv.sender_id === user?.id ? activeConv.receiver_id : activeConv.sender_id)
-      : null;
+  const peerProfileHref = conversationPeerProfileHref(activeConv, user?.id ?? "", isNewConv ? newConvRecipient : null);
 
   return (
     <div
@@ -784,6 +781,8 @@ function MessagesContent() {
                     <div className="w-10 h-10 rounded-full bg-bg-elevated border border-border flex items-center justify-center shrink-0 overflow-hidden">
                       {conv.kind === "group"
                         ? <Users size={17} className="text-gold" />
+                        : conv.kind === "support"
+                        ? <UnoptimizedImage src={SUPPORT_AVATAR_URL} alt={SUPPORT_NAME} className="h-full w-full object-contain p-1" />
                         : conv.otherAvatar
                         ? <UnoptimizedImage src={conv.otherAvatar} alt="" className="w-full h-full object-cover" />
                         : <User size={16} className="text-text-muted" />}
@@ -825,6 +824,8 @@ function MessagesContent() {
               <div className="w-9 h-9 rounded-full bg-bg-elevated border border-border flex items-center justify-center overflow-hidden shrink-0">
                 {activeConv?.kind === "group"
                   ? <Users size={16} className="text-gold" />
+                  : activeConv?.kind === "support"
+                  ? <UnoptimizedImage src={SUPPORT_AVATAR_URL} alt={SUPPORT_NAME} className="h-full w-full object-contain p-1" />
                   : activeConv?.otherAvatar
                   ? <UnoptimizedImage src={activeConv.otherAvatar} alt="" className="w-full h-full object-cover" />
                   : <User size={15} className="text-text-muted" />}
@@ -850,9 +851,9 @@ function MessagesContent() {
                 <Users size={17} />
               </button>
             )}
-              {otherUserId && (
+              {peerProfileHref && (
                 <Link
-                  href={`/profile/${otherUserId}`}
+                  href={peerProfileHref}
                   className="shrink-0 text-xs text-gold hover:text-gold-light transition-colors"
                 >
                   Profil

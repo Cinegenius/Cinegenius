@@ -1,3 +1,4 @@
+import { SUPPORT_ACTOR_ID, SUPPORT_AVATAR_URL, SUPPORT_NAME } from "@/lib/support-identity";
 import { NextRequest, NextResponse } from "next/server";
 import { clerkClient } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
@@ -5,9 +6,8 @@ import { requireAdmin } from "@/lib/requireAdmin";
 import { sendNewMessageEmail } from "@/lib/email";
 import { rateLimit } from "@/lib/rateLimit";
 
-const SUPPORT_ACTOR_ID = "cinegenius-support";
 
-export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const admin = await requireAdmin();
   if (admin instanceof NextResponse) return admin;
   const { id } = await params;
@@ -16,11 +16,20 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     .eq("id", id).eq("kind", "support").maybeSingle();
   if (error) return NextResponse.json({ error: "Supportunterhaltung konnte nicht geladen werden." }, { status: 500 });
   if (!thread) return NextResponse.json({ error: "Supportunterhaltung nicht gefunden." }, { status: 404 });
-  const [{ data: profile, error: profileError }, { data: messages, error: messagesError }] = await Promise.all([
+  const before = request.nextUrl.searchParams.get("before");
+  const beforeId = request.nextUrl.searchParams.get("before_id");
+  if ((before || beforeId) && (!before || !beforeId || Number.isNaN(Date.parse(before)) || !/^[0-9a-f-]{36}$/i.test(beforeId))) {
+    return NextResponse.json({ error: "Ungültiger Nachrichtenzeiger." }, { status: 400 });
+  }
+  let query = db.from("messages").select("id, sender_id, content, created_at").eq("conversation_id", id);
+  if (before && beforeId) query = query.or(`created_at.lt.${before},and(created_at.eq.${before},id.lt.${beforeId})`);
+  const [{ data: profile, error: profileError }, { data: rawMessages, error: messagesError }] = await Promise.all([
     db.from("profiles").select("user_id, display_name, slug, avatar_url").eq("user_id", thread.support_user_id).maybeSingle(),
-    db.from("messages").select("id, sender_id, content, created_at").eq("conversation_id", id).order("created_at", { ascending: true }).limit(200),
+    query.order("created_at", { ascending: false }).order("id", { ascending: false }).limit(201),
   ]);
   if (profileError || messagesError) return NextResponse.json({ error: "Nachrichten konnten nicht geladen werden." }, { status: 500 });
+  const hasOlder = (rawMessages?.length ?? 0) > 200;
+  const messages = (rawMessages ?? []).slice(0, 200).reverse();
   const messageIds = (messages ?? []).map((message) => message.id);
   const { data: receipts, error: receiptsError } = messageIds.length
     ? await db.from("message_reads").select("message_id, read_at").eq("user_id", SUPPORT_ACTOR_ID).in("message_id", messageIds)
@@ -28,6 +37,8 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
   if (receiptsError) return NextResponse.json({ error: "Lesestatus konnte nicht geladen werden." }, { status: 500 });
   const receiptMap = new Map((receipts ?? []).map((receipt) => [receipt.message_id, receipt.read_at]));
   return NextResponse.json({
+    hasOlder,
+    nextCursor: hasOlder && messages.length ? { before: messages[0].created_at, before_id: messages[0].id } : null,
     thread: {
       id: thread.id, targetType: thread.support_target_type, targetId: thread.support_target_id,
       targetLabel: thread.support_target_label, editUrl: thread.support_edit_url,
@@ -37,8 +48,8 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     },
     messages: (messages ?? []).map((message) => ({
       id: message.id, content: message.content, createdAt: message.created_at,
-      senderName: message.sender_id === SUPPORT_ACTOR_ID ? "CineGenius Support" : (profile?.display_name ?? "Mitglied"),
-      senderAvatarUrl: message.sender_id === SUPPORT_ACTOR_ID ? "/cinegenius-logo.svg" : profile?.avatar_url ?? null,
+      senderName: message.sender_id === SUPPORT_ACTOR_ID ? SUPPORT_NAME : (profile?.display_name ?? "Mitglied"),
+      senderAvatarUrl: message.sender_id === SUPPORT_ACTOR_ID ? SUPPORT_AVATAR_URL : profile?.avatar_url ?? null,
       fromSupport: message.sender_id === SUPPORT_ACTOR_ID,
       readAt: message.sender_id === SUPPORT_ACTOR_ID ? null : receiptMap.get(message.id) ?? null,
     })),
@@ -79,7 +90,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         const client = await clerkClient();
         const member = await client.users.getUser(thread.support_user_id);
         const email = member.emailAddresses[0]?.emailAddress;
-        if (email) await sendNewMessageEmail(email, "CineGenius Support", content, id);
+        if (email) await sendNewMessageEmail(email, SUPPORT_NAME, content, id);
       }
     } catch { /* stored in-app response remains authoritative */ }
   }

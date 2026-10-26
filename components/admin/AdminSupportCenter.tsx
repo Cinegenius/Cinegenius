@@ -11,7 +11,7 @@ type Thread = {
   latest: { id: string; content: string; createdAt: string; senderName: string; fromSupport: boolean } | null;
 };
 type Message = { id: string; content: string; createdAt: string; senderName: string; senderAvatarUrl: string | null; fromSupport: boolean; readAt: string | null };
-type Detail = { thread: Thread; messages: Message[] };
+type Detail = { thread: Thread; messages: Message[]; hasOlder?: boolean; nextCursor?: { before: string; before_id: string } | null };
 type Template = { template_key: string; label: string; body: string; enabled: boolean; updated_at?: string };
 async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, init);
@@ -28,6 +28,11 @@ export function AdminSupportCenter() {
   const [tab, setTab] = useState<"inbox" | "templates">("inbox");
   const [activeId, setActiveId] = useState<string | null>(null);
   const [detail, setDetail] = useState<Detail | null>(null);
+  const activeThreadRef = useRef<string | null>(null);
+  const detailRef = useRef<Detail | null>(null);
+  const threadRequestRef = useRef(0);
+  const [olderLoading, setOlderLoading] = useState(false);
+  detailRef.current = detail;
   const [reply, setReply] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -55,11 +60,26 @@ export function AdminSupportCenter() {
       setEdits(Object.fromEntries(payload.templates.map((item) => [item.template_key, { label: item.label, body: item.body, enabled: item.enabled }])));
     } catch (cause) { setTemplateError(cause instanceof Error ? cause.message : "Vorlagen konnten nicht geladen werden."); }
   }, []);
-  const openThread = useCallback(async (id: string) => {
+  const openThread = useCallback(async (id: string, older = false) => {
+    const cursor = older ? detailRef.current?.nextCursor : null;
+    if (older && !cursor) return;
+    if (activeThreadRef.current !== id) { setReply(""); setSendSuccess(""); }
+    activeThreadRef.current = id;
+    const sequence = older ? null : ++threadRequestRef.current;
+    if (older) setOlderLoading(true);
     setActiveId(id); setDetail((current) => current?.thread.id === id ? current : null); setError("");
     try {
-      const payload = await fetchJson<Detail>("/api/admin/support/threads/" + id, { cache: "no-store" });
-      setDetail(payload);
+      const suffix = cursor ? "?" + new URLSearchParams(cursor).toString() : "";
+      const payload = await fetchJson<Detail>("/api/admin/support/threads/" + id + suffix, { cache: "no-store" });
+      if (activeThreadRef.current !== id || (sequence !== null && sequence !== threadRequestRef.current)) return;
+      setDetail((current) => {
+        if (current?.thread.id !== id) return payload;
+        const earliest = payload.messages[0];
+        const retained = older ? current.messages : current.messages.filter(message => earliest && (message.createdAt < earliest.createdAt || (message.createdAt === earliest.createdAt && message.id < earliest.id)));
+        const messages = [...new Map([...retained, ...payload.messages].map(message => [message.id, message])).values()]
+          .sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id));
+        return { ...payload, messages, ...(older || !retained.length ? {} : { hasOlder: current.hasOlder, nextCursor: current.nextCursor }) };
+      });
       const unreadIds = payload.messages.filter((message) => !message.fromSupport && !message.readAt).map((message) => message.id);
       if (unreadIds.length) {
         await fetchJson("/api/admin/support/threads/" + id + "/read", {
@@ -68,7 +88,8 @@ export function AdminSupportCenter() {
         });
         void loadInbox();
       }
-    } catch (cause) { setError(cause instanceof Error ? cause.message : "Unterhaltung konnte nicht geladen werden."); }
+    } catch (cause) { if (activeThreadRef.current === id) setError(cause instanceof Error ? cause.message : "Unterhaltung konnte nicht geladen werden."); }
+    finally { if (older) setOlderLoading(false); }
   }, [loadInbox]);
   useEffect(() => { void loadInbox(); void loadTemplates(); }, [loadInbox, loadTemplates]);
   useEffect(() => {
@@ -132,8 +153,8 @@ export function AdminSupportCenter() {
       <section className="flex min-h-[480px] min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-bg-secondary">
         {!activeId || !detail ? <div className="flex flex-1 items-center justify-center p-6 text-center text-sm text-text-muted">Wähle eine Supportunterhaltung aus.</div> : <>
           <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-3 sm:p-4"><div className="flex min-w-0 items-center gap-3">{detail.thread.userAvatarUrl ? <UnoptimizedImage src={detail.thread.userAvatarUrl} alt="" className="h-9 w-9 rounded-full object-cover" /> : <div className="h-9 w-9 rounded-full bg-bg-elevated" />}<div className="min-w-0"><p className="truncate text-sm font-semibold text-text-primary">{detail.thread.userName}</p><p className="truncate text-xs text-text-muted">{detail.thread.targetLabel}</p></div></div><div className="flex gap-2">{detail.thread.userProfileUrl && <a href={detail.thread.userProfileUrl} target="_blank" rel="noreferrer" className="rounded-lg border border-border px-3 py-2 text-xs text-text-secondary">Profil öffnen</a>}<a href={detail.thread.editUrl} target="_blank" rel="noreferrer" className="rounded-lg border border-gold/30 px-3 py-2 text-xs text-gold">Bearbeitungsziel</a></div></header>
-          <div className="flex-1 space-y-3 overflow-y-auto p-3 sm:p-4">{detail.messages.map((message) => <article key={message.id} className={"max-w-[88%] rounded-xl border p-3 " + (message.fromSupport ? "ml-auto border-gold/30 bg-gold/10" : "border-border bg-bg-primary")}><p className="mb-1 text-[11px] font-semibold text-text-muted">{message.senderName}</p><p className="whitespace-pre-wrap break-words text-sm leading-6 text-text-primary">{message.content}</p><time className="mt-2 block text-right text-[10px] text-text-muted">{new Date(message.createdAt).toLocaleString("de-DE")}</time></article>)}</div>
-          <div className="border-t border-border p-3 sm:p-4"><div className="flex items-end gap-2"><textarea disabled={sending} value={reply} onChange={(event) => { setReply(event.target.value); setSendSuccess(""); }} maxLength={5000} rows={2} placeholder="Als CineGenius Support antworten…" className="min-h-11 min-w-0 flex-1 resize-y rounded-lg border border-border bg-bg-primary p-3 text-sm text-text-primary" /><button onClick={() => void sendReply()} disabled={!reply.trim() || sending} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg bg-gold px-3 text-sm font-semibold text-bg-primary disabled:opacity-50">{sending ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}<span className="hidden sm:inline">Antworten</span></button></div></div>
+          <div className="flex-1 space-y-3 overflow-y-auto p-3 sm:p-4">{detail.hasOlder && <button type="button" disabled={olderLoading} onClick={() => void openThread(detail.thread.id, true)} className="min-h-11 rounded-lg border border-border px-3 text-xs text-text-secondary disabled:opacity-50">{olderLoading ? "Wird geladen…" : "Ältere Nachrichten laden"}</button>}{detail.messages.map((message) => <article key={message.id} className={"max-w-[88%] rounded-xl border p-3 " + (message.fromSupport ? "ml-auto border-gold/30 bg-gold/10" : "border-border bg-bg-primary")}><p className="mb-1 text-[11px] font-semibold text-text-muted">{message.senderName}</p><p className="whitespace-pre-wrap break-words text-sm leading-6 text-text-primary">{message.content}</p><time className="mt-2 block text-right text-[10px] text-text-muted">{new Date(message.createdAt).toLocaleString("de-DE")}</time></article>)}</div>
+          <div className="border-t border-border p-3 sm:p-4"><div className="flex items-end gap-2"><textarea disabled={sending} value={reply} onChange={(event) => { setReply(event.target.value); setSendSuccess(""); }} maxLength={5000} rows={2} placeholder="Als CineGenius Support antworten…" className="min-h-11 min-w-0 flex-1 resize-y rounded-lg border border-border bg-bg-primary p-3 text-sm text-text-primary" /><button aria-label="Supportantwort senden" onClick={() => void sendReply()} disabled={!reply.trim() || sending} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg bg-gold px-3 text-sm font-semibold text-bg-primary disabled:opacity-50">{sending ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}<span className="hidden sm:inline">Antworten</span></button></div></div>
         </>}
       </section>
     </div>}

@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import UnoptimizedImage from "@/components/UnoptimizedImage";
 import { Check, Loader2, Mail, MessageSquareText, Send, X } from "lucide-react";
+import { SUPPORT_AVATAR_URL } from "@/lib/support-identity";
 import { fillSupportTemplate } from "@/lib/support-message-templates";
 
 type TargetType = "profile" | "company" | "listing";
@@ -124,7 +125,7 @@ export function SupportMessageAction({ targetType, targetId }: { targetType: Tar
             <label className="block text-xs font-medium text-text-secondary">Nachrichtenvorlage<select disabled={sending} value={templateKey} onChange={(event) => selectTemplate(event.target.value)} className="mt-1.5 min-h-11 w-full rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary">{templates.map((template) => <option key={template.template_key} value={template.template_key}>{template.label}</option>)}</select></label>
             {needsFields && !target.missingFields.length && <p role="status" className="rounded-lg border border-gold/30 bg-gold/10 p-3 text-xs text-gold">Diese Vorlage passt nicht: Es fehlen keine Pflichtangaben. Wähle eine Nachfrage oder eine optionale Fotovorlage.</p>}
             <label className="block text-xs font-medium text-text-secondary">Nachricht bearbeiten<textarea disabled={sending} value={message} onChange={(event) => setMessage(event.target.value)} maxLength={5000} rows={7} className="mt-1.5 w-full resize-y rounded-lg border border-border bg-bg-secondary p-3 text-sm leading-6 text-text-primary outline-none focus:border-gold" /></label>
-            <div className="rounded-xl border border-border bg-bg-secondary p-3 sm:p-4"><p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-muted">Vorschau</p><p className="whitespace-pre-wrap break-words text-sm leading-6 text-text-primary">{message || "Die Nachrichtenvorschau erscheint hier."}</p><p className="mt-3 flex items-center gap-2 border-t border-border pt-3 text-xs text-text-muted"><UnoptimizedImage src="/cinegenius-logo.svg" alt="" className="h-5 w-5 object-contain" />CineGenius Support</p></div>
+            <div className="rounded-xl border border-border bg-bg-secondary p-3 sm:p-4"><p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-muted">Vorschau</p><p className="whitespace-pre-wrap break-words text-sm leading-6 text-text-primary">{message || "Die Nachrichtenvorschau erscheint hier."}</p><p className="mt-3 flex items-center gap-2 border-t border-border pt-3 text-xs text-text-muted"><UnoptimizedImage src={SUPPORT_AVATAR_URL} alt="" className="h-5 w-5 object-contain" />CineGenius Support</p></div>
             <p className="text-[11px] leading-5 text-text-muted">Antworten landen im geschützten Support-Postfach. Private Kontaktdaten des Administrators werden nicht angezeigt.</p>
           </>)}
           {error && <p role="alert" className="rounded-lg border border-crimson/30 bg-crimson/10 p-3 text-sm text-crimson-light">{error}</p>}

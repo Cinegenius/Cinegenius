@@ -1,3 +1,4 @@
+import { SUPPORT_ACTOR_ID, SUPPORT_AVATAR_URL, SUPPORT_NAME } from "@/lib/support-identity";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { anyBlockExists, areAcceptedFriends } from "@/lib/trust";
@@ -8,7 +9,6 @@ import { sendNewMessageEmail } from "@/lib/email";
 import { applyParticipantReadReceipts } from "@/lib/message-read-state";
 import { getUnreadMessageCounts } from "@/lib/unread-message-counts";
 
-const SUPPORT_ACTOR_ID = "cinegenius-support";
 
 // The membership table is the access-control source for both direct and group
 // conversations. It lets a user participate in many-member conversations
@@ -144,12 +144,12 @@ export async function GET(request: NextRequest) {
         ...conversation,
         messages: applyParticipantReadReceipts(messages, receipts, userId, SUPPORT_ACTOR_ID).map((message) => ({
           ...message,
-          senderName: message.sender_id === SUPPORT_ACTOR_ID ? "CineGenius Support" : profileMap[message.sender_id]?.display_name ?? "Du",
-          senderAvatar: message.sender_id === SUPPORT_ACTOR_ID ? "/cinegenius-logo.svg" : profileMap[message.sender_id]?.avatar_url ?? null,
+          senderName: message.sender_id === SUPPORT_ACTOR_ID ? SUPPORT_NAME : profileMap[message.sender_id]?.display_name ?? "Du",
+          senderAvatar: message.sender_id === SUPPORT_ACTOR_ID ? SUPPORT_AVATAR_URL : profileMap[message.sender_id]?.avatar_url ?? null,
         })),
         unread_count: unreadCount,
-        otherName: "CineGenius Support",
-        otherAvatar: "/cinegenius-logo.svg",
+        otherName: SUPPORT_NAME,
+        otherAvatar: SUPPORT_AVATAR_URL,
         members: [],
         memberCount: 2,
         isAdmin: false,

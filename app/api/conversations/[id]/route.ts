@@ -1,3 +1,4 @@
+import { SUPPORT_ACTOR_ID, SUPPORT_AVATAR_URL, SUPPORT_NAME } from "@/lib/support-identity";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { anyBlockExists, areAcceptedFriends } from "@/lib/trust";
@@ -24,7 +25,7 @@ export async function GET(
     .eq("id", id)
     .maybeSingle();
   if (conversationError) return NextResponse.json({ error: "Unterhaltung konnte nicht geladen werden." }, { status: 500 });
-  if (!conversation) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 });
+  if (!conversation || (conversation.kind === "support" && conversation.receiver_id !== userId)) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 });
 
   const { data: membership, error: membershipError } = await db
     .from("conversation_members")
@@ -109,8 +110,8 @@ export async function GET(
     if (conversation.kind === "support") {
       messages = messages.map((message) => ({
         ...message,
-        senderName: message.sender_id === "cinegenius-support" ? "CineGenius Support" : "Du",
-        senderAvatar: message.sender_id === "cinegenius-support" ? "/cinegenius-logo.svg" : null,
+        senderName: message.sender_id === SUPPORT_ACTOR_ID ? SUPPORT_NAME : "Du",
+        senderAvatar: message.sender_id === SUPPORT_ACTOR_ID ? SUPPORT_AVATAR_URL : null,
       }));
     }
   }
@@ -122,7 +123,7 @@ export async function GET(
         otherName: members.find(member => member.user_id !== userId)?.display_name ?? "Unbekannt",
         otherAvatar: members.find(member => member.user_id !== userId)?.avatar_url ?? null,
       } : {}),
-      ...(conversation.kind === "support" ? { otherName: "CineGenius Support", otherAvatar: "/cinegenius-logo.svg" } : {}),
+      ...(conversation.kind === "support" ? { otherName: SUPPORT_NAME, otherAvatar: SUPPORT_AVATAR_URL } : {}),
       members,
       memberCount: members.length,
       isAdmin: members.some((member) => member.user_id === userId && member.role === "admin"),
