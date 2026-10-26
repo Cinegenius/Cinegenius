@@ -1356,10 +1356,11 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
       {lightbox && <Lightbox src={lightbox} onClose={() => setLightbox(null)} />}
 
       {/* Hero */}
-      <section className={`relative flex items-end ${bgImage ? "min-h-56 sm:min-h-64" : ""}`}>
+      <section className={`relative isolate flex items-end ${bgImage ? "min-h-56 sm:min-h-64" : ""}`}>
         {bgImage ? (
           <>
             <ResilientPublicImage src={bgImage} alt="" className="absolute inset-0" imageClassName="h-full w-full object-cover" imageStyle={profileCoverStyle(profile.focal_point)} loading="eager" />
+            <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[65px] bg-gradient-to-b from-transparent to-bg-primary" />
           </>
         ) : (
           <div className="absolute inset-0 bg-gradient-to-b from-bg-elevated to-bg-primary" />
@@ -1368,7 +1369,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
         <div className={`relative z-10 mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 pb-5 sm:pb-6 ${bgImage ? "pt-12 sm:pt-16" : "pt-6 sm:pt-8"}`}>
           <div className={`flex w-fit min-w-0 max-w-[min(100%,48rem)] flex-col items-start gap-3 ${isOwner ? "sm:flex-row" : ""}`}>
             <div className="flex-1 min-w-0 w-full max-w-full [overflow-wrap:anywhere]">
-              <h1 className="min-w-0 max-w-full break-words font-display text-3xl sm:text-4xl font-bold tracking-tight text-white leading-tight [overflow-wrap:anywhere]" style={{ textShadow: "0 1px 2px #000, 0 2px 8px #000, 0 0 24px rgba(0,0,0,0.6)" }}>
+              <h1 className="min-w-0 max-w-full break-words font-display text-3xl sm:text-4xl font-bold tracking-tight text-white leading-tight [overflow-wrap:anywhere]" style={{ textShadow: "0 2px 4px #000, 0 0 22px rgba(0,0,0,0.7)" }}>
                 {profile.display_name ?? "Unbekannt"}
                 <span className="block h-0.5 w-12 bg-gold mt-2 rounded-full" />
               </h1>
