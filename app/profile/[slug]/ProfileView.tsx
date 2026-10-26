@@ -396,7 +396,7 @@ function ExternalProfilesDisplay({ profiles }: { profiles: ExternalProfileRow[] 
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-bg-elevated border border-border rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-all group"
+              className="inline-flex min-h-11 min-w-0 max-w-full items-center gap-1.5 px-2.5 py-2 bg-bg-elevated border border-border rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-all group"
             >
               {faviconDomain ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -410,7 +410,7 @@ function ExternalProfilesDisplay({ profiles }: { profiles: ExternalProfileRow[] 
                 />
               ) : null}
               <span className={`text-[10px] font-bold shrink-0 ${plat.textCls}${faviconDomain ? " hidden" : ""}`}>{plat.abbr}</span>
-              <span>{displayName}{entry.custom_label ? ` · ${entry.custom_label}` : ""}</span>
+              <span className="min-w-0 [overflow-wrap:anywhere]">{displayName}{entry.custom_label ? ` · ${entry.custom_label}` : ""}</span>
               <ExternalLink size={9} className="shrink-0 opacity-40 group-hover:opacity-70" />
             </a>
           );
@@ -456,8 +456,8 @@ function CompanyBadge({ membership }: { membership: CompanyMemberships }) {
                     : <Building2 size={16} className="text-text-muted group-hover:text-gold transition-colors" />}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{co.name}</p>
-                  <p className="text-[11px] text-text-muted truncate">{roleLabel}{categoryLabel ? ` · ${categoryLabel}` : ""}</p>
+                  <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors break-words [overflow-wrap:anywhere]">{co.name}</p>
+                  <p className="text-[11px] text-text-muted break-words [overflow-wrap:anywhere]">{roleLabel}{categoryLabel ? ` · ${categoryLabel}` : ""}</p>
                 </div>
                 <ExternalLink size={11} className="text-text-muted group-hover:text-gold transition-colors shrink-0" />
               </div>
@@ -469,9 +469,9 @@ function CompanyBadge({ membership }: { membership: CompanyMemberships }) {
                     : <div className="w-16 h-16 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shadow-xl"><Building2 size={28} className="text-text-muted group-hover:text-gold transition-colors" /></div>}
                 </div>
                 <div className="px-4 py-3 text-center border-t border-border/50">
-                  <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{co.name}</p>
-                  {categoryLabel && <p className="text-[11px] text-gold/70 mt-0.5 truncate">{categoryLabel}</p>}
-                  <p className="text-[11px] text-text-muted mt-0.5 truncate">{roleLabel}</p>
+                  <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors break-words [overflow-wrap:anywhere]">{co.name}</p>
+                  {categoryLabel && <p className="text-[11px] text-gold/70 mt-0.5 break-words [overflow-wrap:anywhere]">{categoryLabel}</p>}
+                  <p className="text-[11px] text-text-muted mt-0.5 break-words [overflow-wrap:anywhere]">{roleLabel}</p>
                   <p className="text-[10px] text-gold/60 mt-1.5 flex items-center justify-center gap-1"><ExternalLink size={9} /> Unternehmensprofil</p>
                 </div>
               </div>
@@ -1375,7 +1375,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
       {lightbox && <Lightbox src={lightbox} onClose={() => setLightbox(null)} />}
 
       {/* Hero */}
-      <section className="relative min-h-56 sm:min-h-64">
+      <section className={`relative flex items-end ${bgImage ? "min-h-56 sm:min-h-64" : ""}`}>
         {bgImage ? (
           <>
             <ResilientPublicImage src={bgImage} alt="" className="absolute inset-0" imageClassName="h-full w-full object-cover" imageStyle={profileCoverStyle(profile.focal_point)} loading="eager" />
@@ -1384,35 +1384,35 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
           <div className="absolute inset-0 bg-gradient-to-b from-bg-elevated to-bg-primary" />
         )}
 
-        <div className="relative z-10 mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 pb-6 sm:pb-8">
-          <div className={`flex min-w-0 max-w-full flex-col sm:flex-row items-start gap-3 sm:gap-4 ${bgImage ? "rounded-2xl bg-black/60 p-4 backdrop-blur-sm" : ""}`}>
+        <div className={`relative z-10 mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 pb-5 sm:pb-6 ${bgImage ? "pt-12 sm:pt-16" : "pt-6 sm:pt-8"}`}>
+          <div className={`flex w-fit min-w-0 max-w-[min(100%,48rem)] flex-col items-start gap-3 ${isOwner ? "sm:flex-row" : ""}`}>
             <div className="flex-1 min-w-0 w-full max-w-full [overflow-wrap:anywhere]">
-              <h1 className="min-w-0 max-w-full break-words font-display text-4xl sm:text-5xl font-bold tracking-tight text-white leading-tight drop-shadow-lg [overflow-wrap:anywhere]">
+              <h1 className="min-w-0 max-w-full break-words font-display text-3xl sm:text-4xl font-bold tracking-tight text-white leading-tight [overflow-wrap:anywhere]" style={{ textShadow: "0 1px 2px #000, 0 2px 8px #000, 0 0 24px rgba(0,0,0,0.6)" }}>
                 {profile.display_name ?? "Unbekannt"}
-                <span className="block h-0.5 w-12 bg-gold mt-3 rounded-full" />
+                <span className="block h-0.5 w-12 bg-gold mt-2 rounded-full" />
               </h1>
               <ProfileRoles positions={roleLabels} tone="hero" />
               {profile.location && (
-                <p className="min-w-0 max-w-full break-words text-white/60 text-xs mt-2.5 flex items-center gap-1 drop-shadow-md [overflow-wrap:anywhere]" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.9)" }}>
-                  <MapPin size={10} />{profile.location}
+                <p className="min-w-0 max-w-full break-words text-white text-sm mt-3 flex items-center gap-1 drop-shadow-md [overflow-wrap:anywhere]" style={{ textShadow: "0 1px 2px #000, 0 0 5px #000" }}>
+                  <MapPin size={13} className="shrink-0" />{profile.location}
                 </p>
               )}
             </div>
-            <div className="flex items-center gap-2 flex-wrap sm:shrink-0 sm:mt-1">
+            <div className={`flex min-w-0 max-w-full items-center gap-2 flex-wrap ${isOwner ? "sm:shrink-0" : ""}`}>
               {!isOwner ? (
                 <>
                   {canContact && (
                     <>
                       <Link href={`/messages?to=${profile.user_id}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
+                        className="inline-flex min-h-11 items-center gap-1.5 px-3 py-2 bg-black/60 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
                         <MessageSquare size={11} /> Nachricht
                       </Link>
                       <button onClick={handleFriendAction} disabled={friendLoading}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs disabled:opacity-50">
+                        className="inline-flex min-h-11 items-center gap-1.5 px-3 py-2 bg-black/60 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs disabled:opacity-50">
                         {friendStatus === "friends" ? <><Check size={11} /> Vernetzt</> : friendStatus === "pending_sent" ? "Gesendet" : friendStatus === "pending_received" ? <><UserPlus size={11} /> Annehmen</> : <><UserPlus size={11} /> Vernetzen</>}
                       </button>
                       <Link href={`/booking?profile=${profile.user_id}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
+                        className="inline-flex min-h-11 items-center gap-1.5 px-3 py-2 bg-black/60 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
                         Anfrage <ExternalLink size={11} />
                       </Link>
                     </>
@@ -1420,7 +1420,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                   <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
                 </>
               ) : (
-                <Link href="/profile" className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md text-white text-[10px] font-semibold px-3 py-1.5 rounded-full border border-white/20 hover:bg-white/20 transition-colors">
+                <Link href="/profile" className="inline-flex min-h-11 items-center gap-1.5 bg-black/60 backdrop-blur-md text-white text-xs font-semibold px-3 py-1.5 rounded-full border border-white/20 hover:bg-white/20 transition-colors">
                   <Pencil size={10} /> Bearbeiten
                 </Link>
               )}
@@ -1429,47 +1429,47 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
         </div>
       </section>
 
-      <div className="mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 pb-16">
+      <div className="mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-16">
 
         {/* Two-column: avatar + compact info */}
-        <div className="grid min-w-0 max-w-full grid-cols-1 sm:grid-cols-[220px_minmax(0,1fr)] gap-4 sm:gap-8 mb-6 sm:mb-10">
+        <div className="grid min-w-0 max-w-full grid-cols-1 md:grid-cols-[200px_minmax(0,1fr)] lg:grid-cols-[220px_minmax(0,1fr)] gap-6 md:gap-8 lg:gap-10 mb-6 sm:mb-10">
           {/* Avatar + company badge */}
-          <div className="min-w-0 max-w-full space-y-3">
+          <div className="min-w-0 max-w-full space-y-6 sm:space-y-8">
             {profile.avatar_url ? (
-              <div className="relative aspect-square rounded-2xl overflow-hidden bg-bg-secondary ring-1 ring-white/8 shadow-2xl">
+              <div className="relative mx-auto w-full max-w-xs md:max-w-none aspect-square rounded-2xl overflow-hidden bg-bg-secondary ring-1 ring-white/8 shadow-2xl">
                 <ResilientPublicImage src={profile.avatar_url} alt="" className="absolute inset-0 scale-110 blur-2xl opacity-55" imageClassName="h-full w-full object-cover" />
-                <ResilientPublicImage src={profile.avatar_url} alt={profile.display_name ?? ""} className="relative z-10" imageClassName="h-full w-full object-cover" loading="eager" />
+                <ResilientPublicImage src={profile.avatar_url} alt={profile.display_name ?? ""} className="relative z-10 h-full w-full" imageClassName="h-full w-full object-cover" loading="eager" />
                 <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10">
                   <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${profile.available ? "bg-gold" : "bg-red-400"}`} />
                   <span className={`text-[10px] font-medium ${profile.available ? "text-gold/90" : "text-white/60"}`}>{profile.available ? "Verfügbar" : "Nicht verfügbar"}</span>
                 </div>
               </div>
             ) : (
-              <div className="w-full aspect-square rounded-2xl bg-bg-elevated border border-border flex items-center justify-center text-4xl font-bold text-text-muted">
+              <div className="mx-auto w-full max-w-xs md:max-w-none aspect-square rounded-2xl bg-bg-elevated border border-border flex items-center justify-center text-4xl font-bold text-text-muted">
                 {(profile.display_name ?? "?")[0]}
               </div>
             )}
-            {companyMembership?.length && (
+            {(companyMembership?.length ?? 0) > 0 && (
               <CompanyBadge membership={companyMembership} />
             )}
           </div>
 
           {/* Compact info */}
-          <div className="min-w-0 max-w-full pt-1 [overflow-wrap:anywhere]">
-            <div className="min-w-0 max-w-full space-y-5 [overflow-wrap:anywhere]">
+          <div className="min-w-0 max-w-full [overflow-wrap:anywhere]">
+            <div className="min-w-0 max-w-full space-y-6 sm:space-y-8 [overflow-wrap:anywhere]">
 
             {profile.bio && (
               <div>
                 <div className="flex items-center gap-2 mb-2.5">
                   <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
-                  <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Über mich</p>
+                  <p className="text-[11px] uppercase tracking-widest text-gold font-bold">Über mich</p>
                 </div>
                 <ProfileBio value={profile.bio} />
               </div>
             )}
 
             {(languages.length > 0 || profile.day_rate || profile.travel_ready || profile.crew?.experience_years) && (
-              <div className="flex flex-wrap gap-x-6 gap-y-3 pl-3 border-l border-gold/20">
+              <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-x-6 gap-y-5">
                 {languages.length > 0 && <StatPill label="Sprachen" value={languages.join(", ")} />}
                 {profile.day_rate && <StatPill label="Tagesgage" value={`${profile.day_rate} €`} />}
                 {profile.travel_ready && <StatPill label="Reisen" value="Reisebereit" />}
@@ -1481,7 +1481,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
               <div>
                 <div className="flex items-center gap-2 mb-2.5">
                   <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
-                  <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Skills</p>
+                  <p className="text-[11px] uppercase tracking-widest text-gold font-bold">Skills</p>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {skills.map((s) => (
@@ -1495,11 +1495,11 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
               <div>
                 <div className="flex items-center gap-2 mb-2.5">
                   <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
-                  <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Mitgliedschaften</p>
+                  <p className="text-[11px] uppercase tracking-widest text-gold font-bold">Mitgliedschaften</p>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {memberships.map((m) => (
-                    <span key={m} className="px-2.5 py-1 bg-bg-elevated border border-border rounded-md text-xs text-text-primary hover:border-gold/30 transition-colors">{m}</span>
+                    <span key={m} className="min-w-0 max-w-full whitespace-normal break-words px-2.5 py-1 bg-bg-elevated border border-border rounded-md text-xs text-text-primary hover:border-gold/30 transition-colors">{m}</span>
                   ))}
                 </div>
               </div>
@@ -1523,15 +1523,15 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
                 <div>
                   <div className="flex items-center gap-2 mb-2.5">
                     <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
-                    <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Links & Kontakt</p>
+                    <p className="text-[11px] uppercase tracking-widest text-gold font-bold">Links & Kontakt</p>
                   </div>
                   {links.length > 0 && <div className="flex flex-wrap gap-1.5">
                       {links.map(({ label, url, contactIcon }) => (
                         <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-bg-elevated border border-border rounded-lg text-xs text-text-primary hover:border-gold/40 hover:text-gold transition-colors">
+                          className="inline-flex min-h-11 min-w-0 max-w-full items-center gap-2 whitespace-normal break-words px-3 py-2 bg-bg-elevated border border-border rounded-lg text-xs text-text-primary hover:border-gold/40 hover:text-gold transition-colors">
                           {contactIcon === "phone" && <Phone size={11} className="shrink-0" />}
                           {contactIcon === "mail"  && <Mail size={11} className="shrink-0" />}
-                          {label}
+                          <span className="min-w-0 [overflow-wrap:anywhere]">{label}</span>
                           {!contactIcon && <ExternalLink size={9} className="shrink-0 opacity-40" />}
                         </a>
                       ))}
@@ -1550,11 +1550,11 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
               <div>
                 <div className="flex items-center gap-2 mb-2.5">
                   <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
-                  <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Software</p>
+                  <p className="text-[11px] uppercase tracking-widest text-gold font-bold">Software</p>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {software.map((s) => (
-                    <span key={s} className="px-2.5 py-1 bg-bg-elevated border border-border rounded-md text-xs text-text-primary">{s}</span>
+                    <span key={s} className="min-w-0 max-w-full whitespace-normal break-words px-2.5 py-1 bg-bg-elevated border border-border rounded-md text-xs text-text-primary">{s}</span>
                   ))}
                 </div>
               </div>
@@ -1565,11 +1565,11 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
               <div>
                 <div className="flex items-center gap-2 mb-2.5">
                   <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
-                  <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Lizenzen & Zertifikate</p>
+                  <p className="text-[11px] uppercase tracking-widest text-gold font-bold">Lizenzen & Zertifikate</p>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {certificates.map((c) => (
-                    <span key={c} className="px-2.5 py-1 bg-bg-elevated border border-border rounded-md text-xs text-text-primary">{c}</span>
+                    <span key={c} className="min-w-0 max-w-full whitespace-normal break-words px-2.5 py-1 bg-bg-elevated border border-border rounded-md text-xs text-text-primary">{c}</span>
                   ))}
                 </div>
               </div>
@@ -1725,7 +1725,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 
       {/* ── FOTO-GRID ─────────────────────────────────────────────────── */}
       {images.length > 0 && (
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-16">
           <PhotoGrid images={images} profileId={profile.user_id} isOwner={isOwner} imageLikes={imageLikes} myImageLikes={myImageLikes} />
         </div>
       )}

@@ -14,16 +14,16 @@ export default function ProfileRoles({
   const [expanded, setExpanded] = useState(false);
   if (positions.length === 0) return null;
 
-  const { visible, remaining } = getProfilePositionsPreview(positions, expanded);
+  const { visible, remaining } = getProfilePositionsPreview(positions, expanded, 3);
   const primaryClass = tone === "hero"
-    ? "border-gold/30 bg-gold/20 text-gold drop-shadow-md"
+    ? "border-gold/40 bg-black/70 text-gold"
     : "border-gold/40 bg-gold/12 text-gold";
   const secondaryClass = tone === "hero"
-    ? "border-white/15 bg-black/20 text-white/80"
+    ? "border-white/20 bg-black/60 text-white"
     : "border-border bg-bg-secondary text-text-secondary";
 
   return (
-    <div className="mt-3 min-w-0 max-w-full">
+    <div className="mt-2 min-w-0 max-w-full">
       <div className="flex max-w-full min-w-0 flex-wrap items-start gap-2 [overflow-wrap:anywhere]">
         {visible.map((position, index) => (
           <span
@@ -34,12 +34,13 @@ export default function ProfileRoles({
           </span>
         ))}
       </div>
-      {remaining > 0 && (
+      {positions.length > 3 && (
         <button
           type="button"
           aria-expanded={expanded}
           onClick={() => setExpanded((current) => !current)}
           className="mt-1 inline-flex min-h-11 max-w-full items-center gap-1 text-xs font-semibold text-gold hover:text-gold-light"
+          style={tone === "hero" ? { textShadow: "0 1px 2px #000, 0 0 5px #000" } : undefined}
         >
           {expanded ? "Weniger Tätigkeiten anzeigen" : `Weitere Tätigkeiten anzeigen (${remaining})`}
         </button>
