@@ -1,3 +1,4 @@
+import { listingPriceMetadataError } from "@/lib/listing-price";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { revalidatePath, revalidateTag } from "next/cache";
@@ -79,12 +80,15 @@ export async function PATCH(
     }
 
     if (metadata !== undefined) {
-      if (current.type !== "location") return NextResponse.json({ error: "Zusätzliche Drehortangaben können nur bei Locations geändert werden." }, { status: 400 });
+      if (!["location", "prop", "vehicle"].includes(current.type)) return NextResponse.json({ error: "Preisangaben können nur bei Locations und Marktplatzangeboten geändert werden." }, { status: 400 });
+      const pricingError = listingPriceMetadataError(metadata);
+      if (pricingError) return NextResponse.json({ error: pricingError }, { status: 400 });
       if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return NextResponse.json({ error: "Die Locationangaben sind ungültig." }, { status: 400 });
       const incoming = metadata as Record<string, unknown>;
       const merged = current.metadata && typeof current.metadata === "object" && !Array.isArray(current.metadata)
         ? { ...(current.metadata as Record<string, unknown>) }
         : {};
+      if (current.type !== "location" && Object.keys(incoming).some(key => !["price_negotiable", "price_on_request"].includes(key))) return NextResponse.json({ error: "Es können nur die Preisangaben geändert werden." }, { status: 400 });
       const numericFields: Record<string, number> = { sqm: 1000000, ceiling_height_m: 1000, max_crew: 100000, parking_spots: 100000 };
       for (const [key, maximum] of Object.entries(numericFields)) {
         if (!(key in incoming)) continue;
@@ -98,7 +102,7 @@ export async function PATCH(
         if (!["innen", "außen", "beides"].includes(String(incoming.indoor_outdoor))) return NextResponse.json({ error: "Bitte wähle Innen, Außen oder Innen & Außen." }, { status: 400 });
         merged.indoor_outdoor = incoming.indoor_outdoor;
       }
-      for (const key of ["power_available", "natural_light", "blackout_possible", "loading_access", "price_on_request"]) {
+      for (const key of ["power_available", "natural_light", "blackout_possible", "loading_access", "price_on_request", "price_negotiable"]) {
         if (!(key in incoming)) continue;
         if (typeof incoming[key] !== "boolean") return NextResponse.json({ error: "Eine Ausstattungsangabe ist ungültig." }, { status: 400 });
         merged[key] = incoming[key];
@@ -114,6 +118,8 @@ export async function PATCH(
         if (!Array.isArray(value) || value.length > 80 || value.some((item) => typeof item !== "string" || item.length > 100)) return NextResponse.json({ error: "Die ausgewählten Räume oder Ausstattungen sind ungültig." }, { status: 400 });
         merged[key] = [...new Set(value.map((item) => (item as string).trim()).filter(Boolean))];
       }
+      if (incoming.price_negotiable === true) merged.price_on_request = false;
+      if (incoming.price_on_request === true) merged.price_negotiable = false;
       updates.metadata = merged;
     }
   }

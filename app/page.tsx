@@ -1,3 +1,4 @@
+import { listingPriceLabel } from "@/lib/listing-price";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { getListingProviders } from "@/lib/listing-provider";
@@ -148,6 +149,7 @@ async function getHomeData(viewerId: string | null) {
     title: l.title as string,
     city: (l.city ?? "") as string,
     price: (l.price ?? 0) as number,
+    priceLabel: listingPriceLabel(l.price,l.metadata),
     image: (l.image_url ?? "") as string,
     focalPoint: (((l.metadata ?? {}) as Record<string, unknown>).focal_point as { x: number; y: number } | null) ?? null,
     isNew: l.created_at ? (currentTime - new Date(l.created_at as string).getTime()) < 3 * 24 * 60 * 60 * 1000 : false,
@@ -168,6 +170,7 @@ async function getHomeData(viewerId: string | null) {
     title: p.title as string,
     city: (p.city ?? "") as string,
     price: (p.price ?? 0) as number,
+    priceLabel: listingPriceLabel(p.price,p.metadata),
     image: (p.image_url ?? "") as string,
     focalPoint: (((p.metadata ?? {}) as Record<string, unknown>).focal_point as { x: number; y: number } | null) ?? null,
     type: (p.type ?? "prop") as string,
@@ -367,7 +370,7 @@ export default async function HomePage() {
                       <span className="text-xs text-text-muted">{formatDate(loc.created_at)}</span>
                     )}
                     <span className="text-sm font-semibold text-gold">
-                      {loc.price.toLocaleString()} €<span className="text-[11px] text-text-muted font-normal">{tc("perDay")}</span>
+                      {loc.priceLabel}
                     </span>
                   </div>
                 </Link>
@@ -504,7 +507,7 @@ export default async function HomePage() {
                   <div className="px-2.5 py-2 sm:px-4 sm:py-3 flex items-center justify-between gap-1">
                     <span className="text-[10px] sm:text-xs text-text-muted truncate">{formatDate(prop.created_at)}</span>
                     <span className="text-xs sm:text-sm font-semibold text-gold whitespace-nowrap">
-                      {prop.price > 0 ? `${prop.price.toLocaleString()} €${tc("perDay")}` : tc("onRequest")}
+                      {prop.priceLabel}
                     </span>
                   </div>
                 </Link>

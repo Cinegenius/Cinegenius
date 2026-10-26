@@ -1,4 +1,6 @@
 "use client";
+import { listingPriceLabel, type ListingPriceMetadata } from "@/lib/listing-price";
+
 
 import UnoptimizedImage from "@/components/UnoptimizedImage";
 
@@ -13,6 +15,7 @@ const eras = ["Alle", "1950s", "1960s–70s", "1970s", "1970s–80s", "1980s–9
 type Vehicle = {
   id: string; title: string; type: string; make: string; model: string; year: number;
   color: string; era: string | null; condition: string; location: string; vendor: string;
+  pricing?: ListingPriceMetadata;
   dailyRate: number; image: string; tags: string[]; instantBook: boolean; verified: boolean;
   delivery: boolean; focalPoint?: { x: number; y: number } | null; description?: string; ownerId?: string; ownerName?: string; isReal?: boolean;
 };
@@ -198,7 +201,7 @@ export default function VehiclesContent({ serverVehicles }: { serverVehicles: Ve
                           <span className="px-1.5 py-0.5 bg-bg-elevated rounded">{v.type}</span>
                           {v.delivery && <span className="flex items-center gap-0.5 text-success"><Truck size={10} /> Lieferung</span>}
                         </div>
-                        <span className="text-sm font-semibold text-gold">{v.dailyRate.toLocaleString()} €<span className="text-text-muted font-normal text-xs">/Tag</span></span>
+                        <span className="text-sm font-semibold text-gold">{listingPriceLabel(v.dailyRate,v.pricing)}</span>
                       </div>
                     </div>
                   </Link>

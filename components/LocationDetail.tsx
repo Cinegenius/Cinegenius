@@ -1,4 +1,6 @@
 "use client";
+import { listingPriceLabel } from "@/lib/listing-price";
+
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -248,7 +250,7 @@ export default function LocationDetail({ location }: { location: Location }) {
                   meta.natural_light && { label: "Tageslicht", value: "Vorhanden" },
                   meta.blackout_possible && { label: "Verdunkelung", value: "Möglich" },
                   meta.loading_access && { label: "Be-/Entladung", value: "Gut möglich" },
-                  location.price > 0 && { label: "Preis", value: `${location.price.toLocaleString()} €/Tag` },
+                  location.price > 0 && { label: "Preis", value: listingPriceLabel(location.price,location.metadata) },
                 ].filter((x): x is { label: string; value: string } => !!x).map(({ label, value }) => (
                   <div key={label} className="p-3 bg-bg-secondary border border-border rounded-xl flex flex-col items-center gap-1.5 text-center">
                     {specIcons[label] ?? null}
@@ -345,9 +347,9 @@ export default function LocationDetail({ location }: { location: Location }) {
               <div className="bg-bg-secondary border border-border rounded-xl p-5">
                 <div className="flex items-end gap-1 mb-1">
                   <span className="text-3xl font-bold font-display text-text-primary">
-                    {location.price > 0 ? `${location.price.toLocaleString()} €` : "Auf Anfrage"}
+                    {listingPriceLabel(location.price,location.metadata)}
                   </span>
-                  {location.price > 0 && <span className="text-text-muted mb-1">/{location.priceUnit}</span>}
+
                 </div>
                 <div className="flex items-center gap-1.5 mb-5">
                   {ratingSummary.count > 0 ? (
@@ -388,8 +390,8 @@ export default function LocationDetail({ location }: { location: Location }) {
       <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-bg-primary/95 backdrop-blur-sm border-t border-border px-4 py-3 flex items-center gap-3">
         <div className="flex-1">
           <div className="text-lg font-bold font-display text-text-primary">
-            {location.price > 0 ? `${location.price.toLocaleString()} €` : "Auf Anfrage"}
-            {location.price > 0 && <span className="text-text-muted font-normal text-sm">/{location.priceUnit}</span>}
+            {listingPriceLabel(location.price,location.metadata)}
+
           </div>
           <div className="flex items-center gap-1">
             {ratingSummary.count > 0 ? (

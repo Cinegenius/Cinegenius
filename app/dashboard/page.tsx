@@ -1,4 +1,6 @@
 "use client";
+import ListingPriceOptions from "@/components/ListingPriceOptions";
+import { listingPriceLabel } from "@/lib/listing-price";
 
 import SetupStatusNotice from "@/components/SetupStatusNotice";
 
@@ -237,7 +239,7 @@ export default function DashboardPage() {
   const [editLocationMeta, setEditLocationMeta] = useState({
     indoor_outdoor: "innen", sqm: "", ceiling_height_m: "", max_crew: "", parking_spots: "",
     power_available: false, power_details: "", natural_light: false, blackout_possible: false,
-    loading_access: false, access_notes: "", shooting_hours: "", availability_notes: "", price_on_request: true,
+    loading_access: false, access_notes: "", shooting_hours: "", availability_notes: "", price_on_request: true, price_negotiable: false,
     rooms: [] as string[], amenities: [] as string[],
   });
   const [editGalleryState, setEditGalleryState] = useState({ uploading: false, failed: 0 });
@@ -266,7 +268,8 @@ export default function DashboardPage() {
       access_notes: typeof meta.access_notes === "string" ? meta.access_notes : "",
       shooting_hours: typeof meta.shooting_hours === "string" ? meta.shooting_hours : "",
       availability_notes: typeof meta.availability_notes === "string" ? meta.availability_notes : "",
-      price_on_request: meta.price_on_request === true || l.price <= 0,
+      price_on_request: meta.price_negotiable !== true && (meta.price_on_request === true || l.price <= 0),
+      price_negotiable: meta.price_negotiable === true,
       rooms: Array.isArray(meta.rooms) ? meta.rooms.filter((value): value is string => typeof value === "string") : [],
       amenities: Array.isArray(meta.amenities) ? meta.amenities.filter((value): value is string => typeof value === "string") : [],
     });
@@ -324,7 +327,7 @@ export default function DashboardPage() {
         body: JSON.stringify({
           title: editForm.title.trim(),
           description: editForm.description,
-          price: editingListing?.type === "location" && editLocationMeta.price_on_request ? 0 : parseFloat(editForm.price) || 0,
+          price: ["location", "prop", "vehicle"].includes(editingListing?.type ?? "") && editLocationMeta.price_on_request ? 0 : parseFloat(editForm.price) || 0,
           city: editForm.city.trim(),
           image_url: usesGallery ? editGallery[0] ?? null : editForm.image_url || null,
           ...(usesGallery ? { extra_images: editGallery.slice(1) } : {}),
@@ -344,9 +347,10 @@ export default function DashboardPage() {
             shooting_hours: editLocationMeta.shooting_hours,
             availability_notes: editLocationMeta.availability_notes,
             price_on_request: editLocationMeta.price_on_request,
+            price_negotiable: editLocationMeta.price_negotiable,
             rooms: editLocationMeta.rooms,
             amenities: editLocationMeta.amenities,
-          } } : {}),
+          } } : usesGallery ? {metadata:{price_on_request:editLocationMeta.price_on_request,price_negotiable:editLocationMeta.price_negotiable}} : {}),
         }),
       });
       const { error } = await res.json();
@@ -358,7 +362,7 @@ export default function DashboardPage() {
               title: editForm.title.trim(),
               description: editForm.description,
               city: editForm.city.trim(),
-              price: l.type === "location" && editLocationMeta.price_on_request ? 0 : parseFloat(editForm.price) || 0,
+              price: ["location", "prop", "vehicle"].includes(l.type) && editLocationMeta.price_on_request ? 0 : parseFloat(editForm.price) || 0,
               ...(l.type === "location" ? { metadata: {
                 ...(l.metadata ?? {}),
                 indoor_outdoor: editLocationMeta.indoor_outdoor,
@@ -375,9 +379,10 @@ export default function DashboardPage() {
                 shooting_hours: editLocationMeta.shooting_hours,
                 availability_notes: editLocationMeta.availability_notes,
                 price_on_request: editLocationMeta.price_on_request,
+            price_negotiable: editLocationMeta.price_negotiable,
                 rooms: editLocationMeta.rooms,
                 amenities: editLocationMeta.amenities,
-              } } : {}),
+              } } : ["prop", "vehicle"].includes(l.type) ? {metadata:{...l.metadata,price_on_request:editLocationMeta.price_on_request,price_negotiable:editLocationMeta.price_negotiable}} : {}),
               ...(l.type === "location" ? { blocked_dates: editBlockedDates } : {}),
               ...(l.type === "prop" || l.type === "vehicle" || l.type === "location" ? { image_url: editGallery[0] ?? null, extra_images: editGallery.slice(1) } : { image_url: editForm.image_url || null }),
             }
@@ -1120,7 +1125,7 @@ export default function DashboardPage() {
                         {/* Preis */}
                         <div className="text-right shrink-0">
                           <p className="font-semibold text-gold font-display">
-                            {l.price > 0 ? `${l.price.toLocaleString()} €` : "—"}
+                            {listingPriceLabel(l.price,l.metadata,"")}
                           </p>
                           <p className="text-[10px] text-text-muted mt-0.5">/Tag</p>
                         </div>
@@ -1734,7 +1739,7 @@ export default function DashboardPage() {
                     </div>
                     <p className="text-xs text-text-muted mb-1">{typeLabel[l.type] ?? l.type} · {l.city}</p>
                     <p className="text-xs text-text-muted">
-                      {l.price > 0 ? `${l.price.toLocaleString()} € / Tag` : "Preis auf Anfrage"} ·{" "}
+                      {listingPriceLabel(l.price,l.metadata)} ·{" "}
                       erstellt {new Date(l.created_at).toLocaleDateString("de-DE")}
                     </p>
                   </div>
@@ -1884,8 +1889,8 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div>
-                      {l.type === "location" && <button type="button" aria-pressed={editLocationMeta.price_on_request} onClick={() => setEditLocationMeta((current) => ({ ...current, price_on_request: !current.price_on_request }))} className={`mb-2 min-h-10 rounded-lg border px-3 text-xs ${editLocationMeta.price_on_request ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{editLocationMeta.price_on_request ? "✓ " : ""}Preis auf Anfrage</button>}
-                      {!editLocationMeta.price_on_request || l.type !== "location" ? <>
+                      {["location", "prop", "vehicle"].includes(l.type) && <ListingPriceOptions onRequest={editLocationMeta.price_on_request} negotiable={editLocationMeta.price_negotiable} onChange={value=>setEditLocationMeta(current=>({...current,price_on_request:value.priceOnRequest,price_negotiable:value.priceNegotiable}))} />}
+                      {!editLocationMeta.price_on_request || !["location", "prop", "vehicle"].includes(l.type) ? <>
                         <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">{l.type === "location" ? "Preis pro Drehtag (€)" : "Preis / Tag (€)"}</label>
                         <input type="number" min="0" value={editForm.price} onChange={(e) => { setEditLocationMeta((current) => ({ ...current, price_on_request: false })); setEditForm((p) => ({ ...p, price: e.target.value })); }} className="w-full rounded-lg border border-border bg-bg-elevated px-3 py-2 text-sm transition-colors focus:border-gold focus:outline-none" placeholder="z. B. 500" />
                       </> : <p className="text-xs text-text-muted">Der Preis wird öffentlich als „Auf Anfrage“ angezeigt.</p>}

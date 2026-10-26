@@ -1,3 +1,4 @@
+import { listingPriceLabel } from "@/lib/listing-price";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import type { Metadata } from "next";
@@ -43,7 +44,7 @@ async function getLocation(slug: string, viewerId: string | null = null) {
     ? data.metadata as Record<string, unknown>
     : {};
   const publicMetadata = Object.fromEntries(
-    ["sqm", "ceiling_height_m", "max_crew", "indoor_outdoor", "power_available", "power_details", "parking_spots", "amenities", "rooms", "natural_light", "blackout_possible", "loading_access", "access_notes", "shooting_hours", "availability_notes", "price_on_request", "production_credits"]
+    ["sqm", "ceiling_height_m", "max_crew", "indoor_outdoor", "power_available", "power_details", "parking_spots", "amenities", "rooms", "natural_light", "blackout_possible", "loading_access", "access_notes", "shooting_hours", "availability_notes", "price_on_request", "price_negotiable", "production_credits"]
       .filter((key) => key in rawMetadata)
       .map((key) => [key, rawMetadata[key]])
   );
@@ -94,7 +95,7 @@ export async function generateMetadata({
   if (!location) return {};
   return {
     title: location.title,
-    description: `${location.type} in ${location.city} — ${location.price > 0 ? `${location.price.toLocaleString()} € pro Tag` : "Preis auf Anfrage"}.`,
+    description: `${location.type} in ${location.city} — ${listingPriceLabel(location.price,location.metadata)}.`,
     openGraph: {
       title: `${location.title} | CineGenius`,
       description: `${location.type} in ${location.city} — jetzt für Film & Foto buchen.`,
@@ -123,7 +124,7 @@ export default async function LocationPage({
       "addressCountry": "DE",
     },
     "image": location.image || undefined,
-    ...(location.price > 0 ? { "offers": {
+    ...(location.price > 0 && !location.metadata.price_negotiable && !location.metadata.price_on_request ? { "offers": {
       "@type": "Offer",
       "price": location.price,
       "priceCurrency": "EUR",

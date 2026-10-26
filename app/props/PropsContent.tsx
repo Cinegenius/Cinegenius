@@ -1,4 +1,6 @@
 "use client";
+import { listingPriceLabel } from "@/lib/listing-price";
+
 
 import UnoptimizedImage from "@/components/UnoptimizedImage";
 
@@ -93,7 +95,6 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
   onRate?: (star: number) => void; canRate?: boolean;
   isFavorited?: boolean; onFavorite?: (e: React.MouseEvent) => void;
 }) {
-  const tc = useTranslations("common");
   const tp = useTranslations("props");
   const href = p.type === "vehicle" ? `/vehicles/${p.id}` : `/props/${p.id}`;
 
@@ -120,8 +121,7 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
         </div>
         <div className="shrink-0 text-right">
           <p className="text-sm font-bold text-gold">
-            {p.dailyRate > 0 ? `${p.dailyRate.toLocaleString()} €` : tc("onRequest")}
-            {p.dailyRate > 0 && <span className="text-text-muted font-normal text-xs"> {tc("perDay")}</span>}
+            {listingPriceLabel(p.dailyRate,{...p.meta,rental_type:p.rentalType})}
           </p>
           <p className="text-[10px] text-text-muted mt-0.5">{p.condition}</p>
         </div>
@@ -157,9 +157,7 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
           <h3 className="font-semibold text-white text-sm line-clamp-1 mb-1.5">{p.title}</h3>
           <div className="flex items-center justify-between">
             <p className="text-white/50 text-xs flex items-center gap-1 truncate mr-2"><MapPin size={9} className="shrink-0" />{p.location || p.vendor}</p>
-            {p.dailyRate > 0
-              ? <p className="text-gold font-bold text-sm shrink-0">{p.dailyRate.toLocaleString()} €<span className="text-white/40 font-normal text-[10px]"> {tc("perDay")}</span></p>
-              : <p className="text-white/50 text-xs shrink-0">{tc("onRequest")}</p>}
+            <p className="text-gold font-bold text-sm shrink-0">{listingPriceLabel(p.dailyRate,{...p.meta,rental_type:p.rentalType})}</p>
           </div>
         </div>
       </div>

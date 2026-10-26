@@ -14,6 +14,7 @@ type Result = {
   subtitle: string;
   type: string;
   price: number;
+  priceLabel?: string;
   image: string | null;
   available: boolean | null;
 };
@@ -287,8 +288,8 @@ export default function GlobalSearch() {
                         {isProfile && r.available !== null && (
                           <span className={`w-2 h-2 rounded-full ${r.available ? "bg-success" : "bg-text-muted"}`} />
                         )}
-                        {!isProfile && r.price > 0 && (
-                          <span className="text-xs font-mono text-gold">{r.price.toLocaleString()} €</span>
+                        {!isProfile && (r.priceLabel || r.price > 0) && (
+                          <span className="text-xs font-mono text-gold">{r.priceLabel ?? `${r.price.toLocaleString()} €`}</span>
                         )}
                       </div>
                     </button>

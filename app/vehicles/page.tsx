@@ -1,3 +1,4 @@
+import { listingPriceMetadata } from "@/lib/listing-price";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import VehiclesContent from "./VehiclesContent";
@@ -48,6 +49,7 @@ export default async function VehiclesPage() {
       location: l.city ?? "",
       vendor: "",
       dailyRate: l.price,
+      pricing: listingPriceMetadata(l.metadata),
       image: l.image_url ?? "",
       tags: l.created_at && (new Date().getTime() - new Date(l.created_at).getTime() < 3 * 24 * 60 * 60 * 1000) ? ["Neu"] : [],
       instantBook: false,

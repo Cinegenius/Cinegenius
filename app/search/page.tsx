@@ -16,6 +16,7 @@ type Result = {
   subtitle: string;
   type: string;
   price: number;
+  priceLabel?: string;
   image: string | null;
   available: boolean | null;
 };
@@ -107,9 +108,9 @@ function ResultCard({ result }: { result: Result }) {
           {result.title}
         </h3>
         <p className="text-xs text-text-muted line-clamp-1 flex-1">{result.subtitle}</p>
-        {!isProfile && result.price > 0 && (
+        {!isProfile && (result.priceLabel || result.price > 0) && (
           <p className="mt-2 text-sm font-semibold font-mono text-gold">
-            {result.price.toLocaleString("de-DE")} €<span className="text-text-muted font-sans font-normal text-xs">/Tag</span>
+            {result.priceLabel ?? `${result.price.toLocaleString("de-DE")} €/Tag`}
           </p>
         )}
         {isProfile && (

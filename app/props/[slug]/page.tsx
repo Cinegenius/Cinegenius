@@ -1,3 +1,4 @@
+import { listingPriceLabel, listingPriceMetadata } from "@/lib/listing-price";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import type { Metadata } from "next";
@@ -42,6 +43,7 @@ async function getProp(slug: string, viewerId?: string | null) {
       vendor: provider.name,
       location: data.city ?? "",
       dailyRate: data.price ?? 0,
+    pricing: listingPriceMetadata(rawMetadata),
       image: data.image_url ?? "",
       condition: typeof rawMetadata.condition === "string" ? rawMetadata.condition : "Gut",
       era: typeof rawMetadata.era === "string" ? rawMetadata.era : null,
@@ -72,10 +74,10 @@ export async function generateMetadata({
   if (!prop) return {};
   return {
     title: prop.title,
-    description: `${prop.title} mieten — ${prop.condition}, ${prop.dailyRate} €/Tag bei ${prop.vendor} in ${prop.location}.`,
+    description: `${prop.title} mieten — ${prop.condition}, ${listingPriceLabel(prop.dailyRate,prop.pricing)} bei ${prop.vendor} in ${prop.location}.`,
     openGraph: {
       title: `${prop.title} | CineGenius Verleih`,
-      description: `${prop.category} · ${prop.condition} · ${prop.dailyRate} €/Tag`,
+      description: `${prop.category} · ${prop.condition} · ${listingPriceLabel(prop.dailyRate,prop.pricing)}`,
       ...(prop.image ? { images: [{ url: prop.image, width: 800, height: 600, alt: prop.title }] } : {}),
     },
   };

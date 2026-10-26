@@ -1,4 +1,6 @@
 "use client";
+import { listingPriceLabel } from "@/lib/listing-price";
+
 
 import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
@@ -49,10 +51,6 @@ type Location = {
   ownerId?: string;
   metadata?: Record<string, unknown>;
 };
-
-function isPriceOnRequest(location: Location) {
-  return location.metadata?.price_on_request === true || location.price <= 0;
-}
 
 function parseLocationMeta(desc: string): { lage?: string; hasPower: boolean } {
   const metaLine = desc.split("\n\n")[0] ?? desc;
@@ -608,8 +606,8 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                           </p>
                           <div className="flex items-center justify-between mb-1.5">
                             <span className="text-sm font-bold text-gold">
-                              {!isPriceOnRequest(loc) ? `${loc.price.toLocaleString()} €` : "Auf Anfrage"}
-                              {!isPriceOnRequest(loc) && <span className="text-text-muted font-normal text-xs">/{loc.priceUnit}</span>}
+                              {listingPriceLabel(loc.price,loc.metadata)}
+
                             </span>
                           </div>
                           <div className="flex items-center justify-between pt-1.5 border-t border-border/30"
@@ -672,7 +670,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                         <p className="text-xs text-text-muted mb-2 flex items-center gap-1"><MapPin size={11} /> {loc.city}</p>
                         <div className="flex items-center justify-between pt-2 border-t border-border mb-1.5">
                           <span className="text-xs text-text-muted">{loc.type}</span>
-                          <span className="text-sm font-bold text-gold">{!isPriceOnRequest(loc) ? <>{loc.price.toLocaleString()} €<span className="text-text-muted font-normal text-xs">/{loc.priceUnit}</span></> : "Auf Anfrage"}</span>
+                          <span className="text-sm font-bold text-gold">{listingPriceLabel(loc.price,loc.metadata)}</span>
                         </div>
                         <div className="flex items-center justify-between pt-1.5 border-t border-border/30"
                           onClick={(e) => e.stopPropagation()}>

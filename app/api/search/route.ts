@@ -1,3 +1,4 @@
+import { listingPriceLabel } from "@/lib/listing-price";
 import { db } from "@/lib/db";
 import { getPrivateProfileIds } from "@/lib/trust";
 import { NextRequest, NextResponse } from "next/server";
@@ -28,7 +29,7 @@ export async function GET(req: NextRequest) {
       ? (() => {
           let q2 = db
             .from("listings")
-            .select("id, title, city, type, category, price, image_url")
+            .select("id, title, city, type, category, price, image_url, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type")
             .eq("published", true)
             .or(`title.ilike.${like},city.ilike.${like},category.ilike.${like},description.ilike.${like}`)
             .order("created_at", { ascending: false });
@@ -81,6 +82,7 @@ export async function GET(req: NextRequest) {
     subtitle: (l.city as string) ?? "",
     type: l.type as string,
     price: (l.price as number) ?? 0,
+    priceLabel: ["prop","vehicle","location"].includes(String(l.type)) ? listingPriceLabel((l.price as number) ?? 0,l) : undefined,
     image: l.image_url as string | null,
     available: null as boolean | null,
   }));

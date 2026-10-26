@@ -23,6 +23,7 @@ export type QuickStartIntentData = {
   imageUrl: string;
   price: string;
   priceOnRequest: boolean;
+  priceNegotiable?: boolean;
   departmentIds: string[];
   roles: QuickStartRoleSelection[];
   categoryIds: string[];
@@ -132,6 +133,7 @@ function normalizeIntentData(value: unknown): QuickStartIntentData {
     imageUrl: typeof input.imageUrl === "string" ? input.imageUrl.slice(0, 1200) : "",
     price: typeof input.price === "string" ? input.price.slice(0, 20) : "",
     priceOnRequest: input.priceOnRequest !== false,
+    priceNegotiable: input.priceNegotiable === true,
     departmentIds,
     roles,
     categoryIds: Array.isArray(input.categoryIds)
@@ -344,7 +346,7 @@ export function validateQuickStartScreen(draft: QuickStartDraft, screen: QuickSt
   if (screen === "intro") {
     for (const intent of ["location", "equipment"] as const) {
       const section = draft.sections[intent];
-      if (draft.intents.includes(intent) && section && !section.priceOnRequest && (!section.price.trim() || !Number.isFinite(Number(section.price)) || Number(section.price) < 0)) {
+      if (draft.intents.includes(intent) && section && !section.priceOnRequest && !(section.priceNegotiable && !section.price.trim()) && (!section.price.trim() || !Number.isFinite(Number(section.price)) || Number(section.price) < 0)) {
         return { field: `${intent}-price`, message: "Gib einen gültigen Preis in Euro an oder wähle ‚Preis auf Anfrage‘." };
       }
     }

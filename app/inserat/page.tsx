@@ -1,4 +1,5 @@
 "use client";
+import ListingPriceOptions from "@/components/ListingPriceOptions";
 
 import UnoptimizedImage from "@/components/UnoptimizedImage";
 
@@ -384,6 +385,7 @@ export default function InseratPage() {
   const [locBlockedDates, setLocBlockedDates] = useState<string[]>([]);
   const [locExtraImages, setLocExtraImages] = useState<string[]>([]);
   const [locPriceOnRequest, setLocPriceOnRequest] = useState(true);
+  const [priceNegotiable, setPriceNegotiable] = useState(false);
   const [locFloorPlanUrl, setLocFloorPlanUrl] = useState<string | null>(null);
   const [locFloorPlanPreview, setLocFloorPlanPreview] = useState<string | null>(null);
   const [locFloorUploading, setLocFloorUploading] = useState(false);
@@ -460,7 +462,7 @@ export default function InseratPage() {
     step,
     form: {
       title: form.title, description: form.description, city: form.city, price: form.price,
-        price_on_request: locPriceOnRequest,
+        price_negotiable: priceNegotiable, price_on_request: locPriceOnRequest,
       sqm: form.sqm, ceiling_height: form.ceiling_height, max_crew: form.max_crew,
       indoor_outdoor: form.indoor_outdoor, power_available: form.power_available,
       power_details: form.power_details, parking_spots: form.parking_spots,
@@ -476,7 +478,7 @@ export default function InseratPage() {
     selectedCompanyId,
     focalPoint,
     productionCredits,
-  }), [selected, activeGroup, step, form, locAmenities, locRooms, locBlockedDates, locExtraImages, locFloorPlanUrl, locPriceOnRequest, selectedCompanyId, focalPoint, productionCredits]);
+  }), [selected, activeGroup, step, form, locAmenities, locRooms, locBlockedDates, locExtraImages, locFloorPlanUrl, locPriceOnRequest, priceNegotiable, selectedCompanyId, focalPoint, productionCredits]);
 
   const persistLocationDraft = useCallback(async (draft: ReturnType<typeof buildLocationDraft>) => {
     const revision = ++locationDraftRevision.current;
@@ -546,6 +548,7 @@ export default function InseratPage() {
             const imageUrls = Array.isArray(saved.imageUrls) ? saved.imageUrls.filter((value): value is string => typeof value === "string" && value.startsWith("https://")).slice(0, MAX_LOCATION_IMAGES) : [];
             setLocExtraImages(imageUrls);
             setLocPriceOnRequest(savedForm.price_on_request !== false);
+            setPriceNegotiable(savedForm.price_negotiable === true);
             const floorPlanUrl = typeof saved.floorPlanUrl === "string" && saved.floorPlanUrl.startsWith("https://") ? saved.floorPlanUrl : null;
             setLocFloorPlanUrl(floorPlanUrl);
             setLocFloorPlanPreview(floorPlanUrl);
@@ -619,6 +622,7 @@ export default function InseratPage() {
         price: parseFloat(form.price) || 0,
         city: form.city,
         metadata: {
+          price_negotiable: priceNegotiable,
           make: form.make || null,
           model: form.model || null,
           year: form.year ? parseInt(form.year) : null,
@@ -654,7 +658,7 @@ export default function InseratPage() {
           access_notes: form.access_notes || null,
           shooting_hours: form.shooting_hours || null,
           availability_notes: form.availability_notes || null,
-          price_on_request: locPriceOnRequest,
+          price_negotiable: priceNegotiable, price_on_request: locPriceOnRequest,
           amenities: locAmenities,
           rooms: locRooms,
           focal_point: focalPoint ?? null,
@@ -743,6 +747,7 @@ export default function InseratPage() {
       city: form.city,
       rental_type: form.rental_type,
       metadata: {
+        price_negotiable: priceNegotiable,
         condition: form.condition || null,
         delivery: form.delivery,
         dimensions: form.dimensions || null,
@@ -1763,10 +1768,7 @@ export default function InseratPage() {
                 {isLocation ? (
                   <div className="space-y-2">
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest">Preis</label>
-                    <div className="flex flex-wrap gap-2">
-                      <button type="button" aria-pressed={locPriceOnRequest} onClick={() => setLocPriceOnRequest(true)} className={`min-h-10 rounded-lg border px-3 text-xs ${locPriceOnRequest ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>Preis auf Anfrage</button>
-                      <button type="button" aria-pressed={!locPriceOnRequest} onClick={() => setLocPriceOnRequest(false)} className={`min-h-10 rounded-lg border px-3 text-xs ${!locPriceOnRequest ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>Tagespreis angeben</button>
-                    </div>
+                    <ListingPriceOptions onRequest={locPriceOnRequest} negotiable={priceNegotiable} onChange={value=>{setLocPriceOnRequest(value.priceOnRequest);setPriceNegotiable(value.priceNegotiable);}} />
                     {!locPriceOnRequest && <label className="block text-xs text-text-muted">Preis pro Drehtag (€)
                       <input type="number" min="0" value={form.price} onChange={(e) => f("price", e.target.value)} placeholder="z. B. 500" className="mt-1 w-full rounded-xl border border-border bg-bg-elevated px-4 py-3 text-sm text-text-primary placeholder:text-text-muted transition-colors focus:border-gold focus:outline-none" />
                     </label>}
@@ -1776,6 +1778,7 @@ export default function InseratPage() {
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
                       {isJob ? "Gage / Tag (€) — 0 = Auf Anfrage" : isCreator ? "Tagesrate (€)" : form.rental_type === "kauf" ? "Kaufpreis (€) *" : "Preis / Tag (€) *"}
                     </label>
+                    {!isJob && !isCreator && <label className="mb-2 flex min-h-11 items-center gap-2 text-sm text-text-secondary"><input type="checkbox" checked={priceNegotiable} onChange={event=>{setPriceNegotiable(event.target.checked);if(event.target.checked)setLocPriceOnRequest(false);}} />VB – Verhandlungsbasis (Betrag optional)</label>}
                     <input type="number" min="0" value={form.price} onChange={(e) => f("price", e.target.value)} placeholder={isJob || isCreator ? "z. B. 500" : form.rental_type === "kauf" ? "z. B. 1200" : "z. B. 800"} className="w-full rounded-xl border border-border bg-bg-elevated px-4 py-3 text-sm text-text-primary placeholder:text-text-muted transition-colors focus:border-gold focus:outline-none" />
                   </>
                 )}
@@ -1962,7 +1965,7 @@ export default function InseratPage() {
               setCreatedIsDraft(false);
               setForm({ title: "", description: "", price: "", city: "", make: "", model: "", year: "", fuel_type: "", license_class: "", condition: "", vehicle_subtype: "", sqm: "", ceiling_height: "", max_crew: "", indoor_outdoor: "innen", power_available: false, power_details: "", parking_spots: "", natural_light: false, blackout_possible: false, loading_access: false, access_notes: "", shooting_hours: "", availability_notes: "", company: "", projectType: "", shoot_start: "", shoot_end: "", pay_type: "", role_label: "", urgent: false, content_nudity: false, content_violence: false, content_stunts: false, delivery: false, rental_type: "miete", dimensions: "", safety_note: "", skills: "", experience: "", animal_training: "", animal_handler: true, animal_count: "1", animal_skills: "" });
               setLocAmenities([]); setLocBlockedDates([]); setLocExtraImages([]); setLocFloorPlanUrl(null); setLocFloorPlanPreview(null);
-              setLocRooms([]); setLocPriceOnRequest(true); setSelectedCompanyId(""); setFocalPoint(null);
+              setLocRooms([]); setLocPriceOnRequest(true); setPriceNegotiable(false); setSelectedCompanyId(""); setFocalPoint(null);
               setArticleImages([]); setLocationGalleryState({ uploading: false, failed: 0 }); setArticleGalleryState({ uploading: false, failed: 0 });
             }}
             className="px-6 py-3 border border-border text-text-secondary rounded-xl hover:border-gold hover:text-gold transition-all text-sm font-medium"

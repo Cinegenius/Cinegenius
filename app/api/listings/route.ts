@@ -1,3 +1,4 @@
+import { listingPriceMetadataError, listingPriceLabel } from "@/lib/listing-price";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { rateLimit } from "@/lib/rateLimit";
@@ -18,7 +19,7 @@ const LISTING_COLS =
 // internal ownership IDs, arbitrary metadata and private availability data on
 // authenticated owner endpoints.
 const LISTING_COLS_PUBLIC =
-  "id, type, category, title, description, price, city, image_url, published, extra_images, created_at";
+  "id, type, category, title, description, price, city, image_url, published, extra_images, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type";
 
 function privateNoStoreJson(body: unknown, status = 200) {
   const response = NextResponse.json(body, { status });
@@ -74,7 +75,7 @@ export async function GET(req: NextRequest) {
     console.error("[listings GET]", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  return NextResponse.json({ data, page, limit }, { headers: { "Cache-Control": "public, max-age=30, s-maxage=60, stale-while-revalidate=300" } });
+  return NextResponse.json({ data: (data ?? []).map((listing: Record<string, unknown>) => ({...listing,priceLabel:listingPriceLabel(Number(listing.price),listing)})), page, limit }, { headers: { "Cache-Control": "public, max-age=30, s-maxage=60, stale-while-revalidate=300" } });
 }
 
 export async function POST(req: Request) {
@@ -110,6 +111,8 @@ export async function POST(req: Request) {
   if (onboarding_request_key !== undefined && (draft !== true || typeof onboarding_request_key !== "string" || !/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(onboarding_request_key))) {
     return NextResponse.json({ error: "Ungültiger Einrichtungsauftrag" }, { status: 400 });
   }
+
+  if (metadata !== undefined && metadata !== null) { const pricingError = listingPriceMetadataError(metadata); if (pricingError) return NextResponse.json({ error: pricingError }, { status: 400 }); }
 
   // SECURITY: input length limits and price sanitization
   if (title.length > 200) return NextResponse.json({ error: "Titel zu lang (max. 200 Zeichen)" }, { status: 400 });

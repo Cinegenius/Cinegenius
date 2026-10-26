@@ -1,3 +1,4 @@
+import { listingPriceLabel } from "@/lib/listing-price";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { NextRequest, NextResponse } from "next/server";
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
   }
 
   let query = db.from("listings")
-    .select("id, user_id, company_id, type, title, city, price, published, created_at", { count: "exact" })
+    .select("id, user_id, company_id, type, title, city, price, published, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type", { count: "exact" })
     .order("created_at", { ascending: false })
     .range((page - 1) * pageSize, page * pageSize - 1);
   if (rawType !== "all") query = query.eq("type", rawType);
@@ -60,6 +61,7 @@ export async function GET(req: NextRequest) {
     const companySlug = company?.slug ?? null;
     return {
       ...listing,
+      priceLabel: listingPriceLabel(listing.price,listing),
       company_slug: companySlug,
       provider_name: providerName,
       provider_href: listing.company_id

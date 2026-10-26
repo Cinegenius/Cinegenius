@@ -1,3 +1,4 @@
+import { listingPriceLabel, listingPriceMetadata } from "@/lib/listing-price";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
@@ -57,6 +58,7 @@ async function getVehicle(slug: string, viewerId?: string | null) {
     location: data.city ?? "",
     vendor: ownerName,
     dailyRate: data.price ?? 0,
+    pricing: listingPriceMetadata(rawMetadata),
     image: data.image_url ?? "",
     tags: (data.created_at && (Date.now() - new Date(data.created_at as string).getTime() < 3 * 24 * 60 * 60 * 1000) ? ["Neu"] : []) as string[],
     instantBook: false,
@@ -89,7 +91,7 @@ export async function generateMetadata({
     const title = vehicle.title ?? "Fahrzeug";
     return {
       title,
-      description: `${vehicle.type} — ab ${vehicle.dailyRate.toLocaleString()} € / Tag. Jetzt auf CineGenius für Filmproduktionen mieten.`,
+      description: `${vehicle.type} — ${listingPriceLabel(vehicle.dailyRate,vehicle.pricing)}. Jetzt auf CineGenius für Filmproduktionen mieten.`,
       openGraph: {
         title: `${title} | CineGenius`,
         description: `${vehicle.type} mieten für Film & Foto.`,
@@ -120,13 +122,13 @@ export default async function VehicleDetailPage({
     "description": vehicle.description || `${vehicle.type} für Filmproduktionen mieten`,
     "image": vehicle.image,
     "category": vehicle.type,
-    "offers": {
+    ...(vehicle.dailyRate > 0 && !vehicle.pricing.price_on_request && !vehicle.pricing.price_negotiable ? { "offers": {
       "@type": "Offer",
       "price": vehicle.dailyRate,
       "priceCurrency": "EUR",
       "availability": "https://schema.org/InStock",
     "seller": { "@type": vehicle.provider.kind === "company" ? "Organization" : "Person", "name": vehicle.ownerName },
-    },
+    } } : {}),
   };
 
   return (
@@ -250,7 +252,7 @@ export default async function VehicleDetailPage({
             <div className="sticky top-24 space-y-4">
               <div className="p-6 rounded-2xl border border-border bg-bg-secondary">
                 <div className="mb-5">
-                  <span className="font-display text-3xl font-bold text-gold">{vehicle.dailyRate.toLocaleString()} €</span>
+                  <span className="font-display text-3xl font-bold text-gold">{listingPriceLabel(vehicle.dailyRate,vehicle.pricing)}</span>
                   <span className="text-text-muted text-sm"> / Tag</span>
                 </div>
 
