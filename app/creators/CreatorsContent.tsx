@@ -1,5 +1,6 @@
 "use client";
 
+import { filterProviderProfiles, isProviderFilter, LOCATION_PROVIDER_FILTER, MARKETPLACE_PROVIDER_FILTER } from "@/lib/profile-provider-filters";
 import { filterCrewOccupations } from "@/lib/crew-occupations";
 
 import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
@@ -548,7 +549,8 @@ function CreatorsInner({
   const chooseSidebarDept = (deptId: string | null) => {
     setSelectedRoles(new Set());
     setSidebarDept(deptId);
-    if (deptId) setActiveDept(deptId);
+    if (deptId && !isProviderFilter(deptId)) setActiveDept(deptId);
+    if (isProviderFilter(deptId)) setFilterOpen(false);
     if (deptId === null) setViewMode("grid");
   };
 
@@ -587,7 +589,9 @@ function CreatorsInner({
       result = filterCrewOccupations(result, null, [...selectedRoles]);
     }
 
-    if (sidebarDept) {
+    if (isProviderFilter(sidebarDept)) {
+      result = filterProviderProfiles(result, sidebarDept!);
+    } else if (sidebarDept) {
       result = filterCrewOccupations(result, sidebarDept);
     }
 
@@ -716,6 +720,8 @@ function CreatorsInner({
         allCategoryLabel="Alle Bereiche"
         categories={[
           ...departments.map((department) => ({ value: department.id, label: getDeptLabel(department, locale) })),
+          { value: LOCATION_PROVIDER_FILTER, label: "Locations – Anbieter" },
+          { value: MARKETPLACE_PROVIDER_FILTER, label: "Marktplatz – Anbieter" },
         ]}
         categoryValue={sidebarDept ?? ""}
         onCategoryChange={(value) => { setSelectedRoles(new Set()); chooseSidebarDept(value || null); }}
@@ -729,9 +735,9 @@ function CreatorsInner({
         <MobileFilterField label={t("filterProfileType")}>
           <MobileFilterSelect value={profileTypeFilter} onChange={setProfileTypeFilter} placeholder={t("filterAll")} options={availableProfileTypes.map((value) => ({ value, label: PROFILE_TYPE_MAP[value] ?? value }))} />
         </MobileFilterField>
-        <MobileFilterField label="Rolle">
+        {!isProviderFilter(sidebarDept) && <MobileFilterField label="Rolle">
           <MobileFilterSelect value={[...selectedRoles][0] ?? ""} onChange={(value) => setSelectedRoles(value ? new Set([value]) : new Set())} placeholder="Alle Rollen" options={occupationCatalogue.filter(option => !sidebarDept || option.departmentId === sidebarDept).map(option => ({ value: option.roleId, label: `${option.departmentLabel} → ${option.label}` }))} />
-        </MobileFilterField>
+        </MobileFilterField>}
         <MobileFilterField label={t("filterCity")}>
           <MobileFilterSelect value={cityFilter} onChange={setCityFilter} placeholder="Alle Städte" options={availableCities.map((value) => ({ value, label: value }))} />
         </MobileFilterField>
@@ -1096,10 +1102,10 @@ function CreatorsInner({
 
           {/* Row 2: Filters */}
           <div className="flex items-center gap-2 overflow-x-auto lg:overflow-visible pb-0.5" style={{ scrollbarWidth: "none" }}>
-            <button type="button" onClick={() => setFilterOpen(value => !value)} aria-expanded={filterOpen}
+            {!isProviderFilter(sidebarDept) && <button type="button" onClick={() => setFilterOpen(value => !value)} aria-expanded={filterOpen}
               className={`flex min-h-11 items-center gap-2 rounded-lg border px-3 text-xs font-medium ${filterOpen || selectedRoles.size ? "border-gold/30 text-gold bg-gold/10" : "border-border text-text-muted"}`}>
               Beruf auswählen <ChevronDown size={12} />
-            </button>
+            </button>}
             {/* Available toggle */}
             <label className="flex items-center gap-1.5 text-xs text-text-muted cursor-pointer hover:text-text-secondary transition-colors select-none shrink-0">
               <div
@@ -1327,14 +1333,14 @@ function CreatorsInner({
                 })}
                 <div className="pt-3 mt-2 border-t border-border/50 space-y-0.5">
                   {([
-                    { id: "/locations", label: "Locations", Icon: MapPin },
-                    { id: "/props", label: "Marktplatz", Icon: ShoppingBag },
+                    { id: LOCATION_PROVIDER_FILTER, label: "Locations", Icon: MapPin },
+                    { id: MARKETPLACE_PROVIDER_FILTER, label: "Marktplatz", Icon: ShoppingBag },
                   ] as const).map(({ id, label, Icon }) => {
                     const isActive = sidebarDept === id;
                     return (
                       <button
                         key={id}
-                        onClick={() => { window.location.href = id; }}
+                        onClick={() => chooseSidebarDept(isActive ? null : id)}
                         className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
                           isActive
                             ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
@@ -1391,14 +1397,14 @@ function CreatorsInner({
                 );
               })}
               {([
-                { id: "/locations", label: "Locations" },
-                { id: "/props", label: "Marktplatz" },
+                { id: LOCATION_PROVIDER_FILTER, label: "Locations" },
+                { id: MARKETPLACE_PROVIDER_FILTER, label: "Marktplatz" },
               ] as const).map(({ id, label }) => {
                 const isActive = sidebarDept === id;
                 return (
                   <button
                     key={id}
-                    onClick={() => { window.location.href = id; }}
+                    onClick={() => chooseSidebarDept(isActive ? null : id)}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
                       isActive
                         ? "bg-gold/10 text-gold border-gold/40"

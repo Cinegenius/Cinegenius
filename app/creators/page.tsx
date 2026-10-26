@@ -1,3 +1,4 @@
+import { isPeopleDirectoryProfile } from "@/lib/profile-provider-filters";
 import { crewOccupationIds } from "@/lib/crew-occupations";
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
@@ -6,7 +7,7 @@ import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
 import { getPrivateProfileIds } from "@/lib/trust";
 import CreatorsContent, { type ServerCreator } from "./CreatorsContent";
-import { primaryOccupationForPositions, occupationReference, isCrewDirectoryProfile } from "@/lib/primary-occupation";
+import { primaryOccupationForPositions, occupationReference } from "@/lib/primary-occupation";
 import PageHeader from "@/components/PageHeader";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
 import { getProfileDisplayPositions, normalizeProfileTypes } from "@/lib/profile-display";
@@ -86,7 +87,7 @@ const getCreatorDirectoryData = unstable_cache(
 
     return { listings, profiles, listingRatings, profileRatings };
   },
-  ["creator-directory-selected-occupations-v6"],
+  ["people-directory-selected-occupations-providers-v7"],
   { revalidate: 60, tags: ["creator-directory", "profiles", "listings"] },
 );
 
@@ -176,7 +177,7 @@ export default async function CreatorsPage({
       if (privateProfileIds.has(p.user_id)) return false;
       // Don't show a second card for users who already have a creator listing
 
-      return isCrewDirectoryProfile(p);
+      return isPeopleDirectoryProfile(p);
     })
     .map((p) => {
       const phys = p.physical ?? {};
