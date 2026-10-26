@@ -43,7 +43,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer id="site-footer" className="border-t border-border bg-bg-secondary mt-12 pb-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
+    <footer id="site-footer" className="relative z-10 border-t border-border bg-bg-secondary mt-12 pb-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Marke */}
