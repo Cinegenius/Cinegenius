@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import type { ReactNode } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   ArrowLeft, ArrowRight, Building2, Camera, CheckCircle2, Film, ImagePlus,
   Loader2, MapPin, Package, Search, Trash2, Lock, UserRound,
@@ -13,6 +14,7 @@ import { compressImage, MAX_FUNCTION_UPLOAD_BYTES } from "@/lib/compressImage";
 import { departments, getDepartmentRoleSearchTerms } from "@/lib/departments";
 import { safeAuthRedirect } from "@/lib/auth-redirect";
 import { hasCompletedNonPersonalSetup, hasProfileBasics, shouldSkipProfileSetup } from "@/lib/profile-setup-flow";
+import { createOnboardingSaveQueue, isQuickStartContentSaved } from "@/lib/onboarding-save";
 import {
   buildQuickStartScreens, createQuickStartIntentData, findQuickStartRoles, getQuickStartDepartments, getQuickStartIntroIntents,
   getQuickStartProfileTypesForRoles, normalizeQuickStartDraft, QUICK_START_CATEGORIES,
@@ -84,6 +86,8 @@ export default function ProfileSetupWizard() {
   const [profileIsPrivate, setProfileIsPrivate] = useState(false);
   const [profilePublic, setProfilePublic] = useState(false);
   const [profileExists, setProfileExists] = useState(false);
+  const [completionPending, setCompletionPending] = useState(false);
+  const [retrySeconds, setRetrySeconds] = useState(0);
   const [ready, setReady] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [loadAttempt, setLoadAttempt] = useState(0);
@@ -96,7 +100,30 @@ export default function ProfileSetupWizard() {
   const [companyCategorySearch, setCompanyCategorySearch] = useState("");
   const [countryOther, setCountryOther] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const saveQueue = useRef<Promise<boolean>>(Promise.resolve(true));
+  const saveQueue = useMemo(() => createOnboardingSaveQueue(async (value) => {
+    setSaveState("saving");
+    try {
+      const response = await fetch("/api/onboarding", {
+        method: "PUT", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ intent: primaryIntent(value), setupComplete: false, quickStart: value, updatedAt: new Date().toISOString() }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (response.status === 429) setRetrySeconds(Number(response.headers.get("Retry-After")) || result.retryAfter || 10);
+      if (!response.ok) throw new Error(result.error ?? "Dein Fortschritt konnte nicht gespeichert werden.");
+      setSaveState("saved");
+      return true;
+    } catch (cause) {
+      setSaveState("error");
+      setError(cause instanceof Error ? cause.message : "Dein Fortschritt konnte nicht gespeichert werden.");
+      return false;
+    }
+  }), []);
+
+  useEffect(() => {
+    if (retrySeconds <= 0) return;
+    const timeout = setTimeout(() => setRetrySeconds(value => Math.max(0, value - 1)), 1000);
+    return () => clearTimeout(timeout);
+  }, [retrySeconds]);
 
   useEffect(() => {
     let active = true;
@@ -130,6 +157,7 @@ export default function ProfileSetupWizard() {
       let nextDraft = hasInProgressDraft
         ? normalizeQuickStartDraft(saved.quickStart)
         : { ...START_QUICK_START_DRAFT, name: existingName };
+      if (hasInProgressDraft) saveQueue.acknowledge(normalizeQuickStartDraft(saved.quickStart));
       if (!profileComplete && nextDraft.completed.profile) nextDraft = { ...nextDraft, completed: { ...nextDraft.completed, profile: false } };
       if (resumeIncomplete && hasInProgressDraft) {
         const missing = validateQuickStartDraft(nextDraft);
@@ -144,42 +172,21 @@ export default function ProfileSetupWizard() {
       setReady(true);
     });
     return () => { active = false; };
-  }, [isNewRegistration, resumeIncomplete, loadAttempt, redirectTo, router, user?.fullName]);
+  }, [isNewRegistration, resumeIncomplete, loadAttempt, redirectTo, router, user?.fullName, saveQueue]);
 
   useEffect(() => {
     if (!ready || draft.name || !user?.fullName) return;
     setDraft((current) => current.name ? current : { ...current, name: user.fullName ?? "" });
   }, [ready, draft.name, user?.fullName]);
 
-  const persist = useCallback((value: QuickStartDraft) => {
-    setSaveState("saving");
-    const queued = saveQueue.current.catch(() => false).then(async () => {
-      try {
-        const response = await fetch("/api/onboarding", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ intent: primaryIntent(value), setupComplete: false, quickStart: value, updatedAt: new Date().toISOString() }),
-        });
-        const result = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(result.error ?? "Dein Fortschritt konnte nicht gespeichert werden.");
-        setSaveState("saved");
-        return true;
-      } catch (cause) {
-        setSaveState("error");
-        setError(cause instanceof Error ? cause.message : "Dein Fortschritt konnte nicht gespeichert werden.");
-        return false;
-      }
-    });
-    saveQueue.current = queued;
-    return queued;
-  }, []);
+  const persist = useCallback((value: QuickStartDraft) => saveQueue.save(value), [saveQueue]);
 
   useEffect(() => {
-    if (!ready || saving || finished || draft.welcomeAcknowledged === false) return;
+    if (!ready || saving || finished || completionPending || retrySeconds > 0 || draft.welcomeAcknowledged === false) return;
     if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => { void persist(draft); }, 450);
+    timer.current = setTimeout(() => { void persist(draft); }, 1500);
     return () => { if (timer.current) clearTimeout(timer.current); };
-  }, [ready, draft, persist, saving, finished]);
+  }, [ready, draft, persist, saving, finished, completionPending, retrySeconds]);
 
   const screens = useMemo(() => buildQuickStartScreens(draft), [draft]);
   const currentIndex = Math.max(0, screens.findIndex((screen) => screen.id === draft.step));
@@ -368,9 +375,14 @@ export default function ProfileSetupWizard() {
   }
 
   async function clearAndContinue(completedDraft: QuickStartDraft) {
-    const response = await fetch("/api/onboarding?type=quick-start", { method: "DELETE" });
+    setCompletionPending(true);
+    await saveQueue.settle();
+    const response = await fetch("/api/onboarding?type=quick-start", { method: "DELETE" }).catch(() => {
+      throw new Error("Deine Angaben sind bereits gespeichert. Die Verbindung wurde unterbrochen. Bitte versuche nur den Abschluss erneut.");
+    });
     const body = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(body.error ?? "Dein Einrichtungsstand konnte nicht abgeschlossen werden.");
+    if (response.status === 429) setRetrySeconds(Number(response.headers.get("Retry-After")) || body.retryAfter || 10);
+    if (!response.ok || body.completed !== true) throw new Error(`Deine Angaben sind bereits gespeichert. ${body.error ?? "Die Einrichtung konnte noch nicht abgeschlossen werden. Bitte versuche den Abschluss erneut."}`);
     if (completedDraft.completed.profile) {
       try {
         const settingsResponse = await fetch("/api/user-settings", { cache: "no-store" });
@@ -380,9 +392,11 @@ export default function ProfileSetupWizard() {
     }
     setFinished(completedDraft);
     setSaveState("saved");
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
   }
 
   async function finish() {
+    if (saving || retrySeconds > 0) return;
     const validation = validateQuickStartDraft(draft);
     if (validation) {
       const firstBadScreen = screenForField(validation.field);
@@ -398,7 +412,7 @@ export default function ProfileSetupWizard() {
     setError("");
     try {
       let progress: QuickStartDraft = { ...draft, step: "review", completed: { ...draft.completed, listings: { ...draft.completed.listings } } };
-      if (!(await persist(progress))) return;
+      if (!isQuickStartContentSaved(progress) && !(await persist(progress))) return;
 
       if ((progress.intents.includes("crew") || progress.intents.includes("talent")) && !progress.completed.profile) {
         const positions = selectedRoles.map((role) => role.role);
@@ -426,8 +440,9 @@ export default function ProfileSetupWizard() {
           throw new Error(result.fieldErrors?.[firstField] ?? result.error ?? "Dein Profil konnte nicht erstellt werden.");
         }
         progress = { ...progress, completed: { ...progress.completed, profile: true } };
+        setProfileExists(true);
         setDraft(progress);
-        if (!(await persist(progress))) throw new Error("Das Profil wurde erstellt, aber dein Einrichtungsstand konnte nicht aktualisiert werden. Bitte versuche es erneut.");
+        if (!isQuickStartContentSaved(progress) && !(await persist(progress))) throw new Error("Das Profil wurde erstellt, aber dein Einrichtungsstand konnte nicht aktualisiert werden. Bitte versuche es erneut.");
       }
 
       for (const intent of ["location", "equipment"] as const) {
@@ -454,7 +469,7 @@ export default function ProfileSetupWizard() {
         if (!response.ok || !result.data?.id) throw new Error(result.error ?? "Der private Angebotsentwurf konnte nicht gespeichert werden.");
         progress = { ...progress, completed: { ...progress.completed, listings: { ...progress.completed.listings, [intent]: String(result.data.id) } } };
         setDraft(progress);
-        if (!(await persist(progress))) throw new Error("Der Angebotsentwurf wurde gespeichert, aber dein Einrichtungsstand konnte nicht aktualisiert werden. Bitte versuche es erneut.");
+        if (!isQuickStartContentSaved(progress) && !(await persist(progress))) throw new Error("Der Angebotsentwurf wurde gespeichert, aber dein Einrichtungsstand konnte nicht aktualisiert werden. Bitte versuche es erneut.");
       }
 
       if (progress.intents.includes("company") && !progress.completed.company) {
@@ -479,7 +494,7 @@ export default function ProfileSetupWizard() {
         if (!response.ok || !result.data?.id) throw new Error(result.error ?? "Das Firmenprofil konnte nicht gespeichert werden.");
         progress = { ...progress, completed: { ...progress.completed, company: String(result.data.id) } };
         setDraft(progress);
-        if (!(await persist(progress))) throw new Error("Das Firmenprofil wurde gespeichert, aber dein Einrichtungsstand konnte nicht aktualisiert werden. Bitte versuche es erneut.");
+        if (!isQuickStartContentSaved(progress) && !(await persist(progress))) throw new Error("Das Firmenprofil wurde gespeichert, aber dein Einrichtungsstand konnte nicht aktualisiert werden. Bitte versuche es erneut.");
       }
       await clearAndContinue(progress);
     } catch (cause) {
@@ -598,10 +613,11 @@ export default function ProfileSetupWizard() {
     <h1 className="font-display text-2xl font-bold sm:text-3xl">{finished.completed.profile ? profilePublic ? "Dein Profil ist jetzt öffentlich sichtbar." : "Dein Profil ist erstellt." : finished.completed.company ? "Dein Firmenprofil ist erstellt." : finished.intents.every(intent => intent === "search") ? "Du kannst jetzt entdecken." : "Deine Angebotsentwürfe sind gespeichert."}</h1>
     <p className="mt-4 text-sm leading-6 text-text-secondary">{finished.completed.profile ? profilePublic ? "Andere können dich jetzt finden und dein Profil ansehen." : "Deine bisherigen Sichtbarkeitseinstellungen bleiben erhalten. Ein privates Profil bleibt privat." : finished.completed.company ? "Deine Firma wurde gespeichert. Etwaige Inserate haben einen eigenen Veröffentlichungsstatus." : "Deine Einrichtung ist abgeschlossen. Du kannst jederzeit weitere Bereiche ergänzen."}</p>
     <div className="mt-6 space-y-3">
-      {finished.completed.profile && user?.id && <a href={`/profile/${encodeURIComponent(user.id)}`} className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary">{profilePublic ? "Öffentliches Profil ansehen" : "Profil ansehen"}<ArrowRight size={16} /></a>}
+      <Link href="/" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary">Zur Startseite<ArrowRight size={16} /></Link>
+      {finished.completed.profile && user?.id && <a href={`/profile/${encodeURIComponent(user.id)}`} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-border px-5 text-sm font-semibold text-text-primary">{profilePublic ? "Öffentliches Profil ansehen" : "Profil ansehen"}<ArrowRight size={16} /></a>}
       {finished.completed.company && <a href={`/companies/${encodeURIComponent(finished.completed.company)}`} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-gold/30 px-5 text-sm font-semibold text-gold">Firmenprofil ansehen<ArrowRight size={16} /></a>}
       {(finished.completed.listings.location || finished.completed.listings.equipment) && <><p className="rounded-xl border border-border bg-bg-primary p-4 text-xs leading-5 text-text-muted">Deine Location- und Marktplatzangebote bleiben private Entwürfe. Vervollständige sie und veröffentliche sie anschließend ausdrücklich.</p>{Object.entries(finished.completed.listings).map(([kind, id]) => <a key={id} href={`/dashboard?tab=listings&editListing=${encodeURIComponent(id!)}`} className="flex min-h-12 items-center justify-center rounded-xl border border-border px-4 text-sm text-text-primary">{kind === "location" ? "Locationentwurf fortsetzen" : "Marktplatzentwurf fortsetzen"}</a>)}</>}
-      <button type="button" onClick={() => router.replace(redirectTo || (finished.intents.every(intent => intent === "search") ? "/search" : "/dashboard"))} className="flex min-h-12 w-full items-center justify-center rounded-xl border border-border px-4 text-sm text-text-primary">{finished.intents.every(intent => intent === "search") ? "Jetzt suchen" : "Zu Mein Bereich"}</button>
+      {redirectTo && redirectTo !== "/dashboard" && <button type="button" onClick={() => router.replace(redirectTo)} className="flex min-h-12 w-full items-center justify-center rounded-xl border border-border px-4 text-sm text-text-primary">Vorgang fortsetzen</button>}
     </div>
   </section></div>;
   if (draft.welcomeAcknowledged === false) return <div className="min-h-screen bg-bg-primary px-4 py-8 sm:py-12"><section className="mx-auto max-w-xl rounded-2xl border border-border bg-bg-secondary p-5 sm:p-7">
@@ -657,10 +673,11 @@ export default function ProfileSetupWizard() {
         </div>}
       </section>
 
+      {completionPending && draft.completed.profile && <p role="status" className="mt-4 rounded-xl border border-gold/30 bg-gold/5 p-4 text-sm text-text-primary">Dein Profil ist bereits gespeichert. Du musst es nicht erneut veröffentlichen.</p>}
       {error && <p role="alert" className="mt-4 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm leading-6 text-red-300">{error}</p>}
       <div className="sticky bottom-0 z-30 -mx-4 mt-5 flex flex-col-reverse items-stretch justify-between gap-3 border-t border-border bg-bg-primary/95 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur sm:static sm:mx-0 sm:flex-row sm:items-center sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
         <button type="button" disabled={saving || uploading || currentIndex === 0} onClick={() => void back()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-border px-4 text-sm text-text-primary disabled:cursor-not-allowed disabled:opacity-40"><ArrowLeft size={16} /> Zurück</button>
-        {draft.step !== "review" ? <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">{draft.step === "intro" && <button type="button" disabled={saving || uploading} onClick={() => void skipOptional()} className="min-h-12 rounded-xl border border-border px-4 text-sm text-text-secondary disabled:opacity-50">Später ergänzen</button>}<button type="button" disabled={saving || uploading} onClick={() => void next()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary disabled:opacity-50">{saving ? <><Loader2 size={16} className="animate-spin" /> Speichert …</> : <>Weiter <ArrowRight size={16} /></>}</button></div> : <button type="button" disabled={saving || uploading} onClick={() => void finish()} className="inline-flex min-h-12 flex-wrap items-center justify-center gap-2 rounded-xl bg-gold px-5 py-3 text-center text-sm font-semibold leading-5 text-bg-primary disabled:opacity-50">{saving ? <><Loader2 size={17} className="shrink-0 animate-spin" /><span>Wird gespeichert …</span></> : <><CheckCircle2 size={17} className="shrink-0" /><span>{completionActionLabel}</span></>}</button>}
+        {draft.step !== "review" ? <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">{draft.step === "intro" && <button type="button" disabled={saving || uploading || retrySeconds > 0} onClick={() => void skipOptional()} className="min-h-12 rounded-xl border border-border px-4 text-sm text-text-secondary disabled:opacity-50">Später ergänzen</button>}<button type="button" disabled={saving || uploading || retrySeconds > 0} onClick={() => void next()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary disabled:opacity-50">{saving ? <><Loader2 size={16} className="animate-spin" /> Speichert …</> : <>Weiter <ArrowRight size={16} /></>}</button></div> : <button type="button" disabled={saving || uploading || retrySeconds > 0} onClick={() => void finish()} className="inline-flex min-h-12 flex-wrap items-center justify-center gap-2 rounded-xl bg-gold px-5 py-3 text-center text-sm font-semibold leading-5 text-bg-primary disabled:opacity-50">{saving ? <><Loader2 size={17} className="shrink-0 animate-spin" /><span>Wird gespeichert …</span></> : <><CheckCircle2 size={17} className="shrink-0" /><span>{retrySeconds > 0 ? `Abschluss erneut in ${retrySeconds} s` : completionPending ? "Einrichtung abschließen" : completionActionLabel}</span></>}</button>}
       </div>
       <p className="mt-4 text-center text-xs leading-5 text-text-muted">Dein Fortschritt wird privat gespeichert. Nach einer Unterbrechung geht es hier weiter.</p>
     </div>

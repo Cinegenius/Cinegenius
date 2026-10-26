@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { clerkClient } from "@clerk/nextjs/server";
 import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { PROFILE_TYPE_LABELS } from "@/lib/profile-types";
@@ -78,20 +78,9 @@ export async function GET() {
     unavailableFields = optionalResult.unavailableFields;
   }
 
-  // Back-fill Clerk metadata and set cookie for users who had a profile before this flag existed
+  // Reading a profile must not write Clerk metadata: session claims can lag,
+  // and repeated GETs otherwise exhaust the per-user metadata write limit.
   if (data) {
-    const { sessionClaims } = await auth();
-    const meta = sessionClaims?.metadata as Record<string, unknown> | undefined;
-    if (!meta?.profileComplete) {
-      try {
-        const clerk = await clerkClient();
-        await clerk.users.updateUserMetadata(userId, {
-          publicMetadata: { profileComplete: true },
-        });
-      } catch (e) {
-        console.error("[profile GET] failed to back-fill Clerk metadata:", e);
-      }
-    }
     const res = privateNoStoreJson({ profile: data, exists: true, unavailableFields });
     res.cookies.set("cg_profile_ok", "1", {
       httpOnly: true,

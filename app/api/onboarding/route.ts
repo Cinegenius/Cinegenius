@@ -3,12 +3,20 @@ import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { compressProfileEditorDraft, expandProfileEditorDraft } from "@/lib/profile-editor-private-draft";
 import { normalizeQuickStartDraft, QUICK_START_INTENTS, validateQuickStartDraft } from "@/lib/quick-start-flow";
+import { clerkRateLimitSeconds } from "@/lib/onboarding-save";
 
 export const runtime = "nodejs";
 
 const KEY = "cinegeniusOnboarding";
 const INTENTS = new Set(["crew", "location", "equipment", "talent", "search", "company"]);
 const MAX_BYTES = 7000;
+
+function rateLimitResponse(error: unknown) {
+  const retryAfter = clerkRateLimitSeconds(error);
+  return retryAfter === null ? null : NextResponse.json({ error: `Zu viele Speicheranfragen. Bitte versuche es in ${retryAfter} Sekunden erneut.`, retryAfter }, {
+    status: 429, headers: { "Cache-Control": "private, no-store", "Retry-After": String(retryAfter) },
+  });
+}
 
 function json(body: unknown, status = 200) {
   return NextResponse.json(body, {
@@ -37,6 +45,8 @@ export async function GET() {
     }
     return json({ draft });
   } catch (error) {
+    const limited = rateLimitResponse(error);
+    if (limited) return limited;
     console.error("[onboarding GET] private progress could not be loaded", error);
     return json({ error: "Dein gespeicherter Fortschritt konnte nicht geladen werden." }, 503);
   }
@@ -133,6 +143,8 @@ export async function PUT(request: NextRequest) {
     });
     return json({ saved: true });
   } catch (error) {
+    const limited = rateLimitResponse(error);
+    if (limited) return limited;
     console.error("[onboarding PUT] private progress could not be saved", error);
     return json({ error: "Dein Fortschritt konnte nicht gespeichert werden. Bitte versuche es erneut." }, 503);
   }
@@ -143,8 +155,16 @@ export async function DELETE(request: NextRequest) {
   if (authResult instanceof NextResponse) return authResult;
   try {
     const clerk = await clerkClient();
-    const user = await clerk.users.getUser(authResult.userId);
     const requestedType = request.nextUrl.searchParams.get("type");
+    if (requestedType === "quick-start") {
+      // Clerk deep-merges metadata. Omission does not delete a nested key;
+      // null does. One atomic patch also preserves unrelated private drafts.
+      await clerk.users.updateUserMetadata(authResult.userId, {
+        privateMetadata: { [KEY]: { quickStart: null, setupComplete: true } },
+      });
+      return json({ deleted: true, completed: true });
+    }
+    const user = await clerk.users.getUser(authResult.userId);
     const privateMetadata = { ...(user.privateMetadata ?? {}) };
     const current = privateMetadata[KEY] && typeof privateMetadata[KEY] === "object"
       ? { ...(privateMetadata[KEY] as Record<string, unknown>) }
@@ -171,11 +191,6 @@ export async function DELETE(request: NextRequest) {
       current.setupComplete = true;
       if (Object.keys(current).length) privateMetadata[KEY] = current;
       else delete privateMetadata[KEY];
-    } else if (current && requestedType === "quick-start") {
-      delete current.quickStart;
-      current.setupComplete = true;
-      if (Object.keys(current).length) privateMetadata[KEY] = current;
-      else delete privateMetadata[KEY];
     } else if (current && requestedType === "profile-edit") {
       delete current.profileEditorDraft;
       delete current.profileEditorDraftEncoded;
@@ -193,6 +208,8 @@ export async function DELETE(request: NextRequest) {
     await clerk.users.updateUserMetadata(authResult.userId, { privateMetadata });
     return json({ deleted: true });
   } catch (error) {
+    const limited = rateLimitResponse(error);
+    if (limited) return limited;
     console.error("[onboarding DELETE] private progress could not be cleared", error);
     return json({ error: "Der gespeicherte Einrichtungsfortschritt konnte nicht entfernt werden." }, 503);
   }
