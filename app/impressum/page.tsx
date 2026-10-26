@@ -32,7 +32,7 @@ export default function ImpressumPage() {
             <h2 className="text-base font-semibold text-text-primary mb-2">Kontakt</h2>
             <p className="text-sm leading-relaxed">
               Telefon: <a href="tel:+491713866624" className="text-gold hover:underline">+49 171 3866624</a><br />
-              E-Mail: <a href="mailto:support@cinegenius.co" className="text-gold hover:underline">support@cinegenius.co</a>
+              E-Mail: <a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">cinegenius.co@gmail.com</a>
             </p>
           </section>
 
@@ -58,7 +58,7 @@ export default function ImpressumPage() {
             <p className="text-sm leading-relaxed">
               Für eigene Inhalte gelten die allgemeinen gesetzlichen Vorschriften. Inhalte von Mitgliedern
               werden von diesen bereitgestellt. Hinweise auf rechtswidrige Inhalte können mit dem Link
-              zum betroffenen Inhalt an support@cinegenius.co gesendet werden. Wir prüfen solche Hinweise
+              zum betroffenen Inhalt an cinegenius.co@gmail.com gesendet werden. Wir prüfen solche Hinweise
               und ergreifen die erforderlichen Maßnahmen nach den geltenden Vorschriften.
             </p>
           </section>
