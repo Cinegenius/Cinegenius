@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent } from "react";
 import { ArrowRight, Image as ImageIcon, Pause, Play, Star, X, Share2 } from "lucide-react";
@@ -8,6 +7,7 @@ import PhotoLikeButton from "@/components/PhotoLikeButton";
 import ResilientPublicImage from "@/components/ResilientPublicImage";
 import { markPhotoNavigation, markPhotoNavigationWithAnimation, photoHref } from "@/lib/photo-link";
 import { getPhotoBandFillerCount, orderPhotosByAuthor, repeatForSeamlessLoop, shouldAnimatePhotoBand } from "@/lib/home-discovery";
+import { communityPreviewUrl } from "@/lib/community-preview";
 
 export type DiscoverPhoto = {
   authorHref?: string | null;
@@ -90,7 +90,7 @@ export function PhotoDialog({ photo, onClose, resumeLike = false }: { photo: Dis
       <section className="relative flex max-h-[94dvh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-border bg-bg-secondary shadow-2xl" role="dialog" aria-modal="true" aria-label={`Foto von ${photo.author}`}>
         <button type="button" onClick={onClose} aria-label="Foto schließen" className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/70 text-white hover:border-gold"><X size={20} /></button>
         <div className="relative flex h-[62dvh] min-h-0 shrink items-center justify-center bg-black px-2 pb-2 pt-14 sm:px-4 sm:pb-4">
-          <ResilientPublicImage src={photo.imageUrl} alt={photo.caption || `${photo.imageKind || "Foto"} von ${photo.author}`} imageClassName="h-full w-full object-contain" loading="eager" />
+          <ResilientPublicImage src={communityPreviewUrl(photo.imageUrl, "detail")} alt={photo.caption || `${photo.imageKind || "Foto"} von ${photo.author}`} imageClassName="h-full w-full object-contain" loading="eager" />
         </div>
         <div className="flex max-h-[28dvh] shrink-0 flex-wrap items-center justify-between gap-4 overflow-y-auto p-4 sm:px-6">
           <div className="min-w-0">
@@ -139,7 +139,8 @@ function PhotoBandCard({
   return (
     <article aria-hidden={pointerOnly || undefined} className="home-photo-band-card group relative aspect-[4/3] w-[165px] shrink-0 overflow-hidden rounded-xl border border-white/10 bg-bg-elevated sm:w-[200px] lg:w-[240px] xl:w-[250px]">
       {!failed ? <Link href={href} onClick={onPhotoOpen ?? (() => markPhotoNavigation())} aria-label={pointerOnly ? undefined : `Foto öffnen: ${photo.caption || `Portfoliofoto von ${photo.author}`}`} tabIndex={pointerOnly ? -1 : undefined} className="absolute inset-0 block focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold">
-        <Image src={photo.imageUrl} alt={pointerOnly ? "" : photo.caption || `Foto von ${photo.author}`} fill priority={priority} sizes="(max-width: 639px) 165px, (max-width: 1023px) 200px, (max-width: 1279px) 240px, 250px" onError={() => onImageError(photo.imageUrl)} draggable={false} className={photo.fit === "contain" ? "object-contain p-4" : "object-cover"} />
+        {/* eslint-disable-next-line @next/next/no-img-element -- endpoint guarantees bounded pixels, including oversized originals */}
+        <img src={communityPreviewUrl(photo.imageUrl)} alt={pointerOnly ? "" : photo.caption || `Foto von ${photo.author}`} loading={priority ? "eager" : "lazy"} decoding="async" onError={() => onImageError(photo.imageUrl)} draggable={false} className={`absolute inset-0 h-full w-full ${photo.fit === "contain" ? "object-contain p-4" : "object-cover"}`} />
       </Link> : <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-bg-elevated to-bg-primary text-text-muted"><div className="flex flex-col items-center gap-2"><ImageIcon size={28} /><span className="text-xs">Bild derzeit nicht verfügbar</span></div></div>}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
       <PhotoLikeButton profileId={photo.profileId} imageUrl={photo.imageUrl} initialCount={photo.likeCount ?? 0} initialLiked={photo.likedByMe ?? false} disabled={photo.canLike === false} tabIndex={pointerOnly ? -1 : undefined} className="absolute right-3 top-3 z-10" />
@@ -306,8 +307,6 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
       startY: event.clientY,
       moved: false,
     };
-    event.currentTarget.setPointerCapture(event.pointerId);
-    setIsDragging(true);
   }
 
   function movePointerDrag(event: ReactPointerEvent<HTMLDivElement>) {
@@ -323,6 +322,11 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
       return;
     }
 
+    if (!pointer.moved) {
+      // Capture only an intentional horizontal drag; a tap must retain its link target.
+      event.currentTarget.setPointerCapture(event.pointerId);
+      setIsDragging(true);
+    }
     pointer.moved = true;
     const cycleWidth = groupRefs.current[pointer.row]?.getBoundingClientRect().width ?? 0;
     const animation = trackRefs.current[pointer.row]?.getAnimations()[0];

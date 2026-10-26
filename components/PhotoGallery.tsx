@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useState } from "react";
 import { ImageOff } from "lucide-react";
@@ -8,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { DiscoverPhoto, PhotoDialog } from "@/components/HomePhotoDiscovery";
 import { photoHref } from "@/lib/photo-link";
 import PhotoLikeButton from "@/components/PhotoLikeButton";
+import { communityPreviewUrl } from "@/lib/community-preview";
 
 type GalleryItem = DiscoverPhoto;
 
@@ -46,7 +46,8 @@ export function PhotoGallery({
                   aria-label={`Foto von ${item.author} öffnen${item.caption ? `: ${item.caption}` : ""}`}
                   className="relative block focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold focus-visible:outline-offset-2"
                 >
-                  {failedImages.has(item.imageUrl) ? <div role="img" aria-label="Foto derzeit nicht erreichbar" className="flex aspect-[4/3] flex-col items-center justify-center gap-2 p-4 text-center text-xs text-text-muted"><ImageOff size={24} /><span>Foto derzeit nicht erreichbar</span></div> : <Image src={item.imageUrl} alt={item.caption || `Foto von ${item.author}`} width={1200} height={900} sizes="(max-width:767px) 50vw,(max-width:1279px) 33vw,25vw" onError={() => setFailedImages(current => new Set(current).add(item.imageUrl))} className={item.fit === "contain" ? "block aspect-[4/3] w-full object-contain p-4" : "block h-auto w-full transition-transform duration-500 group-hover:scale-105"} />}
+                  {/* eslint-disable-next-line @next/next/no-img-element -- bounded derivative, never the original-resolution fallback */}
+                  {failedImages.has(item.imageUrl) ? <div role="img" aria-label="Foto derzeit nicht erreichbar" className="flex aspect-[4/3] flex-col items-center justify-center gap-2 p-4 text-center text-xs text-text-muted"><ImageOff size={24} /><span>Foto derzeit nicht erreichbar</span></div> : <img src={communityPreviewUrl(item.imageUrl)} alt={item.caption || `Foto von ${item.author}`} width={640} height={480} loading="lazy" decoding="async" onError={() => setFailedImages(current => new Set(current).add(item.imageUrl))} className={item.fit === "contain" ? "block aspect-[4/3] w-full object-contain p-4" : "block h-auto w-full transition-transform duration-500 group-hover:scale-105"} />}
                   <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-70 transition-opacity group-hover:opacity-100" />
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3 text-white sm:p-4">
                     <p className="mt-1 line-clamp-2 break-words text-[11px] text-white/80 sm:text-xs">{[item.imageKind, item.sourceTitle !== item.author ? item.sourceTitle : item.caption].filter(Boolean).join(" · ") || "Portfoliofoto"}</p>

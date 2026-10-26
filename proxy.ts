@@ -24,6 +24,7 @@ function getAdminIds(): Set<string> {
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 const RATE_LIMITS: Record<string, { limit: number; windowMs: number }> = {
+  "/api/community-image": { limit: 120, windowMs: 60_000 },
   "/api/upload/avatar":  { limit: 5,  windowMs: 60_000 },
   "/api/upload":         { limit: 20, windowMs: 60_000 },
   "/api/applications":   { limit: 10, windowMs: 60_000 },
@@ -147,6 +148,7 @@ const isWebhookRoute = createRouteMatcher(["/api/webhooks/(.*)"]);
 // API routes where GET is public — mutations (POST/PATCH/PUT/DELETE) require auth.
 // This prevents a missed requireAuth() in a handler from opening write access.
 const isPublicApiGet = createRouteMatcher([
+  "/api/community-image",
   "/api/listings(.*)",
   "/api/reviews(.*)",
   "/api/search(.*)",
