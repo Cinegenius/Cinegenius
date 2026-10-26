@@ -2,6 +2,12 @@
 
 Abgeglichen am 21. Oktober 2026. Die geführte Profilerstellung verwendet dieselben ausgewählten Tätigkeiten wie Profilbearbeitung, Crewfilter und Job-/Projektausschreibungen.
 
+## Verbindliche Crewfilter-Regel (26. Oktober 2026)
+
+Alle ausdrücklich ausgewählten Tätigkeiten bestimmen die Auffindbarkeit: sowohl im zugehörigen Gewerk als auch im konkreten Berufsfilter. Mehrfachauswahl über mehrere Gewerke ist erlaubt; unter „Alle Bereiche“ erscheint eine Person weiterhin einmal. Die Haupttätigkeit dient zur Hervorhebung und Sortierung der Berufsangaben, nicht als Ausschlusskriterium für andere ausgewählte Berufe. Diese Regel ersetzt die frühere Einschränkung auf eine Haupttätigkeit beziehungsweise ein einziges eindeutiges Gewerk.
+
+`lib/crew-occupations.ts` löst ausschließlich gespeicherte Berufsangaben und deklarierte exakte Synonyme auf. Onboarding und Profilbearbeitung speichern für neue Auswahlen zusätzlich `crew.occupations` mit Gewerke- und Rollenkennung im vorhandenen JSON-Feld. Öffentliche Crewseite und Nachlade-API verwenden daraus dieselben `occupationIds`; synthetische Profiltyp-Beschriftungen werden nicht als ausgewählte Berufe ausgewertet. Gleichlautende Berufe in verschiedenen Gewerken werden anhand ihrer gespeicherten Kennung unterschieden. Nicht eindeutig auflösbare ältere Freitextangaben werden nicht ungeprüft fremden Gewerken zugeordnet.
+
 ## Bestandsabgleich
 
 Die bestehende Profil- und Crewquelle `lib/departments.ts` enthielt 20 Bereiche. Die Job-/Projektquelle `lib/filmRoles.ts` enthielt 30 Fachbereiche mit 761 auswählbaren Rolleneinträgen. Diese 30 Bereiche werden per `FILM_TO_PROFILE_DEPARTMENT` auf die gemeinsame Auswahl abgebildet. Rollen werden im Zielbereich anhand ihrer kanonischen Bezeichnung und gepflegten Aliasnamen zusammengeführt, damit sie nicht als doppelte Auswahl erscheinen.

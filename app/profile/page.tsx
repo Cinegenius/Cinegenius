@@ -17,7 +17,8 @@ import ExternalProfilesSection from "@/components/ExternalProfilesSection";
 import { useToast } from "@/contexts/ToastContext";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 import PrimaryOccupationPicker from "@/components/PrimaryOccupationPicker";
-import { primaryOccupationForPositions, occupationReference, orderPositionsByPrimary, type PrimaryOccupation } from "@/lib/primary-occupation";
+import { selectedCrewOccupations } from "@/lib/crew-occupations";
+import { occupationId, occupationById, primaryOccupationForPositions, occupationReference, orderPositionsByPrimary, type PrimaryOccupation } from "@/lib/primary-occupation";
 import ProfileCoverEditor from "@/components/ProfileCoverEditor";
 import { profileCoverSettings } from "@/lib/profile-cover";
 import { departments, deptColors, DEPARTMENT_TO_PROFILE_TYPE, getDepartmentRoleSearchTerms } from "@/lib/departments";
@@ -101,20 +102,29 @@ function TypeChipPicker({
   onTypesChange,
   positions,
   onPositionsChange,
+  occupationSelections,
+  onOccupationsChange,
 }: {
   mode: "types" | "roles";
   selectedTypes: string[];
   onTypesChange: (types: string[]) => void;
   positions: string[];
   onPositionsChange: (p: string[]) => void;
+  occupationSelections?: PrimaryOccupation[];
+  onOccupationsChange?: (value: PrimaryOccupation[]) => void;
 }) {
   const [roleSearch, setRoleSearch] = useState("");
   const [expandedDepartments, setExpandedDepartments] = useState<Record<string, boolean>>({});
   const [chosenDepartments, setChosenDepartments] = useState<string[]>([]);
 
   function togglePosition(job: string, deptId: string) {
-    const isSel = positions.includes(job);
-    const next = isSel ? positions.filter((x) => x !== job) : [...positions, job];
+    const current = occupationSelections ?? selectedCrewOccupations(positions);
+    const roleId = occupationId(deptId, job);
+    const isSel = current.some(option => option.roleId === roleId);
+    const nextSelections = isSel ? current.filter(option => option.roleId !== roleId) : [...current, {departmentId: deptId, roleId}];
+    const stillSelected = nextSelections.some(option => occupationById(option.roleId)?.label === job);
+    const next = isSel && !stillSelected ? positions.filter(x => x !== job) : positions.includes(job) ? positions : [...positions, job];
+    onOccupationsChange?.(nextSelections);
     onPositionsChange(next);
     setChosenDepartments((current) => current.includes(deptId) ? current : [...current, deptId]);
     const mapped = DEPARTMENT_TO_PROFILE_TYPE[deptId];
@@ -185,8 +195,9 @@ function TypeChipPicker({
               <span key={position} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-3 text-sm text-gold">
                 {position}
                 <button type="button" onClick={() => {
-                  const dept = departments.find((item) => item.roles.includes(position));
-                  if (dept) togglePosition(position, dept.id);
+                  const selected = (occupationSelections ?? selectedCrewOccupations(positions)).find(option => occupationById(option.roleId)?.label === position);
+                  const dept = selected?.departmentId ?? departments.find(item => item.roles.includes(position))?.id;
+                  if (dept) togglePosition(position, dept);
                 }} className="inline-flex h-7 w-7 items-center justify-center rounded-full hover:bg-red-500/10" aria-label={`${position} entfernen`}><X size={14} /></button>
               </span>
             ))}
@@ -228,7 +239,7 @@ function TypeChipPicker({
               {expanded && <div className="flex flex-wrap gap-2 border-t border-border px-4 py-3">
                 {dept.id === "grip" && <p className="mb-1 w-full text-xs leading-5 text-text-muted">Kamerabühne / Grip umfasst Kameraunterstützung wie Dolly, Schienen und Kräne. Zuständigkeiten können sich je nach Land und Produktion unterscheiden.</p>}
                 {roles.map((role) => {
-                  const active = positions.includes(role);
+                  const active = (occupationSelections ?? selectedCrewOccupations(positions)).some(option => option.roleId === occupationId(dept.id, role));
                   const explanation = GRIP_OCCUPATIONS.find((occupation) => occupation.label === role)?.description;
                   return <button key={role} type="button" aria-pressed={active} title={explanation} onClick={() => togglePosition(role, dept.id)}
                     className={`min-h-10 rounded-full border px-3 py-2 text-xs font-medium transition-colors ${active ? `${colors.bg} ${colors.border} ${colors.text}` : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"}`}>{role}</button>;
@@ -541,6 +552,7 @@ export default function ProfilePage() {
   const [positions, setPositions] = useState<string[]>([]);
   const [primaryOccupation, setPrimaryOccupation] = useState<PrimaryOccupation | null>(null);
   const crewDataRef = useRef<Record<string, unknown>>({});
+  const [occupationSelections, setOccupationSelections] = useState<PrimaryOccupation[]>([]);
   const [languages, setLanguages] = useState<string[]>([]);
   const [newLanguage, setNewLanguage] = useState("");
   const [profileImages, setProfileImages] = useState<ProfileImage[]>([]);
@@ -738,6 +750,7 @@ export default function ProfilePage() {
           setMemberships(profile.memberships ?? []);
           setPositions(profile.positions ?? []);
           crewDataRef.current = profile.crew ?? {};
+          setOccupationSelections(selectedCrewOccupations(profile.positions ?? [], profile.crew?.occupations, profile.role, profile.crew?.primaryOccupation));
           setPrimaryOccupation(occupationReference(primaryOccupationForPositions(profile.crew?.primaryOccupation, profile.positions ?? [], profile.role)));
           setLanguages(profile.languages ?? []);
           setProfileImages(profile.profile_images ?? []);
@@ -1118,7 +1131,7 @@ export default function ProfilePage() {
         day_rate:       dayRate ? parseInt(dayRate) : null,
         filmography,
         video_links:    videoLinks,
-        crew: { ...crewDataRef.current, certificates: crewCertificates, primaryOccupation: occupationReference(primaryOccupationForPositions(primaryOccupation, positions)) },
+        crew: { ...crewDataRef.current, occupations: selectedCrewOccupations(positions, occupationSelections, null, primaryOccupation), certificates: crewCertificates, primaryOccupation: occupationReference(primaryOccupationForPositions(primaryOccupation, positions)) },
       };
 
       // First-time profile creation uses POST; subsequent edits use PATCH
@@ -1310,6 +1323,7 @@ export default function ProfilePage() {
     videoLinks,
     crewCertificates,
     primaryOccupation,
+    occupationSelections,
     currentProfileTypes,
     physicalData: physicalDataRef.current,
     performanceData: performanceDataRef.current,
@@ -1397,6 +1411,7 @@ export default function ProfilePage() {
           if (Array.isArray(saved.videoLinks)) setVideoLinks(saved.videoLinks.filter((item: unknown): item is string => typeof item === "string"));
           if (Object.hasOwn(saved, "primaryOccupation")) setPrimaryOccupation(occupationReference(primaryOccupationForPositions(saved.primaryOccupation, Array.isArray(saved.positions) ? saved.positions : [])));
           if (Array.isArray(saved.crewCertificates)) setCrewCertificates(saved.crewCertificates.filter((item: unknown): item is string => typeof item === "string"));
+          if (Array.isArray(saved.occupationSelections)) setOccupationSelections(selectedCrewOccupations(Array.isArray(saved.positions) ? saved.positions : [], saved.occupationSelections));
           if (Array.isArray(saved.currentProfileTypes)) setCurrentProfileTypes(saved.currentProfileTypes.filter((item: unknown): item is string => typeof item === "string"));
           if (saved.physicalData && typeof saved.physicalData === "object") physicalDataRef.current = saved.physicalData as Record<string, unknown>;
           if (saved.performanceData && typeof saved.performanceData === "object") performanceDataRef.current = saved.performanceData as Record<string, unknown>;
@@ -1654,11 +1669,11 @@ export default function ProfilePage() {
                 {editorStep === 2 && !draftLoading && !draftLoadError && (
                   <div ref={activityPickerRef} tabIndex={-1} className="scroll-mt-28 rounded-xl border border-border bg-bg-secondary p-4 sm:p-6 outline-none focus-visible:ring-2 focus-visible:ring-gold">
                     <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-text-muted">Filmcrew und Kreativberufe <span className="text-text-muted">· Weitere Tätigkeiten optional</span></p>
-                    <TypeChipPicker mode="roles" selectedTypes={currentProfileTypes} onTypesChange={setCurrentProfileTypes} positions={positions} onPositionsChange={(next) => {
+                    <TypeChipPicker mode="roles" occupationSelections={occupationSelections} onOccupationsChange={setOccupationSelections} selectedTypes={currentProfileTypes} onTypesChange={setCurrentProfileTypes} positions={positions} onPositionsChange={(next) => {
                       setPositions(next);
                       if (next.length > 0 || currentProfileTypes.length > 0) setFieldErrors((previous) => ({ ...previous, activity: undefined }));
                     }} />
-                    <PrimaryOccupationPicker positions={positions} value={primaryOccupation} onChange={setPrimaryOccupation} />
+                    <PrimaryOccupationPicker positions={positions} value={primaryOccupation} onChange={value => { setPrimaryOccupation(value); if (value) setOccupationSelections(current => selectedCrewOccupations(positions, [...current, value])); }} />
                     {fieldErrors.activity && <p role="alert" className="mt-3 rounded-lg border border-error/30 bg-error/10 p-3 text-sm text-error">{fieldErrors.activity}</p>}
                   </div>
                 )}

@@ -1,5 +1,7 @@
 "use client";
 
+import { filterCrewOccupations } from "@/lib/crew-occupations";
+
 import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,7 +16,7 @@ import { departments, deptColors, getDeptLabel, getOccupationSearchTerms, getDep
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 import { rankByRatingConfidence } from "@/lib/rating-ranking";
 import { gripSearchTerms, isGripDepartmentSearch, isGripOccupation, normalizeOccupation } from "@/lib/gripTaxonomy";
-import { filterPrimaryOccupations, occupationCatalogue, occupationById, occupationId, type PrimaryOccupation } from "@/lib/primary-occupation";
+import { occupationCatalogue, occupationById, occupationId, type PrimaryOccupation } from "@/lib/primary-occupation";
 import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
 
 const DEPT_ICON: Record<string, LucideIcon> = {
@@ -49,7 +51,7 @@ export type ServerCreator = {
   role: string;
   positions: string[];
   primaryOccupation?: PrimaryOccupation | null;
-  crewDepartmentId?: string | null;
+  occupationIds?: string[];
   location: string;
   image: string;       // cover image (portfolio or avatar)
   avatar: string;      // circular avatar (always avatar_url)
@@ -582,11 +584,11 @@ function CreatorsInner({
     }
 
     if (selectedRoles.size > 0) {
-      result = filterPrimaryOccupations(result, null, [...selectedRoles]);
+      result = filterCrewOccupations(result, null, [...selectedRoles]);
     }
 
     if (sidebarDept) {
-      result = filterPrimaryOccupations(result, sidebarDept);
+      result = filterCrewOccupations(result, sidebarDept);
     }
 
     if (vendorOnly) result = result.filter((c) => c.isVendor === true);

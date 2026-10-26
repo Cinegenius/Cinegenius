@@ -1,3 +1,4 @@
+import { crewOccupationsError } from "@/lib/crew-occupations";
 import { primaryOccupationError } from "@/lib/primary-occupation";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
@@ -124,7 +125,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ungültige Profiltypen." }, { status: 400 });
   }
   const normalizedProfileTypes = normalizeProfileTypes(profile_types ?? [], profile_type ?? null);
-  const primaryError = primaryOccupationError(crew, positions);
+  const primaryError = primaryOccupationError(crew, positions) ?? crewOccupationsError(crew, positions);
   if (primaryError) fieldErrors.activity = primaryError;
   const hasPositions = Array.isArray(positions) && positions.some((position: unknown) => typeof position === "string" && position.trim());
   if (!hasPositions && normalizedProfileTypes.length === 0) fieldErrors.activity = "Bitte wähle mindestens eine Tätigkeit aus.";
@@ -297,7 +298,7 @@ export async function PATCH(req: NextRequest) {
       const types = Array.isArray(safe.profile_types) ? safe.profile_types as string[] : [];
       if (!hasPositions && types.length === 0) fieldErrors.activity = "Bitte wähle mindestens eine Tätigkeit aus.";
     }
-    const primaryError = primaryOccupationError(safe.crew, safe.positions);
+    const primaryError = primaryOccupationError(safe.crew, safe.positions) ?? crewOccupationsError(safe.crew, safe.positions);
     if (primaryError) fieldErrors.activity = primaryError;
     if (Object.keys(fieldErrors).length > 0) {
       return NextResponse.json({ error: "Bitte prüfe die markierten Pflichtfelder.", fieldErrors }, { status: 400 });

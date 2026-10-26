@@ -9,6 +9,7 @@ import Link from "next/link";
 import ListingPriceOptions from "@/components/ListingPriceOptions";
 import { listingPriceLabel } from "@/lib/listing-price";
 import PrimaryOccupationPicker from "@/components/PrimaryOccupationPicker";
+import { selectedCrewOccupations } from "@/lib/crew-occupations";
 import { primaryOccupationForPositions, occupationReference, orderPositionsByPrimary } from "@/lib/primary-occupation";
 import {
   ArrowLeft, ArrowRight, Building2, Camera, CheckCircle2, Film, ImagePlus,
@@ -432,7 +433,7 @@ export default function ProfileSetupWizard() {
             location: [progress.personCity.trim(), progress.personCountry.trim()].filter(Boolean).join(", "),
             profile_types: profileTypes, profile_type: profileTypes[0] ?? null,
             positions,
-            crew: { ...savedCrew.current, primaryOccupation: occupationReference(primary) },
+            crew: { ...savedCrew.current, primaryOccupation: occupationReference(primary), occupations: selectedCrewOccupations(positions, selectedRoles.map(item => ({departmentId: item.departmentId, roleId: `${item.departmentId}/${encodeURIComponent(item.role)}`}))) },
             ...(!profileExists ? { bio: progress.talentIntro.trim(), avatar_url: profilePhoto, available: true } : {
               ...(progress.talentIntro.trim() ? { bio: progress.talentIntro.trim() } : {}),
               ...(profilePhoto ? { avatar_url: profilePhoto } : {}),

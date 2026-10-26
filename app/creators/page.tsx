@@ -1,3 +1,4 @@
+import { crewOccupationIds } from "@/lib/crew-occupations";
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import { unstable_cache } from "next/cache";
@@ -5,7 +6,7 @@ import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
 import { getPrivateProfileIds } from "@/lib/trust";
 import CreatorsContent, { type ServerCreator } from "./CreatorsContent";
-import { primaryOccupationForPositions, occupationReference, isCrewDirectoryProfile, crewDepartmentForPositions } from "@/lib/primary-occupation";
+import { primaryOccupationForPositions, occupationReference, isCrewDirectoryProfile } from "@/lib/primary-occupation";
 import PageHeader from "@/components/PageHeader";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
 import { getProfileDisplayPositions, normalizeProfileTypes } from "@/lib/profile-display";
@@ -26,7 +27,7 @@ type CreatorProfileRow = {
   skills: string[] | null;
   role: string | null;
   positions: string[] | null;
-  crew: { primaryOccupation?: unknown } | null;
+  crew: { primaryOccupation?: unknown; occupations?: unknown } | null;
   available: boolean | null;
   avatar_url: string | null;
   portfolio_images: string[] | null;
@@ -85,7 +86,7 @@ const getCreatorDirectoryData = unstable_cache(
 
     return { listings, profiles, listingRatings, profileRatings };
   },
-  ["creator-directory-primary-v5"],
+  ["creator-directory-selected-occupations-v6"],
   { revalidate: 60, tags: ["creator-directory", "profiles", "listings"] },
 );
 
@@ -155,7 +156,7 @@ export default async function CreatorsPage({
       role: l.category ?? "Filmschaffende/r",
       positions: l.category ? [l.category] : [],
       primaryOccupation: occupationReference(primaryOccupationForPositions(null, l.category ? [l.category] : [])),
-      crewDepartmentId: crewDepartmentForPositions(null, l.category ? [l.category] : []),
+      occupationIds: crewOccupationIds({positions: l.category ? [l.category] : []}),
       location: l.city ?? "",
       image: l.image_url ?? "",
       avatar: l.image_url ?? "",
@@ -197,7 +198,7 @@ export default async function CreatorsPage({
         role: p.role ?? displayPositions[0] ?? typeLabel ?? "Filmschaffende/r",
         positions: displayPositions,
         primaryOccupation: occupationReference(primaryOccupationForPositions(p.crew?.primaryOccupation, p.positions ?? [], p.role)),
-        crewDepartmentId: crewDepartmentForPositions(p.crew?.primaryOccupation, p.positions ?? [], p.role),
+        occupationIds: crewOccupationIds(p),
         location: p.location ?? "",
         // cover: prefer first portfolio image, fall back to avatar
         image: (Array.isArray(p.portfolio_images) && p.portfolio_images.length > 0)

@@ -72,6 +72,7 @@ export function primaryOccupationError(crew: unknown, positions: unknown): strin
   return primaryOccupationForPositions(value, list) ? null : 'Bitte wähle eine Haupttätigkeit aus deinen ausgewählten Tätigkeiten aus.';
 }
 
+/** Main-job-only analysis helper. Public crew filters use filterCrewOccupations instead. */
 export function filterPrimaryOccupations<T extends {primaryOccupation?: PrimaryOccupation|null; crewDepartmentId?: string|null}>(profiles:readonly T[], departmentId:string|null, roles:readonly string[]=[]):T[] {
   const ids = new Set(roles.flatMap(role => byId.has(role) ? [byId.get(role)!.roleId] : occupationChoices([role]).map(option => option.roleId)));
   return profiles.filter(profile=>{
