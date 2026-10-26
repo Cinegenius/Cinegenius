@@ -1,4 +1,4 @@
-import { primaryOccupationForPositions, occupationReference } from "@/lib/primary-occupation";
+import { primaryOccupationForPositions, occupationReference, isCrewDirectoryProfile } from "@/lib/primary-occupation";
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
   const privateProfileIds = await getPrivateProfileIds((profiles ?? []).map((profile) => profile.user_id));
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const creators = (profiles ?? []).filter((profile) => !privateProfileIds.has(profile.user_id)).map((p: any) => {
+  const creators = (profiles ?? []).filter((profile) => !privateProfileIds.has(profile.user_id) && isCrewDirectoryProfile(profile)).map((p: any) => {
     const phys = p.physical ?? {};
     const avail = p.availability_config ?? {};
     const types = normalizeProfileTypes(p.profile_types, p.profile_type);
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
       name: p.display_name ?? "Unbekannt",
       role: p.role ?? displayPositions[0] ?? typeLabel ?? "Filmschaffende/r",
       positions: displayPositions,
-      primaryOccupation: occupationReference(primaryOccupationForPositions(p.crew?.primaryOccupation, p.positions ?? [])),
+      primaryOccupation: occupationReference(primaryOccupationForPositions(p.crew?.primaryOccupation, p.positions ?? [], p.role)),
       location: p.location ?? "",
       image: (Array.isArray(p.portfolio_images) && p.portfolio_images.length > 0) ? p.portfolio_images[0] : (p.avatar_url ?? ""),
       avatar: p.avatar_url ?? "",

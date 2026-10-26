@@ -1,3 +1,4 @@
+import { PROFILE_CATEGORY_MAP, type ProfileType } from './profile-types';
 import { departments, getDepartmentRoleSearchTerms } from './departments';
 
 export type PrimaryOccupation = { departmentId: string; roleId: string };
@@ -9,6 +10,17 @@ export const occupationCatalogue: OccupationOption[] = departments.flatMap(depar
   label, departmentLabel: department.label, aliases: getDepartmentRoleSearchTerms(department, label),
 })));
 const byId = new Map(occupationCatalogue.map(option => [option.roleId, option]));
+// Preserve references generated for older catalogue titles now consolidated as synonyms.
+for (const option of occupationCatalogue) {
+  for (const alias of option.aliases) {
+    const id = `${option.departmentId}/${encodeURIComponent(alias)}`;
+    if (!byId.has(id)) byId.set(id, option);
+  }
+}
+export function occupationId(departmentId: string, label: string): string {
+  return `${departmentId}/${encodeURIComponent(label)}`;
+}
+export function occupationById(id: string): OccupationOption | null { return byId.get(id) ?? null; }
 export function readPrimaryOccupation(value: unknown): OccupationOption | null {
   if (!value || typeof value !== 'object') return null;
   const record = value as Partial<PrimaryOccupation>;
@@ -19,13 +31,20 @@ export function occupationChoices(positions: readonly string[]): OccupationOptio
   const keys = new Set(positions.map(exactKey));
   return occupationCatalogue.filter(option => option.aliases.some(alias => keys.has(exactKey(alias))));
 }
-export function primaryOccupationForPositions(value: unknown, positions: readonly string[]): OccupationOption | null {
+export function primaryOccupationForPositions(value: unknown, positions: readonly string[], legacyPrimaryRole?: string | null): OccupationOption | null {
   const explicit = readPrimaryOccupation(value);
   if (explicit) return occupationChoices(positions).some(option => option.roleId === explicit.roleId) ? explicit : null;
+  // `role` was the explicit main title before crew.primaryOccupation existed.
+  // Never use a generic profile-type label synthesized for display here.
+  if (value == null && legacyPrimaryRole?.trim()) {
+    const legacy = occupationChoices([legacyPrimaryRole]);
+    if (legacy.length === 1 && (!positions.length || occupationChoices(positions).some(option => option.roleId === legacy[0].roleId))) return legacy[0];
+  }
   // An old single, unambiguous occupation is reliable. Never infer a main job from list order.
-  const uniquePositions = [...new Set(positions.map(exactKey))].filter(Boolean);
   const candidates = occupationChoices(positions);
-  return value == null && uniquePositions.length === 1 && candidates.length === 1 ? candidates[0] : null;
+  if (value != null || candidates.length !== 1) return null;
+  const aliases = new Set(candidates[0].aliases.map(exactKey));
+  return positions.every(position => !position.trim() || aliases.has(exactKey(position))) ? candidates[0] : null;
 }
 export function occupationReference(option: PrimaryOccupation | null): PrimaryOccupation | null {
   return option ? {departmentId: option.departmentId, roleId: option.roleId} : null;
@@ -39,11 +58,11 @@ export function primaryOccupationError(crew: unknown, positions: unknown): strin
 }
 
 export function filterPrimaryOccupations<T extends {primaryOccupation?: PrimaryOccupation|null}>(profiles:readonly T[], departmentId:string|null, roles:readonly string[]=[]):T[] {
-  const keys = new Set(roles.map(exactKey));
+  const ids = new Set(roles.flatMap(role => byId.has(role) ? [byId.get(role)!.roleId] : occupationChoices([role]).map(option => option.roleId)));
   return profiles.filter(profile=>{
     const primary=readPrimaryOccupation(profile.primaryOccupation);
     return (!departmentId || primary?.departmentId===departmentId)
-      && (!keys.size || !!primary?.aliases.some(alias=>keys.has(exactKey(alias))));
+      && (!roles.length || !!primary && ids.has(primary.roleId));
   });
 }
 export function occupiedPrimaryRoles(profiles:readonly {primaryOccupation?:PrimaryOccupation|null}[]) {
@@ -55,4 +74,12 @@ export function orderPositionsByPrimary(positions:readonly string[], primary:Pri
   const option=readPrimaryOccupation(primary);
   const index=option ? positions.findIndex(position=>option.aliases.some(alias=>exactKey(alias)===exactKey(position))) : -1;
   return index>0 ? [positions[index], ...positions.slice(0,index), ...positions.slice(index+1)] : [...positions];
+}
+
+/** Exclude offer-only accounts; a person can have a crew job and offers together. */
+export function isCrewDirectoryProfile(profile: {positions?: string[] | null; role?: string | null; profile_type?: string | null; profile_types?: string[] | null}): boolean {
+  const types = [profile.profile_type, ...(profile.profile_types ?? [])].filter(Boolean) as string[];
+  if (types.some(type => PROFILE_CATEGORY_MAP[type as ProfileType] && PROFILE_CATEGORY_MAP[type as ProfileType] !== 'vendor')) return true;
+  if (types.length && types.every(type => PROFILE_CATEGORY_MAP[type as ProfileType] === 'vendor' || type === 'company')) return false;
+  return occupationChoices(profile.positions ?? []).length > 0 || occupationChoices(profile.role ? [profile.role] : []).length > 0;
 }

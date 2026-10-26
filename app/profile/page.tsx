@@ -738,7 +738,7 @@ export default function ProfilePage() {
           setMemberships(profile.memberships ?? []);
           setPositions(profile.positions ?? []);
           crewDataRef.current = profile.crew ?? {};
-          setPrimaryOccupation(occupationReference(primaryOccupationForPositions(profile.crew?.primaryOccupation, profile.positions ?? [])));
+          setPrimaryOccupation(occupationReference(primaryOccupationForPositions(profile.crew?.primaryOccupation, profile.positions ?? [], profile.role)));
           setLanguages(profile.languages ?? []);
           setProfileImages(profile.profile_images ?? []);
           if (profile.avatar_url) {

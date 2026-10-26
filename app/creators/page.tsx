@@ -5,17 +5,13 @@ import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
 import { getPrivateProfileIds } from "@/lib/trust";
 import CreatorsContent, { type ServerCreator } from "./CreatorsContent";
-import { primaryOccupationForPositions, occupationReference } from "@/lib/primary-occupation";
+import { primaryOccupationForPositions, occupationReference, isCrewDirectoryProfile } from "@/lib/primary-occupation";
 import PageHeader from "@/components/PageHeader";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
 import { getProfileDisplayPositions, normalizeProfileTypes } from "@/lib/profile-display";
 import { getTranslations } from "next-intl/server";
 
-// All profile types shown on this page (crew, talent, creative + vendors/renters)
-const CREATOR_TYPES = new Set(
-  (Object.entries(PROFILE_CATEGORY_MAP) as [ProfileType, string][]).map(([type]) => type)
-);
-
+// Mixed person/offer accounts are retained; offer-only accounts are excluded below.
 const VENDOR_TYPES = new Set(
   (Object.entries(PROFILE_CATEGORY_MAP) as [ProfileType, string][])
     .filter(([, cat]) => cat === "vendor")
@@ -89,7 +85,7 @@ const getCreatorDirectoryData = unstable_cache(
 
     return { listings, profiles, listingRatings, profileRatings };
   },
-  ["creator-directory-primary-v2"],
+  ["creator-directory-primary-v3"],
   { revalidate: 60, tags: ["creator-directory", "profiles", "listings"] },
 );
 
@@ -178,12 +174,7 @@ export default async function CreatorsPage({
       if (privateProfileIds.has(p.user_id)) return false;
       // Don't show a second card for users who already have a creator listing
 
-      const types = normalizeProfileTypes(p.profile_types, p.profile_type);
-      // Show if any profile type belongs on this page (talent / crew / creative)
-      if (types.some((t) => CREATOR_TYPES.has(t as ProfileType))) return true;
-      // No profile type set yet (new/incomplete profile) → show by default
-      if (types.length === 0) return true;
-      return false;
+      return isCrewDirectoryProfile(p);
     })
     .map((p) => {
       const phys = p.physical ?? {};
@@ -204,7 +195,7 @@ export default async function CreatorsPage({
         name: p.display_name ?? "Unbekannt",
         role: p.role ?? displayPositions[0] ?? typeLabel ?? "Filmschaffende/r",
         positions: displayPositions,
-        primaryOccupation: occupationReference(primaryOccupationForPositions(p.crew?.primaryOccupation, p.positions ?? [])),
+        primaryOccupation: occupationReference(primaryOccupationForPositions(p.crew?.primaryOccupation, p.positions ?? [], p.role)),
         location: p.location ?? "",
         // cover: prefer first portfolio image, fall back to avatar
         image: (Array.isArray(p.portfolio_images) && p.portfolio_images.length > 0)

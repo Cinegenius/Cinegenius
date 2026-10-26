@@ -87,6 +87,10 @@ export const departments: Department[] = [
   },
   {
     id: "kamera",
+    roleAliases: {
+      "1st AC (Focus Puller)": ["Kameraassistenz", "1st AC", "1. Kameraassistenz"],
+      "2nd AC (Clapper / Loader)": ["2nd AC", "2. Kameraassistenz"],
+    },
     label: "Kamera",
     labels: { "de":"Kamera", "en":"Camera", "es":"Cámara", "it":"Camera", "cs":"Kamera", "hu":"Kamera" },
     emoji: "🎥",
@@ -130,6 +134,10 @@ export const departments: Department[] = [
   },
   {
     id: "licht",
+    roleAliases: {
+      "Gaffer (Oberbeleuchter)": ["Gaffer", "Oberbeleuchter", "Gaffer / Oberbeleuchter", "Oberbeleuchter / Gaffer", "Licht / Gaffer"],
+      "Beleuchter (Electrician)": ["Beleuchter", "Electrician", "Electrician / Lighting Tech"],
+    },
     label: "Licht",
     labels: { "de":"Licht", "en":"Lighting", "es":"Iluminación", "it":"Illuminazione", "cs":"Osvětlení", "hu":"Világítás" },
     emoji: "💡",

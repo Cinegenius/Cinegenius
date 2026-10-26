@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
@@ -10,11 +10,11 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
-import { departments, deptColors, getDeptLabel, getOccupationSearchTerms, type Department } from "@/lib/departments";
+import { departments, deptColors, getDeptLabel, getOccupationSearchTerms, getDepartmentRoleSearchTerms, type Department } from "@/lib/departments";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 import { rankByRatingConfidence } from "@/lib/rating-ranking";
 import { gripSearchTerms, isGripDepartmentSearch, isGripOccupation, normalizeOccupation } from "@/lib/gripTaxonomy";
-import { filterPrimaryOccupations, occupiedPrimaryRoles, type PrimaryOccupation } from "@/lib/primary-occupation";
+import { filterPrimaryOccupations, occupationCatalogue, occupationById, occupationId, type PrimaryOccupation } from "@/lib/primary-occupation";
 import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
 
 const DEPT_ICON: Record<string, LucideIcon> = {
@@ -280,14 +280,12 @@ function SortDropdown({ value, options, onChange }: { value: string; options: { 
 function RolePanel({
   dept,
   selectedRoles,
-  occupiedRoles,
   onToggle,
   onClose,
   locale,
 }: {
   dept: Department;
   selectedRoles: Set<string>;
-  occupiedRoles: Set<string>;
   onToggle: (role: string) => void;
   onClose: () => void;
   locale: string;
@@ -301,15 +299,15 @@ function RolePanel({
     inputRef.current?.focus();
   }, []);
 
-  const deptRoles = dept.roles.filter((r) => occupiedRoles.has(r));
+  const deptRoles = dept.roles;
 
   const visible = useMemo(() => {
     if (!search.trim()) return deptRoles;
     const q = search.toLowerCase();
-    return deptRoles.filter((r) => r.toLowerCase().includes(q));
-  }, [deptRoles, search]);
+    return deptRoles.filter((r) => getDepartmentRoleSearchTerms(dept, r).some(term => term.toLowerCase().includes(q)));
+  }, [deptRoles, search, dept]);
 
-  const selectedCount = deptRoles.filter((r) => selectedRoles.has(r)).length;
+  const selectedCount = deptRoles.filter((r) => selectedRoles.has(occupationId(dept.id, r))).length;
 
   return (
     <div className="h-full flex flex-col">
@@ -324,7 +322,7 @@ function RolePanel({
             </span>
           )}
         </div>
-        <button onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors p-0.5 rounded hover:bg-white/5">
+        <button aria-label="Berufsauswahl schließen" onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors p-0.5 rounded hover:bg-white/5">
           <X size={13} />
         </button>
       </div>
@@ -356,18 +354,18 @@ function RolePanel({
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-px">
             {visible.map((role) => {
-              const active = selectedRoles.has(role);
+              const active = selectedRoles.has(occupationId(dept.id, role));
               return (
                 <label
                   key={role}
-                  className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg cursor-pointer transition-all group
+                  className={`flex min-h-11 items-center gap-2 px-2.5 py-1.5 rounded-lg cursor-pointer transition-all group
                     ${active ? `${colors.bg} ${colors.text}` : `text-text-secondary hover:text-text-primary hover:bg-white/[0.03]`}`}
                 >
                   <div className={`w-3 h-3 rounded border flex items-center justify-center shrink-0 transition-all
                     ${active ? `${colors.border} bg-current/20` : "border-border group-hover:border-border-light"}`}>
                     {active && <div className="w-1.5 h-1.5 rounded-sm bg-current" />}
                   </div>
-                  <input type="checkbox" checked={active} onChange={() => onToggle(role)} className="sr-only" />
+                  <input type="checkbox" checked={active} onChange={() => onToggle(occupationId(dept.id, role))} className="sr-only" />
                   <span className="text-[11px] leading-snug">{role}</span>
                 </label>
               );
@@ -405,6 +403,13 @@ function CreatorsInner({
   const [apiPage, setApiPage] = useState(1);
   const [hasMoreFromApi, setHasMoreFromApi] = useState(hasMoreProfiles);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  useEffect(() => {
+    setAllCreators(serverCreators);
+    setApiPage(1);
+    setHasMoreFromApi(hasMoreProfiles);
+    setLoadError(false);
+  }, [serverCreators, hasMoreProfiles]);
 
   useEffect(() => subscribeToProfileUpdated(({ userId, avatarUrl, previousAvatarUrl }) => {
     if (!userId || avatarUrl === undefined) return;
@@ -416,7 +421,7 @@ function CreatorsInner({
     }));
   }), []);
 
-  async function loadMoreFromApi() {
+  const loadMoreFromApi = useCallback(async () => {
     if (loadingMore || !hasMoreFromApi) return;
     setLoadingMore(true);
     try {
@@ -428,10 +433,15 @@ function CreatorsInner({
       }
       setApiPage(p => p + 1);
       setHasMoreFromApi(!!hasMore);
-    } catch { /* ignore */ } finally {
+    } catch { setLoadError(true); } finally {
       setLoadingMore(false);
     }
-  }
+  }, [apiPage, hasMoreFromApi, loadingMore]);
+
+  // Fetch bounded pages so filters also see profiles beyond the initial page.
+  useEffect(() => {
+    if (hasMoreFromApi && !loadingMore && !loadError) void loadMoreFromApi();
+  }, [hasMoreFromApi, loadingMore, loadError, loadMoreFromApi]);
 
   // Derive available filter options from real data only
   const { availableCities, availableCountries, availableLanguages } = useMemo(() => {
@@ -512,29 +522,30 @@ function CreatorsInner({
   const [selectedRoles, setSelectedRoles] = useState<Set<string>>(new Set());
   const [sidebarDept, setSidebarDept] = useState<string | null>(null);
 
-  // Which department roles actually have at least one creator
-  const occupiedRoles = useMemo(() => {
-    return occupiedPrimaryRoles(allCreators);
-  }, [allCreators]);
-
-  // Only show departments that have at least one occupied role
-  const activeDepts = useMemo(
-    () => departments.filter((d) => d.roles.some((r) => occupiedRoles.has(r))),
-    [occupiedRoles]
-  );
+  // Same complete catalogue and order as onboarding and profile editing.
+  const activeDepts = departments;
 
   const [activeDept, setActiveDept] = useState<string>(() => activeDepts[0]?.id ?? departments[0].id);
 
-  const toggleRole = (role: string) =>
+  const toggleRole = (role: string) => {
+    const departmentId = occupationById(role)?.departmentId;
+    if (departmentId && sidebarDept && departmentId !== sidebarDept) {
+      setSidebarDept(departmentId);
+      setSelectedRoles(new Set([role]));
+      return;
+    }
     setSelectedRoles((prev) => {
       const next = new Set(prev);
       if (next.has(role)) next.delete(role);
       else next.add(role);
       return next;
     });
+  };
 
   const chooseSidebarDept = (deptId: string | null) => {
+    setSelectedRoles(new Set());
     setSidebarDept(deptId);
+    if (deptId) setActiveDept(deptId);
     if (deptId === null) setViewMode("grid");
   };
 
@@ -573,11 +584,7 @@ function CreatorsInner({
       result = filterPrimaryOccupations(result, null, [...selectedRoles]);
     }
 
-    if (sidebarDept === "__locations") {
-      result = result.filter((c) => hasProfileType(c, "location", "studio"));
-    } else if (sidebarDept === "__marktplatz") {
-      result = result.filter((c) => hasProfileType(c, "equipment", "vehicle", "studio", "props"));
-    } else if (sidebarDept) {
+    if (sidebarDept) {
       result = filterPrimaryOccupations(result, sidebarDept);
     }
 
@@ -642,8 +649,9 @@ function CreatorsInner({
   // Active filter chips: group by dept for context
   const activeChips = useMemo(() =>
     [...selectedRoles].map((role) => {
-      const dept = departments.find((d) => d.roles.includes(role));
-      return { role, dept };
+      const option = occupationById(role);
+      const dept = departments.find((d) => d.id === option?.departmentId);
+      return { role, label: option?.label ?? role, dept };
     }),
     [selectedRoles]
   );
@@ -666,7 +674,7 @@ function CreatorsInner({
 
   const mobileChips: BrowseChip[] = [
     ...(sidebarDept ? [{ id: "area", label: sidebarDept === "__locations" ? "Locations" : sidebarDept === "__marktplatz" ? "Marktplatz" : getDeptLabel(departments.find((department) => department.id === sidebarDept) ?? departments[0], locale), onRemove: () => chooseSidebarDept(null) }] : []),
-    ...[...selectedRoles].map((role) => ({ id: `role-${role}`, label: role, onRemove: () => removeRole(role) })),
+    ...[...selectedRoles].map((role) => ({ id: `role-${role}`, label: occupationById(role)?.label ?? role, onRemove: () => removeRole(role) })),
     ...(cityFilter ? [{ id: "city", label: cityFilter, onRemove: () => setCityFilter("") }] : []),
     ...(countryFilter ? [{ id: "country", label: countryFilter, onRemove: () => setCountryFilter("") }] : []),
     ...(languageFilter ? [{ id: "language", label: languageFilter, onRemove: () => setLanguageFilter("") }] : []),
@@ -705,12 +713,10 @@ function CreatorsInner({
         allCategoryLabel="Alle Bereiche"
         categories={[
           ...departments.map((department) => ({ value: department.id, label: getDeptLabel(department, locale) })),
-          { value: "__locations", label: "Locations" },
-          { value: "__marktplatz", label: "Marktplatz" },
         ]}
         categoryValue={sidebarDept ?? ""}
         onCategoryChange={(value) => { setSelectedRoles(new Set()); chooseSidebarDept(value || null); }}
-        resultSummary={t("results", { count: filtered.length })}
+        resultSummary={hasMoreFromApi ? `${t("results", { count: filtered.length })} · ${loadError ? "Laden unvollständig" : "Weitere Profile werden geladen …"}` : t("results", { count: filtered.length })}
         filterCount={secondaryFilterCount + (sidebarDept ? 1 : 0)}
         chips={mobileChips}
         onReset={resetMobileFilters}
@@ -721,7 +727,7 @@ function CreatorsInner({
           <MobileFilterSelect value={profileTypeFilter} onChange={setProfileTypeFilter} placeholder={t("filterAll")} options={availableProfileTypes.map((value) => ({ value, label: PROFILE_TYPE_MAP[value] ?? value }))} />
         </MobileFilterField>
         <MobileFilterField label="Rolle">
-          <MobileFilterSelect value={[...selectedRoles][0] ?? ""} onChange={(value) => setSelectedRoles(value ? new Set([value]) : new Set())} placeholder="Alle Rollen" options={[...new Set(departments.flatMap((department) => department.roles))].sort((a, b) => a.localeCompare(b, locale)).map((value) => ({ value, label: value }))} />
+          <MobileFilterSelect value={[...selectedRoles][0] ?? ""} onChange={(value) => setSelectedRoles(value ? new Set([value]) : new Set())} placeholder="Alle Rollen" options={occupationCatalogue.filter(option => !sidebarDept || option.departmentId === sidebarDept).map(option => ({ value: option.roleId, label: `${option.departmentLabel} → ${option.label}` }))} />
         </MobileFilterField>
         <MobileFilterField label={t("filterCity")}>
           <MobileFilterSelect value={cityFilter} onChange={setCityFilter} placeholder="Alle Städte" options={availableCities.map((value) => ({ value, label: value }))} />
@@ -824,11 +830,11 @@ function CreatorsInner({
         {/* Row 3 — Active role chips (nur wenn aktiv) */}
         {activeChips.length > 0 && (
           <div className="browse-toolbar site-container flex flex-wrap items-center gap-1.5 py-2">
-            {activeChips.map(({ role, dept }) => {
+            {activeChips.map(({ role, label, dept }) => {
               const colors = dept ? deptColors(dept.color) : deptColors("slate");
               return (
                 <span key={role} className={`inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-full border font-medium ${colors.bg} ${colors.border} ${colors.text}`}>
-                  {role}
+                  {label}
                   <button onClick={() => removeRole(role)} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               );
@@ -881,7 +887,7 @@ function CreatorsInner({
 
               {/* Rollen — einfache Chips pro Abteilung, keine Suchleiste */}
               {activeDepts.map((dept) => {
-                const deptRoles = dept.roles.filter((r) => occupiedRoles.has(r));
+                const deptRoles = dept.roles;
                 if (deptRoles.length === 0) return null;
                 const colors = deptColors(dept.color);
                 return (
@@ -891,11 +897,11 @@ function CreatorsInner({
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {deptRoles.map((role) => {
-                        const active = selectedRoles.has(role);
+                        const active = selectedRoles.has(occupationId(dept.id, role));
                         return (
                           <button
                             key={role}
-                            onClick={() => toggleRole(role)}
+                            onClick={() => toggleRole(occupationId(dept.id, role))}
                             className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
                               active ? `${colors.bg} ${colors.text} border-transparent` : "border-border text-text-muted bg-bg-secondary"
                             }`}
@@ -1087,6 +1093,10 @@ function CreatorsInner({
 
           {/* Row 2: Filters */}
           <div className="flex items-center gap-2 overflow-x-auto lg:overflow-visible pb-0.5" style={{ scrollbarWidth: "none" }}>
+            <button type="button" onClick={() => setFilterOpen(value => !value)} aria-expanded={filterOpen}
+              className={`flex min-h-11 items-center gap-2 rounded-lg border px-3 text-xs font-medium ${filterOpen || selectedRoles.size ? "border-gold/30 text-gold bg-gold/10" : "border-border text-text-muted"}`}>
+              Beruf auswählen <ChevronDown size={12} />
+            </button>
             {/* Available toggle */}
             <label className="flex items-center gap-1.5 text-xs text-text-muted cursor-pointer hover:text-text-secondary transition-colors select-none shrink-0">
               <div
@@ -1193,10 +1203,10 @@ function CreatorsInner({
                 <div className="flex overflow-x-auto gap-1.5 p-3 border-b border-border bg-bg-secondary" style={{ scrollbarWidth: "none" }}>
                   {activeDepts.map((dept) => {
                     const colors = deptColors(dept.color);
-                    const deptSelected = dept.roles.filter((r) => selectedRoles.has(r) && occupiedRoles.has(r)).length;
+                    const deptSelected = dept.roles.filter((r) => selectedRoles.has(occupationId(dept.id, r))).length;
                     const isActive = activeDept === dept.id;
                     return (
-                      <button key={dept.id} onClick={() => setActiveDept(dept.id)}
+                      <button key={dept.id} onClick={() => chooseSidebarDept(dept.id)}
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border shrink-0 transition-all ${
                           isActive ? `${colors.bg} ${colors.text} border-transparent` : "border-border text-text-muted"
                         }`}>
@@ -1207,20 +1217,19 @@ function CreatorsInner({
                   })}
                 </div>
                 <div className="p-3">
-                  <RolePanel key={activeDeptData.id} dept={activeDeptData} selectedRoles={selectedRoles} occupiedRoles={occupiedRoles} onToggle={toggleRole} onClose={() => setFilterOpen(false)} locale={locale} />
+                  <RolePanel key={activeDeptData.id} dept={activeDeptData} selectedRoles={selectedRoles} onToggle={toggleRole} onClose={() => setFilterOpen(false)} locale={locale} />
                 </div>
               </div>
               {/* Desktop: two-panel */}
-              <div className="hidden sm:flex" style={{ minHeight: "260px" }}>
+              <div className="hidden h-80 sm:flex">
                 <div className="w-44 shrink-0 border-r border-border overflow-y-auto bg-bg-secondary">
                   {activeDepts.map((dept) => {
                     const colors = deptColors(dept.color);
-                    const deptSelected = dept.roles.filter((r) => selectedRoles.has(r) && occupiedRoles.has(r)).length;
+                    const deptSelected = dept.roles.filter((r) => selectedRoles.has(occupationId(dept.id, r))).length;
                     const isActive = activeDept === dept.id;
                     return (
                       <button key={dept.id}
-                        onMouseEnter={() => setActiveDept(dept.id)}
-                        onClick={() => setActiveDept(dept.id)}
+                        onClick={() => chooseSidebarDept(dept.id)}
                         className={`w-full flex items-center justify-between px-3 py-2 text-left text-xs transition-colors border-b border-border/40 last:border-0 ${
                           isActive ? `${colors.bg} ${colors.text} font-semibold` : "text-text-muted hover:text-text-secondary hover:bg-white/[0.02]"
                         }`}>
@@ -1233,7 +1242,7 @@ function CreatorsInner({
                   })}
                 </div>
                 <div className="flex-1 overflow-y-auto p-3">
-                  <RolePanel key={activeDeptData.id} dept={activeDeptData} selectedRoles={selectedRoles} occupiedRoles={occupiedRoles} onToggle={toggleRole} onClose={() => setFilterOpen(false)} locale={locale} />
+                  <RolePanel key={activeDeptData.id} dept={activeDeptData} selectedRoles={selectedRoles} onToggle={toggleRole} onClose={() => setFilterOpen(false)} locale={locale} />
                 </div>
               </div>
             </div>
@@ -1242,14 +1251,14 @@ function CreatorsInner({
           {/* Row 4: Active filter chips */}
           {activeChips.length > 0 && (
             <div className="flex flex-wrap gap-1.5 items-center">
-              {activeChips.map(({ role, dept }) => {
+              {activeChips.map(({ role, label, dept }) => {
                 const colors = dept ? deptColors(dept.color) : deptColors("slate");
                 return (
                   <span
                     key={role}
                     className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium ${colors.bg} ${colors.border} ${colors.text}`}
                   >
-                    {dept?.emoji} {role}
+                    {dept?.emoji} {label}
                     <button onClick={() => removeRole(role)} className="hover:opacity-70 transition-opacity ml-0.5">
                       <X size={9} />
                     </button>
@@ -1267,6 +1276,7 @@ function CreatorsInner({
         </div>
       </div>
 
+      {loadError && <div className="site-container py-3"><p role="alert" className="text-sm text-text-muted">Weitere Profile konnten nicht geladen werden. Die Trefferzahl ist noch unvollständig. <button className="min-h-11 text-gold underline" onClick={() => setLoadError(false)}>Erneut versuchen</button></p></div>}
       {/* ── Results ─────────────────────────────────────────────────────────── */}
       {(() => {
         const isAllAreas = sidebarDept === null;
@@ -1314,14 +1324,14 @@ function CreatorsInner({
                 })}
                 <div className="pt-3 mt-2 border-t border-border/50 space-y-0.5">
                   {([
-                    { id: "__locations", label: "Locations", Icon: MapPin },
-                    { id: "__marktplatz", label: "Marktplatz", Icon: ShoppingBag },
+                    { id: "/locations", label: "Locations", Icon: MapPin },
+                    { id: "/props", label: "Marktplatz", Icon: ShoppingBag },
                   ] as const).map(({ id, label, Icon }) => {
                     const isActive = sidebarDept === id;
                     return (
                       <button
                         key={id}
-                        onClick={() => chooseSidebarDept(isActive ? null : id)}
+                        onClick={() => { window.location.href = id; }}
                         className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
                           isActive
                             ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
@@ -1361,7 +1371,7 @@ function CreatorsInner({
               >
                 Alle Bereiche
               </button>
-              {[...departments].sort((a, b) => a.label.localeCompare(b.label, "de")).map((dept) => {
+              {departments.map((dept) => {
                 const isActive = sidebarDept === dept.id;
                 return (
                   <button
@@ -1378,14 +1388,14 @@ function CreatorsInner({
                 );
               })}
               {([
-                { id: "__locations", label: "Locations" },
-                { id: "__marktplatz", label: "Marktplatz" },
+                { id: "/locations", label: "Locations" },
+                { id: "/props", label: "Marktplatz" },
               ] as const).map(({ id, label }) => {
                 const isActive = sidebarDept === id;
                 return (
                   <button
                     key={id}
-                    onClick={() => chooseSidebarDept(isActive ? null : id)}
+                    onClick={() => { window.location.href = id; }}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
                       isActive
                         ? "bg-gold/10 text-gold border-gold/40"
@@ -1401,7 +1411,7 @@ function CreatorsInner({
             {/* Count */}
             <p className="hidden xl:block text-sm text-text-muted mb-5">
               <span className="text-text-primary font-semibold">
-                {t("results", { count: filteredCrew.length })}
+                {t("results", { count: filteredCrew.length })}{hasMoreFromApi ? " · Laden noch nicht abgeschlossen" : ""}
               </span>
               {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
             </p>
