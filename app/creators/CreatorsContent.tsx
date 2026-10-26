@@ -14,7 +14,7 @@ import { departments, deptColors, getDeptLabel, getOccupationSearchTerms, type D
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 import { rankByRatingConfidence } from "@/lib/rating-ranking";
 import { gripSearchTerms, isGripDepartmentSearch, isGripOccupation, normalizeOccupation } from "@/lib/gripTaxonomy";
-import { findOccupiedCreatorRoles, matchesCreatorRole } from "@/lib/creator-role-matching";
+import { filterPrimaryOccupations, occupiedPrimaryRoles, type PrimaryOccupation } from "@/lib/primary-occupation";
 import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
 
 const DEPT_ICON: Record<string, LucideIcon> = {
@@ -44,9 +44,11 @@ const PAGE_SIZE = 24;
 
 export type ServerCreator = {
   id: string;
+  ownerId?: string;
   name: string;
   role: string;
   positions: string[];
+  primaryOccupation?: PrimaryOccupation | null;
   location: string;
   image: string;       // cover image (portfolio or avatar)
   avatar: string;      // circular avatar (always avatar_url)
@@ -381,9 +383,11 @@ function RolePanel({
 
 function CreatorsInner({
   serverCreators,
+  hasMoreProfiles = false,
   initialFilters,
 }: {
   serverCreators: ServerCreator[];
+  hasMoreProfiles?: boolean;
   initialFilters: { query: string; city: string; sort: string };
 }) {
   const tc = useTranslations("common");
@@ -399,7 +403,7 @@ function CreatorsInner({
   // allCreators muss VOR den useMemo-Aufrufen deklariert sein
   const [allCreators, setAllCreators] = useState<ServerCreator[]>(serverCreators);
   const [apiPage, setApiPage] = useState(1);
-  const [hasMoreFromApi, setHasMoreFromApi] = useState(serverCreators.length >= 96);
+  const [hasMoreFromApi, setHasMoreFromApi] = useState(hasMoreProfiles);
   const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => subscribeToProfileUpdated(({ userId, avatarUrl, previousAvatarUrl }) => {
@@ -417,11 +421,12 @@ function CreatorsInner({
     setLoadingMore(true);
     try {
       const res = await fetch(`/api/creators?page=${apiPage}`);
+      if (!res.ok) throw new Error("Profile konnten nicht geladen werden.");
       const { creators, hasMore } = await res.json();
       if (creators?.length) {
-        setAllCreators(prev => [...prev, ...creators]);
-        setApiPage(p => p + 1);
+        setAllCreators(prev => [...new Map([...prev.filter(creator => !creator.id.startsWith("listing_") || !creators.some((profile: ServerCreator) => profile.id === creator.ownerId)), ...creators].map(creator => [creator.id, creator])).values()]);
       }
+      setApiPage(p => p + 1);
       setHasMoreFromApi(!!hasMore);
     } catch { /* ignore */ } finally {
       setLoadingMore(false);
@@ -509,7 +514,7 @@ function CreatorsInner({
 
   // Which department roles actually have at least one creator
   const occupiedRoles = useMemo(() => {
-    return findOccupiedCreatorRoles(allCreators);
+    return occupiedPrimaryRoles(allCreators);
   }, [allCreators]);
 
   // Only show departments that have at least one occupied role
@@ -565,9 +570,7 @@ function CreatorsInner({
     }
 
     if (selectedRoles.size > 0) {
-      result = result.filter((c) =>
-        [...selectedRoles].some((role) => matchesCreatorRole(c, role))
-      );
+      result = filterPrimaryOccupations(result, null, [...selectedRoles]);
     }
 
     if (sidebarDept === "__locations") {
@@ -575,8 +578,7 @@ function CreatorsInner({
     } else if (sidebarDept === "__marktplatz") {
       result = result.filter((c) => hasProfileType(c, "equipment", "vehicle", "studio", "props"));
     } else if (sidebarDept) {
-      const deptRoles = departments.find((d) => d.id === sidebarDept)?.roles ?? [];
-      result = result.filter((c) => deptRoles.some((role) => matchesCreatorRole(c, role)));
+      result = filterPrimaryOccupations(result, sidebarDept);
     }
 
     if (vendorOnly) result = result.filter((c) => c.isVendor === true);
@@ -708,7 +710,7 @@ function CreatorsInner({
         ]}
         categoryValue={sidebarDept ?? ""}
         onCategoryChange={(value) => { setSelectedRoles(new Set()); chooseSidebarDept(value || null); }}
-        resultSummary={isTopMode ? "Top 20 nach Bewertung" : t("results", { count: filtered.length })}
+        resultSummary={t("results", { count: filtered.length })}
         filterCount={secondaryFilterCount + (sidebarDept ? 1 : 0)}
         chips={mobileChips}
         onReset={resetMobileFilters}
@@ -844,7 +846,7 @@ function CreatorsInner({
         <div className="site-container flex items-center justify-between py-2.5">
           <p className="text-xs text-text-muted">
             {isTopMode ? (
-              <span className="text-gold font-semibold">Top 20 nach Bewertung</span>
+              <span className="text-gold font-semibold">{t("results", { count: filtered.length })}</span>
             ) : (
               <span className="text-text-primary font-semibold">{t("results", { count: filtered.length })}</span>
             )}
@@ -1268,8 +1270,7 @@ function CreatorsInner({
       {/* ── Results ─────────────────────────────────────────────────────────── */}
       {(() => {
         const isAllAreas = sidebarDept === null;
-        const isVendorCategory = sidebarDept === "__locations" || sidebarDept === "__marktplatz";
-        const filteredCrew = isAllAreas || isVendorCategory ? filtered : filtered.filter((c) => !c.isVendor);
+        const filteredCrew = filtered;
         const crewVisible  = filteredCrew.slice(0, visibleCount);
 
         return (
@@ -1553,10 +1554,12 @@ function CreatorsInner({
 
 export default function CreatorsContent({
   serverCreators,
+  hasMoreProfiles = false,
   initialFilters,
 }: {
   serverCreators: ServerCreator[];
+  hasMoreProfiles?: boolean;
   initialFilters: { query: string; city: string; sort: string };
 }) {
-  return <CreatorsInner serverCreators={serverCreators} initialFilters={initialFilters} />;
+  return <CreatorsInner key={JSON.stringify(serverCreators.map(creator => [creator.id, creator.primaryOccupation]))} serverCreators={serverCreators} hasMoreProfiles={hasMoreProfiles} initialFilters={initialFilters} />;
 }

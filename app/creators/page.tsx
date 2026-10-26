@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
 import { getPrivateProfileIds } from "@/lib/trust";
 import CreatorsContent, { type ServerCreator } from "./CreatorsContent";
+import { primaryOccupationForPositions, occupationReference } from "@/lib/primary-occupation";
 import PageHeader from "@/components/PageHeader";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
 import { getProfileDisplayPositions, normalizeProfileTypes } from "@/lib/profile-display";
@@ -29,6 +30,7 @@ type CreatorProfileRow = {
   skills: string[] | null;
   role: string | null;
   positions: string[] | null;
+  crew: { primaryOccupation?: unknown } | null;
   available: boolean | null;
   avatar_url: string | null;
   portfolio_images: string[] | null;
@@ -68,7 +70,7 @@ const getCreatorDirectoryData = unstable_cache(
         .limit(300),
       db
         .from("profiles")
-        .select("user_id, display_name, location, bio, skills, role, positions, available, avatar_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point, last_seen_at")
+        .select("user_id, display_name, location, bio, skills, role, positions, crew, available, avatar_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point, last_seen_at")
         .not("display_name", "is", null)
         .neq("display_name", "")
         .order("created_at", { ascending: false })
@@ -87,7 +89,7 @@ const getCreatorDirectoryData = unstable_cache(
 
     return { listings, profiles, listingRatings, profileRatings };
   },
-  ["creator-directory-v1"],
+  ["creator-directory-primary-v2"],
   { revalidate: 60, tags: ["creator-directory", "profiles", "listings"] },
 );
 
@@ -141,13 +143,22 @@ export default async function CreatorsPage({
   ]);
   const hasProfile = !!ownProfile.data?.display_name;
 
-  const fromListings: ServerCreator[] = listings.map((l) => {
+  const profileOwnerIds = new Set(profiles.map(profile => profile.user_id));
+  const seenListingOwners = new Set<string>();
+  const fromListings: ServerCreator[] = listings.filter(listing => {
+    if (!listing.user_id) return true;
+    if (profileOwnerIds.has(listing.user_id) || seenListingOwners.has(listing.user_id)) return false;
+    seenListingOwners.add(listing.user_id);
+    return true;
+  }).map((l) => {
     const { skills, credits } = parseCreatorDescription(l.description ?? "");
     return {
       id: `listing_${l.id}`,        // prefix to avoid collision with user IDs
+      ownerId: l.user_id ?? undefined,
       name: l.title,
       role: l.category ?? "Filmschaffende/r",
       positions: l.category ? [l.category] : [],
+      primaryOccupation: occupationReference(primaryOccupationForPositions(null, l.category ? [l.category] : [])),
       location: l.city ?? "",
       image: l.image_url ?? "",
       avatar: l.image_url ?? "",
@@ -162,16 +173,11 @@ export default async function CreatorsPage({
     };
   });
 
-  // User IDs that already have a creator listing → suppress their profile card
-  const listingOwnerIds = new Set(
-    listings.map((l) => l.user_id).filter(Boolean)
-  );
-
   const fromProfiles: ServerCreator[] = profiles
     .filter((p) => {
       if (privateProfileIds.has(p.user_id)) return false;
       // Don't show a second card for users who already have a creator listing
-      if (listingOwnerIds.has(p.user_id)) return false;
+
       const types = normalizeProfileTypes(p.profile_types, p.profile_type);
       // Show if any profile type belongs on this page (talent / crew / creative)
       if (types.some((t) => CREATOR_TYPES.has(t as ProfileType))) return true;
@@ -198,6 +204,7 @@ export default async function CreatorsPage({
         name: p.display_name ?? "Unbekannt",
         role: p.role ?? displayPositions[0] ?? typeLabel ?? "Filmschaffende/r",
         positions: displayPositions,
+        primaryOccupation: occupationReference(primaryOccupationForPositions(p.crew?.primaryOccupation, p.positions ?? [])),
         location: p.location ?? "",
         // cover: prefer first portfolio image, fall back to avatar
         image: (Array.isArray(p.portfolio_images) && p.portfolio_images.length > 0)
@@ -253,6 +260,7 @@ export default async function CreatorsPage({
       />
       <CreatorsContent
         serverCreators={serverCreators}
+        hasMoreProfiles={profiles.length >= 96}
         initialFilters={{
           query: Array.isArray(params.q) ? params.q[0] ?? "" : params.q ?? "",
           city: Array.isArray(params.city) ? params.city[0] ?? "" : params.city ?? "",

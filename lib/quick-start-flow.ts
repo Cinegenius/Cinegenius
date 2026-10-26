@@ -1,3 +1,4 @@
+import { primaryOccupationForPositions, occupationReference, type PrimaryOccupation } from "./primary-occupation";
 import { departments, getDepartmentRoleSearchTerms, getProfileTypesForDepartment } from "@/lib/departments";
 import { gripSearchTerms, normalizeOccupation } from "@/lib/gripTaxonomy";
 import type { ProfileType } from "@/lib/profile-types";
@@ -40,6 +41,7 @@ export type QuickStartDraft = {
   personCountry: string;
   activeIntent: QuickStartIntent | null;
   talentIntro: string;
+  primaryOccupation?: PrimaryOccupation | null;
   sections: Partial<Record<QuickStartIntent, QuickStartIntentData>>;
   completed: { profile: boolean; listings: Partial<Record<"location" | "equipment", string>>; company?: string };
   requestKeys: Partial<Record<"location" | "equipment" | "company", string>>;
@@ -222,6 +224,7 @@ export function normalizeQuickStartDraft(value: unknown): QuickStartDraft {
     activeIntent,
     talentIntro: typeof input.talentIntro === "string" ? input.talentIntro.slice(0, 1200) : "",
     sections,
+    primaryOccupation: occupationReference(primaryOccupationForPositions(input.primaryOccupation, [...(sections.crew?.roles ?? []), ...(sections.talent?.roles ?? [])].map(item=>item.role))),
     completed: {
       profile: completedInput.profile === true,
       listings: {
@@ -349,7 +352,7 @@ export function validateQuickStartScreen(draft: QuickStartDraft, screen: QuickSt
   return null;
 }
 
-export function validateQuickStartDraft(draft: QuickStartDraft): QuickStartValidation | null {
+export function validateQuickStartDraft(draft: QuickStartDraft, { requirePrimary = true } = {}): QuickStartValidation | null {
   const name = validateQuickStartScreen(draft, "name");
   if (name) return name;
   const goals = validateQuickStartScreen(draft, "goals");
@@ -360,6 +363,8 @@ export function validateQuickStartDraft(draft: QuickStartDraft): QuickStartValid
     const details = validateQuickStartIntentDetails(draft, intent);
     if (details) return details;
   }
+  const personalRoles = [...(draft.sections.crew?.roles ?? []), ...(draft.sections.talent?.roles ?? [])];
+  if (requirePrimary && personalRoles.length && !primaryOccupationForPositions(draft.primaryOccupation, personalRoles.map(item=>item.role))) return {field: "primaryOccupation", message: "Bitte wähle deine Haupttätigkeit aus."};
   const intro = validateQuickStartScreen(draft, "intro");
   if (intro) return intro;
   return null;

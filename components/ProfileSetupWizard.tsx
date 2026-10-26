@@ -6,6 +6,8 @@ import { useUser } from "@clerk/nextjs";
 import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import PrimaryOccupationPicker from "@/components/PrimaryOccupationPicker";
+import { primaryOccupationForPositions, occupationReference, orderPositionsByPrimary } from "@/lib/primary-occupation";
 import {
   ArrowLeft, ArrowRight, Building2, Camera, CheckCircle2, Film, ImagePlus,
   Loader2, MapPin, Package, Search, Trash2, Lock, UserRound,
@@ -100,6 +102,7 @@ export default function ProfileSetupWizard() {
   const [companyCategorySearch, setCompanyCategorySearch] = useState("");
   const [countryOther, setCountryOther] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const savedCrew = useRef<Record<string, unknown>>({});
   const saveQueue = useMemo(() => createOnboardingSaveQueue(async (value) => {
     setSaveState("saving");
     try {
@@ -143,6 +146,7 @@ export default function ProfileSetupWizard() {
       if (!active) return;
       setProfileIsPrivate(settings?.settings?.profile_visibility === "private");
       setProfileExists(profile?.exists === true);
+      savedCrew.current = profile?.profile?.crew ?? {};
       const profileComplete = hasProfileBasics(profile?.profile);
       const hasInProgressDraft = !!saved?.quickStart && saved.setupComplete !== true;
       if (saved?.setupComplete && (profileComplete || hasCompletedNonPersonalSetup(saved))) {
@@ -161,7 +165,7 @@ export default function ProfileSetupWizard() {
       if (!profileComplete && nextDraft.completed.profile) nextDraft = { ...nextDraft, completed: { ...nextDraft.completed, profile: false } };
       if (resumeIncomplete && hasInProgressDraft) {
         const missing = validateQuickStartDraft(nextDraft);
-        if (missing) nextDraft = { ...nextDraft, step: screenForField(missing.field), activeIntent: intentForField(missing.field) ?? nextDraft.activeIntent };
+        if (missing) nextDraft = { ...nextDraft, step: missing.field === "primaryOccupation" ? "review" : screenForField(missing.field), activeIntent: intentForField(missing.field) ?? nextDraft.activeIntent };
       }
       setDraft(nextDraft);
       setCountryOther(!countries.includes(nextDraft.personCountry));
@@ -399,7 +403,7 @@ export default function ProfileSetupWizard() {
     if (saving || retrySeconds > 0) return;
     const validation = validateQuickStartDraft(draft);
     if (validation) {
-      const firstBadScreen = screenForField(validation.field);
+      const firstBadScreen = validation.field === "primaryOccupation" ? "review" : screenForField(validation.field);
       setError(validation.message);
       const matchingIntent = intentForField(validation.field) ?? activeIntent;
       const corrected = { ...draft, step: firstBadScreen, activeIntent: matchingIntent };
@@ -415,7 +419,8 @@ export default function ProfileSetupWizard() {
       if (!isQuickStartContentSaved(progress) && !(await persist(progress))) return;
 
       if ((progress.intents.includes("crew") || progress.intents.includes("talent")) && !progress.completed.profile) {
-        const positions = selectedRoles.map((role) => role.role);
+        const primary = primaryOccupationForPositions(progress.primaryOccupation, selectedRoles.map(role=>role.role));
+        const positions = orderPositionsByPrimary(selectedRoles.map(role=>role.role), primary);
         const profileTypes = getQuickStartProfileTypesForRoles(selectedRoles);
         const profilePhoto = progress.sections.crew?.imageUrl || progress.sections.talent?.imageUrl || null;
         const response = await fetch("/api/profile", {
@@ -425,6 +430,7 @@ export default function ProfileSetupWizard() {
             location: [progress.personCity.trim(), progress.personCountry.trim()].filter(Boolean).join(", "),
             profile_types: profileTypes, profile_type: profileTypes[0] ?? null,
             positions,
+            crew: { ...savedCrew.current, primaryOccupation: occupationReference(primary) },
             ...(!profileExists ? { bio: progress.talentIntro.trim(), avatar_url: profilePhoto, available: true } : {
               ...(progress.talentIntro.trim() ? { bio: progress.talentIntro.trim() } : {}),
               ...(profilePhoto ? { avatar_url: profilePhoto } : {}),
@@ -660,7 +666,7 @@ export default function ProfileSetupWizard() {
           <ReviewSection title="Dein Ort" onEdit={() => editReview("location")}><ReviewRow label="Standort" value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} /></ReviewSection>
           <ReviewSection title="Deine Auswahl" onEdit={() => editReview("goals")}><p className="break-words text-sm text-text-primary">{selectedIntentTitles.join(" · ") || "—"}</p></ReviewSection>
           {(draft.intents.includes("crew") || draft.intents.includes("talent")) && <>
-            <ReviewSection title="Dein persönliches Profil" onEdit={() => editReview("details", draft.intents.includes("crew") ? "crew" : "talent")}><ReviewRow label="Tätigkeiten" value={selectedRoles.map((role) => role.role).join(", ")} /><ReviewRow label="Standort" value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} /><p className="rounded-xl border border-amber-400/25 bg-amber-500/5 p-3 text-xs leading-5 text-text-muted">Mit „Profil veröffentlichen“ erstellst du dein Profil. Deine gespeicherten Sichtbarkeitseinstellungen bleiben erhalten.</p></ReviewSection>
+            <ReviewSection title="Dein persönliches Profil" onEdit={() => editReview("details", draft.intents.includes("crew") ? "crew" : "talent")}><ReviewRow label="Tätigkeiten" value={selectedRoles.map((role) => role.role).join(", ")} /><PrimaryOccupationPicker id="quick-start-primary-occupation" positions={selectedRoles.map(role=>role.role)} value={draft.primaryOccupation ?? null} onChange={value=>update("primaryOccupation", value)} /><ReviewRow label="Standort" value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} /><p className="rounded-xl border border-amber-400/25 bg-amber-500/5 p-3 text-xs leading-5 text-text-muted">Mit „Profil veröffentlichen“ erstellst du dein Profil. Deine gespeicherten Sichtbarkeitseinstellungen bleiben erhalten.</p></ReviewSection>
             <ReviewSection title="Foto und Vorstellung" onEdit={() => editReview("intro", draft.intents.includes("crew") ? "crew" : "talent")}>{draft.sections.crew?.imageUrl && <Image src={draft.sections.crew.imageUrl} alt="Profilfoto" width={240} height={240} className="h-20 w-20 rounded-xl object-cover" />}{draft.sections.talent?.imageUrl && <Image src={draft.sections.talent.imageUrl} alt="Profilfoto" width={240} height={240} className="h-20 w-20 rounded-xl object-cover" />}<ReviewRow label="Vorstellung" value={draft.talentIntro} /></ReviewSection>
           </>}
           {draft.intents.filter((intent) => intent === "location" || intent === "equipment").map((intent) => { const data = draft.sections[intent] ?? createQuickStartIntentData(); const categoryName = QUICK_START_CATEGORIES[intent].find((item) => item.value === data.category)?.label ?? data.category; return <div key={intent} className="space-y-3"><ReviewSection title={QUICK_START_INTENT_LABELS[intent]} onEdit={() => editReview("details", intent)}><ReviewRow label="Art" value={categoryName} /><ReviewRow label="Angebot" value={data.title} /><ReviewRow label="Standort" value={data.city} /></ReviewSection><ReviewSection title={`${QUICK_START_INTENT_LABELS[intent]}: Ergänzungen`} onEdit={() => editReview("intro", intent)}>{data.description && <ReviewRow label="Beschreibung" value={data.description} />}<ReviewRow label="Preis" value={data.priceOnRequest ? "Auf Anfrage" : `${data.price} € pro Tag`} />{data.imageUrl && <Image src={data.imageUrl} alt="Angebotsfoto" width={720} height={480} sizes="(max-width: 640px) 100vw, 640px" className="max-h-40 w-full rounded-lg object-contain" />}<p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">Dein Angebot wird als privater Entwurf gespeichert. Du entscheidest später ausdrücklich, ob du es veröffentlichst.</p></ReviewSection></div>; })}

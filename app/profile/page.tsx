@@ -16,6 +16,8 @@ import LicensePicker from "@/components/LicensePicker";
 import ExternalProfilesSection from "@/components/ExternalProfilesSection";
 import { useToast } from "@/contexts/ToastContext";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
+import PrimaryOccupationPicker from "@/components/PrimaryOccupationPicker";
+import { primaryOccupationForPositions, occupationReference, orderPositionsByPrimary, type PrimaryOccupation } from "@/lib/primary-occupation";
 import ProfileCoverEditor from "@/components/ProfileCoverEditor";
 import { profileCoverSettings } from "@/lib/profile-cover";
 import { departments, deptColors, DEPARTMENT_TO_PROFILE_TYPE, getDepartmentRoleSearchTerms } from "@/lib/departments";
@@ -537,6 +539,8 @@ export default function ProfilePage() {
   const [memberships, setMemberships] = useState<string[]>([]);
   const [newMembership, setNewMembership] = useState("");
   const [positions, setPositions] = useState<string[]>([]);
+  const [primaryOccupation, setPrimaryOccupation] = useState<PrimaryOccupation | null>(null);
+  const crewDataRef = useRef<Record<string, unknown>>({});
   const [languages, setLanguages] = useState<string[]>([]);
   const [newLanguage, setNewLanguage] = useState("");
   const [profileImages, setProfileImages] = useState<ProfileImage[]>([]);
@@ -733,6 +737,8 @@ export default function ProfilePage() {
           setSkills(profile.skills ?? []);
           setMemberships(profile.memberships ?? []);
           setPositions(profile.positions ?? []);
+          crewDataRef.current = profile.crew ?? {};
+          setPrimaryOccupation(occupationReference(primaryOccupationForPositions(profile.crew?.primaryOccupation, profile.positions ?? [])));
           setLanguages(profile.languages ?? []);
           setProfileImages(profile.profile_images ?? []);
           if (profile.avatar_url) {
@@ -1028,6 +1034,7 @@ export default function ProfilePage() {
       positions,
       profileTypes: currentProfileTypes,
     });
+    if (positions.length && !primaryOccupationForPositions(primaryOccupation, positions)) validationErrors.activity = "Bitte wähle deine Haupttätigkeit aus. Deine weiteren Tätigkeiten bleiben erhalten.";
     setFieldErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) {
       const destination = profileEditorStepForErrors(Object.keys(validationErrors) as ("activity" | "name" | "city")[]);
@@ -1078,7 +1085,10 @@ export default function ProfilePage() {
         available:      form.available,
         skills,
         memberships,
-        positions,
+        positions: (() => {
+          const primary = primaryOccupationForPositions(primaryOccupation, positions);
+          return orderPositionsByPrimary(positions, primary);
+        })(),
         profile_types:  currentProfileTypes,
         profile_type:   primaryProfileType || null,
         physical,
@@ -1108,7 +1118,7 @@ export default function ProfilePage() {
         day_rate:       dayRate ? parseInt(dayRate) : null,
         filmography,
         video_links:    videoLinks,
-        crew: { certificates: crewCertificates },
+        crew: { ...crewDataRef.current, certificates: crewCertificates, primaryOccupation: occupationReference(primaryOccupationForPositions(primaryOccupation, positions)) },
       };
 
       // First-time profile creation uses POST; subsequent edits use PATCH
@@ -1299,6 +1309,7 @@ export default function ProfilePage() {
     filmography,
     videoLinks,
     crewCertificates,
+    primaryOccupation,
     currentProfileTypes,
     physicalData: physicalDataRef.current,
     performanceData: performanceDataRef.current,
@@ -1384,6 +1395,7 @@ export default function ProfilePage() {
           if (typeof saved.dayRate === "string") setDayRate(saved.dayRate);
           if (Array.isArray(saved.filmography)) setFilmography(saved.filmography);
           if (Array.isArray(saved.videoLinks)) setVideoLinks(saved.videoLinks.filter((item: unknown): item is string => typeof item === "string"));
+          if (Object.hasOwn(saved, "primaryOccupation")) setPrimaryOccupation(occupationReference(primaryOccupationForPositions(saved.primaryOccupation, Array.isArray(saved.positions) ? saved.positions : [])));
           if (Array.isArray(saved.crewCertificates)) setCrewCertificates(saved.crewCertificates.filter((item: unknown): item is string => typeof item === "string"));
           if (Array.isArray(saved.currentProfileTypes)) setCurrentProfileTypes(saved.currentProfileTypes.filter((item: unknown): item is string => typeof item === "string"));
           if (saved.physicalData && typeof saved.physicalData === "object") physicalDataRef.current = saved.physicalData as Record<string, unknown>;
@@ -1646,6 +1658,7 @@ export default function ProfilePage() {
                       setPositions(next);
                       if (next.length > 0 || currentProfileTypes.length > 0) setFieldErrors((previous) => ({ ...previous, activity: undefined }));
                     }} />
+                    <PrimaryOccupationPicker positions={positions} value={primaryOccupation} onChange={setPrimaryOccupation} />
                     {fieldErrors.activity && <p role="alert" className="mt-3 rounded-lg border border-error/30 bg-error/10 p-3 text-sm text-error">{fieldErrors.activity}</p>}
                   </div>
                 )}

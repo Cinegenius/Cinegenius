@@ -73,7 +73,7 @@ export async function PUT(request: NextRequest) {
       || ((input.version === 2 || input.version === 3) && typeof input.step !== "string")) {
       return json({ error: "Dein Einrichtungsentwurf passt nicht zur gewählten Aufgabe." }, 400);
     }
-    const validation = normalized.step === "review" ? validateQuickStartDraft(normalized) : null;
+    const validation = normalized.step === "review" ? validateQuickStartDraft(normalized, { requirePrimary: false }) : null;
     if (validation) {
       return json({ error: validation.message }, 400);
     }

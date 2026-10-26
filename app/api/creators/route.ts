@@ -1,3 +1,4 @@
+import { primaryOccupationForPositions, occupationReference } from "@/lib/primary-occupation";
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
@@ -8,13 +9,13 @@ const PAGE_SIZE = 48;
 
 // GET /api/creators?page=1  → next page of profiles (page 0 = first 96 served by SSR)
 export async function GET(req: NextRequest) {
-  const page = parseInt(req.nextUrl.searchParams.get("page") ?? "1", 10);
+  const page = Math.max(1, Math.min(100000, parseInt(req.nextUrl.searchParams.get("page") ?? "1", 10) || 1));
   const from = 96 + (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
 
   const { data: profiles, error } = await db
     .from("profiles")
-    .select("user_id, display_name, location, bio, skills, role, positions, available, avatar_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point")
+    .select("user_id, display_name, location, bio, skills, role, positions, crew, available, avatar_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point")
     .not("display_name", "is", null)
     .neq("display_name", "")
     .order("created_at", { ascending: false })
@@ -43,6 +44,7 @@ export async function GET(req: NextRequest) {
       name: p.display_name ?? "Unbekannt",
       role: p.role ?? displayPositions[0] ?? typeLabel ?? "Filmschaffende/r",
       positions: displayPositions,
+      primaryOccupation: occupationReference(primaryOccupationForPositions(p.crew?.primaryOccupation, p.positions ?? [])),
       location: p.location ?? "",
       image: (Array.isArray(p.portfolio_images) && p.portfolio_images.length > 0) ? p.portfolio_images[0] : (p.avatar_url ?? ""),
       avatar: p.avatar_url ?? "",
