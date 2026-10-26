@@ -867,7 +867,7 @@ function MessagesContent() {
                 const element = event.currentTarget;
                 atBottomRef.current = element.scrollHeight - element.scrollTop - element.clientHeight < 80;
               }}
-              className="flex-1 min-w-0 overflow-y-auto overscroll-contain px-4 py-4 space-y-1"
+              className="flex-1 min-h-0 min-w-0 overflow-y-auto overscroll-contain px-4 py-4 space-y-1"
             >
               {hasOlderMessages && messages.length > 0 && (
                 <div className="flex justify-center pb-3">

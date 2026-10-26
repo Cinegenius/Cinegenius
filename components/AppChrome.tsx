@@ -20,7 +20,7 @@ export default function AppChrome({ children, initialIsSignedIn }: { children: R
     <main className="flex-1 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
       <PersonalAreaNavigation>{children}</PersonalAreaNavigation>
     </main>
-    <Footer />
+    {pathname !== "/messages" && <Footer />}
     <BottomNav />
   </>;
 }
