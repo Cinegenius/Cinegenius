@@ -6,7 +6,7 @@ import { ArrowRight, Image as ImageIcon, Pause, Play, Star, X, Share2 } from "lu
 import PhotoLikeButton from "@/components/PhotoLikeButton";
 import ResilientPublicImage from "@/components/ResilientPublicImage";
 import { markPhotoNavigation, markPhotoNavigationWithAnimation, photoHref } from "@/lib/photo-link";
-import { getPhotoBandFillerCount, orderPhotosByAuthor, repeatForSeamlessLoop, shouldAnimatePhotoBand } from "@/lib/home-discovery";
+import { getPhotoBandFillerCount, selectHomeDiscoveryPhotos, repeatForSeamlessLoop, shouldAnimatePhotoBand } from "@/lib/home-discovery";
 import { communityPreviewUrl } from "@/lib/community-preview";
 
 export type DiscoverPhoto = {
@@ -154,7 +154,7 @@ function PhotoBandCard({
 }
 
 export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: DiscoverPhoto[]; newPhotos: DiscoverPhoto[] }) {
-  const photos = orderPhotosByAuthor(ratedPhotos.length >= 3 ? ratedPhotos : newPhotos).slice(0, 6) as DiscoverPhoto[];
+  const photos = selectHomeDiscoveryPhotos(ratedPhotos.length >= 3 ? ratedPhotos : newPhotos);
   const photoTotal = photos.length;
   const isRatedSelection = ratedPhotos.length >= 3;
   const sectionRef = useRef<HTMLElement>(null);

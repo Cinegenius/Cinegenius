@@ -8,21 +8,34 @@ export type PublicProfilePhoto = {
   count: number;
 };
 
-/** Keeps different creators adjacent as rarely as possible without random ordering. */
-export function orderPhotosByAuthor(photos: readonly PublicProfilePhoto[]): PublicProfilePhoto[] {
-  const remaining = [...photos];
-  const ordered: PublicProfilePhoto[] = [];
-
-  while (remaining.length > 0) {
-    const previousAuthor = ordered.length > 0 ? ordered[ordered.length - 1].profileId : null;
-    const differentAuthorIndex = previousAuthor === null
-      ? 0
-      : remaining.findIndex((photo) => photo.profileId !== previousAuthor);
-    const nextIndex = differentAuthorIndex >= 0 ? differentAuthorIndex : 0;
-    ordered.push(remaining.splice(nextIndex, 1)[0]);
+/** One image per contributor per pass, preserving newest-first order within each contributor. */
+export function orderPhotosByAuthor<T extends PublicProfilePhoto>(photos: readonly T[]): T[] {
+  const contributors = new Map<string, T[]>();
+  for (const photo of photos) {
+    const group = contributors.get(photo.profileId) ?? [];
+    group.push(photo);
+    contributors.set(photo.profileId, group);
   }
-
+  const ordered: T[] = [];
+  while (contributors.size > 0) {
+    for (const [id, group] of contributors) {
+      ordered.push(group.shift()!);
+      if (group.length === 0) contributors.delete(id);
+    }
+  }
   return ordered;
+}
+
+/** Bounded metadata/preview pool; loop copies reuse URLs and never fetch original files. */
+export const HOME_DISCOVERY_PHOTO_LIMIT = 24;
+export function selectHomeDiscoveryPhotos<T extends PublicProfilePhoto>(photos: readonly T[]): T[] {
+  const seen = new Set<string>();
+  const unique = photos.filter(photo => {
+    if (seen.has(photo.imageUrl)) return false;
+    seen.add(photo.imageUrl);
+    return true;
+  });
+  return orderPhotosByAuthor(unique).slice(0, HOME_DISCOVERY_PHOTO_LIMIT);
 }
 
 /** Repeats a stable sequence for a seamless visual loop; UI clones stay decorative. */
