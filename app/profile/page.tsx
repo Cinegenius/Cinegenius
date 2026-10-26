@@ -146,7 +146,8 @@ function TypeChipPicker({
   }
 
   const normalizedQuery = roleSearch.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("de");
-  const selectedRoleDepartments = departments.filter((dept) => dept.roles.some((role) => positions.includes(role))).map((dept) => dept.id);
+  const selectedOccupations = occupationSelections ?? selectedCrewOccupations(positions);
+  const selectedRoleDepartments = [...new Set(selectedOccupations.map(option => option.departmentId))];
   const activeDepartmentIds = new Set([...chosenDepartments, ...selectedRoleDepartments]);
   const visibleDepartments = departments
     .map((dept) => ({
@@ -227,7 +228,7 @@ function TypeChipPicker({
       <div className="space-y-3">
         {visibleDepartments.map(({ dept, roles }) => {
           const colors = deptColors(dept.color);
-          const selectedCount = dept.roles.filter((role) => positions.includes(role)).length;
+          const selectedCount = selectedOccupations.filter(option => option.departmentId === dept.id).length;
           const expanded = normalizedQuery ? expandedDepartments[dept.id] !== false : Boolean(expandedDepartments[dept.id] || selectedCount > 0);
           return (
             <section key={dept.id} className="overflow-hidden rounded-xl border border-border bg-bg-primary/50">
@@ -239,7 +240,7 @@ function TypeChipPicker({
               {expanded && <div className="flex flex-wrap gap-2 border-t border-border px-4 py-3">
                 {dept.id === "grip" && <p className="mb-1 w-full text-xs leading-5 text-text-muted">Kamerabühne / Grip umfasst Kameraunterstützung wie Dolly, Schienen und Kräne. Zuständigkeiten können sich je nach Land und Produktion unterscheiden.</p>}
                 {roles.map((role) => {
-                  const active = (occupationSelections ?? selectedCrewOccupations(positions)).some(option => option.roleId === occupationId(dept.id, role));
+                  const active = selectedOccupations.some(option => option.roleId === occupationId(dept.id, role));
                   const explanation = GRIP_OCCUPATIONS.find((occupation) => occupation.label === role)?.description;
                   return <button key={role} type="button" aria-pressed={active} title={explanation} onClick={() => togglePosition(role, dept.id)}
                     className={`min-h-10 rounded-full border px-3 py-2 text-xs font-medium transition-colors ${active ? `${colors.bg} ${colors.border} ${colors.text}` : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"}`}>{role}</button>;
