@@ -8,7 +8,7 @@ import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import {
   MapPin, MessageSquare, Award, ChevronDown, ChevronUp,
-  Pencil, ExternalLink, X, Check, Globe, Building2, UserPlus, UserCheck, Clock,
+  Pencil, ExternalLink, X, Check, Globe, UserPlus, UserCheck, Clock,
   Ban, Users2, MoreHorizontal, Phone, Mail, Send,
 } from "lucide-react";
 import type { UserProfile, ProfileImage, FilmographyEntry, ProfileAward, ProjectCredit } from "@/lib/profile-types";
@@ -19,6 +19,7 @@ import { getPlatform, type ExternalProfileRow } from "@/lib/external-platforms";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import PhotoLikeButton from "@/components/PhotoLikeButton";
 import { markPhotoNavigation, photoHref } from "@/lib/photo-link";
+import CompanyLogo from "@/components/CompanyLogo";
 import ProfileRoles from "./ProfileRoles";
 import ResilientPublicImage from "@/components/ResilientPublicImage";
 import { profileCoverStyle } from "@/lib/profile-cover";
@@ -448,32 +449,12 @@ function CompanyBadge({ membership }: { membership: CompanyMemberships }) {
             : null;
           return (
             <Link key={entry.id} href={`/companies/${co.slug}`} className="block bg-bg-elevated border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-all group">
-              <div className="flex sm:hidden items-center gap-3 px-3 py-2.5">
-                <div className="w-14 h-9 shrink-0 rounded-lg overflow-hidden bg-bg-secondary border border-border/50 flex items-center justify-center">
-                  {co.logo_url
-                    // eslint-disable-next-line @next/next/no-img-element
-                    ? <img src={co.logo_url} alt={co.name} className="w-full h-full object-contain p-1" />
-                    : <Building2 size={16} className="text-text-muted group-hover:text-gold transition-colors" />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors break-words [overflow-wrap:anywhere]">{co.name}</p>
-                  <p className="text-[11px] text-text-muted break-words [overflow-wrap:anywhere]">{roleLabel}{categoryLabel ? ` · ${categoryLabel}` : ""}</p>
-                </div>
-                <ExternalLink size={11} className="text-text-muted group-hover:text-gold transition-colors shrink-0" />
-              </div>
-              <div className="hidden sm:block">
-                <div className="h-24 bg-gradient-to-br from-bg-secondary to-bg-primary flex items-center justify-center">
-                  {co.logo_url
-                    // eslint-disable-next-line @next/next/no-img-element
-                    ? <img src={co.logo_url} alt={co.name} className="w-full h-full object-contain p-3" />
-                    : <div className="w-16 h-16 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shadow-xl"><Building2 size={28} className="text-text-muted group-hover:text-gold transition-colors" /></div>}
-                </div>
-                <div className="px-4 py-3 text-center border-t border-border/50">
-                  <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors break-words [overflow-wrap:anywhere]">{co.name}</p>
-                  {categoryLabel && <p className="text-[11px] text-gold/70 mt-0.5 break-words [overflow-wrap:anywhere]">{categoryLabel}</p>}
-                  <p className="text-[11px] text-text-muted mt-0.5 break-words [overflow-wrap:anywhere]">{roleLabel}</p>
-                  <p className="text-[10px] text-gold/60 mt-1.5 flex items-center justify-center gap-1"><ExternalLink size={9} /> Unternehmensprofil</p>
-                </div>
+              <CompanyLogo src={co.logo_url} name={co.name} className="h-28 w-full" />
+              <div className="space-y-1 px-4 py-3 text-center">
+                <p className="break-words text-sm font-semibold text-text-primary group-hover:text-gold [overflow-wrap:anywhere]">{co.name}</p>
+                {categoryLabel && <p className="text-[11px] text-gold/70">{categoryLabel}</p>}
+                <p className="break-words text-xs leading-relaxed text-text-muted [overflow-wrap:anywhere]">{roleLabel}</p>
+                <p className="flex items-center justify-center gap-1 pt-1 text-[10px] text-gold/70"><ExternalLink size={10} /> Unternehmensprofil</p>
               </div>
             </Link>
           );

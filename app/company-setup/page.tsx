@@ -14,6 +14,7 @@ import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import { compressImage, MAX_FUNCTION_UPLOAD_BYTES, safeObjectURL } from "@/lib/compressImage";
 import { MAX_COMPANY_GALLERY_IMAGES, moveCompanyGalleryImage } from "@/lib/company-media";
 import { COMPANY_PUBLIC_TITLE_SUGGESTIONS, normalizeCompanyPublicTitles } from "@/lib/company-roles";
+import CompanyLogo from "@/components/CompanyLogo";
 import CateringCompanyFields from "@/components/CateringCompanyFields";
 import { CATERING_COMPANY_CATEGORY, EMPTY_CATERING_COMPANY_DETAILS, normalizeCateringCompanyDetails, type CateringCompanyDetails } from "@/lib/catering-taxonomy";
 
@@ -534,11 +535,10 @@ export default function CompanySetupPage() {
               <input id="logo-upload" ref={logoRef} type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,image/svg+xml" className="sr-only" onChange={(event) => { void handleSingleImageUpload(event.target.files?.[0], "logo"); event.currentTarget.value = ""; }} />
               <label
                 htmlFor="logo-upload"
-                className="relative w-28 h-28 rounded-2xl border-2 border-dashed border-border hover:border-gold transition-colors group overflow-hidden bg-bg-secondary cursor-pointer block"
+                className="relative w-full max-w-sm h-36 rounded-2xl border-2 border-dashed border-border hover:border-gold transition-colors group overflow-hidden bg-bg-secondary cursor-pointer block"
               >
                 {logoPreview ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={logoPreview} alt="Logo" className="w-full h-full object-contain p-2" />
+                  <CompanyLogo src={logoPreview} name={name || "Firmenlogo"} className="h-full w-full" />
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full gap-1.5">
                     <Upload size={22} className="text-text-muted group-hover:text-gold transition-colors" />
@@ -556,7 +556,7 @@ export default function CompanySetupPage() {
                   <X size={11} /> Entfernen
                 </button>
               )}
-              <p className="text-xs text-text-muted">JPG, PNG, WEBP, HEIC oder SVG · wird für den Upload optimiert</p>
+              <p className="text-xs text-text-muted">JPG, PNG, WEBP, HEIC oder SVG · Vorschau ohne Beschnitt. Hat deine Datei große Außenränder, wähle eine enger zugeschnittene Version. Originaldateien werden nicht automatisch beschnitten.</p>
             </div>
 
             {/* Company cover image */}

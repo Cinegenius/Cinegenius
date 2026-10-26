@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
+import CompanyLogo from "@/components/CompanyLogo";
 import { useTranslations } from "next-intl";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -434,18 +435,11 @@ function CompanyCard({ company }: { company: Company }) {
   return (
     <Link href={`/companies/${company.slug}`}
       className="browse-card card-hover group block p-4">
-      {/* Header: logo + name + city */}
-      <div className="flex items-start gap-3 mb-3">
-        <div className="w-20 h-12 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shrink-0 overflow-hidden">
-          {company.logo_url
-            // eslint-disable-next-line @next/next/no-img-element
-            ? <img src={company.logo_url} alt={company.name} className="w-full h-full object-contain p-1" />
-            : <Building2 size={20} className="text-text-muted opacity-40" />
-          }
-        </div>
+      <div className="flex min-w-0 items-start gap-3 mb-3">
+        <CompanyLogo src={company.logo_url} name={company.name} className="h-12 w-20 shrink-0" />
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-1">
-            <h3 className="font-semibold text-sm text-text-primary group-hover:text-gold transition-colors line-clamp-2 leading-snug">{company.name}</h3>
+            <h3 className="font-semibold text-sm text-text-primary group-hover:text-gold transition-colors break-words leading-snug [overflow-wrap:anywhere]">{company.name}</h3>
             {company.verified && <CheckCircle size={13} className="text-gold shrink-0 mt-0.5" />}
           </div>
           {company.city && (
@@ -478,16 +472,10 @@ function CompanyListRow({ company }: { company: Company }) {
   return (
     <Link href={`/companies/${company.slug}`}
       className="flex items-center gap-4 px-5 py-4 hover:bg-bg-elevated transition-colors group">
-      <div className="w-10 h-10 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shrink-0 overflow-hidden">
-        {company.logo_url
-          // eslint-disable-next-line @next/next/no-img-element
-          ? <img src={company.logo_url} alt="" className="w-full h-full object-contain p-1" />
-          : <Building2 size={18} className="text-text-muted" />
-        }
-      </div>
+      <CompanyLogo src={company.logo_url} name={company.name} className="h-10 w-10 shrink-0" />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
-          <span className="font-semibold text-sm text-text-primary group-hover:text-gold transition-colors truncate">{company.name}</span>
+          <span className="font-semibold text-sm text-text-primary group-hover:text-gold transition-colors break-words [overflow-wrap:anywhere]">{company.name}</span>
           {company.verified && <CheckCircle size={12} className="text-gold shrink-0" />}
         </div>
         <div className="flex items-center gap-1 text-xs text-text-muted"><MapPin size={10} /><span>{company.city}</span></div>

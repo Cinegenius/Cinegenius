@@ -57,6 +57,7 @@ const getCompanyPublicData = unstable_cache(
         .select("user_id, display_name, avatar_url, slug, role")
         .in("user_id", rawMembers.map((m) => m.user_id));
       const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, {
+        user_id: p.user_id,
         display_name: p.display_name,
         avatar_url: p.avatar_url,
         slug: p.slug,

@@ -5,7 +5,7 @@ import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
-  Building2, MapPin, Globe, Mail, Phone, CheckCircle,
+  MapPin, Globe, Mail, Phone, CheckCircle,
   Package, Briefcase, Car, Home, Clapperboard, X,
   Pencil, Users, UserPlus, Clock, Check,
   Crown, ChevronRight, ExternalLink, MoreHorizontal,
@@ -17,6 +17,7 @@ import {
   EQUIPMENT_CATEGORY_BY_ID, CONDITION_LABELS, CONDITION_COLORS, SERVICE_TYPE_BY_ID,
 } from "@/lib/equipment-categories";
 import { COMPANY_PUBLIC_TITLE_SUGGESTIONS, normalizeCompanyPublicTitles } from "@/lib/company-roles";
+import CompanyLogo from "@/components/CompanyLogo";
 import Lightbox from "@/components/Lightbox";
 import { listingDetailPath } from "@/lib/listing-routes";
 
@@ -32,6 +33,7 @@ type Listing = {
 };
 
 type MemberProfile = {
+  user_id?: string;
   display_name: string;
   avatar_url: string | null;
   slug: string | null;
@@ -310,26 +312,10 @@ export default function CompanyDetail({
 
         <div className="relative z-10 mx-auto w-full min-w-0 max-w-4xl px-4 sm:px-6 pt-10 pb-8 sm:pb-10">
 
-          {/* Edit button */}
-          {canEditCompany && (
-            <div className="flex justify-end mb-6">
-              <Link href={`/company-setup?company_id=${company.id}`}
-                className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-xs text-text-muted hover:text-gold hover:border-gold/40 transition-colors bg-bg-primary/60 backdrop-blur-sm">
-                <Pencil size={12} /> Bearbeiten
-              </Link>
-            </div>
-          )}
-
           {/* Logo + Name */}
-          <div className="flex min-w-0 max-w-full items-start gap-4 sm:gap-5 mb-5">
-            {/* Logo */}
-            <div className="w-24 h-16 sm:w-32 sm:h-20 rounded-2xl bg-bg-primary border border-border flex items-center justify-center shrink-0 overflow-hidden shadow-xl">
-              {company.logo_url
-                // eslint-disable-next-line @next/next/no-img-element
-                ? <img src={company.logo_url} alt={company.name} className="w-full h-full object-contain p-1.5" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                : <Building2 size={28} className="text-text-muted/50" />
-              }
-            </div>
+          <div className="flex min-w-0 max-w-full flex-col items-start gap-5 sm:flex-row sm:gap-6 mb-6">
+            <CompanyLogo src={company.logo_url} name={company.name}
+              className="h-36 w-full sm:h-40 sm:w-64 sm:shrink-0" />
 
             {/* Name + tagline */}
             <div className="flex-1 min-w-0 pt-0.5">
@@ -357,6 +343,13 @@ export default function CompanyDetail({
               )}
             </div>
           </div>
+
+          {canEditCompany && (
+            <Link href={`/company-setup?company_id=${company.id}`}
+              className="mb-5 inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-bg-primary/60 px-3 py-2 text-xs text-text-secondary hover:border-gold/40 hover:text-gold">
+              <Pencil size={13} /> Bearbeiten
+            </Link>
+          )}
 
           {/* Industry focus */}
           {company.industry_focus?.length > 0 && (
@@ -587,28 +580,8 @@ export default function CompanyDetail({
                         <Crown size={10} className="text-gold" />
                         <span className="text-[10px] uppercase tracking-widest font-semibold text-gold">Inhaberschaft</span>
                       </div>
-                      <div className="divide-y divide-border">
-                        {managementMembers.map((m) => {
-                          const slug = m.profile?.slug;
-                          if (!slug) return <div key={m.id} className="text-sm text-text-secondary">{m.profile?.display_name ?? "Teammitglied"}</div>;
-                          const name = m.profile?.display_name ?? "Unbekannt";
-                          const position = m.public_titles?.join(" · ") || m.title || "Inhaber/in";
-                          return (
-                            <Link key={m.id} href={`/profile/${slug}`}
-                              className="grid min-w-0 grid-cols-1 gap-1 px-4 py-3.5 hover:bg-bg-elevated transition-colors group items-start sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] sm:items-center sm:gap-4 sm:px-5">
-                              <div className="flex items-center gap-3 min-w-0">
-                                <div className="relative shrink-0">
-                                  <Avatar member={m} size={32} />
-                                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-bg-primary border border-border flex items-center justify-center">
-                                    <Crown size={6} className="text-gold" />
-                                  </div>
-                                </div>
-                              <span className="min-w-0 max-w-full break-words text-sm font-semibold text-text-primary group-hover:text-gold transition-colors [overflow-wrap:anywhere]">{name}</span>
-                              </div>
-                              <span className="min-w-0 max-w-full break-words text-sm text-text-secondary [overflow-wrap:anywhere]">{position}</span>
-                            </Link>
-                          );
-                        })}
+                      <div className="grid min-w-0 divide-y divide-border">
+                        {managementMembers.map((member) => <CompanyPersonCard key={member.id} member={member} />)}
                       </div>
                     </div>
                   )}
@@ -620,23 +593,8 @@ export default function CompanyDetail({
                         <Users size={10} className="text-text-muted" />
                         <span className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">Team</span>
                       </div>
-                      <div className="divide-y divide-border">
-                        {(showAllTeam ? regularMembers : regularMembers.slice(0, 10)).map((m) => {
-                          const slug = m.profile?.slug;
-                          if (!slug) return <div key={m.id} className="text-sm text-text-secondary">{m.profile?.display_name ?? "Teammitglied"}</div>;
-                          const name = m.profile?.display_name ?? "Unbekannt";
-                          const position = m.public_titles?.join(" · ") || m.title || "Teammitglied";
-                          return (
-                            <Link key={m.id} href={`/profile/${slug}`}
-                              className="grid min-w-0 grid-cols-1 gap-1 px-4 py-3.5 hover:bg-bg-elevated transition-colors group items-start sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] sm:items-center sm:gap-4 sm:px-5">
-                              <div className="flex items-center gap-3 min-w-0">
-                                <Avatar member={m} size={32} />
-                                <span className="min-w-0 max-w-full break-words text-sm font-semibold text-text-primary group-hover:text-gold transition-colors [overflow-wrap:anywhere]">{name}</span>
-                              </div>
-                              <span className="min-w-0 max-w-full break-words text-sm text-text-secondary [overflow-wrap:anywhere]">{position}</span>
-                            </Link>
-                          );
-                        })}
+                      <div className="grid min-w-0 divide-y divide-border">
+                        {(showAllTeam ? regularMembers : regularMembers.slice(0, 10)).map((member) => <CompanyPersonCard key={member.id} member={member} />)}
                       </div>
                       {regularMembers.length > 10 && (
                         <button
@@ -913,6 +871,23 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function DetailLine({ label, value }: { label: string; value: string }) {
   return <p className="break-words text-sm leading-6 text-text-secondary"><span className="font-medium text-text-primary">{label}: </span>{value}</p>;
+}
+
+function CompanyPersonCard({ member }: { member: Member }) {
+  const name = member.profile?.display_name || "Teammitglied";
+  const destination = member.profile?.slug || member.profile?.user_id;
+  const titles = member.public_titles?.filter(Boolean).join(" · ") || member.title || (member.is_company_owner ? "Inhaber/in" : "Teammitglied");
+  const content = <>
+    <Avatar member={member} size={32} />
+    <div className="min-w-0 flex-1 space-y-0.5">
+      <p className="break-words text-sm font-semibold leading-snug text-text-primary group-hover:text-gold [overflow-wrap:anywhere]">{name}</p>
+      <p className="break-words text-xs leading-relaxed text-text-secondary [overflow-wrap:anywhere]">{titles}</p>
+    </div>
+  </>;
+  const classes = "group flex min-w-0 items-start gap-3 px-4 py-3 sm:px-5";
+  return destination
+    ? <Link href={`/profile/${encodeURIComponent(destination)}`} className={`${classes} transition-colors hover:bg-bg-elevated`}>{content}</Link>
+    : <div className={classes}>{content}</div>;
 }
 
 function Avatar({ member, size = 40 }: { member: Member; size?: number }) {
