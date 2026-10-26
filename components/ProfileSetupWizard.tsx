@@ -12,7 +12,7 @@ import {
 import { compressImage, MAX_FUNCTION_UPLOAD_BYTES } from "@/lib/compressImage";
 import { departments, getDepartmentRoleSearchTerms } from "@/lib/departments";
 import { safeAuthRedirect } from "@/lib/auth-redirect";
-import { shouldSkipProfileSetup } from "@/lib/profile-setup-flow";
+import { hasCompletedNonPersonalSetup, hasProfileBasics, shouldSkipProfileSetup } from "@/lib/profile-setup-flow";
 import {
   buildQuickStartScreens, createQuickStartIntentData, findQuickStartRoles, getQuickStartDepartments, getQuickStartIntroIntents,
   getQuickStartProfileTypesForRoles, normalizeQuickStartDraft, QUICK_START_CATEGORIES,
@@ -83,6 +83,7 @@ export default function ProfileSetupWizard() {
   const [finished, setFinished] = useState<QuickStartDraft | null>(null);
   const [profileIsPrivate, setProfileIsPrivate] = useState(false);
   const [profilePublic, setProfilePublic] = useState(false);
+  const [profileExists, setProfileExists] = useState(false);
   const [ready, setReady] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [loadAttempt, setLoadAttempt] = useState(0);
@@ -114,12 +115,14 @@ export default function ProfileSetupWizard() {
     ]).then(([saved, profile, settings]) => {
       if (!active) return;
       setProfileIsPrivate(settings?.settings?.profile_visibility === "private");
+      setProfileExists(profile?.exists === true);
+      const profileComplete = hasProfileBasics(profile?.profile);
       const hasInProgressDraft = !!saved?.quickStart && saved.setupComplete !== true;
-      if (saved?.setupComplete) {
+      if (saved?.setupComplete && (profileComplete || hasCompletedNonPersonalSetup(saved))) {
         router.replace(saved.intent === "search" ? (redirectTo || "/search") : (redirectTo || "/dashboard"));
         return;
       }
-      if (shouldSkipProfileSetup({ hasExistingProfile: profile?.exists === true, hasInProgressDraft, isNewRegistration })) {
+      if (shouldSkipProfileSetup({ hasExistingProfile: profileComplete, hasInProgressDraft, isNewRegistration })) {
         router.replace(redirectTo || "/dashboard");
         return;
       }
@@ -127,6 +130,7 @@ export default function ProfileSetupWizard() {
       let nextDraft = hasInProgressDraft
         ? normalizeQuickStartDraft(saved.quickStart)
         : { ...START_QUICK_START_DRAFT, name: existingName };
+      if (!profileComplete && nextDraft.completed.profile) nextDraft = { ...nextDraft, completed: { ...nextDraft.completed, profile: false } };
       if (resumeIncomplete && hasInProgressDraft) {
         const missing = validateQuickStartDraft(nextDraft);
         if (missing) nextDraft = { ...nextDraft, step: screenForField(missing.field), activeIntent: intentForField(missing.field) ?? nextDraft.activeIntent };
@@ -401,16 +405,21 @@ export default function ProfileSetupWizard() {
         const profileTypes = getQuickStartProfileTypesForRoles(selectedRoles);
         const profilePhoto = progress.sections.crew?.imageUrl || progress.sections.talent?.imageUrl || null;
         const response = await fetch("/api/profile", {
-          method: "POST", headers: { "Content-Type": "application/json" },
+          method: profileExists ? "PATCH" : "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             display_name: progress.name.trim(),
             location: [progress.personCity.trim(), progress.personCountry.trim()].filter(Boolean).join(", "),
             profile_types: profileTypes, profile_type: profileTypes[0] ?? null,
-            positions, bio: progress.talentIntro.trim(), avatar_url: profilePhoto, available: true,
+            positions,
+            ...(!profileExists ? { bio: progress.talentIntro.trim(), avatar_url: profilePhoto, available: true } : {
+              ...(progress.talentIntro.trim() ? { bio: progress.talentIntro.trim() } : {}),
+              ...(profilePhoto ? { avatar_url: profilePhoto } : {}),
+            }),
           }),
         });
         const result = await response.json().catch(() => ({}));
-        if (!response.ok || !result.profile?.user_id) {
+        const profileSaved = response.ok && (profileExists ? result.success === true : Boolean(result.profile?.user_id));
+        if (!profileSaved) {
           const firstField = Object.keys(result.fieldErrors ?? {})[0];
           const field = firstField === "display_name" ? "name" : firstField === "location" ? "personCity" : firstField === "activity" ? "crew-roles" : null;
           if (field) { setDraft({ ...progress, step: screenForField(field), activeIntent: intentForField(field) ?? activeIntent }); focusValidation(field); }

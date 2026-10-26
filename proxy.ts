@@ -227,6 +227,10 @@ export default clerkMiddleware(async (auth, request) => {
   const nonce = generateNonce();
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("X-Nonce", nonce); // Clerk v7 reads this automatically
+  // Override any client-supplied value; the dashboard uses this only as a safe return path.
+  const returnUrl = new URL(request.url);
+  returnUrl.searchParams.delete("_rsc");
+  requestHeaders.set("X-CineGenius-Return-Path", `${returnUrl.pathname}${returnUrl.search}`);
 
   const res = NextResponse.next({ request: { headers: requestHeaders } });
   res.headers.set("X-Content-Type-Options", "nosniff");
