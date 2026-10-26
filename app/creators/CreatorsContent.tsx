@@ -49,6 +49,7 @@ export type ServerCreator = {
   role: string;
   positions: string[];
   primaryOccupation?: PrimaryOccupation | null;
+  crewDepartmentId?: string | null;
   location: string;
   image: string;       // cover image (portfolio or avatar)
   avatar: string;      // circular avatar (always avatar_url)

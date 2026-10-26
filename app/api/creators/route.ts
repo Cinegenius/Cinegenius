@@ -1,4 +1,4 @@
-import { primaryOccupationForPositions, occupationReference, isCrewDirectoryProfile } from "@/lib/primary-occupation";
+import { primaryOccupationForPositions, occupationReference, isCrewDirectoryProfile, crewDepartmentForPositions } from "@/lib/primary-occupation";
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
@@ -45,6 +45,7 @@ export async function GET(req: NextRequest) {
       role: p.role ?? displayPositions[0] ?? typeLabel ?? "Filmschaffende/r",
       positions: displayPositions,
       primaryOccupation: occupationReference(primaryOccupationForPositions(p.crew?.primaryOccupation, p.positions ?? [], p.role)),
+      crewDepartmentId: crewDepartmentForPositions(p.crew?.primaryOccupation, p.positions ?? [], p.role),
       location: p.location ?? "",
       image: (Array.isArray(p.portfolio_images) && p.portfolio_images.length > 0) ? p.portfolio_images[0] : (p.avatar_url ?? ""),
       avatar: p.avatar_url ?? "",

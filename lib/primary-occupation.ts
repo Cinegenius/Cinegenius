@@ -46,6 +46,21 @@ export function primaryOccupationForPositions(value: unknown, positions: readonl
   const aliases = new Set(candidates[0].aliases.map(exactKey));
   return positions.every(position => !position.trim() || aliases.has(exactKey(position))) ? candidates[0] : null;
 }
+/** A legacy profile can have an unambiguous department without a single main job.
+ * Never persist an invented main occupation or match an unknown/partial title.
+ */
+export function crewDepartmentForPositions(value: unknown, positions: readonly string[], legacyPrimaryRole?: string | null): string | null {
+  const primary = primaryOccupationForPositions(value, positions, legacyPrimaryRole);
+  if (primary) return primary.departmentId;
+  if (value != null) return null; // invalid explicit references need clarification
+  const titles = [...new Set(positions.map(title => title.trim()).filter(Boolean))];
+  if (!titles.length) return null;
+  const matches = titles.map(title => occupationChoices([title]));
+  if (matches.some(options => options.length === 0)) return null;
+  const ids = new Set(matches.flatMap(options => options.map(option => option.departmentId)));
+  return ids.size === 1 ? [...ids][0] : null;
+}
+
 export function occupationReference(option: PrimaryOccupation | null): PrimaryOccupation | null {
   return option ? {departmentId: option.departmentId, roleId: option.roleId} : null;
 }
@@ -57,11 +72,11 @@ export function primaryOccupationError(crew: unknown, positions: unknown): strin
   return primaryOccupationForPositions(value, list) ? null : 'Bitte wähle eine Haupttätigkeit aus deinen ausgewählten Tätigkeiten aus.';
 }
 
-export function filterPrimaryOccupations<T extends {primaryOccupation?: PrimaryOccupation|null}>(profiles:readonly T[], departmentId:string|null, roles:readonly string[]=[]):T[] {
+export function filterPrimaryOccupations<T extends {primaryOccupation?: PrimaryOccupation|null; crewDepartmentId?: string|null}>(profiles:readonly T[], departmentId:string|null, roles:readonly string[]=[]):T[] {
   const ids = new Set(roles.flatMap(role => byId.has(role) ? [byId.get(role)!.roleId] : occupationChoices([role]).map(option => option.roleId)));
   return profiles.filter(profile=>{
     const primary=readPrimaryOccupation(profile.primaryOccupation);
-    return (!departmentId || primary?.departmentId===departmentId)
+    return (!departmentId || (primary?.departmentId ?? profile.crewDepartmentId)===departmentId)
       && (!roles.length || !!primary && ids.has(primary.roleId));
   });
 }
@@ -77,9 +92,14 @@ export function orderPositionsByPrimary(positions:readonly string[], primary:Pri
 }
 
 /** Exclude offer-only accounts; a person can have a crew job and offers together. */
-export function isCrewDirectoryProfile(profile: {positions?: string[] | null; role?: string | null; profile_type?: string | null; profile_types?: string[] | null}): boolean {
+export function isCrewDirectoryProfile(profile: {positions?: string[] | null; role?: string | null; profile_type?: string | null; profile_types?: string[] | null; display_name?: string | null; bio?: string | null; portfolio_images?: string[] | null}): boolean {
   const types = [profile.profile_type, ...(profile.profile_types ?? [])].filter(Boolean) as string[];
   if (types.some(type => PROFILE_CATEGORY_MAP[type as ProfileType] && PROFILE_CATEGORY_MAP[type as ProfileType] !== 'vendor')) return true;
   if (types.length && types.every(type => PROFILE_CATEGORY_MAP[type as ProfileType] === 'vendor' || type === 'company')) return false;
-  return occupationChoices(profile.positions ?? []).length > 0 || occupationChoices(profile.role ? [profile.role] : []).length > 0;
+  if (occupationChoices(profile.positions ?? []).length > 0 || occupationChoices(profile.role ? [profile.role] : []).length > 0) return true;
+  // Older public personal profiles may predate type/occupation selection entirely.
+  // Keep actual authored profiles discoverable in All areas, without guessing a job.
+  // Visibility checks run in the caller; empty account stubs still do not qualify.
+  return types.length === 0 && !!profile.display_name?.trim()
+    && (!!profile.bio?.trim() || !!profile.portfolio_images?.length);
 }
