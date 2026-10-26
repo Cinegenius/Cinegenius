@@ -306,8 +306,6 @@ body {
 .home-photo-band-track--right { animation-name: homePhotoBandRight; }
 .home-photo-band-track[data-paused="true"] { animation-play-state: paused; }
 .home-photo-band-track[data-paused="false"] { will-change: transform; }
-/* Moving photo strips do not need a separate backdrop surface for every heart. */
-.home-photo-band-card button { backdrop-filter: none; -webkit-backdrop-filter: none; }
 .home-photo-band-viewport {
   overflow: hidden;
   margin-inline: -12px;

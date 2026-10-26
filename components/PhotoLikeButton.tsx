@@ -27,6 +27,7 @@ export default function PhotoLikeButton({
   resumeLike = false,
   className = "",
   tabIndex,
+  blurBackground = true,
 }: {
   profileId: string;
   imageUrl: string;
@@ -36,6 +37,7 @@ export default function PhotoLikeButton({
   resumeLike?: boolean;
   className?: string;
   tabIndex?: number;
+  blurBackground?: boolean;
 }) {
   const { isLoaded, isSignedIn, user } = useUser();
   const [count, setCount] = useState(initialCount);
@@ -126,7 +128,7 @@ export default function PhotoLikeButton({
         aria-label={liked ? `Like entfernen, ${count} Likes` : `Foto liken, ${count} Likes`}
         aria-pressed={liked}
         title={isOwner ? "Eigene Fotos kannst du nicht liken" : undefined}
-        className={`flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-full border border-white/20 bg-black/70 px-2.5 text-white shadow-md backdrop-blur transition-colors hover:border-red-300 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-70 ${liked ? "text-red-400" : ""}`}
+        className={`flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-full border border-white/20 bg-black/70 px-2.5 text-white shadow-md ${blurBackground ? "backdrop-blur" : ""} transition-colors hover:border-red-300 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-70 ${liked ? "text-red-400" : ""}`}
       >
         <Heart size={18} className={liked ? "fill-current text-red-400" : ""} />
         {count > 0 && <span className="text-xs font-semibold">{count}</span>}
