@@ -3,7 +3,7 @@
 import { useRef, useState, useCallback } from "react";
 import { Check, X } from "lucide-react";
 
-export interface FocalPoint { x: number; y: number; opacity?: number }
+export interface FocalPoint { x: number; y: number; opacity?: number; cover?: { x: number; y: number } }
 
 interface Props {
   imageUrl: string;

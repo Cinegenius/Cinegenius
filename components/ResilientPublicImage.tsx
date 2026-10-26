@@ -11,6 +11,7 @@ type ResilientPublicImageProps = {
   imageClassName?: string;
   loading?: "eager" | "lazy";
   style?: CSSProperties;
+  imageStyle?: CSSProperties;
 };
 
 /** Keep broken public media understandable without hiding or replacing the stored image URL. */
@@ -21,6 +22,7 @@ export default function ResilientPublicImage({
   imageClassName = "h-full w-full object-cover",
   loading = "lazy",
   style,
+  imageStyle,
 }: ResilientPublicImageProps) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
 
@@ -37,7 +39,7 @@ export default function ResilientPublicImage({
         </div>
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={src} alt={alt} loading={loading} className={imageClassName} onError={() => setFailedSrc(src)} />
+        <img src={src} alt={alt} loading={loading} className={imageClassName} style={imageStyle} onError={() => setFailedSrc(src)} />
       )}
     </div>
   );

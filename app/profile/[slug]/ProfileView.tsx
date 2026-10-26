@@ -21,6 +21,7 @@ import PhotoLikeButton from "@/components/PhotoLikeButton";
 import { markPhotoNavigation, photoHref } from "@/lib/photo-link";
 import ProfileRoles from "./ProfileRoles";
 import ResilientPublicImage from "@/components/ResilientPublicImage";
+import { profileCoverStyle } from "@/lib/profile-cover";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -1358,7 +1359,6 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
   const certificates: string[] = profile.crew?.certificates ?? [];
   const software: string[] = profile.crew?.software ?? [];
   const bgImage = profile.cover_image_url ?? (images.find((i) => i.featured)?.url);
-  const coverOpacity = profile.focal_point?.opacity ?? 0.4;
   const roleLabels = displayPositions(profile);
 
   // Filmografie shows only manual entries — linked project credits appear as visual cards in "Projekte"
@@ -1375,18 +1375,17 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
       {lightbox && <Lightbox src={lightbox} onClose={() => setLightbox(null)} />}
 
       {/* Hero */}
-      <section className="relative">
+      <section className="relative min-h-56 sm:min-h-64">
         {bgImage ? (
           <>
-            <ResilientPublicImage src={bgImage} alt="" className="absolute inset-0" imageClassName="h-full w-full object-cover" style={{ opacity: coverOpacity }} />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-bg-primary" />
+            <ResilientPublicImage src={bgImage} alt="" className="absolute inset-0" imageClassName="h-full w-full object-cover" imageStyle={profileCoverStyle(profile.focal_point)} loading="eager" />
           </>
         ) : (
           <div className="absolute inset-0 bg-gradient-to-b from-bg-elevated to-bg-primary" />
         )}
 
         <div className="relative z-10 mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 pb-6 sm:pb-8">
-          <div className="flex min-w-0 max-w-full flex-col sm:flex-row items-start gap-3 sm:gap-4">
+          <div className={`flex min-w-0 max-w-full flex-col sm:flex-row items-start gap-3 sm:gap-4 ${bgImage ? "rounded-2xl bg-black/60 p-4 backdrop-blur-sm" : ""}`}>
             <div className="flex-1 min-w-0 w-full max-w-full [overflow-wrap:anywhere]">
               <h1 className="min-w-0 max-w-full break-words font-display text-4xl sm:text-5xl font-bold tracking-tight text-white leading-tight drop-shadow-lg [overflow-wrap:anywhere]">
                 {profile.display_name ?? "Unbekannt"}

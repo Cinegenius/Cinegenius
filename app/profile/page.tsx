@@ -16,6 +16,8 @@ import LicensePicker from "@/components/LicensePicker";
 import ExternalProfilesSection from "@/components/ExternalProfilesSection";
 import { useToast } from "@/contexts/ToastContext";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
+import ProfileCoverEditor from "@/components/ProfileCoverEditor";
+import { profileCoverSettings } from "@/lib/profile-cover";
 import { departments, deptColors, DEPARTMENT_TO_PROFILE_TYPE, getDepartmentRoleSearchTerms } from "@/lib/departments";
 import { gripSearchTerms, GRIP_OCCUPATIONS, normalizeOccupation } from "@/lib/gripTaxonomy";
 import RoleDropdown from "@/components/RoleDropdown";
@@ -545,7 +547,6 @@ export default function ProfilePage() {
   const [coverImageUrl, setCoverImageUrl] = useState("");
   const [coverImagePreview, setCoverImagePreview] = useState("");
   const [coverUploading, setCoverUploading] = useState(false);
-  const savedCoverOpacity = useRef(0.4);
   const coverRef = useRef<HTMLInputElement>(null);
   const [focalPoint, setFocalPoint] = useState<FocalPoint>({ x: 50, y: 33 });
   const [coverOpacity, setCoverOpacity] = useState(0.4);
@@ -746,10 +747,7 @@ export default function ProfilePage() {
           if (storedFocalPoint) {
             const fp = storedFocalPoint;
             setFocalPoint(fp);
-            if (typeof fp.opacity === "number") {
-              setCoverOpacity(fp.opacity);
-              savedCoverOpacity.current = fp.opacity;
-            }
+            setCoverOpacity(profileCoverSettings(fp).brightness);
           }
           setInstagramUrl(profile.instagram_url ?? "");
           setTiktokUrl(profile.tiktok_url ?? "");
@@ -895,8 +893,8 @@ export default function ProfilePage() {
       setCoverImagePreview(url);
       markEditorChanged();
       addToast("Titelbild bereit. Speichere dein Profil, damit es öffentlich übernommen wird.", "success");
-      // Fokuspunkt setzen
-      setFocalPickerImage(url);
+      // Cover cropping has its own controls; never change the portrait focus.
+      setFocalPoint(current => ({ ...current, cover: { x: 50, y: 50 } }));
     } catch (err) {
       addToast(`Titelbild konnte nicht gespeichert werden: ${err instanceof Error ? err.message : t("uploadFailed")}`, "error");
       setCoverImagePreview(coverImageUrl);
@@ -1455,15 +1453,10 @@ export default function ProfilePage() {
   }
 
   async function saveFocalPoint(point: FocalPoint) {
-    setFocalPoint(point);
+    setFocalPoint(current => ({ ...current, x: point.x, y: point.y }));
     setFocalPickerImage(null);
     markEditorChanged();
     addToast("Bildposition im Entwurf übernommen. Speichere dein Profil, um sie zu veröffentlichen.", "success");
-  }
-
-  async function saveCoverOpacity(opacity: number) {
-    savedCoverOpacity.current = opacity;
-    setCoverOpacity(opacity);
   }
 
   return (
@@ -1799,7 +1792,7 @@ export default function ProfilePage() {
 
                 {/* Cover Image — only for crew/creative/vendor; talent uses profile_images as hero */}
                 {!showTalentSections && <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <h2 className="font-semibold text-text-primary mb-0.5">{t("sectionCover")}</h2>
                     <p className="text-xs text-text-muted">{t("sectionCoverDesc")}</p>
@@ -1809,7 +1802,7 @@ export default function ProfilePage() {
                       type="button"
                       onClick={() => coverRef.current?.click()}
                       disabled={coverUploading}
-                      className="flex items-center gap-2 px-4 py-2 bg-gold/10 border border-gold/20 text-gold text-xs font-semibold rounded-lg hover:bg-gold/20 transition-colors disabled:opacity-60"
+                      className="flex min-h-11 self-start items-center gap-2 px-4 py-2 bg-gold/10 border border-gold/20 text-gold text-xs font-semibold rounded-lg hover:bg-gold/20 transition-colors disabled:opacity-60"
                     >
                       {coverUploading ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
                       {coverUploading ? t("uploading") : t("uploadCover")}
@@ -1817,34 +1810,20 @@ export default function ProfilePage() {
                     <input ref={coverRef} type="file" accept={PROFILE_MEDIA_ACCEPT} className="hidden" onChange={handleCoverChange} />
                   </div>
                   {coverImagePreview ? (
-                    <>
-                      <div className="relative rounded-xl overflow-hidden aspect-[3/1] border border-border group">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={coverImagePreview} alt="Cover" className="w-full h-full object-cover" style={{ opacity: coverOpacity }} />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setCoverImagePreview("");
-                            setCoverImageUrl("");
-                          }}
-                          className="absolute top-2 right-2 w-7 h-7 bg-black/60 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-crimson-light"
-                        >
-                          <X size={13} />
-                        </button>
-                      </div>
-                      <div className="mt-3 flex items-center gap-3">
-                        <span className="text-xs text-text-muted shrink-0">Helligkeit</span>
-                        <input
-                          type="range" min="0.1" max="1" step="0.05"
-                          value={coverOpacity}
-                          onChange={(e) => setCoverOpacity(parseFloat(e.target.value))}
-                          onMouseUp={(e) => saveCoverOpacity(parseFloat((e.target as HTMLInputElement).value))}
-                          onTouchEnd={(e) => saveCoverOpacity(parseFloat((e.target as HTMLInputElement).value))}
-                          className="flex-1 accent-gold h-1.5 rounded-full cursor-pointer"
-                        />
-                        <span className="text-xs text-text-muted w-8 text-right shrink-0">{Math.round(coverOpacity * 100)}%</span>
-                      </div>
-                    </>
+                    <ProfileCoverEditor
+                      src={coverImagePreview}
+                      focalPoint={{ ...focalPoint, opacity: coverOpacity }}
+                      onChange={next => {
+                        setFocalPoint(next);
+                        setCoverOpacity(profileCoverSettings(next).brightness);
+                        markEditorChanged();
+                      }}
+                      onRemove={() => {
+                        setCoverImagePreview("");
+                        setCoverImageUrl("");
+                        markEditorChanged();
+                      }}
+                    />
                   ) : (
                     <button
                       type="button"

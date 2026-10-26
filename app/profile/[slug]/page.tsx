@@ -17,7 +17,7 @@ import type { ExternalProfileRow } from "@/lib/external-platforms";
 export const dynamicParams = true;
 
 // Stable base columns that always exist
-const BASE_FIELDS = "user_id, display_name, avatar_url, cover_image_url, role, positions, location, bio, tagline, slug, profile_type, profile_types, verified, available, available_from, day_rate, languages, travel_ready, skills, filmography, profile_images, showreel_url, reel_url, awards, availability_config, modules, instagram_url, tiktok_url, youtube_url, vimeo_url, linkedin_url, website_url, video_links";
+const BASE_FIELDS = "user_id, display_name, avatar_url, cover_image_url, focal_point, role, positions, location, bio, tagline, slug, profile_type, profile_types, verified, available, available_from, day_rate, languages, travel_ready, skills, filmography, profile_images, showreel_url, reel_url, awards, availability_config, modules, instagram_url, tiktok_url, youtube_url, vimeo_url, linkedin_url, website_url, video_links";
 // Newer columns — fetched separately so a missing column doesn't break the whole query
 const EXTRA_FIELDS = "physical, performance, model_measurements, casting, crew, creative, vendor, agency";
 

@@ -5,6 +5,7 @@ import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { PROFILE_TYPE_LABELS } from "@/lib/profile-types";
 import { normalizeProfileTypes } from "@/lib/profile-display";
+import { validProfileFocalPoint } from "@/lib/profile-cover";
 import {
   retryWithoutMissingOptionalProfileColumns,
   selectOptionalProfileColumns,
@@ -118,6 +119,10 @@ export async function POST(req: NextRequest) {
     cover_image_url, instagram_url, tiktok_url, youtube_url, vimeo_url, linkedin_url, website_url,
     day_rate, filmography, video_links, focal_point, physical, performance, model_measurements, casting,
   } = body;
+
+  if (focal_point !== undefined && !validProfileFocalPoint(focal_point)) {
+    return NextResponse.json({ error: "Ungültige Bildeinstellungen. Bitte prüfe Coverposition und Helligkeit." }, { status: 400 });
+  }
 
   const fieldErrors: Record<string, string> = {};
   if (typeof display_name !== "string" || !display_name.trim()) fieldErrors.display_name = "Bitte gib deinen Namen ein.";
@@ -270,6 +275,9 @@ export async function PATCH(req: NextRequest) {
     );
     if (Object.keys(safe).length === 0) {
       return NextResponse.json({ error: "Keine unterstützten Profiländerungen erhalten." }, { status: 400 });
+    }
+    if ("focal_point" in safe && !validProfileFocalPoint(safe.focal_point)) {
+      return NextResponse.json({ error: "Ungültige Bildeinstellungen. Bitte prüfe Coverposition und Helligkeit." }, { status: 400 });
     }
     if ("profile_type" in safe && !isValidProfileType(safe.profile_type)) {
       return NextResponse.json({ error: "Ungültiger Profiltyp." }, { status: 400 });
