@@ -3,97 +3,40 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Vertrauen & Sicherheit",
-  description: "Wie CineGenius Käufer und Anbieter schützt — verifizierte Profile, sichere Zahlungen, Streitschlichtung und Bewertungssystem.",
+  description: "Informationen zu Kontakt, Anfragen, Sichtbarkeit und dem Melden problematischer Inhalte auf CineGenius.",
 };
 import {
   Shield, CheckCircle, AlertCircle, RotateCcw, MessageSquare,
-  Clock, Banknote, ArrowRight, Lock, Eye, Flag,
+  ArrowRight, Lock, Eye, Flag,
 } from "lucide-react";
 
 const sections = [
-  {
-    icon: Lock,
-    title: "Sichere Zahlung & Treuhand",
-    id: "payment",
-    content: [
-      {
-        heading: "Wie funktioniert die Treuhand?",
-        body: "Wenn du eine Buchung abschließt, wird deine Zahlung von CineGenius treuhänderisch gehalten — nicht direkt an den Anbieter übertragen. Das Geld wird erst nach erfolgreichem Abschluss der Buchung freigegeben.",
-      },
-      {
-        heading: "Wann wird das Geld freigegeben?",
-        body: "Für Locations und Requisiten: 24 Stunden nach dem Enddatum der Buchung, sofern kein Streitfall gemeldet wurde. Für Crew-Buchungen: nach Bestätigung durch beide Parteien oder 48 Stunden nach dem letzten Drehtag.",
-      },
-      {
-        heading: "Welche Zahlungsmethoden werden akzeptiert?",
-        body: "Kreditkarten (Visa, Mastercard, Amex), SEPA-Lastschrift und Sofortüberweisung — alle verarbeitet über Stripe, einem PCI-DSS-zertifizierten Zahlungsdienstleister.",
-      },
-    ],
-  },
-  {
-    icon: RotateCcw,
-    title: "Stornierungsrichtlinien",
-    id: "cancellation",
-    content: [
-      {
-        heading: "Flexible Richtlinie",
-        body: "Vollständige Rückerstattung bei Stornierung bis 48 Stunden vor Buchungsbeginn. Danach: 50 % Rückerstattung. Keine Rückerstattung bei Stornierung weniger als 24 Stunden vorher.",
-      },
-      {
-        heading: "Moderate Richtlinie",
-        body: "Vollständige Rückerstattung bei Stornierung bis 7 Tage vor Buchungsbeginn. 50 % Rückerstattung bei Stornierung 3–7 Tage vorher. Keine Rückerstattung bei weniger als 3 Tagen.",
-      },
-      {
-        heading: "Strenge Richtlinie",
-        body: "Vollständige Rückerstattung nur innerhalb von 48 Stunden nach der Buchung (sofern Beginn mehr als 7 Tage entfernt). Danach keine Rückerstattung — empfohlen für stark nachgefragte Locations.",
-      },
-    ],
-  },
-  {
-    icon: AlertCircle,
-    title: "Streitfall & Schadensmeldung",
-    id: "disputes",
-    content: [
-      {
-        heading: "Wie melde ich einen Streitfall?",
-        body: "Gehe in dein Dashboard → Buchungen → wähle die betreffende Buchung → klicke auf 'Streitfall melden'. Du hast 72 Stunden nach Buchungsende Zeit, einen Fall zu eröffnen.",
-      },
-      {
-        heading: "Was passiert nach der Meldung?",
-        body: "Unser Trust & Safety Team meldet sich innerhalb von 24 Stunden. Die Treuhandzahlung wird eingefroren, bis der Fall gelöst ist. Beide Parteien können Belege einreichen.",
-      },
-      {
-        heading: "Schadensregelung",
-        body: "Anbieter können eine Schadenskaution verlangen, die vor Buchungsbeginn hinterlegt wird. Im Schadensfall werden Belege (Fotos, Kostenvoranschläge) benötigt. CineGenius vermittelt — der endgültige Betrag wird nach Prüfung freigegeben oder erstattet.",
-      },
-    ],
-  },
-  {
-    icon: Eye,
-    title: "Verifizierung & Vertrauen",
-    id: "verification",
-    content: [
-      {
-        heading: "Was bedeutet das Verifizierungs-Badge?",
-        body: "Verifizierte Anbieter haben ihre Identität (Personalausweis oder Reisepass) und — bei Locations — den Eigentumsnachweis oder die Nutzungsberechtigung nachgewiesen. Verifizierte Crew-Profile haben mindestens 2 bestätigte Credits.",
-      },
-      {
-        heading: "Wie werden Bewertungen geprüft?",
-        body: "Nur abgeschlossene Buchungen können bewertet werden. Bewertungen können nicht nachträglich geändert werden. Unser System erkennt und entfernt verdächtige Muster (z. B. Fake-Bewertungen).",
-      },
-      {
-        heading: "Wie melde ich ein verdächtiges Inserat?",
-        body: "Über den 'Melden'-Button auf jeder Angebots- oder Profilseite. Gemeldete Inhalte werden innerhalb von 48 Stunden geprüft und bei Verstoß gegen unsere Richtlinien entfernt.",
-      },
-    ],
-  },
+  { icon: Lock, title: "Anfragen & Vereinbarungen", id: "payment", content: [
+    { heading: "Wie kommt ein Kontakt zustande?", body: "Öffentliche Angebote kannst du ohne Konto entdecken. Für Nachrichten und Anfragen meldest du dich an. Eine Anfrage ist noch keine Zusage des Anbieters." },
+    { heading: "Wie wird bezahlt?", body: "Preis, Verfügbarkeit, Zahlung und Übergabe vereinbaren die Beteiligten miteinander. Eine Anfrage löst keine automatische Zahlung aus. CineGenius verspricht keine Treuhandverwahrung oder Auszahlung zu festen Fristen." },
+    { heading: "Worauf sollte ich achten?", body: "Prüfe Angebot und Anbieter, kläre den Leistungsumfang und halte Vereinbarungen schriftlich fest. Überweise kein Geld allein aufgrund eines vermeintlichen Plattform-Gütesiegels." },
+  ] },
+  { icon: RotateCcw, title: "Stornierung & Änderungen", id: "cancellation", content: [
+    { heading: "Welche Bedingungen gelten?", body: "Kläre Stornierung, Terminänderungen, Kaution und mögliche Kosten vor einer Zusage direkt mit dem Anbieter. Maßgeblich sind eure Vereinbarung und die gesetzlichen Rechte." },
+    { heading: "Erstattet CineGenius automatisch?", body: "Es gibt keine allgemeine automatische Rückerstattung durch CineGenius. Wende dich bei Fragen zur vereinbarten Leistung oder Zahlung zunächst an deinen Vertragspartner." },
+  ] },
+  { icon: AlertCircle, title: "Probleme & Meldungen", id: "disputes", content: [
+    { heading: "Wie melde ich ein Problem?", body: "Nutze die vorhandene Melden-Funktion am Profil oder Angebot oder sende den betroffenen Link mit einer Beschreibung an support@cinegenius.co. Teile nur die für die Prüfung notwendigen Informationen." },
+    { heading: "Was passiert anschließend?", body: "Berechtigte Verantwortliche prüfen die Meldung. Eine feste Bearbeitungszeit oder eine Erstattung kann nicht pauschal zugesichert werden. Supportunterhaltungen können von berechtigten Supportadministratoren bearbeitet werden." },
+    { heading: "Wer ist für Schäden verantwortlich?", body: "Kläre Haftung, Versicherungen und eventuelle Kautionen vor dem Einsatz mit deinem Vertragspartner. Eine Plattformanfrage enthält keinen automatischen Versicherungsschutz." },
+  ] },
+  { icon: Eye, title: "Profile, Bewertungen & Sichtbarkeit", id: "verification", content: [
+    { heading: "Was bedeutet eine Kennzeichnung?", body: "Beachte die jeweils angezeigte Kennzeichnung und ihren konkreten Bezug. Ein Profil ist keine pauschale Garantie für Identität, Qualifikation, Eigentum oder die Qualität jeder angebotenen Leistung." },
+    { heading: "Wer kann bewerten?", body: "Für Bewertungen prüft die Plattform die jeweils erforderliche Berechtigung anhand zugehöriger Vorgänge. Inhalte können gemeldet und geprüft werden; ein automatischer Schutz vor jeder falschen Bewertung wird nicht zugesichert." },
+    { heading: "Wer sieht meine Daten?", body: "Öffentliche Inhalte bleiben auffindbar. Persönliche Kontaktdaten richten sich nach den Sichtbarkeitseinstellungen und Zugriffsrechten. Eine öffentliche Firmenfunktion vergibt keine Verwaltungsrechte." },
+  ] },
 ];
 
 const quickFacts = [
-  { icon: Banknote, stat: "100 %", label: "Zahlungen über Treuhand" },
-  { icon: Clock, stat: "24h", label: "Support-Reaktionszeit" },
-  { icon: Shield, stat: "0 €", label: "Keine versteckten Gebühren" },
-  { icon: CheckCircle, stat: "94 %", label: "Buchungszufriedenheit" },
+  { icon: MessageSquare, stat: "Kontakt", label: "Direkt miteinander sprechen" },
+  { icon: Flag, stat: "Melden", label: "Problematische Inhalte melden" },
+  { icon: Shield, stat: "Sichtbarkeit", label: "Eigene Angaben verwalten" },
+  { icon: CheckCircle, stat: "Anfragen", label: "Konditionen vorab klären" },
 ];
 
 export default function TrustSafetyPage() {
@@ -110,8 +53,8 @@ export default function TrustSafetyPage() {
             Deine Sicherheit hat Priorität.
           </h1>
           <p className="text-text-secondary text-lg max-w-2xl mx-auto leading-relaxed">
-            Treuhandzahlungen, Identitätsverifizierung und ein dediziertes Support-Team —
-            damit jede Buchung so abläuft, wie sie soll.
+            Informiere dich über Anbieter, kläre Vereinbarungen direkt und nutze die
+            Meldefunktionen, wenn dir problematische Inhalte auffallen.
           </p>
         </div>
       </div>
@@ -161,7 +104,7 @@ export default function TrustSafetyPage() {
           </aside>
 
           {/* Sections */}
-          <div className="flex-1 space-y-12">
+          <div className="flex-1 min-w-0 space-y-12 [overflow-wrap:anywhere]">
             {sections.map(({ icon: Icon, title, id, content }) => (
               <section key={id} id={id} className="scroll-mt-24">
                 <div className="flex items-center gap-3 mb-6">
@@ -189,7 +132,7 @@ export default function TrustSafetyPage() {
               <div>
                 <h3 className="font-semibold text-text-primary mb-1">Etwas melden</h3>
                 <p className="text-sm text-text-muted leading-relaxed mb-3">
-                  Verdächtiges Inserat, Betrugsversuch oder unsicheres Verhalten? Unser Team reagiert innerhalb von 24 Stunden.
+                  Verdächtiges Inserat, Betrugsversuch oder unsicheres Verhalten? Melde uns den betroffenen Inhalt mit einer kurzen Beschreibung.
                 </p>
                 <Link
                   href="/help"

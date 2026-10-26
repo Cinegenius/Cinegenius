@@ -7,13 +7,13 @@ export const metadata = {
 
 export default function AgbPage() {
   return (
-    <div className="pt-16 min-h-screen bg-bg-primary">
+    <div className="pt-16 min-h-screen min-w-0 bg-bg-primary [overflow-wrap:anywhere]">
       <div className="max-w-2xl mx-auto px-4 py-16">
 
         <div className="mb-10">
           <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-3">Rechtliches</p>
           <h1 className="font-display text-3xl font-bold text-text-primary mb-2">Allgemeine Geschäftsbedingungen</h1>
-          <p className="text-text-muted text-sm">Stand: Mai 2026</p>
+          <p className="text-text-muted text-sm">Stand: 26. Oktober 2026</p>
         </div>
 
         <div className="space-y-8 text-text-secondary">
@@ -119,96 +119,26 @@ export default function AgbPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-2">§ 5 Zahlungsbedingungen & Gebühren</h2>
-            <p className="text-sm leading-relaxed">
-              Die Nutzung der Grundfunktionen von CineGenius (Profil anlegen, Inserate einstellen,
-              Nachrichten senden) ist kostenfrei. Für Premium-Funktionen und die Abwicklung von Buchungen
-              über die Plattform können Gebühren anfallen, die jeweils transparent vor Abschluss
-              ausgewiesen werden.
-            </p>
-            <p className="text-sm leading-relaxed mt-3">
-              Zahlungen werden über den Zahlungsdienstleister Stripe, Inc. (USA) abgewickelt. Es gelten
-              ergänzend die Nutzungsbedingungen von Stripe. Mit der Zahlung beauftragst du Stripe als
-              Zahlungsagenten; der Betreiber erhält erst nach erfolgreicher Transaktion Kenntnis.
-            </p>
-            <p className="text-sm leading-relaxed mt-3">
-              Alle Preise verstehen sich inklusive der gesetzlichen Mehrwertsteuer, soweit anwendbar.
-              Rechnungen werden per E-Mail oder als Download im Account bereitgestellt.
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-2">§ 5 Kosten der Plattformnutzung</h2>
+            <p className="text-sm leading-relaxed mt-3">Registrierung, Profilerstellung, Suche, Inserate und Plattformnachrichten sind derzeit kostenlos. Entgelte für angebotene Dienstleistungen, Vermietungen oder Verkäufe werden zwischen den beteiligten Nutzern vereinbart und sind keine Gebühr für die Plattformnutzung.</p>
+            <p className="text-sm leading-relaxed mt-3">Eine Anfrage oder Kontaktaufnahme ist noch keine automatische Buchungsbestätigung und löst keine automatische Zahlung aus. Verfügbarkeit, Leistungsumfang, Preis, Zahlungsweise und Übergabe sind mit dem jeweiligen Anbieter zu klären.</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-2">§ 6 Servicegebühren</h2>
-            <p className="text-sm leading-relaxed">
-              Die Nutzung der Plattform — einschließlich Registrierung, Profilerstellung, Inseratsschaltung
-              und Suche — ist derzeit kostenlos. Der Betreiber behält sich vor, zukünftig Servicegebühren
-              einzuführen. Nutzer werden über Änderungen der Gebührenstruktur mindestens 30 Tage im Voraus
-              per E-Mail informiert.
-            </p>
-            <p className="text-sm leading-relaxed mt-3">
-              Eine Umgehung etwaiger zukünftiger Gebühren durch Direktkontakt oder außerhalb der Plattform
-              abgewickelte Buchungen, die über die Plattform angebahnt wurden, ist verboten und
-              berechtigt den Betreiber zur Sperrung des Accounts.
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-2">§ 6 Änderungen des Leistungsangebots</h2>
+            <p className="text-sm leading-relaxed mt-3">Sollten künftig kostenpflichtige Plattformleistungen angeboten werden, müssen Leistung und Preis vor einer kostenpflichtigen Beauftragung erkennbar sein. Eine kostenpflichtige Beauftragung wird nicht allein durch eine Anfrage oder die weitere Nutzung kostenloser Funktionen ausgelöst.</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-2">§ 7 Widerrufsrecht</h2>
-            <p className="text-sm leading-relaxed">
-              Für Verbraucher (§ 13 BGB) gilt grundsätzlich ein gesetzliches Widerrufsrecht von
-              14 Tagen nach Vertragsschluss gemäß §§ 312 ff. BGB.
-            </p>
-            <p className="text-sm leading-relaxed mt-3">
-              <strong className="text-text-primary">Ausschluss des Widerrufsrechts:</strong> Das Widerrufsrecht erlischt bei digitalen
-              Dienstleistungen, die auf ausdrücklichen Wunsch des Nutzers vor Ablauf der Widerrufsfrist
-              vollständig erbracht werden, wenn der Nutzer vor Beginn der Ausführung ausdrücklich
-              zugestimmt hat, dass sein Widerrufsrecht mit Beginn der Vertragsausführung erlischt
-              (§ 356 Abs. 5 BGB). Durch Bestätigung der Buchung erklärt der Nutzer diese Zustimmung.
-            </p>
-            <p className="text-sm leading-relaxed mt-3">
-              Für Buchungen von Locations, Fahrzeugen oder Requisiten, die als Dienstleistungsverträge
-              für einen bestimmten Zeitraum geschlossen werden, besteht gemäß § 312g Abs. 2 Nr. 9 BGB
-              kein Widerrufsrecht, wenn im Vertrag ein spezifischer Termin oder Zeitraum zur Erbringung
-              der Dienstleistung vereinbart ist.
-            </p>
-            <p className="text-sm leading-relaxed mt-3">
-              <strong className="text-text-primary">Widerrufserklärung:</strong> Den Widerruf kannst du per E-Mail an{" "}
-              <a href="mailto:support@cinegenius.co" className="text-gold hover:underline">
-                support@cinegenius.co
-              </a>{" "}
-              oder per Post (Markus Müller, Plinganserstr. 19, 81369 München) erklären.
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-2">§ 7 Gesetzliche Verbraucherrechte</h2>
+            <p className="text-sm leading-relaxed mt-3">Ob für einen Vertrag zwischen Nutzern ein gesetzliches Widerrufsrecht besteht, richtet sich insbesondere nach den beteiligten Vertragsparteien, der vereinbarten Leistung und den gesetzlichen Vorschriften. Anbieter sind für die gegebenenfalls erforderlichen Verbraucherinformationen verantwortlich.</p>
+            <p className="text-sm leading-relaxed mt-3">Mit einer Anfrage auf CineGenius wird kein pauschaler Verzicht auf ein gesetzliches Widerrufsrecht erklärt. Gesetzliche Rechte bleiben unberührt.</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-2">§ 8 Stornierungsbedingungen</h2>
-            <p className="text-sm leading-relaxed">
-              Die folgenden Stornierungsbedingungen gelten für über die Plattform vermittelte
-              Buchungen, sofern zwischen Anbieter und Nachfrager keine abweichenden Regelungen
-              ausdrücklich vereinbart wurden:
-            </p>
-            <div className="mt-3 space-y-3">
-              <div className="text-sm leading-relaxed bg-bg-elevated rounded-lg p-4">
-                <p className="font-medium text-text-primary mb-1">Stornierung durch den Nachfrager</p>
-                <ul className="space-y-1 list-disc list-inside">
-                  <li>Bis <strong>72 Stunden vor</strong> dem vereinbarten Termin: vollständige Erstattung des Buchungsbetrags</li>
-                  <li>Weniger als 72 Stunden vor dem Termin: keine Erstattung, es sei denn, der Anbieter stimmt einer Rückerstattung ausdrücklich zu</li>
-                  <li>Höhere Gewalt (z. B. Naturkatastrophen, behördliche Verbote): Die Plattform vermittelt auf Anfrage eine Lösung; ein gesetzlicher Anspruch besteht nur nach Maßgabe des BGB</li>
-                </ul>
-              </div>
-              <div className="text-sm leading-relaxed bg-bg-elevated rounded-lg p-4">
-                <p className="font-medium text-text-primary mb-1">Stornierung durch den Anbieter</p>
-                <ul className="space-y-1 list-disc list-inside">
-                  <li>Bei Stornierung durch den Anbieter wird der Buchungsbetrag vollständig erstattet</li>
-                  <li>Wiederholte Stornierungen durch Anbieter können zur Einschränkung oder Sperrung des Accounts führen</li>
-                </ul>
-              </div>
-            </div>
-            <p className="text-sm leading-relaxed mt-3">
-              Die Serviceprovision nach § 6 wird bei Stornierungen gemäß den jeweiligen
-              Stripe-Rückerstattungsbedingungen behandelt. Bearbeitungsgebühren von Stripe
-              können nicht rückerstattet werden.
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-2">§ 8 Terminänderungen, Stornierung und Erstattungen</h2>
+            <p className="text-sm leading-relaxed mt-3">Terminänderungen, Stornierungsbedingungen, Kautionen und mögliche Erstattungen sind vor Vertragsschluss zwischen Anbieter und Nachfrager zu klären. Es gelten ihre wirksamen Vereinbarungen und die gesetzlichen Vorschriften.</p>
+            <p className="text-sm leading-relaxed mt-3">CineGenius verspricht keine allgemeinen automatischen Erstattungen, keine Treuhandverwahrung und keine Auszahlung zu festen Zeitpunkten. Ein Plattformhinweis ersetzt keine konkrete Vereinbarung der Vertragsparteien.</p>
           </section>
 
           <section>
@@ -283,12 +213,11 @@ export default function AgbPage() {
             <p className="text-sm leading-relaxed mt-3">
               Der Betreiber ist berechtigt, Accounts bei schwerwiegenden oder wiederholten Verstößen
               gegen diese AGB fristlos zu sperren oder dauerhaft zu löschen. Im Fall einer Sperrung
-              werden laufende Buchungen nach Maßgabe von § 8 abgewickelt.
+              bleiben die Rechte und Pflichten aus Vereinbarungen zwischen Nutzern unberührt.
             </p>
             <p className="text-sm leading-relaxed mt-3">
               Der Betreiber kann die Plattform mit einer Ankündigungsfrist von 30 Tagen einstellen.
-              Im Fall der Einstellung werden laufende Buchungen nach Möglichkeit abgewickelt und
-              Prepaid-Guthaben erstattet.
+              Die Rechte aus bereits geschlossenen Verträgen zwischen Nutzern bleiben hiervon unberührt.
             </p>
           </section>
 
@@ -312,28 +241,8 @@ export default function AgbPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-2">§ 14 Online-Streitbeilegung & Verbraucherschlichtung</h2>
-            <p className="text-sm leading-relaxed">
-              Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:{" "}
-              <a
-                href="https://ec.europa.eu/consumers/odr/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gold hover:underline"
-              >
-                https://ec.europa.eu/consumers/odr/
-              </a>
-              . Unsere E-Mail-Adresse lautet:{" "}
-              <a href="mailto:support@cinegenius.co" className="text-gold hover:underline">
-                support@cinegenius.co
-              </a>
-            </p>
-            <p className="text-sm leading-relaxed mt-3">
-              Der Betreiber ist nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren
-              vor einer Verbraucherschlichtungsstelle teilzunehmen (§ 36 VSBG).
-              Streitigkeiten zwischen Nutzern und dem Betreiber können im ordentlichen Rechtsweg
-              geltend gemacht werden.
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-2">§ 14 Verbraucherstreitbeilegung</h2>
+            <p className="text-sm leading-relaxed mt-3">Der Betreiber ist nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen (§ 36 VSBG). Bei Fragen oder Beschwerden ist der Betreiber unter support@cinegenius.co erreichbar. Der ordentliche Rechtsweg bleibt unberührt.</p>
           </section>
 
           <section>
@@ -387,7 +296,7 @@ export default function AgbPage() {
 
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border flex gap-6">
+        <div className="mt-12 pt-8 border-t border-border flex flex-wrap gap-6">
           <Link href="/impressum" className="text-sm text-gold hover:underline">Impressum →</Link>
           <Link href="/datenschutz" className="text-sm text-gold hover:underline">Datenschutzerklärung →</Link>
         </div>

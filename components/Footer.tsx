@@ -25,13 +25,15 @@ export default function Footer() {
       links: [
         { labelKey: "links_filmJobs", href: "/jobs" },
         { labelKey: "links_crewTalent", href: "/creators" },
-        { labelKey: "links_postJob", href: "/dashboard" },
-        { labelKey: "links_findCrew", href: "/creators" },
+        { labelKey: "links_postJob", href: "/inserat" },
+        { labelKey: "links_projects", href: "/projects/alle" },
+        { labelKey: "links_board", href: "/community" },
       ],
     },
     {
       titleKey: "col3",
       links: [
+        { labelKey: "links_companies", href: "/companies" },
         { labelKey: "links_about", href: "/about" },
         { labelKey: "links_help", href: "/help" },
         { labelKey: "links_trust", href: "/trust" },
@@ -41,7 +43,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="border-t border-border bg-bg-secondary mt-20 pb-14 lg:pb-0">
+    <footer id="site-footer" className="border-t border-border bg-bg-secondary mt-12 pb-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Marke */}
@@ -65,7 +67,7 @@ export default function Footer() {
                   <li key={link.labelKey}>
                     <Link
                       href={link.href}
-                      className="text-sm text-text-secondary hover:text-gold transition-colors"
+                      className="inline-flex min-h-11 items-center text-sm text-text-secondary hover:text-gold transition-colors [overflow-wrap:anywhere]"
                     >
                       {tf(link.labelKey as Parameters<typeof tf>[0])}
                     </Link>
@@ -81,7 +83,7 @@ export default function Footer() {
           <p className="text-xs text-text-muted">
             © {new Date().getFullYear()} CineGenius. {tf("rights")}
           </p>
-          <div className="flex gap-6">
+          <div className="flex max-w-full flex-wrap justify-center gap-x-6 gap-y-2">
             {[
               { labelKey: "links_privacy", href: "/datenschutz" },
               { labelKey: "links_terms", href: "/agb" },
@@ -90,7 +92,7 @@ export default function Footer() {
               <Link
                 key={labelKey}
                 href={href}
-                className="text-xs text-text-muted hover:text-text-secondary transition-colors"
+                className="inline-flex min-h-11 items-center text-sm text-text-muted hover:text-text-secondary transition-colors"
               >
                 {tf(labelKey as Parameters<typeof tf>[0])}
               </Link>

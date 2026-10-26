@@ -19,7 +19,7 @@ const categories = [
       },
       {
         q: "Ist CineGenius kostenlos?",
-        a: "Ja — vollständig und dauerhaft kostenlos. Registrierung, Profilerstellung, Inserate schalten und Angebote durchsuchen sind für alle kostenlos. Es gibt keine Gebühren, keine Provisionen und keine versteckten Kosten.",
+        a: "Registrierung, Profile, Suche und Inserate sind derzeit kostenlos. Preise für gemietete Gegenstände, Locations oder Dienstleistungen vereinbarst du mit dem jeweiligen Anbieter.",
       },
       {
         q: "Wie nehme ich Kontakt mit einem Anbieter auf?",
@@ -33,11 +33,11 @@ const categories = [
     items: [
       {
         q: "Wie stelle ich meine Location ein?",
-        a: "Klicke oben rechts auf 'Inserat erstellen', wähle 'Location' und fülle das Formular aus. Dein Inserat wird nach einer kurzen Prüfung freigeschaltet. Verifizierte Inserate erhalten ein Badge.",
+        a: "Melde dich an, öffne „Inserat erstellen“ und wähle „Location“. Ergänze Grunddaten, Drehbedingungen, bis zu 20 Fotos sowie Preis und Verfügbarkeit. Du kannst einen Entwurf speichern und veröffentlichst erst über die entsprechende Aktion.",
       },
       {
         q: "Kann ich eine Location vor der Anmietung besichtigen?",
-        a: "Ja — die meisten Location-Inhaber bieten einen kurzen Scout-Besuch oder eine Video-Besichtigung an. Schreib dem Anbieter einfach über die Nachrichtenfunktion.",
+        a: "Frage den Anbieter, ob eine Besichtigung vor Ort oder per Video möglich ist. Eine Besichtigung ist nicht automatisch Bestandteil eines Angebots.",
       },
       {
         q: "Wie werden Preise und Konditionen vereinbart?",
@@ -73,7 +73,7 @@ const categories = [
       },
       {
         q: "Wie stelle ich mein Fahrzeug ein?",
-        a: "Klicke auf 'Inserat erstellen' und wähle die Kategorie 'Fahrzeug'. Für Produktionsfahrzeuge kannst du zusätzlich den genauen Fahrzeugtyp angeben (z. B. Kostümbus oder Generator-Fahrzeug). Nach einer kurzen Prüfung wird dein Inserat freigeschaltet.",
+        a: "Klicke auf 'Inserat erstellen' und wähle die Kategorie 'Fahrzeug'. Für Produktionsfahrzeuge kannst du zusätzlich den genauen Fahrzeugtyp angeben (z. B. Kostümbus oder Generator-Fahrzeug). Speichere dein Angebot zunächst als Entwurf oder veröffentliche es mit der dafür vorgesehenen Aktion.",
       },
       {
         q: "Wie wird die Miete / der Einsatz vereinbart?",
@@ -109,16 +109,26 @@ const categories = [
       },
       {
         q: "Werden meine Daten bei einer Bewerbung weitergegeben?",
-        a: "Dein öffentliches CineGenius-Profil (Name, Foto, Skills, Portfolio) ist für alle sichtbar. Kontaktdaten teilst du nur, wenn du selbst antwortest — CineGenius gibt nichts automatisch weiter.",
+        a: "Der Empfänger sieht deine Bewerbung und die dazu vorgesehenen Profilangaben. Öffentlich freigegebene Profilinhalte sind für Besucher sichtbar; persönliche Kontaktdaten richten sich nach deinen Sichtbarkeitseinstellungen.",
       },
       {
         q: "Können Produktionen Jobs kostenlos ausschreiben?",
-        a: "Ja — vollständig kostenlos und ohne Limit. Alle Stellenausschreibungen, Crew-Suche und Bewerbungen sind dauerhaft kostenlos.",
+        a: "Jobs einstellen, Crew suchen und Bewerbungen über die vorhandenen Funktionen versenden ist derzeit kostenlos.",
       },
       {
         q: "Wie erstelle ich ein Crew-Profil?",
-        a: "Registriere dich kostenlos, gehe zu 'Profil bearbeiten' und wähle deinen Typ (Schauspieler/in, Filmcrew, Fotograf/in usw.). Lade ein Profilfoto hoch, füge deine Skills und Credits hinzu — fertig. Dein Profil erscheint dann in der Crew-Suche.",
+        a: "Nach der E-Mail-Bestätigung führt dich die Einrichtung durch Name, Ort, gewünschte Bereiche und passende Tätigkeiten. Mehrere Gewerke und Tätigkeiten sind möglich. Später bearbeitest du dein Profil in „Mein Bereich“. Ob es öffentlich erscheint, hängt von der vorgesehenen Sichtbarkeit ab.",
       },
+    ],
+  },
+  {
+    icon: BookOpen,
+    label: "Firmen & Fotos",
+    items: [
+      { q: "Wie präsentiere ich meine Firma oder mein Catering?", a: "Wähle bei der Einrichtung eine Firma oder Dienstleistung und ergänze Branche und Leistungen. Mehrere passende Bereiche einschließlich Catering sind möglich. Ein neues Firmenprofil wird beim Speichern öffentlich; Entwürfe anderer Angebotsarten bleiben bis zur Veröffentlichung privat." },
+      { q: "Wie verknüpfe ich mein Profil mit einer Firma?", a: "Auf dem Firmenprofil findest du unter „Weitere Aktionen“ die Firmenzugehörigkeitsanfrage. Wähle Funktionen und ergänze bei Bedarf eine Nachricht. Erst nach Bestätigung erscheint die Zugehörigkeit öffentlich. Firmenverantwortliche können bereits registrierte Mitglieder einladen; auch diese Einladung muss angenommen werden." },
+      { q: "Wie viele Fotos kann ich hochladen?", a: "Im Marktplatz sind bis zu 10 Fotos pro Artikel und bei Locations bis zu 20 Fotos möglich. Die jeweiligen Formulare zeigen unterstützte Formate und Größenlimits. Persönliche Profile und Firmen haben eigene Foto- und Galerieeingaben." },
+      { q: "Welche Bilder erscheinen in „Frische Einblicke“?", a: "Öffentlich sichtbare Profilfotos, Cover und direkt hochgeladene persönliche Portfoliofotos sowie Firmenlogos, Firmen-Cover und Firmengalerien können automatisch erscheinen. Projekt-, Marktplatz-, Location- und Schwarzes-Brett-Bilder sowie private Inhalte und Nachrichtenanhänge gehören nicht dazu." },
     ],
   },
   {
@@ -127,11 +137,11 @@ const categories = [
     items: [
       {
         q: "Ist CineGenius seriös?",
-        a: "CineGenius ist eine deutschsprachige Plattform speziell für die Film- und Medienbranche. Wir prüfen Inserate vor der Freischaltung und entfernen inaktive oder irreführende Einträge. Bei Fragen erreichst du uns jederzeit unter support@cinegenius.co.",
+        a: "CineGenius verbindet Menschen und Angebote für Film, Fotografie und Content. Angaben stammen von den jeweiligen Mitgliedern. Prüfe wichtige Details direkt mit dem Anbieter; auffällige Inhalte kannst du melden.",
       },
       {
         q: "Wie melde ich ein verdächtiges Inserat?",
-        a: "Schreib uns einfach an support@cinegenius.co mit dem Link zum Inserat und einer kurzen Beschreibung. Wir prüfen alle Meldungen und reagieren schnell.",
+        a: "Schreib uns einfach an support@cinegenius.co mit dem Link zum Inserat und einer kurzen Beschreibung. Wir prüfen Meldungen; eine feste Bearbeitungszeit wird nicht zugesichert.",
       },
       {
         q: "Was passiert mit meinen Daten?",
@@ -274,7 +284,7 @@ export default function HelpPage() {
             Noch Fragen?
           </h2>
           <p className="text-text-muted mb-6 text-sm">
-            Unser Support-Team ist montags bis freitags von 9–18 Uhr MEZ erreichbar.
+            Schreibe uns an support@cinegenius.co. Nenne den betroffenen Bereich und füge bei Fehlern möglichst den Seitenlink hinzu.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
@@ -287,7 +297,7 @@ export default function HelpPage() {
               href="/dashboard"
               className="px-6 py-3 border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-colors flex items-center justify-center gap-2"
             >
-              <MessageSquare size={15} /> Ticket öffnen
+              <MessageSquare size={15} /> Mein Bereich
             </Link>
           </div>
         </div>

@@ -116,14 +116,14 @@ export default async function PricingPage() {
           <h2 className="font-display text-3xl font-bold text-text-primary mb-2">{t("categoriesTitle")}</h2>
           <p className="text-text-muted text-sm">{t("categoriesDesc")}</p>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {categories.map(({ icon: Icon, name }) => (
-            <div key={name} className="flex items-center gap-3 p-4 rounded-xl border border-border bg-bg-secondary">
+            <div key={name} className="flex min-w-0 items-center gap-3 p-4 rounded-xl border border-border bg-bg-secondary">
               <div className="w-9 h-9 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
                 <Icon size={16} className="text-gold" />
               </div>
               <div>
-                <p className="text-sm font-medium text-text-primary">{name}</p>
+                <p className="min-w-0 break-words text-sm font-medium text-text-primary [overflow-wrap:anywhere]">{name}</p>
                 <p className="text-xs text-success font-semibold">{t("catFreeLabel")}</p>
               </div>
             </div>

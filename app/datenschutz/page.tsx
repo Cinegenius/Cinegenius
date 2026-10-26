@@ -8,13 +8,13 @@ export const metadata: Metadata = {
 
 export default function DatenschutzPage() {
   return (
-    <div className="pt-16 min-h-screen bg-bg-primary">
+    <div className="pt-16 min-h-screen min-w-0 bg-bg-primary [overflow-wrap:anywhere]">
       <div className="max-w-2xl mx-auto px-4 py-16">
 
         <div className="mb-10">
           <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-3">Rechtliches</p>
           <h1 className="font-display text-3xl font-bold text-text-primary mb-2">Datenschutzerklärung</h1>
-          <p className="text-text-muted text-sm">Gemäß DSGVO, BDSG und TTDSG — Stand: Mai 2026</p>
+          <p className="text-text-muted text-sm">Gemäß DSGVO, BDSG und TDDDG — Stand: 26. Oktober 2026</p>
         </div>
 
         <div className="space-y-10 text-text-secondary text-sm leading-relaxed">
@@ -25,7 +25,7 @@ export default function DatenschutzPage() {
               Markus Müller<br />
               Plinganserstrasse 19, 81369 München<br />
               E-Mail: <a href="mailto:support@cinegenius.co" className="text-gold hover:underline">support@cinegenius.co</a><br />
-              Tel: <a href="tel:+4901713866624" className="text-gold hover:underline">+49 171 3866624</a>
+              Tel: <a href="tel:+491713866624" className="text-gold hover:underline">+49 171 3866624</a>
             </p>
           </section>
 
@@ -62,7 +62,7 @@ export default function DatenschutzPage() {
                 </tbody>
               </table>
             </div>
-            <p className="mt-3 text-text-muted text-xs">Alle Drittlandübertragungen (USA) erfolgen auf Basis von EU-Standardvertragsklauseln (SCC) gem. Art. 46 Abs. 2 lit. c DSGVO.</p>
+            <p className="mt-3 text-text-muted text-xs">Informationen zu Drittlandübertragungen findest du in Abschnitt 17. Die konkreten Dienstverträge und Speicherkonfigurationen sind vom Betreiber zu prüfen.</p>
           </section>
 
           <section>
@@ -79,7 +79,7 @@ export default function DatenschutzPage() {
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">4. Profildaten & Inserate</h2>
             <p>
-              Alle von dir eingestellten Inhalte — Profildaten, Inserate, Beschreibungen, Bilder — werden in unserer Datenbank (<strong className="text-text-primary">Supabase</strong>, Server in Frankfurt/EU) gespeichert. Rechtsgrundlage ist die Vertragserfüllung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO). Veröffentlichte Inserate und Profile sind für alle Besucher der Plattform öffentlich einsehbar.
+              Alle von dir eingestellten Inhalte — Profildaten, Inserate, Beschreibungen, Bilder — werden in unserer Datenbank (<strong className="text-text-primary">Supabase</strong>, Server in Frankfurt/EU) gespeichert. Rechtsgrundlage ist die Vertragserfüllung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO). Veröffentlichte Inhalte sind entsprechend ihrer Sichtbarkeit öffentlich einsehbar. Private Entwürfe und persönliche Kontaktdaten unterliegen gesonderten Sichtbarkeits- und Zugriffsregeln. Persönliche Kontaktdaten werden nicht automatisch zu öffentlichen Firmenkontakten.
             </p>
             <p className="mt-2">
               Datenschutz Supabase: <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">supabase.com/privacy</a>
@@ -89,21 +89,21 @@ export default function DatenschutzPage() {
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">5. Nachrichten & Kommunikation</h2>
             <p>
-              Nachrichten zwischen Nutzern werden zur Ermöglichung der Plattformfunktion in der Datenbank gespeichert (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO). Wir lesen keine privaten Nachrichten, außer zur Strafverfolgung oder bei gemeldeten Inhaltsverstoßen. Bewerbungen auf Job-Inserate werden dem ausschreibenden Unternehmen weitergegeben.
+              Nachrichten zwischen Nutzern werden zur Ermöglichung der Plattformfunktion in der Datenbank gespeichert (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO). Private Gespräche sind nicht als allgemeiner Admininhalt frei durchsuchbar. Für rechtmäßig erforderliche Prüfungen oder gemeldete Inhalte ist der Zugriff auf das notwendige Maß zu beschränken. Nachrichten an „CineGenius Support“ werden von berechtigten Supportadministratoren bearbeitet. Die Funktion „für mich löschen“ blendet eine eigene Nachricht nur für den Absender aus; beim Empfänger kann sie weiterhin sichtbar sein. Bewerbungen auf Job-Inserate werden dem ausschreibenden Unternehmen weitergegeben.
             </p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">6. Profilaufrufe</h2>
             <p>
-              Wenn ein eingeloggter Nutzer ein Profil besucht, speichern wir intern, dass dieses Profil aufgerufen wurde (Zeitstempel und pseudonymisierter Bezug zum Betrachter). So können Profilinhaber sehen, wie oft ihr Profil aufgerufen wurde. Rechtsgrundlage ist das berechtigte Interesse beider Seiten an Transparenz (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO). Die Daten werden nach 90 Tagen automatisch gelöscht. Nicht eingeloggte Besucher werden nicht erfasst.
+              Wenn ein eingeloggter Nutzer ein Profil besucht, speichern wir intern, dass dieses Profil aufgerufen wurde (Zeitstempel und pseudonymisierter Bezug zum Betrachter). So können Profilinhaber sehen, wie oft ihr Profil aufgerufen wurde. Rechtsgrundlage ist das berechtigte Interesse beider Seiten an Transparenz (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO). Nicht eingeloggte Besucher werden über diese Profilaufruffunktion nicht erfasst. Es gilt die unter „Speicherdauer & Löschung“ beschriebene Begrenzung.
             </p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">7. Online-Präsenzstatus</h2>
             <p>
-              Wenn du eingeloggt bist, sendet die Plattform alle 30 Sekunden einen anonymen Ping an unsere Server, der deinen Online-Status aktualisiert. Dabei wird ausschließlich deine pseudonymisierte Nutzer-ID sowie ein Zeitstempel gespeichert — keine Inhalte oder Standortdaten. Dieser Status wird anderen Nutzern als „Online“-Indikator angezeigt. Rechtsgrundlage ist das berechtigte Interesse an einer funktionalen Kommunikationsplattform (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO). Der Status wird nach Ablauf der Sitzung automatisch zurückgesetzt.
+              Wenn du eingeloggt bist, sendet die Plattform bei sichtbarem Browser-Tab ungefähr alle zwei Minuten einen authentifizierten Ping an unsere Server, der deinen Online-Status aktualisiert. Dabei wird ausschließlich deine pseudonymisierte Nutzer-ID sowie ein Zeitstempel gespeichert — keine Inhalte oder Standortdaten. Dieser Status wird anderen Nutzern als „Online“-Indikator angezeigt. Rechtsgrundlage ist das berechtigte Interesse an einer funktionalen Kommunikationsplattform (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO). Die Anzeige richtet sich nach dem zuletzt gespeicherten Aktivitätszeitpunkt. Dieser Zeitpunkt wird nicht bei jeder Abmeldung automatisch gelöscht.
             </p>
           </section>
 
@@ -115,9 +115,16 @@ export default function DatenschutzPage() {
           </section>
 
           <section>
+            <h2 className="text-base font-semibold text-text-primary mb-3">9. Öffentliche Fotos, Firmenzugehörigkeit und Entwürfe</h2>
+            <p>Öffentlich sichtbare Profilfotos, Coverbilder und direkt zugeordnete persönliche Portfoliofotos sowie Firmenlogos, Firmen-Cover und Firmengalerien können auch in „Frische Einblicke“ erscheinen. Dafür ist keine gesonderte Kennzeichnung notwendig. Bilder eigenständiger Projekte, Locations, Marktplatzangebote und Beiträge im Schwarzen Brett sowie private Bilder, Entwürfe und Nachrichtenanhänge sind von dieser Sammlung ausgeschlossen. Die Zuordnung zum öffentlichen Profil oder Unternehmen bleibt erhalten.</p>
+            <p className="mt-2">Zugehörigkeitsanfragen und Firmeneinladungen enthalten Profilbezug, gewünschte Funktionen und gegebenenfalls eine Nachricht. Sie werden zur Entscheidung durch die jeweils berechtigte Gegenseite verarbeitet. Die Zugehörigkeit erscheint erst nach Bestätigung öffentlich. Eine öffentliche Firmenfunktion ist von technischen Verwaltungsrechten getrennt.</p>
+            <p className="mt-2">Die geführte Einrichtung und die Profilbearbeitung speichern begonnene Angaben als privaten Entwurf im bestehenden Kontosystem. Rechtsgrundlage für diese Funktionen ist die Bereitstellung der angeforderten Plattformleistung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO).</p>
+          </section>
+
+          <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">10. Zahlungsabwicklung (Stripe)</h2>
             <p>
-              Buchungen werden über <strong className="text-text-primary">Stripe Inc.</strong> (USA) abgewickelt. Bei einer Zahlung werden Zahlungsdaten direkt von Stripe entgegengenommen — wir haben zu keinem Zeitpunkt Zugriff auf vollständige Kartennummern. Stripe verarbeitet Name, E-Mail, Rechnungsadresse und Zahlungsmittelinformationen auf Basis der Vertragserfüllung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO).<br />
+              Eine Anfrage auf CineGenius löst keine automatische Zahlung aus. In der Plattform ist eine Schnittstelle zu <strong className="text-text-primary">Stripe</strong> vorbereitet; eine allgemeine Treuhandabwicklung wird nicht angeboten. Falls eine gesonderte Zahlungsfunktion bereitgestellt und ausdrücklich genutzt wird, sind deren konkrete Datenverarbeitung und Bedingungen vorab anzugeben.<br />
               Datenschutz Stripe: <a href="https://stripe.com/de/privacy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">stripe.com/de/privacy</a>
             </p>
           </section>
@@ -125,7 +132,7 @@ export default function DatenschutzPage() {
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">11. Hosting & Infrastruktur (Vercel)</h2>
             <p>
-              Die Plattform wird bei <strong className="text-text-primary">Vercel Inc.</strong> (USA) gehostet. Vercel verarbeitet Zugriffsdaten (IP-Adresse, Browsertyp, aufgerufene Seite, Datum und Uhrzeit) in Server-Logs. Rechtsgrundlage ist das berechtigte Interesse an einem sicheren und fehlerfreien Betrieb (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO). Log-Daten werden nach maximal 30 Tagen gelöscht.<br />
+              Die Plattform wird bei <strong className="text-text-primary">Vercel Inc.</strong> (USA) gehostet. Vercel verarbeitet Zugriffsdaten (IP-Adresse, Browsertyp, aufgerufene Seite, Datum und Uhrzeit) in Server-Logs. Rechtsgrundlage ist das berechtigte Interesse an einem sicheren und fehlerfreien Betrieb (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO). Die konkrete Aufbewahrung richtet sich nach der eingesetzten Hosting-Konfiguration und den notwendigen Betriebs- und Sicherheitszwecken.<br />
               Datenschutz Vercel: <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">vercel.com/legal/privacy-policy</a>
             </p>
           </section>
@@ -136,7 +143,7 @@ export default function DatenschutzPage() {
               Zur Erkennung und Behebung technischer Fehler setzen wir <strong className="text-text-primary">Sentry</strong> (Functional Software Inc., San Francisco, USA) ein. Tritt ein Fehler auf, werden technische Informationen — Fehlermeldung, Stack-Trace, Browsertyp, Betriebssystem sowie deine pseudonymisierte Nutzer-ID (kein Name, keine E-Mail) — an Sentry übermittelt. Sentry ist ausschließlich in der Produktionsumgebung aktiv.
             </p>
             <p className="mt-2">
-              Session-Replay ist so konfiguriert, dass es <strong className="text-text-primary">ausschließlich bei Fehlern</strong> ausgelöst wird und dabei alle Texte automatisch unkenntlich gemacht sind (<code className="bg-bg-elevated px-1 rounded text-xs">maskAllText: true</code>). Normale Nutzungssitzungen werden nicht aufgezeichnet. Rechtsgrundlage ist das berechtigte Interesse an der Systemstabilität (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO). Fehler-Logs werden nach 90 Tagen automatisch gelöscht.<br />
+              Für Sitzungswiederholungen ist normales Session-Sampling deaktiviert; die Fehler-Samplingrate beträgt 100 %. Die Replay-Integration kann dafür einen Puffer der Sitzung vor dem Fehler verwenden. Texte werden maskiert, Medien sind in der aktuellen Konfiguration nicht pauschal blockiert. Eine Behauptung, dass keinerlei Nutzungsabschnitte vor einem Fehler erfasst werden, wäre daher unzutreffend. Die datenschutzrechtliche Grundlage und eine gegebenenfalls erforderliche Einwilligung für diese Aufzeichnung müssen gesondert berücksichtigt werden; dieser Text stellt keine Einwilligung dar.<br />
               Datenschutz Sentry: <a href="https://sentry.io/privacy/" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">sentry.io/privacy</a>
             </p>
           </section>
@@ -160,7 +167,7 @@ export default function DatenschutzPage() {
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">15. Geocoding (OpenStreetMap Nominatim)</h2>
             <p>
-              Für die Kartenansicht bei Locations ermitteln wir geografische Koordinaten über die öffentliche <strong className="text-text-primary">Nominatim-API</strong> der OpenStreetMap Foundation (UK). Dabei werden ausschließlich Städtenamen übertragen — keine personenbezogenen Daten. Ergebnisse werden serverseitig 24 Stunden gecacht, sodass jede Stadt nur einmal angefragt wird. Rechtsgrundlage ist das berechtigte Interesse (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO).<br />
+              Für die Kartenansicht bei Locations ermitteln wir geografische Koordinaten über die öffentliche <strong className="text-text-primary">Nominatim-API</strong> der OpenStreetMap Foundation (UK). Beim serverseitigen Geocoding werden Städtenamen übertragen. Kartenkacheln werden bei angezeigten Karten vom OpenStreetMap-Kartendienst geladen; dabei erhält dieser unter anderem die IP-Adresse und technische Zugriffsdaten des Browsers. Ergebnisse werden serverseitig 24 Stunden gecacht, sodass jede Stadt nur einmal angefragt wird. Rechtsgrundlage ist das berechtigte Interesse (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO).<br />
               Datenschutz OpenStreetMap: <a href="https://osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">osmfoundation.org/wiki/Privacy_Policy</a>
             </p>
           </section>
@@ -169,17 +176,17 @@ export default function DatenschutzPage() {
             <h2 className="text-base font-semibold text-text-primary mb-3">16. Cookies, localStorage & lokale Speicherung</h2>
             <div className="space-y-3">
               <p>
-                <strong className="text-text-primary">Technisch notwendige Cookies (Clerk):</strong> Clerk setzt Session-Cookies, die für die Authentifizierung zwingend erforderlich sind. Ohne diese Cookies ist eine Anmeldung nicht möglich. Rechtsgrundlage: Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO, § 25 Abs.&nbsp;2 Nr.&nbsp;2 TTDSG.
+                <strong className="text-text-primary">Technisch notwendige Cookies (Clerk):</strong> Clerk setzt Session-Cookies, die für die Authentifizierung zwingend erforderlich sind. Ohne diese Cookies ist eine Anmeldung nicht möglich. Rechtsgrundlage: Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO, § 25 Abs.&nbsp;2 Nr.&nbsp;2 TDDDG.
               </p>
               <p>
-                <strong className="text-text-primary">Präferenz-Cookie:</strong> <code className="bg-bg-elevated px-1 rounded text-xs">cg_locale</code> speichert deine Sprachauswahl. Enthält keine personenbezogenen Daten. Rechtsgrundlage: § 25 Abs.&nbsp;2 Nr.&nbsp;2 TTDSG (technisch notwendig für korrekte Sprachanzeige).
+                <strong className="text-text-primary">Präferenz-Cookie:</strong> <code className="bg-bg-elevated px-1 rounded text-xs">cg_locale</code> speichert deine Sprachauswahl. Enthält keine personenbezogenen Daten. Rechtsgrundlage: § 25 Abs.&nbsp;2 Nr.&nbsp;2 TDDDG (technisch notwendig für korrekte Sprachanzeige).
               </p>
               <p>
                 <strong className="text-text-primary">Lokaler Browser-Speicher (localStorage):</strong> Im Browser werden lokal gespeichert:
               </p>
               <ul className="list-disc list-inside space-y-1 pl-2">
                 <li><code className="bg-bg-elevated px-1 rounded text-xs">cg_recent_searches</code> — deine zuletzt eingegebenen Suchbegriffe. Verbleiben ausschließlich in deinem Browser, werden nie an unsere Server übertragen.</li>
-                <li><code className="bg-bg-elevated px-1 rounded text-xs">cg_cookies_ok</code> — deine Bestätigung des Cookie-Hinweises.</li>
+                <li><code className="bg-bg-elevated px-1 rounded text-xs">cg_cookies_ok</code> — deine Bestätigung des Cookie-Hinweises. Sie ist keine pauschale Einwilligung in optionale Aufzeichnungen.</li>
               </ul>
               <p>
                 <strong className="text-text-primary">Keine Werbe- oder Tracking-Cookies:</strong> Wir setzen keinerlei Cookies zu Werbe-, Tracking- oder Profilierungszwecken ein.
@@ -190,7 +197,7 @@ export default function DatenschutzPage() {
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">17. Drittlandübertragungen (USA)</h2>
             <p>
-              Mehrere eingesetzte Dienste (Clerk, Vercel, Stripe, Sentry, Resend) haben ihren Sitz in den USA. Da die USA kein der EU vergleichbares Datenschutzniveau garantieren, erfolgen diese Übertragungen auf Basis von EU-Standardvertragsklauseln (SCC) gemäß Art.&nbsp;46 Abs.&nbsp;2 lit.&nbsp;c DSGVO. Die SCC-Dokumente der jeweiligen Anbieter können über deren Datenschutzseiten abgerufen werden.
+              Mehrere eingesetzte Dienste (Clerk, Vercel, Stripe, Sentry, Resend) haben ihren Sitz in den USA. Für eine Übertragung ist eine anwendbare Grundlage nach Art.&nbsp;44 ff. DSGVO erforderlich, etwa ein anwendbarer Angemessenheitsbeschluss oder geeignete Garantien wie Standardvertragsklauseln. Maßgeblich sind der konkrete Anbieter und die tatsächlich vereinbarten Bedingungen. Die SCC-Dokumente der jeweiligen Anbieter können über deren Datenschutzseiten abgerufen werden.
             </p>
           </section>
 
@@ -198,15 +205,11 @@ export default function DatenschutzPage() {
             <h2 className="text-base font-semibold text-text-primary mb-3">18. Speicherdauer & Löschung</h2>
             <div className="space-y-2 mt-1">
               {[
-                ["Profildaten & Inserate", "Bis zur Kontolöschung; danach binnen 30 Tagen vollständig gelöscht"],
-                ["Nachrichten", "Bis zur Löschung des Kontos eines der Beteiligten"],
-                ["Profilaufrufe", "90 Tage (automatische Löschung)"],
-                ["Foto-Likes", "Bis zur Kontolöschung oder manuellen Entfernung"],
-                ["Online-Präsenzstatus", "Wird nach Sitzungsende automatisch zurückgesetzt"],
-                ["Server-Logs (Vercel)", "Max. 30 Tage"],
-                ["Fehler-Logs (Sentry)", "90 Tage"],
-                ["Buchungsdaten", "10 Jahre (§ 147 AO — gesetzliche Aufbewahrungspflicht)"],
-                ["E-Mail-Versandlogs (Resend)", "30 Tage"],
+                ["Profildaten, Inserate und Entwürfe", "Für die Bereitstellung des Kontos und der gespeicherten Inhalte; Löschanfragen können über die Kontoeinstellungen oder den Support gestellt werden"],
+                ["Nachrichten und Supportvorgänge", "Für die Kommunikation und erforderliche Bearbeitung; lokales Ausblenden einer Nachricht löscht nicht automatisch die Empfängerkopie"],
+                ["Profilaufrufe, Foto-Likes und Präsenzdaten", "Nur soweit für die jeweiligen Funktionen und erforderlichen Nachweise benötigt"],
+                ["Hosting-, Fehler- und E-Mail-Protokolle", "Nach der tatsächlichen Dienstkonfiguration und dem erforderlichen Betriebszweck"],
+                ["Vertrags- und Abrechnungsunterlagen", "Soweit vorhanden und gesetzlich vorgeschrieben, für die jeweils anwendbare Aufbewahrungsfrist"],
               ].map(([what, when]) => (
                 <div key={what} className="flex flex-col sm:flex-row gap-1 sm:gap-3 py-1.5 border-b border-border/50 last:border-0">
                   <span className="text-text-primary font-medium sm:w-52 shrink-0">{what}</span>
@@ -272,7 +275,7 @@ export default function DatenschutzPage() {
 
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border flex gap-6">
+        <div className="mt-12 pt-8 border-t border-border flex flex-wrap gap-6">
           <Link href="/impressum" className="text-sm text-gold hover:underline">Impressum →</Link>
           <Link href="/agb" className="text-sm text-gold hover:underline">AGB →</Link>
         </div>

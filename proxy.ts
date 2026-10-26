@@ -134,6 +134,7 @@ const isPublicRoute = createRouteMatcher([
   "/about(.*)",
   "/pricing(.*)",
   "/help(.*)",
+  "/trust",
   "/marketplace(.*)",
 ]);
 
