@@ -32,6 +32,7 @@ export type QuickStartIntentData = {
 };
 export type QuickStartDraft = {
   version: 3;
+  welcomeAcknowledged?: boolean;
   step: QuickStartScreen;
   intents: QuickStartIntent[];
   name: string;
@@ -46,6 +47,7 @@ export type QuickStartDraft = {
 
 export const START_QUICK_START_DRAFT: QuickStartDraft = {
   version: 3,
+  welcomeAcknowledged: false,
   step: "name",
   intents: [],
   name: "",
@@ -165,6 +167,7 @@ export function normalizeQuickStartDraft(value: unknown): QuickStartDraft {
     const step: QuickStartScreen = legacyStep === 3 ? "review" : "name";
     return {
       ...START_QUICK_START_DRAFT,
+      welcomeAcknowledged: true,
       step,
       intents: intent ? [intent] : [],
       name: typeof input.name === "string" ? input.name.slice(0, 120) : "",
@@ -210,6 +213,7 @@ export function normalizeQuickStartDraft(value: unknown): QuickStartDraft {
       : intents.find((intent) => intent !== "search") ?? null;
   return {
     version: 3,
+    welcomeAcknowledged: input.welcomeAcknowledged !== false,
     step: migratedStep,
     intents,
     name: typeof input.name === "string" ? input.name.slice(0, 120) : "",

@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import {
   ArrowLeft, ArrowRight, Building2, Camera, CheckCircle2, Film, ImagePlus,
-  Loader2, MapPin, Package, Search, Trash2,
+  Loader2, MapPin, Package, Search, Trash2, Lock, UserRound,
 } from "lucide-react";
 import { compressImage, MAX_FUNCTION_UPLOAD_BYTES } from "@/lib/compressImage";
 import { departments, getDepartmentRoleSearchTerms } from "@/lib/departments";
@@ -37,7 +37,7 @@ const crewDepartments = getQuickStartDepartments();
 const castDepartment = departments.find((department) => department.id === "cast");
 const inputClass = "min-h-12 w-full rounded-xl border border-border bg-bg-primary px-4 text-base text-text-primary outline-none focus:border-gold focus:ring-2 focus:ring-gold/20";
 const stepContent: Record<QuickStartScreen, { title: string; description: string }> = {
-  name: { title: "Willkommen bei CineGenius! Schön, dass du dabei bist. Wie heißt du?", description: "Dein Name wird für dein CineGenius-Profil verwendet." },
+  name: { title: "Wie heißt du?", description: "Dein Name wird für dein CineGenius-Profil verwendet." },
   location: { title: "Wo bist du zu Hause?", description: "Stadt und Land helfen dabei, dich und deine Angebote in deiner Region zu finden. Für ein Angebot kannst du später einen anderen Ort angeben." },
   goals: { title: "Was möchtest du auf CineGenius machen?", description: "Du kannst später jederzeit weitere Bereiche ergänzen." },
   details: { title: "Was passt zu deiner Auswahl?", description: "Wir zeigen nur die Angaben für den Bereich, den du gerade einrichtest." },
@@ -77,8 +77,12 @@ export default function ProfileSetupWizard() {
   const params = useSearchParams();
   const { user } = useUser();
   const isNewRegistration = params.get("welcome") === "1";
+  const resumeIncomplete = params.get("resume") === "1";
   const redirectTo = safeAuthRedirect(params.get("redirect") ?? undefined, "", ["/sign-in", "/sign-up", "/profile-setup", "/guided-profile", "/guided-listing", "/company-setup"]);
   const [draft, setDraft] = useState<QuickStartDraft>(START_QUICK_START_DRAFT);
+  const [finished, setFinished] = useState<QuickStartDraft | null>(null);
+  const [profileIsPrivate, setProfileIsPrivate] = useState(false);
+  const [profilePublic, setProfilePublic] = useState(false);
   const [ready, setReady] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [loadAttempt, setLoadAttempt] = useState(0);
@@ -106,21 +110,27 @@ export default function ProfileSetupWizard() {
         if (!response.ok) throw new Error(result.error ?? "Dein Profilstatus konnte nicht geprüft werden.");
         return result;
       }),
-    ]).then(([saved, profile]) => {
+      fetch("/api/user-settings", { cache: "no-store" }).then(response => response.ok ? response.json() : null).catch(() => null),
+    ]).then(([saved, profile, settings]) => {
       if (!active) return;
+      setProfileIsPrivate(settings?.settings?.profile_visibility === "private");
       const hasInProgressDraft = !!saved?.quickStart && saved.setupComplete !== true;
       if (saved?.setupComplete) {
-        router.replace(saved.intent === "search" ? (redirectTo ?? "/search") : (redirectTo ?? "/dashboard"));
+        router.replace(saved.intent === "search" ? (redirectTo || "/search") : (redirectTo || "/dashboard"));
         return;
       }
       if (shouldSkipProfileSetup({ hasExistingProfile: profile?.exists === true, hasInProgressDraft, isNewRegistration })) {
-        router.replace(redirectTo ?? "/dashboard");
+        router.replace(redirectTo || "/dashboard");
         return;
       }
       const existingName = typeof profile?.profile?.display_name === "string" ? profile.profile.display_name : user?.fullName ?? "";
-      const nextDraft = hasInProgressDraft
+      let nextDraft = hasInProgressDraft
         ? normalizeQuickStartDraft(saved.quickStart)
         : { ...START_QUICK_START_DRAFT, name: existingName };
+      if (resumeIncomplete && hasInProgressDraft) {
+        const missing = validateQuickStartDraft(nextDraft);
+        if (missing) nextDraft = { ...nextDraft, step: screenForField(missing.field), activeIntent: intentForField(missing.field) ?? nextDraft.activeIntent };
+      }
       setDraft(nextDraft);
       setCountryOther(!countries.includes(nextDraft.personCountry));
       setReady(true);
@@ -130,7 +140,7 @@ export default function ProfileSetupWizard() {
       setReady(true);
     });
     return () => { active = false; };
-  }, [isNewRegistration, loadAttempt, redirectTo, router, user?.fullName]);
+  }, [isNewRegistration, resumeIncomplete, loadAttempt, redirectTo, router, user?.fullName]);
 
   useEffect(() => {
     if (!ready || draft.name || !user?.fullName) return;
@@ -161,11 +171,11 @@ export default function ProfileSetupWizard() {
   }, []);
 
   useEffect(() => {
-    if (!ready || (!draft.name.trim() && draft.intents.length === 0)) return;
+    if (!ready || saving || finished || draft.welcomeAcknowledged === false) return;
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => { void persist(draft); }, 450);
     return () => { if (timer.current) clearTimeout(timer.current); };
-  }, [ready, draft, persist]);
+  }, [ready, draft, persist, saving, finished]);
 
   const screens = useMemo(() => buildQuickStartScreens(draft), [draft]);
   const currentIndex = Math.max(0, screens.findIndex((screen) => screen.id === draft.step));
@@ -196,10 +206,10 @@ export default function ProfileSetupWizard() {
   const hasCompanyIntent = draft.intents.includes("company");
   const hasOfferIntent = draft.intents.includes("location") || draft.intents.includes("equipment");
   const completionActionLabel = hasProfileIntent
-    ? hasCompanyIntent && hasOfferIntent ? "Profil und Firma erstellen, Angebote speichern"
-      : hasCompanyIntent ? "Profil und Firma erstellen"
-        : hasOfferIntent ? "Profil erstellen und Angebote speichern"
-          : "Profil erstellen"
+    ? profileIsPrivate ? "Privates Profil speichern und Einrichtung abschließen" : hasCompanyIntent && hasOfferIntent ? "Profil und Firma veröffentlichen, Entwürfe speichern"
+      : hasCompanyIntent ? "Profil und Firma veröffentlichen"
+        : hasOfferIntent ? "Profil veröffentlichen und Entwürfe speichern"
+          : "Profil veröffentlichen"
     : hasCompanyIntent
       ? hasOfferIntent ? "Firma eintragen und Angebote speichern" : "Firma eintragen"
       : hasOfferIntent ? "Private Angebotsentwürfe speichern" : "Los zur Suche";
@@ -357,9 +367,15 @@ export default function ProfileSetupWizard() {
     const response = await fetch("/api/onboarding?type=quick-start", { method: "DELETE" });
     const body = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(body.error ?? "Dein Einrichtungsstand konnte nicht abgeschlossen werden.");
-    const hasSearchOnly = completedDraft.intents.every((intent) => intent === "search");
-    const destination = hasSearchOnly ? (redirectTo ?? "/search") : (redirectTo ?? "/dashboard?tab=listings");
-    router.replace(destination);
+    if (completedDraft.completed.profile) {
+      try {
+        const settingsResponse = await fetch("/api/user-settings", { cache: "no-store" });
+        const settingsBody = await settingsResponse.json().catch(() => ({}));
+        setProfilePublic(settingsResponse.ok && settingsBody.settings?.profile_visibility === "public");
+      } catch { setProfilePublic(false); }
+    }
+    setFinished(completedDraft);
+    setSaveState("saved");
   }
 
   async function finish() {
@@ -394,7 +410,12 @@ export default function ProfileSetupWizard() {
           }),
         });
         const result = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(result.error ?? "Dein Profil konnte nicht erstellt werden.");
+        if (!response.ok || !result.profile?.user_id) {
+          const firstField = Object.keys(result.fieldErrors ?? {})[0];
+          const field = firstField === "display_name" ? "name" : firstField === "location" ? "personCity" : firstField === "activity" ? "crew-roles" : null;
+          if (field) { setDraft({ ...progress, step: screenForField(field), activeIntent: intentForField(field) ?? activeIntent }); focusValidation(field); }
+          throw new Error(result.fieldErrors?.[firstField] ?? result.error ?? "Dein Profil konnte nicht erstellt werden.");
+        }
         progress = { ...progress, completed: { ...progress.completed, profile: true } };
         setDraft(progress);
         if (!(await persist(progress))) throw new Error("Das Profil wurde erstellt, aber dein Einrichtungsstand konnte nicht aktualisiert werden. Bitte versuche es erneut.");
@@ -562,6 +583,28 @@ export default function ProfileSetupWizard() {
   if (!ready) return <div className="min-h-screen bg-bg-primary px-4 pt-20 text-center text-sm text-text-muted"><Loader2 className="mx-auto mb-3 animate-spin" />Dein Start wird geladen …</div>;
   if (loadError) return <div className="min-h-[75vh] bg-bg-primary px-4 pb-8 pt-8 sm:pt-12"><section className="mx-auto max-w-xl rounded-2xl border border-border bg-bg-secondary p-6 text-center"><p role="alert" className="text-sm leading-6 text-red-300">{loadError}</p><p className="mt-2 text-xs leading-5 text-text-muted">Damit kein gespeicherter Fortschritt verloren geht, starte bitte erst weiter, wenn der Status geladen wurde.</p><button type="button" onClick={() => { setReady(false); setLoadError(""); setLoadAttempt((value) => value + 1); }} className="mt-5 min-h-12 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary">Erneut versuchen</button></section></div>;
 
+  if (finished) return <div className="min-h-screen bg-bg-primary px-4 py-8 sm:py-12"><section className="mx-auto max-w-xl rounded-2xl border border-border bg-bg-secondary p-5 sm:p-7">
+    <CheckCircle2 size={36} className="mb-5 text-gold" />
+    <p className="mb-2 text-xs font-semibold text-gold">Erfolgreich gespeichert</p>
+    <h1 className="font-display text-2xl font-bold sm:text-3xl">{finished.completed.profile ? profilePublic ? "Dein Profil ist jetzt öffentlich sichtbar." : "Dein Profil ist erstellt." : finished.completed.company ? "Dein Firmenprofil ist erstellt." : finished.intents.every(intent => intent === "search") ? "Du kannst jetzt entdecken." : "Deine Angebotsentwürfe sind gespeichert."}</h1>
+    <p className="mt-4 text-sm leading-6 text-text-secondary">{finished.completed.profile ? profilePublic ? "Andere können dich jetzt finden und dein Profil ansehen." : "Deine bisherigen Sichtbarkeitseinstellungen bleiben erhalten. Ein privates Profil bleibt privat." : finished.completed.company ? "Deine Firma wurde gespeichert. Etwaige Inserate haben einen eigenen Veröffentlichungsstatus." : "Deine Einrichtung ist abgeschlossen. Du kannst jederzeit weitere Bereiche ergänzen."}</p>
+    <div className="mt-6 space-y-3">
+      {finished.completed.profile && user?.id && <a href={`/profile/${encodeURIComponent(user.id)}`} className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary">{profilePublic ? "Öffentliches Profil ansehen" : "Profil ansehen"}<ArrowRight size={16} /></a>}
+      {finished.completed.company && <a href={`/companies/${encodeURIComponent(finished.completed.company)}`} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-gold/30 px-5 text-sm font-semibold text-gold">Firmenprofil ansehen<ArrowRight size={16} /></a>}
+      {(finished.completed.listings.location || finished.completed.listings.equipment) && <><p className="rounded-xl border border-border bg-bg-primary p-4 text-xs leading-5 text-text-muted">Deine Location- und Marktplatzangebote bleiben private Entwürfe. Vervollständige sie und veröffentliche sie anschließend ausdrücklich.</p>{Object.entries(finished.completed.listings).map(([kind, id]) => <a key={id} href={`/dashboard?tab=listings&editListing=${encodeURIComponent(id!)}`} className="flex min-h-12 items-center justify-center rounded-xl border border-border px-4 text-sm text-text-primary">{kind === "location" ? "Locationentwurf fortsetzen" : "Marktplatzentwurf fortsetzen"}</a>)}</>}
+      <button type="button" onClick={() => router.replace(redirectTo || (finished.intents.every(intent => intent === "search") ? "/search" : "/dashboard"))} className="flex min-h-12 w-full items-center justify-center rounded-xl border border-border px-4 text-sm text-text-primary">{finished.intents.every(intent => intent === "search") ? "Jetzt suchen" : "Zu Mein Bereich"}</button>
+    </div>
+  </section></div>;
+  if (draft.welcomeAcknowledged === false) return <div className="min-h-screen bg-bg-primary px-4 py-8 sm:py-12"><section className="mx-auto max-w-xl rounded-2xl border border-border bg-bg-secondary p-5 sm:p-7">
+    <CheckCircle2 size={32} className="mb-5 text-gold" /><p className="mb-2 text-xs font-semibold text-gold">Konto erstellt</p>
+    <h1 className="font-display text-2xl font-bold sm:text-3xl">Willkommen bei CineGenius!</h1>
+    <p className="mt-4 text-sm leading-6 text-text-secondary">Dein Konto ist erstellt. Damit andere dich oder dein Angebot finden können, ergänze jetzt die wichtigsten Angaben.</p>
+    <div className="mt-5 rounded-xl border border-border bg-bg-primary p-4"><p className="flex items-center gap-2 text-sm font-semibold"><UserRound size={17} className="text-gold" />Ein Schritt nach dem anderen</p><p className="mt-2 text-sm leading-6 text-text-muted">Zuerst dein Name und Ort. Danach wählst du, wofür du CineGenius nutzen möchtest.</p><p className="mt-2 text-xs leading-5 text-text-muted">Du kannst dich, eine Firma oder ein Angebot einrichten – oder einfach nur suchen.</p></div>
+    {error && <p role="alert" className="mt-4 text-sm text-red-300">{error}</p>}
+    <button type="button" disabled={saving} onClick={async () => { setSaving(true); setError(""); const next = { ...draft, welcomeAcknowledged: true }; if (await persist(next)) setDraft(next); setSaving(false); }} className="mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary disabled:opacity-50">{saving ? "Speichert …" : "Jetzt starten"}<ArrowRight size={17} /></button>
+    <p className="mt-4 flex items-start gap-2 text-xs leading-5 text-text-muted"><Lock size={14} className="mt-0.5 shrink-0" />Deine Eingaben bleiben zunächst privat. Du entscheidest ausdrücklich, was veröffentlicht wird.</p>
+  </section></div>;
+
   return <div className="min-h-screen bg-bg-primary px-4 pb-[calc(7rem+env(safe-area-inset-bottom))] pt-6 sm:pt-10">
     <div className="mx-auto w-full max-w-2xl">
       <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-gold">Dein Start auf CineGenius</p>
@@ -592,7 +635,7 @@ export default function ProfileSetupWizard() {
           <ReviewSection title="Dein Ort" onEdit={() => editReview("location")}><ReviewRow label="Standort" value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} /></ReviewSection>
           <ReviewSection title="Deine Auswahl" onEdit={() => editReview("goals")}><p className="break-words text-sm text-text-primary">{selectedIntentTitles.join(" · ") || "—"}</p></ReviewSection>
           {(draft.intents.includes("crew") || draft.intents.includes("talent")) && <>
-            <ReviewSection title="Dein persönliches Profil" onEdit={() => editReview("details", draft.intents.includes("crew") ? "crew" : "talent")}><ReviewRow label="Tätigkeiten" value={selectedRoles.map((role) => role.role).join(", ")} /><ReviewRow label="Standort" value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} /><p className="rounded-xl border border-amber-400/25 bg-amber-500/5 p-3 text-xs leading-5 text-text-muted">Mit „Profil erstellen“ werden deine Angaben öffentlich auf CineGenius sichtbar.</p></ReviewSection>
+            <ReviewSection title="Dein persönliches Profil" onEdit={() => editReview("details", draft.intents.includes("crew") ? "crew" : "talent")}><ReviewRow label="Tätigkeiten" value={selectedRoles.map((role) => role.role).join(", ")} /><ReviewRow label="Standort" value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} /><p className="rounded-xl border border-amber-400/25 bg-amber-500/5 p-3 text-xs leading-5 text-text-muted">Mit „Profil veröffentlichen“ erstellst du dein Profil. Deine gespeicherten Sichtbarkeitseinstellungen bleiben erhalten.</p></ReviewSection>
             <ReviewSection title="Foto und Vorstellung" onEdit={() => editReview("intro", draft.intents.includes("crew") ? "crew" : "talent")}>{draft.sections.crew?.imageUrl && <Image src={draft.sections.crew.imageUrl} alt="Profilfoto" width={240} height={240} className="h-20 w-20 rounded-xl object-cover" />}{draft.sections.talent?.imageUrl && <Image src={draft.sections.talent.imageUrl} alt="Profilfoto" width={240} height={240} className="h-20 w-20 rounded-xl object-cover" />}<ReviewRow label="Vorstellung" value={draft.talentIntro} /></ReviewSection>
           </>}
           {draft.intents.filter((intent) => intent === "location" || intent === "equipment").map((intent) => { const data = draft.sections[intent] ?? createQuickStartIntentData(); const categoryName = QUICK_START_CATEGORIES[intent].find((item) => item.value === data.category)?.label ?? data.category; return <div key={intent} className="space-y-3"><ReviewSection title={QUICK_START_INTENT_LABELS[intent]} onEdit={() => editReview("details", intent)}><ReviewRow label="Art" value={categoryName} /><ReviewRow label="Angebot" value={data.title} /><ReviewRow label="Standort" value={data.city} /></ReviewSection><ReviewSection title={`${QUICK_START_INTENT_LABELS[intent]}: Ergänzungen`} onEdit={() => editReview("intro", intent)}>{data.description && <ReviewRow label="Beschreibung" value={data.description} />}<ReviewRow label="Preis" value={data.priceOnRequest ? "Auf Anfrage" : `${data.price} € pro Tag`} />{data.imageUrl && <Image src={data.imageUrl} alt="Angebotsfoto" width={720} height={480} sizes="(max-width: 640px) 100vw, 640px" className="max-h-40 w-full rounded-lg object-contain" />}<p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">Dein Angebot wird als privater Entwurf gespeichert. Du entscheidest später ausdrücklich, ob du es veröffentlichst.</p></ReviewSection></div>; })}
