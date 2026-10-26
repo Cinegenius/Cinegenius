@@ -44,8 +44,8 @@ export default function Footer() {
 
   return (
     <footer id="site-footer" className="relative z-10 border-t border-border bg-bg-secondary mt-12 pb-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-6 lg:gap-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 lg:py-12">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-x-4 gap-y-4 sm:gap-x-6 sm:gap-y-6 lg:gap-12">
           {/* Marke */}
           <div className="col-span-2 lg:col-span-2">
             <div className="mb-3">
@@ -59,15 +59,15 @@ export default function Footer() {
           {/* Link-Spalten */}
           {columns.map((col) => (
             <div key={col.titleKey} className={col.titleKey === "col3" ? "col-span-2 lg:col-span-1" : "min-w-0"}>
-              <h4 className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
+              <h4 className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-1 sm:mb-2">
                 {tf(col.titleKey as "col1" | "col2" | "col3")}
               </h4>
-              <ul className={col.titleKey === "col3" ? "grid grid-cols-2 gap-x-6 lg:flex lg:flex-col" : "flex flex-col"}>
+              <ul className={col.titleKey === "col3" ? "grid grid-cols-2 gap-x-4 sm:gap-x-6 lg:flex lg:flex-col" : "flex flex-col"}>
                 {col.links.map((link) => (
                   <li key={link.labelKey}>
                     <Link
                       href={link.href}
-                      className="inline-flex min-h-11 items-center text-sm text-text-secondary hover:text-gold transition-colors [overflow-wrap:anywhere]"
+                      className="inline-flex min-h-9 sm:min-h-11 items-center text-sm text-text-secondary hover:text-gold transition-colors [overflow-wrap:anywhere]"
                     >
                       {tf(link.labelKey as Parameters<typeof tf>[0])}
                     </Link>
@@ -79,7 +79,7 @@ export default function Footer() {
         </div>
 
         {/* Unterzeile */}
-        <div className="mt-6 pt-4 sm:mt-8 sm:pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
+        <div className="mt-4 pt-3 sm:mt-8 sm:pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
           <p className="text-xs text-text-muted">
             © {new Date().getFullYear()} CineGenius. {tf("rights")}
           </p>
