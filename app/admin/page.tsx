@@ -3,15 +3,18 @@
 import { useAuth } from "@clerk/nextjs";
 import { useViewState } from "@/lib/use-view-state";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import { ServerAdminContext } from "@/lib/server-admin-context";
 import Image from "next/image";
 import {
   Activity, BadgeCheck, Building2, Check, ChevronDown, ChevronLeft,
   ChevronRight, CircleAlert, ClipboardList, Clapperboard, CreditCard, Eye, FileImage,
   LayoutDashboard, List, MessageSquareText, Search, Shield, ShieldCheck, Users, X,
 } from "lucide-react";
-import { AdminSupportCenter } from "@/components/admin/AdminSupportCenter";
 import { SupportMessageAction } from "@/components/admin/SupportMessageAction";
+
+const AdminSupportCenter = dynamic(() => import("@/components/admin/AdminSupportCenter").then(module => module.AdminSupportCenter));
 
 type TabId = "overview" | "reports" | "verifications" | "users" | "companies" | "listings" | "projects" | "bookings" | "media" | "support" | "audit";
 const navItems: { icon: typeof LayoutDashboard; label: string; id: TabId }[] = [
@@ -239,17 +242,36 @@ function AdminContent() {
   const [auditError, setAuditError] = useState("");
 
   const overviewRequest = useRef(0);
-  const loadOverview = useCallback(() => {
+  const loadOverview = useCallback((signal = new AbortController().signal) => {
     const sequence = ++overviewRequest.current;
     setOverviewLoading(true);
     setOverviewError("");
-    fetchJson<Overview>("/api/admin/overview")
-      .then(data => { if (sequence === overviewRequest.current) setOverview(data); })
-      .catch((error: Error) => { if (sequence === overviewRequest.current) setOverviewError(error.message); })
-      .finally(() => { if (sequence === overviewRequest.current) setOverviewLoading(false); });
+    fetchJson<Overview>("/api/admin/overview", { signal })
+      .then(data => { if (!signal.aborted && sequence === overviewRequest.current) setOverview(data); })
+      .catch((error: Error) => { if (!signal.aborted && sequence === overviewRequest.current) setOverviewError(error.message); })
+      .finally(() => { if (!signal.aborted && sequence === overviewRequest.current) setOverviewLoading(false); });
   }, []);
 
-  useEffect(() => { loadOverview(); }, [loadOverview, refreshKey]);
+  const loadAttention = useCallback((signal = new AbortController().signal) => {
+    return fetchJson<{ counts: Record<string, number> }>("/api/admin/overview?summary=attention", { signal })
+      .then(({ counts }) => { if (!signal.aborted) setOverview(current => ({ counts: { ...current?.counts, ...counts }, recentListings: current?.recentListings ?? [] })); })
+      .catch(() => { /* The active section has its own visible error and retry handling. */ });
+  }, []);
+  const needsAttention = activeTab !== "overview";
+  useEffect(() => {
+    if (!needsAttention) return;
+    const controller = new AbortController();
+    void loadAttention(controller.signal);
+    return () => controller.abort();
+  }, [needsAttention, loadAttention, refreshKey]);
+
+  useEffect(() => {
+    if (activeTab !== "overview") return;
+    const controller = new AbortController();
+    // Let restored tab state settle before issuing the overview's count queries.
+    void Promise.resolve().then(() => { if (!controller.signal.aborted) loadOverview(controller.signal); });
+    return () => controller.abort();
+  }, [activeTab, loadOverview, refreshKey]);
 
   useEffect(() => {
     if (activeTab !== "listings") return;
@@ -371,7 +393,8 @@ function AdminContent() {
     });
     if (data.auditLogged === false) setActionMessage({ text: "Änderung gespeichert. Das Protokoll blieb im Status „gestartet“; bitte die Adminmigration prüfen.", error: true });
     else setActionMessage({ text: "Änderung gespeichert und protokolliert." });
-    loadOverview();
+    if (activeTab === "overview") loadOverview();
+    else void loadAttention();
     return data;
   }
 
@@ -612,5 +635,7 @@ function AdminContent() {
 
 export default function AdminPage() {
   const { userId, isLoaded } = useAuth();
-  return isLoaded && userId ? <AdminContent key={userId} /> : null;
+  const serverAdminId = useContext(ServerAdminContext);
+  const activeId = isLoaded ? userId : serverAdminId;
+  return activeId ? <AdminContent key={activeId} /> : null;
 }

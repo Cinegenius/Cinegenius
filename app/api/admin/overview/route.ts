@@ -18,15 +18,37 @@ async function countRows(table: string, filter?: CountFilter) {
   return count ?? 0;
 }
 
-export async function GET() {
+async function attentionCounts() {
+  const [pendingReports, pendingVerifications, companyClarifications] = await Promise.all([
+    countRows("reports", { op: "eq", column: "status", value: "pending" }),
+    countRows("verification_requests", { op: "eq", column: "status", value: "pending" }),
+    countRows("admin_company_membership_clarifications"),
+  ]);
+  return { pendingReports, pendingVerifications, companyClarifications };
+}
+
+export async function GET(request: Request) {
+  const startedAt = performance.now();
   const admin = await requireAdmin();
   if (admin instanceof NextResponse) return admin;
 
+  const authorizedAt = performance.now();
   try {
+    if (new URL(request.url).searchParams.get("summary") === "attention") {
+      const counts = await attentionCounts();
+      return NextResponse.json({ counts }, { headers: { "Cache-Control": "private, no-store", "Server-Timing": `auth;dur=${(authorizedAt - startedAt).toFixed(1)}, database;dur=${(performance.now() - authorizedAt).toFixed(1)}` } });
+    }
+    const recentListingsPromise = db.from("listings")
+      .select("id, company_id, type, title, city, price, published, created_at")
+      .order("created_at", { ascending: false }).limit(6)
+      .then(({ data, error }) => {
+        if (error) throw new Error(`Admin overview recent listings: ${error.message}`);
+        return data ?? [];
+      });
     const [
       profiles, companies, listings, activeListings, draftListings, locations, jobs, animals,
-      crew, marketplace, services, projects, pendingReports, pendingVerifications,
-      clarificationCount, bookings, reviews, communityPosts, applications,
+      crew, marketplace, services, projects, attention,
+      bookings, reviews, communityPosts, applications, recentListings,
     ] = await Promise.all([
       countRows("profiles"),
       countRows("companies"),
@@ -40,30 +62,22 @@ export async function GET() {
       countRows("listings", { op: "in", column: "type", value: ["prop", "vehicle"] }),
       countRows("listings", { op: "eq", column: "type", value: "service" }),
       countRows("projects"),
-      countRows("reports", { op: "eq", column: "status", value: "pending" }),
-      countRows("verification_requests", { op: "eq", column: "status", value: "pending" }),
-      countRows("admin_company_membership_clarifications"),
+      attentionCounts(),
       countRows("bookings"),
       countRows("reviews"),
       countRows("community_posts", { op: "gt", column: "expires_at", value: new Date().toISOString() }),
       countRows("applications"),
+      recentListingsPromise,
     ]);
-
-    const { data: recentListings, error: recentError } = await db
-      .from("listings")
-      .select("id, company_id, type, title, city, price, published, created_at")
-      .order("created_at", { ascending: false })
-      .limit(6);
-    if (recentError) throw new Error(`Admin overview recent listings: ${recentError.message}`);
 
     return NextResponse.json({
       counts: {
         profiles, companies, listings, activeListings, draftListings, locations, jobs, animals,
-        crew, marketplace, services, projects, pendingReports, pendingVerifications,
-        companyClarifications: clarificationCount, bookings, reviews, communityPosts, applications,
+        crew, marketplace, services, projects, ...attention,
+        bookings, reviews, communityPosts, applications,
       },
       recentListings: recentListings ?? [],
-    }, { headers: { "Cache-Control": "private, no-store" } });
+    }, { headers: { "Cache-Control": "private, no-store", "Server-Timing": `auth;dur=${(authorizedAt - startedAt).toFixed(1)}, database;dur=${(performance.now() - authorizedAt).toFixed(1)}` } });
   } catch (error) {
     console.error("[admin] overview failed", error);
     return NextResponse.json({ error: "Die Adminübersicht konnte nicht vollständig geladen werden. Bitte Datenquelle und Admin-Migration prüfen." }, { status: 503 });

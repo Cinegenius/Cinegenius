@@ -102,7 +102,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [locale, messages, { userId }] = await Promise.all([getLocale(), getMessages(), auth()]);
+  const [locale, messages, { userId, sessionId }] = await Promise.all([getLocale(), getMessages(), auth()]);
   const clerkLocalization = CLERK_LOCALIZATIONS[locale] ?? deDE;
   const htmlLang = HTML_LANG[locale] ?? "de";
 
@@ -130,7 +130,7 @@ export default async function RootLayout({
           <AppIntlProvider locale={locale} messages={messages}>
           <ThemeProvider>
             <ToastProvider>
-              <AuthSessionBoundary>
+              <AuthSessionBoundary initialSessionId={sessionId}>
                 <GlobalEffects />
                 <PresencePing />
                 <GlobalSearch />

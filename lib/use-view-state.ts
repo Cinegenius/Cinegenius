@@ -1,15 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type SetStateAction, type Dispatch } from "react";
+import { useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type SetStateAction, type Dispatch } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { sameViewValue, viewRecord, writeViewRecord } from "@/lib/navigation-context";
+import { ServerAdminContext } from "@/lib/server-admin-context";
 
 /** Retain small view controls on the actual history entry, separately for each account. */
 export function useViewState<T>(field: string, initial: T | (() => T)): [T, Dispatch<SetStateAction<T>>] {
   const path = usePathname();
-  const { userId } = useAuth();
-  const owner = userId ?? "guest";
+  const { userId, isLoaded } = useAuth();
+  const serverAdminId = useContext(ServerAdminContext);
+  const owner = userId ?? (!isLoaded && path === "/admin" ? serverAdminId : null) ?? "guest";
   const [value, setValue] = useState(initial);
   const current = useRef(value);
   const defaults = useRef(value);

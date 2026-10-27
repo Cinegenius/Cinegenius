@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { viewRecord, writeViewRecord } from "@/lib/navigation-context";
+import { ServerAdminContext } from "@/lib/server-admin-context";
 
 export default function NavigationRestoration() {
   const path = usePathname();
-  const { userId } = useAuth();
-  const owner = userId ?? "guest";
+  const { userId, isLoaded } = useAuth();
+  const serverAdminId = useContext(ServerAdminContext);
+  const owner = userId ?? (!isLoaded && path === "/admin" ? serverAdminId : null) ?? "guest";
   const previousPath = useRef(path);
   const linkVisit = useRef<{ from: string; to: string } | null>(null);
   const pending = useRef<{ path: string; y: number } | null>(null);

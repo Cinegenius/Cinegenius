@@ -8,7 +8,9 @@ import { Fragment } from "react";
  * This prevents a previous account's profile or inbox data lingering during a
  * multi-session switch.
  */
-export default function AuthSessionBoundary({ children }: { children: React.ReactNode }) {
-  const { session } = useSession();
-  return <Fragment key={session?.id ?? "signed-out"}>{children}</Fragment>;
+export default function AuthSessionBoundary({ children, initialSessionId = null }: { children: React.ReactNode; initialSessionId?: string | null }) {
+  const { session, isLoaded } = useSession();
+  // Hydrating the same server-verified session must not remount every private page.
+  const sessionId = isLoaded ? session?.id : initialSessionId;
+  return <Fragment key={sessionId ?? "signed-out"}>{children}</Fragment>;
 }
