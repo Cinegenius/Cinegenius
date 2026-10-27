@@ -1,3 +1,4 @@
+import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
 import "server-only";
 import { db } from "@/lib/db";
 import { normalizeContactVisibility, type ProfileContactVisibility } from "@/lib/contact-visibility";
@@ -49,7 +50,7 @@ export async function anyBlockExists(userA: string, userB: string): Promise<bool
     db.from("blocks").select("id").eq("blocker_id", userA).eq("blocked_id", userB).maybeSingle(),
     db.from("blocks").select("id").eq("blocker_id", userB).eq("blocked_id", userA).maybeSingle(),
   ]);
-  return !!(ab.data ?? ba.data);
+  return Boolean(ab.error || ba.error || ab.data || ba.data);
 }
 
 /** Returns true only for an accepted friendship in either direction. */
@@ -63,23 +64,7 @@ export async function areAcceptedFriends(userA: string, userB: string): Promise<
 
 /** Whether the current viewer may open a profile under its saved privacy setting. */
 export async function canViewProfile(ownerId: string, viewerId: string | null): Promise<boolean> {
-  if (viewerId === ownerId) return true;
-
-  const { data: settings, error } = await db
-    .from("user_settings")
-    .select("profile_visibility")
-    .eq("user_id", ownerId)
-    .maybeSingle();
-
-  // Before the settings table exists, profiles retain the historical public default.
-  if (error && (error.code === "42P01" || error.code === "PGRST205")) return true;
-  if (error) {
-    console.error("[profile visibility] settings lookup failed:", error.message);
-    return false;
-  }
-
-  if (settings?.profile_visibility !== "private") return true;
-  return viewerId ? areAcceptedFriends(viewerId, ownerId) : false;
+  return (await visibleLinkedProfileIds([ownerId], viewerId)).has(ownerId);
 }
 
 /** Private profiles stay out of public crew discovery, even if their link is known. */
@@ -92,7 +77,7 @@ export async function getPrivateProfileIds(userIds: string[]): Promise<Set<strin
     .select("user_id, profile_visibility")
     .in("user_id", uniqueIds);
 
-  if (error && (error.code === "42P01" || error.code === "PGRST205")) return new Set();
+
   if (error) {
     console.error("[profile visibility] discovery lookup failed:", error.message);
     return new Set(uniqueIds);

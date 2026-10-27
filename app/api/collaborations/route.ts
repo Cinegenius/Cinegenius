@@ -1,3 +1,6 @@
+import { auth } from "@clerk/nextjs/server";
+import { canViewProfile } from "@/lib/trust";
+import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -6,6 +9,9 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const userId = searchParams.get("userId");
   if (!userId) return NextResponse.json({ error: "userId fehlt" }, { status: 400 });
+
+  const { userId: viewerId } = await auth();
+  if (!await canViewProfile(userId, viewerId)) return new NextResponse(null, { status: 404, headers: { "Cache-Control": "private, no-store" } });
 
   const [asSender, asReceiver] = await Promise.all([
     db
@@ -30,7 +36,9 @@ export async function GET(req: NextRequest) {
   if (collabs.length === 0) return NextResponse.json({ collaborations: [] });
 
   const uniqueCollabs = [...new Map(collabs.map((c) => [c.friendId, c])).values()];
-  const ids = uniqueCollabs.map((c) => c.friendId);
+  const visibleIds = await visibleLinkedProfileIds(uniqueCollabs.map((c) => c.friendId), viewerId);
+  const ids = [...visibleIds];
+  if (!ids.length) return NextResponse.json({ collaborations: [] });
   const { data: profiles } = await db
     .from("profiles")
     .select("user_id, display_name, avatar_url, slug, role, positions")
@@ -39,7 +47,7 @@ export async function GET(req: NextRequest) {
   const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, p]));
 
   return NextResponse.json({
-    collaborations: uniqueCollabs.map((c) => {
+    collaborations: uniqueCollabs.filter((c) => visibleIds.has(c.friendId)).map((c) => {
       const p = profileMap[c.friendId] ?? {};
       return {
         user_id: c.friendId,

@@ -1,7 +1,7 @@
+import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
-import { unstable_cache } from "next/cache";
 import type { Metadata } from "next";
 import CompanyDetail from "./CompanyDetail";
 import { isPublicCompanyMembership } from "@/lib/company-membership-requests";
@@ -26,8 +26,7 @@ async function getCompany(slug: string) {
   return { ...data, ...((publicContacts ?? {}) as Record<string, unknown>) };
 }
 
-const getCompanyPublicData = unstable_cache(
-  async (companyId: string, ownerUserId: string) => {
+async function getCompanyPublicData(companyId: string, ownerUserId: string, viewerId: string | null = null) {
     const [listingsRes, rawMembersRes, servicesRes, equipmentRes] = await Promise.all([
       db.from("listings")
         .select("id, title, type, category, price, city, image_url, created_at")
@@ -46,10 +45,12 @@ const getCompanyPublicData = unstable_cache(
       db.from("company_equipment")
         .select("id, category, subcategory, name, brand, model, condition, available, price_day, price_week, price_on_request, pickup_available, delivery_available, insured, quantity")
         .eq("company_id", companyId)
+        .eq("published", true)
         .order("created_at", { ascending: false }),
     ]);
 
-    const rawMembers = (rawMembersRes.data ?? []).filter((member) => isPublicCompanyMembership(member.status));
+    const visibleIds = await visibleLinkedProfileIds((rawMembersRes.data ?? []).map((member) => member.user_id), viewerId);
+    const rawMembers = (rawMembersRes.data ?? []).filter((member) => isPublicCompanyMembership(member.status) && visibleIds.has(member.user_id));
     let members: object[] = [];
     if (rawMembers.length > 0) {
       const { data: profiles } = await db
@@ -80,10 +81,7 @@ const getCompanyPublicData = unstable_cache(
       services: servicesRes.data ?? [],
       equipment: equipmentRes.data ?? [],
     };
-  },
-  ["company-public-data"],
-  { revalidate: 300, tags: ["companies"] }
-);
+}
 
 export async function generateMetadata({
   params,
@@ -127,7 +125,7 @@ export default async function CompanyPage({
   // Public data is accepted-only. Pending requests are private and only shown
   // in the company dashboard to authorized team managers.
   const [publicData, myMembership, myTitleChangeRequest] = await Promise.all([
-    getCompanyPublicData(company.id, company.owner_user_id),
+    getCompanyPublicData(company.id, company.owner_user_id, userId),
     // Check current user's membership status
     userId && !isOwner
       ? db.from("company_members")

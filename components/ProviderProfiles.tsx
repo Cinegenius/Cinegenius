@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import Link from "next/link";
 import { MapPin, UserCircle2, ChevronDown } from "lucide-react";
 

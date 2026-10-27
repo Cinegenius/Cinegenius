@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowRight } from "lucide-react";

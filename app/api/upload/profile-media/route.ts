@@ -1,4 +1,5 @@
-import { db } from "@/lib/db";
+import { getTranslations } from "next-intl/server";
+import { storeProtectedMedia } from "@/lib/protected-media-server";
 import { requireAuth } from "@/lib/guards";
 import { validateUpload, buildStoragePath } from "@/lib/uploadGuard";
 import { rateLimit } from "@/lib/rateLimit";
@@ -9,6 +10,7 @@ export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
+  const t = await getTranslations("mediaSecurity");
 
   const { allowed } = await rateLimit(`profile-media:${userId}`, 10, 60);
   if (!allowed) return NextResponse.json({ error: "Zu viele Uploads. Bitte kurz warten." }, { status: 429 });
@@ -24,23 +26,21 @@ export async function POST(req: NextRequest) {
 
   const validation = await validateUpload(file, {
     maxBytes: PROFILE_MEDIA_MAX_BYTES,
+    emptyMessage: t("empty"),
     allowedMimeTypes: PROFILE_MEDIA_MIME_TYPES,
-    tooLargeMessage: "Das Bild ist nach der Komprimierung größer als 4 MB.",
-    unsupportedTypeMessage: "Ungültiges Dateiformat. Unterstützt werden JPG, PNG und WEBP.",
+    tooLargeMessage: t("tooLarge"),
+    unsupportedTypeMessage: t("invalid"),
   });
   if ("error" in validation) {
     return NextResponse.json({ error: validation.error }, { status: validation.status });
   }
 
   const path = buildStoragePath(userId, validation.ext, "profile-media");
-  const { error: uploadError } = await db.storage
-    .from("listing-images")
-    .upload(path, validation.buffer, { contentType: validation.mime, upsert: false });
-  if (uploadError) {
-    console.error("[upload/profile-media]", uploadError);
-    return NextResponse.json({ error: "Profilbild konnte nicht gespeichert werden" }, { status: 500 });
+  try {
+    const url = await storeProtectedMedia(userId, path, validation.buffer, validation.mime);
+    return NextResponse.json({ url }, { headers: { "Cache-Control": "private, no-store" } });
+  } catch {
+    console.error("[upload] private file persistence failed");
+    return NextResponse.json({ error: t("saveFailed") }, { status: 500 });
   }
-
-  const { data } = db.storage.from("listing-images").getPublicUrl(path);
-  return NextResponse.json({ url: data.publicUrl }, { headers: { "Cache-Control": "private, no-store" } });
 }

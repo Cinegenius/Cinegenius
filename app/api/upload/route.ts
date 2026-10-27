@@ -1,4 +1,5 @@
-import { db } from "@/lib/db";
+import { getTranslations } from "next-intl/server";
+import { storeProtectedMedia } from "@/lib/protected-media-server";
 import { requireAuth } from "@/lib/guards";
 import { validateUpload, buildStoragePath } from "@/lib/uploadGuard";
 import { rateLimit } from "@/lib/rateLimit";
@@ -9,6 +10,7 @@ export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
+  const t = await getTranslations("mediaSecurity");
 
   // A location may use twenty uploads in one batch. Leave room for retries
   // and replacement uploads while keeping a per-user abuse limit.
@@ -31,7 +33,7 @@ export async function POST(req: NextRequest) {
   // 4. Validate — magic bytes, size, allowed types.
   //    Returns { buffer, mime, ext } or { error, status }.
   //    The buffer is used below to avoid reading the file twice.
-  const validation = await validateUpload(file);
+  const validation = await validateUpload(file, { emptyMessage: t("empty"), tooLargeMessage: t("tooLarge"), unsupportedTypeMessage: t("invalid") });
   if ("error" in validation) {
     return NextResponse.json({ error: validation.error }, { status: validation.status });
   }
@@ -44,24 +46,11 @@ export async function POST(req: NextRequest) {
   //    - Extension from magic bytes: not from client filename or Content-Type
   const path = buildStoragePath(userId, ext);
 
-  // 6. Upload to Supabase Storage.
-  //    upsert: false — never overwrite an existing file at the same path.
-  //    (UUID makes collision effectively impossible, but we enforce it anyway.)
-  const { error: uploadError } = await db.storage
-    .from("listing-images")
-    .upload(path, buffer, {
-      contentType: mime,
-      upsert: false,
-    });
-
-  if (uploadError) {
-    console.error("[upload]", uploadError);
-    return NextResponse.json({ error: uploadError.message }, { status: 500 });
+  try {
+    const url = await storeProtectedMedia(userId, path, buffer, mime);
+    return NextResponse.json({ url }, { headers: { "Cache-Control": "private, no-store" } });
+  } catch {
+    console.error("[upload] private file persistence failed");
+    return NextResponse.json({ error: t("saveFailed") }, { status: 500 });
   }
-
-  const { data: urlData } = db.storage
-    .from("listing-images")
-    .getPublicUrl(path);
-
-  return NextResponse.json({ url: urlData.publicUrl });
 }

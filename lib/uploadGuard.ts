@@ -1,10 +1,11 @@
+import sharp from "sharp";
 /**
  * lib/uploadGuard.ts
  * Server-side file upload validation.
  *
  * Design principles:
- * - File is read ONCE into a buffer. All checks run on that buffer.
- *   The same buffer is returned for Supabase upload (no double-read).
+ * - Read once, verify the header AND decoder, normalize orientation and emit
+ *   an inert, bounded WebP without EXIF. Never store active SVG source.
  * - MIME type from the Content-Type header is intentionally NOT trusted
  *   for anything security-relevant. Magic bytes from the actual file
  *   content are the authoritative source of truth for file type.
@@ -95,9 +96,6 @@ function detectMimeFromBytes(header: Uint8Array): string | null {
   return null;
 }
 
-function extForMime(mime: string): string {
-  return SIGNATURES.find((s) => s.mime === mime)?.ext ?? "jpg";
-}
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -123,6 +121,7 @@ export type UploadValidationError = {
  * - Reads the file ONCE into an ArrayBuffer.
  * - Checks size limit.
  * - Checks magic bytes (actual file content), not the Content-Type header.
+ * - Decodes and re-encodes within pixel, frame, size and processing limits.
  * - Returns { buffer, mime, ext } on success, or { error, status } on failure.
  *
  * The returned `buffer` should be passed directly to Supabase Storage
@@ -131,6 +130,7 @@ export type UploadValidationError = {
 export async function validateUpload(
   file: File,
   options: {
+    emptyMessage?: string;
     maxBytes?: number;
     allowedMimeTypes?: ReadonlySet<string>;
     tooLargeMessage?: string;
@@ -140,7 +140,7 @@ export async function validateUpload(
   const maxBytes = options.maxBytes ?? MAX_UPLOAD_BYTES;
   // Size check first — avoid reading large files into memory
   if (file.size === 0) {
-    return { error: "Datei ist leer", status: 400 };
+    return { error: options.emptyMessage ?? "Datei ist leer", status: 400 };
   }
   if (file.size > maxBytes) {
     const maxMb = Math.floor(maxBytes / (1024 * 1024));
@@ -167,11 +167,23 @@ export async function validateUpload(
     };
   }
 
-  return {
-    buffer,
-    mime: detectedMime,
-    ext: extForMime(detectedMime),
-  };
+  // Header signatures are not proof of a valid image. Decode within a strict
+  // pixel/frame budget, normalize orientation and strip metadata/active content.
+  try {
+    if (detectedMime === "image/svg+xml") {
+      const svg = Buffer.from(buffer).toString("utf8");
+      if (/<!DOCTYPE|<!ENTITY|<script\b|<foreignObject\b|<style\b|\bstyle\s*=|\bon[a-z]+\s*=|(?:href|src)\s*=|url\s*\(/i.test(svg)) throw new Error("Active SVG");
+    }
+    const input = sharp(Buffer.from(buffer), { limitInputPixels: 40_000_000, animated: false, failOn: "warning" });
+    const metadata = await input.metadata();
+    if (!metadata.width || !metadata.height || (metadata.pages ?? 1) > 1) throw new Error("Invalid image");
+    const output = await input.rotate().resize({ width: 2560, height: 2560, fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 85 }).timeout({ seconds: 10 }).toBuffer();
+    if (output.length > maxBytes) return { error: options.tooLargeMessage ?? "Datei zu groß", status: 413 };
+    return { buffer: output.buffer.slice(output.byteOffset, output.byteOffset + output.byteLength) as ArrayBuffer, mime: "image/webp", ext: "webp" };
+  } catch {
+    return { error: options.unsupportedTypeMessage ?? "Ungültiges Dateiformat.", status: 415 };
+  }
 }
 
 /**

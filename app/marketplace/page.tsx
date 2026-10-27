@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import {
   Package, Car, Shirt, Wrench, Clapperboard, Sparkles,
   Lightbulb, Mic, Zap, Layers, MapPin, Tag,

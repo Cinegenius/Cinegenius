@@ -1290,5 +1290,11 @@
     "unavailable": "Die Firma konnte gerade nicht geladen werden.",
     "noContact": "Für diese Firma ist noch kein verantwortliches Nachrichtenkonto hinterlegt.",
     "context": "Kontakt zur Firma: {name}"
+  },
+  "mediaSecurity": {
+    "saveFailed": "Das Bild konnte nicht gespeichert werden. Bitte versuche es erneut.",
+    "empty": "Bitte wähle eine nicht leere Bilddatei.",
+    "invalid": "Das Bild konnte nicht sicher verarbeitet werden. Verwende ein gültiges JPG-, PNG- oder WEBP-Bild.",
+    "tooLarge": "Das verarbeitete Bild darf höchstens 4 MB groß sein."
   }
 }

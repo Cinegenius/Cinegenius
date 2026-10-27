@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import Link from "next/link";
 import { Camera, ArrowRight } from "lucide-react";
 import { auth } from "@clerk/nextjs/server";

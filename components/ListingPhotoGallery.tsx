@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import type { ReactNode, TouchEvent as ReactTouchEvent } from "react";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import dynamic from "next/dynamic";
 import { Expand, ImageOff } from "lucide-react";
 import { getListingGalleryPreview } from "@/lib/listing-image-gallery";

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import Link from "next/link";
 import { Search, MapPin, Star, ArrowRight, Plus } from "lucide-react";
 import PageHeader from "@/components/PageHeader";

@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ projects: data ?? [] }, { headers: { "Cache-Control": "public, max-age=30, s-maxage=60, stale-while-revalidate=300" } });
+  return NextResponse.json({ projects: data ?? [] }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 }
 
 // POST /api/projects — create a private draft; publication is a separate action.

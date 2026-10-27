@@ -1,3 +1,4 @@
+import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { recordProfileView } from "@/lib/profile-views";
@@ -161,9 +162,8 @@ function getPublicListings(userId: string): Promise<Array<{ id: string; type: st
 
 type PublicCollab = { label: string; display_name: string; avatar_url: string | null; slug: string; role: string | null };
 
-function getPublicCollaborations(userId: string): Promise<PublicCollab[]> {
-  return unstable_cache(
-    async () => {
+function getPublicCollaborations(userId: string, viewerId: string | null = null): Promise<PublicCollab[]> {
+  return (async () => {
       const [asSender, asReceiver] = await Promise.all([
         db
           .from("friendships")
@@ -187,7 +187,9 @@ function getPublicCollaborations(userId: string): Promise<PublicCollab[]> {
       if (collabs.length === 0) return [];
 
       const uniqueCollabs = [...new Map(collabs.map((c) => [c.friendId, c])).values()];
-      const ids = uniqueCollabs.map((c) => c.friendId);
+      const visibleIds = await visibleLinkedProfileIds(uniqueCollabs.map((c) => c.friendId), viewerId);
+      const ids = [...visibleIds];
+      if (!ids.length) return [];
       const { data: profiles } = await db
         .from("profiles")
         .select("user_id, display_name, avatar_url, slug, role, positions")
@@ -206,10 +208,7 @@ function getPublicCollaborations(userId: string): Promise<PublicCollab[]> {
           role: p.role ?? (Array.isArray(p.positions) ? p.positions[0] : null) ?? null,
         }];
       });
-    },
-    ["profile-collaborations", userId],
-    { revalidate: 300, tags: ["profiles"] }
-  )();
+    })();
 }
 
 function getCompanyMembership(userId: string): Promise<Array<{
@@ -280,6 +279,10 @@ export default async function ProfilePage(
   const contactFields = projectProfileContacts(contactData, contactVisibility, userId, isOwner);
   const visibleProfile: UserProfile = {
     ...profile,
+    profile_images: isOwner ? profile.profile_images : (profile.profile_images ?? []).filter((image) => {
+      const visibility = image as typeof image & { visibility?: string; public?: boolean };
+      return visibility.visibility !== "private" && visibility.public !== false;
+    }),
     ...contactFields,
     visibility: { ...profile.visibility, ...contactVisibility },
   };
@@ -289,7 +292,7 @@ export default async function ProfilePage(
     getExternalProfiles(profile.user_id),
     getPublicListings(profile.user_id),
     userId && !isOwner ? getBlockStatus(userId, profile.user_id) : Promise.resolve(null),
-    getPublicCollaborations(profile.user_id),
+    getPublicCollaborations(profile.user_id, userId),
     // Fetch image likes (binary: liked vs not)
     (async () => {
       const { data } = await db
@@ -317,9 +320,11 @@ export default async function ProfilePage(
         .order("updated_at", { ascending: false })
         .limit(20);
       const rows = (data ?? []) as Array<{ user_id: string; display_name: string; avatar_url: string | null; slug: string; role: string | null; profile_type: string; location: string | null; tagline: string | null; verified: boolean; day_rate: number | null }>;
+      const visibleIds = await visibleLinkedProfileIds(rows.map((row) => row.user_id), userId);
+      const visibleRows = rows.filter((row) => visibleIds.has(row.user_id));
       // Prioritize same city, then fill with others, cap at 6
-      const sameCity = city ? rows.filter(r => r.location?.includes(city)) : [];
-      const others = rows.filter(r => !city || !r.location?.includes(city));
+      const sameCity = city ? visibleRows.filter(r => r.location?.includes(city)) : [];
+      const others = visibleRows.filter(r => !city || !r.location?.includes(city));
       return [...sameCity, ...others].slice(0, 6);
     })(),
   ]);

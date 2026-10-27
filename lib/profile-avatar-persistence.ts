@@ -7,7 +7,7 @@ export type AvatarAssociationOutcome =
 export function isAvatarUploadAssociated(url: unknown, uploadId: string): url is string {
   if (typeof url !== "string" || !/^[a-f0-9]{32}$/i.test(uploadId)) return false;
   try {
-    const path = new URL(url).pathname;
+    const path = new URL(url, "https://cinegenius.co").pathname;
     return path.split("/").some((segment) => new RegExp(`^${uploadId}\\.(?:jpg|png|webp)$`, "i").test(segment));
   } catch {
     return false;

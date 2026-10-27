@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     p_edit_url: target.editUrl, p_content: content, p_idempotency_key: idempotencyKey,
   });
   if (error) {
-    console.error("[admin support] create failed", error);
+    console.error("[admin support] conversation persistence failed");
     return NextResponse.json({ error: "Supportnachricht konnte nicht dauerhaft gespeichert werden." }, { status: 503 });
   }
   const result = Array.isArray(data) ? data[0] : data;

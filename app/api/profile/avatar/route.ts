@@ -1,3 +1,5 @@
+import { getTranslations } from "next-intl/server";
+import { storeProtectedMedia, removeUnusedProtectedMedia } from "@/lib/protected-media-server";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { validateUpload, buildStoragePath } from "@/lib/uploadGuard";
@@ -18,6 +20,7 @@ export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
+  const t = await getTranslations("mediaSecurity");
 
   const limit = await rateLimit(`profile-avatar:${userId}`, 10, 60);
   if (!limit.allowed) return json({ error: "Zu viele Profilfoto-Uploads. Bitte kurz warten." }, 429);
@@ -38,9 +41,10 @@ export async function POST(req: NextRequest) {
 
   const validation = await validateUpload(file, {
     maxBytes: PROFILE_MEDIA_MAX_BYTES,
+    emptyMessage: t("empty"),
     allowedMimeTypes: PROFILE_MEDIA_MIME_TYPES,
-    tooLargeMessage: "Das Bild ist nach der Komprimierung größer als 4 MB.",
-    unsupportedTypeMessage: "Das verarbeitete Bildformat wird nicht unterstützt. Bitte wähle JPG, PNG oder WEBP.",
+    tooLargeMessage: t("tooLarge"),
+    unsupportedTypeMessage: t("invalid"),
   });
   if ("error" in validation) return json({ error: validation.error }, validation.status);
 
@@ -56,22 +60,19 @@ export async function POST(req: NextRequest) {
   if (!current) return json({ error: "Speichere zuerst die Grunddaten deines Profils. Danach wird das Foto sofort übernommen." }, 409);
 
   const path = buildStoragePath(userId, validation.ext, "profile-media/avatars", uploadId);
-  const bucket = db.storage.from("listing-images");
-  const { error: uploadError } = await bucket.upload(path, validation.buffer, {
-    contentType: validation.mime,
-    upsert: false,
-  });
-  if (uploadError) {
-    console.error("[profile avatar] storage upload failed:", uploadError.message);
+  let savedUrl: string;
+  try {
+    savedUrl = await storeProtectedMedia(userId, path, validation.buffer, validation.mime);
+  } catch {
+    console.error("[profile avatar] private upload failed");
     return json({ error: "Das Profilfoto konnte nicht hochgeladen werden. Dein bisheriges Foto bleibt erhalten." }, 500);
   }
 
-  const { data: urlData } = bucket.getPublicUrl(path);
   const outcome = await persistAvatarAssociation({
-    url: urlData.publicUrl,
+    url: savedUrl,
     path,
     update: async () => {
-      let update = db.from("profiles").update({ avatar_url: urlData.publicUrl, updated_at: new Date().toISOString() }).eq("user_id", userId);
+      let update = db.from("profiles").update({ avatar_url: savedUrl, updated_at: new Date().toISOString() }).eq("user_id", userId);
       update = current.avatar_url == null ? update.is("avatar_url", null) : update.eq("avatar_url", current.avatar_url);
       const { data, error } = await update.select("user_id, avatar_url").maybeSingle();
       if (error) console.error("[profile avatar] association failed:", error.message);
@@ -81,13 +82,7 @@ export async function POST(req: NextRequest) {
       const { data, error } = await db.from("profiles").select("avatar_url").eq("user_id", userId).maybeSingle();
       return { ok: !error, url: data?.avatar_url ?? null };
     },
-    removeUnusedAsset: async (unusedPath) => {
-      const { error } = await bucket.remove([unusedPath]);
-      if (error) {
-        console.error("[profile avatar] unused upload cleanup failed:", error.message);
-        throw error;
-      }
-    },
+    removeUnusedAsset: (unusedPath) => removeUnusedProtectedMedia(userId, unusedPath),
   });
 
   if (outcome.status !== "saved") {
@@ -99,5 +94,5 @@ export async function POST(req: NextRequest) {
 
   revalidateTag("profiles", { expire: 0 });
   revalidateTag("creator-directory", { expire: 0 });
-  return json({ url: urlData.publicUrl, saved: true });
+  return json({ url: savedUrl, saved: true });
 }

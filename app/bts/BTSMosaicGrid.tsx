@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { useUser } from "@clerk/nextjs";

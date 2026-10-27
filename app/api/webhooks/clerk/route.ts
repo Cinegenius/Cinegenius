@@ -235,7 +235,7 @@ function buildOtpEmail(otp: string, type: "verification" | "password"): string {
 }
 
 function buildWelcomeEmail(firstName: string): string {
-  const name = firstName || "Hey";
+  const name = (firstName || "Hey").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]!));
   return `<!DOCTYPE html>
 <html lang="de">
 <head>

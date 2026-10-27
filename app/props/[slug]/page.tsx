@@ -1,3 +1,4 @@
+import JsonLd from "@/components/JsonLd";
 import { listingPriceLabel, listingPriceMetadata } from "@/lib/listing-price";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
@@ -124,10 +125,7 @@ export default async function PropDetailPage({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <PropDetail prop={prop} />
     </>
   );

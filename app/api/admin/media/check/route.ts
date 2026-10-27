@@ -1,3 +1,6 @@
+import { db } from "@/lib/db";
+import { protectedMediaKey, PROTECTED_MEDIA_BUCKET } from "@/lib/protected-media";
+import { readableProtectedMedia } from "@/lib/protected-media-server";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -6,6 +9,25 @@ export async function GET(request: NextRequest) {
   if (admin instanceof NextResponse) return admin;
   const rawUrl = request.nextUrl.searchParams.get("url");
   if (!rawUrl || rawUrl.length > 2048) return NextResponse.json({ error: "Bildadresse fehlt oder ist zu lang." }, { status: 400 });
+  const privateKey = protectedMediaKey(rawUrl);
+  if (privateKey) {
+    // Inspect existence and current rights, never return private file bytes or
+    // grant a platform admin implicit access to another person's private media.
+    const asset = await db.from("media_assets").select("storage_path").eq("storage_path", privateKey).maybeSingle();
+    if (asset.error) return NextResponse.json({ status: "connection_error" }, { headers: { "Cache-Control": "private, no-store" } });
+    if (!asset.data) return NextResponse.json({ status: "missing_file" }, { headers: { "Cache-Control": "private, no-store" } });
+    const slash = privateKey.lastIndexOf("/");
+    const name = privateKey.slice(slash + 1);
+    const files = await db.storage.from(PROTECTED_MEDIA_BUCKET).list(privateKey.slice(0, slash), { search: name, limit: 10 });
+    if (files.error) return NextResponse.json({ status: "connection_error" }, { headers: { "Cache-Control": "private, no-store" } });
+    if (!files.data?.some((file) => file.name === name)) return NextResponse.json({ status: "missing_file" }, { headers: { "Cache-Control": "private, no-store" } });
+    try {
+      const permitted = await readableProtectedMedia(rawUrl, admin.userId);
+      return NextResponse.json({ status: permitted ? "reachable" : "access_problem", protected: true }, { headers: { "Cache-Control": "private, no-store" } });
+    } catch {
+      return NextResponse.json({ status: "connection_error" }, { headers: { "Cache-Control": "private, no-store" } });
+    }
+  }
   let candidate: URL;
   try { candidate = new URL(rawUrl); } catch { return NextResponse.json({ status: "invalid_reference" }); }
   if (candidate.protocol !== "https:") return NextResponse.json({ status: "unsupported_reference", message: "Nur HTTPS-Bildadressen werden geprüft." });

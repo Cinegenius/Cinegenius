@@ -131,7 +131,7 @@ export async function PATCH(req: NextRequest) {
       const { data: assignedProfile } = await db.from("profiles").select("slug, user_id").eq("user_id", providerId).maybeSingle();
       if (assignedProfile) revalidatePath(`/profile/${assignedProfile.slug || assignedProfile.user_id}`);
     }
-    revalidateTag("listings", "max");
+    revalidateTag("listings", { expire: 0 });
     return NextResponse.json({ success: true, auditLogged });
   }
 
@@ -187,7 +187,7 @@ export async function PATCH(req: NextRequest) {
   if (detailPath) revalidatePath(detailPath);
   if (company.data?.slug) revalidatePath(`/companies/${company.data.slug}`);
   revalidatePath("/");
-  revalidateTag("listings", "max");
+  revalidateTag("listings", { expire: 0 });
 
   return NextResponse.json({ success: true, auditLogged });
 }

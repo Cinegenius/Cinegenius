@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useRef, useState } from "react";
 import type { TouchEvent as ReactTouchEvent } from "react";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import { X, ChevronLeft, ChevronRight, ImageOff } from "lucide-react";
 
 interface LightboxProps {

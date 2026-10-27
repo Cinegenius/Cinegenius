@@ -1,3 +1,4 @@
+import JsonLd from "@/components/JsonLd";
 import { listingPriceLabel } from "@/lib/listing-price";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
@@ -46,7 +47,9 @@ async function getLocation(slug: string, viewerId: string | null = null) {
   const publicMetadata = Object.fromEntries(
     ["sqm", "ceiling_height_m", "max_crew", "indoor_outdoor", "power_available", "power_details", "parking_spots", "amenities", "rooms", "natural_light", "blackout_possible", "loading_access", "access_notes", "shooting_hours", "availability_notes", "price_on_request", "price_negotiable", "production_credits"]
       .filter((key) => key in rawMetadata)
-      .map((key) => [key, rawMetadata[key]])
+      .map((key) => [key, key === "production_credits" && Array.isArray(rawMetadata[key])
+        ? rawMetadata[key].filter((entry: unknown) => !entry || typeof entry !== "object" || ((entry as { visibility?: string }).visibility !== "private" && (entry as { public?: boolean }).public !== false))
+        : rawMetadata[key]])
   );
   const focalPoint = rawMetadata.focal_point && typeof rawMetadata.focal_point === "object"
     ? rawMetadata.focal_point as { x?: unknown; y?: unknown }
@@ -139,10 +142,7 @@ export default async function LocationPage({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <LocationDetail location={location} />
     </>
   );

@@ -75,7 +75,7 @@ export async function GET(req: NextRequest) {
     console.error("[listings GET]", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  return NextResponse.json({ data: (data ?? []).map((listing: Record<string, unknown>) => ({...listing,priceLabel:listingPriceLabel(Number(listing.price),listing)})), page, limit }, { headers: { "Cache-Control": "public, max-age=30, s-maxage=60, stale-while-revalidate=300" } });
+  return NextResponse.json({ data: (data ?? []).map((listing: Record<string, unknown>) => ({...listing,priceLabel:listingPriceLabel(Number(listing.price),listing)})), page, limit }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 }
 
 export async function POST(req: Request) {
@@ -195,7 +195,7 @@ export async function POST(req: Request) {
     animal: "/tiere",
   };
   if (pathMap[type]) revalidatePath(pathMap[type]);
-  revalidateTag("listings", "max");
+  revalidateTag("listings", { expire: 0 });
 
   return NextResponse.json({ data });
 }
@@ -219,6 +219,6 @@ export async function DELETE(req: NextRequest) {
     console.error("[listings DELETE]", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  revalidateTag("listings", "max");
+  revalidateTag("listings", { expire: 0 });
   return NextResponse.json({ success: true });
 }

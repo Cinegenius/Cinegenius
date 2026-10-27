@@ -145,7 +145,7 @@ export async function PATCH(
     vehicle: "/vehicles", creator: "/creators", animal: "/tiere",
   };
   if (pathMap[data.type]) revalidatePath(pathMap[data.type]);
-  revalidateTag("listings", "max");
+  revalidateTag("listings", { expire: 0 });
 
   return NextResponse.json({ success: true });
 }
@@ -188,7 +188,7 @@ export async function DELETE(
     vehicle: "/vehicles", creator: "/creators", animal: "/tiere",
   };
   if (listing?.type && pathMap[listing.type]) revalidatePath(pathMap[listing.type]);
-  revalidateTag("listings", "max");
+  revalidateTag("listings", { expire: 0 });
 
   return NextResponse.json({ success: true });
 }

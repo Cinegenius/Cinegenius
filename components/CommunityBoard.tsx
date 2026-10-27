@@ -4,7 +4,7 @@ import { useViewState } from "@/lib/use-view-state";
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import { useLocale, useTranslations } from "next-intl";
 import { MapPin, MessageCircle, Pin, Plus, Search, Send, Trash2, X } from "lucide-react";
 import { useUser } from "@clerk/nextjs";

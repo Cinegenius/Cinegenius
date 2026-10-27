@@ -1290,5 +1290,11 @@
     "unavailable": "Al momento non è possibile caricare l’azienda.",
     "noContact": "Questa azienda non ha ancora un account responsabile per i messaggi.",
     "context": "Contatto aziendale: {name}"
+  },
+  "mediaSecurity": {
+    "saveFailed": "Impossibile salvare l’immagine. Riprova.",
+    "empty": "Seleziona un file immagine non vuoto.",
+    "invalid": "Impossibile elaborare l’immagine in modo sicuro. Usa un’immagine JPG, PNG o WEBP valida.",
+    "tooLarge": "L’immagine elaborata non deve superare i 4 MB."
   }
 }

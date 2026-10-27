@@ -20,8 +20,8 @@ export async function POST(_request: Request, context: { params: Promise<{ slug:
   const { error } = await db.from("companies").update({ published: true, updated_at: new Date().toISOString() })
     .eq("id", company.id).eq("owner_user_id", authResult.userId).eq("published", false);
   if (error) return NextResponse.json({ error: "Das Firmenprofil konnte nicht veröffentlicht werden." }, { status: 500 });
-  revalidateTag("companies", "max");
-  revalidateTag("profiles", "max");
+  revalidateTag("companies", { expire: 0 });
+  revalidateTag("profiles", { expire: 0 });
   revalidatePath("/");
   revalidatePath("/companies");
   revalidatePath(`/companies/${slug}`);

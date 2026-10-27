@@ -1,3 +1,4 @@
+import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
 import { db } from "@/lib/db";
 import { getCurrentUser, requireAuth } from "@/lib/auth";
 import { getCompanyAccess } from "@/lib/company-access";
@@ -45,13 +46,14 @@ export async function GET(req: NextRequest) {
       : { data: [] as { id: string; request_message: string | null }[] };
     const messagesByMember = new Map((requestMessages ?? []).map((item) => [item.id, item.request_message ?? ""]));
 
-    const userIds = (members ?? []).map((member) => member.user_id);
+    const visibleIds = await visibleLinkedProfileIds((members ?? []).map((member) => member.user_id), caller?.userId ?? null);
+    const userIds = [...visibleIds];
     const profiles: Record<string, { display_name: string; avatar_url: string | null; slug: string | null; role: string | null }> = {};
     if (userIds.length) {
       const { data } = await admin.from("profiles").select("user_id, display_name, avatar_url, slug, role").in("user_id", userIds);
       for (const profile of data ?? []) profiles[profile.user_id] = profile;
     }
-    const result = (members ?? []).filter((member) => canManageTeam || isPublicCompanyMembership(member.status)).map((member) => ({
+    const result = (members ?? []).filter((member) => canManageTeam || (isPublicCompanyMembership(member.status) && visibleIds.has(member.user_id))).map((member) => ({
       ...member,
       ...(member.status === "pending" && canManageTeam ? { request_message: messagesByMember.get(member.id) ?? "" } : {}),
       role: canManageTeam ? normalizeCompanyPermissionRole(member.role) ?? "member" : undefined,

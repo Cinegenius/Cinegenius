@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useGallerySelection } from "@/lib/use-gallery-selection";
 import Link from "next/link";
 import ContextBackLink from "@/components/ContextBackLink";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import {
   ArrowLeft, MapPin, Star, CheckCircle, Shield,
   MessageSquare, ChevronRight, Film, Users, Loader2,

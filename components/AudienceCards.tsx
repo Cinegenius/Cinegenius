@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import { Film, Camera, Building2, TrendingUp, ArrowRight } from "lucide-react";
 
 const FALLBACKS = {

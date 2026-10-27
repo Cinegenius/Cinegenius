@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Clapperboard } from "lucide-react";
 

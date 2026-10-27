@@ -1,3 +1,4 @@
+import JsonLd from "@/components/JsonLd";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import type { Metadata } from "next";
@@ -133,10 +134,7 @@ export default async function JobDetailPage({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <JobDetail job={job} preview={preview} />
     </>
   );

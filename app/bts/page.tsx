@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import Link from "next/link";
 import { Aperture, ArrowRight, Heart } from "lucide-react";
 import { auth } from "@clerk/nextjs/server";

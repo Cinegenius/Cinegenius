@@ -1,6 +1,6 @@
+import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { unstable_cache } from "next/cache";
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import { isAdminSession } from "@/lib/guards";
@@ -35,7 +35,8 @@ async function _getProject(id: string) {
 
   const rawCredits = (credits ?? []) as RawCredit[];
 
-  const userIds = rawCredits.filter((c) => c.user_id).map((c) => c.user_id as string);
+  const visibleIds = await visibleLinkedProfileIds(rawCredits.map((c) => c.user_id));
+  const userIds = [...visibleIds];
 
   const profilesMap = userIds.length > 0
       ? await db.from("profiles").select("user_id, display_name, avatar_url, role, slug").in("user_id", userIds).then(
@@ -54,7 +55,8 @@ async function _getProject(id: string) {
   return { project, credits: creditsWithProfiles, festivals: festivals ?? [] };
 }
 
-const getProject = unstable_cache(_getProject, ["project-id"], { revalidate: 300, tags: ["projects"] });
+// Identity permissions are evaluated per request, never served from a shared page cache.
+const getProject = _getProject;
 
 export async function generateMetadata({
   params,

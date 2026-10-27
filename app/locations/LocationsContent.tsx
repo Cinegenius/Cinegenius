@@ -7,7 +7,7 @@ import { listingPriceLabel } from "@/lib/listing-price";
 
 import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import dynamicImport from "next/dynamic";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useUser, useAuth } from "@clerk/nextjs";

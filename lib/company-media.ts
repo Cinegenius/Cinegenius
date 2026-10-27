@@ -1,3 +1,4 @@
+import { isOwnedProtectedMedia } from "./protected-media";
 export const MAX_COMPANY_GALLERY_IMAGES = 12;
 
 export function moveCompanyGalleryImage(images: string[], from: number, to: number): string[] {
@@ -9,6 +10,7 @@ export function moveCompanyGalleryImage(images: string[], from: number, to: numb
 }
 
 export function isCompanyImageUrlOwnedByUser(url: string, userId: string, supabaseUrl: string): boolean {
+  if (isOwnedProtectedMedia(url, userId)) return true;
   try {
     const parsed = new URL(url);
     const storageOrigin = new URL(supabaseUrl).origin;

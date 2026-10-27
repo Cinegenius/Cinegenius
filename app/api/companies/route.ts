@@ -8,8 +8,8 @@ import { canCompanyRole, normalizeCompanyPublicTitles } from "@/lib/company-role
 import { canPersistCompanyImages, isCompanyImageUrlOwnedByUser } from "@/lib/company-media";
 
 function revalidateCompanyViews(slug: string) {
-  revalidateTag("companies", "max");
-  revalidateTag("profiles", "max");
+  revalidateTag("companies", { expire: 0 });
+  revalidateTag("profiles", { expire: 0 });
   revalidatePath("/");
   revalidatePath("/companies");
   revalidatePath(`/companies/${slug}`);

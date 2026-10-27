@@ -1290,5 +1290,11 @@
     "unavailable": "The company could not be loaded right now.",
     "noContact": "This company does not yet have a responsible messaging account.",
     "context": "Company contact: {name}"
+  },
+  "mediaSecurity": {
+    "saveFailed": "The image could not be saved. Please try again.",
+    "empty": "Please select a non-empty image file.",
+    "invalid": "The image could not be processed safely. Use a valid JPG, PNG or WEBP image.",
+    "tooLarge": "The processed image must not exceed 4 MB."
   }
 }

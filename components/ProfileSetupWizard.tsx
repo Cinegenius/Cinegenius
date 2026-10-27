@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import type { ReactNode } from "react";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import Link from "next/link";
 import ListingPriceOptions from "@/components/ListingPriceOptions";
 import { listingPriceLabel } from "@/lib/listing-price";

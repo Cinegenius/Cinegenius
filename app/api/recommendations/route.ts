@@ -1,3 +1,6 @@
+import { auth } from "@clerk/nextjs/server";
+import { canViewProfile } from "@/lib/trust";
+import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
@@ -6,6 +9,9 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
   const recipientId = req.nextUrl.searchParams.get("userId");
   if (!recipientId) return NextResponse.json({ recommendations: [] });
+
+  const { userId: viewerId } = await auth();
+  if (!await canViewProfile(recipientId, viewerId)) return new NextResponse(null, { status: 404, headers: { "Cache-Control": "private, no-store" } });
 
   const { data, error } = await db
     .from("recommendations")
@@ -19,7 +25,9 @@ export async function GET(req: NextRequest) {
   if (!data?.length) return NextResponse.json({ recommendations: [] });
 
   // Autoren-Profile nachladen
-  const authorIds = [...new Set(data.map((r) => r.author_id))];
+  const visibleIds = await visibleLinkedProfileIds(data.map((r) => r.author_id), viewerId);
+  const authorIds = [...visibleIds];
+  if (!authorIds.length) return NextResponse.json({ recommendations: [] });
   const { data: profiles } = await db
     .from("profiles")
     .select("user_id, display_name, avatar_url")
@@ -27,7 +35,7 @@ export async function GET(req: NextRequest) {
 
   const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.user_id, p]));
 
-  const recommendations = data.map((r) => ({
+  const recommendations = data.filter((r) => visibleIds.has(r.author_id)).map((r) => ({
     id: r.id,
     author_id: r.author_id,
     author_name: profileMap[r.author_id]?.display_name ?? "Unbekannt",

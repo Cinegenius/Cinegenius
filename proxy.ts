@@ -1,3 +1,5 @@
+import { trustedMutationOrigin } from "@/lib/request-origin";
+import { mediaOptimizerBlockStatus } from "@/lib/media-optimizer-guard";
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { isProtectedCreatePath, isPublicProfilePath } from "@/lib/public-access";
@@ -24,6 +26,7 @@ function getAdminIds(): Set<string> {
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 const RATE_LIMITS: Record<string, { limit: number; windowMs: number }> = {
+  "/api/media": { limit: 120, windowMs: 60_000 },
   "/api/community-image": { limit: 120, windowMs: 60_000 },
   "/api/upload/avatar":  { limit: 5,  windowMs: 60_000 },
   "/api/upload":         { limit: 20, windowMs: 60_000 },
@@ -82,24 +85,19 @@ function ipRateLimit(req: NextRequest): NextResponse | null {
 }
 
 // ── CSRF: Origin/Referer check for mutating API requests ─────────────────────
-const SAFE_ORIGINS = new Set([
-  "https://cinegenius.co",
-  "https://www.cinegenius.co",
-  ...(process.env.NODE_ENV !== "production" ? ["http://localhost:3000"] : []),
-]);
 
 function csrfCheck(request: NextRequest): NextResponse | null {
   if (!["POST", "PUT", "PATCH", "DELETE"].includes(request.method)) return null;
   if (!request.nextUrl.pathname.startsWith("/api/")) return null;
   if (request.nextUrl.pathname.startsWith("/api/webhooks/")) return null;
 
-  const origin  = request.headers.get("origin");
-  const referer = request.headers.get("referer");
-
-  const originOk  = origin  && SAFE_ORIGINS.has(origin);
-  const refererOk = referer && (() => { try { return SAFE_ORIGINS.has(new URL(referer).origin); } catch { return false; } })();
-
-  if (!originOk && !refererOk) {
+  if (!trustedMutationOrigin({
+    requestUrl: request.url,
+    origin: request.headers.get("origin"),
+    referer: request.headers.get("referer"),
+    development: process.env.NODE_ENV !== "production",
+    deploymentHost: process.env.VERCEL_URL,
+  })) {
     return NextResponse.json({ error: "CSRF check failed" }, { status: 403 });
   }
   return null;
@@ -149,6 +147,7 @@ const isWebhookRoute = createRouteMatcher(["/api/webhooks/(.*)"]);
 // This prevents a missed requireAuth() in a handler from opening write access.
 const isPublicApiGet = createRouteMatcher([
   "/api/community-image",
+  "/api/media/(.*)",
   "/api/listings(.*)",
   "/api/reviews(.*)",
   "/api/search(.*)",
@@ -161,6 +160,12 @@ const isPublicApiGet = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
+  // Auth-dependent images must never enter Next's shared optimizer cache.
+  if (request.nextUrl.pathname === "/_next/image") {
+    const blocked = await mediaOptimizerBlockStatus(request.nextUrl.searchParams.get("url") ?? "", request.url, process.env.NEXT_PUBLIC_SUPABASE_URL ?? "", process.env.SUPABASE_SERVICE_ROLE_KEY);
+    if (blocked) return new NextResponse(null, { status: blocked, headers: { "Cache-Control": "private, no-store", "CDN-Cache-Control": "no-store", "Vercel-CDN-Cache-Control": "no-store" } });
+    return NextResponse.next();
+  }
   // Webhooks must never be redirected — bypass everything immediately
   if (request.nextUrl.pathname.startsWith("/api/webhooks/")) {
     return NextResponse.next();
@@ -202,7 +207,7 @@ export default clerkMiddleware(async (auth, request) => {
   } else if (isPublicApiGet(request)) {
     // 3b. Public-GET API — only protect mutations so a missed handler check
     //     doesn't silently open write access to unauthenticated callers.
-    if (request.method !== "GET") await auth.protect();
+    if (!["GET", "HEAD"].includes(request.method)) await auth.protect();
   } else if (isProtectedCreatePath(request.nextUrl.pathname) || (!isPublicRoute(request) && !isPublicProfilePath(request.nextUrl.pathname))) {
     // 3c. Session-only protection for all other non-public routes
     if (request.method === "GET" && !isApi) {
@@ -256,6 +261,8 @@ export default clerkMiddleware(async (auth, request) => {
 
 export const config = {
   matcher: [
+    "/api/media/:path*",
+    "/_next/image",
     "/((?!_next/static|_next/image|favicon.ico|api/webhooks|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

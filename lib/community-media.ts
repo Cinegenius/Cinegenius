@@ -1,3 +1,4 @@
+import { protectedMediaKey } from "./protected-media";
 export const COMMUNITY_ALLOWED_SOURCE_TYPES = ["profile", "company"] as const;
 export const COMMUNITY_IMAGE_LABELS: Record<string, string> = {
   profile: "Portfolio / Arbeitsprobe", company: "Firmenfoto",
@@ -16,6 +17,7 @@ export function communityMediaLabel(row: Pick<CommunityMediaRow, "source_type" |
   return COMMUNITY_IMAGE_LABELS[row.source_type] ?? "Öffentliches Foto";
 }
 export function isOwnPublicStorageUrl(value: string, origin: string) {
+  if (protectedMediaKey(value)) return true;
   try { const url = new URL(value); return url.origin === new URL(origin).origin && url.pathname.startsWith("/storage/v1/object/public/") && !url.searchParams.has("token"); } catch { return false; }
 }
 export function communityPhotoFromRow(row: CommunityMediaRow) {

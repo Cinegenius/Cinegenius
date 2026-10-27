@@ -6,7 +6,7 @@ import { useViewState } from "@/lib/use-view-state";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { ServerAdminContext } from "@/lib/server-admin-context";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import {
   Activity, BadgeCheck, Building2, Check, ChevronDown, ChevronLeft,
   ChevronRight, CircleAlert, ClipboardList, Clapperboard, CreditCard, Eye, FileImage,

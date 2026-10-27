@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
@@ -76,5 +77,11 @@ export async function PATCH(req: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (body.profile_visibility !== undefined) {
+    revalidateTag("profiles", { expire: 0 });
+    revalidateTag("creator-directory", { expire: 0 });
+    revalidateTag("companies", { expire: 0 });
+    revalidateTag("projects", { expire: 0 });
+  }
   return NextResponse.json({ success: true, settings: saved }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 }

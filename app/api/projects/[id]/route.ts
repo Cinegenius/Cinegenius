@@ -1,3 +1,5 @@
+import { auth } from "@clerk/nextjs/server";
+import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
 import { db } from "@/lib/db";
 import { requireAuth, assertOwner } from "@/lib/guards";
 import { NextRequest, NextResponse } from "next/server";
@@ -23,7 +25,9 @@ export async function GET(
     .order("created_at", { ascending: true });
   if (creditsError) return NextResponse.json({ error: "Projektmitwirkende konnten nicht geladen werden." }, { status: 500 });
 
-  const userIds = (credits ?? []).map((c) => c.user_id);
+  const { userId: viewerId } = await auth();
+  const visibleIds = await visibleLinkedProfileIds((credits ?? []).map((c) => c.user_id), viewerId);
+  const userIds = [...visibleIds];
   let profiles: Record<string, { display_name: string; avatar_url: string | null; role: string | null }> = {};
 
   if (userIds.length > 0) {

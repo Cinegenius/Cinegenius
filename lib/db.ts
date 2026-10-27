@@ -32,12 +32,10 @@ type DbError = {
 type BuilderMethod = (this: object, ...args: unknown[]) => unknown;
 
 function logDbError(context: string, error: DbError): void {
-  const parts: string[] = [`[db:${context}]`];
-  if (error.code)    parts.push(`code=${error.code}`);
-  if (error.message) parts.push(error.message);
-  if (error.details) parts.push(`| details: ${error.details}`);
-  if (error.hint)    parts.push(`| hint: ${error.hint}`);
-  console.error(parts.join(" "));
+  // PostgreSQL details can contain the complete rejected row (messages/contact data).
+  // Only stable diagnostic identifiers belong in shared production logs.
+  const code = /^[A-Z0-9_]{2,24}$/.test(error.code ?? "") ? error.code : "UNKNOWN";
+  console.error(`[db:${context}] code=${code}`);
 }
 
 // ---------------------------------------------------------------------------
@@ -139,8 +137,8 @@ export const db = {
    * builders — pass errors through to the caller as-is.
    *
    * @example
-   *   const { error } = await db.storage.from("listing-images").upload(path, buffer, opts);
-   *   const { data }  = db.storage.from("listing-images").getPublicUrl(path);
+   *   const url = await storeProtectedMedia(userId, path, buffer, mime);
+   *   // Source association determines read permissions; never persist signed links.
    */
   // Keep client creation lazy during Next.js build analysis. Reading this
   // property at runtime still creates the admin client on first use.

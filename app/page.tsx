@@ -5,7 +5,7 @@ import { getListingProviders } from "@/lib/listing-provider";
 import { listingDetailPath } from "@/lib/listing-routes";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import { getTranslations } from "next-intl/server";
 
 export const metadata: Metadata = {

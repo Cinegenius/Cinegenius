@@ -1,3 +1,5 @@
+import { getTranslations } from "next-intl/server";
+import { storeProtectedMedia, removeUnusedProtectedMedia } from "@/lib/protected-media-server";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { buildStoragePath, validateUpload } from "@/lib/uploadGuard";
@@ -17,6 +19,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
+  const t = await getTranslations("mediaSecurity");
   const { id } = await params;
 
   const { data: listing, error: listingError } = await db
@@ -53,7 +56,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const { allowed } = await rateLimit(`upload:${userId}`, 10, 60);
     if (!allowed) return NextResponse.json({ error: "Zu viele Uploads. Bitte kurz warten." }, { status: 429 });
   }
-  const upload = file instanceof File ? await validateUpload(file) : null;
+  const upload = file instanceof File ? await validateUpload(file, { emptyMessage: t("empty"), tooLargeMessage: t("tooLarge"), unsupportedTypeMessage: t("invalid") }) : null;
   if (upload && "error" in upload) return NextResponse.json({ error: upload.error }, { status: upload.status });
 
   const provider = await getListingProvider(listing.user_id, listing.company_id, userId);
@@ -74,12 +77,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   let imageUrl: string | null = null;
   if (file instanceof File && upload && !("error" in upload)) {
       uploadedPath = buildStoragePath(userId, upload.ext);
-      const { error: uploadError } = await db.storage.from("listing-images").upload(uploadedPath, upload.buffer, {
-        contentType: upload.mime,
-        upsert: false,
-      });
-      if (uploadError) return NextResponse.json({ error: "Bild konnte nicht hochgeladen werden" }, { status: 500 });
-      imageUrl = db.storage.from("listing-images").getPublicUrl(uploadedPath).data.publicUrl;
+      try {
+        imageUrl = await storeProtectedMedia(userId, uploadedPath, upload.buffer, upload.mime);
+      } catch {
+        return NextResponse.json({ error: "Bild konnte nicht hochgeladen werden" }, { status: 500 });
+      }
   }
 
   const updates: Record<string, unknown> = { published: true };
@@ -93,13 +95,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     .maybeSingle();
 
   if (error || !data) {
-    if (uploadedPath) await db.storage.from("listing-images").remove([uploadedPath]);
+    if (uploadedPath) await removeUnusedProtectedMedia(userId, uploadedPath);
     return NextResponse.json({ error: error ? "Inserat konnte nicht veröffentlicht werden" : "Der Status hat sich inzwischen geändert. Bitte lade die Seite neu." }, { status: error ? 500 : 409 });
   }
 
   if (PATHS[data.type]) revalidatePath(PATHS[data.type]);
   const detailPath = listingDetailPath(data.type, data.id, companyResult.data?.slug);
   if (detailPath) revalidatePath(detailPath);
-  revalidateTag("listings", "max");
+  revalidateTag("listings", { expire: 0 });
   return NextResponse.json({ success: true });
 }

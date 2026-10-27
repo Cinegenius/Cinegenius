@@ -1,10 +1,14 @@
+import { downloadProtectedMedia, readableProtectedMedia } from "@/lib/protected-media-server";
+import { protectedMediaKey } from "@/lib/protected-media";
+import { auth } from "@clerk/nextjs/server";
+import { blockedMediaOwnerIds } from "@/lib/linked-profile-access";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { COMMUNITY_ALLOWED_SOURCE_TYPES, isOwnPublicStorageUrl } from "@/lib/community-media";
 import { cachedCommunityPreview, readPreviewSource, resizeCommunityPreview } from "@/lib/community-preview-server";
 
 export const runtime = "nodejs";
-const headers = { "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff" };
+const headers = { "Cache-Control": "private, no-store", "CDN-Cache-Control": "no-store", "Vercel-CDN-Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" };
 
 export async function GET(request: NextRequest) {
   const image = request.nextUrl.searchParams.get("image") ?? "";
@@ -14,12 +18,23 @@ export async function GET(request: NextRequest) {
   }
   // Never turn the resizing service into a proxy for private or excluded media.
   const { data, error } = await db.from("public_community_media")
-    .select("storage_id,uploaded_at").in("source_type", [...COMMUNITY_ALLOWED_SOURCE_TYPES])
+    .select("storage_id,uploaded_at,owner_id").in("source_type", [...COMMUNITY_ALLOWED_SOURCE_TYPES])
     .eq("image_url", image).limit(1).maybeSingle();
   if (error) return NextResponse.json({ error: "Bildstatus derzeit nicht erreichbar." }, { status: 503, headers });
   if (!data) return NextResponse.json({ error: "Bild nicht öffentlich verfügbar." }, { status: 404, headers });
   try {
+    const { userId } = await auth();
+    const blocked = await blockedMediaOwnerIds(userId);
+    if (data.owner_id && blocked.includes(data.owner_id)) return new Response(null, { status: 404, headers });
+    // Recheck source rights before even looking up a cached derivative.
+    const protectedAsset = protectedMediaKey(image) ? await readableProtectedMedia(image, userId) : null;
+    if (protectedMediaKey(image) && !protectedAsset) return new Response(null, { status: 404, headers });
     const output = await cachedCommunityPreview(`${data.storage_id}:${data.uploaded_at}:${image}:${size}`, async () => {
+      if (protectedAsset) {
+        const file = await downloadProtectedMedia(image, userId);
+        if (!file) throw new Error("Public source no longer readable");
+        return resizeCommunityPreview(file.bytes, size as "thumbnail" | "detail");
+      }
       const response = await fetch(image, { redirect: "error", cache: "no-store", signal: AbortSignal.timeout(15_000) });
       return resizeCommunityPreview(await readPreviewSource(response), size as "thumbnail" | "detail");
     });

@@ -1,3 +1,5 @@
+import { auth } from "@clerk/nextjs/server";
+import { canViewProfile } from "@/lib/trust";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { rateLimit } from "@/lib/rateLimit";
@@ -124,9 +126,12 @@ export async function GET(req: NextRequest) {
   const user_id = searchParams.get("user_id");
   if (!user_id) return NextResponse.json({ error: "user_id fehlt" }, { status: 400 });
 
+  const { userId: viewerId } = await auth();
+  if (!await canViewProfile(user_id, viewerId)) return new NextResponse(null, { status: 404, headers: { "Cache-Control": "private, no-store" } });
+
   const { data: credits, error } = await db
     .from("project_credits")
-    .select("id, role, created_at, project_id, projects(id, title, year, type, director, poster_url, metadata)")
+    .select("id, role, created_at, project_id, projects(id, title, year, type, director, poster_url)")
     .eq("user_id", user_id)
     .order("created_at", { ascending: false });
 

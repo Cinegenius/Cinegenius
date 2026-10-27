@@ -77,7 +77,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     p_conversation_id: id, p_admin_user_id: admin.userId, p_content: content, p_idempotency_key: idempotencyKey,
   });
   if (error) {
-    console.error("[admin support] reply failed", error);
+    console.error("[admin support] reply persistence failed");
     return NextResponse.json({ error: "Supportantwort konnte nicht dauerhaft gespeichert werden." }, { status: 503 });
   }
   const result = Array.isArray(data) ? data[0] : data;

@@ -1,3 +1,5 @@
+import { canViewProfile } from "@/lib/trust";
+import JsonLd from "@/components/JsonLd";
 import { notFound, redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { recordProfileView } from "@/lib/profile-views";
@@ -86,7 +88,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const creator = await getCreator(slug);
-  if (!creator) return {};
+  if (!creator || !await canViewProfile(creator.ownerId, null)) return {};
   return {
     title: `${creator.name} — ${creator.role}`,
     description: `${creator.name} ist ${creator.role} aus ${creator.location}. Jetzt auf CineGenius anfragen.`,
@@ -119,7 +121,6 @@ export default async function CreatorProfilePage({
     .eq("user_id", creator.ownerId)
     .maybeSingle();
 
-  const profileVisibility = settings?.profile_visibility ?? "public";
   const messagePermission = settings?.message_permission ?? "everyone";
 
   // Check friendship status
@@ -140,7 +141,7 @@ export default async function CreatorProfilePage({
   const isOwn   = userId === creator.ownerId;
 
   // Private profile check
-  const canView = isOwn || profileVisibility === "public" || isFriend;
+  const canView = await canViewProfile(creator.ownerId, userId);
   if (!canView) {
     return (
       <div className="pt-16 min-h-screen flex items-center justify-center px-4">
@@ -201,10 +202,7 @@ export default async function CreatorProfilePage({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <CreatorDetail
         creator={creator}
         friendshipId={friendshipData?.id}

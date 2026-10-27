@@ -1,4 +1,5 @@
-import { db } from "@/lib/db";
+import { getTranslations } from "next-intl/server";
+import { storeProtectedMedia } from "@/lib/protected-media-server";
 import { requireAuth } from "@/lib/guards";
 import { validateUpload, buildStoragePath } from "@/lib/uploadGuard";
 import { rateLimit } from "@/lib/rateLimit";
@@ -9,6 +10,7 @@ export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
+  const t = await getTranslations("mediaSecurity");
 
   // 2. Per-user rate limit: 3 avatar uploads per minute
   const { allowed } = await rateLimit(`avatar:${userId}`, 3, 60);
@@ -23,7 +25,7 @@ export async function POST(req: NextRequest) {
   }
 
   // 3. Validate — magic bytes, size, allowed types
-  const validation = await validateUpload(file);
+  const validation = await validateUpload(file, { emptyMessage: t("empty"), tooLargeMessage: t("tooLarge"), unsupportedTypeMessage: t("invalid") });
   if ("error" in validation) {
     return NextResponse.json({ error: validation.error }, { status: validation.status });
   }
@@ -42,22 +44,11 @@ export async function POST(req: NextRequest) {
   //      and can be cleaned up with a periodic storage sweep.
   const path = buildStoragePath(userId, ext, "avatars");
 
-  // 5. Upload — upsert: false, no overwriting
-  const { error: uploadError } = await db.storage
-    .from("listing-images")
-    .upload(path, buffer, {
-      contentType: mime,
-      upsert: false,
-    });
-
-  if (uploadError) {
-    console.error("[upload/avatar]", uploadError);
-    return NextResponse.json({ error: uploadError.message }, { status: 500 });
+  try {
+    const url = await storeProtectedMedia(userId, path, buffer, mime);
+    return NextResponse.json({ url }, { headers: { "Cache-Control": "private, no-store" } });
+  } catch {
+    console.error("[upload] private file persistence failed");
+    return NextResponse.json({ error: t("saveFailed") }, { status: 500 });
   }
-
-  const { data: urlData } = db.storage
-    .from("listing-images")
-    .getPublicUrl(path);
-
-  return NextResponse.json({ url: urlData.publicUrl });
 }

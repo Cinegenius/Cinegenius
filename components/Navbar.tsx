@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import type React from "react";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import { usePathname } from "next/navigation";
 import { useAuth, useUser, useClerk } from "@clerk/nextjs";
 import {

@@ -13,8 +13,8 @@ const json = (body: unknown, status = 200) => NextResponse.json(body, {
 });
 
 function invalidateCompany(slug?: string | null) {
-  revalidateTag("companies", "max");
-  revalidateTag("profiles", "max");
+  revalidateTag("companies", { expire: 0 });
+  revalidateTag("profiles", { expire: 0 });
   if (slug) revalidatePath(`/companies/${slug}`);
 }
 

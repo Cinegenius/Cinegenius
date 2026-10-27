@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import { COMPANY_PUBLIC_TITLE_SUGGESTIONS, normalizeCompanyPublicTitles } from "@/lib/company-roles";
 
 type Person = { user_id: string; display_name: string; avatar_url: string | null; slug: string | null; role: string | null; positions?: string[]; location: string | null };

@@ -1290,5 +1290,11 @@
     "unavailable": "No se ha podido cargar la empresa.",
     "noContact": "Esta empresa todavía no tiene una cuenta responsable para recibir mensajes.",
     "context": "Contacto de la empresa: {name}"
+  },
+  "mediaSecurity": {
+    "saveFailed": "No se pudo guardar la imagen. Inténtalo de nuevo.",
+    "empty": "Selecciona un archivo de imagen que no esté vacío.",
+    "invalid": "No se pudo procesar la imagen de forma segura. Usa una imagen JPG, PNG o WEBP válida.",
+    "tooLarge": "La imagen procesada no debe superar los 4 MB."
   }
 }

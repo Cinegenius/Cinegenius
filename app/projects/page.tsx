@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import { getTranslations } from "next-intl/server";
 import {
   Film, Tv, Camera, Zap, Music, FileVideo, Building2, Radio, ArrowRight,

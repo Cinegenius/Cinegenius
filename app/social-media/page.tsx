@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import Link from "next/link";
 import { Zap, ArrowRight, MapPin, ExternalLink, Link2, Play } from "lucide-react";
 

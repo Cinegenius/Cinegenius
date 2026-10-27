@@ -7,7 +7,7 @@ import { filterCrewOccupations } from "@/lib/crew-occupations";
 
 import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/MediaImage";
 import { useTranslations, useLocale } from "next-intl";
 import {
   MapPin, CheckCircle, Search, X, LayoutGrid, List, SlidersHorizontal, ChevronDown, Users, Globe, Languages, ArrowUpDown, Plus, ShoppingBag,
