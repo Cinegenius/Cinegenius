@@ -8,6 +8,7 @@ import ResilientPublicImage from "@/components/ResilientPublicImage";
 import { markPhotoNavigation, markPhotoNavigationWithAnimation, photoHref } from "@/lib/photo-link";
 import { getPhotoBandFillerCount, selectHomeDiscoveryPhotos, repeatForSeamlessLoop, shouldAnimatePhotoBand } from "@/lib/home-discovery";
 import { communityPreviewUrl } from "@/lib/community-preview";
+import CompanyLogo from "@/components/CompanyLogo";
 
 export type DiscoverPhoto = {
   authorHref?: string | null;
@@ -15,6 +16,7 @@ export type DiscoverPhoto = {
   sourceTitle?: string;
   imageKind?: string;
   fit?: "contain" | "cover";
+  logoBackground?: string | null;
   canLike?: boolean;
   canRate?: boolean;
   uploadedAt?: string;
@@ -90,7 +92,7 @@ export function PhotoDialog({ photo, onClose, resumeLike = false }: { photo: Dis
       <section className="relative flex max-h-[94dvh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-border bg-bg-secondary shadow-2xl" role="dialog" aria-modal="true" aria-label={`Foto von ${photo.author}`}>
         <button type="button" onClick={onClose} aria-label="Foto schließen" className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/70 text-white hover:border-gold"><X size={20} /></button>
         <div className="relative flex h-[62dvh] min-h-0 shrink items-center justify-center bg-black px-2 pb-2 pt-14 sm:px-4 sm:pb-4">
-          <ResilientPublicImage src={communityPreviewUrl(photo.imageUrl, "detail")} alt={photo.caption || `${photo.imageKind || "Foto"} von ${photo.author}`} imageClassName="h-full w-full object-contain" loading="eager" />
+          {photo.fit === "contain" ? <CompanyLogo src={communityPreviewUrl(photo.imageUrl, "detail")} name={photo.author} background={photo.logoBackground} className="h-full w-full" /> : <ResilientPublicImage src={communityPreviewUrl(photo.imageUrl, "detail")} alt={photo.caption || `${photo.imageKind || "Foto"} von ${photo.author}`} imageClassName="h-full w-full object-contain" loading="eager" />}
         </div>
         <div className="flex max-h-[28dvh] shrink-0 flex-wrap items-center justify-between gap-4 overflow-y-auto p-4 sm:px-6">
           <div className="min-w-0">
@@ -140,9 +142,9 @@ function PhotoBandCard({
     <article aria-hidden={pointerOnly || undefined} className="home-photo-band-card group relative aspect-[4/3] w-[165px] shrink-0 overflow-hidden rounded-xl border border-white/10 bg-bg-elevated sm:w-[200px] lg:w-[240px] xl:w-[250px]">
       {!failed ? <Link href={href} onClick={onPhotoOpen ?? (() => markPhotoNavigation())} aria-label={pointerOnly ? undefined : `Foto öffnen: ${photo.caption || `Portfoliofoto von ${photo.author}`}`} tabIndex={pointerOnly ? -1 : undefined} className="absolute inset-0 block focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold">
         {/* eslint-disable-next-line @next/next/no-img-element -- endpoint guarantees bounded pixels, including oversized originals */}
-        <img src={communityPreviewUrl(photo.imageUrl)} alt={pointerOnly ? "" : photo.caption || `Foto von ${photo.author}`} loading={priority ? "eager" : "lazy"} decoding="async" onError={() => onImageError(photo.imageUrl)} draggable={false} className={`absolute inset-0 h-full w-full ${photo.fit === "contain" ? "object-contain p-4" : "object-cover"}`} />
+        {photo.fit === "contain" ? <CompanyLogo src={communityPreviewUrl(photo.imageUrl)} name={photo.author} background={photo.logoBackground} className="absolute inset-x-0 top-0 bottom-20" /> : <img src={communityPreviewUrl(photo.imageUrl)} alt={pointerOnly ? "" : photo.caption || `Foto von ${photo.author}`} loading={priority ? "eager" : "lazy"} decoding="async" onError={() => onImageError(photo.imageUrl)} draggable={false} className="absolute inset-0 h-full w-full object-cover" />}
       </Link> : <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-bg-elevated to-bg-primary text-text-muted"><div className="flex flex-col items-center gap-2"><ImageIcon size={28} /><span className="text-xs">Bild derzeit nicht verfügbar</span></div></div>}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
+      {photo.fit !== "contain" && <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />}
       <PhotoLikeButton profileId={photo.profileId} imageUrl={photo.imageUrl} initialCount={photo.likeCount ?? 0} initialLiked={photo.likedByMe ?? false} disabled={photo.canLike === false} blurBackground={false} tabIndex={pointerOnly ? -1 : undefined} className="absolute right-3 top-3 z-10" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3 text-white sm:p-4">
         {photo.authorHref === null ? <span className="inline-flex min-h-11 max-w-full items-center truncate text-sm font-semibold sm:text-base">{photo.author}</span> : <Link href={photo.authorHref ?? `/profile/${photo.profileSlug}#portfolio`} tabIndex={pointerOnly ? -1 : undefined} className="pointer-events-auto inline-flex min-h-11 max-w-full items-center truncate text-sm font-semibold hover:text-gold sm:text-base">{photo.author}</Link>}

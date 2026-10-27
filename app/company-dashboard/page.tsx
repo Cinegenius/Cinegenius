@@ -35,6 +35,7 @@ export default async function CompanyDashboardPage({ searchParams }: { searchPar
     name: company.name,
     slug: company.slug,
     logo_url: company.logo_url,
+    logo_background: company.logo_background,
     city: company.city,
   }));
   return <DashboardClient company={selected.company} permissionRole={selected.permissionRole} companyOptions={companyOptions} />;

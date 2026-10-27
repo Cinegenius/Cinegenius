@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
     if (!caller) return privateJson({ error: "Nicht eingeloggt" }, 401);
     if (caller.userId !== userId) return privateJson({ error: "Keine Berechtigung" }, 403);
     const { data, error } = await admin.from("company_members")
-      .select("id, company_id, role, title, public_titles, status, companies(id, slug, name, logo_url, published)")
+      .select("id, company_id, role, title, public_titles, status, companies(id, slug, name, logo_url, logo_background, published)")
       .eq("user_id", userId).eq("status", "accepted").order("created_at", { ascending: true });
     if (error) return privateJson({ error: "Firmenzugehörigkeiten konnten nicht geladen werden." }, 500);
     return privateJson({ data: (data ?? []).filter((member) => (member.companies as { published?: boolean } | null)?.published) });

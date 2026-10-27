@@ -68,3 +68,7 @@ Public advertising surfaces are disabled across all routes and screen sizes. Do 
 ## Cause confirmed during the deployment review
 
 Production had been replaced by manual CLI uploads from dirty or stale local snapshots instead of a single canonical Git commit. Automatic Git production deployment was disabled, so different uploads could replace the live build without being tied to the current `main` commit. The source review found no service worker registration or service-worker asset; it was not the cause of the differing layouts.
+
+## Company logo presentation
+
+Before releasing the logo background setting, apply `supabase/migrations/20261027150000_company_logo_background.sql` and verify the production `companies.logo_background` column and its enum constraint. The additive column defaults existing companies to `auto` (light surface); company editors can choose light or dark without changing the file. Do not deploy the dependent company selects before the migration. Existing membership permissions, visibility and images remain unchanged.

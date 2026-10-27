@@ -23,7 +23,7 @@ type Company = {
   id: string;
   slug: string;
   name: string;
-  logo_url: string | null;
+  logo_url: string | null; logo_background?: string | null;
   description: string;
   city: string;
   categories: string[];
@@ -438,7 +438,7 @@ function CompanyCard({ company }: { company: Company }) {
     <Link href={`/companies/${company.slug}`}
       className="browse-card card-hover group block p-4">
       <div className="flex min-w-0 items-start gap-3 mb-3">
-        <CompanyLogo src={company.logo_url} name={company.name} className="h-12 w-20 shrink-0" />
+        <CompanyLogo src={company.logo_url} name={company.name} background={company.logo_background} className="h-12 w-20 shrink-0" />
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-1">
             <h3 className="font-semibold text-sm text-text-primary group-hover:text-gold transition-colors break-words leading-snug [overflow-wrap:anywhere]">{company.name}</h3>
@@ -474,7 +474,7 @@ function CompanyListRow({ company }: { company: Company }) {
   return (
     <Link href={`/companies/${company.slug}`}
       className="flex items-center gap-4 px-5 py-4 hover:bg-bg-elevated transition-colors group">
-      <CompanyLogo src={company.logo_url} name={company.name} className="h-10 w-10 shrink-0" />
+      <CompanyLogo src={company.logo_url} name={company.name} background={company.logo_background} className="h-10 w-10 shrink-0" />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
           <span className="font-semibold text-sm text-text-primary group-hover:text-gold transition-colors break-words [overflow-wrap:anywhere]">{company.name}</span>

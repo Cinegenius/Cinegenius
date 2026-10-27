@@ -1,5 +1,7 @@
 "use client";
 
+import CompanyLogo from "@/components/CompanyLogo";
+
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -20,7 +22,7 @@ import { canCompanyRoleManageTarget, normalizeCompanyPublicTitles, COMPANY_PUBLI
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Company = {
-  id: string; slug: string; name: string; logo_url: string | null;
+  id: string; slug: string; name: string; logo_url: string | null; logo_background?: string | null;
   city: string; categories: string[]; published: boolean;
   tagline: string | null; description: string | null;
   social_links: Record<string, string> | null;
@@ -62,7 +64,7 @@ type Tab = "overview" | "services" | "equipment" | "team";
 export default function DashboardClient({ company, permissionRole, companyOptions = [] }: {
   company: Company;
   permissionRole: "owner" | "admin" | "editor" | "member";
-  companyOptions?: Array<Pick<Company, "id" | "name" | "slug" | "logo_url" | "city">>;
+  companyOptions?: Array<Pick<Company, "id" | "name" | "slug" | "logo_url" | "logo_background" | "city">>;
 }) {
   const searchParams = useSearchParams();
   const [tab, setTab] = useState<Tab>(() => searchParams.get("tab") === "team" ? "team" : "overview");
@@ -88,7 +90,7 @@ export default function DashboardClient({ company, permissionRole, companyOption
           <div className="flex items-center gap-3">
             <div className="w-14 h-9 rounded-lg bg-bg-elevated border border-border overflow-hidden flex items-center justify-center shrink-0">
               {company.logo_url
-                ? <img src={company.logo_url} alt="" className="w-full h-full object-contain p-1" /> // eslint-disable-line @next/next/no-img-element
+                ? <CompanyLogo src={company.logo_url} name={company.name} background={company.logo_background} className="h-full w-full" />
                 : <Building2 size={16} className="text-text-muted" />
               }
             </div>

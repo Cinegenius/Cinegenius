@@ -14,6 +14,9 @@ import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import { compressImage, MAX_FUNCTION_UPLOAD_BYTES, safeObjectURL } from "@/lib/compressImage";
 import { MAX_COMPANY_GALLERY_IMAGES, moveCompanyGalleryImage } from "@/lib/company-media";
 import { COMPANY_PUBLIC_TITLE_SUGGESTIONS, normalizeCompanyPublicTitles } from "@/lib/company-roles";
+import { useTranslations } from "next-intl";
+import CompanyLogoBackgroundSelect from "@/components/CompanyLogoBackgroundSelect";
+import { normalizeCompanyLogoBackground, type CompanyLogoBackground } from "@/lib/company-logo";
 import CompanyLogo from "@/components/CompanyLogo";
 import CateringCompanyFields from "@/components/CateringCompanyFields";
 import { CATERING_COMPANY_CATEGORY, EMPTY_CATERING_COMPANY_DETAILS, normalizeCateringCompanyDetails, type CateringCompanyDetails } from "@/lib/catering-taxonomy";
@@ -56,6 +59,7 @@ async function prepareCompanyImage(file: File, dimensions: { maxWidth: number; m
 
 export default function CompanySetupPage() {
   const { isLoaded } = useUser();
+  const logoText = useTranslations("companyLogo");
   const router = useRouter();
 
   // Basic info
@@ -71,6 +75,7 @@ export default function CompanySetupPage() {
 
   // Logo
   const [logoUrl, setLogoUrl] = useState("");
+  const [logoBackground, setLogoBackground] = useState<CompanyLogoBackground>("auto");
   const [logoPreview, setLogoPreview] = useState("");
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [logoProgress, setLogoProgress] = useState(0);
@@ -158,6 +163,7 @@ export default function CompanySetupPage() {
           setPhonePublic(c.phone_public === true);
           setHqAddressPublic(c.hq_address_public === true);
           setLogoUrl(c.logo_url ?? "");
+          setLogoBackground(normalizeCompanyLogoBackground(c.logo_background));
           setLogoPreview(c.logo_url ?? "");
           setCoverUrl(c.cover_url ?? "");
           setCoverPreview(c.cover_url ?? "");
@@ -209,6 +215,7 @@ export default function CompanySetupPage() {
         setName(draft.name ?? ""); setCity(draft.city ?? ""); setDescription(draft.description ?? "");
         setWebsite(draft.website ?? ""); setEmail(draft.email ?? ""); setPhone(draft.phone ?? "");
         setEmailPublic(draft.emailPublic === true); setPhonePublic(draft.phonePublic === true); setHqAddressPublic(draft.hqAddressPublic === true);
+        setLogoBackground(normalizeCompanyLogoBackground(draft.logoBackground));
         setLogoUrl(draft.logoUrl ?? ""); setLogoPreview(draft.logoUrl ?? "");
         setCoverUrl(draft.coverUrl ?? ""); setCoverPreview(draft.coverUrl ?? "");
         setPortfolioImages(draft.portfolioImages ?? []); setSelectedCategories(draft.selectedCategories ?? []);
@@ -232,7 +239,7 @@ export default function CompanySetupPage() {
       setCompanyDraftStatus("saving");
       try {
         const response = await fetch("/api/onboarding", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
-          intent: "company", setupComplete: false, companyDraft: { name, city, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep, updatedAt: new Date().toISOString() },
+          intent: "company", setupComplete: false, companyDraft: { name, city, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, logoBackground, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep, updatedAt: new Date().toISOString() },
         }) });
         const result = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(result.error ?? "Der Entwurf konnte nicht gespeichert werden.");
@@ -243,7 +250,7 @@ export default function CompanySetupPage() {
       }
     }, 650);
     return () => clearTimeout(timer);
-  }, [guidedSetup, companyDraftLoaded, loading, existingId, name, city, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, companyStep]);
+  }, [guidedSetup, companyDraftLoaded, loading, existingId, name, city, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, logoBackground, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, companyStep]);
 
   const handleSingleImageUpload = async (file: File | undefined, kind: "logo" | "cover") => {
     if (!file) return;
@@ -392,6 +399,7 @@ export default function CompanySetupPage() {
           name, city, description, website, email, phone,
           email_public: emailPublic, phone_public: phonePublic, hq_address_public: hqAddressPublic,
           logo_url: logoUrl || null,
+          logo_background: logoBackground,
           categories: selectedCategories,
           services,
           catering_details: selectedCategories.includes(CATERING_COMPANY_CATEGORY.id) ? cateringDetails : EMPTY_CATERING_COMPANY_DETAILS,
@@ -538,7 +546,7 @@ export default function CompanySetupPage() {
                 className="relative w-full max-w-sm h-36 rounded-2xl border-2 border-dashed border-border hover:border-gold transition-colors group overflow-hidden bg-bg-secondary cursor-pointer block"
               >
                 {logoPreview ? (
-                  <CompanyLogo src={logoPreview} name={name || "Firmenlogo"} className="h-full w-full" />
+                  <CompanyLogo src={logoPreview} name={name || logoText("background")} background={logoBackground} className="h-full w-full" />
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full gap-1.5">
                     <Upload size={22} className="text-text-muted group-hover:text-gold transition-colors" />
@@ -558,6 +566,8 @@ export default function CompanySetupPage() {
               )}
               <p className="text-xs text-text-muted">JPG, PNG, WEBP, HEIC oder SVG · Vorschau ohne Beschnitt. Hat deine Datei große Außenränder, wähle eine enger zugeschnittene Version. Originaldateien werden nicht automatisch beschnitten.</p>
             </div>
+
+            <CompanyLogoBackgroundSelect value={logoBackground} onChange={setLogoBackground} />
 
             {/* Company cover image */}
             <div className="space-y-3">

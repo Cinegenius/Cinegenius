@@ -1290,5 +1290,14 @@
     "unavailable": "Firmu se nyní nepodařilo načíst.",
     "noContact": "Tato firma zatím nemá odpovědný účet pro příjem zpráv.",
     "context": "Kontakt na firmu: {name}"
+  },
+  "companyLogo": {
+    "background": "Pozadí loga",
+    "auto": "Automaticky",
+    "light": "Světlé pozadí",
+    "dark": "Tmavé pozadí",
+    "hint": "Automatická volba používá světlé pozadí. Pro bílé nebo světlé logo zvolte Tmavé. Náhled ukazuje vaši volbu; uloží se společně s údaji firmy.",
+    "missing": "{name}: bez loga",
+    "invalid": "Vyberte platné pozadí loga."
   }
 }

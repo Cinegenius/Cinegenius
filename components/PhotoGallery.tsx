@@ -8,6 +8,7 @@ import { DiscoverPhoto, PhotoDialog } from "@/components/HomePhotoDiscovery";
 import { photoHref } from "@/lib/photo-link";
 import PhotoLikeButton from "@/components/PhotoLikeButton";
 import { communityPreviewUrl } from "@/lib/community-preview";
+import CompanyLogo from "@/components/CompanyLogo";
 
 type GalleryItem = DiscoverPhoto;
 
@@ -47,9 +48,9 @@ export function PhotoGallery({
                   className="relative block focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold focus-visible:outline-offset-2"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element -- bounded derivative, never the original-resolution fallback */}
-                  {failedImages.has(item.imageUrl) ? <div role="img" aria-label="Foto derzeit nicht erreichbar" className="flex aspect-[4/3] flex-col items-center justify-center gap-2 p-4 text-center text-xs text-text-muted"><ImageOff size={24} /><span>Foto derzeit nicht erreichbar</span></div> : <img src={communityPreviewUrl(item.imageUrl)} alt={item.caption || `Foto von ${item.author}`} width={640} height={480} loading="lazy" decoding="async" onError={() => setFailedImages(current => new Set(current).add(item.imageUrl))} className={item.fit === "contain" ? "block aspect-[4/3] w-full object-contain p-4" : "block h-auto w-full transition-transform duration-500 group-hover:scale-105"} />}
-                  <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-70 transition-opacity group-hover:opacity-100" />
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3 text-white sm:p-4">
+                  {failedImages.has(item.imageUrl) ? <div role="img" aria-label="Foto derzeit nicht erreichbar" className="flex aspect-[4/3] flex-col items-center justify-center gap-2 p-4 text-center text-xs text-text-muted"><ImageOff size={24} /><span>Foto derzeit nicht erreichbar</span></div> : item.fit === "contain" ? <CompanyLogo src={communityPreviewUrl(item.imageUrl)} name={item.author} background={item.logoBackground} className="aspect-[4/3] w-full" /> : <img src={communityPreviewUrl(item.imageUrl)} alt={item.caption || `Foto von ${item.author}`} width={640} height={480} loading="lazy" decoding="async" onError={() => setFailedImages(current => new Set(current).add(item.imageUrl))} className="block h-auto w-full transition-transform duration-500 group-hover:scale-105" />}
+                  {item.fit !== "contain" && <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-70 transition-opacity group-hover:opacity-100" />}
+                  <div className={`pointer-events-none p-3 text-white sm:p-4 ${item.fit === "contain" ? "bg-bg-elevated" : "absolute inset-x-0 bottom-0"}`}>
                     <p className="mt-1 line-clamp-2 break-words text-[11px] text-white/80 sm:text-xs">{[item.imageKind, item.sourceTitle !== item.author ? item.sourceTitle : item.caption].filter(Boolean).join(" · ") || "Portfoliofoto"}</p>
                   </div>
                 </Link>

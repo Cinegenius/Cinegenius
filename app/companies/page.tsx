@@ -20,7 +20,7 @@ export default async function CompaniesPage() {
   const t = await getTranslations("companies");
   const { data } = await db
     .from("companies")
-    .select("id, slug, name, logo_url, description, city, categories, services, catering_details, verified, created_at")
+    .select("id, slug, name, logo_url, logo_background, description, city, categories, services, catering_details, verified, created_at")
     .eq("published", true)
     .order("created_at", { ascending: false })
     .limit(200);

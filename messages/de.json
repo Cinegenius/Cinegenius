@@ -1290,5 +1290,14 @@
     "unavailable": "Die Firma konnte gerade nicht geladen werden.",
     "noContact": "Für diese Firma ist noch kein verantwortliches Nachrichtenkonto hinterlegt.",
     "context": "Kontakt zur Firma: {name}"
+  },
+  "companyLogo": {
+    "background": "Logo-Hintergrund",
+    "auto": "Automatisch",
+    "light": "Heller Hintergrund",
+    "dark": "Dunkler Hintergrund",
+    "hint": "Automatisch verwendet eine helle Fläche. Für weiße oder helle Logos wähle Dunkel. Die Vorschau zeigt deine Auswahl; gespeichert wird sie mit den Firmendaten.",
+    "missing": "{name}: kein Logo",
+    "invalid": "Bitte wähle einen gültigen Logo-Hintergrund."
   }
 }

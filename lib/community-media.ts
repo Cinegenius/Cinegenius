@@ -6,6 +6,7 @@ export type CommunityMediaRow = {
   source_type: string; source_id: string; owner_id: string | null; author: string;
   author_href: string | null; source_href: string; source_label: string;
   image_url: string; caption: string; media_type: string; uploaded_at: string; storage_id: string;
+  logo_background?: string | null;
 };
 export function communityMediaLabel(row: Pick<CommunityMediaRow, "source_type" | "media_type">) {
   if (row.media_type === "floor_plan") return "Location-Grundriss";
@@ -24,6 +25,7 @@ export function communityPhotoFromRow(row: CommunityMediaRow) {
     author: row.author, authorHref: row.author_href, sourceHref: row.source_href, sourceTitle: row.source_label,
     imageKind: communityMediaLabel(row), imageUrl: row.image_url,
     caption: row.caption, fit: row.media_type === "logo" ? "contain" as const : "cover" as const,
+    logoBackground: row.media_type === "logo" ? row.logo_background ?? "auto" : undefined,
     canRate: row.source_type === "profile" && !["avatar", "headshot", "cover"].includes(row.media_type),
     uploadedAt: row.uploaded_at, canLike: Boolean(row.owner_id), rating: 0, count: 0,
   };

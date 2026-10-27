@@ -2,13 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { Building2, UserRound } from "lucide-react";
 import type { ListingProvider } from "@/lib/listing-provider";
+import CompanyLogo from "@/components/CompanyLogo";
 
 export default function ListingProviderCard({ provider, compact = false }: { provider: ListingProvider; compact?: boolean }) {
   const Icon = provider.kind === "company" ? Building2 : UserRound;
   const content = (
     <>
       <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-bg-elevated text-gold">
-        {provider.imageUrl ? <Image src={provider.imageUrl} alt="" width={44} height={44} unoptimized className="h-full w-full object-cover" /> : <Icon size={19} />}
+        {provider.kind === "company" ? <CompanyLogo src={provider.imageUrl} name={provider.name} background={provider.logoBackground} className="h-full w-full" /> : provider.imageUrl ? <Image src={provider.imageUrl} alt="" width={44} height={44} unoptimized className="h-full w-full object-cover" /> : <Icon size={19} />}
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-[11px] uppercase tracking-wide text-text-muted">{provider.kind === "unassigned" ? "Anbieterstatus" : provider.kind === "company" ? "Anbieter · Firma" : "Anbieter"}</span>
