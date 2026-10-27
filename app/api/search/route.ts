@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
     wantCompanies
       ? db
           .from("companies")
-          .select("id, slug, name, city, logo_url, logo_background, categories")
+          .select("id, slug, name, city, logo_url, categories")
           .eq("published", true)
           .or(`name.ilike.${like},city.ilike.${like},description.ilike.${like}`)
           .limit(type === "all" ? 4 : 24)
@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
 
     searchCateringCompanies
       ? db.from("companies")
-          .select("id, slug, name, city, logo_url, logo_background, categories")
+          .select("id, slug, name, city, logo_url, categories")
           .eq("published", true)
           .contains("categories", [CATERING_COMPANY_CATEGORY.id])
           .limit(type === "all" ? 8 : 24)
@@ -119,7 +119,6 @@ export async function GET(req: NextRequest) {
     type: "company",
     price: 0,
     image: c.logo_url as string | null,
-    logoBackground: c.logo_background as string | null,
     available: null as boolean | null,
   }));
 

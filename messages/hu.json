@@ -1290,14 +1290,5 @@
     "unavailable": "A cég jelenleg nem tölthető be.",
     "noContact": "Ehhez a céghez még nincs felelős üzenetfogadó fiók megadva.",
     "context": "Céges kapcsolat: {name}"
-  },
-  "companyLogo": {
-    "background": "Logó háttere",
-    "auto": "Automatikus",
-    "light": "Világos háttér",
-    "dark": "Sötét háttér",
-    "hint": "Az automatikus beállítás világos hátteret használ. Fehér vagy világos logóhoz válassz sötét hátteret. Az előnézet mutatja a választást; a céges adatokkal együtt mentjük.",
-    "missing": "{name}: nincs logó",
-    "invalid": "Válassz érvényes logóhátteret."
   }
 }

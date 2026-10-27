@@ -1,6 +1,4 @@
 "use client";
-
-import CompanyLogo from "@/components/CompanyLogo";
 import ListingPriceOptions from "@/components/ListingPriceOptions";
 import { listingPriceLabel } from "@/lib/listing-price";
 
@@ -429,7 +427,7 @@ export default function DashboardPage() {
 
   // Company
   type MyCompany = {
-    id: string; slug: string; name: string; logo_url: string | null; logo_background?: string | null;
+    id: string; slug: string; name: string; logo_url: string | null;
     published: boolean; categories: string[]; city: string | null;
     tagline: string | null; description: string | null;
     social_links: Record<string, string> | null;
@@ -1251,7 +1249,7 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-4 p-4 rounded-xl border border-border bg-bg-secondary hover:border-gold/30 hover:bg-bg-elevated transition-all">
                     <div className="w-12 h-12 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shrink-0 overflow-hidden">
                       {myCompany.logo_url
-                        ? <CompanyLogo src={myCompany.logo_url} name={myCompany.name} background={myCompany.logo_background} className="h-full w-full" />
+                        ? <UnoptimizedImage src={myCompany.logo_url} alt={myCompany.name} className="w-full h-full object-contain p-1" />
                         : <Building2 size={20} className="text-text-muted opacity-40" />}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -1473,7 +1471,7 @@ export default function DashboardPage() {
                   <div className="flex items-start gap-5 p-6 rounded-2xl border border-border bg-bg-secondary">
                     <div className="w-16 h-16 rounded-xl bg-bg-elevated border border-border flex items-center justify-center shrink-0 overflow-hidden">
                       {myCompany.logo_url
-                        ? <CompanyLogo src={myCompany.logo_url} name={myCompany.name} background={myCompany.logo_background} className="h-full w-full" />
+                        ? <UnoptimizedImage src={myCompany.logo_url} alt={myCompany.name} className="w-full h-full object-contain p-1.5" />
                         : <Building2 size={24} className="text-text-muted opacity-40" />}
                     </div>
                     <div className="flex-1 min-w-0">

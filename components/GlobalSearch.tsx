@@ -1,7 +1,5 @@
 "use client";
 
-import CompanyLogo from "@/components/CompanyLogo";
-
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -18,7 +16,6 @@ type Result = {
   price: number;
   priceLabel?: string;
   image: string | null;
-  logoBackground?: string | null;
   available: boolean | null;
 };
 
@@ -273,7 +270,7 @@ export default function GlobalSearch() {
                         isSelected ? "bg-gold/10" : "hover:bg-bg-secondary"
                       }`}
                     >
-                      {r.type === "company" ? <CompanyLogo src={r.image} name={r.title} background={r.logoBackground} className="h-9 w-12 shrink-0" /> : r.image ? (
+                      {r.image ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={r.image} alt=""
                           className={`w-9 h-9 object-cover shrink-0 border border-border ${isProfile ? "rounded-full" : "rounded-lg"}`}

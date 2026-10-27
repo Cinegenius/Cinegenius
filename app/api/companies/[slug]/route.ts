@@ -19,7 +19,7 @@ export async function GET(
     previewUserId = authResult.userId;
   }
 
-  const safeFields = "id, owner_user_id, slug, name, logo_url, logo_background, cover_url, description, city, website, email_public, phone_public, hq_address_public, categories, services, portfolio_images, tagline, bio_short, usp, founded_year, legal_form, countries, industry_focus, social_links, catering_details, published, verified, created_at";
+  const safeFields = "id, owner_user_id, slug, name, logo_url, cover_url, description, city, website, email_public, phone_public, hq_address_public, categories, services, portfolio_images, tagline, bio_short, usp, founded_year, legal_form, countries, industry_focus, social_links, catering_details, published, verified, created_at";
   let query = db.from("companies")
     .select(safeFields)
     .eq("slug", slug);

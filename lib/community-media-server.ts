@@ -11,21 +11,16 @@ export async function getCommunityMedia({ page = 1, limit = 48, ownerId, imageUr
   const safeLimit = Math.max(1, Math.min(limit, 100));
   const { data, error, count } = await query.range((Math.max(1, page) - 1) * safeLimit, Math.max(1, page) * safeLimit - 1);
   if (error) throw new Error("Öffentliche Einblicke konnten nicht geladen werden.");
-  const media = ((data ?? []) as CommunityMediaRow[])
-    .filter((row) => isOwnPublicStorageUrl(row.image_url, process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""));
-  const companyIds = [...new Set(media.filter((row) => row.source_type === "company" && row.media_type === "logo").map((row) => row.source_id))];
-  const photos = media.map(communityPhotoFromRow);
+  const photos = ((data ?? []) as CommunityMediaRow[])
+    .filter((row) => isOwnPublicStorageUrl(row.image_url, process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""))
+    .map(communityPhotoFromRow);
   const owners = [...new Set(photos.filter((p) => p.canLike).map((p) => p.profileId))];
-  const [companyResult, { data: likes, error: likesError }] = await Promise.all([
-    companyIds.length ? db.from("companies").select("id,logo_background").in("id", companyIds).eq("published", true) : Promise.resolve({ data: [], error: null }),
-    owners.length ? db.from("profile_image_likes").select("profile_id,image_url,liker_id").in("profile_id", owners).in("image_url", photos.map((p) => p.imageUrl)) : Promise.resolve({ data: [], error: null }),
-  ]);
-  if (companyResult.error) throw new Error("Öffentliche Einblicke konnten nicht geladen werden.");
-  const backgrounds = new Map((companyResult.data ?? []).map((company) => [company.id, company.logo_background]));
+  const { data: likes, error: likesError } = owners.length ? await db.from("profile_image_likes")
+    .select("profile_id,image_url,liker_id").in("profile_id", owners).in("image_url", photos.map((p) => p.imageUrl)) : { data: [], error: null };
   if (likesError) throw new Error("Foto-Likes konnten nicht geladen werden.");
-  return { total: count ?? 0, photos: photos.map((photo, index) => {
+  return { total: count ?? 0, photos: photos.map((photo) => {
     const rows = (likes ?? []).filter((like) => like.profile_id === photo.profileId && like.image_url === photo.imageUrl);
-    return { ...photo, logoBackground: media[index]?.media_type === "logo" ? backgrounds.get(media[index].source_id) ?? "auto" : undefined, likeCount: rows.length, likedByMe: rows.some((like) => like.liker_id === viewerId) };
+    return { ...photo, likeCount: rows.length, likedByMe: rows.some((like) => like.liker_id === viewerId) };
   }) };
 }
 

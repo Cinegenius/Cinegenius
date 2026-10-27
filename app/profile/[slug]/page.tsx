@@ -217,19 +217,19 @@ function getCompanyMembership(userId: string): Promise<Array<{
   title: string | null;
   public_titles: string[];
   is_company_owner: boolean;
-  companies: { id: string; slug: string; name: string; logo_url: string | null; logo_background?: string | null; categories: string[] | null };
+  companies: { id: string; slug: string; name: string; logo_url: string | null; categories: string[] | null };
 }>> {
   return unstable_cache(
     async () => {
       const { data } = await db
         .from("company_members")
-        .select("id, title, public_titles, status, companies(id, slug, name, logo_url, logo_background, categories, published, owner_user_id)")
+        .select("id, title, public_titles, status, companies(id, slug, name, logo_url, categories, published, owner_user_id)")
         .eq("user_id", userId)
         .eq("status", "accepted")
         .order("created_at", { ascending: true });
       return (data ?? []).flatMap((member) => {
         const company = member.companies as unknown as {
-          id: string; slug: string; name: string; logo_url: string | null; logo_background?: string | null;
+          id: string; slug: string; name: string; logo_url: string | null;
           categories: string[] | null; published: boolean; owner_user_id: string;
         } | null;
         if (!company?.published) return [];
@@ -240,7 +240,7 @@ function getCompanyMembership(userId: string): Promise<Array<{
             ? member.public_titles
             : member.title ? [member.title] : [],
           is_company_owner: company.owner_user_id === userId,
-          companies: { id: company.id, slug: company.slug, name: company.name, logo_url: company.logo_url, logo_background: company.logo_background, categories: company.categories },
+          companies: { id: company.id, slug: company.slug, name: company.name, logo_url: company.logo_url, categories: company.categories },
         }];
       });
     },

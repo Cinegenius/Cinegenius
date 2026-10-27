@@ -428,7 +428,7 @@ type CompanyMembership = {
   title: string | null;
   public_titles: string[];
   is_company_owner: boolean;
-  companies: { id: string; slug: string; name: string; logo_url: string | null; logo_background?: string | null; categories: string[] | null };
+  companies: { id: string; slug: string; name: string; logo_url: string | null; categories: string[] | null };
 };
 type CompanyMemberships = CompanyMembership[] | null;
 
@@ -449,7 +449,7 @@ function CompanyBadge({ membership }: { membership: CompanyMemberships }) {
             : null;
           return (
             <Link key={entry.id} href={`/companies/${co.slug}`} className="block bg-bg-elevated border border-border rounded-xl overflow-hidden hover:border-gold/40 transition-all group">
-              <CompanyLogo src={co.logo_url} name={co.name} background={co.logo_background} className="h-28 w-full" />
+              <CompanyLogo src={co.logo_url} name={co.name} className="h-28 w-full" />
               <div className="space-y-1 px-4 py-3 text-center">
                 <p className="break-words text-sm font-semibold text-text-primary group-hover:text-gold [overflow-wrap:anywhere]">{co.name}</p>
                 {categoryLabel && <p className="text-[11px] text-gold/70">{categoryLabel}</p>}

@@ -1,7 +1,5 @@
 "use client";
 
-import CompanyLogo from "@/components/CompanyLogo";
-
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -21,7 +19,6 @@ type Result = {
   price: number;
   priceLabel?: string;
   image: string | null;
-  logoBackground?: string | null;
   available: boolean | null;
 };
 
@@ -82,7 +79,7 @@ function ResultCard({ result }: { result: Result }) {
     >
       {/* Image */}
       <div className="relative aspect-video bg-bg-elevated overflow-hidden">
-        {result.type === "company" ? <CompanyLogo src={result.image} name={result.title} background={result.logoBackground} className="h-full w-full" /> : result.image ? (
+        {result.image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={result.image}

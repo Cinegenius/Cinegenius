@@ -1290,14 +1290,5 @@
     "unavailable": "No se ha podido cargar la empresa.",
     "noContact": "Esta empresa todavía no tiene una cuenta responsable para recibir mensajes.",
     "context": "Contacto de la empresa: {name}"
-  },
-  "companyLogo": {
-    "background": "Fondo del logotipo",
-    "auto": "Automático",
-    "light": "Fondo claro",
-    "dark": "Fondo oscuro",
-    "hint": "Automático utiliza un fondo claro. Elige Oscuro para logotipos blancos o claros. La vista previa muestra tu elección; se guarda con los datos de la empresa.",
-    "missing": "{name}: sin logotipo",
-    "invalid": "Elige un fondo de logotipo válido."
   }
 }

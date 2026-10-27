@@ -1,5 +1,3 @@
-import { getTranslations } from "next-intl/server";
-import { isCompanyLogoBackground } from "@/lib/company-logo";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { revalidatePath, revalidateTag } from "next/cache";
@@ -28,14 +26,14 @@ function generateSlug(name: string): string {
 
 // Full company data — needed for the company editor/dashboard.
 const COMPANY_COLS_FULL =
-  "id, slug, owner_user_id, name, logo_url, logo_background, cover_url, description, city, website, email, phone, " +
+  "id, slug, owner_user_id, name, logo_url, cover_url, description, city, website, email, phone, " +
   "categories, services, portfolio_images, tagline, bio_short, usp, founded_year, " +
   "legal_form, hq_address, countries, industry_focus, social_links, catering_details, published, " +
   "email_public, phone_public, hq_address_public, created_at, updated_at";
 
 // Lighter set for public directory listings.
 const COMPANY_COLS_PUBLIC =
-  "id, slug, name, logo_url, logo_background, description, city, categories, services, tagline, " +
+  "id, slug, name, logo_url, description, city, categories, services, tagline, " +
   "founded_year, catering_details, published, created_at";
 
 // GET — list published companies (with optional filters)
@@ -154,7 +152,7 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json();
   const {
-    id, name, logo_url, logo_background, cover_url, description, city, website, email, phone,
+    id, name, logo_url, cover_url, description, city, website, email, phone,
     categories, services, portfolio_images, owner_title, owner_titles,
     tagline, bio_short, usp, founded_year, legal_form, hq_address, countries, industry_focus,
     email_public, phone_public, hq_address_public,
@@ -162,11 +160,6 @@ export async function POST(req: NextRequest) {
     catering_details,
     onboarding_request_key,
   } = body;
-
-  if (logo_background !== undefined && !isCompanyLogoBackground(logo_background)) {
-    const t = await getTranslations("companyLogo");
-    return NextResponse.json({ error: t("invalid") }, { status: 400 });
-  }
 
   if (!name?.trim() || !city?.trim()) {
     return NextResponse.json({ error: "Firmenname und Standort sind Pflichtfelder" }, { status: 400 });
@@ -216,7 +209,6 @@ export async function POST(req: NextRequest) {
       .update({
         name: name.trim(),
         logo_url: nextLogo ?? null,
-        ...(logo_background !== undefined && { logo_background }),
         cover_url: nextCover ?? null,
         description: description?.trim() ?? "",
         city: city.trim(),
@@ -308,7 +300,6 @@ export async function POST(req: NextRequest) {
       slug,
       name: name.trim(),
       logo_url: logo_url ?? null,
-      logo_background: logo_background ?? "auto",
       cover_url: cover_url ?? null,
       description: description?.trim() ?? "",
       city: city.trim(),

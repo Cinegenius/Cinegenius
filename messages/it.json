@@ -1290,14 +1290,5 @@
     "unavailable": "Al momento non è possibile caricare l’azienda.",
     "noContact": "Questa azienda non ha ancora un account responsabile per i messaggi.",
     "context": "Contatto aziendale: {name}"
-  },
-  "companyLogo": {
-    "background": "Sfondo del logo",
-    "auto": "Automatico",
-    "light": "Sfondo chiaro",
-    "dark": "Sfondo scuro",
-    "hint": "Automatico utilizza una superficie chiara. Scegli Scuro per i loghi bianchi o chiari. L’anteprima mostra la tua scelta, che viene salvata con i dati aziendali.",
-    "missing": "{name}: nessun logo",
-    "invalid": "Scegli uno sfondo valido per il logo."
   }
 }

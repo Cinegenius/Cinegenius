@@ -7,7 +7,6 @@ export type ListingProvider = {
   name: string;
   href: string | null;
   imageUrl: string | null;
-  logoBackground?: string | null;
   contactUserId: string | null;
 };
 
@@ -28,7 +27,7 @@ export async function getListingProvider(
   if (companyId) {
     const { data: company, error } = await db
       .from("companies")
-      .select("id, slug, name, logo_url, logo_background, owner_user_id, published")
+      .select("id, slug, name, logo_url, owner_user_id, published")
       .eq("id", companyId)
       .maybeSingle();
     if (error || !company || company.published !== true || !company.slug || !company.name) return UNASSIGNED_PROVIDER;
@@ -43,7 +42,6 @@ export async function getListingProvider(
       name: company.name,
       href: `/companies/${company.slug}`,
       imageUrl: company.logo_url ?? null,
-      logoBackground: company.logo_background ?? "auto",
       contactUserId: owner ? company.owner_user_id : null,
     };
   }

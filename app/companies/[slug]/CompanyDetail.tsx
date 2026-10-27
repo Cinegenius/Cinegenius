@@ -69,7 +69,7 @@ type Company = {
   id: string;
   slug: string;
   name: string;
-  logo_url: string | null; logo_background?: string | null;
+  logo_url: string | null;
   cover_url?: string | null;
   description: string;
   bio_short: string | null;
@@ -317,7 +317,7 @@ export default function CompanyDetail({
 
           {/* Logo + Name */}
           <div className="flex min-w-0 max-w-full flex-col items-start gap-5 sm:flex-row sm:gap-6 mb-6">
-            <CompanyLogo src={company.logo_url} name={company.name} background={company.logo_background}
+            <CompanyLogo src={company.logo_url} name={company.name}
               className="h-36 w-full sm:h-40 sm:w-64 sm:shrink-0" />
 
             {/* Name + tagline */}
