@@ -1352,7 +1352,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
     .sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
 
   return (
-    <div className="min-h-screen min-w-0 max-w-full bg-bg-primary text-text-primary [overflow-wrap:anywhere]">
+    <div className="pt-16 min-h-screen min-w-0 max-w-full bg-bg-primary text-text-primary [overflow-wrap:anywhere]">
       {lightbox && <Lightbox src={lightbox} onClose={() => setLightbox(null)} />}
 
       {/* Hero */}

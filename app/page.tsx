@@ -385,14 +385,14 @@ export default async function HomePage() {
       ══════════════════════════════════════════════ */}
       <section className="py-10 sm:py-14">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-end justify-between mb-6">
-              <div>
+            <div className="mb-6 flex min-w-0 flex-col items-start gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+              <div className="min-w-0 flex-1">
                 <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{topCreators.length >= 3 ? t("topCreatorsLabel") : t("newCrewLabel")}</p>
                 <h2 className="font-display text-xl sm:text-2xl font-bold text-text-primary">{topCreators.length >= 3 ? t("topCreatorsTitle") : t("newCrewTitle")}</h2>
                 {topCreators.length < 3 && <p className="mt-1 text-xs text-text-muted">{t("newCrewDescription")}</p>}
               </div>
-              <Link href="/creators?sort=rating" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium shrink-0">
-                {t("discoverCrew")} <ArrowRight size={14} />
+              <Link href="/creators?sort=rating" className="inline-flex min-h-11 max-w-full items-center gap-1 text-sm text-gold hover:text-gold-light font-medium sm:max-w-[45%]">
+                <span className="min-w-0 break-words">{t("discoverCrew")}</span> <ArrowRight size={14} className="shrink-0" />
               </Link>
             </div>
             {(topCreators.length >= 3 || newCrew.length > 0) ? <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
