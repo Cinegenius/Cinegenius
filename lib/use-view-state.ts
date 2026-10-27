@@ -8,8 +8,8 @@ import { sameViewValue, viewRecord, writeViewRecord } from "@/lib/navigation-con
 /** Retain small view controls on the actual history entry, separately for each account. */
 export function useViewState<T>(field: string, initial: T | (() => T)): [T, Dispatch<SetStateAction<T>>] {
   const path = usePathname();
-  const { userId, isLoaded } = useAuth();
-  const owner = isLoaded === false ? "pending" : userId ?? "guest";
+  const { userId } = useAuth();
+  const owner = userId ?? "guest";
   const [value, setValue] = useState(initial);
   const current = useRef(value);
   const defaults = useRef(value);

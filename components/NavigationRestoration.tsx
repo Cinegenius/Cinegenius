@@ -7,8 +7,8 @@ import { viewRecord, writeViewRecord } from "@/lib/navigation-context";
 
 export default function NavigationRestoration() {
   const path = usePathname();
-  const { userId, isLoaded } = useAuth();
-  const owner = isLoaded === false ? "pending" : userId ?? "guest";
+  const { userId } = useAuth();
+  const owner = userId ?? "guest";
   const previousPath = useRef(path);
   const linkVisit = useRef<{ from: string; to: string } | null>(null);
   const pending = useRef<{ path: string; y: number } | null>(null);

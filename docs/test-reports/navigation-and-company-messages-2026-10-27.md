@@ -16,7 +16,7 @@ Status: pre-release verification of the navigation and company-message changes. 
 
 ## Verification performed
 
-626 previous/new tests plus two additional regressions: **628 passing**. Production build, TypeScript and translation validation pass. Changed-file lint: no errors; one existing native-image warning in CompanyDetail.
+**629 passing tests**, including the release follow-up for delayed authentication initialization. Production build, TypeScript and translation validation pass. Changed-file lint: no errors; one existing native-image warning in CompanyDetail.
 
 Browser tests ran on Next 16 with real application components and routing, **mock accounts and controlled local HTTP fixtures**, outside the production application:
 
@@ -33,6 +33,10 @@ Browser tests ran on Next 16 with real application components and routing, **moc
 | Messages: prepend older page | Older messages appeared; scroll increased by the added height (3735 px), preserving the reading window; draft remained. |
 | Company gallery: reorder while photo open | Same photo C remained open while its displayed position changed from 1/3 to 3/3. |
 | Company contact route | Unit-tested signed-out return path, actual owner resolution without a public person profile, private/missing company, missing responsible account, self-contact, and technical-error handling. Button visually checked in the real CompanyDetail component. |
+
+## Release follow-up
+
+The first live return check exposed a public-filter reset when Clerk changed from an unresolved session to an anonymous session. Removed the separate pending owner scope and permit adoption of anonymous controls only on explicitly public lists. Member-to-member, member-to-guest, and private/admin history remain isolated. A controlled browser test entered a filter while authentication was unresolved, completed authentication, and retained the filter and its ten matches. The suite adds a regression for this transition.
 
 ## Limits and remaining work
 
