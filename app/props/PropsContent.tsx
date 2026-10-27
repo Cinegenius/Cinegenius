@@ -1,5 +1,6 @@
 "use client";
 
+import { useViewUrl } from "@/lib/use-view-url";
 import { useViewState } from "@/lib/use-view-state";
 import { listingPriceLabel } from "@/lib/listing-price";
 
@@ -294,18 +295,11 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
     }
   };
 
-  // Sync URL
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const p = new URLSearchParams();
-      if (query) p.set("q", query);
-      if (selectedDept) p.set("dept", selectedDept);
-      if (sortKey !== "featured") p.set("sort", sortKey);
-      const qs = p.toString();
-      router.replace(qs ? `/props?${qs}` : "/props", { scroll: false });
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [query, selectedDept, sortKey, router]);
+  const filterParams = new URLSearchParams();
+  if (query) filterParams.set("q", query);
+  if (selectedDept) filterParams.set("dept", selectedDept);
+  if (sortKey !== "featured") filterParams.set("sort", sortKey);
+  useViewUrl(filterParams.size ? `/props?${filterParams}` : "/props");
 
   const filtered = useMemo(() => {
     let r = [...serverListings];

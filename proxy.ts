@@ -186,7 +186,7 @@ export default clerkMiddleware(async (auth, request) => {
       // Not authenticated
       return isApi
         ? NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 })
-        : NextResponse.redirect(new URL("/sign-in", request.url));
+        : NextResponse.redirect(new URL(`/sign-in?redirect_url=${encodeURIComponent(request.nextUrl.pathname + request.nextUrl.search)}`, request.url));
     }
 
     if (!getAdminIds().has(userId)) {

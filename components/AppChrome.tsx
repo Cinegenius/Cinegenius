@@ -9,7 +9,7 @@ import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
 import PersonalAreaNavigation from "@/components/PersonalAreaNavigation";
 
-export default function AppChrome({ children, initialIsSignedIn }: { children: ReactNode; initialIsSignedIn: boolean }) {
+export default function AppChrome({ children, initialIsSignedIn, initialAdminUserId = null }: { children: ReactNode; initialIsSignedIn: boolean; initialAdminUserId?: string | null }) {
   const pathname = usePathname();
   const guidedSetup = pathname.startsWith("/profile-setup");
 
@@ -19,7 +19,7 @@ export default function AppChrome({ children, initialIsSignedIn }: { children: R
 
   return <>
     <NavigationRestoration />
-    <Navbar initialIsSignedIn={initialIsSignedIn} />
+    <Navbar initialIsSignedIn={initialIsSignedIn} initialAdminUserId={initialAdminUserId} />
     <main className="flex-1 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
       <LegalLanguageNotice />
       <PersonalAreaNavigation>{children}</PersonalAreaNavigation>

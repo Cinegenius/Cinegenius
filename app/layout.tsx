@@ -9,6 +9,7 @@ import AppIntlProvider from "@/components/AppIntlProvider";
 import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
 import AppChrome from "@/components/AppChrome";
+import { isConfiguredAdmin } from "@/lib/admin-policy";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import GlobalEffects from "@/components/GlobalEffects";
 import PresencePing from "@/components/PresencePing";
@@ -133,7 +134,7 @@ export default async function RootLayout({
                 <GlobalEffects />
                 <PresencePing />
                 <GlobalSearch />
-                <AppChrome initialIsSignedIn={!!userId}>{children}</AppChrome>
+                <AppChrome initialIsSignedIn={!!userId} initialAdminUserId={isConfiguredAdmin(userId, process.env.ADMIN_USER_IDS) ? userId : null}>{children}</AppChrome>
                 <CookieBanner />
                 <Analytics />
                 <SpeedInsights />

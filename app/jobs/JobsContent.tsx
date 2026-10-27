@@ -1,5 +1,6 @@
 "use client";
 
+import { useViewUrl } from "@/lib/use-view-url";
 import { useViewState } from "@/lib/use-view-state";
 
 import { useState, useMemo, useEffect, useRef, Suspense } from "react";
@@ -311,24 +312,17 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
     return () => document.removeEventListener("mousedown", h);
   }, [panelOpen]);
 
-  // Sync URL
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const params = new URLSearchParams();
-      if (query) params.set("q", query);
-      if (selectedDeptId) params.set("dept", selectedDeptId);
-      if (selectedRoleId) params.set("role", selectedRoleId);
-      if (activeType) params.set("type", activeType);
-      if (urgentOnly) params.set("urgent", "1");
-      if (payTypeFilter) params.set("pay", payTypeFilter);
-      if (cityFilter) params.set("city", cityFilter);
-      if (countryFilter) params.set("country", countryFilter);
-      if (sortKey !== "newest") params.set("sort", sortKey);
-      const qs = params.toString();
-      router.replace(qs ? `/jobs?${qs}` : "/jobs", { scroll: false });
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [query, selectedDeptId, selectedRoleId, activeType, urgentOnly, payTypeFilter, cityFilter, countryFilter, sortKey, router]);
+  const filterParams = new URLSearchParams();
+  if (query) filterParams.set("q", query);
+  if (selectedDeptId) filterParams.set("dept", selectedDeptId);
+  if (selectedRoleId) filterParams.set("role", selectedRoleId);
+  if (activeType) filterParams.set("type", activeType);
+  if (urgentOnly) filterParams.set("urgent", "1");
+  if (payTypeFilter) filterParams.set("pay", payTypeFilter);
+  if (cityFilter) filterParams.set("city", cityFilter);
+  if (countryFilter) filterParams.set("country", countryFilter);
+  if (sortKey !== "newest") filterParams.set("sort", sortKey);
+  useViewUrl(filterParams.size ? `/jobs?${filterParams}` : "/jobs");
 
   const availableCities = useMemo(() => {
     const cities = allJobs.map((j) => j.location?.split(",")[0]?.trim()).filter(Boolean) as string[];

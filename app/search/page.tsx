@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useViewUrl } from "@/lib/use-view-url";
 import {
   Search, X, MapPin, Car, Package, Briefcase, Users, User,
   Loader2, ArrowRight, Building2,
@@ -148,7 +149,6 @@ function EmptyState({ query }: { query: string }) {
 
 function SearchContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   const initialQ = searchParams.get("q") ?? "";
   const initialType = searchParams.get("type") ?? "all";
@@ -197,25 +197,21 @@ function SearchContent() {
     debounceRef.current = setTimeout(() => {
       setQuery(inputValue.trim());
       doSearch(inputValue.trim());
-      // Update URL
-      const params = new URLSearchParams();
-      if (inputValue.trim()) params.set("q", inputValue.trim());
-      if (activeTab !== "all") params.set("type", activeTab);
-      router.replace(`/search?${params.toString()}`, { scroll: false });
     }, 250);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputValue]);
 
-  // Re-search and update URL on tab change
+  // Re-search on tab change; URL updates are navigation-guarded below.
   useEffect(() => {
-    const params = new URLSearchParams();
-    if (query) params.set("q", query);
-    if (activeTab !== "all") params.set("type", activeTab);
-    router.replace(`/search?${params.toString()}`, { scroll: false });
     if (query.length >= 2) doSearch(query, activeTab);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
+
+  const filterParams = new URLSearchParams();
+  if (inputValue.trim()) filterParams.set("q", inputValue.trim());
+  if (activeTab !== "all") filterParams.set("type", activeTab);
+  useViewUrl(filterParams.size ? `/search?${filterParams}` : "/search", 250);
 
   // Filter by active tab
   const filtered = activeTab === "all"

@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
 import { useAuth, useUser, useClerk } from "@clerk/nextjs";
 import {
   Menu, X, Film, ChevronDown, Search, Loader2, User,
-  LayoutDashboard, LogOut, MessageSquare, Bell,
+  LayoutDashboard, LogOut, MessageSquare, Bell, ShieldCheck,
 } from "lucide-react";
 import NotificationCenter from "@/components/NotificationCenter";
 import { Logo } from "@/components/Logo";
@@ -28,7 +28,7 @@ const desktopNavHrefs = [
   { href: "/companies", key: "companies" },
 ] as const;
 
-export default function Navbar({ initialIsSignedIn = false }: { initialIsSignedIn?: boolean }) {
+export default function Navbar({ initialIsSignedIn = false, initialAdminUserId = null }: { initialIsSignedIn?: boolean; initialAdminUserId?: string | null }) {
   const t = useTranslations("nav");
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -49,6 +49,7 @@ export default function Navbar({ initialIsSignedIn = false }: { initialIsSignedI
   const { addToast } = useToast();
   const userMenuRef = useRef<HTMLDivElement>(null);
   const activeUserId = isSignedIn ? user?.id : null;
+  const showAdminLink = !!initialAdminUserId && initialAdminUserId === activeUserId;
   const hasSignedInSession = isLoaded ? !!isSignedIn : initialIsSignedIn;
   const profileDisplayName = profileData?.userId === activeUserId ? profileData?.displayName ?? "" : "";
   const profileAvatarUrl = profileData?.userId === activeUserId ? profileData?.avatarUrl ?? "" : "";
@@ -305,6 +306,7 @@ export default function Navbar({ initialIsSignedIn = false }: { initialIsSignedI
                           >
                             <User size={15} className="text-text-muted shrink-0" /> {t("publicProfile")}
                           </Link>
+                          {showAdminLink && <Link href="/admin" onClick={() => setUserMenuOpen(false)} className="flex min-h-11 items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"><ShieldCheck size={15} className="text-text-muted shrink-0" />{t("adminArea")}</Link>}
                         </div>
 
                         {/* Sign out */}
@@ -403,6 +405,7 @@ export default function Navbar({ initialIsSignedIn = false }: { initialIsSignedI
               <div className="space-y-1">
                 {[
                   { href: "/dashboard",     icon: LayoutDashboard, label: t("personalArea")    },
+                  ...(showAdminLink ? [{ href: "/admin", icon: ShieldCheck, label: t("adminArea") }] : []),
                   { href: "/dashboard?tab=listings", icon: Film,    label: t("myOffers")        },
                   { href: "/messages",      icon: MessageSquare,   label: t("messages")        },
                   { href: "/notifications", icon: Bell,            label: t("notifications")   },

@@ -1,5 +1,6 @@
 "use client";
 
+import { useViewUrl } from "@/lib/use-view-url";
 import { useViewState } from "@/lib/use-view-state";
 import { listingPriceLabel } from "@/lib/listing-price";
 
@@ -283,24 +284,17 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
     router.replace(pathname, { scroll: false });
   };
 
-  // Sync URL with filters
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const params = new URLSearchParams();
-      if (query) params.set("q", query);
-      if (activeType !== "All Types") params.set("type", activeType);
-      if (instantOnly) params.set("instant", "1");
-      if (verifiedOnly) params.set("verified", "1");
-      if (minPrice) params.set("min", minPrice);
-      if (maxPrice) params.set("max", maxPrice);
-      if (lageFilter !== "Alle") params.set("lage", lageFilter);
-      if (powerOnly) params.set("power", "1");
-      if (sortKey !== "featured") params.set("sort", sortKey);
-      const qs = params.toString();
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, router, pathname]);
+  const filterParams = new URLSearchParams();
+  if (query) filterParams.set("q", query);
+  if (activeType !== "All Types") filterParams.set("type", activeType);
+  if (instantOnly) filterParams.set("instant", "1");
+  if (verifiedOnly) filterParams.set("verified", "1");
+  if (minPrice) filterParams.set("min", minPrice);
+  if (maxPrice) filterParams.set("max", maxPrice);
+  if (lageFilter !== "Alle") filterParams.set("lage", lageFilter);
+  if (powerOnly) filterParams.set("power", "1");
+  if (sortKey !== "featured") filterParams.set("sort", sortKey);
+  useViewUrl(filterParams.size ? `${pathname}?${filterParams}` : pathname);
 
   const hasActiveFilters = query || activeType !== "All Types" || instantOnly || verifiedOnly || minPrice || maxPrice || userLocation || lageFilter !== "Alle" || powerOnly;
   const mobileChips: BrowseChip[] = [
