@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect, useSyncExternalStore } from "react";
+import { useState, useRef, useEffect, useTransition } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { Globe, Check } from "lucide-react";
 
 const LANGUAGES = [
@@ -12,25 +14,16 @@ const LANGUAGES = [
   { code: "hu", label: "Magyar",   flag: "🇭🇺" },
 ];
 
-function getStoredLocale(): string {
-  if (typeof document === "undefined") return "de";
-  return document.cookie.match(/cg_locale=([^;]+)/)?.[1] ?? "de";
-}
-
-function subscribeToLocale(onChange: () => void) {
-  window.addEventListener("cg-locale-change", onChange);
-  return () => window.removeEventListener("cg-locale-change", onChange);
-}
-
-function setCookieDirect(code: string) {
-  document.cookie = `cg_locale=${code}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
-  window.dispatchEvent(new Event("cg-locale-change"));
+function persistLocaleCookie(code: string) {
+  document.cookie = `cg_locale=${code}; path=/; max-age=31536000; samesite=lax`;
 }
 
 export default function LanguageSwitcher() {
   const [open, setOpen] = useState(false);
-  const current = useSyncExternalStore(subscribeToLocale, getStoredLocale, () => "de");
-  const [loading, setLoading] = useState(false);
+  const current = useLocale();
+  const t = useTranslations("language");
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -41,29 +34,20 @@ export default function LanguageSwitcher() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const select = async (code: string) => {
-    if (code === current || loading) return;
-    setLoading(true);
+  const select = (code: string) => {
+    if (code === current || pending) return;
     setOpen(false);
 
     // Set cookie directly in the browser first — works even without network
-    setCookieDirect(code);
+    persistLocaleCookie(code);
 
-    // Sync to server in the background (best-effort)
-    try {
-      await fetch("/api/locale", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ locale: code }),
-      });
-    } catch {
-      // API unreachable — cookie is already set via document.cookie above
-    }
-
-    // Hard reload so the server reads the new cookie and re-renders with the correct locale.
-    // router.refresh() is not sufficient — next-intl's getRequestConfig may be cached
-    // at the request level and won't pick up the new cookie without a full navigation.
-    window.location.reload();
+    // Cookie is already available to the refresh. Do not delay the switch on a second request.
+    startTransition(() => router.refresh());
+    void fetch("/api/locale", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({locale: code}),
+    }).catch(() => { /* The directly stored cookie remains authoritative. */ });
   };
 
   const currentLang = LANGUAGES.find((l) => l.code === current);
@@ -73,15 +57,17 @@ export default function LanguageSwitcher() {
       <button
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-text-muted hover:text-gold hover:bg-bg-elevated transition-all text-sm"
-        aria-label="Sprache wählen"
-        disabled={loading}
+        aria-label={t("choose")}
+        aria-expanded={open}
+        aria-busy={pending}
+        disabled={pending}
       >
         <Globe size={15} />
         <span>{currentLang?.flag}</span>
       </button>
 
       {open && (
-        <div className="absolute top-full right-0 mt-1.5 w-32 bg-bg-elevated border border-border rounded-lg shadow-xl overflow-hidden z-50 animate-fade-in">
+        <div className="absolute top-full right-0 mt-1.5 w-44 bg-bg-elevated border border-border rounded-lg shadow-xl overflow-hidden z-50 animate-fade-in">
           {LANGUAGES.map((lang) => (
             <button
               key={lang.code}
@@ -91,7 +77,7 @@ export default function LanguageSwitcher() {
               }`}
             >
               <span className="leading-none">{lang.flag}</span>
-              <span className="flex-1 text-left">{lang.label}</span>
+              <span className="flex-1 text-left">{lang.label}{lang.code !== "de" && <span className="block text-[10px] text-text-muted">{t("inProgress")}</span>}</span>
               {current === lang.code && <Check size={11} className="text-gold shrink-0" />}
             </button>
           ))}

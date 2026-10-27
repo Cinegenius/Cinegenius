@@ -34,6 +34,7 @@ if (project.projectName !== expectedProjectName || !project.projectId || !projec
 
 console.log(`Building and deploying CineGenius ${head} to production…`);
 execFileSync("npm", ["run", "check:design"], { stdio: "inherit" });
+execFileSync("npm", ["run", "check:i18n"], { stdio: "inherit" });
 // Build on Vercel so production secrets stay in the project environment. `vercel pull`
 // redacts sensitive values in local files; a prebuilt upload would then compile with
 // placeholders instead of the real production configuration.

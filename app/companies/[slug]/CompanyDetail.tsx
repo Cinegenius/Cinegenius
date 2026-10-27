@@ -491,7 +491,7 @@ export default function CompanyDetail({
                   <button type="button" aria-label="Dialog schließen" onClick={() => !joining && setJoinDialogMode(null)} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-text-muted hover:bg-bg-elevated hover:text-text-primary"><X size={16} /></button>
                 </div>
                 <p className="mt-3 rounded-lg border border-border bg-bg-primary/60 p-3 text-xs leading-relaxed text-text-muted">
-                  Die Angaben erscheinen erst nach der Bestätigung durch die Firma öffentlich. Öffentliche Funktionen vergeben keine Verwaltungsrechte. Ohne zuständige Firmenverwaltung wird nichts automatisch freigegeben; zur Klärung erreichst du uns unter <a className="text-gold underline underline-offset-2" href="mailto:support@cinegenius.co">support@cinegenius.co</a>.
+                  Die Angaben erscheinen erst nach der Bestätigung durch die Firma öffentlich. Öffentliche Funktionen vergeben keine Verwaltungsrechte. Ohne zuständige Firmenverwaltung wird nichts automatisch freigegeben; zur Klärung erreichst du uns unter <a className="text-gold underline underline-offset-2" href="mailto:cinegenius.co@gmail.com">cinegenius.co@gmail.com</a>.
                 </p>
                 <div className="mt-5 space-y-4">
                   <div>

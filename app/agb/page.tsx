@@ -203,8 +203,8 @@ export default function AgbPage() {
             <p className="text-sm leading-relaxed">
               Du kannst deinen Account jederzeit ohne Angabe von Gründen löschen. Die Löschung erfolgt
               über die Accounteinstellungen oder per schriftlicher Anfrage an{" "}
-              <a href="mailto:support@cinegenius.co" className="text-gold hover:underline">
-                support@cinegenius.co
+              <a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">
+                cinegenius.co@gmail.com
               </a>
               . Nach der Löschung werden deine personenbezogenen Daten innerhalb von 30 Tagen gelöscht,
               sofern keine gesetzlichen Aufbewahrungspflichten entgegenstehen (z. B. steuerrechtliche
@@ -242,7 +242,7 @@ export default function AgbPage() {
 
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-2">§ 14 Verbraucherstreitbeilegung</h2>
-            <p className="text-sm leading-relaxed mt-3">Der Betreiber ist nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen (§ 36 VSBG). Bei Fragen oder Beschwerden ist der Betreiber unter support@cinegenius.co erreichbar. Der ordentliche Rechtsweg bleibt unberührt.</p>
+            <p className="text-sm leading-relaxed mt-3">Der Betreiber ist nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen (§ 36 VSBG). Bei Fragen oder Beschwerden ist der Betreiber unter cinegenius.co@gmail.com erreichbar. Der ordentliche Rechtsweg bleibt unberührt.</p>
           </section>
 
           <section>
@@ -287,8 +287,8 @@ export default function AgbPage() {
               <p>Plinganserstr. 19, 81369 München</p>
               <p>
                 E-Mail:{" "}
-                <a href="mailto:support@cinegenius.co" className="text-gold hover:underline">
-                  support@cinegenius.co
+                <a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">
+                  cinegenius.co@gmail.com
                 </a>
               </p>
             </div>

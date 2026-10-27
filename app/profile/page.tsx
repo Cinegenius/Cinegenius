@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { compressImage, compressAvatar, MAX_FUNCTION_UPLOAD_BYTES, safeObjectURL } from "@/lib/compressImage";
 import {
   Camera, CheckCircle, User, Lock, Bell, CreditCard, Film,
@@ -21,7 +21,7 @@ import { selectedCrewOccupations } from "@/lib/crew-occupations";
 import { occupationId, occupationById, primaryOccupationForPositions, occupationReference, orderPositionsByPrimary, type PrimaryOccupation } from "@/lib/primary-occupation";
 import ProfileCoverEditor from "@/components/ProfileCoverEditor";
 import { profileCoverSettings } from "@/lib/profile-cover";
-import { departments, deptColors, DEPARTMENT_TO_PROFILE_TYPE, getDepartmentRoleSearchTerms } from "@/lib/departments";
+import { getDeptLabel, getDepartmentRoleLabel, departments, deptColors, DEPARTMENT_TO_PROFILE_TYPE, getDepartmentRoleSearchTerms } from "@/lib/departments";
 import { gripSearchTerms, GRIP_OCCUPATIONS, normalizeOccupation } from "@/lib/gripTaxonomy";
 import RoleDropdown from "@/components/RoleDropdown";
 import { calculateProfileCompletion } from "@/lib/profile-completion";
@@ -113,6 +113,7 @@ function TypeChipPicker({
   occupationSelections?: PrimaryOccupation[];
   onOccupationsChange?: (value: PrimaryOccupation[]) => void;
 }) {
+  const locale = useLocale();
   const [roleSearch, setRoleSearch] = useState("");
   const [expandedDepartments, setExpandedDepartments] = useState<Record<string, boolean>>({});
   const [chosenDepartments, setChosenDepartments] = useState<string[]>([]);
@@ -222,7 +223,7 @@ function TypeChipPicker({
           }
         }} className="min-h-11 w-full rounded-xl border border-border bg-bg-primary px-3 text-sm text-text-primary focus:border-gold focus:outline-none">
           <option value="">Gewerk suchen oder auswählen …</option>
-          {departments.map((dept) => <option key={dept.id} value={dept.id}>{dept.emoji} {dept.label}</option>)}
+          {departments.map((dept) => <option key={dept.id} value={dept.id}>{dept.emoji} {getDeptLabel(dept, locale)}</option>)}
         </select>
       </label>
       <div className="space-y-3">
@@ -234,7 +235,7 @@ function TypeChipPicker({
             <section key={dept.id} className="overflow-hidden rounded-xl border border-border bg-bg-primary/50">
               <button type="button" aria-expanded={expanded} onClick={() => setExpandedDepartments((current) => ({ ...current, [dept.id]: !expanded }))}
                 className="flex min-h-12 w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-bg-elevated/60">
-                <span className="min-w-0"><span className={`text-xs font-semibold uppercase tracking-wider ${colors.text}`}>{dept.emoji} {dept.label}</span><span className="ml-2 text-xs text-text-muted">{roles.length} {roles.length === 1 ? "Tätigkeit" : "Tätigkeiten"}</span></span>
+                <span className="min-w-0"><span className={`text-xs font-semibold uppercase tracking-wider ${colors.text}`}>{dept.emoji} {getDeptLabel(dept, locale)}</span><span className="ml-2 text-xs text-text-muted">{roles.length} {roles.length === 1 ? "Tätigkeit" : "Tätigkeiten"}</span></span>
                 <span className="flex shrink-0 items-center gap-2">{selectedCount > 0 && <span className={`rounded-full border px-2 py-1 text-[10px] ${colors.bg} ${colors.border} ${colors.text}`}>{selectedCount} ausgewählt</span>}<ChevronDown size={15} className={`text-text-muted transition-transform ${expanded ? "rotate-180" : ""}`} /></span>
               </button>
               {expanded && <div className="flex flex-wrap gap-2 border-t border-border px-4 py-3">
@@ -243,7 +244,7 @@ function TypeChipPicker({
                   const active = selectedOccupations.some(option => option.roleId === occupationId(dept.id, role));
                   const explanation = GRIP_OCCUPATIONS.find((occupation) => occupation.label === role)?.description;
                   return <button key={role} type="button" aria-pressed={active} title={explanation} onClick={() => togglePosition(role, dept.id)}
-                    className={`min-h-10 rounded-full border px-3 py-2 text-xs font-medium transition-colors ${active ? `${colors.bg} ${colors.border} ${colors.text}` : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"}`}>{role}</button>;
+                    className={`min-h-10 rounded-full border px-3 py-2 text-xs font-medium transition-colors ${active ? `${colors.bg} ${colors.border} ${colors.text}` : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"}`}>{getDepartmentRoleLabel(dept.id, role, locale)}</button>;
                 })}
               </div>}
             </section>

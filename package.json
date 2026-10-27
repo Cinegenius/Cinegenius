@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build --webpack",
+    "build": "npm run check:i18n && next build --webpack",
     "start": "next start",
     "test": "node --experimental-strip-types --import ./scripts/register-test-aliases.mjs --test lib/*.test.mjs",
     "lint": "eslint",
     "check:design": "node scripts/check-design.mjs",
     "deploy": "node scripts/deploy-production.mjs",
-    "deploy:production": "node scripts/deploy-production.mjs"
+    "deploy:production": "node scripts/deploy-production.mjs",
+    "check:i18n": "node scripts/check-i18n.mjs"
   },
   "dependencies": {
     "@clerk/localizations": "^4.5.3",

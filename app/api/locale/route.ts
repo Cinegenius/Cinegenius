@@ -1,7 +1,7 @@
 import { rateLimit } from "@/lib/rateLimit";
 import { NextRequest, NextResponse } from "next/server";
 
-const SUPPORTED = new Set(["de", "en", "es", "cs", "hu", "it"]);
+import { isAppLocale } from "@/lib/i18n/locales";
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => null);
   const locale = body?.locale;
-  if (!SUPPORTED.has(locale)) {
+  if (!isAppLocale(locale)) {
     return NextResponse.json({ error: "Unsupported locale" }, { status: 400 });
   }
 

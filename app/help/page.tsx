@@ -59,7 +59,7 @@ const categories = [
       },
       {
         q: "Was mache ich, wenn ein Anbieter nicht antwortet?",
-        a: "Wenn du innerhalb von 2–3 Tagen keine Antwort erhältst, kannst du es nochmals versuchen oder einen anderen Anbieter kontaktieren. Du kannst uns auch unter support@cinegenius.co melden, wenn ein Inserat veraltet oder inaktiv wirkt.",
+        a: "Wenn du innerhalb von 2–3 Tagen keine Antwort erhältst, kannst du es nochmals versuchen oder einen anderen Anbieter kontaktieren. Du kannst uns auch unter cinegenius.co@gmail.com melden, wenn ein Inserat veraltet oder inaktiv wirkt.",
       },
     ],
   },
@@ -141,7 +141,7 @@ const categories = [
       },
       {
         q: "Wie melde ich ein verdächtiges Inserat?",
-        a: "Schreib uns einfach an support@cinegenius.co mit dem Link zum Inserat und einer kurzen Beschreibung. Wir prüfen Meldungen; eine feste Bearbeitungszeit wird nicht zugesichert.",
+        a: "Schreib uns einfach an cinegenius.co@gmail.com mit dem Link zum Inserat und einer kurzen Beschreibung. Wir prüfen Meldungen; eine feste Bearbeitungszeit wird nicht zugesichert.",
       },
       {
         q: "Was passiert mit meinen Daten?",
@@ -284,11 +284,11 @@ export default function HelpPage() {
             Noch Fragen?
           </h2>
           <p className="text-text-muted mb-6 text-sm">
-            Schreibe uns an support@cinegenius.co. Nenne den betroffenen Bereich und füge bei Fehlern möglichst den Seitenlink hinzu.
+            Schreibe uns an cinegenius.co@gmail.com. Nenne den betroffenen Bereich und füge bei Fehlern möglichst den Seitenlink hinzu.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
-              href="mailto:support@cinegenius.co"
+              href="mailto:cinegenius.co@gmail.com"
               className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors flex items-center justify-center gap-2"
             >
               <Mail size={15} /> E-Mail Support

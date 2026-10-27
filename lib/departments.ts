@@ -12,6 +12,7 @@ export type Department = {
   roles: string[];
   /** Alternate names from the job/project catalogue; kept searchable, not shown as duplicate choices. */
   roleAliases?: Record<string, string[]>;
+  roleLabels?: Record<string, Record<string, string>>;
 };
 
 export function getDeptLabel(dept: Department, locale: string): string {
@@ -592,6 +593,10 @@ for (const filmDepartment of FILM_DEPARTMENTS) {
     });
 
     if (targetsExisting) {
+      if (filmRole.labelEn) {
+        target.roleLabels ??= {};
+        target.roleLabels[targetsExisting] = {en: filmRole.labelEn};
+      }
       const current = target.roleAliases[targetsExisting] ?? [];
       const alternateLabels = [filmRole.label, ...synonyms].filter((value) => roleKey(value) !== roleKey(targetsExisting));
       target.roleAliases[targetsExisting] = [...new Set([...current, ...alternateLabels])];
@@ -599,6 +604,10 @@ for (const filmDepartment of FILM_DEPARTMENTS) {
     }
 
     target.roles.push(filmRole.label);
+    if (filmRole.labelEn) {
+      target.roleLabels ??= {};
+      target.roleLabels[filmRole.label] = {en: filmRole.labelEn};
+    }
     if (synonyms.length) target.roleAliases[filmRole.label] = [...new Set(synonyms)];
   }
 }
@@ -694,4 +703,9 @@ export function deptColors(color: string) {
     lime:    { bg: "bg-lime-500/12",    border: "border-lime-500/30",    text: "text-lime-400",    bgHover: "hover:bg-lime-500/8"    },
   };
   return map[color] ?? map.slate;
+}
+
+/** Display only; stored occupation titles and stable role IDs never change. */
+export function getDepartmentRoleLabel(departmentId: string, role: string, locale: string): string {
+  return departments.find(department=>department.id===departmentId)?.roleLabels?.[role]?.[locale] ?? role;
 }

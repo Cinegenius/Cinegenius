@@ -1,27 +1,11 @@
 import { getRequestConfig } from "next-intl/server";
-import { cookies } from "next/headers";
-
-const SUPPORTED = ["de", "en", "es", "it", "cs", "hu"] as const;
-type Locale = (typeof SUPPORTED)[number];
-
-async function loadMessages(locale: Locale) {
-  switch (locale) {
-    case "de": return (await import("./messages/de.json")).default;
-    case "en": return (await import("./messages/en.json")).default;
-    case "es": return (await import("./messages/es.json")).default;
-    case "it": return (await import("./messages/it.json")).default;
-    case "cs": return (await import("./messages/cs.json")).default;
-    case "hu": return (await import("./messages/hu.json")).default;
-  }
-}
+import { cookies, headers } from "next/headers";
+import { resolveLocale } from "@/lib/i18n/locales";
+import { loadMessages } from "@/lib/i18n/messages";
 
 export default getRequestConfig(async () => {
-  const cookieStore = await cookies();
-  const raw = cookieStore.get("cg_locale")?.value ?? "de";
-  const locale = (SUPPORTED as readonly string[]).includes(raw) ? (raw as Locale) : "de";
-
-  return {
-    locale,
-    messages: await loadMessages(locale),
-  };
+  const [cookieStore, requestHeaders] = await Promise.all([cookies(), headers()]);
+  const locale = resolveLocale(cookieStore.get('cg_locale')?.value, requestHeaders.get('accept-language') ?? '');
+  const messages = await loadMessages(locale);
+  return {locale, messages, onError: error => console.warn("Translation error", error.code), getMessageFallback: () => String((messages.common as Record<string,unknown>).translationUnavailable)};
 });

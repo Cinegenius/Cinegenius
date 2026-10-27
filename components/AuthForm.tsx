@@ -4,6 +4,8 @@ import { useAuth, useSignIn, useSignUp } from "@clerk/nextjs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
+import { localizeAuthMessage } from "@/lib/i18n/auth-messages";
 import { Eye, EyeOff } from "lucide-react";
 import { finalizeThenNavigate, getMfaResendChannel, getPasswordSignInAction, resolveAuthNavigationUrl, selectSecondFactor, shouldRedirectForActiveSession } from "@/lib/sign-in-flow";
 import { classifyPasswordResetError, getPasswordResetRequestErrorMessage, PASSWORD_RESET_NEUTRAL_MESSAGE, PASSWORD_RESET_RESEND_COOLDOWN_SECONDS, validateNewPassword } from "@/lib/password-reset-flow";
@@ -58,6 +60,7 @@ export default function AuthForm({ mode, destination, signUpDestination, signInD
 }
 
 function SignInForm({ destination, signUpDestination }: { destination: string; signUpDestination: string }) {
+  const t = useTranslations("auth");
   const { signIn, errors, fetchStatus } = useSignIn();
   const { isLoaded, isSignedIn } = useAuth();
   const [email, setEmail] = useState("");
@@ -494,26 +497,23 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
       {step === "credentials" && (
         <form onSubmit={submitPassword} className="space-y-5" noValidate>
           <label className="block text-sm font-medium text-text-primary">
-            E-Mail-Adresse
-            <input id="sign-in-email" autoComplete="email" autoCapitalize="none" autoCorrect="off" type="email" inputMode="email" required value={email} onChange={(event) => { setEmail(event.target.value); setResetEmailError(""); }} className={inputClass} placeholder="name@beispiel.de" aria-invalid={!!resetEmailError} aria-describedby={resetEmailError ? "reset-email-error" : undefined} />
+            {t("email")}<input id="sign-in-email" autoComplete="email" autoCapitalize="none" autoCorrect="off" type="email" inputMode="email" required value={email} onChange={(event) => { setEmail(event.target.value); setResetEmailError(""); }} className={inputClass} placeholder="name@beispiel.de" aria-invalid={!!resetEmailError} aria-describedby={resetEmailError ? "reset-email-error" : undefined} />
             {errors.fields.identifier && <span className="mt-1 block text-sm text-red-400">{errors.fields.identifier.message}</span>}
-            {resetEmailError && <span id="reset-email-error" className="mt-1 block text-sm text-red-400">{resetEmailError}</span>}
+            {resetEmailError && <span id="reset-email-error" className="mt-1 block text-sm text-red-400">{localizeAuthMessage(resetEmailError, t)}</span>}
           </label>
           <label className="block text-sm font-medium text-text-primary">
-            Passwort
-            <input autoComplete="current-password" type="password" required value={password} onChange={(event) => setPassword(event.target.value)} className={inputClass} placeholder="Dein Passwort" />
+            {t("password")}<input autoComplete="current-password" type="password" required value={password} onChange={(event) => setPassword(event.target.value)} className={inputClass} placeholder={t("yourPassword")} />
             {errors.fields.password && <span className="mt-1 block text-sm text-red-400">{errors.fields.password.message}</span>}
           </label>
           <button type="submit" disabled={!signIn || busy} className={buttonClass}>
-            {busy ? "Anmeldung läuft …" : "Anmelden"}
+            {busy ? t("signingIn") : t("signIn")}
           </button>
           <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
             <button type="button" disabled={!signIn || busy || !email.trim() || resetCooldownSeconds > 0} onClick={() => void startPasswordReset()} className="min-h-11 text-text-muted underline-offset-4 hover:text-gold hover:underline disabled:opacity-50">
-              {resetRequestInProgress ? "Wiederherstellung läuft …" : resetCooldownSeconds > 0 ? `Erneut versuchen in ${resetCooldownSeconds} s` : "Passwort vergessen?"}
+              {resetRequestInProgress ? t("recovering") : resetCooldownSeconds > 0 ? t("retrySeconds", {seconds: resetCooldownSeconds}) : t("forgotPassword")}
             </button>
             <button type="button" disabled={!signIn || busy || !email.trim()} onClick={() => void sendEmailCode()} className="min-h-11 text-gold underline-offset-4 hover:underline disabled:opacity-50">
-              Mit E-Mail-Code anmelden
-            </button>
+              {t("emailSignIn")}</button>
           </div>
         </form>
       )}
@@ -521,76 +521,75 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
       {(step === "email-code" || step === "mfa") && (
         <form onSubmit={submitCode} className="space-y-5">
           <label className="block text-sm font-medium text-text-primary">
-            {step === "mfa" && factor === "totp" ? "Code aus der Authenticator-App" : step === "mfa" && factor === "backup_code" ? "Wiederherstellungscode" : "E-Mail-Code"}
-            <input autoComplete="one-time-code" inputMode="numeric" required value={code} onChange={(event) => setCode(event.target.value)} className={inputClass} placeholder="Bestätigungscode" />
+            {step === "mfa" && factor === "totp" ? t("authenticatorCode") : step === "mfa" && factor === "backup_code" ? t("recoveryCode") : t("emailCode")}
+            <input autoComplete="one-time-code" inputMode="numeric" required value={code} onChange={(event) => setCode(event.target.value)} className={inputClass} placeholder={t("verificationCode")} />
             {errors.fields.code && <span className="mt-1 block text-sm text-red-400">{errors.fields.code.message}</span>}
           </label>
-          <button type="submit" disabled={!signIn || busy} className={buttonClass}>{busy ? "Prüfe Code …" : "Code bestätigen"}</button>
-          {step === "email-code" && <button type="button" disabled={!signIn || busy} onClick={() => void sendEmailCode()} className={`${secondaryButtonClass} w-full`}>Neuen Code senden</button>}
-          {step === "mfa" && getMfaResendChannel(factor) && <button type="button" disabled={!signIn || busy} onClick={() => void resendSecondFactorCode()} className={`${secondaryButtonClass} w-full`}>Neuen Code senden</button>}
-          <button type="button" disabled={busy} onClick={() => void resetFlow()} className="min-h-11 w-full text-sm text-text-muted hover:text-text-primary">Zurück zur Anmeldung</button>
+          <button type="submit" disabled={!signIn || busy} className={buttonClass}>{busy ? t("checkingCode") : t("verifyCode")}</button>
+          {step === "email-code" && <button type="button" disabled={!signIn || busy} onClick={() => void sendEmailCode()} className={`${secondaryButtonClass} w-full`}>{t("sendNewCode")}</button>}
+          {step === "mfa" && getMfaResendChannel(factor) && <button type="button" disabled={!signIn || busy} onClick={() => void resendSecondFactorCode()} className={`${secondaryButtonClass} w-full`}>{t("sendNewCode")}</button>}
+          <button type="button" disabled={busy} onClick={() => void resetFlow()} className="min-h-11 w-full text-sm text-text-muted hover:text-text-primary">{t("backSignIn")}</button>
         </form>
       )}
 
       {step === "reset-code" && (
         <form onSubmit={submitResetCode} className="space-y-5" noValidate>
-          <p className="text-sm leading-relaxed text-text-muted">Gib den Wiederherstellungscode ein, falls du eine E-Mail erhalten hast. Sieh auch im Spam-Ordner nach. Wenn kein Code eintrifft, nutze die alternative Anmeldemethode.</p>
-          <label className="block text-sm font-medium text-text-primary">Wiederherstellungscode
-            <input autoComplete="one-time-code" inputMode="numeric" required value={code} onChange={(event) => { setCode(event.target.value); setResetCodeError(""); }} className={inputClass} placeholder="Code aus der E-Mail" aria-invalid={!!resetCodeError} />
+          <p className="text-sm leading-relaxed text-text-muted">{t("recoveryInstructions")}</p>
+          <label className="block text-sm font-medium text-text-primary">{t("recoveryCode")}<input autoComplete="one-time-code" inputMode="numeric" required value={code} onChange={(event) => { setCode(event.target.value); setResetCodeError(""); }} className={inputClass} placeholder={t("codeFromEmail")} aria-invalid={!!resetCodeError} />
             {errors.fields.code && <span className="mt-1 block text-sm text-red-400">{errors.fields.code.message}</span>}
-            {resetCodeError && <span className="mt-1 block text-sm text-red-400">{resetCodeError}</span>}
+            {resetCodeError && <span className="mt-1 block text-sm text-red-400">{localizeAuthMessage(resetCodeError, t)}</span>}
           </label>
-          <button type="submit" disabled={!signIn || busy} className={buttonClass}>{busy ? "Prüfe Code …" : "Code bestätigen"}</button>
+          <button type="submit" disabled={!signIn || busy} className={buttonClass}>{busy ? t("checkingCode") : t("verifyCode")}</button>
           <button type="button" disabled={!signIn || busy || resetCooldownSeconds > 0} onClick={() => void resendPasswordResetCode()} className={`${secondaryButtonClass} w-full`}>
-            {busy ? "Sende Code …" : resetCooldownSeconds > 0 ? `Neuen Code in ${resetCooldownSeconds} s anfordern` : "Neuen Code anfordern"}
+            {busy ? t("sendingCode") : resetCooldownSeconds > 0 ? t("requestSeconds", {seconds: resetCooldownSeconds}) : t("requestCode")}
           </button>
           <button type="button" disabled={!signIn || busy} onClick={() => void startEmailCodeSignIn()} className="min-h-11 w-full text-sm font-semibold text-gold hover:underline">
-            Stattdessen mit E-Mail-Code anmelden
-          </button>
-          <button type="button" disabled={busy} onClick={() => void resetFlow()} className="min-h-11 w-full text-sm text-text-muted hover:text-text-primary">Zurück zur Anmeldung</button>
+            {t("alternativeSignIn")}</button>
+          <button type="button" disabled={busy} onClick={() => void resetFlow()} className="min-h-11 w-full text-sm text-text-muted hover:text-text-primary">{t("backSignIn")}</button>
         </form>
       )}
 
       {step === "new-password" && (
         <form onSubmit={submitNewPassword} className="space-y-5" noValidate>
           <div>
-            <label htmlFor="reset-new-password" className="block text-sm font-medium text-text-primary">Neues Passwort</label>
+            <label htmlFor="reset-new-password" className="block text-sm font-medium text-text-primary">{t("newPassword")}</label>
             <div className="relative">
-              <input id="reset-new-password" autoComplete="new-password" type={showNewPassword ? "text" : "password"} minLength={8} required value={newPassword} onChange={(event) => { setNewPassword(event.target.value); setNewPasswordError(""); setError(""); }} className={`${inputClass} pr-12`} placeholder="Mindestens 8 Zeichen" aria-invalid={!!newPasswordError} aria-describedby="reset-password-requirement reset-password-error" />
-              <button type="button" onClick={() => setShowNewPassword((visible) => !visible)} aria-label={showNewPassword ? "Passwort verbergen" : "Passwort anzeigen"} aria-pressed={showNewPassword} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-2 text-text-muted hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
+              <input id="reset-new-password" autoComplete="new-password" type={showNewPassword ? "text" : "password"} minLength={8} required value={newPassword} onChange={(event) => { setNewPassword(event.target.value); setNewPasswordError(""); setError(""); }} className={`${inputClass} pr-12`} placeholder={t("minimumPassword")} aria-invalid={!!newPasswordError} aria-describedby="reset-password-requirement reset-password-error" />
+              <button type="button" onClick={() => setShowNewPassword((visible) => !visible)} aria-label={showNewPassword ? t("hidePassword") : t("showPassword")} aria-pressed={showNewPassword} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-2 text-text-muted hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
                 {showNewPassword ? <EyeOff aria-hidden="true" size={18} /> : <Eye aria-hidden="true" size={18} />}
               </button>
             </div>
-            <span id="reset-password-requirement" className="mt-1 block text-xs text-text-muted">Mindestens 8 Zeichen. Weitere Sicherheitsregeln prüft Clerk beim Speichern.</span>
+            <span id="reset-password-requirement" className="mt-1 block text-xs text-text-muted">{t("passwordRules")}</span>
             {errors.fields.password && <span className="mt-1 block text-sm text-red-400">{errors.fields.password.message}</span>}
-            {newPasswordError && <span id="reset-password-error" className="mt-1 block text-sm text-red-400">{newPasswordError}</span>}
+            {newPasswordError && <span id="reset-password-error" className="mt-1 block text-sm text-red-400">{localizeAuthMessage(newPasswordError, t)}</span>}
           </div>
           <div>
-            <label htmlFor="reset-confirm-password" className="block text-sm font-medium text-text-primary">Passwort wiederholen</label>
+            <label htmlFor="reset-confirm-password" className="block text-sm font-medium text-text-primary">{t("confirmPassword")}</label>
             <div className="relative">
-              <input id="reset-confirm-password" autoComplete="new-password" type={showConfirmNewPassword ? "text" : "password"} required value={confirmNewPassword} onChange={(event) => { setConfirmNewPassword(event.target.value); setConfirmPasswordError(""); setError(""); }} className={`${inputClass} pr-12`} placeholder="Neues Passwort erneut eingeben" aria-invalid={!!confirmPasswordError} aria-describedby="reset-confirm-password-error" />
-              <button type="button" onClick={() => setShowConfirmNewPassword((visible) => !visible)} aria-label={showConfirmNewPassword ? "Passwort verbergen" : "Passwort anzeigen"} aria-pressed={showConfirmNewPassword} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-2 text-text-muted hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
+              <input id="reset-confirm-password" autoComplete="new-password" type={showConfirmNewPassword ? "text" : "password"} required value={confirmNewPassword} onChange={(event) => { setConfirmNewPassword(event.target.value); setConfirmPasswordError(""); setError(""); }} className={`${inputClass} pr-12`} placeholder={t("repeatNewPassword")} aria-invalid={!!confirmPasswordError} aria-describedby="reset-confirm-password-error" />
+              <button type="button" onClick={() => setShowConfirmNewPassword((visible) => !visible)} aria-label={showConfirmNewPassword ? t("hidePassword") : t("showPassword")} aria-pressed={showConfirmNewPassword} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-2 text-text-muted hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
                 {showConfirmNewPassword ? <EyeOff aria-hidden="true" size={18} /> : <Eye aria-hidden="true" size={18} />}
               </button>
             </div>
-            {confirmPasswordError && <span id="reset-confirm-password-error" className="mt-1 block text-sm text-red-400">{confirmPasswordError}</span>}
+            {confirmPasswordError && <span id="reset-confirm-password-error" className="mt-1 block text-sm text-red-400">{localizeAuthMessage(confirmPasswordError, t)}</span>}
           </div>
-          <button type="submit" disabled={!signIn || busy} className={buttonClass}>{busy ? "Speichere Passwort …" : "Passwort speichern und anmelden"}</button>
-          <button type="button" disabled={busy} onClick={() => void resetFlow()} className="min-h-11 w-full text-sm text-text-muted hover:text-text-primary">Abbrechen und zur Anmeldung</button>
+          <button type="submit" disabled={!signIn || busy} className={buttonClass}>{busy ? t("savingPassword") : t("savePassword")}</button>
+          <button type="button" disabled={busy} onClick={() => void resetFlow()} className="min-h-11 w-full text-sm text-text-muted hover:text-text-primary">{t("cancelSignIn")}</button>
         </form>
       )}
 
-      {message && <p role="status" className="mt-4 rounded-xl border border-gold/30 bg-gold/10 px-4 py-3 text-sm text-text-primary">{message}</p>}
-      {error && <p role="alert" className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</p>}
+      {message && <p role="status" className="mt-4 rounded-xl border border-gold/30 bg-gold/10 px-4 py-3 text-sm text-text-primary">{localizeAuthMessage(message, t)}</p>}
+      {error && <p role="alert" className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{localizeAuthMessage(error, t)}</p>}
       <p className="mt-6 text-center text-sm text-text-muted">
-        Noch kein Konto?{" "}
-        <Link prefetch href={signUpDestination} className="font-semibold text-gold hover:text-gold-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-sm">Jetzt registrieren</Link>
+        {t("noAccount")}{" "}
+        <Link prefetch href={signUpDestination} className="font-semibold text-gold hover:text-gold-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-sm">{t("registerNow")}</Link>
       </p>
     </div>
   );
 }
 
 function SignUpForm({ destination, signInDestination }: { destination: string; signInDestination: string }) {
+  const t = useTranslations("auth");
   const { signUp, errors, fetchStatus } = useSignUp();
   const { isLoaded, isSignedIn } = useAuth();
   const router = useRouter();
@@ -718,47 +717,42 @@ function SignUpForm({ destination, signInDestination }: { destination: string; s
     <div className="w-full">
       {step === "credentials" ? (
         <form onSubmit={submitSignUp} className="space-y-5" noValidate>
-          <label className="block text-sm font-medium text-text-primary">E-Mail-Adresse
-            <input autoComplete="email" autoCapitalize="none" autoCorrect="off" type="email" inputMode="email" required value={email} onChange={(event) => setEmail(event.target.value)} className={inputClass} placeholder="name@beispiel.de" />
+          <label className="block text-sm font-medium text-text-primary">{t("email")}<input autoComplete="email" autoCapitalize="none" autoCorrect="off" type="email" inputMode="email" required value={email} onChange={(event) => setEmail(event.target.value)} className={inputClass} placeholder="name@beispiel.de" />
             {errors.fields.emailAddress && <span className="mt-1 block text-sm text-red-400">{errors.fields.emailAddress.message}</span>}
           </label>
-          <label className="block text-sm font-medium text-text-primary">Passwort
-            <input autoComplete="new-password" type="password" minLength={8} required value={password} onChange={(event) => setPassword(event.target.value)} className={inputClass} placeholder="Mindestens 8 Zeichen" />
+          <label className="block text-sm font-medium text-text-primary">{t("password")}<input autoComplete="new-password" type="password" minLength={8} required value={password} onChange={(event) => setPassword(event.target.value)} className={inputClass} placeholder={t("minimumPassword")} />
             {errors.fields.password && <span className="mt-1 block text-sm text-red-400">{errors.fields.password.message}</span>}
           </label>
-          {required.has("first_name") && <label className="block text-sm font-medium text-text-primary">Vorname
-            <input autoComplete="given-name" required value={firstName} onChange={(event) => setFirstName(event.target.value)} className={inputClass} />
+          {required.has("first_name") && <label className="block text-sm font-medium text-text-primary">{t("firstName")}<input autoComplete="given-name" required value={firstName} onChange={(event) => setFirstName(event.target.value)} className={inputClass} />
             {errors.fields.firstName && <span className="mt-1 block text-sm text-red-400">{errors.fields.firstName.message}</span>}
           </label>}
-          {required.has("last_name") && <label className="block text-sm font-medium text-text-primary">Nachname
-            <input autoComplete="family-name" required value={lastName} onChange={(event) => setLastName(event.target.value)} className={inputClass} />
+          {required.has("last_name") && <label className="block text-sm font-medium text-text-primary">{t("lastName")}<input autoComplete="family-name" required value={lastName} onChange={(event) => setLastName(event.target.value)} className={inputClass} />
             {errors.fields.lastName && <span className="mt-1 block text-sm text-red-400">{errors.fields.lastName.message}</span>}
           </label>}
           {required.has("legal_accepted") && <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary">
             <input type="checkbox" required checked={legalAccepted} onChange={(event) => setLegalAccepted(event.target.checked)} className="h-5 w-5 accent-[var(--color-gold)]" />
-            <span>Ich stimme den <Link href="/agb" target="_blank" className="underline hover:text-gold">Nutzungsbedingungen</Link> und <Link href="/datenschutz" target="_blank" className="underline hover:text-gold">Datenschutzhinweisen</Link> zu.</span>
+            <span>{t("agree")}<Link href="/agb" target="_blank" className="underline hover:text-gold">{t("terms")}</Link> {t("and")}<Link href="/datenschutz" target="_blank" className="underline hover:text-gold">{t("privacy")}</Link> {t("agreeEnd")}</span>
             {errors.fields.legalAccepted && <span className="text-sm text-red-400">{errors.fields.legalAccepted.message}</span>}
           </label>}
-          <button type="submit" disabled={!signUp || busy || (required.has("legal_accepted") && !legalAccepted)} className={buttonClass}>{busy ? "Konto wird erstellt …" : "Konto erstellen"}</button>
-          <p className="text-center text-xs leading-5 text-text-muted">Mit der Registrierung wird nur dein Konto angelegt. Tätigkeiten und Profildetails ergänzt du anschließend.</p>
+          <button type="submit" disabled={!signUp || busy || (required.has("legal_accepted") && !legalAccepted)} className={buttonClass}>{busy ? t("creatingAccount") : t("createAccount")}</button>
+          <p className="text-center text-xs leading-5 text-text-muted">{t("accountOnly")}</p>
           <div id="clerk-captcha" />
         </form>
       ) : (
         <form onSubmit={verifySignUp} className="space-y-5">
-          <label className="block text-sm font-medium text-text-primary">Bestätigungscode
-            <input autoComplete="one-time-code" inputMode="numeric" required value={code} onChange={(event) => setCode(event.target.value)} className={inputClass} placeholder="Code aus der E-Mail" />
+          <label className="block text-sm font-medium text-text-primary">{t("verificationCode")}<input autoComplete="one-time-code" inputMode="numeric" required value={code} onChange={(event) => setCode(event.target.value)} className={inputClass} placeholder={t("codeFromEmail")} />
             {errors.fields.code && <span className="mt-1 block text-sm text-red-400">{errors.fields.code.message}</span>}
           </label>
-          <button type="submit" disabled={!signUp || busy} className={buttonClass}>{busy ? "Bestätige …" : "E-Mail bestätigen"}</button>
-          <button type="button" disabled={!signUp || busy} onClick={() => void resendCode()} className={`${secondaryButtonClass} w-full`}>Code erneut senden</button>
-          <button type="button" disabled={busy} onClick={() => void resetSignUp()} className="min-h-11 w-full text-sm text-text-muted hover:text-text-primary">E-Mail-Adresse ändern</button>
+          <button type="submit" disabled={!signUp || busy} className={buttonClass}>{busy ? t("verifying") : t("verifyEmail")}</button>
+          <button type="button" disabled={!signUp || busy} onClick={() => void resendCode()} className={`${secondaryButtonClass} w-full`}>{t("resendCode")}</button>
+          <button type="button" disabled={busy} onClick={() => void resetSignUp()} className="min-h-11 w-full text-sm text-text-muted hover:text-text-primary">{t("changeEmail")}</button>
         </form>
       )}
-      {message && <p role="status" className="mt-4 rounded-xl border border-gold/30 bg-gold/10 px-4 py-3 text-sm text-text-primary">{message}</p>}
-      {error && <p role="alert" className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</p>}
+      {message && <p role="status" className="mt-4 rounded-xl border border-gold/30 bg-gold/10 px-4 py-3 text-sm text-text-primary">{localizeAuthMessage(message, t)}</p>}
+      {error && <p role="alert" className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{localizeAuthMessage(error, t)}</p>}
       <p className="mt-6 text-center text-sm text-text-muted">
-        Schon registriert?{" "}
-        <Link prefetch href={signInDestination} className="font-semibold text-gold hover:text-gold-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-sm">Anmelden</Link>
+        {t("existingAccount")}{" "}
+        <Link prefetch href={signInDestination} className="font-semibold text-gold hover:text-gold-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded-sm">{t("signIn")}</Link>
       </p>
     </div>
   );

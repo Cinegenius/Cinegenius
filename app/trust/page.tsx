@@ -21,7 +21,7 @@ const sections = [
     { heading: "Erstattet CineGenius automatisch?", body: "Es gibt keine allgemeine automatische Rückerstattung durch CineGenius. Wende dich bei Fragen zur vereinbarten Leistung oder Zahlung zunächst an deinen Vertragspartner." },
   ] },
   { icon: AlertCircle, title: "Probleme & Meldungen", id: "disputes", content: [
-    { heading: "Wie melde ich ein Problem?", body: "Nutze die vorhandene Melden-Funktion am Profil oder Angebot oder sende den betroffenen Link mit einer Beschreibung an support@cinegenius.co. Teile nur die für die Prüfung notwendigen Informationen." },
+    { heading: "Wie melde ich ein Problem?", body: "Nutze die vorhandene Melden-Funktion am Profil oder Angebot oder sende den betroffenen Link mit einer Beschreibung an cinegenius.co@gmail.com. Teile nur die für die Prüfung notwendigen Informationen." },
     { heading: "Was passiert anschließend?", body: "Berechtigte Verantwortliche prüfen die Meldung. Eine feste Bearbeitungszeit oder eine Erstattung kann nicht pauschal zugesichert werden. Supportunterhaltungen können von berechtigten Supportadministratoren bearbeitet werden." },
     { heading: "Wer ist für Schäden verantwortlich?", body: "Kläre Haftung, Versicherungen und eventuelle Kautionen vor dem Einsatz mit deinem Vertragspartner. Eine Plattformanfrage enthält keinen automatischen Versicherungsschutz." },
   ] },

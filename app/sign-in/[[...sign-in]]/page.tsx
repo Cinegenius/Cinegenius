@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import AuthForm from "@/components/AuthForm";
@@ -13,12 +14,14 @@ export default async function SignInPage({ searchParams }: { searchParams: Searc
   const destination = safeAuthRedirect(query.redirect_url ?? query.redirect, "/dashboard", ["/sign-in", "/sign-up"]);
   if (userId) redirect(destination);
 
+  const t = await getTranslations("auth");
+
   return (
     <div className="pt-16 min-h-screen flex items-center justify-center bg-bg-primary px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Willkommen zurück</p>
-          <h1 className="font-display text-3xl font-bold text-text-primary">Anmelden</h1>
+          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">{t("welcomeBack")}</p>
+          <h1 className="font-display text-3xl font-bold text-text-primary">{t("signIn")}</h1>
         </div>
         <AuthForm
           mode="sign-in"

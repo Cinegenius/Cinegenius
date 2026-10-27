@@ -5,9 +5,8 @@ import { auth } from "@clerk/nextjs/server";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { deDE, enUS, esES, csCZ, huHU, itIT } from "@clerk/localizations";
-import { cookies } from "next/headers";
-import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import AppIntlProvider from "@/components/AppIntlProvider";
+import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
 import AppChrome from "@/components/AppChrome";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -102,11 +101,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [cookieStore, { userId }] = await Promise.all([cookies(), auth()]);
-  const locale = cookieStore.get("cg_locale")?.value ?? "de";
+  const [locale, messages, { userId }] = await Promise.all([getLocale(), getMessages(), auth()]);
   const clerkLocalization = CLERK_LOCALIZATIONS[locale] ?? deDE;
   const htmlLang = HTML_LANG[locale] ?? "de";
-  const messages = await getMessages();
 
   return (
     <ClerkProvider
@@ -129,7 +126,7 @@ export default async function RootLayout({
           <link rel="dns-prefetch" href="https://clerk.com" />
         </head>
         <body className="min-h-screen flex flex-col bg-bg-primary text-text-primary font-sans">
-          <NextIntlClientProvider messages={messages}>
+          <AppIntlProvider locale={locale} messages={messages}>
           <ThemeProvider>
             <ToastProvider>
               <AuthSessionBoundary>
@@ -143,7 +140,7 @@ export default async function RootLayout({
               </AuthSessionBoundary>
             </ToastProvider>
           </ThemeProvider>
-          </NextIntlClientProvider>
+          </AppIntlProvider>
         </body>
       </html>
     </ClerkProvider>

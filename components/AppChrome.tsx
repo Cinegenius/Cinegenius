@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import LegalLanguageNotice from "@/components/LegalLanguageNotice";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
@@ -18,6 +19,7 @@ export default function AppChrome({ children, initialIsSignedIn }: { children: R
   return <>
     <Navbar initialIsSignedIn={initialIsSignedIn} />
     <main className="flex-1 pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
+      <LegalLanguageNotice />
       <PersonalAreaNavigation>{children}</PersonalAreaNavigation>
     </main>
     {pathname !== "/messages" && <Footer />}

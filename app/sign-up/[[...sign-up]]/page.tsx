@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import AuthForm from "@/components/AuthForm";
@@ -15,12 +16,14 @@ export default async function SignUpPage({ searchParams }: { searchParams: Searc
 
   const afterSignUp = getSignUpSetupDestination(destination);
 
+  const t = await getTranslations("auth");
+
   return (
     <div className="pt-16 min-h-screen flex items-center justify-center bg-bg-primary px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Kostenlos starten</p>
-          <h1 className="font-display text-3xl font-bold text-text-primary">Konto erstellen</h1>
+          <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">{t("startFree")}</p>
+          <h1 className="font-display text-3xl font-bold text-text-primary">{t("createAccount")}</h1>
         </div>
         <AuthForm
           mode="sign-up"
