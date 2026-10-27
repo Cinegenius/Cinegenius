@@ -1,5 +1,7 @@
 "use client";
 
+import { useViewState } from "@/lib/use-view-state";
+
 import { filterProviderProfiles, isProviderFilter, LOCATION_PROVIDER_FILTER, MARKETPLACE_PROVIDER_FILTER } from "@/lib/profile-provider-filters";
 import { filterCrewOccupations } from "@/lib/crew-occupations";
 
@@ -396,11 +398,11 @@ function CreatorsInner({
   const t = useTranslations("creators");
   const locale = useLocale();
 
-  const [query, setQuery] = useState(() => initialFilters.query);
-  const [cityFilter, setCityFilter] = useState(() => initialFilters.city);
-  const [countryFilter, setCountryFilter] = useState("");
-  const [languageFilter, setLanguageFilter] = useState("");
-  const [availableOnly, setAvailableOnly] = useState(false);
+  const [query, setQuery] = useViewState("crew.query", () => initialFilters.query);
+  const [cityFilter, setCityFilter] = useViewState("crew.cityFilter", () => initialFilters.city);
+  const [countryFilter, setCountryFilter] = useViewState("crew.countryFilter", "");
+  const [languageFilter, setLanguageFilter] = useViewState("crew.languageFilter", "");
+  const [availableOnly, setAvailableOnly] = useViewState("crew.availableOnly", false);
 
   // allCreators muss VOR den useMemo-Aufrufen deklariert sein
   const [allCreators, setAllCreators] = useState<ServerCreator[]>(serverCreators);
@@ -464,17 +466,17 @@ function CreatorsInner({
       availableLanguages:  [...langs].sort(),
     };
   }, [allCreators]);
-  const [sortKey, setSortKey] = useState(() => initialFilters.sort === "rating" ? "rating" : "featured");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [sortKey, setSortKey] = useViewState("crew.sortKey", () => initialFilters.sort === "rating" ? "rating" : "featured");
+  const [viewMode, setViewMode] = useViewState<"grid" | "list">("crew.viewMode", "grid");
 
   // Neue Casting-Filter
-  const [profileTypeFilter, setProfileTypeFilter] = useState("");
-  const [hairFilter, setHairFilter] = useState("");
-  const [eyeFilter, setEyeFilter] = useState("");
-  const [bodyFilter, setBodyFilter] = useState("");
-  const [ageMinFilter, setAgeMinFilter] = useState("");
-  const [ageMaxFilter, setAgeMaxFilter] = useState("");
-  const [travelFilter, setTravelFilter] = useState("");
+  const [profileTypeFilter, setProfileTypeFilter] = useViewState("crew.profileTypeFilter", "");
+  const [hairFilter, setHairFilter] = useViewState("crew.hairFilter", "");
+  const [eyeFilter, setEyeFilter] = useViewState("crew.eyeFilter", "");
+  const [bodyFilter, setBodyFilter] = useViewState("crew.bodyFilter", "");
+  const [ageMinFilter, setAgeMinFilter] = useViewState("crew.ageMinFilter", "");
+  const [ageMaxFilter, setAgeMaxFilter] = useViewState("crew.ageMaxFilter", "");
+  const [travelFilter, setTravelFilter] = useViewState("crew.travelFilter", "");
 
   // Optionen aus echten Daten ableiten
   const { availableProfileTypes, availableHairColors, availableEyeColors, availableBodyTypes } = useMemo(() => {
@@ -516,20 +518,20 @@ function CreatorsInner({
     hu: { regional:"Regionális", national:"Országosan", european:"Európai", worldwide:"Világszerte" },
   };
   const TRAVEL_MAP = TRAVEL_LABELS[locale] ?? TRAVEL_LABELS.de;
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [pagination, setPagination] = useViewState("crew.pagination", { filterKey: "", visibleCount: PAGE_SIZE });
 
-  const [vendorOnly, setVendorOnly] = useState(false);
+  const [vendorOnly, setVendorOnly] = useViewState("crew.vendorOnly", false);
 
   // Hierarchical filter state
   const [filterOpen, setFilterOpen] = useState(false);
-  const [moreFiltersOpen, setMoreFiltersOpen] = useState(false);
-  const [selectedRoles, setSelectedRoles] = useState<Set<string>>(new Set());
-  const [sidebarDept, setSidebarDept] = useState<string | null>(null);
+  const [moreFiltersOpen, setMoreFiltersOpen] = useViewState("crew.moreFiltersOpen", false);
+  const [selectedRoles, setSelectedRoles] = useViewState<Set<string>>("crew.selectedRoles", new Set());
+  const [sidebarDept, setSidebarDept] = useViewState<string | null>("crew.sidebarDept", null);
 
   // Same complete catalogue and order as onboarding and profile editing.
   const activeDepts = departments;
 
-  const [activeDept, setActiveDept] = useState<string>(() => activeDepts[0]?.id ?? departments[0].id);
+  const [activeDept, setActiveDept] = useViewState<string>("crew.activeDept", () => activeDepts[0]?.id ?? departments[0].id);
 
   const toggleRole = (role: string) => {
     const departmentId = occupationById(role)?.departmentId;
@@ -651,7 +653,12 @@ function CreatorsInner({
       profileTypeFilter, hairFilter, eyeFilter, bodyFilter, travelFilter, ageMinFilter, ageMaxFilter,
       sortKey, allCreators, isTopMode]);
 
-  useEffect(() => { setVisibleCount(PAGE_SIZE); }, [filtered]);
+  const filterKey = JSON.stringify([query, [...selectedRoles].sort(), sidebarDept, availableOnly, vendorOnly,
+    cityFilter, countryFilter, languageFilter, profileTypeFilter, hairFilter, eyeFilter, bodyFilter,
+    travelFilter, ageMinFilter, ageMaxFilter, sortKey]);
+  const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
+  const setVisibleCount = (next: number | ((value: number) => number)) =>
+    setPagination({ filterKey, visibleCount: typeof next === "function" ? next(visibleCount) : next });
 
   // Active filter chips: group by dept for context
   const activeChips = useMemo(() =>
@@ -1580,5 +1587,5 @@ export default function CreatorsContent({
   hasMoreProfiles?: boolean;
   initialFilters: { query: string; city: string; sort: string };
 }) {
-  return <CreatorsInner key={JSON.stringify(serverCreators.map(creator => [creator.id, creator.primaryOccupation]))} serverCreators={serverCreators} hasMoreProfiles={hasMoreProfiles} initialFilters={initialFilters} />;
+  return <CreatorsInner serverCreators={serverCreators} hasMoreProfiles={hasMoreProfiles} initialFilters={initialFilters} />;
 }

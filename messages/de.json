@@ -1279,5 +1279,15 @@
   },
   "legalLanguage": {
     "original": "Diese rechtlichen Angaben liegen im deutschen Original vor."
+  },
+  "navigationStability": {
+    "newMessages": "Neue Nachrichten anzeigen"
+  },
+  "companyMessages": {
+    "send": "Nachricht senden",
+    "signIn": "Anmelden und Nachricht senden",
+    "unavailable": "Die Firma konnte gerade nicht geladen werden.",
+    "noContact": "Für diese Firma ist noch kein verantwortliches Nachrichtenkonto hinterlegt.",
+    "context": "Kontakt zur Firma: {name}"
   }
 }

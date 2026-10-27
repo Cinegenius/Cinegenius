@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import ContextBackLink from "@/components/ContextBackLink";
 import { ArrowLeft, MapPin, Clock, Briefcase, CheckCircle, Users, Calendar, Shield, AlertTriangle, DollarSign } from "lucide-react";
 import FavoriteButton from "@/components/FavoriteButton";
 import ReportButton from "@/components/ReportButton";
@@ -68,9 +69,9 @@ export default function JobDetail({ job, preview = false }: { job: Job; preview?
   return (
     <div className="pt-16 min-h-screen">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/jobs" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors mb-6">
+        <ContextBackLink href="/jobs" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors mb-6">
           <ArrowLeft size={14} /> Zurück zu Jobs
-        </Link>
+        </ContextBackLink>
 
         {preview && (
           <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-gold/30 bg-gold/10 px-4 py-3">

@@ -4,6 +4,7 @@ import { listingPriceLabel } from "@/lib/listing-price";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import ContextBackLink from "@/components/ContextBackLink";
 import {
   MapPin, Star, CheckCircle, Users, Zap, ArrowLeft,
   Shield, MessageSquare,
@@ -155,9 +156,9 @@ export default function LocationDetail({ location }: { location: Location }) {
     <div className="pt-16 min-h-screen">
       {/* Back */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <Link href="/locations" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors mb-4">
+        <ContextBackLink href="/locations" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors mb-4">
           <ArrowLeft size={14} /> Zurück zu Locations
-        </Link>
+        </ContextBackLink>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">

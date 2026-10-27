@@ -1,5 +1,7 @@
 "use client";
 
+import { useViewState } from "@/lib/use-view-state";
+
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import CompanyLogo from "@/components/CompanyLogo";
@@ -106,14 +108,14 @@ function FilterDropdown({
 export default function CompaniesContent({ initialCompanies }: { initialCompanies: Company[] }) {
   const t = useTranslations("companies");
 
-  const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [cityFilter, setCityFilter] = useState("");
-  const [countryFilter, setCountryFilter] = useState("");
-  const [verifiedOnly, setVerifiedOnly] = useState(false);
-  const [sortKey, setSortKey] = useState("newest");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [pageState, setPageState] = useState({ filterKey: "", page: 1 });
+  const [search, setSearch] = useViewState("companies.search", "");
+  const [selectedCategory, setSelectedCategory] = useViewState<string | null>("companies.selectedCategory", null);
+  const [cityFilter, setCityFilter] = useViewState("companies.cityFilter", "");
+  const [countryFilter, setCountryFilter] = useViewState("companies.countryFilter", "");
+  const [verifiedOnly, setVerifiedOnly] = useViewState("companies.verifiedOnly", false);
+  const [sortKey, setSortKey] = useViewState("companies.sortKey", "newest");
+  const [viewMode, setViewMode] = useViewState<"grid" | "list">("companies.viewMode", "grid");
+  const [pageState, setPageState] = useViewState("companies.pageState", { filterKey: "", page: 1 });
 
   const availableCities = useMemo(() => {
     const cities = initialCompanies.map((c) => c.city?.split(",")[0]?.trim()).filter(Boolean) as string[];

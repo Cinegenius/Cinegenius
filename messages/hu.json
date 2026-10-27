@@ -1279,5 +1279,15 @@
   },
   "legalLanguage": {
     "original": "Ezek a jogi dokumentumok német eredetiben érhetők el. A választott nyelven még nincs ellenőrzött fordítás."
+  },
+  "navigationStability": {
+    "newMessages": "Új üzenetek megjelenítése"
+  },
+  "companyMessages": {
+    "send": "Üzenet küldése",
+    "signIn": "Jelentkezz be az üzenetküldéshez",
+    "unavailable": "A cég jelenleg nem tölthető be.",
+    "noContact": "Ehhez a céghez még nincs felelős üzenetfogadó fiók megadva.",
+    "context": "Céges kapcsolat: {name}"
   }
 }

@@ -1279,5 +1279,15 @@
   },
   "legalLanguage": {
     "original": "Tyto právní dokumenty jsou dostupné v německém originále. Ověřený překlad do zvoleného jazyka zatím není k dispozici."
+  },
+  "navigationStability": {
+    "newMessages": "Zobrazit nové zprávy"
+  },
+  "companyMessages": {
+    "send": "Odeslat zprávu",
+    "signIn": "Přihlásit se a odeslat zprávu",
+    "unavailable": "Firmu se nyní nepodařilo načíst.",
+    "noContact": "Tato firma zatím nemá odpovědný účet pro příjem zpráv.",
+    "context": "Kontakt na firmu: {name}"
   }
 }

@@ -1,5 +1,7 @@
 "use client";
 
+import { useViewState } from "@/lib/use-view-state";
+
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -124,13 +126,13 @@ function FilterDropdown({
 // ─── Main ─────────────────────────────────────────────────────────
 export default function ProjectsContent({ projects: allProjects }: { projects: Project[] }) {
   const t = useTranslations("projects");
-  const [query, setQuery] = useState("");
-  const [categoryChip, setCategoryChip] = useState<string | null>(null);
-  const [typeFilter, setTypeFilter] = useState("");
-  const [yearFilter, setYearFilter] = useState("");
-  const [directorFilter, setDirectorFilter] = useState("");
-  const [sort, setSort] = useState<SortKey>("year_desc");
-  const [view, setView] = useState<"list" | "grid">("list");
+  const [query, setQuery] = useViewState("projects.query", "");
+  const [categoryChip, setCategoryChip] = useViewState<string | null>("projects.categoryChip", null);
+  const [typeFilter, setTypeFilter] = useViewState("projects.typeFilter", "");
+  const [yearFilter, setYearFilter] = useViewState("projects.yearFilter", "");
+  const [directorFilter, setDirectorFilter] = useViewState("projects.directorFilter", "");
+  const [sort, setSort] = useViewState<SortKey>("projects.sort", "year_desc");
+  const [view, setView] = useViewState<"list" | "grid">("projects.view", "list");
 
   // Derive available filter options from data
   const availableTypes = useMemo(() => {

@@ -1,4 +1,6 @@
 "use client";
+
+import { useViewState } from "@/lib/use-view-state";
 import { listingPriceLabel } from "@/lib/listing-price";
 
 
@@ -158,24 +160,24 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
     }
   };
 
-  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
-  const [activeType, setActiveType] = useState(() => searchParams.get("type") ?? "All Types");
-  const [instantOnly, setInstantOnly] = useState(() => searchParams.get("instant") === "1");
-  const [verifiedOnly, setVerifiedOnly] = useState(() => searchParams.get("verified") === "1");
-  const [minPrice, setMinPrice] = useState(() => searchParams.get("min") ?? "");
-  const [maxPrice, setMaxPrice] = useState(() => searchParams.get("max") ?? "");
-  const [lageFilter, setLageFilter] = useState(() => searchParams.get("lage") ?? "Alle");
-  const [powerOnly, setPowerOnly] = useState(() => searchParams.get("power") === "1");
-  const [sortKey, setSortKey] = useState(() => searchParams.get("sort") ?? "featured");
-  const [viewMode, setViewMode] = useState<ViewMode>("split");
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [query, setQuery] = useViewState("locations.query", () => searchParams.get("q") ?? "");
+  const [activeType, setActiveType] = useViewState("locations.activeType", () => searchParams.get("type") ?? "All Types");
+  const [instantOnly, setInstantOnly] = useViewState("locations.instantOnly", () => searchParams.get("instant") === "1");
+  const [verifiedOnly, setVerifiedOnly] = useViewState("locations.verifiedOnly", () => searchParams.get("verified") === "1");
+  const [minPrice, setMinPrice] = useViewState("locations.minPrice", () => searchParams.get("min") ?? "");
+  const [maxPrice, setMaxPrice] = useViewState("locations.maxPrice", () => searchParams.get("max") ?? "");
+  const [lageFilter, setLageFilter] = useViewState("locations.lageFilter", () => searchParams.get("lage") ?? "Alle");
+  const [powerOnly, setPowerOnly] = useViewState("locations.powerOnly", () => searchParams.get("power") === "1");
+  const [sortKey, setSortKey] = useViewState("locations.sortKey", () => searchParams.get("sort") ?? "featured");
+  const [viewMode, setViewMode] = useViewState<ViewMode>("locations.viewMode", "split");
+  const [activeId, setActiveId] = useViewState<string | null>("locations.activeId", null);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
-  const [radiusKm, setRadiusKm] = useState(50);
+  const [radiusKm, setRadiusKm] = useViewState("locations.radiusKm", 50);
   const [copied, setCopied] = useState(false);
   const [locating, setLocating] = useState(false);
   const [locationError, setLocationError] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [pagination, setPagination] = useState({ filterKey: "", visibleCount: PAGE_SIZE });
+  const [pagination, setPagination] = useViewState("locations.pagination", { filterKey: "", visibleCount: PAGE_SIZE });
   const listRef = useRef<HTMLDivElement>(null);
 
   const handleCopyLink = () => {

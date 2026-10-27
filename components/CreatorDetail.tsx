@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { useGallerySelection } from "@/lib/use-gallery-selection";
 import Link from "next/link";
+import ContextBackLink from "@/components/ContextBackLink";
 import Image from "next/image";
 import {
   ArrowLeft, MapPin, Star, CheckCircle, Shield,
@@ -125,7 +127,7 @@ export default function CreatorDetail({
   const [msgSending, setMsgSending] = useState(false);
   const [msgSent, setMsgSent] = useState(false);
   const [msgError, setMsgError] = useState("");
-  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+  const [lightboxIdx, setLightboxIdx] = useGallerySelection(creator.portfolio_images ?? []);
   const totalPortfolio = creator.portfolio_images?.length ?? 0;
 
   const [currentFriendStatus, setCurrentFriendStatus] = useState<FriendStatus>(friendStatus);
@@ -298,9 +300,9 @@ export default function CreatorDetail({
 
         {/* Back link */}
         <div className="absolute top-4 left-4">
-          <Link href="/creators" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/40 backdrop-blur-sm rounded-full text-white/80 hover:text-white text-xs font-medium transition-colors">
+          <ContextBackLink href="/creators" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/40 backdrop-blur-sm rounded-full text-white/80 hover:text-white text-xs font-medium transition-colors">
             <ArrowLeft size={13} /> Filmschaffende
-          </Link>
+          </ContextBackLink>
         </div>
 
         {isOwnProfile && (

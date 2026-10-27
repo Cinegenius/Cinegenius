@@ -14,6 +14,7 @@ import { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import ContextBackLink from "@/components/ContextBackLink";
 import {
   ArrowLeft, Clapperboard, Calendar, Users, Upload,
   Plus, X, Check, Loader2, Pencil, Save, ImageIcon, Trash2, ShieldCheck, ShieldAlert,
@@ -497,9 +498,9 @@ export default function ProjectDetail({
     <div className="pt-16 min-h-screen bg-bg-primary">
       <div className="max-w-6xl mx-auto px-4 py-10">
 
-        <Link href="/projects" className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-gold transition-colors mb-8">
+        <ContextBackLink href="/projects" className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-gold transition-colors mb-8">
           <ArrowLeft size={13} /> Alle Projekte
-        </Link>
+        </ContextBackLink>
 
         {draftId && (
           <div className="mb-6 rounded-xl border border-gold/25 bg-gold/5 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">

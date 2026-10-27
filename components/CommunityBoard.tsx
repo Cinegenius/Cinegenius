@@ -1,6 +1,8 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { useViewState } from "@/lib/use-view-state";
+
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
@@ -46,11 +48,11 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
   const { user, isLoaded } = useUser();
   const activeLoggedIn = isLoaded ? Boolean(user) : loggedIn;
   const [posts, setPosts] = useState<Post[]>([]);
-  const [kind, setKind] = useState<Kind | "all">("all");
-  const [query, setQuery] = useState("");
+  const [kind, setKind] = useViewState<Kind | "all">("board.kind", "all");
+  const [query, setQuery] = useViewState("board.query", "");
   const [loading, setLoading] = useState(true);
   const [composerOpen, setComposerOpen] = useState(false);
-  const [expanded, setExpanded] = useState<string | null>(null);
+  const [expanded, setExpanded] = useViewState<string | null>("board.expanded", null);
   const [replies, setReplies] = useState<Record<string, Reply[]>>({});
   const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
   const [form, setForm] = useState({ kind: "question" as Kind, title: "", body: "", city: "" });
@@ -58,8 +60,10 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [error, setError] = useState("");
   const limit = fullPage ? 50 : 3;
+  const postRequest = useRef(0);
 
   const loadPosts = useCallback(async (search: string, selectedKind: Kind | "all") => {
+    const sequence = ++postRequest.current;
     setLoading(true);
     const params = new URLSearchParams({ limit: String(limit) });
     if (search.trim()) params.set("q", search.trim());
@@ -67,15 +71,18 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
     try {
       const response = await fetch(`/api/community-posts?${params}`);
       const payload = await response.json();
-      setPosts(response.ok ? payload.posts ?? [] : []);
+      if (sequence === postRequest.current) {
+        if (response.ok) setPosts(payload.posts ?? []);
+        else setError(t("boardError"));
+      }
     } catch {
-      setPosts([]);
+      if (sequence === postRequest.current) setError(t("boardError"));
     } finally {
-      setLoading(false);
+      if (sequence === postRequest.current) setLoading(false);
     }
-  }, [limit]);
+  }, [limit, t]);
 
-  useEffect(() => { void loadPosts("", "all"); }, [loadPosts]);
+  useEffect(() => { if (!fullPage) void loadPosts("", "all"); }, [fullPage, loadPosts]);
 
   useEffect(() => {
     if (!fullPage) return;
@@ -179,7 +186,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
         </div>}
 
         {error && <p role="alert" className="relative mb-4 rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-200">{error}</p>}
-        {loading ? <div className="relative rounded-xl border border-border bg-bg-primary/40 px-4 py-8 text-center text-sm text-text-muted">{t("boardLoading")}</div> : posts.length ? <div className={`relative grid gap-2.5 sm:gap-3 ${fullPage ? "md:grid-cols-2" : "sm:grid-cols-2 xl:grid-cols-3"}`}>
+        {loading && !posts.length ? <div className="relative rounded-xl border border-border bg-bg-primary/40 px-4 py-8 text-center text-sm text-text-muted">{t("boardLoading")}</div> : posts.length ? <div className={`relative grid gap-2.5 sm:gap-3 ${fullPage ? "md:grid-cols-2" : "sm:grid-cols-2 xl:grid-cols-3"}`}>
           {posts.map((post, index) => <article id={post.id} key={post.id} className={`relative min-w-0 overflow-hidden rounded-2xl border p-3.5 text-text-primary shadow-[0_12px_30px_rgba(0,0,0,0.26)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(0,0,0,0.38)] sm:p-5 ${KIND_CARD_STYLE[post.kind].card} ${!fullPage && index >= 2 ? "hidden sm:block" : ""}`}>
             <span aria-hidden="true" className={`absolute inset-y-0 left-0 w-1 bg-gradient-to-b ${KIND_CARD_STYLE[post.kind].accent}`} />
             <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2 sm:mb-3.5">

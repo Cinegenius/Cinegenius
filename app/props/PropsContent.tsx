@@ -1,4 +1,6 @@
 "use client";
+
+import { useViewState } from "@/lib/use-view-state";
 import { listingPriceLabel } from "@/lib/listing-price";
 
 
@@ -210,12 +212,12 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const { user } = useUser();
   const { isSignedIn } = useAuth();
 
-  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
-  const [selectedDept, setSelectedDept] = useState<string | null>(() => searchParams.get("dept") ?? null);
-  const [rentalTypeFilter, setRentalTypeFilter] = useState<"alle" | "miete" | "kauf">("alle");
-  const [sortKey, setSortKey] = useState("featured");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [pagination, setPagination] = useState({ filterKey: "", visibleCount: PAGE_SIZE });
+  const [query, setQuery] = useViewState("marketplace.query", () => searchParams.get("q") ?? "");
+  const [selectedDept, setSelectedDept] = useViewState<string | null>("marketplace.selectedDept", () => searchParams.get("dept") ?? null);
+  const [rentalTypeFilter, setRentalTypeFilter] = useViewState<"alle" | "miete" | "kauf">("marketplace.rentalTypeFilter", "alle");
+  const [sortKey, setSortKey] = useViewState("marketplace.sortKey", "featured");
+  const [viewMode, setViewMode] = useViewState<"grid" | "list">("marketplace.viewMode", "grid");
+  const [pagination, setPagination] = useViewState("marketplace.pagination", { filterKey: "", visibleCount: PAGE_SIZE });
   const [liveRatings, setLiveRatings] = useState<Record<string, { avg: number; count: number }>>({});
   const [myRatings, setMyRatings] = useState<Record<string, number>>({});
   const [eligible, setEligible] = useState<Set<string>>(new Set());

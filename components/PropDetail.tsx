@@ -4,6 +4,7 @@ import { listingPriceLabel, type ListingPriceMetadata } from "@/lib/listing-pric
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import ContextBackLink from "@/components/ContextBackLink";
 import {
   ArrowLeft, Star, CheckCircle,
   MapPin, Package, Truck, Pencil,
@@ -95,9 +96,9 @@ export default function PropDetail({ prop }: { prop: Prop }) {
   return (
     <div className="pt-16 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/props" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors mb-6">
+        <ContextBackLink href="/props" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors mb-6">
           <ArrowLeft size={14} /> Zurück zu Requisiten & Verleih
-        </Link>
+        </ContextBackLink>
 
         <ListingPhotoGallery images={images} title={prop.title} label="Artikelgalerie" focalPoint={prop.focalPoint} />
 

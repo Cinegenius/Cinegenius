@@ -1,5 +1,7 @@
 "use client";
 
+import { useViewState } from "@/lib/use-view-state";
+
 import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -287,19 +289,19 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
 
   const allJobs = useMemo(() => serverJobs, [serverJobs]);
 
-  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
-  const [selectedDeptId, setSelectedDeptId] = useState<string | null>(() => normalizeGripDepartmentId(searchParams.get("dept")));
-  const [selectedRoleId, setSelectedRoleId] = useState<string | null>(() => normalizeGripRoleId(searchParams.get("role")));
-  const [activePanelDept, setActivePanelDept] = useState(FILM_DEPARTMENTS[0].id);
+  const [query, setQuery] = useViewState("jobs.query", () => searchParams.get("q") ?? "");
+  const [selectedDeptId, setSelectedDeptId] = useViewState<string | null>("jobs.selectedDeptId", () => normalizeGripDepartmentId(searchParams.get("dept")));
+  const [selectedRoleId, setSelectedRoleId] = useViewState<string | null>("jobs.selectedRoleId", () => normalizeGripRoleId(searchParams.get("role")));
+  const [activePanelDept, setActivePanelDept] = useViewState("jobs.activePanelDept", FILM_DEPARTMENTS[0].id);
   const [panelOpen, setPanelOpen] = useState(false);
-  const [activeType, setActiveType] = useState(() => searchParams.get("type") ?? "");
-  const [urgentOnly, setUrgentOnly] = useState(() => searchParams.get("urgent") === "1");
-  const [payTypeFilter, setPayTypeFilter] = useState(() => searchParams.get("pay") ?? "");
-  const [jobTypeFilter, setJobTypeFilter] = useState<"alle" | "freelance" | "festanstellung" | "praktikum">("alle");
-  const [cityFilter, setCityFilter] = useState(() => searchParams.get("city") ?? "");
-  const [countryFilter, setCountryFilter] = useState(() => searchParams.get("country") ?? "");
-  const [sortKey, setSortKey] = useState(() => searchParams.get("sort") ?? "newest");
-  const [pagination, setPagination] = useState({ filterKey: "", visibleCount: PAGE_SIZE });
+  const [activeType, setActiveType] = useViewState("jobs.activeType", () => searchParams.get("type") ?? "");
+  const [urgentOnly, setUrgentOnly] = useViewState("jobs.urgentOnly", () => searchParams.get("urgent") === "1");
+  const [payTypeFilter, setPayTypeFilter] = useViewState("jobs.payTypeFilter", () => searchParams.get("pay") ?? "");
+  const [jobTypeFilter, setJobTypeFilter] = useViewState<"alle" | "freelance" | "festanstellung" | "praktikum">("jobs.jobTypeFilter", "alle");
+  const [cityFilter, setCityFilter] = useViewState("jobs.cityFilter", () => searchParams.get("city") ?? "");
+  const [countryFilter, setCountryFilter] = useViewState("jobs.countryFilter", () => searchParams.get("country") ?? "");
+  const [sortKey, setSortKey] = useViewState("jobs.sortKey", () => searchParams.get("sort") ?? "newest");
+  const [pagination, setPagination] = useViewState("jobs.pagination", { filterKey: "", visibleCount: PAGE_SIZE });
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

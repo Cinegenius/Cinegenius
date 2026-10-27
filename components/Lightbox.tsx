@@ -38,13 +38,16 @@ export default function Lightbox({
 
   useEffect(() => {
     document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [handleKey]);
+
+  useEffect(() => {
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
-      document.removeEventListener("keydown", handleKey);
       document.body.style.overflow = previousOverflow;
     };
-  }, [handleKey]);
+  }, []);
 
   const handleTouchStart = (event: ReactTouchEvent) => {
     touchStartX.current = event.touches[0]?.clientX ?? null;

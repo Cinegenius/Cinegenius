@@ -29,7 +29,11 @@ export default function ListingPhotoGallery({
   focalPoint,
 }: ListingPhotoGalleryProps) {
   const images = [...new Set(rawImages.filter((url) => typeof url === "string").map((url) => url.trim()).filter(Boolean))];
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeImage, setActiveImage] = useState<string | null>(null);
+  const activeIndex = Math.max(0, images.indexOf(activeImage ?? images[0]));
+  const setActiveIndex = (next: number | ((index: number) => number)) =>
+    setActiveImage(current => images[typeof next === "function"
+      ? next(Math.max(0, images.indexOf(current ?? images[0]))) : next] ?? null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
   const touchStartX = useRef<number | null>(null);
@@ -134,7 +138,7 @@ export default function ListingPhotoGallery({
             <div className={`col-span-2 row-span-2 hidden min-h-0 min-w-0 gap-2 sm:grid ${thumbnailGridClass}`}>
               {preview.thumbnails.map(({ url, index }, thumbnailIndex) => (
                 <button
-                  key={`${url}-${index}`}
+                  key={url}
                   type="button"
                   aria-label={`Foto ${index + 1} vergrößern`}
                   className={`group relative min-h-0 min-w-0 overflow-hidden rounded-lg bg-bg-secondary ${preview.thumbnails.length === 3 && thumbnailIndex === 2 ? "col-span-2" : ""}`}
@@ -165,7 +169,7 @@ export default function ListingPhotoGallery({
           <div className="mt-2 flex min-w-0 gap-2 overflow-x-auto pb-1 sm:hidden" aria-label={label}>
             {preview.thumbnails.map(({ url, index }) => (
               <button
-                key={`${url}-${index}`}
+                key={url}
                 type="button"
                 aria-label={`Foto ${index + 1} auswählen`}
                 aria-pressed={safeActiveIndex === index}

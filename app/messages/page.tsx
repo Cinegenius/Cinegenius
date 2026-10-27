@@ -8,6 +8,7 @@ import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { Send, ArrowLeft, MessageSquare, Loader2, User, UserPlus, Check, X, Users, Pencil, UserMinus, Plus, Trash2 } from "lucide-react";
 import { Suspense } from "react";
+import { useTranslations } from "next-intl";
 import { applyReadReceiptTimestamps, incomingUnreadMessageIds } from "@/lib/message-read-state";
 import { notifyMessagesRead, subscribeToMessageReads } from "@/lib/message-read-sync";
 import { mergeMessagesById } from "@/lib/conversation-logic";
@@ -65,15 +66,35 @@ function formatTime(iso: string) {
 }
 
 function MessagesContent() {
+  const navigationText = useTranslations("navigationStability");
+  const companyText = useTranslations("companyMessages");
   const { user } = useUser();
   const searchParams = useSearchParams();
   const toParam = searchParams.get("to");
   const convParam = searchParams.get("conv");
+  const requestedCompanySlug = toParam ? searchParams.get("company_slug")?.slice(0, 200) : null;
+  const [companyContact, setCompanyContact] = useState<{ name: string; slug: string; recipient: string } | null>(null);
+  const verifiedCompany = companyContact?.recipient === toParam && companyContact?.slug === requestedCompanySlug ? companyContact : null;
+  const companyLabel = verifiedCompany?.name;
+  const companySlug = verifiedCompany?.slug;
+
+  useEffect(() => {
+    if (!toParam || !requestedCompanySlug || !user?.id) return;
+    const controller = new AbortController();
+    const query = new URLSearchParams({ slug: requestedCompanySlug, recipient: toParam });
+    fetch(`/api/companies/contact-context?${query}`, { signal: controller.signal, cache: "no-store" })
+      .then(async response => response.ok ? response.json() : { company: null })
+      .then(({ company }) => { if (!controller.signal.aborted) setCompanyContact(company ? { ...company, recipient: toParam } : null); })
+      .catch(() => { if (!controller.signal.aborted) setCompanyContact(null); });
+    return () => controller.abort();
+  }, [toParam, requestedCompanySlug, user?.id]);
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState("");
+  const [newMessagesAvailable, setNewMessagesAvailable] = useState(false);
+  const drafts = useRef(new Map<string, string>());
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [newConvRecipient, setNewConvRecipient] = useState<string | null>(toParam);
@@ -117,11 +138,18 @@ function MessagesContent() {
   const deletePendingRef = useRef(false);
   const hiddenMessageIds = useRef(new Set<string>());
   const messageRequestSequence = useRef(0);
+  const conversationRequestSequence = useRef(0);
   const currentUserRef = useRef(user?.id);
   currentUserRef.current = user?.id;
 
   // Mobile: true = zeige Chat, false = zeige Liste
   const showChat = !!(activeId || newConvRecipient);
+
+  useEffect(() => {
+    setText(drafts.current.get(activeId ?? newConvRecipient ?? "") ?? "");
+    setNewMessagesAvailable(false);
+    atBottomRef.current = true;
+  }, [activeId, newConvRecipient]);
 
   // Keep the conversation fitted to the visible iOS viewport when the keyboard opens.
   useEffect(() => {
@@ -158,14 +186,15 @@ function MessagesContent() {
   const loadConversations = useCallback(async () => {
     const owner = currentUserRef.current;
     if (!owner) return;
+    const sequence = ++conversationRequestSequence.current;
     try {
       const res = await fetch("/api/conversations", { cache: "no-store" });
       if (!res.ok) throw new Error("fetch failed");
       const { data } = await res.json();
-      if (currentUserRef.current !== owner) return;
+      if (currentUserRef.current !== owner || sequence !== conversationRequestSequence.current) return;
       setConversations(Array.isArray(data) ? data as Conversation[] : []);
     } catch { /* silent — UI shows empty state */ } finally {
-      if (currentUserRef.current === owner) setLoading(false);
+      if (currentUserRef.current === owner && sequence === conversationRequestSequence.current) setLoading(false);
     }
   }, []);
 
@@ -200,7 +229,7 @@ function MessagesContent() {
     setConversations([]); setContacts([]); setFriendRequests([]); setMessages([]);
     setActiveId(null); activeIdRef.current = null; messagesRef.current = [];
     setNewConvRecipient(toParam); setRecipientName(""); setLoadingRecipient(Boolean(toParam));
-    hiddenMessageIds.current.clear(); setMessageNotice(""); setText("");
+    hiddenMessageIds.current.clear(); drafts.current.clear(); setMessageNotice(""); setText(""); setNewMessagesAvailable(false);
     messageRequestSequence.current += 1;
     setSendError(""); setContactSearch(""); setGroupModalMode(null);
     setDismissedIds(new Set());
@@ -218,12 +247,12 @@ function MessagesContent() {
       .then(r => r.json())
       .then(({ profile }) => {
         if (controller.signal.aborted) return;
-        setRecipientName(profile?.display_name ?? "Unbekannt");
+        setRecipientName(profile?.display_name ?? companyLabel ?? "Unbekannt");
         setLoadingRecipient(false);
       })
       .catch(() => { if (!controller.signal.aborted) setLoadingRecipient(false); });
     return () => controller.abort();
-  }, [toParam, user?.id]);
+  }, [toParam, user?.id, companyLabel]);
 
   useEffect(() => {
     if (!toParam) {
@@ -297,7 +326,9 @@ function MessagesContent() {
       const { messages: msgs, hasOlder, conversation } = await res.json();
       const snapshot = Array.isArray(msgs) ? msgs as Message[] : [];
       if (currentUserRef.current !== owner || activeIdRef.current !== convId || (requestSequence !== null && requestSequence !== messageRequestSequence.current)) return;
-      setHasOlderMessages(Boolean(hasOlder));
+      const alreadyLoadedOlder = snapshot[0] && messagesRef.current[0]
+        && messagesRef.current[0].created_at < snapshot[0].created_at;
+      if (options.before || !alreadyLoadedOlder) setHasOlderMessages(Boolean(hasOlder));
       const currentIds = new Set(messagesRef.current.map((message) => message.id));
       const hasNewVisibleMessage = snapshot.some((message) => !currentIds.has(message.id));
       setMessages((current) => mergeVisibleMessagePage(current, snapshot, hiddenMessageIds.current, !options.before));
@@ -326,10 +357,16 @@ function MessagesContent() {
       if (olderViewport) {
         window.setTimeout(() => {
           const nextViewport = messagesViewportRef.current;
-          if (nextViewport) nextViewport.scrollTop = previousScrollTop + (nextViewport.scrollHeight - previousScrollHeight);
+          if (nextViewport && currentUserRef.current === owner && activeIdRef.current === convId) nextViewport.scrollTop = previousScrollTop + (nextViewport.scrollHeight - previousScrollHeight);
         }, 0);
       } else if (options.scroll || (atBottomRef.current && hasNewVisibleMessage)) {
-        window.setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: options.scroll ? "auto" : "smooth" }), 50);
+        window.setTimeout(() => {
+          if (currentUserRef.current !== owner || activeIdRef.current !== convId || (!options.scroll && !atBottomRef.current)) return;
+          const viewport = messagesViewportRef.current;
+          viewport?.scrollTo({ top: viewport.scrollHeight, behavior: options.scroll ? "instant" : "smooth" });
+        }, 50);
+      } else if (hasNewVisibleMessage && !options.before) {
+        setNewMessagesAvailable(true);
       }
     } catch { /* silent */ }
   }, [user?.id]);
@@ -362,6 +399,9 @@ function MessagesContent() {
     setMessages([]);
     setHasOlderMessages(false);
     setNewConvRecipient(null);
+    atBottomRef.current = true;
+    setNewMessagesAvailable(false);
+    setText(drafts.current.get(conv.id) ?? "");
     setSendError(""); setMessageNotice("");
   }
 
@@ -582,6 +622,10 @@ function MessagesContent() {
 
   async function sendMessage() {
     if (!text.trim() || sending) return;
+    const owner = currentUserRef.current;
+    const conversationAtSend = activeId;
+    const recipientAtSend = newConvRecipient;
+    const sentText = text;
     setSending(true);
     setSendError("");
 
@@ -594,6 +638,9 @@ function MessagesContent() {
         });
         const { conversationId, error } = await res.json().catch(() => ({}));
         if (!res.ok || error || typeof conversationId !== "string") throw new Error(error ?? "Nachricht konnte nicht gesendet werden.");
+        if (currentUserRef.current !== owner) return;
+        if (recipientAtSend && drafts.current.get(recipientAtSend) === sentText) drafts.current.delete(recipientAtSend);
+        if (activeIdRef.current !== conversationAtSend) { await loadConversations(); return; }
         setText("");
         setNewConvRecipient(null);
         await loadConversations();
@@ -609,11 +656,18 @@ function MessagesContent() {
         });
         const { message, error } = await res.json().catch(() => ({}));
         if (!res.ok || error || !message?.id) throw new Error(error ?? "Nachricht konnte nicht bestätigt werden.");
+        if (currentUserRef.current !== owner) return;
+        if (conversationAtSend && drafts.current.get(conversationAtSend) === sentText) drafts.current.delete(conversationAtSend);
+        if (activeIdRef.current !== conversationAtSend) { await loadConversations(); return; }
         messageRequestSequence.current += 1;
-        setText("");
+        setText(current => current === sentText ? "" : current);
         setMessages(prev => mergeMessagesById(prev, [message]));
         atBottomRef.current = true;
-        setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+        setTimeout(() => {
+          if (currentUserRef.current !== owner || activeIdRef.current !== conversationAtSend) return;
+          const viewport = messagesViewportRef.current;
+          viewport?.scrollTo({ top: viewport.scrollHeight, behavior: "smooth" });
+        }, 50);
       }
     } catch (e) {
       setSendError(e instanceof Error ? e.message : "Nachricht konnte nicht gesendet werden. Deine Eingabe ist erhalten.");
@@ -808,7 +862,7 @@ function MessagesContent() {
       {/* ── CHAT-BEREICH ── */}
       <div className={`
         ${showChat ? "flex" : "hidden sm:flex"}
-        flex-col flex-1 min-w-0 bg-bg-primary
+        relative flex-col flex-1 min-w-0 bg-bg-primary
       `}>
         {showChat ? (
           <>
@@ -862,11 +916,13 @@ function MessagesContent() {
             </div>
 
             {/* Nachrichten */}
+            {companyLabel && companySlug && <Link href={`/companies/${encodeURIComponent(companySlug)}`} className="shrink-0 border-b border-border px-4 py-2 text-xs text-gold">{companyText("context", { name: companyLabel })}</Link>}
             <div
               ref={messagesViewportRef}
               onScroll={(event) => {
                 const element = event.currentTarget;
                 atBottomRef.current = element.scrollHeight - element.scrollTop - element.clientHeight < 80;
+                if (atBottomRef.current) setNewMessagesAvailable(false);
               }}
               className="flex-1 min-h-0 min-w-0 overflow-y-auto overscroll-contain px-4 py-4 space-y-1"
             >
@@ -965,6 +1021,12 @@ function MessagesContent() {
               <div ref={bottomRef} />
             </div>
 
+            {newMessagesAvailable && <button type="button" onClick={() => {
+              const viewport = messagesViewportRef.current;
+              viewport?.scrollTo({ top: viewport.scrollHeight, behavior: "smooth" });
+              setNewMessagesAvailable(false);
+            }} className="absolute bottom-24 left-1/2 z-10 -translate-x-1/2 rounded-full border border-gold/40 bg-bg-secondary px-4 py-2 text-sm text-gold shadow-lg">{navigationText("newMessages")}</button>}
+
             {/* Eingabe */}
             <div className="px-4 py-3 border-t border-border shrink-0 safe-area-pb">
               {sendError && <p role="alert" className="text-xs text-red-400 mb-2">{sendError}</p>}
@@ -973,7 +1035,7 @@ function MessagesContent() {
                 <input
                   type="text"
                   value={text}
-                  onChange={e => setText(e.target.value)}
+                  onChange={e => { setText(e.target.value); const key = activeId ?? newConvRecipient; if (key) drafts.current.set(key, e.target.value); }}
                   onKeyDown={e => e.key === "Enter" && !e.shiftKey && sendMessage()}
                   placeholder="Nachricht schreiben…"
                   className="min-w-0 flex-1 bg-bg-elevated border border-border rounded-2xl px-4 py-3 text-base sm:text-sm focus:outline-none focus:border-gold transition-colors"

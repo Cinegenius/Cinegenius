@@ -4,12 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useGallerySelection } from "@/lib/use-gallery-selection";
 import {
   MapPin, Globe, Mail, Phone, CheckCircle,
   Package, Briefcase, Car, Home, Clapperboard, X,
   Pencil, Users, UserPlus, Clock, Check,
   Crown, ChevronRight, ExternalLink, MoreHorizontal,
-  Calendar, Scale, Globe2, Quote,
+  Calendar, Scale, Globe2, Quote, MessageSquare,
 } from "lucide-react";
 import { COMPANY_CATEGORY_BY_ID } from "@/lib/companyCategories";
 import { CATERING_COMPANY_CATEGORY, normalizeCateringCompanyDetails } from "@/lib/catering-taxonomy";
@@ -118,6 +120,7 @@ export default function CompanyDetail({
   initialIsOwner: boolean;
 }) {
   const { user, isLoaded } = useUser();
+  const messageText = useTranslations("companyMessages");
   const currentUserId = isLoaded ? user?.id ?? null : initialUserId;
   const searchParams = useSearchParams();
   const isWelcome = searchParams.get("welcome") === "1";
@@ -125,7 +128,7 @@ export default function CompanyDetail({
   const [companyPublished, setCompanyPublished] = useState(company.published !== false);
   const [publishingCompany, setPublishingCompany] = useState(false);
   const [publishError, setPublishError] = useState("");
-  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+  const [lightboxIdx, setLightboxIdx] = useGallerySelection(company.portfolio_images);
 
   const isOwner = initialIsOwner && !!initialUserId && currentUserId === initialUserId;
   const cats = company.categories.map((id) => COMPANY_CATEGORY_BY_ID[id]).filter(Boolean);
@@ -381,6 +384,10 @@ export default function CompanyDetail({
                 <Mail size={13} /> E-Mail schreiben
               </a>
             )}
+            {!isOwner && <Link href={`/companies/${encodeURIComponent(company.slug)}/message`}
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-border bg-bg-elevated px-4 py-2 text-xs text-text-secondary transition-colors hover:border-gold/40 hover:text-gold">
+              <MessageSquare size={14} /> {currentUserId ? messageText("send") : messageText("signIn")}
+            </Link>}
             {company.phone && (
               <a href={`tel:${company.phone}`}
                 className="inline-flex items-center gap-1.5 px-4 py-2 border border-border bg-bg-elevated rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
@@ -618,7 +625,7 @@ export default function CompanyDetail({
                 <SectionLabel>Portfolio</SectionLabel>
                 <div className="grid grid-cols-3 gap-2">
                   {company.portfolio_images.slice(0, 9).map((url, i) => (
-                    <button key={i} onClick={() => setLightboxIdx(i)}
+                    <button key={url} onClick={() => setLightboxIdx(i)}
                       className="aspect-square rounded-xl overflow-hidden bg-bg-elevated hover:opacity-85 transition-opacity relative group">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={url} alt="" className="w-full h-full object-cover" />

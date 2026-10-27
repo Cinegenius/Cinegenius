@@ -1279,5 +1279,15 @@
   },
   "legalLanguage": {
     "original": "Estos documentos legales están disponibles en su original alemán. Aún no hay una traducción revisada en el idioma seleccionado."
+  },
+  "navigationStability": {
+    "newMessages": "Mostrar mensajes nuevos"
+  },
+  "companyMessages": {
+    "send": "Enviar mensaje",
+    "signIn": "Inicia sesión para enviar un mensaje",
+    "unavailable": "No se ha podido cargar la empresa.",
+    "noContact": "Esta empresa todavía no tiene una cuenta responsable para recibir mensajes.",
+    "context": "Contacto de la empresa: {name}"
   }
 }

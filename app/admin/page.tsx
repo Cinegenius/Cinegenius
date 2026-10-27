@@ -1,5 +1,8 @@
 "use client";
 
+import { useAuth } from "@clerk/nextjs";
+import { useViewState } from "@/lib/use-view-state";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import {
@@ -146,8 +149,8 @@ function ListingProviderControls({ listing, onSaved, onError }: { listing: Listi
   </div>;
 }
 
-export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<TabId>("overview");
+function AdminContent() {
+  const [activeTab, setActiveTab] = useViewState<TabId>("admin.activeTab", "overview");
   const [refreshKey, setRefreshKey] = useState(0);
   const [overview, setOverview] = useState<Overview | null>(null);
   const [overviewLoading, setOverviewLoading] = useState(true);
@@ -156,17 +159,17 @@ export default function AdminPage() {
 
   const [listings, setListings] = useState<Listing[]>([]);
   const [listingsTotal, setListingsTotal] = useState(0);
-  const [listingsPage, setListingsPage] = useState(1);
-  const [listingsSearch, setListingsSearch] = useState("");
-  const [listingsType, setListingsType] = useState("all");
-  const [listingsStatus, setListingsStatus] = useState("all");
+  const [listingsPage, setListingsPage] = useViewState("admin.listingsPage", 1);
+  const [listingsSearch, setListingsSearch] = useViewState("admin.listingsSearch", "");
+  const [listingsType, setListingsType] = useViewState("admin.listingsType", "all");
+  const [listingsStatus, setListingsStatus] = useViewState("admin.listingsStatus", "all");
   const [listingsLoading, setListingsLoading] = useState(false);
   const [listingsError, setListingsError] = useState("");
   const [listingActing, setListingActing] = useState<string | null>(null);
 
   const [reports, setReports] = useState<Report[]>([]);
-  const [reportsStatus, setReportsStatus] = useState("pending");
-  const [reportsPage, setReportsPage] = useState(1);
+  const [reportsStatus, setReportsStatus] = useViewState("admin.reportsStatus", "pending");
+  const [reportsPage, setReportsPage] = useViewState("admin.reportsPage", 1);
   const [reportsTotal, setReportsTotal] = useState(0);
   const [reportsLoading, setReportsLoading] = useState(false);
   const [reportsError, setReportsError] = useState("");
@@ -175,39 +178,39 @@ export default function AdminPage() {
   const [verificationsLoading, setVerificationsLoading] = useState(false);
   const [verificationsError, setVerificationsError] = useState("");
   const [verificationsTotal, setVerificationsTotal] = useState(0);
-  const [verificationsPage, setVerificationsPage] = useState(1);
+  const [verificationsPage, setVerificationsPage] = useViewState("admin.verificationsPage", 1);
   const [verificationActing, setVerificationActing] = useState<string | null>(null);
 
   const [profiles, setProfiles] = useState<AdminProfile[]>([]);
   const [profilesTotal, setProfilesTotal] = useState(0);
-  const [profilesPage, setProfilesPage] = useState(1);
-  const [profilesSearch, setProfilesSearch] = useState("");
+  const [profilesPage, setProfilesPage] = useViewState("admin.profilesPage", 1);
+  const [profilesSearch, setProfilesSearch] = useViewState("admin.profilesSearch", "");
   const [profilesLoading, setProfilesLoading] = useState(false);
   const [profilesError, setProfilesError] = useState("");
   const [profileActing, setProfileActing] = useState<string | null>(null);
 
   const [companies, setCompanies] = useState<Company[]>([]);
   const [companiesTotal, setCompaniesTotal] = useState(0);
-  const [companiesPage, setCompaniesPage] = useState(1);
-  const [companiesSearch, setCompaniesSearch] = useState("");
+  const [companiesPage, setCompaniesPage] = useViewState("admin.companiesPage", 1);
+  const [companiesSearch, setCompaniesSearch] = useViewState("admin.companiesSearch", "");
   const [companiesLoading, setCompaniesLoading] = useState(false);
   const [companiesError, setCompaniesError] = useState("");
   const [clarifications, setClarifications] = useState<Clarification[]>([]);
   const [clarificationsTotal, setClarificationsTotal] = useState(0);
-  const [clarificationsPage, setClarificationsPage] = useState(1);
+  const [clarificationsPage, setClarificationsPage] = useViewState("admin.clarificationsPage", 1);
   const [clarificationsError, setClarificationsError] = useState("");
 
   const [projects, setProjects] = useState<AdminProject[]>([]);
   const [projectsTotal, setProjectsTotal] = useState(0);
-  const [projectsPage, setProjectsPage] = useState(1);
-  const [projectsSearch, setProjectsSearch] = useState("");
+  const [projectsPage, setProjectsPage] = useViewState("admin.projectsPage", 1);
+  const [projectsSearch, setProjectsSearch] = useViewState("admin.projectsSearch", "");
   const [projectsLoading, setProjectsLoading] = useState(false);
   const [projectsError, setProjectsError] = useState("");
   const [projectActing, setProjectActing] = useState<string | null>(null);
-  const [expandedProject, setExpandedProject] = useState<string | null>(null);
+  const [expandedProject, setExpandedProject] = useViewState<string | null>("admin.expandedProject", null);
   const [credits, setCredits] = useState<Record<string, AdminCredit[]>>({});
   const [creditsLoading, setCreditsLoading] = useState<string | null>(null);
-  const [creditsPage, setCreditsPage] = useState(1);
+  const [creditsPage, setCreditsPage] = useViewState("admin.creditsPage", 1);
   const [creditsTotal, setCreditsTotal] = useState(0);
   const [editingCredit, setEditingCredit] = useState<string | null>(null);
   const [editingRole, setEditingRole] = useState("");
@@ -215,14 +218,14 @@ export default function AdminPage() {
 
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [bookingsTotal, setBookingsTotal] = useState(0);
-  const [bookingsPage, setBookingsPage] = useState(1);
-  const [bookingsStatus, setBookingsStatus] = useState("all");
+  const [bookingsPage, setBookingsPage] = useViewState("admin.bookingsPage", 1);
+  const [bookingsStatus, setBookingsStatus] = useViewState("admin.bookingsStatus", "all");
   const [bookingsLoading, setBookingsLoading] = useState(false);
   const [bookingsError, setBookingsError] = useState("");
 
   const [mediaEntities, setMediaEntities] = useState<MediaEntity[]>([]);
-  const [mediaType, setMediaType] = useState("profiles");
-  const [mediaPage, setMediaPage] = useState(1);
+  const [mediaType, setMediaType] = useViewState("admin.mediaType", "profiles");
+  const [mediaPage, setMediaPage] = useViewState("admin.mediaPage", 1);
   const [mediaTotal, setMediaTotal] = useState(0);
   const [mediaLoading, setMediaLoading] = useState(false);
   const [mediaError, setMediaError] = useState("");
@@ -230,63 +233,74 @@ export default function AdminPage() {
   const [mediaChecking, setMediaChecking] = useState<string | null>(null);
 
   const [auditEntries, setAuditEntries] = useState<AuditEntry[]>([]);
-  const [auditPage, setAuditPage] = useState(1);
+  const [auditPage, setAuditPage] = useViewState("admin.auditPage", 1);
   const [auditTotal, setAuditTotal] = useState(0);
   const [auditLoading, setAuditLoading] = useState(false);
   const [auditError, setAuditError] = useState("");
 
+  const overviewRequest = useRef(0);
   const loadOverview = useCallback(() => {
+    const sequence = ++overviewRequest.current;
     setOverviewLoading(true);
     setOverviewError("");
     fetchJson<Overview>("/api/admin/overview")
-      .then(setOverview)
-      .catch((error: Error) => setOverviewError(error.message))
-      .finally(() => setOverviewLoading(false));
+      .then(data => { if (sequence === overviewRequest.current) setOverview(data); })
+      .catch((error: Error) => { if (sequence === overviewRequest.current) setOverviewError(error.message); })
+      .finally(() => { if (sequence === overviewRequest.current) setOverviewLoading(false); });
   }, []);
 
   useEffect(() => { loadOverview(); }, [loadOverview, refreshKey]);
 
   useEffect(() => {
     if (activeTab !== "listings") return;
+    let active = true;
     setListingsLoading(true); setListingsError("");
     const params = new URLSearchParams({ page: String(listingsPage), type: listingsType, status: listingsStatus });
     if (listingsSearch.trim()) params.set("search", listingsSearch.trim());
     fetchJson<{ listings: Listing[]; total: number }>(`/api/admin/listings?${params}`)
-      .then((data) => { setListings(data.listings); setListingsTotal(data.total); })
-      .catch((error: Error) => setListingsError(error.message))
-      .finally(() => setListingsLoading(false));
+      .then((data) => { if (active) { setListings(data.listings); setListingsTotal(data.total); } })
+      .catch((error: Error) => { if (active) setListingsError(error.message); })
+      .finally(() => { if (active) setListingsLoading(false); });
+    return () => { active = false; };
   }, [activeTab, listingsPage, listingsSearch, listingsType, listingsStatus, refreshKey]);
 
   useEffect(() => {
+    let active = true;
     if (activeTab !== "reports") return;
     setReportsLoading(true); setReportsError("");
     fetchJson<{ reports: Report[]; total: number }>(`/api/reports?status=${reportsStatus}&page=${reportsPage}`)
-      .then((data) => { setReports(data.reports); setReportsTotal(data.total); })
-      .catch((error: Error) => setReportsError(error.message))
-      .finally(() => setReportsLoading(false));
+      .then((data) => { if (!active) return;  setReports(data.reports); setReportsTotal(data.total); })
+      .catch((error: Error) => { if (active) setReportsError(error.message); })
+      .finally(() => { if (active) setReportsLoading(false); });
+      return () => { active = false; };
   }, [activeTab, reportsPage, reportsStatus, refreshKey]);
 
   useEffect(() => {
+    let active = true;
     if (activeTab !== "verifications") return;
     setVerificationsLoading(true); setVerificationsError("");
     fetchJson<{ data: Verification[]; total: number }>(`/api/verification-requests?page=${verificationsPage}`)
-      .then((data) => { setVerifications(data.data); setVerificationsTotal(data.total); })
-      .catch((error: Error) => setVerificationsError(error.message))
-      .finally(() => setVerificationsLoading(false));
+      .then((data) => { if (!active) return;  setVerifications(data.data); setVerificationsTotal(data.total); })
+      .catch((error: Error) => { if (active) setVerificationsError(error.message); })
+      .finally(() => { if (active) setVerificationsLoading(false); });
+      return () => { active = false; };
   }, [activeTab, verificationsPage, refreshKey]);
 
   useEffect(() => {
+    let active = true;
     if (activeTab !== "users") return;
     setProfilesLoading(true); setProfilesError("");
     const params = new URLSearchParams({ page: String(profilesPage) });
     if (profilesSearch.trim()) params.set("search", profilesSearch.trim());
     fetchJson<{ users: AdminProfile[]; total: number }>(`/api/admin/users?${params}`)
-      .then((data) => { setProfiles(data.users); setProfilesTotal(data.total); })
-      .catch((error: Error) => setProfilesError(error.message))
-      .finally(() => setProfilesLoading(false));
+      .then((data) => { if (!active) return;  setProfiles(data.users); setProfilesTotal(data.total); })
+      .catch((error: Error) => { if (active) setProfilesError(error.message); })
+      .finally(() => { if (active) setProfilesLoading(false); });
+      return () => { active = false; };
   }, [activeTab, profilesPage, profilesSearch, refreshKey]);
 
   useEffect(() => {
+    let active = true;
     if (activeTab !== "companies") return;
     setCompaniesLoading(true); setCompaniesError(""); setClarificationsError("");
     const companyParams = new URLSearchParams({ page: String(companiesPage) });
@@ -294,50 +308,59 @@ export default function AdminPage() {
     Promise.allSettled([
       fetchJson<{ companies: Company[]; total: number }>(`/api/admin/companies?${companyParams}`),
       fetchJson<{ requests: Clarification[]; total: number }>(`/api/admin/company-clarifications?page=${clarificationsPage}`),
-    ]).then(([companyResult, clarificationResult]) => {
+    ]).then(([companyResult, clarificationResult]) => { if (!active) return;
       if (companyResult.status === "fulfilled") { setCompanies(companyResult.value.companies); setCompaniesTotal(companyResult.value.total); }
       else setCompaniesError(companyResult.reason instanceof Error ? companyResult.reason.message : "Firmen konnten nicht geladen werden.");
       if (clarificationResult.status === "fulfilled") { setClarifications(clarificationResult.value.requests); setClarificationsTotal(clarificationResult.value.total); }
       else setClarificationsError(clarificationResult.reason instanceof Error ? clarificationResult.reason.message : "Klärungsfälle konnten nicht geladen werden.");
-    }).finally(() => setCompaniesLoading(false));
+    }).finally(() => { if (active) setCompaniesLoading(false); });
+      return () => { active = false; };
   }, [activeTab, companiesPage, companiesSearch, clarificationsPage, refreshKey]);
 
   useEffect(() => {
+    let active = true;
     if (activeTab !== "projects") return;
     setProjectsLoading(true); setProjectsError("");
     const params = new URLSearchParams({ page: String(projectsPage) });
     if (projectsSearch.trim()) params.set("search", projectsSearch.trim());
     fetchJson<{ projects: AdminProject[]; total: number }>(`/api/admin/projects?${params}`)
-      .then((data) => { setProjects(data.projects); setProjectsTotal(data.total); })
-      .catch((error: Error) => setProjectsError(error.message))
-      .finally(() => setProjectsLoading(false));
+      .then((data) => { if (!active) return;  setProjects(data.projects); setProjectsTotal(data.total); })
+      .catch((error: Error) => { if (active) setProjectsError(error.message); })
+      .finally(() => { if (active) setProjectsLoading(false); });
+      return () => { active = false; };
   }, [activeTab, projectsPage, projectsSearch, refreshKey]);
 
   useEffect(() => {
+    let active = true;
     if (activeTab !== "bookings") return;
     setBookingsLoading(true); setBookingsError("");
     fetchJson<{ bookings: Booking[]; total: number }>(`/api/admin/bookings?page=${bookingsPage}&status=${bookingsStatus}`)
-      .then((data) => { setBookings(data.bookings); setBookingsTotal(data.total); })
-      .catch((error: Error) => setBookingsError(error.message))
-      .finally(() => setBookingsLoading(false));
+      .then((data) => { if (!active) return;  setBookings(data.bookings); setBookingsTotal(data.total); })
+      .catch((error: Error) => { if (active) setBookingsError(error.message); })
+      .finally(() => { if (active) setBookingsLoading(false); });
+      return () => { active = false; };
   }, [activeTab, bookingsPage, bookingsStatus, refreshKey]);
 
   useEffect(() => {
+    let active = true;
     if (activeTab !== "media") return;
     setMediaLoading(true); setMediaError("");
     fetchJson<{ entities: MediaEntity[]; total: number }>(`/api/admin/media?type=${mediaType}&page=${mediaPage}`)
-      .then((data) => { setMediaEntities(data.entities); setMediaTotal(data.total); })
-      .catch((error: Error) => setMediaError(error.message))
-      .finally(() => setMediaLoading(false));
+      .then((data) => { if (!active) return;  setMediaEntities(data.entities); setMediaTotal(data.total); })
+      .catch((error: Error) => { if (active) setMediaError(error.message); })
+      .finally(() => { if (active) setMediaLoading(false); });
+      return () => { active = false; };
   }, [activeTab, mediaType, mediaPage, refreshKey]);
 
   useEffect(() => {
+    let active = true;
     if (activeTab !== "audit") return;
     setAuditLoading(true); setAuditError("");
     fetchJson<{ entries: AuditEntry[]; total: number }>(`/api/admin/audit?page=${auditPage}`)
-      .then((data) => { setAuditEntries(data.entries); setAuditTotal(data.total); })
-      .catch((error: Error) => setAuditError(error.message))
-      .finally(() => setAuditLoading(false));
+      .then((data) => { if (!active) return;  setAuditEntries(data.entries); setAuditTotal(data.total); })
+      .catch((error: Error) => { if (active) setAuditError(error.message); })
+      .finally(() => { if (active) setAuditLoading(false); });
+      return () => { active = false; };
   }, [activeTab, auditPage, refreshKey]);
 
   async function mutate(url: string, payload: Record<string, unknown>, method = "PATCH") {
@@ -512,14 +535,14 @@ export default function AdminPage() {
           {activeTab === "reports" && <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-text-muted">Meldungen über Profile, Inserate und Bewertungen. Private Nachrichten werden hier nicht durchsucht.</p><select value={reportsStatus} onChange={(e) => { setReportsStatus(e.target.value); setReportsPage(1); }} className="rounded-lg border border-border bg-bg-secondary px-3 py-2 text-sm text-text-primary"><option value="pending">Offen</option><option value="reviewed">Geprüft</option><option value="resolved">Abgeschlossen</option><option value="dismissed">Verworfen</option></select></div>
             {reportsError && <ErrorBox text={reportsError} onRetry={() => setRefreshKey((key) => key + 1)} />}
-            {reportsLoading ? <p className="py-10 text-center text-sm text-text-muted">Meldungen werden geladen…</p> : reports.length === 0 ? <Empty title="Keine Meldungen in diesem Status" /> : <div className="space-y-3">{reports.map((report) => <Panel key={report.id} className="p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h2 className="font-semibold text-text-primary">{report.target_name ?? `Ziel ${report.target_id}`}</h2><StatusBadge tone="warning">{reasonLabels[report.reason] ?? report.reason}</StatusBadge><StatusBadge>{report.target_type}</StatusBadge></div><p className="mt-1 text-xs text-text-muted">Gemeldet von {report.reporter_name ?? report.reporter_id} · {new Date(report.created_at).toLocaleString("de-DE")}</p>{report.target_excerpt && <p className="mt-3 rounded-lg border border-border bg-bg-elevated p-3 text-sm text-text-secondary">{report.target_excerpt}</p>}{report.details && <p className="mt-2 whitespace-pre-wrap break-words text-sm text-text-secondary">Zusatzinfo: {report.details}</p>}<p className="mt-2 break-all text-[11px] text-text-muted">Meldungs-ID: {report.id}</p></div>{report.target_href && <a href={report.target_href} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold"><Eye size={12} /> Inhalt öffnen</a>}</div>{reportsStatus === "pending" && <div className="mt-4 flex flex-wrap gap-2"><button onClick={() => changeReport(report, "reviewed")} className="rounded-lg border border-gold/30 px-3 py-2 text-xs font-semibold text-gold">Als geprüft markieren</button><button onClick={() => changeReport(report, "resolved")} className="rounded-lg border border-success/30 px-3 py-2 text-xs font-semibold text-success">Abschließen</button><button onClick={() => changeReport(report, "dismissed")} className="rounded-lg border border-border px-3 py-2 text-xs text-text-muted">Verwerfen</button></div>}</Panel>)}</div>}
+            {reportsLoading && !reports.length ? <p className="py-10 text-center text-sm text-text-muted">Meldungen werden geladen…</p> : reports.length === 0 ? <Empty title="Keine Meldungen in diesem Status" /> : <div className="space-y-3">{reports.map((report) => <Panel key={report.id} className="p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h2 className="font-semibold text-text-primary">{report.target_name ?? `Ziel ${report.target_id}`}</h2><StatusBadge tone="warning">{reasonLabels[report.reason] ?? report.reason}</StatusBadge><StatusBadge>{report.target_type}</StatusBadge></div><p className="mt-1 text-xs text-text-muted">Gemeldet von {report.reporter_name ?? report.reporter_id} · {new Date(report.created_at).toLocaleString("de-DE")}</p>{report.target_excerpt && <p className="mt-3 rounded-lg border border-border bg-bg-elevated p-3 text-sm text-text-secondary">{report.target_excerpt}</p>}{report.details && <p className="mt-2 whitespace-pre-wrap break-words text-sm text-text-secondary">Zusatzinfo: {report.details}</p>}<p className="mt-2 break-all text-[11px] text-text-muted">Meldungs-ID: {report.id}</p></div>{report.target_href && <a href={report.target_href} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold"><Eye size={12} /> Inhalt öffnen</a>}</div>{reportsStatus === "pending" && <div className="mt-4 flex flex-wrap gap-2"><button onClick={() => changeReport(report, "reviewed")} className="rounded-lg border border-gold/30 px-3 py-2 text-xs font-semibold text-gold">Als geprüft markieren</button><button onClick={() => changeReport(report, "resolved")} className="rounded-lg border border-success/30 px-3 py-2 text-xs font-semibold text-success">Abschließen</button><button onClick={() => changeReport(report, "dismissed")} className="rounded-lg border border-border px-3 py-2 text-xs text-text-muted">Verwerfen</button></div>}</Panel>)}</div>}
             <Pager page={reportsPage} total={reportsTotal} pageSize={50} onPage={setReportsPage} />
           </div>}
 
           {activeTab === "verifications" && <div className="space-y-4">
             <div className="rounded-xl border border-border bg-bg-elevated p-4 text-sm text-text-secondary">Nur eingereichte Prüfungen werden gezeigt. Entscheidungen erfordern eine Begründung und werden im Adminprotokoll festgehalten.</div>
             {verificationsError && <ErrorBox text={verificationsError} onRetry={() => setRefreshKey((key) => key + 1)} />}
-            {verificationsLoading ? <p className="py-10 text-center text-sm text-text-muted">Anfragen werden geladen…</p> : !verifications.length ? <Empty title="Keine offenen Verifizierungen" /> : <div className="space-y-2">{verifications.map((request) => <Panel key={request.id} className="flex flex-wrap items-center justify-between gap-3 p-4"><div><a href={`/profile/${request.user_id}`} target="_blank" rel="noreferrer" className="font-medium text-text-primary hover:text-gold">{request.display_name ?? request.user_id}</a><p className="mt-1 text-xs text-text-muted">Eingereicht {new Date(request.submitted_at).toLocaleString("de-DE")} · Clerk-ID {request.user_id}</p>{request.notes && <p className="mt-2 max-w-3xl whitespace-pre-wrap break-words text-sm text-text-secondary">{request.notes}</p>}</div><div className="flex gap-2"><button disabled={verificationActing === request.id} onClick={() => changeVerification(request, "approve")} className="rounded-lg border border-success/30 px-3 py-2 text-xs font-semibold text-success disabled:opacity-50">Genehmigen</button><button disabled={verificationActing === request.id} onClick={() => changeVerification(request, "reject")} className="rounded-lg border border-crimson/30 px-3 py-2 text-xs font-semibold text-crimson-light disabled:opacity-50">Ablehnen</button></div></Panel>)}</div>}
+            {verificationsLoading && !verifications.length ? <p className="py-10 text-center text-sm text-text-muted">Anfragen werden geladen…</p> : !verifications.length ? <Empty title="Keine offenen Verifizierungen" /> : <div className="space-y-2">{verifications.map((request) => <Panel key={request.id} className="flex flex-wrap items-center justify-between gap-3 p-4"><div><a href={`/profile/${request.user_id}`} target="_blank" rel="noreferrer" className="font-medium text-text-primary hover:text-gold">{request.display_name ?? request.user_id}</a><p className="mt-1 text-xs text-text-muted">Eingereicht {new Date(request.submitted_at).toLocaleString("de-DE")} · Clerk-ID {request.user_id}</p>{request.notes && <p className="mt-2 max-w-3xl whitespace-pre-wrap break-words text-sm text-text-secondary">{request.notes}</p>}</div><div className="flex gap-2"><button disabled={verificationActing === request.id} onClick={() => changeVerification(request, "approve")} className="rounded-lg border border-success/30 px-3 py-2 text-xs font-semibold text-success disabled:opacity-50">Genehmigen</button><button disabled={verificationActing === request.id} onClick={() => changeVerification(request, "reject")} className="rounded-lg border border-crimson/30 px-3 py-2 text-xs font-semibold text-crimson-light disabled:opacity-50">Ablehnen</button></div></Panel>)}</div>}
             <Pager page={verificationsPage} total={verificationsTotal} pageSize={50} onPage={setVerificationsPage} />
           </div>}
 
@@ -527,7 +550,7 @@ export default function AdminPage() {
             <div className="rounded-xl border border-border bg-bg-elevated p-4 text-sm text-text-secondary">Diese Liste enthält CineGenius-Profile und ihre Clerk-ID, nicht sämtliche Clerk-Konten. Verifizieren ändert nur das interne Profilkennzeichen; Konten sperren oder löschen wird hier nicht angeboten.</div>
             <div className="flex flex-wrap items-center gap-3"><div className="relative w-full max-w-md"><Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" /><input value={profilesSearch} onChange={(e) => { setProfilesSearch(e.target.value); setProfilesPage(1); }} placeholder="Name oder exakte Clerk-ID suchen…" className="w-full rounded-xl border border-border bg-bg-secondary py-2.5 pl-9 pr-3 text-sm text-text-primary placeholder:text-text-muted" /></div><span className="text-sm text-text-muted">{profilesTotal} Profile</span></div>
             {profilesError && <ErrorBox text={profilesError} onRetry={() => setRefreshKey((key) => key + 1)} />}
-            {profilesLoading ? <p className="py-10 text-center text-sm text-text-muted">Profile werden geladen…</p> : !profiles.length ? <Empty title="Keine Profile gefunden" /> : <div className="space-y-2">{profiles.map((profile) => <Panel key={profile.user_id} className="flex flex-wrap items-center gap-3 p-4">{profile.avatar_url ? <Image src={profile.avatar_url} alt="" width={40} height={40} unoptimized className="h-10 w-10 shrink-0 rounded-full border border-border object-cover" /> : <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-bg-elevated"><Users size={15} className="text-text-muted" /></div>}<div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="truncate text-sm font-medium text-text-primary">{profile.display_name ?? "Kein Name"}</p>{profile.verified && <BadgeCheck size={14} className="text-gold" />}</div><p className="truncate text-xs text-text-muted">{profile.location ?? "Kein Ort"}{profile.profile_types?.length ? ` · ${profile.profile_types.join(", ")}` : ""}</p><p className="truncate font-mono text-[10px] text-text-muted">Clerk-ID: {profile.user_id}</p></div><a href={`/profile/${profile.slug ?? profile.user_id}`} target="_blank" rel="noreferrer" className="rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold"><Eye className="mr-1 inline" size={12} />Profil</a><SupportMessageAction targetType="profile" targetId={profile.user_id} /><button disabled={profileActing === profile.user_id} onClick={() => toggleProfile(profile)} className={`rounded-lg border px-3 py-2 text-xs font-medium disabled:opacity-50 ${profile.verified ? "border-gold/30 text-gold" : "border-border text-text-muted hover:border-gold hover:text-gold"}`}>{profileActing === profile.user_id ? "Speichern…" : profile.verified ? "Verifiziert · entfernen" : "Verifizieren"}</button></Panel>)}</div>}
+            {profilesLoading && !profiles.length ? <p className="py-10 text-center text-sm text-text-muted">Profile werden geladen…</p> : !profiles.length ? <Empty title="Keine Profile gefunden" /> : <div className="space-y-2">{profiles.map((profile) => <Panel key={profile.user_id} className="flex flex-wrap items-center gap-3 p-4">{profile.avatar_url ? <Image src={profile.avatar_url} alt="" width={40} height={40} unoptimized className="h-10 w-10 shrink-0 rounded-full border border-border object-cover" /> : <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-bg-elevated"><Users size={15} className="text-text-muted" /></div>}<div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="truncate text-sm font-medium text-text-primary">{profile.display_name ?? "Kein Name"}</p>{profile.verified && <BadgeCheck size={14} className="text-gold" />}</div><p className="truncate text-xs text-text-muted">{profile.location ?? "Kein Ort"}{profile.profile_types?.length ? ` · ${profile.profile_types.join(", ")}` : ""}</p><p className="truncate font-mono text-[10px] text-text-muted">Clerk-ID: {profile.user_id}</p></div><a href={`/profile/${profile.slug ?? profile.user_id}`} target="_blank" rel="noreferrer" className="rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold"><Eye className="mr-1 inline" size={12} />Profil</a><SupportMessageAction targetType="profile" targetId={profile.user_id} /><button disabled={profileActing === profile.user_id} onClick={() => toggleProfile(profile)} className={`rounded-lg border px-3 py-2 text-xs font-medium disabled:opacity-50 ${profile.verified ? "border-gold/30 text-gold" : "border-border text-text-muted hover:border-gold hover:text-gold"}`}>{profileActing === profile.user_id ? "Speichern…" : profile.verified ? "Verifiziert · entfernen" : "Verifizieren"}</button></Panel>)}</div>}
             <Pager page={profilesPage} total={profilesTotal} pageSize={50} onPage={setProfilesPage} />
           </div>}
 
@@ -538,21 +561,21 @@ export default function AdminPage() {
             </Panel>
             <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="font-semibold text-text-primary">Firmenverzeichnis · {companiesTotal}</h2><div className="relative w-full max-w-md"><Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" /><input value={companiesSearch} onChange={(e) => { setCompaniesSearch(e.target.value); setCompaniesPage(1); }} placeholder="Firma oder Ort suchen…" className="w-full rounded-xl border border-border bg-bg-secondary py-2.5 pl-9 pr-3 text-sm text-text-primary placeholder:text-text-muted" /></div></div>
             {companiesError && <ErrorBox text={companiesError} />}
-            {companiesLoading ? <p className="py-8 text-center text-sm text-text-muted">Firmen werden geladen…</p> : !companies.length ? <Empty title="Keine Firmen gefunden" /> : <div className="space-y-2">{companies.map((company) => <Panel key={company.id} className="flex flex-wrap items-center gap-3 p-4">{company.logo_url ? <Image src={company.logo_url} alt="" width={44} height={44} unoptimized className="h-11 w-11 rounded-lg border border-border object-cover" /> : <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-bg-elevated"><Building2 size={16} className="text-text-muted" /></div>}<div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="font-medium text-text-primary">{company.name}</p><StatusBadge tone={company.published ? "success" : "muted"}>{company.published ? "Öffentlich" : "Entwurf"}</StatusBadge>{company.verified && <StatusBadge tone="success">Verifiziert</StatusBadge>}</div><p className="mt-1 text-xs text-text-muted">{company.city || "Kein Ort"} · {company.categories?.join(", ") || "Keine Branche"} · {company.member_count} bestätigte Teammitglieder · {company.pending_request_count} offene Anfragen</p><p className="mt-1 font-mono text-[10px] text-text-muted">Inhaber-ID: {company.owner_user_id}{company.owner_profile_missing ? " · Inhaberprofil fehlt" : company.owner_name ? ` · ${company.owner_name}` : ""}</p></div><a href={`/companies/${company.slug}`} target="_blank" rel="noreferrer" className="rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold"><Eye className="mr-1 inline" size={12} />Profil</a><SupportMessageAction targetType="company" targetId={company.id} /></Panel>)}</div>}
+            {companiesLoading && !companies.length ? <p className="py-8 text-center text-sm text-text-muted">Firmen werden geladen…</p> : !companies.length ? <Empty title="Keine Firmen gefunden" /> : <div className="space-y-2">{companies.map((company) => <Panel key={company.id} className="flex flex-wrap items-center gap-3 p-4">{company.logo_url ? <Image src={company.logo_url} alt="" width={44} height={44} unoptimized className="h-11 w-11 rounded-lg border border-border object-cover" /> : <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-bg-elevated"><Building2 size={16} className="text-text-muted" /></div>}<div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="font-medium text-text-primary">{company.name}</p><StatusBadge tone={company.published ? "success" : "muted"}>{company.published ? "Öffentlich" : "Entwurf"}</StatusBadge>{company.verified && <StatusBadge tone="success">Verifiziert</StatusBadge>}</div><p className="mt-1 text-xs text-text-muted">{company.city || "Kein Ort"} · {company.categories?.join(", ") || "Keine Branche"} · {company.member_count} bestätigte Teammitglieder · {company.pending_request_count} offene Anfragen</p><p className="mt-1 font-mono text-[10px] text-text-muted">Inhaber-ID: {company.owner_user_id}{company.owner_profile_missing ? " · Inhaberprofil fehlt" : company.owner_name ? ` · ${company.owner_name}` : ""}</p></div><a href={`/companies/${company.slug}`} target="_blank" rel="noreferrer" className="rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold"><Eye className="mr-1 inline" size={12} />Profil</a><SupportMessageAction targetType="company" targetId={company.id} /></Panel>)}</div>}
             <Pager page={companiesPage} total={companiesTotal} pageSize={30} onPage={setCompaniesPage} />
           </div>}
 
           {activeTab === "listings" && <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2"><div className="relative min-w-[220px] flex-1"><Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" /><input value={listingsSearch} onChange={(e) => { setListingsSearch(e.target.value); setListingsPage(1); }} placeholder="Titel suchen…" className="w-full rounded-lg border border-border bg-bg-secondary py-2 pl-9 pr-3 text-sm text-text-primary" /></div><select value={listingsType} onChange={(e) => { setListingsType(e.target.value); setListingsPage(1); }} className="rounded-lg border border-border bg-bg-secondary px-3 py-2 text-sm text-text-primary"><option value="all">Alle Bereiche</option>{Object.entries(typeLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select><select value={listingsStatus} onChange={(e) => { setListingsStatus(e.target.value); setListingsPage(1); }} className="rounded-lg border border-border bg-bg-secondary px-3 py-2 text-sm text-text-primary"><option value="all">Alle Status</option><option value="published">Öffentlich</option><option value="draft">Entwurf / verborgen</option></select><span className="text-sm text-text-muted">{listingsTotal} Einträge</span></div>
             {listingsError && <ErrorBox text={listingsError} onRetry={() => setRefreshKey((key) => key + 1)} />}
-            {listingsLoading ? <p className="py-10 text-center text-sm text-text-muted">Inserate werden geladen…</p> : !listings.length ? <Empty title="Keine Inserate in dieser Auswahl" /> : <div className="space-y-2">{listings.map((listing) => <Panel key={listing.id} className="p-4"><div className="flex flex-wrap items-center gap-3"><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="font-medium text-text-primary">{listing.title}</p><StatusBadge tone={listing.published ? "success" : "muted"}>{listing.published ? "Öffentlich" : "Entwurf / verborgen"}</StatusBadge></div><p className="mt-1 text-xs text-text-muted">{typeLabels[listing.type] ?? listing.type} · {listing.city || "Kein Ort"} · {listing.priceLabel ?? (listing.price ? `${Number(listing.price).toLocaleString("de-DE")} €` : "Preis auf Anfrage")} · {new Date(listing.created_at).toLocaleDateString("de-DE")}</p><p className="mt-1 font-mono text-[10px] text-text-muted">ID {listing.id}</p></div>{listing.published && listing.detail_href && <a href={listing.detail_href} target="_blank" rel="noreferrer" className="rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold"><Eye className="mr-1 inline" size={12} />Öffentlich ansehen</a>}<button disabled={listingActing === listing.id} onClick={() => toggleListing(listing)} className={`rounded-lg border px-3 py-2 text-xs font-medium disabled:opacity-50 ${listing.published ? "border-crimson/30 text-crimson-light" : "border-success/30 text-success"}`}>{listingActing === listing.id ? "Speichern…" : listing.published ? "Ausblenden" : "Veröffentlichen"}</button><SupportMessageAction targetType="listing" targetId={listing.id} /></div><ListingProviderControls listing={listing} onSaved={() => setRefreshKey((key) => key + 1)} onError={(text) => setActionMessage({ text, error: true })} />{!listing.detail_href && <p className="mt-2 text-xs text-crimson-light">Für diesen Angebotstyp ist keine öffentliche Detailadresse eingerichtet.</p>}</Panel>)}</div>}
+            {listingsLoading && !listings.length ? <p className="py-10 text-center text-sm text-text-muted">Inserate werden geladen…</p> : !listings.length ? <Empty title="Keine Inserate in dieser Auswahl" /> : <div className="space-y-2">{listings.map((listing) => <Panel key={listing.id} className="p-4"><div className="flex flex-wrap items-center gap-3"><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="font-medium text-text-primary">{listing.title}</p><StatusBadge tone={listing.published ? "success" : "muted"}>{listing.published ? "Öffentlich" : "Entwurf / verborgen"}</StatusBadge></div><p className="mt-1 text-xs text-text-muted">{typeLabels[listing.type] ?? listing.type} · {listing.city || "Kein Ort"} · {listing.priceLabel ?? (listing.price ? `${Number(listing.price).toLocaleString("de-DE")} €` : "Preis auf Anfrage")} · {new Date(listing.created_at).toLocaleDateString("de-DE")}</p><p className="mt-1 font-mono text-[10px] text-text-muted">ID {listing.id}</p></div>{listing.published && listing.detail_href && <a href={listing.detail_href} target="_blank" rel="noreferrer" className="rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold"><Eye className="mr-1 inline" size={12} />Öffentlich ansehen</a>}<button disabled={listingActing === listing.id} onClick={() => toggleListing(listing)} className={`rounded-lg border px-3 py-2 text-xs font-medium disabled:opacity-50 ${listing.published ? "border-crimson/30 text-crimson-light" : "border-success/30 text-success"}`}>{listingActing === listing.id ? "Speichern…" : listing.published ? "Ausblenden" : "Veröffentlichen"}</button><SupportMessageAction targetType="listing" targetId={listing.id} /></div><ListingProviderControls listing={listing} onSaved={() => setRefreshKey((key) => key + 1)} onError={(text) => setActionMessage({ text, error: true })} />{!listing.detail_href && <p className="mt-2 text-xs text-crimson-light">Für diesen Angebotstyp ist keine öffentliche Detailadresse eingerichtet.</p>}</Panel>)}</div>}
             <Pager page={listingsPage} total={listingsTotal} pageSize={50} onPage={setListingsPage} />
           </div>}
 
           {activeTab === "projects" && <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3"><div className="relative w-full max-w-md"><Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" /><input value={projectsSearch} onChange={(e) => { setProjectsSearch(e.target.value); setProjectsPage(1); }} placeholder="Projekt suchen…" className="w-full rounded-xl border border-border bg-bg-secondary py-2.5 pl-9 pr-3 text-sm text-text-primary" /></div><span className="text-sm text-text-muted">{projectsTotal} Projekte</span></div>
             {projectsError && <ErrorBox text={projectsError} onRetry={() => setRefreshKey((key) => key + 1)} />}
-            {projectsLoading ? <p className="py-10 text-center text-sm text-text-muted">Projekte werden geladen…</p> : !projects.length ? <Empty title="Keine Projekte gefunden" /> : <div className="space-y-2">{projects.map((project) => <Panel key={project.id} className="overflow-hidden"><div className="flex flex-wrap items-center gap-3 p-4"><button aria-expanded={expandedProject === project.id} onClick={() => { const next = expandedProject === project.id ? null : project.id; setExpandedProject(next); if (next) { setCreditsPage(1); loadCredits(next, 1); } }} className="flex items-center gap-1 text-xs text-text-muted"><ChevronDown size={14} className={expandedProject === project.id ? "rotate-180" : ""} />{project.crew_count} Crew</button><div className="min-w-0 flex-1"><p className="truncate font-medium text-text-primary">{project.title}</p><p className="text-xs text-text-muted">{[project.type, project.year, project.director].filter(Boolean).join(" · ")} · {new Date(project.created_at).toLocaleDateString("de-DE")}</p></div><a href={`/projects/${project.id}`} target="_blank" rel="noreferrer" className="rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold"><Eye className="mr-1 inline" size={12} />Projekt</a><button disabled={projectActing === project.id} onClick={() => toggleProject(project)} className="rounded-lg border border-border px-3 py-2 text-xs text-text-secondary disabled:opacity-50">{projectActing === project.id ? "Speichern…" : project.verified ? "Verifizierung entfernen" : "Verifizieren"}</button></div>
+            {projectsLoading && !projects.length ? <p className="py-10 text-center text-sm text-text-muted">Projekte werden geladen…</p> : !projects.length ? <Empty title="Keine Projekte gefunden" /> : <div className="space-y-2">{projects.map((project) => <Panel key={project.id} className="overflow-hidden"><div className="flex flex-wrap items-center gap-3 p-4"><button aria-expanded={expandedProject === project.id} onClick={() => { const next = expandedProject === project.id ? null : project.id; setExpandedProject(next); if (next) { setCreditsPage(1); loadCredits(next, 1); } }} className="flex items-center gap-1 text-xs text-text-muted"><ChevronDown size={14} className={expandedProject === project.id ? "rotate-180" : ""} />{project.crew_count} Crew</button><div className="min-w-0 flex-1"><p className="truncate font-medium text-text-primary">{project.title}</p><p className="text-xs text-text-muted">{[project.type, project.year, project.director].filter(Boolean).join(" · ")} · {new Date(project.created_at).toLocaleDateString("de-DE")}</p></div><a href={`/projects/${project.id}`} target="_blank" rel="noreferrer" className="rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold"><Eye className="mr-1 inline" size={12} />Projekt</a><button disabled={projectActing === project.id} onClick={() => toggleProject(project)} className="rounded-lg border border-border px-3 py-2 text-xs text-text-secondary disabled:opacity-50">{projectActing === project.id ? "Speichern…" : project.verified ? "Verifizierung entfernen" : "Verifizieren"}</button></div>
               {expandedProject === project.id && <div className="border-t border-border bg-bg-elevated">{creditsLoading === project.id ? <p className="p-4 text-xs text-text-muted">Crew wird geladen…</p> : !(credits[project.id] ?? []).length ? <p className="p-4 text-xs text-text-muted">Keine Crewzuordnungen.</p> : (credits[project.id] ?? []).map((credit) => <div key={credit.id} className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-2 last:border-0">{editingCredit === credit.id ? <><span className="min-w-[120px] text-xs text-text-secondary">{credit.name}</span><input value={editingRole} onChange={(event) => setEditingRole(event.target.value)} className="min-w-[160px] flex-1 rounded border border-border bg-bg-primary px-2 py-1 text-xs text-text-primary" /><button onClick={() => saveCredit(credit)} disabled={creditActing === credit.id} className="text-success"><Check size={14} /></button><button onClick={() => setEditingCredit(null)} className="text-text-muted"><X size={14} /></button></> : <><span className="min-w-[120px] flex-1 text-xs text-text-primary">{credit.name} · <span className="text-text-muted">{credit.role.split("||")[0]}</span></span>{credit.type === "user" && credit.user_id && <a href={`/profile/${credit.user_id}`} target="_blank" rel="noreferrer" className="text-xs text-gold">Profil</a>}<button onClick={() => { setEditingCredit(credit.id); setEditingRole(credit.role.split("||")[0]); }} className="rounded border border-border px-2 py-1 text-[11px] text-text-secondary">Funktion ändern</button><button disabled={creditActing === credit.id} onClick={() => deleteCredit(credit)} className="rounded border border-crimson/30 px-2 py-1 text-[11px] text-crimson-light">Zuordnung löschen</button></>}</div>)}<div className="px-4 pb-3"><Pager page={creditsPage} total={creditsTotal} pageSize={50} onPage={(page) => loadCredits(project.id, page)} /></div></div>}
             </Panel>)}</div>}
             <Pager page={projectsPage} total={projectsTotal} pageSize={30} onPage={setProjectsPage} />
@@ -561,7 +584,7 @@ export default function AdminPage() {
           {activeTab === "bookings" && <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3"><p className="max-w-3xl text-sm text-text-muted">Nur Buchungsanfragen aus der vorhandenen Tabelle. In diesen Datensätzen ist keine Zahlungsabwicklung hinterlegt; Provision und Auszahlungen lassen sich daher nicht verwalten.</p><select value={bookingsStatus} onChange={(e) => { setBookingsStatus(e.target.value); setBookingsPage(1); }} className="rounded-lg border border-border bg-bg-secondary px-3 py-2 text-sm text-text-primary"><option value="all">Alle Status</option><option value="pending">Ausstehend</option><option value="confirmed">Bestätigt</option><option value="rejected">Abgelehnt</option></select></div>
             {bookingsError && <ErrorBox text={bookingsError} onRetry={() => setRefreshKey((key) => key + 1)} />}
-            {bookingsLoading ? <p className="py-10 text-center text-sm text-text-muted">Buchungsanfragen werden geladen…</p> : !bookings.length ? <Empty title="Keine Buchungsanfragen gefunden" /> : <div className="space-y-2">{bookings.map((booking) => <Panel key={booking.id} className="flex flex-wrap items-center gap-3 p-4"><div className="min-w-0 flex-1"><p className="font-medium text-text-primary">{booking.listing_title}</p><p className="mt-1 text-xs text-text-muted">{booking.requester_name ?? "Profil nicht zugeordnet"} · {booking.ref} · {typeLabels[booking.listing_type] ?? booking.listing_type}</p><p className="mt-1 text-xs text-text-muted">{booking.start_date} bis {booking.end_date} · {booking.days} Tag(e) · Anfrage am {new Date(booking.created_at).toLocaleDateString("de-DE")}</p><p className="mt-1 font-mono text-[10px] text-text-muted">Clerk-ID: {booking.user_id}</p></div><StatusBadge tone={booking.status === "confirmed" ? "success" : booking.status === "pending" ? "warning" : "muted"}>{booking.status === "pending" ? "Ausstehend" : booking.status === "confirmed" ? "Bestätigt" : booking.status}</StatusBadge><div className="text-right"><p className="font-semibold text-text-primary">{Number(booking.total).toLocaleString("de-DE")} €</p><p className="text-[11px] text-text-muted">Plattformgebühr {Number(booking.platform_fee).toLocaleString("de-DE")} €</p></div></Panel>)}</div>}
+            {bookingsLoading && !bookings.length ? <p className="py-10 text-center text-sm text-text-muted">Buchungsanfragen werden geladen…</p> : !bookings.length ? <Empty title="Keine Buchungsanfragen gefunden" /> : <div className="space-y-2">{bookings.map((booking) => <Panel key={booking.id} className="flex flex-wrap items-center gap-3 p-4"><div className="min-w-0 flex-1"><p className="font-medium text-text-primary">{booking.listing_title}</p><p className="mt-1 text-xs text-text-muted">{booking.requester_name ?? "Profil nicht zugeordnet"} · {booking.ref} · {typeLabels[booking.listing_type] ?? booking.listing_type}</p><p className="mt-1 text-xs text-text-muted">{booking.start_date} bis {booking.end_date} · {booking.days} Tag(e) · Anfrage am {new Date(booking.created_at).toLocaleDateString("de-DE")}</p><p className="mt-1 font-mono text-[10px] text-text-muted">Clerk-ID: {booking.user_id}</p></div><StatusBadge tone={booking.status === "confirmed" ? "success" : booking.status === "pending" ? "warning" : "muted"}>{booking.status === "pending" ? "Ausstehend" : booking.status === "confirmed" ? "Bestätigt" : booking.status}</StatusBadge><div className="text-right"><p className="font-semibold text-text-primary">{Number(booking.total).toLocaleString("de-DE")} €</p><p className="text-[11px] text-text-muted">Plattformgebühr {Number(booking.platform_fee).toLocaleString("de-DE")} €</p></div></Panel>)}</div>}
             <Pager page={bookingsPage} total={bookingsTotal} pageSize={30} onPage={setBookingsPage} />
           </div>}
 
@@ -569,14 +592,14 @@ export default function AdminPage() {
             <div className="rounded-xl border border-border bg-bg-elevated p-4 text-sm text-text-secondary">Prüfung ist lesend. Öffentliche Supabase-Storage- und Clerk-Bildadressen werden nur auf Knopfdruck per HEAD geprüft. 404 = Datei fehlt; 401/403 = Zugriffsproblem; 2xx = Datei erreichbar, ein verbleibender Fehler liegt eher bei Darstellung/Optimierung. Andere Hosts werden nicht automatisch abgerufen.</div>
             <div className="flex flex-wrap items-center gap-3"><select value={mediaType} onChange={(e) => { setMediaType(e.target.value); setMediaPage(1); }} className="rounded-lg border border-border bg-bg-secondary px-3 py-2 text-sm text-text-primary"><option value="profiles">Profile und Portfolios</option><option value="companies">Firmenfotos</option><option value="listings">Inserate</option><option value="projects">Projekte</option></select><span className="text-sm text-text-muted">{mediaTotal} Datensätze</span></div>
             {mediaError && <ErrorBox text={mediaError} onRetry={() => setRefreshKey((key) => key + 1)} />}
-            {mediaLoading ? <p className="py-10 text-center text-sm text-text-muted">Bildverweise werden geladen…</p> : !mediaEntities.length ? <Empty title="Keine Datensätze gefunden" /> : <div className="space-y-2">{mediaEntities.map((entity) => <Panel key={entity.id} className="p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="font-medium text-text-primary">{entity.title}</p><p className="mt-1 font-mono text-[10px] text-text-muted">ID {entity.id} · {entity.published === true || entity.published === "published" ? "veröffentlicht" : "nicht als veröffentlicht markiert"}</p></div><StatusBadge tone={entity.media.length ? "success" : "warning"}>{entity.media.length ? `${entity.media.length} Bildreferenz(en)` : "Keine Bildreferenz"}</StatusBadge></div>{!entity.media.length ? <p className="mt-3 text-xs text-text-muted">In den bekannten Bildfeldern ist kein Bild verknüpft.</p> : <div className="mt-3 grid gap-2">{entity.media.map((url) => { const check = mediaChecks[url]; return <div key={url} className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-bg-elevated p-2"><a href={url} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate text-xs text-text-secondary hover:text-gold">{url}</a><button disabled={mediaChecking === url} onClick={() => checkMedia(url)} className="shrink-0 rounded-md border border-border px-2.5 py-1.5 text-[11px] text-text-secondary disabled:opacity-50">{mediaChecking === url ? "Prüfe…" : "Erreichbarkeit prüfen"}</button>{check && <StatusBadge tone={check.status === "reachable" ? "success" : check.status === "external_reference" ? "muted" : "danger"}>{check.status === "reachable" ? `Erreichbar${check.contentType ? ` · ${check.contentType}` : ""}` : check.status === "missing_file" ? `Datei fehlt (${check.httpStatus})` : check.status === "access_problem" ? `Zugriffsproblem (${check.httpStatus})` : check.status === "external_reference" ? "Externe Quelle · manuell prüfen" : check.status === "connection_error" ? "Quelle nicht erreichbar" : check.message ?? check.status}</StatusBadge>}</div>; })}</div>}</Panel>)}</div>}
+            {mediaLoading && !mediaEntities.length ? <p className="py-10 text-center text-sm text-text-muted">Bildverweise werden geladen…</p> : !mediaEntities.length ? <Empty title="Keine Datensätze gefunden" /> : <div className="space-y-2">{mediaEntities.map((entity) => <Panel key={entity.id} className="p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="font-medium text-text-primary">{entity.title}</p><p className="mt-1 font-mono text-[10px] text-text-muted">ID {entity.id} · {entity.published === true || entity.published === "published" ? "veröffentlicht" : "nicht als veröffentlicht markiert"}</p></div><StatusBadge tone={entity.media.length ? "success" : "warning"}>{entity.media.length ? `${entity.media.length} Bildreferenz(en)` : "Keine Bildreferenz"}</StatusBadge></div>{!entity.media.length ? <p className="mt-3 text-xs text-text-muted">In den bekannten Bildfeldern ist kein Bild verknüpft.</p> : <div className="mt-3 grid gap-2">{entity.media.map((url) => { const check = mediaChecks[url]; return <div key={url} className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-bg-elevated p-2"><a href={url} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate text-xs text-text-secondary hover:text-gold">{url}</a><button disabled={mediaChecking === url} onClick={() => checkMedia(url)} className="shrink-0 rounded-md border border-border px-2.5 py-1.5 text-[11px] text-text-secondary disabled:opacity-50">{mediaChecking === url ? "Prüfe…" : "Erreichbarkeit prüfen"}</button>{check && <StatusBadge tone={check.status === "reachable" ? "success" : check.status === "external_reference" ? "muted" : "danger"}>{check.status === "reachable" ? `Erreichbar${check.contentType ? ` · ${check.contentType}` : ""}` : check.status === "missing_file" ? `Datei fehlt (${check.httpStatus})` : check.status === "access_problem" ? `Zugriffsproblem (${check.httpStatus})` : check.status === "external_reference" ? "Externe Quelle · manuell prüfen" : check.status === "connection_error" ? "Quelle nicht erreichbar" : check.message ?? check.status}</StatusBadge>}</div>; })}</div>}</Panel>)}</div>}
             <Pager page={mediaPage} total={mediaTotal} pageSize={25} onPage={setMediaPage} />
           </div>}
 
           {activeTab === "audit" && <div className="space-y-4">
             <div className="rounded-xl border border-border bg-bg-elevated p-4 text-sm text-text-secondary">Protokolliert werden Admin-ID, Zeitpunkt, Aktion, Datensatz, Begründung und Status. Es werden keine Passwörter, Codes, Sitzungstokens oder privaten Nachrichten protokolliert.</div>
             {auditError && <ErrorBox text={auditError} onRetry={() => setRefreshKey((key) => key + 1)} />}
-            {auditLoading ? <p className="py-10 text-center text-sm text-text-muted">Adminaktionen werden geladen…</p> : !auditEntries.length ? <Empty title="Noch keine protokollierten Adminaktionen" /> : <div className="space-y-2">{auditEntries.map((entry) => <Panel key={entry.id} className="p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="font-medium text-text-primary">{entry.action.replaceAll("_", " ")}</p><StatusBadge tone={entry.outcome === "succeeded" ? "success" : entry.outcome === "failed" ? "danger" : "warning"}>{entry.outcome}</StatusBadge></div><p className="mt-1 text-xs text-text-muted">{new Date(entry.created_at).toLocaleString("de-DE")} · Admin {entry.actor_user_id}</p><p className="mt-1 break-all font-mono text-[10px] text-text-muted">{entry.entity_type} · {entry.entity_id}</p><p className="mt-2 text-sm text-text-secondary">Begründung: {entry.reason}</p></div></div></Panel>)}</div>}
+            {auditLoading && !auditEntries.length ? <p className="py-10 text-center text-sm text-text-muted">Adminaktionen werden geladen…</p> : !auditEntries.length ? <Empty title="Noch keine protokollierten Adminaktionen" /> : <div className="space-y-2">{auditEntries.map((entry) => <Panel key={entry.id} className="p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="font-medium text-text-primary">{entry.action.replaceAll("_", " ")}</p><StatusBadge tone={entry.outcome === "succeeded" ? "success" : entry.outcome === "failed" ? "danger" : "warning"}>{entry.outcome}</StatusBadge></div><p className="mt-1 text-xs text-text-muted">{new Date(entry.created_at).toLocaleString("de-DE")} · Admin {entry.actor_user_id}</p><p className="mt-1 break-all font-mono text-[10px] text-text-muted">{entry.entity_type} · {entry.entity_id}</p><p className="mt-2 text-sm text-text-secondary">Begründung: {entry.reason}</p></div></div></Panel>)}</div>}
             <Pager page={auditPage} total={auditTotal} pageSize={50} onPage={setAuditPage} />
           </div>}
 
@@ -585,4 +608,9 @@ export default function AdminPage() {
       </main>
     </div>
   );
+}
+
+export default function AdminPage() {
+  const { userId, isLoaded } = useAuth();
+  return isLoaded && userId ? <AdminContent key={userId} /> : null;
 }
