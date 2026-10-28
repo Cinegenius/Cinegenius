@@ -1,5 +1,3 @@
-import { getTranslations } from "next-intl/server";
-import { validateResponsiblePerson } from "@/lib/responsible-person-server";
 import { listingPriceLabel } from "@/lib/listing-price";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
@@ -9,7 +7,6 @@ import { getListingProvider } from "@/lib/listing-provider";
 import { listingDetailPath } from "@/lib/listing-routes";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { getPrivateProfileIds } from "@/lib/trust";
-import { validateListingPublication } from "@/lib/listing-publication";
 
 const LISTING_TYPES = new Set(["all", "location", "prop", "vehicle", "job", "creator", "service", "animal"]);
 
@@ -137,63 +134,9 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ success: true, auditLogged });
   }
 
-  const published = body?.published;
-  const reason = validateAdminReason(body?.reason);
-  if (typeof listingId !== "string" || !listingId || typeof published !== "boolean" || !reason) {
-    return NextResponse.json({ error: "Ungültige Parameter" }, { status: 400 });
-  }
-
-  if (published) {
-    const { data: listing, error: listingError } = await db.from("listings")
-      .select("id, responsible_person, user_id, company_id, type, title, city, category, image_url")
-      .eq("id", listingId)
-      .maybeSingle();
-    if (listingError) return NextResponse.json({ error: "Angebot konnte vor der Freigabe nicht geprüft werden." }, { status: 500 });
-    if (!listing) return NextResponse.json({ error: "Angebot nicht gefunden." }, { status: 404 });
-    const responsible = await validateResponsiblePerson(listing.responsible_person, listing.responsible_person?.userId || "", false);
-    if (!listing.responsible_person?.userId || responsible.response) return responsible.response || NextResponse.json({ error: (await getTranslations("responsiblePerson"))("required") }, { status: 400 });
-    const companyResult = listing.company_id
-      ? await db.from("companies").select("slug").eq("id", listing.company_id).maybeSingle()
-      : { data: null };
-    if (listing.company_id && !companyResult.data) return NextResponse.json({ error: "Die zugeordnete Firma konnte nicht geprüft werden." }, { status: 500 });
-    const provider = await getListingProvider(listing.user_id, listing.company_id, guard.userId, listing.responsible_person);
-    const validationError = validateListingPublication({
-      type: listing.type,
-      title: listing.title,
-      city: listing.city,
-      category: listing.category,
-      imageUrl: listing.image_url,
-      companySlug: companyResult.data?.slug,
-      providerAssigned: provider.kind !== "unassigned",
-      providerContactable: Boolean(provider.contactUserId),
-    });
-    if (validationError) return NextResponse.json({ error: validationError }, { status: 400 });
-  }
-
-  const audit = await startAdminAudit({ actorUserId: guard.userId, action: published ? "listing_publish" : "listing_hide", entityType: "listing", entityId: listingId, reason, metadata: { published } });
-  if (!audit) return NextResponse.json({ error: "Aktion aus Sicherheitsgründen gestoppt: Das Adminprotokoll ist nicht verfügbar." }, { status: 503 });
-
-  const { data, error } = await db
-    .from("listings")
-    .update({ published })
-    .eq("id", listingId)
-    .select("id, type, company_id, published")
-    .maybeSingle();
-
-  if (error) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: error.message }, { status: 500 }); }
-  if (!data) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Inserat nicht gefunden." }, { status: 404 }); }
-  const auditLogged = await finishAdminAudit(audit, "succeeded");
-
-  const company = data.company_id
-    ? await db.from("companies").select("slug").eq("id", data.company_id).maybeSingle()
-    : { data: null };
-  const detailPath = listingDetailPath(data.type, data.id, company.data?.slug);
-  if (detailPath) revalidatePath(detailPath);
-  if (company.data?.slug) revalidatePath(`/companies/${company.data.slug}`);
-  revalidatePath("/");
-  revalidateTag("listings", { expire: 0 });
-
-  return NextResponse.json({ success: true, auditLogged });
+  // A release/hide must name the exact version seen in the protected review.
+  const { releaseReviewedListing } = await import("@/lib/admin-review-release");
+  return releaseReviewedListing(typeof listingId === "string" ? listingId : "", body ?? {});
 }
 
 // DELETE /api/admin/listings — remove a listing

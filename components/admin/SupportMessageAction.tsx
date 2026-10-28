@@ -44,7 +44,7 @@ function applies(template: Template, target: Target) {
   return true;
 }
 
-export function SupportMessageAction({ targetType, targetId }: { targetType: TargetType; targetId: string }) {
+export function SupportMessageAction({ targetType, targetId, label }: { targetType: TargetType; targetId: string; label?: string }) {
   const t = useTranslations("AdminAccounts");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -115,7 +115,7 @@ export function SupportMessageAction({ targetType, targetId }: { targetType: Tar
 
   return <>
     <button type="button" onClick={() => void openModal()} className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-gold/30 px-3 py-2 text-xs font-semibold text-gold hover:bg-gold/10">
-      <MessageSquareText size={13} /> {t("sendSupport")}
+      <MessageSquareText size={13} /> {label || t("sendSupport")}
     </button>
     {open && <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/75 p-3 sm:p-6" onMouseDown={(event) => { if (event.target === event.currentTarget && !sending) setOpen(false); }}>
       <section role="dialog" aria-modal="true" aria-labelledby="support-compose-title" className="flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-border bg-bg-primary shadow-2xl">

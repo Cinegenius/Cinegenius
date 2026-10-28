@@ -1,3 +1,4 @@
+import { protectedMediaKey } from "@/lib/protected-media";
 import { isListingDetailRouteSupported } from "@/lib/listing-routes";
 
 export type ListingPublicationInput = {
@@ -24,7 +25,7 @@ export function validateListingPublication(input: ListingPublicationInput): stri
   if (visualListing && !input.imageUrl && !input.imageWillBeUploaded) {
     return "Vor der Veröffentlichung braucht dieses Angebot mindestens ein Hauptbild.";
   }
-  if (input.imageUrl) {
+  if (input.imageUrl && !protectedMediaKey(input.imageUrl)) {
     try {
       if (new URL(input.imageUrl).protocol !== "https:") throw new Error("invalid image protocol");
     } catch {

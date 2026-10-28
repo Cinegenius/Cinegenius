@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import type { ReactNode, TouchEvent as ReactTouchEvent } from "react";
 import Image from "@/components/MediaImage";
@@ -23,11 +24,13 @@ export default function ListingPhotoGallery({
   images: rawImages,
   title,
   alt,
-  label = "Artikelfotos",
+  label,
   fallback,
   priority = true,
   focalPoint,
 }: ListingPhotoGalleryProps) {
+  const t = useTranslations("MediaGallery");
+  const galleryLabel = label || t("listingPhotos");
   const images = [...new Set(rawImages.filter((url) => typeof url === "string").map((url) => url.trim()).filter(Boolean))];
   const [activeImage, setActiveImage] = useState<string | null>(null);
   const activeIndex = Math.max(0, images.indexOf(activeImage ?? images[0]));
@@ -41,8 +44,8 @@ export default function ListingPhotoGallery({
   const preview = getListingGalleryPreview(images, activeIndex);
   const safeActiveIndex = Math.min(activeIndex, Math.max(0, images.length - 1));
   const additionalLabel = preview.additionalCount > 0
-    ? `+ ${preview.additionalCount} weitere Fotos`
-    : `Alle ${images.length} Fotos anzeigen`;
+    ? t("more", { count: preview.additionalCount })
+    : t("allCount", { count: images.length });
 
   const selectImage = (index: number, open = false) => {
     setActiveIndex(index);
@@ -67,9 +70,9 @@ export default function ListingPhotoGallery({
   };
 
   const renderUnavailable = (className: string) => (
-    <div role="img" aria-label="Foto derzeit nicht erreichbar" className={`flex items-center justify-center gap-2 bg-bg-elevated px-4 text-center text-xs text-text-muted ${className}`}>
+    <div role="img" aria-label={t("unavailable")} className={`flex items-center justify-center gap-2 bg-bg-elevated px-4 text-center text-xs text-text-muted ${className}`}>
       {fallback ?? <ImageOff size={22} aria-hidden="true" />}
-      <span>Foto derzeit nicht erreichbar</span>
+      <span>{t("unavailable")}</span>
     </div>
   );
 
@@ -79,7 +82,7 @@ export default function ListingPhotoGallery({
 
   return (
     <>
-      <section aria-label={label} className="mb-8">
+      <section aria-label={galleryLabel} className="mb-8">
         <div
           className="relative grid min-w-0 grid-cols-1 gap-2 overflow-hidden rounded-xl sm:h-72 sm:grid-cols-5 sm:grid-rows-2 lg:h-96"
           style={{ touchAction: "pan-y" }}
@@ -98,7 +101,7 @@ export default function ListingPhotoGallery({
                 ? renderUnavailable("absolute inset-0")
                 : <button
                     type="button"
-                    aria-label={`Foto ${safeActiveIndex + 1} vergrößern`}
+                    aria-label={t("enlarge", { number: safeActiveIndex + 1 })}
                     className="absolute inset-0 block h-full w-full cursor-zoom-in"
                     onClick={() => setLightboxOpen(true)}
                   >
@@ -128,7 +131,7 @@ export default function ListingPhotoGallery({
                   onClick={() => setLightboxOpen(true)}
                   className="absolute bottom-3 right-3 inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-border bg-bg-primary/85 px-3 text-xs text-text-secondary backdrop-blur-sm transition-colors hover:border-gold hover:text-gold"
                 >
-                  <Expand size={13} /> {images.length > 1 ? "Alle Fotos anzeigen" : "Foto vergrößern"}
+                  <Expand size={13} /> {t(images.length > 1 ? "all" : "enlargeOne")}
                 </button>
               </>
             )}
@@ -140,7 +143,7 @@ export default function ListingPhotoGallery({
                 <button
                   key={url}
                   type="button"
-                  aria-label={`Foto ${index + 1} vergrößern`}
+                  aria-label={t("enlarge", { number: index + 1 })}
                   className={`group relative min-h-0 min-w-0 overflow-hidden rounded-lg bg-bg-secondary ${preview.thumbnails.length === 3 && thumbnailIndex === 2 ? "col-span-2" : ""}`}
                   onClick={() => selectImage(index, true)}
                 >
@@ -148,6 +151,7 @@ export default function ListingPhotoGallery({
                     ? renderUnavailable("absolute inset-0")
                     : <Image
                         src={url}
+                        mediaSize="thumbnail"
                         alt=""
                         fill
                         onError={() => handleImageError(url)}
@@ -156,7 +160,7 @@ export default function ListingPhotoGallery({
                       />}
                   {preview.additionalCount > 0 && thumbnailIndex === preview.thumbnails.length - 1 && (
                     <span className="absolute inset-0 flex items-center justify-center bg-black/55 px-2 text-center text-sm font-semibold text-white backdrop-blur-[1px]">
-                      + {preview.additionalCount} weitere
+                      {t("moreShort", { count: preview.additionalCount })}
                     </span>
                   )}
                 </button>
@@ -166,19 +170,19 @@ export default function ListingPhotoGallery({
         </div>
 
         {preview.thumbnails.length > 0 && (
-          <div className="mt-2 flex min-w-0 gap-2 overflow-x-auto pb-1 sm:hidden" aria-label={label}>
+          <div className="mt-2 flex min-w-0 gap-2 overflow-x-auto pb-1 sm:hidden" aria-label={galleryLabel}>
             {preview.thumbnails.map(({ url, index }) => (
               <button
                 key={url}
                 type="button"
-                aria-label={`Foto ${index + 1} auswählen`}
+                aria-label={t("select", { number: index + 1 })}
                 aria-pressed={safeActiveIndex === index}
                 onClick={() => selectImage(index)}
                 className={`relative h-16 w-20 shrink-0 overflow-hidden rounded-lg border-2 bg-bg-secondary ${safeActiveIndex === index ? "border-gold" : "border-border"}`}
               >
                 {failedImages.has(url)
                   ? <ImageOff size={18} className="absolute inset-0 m-auto text-text-muted" aria-hidden="true" />
-                  : <Image src={url} alt="" fill onError={() => handleImageError(url)} className="object-cover" sizes="80px" />}
+                  : <Image src={url} alt="" fill mediaSize="thumbnail" onError={() => handleImageError(url)} className="object-cover" sizes="80px" />}
               </button>
             ))}
             {preview.additionalCount > 0 && (

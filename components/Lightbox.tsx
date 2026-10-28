@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useCallback, useRef, useState } from "react";
 import type { TouchEvent as ReactTouchEvent } from "react";
 import Image from "@/components/MediaImage";
@@ -22,6 +23,7 @@ export default function Lightbox({
   onNext,
   alt = "",
 }: LightboxProps) {
+  const t = useTranslations("MediaGallery");
   const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
   const touchStartX = useRef<number | null>(null);
   const didSwipe = useRef(false);
@@ -80,7 +82,7 @@ export default function Lightbox({
       className="fixed inset-0 z-[300] flex items-center justify-center bg-black/95 animate-fade-in"
       role="dialog"
       aria-modal="true"
-      aria-label="Fotogalerie"
+      aria-label={t("gallery")}
       style={{ touchAction: "pan-y" }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
@@ -98,7 +100,7 @@ export default function Lightbox({
       <button
         type="button"
         onClick={onClose}
-        aria-label="Fotogalerie schließen"
+        aria-label={t("close")}
         className="absolute top-4 right-4 w-10 h-10 bg-bg-elevated border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-gold hover:border-gold transition-all z-10"
       >
         <X size={18} />
@@ -114,7 +116,7 @@ export default function Lightbox({
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); onPrev(); }}
-          aria-label="Vorheriges Foto"
+          aria-label={t("previous")}
           className="absolute left-4 w-12 h-12 bg-bg-elevated border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-gold hover:border-gold transition-all"
         >
           <ChevronLeft size={22} />
@@ -127,9 +129,9 @@ export default function Lightbox({
         onClick={(e) => e.stopPropagation()}
       >
         {failedImages.has(currentImage) ? (
-          <div role="img" aria-label={alt ? `${alt}: Foto derzeit nicht erreichbar` : "Foto derzeit nicht erreichbar"} className="flex h-64 max-h-[85vh] w-[min(80vw,48rem)] flex-col items-center justify-center gap-3 rounded-xl border border-white/10 bg-bg-elevated px-6 text-center text-sm text-text-secondary">
+          <div role="img" aria-label={alt ? `${alt}: ${t("unavailable")}` : t("unavailable")} className="flex h-64 max-h-[85vh] w-[min(80vw,48rem)] flex-col items-center justify-center gap-3 rounded-xl border border-white/10 bg-bg-elevated px-6 text-center text-sm text-text-secondary">
             <ImageOff size={28} className="text-text-muted" aria-hidden="true" />
-            <span>Dieses Foto ist derzeit nicht erreichbar.</span>
+            <span>{t("unavailable")}</span>
           </div>
         ) : (
           <Image
@@ -151,7 +153,7 @@ export default function Lightbox({
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); onNext(); }}
-          aria-label="Nächstes Foto"
+          aria-label={t("next")}
           className="absolute right-4 w-12 h-12 bg-bg-elevated border border-border rounded-full flex items-center justify-center text-text-secondary hover:text-gold hover:border-gold transition-all"
         >
           <ChevronRight size={22} />
@@ -168,14 +170,14 @@ export default function Lightbox({
             <button
               key={i}
               type="button"
-              aria-label={`Foto ${i + 1} anzeigen`}
+              aria-label={t("show", { number: i + 1 })}
               aria-pressed={i === safeIndex}
               onClick={() => selectImage(i)}
               className={`relative h-8 w-12 shrink-0 rounded overflow-hidden border-2 transition-all ${
                 i === safeIndex ? "border-gold" : "border-transparent opacity-50 hover:opacity-80"
               }`}
             >
-              <Image src={img} alt="" fill className="object-cover" sizes="48px" />
+              <Image src={img} alt="" fill mediaSize="thumbnail" className="object-cover" sizes="48px" />
             </button>
           ))}
         </div>

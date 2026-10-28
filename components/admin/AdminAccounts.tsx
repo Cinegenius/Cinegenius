@@ -5,6 +5,7 @@ import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight, Loader2, RefreshCw, Search, Users } from "lucide-react";
 import Image from "@/components/MediaImage";
 import { SupportMessageAction } from "./SupportMessageAction";
+import AdminReviewLink from "./AdminReviewLink";
 import type { adminAccountRow } from "@/lib/admin-account-status";
 
 type Account = ReturnType<typeof adminAccountRow>;
@@ -52,7 +53,7 @@ export function AdminAccounts() {
         <p className="mt-1 font-mono text-[10px] text-text-muted">{account.userId}</p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        {account.profileUrl && <a href={account.profileUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center rounded-lg border border-border px-3 text-xs text-text-secondary hover:text-gold">{t("openProfile")}</a>}
+        {account.profileUrl && <AdminReviewLink kind="profile" id={account.userId} />}{account.profileUrl && <a href={account.profileUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center rounded-lg border border-border px-3 text-xs text-text-secondary hover:text-gold">{t("openProfile")}</a>}
         <SupportMessageAction targetType="profile" targetId={account.userId} />
       </div>
     </li>)}</ul>}

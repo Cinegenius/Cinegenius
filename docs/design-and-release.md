@@ -74,3 +74,31 @@ Public advertising surfaces are disabled across all routes and screen sizes. Do 
 ## Cause confirmed during the deployment review
 
 Production had been replaced by manual CLI uploads from dirty or stale local snapshots instead of a single canonical Git commit. Automatic Git production deployment was disabled, so different uploads could replace the live build without being tied to the current `main` commit. The source review found no service worker registration or service-worker asset; it was not the cause of the differing layouts.
+
+### Admin-Prüfansicht (2026-10-28, erste Ausbaustufe)
+
+Vor Veröffentlichung der abhängigen App-Version die Migration
+`supabase/migrations/20261028160000_admin_review_release.sql` prüfen, in Produktion
+anwenden und die Ausführungsrechte verifizieren. Sie legt ausschließlich die
+servicegeschützte Funktion `admin_review_listing_transition` an, verändert keine
+bestehenden Inhalte und verbindet den Vergleich des geprüften Datensatzes,
+Publikationswechsel und Aktionsprotokoll in einer Transaktion. `anon`,
+`authenticated` und `PUBLIC` dürfen sie nicht ausführen. Ohne diese Funktion
+scheitert die Admin-Freigabe bewusst geschlossen; keinen Ersatz ohne Versionsprüfung
+aktivieren. Die Produktionsmigration wurde am 28.10.2026 in CineGenius main
+PRODUCTION ausgeführt: Gäste/Mitglieder ohne Ausführungsrecht, Service-Rolle
+berechtigt, vorhandene Inserate und Firmen unverändert. Freigeben, Ausblenden,
+Versionskonflikt und Protokolleinträge wurden dort mit einem eigenen Testdatensatz
+in einer vollständig zurückgerollten Transaktion geprüft.
+
+Private Prüfbilder werden ausschließlich über `/api/admin/reviews/[kind]/[id]/media`
+ausgeliefert: aktuelle Adminprüfung, explizite Inhaltsquellen, kanonischer Elternabgleich
+und keine gemeinsamen Bildcaches. Dies ist keine allgemeine Freigabe privater Medien
+für Administratoren; Nachrichten und Supportanhänge gehören nicht zu den Prüfquellen.
+Vor dem Release mit eigenen Testdaten auf dem produktiven Auth-/Storage-System prüfen.
+
+Die erste Stufe bietet bestehende Veröffentlichungsaktionen für Inserate mit
+Versionskontrolle. Ablehnung, dauerhafte Moderationssperre, Kontobeschränkung und
+Löschung gehören zur getrennten nächsten Stufe. Vorläufiges Ausblenden verwendet
+den vorhandenen `published`-Status und kann von berechtigten Anbietern aufgehoben
+werden; dies darf nicht als dauerhafte Moderationssperre bezeichnet werden.

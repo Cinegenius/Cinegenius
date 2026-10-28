@@ -22,7 +22,7 @@ export function isProtectedMediaOptimizerSource(value: string | null, origin: st
     let decodedValue = value;
     for (let n = 0; n < 3; n++) { const next = decodeURIComponent(decodedValue); if (next === decodedValue) break; decodedValue = next; }
     const path = new URL(decodedValue.replace(/\\/g,"/"), origin).pathname.replace(/\/{2,}/g, "/");
-    return /^\/api\/(?:media(?:\/|$)|community-image(?:\/|$))/i.test(path);
+    return /^\/api\/(?:media(?:\/|$)|admin\/reviews(?:\/|$)|community-image(?:\/|$))/i.test(path);
 
   } catch { return true; }
 }

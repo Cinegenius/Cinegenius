@@ -238,6 +238,12 @@ export default clerkMiddleware(async (auth, request) => {
   requestHeaders.set("X-CineGenius-Return-Path", `${returnUrl.pathname}${returnUrl.search}`);
 
   const res = NextResponse.next({ request: { headers: requestHeaders } });
+  if (request.nextUrl.pathname.startsWith("/admin/review/") || request.nextUrl.pathname.startsWith("/api/admin/reviews/")) {
+    res.headers.set("Cache-Control", "private, no-store, max-age=0");
+    res.headers.set("CDN-Cache-Control", "no-store");
+    res.headers.set("Vercel-CDN-Cache-Control", "no-store");
+    res.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+  }
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("X-Frame-Options", "DENY");
   res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
