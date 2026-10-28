@@ -1,4 +1,5 @@
 import { listingPriceLabel } from "@/lib/listing-price";
+import { isOfferStatus } from "@/lib/offer-moderation";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { NextRequest, NextResponse } from "next/server";
@@ -21,17 +22,18 @@ export async function GET(req: NextRequest) {
   const search = (params.get("search") ?? "").trim().slice(0, 80).replace(/[%,()]/g, " ").trim();
   const rawType = params.get("type") ?? "all";
   const rawStatus = params.get("status") ?? "all";
-  if (!LISTING_TYPES.has(rawType) || !["all", "published", "draft"].includes(rawStatus)) {
+  if (!LISTING_TYPES.has(rawType) || (!["all", "published"].includes(rawStatus) && !isOfferStatus(rawStatus))) {
     return NextResponse.json({ error: "Ungültiger Filter." }, { status: 400 });
   }
 
   let query = db.from("listings")
-    .select("id, responsible_person, user_id, company_id, type, title, city, price, published, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type", { count: "exact" })
+    .select("id, responsible_person, user_id, company_id, type, title, city, price, published, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type,moderation_status,content_revision,reviewed_revision,submitted_at,reviewed_at,moderation_reason", { count: "exact" })
     .order("created_at", { ascending: false })
     .range((page - 1) * pageSize, page * pageSize - 1);
   if (rawType !== "all") query = query.eq("type", rawType);
   if (rawStatus === "published") query = query.eq("published", true);
-  if (rawStatus === "draft") query = query.eq("published", false);
+  if (rawStatus === "draft") query = query.eq("moderation_status", "draft");
+  else if (isOfferStatus(rawStatus)) query = query.eq("moderation_status", rawStatus);
   if (search) query = query.ilike("title", `%${search}%`);
   const { data, error, count } = await query;
   if (error) return NextResponse.json({ error: "Inserate konnten nicht geladen werden." }, { status: 500 });
@@ -114,7 +116,7 @@ export async function PATCH(req: NextRequest) {
     const previousProvider = await getListingProvider(listing.user_id, listing.company_id, guard.userId, listing.responsible_person);
     const audit = await startAdminAudit({ actorUserId: guard.userId, action: "listing_provider_assign", entityType: "listing", entityId: listingId, reason, metadata: { providerType, providerId, previousUserId: listing.user_id, previousCompanyId: listing.company_id } });
     if (!audit) return NextResponse.json({ error: "Änderung gestoppt: Das Adminprotokoll ist nicht verfügbar." }, { status: 503 });
-    const { error: updateError } = await db.from("listings").update({ ...update, responsible_person: null }).eq("id", listingId);
+    const { error: updateError } = await db.from("listings").update({ ...update, responsible_person: null, last_editor_id: guard.userId }).eq("id", listingId);
     if (updateError) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Anbieterzuordnung konnte nicht gespeichert werden." }, { status: 500 }); }
     const auditLogged = await finishAdminAudit(audit, "succeeded");
     const assignedCompany = providerType === "company"

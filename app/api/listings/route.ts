@@ -1,3 +1,5 @@
+import { attemptedApproval, OFFER_MODERATION_COLUMNS } from "@/lib/offer-moderation";
+import { getTranslations } from "next-intl/server";
 import { bindResponsiblePerson } from "@/lib/responsible-person";
 import { accountResponsiblePerson, validateResponsiblePerson } from "@/lib/responsible-person-server";
 import { listingPriceMetadataError, listingPriceLabel } from "@/lib/listing-price";
@@ -15,7 +17,7 @@ import { editableCompanyIdsForUser } from "@/lib/listing-access";
 const LISTING_COLS =
   "id, user_id, responsible_person, type, category, title, description, price, city, " +
   "image_url, company_id, published, metadata, blocked_dates, " +
-  "floor_plan_url, extra_images, created_at";
+  "floor_plan_url, extra_images, created_at," + OFFER_MODERATION_COLUMNS;
 
 // Public callers only need fields used by listings and search cards. Keep
 // internal ownership IDs, arbitrary metadata and private availability data on
@@ -54,7 +56,7 @@ export async function GET(req: NextRequest) {
       // The generated Supabase schema types lag the live listing table here;
       // normalize the selected row shape before merging the two result sets.
       const rows = [...(ownResult.data ?? []), ...(companyResult.data ?? [])] as unknown as Array<Record<string, unknown> & { id: string; created_at: string }>;
-      const byId = new Map(rows.map((listing) => [listing.id, listing]));
+      const byId = new Map(rows.filter((listing) => !listing.company_id || companyIds.includes(String(listing.company_id))).map((listing) => [listing.id, listing]));
       const data = [...byId.values()].sort((left, right) => Date.parse(right.created_at) - Date.parse(left.created_at)).slice(0, 200);
       const account = data.some(row => !row.responsible_person && !row.company_id && row.user_id === userId) ? await accountResponsiblePerson(userId) : null;
       return privateNoStoreJson({ data: data.map(row => ({ ...row, responsible_person: row.responsible_person || (!row.company_id && row.user_id === userId ? bindResponsiblePerson(account, userId) : null) })) });
@@ -90,6 +92,7 @@ export async function POST(req: Request) {
   if (!allowed) return NextResponse.json({ error: "Maximal 10 Inserate pro Stunde." }, { status: 429 });
 
   const body = await req.json();
+  if (attemptedApproval(body)) return privateNoStoreJson({ error: (await getTranslations("OfferModeration"))("adminOnly") }, 403);
   const { type, title, description, price, city, category, image_url, company_id,
           metadata, blocked_dates, floor_plan_url, extra_images, rental_type, draft, onboarding_request_key } = body;
 
@@ -175,8 +178,10 @@ export async function POST(req: Request) {
       city,
       image_url: storedImageUrl,
       company_id: company_id ?? null,
-      // Jobs and guided onboarding entries start private; publishing is an explicit owner action.
-      published: type === "job" || draft === true ? false : true,
+      // Saving or completing an offer never grants public release.
+      published: false,
+      moderation_status: draft === true || type === "job" ? "draft" : "pending",
+      last_editor_id: userId,
       metadata: mergedMetadata,
       ...(blocked_dates !== undefined && { blocked_dates }),
       ...(floor_plan_url !== undefined && { floor_plan_url }),
@@ -202,9 +207,10 @@ export async function POST(req: Request) {
     animal: "/tiere",
   };
   if (pathMap[type]) revalidatePath(pathMap[type]);
+  revalidatePath("/", "layout");
   revalidateTag("listings", { expire: 0 });
 
-  return privateNoStoreJson({ data });
+  return privateNoStoreJson({ data, submitted: data.moderation_status === "pending", message: data.moderation_status === "pending" ? (await getTranslations("OfferModeration"))("submitted") : null });
 }
 
 export async function DELETE(req: NextRequest) {
@@ -226,6 +232,7 @@ export async function DELETE(req: NextRequest) {
     console.error("[listings DELETE]", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+  revalidatePath("/", "layout");
   revalidateTag("listings", { expire: 0 });
   return NextResponse.json({ success: true });
 }

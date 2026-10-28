@@ -1,4 +1,5 @@
 "use client";
+import { useFormRouter as useRouter } from "@/lib/use-form-router";
 
 function safeLink(url: string | null | undefined): string | null {
   if (!url?.trim()) return null;
@@ -10,9 +11,12 @@ function safeLink(url: string | null | undefined): string | null {
   } catch { return null; }
 }
 
+import { useFormDraft, useUnsavedForm } from "@/lib/use-form-draft";
+import { useFormNavigation } from "@/contexts/FormDraftContext";
+import FormDraftStatus from "@/components/FormDraftStatus";
 import { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+
 import Link from "next/link";
 import ContextBackLink from "@/components/ContextBackLink";
 import {
@@ -329,6 +333,15 @@ export default function ProjectDetail({
   const streamingList: StreamingRelease[] = project.release_streaming ?? [];
   const tvList: TvRelease[] = project.release_tv ?? [];
 
+  const { leave: leaveProjectForm } = useFormNavigation();
+  const projectFormDraft = useFormDraft({ formKey: `project:${project.id}`, enabled: isCreator && (editing || editingTimeline || showFestivalForm || showStreamingForm || showTvForm || showJoin),
+    value: { editForm, timelineForm, festivalForm, streamingForm, tvForm, joinRole, joinCharacter, joinNote, editing, editingTimeline, showFestivalForm, showStreamingForm, showTvForm, showJoin },
+    busy: saving || savingTimeline || savingFestival || savingStreaming || savingTv || joining,
+    restore: draft => { setEditForm(draft.editForm); setTimelineForm(draft.timelineForm); setFestivalForm(draft.festivalForm); setStreamingForm(draft.streamingForm); setTvForm(draft.tvForm); setJoinRole(draft.joinRole); setJoinCharacter(draft.joinCharacter); setJoinNote(draft.joinNote); },
+  });
+
+  useUnsavedForm(!isCreator && showJoin && !!(joinRole || joinCharacter || joinNote));
+
   // ─── Handlers ────────────────────────────────────────────────────────────────
 
   const deleteProject = async () => {
@@ -394,6 +407,7 @@ export default function ProjectDetail({
   };
 
   const handleSaveEdit = async () => {
+    if (!projectFormDraft.loaded) return;
     setSaving(true);
     const patch = {
       title:              editForm.title.trim(),
@@ -413,6 +427,7 @@ export default function ProjectDetail({
   };
 
   const handleSaveTimeline = async () => {
+    if (!projectFormDraft.loaded) return;
     setSavingTimeline(true);
     const patch = {
       prep_start:  timelineForm.prep_start  || null,
@@ -612,6 +627,7 @@ export default function ProjectDetail({
               <p className="text-sm text-text-secondary leading-relaxed max-w-xl border-t border-border pt-4">{project.description}</p>
             )}
 
+            {(editing || editingTimeline) && <FormDraftStatus draft={projectFormDraft} />}
             {/* Edit form */}
             {editing && (
               <div className="space-y-3 mt-3 pt-3 border-t border-border">
@@ -631,7 +647,7 @@ export default function ProjectDetail({
                   <button onClick={handleSaveEdit} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-60">
                     {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />} Speichern
                   </button>
-                  <button onClick={() => setEditing(false)} className="px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-colors">Abbrechen</button>
+                  <button onClick={() => leaveProjectForm(() => setEditing(false))} className="px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-colors">Abbrechen</button>
                 </div>
               </div>
             )}
@@ -1014,7 +1030,7 @@ export default function ProjectDetail({
                   <button onClick={handleSaveTimeline} disabled={savingTimeline} className="flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-xl hover:bg-gold-light transition-colors disabled:opacity-60">
                     {savingTimeline ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} Speichern
                   </button>
-                  <button onClick={() => setEditingTimeline(false)} className="px-5 py-2.5 border border-border text-text-secondary text-sm rounded-xl hover:border-gold hover:text-gold transition-colors">Abbrechen</button>
+                  <button onClick={() => leaveProjectForm(() => setEditingTimeline(false))} className="px-5 py-2.5 border border-border text-text-secondary text-sm rounded-xl hover:border-gold hover:text-gold transition-colors">Abbrechen</button>
                 </div>
               </div>
             )}

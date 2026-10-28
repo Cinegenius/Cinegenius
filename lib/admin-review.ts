@@ -61,5 +61,6 @@ export type AdminReview = {
   responsible: { name: string; function: string; userId: string; public: boolean } | null;
   provider: { name: string | null; userId: string | null; href: string | null; companyHref: string | null };
   technicalCreator: string | null; publicHref: string | null;
+  moderation?: { status: string; reason: string | null; submittedAt: string | null; reviewedAt: string | null; contentRevision: number; events: { event: string; actor: string | null; status: string; revision: number; reason: string | null; at: string }[] };
   issues: string[]; canPublish: boolean; support: { type: "listing" | "company" | "profile"; id: string } | null;
 };

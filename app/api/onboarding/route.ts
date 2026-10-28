@@ -164,6 +164,18 @@ export async function DELETE(request: NextRequest) {
       });
       return json({ deleted: true, completed: true });
     }
+    const clearFields: Record<string, Record<string, null | boolean>> = {
+      "profile-edit": { profileEditorDraft: null, profileEditorDraftEncoded: null, profileEditorDraftUpdatedAt: null },
+      "location-form": { locationFormDraft: null, locationFormDraftUpdatedAt: null },
+      company: { companyDraft: null, setupComplete: true },
+      profile: { profileDraft: null, setupComplete: true },
+    };
+    if (requestedType && clearFields[requestedType]) {
+      // Clerk deep-merges nested metadata. Omitting keys resurrected completed
+      // forms on the next visit; explicit null removes only this legacy draft.
+      await clerk.users.updateUserMetadata(authResult.userId, { privateMetadata: { [KEY]: clearFields[requestedType] } });
+      return json({ deleted: true });
+    }
     const user = await clerk.users.getUser(authResult.userId);
     const privateMetadata = { ...(user.privateMetadata ?? {}) };
     const current = privateMetadata[KEY] && typeof privateMetadata[KEY] === "object"

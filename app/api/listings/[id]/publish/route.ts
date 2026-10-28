@@ -21,11 +21,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
   const t = await getTranslations("mediaSecurity");
+  const moderation = await getTranslations("OfferModeration");
   const { id } = await params;
 
   const { data: listing, error: listingError } = await db
     .from("listings")
-    .select("id, user_id, company_id, type, title, description, city, category, image_url, published, responsible_person")
+    .select("*")
     .eq("id", id)
     .maybeSingle();
   if (listingError) return NextResponse.json({ error: "Inserat konnte nicht geladen werden" }, { status: 500 });
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   } catch {
     return NextResponse.json({ error: "Berechtigung zur Firmenverwaltung konnte nicht geprüft werden." }, { status: 500 });
   }
-  if (listing.published) return NextResponse.json({ success: true, alreadyPublished: true });
+  if (listing.moderation_status === "approved" || listing.moderation_status === "pending") return NextResponse.json({ success: true, submitted: listing.moderation_status === "pending", moderation_status: listing.moderation_status, published: listing.published, message: moderation(listing.moderation_status === "pending" ? "submitted" : "alreadyApproved") });
 
   if (!listing.responsible_person?.userId) {
     const tResponsible = await getTranslations("responsiblePerson");
@@ -92,24 +93,25 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       }
   }
 
-  const updates: Record<string, unknown> = { published: true };
-  if (imageUrl) updates.image_url = imageUrl;
-  const { data, error } = await db
-    .from("listings")
-    .update(updates)
-    .eq("id", id)
-    .eq("published", false)
-    .select("id, type")
-    .maybeSingle();
-
-  if (error || !data) {
-    if (uploadedPath) await removeUnusedProtectedMedia(userId, uploadedPath);
-    return NextResponse.json({ error: error ? "Inserat konnte nicht veröffentlicht werden" : "Der Status hat sich inzwischen geändert. Bitte lade die Seite neu." }, { status: error ? 500 : 409 });
+  let current = listing;
+  if (imageUrl) {
+    const changed = await db.from("listings").update({ image_url: imageUrl, last_editor_id: userId }).eq("id", id).eq("content_revision", listing.content_revision).select().maybeSingle();
+    if (changed.error || !changed.data) {
+      if (uploadedPath) await removeUnusedProtectedMedia(userId, uploadedPath);
+      return NextResponse.json({ error: moderation("stale") }, { status: 409 });
+    }
+    current = changed.data;
   }
+  const saved = await db.rpc("offer_review_transition", {
+    p_kind: "listing", p_id: id, p_expected: current, p_provider_company: null, p_provider_profile: null,
+    p_action: "submit", p_actor: userId, p_reason: null, p_notification: null,
+  });
+  if (saved.error || !["saved", "unchanged"].includes(saved.data)) return NextResponse.json({ error: moderation(saved.data === "stale" ? "stale" : "saveError") }, { status: saved.data === "stale" ? 409 : 503 });
+  const data = current;
 
   if (PATHS[data.type]) revalidatePath(PATHS[data.type]);
   const detailPath = listingDetailPath(data.type, data.id, companyResult.data?.slug);
   if (detailPath) revalidatePath(detailPath);
   revalidateTag("listings", { expire: 0 });
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, submitted: true, published: false, moderation_status: "pending", message: moderation("submitted") }, { headers: { "Cache-Control": "private, no-store" } });
 }

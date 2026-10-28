@@ -1,7 +1,10 @@
 "use client";
+import { useFormRouter as useRouter } from "@/lib/use-form-router";
 
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useFormDraft } from "@/lib/use-form-draft";
+import FormDraftStatus from "@/components/FormDraftStatus";
+import { useCallback, useState, useEffect, useRef } from "react";
+
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import { useLocale, useTranslations } from "next-intl";
@@ -496,8 +499,7 @@ export default function ProfilePage() {
   const [draftLoading, setDraftLoading] = useState(true);
   const [draftLoaded, setDraftLoaded] = useState(false);
   const [draftLoadError, setDraftLoadError] = useState("");
-  const [draftSaveState, setDraftSaveState] = useState<"idle" | "pending" | "saving" | "saved" | "error">("idle");
-  const [editorRevision, setEditorRevision] = useState(0);
+  const [, setEditorRevision] = useState(0);
   const draftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const draftPausedRef = useRef(false);
   const draftSequenceRef = useRef(0);
@@ -1182,7 +1184,8 @@ export default function ProfilePage() {
       } catch {
         // The newer public profile timestamp prevents an older private draft from being resumed.
       }
-      setDraftSaveState("idle");
+      await profileDraft.complete();
+
 
       physicalDataRef.current = physical ?? {};
       performanceDataRef.current = performance ?? {};
@@ -1298,12 +1301,11 @@ export default function ProfilePage() {
   const displayAvatarName = form.name || clerkEmail.split("@")[0] || "?";
 
   function markEditorChanged() {
-    setDraftSaveState("pending");
+
     setEditorRevision((revision) => revision + 1);
   }
 
   const buildEditorDraft = () => ({
-    savedAt: new Date().toISOString(),
     step: editorStep,
     form,
     skills,
@@ -1344,55 +1346,7 @@ export default function ProfilePage() {
     tattoosCoverable,
   });
 
-  async function persistEditorDraft() {
-    const sequence = ++draftSequenceRef.current;
-    setDraftSaveState("saving");
-    const snapshot = buildEditorDraft();
-    const task = draftQueueRef.current.catch(() => {}).then(async () => {
-      const response = await fetch("/api/onboarding", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profileEditorDraft: snapshot }),
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok || !result.saved) throw new Error(result.error ?? `HTTP ${response.status}`);
-    });
-    draftQueueRef.current = task;
-    try {
-      await task;
-      if (sequence === draftSequenceRef.current) setDraftSaveState("saved");
-    } catch (error) {
-      if (sequence === draftSequenceRef.current) {
-        setDraftSaveState("error");
-        addToast(`Privater Entwurf konnte nicht gespeichert werden: ${error instanceof Error ? error.message : "Bitte versuche es erneut."}`, "error");
-      }
-      throw error;
-    }
-  }
-
-  const persistEditorDraftRef = useRef(persistEditorDraft);
-  persistEditorDraftRef.current = persistEditorDraft;
-
-  useEffect(() => {
-    if (profileLoading) return;
-    let cancelled = false;
-    setDraftLoading(true);
-    setDraftLoadError("");
-    fetch("/api/onboarding", { cache: "no-store" })
-      .then(async (response) => {
-        const result = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(result.error ?? `HTTP ${response.status}`);
-        return result;
-      })
-      .then(({ draft }) => {
-        if (cancelled) return;
-        const saved = draft?.profileEditorDraft;
-        const shouldResume = saved && typeof saved === "object" && shouldResumeProfileEditorDraft({
-          profileExists,
-          draftUpdatedAt: String(draft?.profileEditorDraftUpdatedAt ?? saved?.savedAt ?? ""),
-          profileUpdatedAt,
-        });
-        if (shouldResume) {
+  const restoreEditorDraft = useCallback((saved: ReturnType<typeof buildEditorDraft>) => {
           if (saved.form && typeof saved.form === "object") setForm((current) => ({ ...current, ...(saved.form as Partial<typeof current>) }));
           if (Array.isArray(saved.skills)) setSkills(saved.skills.filter((item: unknown): item is string => typeof item === "string"));
           if (Array.isArray(saved.memberships)) setMemberships(saved.memberships.filter((item: unknown): item is string => typeof item === "string"));
@@ -1427,7 +1381,38 @@ export default function ProfilePage() {
           if (typeof saved.tattoos === "boolean") setTattoos(saved.tattoos);
           if (typeof saved.tattoosCoverable === "boolean") setTattoosCoverable(saved.tattoosCoverable);
           if ([1, 2, 3, 4, 5, 6].includes(Number(saved.step))) setEditorStep(Number(saved.step) as ProfileEditorStep);
-          setDraftSaveState("saved");
+  }, []);
+
+  const tDraft = useTranslations("FormDraft");
+  const profileDraft = useFormDraft({
+    formKey: "profile:edit", value: buildEditorDraft(), ready: !profileLoading && draftLoaded,
+    busy: avatarUploading || coverUploading || profileUploading || uploadingPoster || saving,
+    restore: restoreEditorDraft,
+  });
+  async function persistEditorDraft() { await profileDraft.flush(); }
+
+  useEffect(() => {
+    if (profileLoading) return;
+    let cancelled = false;
+    setDraftLoading(true);
+    setDraftLoadError("");
+    fetch("/api/onboarding", { cache: "no-store" })
+      .then(async (response) => {
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error ?? `HTTP ${response.status}`);
+        return result;
+      })
+      .then(({ draft }) => {
+        if (cancelled) return;
+        const saved = draft?.profileEditorDraft;
+        const shouldResume = saved && typeof saved === "object" && shouldResumeProfileEditorDraft({
+          profileExists,
+          draftUpdatedAt: String(draft?.profileEditorDraftUpdatedAt ?? saved?.savedAt ?? ""),
+          profileUpdatedAt,
+        });
+        if (shouldResume) {
+          restoreEditorDraft(saved);
+
         }
         setDraftLoaded(true);
       })
@@ -1439,14 +1424,7 @@ export default function ProfilePage() {
       })
       .finally(() => { if (!cancelled) setDraftLoading(false); });
     return () => { cancelled = true; };
-  }, [profileLoading, profileExists, profileUpdatedAt]); // profile is loaded once; the private editor draft is then applied over it
-
-  useEffect(() => {
-    if (!draftLoaded || draftPausedRef.current || editorRevision === 0) return;
-    if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
-    draftTimerRef.current = setTimeout(() => { void persistEditorDraftRef.current().catch(() => {}); }, 700);
-    return () => { if (draftTimerRef.current) clearTimeout(draftTimerRef.current); };
-  }, [editorRevision, draftLoaded]);
+  }, [profileLoading, profileExists, profileUpdatedAt, restoreEditorDraft]); // profile is loaded once; the private editor draft is then applied over it
 
   function focusEditorField(field: "activity" | "name" | "city") {
     window.setTimeout(() => {
@@ -1457,7 +1435,7 @@ export default function ProfilePage() {
   }
 
   function goToEditorStep(step: ProfileEditorStep, focus?: "activity" | "name" | "city") {
-    if (step > 0) draftPausedRef.current = false;
+    if (step > 0) { draftPausedRef.current = false; profileDraft.resume(); }
     setEditorStep(step);
     markEditorChanged();
     if (focus) focusEditorField(focus);
@@ -1647,7 +1625,7 @@ export default function ProfilePage() {
                   <section className="rounded-xl border border-border bg-bg-secondary p-4 sm:p-6">
                     <div className="flex items-start justify-between gap-4">
                       <div><p className="text-xs font-semibold uppercase tracking-wider text-gold">Schritt {editorStep} von {PROFILE_EDITOR_STEPS.length}</p><h2 className="mt-1 font-display text-xl font-semibold text-text-primary">{PROFILE_EDITOR_STEPS[editorStep - 1].title}</h2><p className="mt-1 text-sm leading-6 text-text-muted">{PROFILE_EDITOR_STEPS[editorStep - 1].description}</p></div>
-                      <span className="shrink-0 text-xs text-text-muted" aria-live="polite">{draftSaveState === "saving" ? "Entwurf wird gespeichert …" : draftSaveState === "saved" ? "Entwurf gespeichert" : draftSaveState === "error" ? "Entwurf nicht gespeichert" : draftSaveState === "pending" ? "Änderungen noch nicht gespeichert" : "Privater Entwurf"}</span>
+                      <FormDraftStatus draft={profileDraft} />
                     </div>
                     <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-bg-elevated"><div className="h-full rounded-full bg-gold transition-all" style={{ width: `${(editorStep / PROFILE_EDITOR_STEPS.length) * 100}%` }} /></div>
                     <nav aria-label="Profilabschnitte" className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -2770,14 +2748,14 @@ export default function ProfilePage() {
                   <footer className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex flex-wrap gap-2">
                       {profileExists && <button type="button" data-no-draft onClick={() => goToEditorStep(0)} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary hover:border-gold/40">Übersicht</button>}
-                      <button type="button" data-no-draft disabled={draftSaveState === "saving" || !draftLoaded} onClick={() => void persistEditorDraft().catch(() => {})} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary hover:border-gold/40 disabled:opacity-50">{draftSaveState === "saving" ? "Speichert …" : "Privaten Entwurf speichern"}</button>
+                      <button type="button" data-no-draft disabled={profileDraft.status === "saving" || !profileDraft.loaded} onClick={() => void persistEditorDraft().catch(() => {})} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary hover:border-gold/40 disabled:opacity-50">{tDraft("manualSave")}</button>
                     </div>
                     <div className="flex flex-wrap justify-end gap-2">
                       {editorStep > 1 && <button type="button" data-no-draft onClick={() => goToEditorStep((editorStep - 1) as ProfileEditorStep)} className="min-h-11 rounded-lg border border-border px-5 text-sm text-text-secondary hover:border-gold/40">Zurück</button>}
                       {editorStep < 6 ? <>
                         {(editorStep === 4 || editorStep === 5) && <button type="button" data-no-draft onClick={() => goToEditorStep((editorStep + 1) as ProfileEditorStep)} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-muted hover:text-text-primary">Überspringen</button>}
                         <button type="button" data-no-draft onClick={() => { if (validateEditorStep(editorStep)) goToEditorStep((editorStep + 1) as ProfileEditorStep); }} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-gold px-5 text-sm font-semibold text-bg-primary hover:bg-gold-light"><span>Weiter</span><span aria-hidden="true">→</span></button>
-                      </> : <button type="button" data-no-draft onClick={handleSave} disabled={saving || profileLoading || profileLoadError || !draftLoaded || avatarUploading || coverUploading || profileUploading} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-gold px-5 text-sm font-semibold text-bg-primary hover:bg-gold-light disabled:opacity-60">
+                      </> : <button type="button" data-no-draft onClick={handleSave} disabled={!profileDraft.loaded || saving || profileLoading || profileLoadError || !draftLoaded || avatarUploading || coverUploading || profileUploading} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-gold px-5 text-sm font-semibold text-bg-primary hover:bg-gold-light disabled:opacity-60">
                         {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}{saving ? "Wird gespeichert …" : profileExists ? "Änderungen speichern" : "Profil veröffentlichen"}
                       </button>}
                     </div>

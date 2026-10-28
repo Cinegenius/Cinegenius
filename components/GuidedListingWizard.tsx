@@ -1,4 +1,8 @@
 "use client";
+import { useTranslations } from "next-intl";
+import { useFormRouter as useRouter } from "@/lib/use-form-router";
+import { createOnboardingSaveQueue } from "@/lib/onboarding-save";
+import { useExistingDraftProtection } from "@/lib/use-form-draft";
 import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
 import { EMPTY_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, type ResponsiblePerson } from "@/lib/responsible-person";
 
@@ -6,9 +10,8 @@ import ListingPriceOptions from "@/components/ListingPriceOptions";
 import { listingPriceLabel } from "@/lib/listing-price";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { ArrowLeft, ArrowRight, CheckCircle2, Loader2, MapPin, Package } from "lucide-react";
-import { listingDetailPath } from "@/lib/listing-routes";
 import ListingImageManager from "@/components/ListingImageManager";
 import { MAX_LOCATION_IMAGES, MAX_LISTING_IMAGES } from "@/lib/listing-image-gallery";
 
@@ -85,6 +88,7 @@ function normalizeDraft(value: unknown, kind: Kind): Draft {
 
 export default function GuidedListingWizard() {
   const params = useSearchParams();
+  const moderation = useTranslations("OfferModeration");
   const router = useRouter();
   const kind: Kind = params.get("type") === "equipment" ? "equipment" : "location";
   const [form, setForm] = useState<Draft>({ ...initial, type: kind });
@@ -115,7 +119,7 @@ export default function GuidedListingWizard() {
     return () => { active = false; };
   }, [kind]);
 
-  const persist = useCallback(async (draft: Draft) => {
+  const saveQueue = useMemo(() => createOnboardingSaveQueue(async (draft: Draft) => {
     setSaveState("saving");
     try {
       const response = await fetch("/api/onboarding", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ intent: kind, setupComplete: false, listingDraft: draft, updatedAt: new Date().toISOString() }) });
@@ -126,14 +130,17 @@ export default function GuidedListingWizard() {
     } catch (cause) {
       setSaveState("error"); setError(cause instanceof Error ? cause.message : "Der Fortschritt konnte nicht gespeichert werden."); return false;
     }
-  }, [kind]);
+  }), [kind]);
+  const persist = useCallback((snapshot: Draft) => saveQueue.save(snapshot), [saveQueue]);
+
+  const draftProtection = useExistingDraftProtection({ value: form, ready, busy: galleryState.uploading || galleryState.failed > 0 || savingListing, save: persist, saved: saveQueue.matches, enabled: !createdId });
 
   useEffect(() => {
-    if (!ready || createdId) return;
+    if (!ready || createdId || savingListing) return;
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => { void persist(form); }, 600);
     return () => { if (timer.current) clearTimeout(timer.current); };
-  }, [form, ready, persist, createdId]);
+  }, [form, ready, persist, createdId, savingListing]);
 
   function update<K extends keyof Draft>(key: K, value: Draft[K]) {
     setForm((previous) => ({ ...previous, [key]: value })); setError("");
@@ -157,6 +164,8 @@ export default function GuidedListingWizard() {
     if (galleryState.uploading || galleryState.failed > 0) { setError(galleryState.uploading ? "Bitte warte, bis die Fotos hochgeladen sind." : "Bitte lade fehlgeschlagene Fotos erneut hoch oder entferne sie."); return; }
     setSavingListing(true); setError("");
     try {
+      if (timer.current) clearTimeout(timer.current);
+      await saveQueue.settle();
       const vehicle = kind === "equipment" && form.category === "Bild-Fahrzeug";
       const response = await fetch("/api/listings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         type: vehicle ? "vehicle" : kind === "location" ? "location" : "prop", category: form.category,
@@ -184,6 +193,7 @@ export default function GuidedListingWizard() {
       }) });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.data?.id) throw new Error(data.error ?? "Der private Entwurf konnte nicht gespeichert werden.");
+      draftProtection.complete();
       setCreatedId(data.data.id);
       const cleared = await fetch(`/api/onboarding?type=${kind}`, { method: "DELETE" });
       if (!cleared.ok) setSaveState("error");
@@ -207,7 +217,7 @@ export default function GuidedListingWizard() {
   }
 
   if (!ready) return <main className="min-h-screen bg-bg-primary px-4 pt-32 text-center text-sm text-text-muted"><Loader2 className="mx-auto mb-3 animate-spin" />Einrichtung wird geladen …</main>;
-  if (createdId) return <main className="min-h-[75vh] bg-bg-primary px-4 pb-24 pt-28"><section className="mx-auto max-w-xl rounded-3xl border border-border bg-bg-secondary p-6 text-center sm:p-9"><CheckCircle2 size={42} className="mx-auto mb-4 text-gold" /><h1 className="mb-2 font-display text-3xl font-bold text-text-primary">{published ? "Dein Angebot ist veröffentlicht" : "Privater Entwurf gespeichert"}</h1><p className="mb-6 text-sm leading-6 text-text-muted">{published ? "Dein Angebot ist jetzt öffentlich sichtbar." : "Nur du kannst diesen Entwurf sehen. Veröffentliche ihn erst, wenn du mit den Angaben zufrieden bist."}</p>{!published && <ResponsiblePersonFields value={form.responsible ?? EMPTY_RESPONSIBLE_PERSON} onChange={value => update("responsible", value)} errors={responsibleErrors} accountPrefill />}{error && <p role="alert" className="mb-4 text-sm text-red-300">{error}</p>}{!published ? <div className="flex flex-col justify-center gap-3 sm:flex-row"><button onClick={() => router.push("/dashboard?tab=inserate")} className="min-h-12 rounded-xl border border-border px-5 text-sm text-text-primary">Später weiterbearbeiten</button><button disabled={savingListing} onClick={() => void publish()} className="min-h-12 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary">{savingListing ? "Wird veröffentlicht …" : "Jetzt veröffentlichen"}</button></div> : <button onClick={() => { const type = kind === "location" ? "location" : form.category === "Bild-Fahrzeug" ? "vehicle" : "prop"; const href = listingDetailPath(type, createdId); if (href) router.push(href); }} className="min-h-12 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary">Angebot ansehen</button>}</section></main>;
+  if (createdId) return <main className="min-h-[75vh] bg-bg-primary px-4 pb-24 pt-28"><section className="mx-auto max-w-xl rounded-3xl border border-border bg-bg-secondary p-6 text-center sm:p-9"><CheckCircle2 size={42} className="mx-auto mb-4 text-gold" /><h1 className="mb-2 font-display text-3xl font-bold text-text-primary">{moderation(published ? "statuses.pending" : "draftSaved")}</h1><p className="mb-6 text-sm leading-6 text-text-muted">{moderation(published ? "submitted" : "privateNotice")}</p>{!published && <ResponsiblePersonFields value={form.responsible ?? EMPTY_RESPONSIBLE_PERSON} onChange={value => update("responsible", value)} errors={responsibleErrors} accountPrefill />}{error && <p role="alert" className="mb-4 text-sm text-red-300">{error}</p>}{!published ? <div className="flex flex-col justify-center gap-3 sm:flex-row"><button onClick={() => router.push("/dashboard?tab=inserate")} className="min-h-12 rounded-xl border border-border px-5 text-sm text-text-primary">Später weiterbearbeiten</button><button disabled={savingListing} onClick={() => void publish()} className="min-h-12 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary">{moderation(savingListing ? "submitting" : "submit")}</button></div> : <button onClick={() => router.push("/dashboard?tab=listings")} className="min-h-12 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary">{moderation("myOffers")}</button>}</section></main>;
 
   const heading = kind === "location" ? "Location anbieten" : "Equipment anbieten";
   const Icon = kind === "location" ? MapPin : Package;

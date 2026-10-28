@@ -16,15 +16,18 @@ export async function GET(request: NextRequest) {
   const pageSize = 30;
   const source = REVIEW_SOURCES[kind];
   const title = kind === "profile" ? "display_name" : kind === "company" || kind === "company_equipment" ? "name" : "title";
-  const columns = kind === "project_draft" ? "id,draft_data,created_at" : `${source.key},${title},created_at${["company", "listing", "company_equipment"].includes(kind) ? ",published" : ""}`;
+  const offer = kind === "listing" || kind === "company_equipment";
+  const columns = kind === "project_draft" ? "id,draft_data,created_at" : `${source.key},${title},created_at${["company", "listing", "company_equipment"].includes(kind) ? ",published" : ""}${offer ? ",moderation_status,submitted_at" : ""}`;
   let query = db.from(source.table).select(columns, { count: "exact" }).order("created_at", { ascending: false }).order(source.key, { ascending: false }).range((page - 1) * pageSize, page * pageSize - 1);
   const search = (params.get("q") || "").trim().slice(0, 80).replace(/[%,()]/g, " ").trim();
   if (search) query = query.ilike(kind === "project_draft" ? "draft_data->>title" : title, `%${search}%`);
+  const status = params.get("status") || "pending";
+  if (offer && ["draft", "pending", "approved", "changes_requested", "rejected", "hidden", "legacy_review_required"].includes(status)) query = query.eq("moderation_status", status);
   const result = await query;
   if (result.error) return NextResponse.json({ error: t("loadError") }, { status: 503, headers: REVIEW_HEADERS });
   return NextResponse.json({ rows: (result.data ?? []).map(value => {
     const row = value as unknown as Record<string, unknown>;
     const id = String(row[source.key]);
-    return { id, title: String((kind === "project_draft" ? reviewObject(row.draft_data).title : row[title]) || ""), href: reviewPath(kind, id), published: typeof row.published === "boolean" ? row.published : kind === "project_draft" ? false : null };
+    return { moderation_status: row.moderation_status ?? null, id, title: String((kind === "project_draft" ? reviewObject(row.draft_data).title : row[title]) || ""), href: reviewPath(kind, id), published: typeof row.published === "boolean" ? row.published : kind === "project_draft" ? false : null };
   }), total: result.count ?? 0, pageSize }, { headers: REVIEW_HEADERS });
 }

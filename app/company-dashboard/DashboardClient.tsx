@@ -1,4 +1,6 @@
 "use client";
+import { useTranslations } from "next-intl";
+import OfferModerationStatus from "@/components/OfferModerationStatus";
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
@@ -33,6 +35,7 @@ type ServiceItem = {
 };
 
 type EquipmentItem = {
+  published?: boolean; moderation_status?: string; moderation_reason?: string | null;
   id: string; company_id: string; category: string; subcategory: string | null;
   name: string; brand: string | null; model: string | null; description: string | null;
   images: string[]; condition: string; available: boolean; price_day: number | null;
@@ -576,6 +579,7 @@ const BLANK_EQUIPMENT = {
 };
 
 function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: boolean }) {
+  const moderation = useTranslations("OfferModeration");
   const [items, setItems] = useState<EquipmentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [catFilter, setCatFilter] = useState("alle");
@@ -664,12 +668,22 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
     setItems(p => p.filter(x => x.id !== id));
   }
 
+  async function submitEquipment(item: EquipmentItem) {
+    setError(""); setSaving(true);
+    try {
+      const response = await fetch(`/api/company-equipment/${item.id}/submit`, { method: "POST" });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || moderation("saveError"));
+      load();
+    } catch (cause) { setError(cause instanceof Error ? cause.message : moderation("saveError")); }
+    finally { setSaving(false); }
+  }
   async function toggleAvailable(item: EquipmentItem) {
     await fetch("/api/company-equipment", {
       method: "PATCH", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: item.id, available: !item.available }),
     });
-    setItems(p => p.map(x => x.id === item.id ? { ...x, available: !x.available } : x));
+    load();
   }
 
   const set = (k: string, v: unknown) => setForm((p: typeof BLANK_EQUIPMENT) => ({ ...p, [k]: v }));
@@ -833,6 +847,7 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
         </button>}
       </div>
 
+      <p className="text-sm leading-6 text-text-muted">{moderation("publicNotice")}</p>{error && <p role="alert" className="text-sm text-crimson-light">{error}</p>}
       {/* Category filter */}
       {usedCats.length > 1 && (
         <div className="flex gap-1.5 flex-wrap">
@@ -873,7 +888,7 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-sm font-semibold text-text-primary truncate">{item.name}</p>
+                    <p className="text-sm font-semibold text-text-primary truncate">{item.name}</p><OfferModerationStatus item={item} />
                     {item.brand && <span className="text-xs text-text-muted">{item.brand}</span>}
                     <span className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${CONDITION_COLORS[item.condition]}`}>
                       {CONDITION_LABELS[item.condition]}
@@ -888,6 +903,7 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
+                  {canEdit && !item.published && item.moderation_status !== "pending" && <button disabled={saving} onClick={() => void submitEquipment(item)} className="min-h-11 rounded-lg border border-gold/30 px-3 text-xs text-gold">{moderation("submit")}</button>}
                   {canEdit && <button onClick={() => toggleAvailable(item)} title={item.available ? "Verfügbar" : "Nicht verfügbar"}
                     className={`text-xs px-2 py-1 rounded-full border font-medium transition-colors ${item.available ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" : "text-text-muted bg-bg-elevated border-border"}`}>
                     {item.available ? "Verfügbar" : "Nicht verfügbar"}

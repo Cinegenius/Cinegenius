@@ -17,7 +17,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ ki
   const admin = await requireAdmin();
   if (admin instanceof NextResponse) return admin;
   const { kind, id } = await context.params;
-  if (kind !== "listing") return NextResponse.json({ error: (await getTranslations("AdminReview"))("unsupportedAction") }, { status: 400, headers: REVIEW_HEADERS });
+  if (kind !== "listing" && kind !== "company_equipment") return NextResponse.json({ error: (await getTranslations("AdminReview"))("unsupportedAction") }, { status: 400, headers: REVIEW_HEADERS });
   const body = await request.json().catch(() => null);
-  return releaseReviewedListing(id, body ?? {});
+  return releaseReviewedListing(id, body ?? {}, kind);
 }

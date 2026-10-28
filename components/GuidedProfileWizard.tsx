@@ -1,7 +1,10 @@
 "use client";
+import { useFormRouter as useRouter } from "@/lib/use-form-router";
+import { createOnboardingSaveQueue } from "@/lib/onboarding-save";
+import { useExistingDraftProtection } from "@/lib/use-form-draft";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+
 import { useUser } from "@clerk/nextjs";
 import { ArrowLeft, ArrowRight, ChevronDown, Loader2, Search, UserRound } from "lucide-react";
 import {
@@ -53,7 +56,7 @@ export default function GuidedProfileWizard() {
     setDraft((current) => current.name ? current : { ...current, name: user.fullName ?? "" });
   }, [ready, draft.name, user?.fullName]);
 
-  const persist = useCallback(async (value: GuidedProfileDraft) => {
+  const saveQueue = useMemo(() => createOnboardingSaveQueue(async (value: GuidedProfileDraft) => {
     setSaveState("saving");
     try {
       const response = await fetch("/api/onboarding", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ intent: "talent", setupComplete: false, profileDraft: value, updatedAt: new Date().toISOString() }) });
@@ -61,14 +64,17 @@ export default function GuidedProfileWizard() {
       if (!response.ok) throw new Error(result.error ?? "Der Fortschritt konnte nicht gespeichert werden.");
       setSaveState("saved"); return true;
     } catch (cause) { setSaveState("error"); setError(cause instanceof Error ? cause.message : "Der Fortschritt konnte nicht gespeichert werden."); return false; }
-  }, []);
+  }), []);
+  const persist = useCallback((snapshot: GuidedProfileDraft) => saveQueue.save(snapshot), [saveQueue]);
+
+  const draftProtection = useExistingDraftProtection({ value: draft, ready, busy: submitting, save: persist, saved: saveQueue.matches, enabled: !savedProfile });
 
   useEffect(() => {
-    if (!ready || savedProfile) return;
+    if (!ready || savedProfile || submitting) return;
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => { void persist(draft); }, 600);
     return () => { if (timer.current) clearTimeout(timer.current); };
-  }, [ready, savedProfile, draft, persist]);
+  }, [ready, savedProfile, draft, persist, submitting]);
 
   const normalizedSearch = normalizeOccupation(search.trim());
   const selectedDepartments = useMemo(() => departments.filter((department) => draft.departmentIds.includes(department.id)), [draft.departmentIds]);
@@ -122,6 +128,8 @@ export default function GuidedProfileWizard() {
     const profileTypes = getGuidedProfileTypes(draft);
     setSubmitting(true); setError("");
     try {
+      if (timer.current) clearTimeout(timer.current);
+      await saveQueue.settle();
       const response = await fetch("/api/profile", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         display_name: draft.name.trim(), location: draft.city.trim(), profile_types: profileTypes,
         profile_type: profileTypes[0] ?? null, positions: draft.positions, bio: draft.bio.trim(), available: true,
@@ -129,6 +137,7 @@ export default function GuidedProfileWizard() {
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error ?? "Das Profil konnte nicht gespeichert werden.");
       await fetch("/api/onboarding?type=profile", { method: "DELETE" });
+      draftProtection.complete();
       setSavedProfile(true);
       router.replace("/dashboard");
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Das Profil konnte nicht gespeichert werden."); }

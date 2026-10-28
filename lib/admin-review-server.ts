@@ -68,6 +68,13 @@ export async function loadAdminReview(rawKind: string, rawId: string) {
     if (!userId || (companyId && (!providerCompany || providerCompany.published !== true || !companySlug))) issues.push("provider");
     if (Object.keys(responsiblePersonErrors(snapshot)).length || !responsibleUser) issues.push("responsible");
   }
+  if (kind === "company_equipment") {
+    if (!text(record.category)) issues.push("category");
+    if (!providerCompany || providerCompany.published !== true || !companySlug || !userId) issues.push("provider");
+  }
+  const offer = kind === "listing" || kind === "company_equipment";
+  const history = offer ? await db.from("offer_moderation_events").select("event,actor_user_id,to_status,content_revision,reason,created_at").eq("offer_kind", kind).eq("offer_id", id).order("created_at", { ascending: false }).limit(30) : { data: [] };
+  if ("error" in history && history.error) throw new ReviewError("loadError", 503);
   const revision = reviewRevision({ record, providerCompany, providerProfile });
   const base = `/api/admin/reviews/${kind}/${encodeURIComponent(id)}/media`;
   const dto: AdminReview = {
@@ -80,7 +87,9 @@ export async function loadAdminReview(rawKind: string, rawId: string) {
       href: userId && providerProfile ? reviewPath("profile", userId) : null,
       companyHref: providerCompany ? reviewPath("company", String(providerCompany.id)) : null },
     technicalCreator: text(record.user_id) || text(record.created_by) || text(record.author_id) || text(record.owner_user_id),
-    publicHref, issues, canPublish: kind === "listing" && issues.length === 0,
+    publicHref: kind === "company_equipment" && companySlug ? `/companies/${encodeURIComponent(companySlug)}` : publicHref,
+    ...(offer ? { moderation: { status: String(record.moderation_status || (published ? "legacy_review_required" : "draft")), reason: text(record.moderation_reason), submittedAt: text(record.submitted_at), reviewedAt: text(record.reviewed_at), contentRevision: Number(record.content_revision || 1), events: (history.data ?? []).map(row => ({ event: String(row.event), actor: row.actor_user_id as string | null, status: String(row.to_status), revision: Number(row.content_revision), reason: row.reason as string | null, at: String(row.created_at) })) } } : {}),
+    issues, canPublish: offer && issues.length === 0 && ["pending", "legacy_review_required"].includes(String(record.moderation_status)),
     support: kind === "listing" || kind === "company" || kind === "profile" ? { type: kind, id } : null,
   };
   return { admin, kind, id, record, providerCompany, providerProfile, dto, images };

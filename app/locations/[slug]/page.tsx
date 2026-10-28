@@ -1,3 +1,4 @@
+import { canEditListing } from "@/lib/listing-access";
 import JsonLd from "@/components/JsonLd";
 import { listingPriceLabel } from "@/lib/listing-price";
 import { notFound } from "next/navigation";
@@ -29,11 +30,11 @@ async function getLocation(slug: string, viewerId: string | null = null) {
     .select("id, user_id, company_id, type, category, title, city, price, created_at, image_url, description, metadata, blocked_dates, floor_plan_url, extra_images, responsible_person, published")
     .eq("id", slug)
     .eq("type", "location")
-    .eq("published", true)
     .maybeSingle();
 
   if (error) throw new Error(`Location konnte nicht geladen werden: ${error.message}`);
   if (!data) return null;
+  if (data.published !== true && (!viewerId || !await canEditListing(viewerId, data))) return null;
 
   const [{ lat, lng }, provider, ratingMap] = await Promise.all([
     geocodeCity(data.city ?? ""),

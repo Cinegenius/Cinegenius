@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 // Required Supabase table:
 // CREATE TABLE IF NOT EXISTS favorites (
 //   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -56,7 +57,14 @@ export async function GET(req: NextRequest) {
     .order("created_at", { ascending: false })
     .limit(200);
 
-  return NextResponse.json({ favorites: data ?? [] });
+  const idsToResolve = (data ?? []).map(row => row.listing_id);
+  const current = idsToResolve.length ? await db.from("listings").select("id,type,title,city,price,image_url").in("id", idsToResolve).eq("published", true) : { data: [], error: null };
+  if (current.error) return NextResponse.json({ error: (await getTranslations("OfferModeration"))("saveError") }, { status: 503 });
+  const visible = new Map((current.data ?? []).map(row => [row.id, row]));
+  return NextResponse.json({ favorites: (data ?? []).flatMap(row => {
+    const offer = visible.get(row.listing_id);
+    return offer ? [{ ...row, listing_type: offer.type, listing_title: offer.title, listing_city: offer.city, listing_price: offer.price, listing_image: offer.image_url }] : [];
+  }) }, { headers: { "Cache-Control": "private, no-store" } });
 }
 
 // POST /api/favorites — toggle favorite
@@ -94,6 +102,7 @@ export async function POST(req: NextRequest) {
   const { data: listing } = await db
     .from("listings")
     .select("type, title, city, price, image_url")
+    .eq("published", true)
     .eq("id", listing_id)
     .maybeSingle();
 

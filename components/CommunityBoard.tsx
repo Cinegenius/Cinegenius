@@ -1,5 +1,8 @@
 "use client";
 
+import { useFormDraft } from "@/lib/use-form-draft";
+import { useFormNavigation } from "@/contexts/FormDraftContext";
+import FormDraftStatus from "@/components/FormDraftStatus";
 import { useViewState } from "@/lib/use-view-state";
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
@@ -59,6 +62,11 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
   const [busy, setBusy] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const { leave: leaveComposer } = useFormNavigation();
+  const boardDraft = useFormDraft({ formKey: "board:compose", enabled: !!user,
+    value: { form, replies: replyDrafts, composerOpen }, busy,
+    restore: draft => { setForm(draft.form); setReplyDrafts(draft.replies); setComposerOpen(draft.composerOpen); },
+  });
   const limit = fullPage ? 50 : 3;
   const postRequest = useRef(0);
 
@@ -92,11 +100,13 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
 
   async function submitPost(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!boardDraft.loaded) return;
     setBusy(true); setError("");
     try {
       const response = await fetch("/api/community-posts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || t("boardError"));
+      if (!Object.values(replyDrafts).some(text => text.trim())) await boardDraft.complete();
       setForm({ kind: "question", title: "", body: "", city: "" });
       setComposerOpen(false);
       await loadPosts("", "all");
@@ -118,6 +128,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
 
   async function submitReply(event: FormEvent<HTMLFormElement>, postId: string) {
     event.preventDefault();
+    if (!boardDraft.loaded) return;
     const body = replyDrafts[postId]?.trim();
     if (!body) return;
     setBusy(true); setError("");
@@ -125,6 +136,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
       const response = await fetch(`/api/community-posts/${postId}/replies`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ body }) });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || t("boardError"));
+      if (!form.title.trim() && !form.body.trim() && !Object.entries(replyDrafts).some(([id, text]) => id !== postId && text.trim())) await boardDraft.complete();
       setReplies(current => ({ ...current, [postId]: [...(current[postId] ?? []), payload.reply] }));
       setPosts(current => current.map(post => post.id === postId ? { ...post, reply_count: post.reply_count + 1 } : post));
       setReplyDrafts(current => ({ ...current, [postId]: "" }));
@@ -147,12 +159,12 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
   }
 
   const formatDate = (date: string) => new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(date));
-  const composerContent = activeLoggedIn ? <form onSubmit={event => void submitPost(event)} className="space-y-4">
+  const composerContent = activeLoggedIn ? <form onChangeCapture={() => boardDraft.resume()} onSubmit={event => void submitPost(event)} className="space-y-4">
     <label className="block text-sm font-medium text-text-secondary">{t("boardTypeLabel")}<select value={form.kind} onChange={event => setForm(current => ({ ...current, kind: event.target.value as Kind }))} className="mt-1.5 h-11 w-full rounded-xl border border-border bg-bg-primary px-3 text-sm text-text-primary outline-none focus:border-gold/60">{KINDS.map(value => <option key={value} value={value}>{t(`boardKind_${value}`)}</option>)}</select></label>
     <label className="block text-sm font-medium text-text-secondary">{t("boardTitleLabel")}<input required minLength={5} maxLength={140} value={form.title} onChange={event => setForm(current => ({ ...current, title: event.target.value }))} placeholder={t("boardTitlePlaceholder")} className="mt-1.5 h-11 w-full rounded-xl border border-border bg-bg-primary px-3 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-gold/60" /></label>
     <label className="block text-sm font-medium text-text-secondary">{t("boardTextLabel")}<textarea required minLength={10} maxLength={3000} rows={5} value={form.body} onChange={event => setForm(current => ({ ...current, body: event.target.value }))} placeholder={t(form.kind === "question" ? "boardQuestionPlaceholder" : "boardBodyPlaceholder")} className="mt-1.5 w-full resize-y rounded-xl border border-border bg-bg-primary px-3 py-2.5 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-gold/60" /></label>
     <label className="block text-sm font-medium text-text-secondary">{t("boardCityLabel")}<input maxLength={100} value={form.city} onChange={event => setForm(current => ({ ...current, city: event.target.value }))} placeholder={t("boardCityPlaceholder")} className="mt-1.5 h-11 w-full rounded-xl border border-border bg-bg-primary px-3 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-gold/60" /></label>
-    <div className="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end"><button type="button" onClick={() => setComposerOpen(false)} className="min-h-11 rounded-xl border border-border px-4 text-sm font-medium text-text-secondary">{t("boardCancel")}</button><button disabled={busy} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary disabled:opacity-60"><Pin size={15} />{t("boardSubmit")}</button></div>
+    <div className="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end"><button type="button" onClick={() => leaveComposer(() => setComposerOpen(false))} className="min-h-11 rounded-xl border border-border px-4 text-sm font-medium text-text-secondary">{t("boardCancel")}</button><button disabled={busy || !boardDraft.loaded} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary disabled:opacity-60"><Pin size={15} />{t("boardSubmit")}</button></div>
   </form> : <div className="rounded-xl border border-border bg-bg-primary/50 p-5 text-center"><p className="text-sm text-text-secondary">{t("boardLoginPrompt")}</p><Link href="/sign-in?redirect_url=%2Fcommunity" className="mt-4 inline-flex min-h-10 items-center rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary">{t("boardLogin")}</Link></div>;
 
   return (
@@ -172,6 +184,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
         {composerOpen && !fullPage && <div className="relative mb-5 rounded-2xl border border-gold/25 bg-gradient-to-br from-gold/[0.08] via-bg-primary/70 to-bg-primary/40 p-4 shadow-lg shadow-black/10 sm:p-5">
           <span className="absolute -top-1.5 left-7 h-3 w-3 rounded-full border-2 border-bg-secondary bg-gold shadow-[0_0_12px_rgba(191,242,39,0.45)]" />
           <div className="mb-4 border-b border-gold/15 pb-3"><p className="font-display text-lg font-semibold italic text-text-primary">{t("boardComposeTitle")}</p><p className="mt-1 text-xs text-text-muted">{t("boardExpiresHint")}</p></div>
+          <FormDraftStatus draft={boardDraft} />
           {composerContent}
         </div>}
 
@@ -211,7 +224,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
                 {(replies[post.id] ?? []).map(reply => <div key={reply.id} className="flex gap-2.5 text-sm"><span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-bg-elevated text-[10px] text-text-secondary">{reply.author_name.slice(0, 1).toUpperCase()}</span><div><p className="font-medium text-text-primary">{reply.author_name} <time className="ml-1 text-[11px] font-normal text-text-muted">{formatDate(reply.created_at)}</time></p><p className="mt-0.5 whitespace-pre-wrap text-text-secondary">{reply.body}</p></div></div>)}
                 {!replies[post.id]?.length && <p className="text-xs text-text-muted">{t("boardNoReplies")}</p>}
               </div>
-              {activeLoggedIn ? <form onSubmit={event => void submitReply(event, post.id)} className="mt-3 flex gap-2"><input value={replyDrafts[post.id] ?? ""} onChange={event => setReplyDrafts(current => ({ ...current, [post.id]: event.target.value }))} maxLength={1000} placeholder={t("boardReplyPlaceholder")} className="h-10 min-w-0 flex-1 rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-gold/60" /><button aria-label={t("boardSendReply")} disabled={busy || !(replyDrafts[post.id] ?? "").trim()} className="flex h-10 w-10 items-center justify-center rounded-lg bg-gold text-bg-primary disabled:opacity-50"><Send size={15} /></button></form> : <Link href="/sign-in?redirect_url=%2Fcommunity" className="mt-3 inline-block text-sm font-medium text-gold">{t("boardLogin")}</Link>}
+              {activeLoggedIn ? <form onSubmit={event => void submitReply(event, post.id)} className="mt-3 flex gap-2"><input value={replyDrafts[post.id] ?? ""} onChange={event => { boardDraft.resume(); setReplyDrafts(current => ({ ...current, [post.id]: event.target.value })); }} maxLength={1000} placeholder={t("boardReplyPlaceholder")} className="h-10 min-w-0 flex-1 rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-gold/60" /><button aria-label={t("boardSendReply")} disabled={busy || !boardDraft.loaded || !(replyDrafts[post.id] ?? "").trim()} className="flex h-10 w-10 items-center justify-center rounded-lg bg-gold text-bg-primary disabled:opacity-50"><Send size={15} /></button></form> : <Link href="/sign-in?redirect_url=%2Fcommunity" className="mt-3 inline-block text-sm font-medium text-gold">{t("boardLogin")}</Link>}
             </div>}
           </article>)}
         </div> : <div className="rounded-2xl border border-dashed border-border bg-bg-primary/30 px-4 py-8 text-center sm:px-6">
@@ -220,9 +233,9 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
         {!fullPage && <div className="mt-4 text-right"><Link href="/community" className="text-sm font-semibold text-gold hover:text-gold-light">{t("boardSeeAll")} →</Link></div>}
       </div>
 
-      {composerOpen && fullPage && <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/70 p-0 backdrop-blur-sm sm:items-center sm:p-4" onMouseDown={event => { if (event.target === event.currentTarget) setComposerOpen(false); }}>
+      {composerOpen && fullPage && <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/70 p-0 backdrop-blur-sm sm:items-center sm:p-4" onMouseDown={event => { if (event.target === event.currentTarget) leaveComposer(() => setComposerOpen(false)); }}>
         <div role="dialog" aria-modal="true" aria-labelledby="board-compose-title" className="max-h-[92dvh] w-full max-w-xl overflow-y-auto rounded-t-3xl border border-border bg-bg-secondary p-5 shadow-2xl sm:rounded-2xl sm:p-6">
-          <div className="mb-5 flex items-start justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-widest text-gold">{t("boardLabel")}</p><h2 id="board-compose-title" className="mt-1 font-display text-xl font-bold text-text-primary">{t("boardComposeTitle")}</h2></div><button type="button" onClick={() => setComposerOpen(false)} aria-label={t("boardCancel")} className="rounded-lg p-2 text-text-muted hover:bg-bg-elevated"><X size={18} /></button></div>
+          <div className="mb-5 flex items-start justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-widest text-gold">{t("boardLabel")}</p><h2 id="board-compose-title" className="mt-1 font-display text-xl font-bold text-text-primary">{t("boardComposeTitle")}</h2></div><button type="button" onClick={() => leaveComposer(() => setComposerOpen(false))} aria-label={t("boardCancel")} className="rounded-lg p-2 text-text-muted hover:bg-bg-elevated"><X size={18} /></button></div>
           {composerContent}
         </div>
       </div>}

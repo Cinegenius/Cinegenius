@@ -1,3 +1,4 @@
+import { attemptedApproval } from "@/lib/offer-moderation";
 import { bindResponsiblePerson } from "@/lib/responsible-person";
 import { getTranslations } from "next-intl/server";
 import { validateResponsiblePerson } from "@/lib/responsible-person-server";
@@ -34,9 +35,7 @@ export async function PATCH(
 
   const { title, description, price, city, published, image_url, extra_images, metadata, blocked_dates } = body;
 
-  if (published === true) {
-    return NextResponse.json({ error: "Zum Veröffentlichen bitte die ausdrückliche Freigabe-Aktion verwenden." }, { status: 400 });
-  }
+  if (attemptedApproval(body)) return NextResponse.json({ error: (await getTranslations("OfferModeration"))("adminOnly") }, { status: 403 });
 
   if (title !== undefined && title.length > 200)
     return NextResponse.json({ error: "Titel zu lang (max. 200 Zeichen)" }, { status: 400 });
@@ -143,9 +142,9 @@ export async function PATCH(
 
   const { data, error } = await db
     .from("listings")
-    .update(updates)
+    .update({ ...updates, last_editor_id: userId })
     .eq("id", id)
-    .select("id, type")
+    .select("id, type, published, moderation_status, moderation_reason")
     .single();
 
   if (error) {
@@ -159,9 +158,10 @@ export async function PATCH(
     vehicle: "/vehicles", creator: "/creators", animal: "/tiere",
   };
   if (pathMap[data.type]) revalidatePath(pathMap[data.type]);
+  revalidatePath("/", "layout");
   revalidateTag("listings", { expire: 0 });
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, data, message: data.moderation_status === "pending" ? (await getTranslations("OfferModeration"))("changed") : null }, { headers: { "Cache-Control": "private, no-store" } });
 }
 
 // DELETE /api/listings/[id] — delete own listing
@@ -202,6 +202,7 @@ export async function DELETE(
     vehicle: "/vehicles", creator: "/creators", animal: "/tiere",
   };
   if (listing?.type && pathMap[listing.type]) revalidatePath(pathMap[listing.type]);
+  revalidatePath("/", "layout");
   revalidateTag("listings", { expire: 0 });
 
   return NextResponse.json({ success: true });

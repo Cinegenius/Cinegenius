@@ -1,4 +1,6 @@
 "use client";
+import { useFormRouter as useRouter } from "@/lib/use-form-router";
+import { useExistingDraftProtection } from "@/lib/use-form-draft";
 import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
 import { EMPTY_RESPONSIBLE_PERSON, responsiblePersonErrors } from "@/lib/responsible-person";
 
@@ -6,7 +8,7 @@ import { EMPTY_RESPONSIBLE_PERSON, responsiblePersonErrors } from "@/lib/respons
 import { useLocale, useTranslations } from "next-intl";
 import { localizeSetupError, localizeSetupMessage } from "@/lib/i18n/setup-messages";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import type { ReactNode } from "react";
 import Image from "@/components/MediaImage";
@@ -195,6 +197,8 @@ export default function ProfileSetupWizard() {
   }, [ready, draft.name, user?.fullName]);
 
   const persist = useCallback((value: QuickStartDraft) => saveQueue.save(value), [saveQueue]);
+
+  const draftProtection = useExistingDraftProtection({ value: draft, ready, busy: uploading || saving || retrySeconds > 0, save: persist, saved: saveQueue.matches, enabled: !finished && !completionPending });
 
   useEffect(() => {
     if (!ready || saving || finished || completionPending || retrySeconds > 0 || draft.welcomeAcknowledged === false) return;
@@ -409,6 +413,7 @@ export default function ProfileSetupWizard() {
         setProfilePublic(settingsResponse.ok && settingsBody.settings?.profile_visibility === "public");
       } catch { setProfilePublic(false); }
     }
+    draftProtection.complete();
     setFinished(completedDraft);
     setSaveState("saved");
     requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));

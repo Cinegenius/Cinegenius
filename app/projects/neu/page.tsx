@@ -1,7 +1,10 @@
 "use client";
+import { useFormRouter as useRouter } from "@/lib/use-form-router";
 
+import { useFormDraft } from "@/lib/use-form-draft";
+import FormDraftStatus from "@/components/FormDraftStatus";
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+
 import Link from "next/link";
 import {
   ArrowLeft, Clapperboard, Loader2, Check, Search, Plus, X,
@@ -120,8 +123,13 @@ export default function NeuesProjektPage() {
     setShowCreate(true);
   }
 
+  const projectDraft = useFormDraft({ formKey: "project:quick", value: { form, teamMembers, memberName, memberRole },
+    restore: (draft) => { setForm(draft.form); setTeamMembers(draft.teamMembers); setMemberName(draft.memberName); setMemberRole(draft.memberRole); setShowCreate(true); },
+  });
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!projectDraft.loaded) return;
     if (!form.title.trim()) { setCreateError("Titel ist Pflichtfeld"); return; }
     setSaving(true); setCreateError("");
     try {
@@ -145,6 +153,7 @@ export default function NeuesProjektPage() {
       const json = await res.json();
       if (!res.ok) { setCreateError(json.error ?? "Fehler"); return; }
       if (!json.draft?.id) throw new Error("Der Entwurf konnte nicht bestätigt werden.");
+      await projectDraft.complete();
       router.push(`/dashboard/projects/drafts/${json.draft.id}`);
     } catch {
       setCreateError("Netzwerkfehler — bitte erneut versuchen");
@@ -327,7 +336,7 @@ export default function NeuesProjektPage() {
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <FormDraftStatus draft={projectDraft} /><form onSubmit={handleSubmit} className="space-y-5">
                 <div>
                   <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">
                     Projekttitel <span className="text-gold">*</span>
@@ -475,7 +484,7 @@ export default function NeuesProjektPage() {
                 <div className="flex items-center gap-3 pt-2">
                   <button
                     type="submit"
-                    disabled={saving || !form.title.trim()}
+                    disabled={!projectDraft.loaded || saving || !form.title.trim()}
                     className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {saving ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}

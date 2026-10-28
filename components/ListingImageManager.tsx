@@ -15,6 +15,7 @@ type Entry = {
   stage?: "compressing" | "uploading";
   file?: File;
   replacementFile?: File;
+  uploadId?: string;
   replacementPreview?: string;
   error?: string;
 };
@@ -39,11 +40,12 @@ function uniqueUrls(urls: string[]) {
   return [...new Set(urls.filter((url) => typeof url === "string" && url.trim()).map((url) => url.trim()))];
 }
 
-function uploadFile(file: File, onProgress: (progress: number) => void): Promise<string> {
+function uploadFile(file: File, onProgress: (progress: number) => void, uploadId: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const request = new XMLHttpRequest();
     const data = new FormData();
     data.append("file", file);
+    data.append("upload_id", uploadId);
     request.open("POST", "/api/upload");
     request.timeout = 120_000;
     request.upload.onprogress = (event) => {
@@ -158,6 +160,8 @@ export default function ListingImageManager({ value, onChange, onStatusChange, l
   const runUpload = async (id: string, file: File, replacing: boolean, manageBusy = true) => {
     const existing = entriesRef.current.find((entry) => entry.id === id);
     if (!existing) return;
+    const uploadId = existing.uploadId ?? crypto.randomUUID().replace(/-/g, "");
+    patchEntry(id, { uploadId });
     if (manageBusy) setBusy(true);
     patchEntry(id, { status: "uploading", stage: "compressing", progress: 0, error: undefined }, false);
     try {
@@ -169,7 +173,7 @@ export default function ListingImageManager({ value, onChange, onStatusChange, l
       });
       if (!mountedRef.current) return;
       patchEntry(id, { stage: "uploading", progress: 0 }, false);
-      const url = await uploadFile(compressed, (progress) => patchEntry(id, { progress }, false));
+      const url = await uploadFile(compressed, (progress) => patchEntry(id, { progress }, false), uploadId);
       if (!mountedRef.current) return;
       const current = entriesRef.current.find((entry) => entry.id === id);
       if (!current) return;
@@ -248,6 +252,7 @@ export default function ListingImageManager({ value, onChange, onStatusChange, l
       progress: 0,
       error: undefined,
       replacementFile: file,
+      uploadId: crypto.randomUUID().replace(/-/g, ""),
       replacementPreview: preview ?? undefined,
       previewUrl: preview ?? entry.previewUrl,
     }, false);

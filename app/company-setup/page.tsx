@@ -1,10 +1,14 @@
 "use client";
+import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
 import { EMPTY_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, type ResponsiblePerson } from "@/lib/responsible-person";
 
 
+import { useTranslations } from "next-intl";
+import { useFormDraft } from "@/lib/use-form-draft";
+import FormDraftStatus from "@/components/FormDraftStatus";
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+
 import { useUser } from "@clerk/nextjs";
 import {
   Building2, MapPin, Globe, Mail, Phone, FileText, Briefcase,
@@ -25,11 +29,12 @@ const MAX_PORTFOLIO = MAX_COMPANY_GALLERY_IMAGES;
 
 type PendingCompanyImage = { id: string; file: File; previewUrl: string; status: "compressing" | "uploading" | "failed"; progress: number; replaceIndex?: number; error?: string };
 
-function uploadCompanyImage(file: File, onProgress: (progress: number) => void): Promise<string> {
+function uploadCompanyImage(file: File, onProgress: (progress: number) => void, uploadId = crypto.randomUUID().replace(/-/g, "")): Promise<string> {
   return new Promise((resolve, reject) => {
     const request = new XMLHttpRequest();
     const form = new FormData();
     form.append("file", file);
+    form.append("upload_id", uploadId);
     request.open("POST", "/api/upload");
     request.timeout = 120_000;
     request.upload.onprogress = (event) => {
@@ -59,6 +64,7 @@ async function prepareCompanyImage(file: File, dimensions: { maxWidth: number; m
 
 export default function CompanySetupPage() {
   const { isLoaded, user } = useUser();
+  const tDraft = useTranslations("FormDraft");
   const [responsible, setResponsible] = useState<ResponsiblePerson>(EMPTY_RESPONSIBLE_PERSON);
   const [responsibleErrors, setResponsibleErrors] = useState<Record<string, string>>({});
   const [responsibleAccountId, setResponsibleAccountId] = useState<string | null>(null);
@@ -113,9 +119,7 @@ export default function CompanySetupPage() {
   const [error, setError] = useState("");
   const [guidedSetup, setGuidedSetup] = useState(false);
   const [companyDraftLoaded, setCompanyDraftLoaded] = useState(false);
-  const [companyDraftStatus, setCompanyDraftStatus] = useState("idle");
   const [companyStep, setCompanyStep] = useState(1);
-  const [existingPublished, setExistingPublished] = useState(true);
 
   // Extended fields
   const [tagline, setTagline] = useState("");
@@ -155,7 +159,7 @@ export default function CompanySetupPage() {
           setExistingId(c.id);
           setResponsible(responsiblePersonDraft(c.responsible_person));
           setResponsibleAccountId(c.responsible_person?.userId || c.owner_user_id);
-          setExistingPublished(c.published !== false);
+
           setName(c.name ?? "");
           setCity(c.city ?? "");
           setDescription(c.description ?? "");
@@ -235,24 +239,27 @@ export default function CompanySetupPage() {
     return () => { active = false; };
   }, [guidedSetup, loading, existingId]);
 
-  useEffect(() => {
-    if (!guidedSetup || !companyDraftLoaded || loading || existingId) return;
-    const timer = setTimeout(async () => {
-      setCompanyDraftStatus("saving");
-      try {
-        const response = await fetch("/api/onboarding", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
-          intent: "company", setupComplete: false, companyDraft: { responsible, name, city, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep, updatedAt: new Date().toISOString() },
-        }) });
-        const result = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(result.error ?? "Der Entwurf konnte nicht gespeichert werden.");
-        setCompanyDraftStatus("saved");
-      } catch (cause) {
-        setCompanyDraftStatus("error");
-        setError(cause instanceof Error ? cause.message : "Der Entwurf konnte nicht gespeichert werden.");
-      }
-    }, 650);
-    return () => clearTimeout(timer);
-  }, [responsible, guidedSetup, companyDraftLoaded, loading, existingId, name, city, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, companyStep]);
+  const companyDraft = useFormDraft({
+    formKey: `company:${existingId ?? "new"}`,
+    value: { responsible, name, city, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep },
+    ready: !loading && (!guidedSetup || !!existingId || companyDraftLoaded),
+    busy: uploadingLogo || uploadingCover || uploadingPortfolio || portfolioUploads.some(entry => entry.status === "failed") || saving,
+    restore: (draft) => {
+        setResponsible(responsiblePersonDraft(draft.responsible));
+        setName(draft.name ?? ""); setCity(draft.city ?? ""); setDescription(draft.description ?? "");
+        setWebsite(draft.website ?? ""); setEmail(draft.email ?? ""); setPhone(draft.phone ?? "");
+        setEmailPublic(draft.emailPublic === true); setPhonePublic(draft.phonePublic === true); setHqAddressPublic(draft.hqAddressPublic === true);
+        setLogoUrl(draft.logoUrl ?? ""); setLogoPreview(draft.logoUrl ?? "");
+        setCoverUrl(draft.coverUrl ?? ""); setCoverPreview(draft.coverUrl ?? "");
+        setPortfolioImages(draft.portfolioImages ?? []); setSelectedCategories(draft.selectedCategories ?? []);
+        setCateringDetails(normalizeCateringCompanyDetails(draft.cateringDetails));
+        setServices(draft.services ?? []); setTagline(draft.tagline ?? ""); setBioShort(draft.bioShort ?? "");
+        setUsp(draft.usp ?? ""); setFoundedYear(draft.foundedYear ?? ""); setLegalForm(draft.legalForm ?? "");
+        setHqAddress(draft.hqAddress ?? ""); setCountries(draft.countries ?? []);
+        setIndustryFocus(draft.industryFocus ?? []); setSocialLinks(draft.socialLinks ?? {}); setOwnerTitle(draft.ownerTitle ?? "");
+        setCompanyStep(Math.min(3, Math.max(1, Number(draft.step) || 1)));
+    },
+  });
 
   const handleSingleImageUpload = async (file: File | undefined, kind: "logo" | "cover") => {
     if (!file) return;
@@ -284,7 +291,7 @@ export default function CompanySetupPage() {
     try {
       const prepared = await prepareCompanyImage(entry.file, { maxWidth: 2200, maxHeight: 1800 });
       updateEntry({ status: "uploading", progress: 3 });
-      const url = await uploadCompanyImage(prepared, (progress) => updateEntry({ progress }));
+      const url = await uploadCompanyImage(prepared, (progress) => updateEntry({ progress }), entry.id.replace(/-/g, ""));
       if (entry.replaceIndex !== undefined) {
         setPortfolioImages((current) => current.map((old, index) => index === entry.replaceIndex ? url : old));
       } else {
@@ -427,6 +434,7 @@ export default function CompanySetupPage() {
       });
       const { data, error: apiError } = await res.json();
       if (apiError) throw new Error(apiError);
+      await companyDraft.complete();
       if (guidedSetup) await fetch("/api/onboarding?type=company", { method: "DELETE" });
       router.replace(`/companies/${data.slug}?welcome=1`);
     } catch (err: unknown) {
@@ -461,10 +469,12 @@ export default function CompanySetupPage() {
             <p className="text-text-secondary max-w-sm mx-auto leading-relaxed text-sm">
               Präsentiere dein Unternehmen der Filmbranche — von Verleih bis Postproduktion.
             </p>
-            {guidedSetup && !existingId && <p className="mt-3 text-xs text-text-muted">{companyDraftStatus === "saving" ? "Speichert deinen privaten Formularfortschritt …" : companyDraftStatus === "saved" ? "Dein Formularfortschritt ist privat gespeichert." : companyDraftStatus === "error" ? "Der letzte Stand konnte nicht gespeichert werden." : "Dein Formularfortschritt wird privat gespeichert."}</p>}
+
           </div>
 
+          <FormDraftStatus draft={companyDraft} />
           <form onSubmit={handleSubmit} className="space-y-8">
+          <fieldset disabled={!companyDraft.loaded || saving} className="contents">
             <datalist id="company-title-suggestions">
               {COMPANY_PUBLIC_TITLE_SUGGESTIONS.map((title) => <option key={title} value={title} />)}
             </datalist>
@@ -539,7 +549,7 @@ export default function CompanySetupPage() {
                     <button type="submit" disabled={saving || !name.trim() || !city.trim()} className="min-h-12 flex-1 rounded-xl bg-gold px-4 text-sm font-bold text-bg-primary hover:bg-gold-light disabled:opacity-50">{saving ? <><Loader2 size={15} className="mr-2 inline animate-spin" />Wird gespeichert…</> : <>Firma öffentlich eintragen <ArrowRight size={15} className="ml-1 inline" /></>}</button>
                   )}
                 </div>
-                <p className="text-center text-xs text-text-muted">{companyDraftStatus === "saving" ? "Speichert deinen privaten Formularfortschritt …" : companyDraftStatus === "saved" ? "Dein Formularfortschritt ist privat gespeichert." : companyDraftStatus === "error" ? "Der letzte Stand konnte nicht gespeichert werden." : "Dein Formularfortschritt wird privat gespeichert."}</p>
+                <FormDraftStatus draft={companyDraft} />
               </div>
             ) : (
               <>
@@ -1089,9 +1099,7 @@ export default function CompanySetupPage() {
             )}
 
             <p className="rounded-xl border border-gold/20 bg-gold/5 px-4 py-3 text-sm leading-6 text-text-secondary">
-              {existingId && !existingPublished
-                ? "Dieses bisher private Firmenprofil wird mit dem Speichern öffentlich auffindbar."
-                : "Das Firmenprofil wird nach dem Speichern öffentlich auf CineGenius angezeigt."}
+              {tDraft("privateNotice")}
             </p>
 
             <button
@@ -1111,6 +1119,7 @@ export default function CompanySetupPage() {
             </p>
               </>
             )}
+          </fieldset>
           </form>
 
           {/* Team management — only shown when editing existing company */}

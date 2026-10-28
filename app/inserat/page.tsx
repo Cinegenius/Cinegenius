@@ -1,4 +1,6 @@
 "use client";
+import { useTranslations } from "next-intl";
+import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
 import { EMPTY_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, type ResponsiblePerson } from "@/lib/responsible-person";
 
@@ -6,9 +8,11 @@ import ListingPriceOptions from "@/components/ListingPriceOptions";
 
 import UnoptimizedImage from "@/components/UnoptimizedImage";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useFormDraft } from "@/lib/use-form-draft";
+import FormDraftStatus from "@/components/FormDraftStatus";
+import React, { useState, useRef, useEffect } from "react";
 import { compressImage, MAX_FUNCTION_UPLOAD_BYTES, safeObjectURL } from "@/lib/compressImage";
-import { useRouter } from "next/navigation";
+
 import { useAuth } from "@clerk/nextjs";
 import {
   Package, Car, Shirt, Camera, Lightbulb, Mic, Layers, Wrench,
@@ -305,6 +309,7 @@ const conditionOptions = ["Neuwertig", "Sehr gut", "Gut", "Akzeptabel"];
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function InseratPage() {
+  const moderation = useTranslations("OfferModeration");
   const router = useRouter();
   const { userId, isLoaded } = useAuth();
   const [responsible, setResponsible] = useState<ResponsiblePerson>(EMPTY_RESPONSIBLE_PERSON);
@@ -397,9 +402,6 @@ export default function InseratPage() {
   const [productionCredits, setProductionCredits] = useState<ProductionCreditDraft[]>([]);
   const [locationDraftReady, setLocationDraftReady] = useState(false);
   const [locationDraftStatus, setLocationDraftStatus] = useState<"loading" | "idle" | "saving" | "saved" | "error">("loading");
-  const locationDraftTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const locationDraftQueue = useRef<Promise<void>>(Promise.resolve());
-  const locationDraftRevision = useRef(0);
   // Calendar state for blocked dates
   const [calYear, setCalYear] = useState(() => new Date().getFullYear());
   const [calMonth, setCalMonth] = useState(() => new Date().getMonth());
@@ -460,55 +462,6 @@ export default function InseratPage() {
   const [myCompanies, setMyCompanies] = useState<{ id: string; name: string; logo_url: string | null }[]>([]);
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>("");
 
-  const buildLocationDraft = useCallback(() => ({
-    version: 1,
-    responsible,
-    categoryId: selected?.type === "location" ? selected.id : "",
-    groupId: activeGroup ?? "drehorte",
-    step,
-    form: {
-      title: form.title, description: form.description, city: form.city, price: form.price,
-        price_negotiable: priceNegotiable, price_on_request: locPriceOnRequest,
-      sqm: form.sqm, ceiling_height: form.ceiling_height, max_crew: form.max_crew,
-      indoor_outdoor: form.indoor_outdoor, power_available: form.power_available,
-      power_details: form.power_details, parking_spots: form.parking_spots,
-      natural_light: form.natural_light, blackout_possible: form.blackout_possible,
-      loading_access: form.loading_access, access_notes: form.access_notes,
-      shooting_hours: form.shooting_hours, availability_notes: form.availability_notes,
-    },
-    amenities: locAmenities,
-    rooms: locRooms,
-    blockedDates: locBlockedDates,
-    imageUrls: locExtraImages,
-    floorPlanUrl: locFloorPlanUrl,
-    selectedCompanyId,
-    focalPoint,
-    productionCredits,
-  }), [responsible, selected, activeGroup, step, form, locAmenities, locRooms, locBlockedDates, locExtraImages, locFloorPlanUrl, locPriceOnRequest, priceNegotiable, selectedCompanyId, focalPoint, productionCredits]);
-
-  const persistLocationDraft = useCallback(async (draft: ReturnType<typeof buildLocationDraft>) => {
-    const revision = ++locationDraftRevision.current;
-    setLocationDraftStatus("saving");
-    const task = locationDraftQueue.current.catch(() => undefined).then(async () => {
-      const response = await fetch("/api/onboarding", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ locationFormDraft: draft }),
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error ?? "Der Locationentwurf konnte nicht gespeichert werden.");
-    });
-    locationDraftQueue.current = task.then(() => undefined, () => undefined);
-    try {
-      await task;
-      if (revision === locationDraftRevision.current) setLocationDraftStatus("saved");
-      return true;
-    } catch (cause) {
-      if (revision === locationDraftRevision.current) setLocationDraftStatus("error");
-      throw cause;
-    }
-  }, []);
-
   useEffect(() => {
     if (!isLoaded) return;
     if (!userId) {
@@ -552,11 +505,11 @@ export default function InseratPage() {
             setLocAmenities(Array.isArray(saved.amenities) ? saved.amenities.filter((value): value is string => typeof value === "string").slice(0, 80) : []);
             setLocRooms(Array.isArray(saved.rooms) ? saved.rooms.filter((value): value is string => typeof value === "string").slice(0, 80) : []);
             setLocBlockedDates(Array.isArray(saved.blockedDates) ? saved.blockedDates.filter((value): value is string => typeof value === "string").slice(0, 500) : []);
-            const imageUrls = Array.isArray(saved.imageUrls) ? saved.imageUrls.filter((value): value is string => typeof value === "string" && value.startsWith("https://")).slice(0, MAX_LOCATION_IMAGES) : [];
+            const imageUrls = Array.isArray(saved.imageUrls) ? saved.imageUrls.filter((value): value is string => typeof value === "string" && (value.startsWith("https://") || value.startsWith("/api/media/"))).slice(0, MAX_LOCATION_IMAGES) : [];
             setLocExtraImages(imageUrls);
             setLocPriceOnRequest(savedForm.price_on_request !== false);
             setPriceNegotiable(savedForm.price_negotiable === true);
-            const floorPlanUrl = typeof saved.floorPlanUrl === "string" && saved.floorPlanUrl.startsWith("https://") ? saved.floorPlanUrl : null;
+            const floorPlanUrl = typeof saved.floorPlanUrl === "string" && (saved.floorPlanUrl.startsWith("https://") || saved.floorPlanUrl.startsWith("/api/media/")) ? saved.floorPlanUrl : null;
             setLocFloorPlanUrl(floorPlanUrl);
             setLocFloorPlanPreview(floorPlanUrl);
             setSelectedCompanyId(typeof saved.selectedCompanyId === "string" ? saved.selectedCompanyId.slice(0, 100) : "");
@@ -576,21 +529,26 @@ export default function InseratPage() {
     return () => { active = false; };
   }, [isLoaded, userId]);
 
-  useEffect(() => {
-    if (!isLoaded || !userId || !locationDraftReady || selected?.type !== "location" || step !== 2 || createdId) return;
-    if (locationDraftTimer.current) clearTimeout(locationDraftTimer.current);
-    const draft = buildLocationDraft();
-    locationDraftTimer.current = setTimeout(() => {
-      void persistLocationDraft(draft).catch(() => {});
-    }, 700);
-    return () => {
-      if (locationDraftTimer.current) clearTimeout(locationDraftTimer.current);
-    };
-  }, [isLoaded, userId, locationDraftReady, selected, step, createdId, buildLocationDraft, persistLocationDraft]);
-
-  useEffect(() => () => {
-    if (locationDraftTimer.current) clearTimeout(locationDraftTimer.current);
-  }, []);
+  const listingDraft = useFormDraft({
+    formKey: "listing:new",
+    value: { form, responsible, categoryId: selected?.id ?? "", activeGroup, step, catMeta,
+      imageUrl, articleImages, focalPoint, locAmenities, locRooms, locBlockedDates, locExtraImages,
+      locPriceOnRequest, priceNegotiable, locFloorPlanUrl, productionCredits, selectedCompanyId },
+    ready: locationDraftReady && isLoaded && !!userId,
+    enabled: !createdId,
+    busy: uploading || articleGalleryState.uploading || articleGalleryState.failed > 0 || locationGalleryState.uploading || locationGalleryState.failed > 0 || locFloorUploading || !!pendingImageFile || loading,
+    restore: (draft) => {
+      setForm(draft.form); setResponsible(responsiblePersonDraft(draft.responsible));
+      setSelected(groups.flatMap(group => group.items).find(item => item.id === draft.categoryId) ?? null);
+      setActiveGroup(draft.activeGroup); setStep(draft.step); setCatMeta(draft.catMeta);
+      setImageUrl(draft.imageUrl); setImagePreview(draft.imageUrl); setArticleImages(draft.articleImages);
+      setFocalPoint(draft.focalPoint); setLocAmenities(draft.locAmenities); setLocRooms(draft.locRooms);
+      setLocBlockedDates(draft.locBlockedDates); setLocExtraImages(draft.locExtraImages);
+      setLocPriceOnRequest(draft.locPriceOnRequest); setPriceNegotiable(draft.priceNegotiable);
+      setLocFloorPlanUrl(draft.locFloorPlanUrl); setLocFloorPlanPreview(draft.locFloorPlanUrl);
+      setProductionCredits(draft.productionCredits); setSelectedCompanyId(draft.selectedCompanyId);
+    },
+  });
 
   useEffect(() => {
     if (!userId) return;
@@ -816,6 +774,7 @@ export default function InseratPage() {
       router.push(`/sign-in?redirect_url=${encodeURIComponent(destination)}`);
       return;
     }
+    if (!listingDraft.loaded) return;
     const personErrors = responsiblePersonErrors(responsible);
     setResponsibleErrors(personErrors);
     if (Object.keys(personErrors).length && selected?.type !== "location" && selected?.type !== "job") { focusResponsiblePerson(); return; }
@@ -831,16 +790,6 @@ export default function InseratPage() {
     }
     setLoading(true);
     setError("");
-    if (selected?.type === "location") {
-      if (locationDraftTimer.current) clearTimeout(locationDraftTimer.current);
-      try {
-        await persistLocationDraft(buildLocationDraft());
-      } catch (cause) {
-        setLoading(false);
-        setError(cause instanceof Error ? cause.message : "Der private Locationentwurf konnte nicht gesichert werden.");
-        return;
-      }
-    }
     const payload = buildPayload();
     if (!payload) { setLoading(false); return; }
 
@@ -874,6 +823,7 @@ export default function InseratPage() {
       return;
     }
     setLoading(false);
+    await listingDraft.complete();
     setCreatedId(json.data?.id ?? null);
     setCreatedIsDraft(selected?.type === "job" || selected?.type === "location");
     if (selected?.type === "location") {
@@ -902,11 +852,11 @@ export default function InseratPage() {
         response = await fetch(`/api/listings/${createdId}/publish`, { method: "POST" });
       }
       const result = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(result.error ?? "Veröffentlichung fehlgeschlagen");
+      if (!response.ok) throw new Error(result.error ?? moderation("saveError"));
       setCreatedIsDraft(false);
       setPendingImageFile(null);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Veröffentlichung fehlgeschlagen");
+      setError(cause instanceof Error ? cause.message : moderation("saveError"));
     } finally {
       setPublishingDraft(false);
     }
@@ -1111,7 +1061,7 @@ export default function InseratPage() {
             </div>
             <div>
               <p className="text-xs uppercase tracking-widest text-gold font-semibold">Inserat erstellen</p>
-              {isLocation && <p role="status" className="mt-1 text-xs text-text-muted">{locationDraftStatus === "loading" ? "Entwurf wird geladen …" : locationDraftStatus === "saving" ? "Entwurf wird privat gespeichert …" : locationDraftStatus === "saved" ? "Fortschritt privat gespeichert" : locationDraftStatus === "error" ? "Speichern fehlgeschlagen — bitte Verbindung prüfen" : ""}</p>}
+              <FormDraftStatus draft={listingDraft} />
               <h1 className="font-display text-2xl font-bold text-text-primary">{label}</h1>
             </div>
           </div>
@@ -1932,13 +1882,13 @@ export default function InseratPage() {
             {/* ── SUBMIT ── */}
             <button
               onClick={handleSubmit}
-              disabled={!canSubmit() || loading || uploading || ((selected?.type === "prop" || selected?.type === "vehicle") && (articleGalleryState.uploading || articleGalleryState.failed > 0)) || (selected?.type === "location" && (locationGalleryState.uploading || locationGalleryState.failed > 0))}
+              disabled={!listingDraft.loaded || !canSubmit() || loading || uploading || ((selected?.type === "prop" || selected?.type === "vehicle") && (articleGalleryState.uploading || articleGalleryState.failed > 0)) || (selected?.type === "location" && (locationGalleryState.uploading || locationGalleryState.failed > 0))}
               className="w-full py-4 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
             >
               {loading ? (
-                <><Loader2 size={18} className="animate-spin" /> {selected?.type === "job" || selected?.type === "location" ? "Entwurf wird gespeichert…" : "Wird veröffentlicht…"}</>
+                <><Loader2 size={18} className="animate-spin" /> {selected?.type === "job" || selected?.type === "location" ? "Entwurf wird gespeichert…" : moderation("submitting")}</>
               ) : (
-                <>{selected?.type === "job" ? "Als Entwurf speichern" : selected?.type === "location" ? "Entwurf speichern und prüfen" : "Jetzt veröffentlichen"} <ArrowRight size={18} /></>
+                <>{selected?.type === "job" ? "Als Entwurf speichern" : selected?.type === "location" ? "Entwurf speichern und prüfen" : moderation("submit")} <ArrowRight size={18} /></>
               )}
             </button>
           </div>
@@ -1964,9 +1914,9 @@ export default function InseratPage() {
           <CheckCircle size={40} className={createdIsDraft ? "text-gold" : "text-success"} />
         </div>
         {createdIsDraft && <ResponsiblePersonFields value={responsible} onChange={setResponsible} errors={responsibleErrors} accountPrefill />}
-        <h2 className="font-display text-3xl font-bold text-text-primary mb-3">{createdIsDraft ? "Entwurf gespeichert" : "Veröffentlicht!"}</h2>
+        <h2 className="font-display text-3xl font-bold text-text-primary mb-3">{moderation(createdIsDraft ? "draftSaved" : "statuses.pending")}</h2>
         <p className="text-text-muted mb-8">
-          {createdIsDraft ? selected?.type === "location" ? "Diese Location ist nur für dich sichtbar. Prüfe deine Angaben und veröffentliche sie erst mit deiner ausdrücklichen Freigabe." : "Dieser Job ist nur für dich sichtbar. Prüfe die Vorschau und veröffentliche ihn erst mit deiner ausdrücklichen Freigabe." : "Dein Inserat ist jetzt live und für Produktionen sichtbar."}
+          {moderation(createdIsDraft ? "privateNotice" : "submitted")}
         </p>
         {error && <p role="alert" className="mb-5 text-sm text-red-400">{error}</p>}
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -1987,7 +1937,7 @@ export default function InseratPage() {
             }}
             className="px-6 py-3 border border-border text-text-secondary rounded-xl hover:border-gold hover:text-gold transition-all text-sm font-medium"
           >
-            Weiteres Inserat
+            {moderation("another")}
           </button>
           {createdIsDraft ? (
             <>
@@ -1997,12 +1947,12 @@ export default function InseratPage() {
                 <a href={`${successHref(createdId)}?preview=1`} target="_blank" rel="noreferrer" className="px-6 py-3 border border-border text-text-secondary rounded-xl hover:border-gold hover:text-gold transition-all text-sm font-medium">Vorschau ansehen</a>
               )}
               <button type="button" onClick={handlePublishDraft} disabled={publishingDraft} className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm disabled:opacity-50">
-                {publishingDraft ? "Wird veröffentlicht…" : "Jetzt veröffentlichen"}
+                {moderation(publishingDraft ? "submitting" : "submit")}
               </button>
             </>
           ) : (
-            <a href={successHref(createdId)} className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm">
-              Inserat ansehen
+            <a href="/dashboard?tab=listings" className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm">
+              {moderation("myOffers")}
             </a>
           )}
         </div>

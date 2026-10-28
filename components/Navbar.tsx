@@ -13,6 +13,7 @@ import {
 import NotificationCenter from "@/components/NotificationCenter";
 import { Logo } from "@/components/Logo";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useFormNavigation } from "@/contexts/FormDraftContext";
 import { useTranslations } from "next-intl";
 import { useToast } from "@/contexts/ToastContext";
 import { subscribeToMessageReads } from "@/lib/message-read-sync";
@@ -30,6 +31,7 @@ const desktopNavHrefs = [
 
 export default function Navbar({ initialIsSignedIn = false, initialAdminUserId = null }: { initialIsSignedIn?: boolean; initialAdminUserId?: string | null }) {
   const t = useTranslations("nav");
+  const { leave } = useFormNavigation();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -312,7 +314,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                         {/* Sign out */}
                         <div className="border-t border-border py-1.5">
                           <button
-                            onClick={() => { setUserMenuOpen(false); void handleSignOut(); }}
+                            onClick={() => { setUserMenuOpen(false); leave(() => void handleSignOut()); }}
                             disabled={signingOut}
                             aria-busy={signingOut}
                             className="w-full min-h-11 flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-red-400 hover:bg-red-500/5 transition-colors disabled:opacity-60"
@@ -446,7 +448,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
               {/* Sign out */}
               <div className="pt-2 border-t border-border">
                 <button
-                  onClick={() => { setOpen(false); void handleSignOut(); }}
+                  onClick={() => { setOpen(false); leave(() => void handleSignOut()); }}
                   disabled={signingOut}
                   aria-busy={signingOut}
                   className="w-full min-h-11 flex items-center gap-2 px-3 py-2.5 text-sm text-text-secondary hover:text-red-400 rounded-lg transition-colors disabled:opacity-60"

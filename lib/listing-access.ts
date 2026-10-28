@@ -5,7 +5,7 @@ import { canCompanyRole } from "@/lib/company-roles";
 
 /** The listing creator can edit their own listing; a company's accepted offer editors can edit company-owned offers. */
 export async function canEditListing(userId: string, listing: { user_id: string | null; company_id: string | null }) {
-  if (listing.user_id === userId) return true;
+  if (listing.user_id === userId && !listing.company_id) return true;
   if (!listing.company_id) return false;
 
   const { data: company, error: companyError } = await db.from("companies")

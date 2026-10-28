@@ -16,6 +16,7 @@ import PresencePing from "@/components/PresencePing";
 import CookieBanner from "@/components/CookieBanner";
 import { ToastProvider } from "@/contexts/ToastContext";
 import GlobalSearch from "@/components/GlobalSearch";
+import FormDraftProvider from "@/contexts/FormDraftContext";
 import AuthSessionBoundary from "@/components/AuthSessionBoundary";
 
 const playfair = Playfair_Display({
@@ -131,6 +132,7 @@ export default async function RootLayout({
           <ThemeProvider>
             <ToastProvider>
               <AuthSessionBoundary initialSessionId={sessionId}>
+              <FormDraftProvider>
                 <GlobalEffects />
                 <PresencePing />
                 <GlobalSearch />
@@ -138,6 +140,7 @@ export default async function RootLayout({
                 <CookieBanner />
                 <Analytics />
                 <SpeedInsights />
+              </FormDraftProvider>
               </AuthSessionBoundary>
             </ToastProvider>
           </ThemeProvider>

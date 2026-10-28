@@ -1,7 +1,10 @@
 "use client";
+import { useFormRouter as useRouter } from "@/lib/use-form-router";
 
+import { useFormDraft } from "@/lib/use-form-draft";
+import FormDraftStatus from "@/components/FormDraftStatus";
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
+
 import { useAuth } from "@clerk/nextjs";
 import {
   ArrowLeft, Clapperboard, CheckCircle, Loader2, X, Plus,
@@ -216,6 +219,10 @@ export default function NewProjectPage() {
   const [linkedLocations, setLinkedLocations] = useState<LinkedItem[]>([]);
   const [crew, setCrew] = useState<CrewEntry[]>([]);
 
+  const projectDraft = useFormDraft({ formKey: "project:new", value: { form, linkedCompanies, linkedLocations, crew },
+    restore: (draft) => { setForm(draft.form); setLinkedCompanies(draft.linkedCompanies); setLinkedLocations(draft.linkedLocations); setCrew(draft.crew); },
+  });
+
   // Search state
   const [companyResults, setCompanyResults] = useState<LinkedItem[]>([]);
   const [locationResults, setLocationResults] = useState<LinkedItem[]>([]);
@@ -283,6 +290,7 @@ export default function NewProjectPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!projectDraft.loaded) return;
     if (!form.title.trim()) { setError("Titel ist Pflichtfeld"); return; }
     setSaving(true);
     setError(null);
@@ -311,6 +319,7 @@ export default function NewProjectPage() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Fehler beim Speichern");
+      await projectDraft.complete();
       router.push(`/dashboard/projects/drafts/${json.draft.id}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Unbekannter Fehler");
@@ -338,7 +347,7 @@ export default function NewProjectPage() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <FormDraftStatus draft={projectDraft} /><form onSubmit={handleSubmit} className="space-y-5">
 
           {/* Produktionsart */}
           <div>
@@ -483,7 +492,7 @@ export default function NewProjectPage() {
               className="flex-1 px-4 py-3 border border-border text-text-secondary rounded-xl hover:border-border-hover hover:text-text-primary transition-all text-sm font-medium text-center">
               Abbrechen
             </Link>
-            <button type="submit" disabled={saving}
+            <button type="submit" disabled={saving || !projectDraft.loaded}
               className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm disabled:opacity-60">
               {saving ? <Loader2 size={15} className="animate-spin" /> : <CheckCircle size={15} />}
               {saving ? "Entwurf wird gespeichert …" : "Als Entwurf speichern"}

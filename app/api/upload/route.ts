@@ -44,7 +44,13 @@ export async function POST(req: NextRequest) {
   //    - User-scoped: prevents cross-user overwrite
   //    - UUID: prevents collision and enumeration
   //    - Extension from magic bytes: not from client filename or Content-Type
-  const path = buildStoragePath(userId, ext);
+  const uploadId = formData.get("upload_id");
+  if (uploadId !== null && (typeof uploadId !== "string" || !/^[a-f0-9]{32}$/i.test(uploadId))) {
+    return NextResponse.json({ error: t("invalid") }, { status: 400 });
+  }
+  // A retried upload uses the same immutable owner-scoped path. The media
+  // journal verifies identical bytes; a different file cannot overwrite it.
+  const path = buildStoragePath(userId, ext, undefined, typeof uploadId === "string" ? uploadId : undefined);
 
   try {
     const url = await storeProtectedMedia(userId, path, buffer, mime);

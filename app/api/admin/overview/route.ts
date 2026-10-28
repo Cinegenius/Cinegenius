@@ -18,13 +18,15 @@ async function countRows(table: string, filter?: CountFilter) {
   return count ?? 0;
 }
 
-async function attentionCounts() {
-  const [pendingReports, pendingVerifications, companyClarifications] = await Promise.all([
+async function attentionCounts(includeOffers = false) {
+  const [pendingReports, pendingVerifications, companyClarifications, pendingOffers, legacyOffers] = await Promise.all([
     countRows("reports", { op: "eq", column: "status", value: "pending" }),
     countRows("verification_requests", { op: "eq", column: "status", value: "pending" }),
     countRows("admin_company_membership_clarifications"),
+    includeOffers ? countRows("listings", { op: "eq", column: "moderation_status", value: "pending" }) : Promise.resolve(0),
+    includeOffers ? countRows("listings", { op: "eq", column: "moderation_status", value: "legacy_review_required" }) : Promise.resolve(0),
   ]);
-  return { pendingReports, pendingVerifications, companyClarifications };
+  return { pendingReports, pendingVerifications, companyClarifications, ...(includeOffers ? { pendingOffers, legacyOffers } : {}) };
 }
 
 export async function GET(request: Request) {
@@ -39,7 +41,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ counts }, { headers: { "Cache-Control": "private, no-store", "Server-Timing": `auth;dur=${(authorizedAt - startedAt).toFixed(1)}, database;dur=${(performance.now() - authorizedAt).toFixed(1)}` } });
     }
     const recentListingsPromise = db.from("listings")
-      .select("id, company_id, type, title, city, price, published, created_at")
+      .select("id, company_id, type, title, city, price, published, moderation_status, created_at")
       .order("created_at", { ascending: false }).limit(6)
       .then(({ data, error }) => {
         if (error) throw new Error(`Admin overview recent listings: ${error.message}`);
@@ -62,7 +64,7 @@ export async function GET(request: Request) {
       countRows("listings", { op: "in", column: "type", value: ["prop", "vehicle"] }),
       countRows("listings", { op: "eq", column: "type", value: "service" }),
       countRows("projects"),
-      attentionCounts(),
+      attentionCounts(true),
       countRows("bookings"),
       countRows("reviews"),
       countRows("community_posts", { op: "gt", column: "expires_at", value: new Date().toISOString() }),

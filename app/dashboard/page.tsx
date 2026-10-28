@@ -1,4 +1,7 @@
 "use client";
+import { useTranslations } from "next-intl";
+import OfferModerationStatus from "@/components/OfferModerationStatus";
+import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
 import { EMPTY_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, type ResponsiblePerson } from "@/lib/responsible-person";
 
@@ -9,8 +12,11 @@ import SetupStatusNotice from "@/components/SetupStatusNotice";
 
 import UnoptimizedImage from "@/components/UnoptimizedImage";
 
+import { useFormDraft } from "@/lib/use-form-draft";
+import { useFormNavigation } from "@/contexts/FormDraftContext";
+import FormDraftStatus from "@/components/FormDraftStatus";
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   List, Calendar, MessageSquare,
@@ -80,6 +86,7 @@ const VALID_TABS = ["overview", "listings", "jobs", "favorites", "messages", "bo
 
 
 export default function DashboardPage() {
+  const moderation = useTranslations("OfferModeration");
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -88,7 +95,7 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState(VALID_TABS.includes(tabParam) ? tabParam : "overview");
 
   // Real listings from Supabase
-  const [myListings, setMyListings] = useState<{ id: string; type: string; title: string; city: string; price: number; published: boolean; responsible_person?: ResponsiblePerson & { userId: string }; created_at: string; image_url: string | null; extra_images?: string[] | null; blocked_dates?: string[] | null; description: string; metadata?: Record<string, unknown> | null }[]>([]);
+  const [myListings, setMyListings] = useState<{ id: string; type: string; title: string; city: string; price: number; published: boolean; moderation_status?: string; moderation_reason?: string | null; responsible_person?: ResponsiblePerson & { userId: string }; created_at: string; image_url: string | null; extra_images?: string[] | null; blocked_dates?: string[] | null; description: string; metadata?: Record<string, unknown> | null }[]>([]);
   const [listingsLoading, setListingsLoading] = useState(false);
   const [listingsError, setListingsError] = useState("");
 
@@ -220,12 +227,12 @@ export default function DashboardPage() {
           body: JSON.stringify({ published: false }),
         })
       : await fetch(`/api/listings/${id}/publish`, { method: "POST" });
+    const result = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const result = await response.json().catch(() => ({}));
       window.alert(result.error ?? "Status konnte nicht geändert werden.");
       return;
     }
-    setMyListings((prev) => prev.map((l) => l.id === id ? { ...l, published: !current } : l));
+    setMyListings((prev) => prev.map((l) => l.id === id ? { ...l, published: result.published ?? result.data?.published ?? false, moderation_status: result.moderation_status ?? result.data?.moderation_status ?? (current ? "hidden" : "pending") } : l));
   };
 
   const deleteListing = async (id: string) => {
@@ -251,6 +258,13 @@ export default function DashboardPage() {
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState("");
   const [editUploading, setEditUploading] = useState(false);
+
+  const { leave: leaveEditor } = useFormNavigation();
+  const editDraft = useFormDraft({ formKey: `listing:${editingId ?? "new"}`, enabled: !!editingId,
+    value: { form: editForm, responsible: editResponsible, gallery: editGallery, blockedDates: editBlockedDates, locationMeta: editLocationMeta, newBlockedDate },
+    busy: editUploading || editGalleryState.uploading || editGalleryState.failed > 0 || editSaving,
+    restore: draft => { setEditForm(draft.form); setEditResponsible(draft.responsible); setEditGallery(draft.gallery); setEditBlockedDates(draft.blockedDates); setEditLocationMeta(draft.locationMeta); setNewBlockedDate(draft.newBlockedDate); },
+  });
 
   const startEdit = useCallback((l: typeof myListings[number]) => {
     setEditingId(l.id);
@@ -314,7 +328,7 @@ export default function DashboardPage() {
   };
 
   const saveEdit = async () => {
-    if (!editingId || editUploading || editGalleryState.uploading) return;
+    if (!editDraft.loaded || !editingId || editUploading || editGalleryState.uploading) return;
     if (editGalleryState.failed > 0) {
       setEditError("Bitte lade fehlgeschlagene Bilder erneut hoch oder entferne sie.");
       return;
@@ -364,12 +378,15 @@ export default function DashboardPage() {
           } } : usesGallery ? {metadata:{price_on_request:editLocationMeta.price_on_request,price_negotiable:editLocationMeta.price_negotiable}} : {}),
         }),
       });
-      const { error } = await res.json();
+      const { error, data: savedListing } = await res.json();
       if (error) throw new Error(error);
       setMyListings((prev) => prev.map((l) =>
         l.id === editingId
           ? {
               ...l,
+              published: savedListing?.published ?? l.published,
+              moderation_status: savedListing?.moderation_status ?? l.moderation_status,
+              moderation_reason: savedListing?.moderation_reason ?? null,
               title: editForm.title.trim(),
               description: editForm.description,
               city: editForm.city.trim(),
@@ -399,6 +416,7 @@ export default function DashboardPage() {
             }
           : l
       ));
+      await editDraft.complete();
       setEditingId(null);
     } catch (err) {
       setEditError(err instanceof Error ? err.message : "Fehler beim Speichern");
@@ -453,7 +471,7 @@ export default function DashboardPage() {
   }, []);
 
   // My posted jobs
-  const [myJobs, setMyJobs] = useState<{ id: string; title: string; published: boolean; role: string | null; location: string | null; employment_type: string | null; created_at: string }[]>([]);
+  const [myJobs, setMyJobs] = useState<{ id: string; title: string; published: boolean; moderation_status?: string; moderation_reason?: string | null; role: string | null; location: string | null; employment_type: string | null; created_at: string }[]>([]);
   const [myJobsLoading, setMyJobsLoading] = useState(false);
 
   useEffect(() => {
@@ -1125,11 +1143,9 @@ export default function DashboardPage() {
                         </div>
                         {/* Info */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
                             <p className="font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{l.title}</p>
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full border shrink-0 font-semibold ${l.published ? "text-success border-success/30 bg-success/10" : "text-text-muted border-border"}`}>
-                              {l.published ? "Aktiv" : "Inaktiv"}
-                            </span>
+                            <OfferModerationStatus item={l} />
                           </div>
                           <p className="text-xs text-text-muted">{typeLabel[l.type] ?? l.type} · {l.city}</p>
                         </div>
@@ -1603,9 +1619,7 @@ export default function DashboardPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                       <p className="font-semibold text-sm text-text-primary truncate">{job.title}</p>
-                      <span className={`text-[10px] px-2 py-0.5 border rounded-full shrink-0 font-semibold ${job.published ? "text-success border-success/30 bg-success/10" : "text-text-muted border-border"}`}>
-                        {job.published ? "Aktiv" : "Entwurf"}
-                      </span>
+                      <OfferModerationStatus item={job} />
                     </div>
                     <p className="text-xs text-text-muted">
                       {[job.role, job.location].filter(Boolean).join(" · ")} · {new Date(job.created_at).toLocaleDateString("de-DE")}
@@ -1744,11 +1758,8 @@ export default function DashboardPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <h3 className="font-semibold text-text-primary">{l.title}</h3>
-                      <span className={`text-xs px-2 py-0.5 border rounded ${l.published ? "bg-success/10 text-success border-success/20" : "bg-border text-text-muted border-border"}`}>
-                        {l.published ? "Aktiv" : "Inaktiv"}
-                      </span>
                     </div>
-                    <p className="text-xs text-text-muted mb-1">{typeLabel[l.type] ?? l.type} · {l.city}</p>
+                    <OfferModerationStatus item={l} explain /><p className="text-xs text-text-muted mb-1">{typeLabel[l.type] ?? l.type} · {l.city}</p>
                     <p className="text-xs text-text-muted">
                       {listingPriceLabel(l.price,l.metadata)} ·{" "}
                       erstellt {new Date(l.created_at).toLocaleDateString("de-DE")}
@@ -1762,7 +1773,7 @@ export default function DashboardPage() {
                       Ansehen
                     </Link>
                     <button
-                      onClick={() => editingId === l.id ? setEditingId(null) : startEdit(l)}
+                      onClick={() => leaveEditor(() => editingId === l.id ? setEditingId(null) : startEdit(l))}
                       disabled={editingId === l.id && (editGalleryState.uploading || editUploading)}
                       className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all flex items-center justify-center gap-1 ${
                         editingId === l.id
@@ -1774,13 +1785,14 @@ export default function DashboardPage() {
                     </button>
                     <button
                       onClick={() => togglePublished(l.id, l.published)}
+                      disabled={l.moderation_status === "pending"}
                       className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
                         l.published
                           ? "border border-gold/30 text-gold hover:bg-gold/10"
                           : "border border-success/30 text-success hover:bg-success/10"
                       }`}
                     >
-                      {l.published ? "Deaktivieren" : "Aktivieren"}
+                      {moderation(l.published ? "hide" : l.moderation_status === "pending" ? "statuses.pending" : "submit")}
                     </button>
                     <button
                       onClick={() => deleteListing(l.id)}
@@ -1795,6 +1807,7 @@ export default function DashboardPage() {
                 {editingId === l.id && (
                   <div className="mt-3 p-4 rounded-xl border border-gold/20 bg-gold/5 space-y-3">
                     <p className="text-xs font-semibold text-gold uppercase tracking-widest">Inserat bearbeiten</p>
+                    <p className="mb-3 text-xs leading-5 text-text-muted">{moderation("editNotice")}</p><FormDraftStatus draft={editDraft} />
                     {editError && (
                       <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{editError}</p>
                     )}
@@ -1919,7 +1932,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex gap-2 justify-end">
                       <button
-                        onClick={() => setEditingId(null)}
+                        onClick={() => leaveEditor(() => setEditingId(null))}
                         disabled={editGalleryState.uploading || editUploading}
                         className="px-4 py-2 text-xs font-medium border border-border text-text-secondary hover:text-text-primary rounded-lg transition-all"
                       >
@@ -1927,7 +1940,7 @@ export default function DashboardPage() {
                       </button>
                       <button
                         onClick={saveEdit}
-                        disabled={editSaving || editUploading || editGalleryState.uploading || editGalleryState.failed > 0}
+                        disabled={!editDraft.loaded || editSaving || editUploading || editGalleryState.uploading || editGalleryState.failed > 0}
                         className="px-4 py-2 text-xs font-semibold bg-gold text-bg-primary rounded-lg hover:bg-gold-light transition-colors flex items-center gap-1.5 disabled:opacity-60"
                       >
                         {editSaving ? <Loader2 size={11} className="animate-spin" /> : <Save size={11} />}

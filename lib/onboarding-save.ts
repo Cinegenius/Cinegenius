@@ -8,12 +8,13 @@ export function isQuickStartContentSaved(draft: QuickStartDraft) {
 }
 
 /** Serialize writes and skip snapshots already acknowledged by the server. */
-export function createOnboardingSaveQueue(save: (draft: QuickStartDraft) => Promise<boolean>) {
+export function createOnboardingSaveQueue<T = QuickStartDraft>(save: (draft: T) => Promise<boolean>) {
   let acknowledged = "";
   let queue: Promise<boolean> = Promise.resolve(true);
   return {
-    acknowledge(draft: QuickStartDraft) { acknowledged = JSON.stringify(draft); },
-    save(draft: QuickStartDraft) {
+    acknowledge(draft: T) { acknowledged = JSON.stringify(draft); },
+    matches(draft: T) { return acknowledged ? acknowledged === JSON.stringify(draft) : null; },
+    save(draft: T) {
       const fingerprint = JSON.stringify(draft);
       queue = queue.catch(() => false).then(async () => {
         if (acknowledged === fingerprint) return true;

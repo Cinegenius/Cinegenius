@@ -1,3 +1,6 @@
+import { attemptedApproval } from "@/lib/offer-moderation";
+import { getTranslations } from "next-intl/server";
+import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getCurrentUser, requireAuth } from "@/lib/auth";
 import { hasCompanyCapability } from "@/lib/company-access";
@@ -32,6 +35,7 @@ export async function POST(req: NextRequest) {
   const { userId } = authResult;
 
   const body = await req.json();
+  if (attemptedApproval(body)) return NextResponse.json({ error: (await getTranslations("OfferModeration"))("adminOnly") }, { status: 403 });
   const { company_id, category, name } = body;
 
   if (!company_id || !category || !name?.trim())
@@ -69,13 +73,16 @@ export async function POST(req: NextRequest) {
       deposit_required:    body.deposit_required     ?? false,
       deposit_amount:      body.deposit_amount       ?? null,
       quantity:            body.quantity             ?? 1,
-      published:           true,
+      published:           false,
+      moderation_status:   body.draft === true ? "draft" : "pending",
+      last_editor_id:     userId,
     })
     .select()
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ data });
+  revalidatePath("/", "layout");
+  return NextResponse.json({ data }, { headers: { "Cache-Control": "private, no-store" } });
 }
 
 export async function PATCH(req: NextRequest) {
@@ -84,6 +91,7 @@ export async function PATCH(req: NextRequest) {
   const { userId } = authResult;
 
   const body = await req.json().catch(() => ({}));
+  if (attemptedApproval(body)) return NextResponse.json({ error: (await getTranslations("OfferModeration"))("adminOnly") }, { status: 403 });
   const { id } = body;
   if (!id) return NextResponse.json({ error: "id fehlt" }, { status: 400 });
 
@@ -109,9 +117,10 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Die Bilder müssen bereits gespeichert oder eigene CineGenius-Uploads sein (maximal 12 Fotos)." }, { status: 400 });
   }
 
-  const { data, error } = await admin.from("company_equipment").update(fields).eq("id", id).select().single();
+  const { data, error } = await admin.from("company_equipment").update({ ...fields, last_editor_id: userId }).eq("id", id).select().single();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ data });
+  revalidatePath("/", "layout");
+  return NextResponse.json({ data }, { headers: { "Cache-Control": "private, no-store" } });
 }
 
 export async function DELETE(req: NextRequest) {
