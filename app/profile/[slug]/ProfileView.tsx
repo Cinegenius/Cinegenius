@@ -23,6 +23,7 @@ import CompanyLogo from "@/components/CompanyLogo";
 import ProfileRoles from "./ProfileRoles";
 import ResilientPublicImage from "@/components/ResilientPublicImage";
 import { profileCoverStyle } from "@/lib/profile-cover";
+import FloatingPanel from "@/components/FloatingPanel";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -138,6 +139,7 @@ function normType(t: string | null | undefined): string | null {
 }
 
 function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; initialYouBlocked: boolean }) {
+  const menuTriggerRef = useRef<HTMLButtonElement>(null);
   const [youBlocked, setYouBlocked] = useState(initialYouBlocked);
   const [blockLoading, setBlockLoading] = useState(false);
   const [blockError, setBlockError] = useState("");
@@ -187,6 +189,9 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
   return (
     <div className="relative">
       <button
+        ref={menuTriggerRef}
+        type="button"
+        aria-expanded={reportOpen}
         onClick={() => setReportOpen((o) => !o)}
         className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white/70 hover:text-white hover:bg-white/20 transition-all"
         aria-label="Mehr Optionen"
@@ -195,7 +200,7 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
       </button>
 
       {reportOpen && (
-        <div className="absolute right-0 top-full mt-2 z-50 bg-[#1e2028] border border-white/10 rounded-xl shadow-2xl py-1 w-52">
+        <FloatingPanel anchorRef={menuTriggerRef} onClose={() => setReportOpen(false)} className="bg-[#1e2028] border border-white/10 rounded-xl shadow-2xl py-1">
           <button
             onClick={() => { toggleBlock(); setReportOpen(false); }}
             disabled={blockLoading}
@@ -239,7 +244,7 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
           )}
           {blockError && <p className="px-3 py-1 text-xs text-red-400">{blockError}</p>}
           {reportError && <p className="px-3 py-1 text-xs text-red-400">{reportError}</p>}
-        </div>
+        </FloatingPanel>
       )}
     </div>
   );

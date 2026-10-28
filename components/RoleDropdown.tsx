@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
+import FloatingPanel from "@/components/FloatingPanel";
 import { ChevronDown, Search } from "lucide-react";
 import { gripSearchTerms, normalizeOccupation } from "@/lib/gripTaxonomy";
 
@@ -19,15 +20,7 @@ export default function RoleDropdown({
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   const normalizedQuery = normalizeOccupation(query);
   const filtered = options.filter((option) =>
@@ -35,9 +28,11 @@ export default function RoleDropdown({
   );
 
   return (
-    <div ref={ref} className={`relative ${className}`}>
+    <div className={`relative ${className}`}>
       <button
+        ref={triggerRef}
         type="button"
+        aria-expanded={open}
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm hover:border-gold/50 focus:outline-none focus:border-gold transition-colors"
       >
@@ -45,7 +40,7 @@ export default function RoleDropdown({
         <ChevronDown size={13} className={`shrink-0 text-text-muted transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
-        <div className="absolute z-50 top-full mt-1 left-0 right-0 bg-bg-elevated border border-border rounded-lg shadow-xl overflow-hidden min-w-[180px]">
+        <FloatingPanel anchorRef={triggerRef} onClose={() => setOpen(false)} width={180} align="left" matchAnchorWidth className="bg-bg-elevated border border-border rounded-lg shadow-xl">
           <div className="flex items-center gap-2 px-3 py-2 border-b border-border">
             <Search size={11} className="text-text-muted shrink-0" />
             <input
@@ -70,7 +65,7 @@ export default function RoleDropdown({
               </button>
             ))}
           </div>
-        </div>
+        </FloatingPanel>
       )}
     </div>
   );

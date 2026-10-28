@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import FloatingPanel from "@/components/FloatingPanel";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -142,6 +143,7 @@ export default function CompanyDetail({
   const [joinDialogMode, setJoinDialogMode] = useState<"join" | "title_change" | null>(null);
   const membershipDialogRef = useRef<HTMLElement | null>(null);
   const [actionMenuOpen, setActionMenuOpen] = useState(false);
+  const actionMenuTriggerRef = useRef<HTMLButtonElement>(null);
   const [withdrawing, setWithdrawing] = useState(false);
   const [membershipError, setMembershipError] = useState("");
   const [membershipSuccess, setMembershipSuccess] = useState("");
@@ -307,7 +309,7 @@ export default function CompanyDetail({
       )}
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <section className={`relative border-b border-border ${actionMenuOpen ? "z-30 overflow-visible" : "overflow-hidden"}`}>
+      <section className="relative border-b border-border overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-bg-elevated to-bg-primary">
           {company.cover_url && <img src={company.cover_url} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />}
           <div className="absolute inset-0 bg-gradient-to-b from-bg-primary/60 via-bg-primary/75 to-bg-primary" />
@@ -408,13 +410,13 @@ export default function CompanyDetail({
             )}
             {!isOwner && (
               <div className="relative">
-                <button type="button" aria-expanded={actionMenuOpen} aria-controls="company-membership-actions-menu"
+                <button ref={actionMenuTriggerRef} type="button" aria-expanded={actionMenuOpen} aria-controls="company-membership-actions-menu"
                   onClick={() => setActionMenuOpen((open) => !open)}
                   className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-bg-elevated px-3 py-2 text-xs text-text-secondary transition-colors hover:border-gold/40 hover:text-gold">
                   <MoreHorizontal size={14} /> Weitere Aktionen
                 </button>
                 {actionMenuOpen && (
-                  <div id="company-membership-actions-menu" role="group" aria-label="Weitere Firmenaktionen" className="absolute right-0 top-full z-30 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-border bg-bg-secondary p-2 shadow-2xl">
+                  <FloatingPanel anchorRef={actionMenuTriggerRef} onClose={() => setActionMenuOpen(false)} width={288} id="company-membership-actions-menu" label="Weitere Firmenaktionen" className="rounded-xl border border-border bg-bg-secondary p-2 shadow-2xl">
                     {!currentUserId ? (
                       <Link href={`/sign-in?redirect_url=${encodeURIComponent(`/companies/${company.slug}`)}`}
                         className="flex min-h-11 items-center rounded-lg px-3 py-2.5 text-left text-sm text-text-primary hover:bg-bg-elevated">
@@ -453,7 +455,7 @@ export default function CompanyDetail({
                         </button>
                       </>
                     )}
-                  </div>
+                  </FloatingPanel>
                 )}
               </div>
             )}

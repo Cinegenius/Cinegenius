@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
+import FloatingPanel from "@/components/FloatingPanel";
 import { Flag } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 
@@ -23,16 +24,7 @@ export default function ReportButton({ listingId, listingType = "listing" }: Pro
   const [reason, setReason] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   if (!userId) return null;
 
@@ -68,8 +60,11 @@ export default function ReportButton({ listingId, listingType = "listing" }: Pro
   }
 
   return (
-    <div ref={ref} className="relative">
+    <div className="relative">
       <button
+        ref={triggerRef}
+        type="button"
+        aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
         className="flex items-center gap-1 text-xs text-text-muted hover:text-red-400 transition-colors px-2 py-1 rounded-lg hover:bg-red-400/10"
         title="Inserat melden"
@@ -78,7 +73,7 @@ export default function ReportButton({ listingId, listingType = "listing" }: Pro
       </button>
 
       {open && (
-        <div className="absolute right-0 top-8 z-50 w-52 bg-bg-elevated border border-border rounded-xl shadow-xl p-2">
+        <FloatingPanel anchorRef={triggerRef} onClose={() => setOpen(false)} className="bg-bg-elevated border border-border rounded-xl shadow-xl p-2">
           <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold px-2 py-1 mb-1">
             Grund auswählen
           </p>
@@ -103,7 +98,7 @@ export default function ReportButton({ listingId, listingType = "listing" }: Pro
           >
             {status === "loading" ? "Wird gesendet…" : "Melden"}
           </button>
-        </div>
+        </FloatingPanel>
       )}
     </div>
   );
