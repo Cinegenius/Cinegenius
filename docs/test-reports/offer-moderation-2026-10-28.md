@@ -1,6 +1,6 @@
 # Verbindliche Inseratsfreigabe — 28.10.2026
 
-Stand: lokal implementiert und geprüft, **nicht in Produktion angewendet oder veröffentlicht**. In der Produktionsdatenbank wurden ausschließlich SELECT-Abfragen ausgeführt. Die zuvor begonnene private Formularwiederherstellung bleibt erhalten.
+Prüfbericht mit lokalem Ausgangsstand und anschließendem Live-Abgleich. Die Produktionsänderungen wurden am 28.10.2026 angewendet; der erste App-Release ist `966c1d0`. Die zuvor begonnene private Formularwiederherstellung ist enthalten.
 
 ## Konkreter Produktionsbefund
 
@@ -125,4 +125,11 @@ Dies waren **Browsersimulationen**, keine echten iPhone-/Android-/Tablet-Geräte
 4. Die 19 Bestandsfälle individuell entscheiden. Aus einem fehlenden alten Protokolleintrag folgt kein Fehlverhalten eines Mitglieds.
 5. Bereits früher öffentlich gespeicherte Originaldateien werden durch einen privaten Datenbankstatus nicht rückwirkend geheim. Geschützte `/api/media/...`-Dateien beachten die aktuelle Freigabe; ältere öffentliche Storage-Kopien benötigen gegebenenfalls eine gesonderte, geprüfte Umstellung. Bereits heruntergeladene Dateien lassen sich nicht zurückholen.
 
-Keine Produktionsmigration, kein Commit/Push und kein Deployment wurden für diese Korrektur ausgeführt.
+## Live-Veröffentlichung und Nachprüfung am 28.10.2026
+
+- Beide Migrationen wurden im richtigen Supabase-Produktionsprojekt in einer gemeinsamen Transaktion angewendet. Ein temporärer, RLS-geschützter Snapshot verglich alle vorherigen Angebotsinhalte und Veröffentlichungswerte vor dem Commit. Ergebnis: 21 Inserate insgesamt, weiterhin dieselben 19 öffentlich; kein Inhalt oder Veröffentlichungswert verändert. Alle 19 öffentlichen Bestandsfälle tragen den gesonderten Klärungsstatus. Direkte Clientrechte wurden als gesperrt bestätigt.
+- GitHub Desktop: geprüfte Änderungen committed und gepusht; sauberes `main` identisch mit `origin/main`. Anschließend Veröffentlichung ausschließlich über `npm run deploy:production`. Erste bereitgestellte Version: `966c1d049b765391a9e9b9935f7d7b214f5ccd41`, Vercel `dpl_zrLzNSQQd59LsVxNaVqyys3F3bHW`, Alias `https://www.cinegenius.co`.
+- Die tatsächliche Produktionsdatenbank bestand eine vollständig zurückgerollte Transaktion: eigenes Testinserat erstellen, privat einreichen, explizit freigeben, bei Inhaltsänderung wieder privat auf Prüfung setzen, veraltete Freigabe verweigern, ablehnen, Audit kontrollieren und privaten Formularentwurf speichern. Keine Testnachricht, kein Testinserat und kein Testentwurf aus dieser SQL-Prüfung blieb erhalten. Der erste Aufbauversuch fehlte wegen des nicht gesetzten Pflichtpreises im Testdatensatz; mit explizitem Testpreis 0 bestanden alle Aussagen.
+- Öffentliche Startseite lädt vollständig. Adminübersicht zeigt die 19 gesondert zu prüfenden Bestandsfälle. Gastaufruf der Adminprüf-API wird verweigert; `/dashboard` führt auf die Anmeldung derselben Domain.
+- Der Live-Abgleich fand zusätzlich einen alten Proxy-Rückgabefall für private APIs: Ohne Sitzung wurde die neue Entwurfs-API zu einer nicht erreichbaren gehosteten Anmeldeseite weitergeleitet. `proxy.ts` liefert für private API-Aufrufe ohne Sitzung nun nicht zwischenspeicherbares JSON mit Status 401. Für vorhandene Sitzungen bleibt `auth.protect()` aktiv; Ursprungsschutz, öffentliche GETs, Adminrollen und Browserweiterleitung bleiben erhalten. Vier neue Regressionstests sowie die zugehörigen Entwurfs-/Moderationstests bestanden (16 gezielte Tests); anschließend bestanden alle 745 Tests der vollständigen Suite sowie TypeScript und die Übersetzungsprüfung. Die kleine Ergänzung wird über denselben geschützten Releaseweg veröffentlicht.
+- Ein vollständiger UI-Upload-/Freigabeablauf mit getrennten echten Admin- und Mitgliedssitzungen sowie echte Gerätetests bleibt separat nachzuweisen; die SQL-Transaktion ersetzt diesen Nachweis nicht.

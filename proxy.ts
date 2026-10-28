@@ -204,6 +204,13 @@ export default clerkMiddleware(async (auth, request) => {
     // Verified admin — fall through to security headers
   } else if (isWebhookRoute(request)) {
     // 3a. Webhook routes — skip Clerk auth entirely; signature verified per-handler
+  } else if (isApi && !isPublicApiGet(request)) {
+    // Private fetch endpoints must not follow Clerk's hosted sign-in redirect
+    // after logout/session expiry. Keep the existing authenticated-session
+    // protection, and return a non-cacheable JSON failure for signed-out calls.
+    const { userId } = await auth();
+    if (!userId) return NextResponse.json({ code: "account" }, { status: 401, headers: { "Cache-Control": "private, no-store", "CDN-Cache-Control": "no-store", "Vercel-CDN-Cache-Control": "no-store" } });
+    await auth.protect();
   } else if (isPublicApiGet(request)) {
     // 3b. Public-GET API — only protect mutations so a missed handler check
     //     doesn't silently open write access to unauthenticated callers.
