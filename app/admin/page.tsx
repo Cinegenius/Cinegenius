@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@clerk/nextjs";
+import { useTranslations } from "next-intl";
 import { useViewState } from "@/lib/use-view-state";
 
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
@@ -15,13 +16,15 @@ import {
 import { SupportMessageAction } from "@/components/admin/SupportMessageAction";
 
 const AdminSupportCenter = dynamic(() => import("@/components/admin/AdminSupportCenter").then(module => module.AdminSupportCenter));
+const AdminAccounts = dynamic(() => import("@/components/admin/AdminAccounts").then(module => module.AdminAccounts));
 
-type TabId = "overview" | "reports" | "verifications" | "users" | "companies" | "listings" | "projects" | "bookings" | "media" | "support" | "audit";
+type TabId = "overview" | "reports" | "verifications" | "users" | "accounts" | "companies" | "listings" | "projects" | "bookings" | "media" | "support" | "audit";
 const navItems: { icon: typeof LayoutDashboard; label: string; id: TabId }[] = [
   { icon: LayoutDashboard, label: "Übersicht", id: "overview" },
   { icon: ClipboardList, label: "Meldungen", id: "reports" },
   { icon: ShieldCheck, label: "Verifizierungen", id: "verifications" },
   { icon: Users, label: "Profile", id: "users" },
+  { icon: Users, label: "", id: "accounts" },
   { icon: Building2, label: "Firmen", id: "companies" },
   { icon: List, label: "Inserate", id: "listings" },
   { icon: Clapperboard, label: "Projekte", id: "projects" },
@@ -153,6 +156,7 @@ function ListingProviderControls({ listing, onSaved, onError }: { listing: Listi
 }
 
 function AdminContent() {
+  const accountsText = useTranslations("AdminAccounts");
   const [activeTab, setActiveTab] = useViewState<TabId>("admin.activeTab", "overview");
   const [refreshKey, setRefreshKey] = useState(0);
   const [overview, setOverview] = useState<Overview | null>(null);
@@ -509,7 +513,7 @@ function AdminContent() {
     } finally { setMediaChecking(null); }
   }
 
-  const labels = (activeTab === "overview" ? "Übersicht" : navItems.find((item) => item.id === activeTab)?.label) ?? "Admin";
+  const labels = activeTab === "accounts" ? accountsText("title") : (activeTab === "overview" ? "Übersicht" : navItems.find((item) => item.id === activeTab)?.label) ?? "Admin";
   const pendingReports = overview?.counts.pendingReports ?? 0;
   const pendingVerifications = overview?.counts.pendingVerifications ?? 0;
   const companyClarificationsCount = overview?.counts.companyClarifications ?? 0;
@@ -519,7 +523,8 @@ function AdminContent() {
       <aside className="fixed bottom-0 left-0 top-16 z-40 hidden w-56 flex-col border-r border-border bg-bg-secondary lg:flex">
         <div className="border-b border-border p-4"><div className="flex items-center gap-2"><div className="flex h-8 w-8 items-center justify-center rounded-lg border border-crimson/30 bg-crimson/20"><Shield size={16} className="text-crimson-light" /></div><div><p className="text-sm font-semibold text-text-primary">Adminbereich</p><p className="text-xs text-text-muted">CineGenius</p></div></div></div>
         <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-          {navItems.map(({ icon: Icon, label, id }) => {
+          {navItems.map(({ icon: Icon, label: originalLabel, id }) => {
+            const label = id === "accounts" ? accountsText("title") : originalLabel;
             const badge = id === "reports" ? pendingReports : id === "verifications" ? pendingVerifications : id === "companies" ? companyClarificationsCount : 0;
             return <button key={id} onClick={() => setActiveTab(id)} className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${activeTab === id ? "border-l-2 border-crimson bg-crimson/10 pl-2.5 text-crimson-light" : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"}`}><Icon size={15} /><span className="flex-1 text-left">{label}</span>{badge > 0 && <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-bg-primary">{badge}</span>}</button>;
           })}
@@ -530,7 +535,7 @@ function AdminContent() {
       <main className="min-w-0 flex-1 lg:ml-56">
         <header className="sticky top-16 z-30 border-b border-border bg-bg-primary/90 px-4 py-3 backdrop-blur-nav sm:px-6"><h1 className="font-display text-lg font-bold text-text-primary">{labels}</h1></header>
         <nav className="flex gap-2 overflow-x-auto border-b border-border bg-bg-primary px-4 py-2 lg:hidden">
-          {navItems.map(({ label, id }) => <button key={id} onClick={() => setActiveTab(id)} className={`shrink-0 rounded-lg border px-3 py-2 text-xs font-medium ${activeTab === id ? "border-crimson/40 bg-crimson/10 text-crimson-light" : "border-border text-text-secondary"}`}>{label}</button>)}
+          {navItems.map(({ label, id }) => <button key={id} onClick={() => setActiveTab(id)} className={`shrink-0 rounded-lg border px-3 py-2 text-xs font-medium ${activeTab === id ? "border-crimson/40 bg-crimson/10 text-crimson-light" : "border-border text-text-secondary"}`}>{id === "accounts" ? accountsText("title") : label}</button>)}
         </nav>
         <div className="space-y-5 p-4 sm:p-6">
           {actionMessage && <div role={actionMessage.error ? "alert" : "status"} className={`flex items-start justify-between gap-3 rounded-xl border px-4 py-3 text-sm ${actionMessage.error ? "border-gold/30 bg-gold/10 text-gold" : "border-success/30 bg-success/10 text-success"}`}><span>{actionMessage.text}</span><button aria-label="Meldung schließen" onClick={() => setActionMessage(null)}><X size={15} /></button></div>}
@@ -569,6 +574,7 @@ function AdminContent() {
             <Pager page={verificationsPage} total={verificationsTotal} pageSize={50} onPage={setVerificationsPage} />
           </div>}
 
+          {activeTab === "accounts" && <AdminAccounts />}
           {activeTab === "users" && <div className="space-y-4">
             <div className="rounded-xl border border-border bg-bg-elevated p-4 text-sm text-text-secondary">Diese Liste enthält CineGenius-Profile und ihre Clerk-ID, nicht sämtliche Clerk-Konten. Verifizieren ändert nur das interne Profilkennzeichen; Konten sperren oder löschen wird hier nicht angeboten.</div>
             <div className="flex flex-wrap items-center gap-3"><div className="relative w-full max-w-md"><Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" /><input value={profilesSearch} onChange={(e) => { setProfilesSearch(e.target.value); setProfilesPage(1); }} placeholder="Name oder exakte Clerk-ID suchen…" className="w-full rounded-xl border border-border bg-bg-secondary py-2.5 pl-9 pr-3 text-sm text-text-primary placeholder:text-text-muted" /></div><span className="text-sm text-text-muted">{profilesTotal} Profile</span></div>

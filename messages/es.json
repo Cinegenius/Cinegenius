@@ -1296,5 +1296,36 @@
     "empty": "Selecciona un archivo de imagen que no esté vacío.",
     "invalid": "No se pudo procesar la imagen de forma segura. Usa una imagen JPG, PNG o WEBP válida.",
     "tooLarge": "La imagen procesada no debe superar los 4 MB."
+  },
+  "AdminAccounts": {
+    "title": "Cuentas",
+    "explanation": "Todas las cuentas registradas, incluso sin perfil personal. La cuenta, el perfil y los anuncios son independientes. Quienes solo buscan y los proveedores de empresas no necesitan un perfil de equipo. Los mensajes de soporte se envían individualmente tras tu confirmación; aquí no se publica ni verifica nada automáticamente.",
+    "search": "Buscar nombre, correo de la cuenta o ID exacto de Clerk…",
+    "count": "{count} cuentas",
+    "refresh": "Actualizar",
+    "loading": "Cargando cuentas y estado de configuración…",
+    "empty": "No se encontraron cuentas.",
+    "loadError": "No se pudieron cargar todas las cuentas. Inténtalo de nuevo.",
+    "unnamed": "Miembro sin nombre de perfil",
+    "noEmail": "Sin correo principal",
+    "profileStatus": {
+      "missing": "Sin perfil personal",
+      "incomplete": "Perfil incompleto",
+      "private": "Perfil privado",
+      "available": "Perfil existente"
+    },
+    "needsSetup": "Configuración pendiente",
+    "setupComplete": "Configuración básica completada",
+    "registered": "Registro: {date}",
+    "openProfile": "Abrir perfil",
+    "page": "Página {page} de {pages}",
+    "previous": "Página anterior",
+    "next": "Página siguiente",
+    "sendSupport": "Enviar mensaje de soporte",
+    "accountLookupError": "No se pudo comprobar la cuenta registrada. Actualiza e inténtalo de nuevo.",
+    "accountTarget": "Configuración de la cuenta",
+    "setupAlreadyComplete": "La configuración básica ya se ha completado. Actualiza y elige una plantilla adecuada.",
+    "setupTemplateLabel": "Continuar el perfil (recordatorio opcional)",
+    "setupTemplateBody": "¡Hola! Tu cuenta de CineGenius ya está creada. Si quieres hacer visible tu perfil o un anuncio, puedes continuar la configuración aquí: '{{Bearbeitungslink}}'. Quienes solo buscan no necesitan un perfil personal. Si tienes preguntas, responde directamente. Tu equipo de soporte de CineGenius"
   }
 }

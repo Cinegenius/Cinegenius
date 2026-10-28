@@ -1296,5 +1296,36 @@
     "empty": "Vyberte neprázdný soubor obrázku.",
     "invalid": "Obrázek nelze bezpečně zpracovat. Použijte platný obrázek JPG, PNG nebo WEBP.",
     "tooLarge": "Zpracovaný obrázek nesmí překročit 4 MB."
+  },
+  "AdminAccounts": {
+    "title": "Účty",
+    "explanation": "Všechny registrované účty, i bez osobního profilu. Účet, profil a inzerát jsou oddělené. Lidé, kteří pouze hledají, ani firemní poskytovatelé nepotřebují profil člena štábu. Zprávy podpory se odesílají jednotlivě až po tvém potvrzení; nic se zde automaticky nezveřejňuje ani neověřuje.",
+    "search": "Hledat jméno, e-mail účtu nebo přesné Clerk ID…",
+    "count": "{count} účtů",
+    "refresh": "Obnovit",
+    "loading": "Načítání účtů a stavu nastavení…",
+    "empty": "Žádné účty nenalezeny.",
+    "loadError": "Účty se nepodařilo načíst úplně. Zkus to znovu.",
+    "unnamed": "Člen bez jména profilu",
+    "noEmail": "Hlavní e-mail není nastaven",
+    "profileStatus": {
+      "missing": "Bez osobního profilu",
+      "incomplete": "Neúplný profil",
+      "private": "Soukromý profil",
+      "available": "Profil existuje"
+    },
+    "needsSetup": "Nastavení nedokončeno",
+    "setupComplete": "Základní nastavení dokončeno",
+    "registered": "Registrace: {date}",
+    "openProfile": "Otevřít profil",
+    "page": "Strana {page} z {pages}",
+    "previous": "Předchozí strana",
+    "next": "Další strana",
+    "sendSupport": "Poslat zprávu podpory",
+    "accountLookupError": "Registrovaný účet se nepodařilo ověřit. Obnov stránku a zkus to znovu.",
+    "accountTarget": "Nastavení účtu",
+    "setupAlreadyComplete": "Základní nastavení již bylo dokončeno. Obnov stránku a vyber vhodnou šablonu.",
+    "setupTemplateLabel": "Pokračovat v profilu (nepovinná připomínka)",
+    "setupTemplateBody": "Ahoj! Tvůj účet CineGenius již existuje. Pokud chceš zveřejnit svůj profil nebo nabídku, pokračuj v nastavení zde: '{{Bearbeitungslink}}'. Pokud pouze hledáš, osobní profil nepotřebuješ. S dotazy nám odpověz přímo. Tvoje podpora CineGenius"
   }
 }

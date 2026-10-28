@@ -1296,5 +1296,36 @@
     "empty": "Seleziona un file immagine non vuoto.",
     "invalid": "Impossibile elaborare l’immagine in modo sicuro. Usa un’immagine JPG, PNG o WEBP valida.",
     "tooLarge": "L’immagine elaborata non deve superare i 4 MB."
+  },
+  "AdminAccounts": {
+    "title": "Account",
+    "explanation": "Tutti gli account registrati, anche senza profilo personale. Account, profili e annunci sono distinti. Chi cerca soltanto e i fornitori aziendali non hanno bisogno di un profilo crew. I messaggi di assistenza vengono inviati singolarmente solo dopo la tua conferma; qui nulla viene pubblicato o verificato automaticamente.",
+    "search": "Cerca nome, email dell’account o ID Clerk esatto…",
+    "count": "{count} account",
+    "refresh": "Aggiorna",
+    "loading": "Caricamento degli account e dello stato della configurazione…",
+    "empty": "Nessun account trovato.",
+    "loadError": "Impossibile caricare tutti gli account. Riprova.",
+    "unnamed": "Membro senza nome del profilo",
+    "noEmail": "Nessuna email principale",
+    "profileStatus": {
+      "missing": "Nessun profilo personale",
+      "incomplete": "Profilo incompleto",
+      "private": "Profilo privato",
+      "available": "Profilo presente"
+    },
+    "needsSetup": "Configurazione da completare",
+    "setupComplete": "Configurazione di base completata",
+    "registered": "Registrazione: {date}",
+    "openProfile": "Apri profilo",
+    "page": "Pagina {page} di {pages}",
+    "previous": "Pagina precedente",
+    "next": "Pagina successiva",
+    "sendSupport": "Invia messaggio di assistenza",
+    "accountLookupError": "Impossibile verificare l’account registrato. Aggiorna e riprova.",
+    "accountTarget": "Configurazione dell’account",
+    "setupAlreadyComplete": "La configurazione di base è già stata completata. Aggiorna e scegli un modello adatto.",
+    "setupTemplateLabel": "Continua il profilo (promemoria facoltativo)",
+    "setupTemplateBody": "Ciao! Il tuo account CineGenius è già stato creato. Se vuoi rendere visibile il tuo profilo o un annuncio, continua qui: '{{Bearbeitungslink}}'. Chi cerca soltanto non ha bisogno di un profilo personale. Per qualsiasi domanda, rispondi direttamente. Il tuo supporto CineGenius"
   }
 }

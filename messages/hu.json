@@ -1296,5 +1296,36 @@
     "empty": "Válassz egy nem üres képfájlt.",
     "invalid": "A kép nem dolgozható fel biztonságosan. Használj érvényes JPG-, PNG- vagy WEBP-képet.",
     "tooLarge": "A feldolgozott kép legfeljebb 4 MB lehet."
+  },
+  "AdminAccounts": {
+    "title": "Fiókok",
+    "explanation": "Minden regisztrált fiók, személyes profil nélkül is. A fiók, a profil és a hirdetés különálló. A csak kereső felhasználóknak és a céges szolgáltatóknak nincs szükségük stábprofilra. A támogatási üzeneteket csak egyenként, a jóváhagyásod után küldjük el; itt semmi sem kerül automatikusan közzétételre vagy hitelesítésre.",
+    "search": "Keresés név, fiókhoz tartozó e-mail vagy pontos Clerk-azonosító alapján…",
+    "count": "{count} fiók",
+    "refresh": "Frissítés",
+    "loading": "Fiókok és beállítási állapot betöltése…",
+    "empty": "Nem található fiók.",
+    "loadError": "Nem sikerült minden fiókot betölteni. Próbáld újra.",
+    "unnamed": "Profilnév nélküli tag",
+    "noEmail": "Nincs elsődleges e-mail-cím",
+    "profileStatus": {
+      "missing": "Nincs személyes profil",
+      "incomplete": "Hiányos profil",
+      "private": "Privát profil",
+      "available": "A profil létezik"
+    },
+    "needsSetup": "Befejezetlen beállítás",
+    "setupComplete": "Alapbeállítás kész",
+    "registered": "Regisztráció: {date}",
+    "openProfile": "Profil megnyitása",
+    "page": "{page}. oldal / {pages}",
+    "previous": "Előző oldal",
+    "next": "Következő oldal",
+    "sendSupport": "Támogatási üzenet küldése",
+    "accountLookupError": "A regisztrált fiókot nem sikerült ellenőrizni. Frissíts és próbáld újra.",
+    "accountTarget": "Fiók beállítása",
+    "setupAlreadyComplete": "Az alapbeállítás időközben elkészült. Frissíts és válassz megfelelő sablont.",
+    "setupTemplateLabel": "Profil folytatása (opcionális emlékeztető)",
+    "setupTemplateBody": "Szia! A CineGenius-fiókod már elkészült. Ha szeretnéd láthatóvá tenni a profilodat vagy egy ajánlatot, itt folytathatod a beállítást: '{{Bearbeitungslink}}'. Ha csak keresel, nem szükséges személyes profilt létrehoznod. Kérdés esetén válaszolj közvetlenül. A CineGenius ügyfélszolgálata"
   }
 }

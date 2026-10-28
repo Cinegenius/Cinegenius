@@ -1,6 +1,9 @@
 import "server-only";
 
 import { db } from "@/lib/db";
+import { clerkClient } from "@clerk/nextjs/server";
+import { getTranslations } from "next-intl/server";
+import { hasProfileBasics, requiredSetupDestination, type SetupProgress } from "@/lib/profile-setup-flow";
 export { fillSupportTemplate, validateSupportTemplateBody } from "@/lib/support-message-templates";
 
 export type AdminSupportTargetType = "profile" | "company" | "listing";
@@ -10,6 +13,7 @@ export type AdminSupportTarget = {
   recipientName: string; recipientProfileUrl: string | null; recipientAvatarUrl: string | null;
   firstName: string | null; companyName: string | null; listingTitle: string | null;
   missingFields: string[]; isDraft: boolean;
+  setupIncomplete?: boolean;
 };
 export class SupportTargetError extends Error {
   constructor(message: string, public status = 404) { super(message); }
@@ -30,9 +34,30 @@ export async function resolveAdminSupportTarget(
 
   if (type === "profile") {
     const { data: profile, error } = await db.from("profiles")
-      .select("user_id, display_name, slug, avatar_url, location, positions, profile_types, profile_type")
+      .select("user_id, display_name, slug, avatar_url, location, positions, role, profile_types, profile_type")
       .eq("user_id", id).maybeSingle();
     if (error) throw new SupportTargetError("Profil konnte nicht geprüft werden.", 500);
+    if (!hasProfileBasics(profile)) {
+      const t = await getTranslations("AdminAccounts");
+      let member;
+      try { member = await (await clerkClient()).users.getUser(id); }
+      catch (error) {
+        throw new SupportTargetError(t("accountLookupError"), (error as { status?: number }).status === 404 ? 404 : 503);
+      }
+      const saved = member.privateMetadata.cinegeniusOnboarding;
+      const destination = requiredSetupDestination(profile, saved && typeof saved === "object" ? saved as SetupProgress : null);
+      const name = profile?.display_name?.trim() || [member.firstName, member.lastName].filter(Boolean).join(" ").trim();
+      return {
+        ...finishTarget({
+          targetType: "profile", targetId: member.id, targetLabel: t("accountTarget"),
+          editUrl: destination ?? "/dashboard", recipientUserId: member.id,
+          profileName: name || t("unnamed"), profileSlug: null, avatarUrl: profile?.avatar_url ?? null,
+          missingFields: [], isDraft: destination !== null,
+        }, adminUserId),
+        recipientProfileUrl: null, firstName: member.firstName || null,
+        setupIncomplete: destination !== null,
+      };
+    }
     if (!profile) throw new SupportTargetError("Profil nicht gefunden.");
     recipientUserId = profile.user_id;
     targetLabel = profile.display_name?.trim() || "Profil";

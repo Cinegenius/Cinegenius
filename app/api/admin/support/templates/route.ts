@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { finishAdminAudit, startAdminAudit, validateAdminReason } from "@/lib/admin-audit";
 import { validateSupportTemplateBody } from "@/lib/admin-support";
+import { getTranslations } from "next-intl/server";
+import { SETUP_TEMPLATE_KEY, setupSupportTemplate } from "@/lib/support-setup-template";
 
 export async function GET() {
   const admin = await requireAdmin();
@@ -11,7 +13,11 @@ export async function GET() {
     .select("template_key, label, body, enabled, updated_at")
     .order("label", { ascending: true });
   if (error) return NextResponse.json({ error: "Supportvorlagen konnten nicht geladen werden. Bitte Migration prüfen." }, { status: 503 });
-  return NextResponse.json({ templates: data ?? [] }, { headers: { "Cache-Control": "private, no-store" } });
+  const templates = data ?? [];
+  if (!templates.some(template => template.template_key === SETUP_TEMPLATE_KEY)) {
+    templates.push({ ...setupSupportTemplate(await getTranslations("AdminAccounts")), updated_at: null });
+  }
+  return NextResponse.json({ templates }, { headers: { "Cache-Control": "private, no-store" } });
 }
 
 export async function POST(request: NextRequest) {
@@ -60,10 +66,11 @@ export async function PATCH(request: NextRequest) {
     entityId: key, reason, metadata: { templateKey: key, enabled },
   });
   if (!audit) return NextResponse.json({ error: "Adminprotokoll nicht verfügbar; Vorlage wurde nicht gespeichert." }, { status: 503 });
-  const { data, error } = await db.from("support_message_templates")
-    .update({ label, body: content, enabled, updated_by: admin.userId, updated_at: new Date().toISOString() })
-    .eq("template_key", key)
-    .select("template_key, label, body, enabled, updated_at").maybeSingle();
+  const values = { label, body: content, enabled, updated_by: admin.userId, updated_at: new Date().toISOString() };
+  const query = key === SETUP_TEMPLATE_KEY
+    ? db.from("support_message_templates").upsert({ template_key: key, ...values }, { onConflict: "template_key" })
+    : db.from("support_message_templates").update(values).eq("template_key", key);
+  const { data, error } = await query.select("template_key, label, body, enabled, updated_at").maybeSingle();
   if (error || !data) {
     await finishAdminAudit(audit, "failed");
     return NextResponse.json({ error: error ? "Vorlage konnte nicht gespeichert werden." : "Vorlage nicht gefunden." }, { status: error ? 500 : 404 });

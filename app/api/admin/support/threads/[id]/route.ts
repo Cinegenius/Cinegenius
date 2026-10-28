@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { sendNewMessageEmail } from "@/lib/email";
 import { rateLimit } from "@/lib/rateLimit";
+import { adminSupportParticipants } from "@/lib/admin-support-participants";
 
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -28,6 +29,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     query.order("created_at", { ascending: false }).order("id", { ascending: false }).limit(201),
   ]);
   if (profileError || messagesError) return NextResponse.json({ error: "Nachrichten konnten nicht geladen werden." }, { status: 500 });
+  let participant = profile;
+  if (!participant) {
+    try { participant = (await adminSupportParticipants([thread.support_user_id], [])).get(thread.support_user_id) ?? null; }
+    catch { return NextResponse.json({ error: "Nachrichten konnten nicht geladen werden." }, { status: 503 }); }
+  }
   const hasOlder = (rawMessages?.length ?? 0) > 200;
   const messages = (rawMessages ?? []).slice(0, 200).reverse();
   const messageIds = (messages ?? []).map((message) => message.id);
@@ -42,13 +48,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     thread: {
       id: thread.id, targetType: thread.support_target_type, targetId: thread.support_target_id,
       targetLabel: thread.support_target_label, editUrl: thread.support_edit_url,
-      userId: thread.support_user_id, userName: profile?.display_name ?? "Mitglied",
+      userId: thread.support_user_id, userName: participant?.display_name ?? "Mitglied",
       userProfileUrl: profile?.slug || profile?.user_id ? "/profile/" + encodeURIComponent(profile.slug || profile.user_id) : null,
       userAvatarUrl: profile?.avatar_url ?? null, createdAt: thread.created_at,
     },
     messages: (messages ?? []).map((message) => ({
       id: message.id, content: message.content, createdAt: message.created_at,
-      senderName: message.sender_id === SUPPORT_ACTOR_ID ? SUPPORT_NAME : (profile?.display_name ?? "Mitglied"),
+      senderName: message.sender_id === SUPPORT_ACTOR_ID ? SUPPORT_NAME : (participant?.display_name ?? "Mitglied"),
       senderAvatarUrl: message.sender_id === SUPPORT_ACTOR_ID ? SUPPORT_AVATAR_URL : profile?.avatar_url ?? null,
       fromSupport: message.sender_id === SUPPORT_ACTOR_ID,
       readAt: message.sender_id === SUPPORT_ACTOR_ID ? null : receiptMap.get(message.id) ?? null,

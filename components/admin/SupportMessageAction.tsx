@@ -1,10 +1,12 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import UnoptimizedImage from "@/components/UnoptimizedImage";
 import { Check, Loader2, Mail, MessageSquareText, Send, X } from "lucide-react";
 import { SUPPORT_AVATAR_URL } from "@/lib/support-identity";
 import { fillSupportTemplate } from "@/lib/support-message-templates";
+import { SETUP_TEMPLATE_KEY } from "@/lib/support-setup-template";
 
 type TargetType = "profile" | "company" | "listing";
 type Template = { template_key: string; label: string; body: string; enabled: boolean };
@@ -14,6 +16,7 @@ type Target = {
   recipientName: string; recipientProfileUrl: string | null; recipientAvatarUrl: string | null;
   firstName: string | null; companyName: string | null; listingTitle: string | null;
   missingFields: string[]; isDraft: boolean;
+  setupIncomplete?: boolean;
 };
 type Previous = { id: string; support_target_label: string; updated_at: string };
 
@@ -24,12 +27,15 @@ async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
   return data as T;
 }
 function defaultKey(target: Target) {
+  if (target.setupIncomplete) return SETUP_TEMPLATE_KEY;
+  if (target.targetType === "profile" && !target.recipientProfileUrl) return "check_in";
   if (target.targetType === "profile") return "crew_profile";
   if (target.targetType === "company") return "company_profile";
   return target.targetType === "location" ? "location" : "marketplace_listing";
 }
 function applies(template: Template, target: Target) {
-  if (template.template_key === "crew_profile") return target.targetType === "profile";
+  if (template.template_key === SETUP_TEMPLATE_KEY) return target.setupIncomplete === true;
+  if (template.template_key === "crew_profile") return target.targetType === "profile" && Boolean(target.recipientProfileUrl);
   if (template.template_key === "company_profile") return target.targetType === "company";
   if (template.template_key === "location") return target.targetType === "location";
   if (template.template_key === "marketplace_listing") return target.targetType === "marketplace";
@@ -39,6 +45,7 @@ function applies(template: Template, target: Target) {
 }
 
 export function SupportMessageAction({ targetType, targetId }: { targetType: TargetType; targetId: string }) {
+  const t = useTranslations("AdminAccounts");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
@@ -108,7 +115,7 @@ export function SupportMessageAction({ targetType, targetId }: { targetType: Tar
 
   return <>
     <button type="button" onClick={() => void openModal()} className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-gold/30 px-3 py-2 text-xs font-semibold text-gold hover:bg-gold/10">
-      <MessageSquareText size={13} /> Supportnachricht senden
+      <MessageSquareText size={13} /> {t("sendSupport")}
     </button>
     {open && <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/75 p-3 sm:p-6" onMouseDown={(event) => { if (event.target === event.currentTarget && !sending) setOpen(false); }}>
       <section role="dialog" aria-modal="true" aria-labelledby="support-compose-title" className="flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-border bg-bg-primary shadow-2xl">

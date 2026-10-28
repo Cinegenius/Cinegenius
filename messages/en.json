@@ -1296,5 +1296,36 @@
     "empty": "Please select a non-empty image file.",
     "invalid": "The image could not be processed safely. Use a valid JPG, PNG or WEBP image.",
     "tooLarge": "The processed image must not exceed 4 MB."
+  },
+  "AdminAccounts": {
+    "title": "Accounts",
+    "explanation": "All registered accounts, including those without a personal profile. Accounts, profiles and listings are separate. Search-only users and company providers do not need a crew profile. Support messages are sent individually only after your confirmation; nothing is automatically published or verified here.",
+    "search": "Search name, account email or exact Clerk ID…",
+    "count": "{count} accounts",
+    "refresh": "Refresh",
+    "loading": "Loading accounts and setup status…",
+    "empty": "No accounts found.",
+    "loadError": "Accounts could not be fully loaded. Please try again.",
+    "unnamed": "Member without a profile name",
+    "noEmail": "No primary email set",
+    "profileStatus": {
+      "missing": "No personal profile",
+      "incomplete": "Incomplete profile",
+      "private": "Private profile",
+      "available": "Profile exists"
+    },
+    "needsSetup": "Setup unfinished",
+    "setupComplete": "Basic setup complete",
+    "registered": "Registered: {date}",
+    "openProfile": "Open profile",
+    "page": "Page {page} of {pages}",
+    "previous": "Previous page",
+    "next": "Next page",
+    "sendSupport": "Send support message",
+    "accountLookupError": "The registered account could not be checked. Please refresh and try again.",
+    "accountTarget": "Account setup",
+    "setupAlreadyComplete": "Basic setup has since been completed. Please refresh and choose a suitable template.",
+    "setupTemplateLabel": "Continue profile setup (optional reminder)",
+    "setupTemplateBody": "Hello! Your CineGenius account has already been created. If you would like to make your profile or a listing visible, continue setup here: '{{Bearbeitungslink}}'. Search-only users do not need a personal profile. Feel free to reply directly with any questions. Your CineGenius Support"
   }
 }

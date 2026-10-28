@@ -1296,5 +1296,36 @@
     "empty": "Bitte wähle eine nicht leere Bilddatei.",
     "invalid": "Das Bild konnte nicht sicher verarbeitet werden. Verwende ein gültiges JPG-, PNG- oder WEBP-Bild.",
     "tooLarge": "Das verarbeitete Bild darf höchstens 4 MB groß sein."
+  },
+  "AdminAccounts": {
+    "title": "Konten",
+    "explanation": "Alle registrierten Konten, auch ohne Personenprofil. Ein Konto, ein Profil und ein Inserat sind getrennte Dinge. Reine Suchende und Firmenanbieter benötigen kein Crewprofil. Supportnachrichten werden nur einzeln nach deiner Bestätigung gesendet; hier wird nichts automatisch veröffentlicht oder verifiziert.",
+    "search": "Name, Konto-E-Mail oder exakte Clerk-ID suchen…",
+    "count": "{count} Konten",
+    "refresh": "Aktualisieren",
+    "loading": "Konten und Einrichtungsstatus werden geladen…",
+    "empty": "Keine Konten gefunden.",
+    "loadError": "Konten konnten nicht vollständig geladen werden. Bitte erneut versuchen.",
+    "unnamed": "Mitglied ohne Profilnamen",
+    "noEmail": "Keine primäre E-Mail hinterlegt",
+    "profileStatus": {
+      "missing": "Kein Personenprofil",
+      "incomplete": "Profil unvollständig",
+      "private": "Profil privat",
+      "available": "Profil vorhanden"
+    },
+    "needsSetup": "Einrichtung offen",
+    "setupComplete": "Grundeinrichtung abgeschlossen",
+    "registered": "Registriert: {date}",
+    "openProfile": "Profil öffnen",
+    "page": "Seite {page} von {pages}",
+    "previous": "Vorherige Seite",
+    "next": "Nächste Seite",
+    "sendSupport": "Supportnachricht senden",
+    "accountLookupError": "Das registrierte Konto konnte nicht geprüft werden. Bitte aktualisieren und erneut versuchen.",
+    "accountTarget": "Kontoeinrichtung",
+    "setupAlreadyComplete": "Die Grundeinrichtung ist inzwischen abgeschlossen. Bitte aktualisieren und eine passende Vorlage wählen.",
+    "setupTemplateLabel": "Profilerstellung fortsetzen (freiwillige Erinnerung)",
+    "setupTemplateBody": "Hallo! Dein CineGenius-Konto ist bereits erstellt. Wenn du dein Profil oder ein Angebot sichtbar machen möchtest, kannst du die Einrichtung hier fortsetzen: '{{Bearbeitungslink}}'. Ein Personenprofil ist für reine Suchende nicht erforderlich. Bei Fragen antworte uns gerne direkt. Dein CineGenius Support"
   }
 }

@@ -6,6 +6,9 @@ import { requireAdmin } from "@/lib/requireAdmin";
 import { resolveAdminSupportTarget, SupportTargetError } from "@/lib/admin-support";
 import { sendNewMessageEmail } from "@/lib/email";
 import { rateLimit } from "@/lib/rateLimit";
+import { getTranslations } from "next-intl/server";
+import { SETUP_TEMPLATE_KEY, setupSupportTemplate } from "@/lib/support-setup-template";
+import { adminSupportParticipants } from "@/lib/admin-support-participants";
 
 const PAGE_SIZE = 30;
 
@@ -29,7 +32,10 @@ export async function GET(request: NextRequest) {
     db.rpc("unread_message_counts", { p_user_id: SUPPORT_ACTOR_ID }),
   ]);
   if (profileError || unreadError) return NextResponse.json({ error: "Supportstatus konnte nicht geladen werden." }, { status: 500 });
-  const profileMap = new Map((profiles ?? []).map((profile) => [profile.user_id, profile]));
+  let profileMap;
+  try { profileMap = await adminSupportParticipants(userIds, profiles ?? []); }
+  catch { return NextResponse.json({ error: "Supportstatus konnte nicht geladen werden." }, { status: 503 }); }
+  const profileIds = new Set((profiles ?? []).map(profile => profile.user_id));
   const unreadMap = new Map((unread ?? []).map((row: { conversation_id: string; unread_count: number }) => [row.conversation_id, Number(row.unread_count)]));
   return NextResponse.json({
     threads: rows.map((thread) => {
@@ -39,7 +45,7 @@ export async function GET(request: NextRequest) {
         id: thread.id, targetType: thread.support_target_type, targetId: thread.support_target_id,
         targetLabel: thread.support_target_label, editUrl: thread.support_edit_url,
         userId: thread.support_user_id, userName: user?.display_name ?? "Mitglied",
-        userProfileUrl: user?.slug || user?.user_id ? "/profile/" + encodeURIComponent(user.slug || user.user_id) : null,
+        userProfileUrl: user && profileIds.has(user.user_id) ? "/profile/" + encodeURIComponent(user.slug || user.user_id) : null,
         userAvatarUrl: user?.avatar_url ?? null, createdAt: thread.created_at, updatedAt: thread.updated_at,
         unreadCount: unreadMap.get(thread.id) ?? 0,
         latest: latest ? {
@@ -67,9 +73,10 @@ export async function POST(request: NextRequest) {
   if (!["profile", "company", "listing"].includes(type) || !id || id.length > 160 || !content || content.length > 5000 || !/^[0-9a-f-]{36}$/i.test(idempotencyKey)) {
     return NextResponse.json({ error: "Empfänger, Nachricht und sichere Versandkennung sind erforderlich." }, { status: 400 });
   }
-  const { data: template, error: templateError } = await db.from("support_message_templates")
+  const { data: savedTemplate, error: templateError } = await db.from("support_message_templates")
     .select("template_key, body, enabled").eq("template_key", templateKey).maybeSingle();
   if (templateError) return NextResponse.json({ error: "Supportvorlage konnte nicht geprüft werden." }, { status: 503 });
+  const template = savedTemplate ?? (templateKey === SETUP_TEMPLATE_KEY ? setupSupportTemplate(await getTranslations("AdminAccounts")) : null);
   if (!template?.enabled) return NextResponse.json({ error: "Diese Supportvorlage ist nicht verfügbar." }, { status: 400 });
   if (/\{\{[^}]+\}\}/.test(content)) return NextResponse.json({ error: "Die Nachricht enthält noch nicht ersetzte Platzhalter." }, { status: 400 });
 
@@ -78,6 +85,10 @@ export async function POST(request: NextRequest) {
     target = await resolveAdminSupportTarget(type as "profile" | "company" | "listing", id, admin.userId);
   } catch (error) {
     return NextResponse.json({ error: error instanceof SupportTargetError ? error.message : "Empfänger konnte nicht sicher ermittelt werden." }, { status: error instanceof SupportTargetError ? error.status : 500 });
+  }
+  if (templateKey === SETUP_TEMPLATE_KEY && !target.setupIncomplete) {
+    const t = await getTranslations("AdminAccounts");
+    return NextResponse.json({ error: t("setupAlreadyComplete") }, { status: 409 });
   }
   if (template.body.includes("{{fehlendeAngaben}}") && !target.missingFields.length) {
     return NextResponse.json({ error: "Für diese Vorlage wurden keine fehlenden Pflichtangaben gefunden. Freiwillige Ergänzungen werden nicht als Pflicht dargestellt." }, { status: 400 });
