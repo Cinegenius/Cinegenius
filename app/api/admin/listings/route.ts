@@ -1,3 +1,5 @@
+import { getTranslations,getLocale } from "next-intl/server";
+import { DEPARTMENTS,deptValues,groupValues } from "@/lib/marketplaceCategories";
 import { listingPriceLabel } from "@/lib/listing-price";
 import { isOfferStatus } from "@/lib/offer-moderation";
 import { db } from "@/lib/db";
@@ -27,9 +29,15 @@ export async function GET(req: NextRequest) {
   }
 
   let query = db.from("listings")
-    .select("id, responsible_person, user_id, company_id, type, title, city, price, published, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type,moderation_status,content_revision,reviewed_revision,submitted_at,reviewed_at,moderation_reason", { count: "exact" })
+    .select("id, responsible_person, user_id, company_id, type, category, title, city, price, published, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type,marketplace:metadata->marketplace,moderation_status,content_revision,reviewed_revision,submitted_at,reviewed_at,moderation_reason", { count: "exact" })
     .order("created_at", { ascending: false })
     .range((page - 1) * pageSize, page * pageSize - 1);
+  const department=params.get("dept"),subcategory=params.get("sub");
+  const selected=department?DEPARTMENTS.find(d=>d.id===department):null;
+  const group=subcategory?DEPARTMENTS.flatMap(d=>d.groups).find(g=>g.id===subcategory):null;
+  if((department&&!selected)||(subcategory&&(!group||(selected&&!selected.groups.some(g=>g.id===subcategory)))))return NextResponse.json({error:(await getTranslations("MarketplaceOffer"))("invalidCategory")},{status:400});
+  if(group)query=query.in("category",groupValues(group));else if(selected)query=query.in("category",deptValues(selected));
+  if(department||subcategory)query=query.in("type",["prop","vehicle"]);
   if (rawType !== "all") query = query.eq("type", rawType);
   if (rawStatus === "published") query = query.eq("published", true);
   if (rawStatus === "draft") query = query.eq("moderation_status", "draft");
@@ -52,6 +60,7 @@ export async function GET(req: NextRequest) {
   const privateProfileIds = await getPrivateProfileIds(profileIds);
   const companyMap = new Map((companies ?? []).map((company: { id: string }) => [company.id, company]));
   const profileMap = new Map((profiles ?? []).map((profile: { user_id: string }) => [profile.user_id, profile]));
+  const market=await getTranslations("MarketplaceOffer"),locale=await getLocale();
   return NextResponse.json({ listings: (data ?? []).map((listing) => {
     const company = listing.company_id ? companyMap.get(listing.company_id) as { id: string; slug: string | null; name: string; logo_url: string | null; published: boolean; owner_user_id: string } | undefined : undefined;
     const profile = !listing.company_id && listing.user_id ? profileMap.get(listing.user_id) as { user_id: string; display_name: string | null; slug: string | null; avatar_url: string | null } | undefined : undefined;
@@ -62,7 +71,7 @@ export async function GET(req: NextRequest) {
     const companySlug = company?.slug ?? null;
     return {
       ...listing,
-      priceLabel: listingPriceLabel(listing.price,listing),
+      priceLabel: listingPriceLabel(listing.price,listing,"/Tag",locale,market),
       company_slug: companySlug,
       provider_name: providerName,
       provider_href: listing.company_id

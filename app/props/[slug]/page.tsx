@@ -1,5 +1,5 @@
 import JsonLd from "@/components/JsonLd";
-import { listingPriceLabel, listingPriceMetadata } from "@/lib/listing-price";
+import { listingPriceLabel, listingPriceMetadata, listingStructuredOffers } from "@/lib/listing-price";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import type { Metadata } from "next";
@@ -46,9 +46,9 @@ async function getProp(slug: string, viewerId?: string | null) {
       dailyRate: data.price ?? 0,
     pricing: listingPriceMetadata(rawMetadata),
       image: data.image_url ?? "",
-      condition: typeof rawMetadata.condition === "string" ? rawMetadata.condition : "Gut",
+      condition: listingPriceMetadata(rawMetadata).marketplace?.condition || (typeof rawMetadata.condition === "string" ? rawMetadata.condition : ""),
       era: typeof rawMetadata.era === "string" ? rawMetadata.era : null,
-      delivery: rawMetadata.delivery === true,
+      delivery: listingPriceMetadata(rawMetadata).marketplace?.fulfilment.includes("delivery") ?? rawMetadata.delivery === true,
       focalPoint: typeof focalPoint?.x === "number" && typeof focalPoint?.y === "number"
         ? { x: focalPoint.x, y: focalPoint.y }
         : null,
@@ -106,18 +106,7 @@ export default async function PropDetailPage({
       "@type": "Brand",
       "name": prop.vendor,
     },
-    "offers": {
-      "@type": "Offer",
-      "price": prop.dailyRate,
-      "priceCurrency": "EUR",
-      "availability": "https://schema.org/InStock",
-      "priceSpecification": {
-        "@type": "UnitPriceSpecification",
-        "price": prop.dailyRate,
-        "priceCurrency": "EUR",
-        "unitText": "DAY",
-      },
-    },
+    offers:listingStructuredOffers(prop.dailyRate,prop.pricing),
     "itemCondition": prop.condition === "Neuwertig"
       ? "https://schema.org/NewCondition"
       : "https://schema.org/UsedCondition",

@@ -1,0 +1,235 @@
+{
+  "date": "2026-10-28T21:03:13.545Z",
+  "status": "release_candidate_verified",
+  "catalog": {
+    "departments": 14,
+    "subcategoriesIncludingOtherAccessories": 116,
+    "legacyConcreteCategories": 213,
+    "automaticDatabaseRecategorization": false,
+    "existingPublicListingsReadOnly": 12,
+    "unresolvedExistingPublicCategories": 0
+  },
+  "implementation": [
+    "Shared stable category IDs across creation, setup, editing, public and admin filters",
+    "Optional common and relevant technical details with private per-category draft retention",
+    "Separate rental/sale prices, both modes, rental units, VB without amount, request pricing",
+    "Shared pricing in cards, search, favorites, profiles, company listings, admin and detail views",
+    "Review before explicit publication and separate private save",
+    "Existing owner_published and admin restriction rules preserved; Location and animal review unchanged",
+    "Fast multi-upload parent acknowledgement race fixed",
+    "Minimum rental period and deposit moved into collapsed optional item details; hidden for sale-only offers without deleting draft values"
+  ],
+  "checks": {
+    "automated": {
+      "total": 783,
+      "passed": 783,
+      "failed": 0,
+      "scope": "Real route handlers with controlled auth/data fixtures; existing PGlite production-migration permission tests; taxonomy, pricing, snapshots, galleries and regressions"
+    },
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "catalogLocalization": "de,en,es,it,cs,hu passed",
+    "design": "passed",
+    "focusedLint": "passed for new components, model, catalog, pricing, browse and changed public listing/search APIs; pre-existing effect warnings in large legacy forms not broadly refactored",
+    "browser": {
+      "authentication": "simulated own test identity",
+      "storage": "local test receiver, not production Supabase",
+      "multipleUpload": 10,
+      "mainImageReorder": true,
+      "remove": true,
+      "preserveImagesOnCategoryChange": true,
+      "reviewAndPrivateSave": true,
+      "viewports": [
+        390,
+        768,
+        1440
+      ],
+      "locales": [
+        "de",
+        "en",
+        "es",
+        "it",
+        "cs",
+        "hu"
+      ],
+      "horizontalOverflow": false,
+      "actualDeviceTests": false
+    },
+    "existingPublicUrls": [
+      {
+        "id": "0ad11e1a-fb2c-490b-b4fa-e112259fceaa",
+        "title": "Installationstester  Fluke 1664 FC",
+        "path": "/props/0ad11e1a-fb2c-490b-b4fa-e112259fceaa",
+        "status": 200,
+        "pageTitle": "Installationstester  Fluke 1664 FC | CineGenius",
+        "redirect": null
+      },
+      {
+        "id": "41c0c48b-6777-4ba4-9101-e5bc714548bb",
+        "title": "DMX nodes 4 Port",
+        "path": "/props/41c0c48b-6777-4ba4-9101-e5bc714548bb",
+        "status": 200,
+        "pageTitle": "DMX nodes 4 Port | CineGenius",
+        "redirect": null
+      },
+      {
+        "id": "734ef2e0-959c-49f1-8935-c186d1b07b1b",
+        "title": "grandMA3 TourPack",
+        "path": "/props/734ef2e0-959c-49f1-8935-c186d1b07b1b",
+        "status": 200,
+        "pageTitle": "grandMA3 TourPack | CineGenius",
+        "redirect": null
+      },
+      {
+        "id": "9cc1efe1-cea2-494d-bcef-86ee2d2f2ba5",
+        "title": "Lumenradio Stardust CRMX",
+        "path": "/props/9cc1efe1-cea2-494d-bcef-86ee2d2f2ba5",
+        "status": 200,
+        "pageTitle": "Lumenradio Stardust CRMX | CineGenius",
+        "redirect": null
+      },
+      {
+        "id": "b821c122-51b3-4173-9744-1b9637e4a1d5",
+        "title": "Steadicam",
+        "path": "/props/b821c122-51b3-4173-9744-1b9637e4a1d5",
+        "status": 200,
+        "pageTitle": "Steadicam | CineGenius",
+        "redirect": null
+      },
+      {
+        "id": "8733c9ba-bd7f-499b-a375-bd4547a822c1",
+        "title": "Balloonlichter und leichtlichtlösungen",
+        "path": "/props/8733c9ba-bd7f-499b-a375-bd4547a822c1",
+        "status": 200,
+        "pageTitle": "Balloonlichter und leichtlichtlösungen | CineGenius",
+        "redirect": null
+      },
+      {
+        "id": "879c86a6-2cd5-4a82-8794-a7b1913dddf9",
+        "title": "Set Al Equipment Verkauf",
+        "path": "/props/879c86a6-2cd5-4a82-8794-a7b1913dddf9",
+        "status": 200,
+        "pageTitle": "Set Al Equipment Verkauf | CineGenius",
+        "redirect": null
+      },
+      {
+        "id": "e81b177c-5573-4783-884e-6a13516ac52c",
+        "title": "ARRI M18",
+        "path": "/props/e81b177c-5573-4783-884e-6a13516ac52c",
+        "status": 200,
+        "pageTitle": "ARRI M18 | CineGenius",
+        "redirect": null
+      },
+      {
+        "id": "4e81abfb-6bcd-43d6-92ef-b3a5452e60c8",
+        "title": "APC MINI ",
+        "path": "/props/4e81abfb-6bcd-43d6-92ef-b3a5452e60c8",
+        "status": 200,
+        "pageTitle": "APC MINI  | CineGenius",
+        "redirect": null
+      },
+      {
+        "id": "3e7ad16c-9472-451b-88fc-b73b183bcd60",
+        "title": "Aputure Sidus One",
+        "path": "/props/3e7ad16c-9472-451b-88fc-b73b183bcd60",
+        "status": 200,
+        "pageTitle": "Aputure Sidus One | CineGenius",
+        "redirect": null
+      },
+      {
+        "id": "f98d9fde-f1ea-46e7-8dbd-0a0e3134c1f7",
+        "title": "Oldtimer Renault Caravelle Cabrio",
+        "path": "/vehicles/f98d9fde-f1ea-46e7-8dbd-0a0e3134c1f7",
+        "status": 200,
+        "pageTitle": "Oldtimer Renault Caravelle Cabrio | CineGenius",
+        "redirect": null
+      },
+      {
+        "id": "072738c9-c816-4a06-80bf-0a37ff9a4b81",
+        "title": "Flitze",
+        "path": "/vehicles/072738c9-c816-4a06-80bf-0a37ff9a4b81",
+        "status": 200,
+        "pageTitle": "Flitze | CineGenius",
+        "redirect": null
+      }
+    ],
+    "optionalFieldsBrowser": {
+      "collapsedInitially": true,
+      "rentalFieldsReachableWhenExpanded": true,
+      "retainValuesAfterCollapse": true,
+      "hiddenForSaleOnly": true,
+      "mobileWidth": 390,
+      "horizontalOverflow": false
+    },
+    "latestReleaseChecks": {
+      "testsPassed": 783,
+      "typecheck": "passed",
+      "design": "passed",
+      "productionBuild": "passed",
+      "linkedVercelProject": "cinegenius verified"
+    }
+  },
+  "limits": [
+    "A full new live Clerk sign-in / Supabase storage / re-login round trip remains unverified: the local production runtime lacks Clerk configuration and the local Supabase service setting is redacted. Production-read-only URLs and controlled route/data tests do not replace that test.",
+    "No new test accounts or listings were created in production; no real users received messages.",
+    "No database migration is needed for this expansion; new optional values use existing metadata. Deployment evidence is recorded separately after the clean source release.",
+    "Legacy categories without a reliable subcategory retain their known department; users explicitly choose a subcategory when changing the new item details."
+  ],
+  "files": [
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/app/admin/page.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/app/api/admin/listings/route.ts",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/app/api/favorites/route.ts",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/app/api/listings/[id]/route.ts",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/app/api/listings/route.ts",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/app/api/search/route.ts",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/app/companies/[slug]/CompanyDetail.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/app/companies/[slug]/page.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/app/dashboard/page.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/app/inserat/page.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/app/page.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/app/profile/[slug]/ProfileView.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/app/profile/[slug]/page.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/app/props/PropsContent.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/app/props/[slug]/page.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/app/vehicles/VehiclesContent.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/app/vehicles/[slug]/page.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/app/vehicles/page.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/components/GuidedListingWizard.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/components/ListingImageManager.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/components/ProfileSetupWizard.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/components/PropDetail.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/components/admin/AdminReviewDetail.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/lib/admin-loading.test.mjs",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/lib/homepage-avatar.test.mjs",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/lib/listing-price.test.mjs",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/lib/listing-price.ts",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/lib/marketplace-publication-server.ts",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/lib/marketplace-publication.test.mjs",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/lib/marketplaceCategories.ts",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/lib/offer-moderation.test.mjs",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/lib/profile-cover.test.mjs",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/lib/quick-start-flow.ts",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/lib/responsible-person.test.mjs",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/messages/cs.json",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/messages/de.json",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/messages/en.json",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/messages/es.json",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/messages/hu.json",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/messages/it.json",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/components/MarketplaceOfferFields.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/components/MarketplaceOfferSummary.tsx",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/lib/marketplace-offer.test.mjs",
+    "/Users/markusmueller/Documents/Codex/2026-10-01/hall/cinegenius/lib/marketplace-offer.ts"
+  ],
+  "screenshots": [
+    "/Users/markusmueller/.codex/visualizations/2026/10/01/01a0f6ab-47e2-72d2-9d2b-c15137c043fd/marketplace-expansion-example.png",
+    "/Users/markusmueller/.codex/visualizations/2026/10/01/01a0f6ab-47e2-72d2-9d2b-c15137c043fd/marketplace-expansion-mobile.png",
+    "/Users/markusmueller/.codex/visualizations/2026/10/01/01a0f6ab-47e2-72d2-9d2b-c15137c043fd/marketplace-expansion-review-desktop.png",
+    "/Users/markusmueller/.codex/visualizations/2026/10/01/01a0f6ab-47e2-72d2-9d2b-c15137c043fd/marketplace-optional-release-mobile.png"
+  ],
+  "evidence": [
+    "/Users/markusmueller/.codex/visualizations/2026/10/01/01a0f6ab-47e2-72d2-9d2b-c15137c043fd/marketplace-locale-browser-checks.json",
+    "/Users/markusmueller/.codex/visualizations/2026/10/01/01a0f6ab-47e2-72d2-9d2b-c15137c043fd/marketplace-size-browser-checks.json",
+    "/Users/markusmueller/.codex/visualizations/2026/10/01/01a0f6ab-47e2-72d2-9d2b-c15137c043fd/marketplace-gallery-browser-checks.json"
+  ]
+}

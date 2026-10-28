@@ -1,4 +1,7 @@
-import { listingPriceLabel, listingPriceMetadata } from "@/lib/listing-price";
+import { marketplaceCategoryLabel } from "@/lib/marketplace-offer";
+import { getLocale, getTranslations } from "next-intl/server";
+import MarketplaceOfferSummary from "@/components/MarketplaceOfferSummary";
+import { listingPriceLabel, listingPriceMetadata, listingStructuredOffers } from "@/lib/listing-price";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
@@ -45,10 +48,11 @@ async function getVehicle(slug: string, viewerId?: string | null) {
     ? rawMetadata.focal_point as { x?: unknown; y?: unknown }
     : null;
 
+  const catalog=await getTranslations("MarketplaceCatalog");
   return {
     id: data.id,
     title: data.title,
-    type: data.category ?? "Fahrzeug",
+    type: marketplaceCategoryLabel(data.category ?? "Fahrzeug",catalog),
     make: ownerName,
     model: data.title,
     year: typeof rawMetadata.year === "number" ? rawMetadata.year : 0,
@@ -59,6 +63,7 @@ async function getVehicle(slug: string, viewerId?: string | null) {
     vendor: ownerName,
     dailyRate: data.price ?? 0,
     pricing: listingPriceMetadata(rawMetadata),
+      marketplaceCategory:data.category ?? "Bild-Fahrzeug",
     image: data.image_url ?? "",
     tags: (data.created_at && (Date.now() - new Date(data.created_at as string).getTime() < 3 * 24 * 60 * 60 * 1000) ? ["Neu"] : []) as string[],
     instantBook: false,
@@ -87,11 +92,12 @@ export async function generateMetadata({
   try {
     const { slug } = await params;
     const vehicle = await getVehicle(slug);
+    const market=await getTranslations("MarketplaceOffer"),locale=await getLocale();
     if (!vehicle) return {};
     const title = vehicle.title ?? "Fahrzeug";
     return {
       title,
-      description: `${vehicle.type} — ${listingPriceLabel(vehicle.dailyRate,vehicle.pricing)}. Jetzt auf CineGenius für Filmproduktionen mieten.`,
+      description: `${vehicle.type} — ${listingPriceLabel(vehicle.dailyRate,vehicle.pricing,"/Tag",locale,market)}. Jetzt auf CineGenius für Filmproduktionen mieten.`,
       openGraph: {
         title: `${title} | CineGenius`,
         description: `${vehicle.type} mieten für Film & Foto.`,
@@ -112,6 +118,7 @@ export default async function VehicleDetailPage({
   const { slug } = await params;
   const { userId } = await auth();
   const vehicle = await getVehicle(slug, userId);
+  const market=await getTranslations("MarketplaceOffer"),locale=await getLocale();
   if (!vehicle) notFound();
   const isOwner = !!userId && userId === vehicle.ownerId;
 
@@ -122,13 +129,7 @@ export default async function VehicleDetailPage({
     "description": vehicle.description || `${vehicle.type} für Filmproduktionen mieten`,
     "image": vehicle.image,
     "category": vehicle.type,
-    ...(vehicle.dailyRate > 0 && !vehicle.pricing.price_on_request && !vehicle.pricing.price_negotiable ? { "offers": {
-      "@type": "Offer",
-      "price": vehicle.dailyRate,
-      "priceCurrency": "EUR",
-      "availability": "https://schema.org/InStock",
-    "seller": { "@type": vehicle.provider.kind === "company" ? "Organization" : "Person", "name": vehicle.ownerName },
-    } } : {}),
+    offers:listingStructuredOffers(vehicle.dailyRate,vehicle.pricing),
   };
 
   return (
@@ -167,6 +168,7 @@ export default async function VehicleDetailPage({
             </div>
 
             <div>
+              <MarketplaceOfferSummary category={vehicle.marketplaceCategory} price={vehicle.dailyRate} metadata={vehicle.pricing} />
               <div className="flex items-start justify-between gap-4 mb-2">
                 <h1 className="font-display text-3xl font-bold text-text-primary">{vehicle.title}</h1>
                 <div className="flex items-center gap-2 shrink-0">
@@ -252,7 +254,7 @@ export default async function VehicleDetailPage({
             <div className="sticky top-24 space-y-4">
               <div className="p-6 rounded-2xl border border-border bg-bg-secondary">
                 <div className="mb-5">
-                  <span className="font-display text-3xl font-bold text-gold">{listingPriceLabel(vehicle.dailyRate,vehicle.pricing)}</span>
+                  <span className="font-display text-3xl font-bold text-gold">{listingPriceLabel(vehicle.dailyRate,vehicle.pricing,"/Tag",locale,market)}</span>
                   <span className="text-text-muted text-sm"> / Tag</span>
                 </div>
 

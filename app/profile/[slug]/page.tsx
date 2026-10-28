@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { recordProfileView } from "@/lib/profile-views";
 import { unstable_cache } from "next/cache";
+import { listingPriceMetadata } from "@/lib/listing-price";
 import JsonLd from "@/components/JsonLd";
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
@@ -134,7 +135,7 @@ function getExternalProfiles(userId: string): Promise<ExternalProfileRow[]> {
   )();
 }
 
-function getPublicListings(userId: string): Promise<Array<{ id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null; focal_point: { x: number; y: number } | null }>> {
+function getPublicListings(userId: string): Promise<Array<{ pricing?: import("@/lib/listing-price").ListingPriceMetadata; id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null; focal_point: { x: number; y: number } | null }>> {
   return unstable_cache(
     async () => {
       const { data } = await db
@@ -150,6 +151,7 @@ function getPublicListings(userId: string): Promise<Array<{ id: string; type: st
         title: l.title,
         category: l.category,
         price: l.price,
+        pricing:listingPriceMetadata(l.metadata),
         city: l.city,
         image_url: l.image_url,
         focal_point: (l.metadata?.focal_point as { x: number; y: number } | null) ?? null,

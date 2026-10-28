@@ -2,10 +2,11 @@
 
 import { useViewUrl } from "@/lib/use-view-url";
 import { useViewState } from "@/lib/use-view-state";
+import { marketplaceCategoryLabel } from "@/lib/marketplace-offer";
 import { listingPriceLabel } from "@/lib/listing-price";
 
 
-import UnoptimizedImage from "@/components/UnoptimizedImage";
+import MediaImage from "@/components/MediaImage";
 
 import React, { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import { useUser, useAuth } from "@clerk/nextjs";
@@ -19,9 +20,9 @@ import {
   Camera, Lightbulb, Wrench, Mic, Shirt, Sparkles, Layers, Car, Zap,
   Monitor, Building2, Briefcase, Palette, Scissors,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import EmptyState from "@/components/EmptyState";
-import { DEPARTMENTS, SEARCH_SYNONYMS, deptValues } from "@/lib/marketplaceCategories";
+import { localizedMarketplaceDepartments, marketplaceMatches, SEARCH_SYNONYMS, marketplaceCategory, marketplaceSearchTerms } from "@/lib/marketplaceCategories";
 import { deptColors } from "@/lib/departments";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 
@@ -48,7 +49,7 @@ const PAGE_SIZE = 24;
 type Prop = {
   id: string; title: string; category: string; vendor: string; location: string;
   dailyRate: number; image: string; condition: string; era: string | null;
-  delivery: boolean; rentalType?: "miete" | "kauf"; focalPoint?: { x: number; y: number } | null;
+  delivery: boolean; rentalType?: "miete" | "kauf" | "beides"; focalPoint?: { x: number; y: number } | null;
   description?: string; isReal?: boolean; type?: string; meta?: Record<string, unknown> | null;
   ownerId?: string;
 };
@@ -99,6 +100,7 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
   isFavorited?: boolean; onFavorite?: (e: React.MouseEvent) => void;
 }) {
   const tp = useTranslations("props");
+  const market=useTranslations("MarketplaceOffer"),catalog=useTranslations("MarketplaceCatalog"),locale=useLocale();
   const href = p.type === "vehicle" ? `/vehicles/${p.id}` : `/props/${p.id}`;
 
   if (list) {
@@ -109,7 +111,7 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
         data-visible>
         <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-bg-elevated border border-border">
           {p.image
-            ? <UnoptimizedImage src={p.image} alt={p.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} />
+            ? <MediaImage mediaSize="thumbnail" src={p.image} alt={p.title} fill sizes="(max-width: 768px) 50vw, 400px" loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} />
             : <div className="w-full h-full flex items-center justify-center text-text-muted/30"><svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></div>
           }
           {p.isReal && <div className="absolute top-1 left-1 bg-gold text-bg-primary text-[9px] font-bold px-1.5 py-0.5 rounded">NEU</div>}
@@ -118,13 +120,13 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
           <h3 className="font-semibold text-text-primary text-sm mb-1 truncate">{p.title}</h3>
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[10px] text-text-muted flex items-center gap-1"><MapPin size={9} />{p.location || p.vendor}</span>
-            <span className="text-[10px] px-2 py-0.5 bg-bg-elevated border border-border text-text-muted rounded-full">{p.category}</span>
+            <span className="text-[10px] px-2 py-0.5 bg-bg-elevated border border-border text-text-muted rounded-full">{marketplaceCategoryLabel(p.category,catalog)}</span>
             {p.delivery && <span className="text-[10px] text-teal-400 flex items-center gap-0.5"><Truck size={9} /> {tp("deliveryBadge")}</span>}
           </div>
         </div>
-        <div className="shrink-0 text-right">
-          <p className="text-sm font-bold text-gold">
-            {listingPriceLabel(p.dailyRate,{...p.meta,rental_type:p.rentalType})}
+        <div className="max-w-[45%] text-right">
+          <p className="break-words text-sm font-bold text-gold">
+            {listingPriceLabel(p.dailyRate,{...p.meta,rental_type:p.rentalType},"/Tag",locale,market)}
           </p>
           <p className="text-[10px] text-text-muted mt-0.5">{p.condition}</p>
         </div>
@@ -139,12 +141,12 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
       data-visible>
       <div className="relative aspect-[4/3] overflow-hidden bg-bg-elevated">
         {p.image
-          ? <UnoptimizedImage src={p.image} alt={p.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} />
+          ? <MediaImage mediaSize="thumbnail" src={p.image} alt={p.title} fill sizes="(max-width: 768px) 50vw, 400px" loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} />
           : <div className="w-full h-full flex items-center justify-center text-text-muted/20"><svg viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></div>
         }
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent" />
         <div className="absolute top-2.5 left-2.5 right-2.5 flex items-start justify-between gap-1">
-          <span className="px-2 py-0.5 bg-black/50 backdrop-blur-sm border border-white/10 text-white/70 text-[10px] rounded-full truncate max-w-[65%]">{p.category}</span>
+          <span className="px-2 py-0.5 bg-black/50 backdrop-blur-sm border border-white/10 text-white/70 text-[10px] rounded-full truncate max-w-[65%]">{marketplaceCategoryLabel(p.category,catalog)}</span>
           <div className="flex gap-1 shrink-0 items-center">
             {p.isReal && <span className="px-2 py-0.5 bg-gold text-bg-primary text-[10px] font-bold rounded-full">NEU</span>}
             {p.delivery && <span className="flex items-center gap-0.5 px-2 py-0.5 bg-teal-500/25 backdrop-blur-sm border border-teal-400/30 text-teal-300 text-[10px] rounded-full"><Truck size={8} /></span>}
@@ -158,9 +160,9 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-3">
           <h3 className="font-semibold text-white text-sm line-clamp-1 mb-1.5">{p.title}</h3>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-start justify-between gap-y-1">
             <p className="text-white/50 text-xs flex items-center gap-1 truncate mr-2"><MapPin size={9} className="shrink-0" />{p.location || p.vendor}</p>
-            <p className="text-gold font-bold text-sm shrink-0">{listingPriceLabel(p.dailyRate,{...p.meta,rental_type:p.rentalType})}</p>
+            <p className="max-w-full break-words text-sm font-bold text-gold">{listingPriceLabel(p.dailyRate,{...p.meta,rental_type:p.rentalType},"/Tag",locale,market)}</p>
           </div>
         </div>
       </div>
@@ -210,12 +212,15 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("props");
+  const catalog=useTranslations("MarketplaceCatalog"),market=useTranslations("MarketplaceOffer");
+  const DEPARTMENTS=useMemo(()=>localizedMarketplaceDepartments(catalog),[catalog]);
   const { user } = useUser();
   const { isSignedIn } = useAuth();
 
   const [query, setQuery] = useViewState("marketplace.query", () => searchParams.get("q") ?? "");
-  const [selectedDept, setSelectedDept] = useViewState<string | null>("marketplace.selectedDept", () => searchParams.get("dept") ?? null);
-  const [rentalTypeFilter, setRentalTypeFilter] = useViewState<"alle" | "miete" | "kauf">("marketplace.rentalTypeFilter", "alle");
+  const [selectedDept, setSelectedDept] = useViewState<string | null>("marketplace.selectedDept", () => marketplaceCategory(searchParams.get("dept"))?.department ?? searchParams.get("dept") ?? null);
+  const [selectedSub,setSelectedSub]=useViewState("marketplace.subcategory",()=>searchParams.get("sub")??"");
+  const [rentalTypeFilter, setRentalTypeFilter] = useViewState<"alle" | "miete" | "kauf" | "beides">("marketplace.rentalTypeFilter", "alle");
   const [sortKey, setSortKey] = useViewState("marketplace.sortKey", "featured");
   const [viewMode, setViewMode] = useViewState<"grid" | "list">("marketplace.viewMode", "grid");
   const [pagination, setPagination] = useViewState("marketplace.pagination", { filterKey: "", visibleCount: PAGE_SIZE });
@@ -298,22 +303,17 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const filterParams = new URLSearchParams();
   if (query) filterParams.set("q", query);
   if (selectedDept) filterParams.set("dept", selectedDept);
+  if(selectedSub)filterParams.set("sub",selectedSub);
   if (sortKey !== "featured") filterParams.set("sort", sortKey);
   useViewUrl(filterParams.size ? `/props?${filterParams}` : "/props");
 
   const filtered = useMemo(() => {
     let r = [...serverListings];
 
-    if (selectedDept) {
-      const dept = DEPARTMENTS.find((d) => d.id === selectedDept);
-      if (dept) {
-        const vals = deptValues(dept).map((v) => v.toLowerCase());
-        r = r.filter((p) => vals.includes(p.category?.toLowerCase() ?? ""));
-      }
-    }
+    if(selectedDept||selectedSub)r=r.filter(p=>marketplaceMatches(p.category,selectedDept,selectedSub||null,p.type));
 
     if (rentalTypeFilter !== "alle") {
-      r = r.filter((p) => (p.rentalType ?? "miete") === rentalTypeFilter);
+      r = r.filter((p) => ((p.rentalType ?? "miete") === rentalTypeFilter || p.rentalType === "beides"));
     }
 
     if (query.trim()) {
@@ -322,10 +322,10 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
       const synonymCats = words.flatMap((w) => SEARCH_SYNONYMS[w] ?? []);
       r = r.filter((p) => {
         const title = p.title.toLowerCase();
-        const cat = p.category?.toLowerCase() ?? "";
+        const cat = marketplaceSearchTerms(p.category).toLowerCase();
         const loc = p.location?.toLowerCase() ?? "";
         if (title.includes(q) || cat.includes(q) || loc.includes(q)) return true;
-        if (synonymCats.length > 0 && synonymCats.some((sc) => cat === sc)) return true;
+        if (synonymCats.length > 0 && synonymCats.some((sc) => marketplaceCategory(sc)?.subcategory === marketplaceCategory(p.category)?.subcategory)) return true;
         return false;
       });
     }
@@ -333,18 +333,37 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
     if (sortKey === "price-asc") r.sort((a, b) => a.dailyRate - b.dailyRate);
     if (sortKey === "price-desc") r.sort((a, b) => b.dailyRate - a.dailyRate);
     return r;
-  }, [serverListings, selectedDept, query, rentalTypeFilter, sortKey]);
+  }, [serverListings, selectedDept, selectedSub, query, rentalTypeFilter, sortKey]);
 
-  const filterKey = JSON.stringify([selectedDept, query, rentalTypeFilter, sortKey]);
+  const filterKey = JSON.stringify([selectedDept, selectedSub, query, rentalTypeFilter, sortKey]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
   const showMore = () => setPagination({ filterKey, visibleCount: visibleCount + PAGE_SIZE });
 
+  const [remote,setRemote]=useState<{key:string;rows:Prop[];count:number}|null>(null);
+  const remoteRef=useRef(remote);
+  useEffect(()=>{remoteRef.current=remote;},[remote]);
+  const [browseError,setBrowseError]=useState<string|null>(null);
+  useEffect(()=>{
+    const controller=new AbortController();
+    const parameters=new URLSearchParams({marketplace:'1',page:String(visibleCount/PAGE_SIZE),limit:String(PAGE_SIZE),sort:sortKey});
+    if(selectedDept)parameters.set('dept',selectedDept);if(selectedSub)parameters.set('sub',selectedSub);if(query)parameters.set('q',query);if(rentalTypeFilter!=='alle')parameters.set('offer',rentalTypeFilter);
+    const pages=remoteRef.current?.key===filterKey&&remoteRef.current.rows.length>=visibleCount-PAGE_SIZE?[visibleCount/PAGE_SIZE]:Array.from({length:visibleCount/PAGE_SIZE},(_,index)=>index+1);
+    Promise.all(pages.map(page=>{const params=new URLSearchParams(parameters);params.set('page',String(page));return fetch(`/api/listings?${params}`,{signal:controller.signal}).then(async response=>{if(!response.ok)throw new Error();return response.json();});})).then(results=>{
+      const result={data:results.flatMap(result=>result.data??[]),count:results[0]?.count??0};
+      const rows:Prop[]=(result.data??[]).map((row:Record<string,unknown>)=>({id:String(row.id),title:String(row.title),type:String(row.type),category:String(row.category??''),location:String(row.city??''),dailyRate:Number(row.price),image:String(row.image_url??''),vendor:t('vendorPrivate'),condition:'',era:null,delivery:false,isReal:true,meta:row,rentalType:String(row.rental_type??'miete') as Prop['rentalType']}));
+      setRemote(previous=>({key:filterKey,rows:visibleCount>PAGE_SIZE&&previous?.key===filterKey?[...new Map([...previous.rows,...rows].map(row=>[row.id,row])).values()]:rows,count:result.count??0}));setBrowseError(null);
+    }).catch(()=>{if(!controller.signal.aborted){setBrowseError(filterKey);}});
+    return ()=>controller.abort();
+  },[filterKey,visibleCount,selectedDept,selectedSub,query,rentalTypeFilter,sortKey,t]);
+  const browseLoading=browseError!==filterKey && (remote?.key!==filterKey || (remote.rows.length<visibleCount && remote.count>remote.rows.length));
+  const resultRows=remote?.key===filterKey?remote.rows:filtered;
+  const resultCount=remote?.key===filterKey?remote.count:filtered.length;
   const clearAll = () => {
-    setSelectedDept(null); setQuery(""); setSortKey("featured"); setRentalTypeFilter("alle");
+    setSelectedDept(null); setSelectedSub(""); setQuery(""); setSortKey("featured"); setRentalTypeFilter("alle");
     router.replace("/props", { scroll: false });
   };
 
-  const hasAnyFilter = Boolean(selectedDept || query || rentalTypeFilter !== "alle");
+  const hasAnyFilter = Boolean(selectedDept || selectedSub || query || rentalTypeFilter !== "alle");
 
   const activeDeptData = selectedDept ? DEPARTMENTS.find((d) => d.id === selectedDept) : null;
   const chipColors = activeDeptData ? deptColors(activeDeptData.color) : null;
@@ -367,14 +386,15 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
         allCategoryLabel={t("offerAll") + " Artikel"}
         categories={DEPARTMENTS.map((department) => ({ value: department.id, label: department.label }))}
         categoryValue={selectedDept ?? ""}
-        onCategoryChange={(value) => setSelectedDept(value || null)}
-        resultSummary={t("results", { count: filtered.length })}
+        onCategoryChange={(value) => {setSelectedDept(value || null);setSelectedSub("");}}
+        resultSummary={t("results", { count: resultCount })}
         filterCount={mobileChips.length}
         chips={mobileChips}
         onReset={clearAll}
         resetLabel={t("clearAllFilters")}
-        showResultsLabel={t("results", { count: filtered.length })}
+        showResultsLabel={t("results", { count: resultCount })}
       >
+        <MobileFilterField label={market("subcategory")}><MobileFilterSelect value={selectedSub} onChange={setSelectedSub} placeholder={market("allSubcategories")} options={(activeDeptData?.groups??[]).map(g=>({value:g.id,label:g.label}))} /></MobileFilterField>
         <MobileFilterField label={t("offerTypeLabel")}>
           <MobileFilterSelect value={rentalTypeFilter === "alle" ? "" : rentalTypeFilter} onChange={(value) => setRentalTypeFilter((value || "alle") as typeof rentalTypeFilter)} placeholder={t("offerAll")} options={[{ value: "miete", label: t("offerRent") }, { value: "kauf", label: t("offerBuy") }]} />
         </MobileFilterField>
@@ -452,6 +472,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
             ))}
           </div>
 
+          {activeDeptData && <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary">{market("subcategory")}<select className="min-h-11 max-w-full rounded-lg border border-border bg-bg-elevated px-3" value={selectedSub} onChange={event=>setSelectedSub(event.target.value)}><option value="">{market("allSubcategories")}</option>{activeDeptData.groups.map(g=><option key={g.id} value={g.id}>{g.label}</option>)}</select></label>}
           {/* Active chips */}
           {(activeDeptData || rentalTypeFilter !== "alle") && (
             <div className="flex flex-wrap gap-1.5 items-center">
@@ -502,7 +523,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                 return (
                   <button
                     key={dept.id}
-                    onClick={() => setSelectedDept(isActive ? null : dept.id)}
+                    onClick={() => {setSelectedDept(isActive ? null : dept.id);setSelectedSub("");}}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
                       isActive
                         ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
@@ -531,7 +552,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               {[...DEPARTMENTS].sort((a, b) => a.label.localeCompare(b.label, "de")).map((dept) => {
                 const isActive = selectedDept === dept.id;
                 return (
-                  <button key={dept.id} onClick={() => setSelectedDept(isActive ? null : dept.id)}
+                  <button key={dept.id} onClick={() => {setSelectedDept(isActive ? null : dept.id);setSelectedSub("");}}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
                       isActive ? "bg-gold/10 text-gold border-gold/40" : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
                     }`}>
@@ -543,7 +564,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
 
             <div className="hidden xl:flex items-center justify-between mb-5">
               <p className="text-sm text-text-muted">
-                <span className="text-text-primary font-semibold">{t("results", { count: filtered.length })}</span>
+                <span className="text-text-primary font-semibold">{t("results", { count: resultCount })}</span>
                 {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
               </p>
               {hasAnyFilter && (
@@ -553,7 +574,9 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               )}
             </div>
 
-            {filtered.length === 0 ? (
+            {browseError===filterKey && <p role="alert" className="mb-4 text-sm text-red-400">{market("loadError")}</p>}
+            <div aria-busy={browseLoading}>
+            {resultCount === 0 ? (
               <EmptyState icon={Package}
                 title={serverListings.length === 0 ? t("emptyTitle") : t("emptyTitleFiltered")}
                 description={serverListings.length === 0 ? t("emptyDesc") : t("emptyDescFiltered")}
@@ -563,7 +586,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                 <div className={viewMode === "grid"
                   ? "grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                   : "space-y-2"}>
-                  {filtered.slice(0, visibleCount).map((p) => (
+                  {resultRows.slice(0, visibleCount).map((p) => (
                     <PropCard key={p.id} p={p} list={viewMode === "list"}
                       ratingData={liveRatings[p.id]}
                       myRating={myRatings[p.id]}
@@ -574,16 +597,17 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                     />
                   ))}
                 </div>
-                {filtered.length > visibleCount && (
+                {resultCount > visibleCount && (
                   <div className="mt-10 text-center">
-                    <button onClick={showMore}
+                    <button onClick={showMore} disabled={browseLoading}
                       className="px-8 py-3 border border-border text-sm font-semibold text-text-secondary hover:border-gold hover:text-gold rounded-xl transition-all">
-                      {t("loadMore", { count: filtered.length - visibleCount })}
+                      {t("loadMore", { count: resultCount - visibleCount })}
                     </button>
                   </div>
                 )}
               </>
             )}
+            </div>
           </div>
         </div>
       </div>

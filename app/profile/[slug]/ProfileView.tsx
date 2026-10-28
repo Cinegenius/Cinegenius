@@ -1,8 +1,10 @@
 "use client";
 
+import { listingPriceLabel } from "@/lib/listing-price";
+import { marketplaceCategoryLabel } from "@/lib/marketplace-offer";
 import Image from "@/components/MediaImage";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect, useRef } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
@@ -305,6 +307,7 @@ const LISTING_TYPE_META: Record<string, { label: string; color: string; href: (i
 };
 
 function ListingsSection({ listings }: { listings: PublicListing[] }) {
+  const market=useTranslations("MarketplaceOffer"),catalog=useTranslations("MarketplaceCatalog"),locale=useLocale();
   if (!listings.length) return null;
   const grouped = listings.reduce<Record<string, PublicListing[]>>((acc, l) => {
     (acc[l.type] = acc[l.type] ?? []).push(l);
@@ -336,10 +339,10 @@ function ListingsSection({ listings }: { listings: PublicListing[] }) {
                         />
                       )}
                       <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{l.title}</span>
-                      {l.category && <span className="text-[10px] text-text-primary shrink-0 hidden sm:inline">{l.category}</span>}
+                      {l.category && <span className="text-[10px] text-text-primary shrink-0 hidden sm:inline">{["prop","vehicle"].includes(l.type)?marketplaceCategoryLabel(l.category,catalog):l.category}</span>}
                       {l.city && <span className="text-[10px] text-text-primary shrink-0">{l.city}</span>}
-                      {l.price != null && l.price > 0 && (
-                        <span className="text-[10px] text-gold font-semibold shrink-0">{l.price.toLocaleString("de-DE")} €</span>
+                      {l.type !== "animal" && (l.price != null || l.pricing) && (
+                        <span className="max-w-full break-words text-[10px] font-semibold text-gold">{listingPriceLabel(l.price,l.pricing,"/Tag",locale,market)}</span>
                       )}
                     </Link>
                   );
@@ -1724,7 +1727,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
 // MAIN — type-based routing
 // ═══════════════════════════════════════════════════════════════════════════════
 
-type PublicListing = { id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null; focal_point?: { x: number; y: number } | null };
+type PublicListing = { pricing?: import("@/lib/listing-price").ListingPriceMetadata; id: string; type: string; title: string; category: string | null; price: number | null; city: string; image_url: string | null; focal_point?: { x: number; y: number } | null };
 
 // ─── Photo grid with likes ────────────────────────────────────────────────────
 type ImageComment = { id: string; author_id: string; author_name: string; author_avatar: string | null; text: string; created_at: string };

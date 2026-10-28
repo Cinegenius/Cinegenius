@@ -1,10 +1,12 @@
 "use client";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import OfferModerationStatus from "@/components/OfferModerationStatus";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
 import { EMPTY_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, marketplaceResponsibleErrors, type ResponsiblePerson } from "@/lib/responsible-person";
 
+import MarketplaceOfferFields from "@/components/MarketplaceOfferFields";
+import { marketplaceDraft, marketplaceMetadataPatch, serializeMarketplaceDraft, validateMarketplaceOffer } from "@/lib/marketplace-offer";
 import ListingPriceOptions from "@/components/ListingPriceOptions";
 import { listingPriceLabel } from "@/lib/listing-price";
 
@@ -97,7 +99,7 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState(VALID_TABS.includes(tabParam) ? tabParam : "overview");
 
   // Real listings from Supabase
-  const [myListings, setMyListings] = useState<{ id: string; type: string; title: string; city: string; price: number; published: boolean; moderation_status?: string; moderation_reason?: string | null; responsible_person?: ResponsiblePerson & { userId: string }; created_at: string; image_url: string | null; extra_images?: string[] | null; blocked_dates?: string[] | null; description: string; metadata?: Record<string, unknown> | null }[]>([]);
+  const [myListings, setMyListings] = useState<{ id: string; type: string; category?: string; title: string; city: string; price: number; published: boolean; moderation_status?: string; moderation_reason?: string | null; responsible_person?: ResponsiblePerson & { userId: string }; created_at: string; image_url: string | null; extra_images?: string[] | null; blocked_dates?: string[] | null; description: string; metadata?: Record<string, unknown> | null }[]>([]);
   const [listingsLoading, setListingsLoading] = useState(false);
   const [listingsError, setListingsError] = useState("");
 
@@ -247,6 +249,8 @@ export default function DashboardPage() {
   const [editResponsibleErrors, setEditResponsibleErrors] = useState<Record<string, string>>({});
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editAnimalMeta, setEditAnimalMeta] = useState({ training_level: "", special_skills: "", count: "1", handler_included: true });
+  const [editMarketplace,setEditMarketplace]=useState(()=>marketplaceDraft());
+  const marketText=useTranslations("MarketplaceOffer"),marketLocale=useLocale();
   const [editForm, setEditForm] = useState({ title: "", description: "", price: "", city: "", image_url: "" });
   const [editGallery, setEditGallery] = useState<string[]>([]);
   const [editBlockedDates, setEditBlockedDates] = useState<string[]>([]);
@@ -264,9 +268,9 @@ export default function DashboardPage() {
 
   const { leave: leaveEditor } = useFormNavigation();
   const editDraft = useFormDraft({ formKey: `listing:${editingId ?? "new"}`, enabled: !!editingId,
-    value: { form: editForm, responsible: editResponsible, gallery: editGallery, blockedDates: editBlockedDates, locationMeta: editLocationMeta, animalMeta: editAnimalMeta, newBlockedDate },
+    value: { marketplace:editMarketplace, form: editForm, responsible: editResponsible, gallery: editGallery, blockedDates: editBlockedDates, locationMeta: editLocationMeta, animalMeta: editAnimalMeta, newBlockedDate },
     busy: editUploading || editGalleryState.uploading || editGalleryState.failed > 0 || editSaving,
-    restore: draft => { setEditForm(draft.form); setEditResponsible(draft.responsible); setEditGallery(draft.gallery); setEditBlockedDates(draft.blockedDates); setEditLocationMeta(draft.locationMeta);
+    restore: draft => { setEditForm(draft.form);if(draft.marketplace)setEditMarketplace(draft.marketplace); setEditResponsible(draft.responsible); setEditGallery(draft.gallery); setEditBlockedDates(draft.blockedDates); setEditLocationMeta(draft.locationMeta);
       if (draft.animalMeta) setEditAnimalMeta(draft.animalMeta); setNewBlockedDate(draft.newBlockedDate); },
   });
 
@@ -279,6 +283,7 @@ export default function DashboardPage() {
     setEditBlockedDates(Array.isArray(l.blocked_dates) ? l.blocked_dates.filter((date): date is string => typeof date === "string") : []);
     setNewBlockedDate("");
     const meta = l.metadata ?? {};
+    setEditMarketplace(marketplaceDraft(l.category??"",l.price,meta));
     setEditAnimalMeta({training_level:String(meta.training_level ?? ""),special_skills:String(meta.special_skills ?? ""),count:String(meta.count ?? "1"),handler_included:meta.handler_included === true});
     setEditLocationMeta({
       indoor_outdoor: typeof meta.indoor_outdoor === "string" ? meta.indoor_outdoor : "innen",
@@ -341,6 +346,11 @@ export default function DashboardPage() {
     const personErrors = (["prop", "vehicle"].includes(myListings.find(item => item.id === editingId)?.type ?? "")) ? marketplaceResponsibleErrors(editResponsible) : responsiblePersonErrors(editResponsible);
     setEditResponsibleErrors(personErrors);
     if (Object.keys(personErrors).length && myListings.find(item => item.id === editingId)?.published) { focusResponsiblePerson(); return; }
+    const editingListing = myListings.find(item=>item.id===editingId);
+    if(editingListing?.type === "prop" || editingListing?.type === "vehicle"){
+      const issue=validateMarketplaceOffer(editMarketplace.category,editingListing.type,serializeMarketplaceDraft(editMarketplace),editingListing.published);
+      if(issue && (JSON.stringify(editMarketplace)!==JSON.stringify(marketplaceDraft(editingListing.category??"",editingListing.price,editingListing.metadata)) || !!editingListing.metadata?.marketplace)){setEditError(marketText(issue));return;}
+    }
     if (!editForm.title.trim() || !editForm.city.trim()) {
       setEditError("Titel und Stadt sind Pflichtfelder");
       return;
@@ -348,7 +358,7 @@ export default function DashboardPage() {
     setEditSaving(true);
     setEditError("");
     try {
-      const editingListing = myListings.find((listing) => listing.id === editingId);
+
       const usesGallery = editingListing?.type === "prop" || editingListing?.type === "vehicle" || editingListing?.type === "animal" || editingListing?.type === "location";
       const res = await fetch(`/api/listings/${editingId}`, {
         method: "PATCH",
@@ -380,7 +390,7 @@ export default function DashboardPage() {
             price_negotiable: editLocationMeta.price_negotiable,
             rooms: editLocationMeta.rooms,
             amenities: editLocationMeta.amenities,
-          } } : editingListing?.type === "animal" ? {metadata:editAnimalMeta} : usesGallery ? {metadata:{price_on_request:editLocationMeta.price_on_request,price_negotiable:editLocationMeta.price_negotiable}} : {}),
+          } } : editingListing?.type === "animal" ? {metadata:editAnimalMeta} : usesGallery ? (validateMarketplaceOffer(editMarketplace.category,editingListing?.type??"",serializeMarketplaceDraft(editMarketplace),editingListing?.published) ? {} : {category:editMarketplace.category,metadata:marketplaceMetadataPatch(editMarketplace)}) : {}),
         }),
       });
       const { error, publicationError, data: savedListing } = await res.json();
@@ -389,6 +399,7 @@ export default function DashboardPage() {
         l.id === editingId
           ? {
               ...l,
+              ...(savedListing ?? {}),
               published: savedListing?.published ?? l.published,
               moderation_status: savedListing?.moderation_status ?? l.moderation_status,
               moderation_reason: savedListing?.moderation_reason ?? null,
@@ -415,7 +426,8 @@ export default function DashboardPage() {
             price_negotiable: editLocationMeta.price_negotiable,
                 rooms: editLocationMeta.rooms,
                 amenities: editLocationMeta.amenities,
-              } } : l.type === "animal" ? { metadata: { ...l.metadata, ...editAnimalMeta } } : ["prop", "vehicle"].includes(l.type) ? {metadata:{...l.metadata,price_on_request:editLocationMeta.price_on_request,price_negotiable:editLocationMeta.price_negotiable}} : {}),
+              } } : l.type === "animal" ? { metadata: { ...l.metadata, ...editAnimalMeta } } : ["prop", "vehicle"].includes(l.type) ? {metadata:{...l.metadata,...marketplaceMetadataPatch(editMarketplace)}} : {}),
+              ...(["prop","vehicle"].includes(l.type) && savedListing ? {category:savedListing.category,price:savedListing.price,metadata:savedListing.metadata} : {}),
               ...(l.type === "location" ? { blocked_dates: editBlockedDates } : {}),
               ...(l.type === "prop" || l.type === "vehicle" || l.type === "animal" || l.type === "location" ? { image_url: editGallery[0] ?? null, extra_images: editGallery.slice(1) } : { image_url: editForm.image_url || null }),
             }
@@ -496,7 +508,7 @@ export default function DashboardPage() {
   type Favorite = {
     id: string; listing_id: string; listing_type: string;
     listing_title: string | null; listing_city: string | null;
-    listing_price: number | null; listing_image: string | null; created_at: string;
+    priceLabel?:string; listing_price: number | null; listing_image: string | null; created_at: string;
   };
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [favoritesLoading, setFavoritesLoading] = useState(false);
@@ -1160,7 +1172,7 @@ export default function DashboardPage() {
                         {/* Preis */}
                         <div className="text-right shrink-0">
                           <p className="font-semibold text-gold font-display">
-                            {listingPriceLabel(l.price,l.metadata,"")}
+                            {listingPriceLabel(l.price,l.metadata,"/Tag",marketLocale,marketText)}
                           </p>
                           <p className="text-[10px] text-text-muted mt-0.5">/Tag</p>
                         </div>
@@ -1769,7 +1781,7 @@ export default function DashboardPage() {
                     </div>
                     <OfferModerationStatus item={l} explain /><p className="text-xs text-text-muted mb-1">{typeLabel[l.type] ?? l.type} · {l.city}</p>
                     <p className="text-xs text-text-muted">
-                      {listingPriceLabel(l.price,l.metadata)} ·{" "}
+                      {listingPriceLabel(l.price,l.metadata,"/Tag",marketLocale,marketText)} ·{" "}
                       erstellt {new Date(l.created_at).toLocaleDateString("de-DE")}
                     </p>
                   </div>
@@ -1923,8 +1935,9 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div>
-                      {["location", "prop", "vehicle"].includes(l.type) && <ListingPriceOptions onRequest={editLocationMeta.price_on_request} negotiable={editLocationMeta.price_negotiable} onChange={value=>setEditLocationMeta(current=>({...current,price_on_request:value.priceOnRequest,price_negotiable:value.priceNegotiable}))} />}
-                      {l.type === "animal" ? <p className="text-xs text-text-muted">{animals("conditions")}</p> : !editLocationMeta.price_on_request || !["location", "prop", "vehicle"].includes(l.type) ? <>
+                      {["prop","vehicle"].includes(l.type) && <MarketplaceOfferFields value={editMarketplace} vehicleOnly={l.type === "vehicle"} onChange={setEditMarketplace} />}
+                      {l.type === "location" && <ListingPriceOptions onRequest={editLocationMeta.price_on_request} negotiable={editLocationMeta.price_negotiable} onChange={value=>setEditLocationMeta(current=>({...current,price_on_request:value.priceOnRequest,price_negotiable:value.priceNegotiable}))} />}
+                      {["prop","vehicle"].includes(l.type) ? null : l.type === "animal" ? <p className="text-xs text-text-muted">{animals("conditions")}</p> : !editLocationMeta.price_on_request || !["location", "prop", "vehicle"].includes(l.type) ? <>
                         <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">{l.type === "location" ? "Preis pro Drehtag (€)" : "Preis / Tag (€)"}</label>
                         <input type="number" min="0" value={editForm.price} onChange={(e) => { setEditLocationMeta((current) => ({ ...current, price_on_request: false })); setEditForm((p) => ({ ...p, price: e.target.value })); }} className="w-full rounded-lg border border-border bg-bg-elevated px-3 py-2 text-sm transition-colors focus:border-gold focus:outline-none" placeholder="z. B. 500" />
                       </> : <p className="text-xs text-text-muted">Der Preis wird öffentlich als „Auf Anfrage“ angezeigt.</p>}
@@ -3122,9 +3135,9 @@ export default function DashboardPage() {
                             {fav.listing_city && <span className="text-xs text-text-muted">{fav.listing_city}</span>}
                           </div>
                         </div>
-                        {fav.listing_price != null && fav.listing_price > 0 && (
+                        {(fav.priceLabel || (fav.listing_price != null && fav.listing_price > 0)) && (
                           <div className="text-right shrink-0 hidden sm:block">
-                            <p className="text-sm font-semibold text-gold font-mono">{fav.listing_price.toLocaleString()} €</p>
+                            <p className="text-sm font-semibold text-gold font-mono">{fav.priceLabel ?? `${fav.listing_price?.toLocaleString()} €`}</p>
                             <p className="text-xs text-text-muted">/ Tag</p>
                           </div>
                         )}

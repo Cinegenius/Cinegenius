@@ -30,7 +30,7 @@ async function getCompany(slug: string) {
 async function getCompanyPublicData(companyId: string, ownerUserId: string, viewerId: string | null = null) {
     const [listingsRes, rawMembersRes, servicesRes, equipmentRes] = await Promise.all([
       db.from("listings")
-        .select("id, title, type, category, price, city, image_url, created_at")
+        .select("id, title, type, category, price, city, image_url, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type, marketplace:metadata->marketplace")
         .eq("company_id", companyId)
         .eq("published", true)
         .order("created_at", { ascending: false }),

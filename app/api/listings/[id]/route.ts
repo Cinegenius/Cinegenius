@@ -1,3 +1,4 @@
+import { validateMarketplaceOffer } from "@/lib/marketplace-offer";
 import { attemptedApproval } from "@/lib/offer-moderation";
 import { bindResponsiblePerson } from "@/lib/responsible-person";
 import { getTranslations } from "next-intl/server";
@@ -21,7 +22,7 @@ export async function PATCH(
 
   const { id } = await params;
   const { data: current, error: currentError } = await db.from("listings")
-    .select("id, user_id, company_id, type, image_url, extra_images, metadata, blocked_dates, responsible_person, published")
+    .select("id, user_id, company_id, type, category, image_url, extra_images, metadata, blocked_dates, responsible_person, published")
     .eq("id", id).maybeSingle();
   if (currentError) return NextResponse.json({ error: "Inserat konnte nicht geprüft werden." }, { status: 500 });
   if (!current) return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
@@ -58,7 +59,13 @@ export async function PATCH(
   if (userId !== responsibleAccountId && body.responsible_person !== undefined && JSON.stringify(responsible.person) !== JSON.stringify(bindResponsiblePerson(current.responsible_person, responsibleAccountId))) {
     return NextResponse.json({ error: (await getTranslations("responsiblePerson"))("unauthorized"), field: "responsible_person" }, { status: 403 });
   }
+  const marketplace = current.type === "prop" || current.type === "vehicle";
+  const nextCategory = body.category ?? current.category;
+  if(body.category !== undefined && (!marketplace || metadata?.marketplace === undefined))return NextResponse.json({error:(await getTranslations("MarketplaceOffer"))("invalidCategory")},{status:400});
+  if(marketplace){const issue=validateMarketplaceOffer(nextCategory,current.type,metadata?.marketplace,current.published===true&&published!==false);if(issue)return NextResponse.json({error:(await getTranslations("MarketplaceOffer"))(issue),field:"marketplace"},{status:400});}
+  else if(metadata?.marketplace !== undefined)return NextResponse.json({error:(await getTranslations("MarketplaceOffer"))("invalidCategory")},{status:400});
   const updates: Record<string, unknown> = {};
+  if(body.category !== undefined)updates.category=nextCategory;
   if (responsible.person && userId === responsibleAccountId) updates.responsible_person = responsible.person;
   if (title !== undefined)       updates.title       = title.trim();
   if (description !== undefined) updates.description = description;
@@ -109,7 +116,7 @@ export async function PATCH(
       const merged = current.metadata && typeof current.metadata === "object" && !Array.isArray(current.metadata)
         ? { ...(current.metadata as Record<string, unknown>) }
         : {};
-      if (current.type !== "location" && Object.keys(incoming).some(key => !["price_negotiable", "price_on_request"].includes(key))) return NextResponse.json({ error: "Es können nur die Preisangaben geändert werden." }, { status: 400 });
+      if (current.type !== "location" && Object.keys(incoming).some(key => !["price_negotiable", "price_on_request", "marketplace", "rental_type"].includes(key))) return NextResponse.json({ error: "Es können nur die Preisangaben geändert werden." }, { status: 400 });
       const numericFields: Record<string, number> = { sqm: 1000000, ceiling_height_m: 1000, max_crew: 100000, parking_spots: 100000 };
       for (const [key, maximum] of Object.entries(numericFields)) {
         if (!(key in incoming)) continue;
@@ -141,6 +148,14 @@ export async function PATCH(
       }
       if (incoming.price_negotiable === true) merged.price_on_request = false;
       if (incoming.price_on_request === true) merged.price_negotiable = false;
+      if(marketplace && incoming.marketplace !== undefined){
+        merged.marketplace=incoming.marketplace;
+        const offer=incoming.marketplace as {mode:string;rent_price:number|null;sale_price:number|null;rent_mode:string;sale_mode:string};
+        merged.rental_type=offer.mode==='sale'?'kauf':offer.mode==='both'?'beides':'miete';
+        const mode=offer.mode==='sale'?offer.sale_mode:offer.rent_mode;
+        merged.price_negotiable=mode==='negotiable';merged.price_on_request=mode==='request';
+        updates.price=mode==='request'?0:(offer.mode==='sale'?offer.sale_price:offer.rent_price)??0;
+      }
       updates.metadata = merged;
     }
   }

@@ -1,4 +1,7 @@
 "use client";
+import MarketplaceOfferSummary from "@/components/MarketplaceOfferSummary";
+import { useTranslations, useLocale } from "next-intl";
+import { marketplaceCategoryLabel } from "@/lib/marketplace-offer";
 import { listingPriceLabel, type ListingPriceMetadata } from "@/lib/listing-price";
 
 
@@ -52,6 +55,7 @@ const conditionColors: Record<string, string> = {
 
 export default function PropDetail({ prop }: { prop: Prop }) {
   const { user } = useUser();
+  const market=useTranslations("MarketplaceOffer"),catalog=useTranslations("MarketplaceCatalog"),locale=useLocale();
   const isOwner = !!user && user.id === prop.ownerId;
 
   const [liveRating, setLiveRating] = useState<{ avg: number; count: number } | null>(null);
@@ -178,10 +182,10 @@ export default function PropDetail({ prop }: { prop: Prop }) {
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
               {[
-                { label: "Tagesrate", value: listingPriceLabel(prop.dailyRate,prop.pricing) },
-                { label: "Zustand", value: prop.condition },
-                { label: "Kategorie", value: prop.category },
-                { label: "Abholung / Lieferung", value: prop.delivery ? "Beides möglich" : "Nur Abholung" },
+                { label: market("mode"), value: listingPriceLabel(prop.dailyRate,prop.pricing,"/Tag",locale,market) },
+                { label: "Zustand", value: prop.condition || "—" },
+                { label: "Kategorie", value: marketplaceCategoryLabel(prop.category,catalog) },
+                { label: "Abholung / Lieferung", value: prop.pricing?.marketplace ? prop.pricing.marketplace.fulfilment.map(value=>market(value)).join(" · ") || "—" : prop.delivery ? "Beides möglich" : "Nur Abholung" },
               ].map(({ label, value }) => (
                 <div key={label} className="p-4 bg-bg-secondary border border-border rounded-xl text-center">
                   <div className="text-xs uppercase tracking-widest text-text-muted mb-1">{label}</div>
@@ -190,6 +194,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
               ))}
             </div>
 
+            <MarketplaceOfferSummary category={prop.category} price={prop.dailyRate} metadata={prop.pricing} />
             <div className="mb-8">
               <h2 className="font-display text-xl font-bold text-text-primary mb-3">Über diesen Artikel</h2>
               {prop.description ? (
@@ -237,7 +242,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
             <div className="sticky top-20">
               <div className="bg-bg-secondary border border-border rounded-xl p-6">
                 <div className="flex items-end gap-1 mb-5">
-                  <span className="text-3xl font-bold font-display text-text-primary">{listingPriceLabel(prop.dailyRate,prop.pricing)}</span>
+                  <span className="text-3xl font-bold font-display text-text-primary">{listingPriceLabel(prop.dailyRate,prop.pricing,"/Tag",locale,market)}</span>
 
                 </div>
 

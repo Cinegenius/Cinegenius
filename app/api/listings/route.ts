@@ -1,5 +1,7 @@
+import { DEPARTMENTS, deptValues, groupValues, marketplaceCategory, marketplaceSearchCategories } from "@/lib/marketplaceCategories";
+import { validateMarketplaceOffer } from "@/lib/marketplace-offer";
 import { attemptedApproval, OFFER_MODERATION_COLUMNS } from "@/lib/offer-moderation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { bindResponsiblePerson } from "@/lib/responsible-person";
 import { accountResponsiblePerson, validateResponsiblePerson } from "@/lib/responsible-person-server";
 import { listingPriceMetadataError, listingPriceLabel } from "@/lib/listing-price";
@@ -23,7 +25,7 @@ const LISTING_COLS =
 // internal ownership IDs, arbitrary metadata and private availability data on
 // authenticated owner endpoints.
 const LISTING_COLS_PUBLIC =
-  "id, type, category, title, description, price, city, image_url, published, extra_images, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type";
+  "id, type, category, title, description, price, city, image_url, published, extra_images, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type, marketplace:metadata->marketplace";
 
 function privateNoStoreJson(body: unknown, status = 200) {
   const response = NextResponse.json(body, { status });
@@ -34,8 +36,8 @@ function privateNoStoreJson(body: unknown, status = 200) {
 export async function GET(req: NextRequest) {
   const type  = req.nextUrl.searchParams.get("type");
   const mine  = req.nextUrl.searchParams.get("mine") === "true";
-  const page  = Math.max(1, parseInt(req.nextUrl.searchParams.get("page")  ?? "1",  10));
-  const limit = Math.min(100, Math.max(1, parseInt(req.nextUrl.searchParams.get("limit") ?? "50", 10)));
+  const page  = Math.max(1, (parseInt(req.nextUrl.searchParams.get("page")  ?? "1",  10)||1));
+  const limit = Math.min(100, Math.max(1, (parseInt(req.nextUrl.searchParams.get("limit") ?? "50", 10)||50)));
   const from  = (page - 1) * limit;
   const to    = from + limit - 1;
 
@@ -66,21 +68,28 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  let query = db
-    .from("listings")
-    .select(LISTING_COLS_PUBLIC)
-    .eq("published", true)
-    .order("created_at", { ascending: false })
-    .range(from, to);
-
-  if (type) query = query.eq("type", type);
-
-  const { data, error } = await query;
-  if (error) {
-    console.error("[listings GET]", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  const marketplaceOnly=req.nextUrl.searchParams.get("marketplace")==="1";
+  const department=req.nextUrl.searchParams.get("dept");const subcategory=req.nextUrl.searchParams.get("sub");
+  const selected=department?DEPARTMENTS.find(d=>d.id===(marketplaceCategory(department)?.department??department)):null;
+  const group=subcategory?DEPARTMENTS.flatMap(d=>d.groups).find(g=>g.id===subcategory):null;
+  const text=(req.nextUrl.searchParams.get("q")??"").trim().slice(0,100).replace(/[(),%*\\]/g," ");
+  if(marketplaceOnly&&((department&&!selected)||(subcategory&&(!group||(selected&&!selected.groups.some(g=>g.id===subcategory))))))return NextResponse.json({error:(await getTranslations("MarketplaceOffer"))("invalidCategory")},{status:400});
+  let query = db.from("listings").select(LISTING_COLS_PUBLIC,{count:"exact"}).eq("published",true);
+  if(marketplaceOnly)query=query.in("type",["prop","vehicle"]);
+  else if(type)query=query.eq("type",type);
+  if(marketplaceOnly){
+    if(group)query=query.in("category",groupValues(group));else if(selected)query=query.in("category",deptValues(selected));
+    const offer=req.nextUrl.searchParams.get("offer");
+    if(offer==="miete"||offer==="kauf")query=query.or(`metadata->>rental_type.eq.${offer},metadata->>rental_type.eq.beides${offer==='miete'?',metadata->>rental_type.is.null':''}`);
+    if(text){const catalog=await getTranslations("MarketplaceCatalog");const values=marketplaceSearchCategories(text,catalog);const cats=values.map(v=>`"${v.replace(/["\\]/g,'')}"`).join(',');query=query.or(`title.ilike.%${text}%,description.ilike.%${text}%,city.ilike.%${text}%,category.ilike.%${text}%${cats?`,category.in.(${cats})`:''}`);}
   }
-  return NextResponse.json({ data: (data ?? []).map((listing: Record<string, unknown>) => ({...listing,priceLabel:listingPriceLabel(Number(listing.price),listing)})), page, limit }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
+  const sort=req.nextUrl.searchParams.get("sort");
+  query=sort==='price-asc'||sort==='price-desc'?query.order("price",{ascending:sort==='price-asc'}).order("id"):query.order("created_at",{ascending:false}).order("id");
+  const {data,error,count}=await query.range(from,to);
+  if(error){console.error("[listings GET]",error);return NextResponse.json({error:(await getTranslations("OfferModeration"))("saveError")},{status:503});}
+  const priceText=await getTranslations("MarketplaceOffer"),locale=await getLocale();
+  return NextResponse.json({data:(data??[]).map((listing:Record<string,unknown>)=>({...listing,priceLabel:listingPriceLabel(Number(listing.price),listing,'/Tag',locale,priceText)})),page,limit,count:count??0},{headers:{"Cache-Control":"private, no-store, max-age=0"}});
+
 }
 
 export async function POST(req: Request) {
@@ -140,6 +149,8 @@ export async function POST(req: Request) {
   }
 
   const marketplace = type === "prop" || type === "vehicle";
+  if(marketplace){const issue=validateMarketplaceOffer(category,type,metadata?.marketplace,draft!==true);if(issue)return privateNoStoreJson({error:(await getTranslations("MarketplaceOffer"))(issue),field:"marketplace"},400);}
+  else if(metadata?.marketplace !== undefined)return privateNoStoreJson({error:(await getTranslations("MarketplaceOffer"))("invalidCategory")},400);
   const responsible = marketplace
     ? await (await import("@/lib/responsible-person-server")).validateMarketplaceResponsiblePerson(body.responsible_person, userId, draft !== true)
     : await validateResponsiblePerson(body.responsible_person, userId, false, draft !== true && type !== "job");
@@ -154,6 +165,7 @@ export async function POST(req: Request) {
     ...(type !== "animal" && rental_type !== undefined && { rental_type }),
   };
 
+  if(marketplace && metadata?.marketplace){const offer=metadata.marketplace;const mode=offer.mode==='sale'?offer.sale_mode:offer.rent_mode;Object.assign(mergedMetadata,{rental_type:offer.mode==='sale'?'kauf':offer.mode==='both'?'beides':'miete',price_negotiable:mode==='negotiable',price_on_request:mode==='request'});}
   // A private setup draft can be retried after a lost browser response. Reuse
   // the first row for the persisted request key instead of creating a duplicate.
   if (typeof onboarding_request_key === "string") {
@@ -179,7 +191,7 @@ export async function POST(req: Request) {
       category: category ?? null,
       title,
       description: description ?? "",
-      price: type === "animal" ? 0 : safePrice,
+      price: type === "animal" ? 0 : marketplace && metadata?.marketplace ? (metadata.marketplace.mode === "sale" ? metadata.marketplace.sale_mode === "request" ? 0 : metadata.marketplace.sale_price : metadata.marketplace.rent_mode === "request" ? 0 : metadata.marketplace.rent_price) ?? 0 : safePrice,
       city,
       image_url: storedImageUrl,
       company_id: company_id ?? null,

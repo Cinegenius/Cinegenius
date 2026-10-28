@@ -85,6 +85,7 @@ export default function ListingImageManager({ value, onChange, onStatusChange, l
   const lastEmittedRef = useRef(JSON.stringify(uniqueUrls(value)));
   const reportedStatusRef = useRef<UploadState>({ uploading: false, failed: 0 });
   const busyRef = useRef(false);
+  const emittedSignaturesRef = useRef(new Set<string>());
   const mountedRef = useRef(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const valueKey = JSON.stringify(value);
@@ -102,7 +103,14 @@ export default function ListingImageManager({ value, onChange, onStatusChange, l
   useEffect(() => {
     const urls = uniqueUrls(value);
     const signature = JSON.stringify(urls);
-    if (signature === lastEmittedRef.current) return;
+    if (signature === lastEmittedRef.current) {
+      if (!busyRef.current) emittedSignaturesRef.current.clear();
+      return;
+    }
+    // Fast sequential uploads can commit a newer local list before the parent
+    // acknowledges an earlier emission. Such acknowledgements are not external
+    // resets and must not discard queued files or completed replacements.
+    if (busyRef.current || emittedSignaturesRef.current.has(signature)) return;
     entriesRef.current.forEach((entry) => {
       if (entry.previewUrl.startsWith("blob:")) URL.revokeObjectURL(entry.previewUrl);
       if (entry.replacementPreview?.startsWith("blob:")) URL.revokeObjectURL(entry.replacementPreview);
@@ -138,6 +146,7 @@ export default function ListingImageManager({ value, onChange, onStatusChange, l
       const urls = galleryUrlsFromEntries(next);
       const signature = JSON.stringify(urls);
       lastEmittedRef.current = signature;
+      emittedSignaturesRef.current.add(signature);
       onChangeRef.current(urls);
     }
   };

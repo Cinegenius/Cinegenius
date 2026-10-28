@@ -6,7 +6,7 @@ import { listingDetailPath } from "@/lib/listing-routes";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import Image from "@/components/MediaImage";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: "CineGenius — Film, Fotografie und Content",
@@ -54,6 +54,7 @@ type HomeProfileRow = {
 };
 
 async function getHomeData(viewerId: string | null) {
+  const market=await getTranslations("MarketplaceOffer"),marketLocale=await getLocale();
   const currentTime = Date.now();
   const hasSupabaseCredentials = Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -149,7 +150,7 @@ async function getHomeData(viewerId: string | null) {
     title: l.title as string,
     city: (l.city ?? "") as string,
     price: (l.price ?? 0) as number,
-    priceLabel: listingPriceLabel(l.price,l.metadata),
+    priceLabel: listingPriceLabel(l.price,l.metadata,"/Tag",marketLocale,market),
     image: (l.image_url ?? "") as string,
     focalPoint: (((l.metadata ?? {}) as Record<string, unknown>).focal_point as { x: number; y: number } | null) ?? null,
     isNew: l.created_at ? (currentTime - new Date(l.created_at as string).getTime()) < 3 * 24 * 60 * 60 * 1000 : false,
@@ -170,7 +171,7 @@ async function getHomeData(viewerId: string | null) {
     title: p.title as string,
     city: (p.city ?? "") as string,
     price: (p.price ?? 0) as number,
-    priceLabel: listingPriceLabel(p.price,p.metadata),
+    priceLabel: listingPriceLabel(p.price,p.metadata,"/Tag",marketLocale,market),
     image: (p.image_url ?? "") as string,
     focalPoint: (((p.metadata ?? {}) as Record<string, unknown>).focal_point as { x: number; y: number } | null) ?? null,
     type: (p.type ?? "prop") as string,

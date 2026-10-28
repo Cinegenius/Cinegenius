@@ -7,7 +7,7 @@ import FloatingPanel from "@/components/FloatingPanel";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useGallerySelection } from "@/lib/use-gallery-selection";
 import {
   MapPin, Globe, Mail, Phone, CheckCircle,
@@ -27,6 +27,7 @@ import { COMPANY_PUBLIC_TITLE_SUGGESTIONS, normalizeCompanyPublicTitles } from "
 import MediaImage from "@/components/MediaImage";
 import CompanyLogo from "@/components/CompanyLogo";
 import Lightbox from "@/components/Lightbox";
+import { listingPriceLabel } from "@/lib/listing-price";
 import { listingDetailPath } from "@/lib/listing-routes";
 
 type Listing = {
@@ -35,6 +36,8 @@ type Listing = {
   type: string;
   category: string | null;
   price: number;
+  marketplace?: unknown;
+  rental_type?:string;price_negotiable?:unknown;price_on_request?:unknown;
   city: string;
   image_url: string | null;
   created_at: string;
@@ -128,6 +131,7 @@ export default function CompanyDetail({
   initialIsOwner: boolean;
 }) {
   const { user, isLoaded } = useUser();
+  const market=useTranslations("MarketplaceOffer"),marketLocale=useLocale();
   const messageText = useTranslations("companyMessages");
   const animals = useTranslations("FilmAnimals");
   const currentUserId = isLoaded ? user?.id ?? null : initialUserId;
@@ -761,7 +765,7 @@ export default function CompanyDetail({
                             <span>{listing.type === "animal" ? animals("portfolio") : listingTypeLabel[listing.type] ?? listing.type}</span>
                             <span>·</span>
                             <span>{listing.city}</span>
-                            {listing.type !== "animal" && listing.price > 0 && <><span>·</span><span className="text-gold">{listing.price} €</span></>}
+                            {listing.type !== "animal" && <><span>·</span><span className="break-words text-gold">{listingPriceLabel(listing.price,listing,"/Tag",marketLocale,market)}</span></>}
                           </div>
                         </div>
                         <ChevronRight size={13} className="text-text-muted shrink-0 group-hover:text-gold transition-colors" />

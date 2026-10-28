@@ -1,807 +1,423 @@
-// ─────────────────────────────────────────────────────────────
-// CineGenius — Marketplace Taxonomy
-// Hollywood Rental-House / Prop-Department hierarchy
-// ─────────────────────────────────────────────────────────────
-
-export type MarketplaceItem = {
-  label: string;
-  value: string; // stored in listings.category
-};
-
-export type MarketplaceGroup = {
-  id: string;
-  label: string;
-  items: MarketplaceItem[];
-};
-
-export type MarketplaceDept = {
-  id: string;
-  label: string;
-  iconName: string;   // lucide icon component name — mapped in PropsContent
-  color: string;      // tailwind color key (sky, amber, teal …)
-  legacyValues: string[]; // old flat values that map here
-  groups: MarketplaceGroup[];
-};
-
+// Central marketplace catalogue. IDs are persisted; labels come from next-intl.
+export type MarketplaceItem = { label: string; value: string };
+export type MarketplaceGroup = { id: string; label: string; items: MarketplaceItem[] };
+export type MarketplaceDept = { id: string; label: string; iconName: string; color: string; legacyValues: string[]; groups: MarketplaceGroup[] };
 export const DEPARTMENTS: MarketplaceDept[] = [
-  // ─── KAMERA ───────────────────────────────────────────────
-  {
-    id: "kamera",
-    label: "Kamera",
-    iconName: "Camera",
-    color: "sky",
-    legacyValues: ["Kameraequipment", "kamera", "filmtechnik"],
-    groups: [
-      {
-        id: "kamera-kameras",
-        label: "Kameras",
-        items: [
-          { label: "ARRI (Alexa Mini, LF, 35…)", value: "arri" },
-          { label: "RED (Komodo, V-Raptor…)", value: "red" },
-          { label: "Sony Cinema Line", value: "sony-cinema" },
-          { label: "Blackmagic", value: "blackmagic" },
-          { label: "DSLR / Mirrorless", value: "dslr" },
-        ],
-      },
-      {
-        id: "kamera-optiken",
-        label: "Optiken",
-        items: [
-          { label: "Prime Lenses", value: "prime-lenses" },
-          { label: "Zoom Lenses", value: "zoom-lenses" },
-          { label: "Anamorphic Lenses", value: "anamorphic" },
-          { label: "Vintage Lenses", value: "vintage-lenses" },
-          { label: "Cine-Objektive (Zeiss, Cooke…)", value: "cine-lenses" },
-        ],
-      },
-      {
-        id: "kamera-zubehoer",
-        label: "Kamera-Zubehör",
-        items: [
-          { label: "Matte Box", value: "matte-box" },
-          { label: "Follow Focus", value: "follow-focus" },
-          { label: "Filter (ND, Polarizer…)", value: "filter" },
-          { label: "Lens Control Systems", value: "lens-control" },
-          { label: "Top Plates / Käfig", value: "camera-cage" },
-        ],
-      },
-      {
-        id: "kamera-monitoring",
-        label: "Monitoring",
-        items: [
-          { label: "On-Set Monitore", value: "onset-monitor" },
-          { label: "Director Monitore", value: "director-monitor" },
-          { label: "Wireless Video Systeme", value: "wireless-video" },
-          { label: "HDMI / SDI Konverter", value: "video-converter" },
-        ],
-      },
-      {
-        id: "kamera-support",
-        label: "Camera Support",
-        items: [
-          { label: "Stative / Tripods", value: "tripod" },
-          { label: "Fluid Heads", value: "fluid-head" },
-          { label: "Shoulder Rigs", value: "shoulder-rig" },
-          { label: "Easyrig / Vest Rig", value: "easyrig" },
-          { label: "Handgriffe / Accessories", value: "handle-acc" },
-        ],
-      },
-      {
-        id: "kamera-movement",
-        label: "Camera Movement",
-        items: [
-          { label: "Gimbal", value: "gimbal" },
-          { label: "Steadicam", value: "steadicam" },
-          { label: "Remote Heads", value: "remote-head" },
-          { label: "Motion Control", value: "motion-control" },
-          { label: "Cable Cam / FPV", value: "cable-cam" },
-        ],
-      },
-      {
-        id: "kamera-spezial",
-        label: "Spezialkameras",
-        items: [
-          { label: "Unterwassergehäuse", value: "underwater-housing" },
-          { label: "High-Speed Kameras", value: "high-speed-cam" },
-          { label: "Crash Cams", value: "crash-cam" },
-          { label: "Aerial / Drohne", value: "drone-cam" },
-          { label: "360° / VR Systeme", value: "360-cam" },
-        ],
-      },
-    ],
-  },
-
-  // ─── LICHT ────────────────────────────────────────────────
-  {
-    id: "licht",
-    label: "Licht",
-    iconName: "Lightbulb",
-    color: "amber",
-    legacyValues: ["Lichttechnik", "licht"],
-    groups: [
-      {
-        id: "licht-quellen",
-        label: "Lichtquellen",
-        items: [
-          { label: "LED Panels (ARRI, Aputure, Nanlite…)", value: "led-panel" },
-          { label: "Fresnel", value: "fresnel" },
-          { label: "HMI", value: "hmi" },
-          { label: "Tungsten / Halogen", value: "tungsten" },
-          { label: "Tubes (Astera, Quasar…)", value: "light-tubes" },
-          { label: "Bi-Color Panels", value: "bicolor-panel" },
-        ],
-      },
-      {
-        id: "licht-modifier",
-        label: "Modifier & Diffusion",
-        items: [
-          { label: "Softboxen", value: "softbox" },
-          { label: "Oktaboxen / Ringblitz", value: "octa" },
-          { label: "Diffusion / CTD-Folie", value: "diffusion" },
-          { label: "Flags / Netz / Butterfly", value: "flags" },
-          { label: "Grids (Honeycomb)", value: "grids" },
-          { label: "Bounce / Reflektoren", value: "bounce" },
-        ],
-      },
-      {
-        id: "licht-strom",
-        label: "Strom & Kabel",
-        items: [
-          { label: "Generatoren", value: "generator" },
-          { label: "Stromverteilung / Distro", value: "distro" },
-          { label: "Feeder Cable / Cee-Kabel", value: "feeder-cable" },
-          { label: "Power Stations (Portable)", value: "powerstation" },
-          { label: "Dimmer / Controller", value: "dimmer" },
-        ],
-      },
-      {
-        id: "licht-rigging",
-        label: "Licht-Rigging",
-        items: [
-          { label: "Rigging-Systeme (Batten, Speed Rail)", value: "light-rigging" },
-          { label: "Deckenaufhängungen", value: "ceiling-mount" },
-          { label: "Junior / Baby Stands", value: "light-stand" },
-          { label: "Overhead Frames", value: "overhead-frame" },
-        ],
-      },
-      {
-        id: "licht-spezial",
-        label: "Speziallicht",
-        items: [
-          { label: "Neon / Leuchtreklame", value: "neon" },
-          { label: "Practical Lights", value: "practical" },
-          { label: "Stroboskope / Club", value: "strobe" },
-          { label: "Effektlicht / RGB", value: "effect-light" },
-          { label: "Underwater Lights", value: "underwater-light" },
-        ],
-      },
-    ],
-  },
-
-  // ─── GRIP / RIGGING ───────────────────────────────────────
-  {
-    id: "grip",
-    label: "Grip & Rigging",
-    iconName: "Wrench",
-    color: "slate",
-    legacyValues: ["Grip & Rigging", "rigging"],
-    groups: [
-      {
-        id: "grip-basics",
-        label: "Grip Basics",
-        items: [
-          { label: "C-Stands", value: "c-stand" },
-          { label: "Sandbags", value: "sandbag" },
-          { label: "Stative (Grip)", value: "grip-stand" },
-          { label: "Baby Pins / Spud Adapters", value: "grip-pins" },
-          { label: "Knuckles / Clamps", value: "clamps" },
-        ],
-      },
-      {
-        id: "grip-movement",
-        label: "Camera Movement (Grip)",
-        items: [
-          { label: "Dolly (Fisher, Chapman…)", value: "dolly" },
-          { label: "Dolly Track", value: "dolly-track" },
-          { label: "Slider", value: "slider" },
-          { label: "Giraffe Boom", value: "giraffe" },
-        ],
-      },
-      {
-        id: "grip-heavy",
-        label: "Heavy Equipment",
-        items: [
-          { label: "Kranarm / Jib", value: "jib" },
-          { label: "Techno Crane", value: "techno-crane" },
-          { label: "Hubsteiger / Cherrypicker", value: "cherry-picker" },
-          { label: "Kamerawagen", value: "camera-car" },
-        ],
-      },
-      {
-        id: "grip-rigging",
-        label: "Rigging",
-        items: [
-          { label: "Truss-Systeme", value: "truss" },
-          { label: "Seilzüge / Chain Hoists", value: "chain-hoist" },
-          { label: "Safety Hardware", value: "safety-hardware" },
-          { label: "Schienen / Tracks", value: "rails" },
-        ],
-      },
-    ],
-  },
-
-  // ─── TON ──────────────────────────────────────────────────
-  {
-    id: "ton",
-    label: "Ton & Audio",
-    iconName: "Mic",
-    color: "teal",
-    legacyValues: ["Ton & Audio", "ton"],
-    groups: [
-      {
-        id: "ton-aufnahme",
-        label: "Aufnahme",
-        items: [
-          { label: "Shotgun Mikrofone", value: "shotgun-mic" },
-          { label: "Lavalier / Clip-On", value: "lavalier" },
-          { label: "Field Recorder (Zaxcom, Sound Devices…)", value: "field-recorder" },
-          { label: "Stereo / Surround Mics", value: "stereo-mic" },
-        ],
-      },
-      {
-        id: "ton-funk",
-        label: "Funk & Wireless",
-        items: [
-          { label: "Wireless-Sets (Sennheiser, Lectrosonics…)", value: "wireless-set" },
-          { label: "IFB / Comtek", value: "ifb" },
-          { label: "Intercom Systeme", value: "intercom" },
-        ],
-      },
-      {
-        id: "ton-zubehoer",
-        label: "Zubehör",
-        items: [
-          { label: "Boom Poles", value: "boom-pole" },
-          { label: "Wind Protection (Blimp, Windjammer)", value: "wind-protection" },
-          { label: "Audio-Kabel / XLR", value: "audio-cable" },
-          { label: "Mixer / Patchbays", value: "audio-mixer" },
-          { label: "Headphones / Abhöre", value: "headphones" },
-        ],
-      },
-    ],
-  },
-
-  // ─── KOSTÜM ───────────────────────────────────────────────
-  {
-    id: "kostuem",
-    label: "Kostüm",
-    iconName: "Shirt",
-    color: "rose",
-    legacyValues: ["Kostüme", "kostueme"],
-    groups: [
-      {
-        id: "kostuem-kleidung",
-        label: "Kleidung",
-        items: [
-          { label: "Alltagskleidung (Modern)", value: "alltagskleidung" },
-          { label: "Historische Kostüme (1900–1970)", value: "historisch-frueh" },
-          { label: "Historische Kostüme (1970–1990)", value: "historisch-spaet" },
-          { label: "Viktorianisch / Biedermeier", value: "viktorianisch" },
-          { label: "Mittelalter / Renaissance", value: "mittelalter" },
-          { label: "Fantasy / Sci-Fi", value: "fantasy-scifi" },
-          { label: "Uniformen (Militär, Polizei…)", value: "uniform" },
-          { label: "Berufskleidung", value: "berufskleidung" },
-        ],
-      },
-      {
-        id: "kostuem-accessoires",
-        label: "Accessoires",
-        items: [
-          { label: "Schmuck", value: "schmuck" },
-          { label: "Taschen / Handtaschen", value: "taschen" },
-          { label: "Gürtel / Schuhe", value: "guertel-schuhe" },
-          { label: "Hüte / Kopfbedeckungen", value: "hut" },
-          { label: "Brillen / Props-Brillen", value: "brille" },
-        ],
-      },
-      {
-        id: "kostuem-spezial",
-        label: "Spezialkostüme",
-        items: [
-          { label: "Stunt-Kostüme / Polsterung", value: "stunt-kostuem" },
-          { label: "Aged / Distressed Kostüme", value: "aged-kostuem" },
-          { label: "Creature / Masken-Kostüme", value: "creature-kostuem" },
-          { label: "Sportbekleidung / Trikots", value: "sport-kostuem" },
-        ],
-      },
-    ],
-  },
-
-  // ─── MASKE / HAIR ─────────────────────────────────────────
-  {
-    id: "maske",
-    label: "Maske & Hair",
-    iconName: "Sparkles",
-    color: "fuchsia",
-    legacyValues: ["Maske"],
-    groups: [
-      {
-        id: "maske-makeup",
-        label: "Make-up & Kits",
-        items: [
-          { label: "Standard Make-up Kits", value: "makeup-kit" },
-          { label: "High-End / HD Make-up", value: "hd-makeup" },
-          { label: "Airbrush-Equipment", value: "airbrush" },
-        ],
-      },
-      {
-        id: "maske-sfx",
-        label: "SFX Make-up",
-        items: [
-          { label: "Latex / Schaumlatex", value: "latex" },
-          { label: "Prosthetics / Gesichtsformen", value: "prosthetics" },
-          { label: "Blood FX / Wunden", value: "blood-fx" },
-          { label: "Bald Caps", value: "bald-cap" },
-          { label: "Body Paint", value: "body-paint" },
-        ],
-      },
-      {
-        id: "maske-hair",
-        label: "Hair",
-        items: [
-          { label: "Perücken (Damen / Herren)", value: "peruecke" },
-          { label: "Extensions", value: "extensions" },
-          { label: "Styling Tools (GHD, Lockenwickler…)", value: "styling-tools" },
-          { label: "Bärte / Fake Haare", value: "fake-haar" },
-        ],
-      },
-    ],
-  },
-
-  // ─── REQUISITEN ───────────────────────────────────────────
-  {
-    id: "requisiten",
-    label: "Requisiten",
-    iconName: "Layers",
-    color: "violet",
-    legacyValues: ["Requisiten", "sfx"],
-    groups: [
-      {
-        id: "req-moebel",
-        label: "Möbel",
-        items: [
-          { label: "Sofas & Sessel", value: "sofa" },
-          { label: "Tische (Ess-, Couchtisch…)", value: "tisch" },
-          { label: "Betten & Lattenroste", value: "bett" },
-          { label: "Büromöbel", value: "bueromoebel" },
-          { label: "Regale & Schränke", value: "regal" },
-          { label: "Stühle & Hocker", value: "stuhl" },
-        ],
-      },
-      {
-        id: "req-deko",
-        label: "Dekoration",
-        items: [
-          { label: "Bilder & Spiegel", value: "bilder-spiegel" },
-          { label: "Lampen & Leuchten", value: "lampen" },
-          { label: "Vorhänge & Textilien", value: "vorhaenge" },
-          { label: "Vasen / Deko-Objekte", value: "deko-objekte" },
-          { label: "Teppiche", value: "teppich" },
-        ],
-      },
-      {
-        id: "req-alltag",
-        label: "Alltagsgegenstände",
-        items: [
-          { label: "Küchenutensilien", value: "kueche" },
-          { label: "Werkzeug", value: "werkzeug" },
-          { label: "Büroartikel", value: "buroartikel" },
-          { label: "Spielzeug", value: "spielzeug" },
-          { label: "Bücher / Zeitungen (Period)", value: "buecher-period" },
-        ],
-      },
-      {
-        id: "req-spezial",
-        label: "Spezial Props",
-        items: [
-          { label: "Waffen (Fake / Replika)", value: "waffen-fake" },
-          { label: "Geld (Filmnoten)", value: "filmgeld" },
-          { label: "Dokumente / Pässe / Ausweise", value: "dokumente" },
-          { label: "Medizinische Props", value: "medical-props" },
-          { label: "Militär Props", value: "militaer-props" },
-        ],
-      },
-      {
-        id: "req-elektronik",
-        label: "Elektronik Props",
-        items: [
-          { label: "Fernseher (modern & vintage)", value: "tv-prop" },
-          { label: "Computer / Monitore", value: "computer-prop" },
-          { label: "Telefone & Handys (period)", value: "phone-prop" },
-          { label: "Vintage Elektronik (Radio, Grammofon…)", value: "vintage-elektronik" },
-        ],
-      },
-      {
-        id: "req-food",
-        label: "Food Props",
-        items: [
-          { label: "Fake Food", value: "fake-food" },
-          { label: "Catering Props / Geschirr", value: "catering-props" },
-          { label: "Flaschen & Gläser", value: "flaschen" },
-        ],
-      },
-    ],
-  },
-
-  // ─── SZENENBILD / SET DESIGN ──────────────────────────────
-  {
-    id: "szenenbild",
-    label: "Szenenbild",
-    iconName: "Palette",
-    color: "emerald",
-    legacyValues: ["Möbel / Szenenbild", "szenenbild", "moebel"],
-    groups: [
-      {
-        id: "szene-bau",
-        label: "Set-Bau",
-        items: [
-          { label: "Wandmodule / Flats", value: "wall-flat" },
-          { label: "Böden / Floor Systems", value: "floor-system" },
-          { label: "Doorsets / Fensterrahmen", value: "doorset" },
-          { label: "Säulen / Pilaster", value: "column" },
-        ],
-      },
-      {
-        id: "szene-oberflaeche",
-        label: "Oberflächen",
-        items: [
-          { label: "Texturen / Strukturputz", value: "texture" },
-          { label: "Paint Kits / Sprühlack", value: "paint" },
-          { label: "Wallpaper (period / modern)", value: "wallpaper" },
-          { label: "Floor Vinyl / Parkett-Look", value: "floor-vinyl" },
-        ],
-      },
-      {
-        id: "szene-greens",
-        label: "Greens & Natur",
-        items: [
-          { label: "Kunstpflanzen / Pflanzen", value: "pflanzen" },
-          { label: "Bäume (Baum-Staging)", value: "baeume" },
-          { label: "Blumen", value: "blumen" },
-          { label: "Moos / Erde (Dekor)", value: "moos-erde" },
-        ],
-      },
-    ],
-  },
-
-  // ─── FAHRZEUGE ────────────────────────────────────────────
-  {
-    id: "fahrzeuge",
-    label: "Fahrzeuge",
-    iconName: "Car",
-    color: "orange",
-    legacyValues: ["Bild-Fahrzeug", "fahrzeuge", "vehicle"],
-    groups: [
-      {
-        id: "fahr-pkw",
-        label: "PKW",
-        items: [
-          { label: "Oldtimer (vor 1970)", value: "oldtimer" },
-          { label: "Classic Cars (1970–1990)", value: "classic-car" },
-          { label: "Moderne PKW", value: "moderne-pkw" },
-          { label: "Luxusfahrzeuge", value: "luxus-fahr" },
-          { label: "Sportwagen", value: "sportwagen" },
-        ],
-      },
-      {
-        id: "fahr-spezial",
-        label: "Spezialfahrzeuge",
-        items: [
-          { label: "Polizei / Feuerwehr (Replika)", value: "polizei-fahr" },
-          { label: "Krankenwagen / Rettung", value: "ambulance" },
-          { label: "Militärfahrzeuge", value: "militaer-fahr" },
-          { label: "Trucks / LKW", value: "truck" },
-          { label: "Motorräder", value: "motorrad" },
-          { label: "Busse / Transporter", value: "bus" },
-        ],
-      },
-      {
-        id: "fahr-stunt",
-        label: "Stunt / Rig Cars",
-        items: [
-          { label: "Stunt Cars", value: "stunt-car" },
-          { label: "Camera Rig Cars", value: "rig-car" },
-          { label: "Tieflader / Transporter für Fahrzeuge", value: "auto-transporter" },
-        ],
-      },
-    ],
-  },
-
-  // ─── SFX ──────────────────────────────────────────────────
-  {
-    id: "sfx",
-    label: "SFX",
-    iconName: "Zap",
-    color: "red",
-    legacyValues: ["SFX"],
-    groups: [
-      {
-        id: "sfx-atmo",
-        label: "Atmosphäre",
-        items: [
-          { label: "Rauch / Nebel Maschinen", value: "smoke-machine" },
-          { label: "Haze Maschinen", value: "haze-machine" },
-          { label: "Wind Maschinen", value: "wind-machine" },
-          { label: "Schnee / Regen Systeme", value: "weather-fx" },
-        ],
-      },
-      {
-        id: "sfx-pyro",
-        label: "Pyrotechnik",
-        items: [
-          { label: "Confetti / Streamer Kanonen", value: "confetti" },
-          { label: "CO2 Jets", value: "co2-jet" },
-          { label: "Pyro Effekte (lizenzpflichtig)", value: "pyro" },
-        ],
-      },
-      {
-        id: "sfx-wasser",
-        label: "Wasser & Klima",
-        items: [
-          { label: "Regen-Rigging / Rain Head", value: "rain-head" },
-          { label: "Wasserpumpen", value: "water-pump" },
-          { label: "Nebel-Düsensysteme", value: "fog-nozzle" },
-        ],
-      },
-    ],
-  },
-
-  // ─── VIRTUAL PRODUCTION ───────────────────────────────────
-  {
-    id: "virtual-production",
-    label: "Virtual Production",
-    iconName: "Monitor",
-    color: "purple",
-    legacyValues: ["Virtual Production"],
-    groups: [
-      {
-        id: "vp-led",
-        label: "LED Walls & Displays",
-        items: [
-          { label: "LED Volume / LED Wall", value: "led-wall" },
-          { label: "LED Panels (Fine Pitch)", value: "led-finepitch" },
-          { label: "Curved LED Displays", value: "curved-led" },
-        ],
-      },
-      {
-        id: "vp-tracking",
-        label: "Tracking & Tech",
-        items: [
-          { label: "Camera Tracking Systeme", value: "cam-tracking" },
-          { label: "Unreal Engine Rigs", value: "unreal-rig" },
-          { label: "Green Screen Systeme", value: "greenscreen-vp" },
-          { label: "Motion Capture Suits", value: "mocap" },
-        ],
-      },
-    ],
-  },
-
-  // ─── POST PRODUCTION ──────────────────────────────────────
-  {
-    id: "post",
-    label: "Post Production",
-    iconName: "Scissors",
-    color: "blue",
-    legacyValues: ["Post Production", "postproduktion"],
-    groups: [
-      {
-        id: "post-edit",
-        label: "Editing Systeme",
-        items: [
-          { label: "Mac Pro / Workstations", value: "edit-workstation" },
-          { label: "Thunderbolt-Arrays / NAS", value: "storage" },
-          { label: "Avid / DaVinci Lizenzen", value: "edit-license" },
-        ],
-      },
-      {
-        id: "post-color",
-        label: "Color Grading",
-        items: [
-          { label: "Blackmagic DaVinci Panels", value: "davinci-panel" },
-          { label: "Referenz-Monitore (EIZO, Sony)", value: "ref-monitor" },
-          { label: "HDR / 4K Monitoring", value: "hdr-monitor" },
-        ],
-      },
-    ],
-  },
-
-  // ─── STUDIO & INFRASTRUKTUR ───────────────────────────────
-  {
-    id: "studio",
-    label: "Studio & Infra",
-    iconName: "Building2",
-    color: "cyan",
-    legacyValues: ["Studio", "Fotostudio"],
-    groups: [
-      {
-        id: "studio-greenscreen",
-        label: "Greenscreen / Backdrop",
-        items: [
-          { label: "Greenscreen Sets", value: "greenscreen" },
-          { label: "Bluescreen", value: "bluescreen" },
-          { label: "Papier-Backdrop Rollen", value: "backdrop-papier" },
-          { label: "Muslin Backgrounds", value: "backdrop-muslin" },
-        ],
-      },
-      {
-        id: "studio-foto",
-        label: "Fotografie",
-        items: [
-          { label: "Fotoequipment (Kamera)", value: "fotoequipment" },
-          { label: "Blitz / Studio Flash", value: "studioblitz" },
-          { label: "Modifiers (Beauty Dish, Softbox)", value: "foto-modifier" },
-          { label: "Backdrops & Hintergründe", value: "backdrops" },
-          { label: "Content Sets / Creator", value: "content-sets" },
-        ],
-      },
-    ],
-  },
-
-  // ─── PRODUKTION & LOGISTIK ────────────────────────────────
-  {
-    id: "produktion",
-    label: "Produktion & Logistik",
-    iconName: "Briefcase",
-    color: "amber",
-    legacyValues: ["Produktionsausstattung", "produktion"],
-    groups: [
-      {
-        id: "prod-set",
-        label: "Set-Infrastruktur",
-        items: [
-          { label: "Walkie Talkies / Funkgeräte", value: "walkie" },
-          { label: "Zelte / Shelter", value: "zelt" },
-          { label: "Set-Möbel (Stühle, Tische)", value: "set-moebel" },
-          { label: "Monitore / PA-Systeme", value: "pa-system" },
-          { label: "Wartebereich / Catering Equip.", value: "catering-equip" },
-        ],
-      },
-      {
-        id: "prod-transport",
-        label: "Transport & Lagerung",
-        items: [
-          { label: "Pelican / Hard Cases", value: "hard-case" },
-          { label: "Softbags / Transporttaschen", value: "soft-bag" },
-          { label: "Equipment Carts / Trolleys", value: "cart" },
-          { label: "Transporter / Sprinter (leer)", value: "sprinter" },
-        ],
-      },
-    ],
-  },
+  { id: "licht", label: "Licht & Lichtsteuerung", iconName: "Lightbulb", color: "amber", legacyValues: [], groups: [
+    {"id": "licht-quellen", "label": "Scheinwerfer und Leuchten", "items": [{"label": "Scheinwerfer und Leuchten", "value": "licht-quellen"}]},
+    {"id": "licht-steuerung", "label": "Lichtpulte und DMX-Steuerung", "items": [{"label": "Lichtpulte und DMX-Steuerung", "value": "licht-steuerung"}]},
+    {"id": "licht-signal", "label": "DMX-Nodes, Splitter und Wireless-DMX", "items": [{"label": "DMX-Nodes, Splitter und Wireless-DMX", "value": "licht-signal"}]},
+    {"id": "licht-former", "label": "Softboxen und Lichtformer", "items": [{"label": "Softboxen und Lichtformer", "value": "licht-former"}]},
+    {"id": "licht-kontrolle", "label": "Flags, Diffusion und Reflektoren", "items": [{"label": "Flags, Diffusion und Reflektoren", "value": "licht-kontrolle"}]},
+    {"id": "licht-stative", "label": "Lichtstative und Halterungen", "items": [{"label": "Lichtstative und Halterungen", "value": "licht-stative"}]},
+    {"id": "licht-verbrauch", "label": "Leuchtmittel, Folien und Verbrauchsmaterial", "items": [{"label": "Leuchtmittel, Folien und Verbrauchsmaterial", "value": "licht-verbrauch"}]},
+    {"id": "licht-pakete", "label": "Lichtpakete und Lichtkoffer", "items": [{"label": "Lichtpakete und Lichtkoffer", "value": "licht-pakete"}]},
+    {"id": "licht-other", "label": "Weiteres Zubehör", "items": [{"label": "Weiteres Zubehör", "value": "licht-other"}]},
+  ] },
+  { id: "strom", label: "Stromversorgung & Verteilung", iconName: "Package", color: "amber", legacyValues: [], groups: [
+    {"id": "strom-generatoren", "label": "Generatoren und Stromerzeuger", "items": [{"label": "Generatoren und Stromerzeuger", "value": "strom-generatoren"}]},
+    {"id": "strom-akkus", "label": "Akkus, Powerstations und Ladegeräte", "items": [{"label": "Akkus, Powerstations und Ladegeräte", "value": "strom-akkus"}]},
+    {"id": "strom-verteiler", "label": "Stromverteiler und Anschlusskästen", "items": [{"label": "Stromverteiler und Anschlusskästen", "value": "strom-verteiler"}]},
+    {"id": "strom-kabel", "label": "Stromkabel, Trommeln und Adapter", "items": [{"label": "Stromkabel, Trommeln und Adapter", "value": "strom-kabel"}]},
+    {"id": "strom-bruecken", "label": "Kabelbrücken und Zubehör", "items": [{"label": "Kabelbrücken und Zubehör", "value": "strom-bruecken"}]},
+    {"id": "strom-messung", "label": "Mess- und Prüfgeräte", "items": [{"label": "Mess- und Prüfgeräte", "value": "strom-messung"}]},
+    {"id": "strom-other", "label": "Weiteres Zubehör", "items": [{"label": "Weiteres Zubehör", "value": "strom-other"}]},
+  ] },
+  { id: "kamera", label: "Kamera & Objektive", iconName: "Camera", color: "sky", legacyValues: [], groups: [
+    {"id": "kamera-kameras", "label": "Film-, Video- und Fotokameras", "items": [{"label": "Film-, Video- und Fotokameras", "value": "kamera-kameras"}]},
+    {"id": "kamera-objektive", "label": "Objektive und Mountadapter", "items": [{"label": "Objektive und Mountadapter", "value": "kamera-objektive"}]},
+    {"id": "kamera-filter", "label": "Filter und Matteboxen", "items": [{"label": "Filter und Matteboxen", "value": "kamera-filter"}]},
+    {"id": "kamera-fokus", "label": "Follow Focus und Funkfokus", "items": [{"label": "Follow Focus und Funkfokus", "value": "kamera-fokus"}]},
+    {"id": "kamera-rigs", "label": "Cages, Rigs und Kamerazubehör", "items": [{"label": "Cages, Rigs und Kamerazubehör", "value": "kamera-rigs"}]},
+    {"id": "kamera-stative", "label": "Kamerastative und Köpfe", "items": [{"label": "Kamerastative und Köpfe", "value": "kamera-stative"}]},
+    {"id": "kamera-medien", "label": "Speicherkarten und Kartenleser", "items": [{"label": "Speicherkarten und Kartenleser", "value": "kamera-medien"}]},
+    {"id": "kamera-pakete", "label": "Kameraakkus und Kamerapakete", "items": [{"label": "Kameraakkus und Kamerapakete", "value": "kamera-pakete"}]},
+    {"id": "kamera-other", "label": "Weiteres Zubehör", "items": [{"label": "Weiteres Zubehör", "value": "kamera-other"}]},
+  ] },
+  { id: "grip", label: "Kamerabühne / Grip & Rigging", iconName: "Wrench", color: "slate", legacyValues: [], groups: [
+    {"id": "grip-dolly", "label": "Dollys und Schienen", "items": [{"label": "Dollys und Schienen", "value": "grip-dolly"}]},
+    {"id": "grip-slider", "label": "Slider und Führungssysteme", "items": [{"label": "Slider und Führungssysteme", "value": "grip-slider"}]},
+    {"id": "grip-kraene", "label": "Kräne, Jibs und Remote Heads", "items": [{"label": "Kräne, Jibs und Remote Heads", "value": "grip-kraene"}]},
+    {"id": "grip-gimbal", "label": "Gimbals und Stabilisierung", "items": [{"label": "Gimbals und Stabilisierung", "value": "grip-gimbal"}]},
+    {"id": "grip-fahrzeugrigs", "label": "Fahrzeugrigs und Saugsysteme", "items": [{"label": "Fahrzeugrigs und Saugsysteme", "value": "grip-fahrzeugrigs"}]},
+    {"id": "grip-hardware", "label": "Klemmen, Rohre und Rigging-Hardware", "items": [{"label": "Klemmen, Rohre und Rigging-Hardware", "value": "grip-hardware"}]},
+    {"id": "grip-unterbau", "label": "Apple Boxes und Nivellierung", "items": [{"label": "Apple Boxes und Nivellierung", "value": "grip-unterbau"}]},
+    {"id": "grip-transport", "label": "Gripwagen und Pakete", "items": [{"label": "Gripwagen und Pakete", "value": "grip-transport"}]},
+    {"id": "grip-other", "label": "Weiteres Zubehör", "items": [{"label": "Weiteres Zubehör", "value": "grip-other"}]},
+  ] },
+  { id: "ton", label: "Ton & Audio", iconName: "Mic", color: "teal", legacyValues: [], groups: [
+    {"id": "ton-mikrofone", "label": "Mikrofone", "items": [{"label": "Mikrofone", "value": "ton-mikrofone"}]},
+    {"id": "ton-funk", "label": "Funkstrecken und Zubehör", "items": [{"label": "Funkstrecken und Zubehör", "value": "ton-funk"}]},
+    {"id": "ton-recorder", "label": "Recorder und Mischpulte", "items": [{"label": "Recorder und Mischpulte", "value": "ton-recorder"}]},
+    {"id": "ton-angeln", "label": "Tonangeln, Windschutz und Halterungen", "items": [{"label": "Tonangeln, Windschutz und Halterungen", "value": "ton-angeln"}]},
+    {"id": "ton-timecode", "label": "Timecode-Systeme", "items": [{"label": "Timecode-Systeme", "value": "ton-timecode"}]},
+    {"id": "ton-abhoere", "label": "Kopfhörer und Lautsprecher", "items": [{"label": "Kopfhörer und Lautsprecher", "value": "ton-abhoere"}]},
+    {"id": "ton-zubehoer", "label": "Audiokabel, Strom und Tonkoffer", "items": [{"label": "Audiokabel, Strom und Tonkoffer", "value": "ton-zubehoer"}]},
+    {"id": "ton-other", "label": "Weiteres Zubehör", "items": [{"label": "Weiteres Zubehör", "value": "ton-other"}]},
+  ] },
+  { id: "video", label: "Video Assist, DIT & Daten", iconName: "Package", color: "amber", legacyValues: [], groups: [
+    {"id": "video-monitore", "label": "Monitore und Sucher", "items": [{"label": "Monitore und Sucher", "value": "video-monitore"}]},
+    {"id": "video-funkbild", "label": "Funkbildübertragung", "items": [{"label": "Funkbildübertragung", "value": "video-funkbild"}]},
+    {"id": "video-playback", "label": "Videorecorder und Playback", "items": [{"label": "Videorecorder und Playback", "value": "video-playback"}]},
+    {"id": "video-signal", "label": "Bildmischer und Signalverteilung", "items": [{"label": "Bildmischer und Signalverteilung", "value": "video-signal"}]},
+    {"id": "video-wagen", "label": "DIT- und Video-Assist-Wagen", "items": [{"label": "DIT- und Video-Assist-Wagen", "value": "video-wagen"}]},
+    {"id": "video-speicher", "label": "Rechner, Speicher und Backups", "items": [{"label": "Rechner, Speicher und Backups", "value": "video-speicher"}]},
+    {"id": "video-farbe", "label": "Kalibrierung und Farbmanagement", "items": [{"label": "Kalibrierung und Farbmanagement", "value": "video-farbe"}]},
+    {"id": "video-netzwerk", "label": "Netzwerk und Streaming", "items": [{"label": "Netzwerk und Streaming", "value": "video-netzwerk"}]},
+    {"id": "video-other", "label": "Weiteres Zubehör", "items": [{"label": "Weiteres Zubehör", "value": "video-other"}]},
+  ] },
+  { id: "kostuem", label: "Kostüm & Garderobe", iconName: "Shirt", color: "rose", legacyValues: [], groups: [
+    {"id": "kostuem-kleidung", "label": "Kleidung, Kostüme und Uniformen", "items": [{"label": "Kleidung, Kostüme und Uniformen", "value": "kostuem-kleidung"}]},
+    {"id": "kostuem-accessoires", "label": "Schuhe, Hüte und Accessoires", "items": [{"label": "Schuhe, Hüte und Accessoires", "value": "kostuem-accessoires"}]},
+    {"id": "kostuem-staender", "label": "Garderobenständer, Bügel und Säcke", "items": [{"label": "Garderobenständer, Bügel und Säcke", "value": "kostuem-staender"}]},
+    {"id": "kostuem-anprobe", "label": "Spiegel, Anprobe und Sichtschutz", "items": [{"label": "Spiegel, Anprobe und Sichtschutz", "value": "kostuem-anprobe"}]},
+    {"id": "kostuem-naehen", "label": "Nähmaschinen und Schneiderwerkzeug", "items": [{"label": "Nähmaschinen und Schneiderwerkzeug", "value": "kostuem-naehen"}]},
+    {"id": "kostuem-buegeln", "label": "Bügeleisen und Steamer", "items": [{"label": "Bügeleisen und Steamer", "value": "kostuem-buegeln"}]},
+    {"id": "kostuem-pflege", "label": "Pflege, Färben und Patinieren", "items": [{"label": "Pflege, Färben und Patinieren", "value": "kostuem-pflege"}]},
+    {"id": "kostuem-transport", "label": "Garderobenwagen und Aufbewahrung", "items": [{"label": "Garderobenwagen und Aufbewahrung", "value": "kostuem-transport"}]},
+    {"id": "kostuem-other", "label": "Weiteres Zubehör", "items": [{"label": "Weiteres Zubehör", "value": "kostuem-other"}]},
+  ] },
+  { id: "maske", label: "Maske, Hair & Make-up", iconName: "Scissors", color: "fuchsia", legacyValues: [], groups: [
+    {"id": "maske-stuehle", "label": "Schminkstühle und Maskenplätze", "items": [{"label": "Schminkstühle und Maskenplätze", "value": "maske-stuehle"}]},
+    {"id": "maske-spiegel", "label": "Spiegel und Arbeitsplatzlicht", "items": [{"label": "Spiegel und Arbeitsplatzlicht", "value": "maske-spiegel"}]},
+    {"id": "maske-koffer", "label": "Maskenkoffer, Taschen und Wagen", "items": [{"label": "Maskenkoffer, Taschen und Wagen", "value": "maske-koffer"}]},
+    {"id": "maske-haar", "label": "Haarstylinggeräte und Werkzeuge", "items": [{"label": "Haarstylinggeräte und Werkzeuge", "value": "maske-haar"}]},
+    {"id": "maske-peruecken", "label": "Perücken, Haarteile und Bärte", "items": [{"label": "Perücken, Haarteile und Bärte", "value": "maske-peruecken"}]},
+    {"id": "maske-makeup", "label": "Make-up und Verbrauchsmaterial", "items": [{"label": "Make-up und Verbrauchsmaterial", "value": "maske-makeup"}]},
+    {"id": "maske-spezial", "label": "Spezialmasken und Materialien", "items": [{"label": "Spezialmasken und Materialien", "value": "maske-spezial"}]},
+    {"id": "maske-hygiene", "label": "Hygiene und Reinigung", "items": [{"label": "Hygiene und Reinigung", "value": "maske-hygiene"}]},
+    {"id": "maske-other", "label": "Weiteres Zubehör", "items": [{"label": "Weiteres Zubehör", "value": "maske-other"}]},
+  ] },
+  { id: "requisiten", label: "Requisite, Ausstattung & Szenenbild", iconName: "Package", color: "violet", legacyValues: [], groups: [
+    {"id": "requisiten-moebel", "label": "Möbel und Wohnaccessoires", "items": [{"label": "Möbel und Wohnaccessoires", "value": "requisiten-moebel"}]},
+    {"id": "requisiten-hand", "label": "Handrequisiten und Alltagsgegenstände", "items": [{"label": "Handrequisiten und Alltagsgegenstände", "value": "requisiten-hand"}]},
+    {"id": "requisiten-historisch", "label": "Historische und thematische Requisiten", "items": [{"label": "Historische und thematische Requisiten", "value": "requisiten-historisch"}]},
+    {"id": "requisiten-gewerbe", "label": "Büro-, Laden- und Werkstattausstattung", "items": [{"label": "Büro-, Laden- und Werkstattausstattung", "value": "requisiten-gewerbe"}]},
+    {"id": "requisiten-deko", "label": "Dekoration, Bilder und Schilder", "items": [{"label": "Dekoration, Bilder und Schilder", "value": "requisiten-deko"}]},
+    {"id": "requisiten-textil", "label": "Textilien und Hintergründe", "items": [{"label": "Textilien und Hintergründe", "value": "requisiten-textil"}]},
+    {"id": "requisiten-kulissen", "label": "Kulissen und Baumaterialien", "items": [{"label": "Kulissen und Baumaterialien", "value": "requisiten-kulissen"}]},
+    {"id": "requisiten-modellbau", "label": "Modellbau und Gestaltungswerkzeug", "items": [{"label": "Modellbau und Gestaltungswerkzeug", "value": "requisiten-modellbau"}]},
+    {"id": "requisiten-other", "label": "Weiteres Zubehör", "items": [{"label": "Weiteres Zubehör", "value": "requisiten-other"}]},
+  ] },
+  { id: "produktion", label: "Produktion, Set & Logistik", iconName: "Package", color: "amber", legacyValues: [], groups: [
+    {"id": "produktion-wagen", "label": "Setwagen und Transporthilfen", "items": [{"label": "Setwagen und Transporthilfen", "value": "produktion-wagen"}]},
+    {"id": "produktion-cases", "label": "Cases, Kisten und Aufbewahrung", "items": [{"label": "Cases, Kisten und Aufbewahrung", "value": "produktion-cases"}]},
+    {"id": "produktion-zelte", "label": "Setzelte und Wetterschutz", "items": [{"label": "Setzelte und Wetterschutz", "value": "produktion-zelte"}]},
+    {"id": "produktion-buero", "label": "Setmöbel und Produktionsbüro", "items": [{"label": "Setmöbel und Produktionsbüro", "value": "produktion-buero"}]},
+    {"id": "produktion-funk", "label": "Funkgeräte und Kommunikation", "items": [{"label": "Funkgeräte und Kommunikation", "value": "produktion-funk"}]},
+    {"id": "produktion-organisation", "label": "Absperrungen und Setorganisation", "items": [{"label": "Absperrungen und Setorganisation", "value": "produktion-organisation"}]},
+    {"id": "produktion-klima", "label": "Heizung, Kühlung und Lüftung", "items": [{"label": "Heizung, Kühlung und Lüftung", "value": "produktion-klima"}]},
+    {"id": "produktion-sicherheit", "label": "Sicherheit und Erste Hilfe", "items": [{"label": "Sicherheit und Erste Hilfe", "value": "produktion-sicherheit"}]},
+    {"id": "produktion-other", "label": "Weiteres Zubehör", "items": [{"label": "Weiteres Zubehör", "value": "produktion-other"}]},
+  ] },
+  { id: "catering", label: "Catering & Versorgung", iconName: "Package", color: "amber", legacyValues: [], groups: [
+    {"id": "catering-kuechen", "label": "Cateringausstattung und mobile Küchen", "items": [{"label": "Cateringausstattung und mobile Küchen", "value": "catering-kuechen"}]},
+    {"id": "catering-getraenke", "label": "Kaffee- und Getränketechnik", "items": [{"label": "Kaffee- und Getränketechnik", "value": "catering-getraenke"}]},
+    {"id": "catering-kuehlung", "label": "Kühlgeräte und Kühlboxen", "items": [{"label": "Kühlgeräte und Kühlboxen", "value": "catering-kuehlung"}]},
+    {"id": "catering-ausgabe", "label": "Warmhalten und Speisenausgabe", "items": [{"label": "Warmhalten und Speisenausgabe", "value": "catering-ausgabe"}]},
+    {"id": "catering-geschirr", "label": "Geschirr, Besteck und Servierzubehör", "items": [{"label": "Geschirr, Besteck und Servierzubehör", "value": "catering-geschirr"}]},
+    {"id": "catering-hygiene", "label": "Spülen, Hygiene und Abfall", "items": [{"label": "Spülen, Hygiene und Abfall", "value": "catering-hygiene"}]},
+    {"id": "catering-transport", "label": "Cateringmöbel und Transportbehälter", "items": [{"label": "Cateringmöbel und Transportbehälter", "value": "catering-transport"}]},
+    {"id": "catering-other", "label": "Weiteres Zubehör", "items": [{"label": "Weiteres Zubehör", "value": "catering-other"}]},
+  ] },
+  { id: "sfx", label: "SFX & Praktische Effekte", iconName: "Package", color: "red", legacyValues: [], groups: [
+    {"id": "sfx-nebel", "label": "Nebel, Haze und Rauch", "items": [{"label": "Nebel, Haze und Rauch", "value": "sfx-nebel"}]},
+    {"id": "sfx-wind", "label": "Windmaschinen", "items": [{"label": "Windmaschinen", "value": "sfx-wind"}]},
+    {"id": "sfx-wetter", "label": "Regen, Schnee und Wettereffekte", "items": [{"label": "Regen, Schnee und Wettereffekte", "value": "sfx-wetter"}]},
+    {"id": "sfx-steuerung", "label": "Effektsteuerung und Zubehör", "items": [{"label": "Effektsteuerung und Zubehör", "value": "sfx-steuerung"}]},
+    {"id": "sfx-mechanik", "label": "Mechanische Effektgeräte", "items": [{"label": "Mechanische Effektgeräte", "value": "sfx-mechanik"}]},
+    {"id": "sfx-material", "label": "Effektmaterialien und Verbrauchsbedarf", "items": [{"label": "Effektmaterialien und Verbrauchsbedarf", "value": "sfx-material"}]},
+    {"id": "sfx-other", "label": "Weiteres Zubehör", "items": [{"label": "Weiteres Zubehör", "value": "sfx-other"}]},
+  ] },
+  { id: "studio", label: "Studio, Bühne & Hintergründe", iconName: "Package", color: "cyan", legacyValues: [], groups: [
+    {"id": "studio-hintergrund", "label": "Hintergrundsysteme und Fotohintergründe", "items": [{"label": "Hintergrundsysteme und Fotohintergründe", "value": "studio-hintergrund"}]},
+    {"id": "studio-chroma", "label": "Green- und Bluescreens", "items": [{"label": "Green- und Bluescreens", "value": "studio-chroma"}]},
+    {"id": "studio-buehne", "label": "Podeste und Bühnenmodule", "items": [{"label": "Podeste und Bühnenmodule", "value": "studio-buehne"}]},
+    {"id": "studio-akustik", "label": "Akustikelemente und Trennwände", "items": [{"label": "Akustikelemente und Trennwände", "value": "studio-akustik"}]},
+    {"id": "studio-teleprompter", "label": "Teleprompter", "items": [{"label": "Teleprompter", "value": "studio-teleprompter"}]},
+    {"id": "studio-pakete", "label": "Studiozubehör und Pakete", "items": [{"label": "Studiozubehör und Pakete", "value": "studio-pakete"}]},
+    {"id": "studio-other", "label": "Weiteres Zubehör", "items": [{"label": "Weiteres Zubehör", "value": "studio-other"}]},
+  ] },
+  { id: "fahrzeuge", label: "Fahrzeuge & Mobile Einheiten", iconName: "Car", color: "orange", legacyValues: [], groups: [
+    {"id": "fahrzeuge-bild", "label": "Spiel- und Bildfahrzeuge", "items": [{"label": "Spiel- und Bildfahrzeuge", "value": "fahrzeuge-bild"}]},
+    {"id": "fahrzeuge-produktion", "label": "Produktions- und Transportfahrzeuge", "items": [{"label": "Produktions- und Transportfahrzeuge", "value": "fahrzeuge-produktion"}]},
+    {"id": "fahrzeuge-technik", "label": "Licht-, Grip-, Kamera- und Tonfahrzeuge", "items": [{"label": "Licht-, Grip-, Kamera- und Tonfahrzeuge", "value": "fahrzeuge-technik"}]},
+    {"id": "fahrzeuge-garderobe", "label": "Kostüm-, Masken- und Garderobenmobile", "items": [{"label": "Kostüm-, Masken- und Garderobenmobile", "value": "fahrzeuge-garderobe"}]},
+    {"id": "fahrzeuge-catering", "label": "Cateringfahrzeuge und mobile Versorgung", "items": [{"label": "Cateringfahrzeuge und mobile Versorgung", "value": "fahrzeuge-catering"}]},
+    {"id": "fahrzeuge-anhaenger", "label": "Anhänger und mobile Einheiten", "items": [{"label": "Anhänger und mobile Einheiten", "value": "fahrzeuge-anhaenger"}]},
+    {"id": "fahrzeuge-other", "label": "Weiteres Zubehör", "items": [{"label": "Weiteres Zubehör", "value": "fahrzeuge-other"}]},
+  ] },
 ];
-
-// ── Helpers ───────────────────────────────────────────────────
-
-/** All category values belonging to a department (incl. legacy) */
-export function deptValues(dept: MarketplaceDept): string[] {
-  const fromGroups = dept.groups.flatMap((g) => g.items.map((i) => i.value));
-  return [...fromGroups, ...dept.legacyValues];
-}
-
-/** All category values belonging to a group */
-export function groupValues(group: MarketplaceGroup): string[] {
-  return group.items.map((i) => i.value);
-}
-
-/** Find the department for a raw category value */
-export function findDept(value: string): MarketplaceDept | undefined {
-  const v = value.toLowerCase();
-  return DEPARTMENTS.find((d) =>
-    d.legacyValues.some((lv) => lv.toLowerCase() === v) ||
-    d.groups.some((g) => g.items.some((i) => i.value === v))
-  );
-}
-
-/** Flat list of every category value across all departments */
-export const ALL_VALUES: string[] = DEPARTMENTS.flatMap(deptValues);
-
-// ── Szenen-Kategorien ─────────────────────────────────────────────
-// Production-designer Denkweise: "Ich brauche ein Büro aus den 80ern"
-// → statt durch Kategorien zu scrollen direkt Szene wählen
-
-export type Scene = {
-  id: string;
-  label: string;
-  iconName: string;
-  description: string;
-  /** category values + legacyValues that belong to this scene */
-  keywords: string[];
+const LEGACY_ALIASES: Record<string, {department:string;subcategory:string|null}> = {
+  "kamera": {"department": "kamera", "subcategory": null},
+  "Kameraequipment": {"department": "kamera", "subcategory": null},
+  "filmtechnik": {"department": "kamera", "subcategory": null},
+  "licht": {"department": "licht", "subcategory": null},
+  "Lichttechnik": {"department": "licht", "subcategory": null},
+  "grip": {"department": "grip", "subcategory": null},
+  "Grip & Rigging": {"department": "grip", "subcategory": null},
+  "rigging": {"department": "grip", "subcategory": null},
+  "ton": {"department": "ton", "subcategory": null},
+  "Ton & Audio": {"department": "ton", "subcategory": null},
+  "kostuem": {"department": "kostuem", "subcategory": null},
+  "Kostüme": {"department": "kostuem", "subcategory": null},
+  "kostueme": {"department": "kostuem", "subcategory": null},
+  "maske": {"department": "maske", "subcategory": null},
+  "Maske": {"department": "maske", "subcategory": null},
+  "requisiten": {"department": "requisiten", "subcategory": null},
+  "Requisiten": {"department": "requisiten", "subcategory": null},
+  "szenenbild": {"department": "requisiten", "subcategory": null},
+  "Möbel / Szenenbild": {"department": "requisiten", "subcategory": null},
+  "moebel": {"department": "requisiten", "subcategory": null},
+  "fahrzeuge": {"department": "fahrzeuge", "subcategory": null},
+  "Bild-Fahrzeug": {"department": "fahrzeuge", "subcategory": null},
+  "vehicle": {"department": "fahrzeuge", "subcategory": null},
+  "sfx": {"department": "sfx", "subcategory": null},
+  "SFX": {"department": "sfx", "subcategory": null},
+  "post": {"department": "video", "subcategory": null},
+  "Post Production": {"department": "video", "subcategory": null},
+  "postproduktion": {"department": "video", "subcategory": null},
+  "studio": {"department": "studio", "subcategory": null},
+  "Studio": {"department": "studio", "subcategory": null},
+  "Fotostudio": {"department": "studio", "subcategory": null},
+  "produktion": {"department": "produktion", "subcategory": null},
+  "Produktionsausstattung": {"department": "produktion", "subcategory": null},
+  "arri": {"department": "kamera", "subcategory": "kamera-kameras"},
+  "red": {"department": "kamera", "subcategory": "kamera-kameras"},
+  "sony-cinema": {"department": "kamera", "subcategory": "kamera-kameras"},
+  "blackmagic": {"department": "kamera", "subcategory": "kamera-kameras"},
+  "dslr": {"department": "kamera", "subcategory": "kamera-kameras"},
+  "prime-lenses": {"department": "kamera", "subcategory": "kamera-objektive"},
+  "zoom-lenses": {"department": "kamera", "subcategory": "kamera-objektive"},
+  "anamorphic": {"department": "kamera", "subcategory": "kamera-objektive"},
+  "vintage-lenses": {"department": "kamera", "subcategory": "kamera-objektive"},
+  "cine-lenses": {"department": "kamera", "subcategory": "kamera-objektive"},
+  "matte-box": {"department": "kamera", "subcategory": "kamera-filter"},
+  "follow-focus": {"department": "kamera", "subcategory": "kamera-fokus"},
+  "filter": {"department": "kamera", "subcategory": "kamera-filter"},
+  "lens-control": {"department": "kamera", "subcategory": "kamera-fokus"},
+  "camera-cage": {"department": "kamera", "subcategory": "kamera-rigs"},
+  "onset-monitor": {"department": "video", "subcategory": "video-monitore"},
+  "director-monitor": {"department": "video", "subcategory": "video-monitore"},
+  "wireless-video": {"department": "video", "subcategory": "video-funkbild"},
+  "video-converter": {"department": "video", "subcategory": "video-signal"},
+  "tripod": {"department": "kamera", "subcategory": "kamera-stative"},
+  "fluid-head": {"department": "kamera", "subcategory": "kamera-stative"},
+  "shoulder-rig": {"department": "kamera", "subcategory": "kamera-rigs"},
+  "easyrig": {"department": "grip", "subcategory": "grip-gimbal"},
+  "handle-acc": {"department": "kamera", "subcategory": "kamera-rigs"},
+  "gimbal": {"department": "grip", "subcategory": "grip-gimbal"},
+  "steadicam": {"department": "grip", "subcategory": "grip-gimbal"},
+  "remote-head": {"department": "grip", "subcategory": "grip-kraene"},
+  "motion-control": {"department": "grip", "subcategory": "grip-kraene"},
+  "cable-cam": {"department": "grip", "subcategory": "grip-slider"},
+  "underwater-housing": {"department": "kamera", "subcategory": "kamera-kameras"},
+  "high-speed-cam": {"department": "kamera", "subcategory": "kamera-kameras"},
+  "crash-cam": {"department": "kamera", "subcategory": "kamera-kameras"},
+  "drone-cam": {"department": "kamera", "subcategory": "kamera-kameras"},
+  "360-cam": {"department": "kamera", "subcategory": "kamera-kameras"},
+  "led-panel": {"department": "licht", "subcategory": "licht-quellen"},
+  "fresnel": {"department": "licht", "subcategory": "licht-quellen"},
+  "hmi": {"department": "licht", "subcategory": "licht-quellen"},
+  "tungsten": {"department": "licht", "subcategory": "licht-quellen"},
+  "light-tubes": {"department": "licht", "subcategory": "licht-quellen"},
+  "bicolor-panel": {"department": "licht", "subcategory": "licht-quellen"},
+  "softbox": {"department": "licht", "subcategory": "licht-former"},
+  "octa": {"department": "licht", "subcategory": "licht-former"},
+  "diffusion": {"department": "licht", "subcategory": "licht-kontrolle"},
+  "flags": {"department": "licht", "subcategory": "licht-kontrolle"},
+  "grids": {"department": "licht", "subcategory": "licht-former"},
+  "bounce": {"department": "licht", "subcategory": "licht-kontrolle"},
+  "generator": {"department": "strom", "subcategory": "strom-generatoren"},
+  "distro": {"department": "strom", "subcategory": "strom-verteiler"},
+  "feeder-cable": {"department": "strom", "subcategory": "strom-kabel"},
+  "powerstation": {"department": "strom", "subcategory": "strom-akkus"},
+  "dimmer": {"department": "licht", "subcategory": "licht-steuerung"},
+  "light-rigging": {"department": "licht", "subcategory": "licht-stative"},
+  "ceiling-mount": {"department": "licht", "subcategory": "licht-stative"},
+  "light-stand": {"department": "licht", "subcategory": "licht-stative"},
+  "overhead-frame": {"department": "licht", "subcategory": "licht-stative"},
+  "neon": {"department": "licht", "subcategory": "licht-quellen"},
+  "practical": {"department": "licht", "subcategory": "licht-quellen"},
+  "strobe": {"department": "licht", "subcategory": "licht-quellen"},
+  "effect-light": {"department": "licht", "subcategory": "licht-quellen"},
+  "underwater-light": {"department": "licht", "subcategory": "licht-quellen"},
+  "c-stand": {"department": "grip", "subcategory": "grip-hardware"},
+  "sandbag": {"department": "grip", "subcategory": "grip-hardware"},
+  "grip-stand": {"department": "grip", "subcategory": "grip-hardware"},
+  "grip-pins": {"department": "grip", "subcategory": "grip-hardware"},
+  "clamps": {"department": "grip", "subcategory": "grip-hardware"},
+  "dolly": {"department": "grip", "subcategory": "grip-dolly"},
+  "dolly-track": {"department": "grip", "subcategory": "grip-dolly"},
+  "slider": {"department": "grip", "subcategory": "grip-slider"},
+  "giraffe": {"department": "grip", "subcategory": "grip-dolly"},
+  "jib": {"department": "grip", "subcategory": "grip-kraene"},
+  "techno-crane": {"department": "grip", "subcategory": "grip-kraene"},
+  "cherry-picker": {"department": "grip", "subcategory": "grip-kraene"},
+  "camera-car": {"department": "fahrzeuge", "subcategory": "fahrzeuge-technik"},
+  "truss": {"department": "grip", "subcategory": "grip-hardware"},
+  "chain-hoist": {"department": "grip", "subcategory": "grip-hardware"},
+  "safety-hardware": {"department": "grip", "subcategory": "grip-hardware"},
+  "rails": {"department": "grip", "subcategory": "grip-hardware"},
+  "shotgun-mic": {"department": "ton", "subcategory": "ton-mikrofone"},
+  "lavalier": {"department": "ton", "subcategory": "ton-mikrofone"},
+  "field-recorder": {"department": "ton", "subcategory": "ton-recorder"},
+  "stereo-mic": {"department": "ton", "subcategory": "ton-mikrofone"},
+  "wireless-set": {"department": "ton", "subcategory": "ton-funk"},
+  "ifb": {"department": "ton", "subcategory": "ton-funk"},
+  "intercom": {"department": "ton", "subcategory": "ton-funk"},
+  "boom-pole": {"department": "ton", "subcategory": "ton-angeln"},
+  "wind-protection": {"department": "ton", "subcategory": "ton-angeln"},
+  "audio-cable": {"department": "ton", "subcategory": "ton-zubehoer"},
+  "audio-mixer": {"department": "ton", "subcategory": "ton-recorder"},
+  "headphones": {"department": "ton", "subcategory": "ton-abhoere"},
+  "alltagskleidung": {"department": "kostuem", "subcategory": "kostuem-kleidung"},
+  "historisch-frueh": {"department": "kostuem", "subcategory": "kostuem-kleidung"},
+  "historisch-spaet": {"department": "kostuem", "subcategory": "kostuem-kleidung"},
+  "viktorianisch": {"department": "kostuem", "subcategory": "kostuem-kleidung"},
+  "mittelalter": {"department": "kostuem", "subcategory": "kostuem-kleidung"},
+  "fantasy-scifi": {"department": "kostuem", "subcategory": "kostuem-kleidung"},
+  "uniform": {"department": "kostuem", "subcategory": "kostuem-kleidung"},
+  "berufskleidung": {"department": "kostuem", "subcategory": "kostuem-kleidung"},
+  "schmuck": {"department": "kostuem", "subcategory": "kostuem-accessoires"},
+  "taschen": {"department": "kostuem", "subcategory": "kostuem-accessoires"},
+  "guertel-schuhe": {"department": "kostuem", "subcategory": "kostuem-accessoires"},
+  "hut": {"department": "kostuem", "subcategory": "kostuem-accessoires"},
+  "brille": {"department": "kostuem", "subcategory": "kostuem-accessoires"},
+  "stunt-kostuem": {"department": "kostuem", "subcategory": "kostuem-kleidung"},
+  "aged-kostuem": {"department": "kostuem", "subcategory": "kostuem-kleidung"},
+  "creature-kostuem": {"department": "kostuem", "subcategory": "kostuem-kleidung"},
+  "sport-kostuem": {"department": "kostuem", "subcategory": "kostuem-kleidung"},
+  "makeup-kit": {"department": "maske", "subcategory": "maske-makeup"},
+  "hd-makeup": {"department": "maske", "subcategory": "maske-makeup"},
+  "airbrush": {"department": "maske", "subcategory": "maske-makeup"},
+  "latex": {"department": "maske", "subcategory": "maske-spezial"},
+  "prosthetics": {"department": "maske", "subcategory": "maske-spezial"},
+  "blood-fx": {"department": "maske", "subcategory": "maske-spezial"},
+  "bald-cap": {"department": "maske", "subcategory": "maske-spezial"},
+  "body-paint": {"department": "maske", "subcategory": "maske-spezial"},
+  "peruecke": {"department": "maske", "subcategory": "maske-peruecken"},
+  "extensions": {"department": "maske", "subcategory": "maske-peruecken"},
+  "styling-tools": {"department": "maske", "subcategory": "maske-haar"},
+  "fake-haar": {"department": "maske", "subcategory": "maske-peruecken"},
+  "sofa": {"department": "requisiten", "subcategory": "requisiten-moebel"},
+  "tisch": {"department": "requisiten", "subcategory": "requisiten-moebel"},
+  "bett": {"department": "requisiten", "subcategory": "requisiten-moebel"},
+  "bueromoebel": {"department": "requisiten", "subcategory": "requisiten-moebel"},
+  "regal": {"department": "requisiten", "subcategory": "requisiten-moebel"},
+  "stuhl": {"department": "requisiten", "subcategory": "requisiten-moebel"},
+  "bilder-spiegel": {"department": "requisiten", "subcategory": "requisiten-deko"},
+  "lampen": {"department": "requisiten", "subcategory": "requisiten-deko"},
+  "vorhaenge": {"department": "requisiten", "subcategory": "requisiten-deko"},
+  "deko-objekte": {"department": "requisiten", "subcategory": "requisiten-deko"},
+  "teppich": {"department": "requisiten", "subcategory": "requisiten-deko"},
+  "kueche": {"department": "requisiten", "subcategory": "requisiten-hand"},
+  "werkzeug": {"department": "requisiten", "subcategory": "requisiten-hand"},
+  "buroartikel": {"department": "requisiten", "subcategory": "requisiten-hand"},
+  "spielzeug": {"department": "requisiten", "subcategory": "requisiten-hand"},
+  "buecher-period": {"department": "requisiten", "subcategory": "requisiten-hand"},
+  "waffen-fake": {"department": "requisiten", "subcategory": "requisiten-historisch"},
+  "filmgeld": {"department": "requisiten", "subcategory": "requisiten-historisch"},
+  "dokumente": {"department": "requisiten", "subcategory": "requisiten-historisch"},
+  "medical-props": {"department": "requisiten", "subcategory": "requisiten-historisch"},
+  "militaer-props": {"department": "requisiten", "subcategory": "requisiten-historisch"},
+  "tv-prop": {"department": "requisiten", "subcategory": "requisiten-hand"},
+  "computer-prop": {"department": "requisiten", "subcategory": "requisiten-hand"},
+  "phone-prop": {"department": "requisiten", "subcategory": "requisiten-hand"},
+  "vintage-elektronik": {"department": "requisiten", "subcategory": "requisiten-hand"},
+  "fake-food": {"department": "requisiten", "subcategory": "requisiten-hand"},
+  "catering-props": {"department": "requisiten", "subcategory": "requisiten-hand"},
+  "flaschen": {"department": "requisiten", "subcategory": "requisiten-hand"},
+  "wall-flat": {"department": "requisiten", "subcategory": "requisiten-kulissen"},
+  "floor-system": {"department": "requisiten", "subcategory": "requisiten-kulissen"},
+  "doorset": {"department": "requisiten", "subcategory": "requisiten-kulissen"},
+  "column": {"department": "requisiten", "subcategory": "requisiten-kulissen"},
+  "texture": {"department": "requisiten", "subcategory": "requisiten-kulissen"},
+  "paint": {"department": "requisiten", "subcategory": "requisiten-kulissen"},
+  "wallpaper": {"department": "requisiten", "subcategory": "requisiten-kulissen"},
+  "floor-vinyl": {"department": "requisiten", "subcategory": "requisiten-kulissen"},
+  "pflanzen": {"department": "requisiten", "subcategory": "requisiten-deko"},
+  "baeume": {"department": "requisiten", "subcategory": "requisiten-deko"},
+  "blumen": {"department": "requisiten", "subcategory": "requisiten-deko"},
+  "moos-erde": {"department": "requisiten", "subcategory": "requisiten-deko"},
+  "oldtimer": {"department": "fahrzeuge", "subcategory": "fahrzeuge-bild"},
+  "classic-car": {"department": "fahrzeuge", "subcategory": "fahrzeuge-bild"},
+  "moderne-pkw": {"department": "fahrzeuge", "subcategory": "fahrzeuge-bild"},
+  "luxus-fahr": {"department": "fahrzeuge", "subcategory": "fahrzeuge-bild"},
+  "sportwagen": {"department": "fahrzeuge", "subcategory": "fahrzeuge-bild"},
+  "polizei-fahr": {"department": "fahrzeuge", "subcategory": "fahrzeuge-bild"},
+  "ambulance": {"department": "fahrzeuge", "subcategory": "fahrzeuge-bild"},
+  "militaer-fahr": {"department": "fahrzeuge", "subcategory": "fahrzeuge-bild"},
+  "truck": {"department": "fahrzeuge", "subcategory": "fahrzeuge-bild"},
+  "motorrad": {"department": "fahrzeuge", "subcategory": "fahrzeuge-bild"},
+  "bus": {"department": "fahrzeuge", "subcategory": "fahrzeuge-bild"},
+  "stunt-car": {"department": "fahrzeuge", "subcategory": "fahrzeuge-bild"},
+  "rig-car": {"department": "fahrzeuge", "subcategory": "fahrzeuge-bild"},
+  "auto-transporter": {"department": "fahrzeuge", "subcategory": "fahrzeuge-bild"},
+  "smoke-machine": {"department": "sfx", "subcategory": "sfx-nebel"},
+  "haze-machine": {"department": "sfx", "subcategory": "sfx-nebel"},
+  "wind-machine": {"department": "sfx", "subcategory": "sfx-wind"},
+  "weather-fx": {"department": "sfx", "subcategory": "sfx-wetter"},
+  "rain-head": {"department": "sfx", "subcategory": "sfx-wetter"},
+  "water-pump": {"department": "sfx", "subcategory": "sfx-wetter"},
+  "fog-nozzle": {"department": "sfx", "subcategory": "sfx-wetter"},
+  "edit-workstation": {"department": "video", "subcategory": "video-speicher"},
+  "storage": {"department": "video", "subcategory": "video-speicher"},
+  "edit-license": {"department": "video", "subcategory": "video-speicher"},
+  "davinci-panel": {"department": "video", "subcategory": "video-farbe"},
+  "ref-monitor": {"department": "video", "subcategory": "video-farbe"},
+  "hdr-monitor": {"department": "video", "subcategory": "video-farbe"},
+  "greenscreen": {"department": "studio", "subcategory": "studio-chroma"},
+  "bluescreen": {"department": "studio", "subcategory": "studio-chroma"},
+  "backdrop-papier": {"department": "studio", "subcategory": "studio-hintergrund"},
+  "backdrop-muslin": {"department": "studio", "subcategory": "studio-hintergrund"},
+  "fotoequipment": {"department": "kamera", "subcategory": "kamera-kameras"},
+  "studioblitz": {"department": "licht", "subcategory": "licht-quellen"},
+  "foto-modifier": {"department": "licht", "subcategory": "licht-former"},
+  "backdrops": {"department": "studio", "subcategory": "studio-hintergrund"},
+  "content-sets": {"department": "studio", "subcategory": "studio-pakete"},
+  "walkie": {"department": "produktion", "subcategory": "produktion-funk"},
+  "zelt": {"department": "produktion", "subcategory": "produktion-zelte"},
+  "set-moebel": {"department": "produktion", "subcategory": "produktion-buero"},
+  "pa-system": {"department": "ton", "subcategory": "ton-abhoere"},
+  "catering-equip": {"department": "catering", "subcategory": "catering-kuechen"},
+  "hard-case": {"department": "produktion", "subcategory": "produktion-cases"},
+  "soft-bag": {"department": "produktion", "subcategory": "produktion-cases"},
+  "cart": {"department": "produktion", "subcategory": "produktion-wagen"},
+  "sprinter": {"department": "fahrzeuge", "subcategory": "fahrzeuge-produktion"},
+  "Produktionsfahrzeug": {"department": "fahrzeuge", "subcategory": null},
+  "Fotoequipment": {"department": "kamera", "subcategory": null},
+  "Backdrops": {"department": "studio", "subcategory": null},
+  "Content Sets": {"department": "studio", "subcategory": null},
+  "virtual-production": {"department": "studio", "subcategory": null},
+  "Virtual Production": {"department": "studio", "subcategory": null},
+  "led-wall": {"department": "studio", "subcategory": null},
+  "led-finepitch": {"department": "studio", "subcategory": null},
+  "curved-led": {"department": "studio", "subcategory": null},
+  "cam-tracking": {"department": "studio", "subcategory": null},
+  "unreal-rig": {"department": "studio", "subcategory": null},
+  "mocap": {"department": "studio", "subcategory": null},
+  "greenscreen-vp": {"department": "studio", "subcategory": "studio-chroma"},
+  "confetti": {"department": "sfx", "subcategory": null},
+  "co2-jet": {"department": "sfx", "subcategory": null},
+  "pyro": {"department": "sfx", "subcategory": null},
 };
-
-export const SCENES: Scene[] = [
-  {
-    id: "wohnzimmer",
-    label: "Wohnzimmer",
-    iconName: "Home",
-    description: "Sofas, Tische, Leuchten, Teppiche, Deko",
-    keywords: ["sofa", "tisch", "bett", "lampen", "teppich", "tv-prop", "bilder-spiegel", "regal", "stuhl", "deko-objekte", "vorhaenge"],
-  },
-  {
-    id: "buero",
-    label: "Büro",
-    iconName: "Briefcase",
-    description: "Schreibtische, Computer, Akten, Büroausstattung",
-    keywords: ["bueromoebel", "computer-prop", "phone-prop", "buroartikel", "stuhl", "tisch", "regal"],
-  },
-  {
-    id: "restaurant",
-    label: "Restaurant",
-    iconName: "Utensils",
-    description: "Tische, Stühle, Geschirr, Flaschen, Besteck",
-    keywords: ["kueche", "catering-props", "flaschen", "tisch", "stuhl"],
-  },
-  {
-    id: "krankenhaus",
-    label: "Krankenhaus",
-    iconName: "HeartPulse",
-    description: "OP-Instrumente, Betten, Monitore, Krankenwagen",
-    keywords: ["medical-props", "bett", "ambulance", "computer-prop"],
-  },
-  {
-    id: "militaer",
-    label: "Militär",
-    iconName: "Shield",
-    description: "Uniformen, Fahrzeuge, Waffen, Ausrüstung",
-    keywords: ["militaer-props", "militaer-fahr", "uniform", "waffen-fake", "stunt-car"],
-  },
-  {
-    id: "fahrzeuge",
-    label: "Fahrzeuge",
-    iconName: "Car",
-    description: "Oldtimer, Stuntcars, Militär, Spezialfahrzeuge",
-    keywords: ["oldtimer", "classic-car", "moderne-pkw", "luxus-fahr", "sportwagen", "militaer-fahr", "stunt-car", "motorrad", "bus", "truck", "rig-car", "auto-transporter", "bild-fahrzeug"],
-  },
-  {
-    id: "kueche",
-    label: "Küche",
-    iconName: "ChefHat",
-    description: "Küchenutensilien, Geschirr, Flaschen",
-    keywords: ["kueche", "catering-props", "flaschen", "werkzeug"],
-  },
-  {
-    id: "bar",
-    label: "Bar & Club",
-    iconName: "Wine",
-    description: "Flaschen, Neonlichter, Barhocker, Atmosphäre",
-    keywords: ["flaschen", "neon", "strobe", "stuhl", "effect-light"],
-  },
-  {
-    id: "hotel",
-    label: "Hotel",
-    iconName: "Hotel",
-    description: "Betten, Sofas, Deko, Empfang",
-    keywords: ["bett", "sofa", "lampen", "bilder-spiegel", "teppich", "regal"],
-  },
-  {
-    id: "kostuem",
-    label: "Kostüm",
-    iconName: "Shirt",
-    description: "Historische und moderne Kostüme, Uniformen",
-    keywords: ["alltagskleidung", "historisch-frueh", "historisch-spaet", "viktorianisch", "mittelalter", "fantasy-scifi", "uniform", "berufskleidung"],
-  },
-  {
-    id: "labor",
-    label: "Labor",
-    iconName: "FlaskConical",
-    description: "Laborgeräte, medizinische Requisiten",
-    keywords: ["medical-props", "computer-prop"],
-  },
-];
-
-// ── Synonyme / Semantische Suche ──────────────────────────────────
-// Mappt Nutzer-Suchbegriffe auf Kategorie-Werte der Taxonomie.
-// → "Löffel" findet Listings mit category="kueche" auch ohne Volltexttreffer
-
+const normalize = (value: string) => value.normalize("NFKC").trim().toLocaleLowerCase("de");
+const aliases = new Map(Object.entries(LEGACY_ALIASES).map(([key,value])=>[normalize(key),value]));
+export function marketplaceCategory(value: unknown, type?: string) {
+  if(typeof value!=="string")return null;
+  const exact = DEPARTMENTS.flatMap(d=>d.groups.map(g=>({department:d.id,subcategory:g.id}))).find(g=>g.subcategory===value);
+  const result=exact ?? aliases.get(normalize(value)) ?? null;
+  if(result && type && ((type==="vehicle") !== (result.department==="fahrzeuge"))) return null;
+  return result;
+}
+export function deptValues(dept: MarketplaceDept): string[] { return [...dept.groups.map(g=>g.id),...Object.keys(LEGACY_ALIASES).filter(v=>LEGACY_ALIASES[v].department===dept.id)]; }
+export function groupValues(group: MarketplaceGroup): string[] { return [group.id,...Object.keys(LEGACY_ALIASES).filter(v=>LEGACY_ALIASES[v].subcategory===group.id)]; }
+export function findDept(value:string) {const mapped=marketplaceCategory(value);return DEPARTMENTS.find(d=>d.id===mapped?.department);}
+export const ALL_VALUES = DEPARTMENTS.flatMap(deptValues);
+export function localizedMarketplaceDepartments(t:(key:string)=>string):MarketplaceDept[] {return DEPARTMENTS.map(d=>({...d,label:t(`categories.${d.id}`),groups:d.groups.map(g=>({...g,label:t(`subcategories.${g.id}`),items:g.items.map(i=>({...i,label:t(`subcategories.${g.id}`)}))}))}));}
+export function marketplaceMatches(category:string,department:string|null,subcategory:string|null=null,type?:string) {const resolved=marketplaceCategory(category,type);return (!department || resolved?.department===department) && (!subcategory || resolved?.subcategory===subcategory);}
+export function marketplaceSearchTerms(category:string):string {const resolved=marketplaceCategory(category);const d=DEPARTMENTS.find(d=>d.id===resolved?.department);return [category,d?.label,d?.groups.find(g=>g.id===resolved?.subcategory)?.label,...Object.entries(SEARCH_SYNONYMS).filter(([,values])=>values.some(v=>{const r=marketplaceCategory(v);return r?.subcategory && r.subcategory===resolved?.subcategory;})).map(([key])=>key)].filter(Boolean).join(' ');}
 export const SEARCH_SYNONYMS: Record<string, string[]> = {
   // Küche / Essen
   löffel:        ["kueche"],
@@ -876,4 +492,25 @@ export const SEARCH_SYNONYMS: Record<string, string[]> = {
   kamera:        ["arri", "red", "sony-cinema", "blackmagic", "dslr"],
   stativ:        ["tripod"],
   scheinwerfer:  ["led-panel", "fresnel", "hmi"],
+  dmx: ["licht-steuerung", "licht-signal"],
+  node: ["licht-signal"],
+  gateway: ["licht-signal"],
+  splitter: ["licht-signal", "video-signal"],
+  garderobenständer: ["kostuem-staender"],
+  clothingrail: ["kostuem-staender"],
+  maskenstuhl: ["maske-stuehle"],
+  catering: ["catering-kuechen"],
 };
+
+/** Candidate stored values for search, using explicit aliases plus translated display terms. */
+export function marketplaceSearchCategories(query:string,t?:(key:string)=>string):string[] {
+ const text=query.trim().toLocaleLowerCase();if(text.length<2)return [];
+ const words=text.split(/\s+/);const values=new Set<string>();
+ for(const d of DEPARTMENTS){
+  const departmentLabel=t?.(`categories.${d.id}`)??d.label;
+  if(departmentLabel.toLocaleLowerCase().includes(text)||d.label.toLocaleLowerCase().includes(text))deptValues(d).forEach(v=>values.add(v));
+  for(const g of d.groups){const label=t?.(`subcategories.${g.id}`)??g.label;if(label.toLocaleLowerCase().includes(text)||g.label.toLocaleLowerCase().includes(text))groupValues(g).forEach(v=>values.add(v));}
+ }
+ for(const word of words)for(const value of SEARCH_SYNONYMS[word]??[]){const resolved=marketplaceCategory(value);if(resolved?.subcategory){const group=DEPARTMENTS.flatMap(d=>d.groups).find(g=>g.id===resolved.subcategory);group?.items.forEach(i=>values.add(i.value));if(group)groupValues(group).forEach(v=>values.add(v));}else values.add(value);}
+ return [...values];
+}

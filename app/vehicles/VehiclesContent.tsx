@@ -1,4 +1,5 @@
 "use client";
+import { useLocale, useTranslations } from "next-intl";
 import { listingPriceLabel, type ListingPriceMetadata } from "@/lib/listing-price";
 
 
@@ -21,6 +22,7 @@ type Vehicle = {
 };
 
 export default function VehiclesContent({ serverVehicles }: { serverVehicles: Vehicle[] }) {
+  const market=useTranslations("MarketplaceOffer"),locale=useLocale();
   const allVehicles = useMemo(() => serverVehicles, [serverVehicles]);
 
   const [search, setSearch] = useState("");
@@ -201,7 +203,7 @@ export default function VehiclesContent({ serverVehicles }: { serverVehicles: Ve
                           <span className="px-1.5 py-0.5 bg-bg-elevated rounded">{v.type}</span>
                           {v.delivery && <span className="flex items-center gap-0.5 text-success"><Truck size={10} /> Lieferung</span>}
                         </div>
-                        <span className="text-sm font-semibold text-gold">{listingPriceLabel(v.dailyRate,v.pricing)}</span>
+                        <span className="text-sm font-semibold text-gold">{listingPriceLabel(v.dailyRate,v.pricing,"/Tag",locale,market)}</span>
                       </div>
                     </div>
                   </Link>

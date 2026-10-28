@@ -1,3 +1,5 @@
+import { getTranslations, getLocale } from "next-intl/server";
+import { marketplaceSearchCategories } from "@/lib/marketplaceCategories";
 import { animalProfileSearchValues, animalCompanySearchFilter } from "@/lib/animal-taxonomy";
 import { listingPriceLabel } from "@/lib/listing-price";
 import { db } from "@/lib/db";
@@ -18,6 +20,8 @@ export async function GET(req: NextRequest) {
   // Strip PostgREST filter-syntax chars that could break the .or() string structure
   const q    = raw.replace(/[(),]/g, " ").trim();
   const like = `%${q}%`;
+  const catalog=await getTranslations("MarketplaceCatalog"),market=await getTranslations("MarketplaceOffer"),locale=await getLocale();
+  const categoryCandidates=marketplaceSearchCategories(q,catalog).map(value=>`"${value.replace(/["\\]/g,'')}"`).join(",");
 
   const wantListings = type === "all" || ["location", "vehicle", "prop", "job", "creator", "animal"].includes(type);
   const wantProfiles = type === "all" || type === "profile";
@@ -31,9 +35,9 @@ export async function GET(req: NextRequest) {
       ? (() => {
           let q2 = db
             .from("listings")
-            .select("id, title, city, type, category, price, image_url, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type")
+            .select("id, title, city, type, category, price, image_url, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type, marketplace:metadata->marketplace")
             .eq("published", true)
-            .or(`title.ilike.${like},city.ilike.${like},category.ilike.${like},description.ilike.${like}`)
+            .or(`title.ilike.${like},city.ilike.${like},category.ilike.${like},description.ilike.${like}${categoryCandidates?`,and(type.in.(prop,vehicle),category.in.(${categoryCandidates}))`:""}`)
             .order("created_at", { ascending: false });
           if (type !== "all") q2 = q2.eq("type", type);
           return q2.limit(type === "all" ? 12 : 24);
@@ -87,7 +91,7 @@ export async function GET(req: NextRequest) {
     subtitle: (l.city as string) ?? "",
     type: l.type as string,
     price: (l.price as number) ?? 0,
-    priceLabel: ["prop","vehicle","location"].includes(String(l.type)) ? listingPriceLabel((l.price as number) ?? 0,l) : undefined,
+    priceLabel: ["prop","vehicle","location"].includes(String(l.type)) ? listingPriceLabel((l.price as number) ?? 0,l,"/Tag",locale,market) : undefined,
     image: l.image_url as string | null,
     available: null as boolean | null,
   }));

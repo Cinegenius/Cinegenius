@@ -25,7 +25,11 @@ import {
 } from "lucide-react";
 import { animalSpecies, animalRoleLabel, ANIMAL_DEPARTMENT_ID, ANIMAL_SPECIES } from "@/lib/animal-taxonomy";
 import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
-import { PROP_CATEGORY_FIELDS } from "@/lib/propCategoryFields";
+import MarketplaceOfferSummary from "@/components/MarketplaceOfferSummary";
+import MediaImage from "@/components/MediaImage";
+import MarketplaceOfferFields, { MarketplaceCategoryPicker } from "@/components/MarketplaceOfferFields";
+import { marketplaceDraft, marketplaceMetadataPatch, marketplaceBasePrice, serializeMarketplaceDraft, validateMarketplaceOffer, marketplaceCategoryLabel } from "@/lib/marketplace-offer";
+import { marketplaceCategory } from "@/lib/marketplaceCategories";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 import ListingImageManager from "@/components/ListingImageManager";
 import { MAX_LOCATION_IMAGES } from "@/lib/listing-image-gallery";
@@ -305,7 +309,6 @@ const projectTypes = [
   "Fashion Shooting", "Produkt-Shooting", "Event-Fotografie", "Hochzeits-Fotografie", "Portrait-Shooting", "Werbe-Fotografie",
   "Sonstiges",
 ];
-const conditionOptions = ["Neuwertig", "Sehr gut", "Gut", "Akzeptabel"];
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -373,13 +376,17 @@ export default function InseratPage() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [createdId, setCreatedId] = useState<string | null>(null);
   const [createdIsDraft, setCreatedIsDraft] = useState(false);
+  const [marketReview,setMarketReview]=useState(false);
+  const [savingPrivate,setSavingPrivate]=useState(false);
   const [publishingDraft, setPublishingDraft] = useState(false);
   const [selected, setSelected] = useState<CategoryItem | null>(null);
   const [activeGroup, setActiveGroup] = useState<string | null>(null); // null = main view
   // Category-specific metadata (dynamic per prop category)
+  const [marketplace, setMarketplace] = useState(() => marketplaceDraft());
+  const marketText = useTranslations("MarketplaceOffer");
+  const marketCatalog = useTranslations("MarketplaceCatalog");
   const [catMeta, setCatMeta] = useState<Record<string, string>>({});
-  const setCatField = (key: string, value: string) =>
-    setCatMeta((prev) => ({ ...prev, [key]: value }));
+
 
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -535,7 +542,7 @@ export default function InseratPage() {
 
   const listingDraft = useFormDraft({
     formKey: "listing:new",
-    value: { form, responsible, categoryId: selected?.id ?? "", activeGroup, step, catMeta,
+    value: { form, responsible, categoryId: selected?.id ?? "", activeGroup, step, catMeta, marketplace,
       imageUrl, articleImages, focalPoint, locAmenities, locRooms, locBlockedDates, locExtraImages,
       locPriceOnRequest, priceNegotiable, locFloorPlanUrl, productionCredits, selectedCompanyId },
     ready: locationDraftReady && isLoaded && !!userId,
@@ -543,8 +550,9 @@ export default function InseratPage() {
     busy: uploading || articleGalleryState.uploading || articleGalleryState.failed > 0 || locationGalleryState.uploading || locationGalleryState.failed > 0 || locFloorUploading || !!pendingImageFile || loading,
     restore: (draft) => {
       setForm(draft.form); setResponsible(responsiblePersonDraft(draft.responsible));
-      setSelected(groups.flatMap(group => group.items).find(item => item.id === draft.categoryId) ?? null);
+      setSelected(groups.flatMap(group => group.items).find(item => item.id === draft.categoryId) ?? (draft.marketplace?.category ? marketplaceItem(draft.marketplace.category) : null));
       setActiveGroup(draft.activeGroup); setStep(draft.step); setCatMeta(draft.catMeta);
+      if(draft.marketplace)setMarketplace(draft.marketplace);
       setImageUrl(draft.imageUrl); setImagePreview(draft.imageUrl); setArticleImages(draft.articleImages);
       setFocalPoint(draft.focalPoint); setLocAmenities(draft.locAmenities); setLocRooms(draft.locRooms);
       setLocBlockedDates(draft.locBlockedDates); setLocExtraImages(draft.locExtraImages);
@@ -570,6 +578,7 @@ export default function InseratPage() {
       setError("Einen gespeicherten Locationentwurf prüfen wir gerade. Bitte versuche es gleich noch einmal.");
       return;
     }
+    setMarketReview(false);
     setSelected(item);
     setCatMeta({});
     setProductionCredits([]);
@@ -588,9 +597,19 @@ export default function InseratPage() {
     if (companyId) setSelectedCompanyId(companyId);
   }, [listingDraft.loaded, selected, form.title, createdId, myCompanies]);
 
+  function marketplaceItem(category:string):CategoryItem {
+    const department=marketplaceCategory(category)?.department;
+    const vehicle=department==='fahrzeuge';
+    return {id:`market_${category}`,label:marketplaceCategoryLabel(category,marketCatalog),icon:vehicle?Car:Package,type:vehicle?'vehicle':'prop',category,color:'text-gold',bg:'bg-gold/10 border-gold/20'};
+  }
+  function chooseMarketplace(category:string){
+    setMarketplace(current=>({...current,category}));
+    if(category){setMarketReview(false);setSelected(marketplaceItem(category));setStep(2);}
+  }
   function buildPayload() {
     if (!selected) return null;
-    const { type, category } = selected;
+    const { type } = selected;
+    const category = (type === "prop" || type === "vehicle") && marketplace.category ? marketplace.category : selected.category;
 
     if (type === "vehicle") {
       return {
@@ -600,10 +619,10 @@ export default function InseratPage() {
           ? `${form.vehicle_subtype}${form.make ? ` – ${form.make}` : ""}`
           : `${form.make} ${form.model}${form.year ? ` (${form.year})` : ""}`).trim(),
         description: form.description || "",
-        price: parseFloat(form.price) || 0,
+        price: marketplaceBasePrice(marketplace),
         city: form.city,
         metadata: {
-          price_negotiable: priceNegotiable,
+          ...marketplaceMetadataPatch(marketplace),
           make: form.make || null,
           model: form.model || null,
           year: form.year ? parseInt(form.year) : null,
@@ -716,26 +735,21 @@ export default function InseratPage() {
       };
     }
 
-    // prop
-    // Build category-specific metadata (only non-empty values)
-    const catMetaFiltered = Object.fromEntries(
-      Object.entries(catMeta).filter(([, v]) => v !== "")
-    );
+    // Prop: only the active canonical technical fields leave the private draft.
     return {
       type,
       category,
       title: form.title,
       description: form.description || "",
-      price: parseFloat(form.price) || 0,
+      price: marketplaceBasePrice(marketplace),
       city: form.city,
-      rental_type: form.rental_type,
+      rental_type: marketplaceMetadataPatch(marketplace).rental_type,
       metadata: {
-        price_negotiable: priceNegotiable,
+        ...marketplaceMetadataPatch(marketplace),
         condition: form.condition || null,
         delivery: form.delivery,
         dimensions: form.dimensions || null,
         safety_note: form.safety_note || null,
-        ...catMetaFiltered,
         focal_point: focalPoint ?? null,
         production_credits: serializeProductionCredits(productionCredits),
       },
@@ -786,7 +800,7 @@ export default function InseratPage() {
     setPendingImageFile(null);
   }
 
-  async function handleSubmit() {
+  async function handleSubmit(privateDraft = false) {
     if (!userId) {
       const destination = `${window.location.pathname}${window.location.search}`;
       router.push(`/sign-in?redirect_url=${encodeURIComponent(destination)}`);
@@ -795,7 +809,7 @@ export default function InseratPage() {
     if (!listingDraft.loaded) return;
     const personErrors = (selected?.type === "prop" || selected?.type === "vehicle") ? marketplaceResponsibleErrors(responsible) : responsiblePersonErrors(responsible);
     setResponsibleErrors(personErrors);
-    if (Object.keys(personErrors).length && selected?.type !== "location" && selected?.type !== "job") { focusResponsiblePerson(); return; }
+    if (!privateDraft && Object.keys(personErrors).length && selected?.type !== "location" && selected?.type !== "job") { focusResponsiblePerson(); return; }
     const usesGallery = selected?.type === "prop" || selected?.type === "vehicle" || selected?.type === "animal" || selected?.type === "location";
     const galleryState = selected?.type === "location" ? locationGalleryState : articleGalleryState;
     if (usesGallery && galleryState.uploading) {
@@ -806,6 +820,12 @@ export default function InseratPage() {
       setError("Bitte lade fehlgeschlagene Bilder erneut hoch oder entferne sie.");
       return;
     }
+    if(selected?.type === "prop" || selected?.type === "vehicle") {
+      const issue=validateMarketplaceOffer(marketplace.category,selected.type,serializeMarketplaceDraft(marketplace),!privateDraft);
+      if(issue){setError(marketText(issue));return;}
+    }
+    if((selected?.type === "prop" || selected?.type === "vehicle") && !privateDraft && !marketReview){setMarketReview(true);window.scrollTo({top:0,behavior:'instant'});return;}
+    setSavingPrivate(privateDraft);
     setLoading(true);
     setError("");
     const payload = buildPayload();
@@ -826,7 +846,7 @@ export default function InseratPage() {
           ...((selected?.type === "location") ? { extra_images: locExtraImages.slice(1) }
             : (selected?.type === "prop" || selected?.type === "vehicle" || selected?.type === "animal") ? { extra_images: articleImages.slice(1) } : {}),
           company_id: selectedCompanyId || null,
-          draft: selected?.type === "job" || selected?.type === "location",
+          draft: privateDraft || selected?.type === "job" || selected?.type === "location",
         }),
       });
       json = await res.json().catch(() => ({}));
@@ -1024,7 +1044,8 @@ export default function InseratPage() {
           )}
 
           {/* Sub-category grid */}
-          {activeGroup && currentGroup && (
+          {activeGroup === "marktplatz" && <MarketplaceCategoryPicker value={marketplace.category} onChange={chooseMarketplace} />}
+          {activeGroup && activeGroup !== "marktplatz" && currentGroup && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {currentGroup.items.map((item) => (
                 <button
@@ -1072,7 +1093,7 @@ export default function InseratPage() {
         <div className="max-w-2xl mx-auto px-4 py-10">
 
           {/* Header */}
-          <button disabled={articleGalleryState.uploading} onClick={() => { setStep(1); setSelected(null); setImageUrl(null); setImagePreview(null); }} className="flex items-center gap-1.5 text-text-muted hover:text-text-primary text-sm mb-6 transition-colors disabled:cursor-not-allowed disabled:opacity-50">
+          <button disabled={articleGalleryState.uploading} onClick={() => { setStep(1); if(selected?.type!=="prop"&&selected?.type!=="vehicle"){setImageUrl(null);setImagePreview(null);} setSelected(null); }} className="flex items-center gap-1.5 text-text-muted hover:text-text-primary text-sm mb-6 transition-colors disabled:cursor-not-allowed disabled:opacity-50">
             <ChevronLeft size={16} /> Zurück zur Auswahl
           </button>
 
@@ -1087,8 +1108,9 @@ export default function InseratPage() {
             </div>
           </div>
 
+          {marketReview && (type === "prop" || type === "vehicle") && <div className="space-y-4"><h2 className="font-display text-xl">{marketText("preview")}</h2><h3 className="break-words text-lg font-semibold">{buildPayload()?.title}</h3><p className="text-text-secondary">{form.city}</p><p className="whitespace-pre-wrap break-words text-sm">{form.description}</p>{articleImages.length>0&&<div className="grid grid-cols-3 gap-2">{articleImages.map((src,index)=><div key={src} className="relative aspect-square overflow-hidden rounded-lg"><MediaImage src={src} alt={String(index+1)} fill sizes="200px" className="object-contain"/></div>)}</div>}<MarketplaceOfferSummary category={marketplace.category} price={marketplaceBasePrice(marketplace)} metadata={marketplaceMetadataPatch(marketplace)} /><button type="button" className="min-h-11 text-gold" onClick={()=>setMarketReview(false)}>{marketText("edit")}</button></div>}
           <div className="space-y-5">
-
+          <div hidden={marketReview} className="space-y-5">
             <ResponsiblePersonFields value={responsible} onChange={setResponsible} errors={responsibleErrors} accountPrefill compactWhenProfile={selected?.type === "prop" || selected?.type === "vehicle"} />
             {/* ── FIRMA VERKNÜPFEN ── */}
             {myCompanies.length > 0 && (
@@ -1127,7 +1149,7 @@ export default function InseratPage() {
                   <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Fahrzeugtyp *</label>
                   <FormSelect value={form.vehicle_subtype} onChange={(v) => f("vehicle_subtype", v)}
                     placeholder="Bitte wählen…"
-                    options={(selected.category === "Produktionsfahrzeug"
+                    options={((selected.category === "Produktionsfahrzeug" || (marketplaceCategory(selected.category)?.department === "fahrzeuge" && marketplaceCategory(selected.category)?.subcategory !== "fahrzeuge-bild"))
                       ? ["Kostümbus", "Maske & Hair", "Equipment-Transporter", "Kamera-Van", "Generator-Fahrzeug", "Catering / Crafty", "Produktions-Van", "Regisseur-Trailer", "Darsteller-Trailer", "Motorboot / Tender", "Produktionsschiff", "Helikopter (Transport)", "Kleinflugzeug (Transport)", "Sonstiges"]
                       : ["PKW / Limousine", "Sportwagen / Cabrio", "SUV / Geländewagen", "Oldtimer / Classic Car", "Motorrad", "Roller / Scooter", "LKW / Truck", "Bus / Reisebus", "Wohnmobil / Camper", "Militärfahrzeug", "Kutsche / Pferdewagen", "Motorboot", "Segelboot / Yacht", "Jet-Ski", "Schiff / Fähre", "U-Boot (Requisite)", "Flugzeug (Prop / Stunt)", "Helikopter / Gyrocopter", "Heißluftballon", "Sonstiges"]
                     ).map(o => ({ value: o, label: o }))} />
@@ -1575,102 +1597,6 @@ export default function InseratPage() {
               </div>
             )}
 
-            {/* ── CATEGORY-SPECIFIC FIELDS (props only) ── */}
-            {type === "prop" && (() => {
-              const configKey = selected.id.replace("mk_", "");
-              const config = PROP_CATEGORY_FIELDS[configKey];
-              if (!config) return null;
-              return (
-                <div className="space-y-4 pb-2 border-b border-border/60">
-                  {config.fields.map((field) => {
-                    if (field.type === "select" && field.options) {
-                      return (
-                        <div key={field.key}>
-                          <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{field.label}</label>
-                          <div className="flex gap-2 flex-wrap">
-                            {field.options.map((opt) => (
-                              <button key={opt} type="button"
-                                onClick={() => setCatField(field.key, catMeta[field.key] === opt ? "" : opt)}
-                                className={`px-3 py-1.5 rounded-lg text-sm border transition-all ${catMeta[field.key] === opt ? "bg-gold text-bg-primary border-gold" : "border-border text-text-secondary hover:border-gold/40"}`}>
-                                {opt}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    }
-                    if (field.type === "text") {
-                      return (
-                        <div key={field.key}>
-                          <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{field.label}</label>
-                          <input
-                            value={catMeta[field.key] ?? ""}
-                            onChange={(e) => setCatField(field.key, e.target.value)}
-                            placeholder={field.placeholder}
-                            className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm"
-                          />
-                        </div>
-                      );
-                    }
-                    return null;
-                  })}
-                </div>
-              );
-            })()}
-
-            {/* ── CONDITION + EXTRAS (props only) ── */}
-            {type === "prop" && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Zustand</label>
-                  <div className="flex gap-2 flex-wrap">
-                    {conditionOptions.map((c) => (
-                      <button key={c} onClick={() => f("condition", c)}
-                        className={`px-3 py-1.5 rounded-lg text-sm border transition-all ${form.condition === c ? "bg-gold text-bg-primary border-gold" : "border-border text-text-secondary hover:border-gold/40"}`}>
-                        {c}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Angebotsart</label>
-                  <div className="flex gap-2">
-                    {(["miete", "kauf"] as const).map((t) => (
-                      <button key={t} onClick={() => f("rental_type", t)}
-                        className={`px-4 py-2 rounded-lg text-sm border transition-all ${form.rental_type === t ? "bg-gold text-bg-primary border-gold" : "border-border text-text-secondary hover:border-gold/40"}`}>
-                        {t === "miete" ? "Verleih / Miete" : "Verkauf"}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <label className="flex items-center gap-3 cursor-pointer select-none">
-                  <div onClick={() => f("delivery", !form.delivery)}
-                    className={`w-10 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${form.delivery ? "bg-gold" : "bg-border"}`}>
-                    <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${form.delivery ? "left-5" : "left-1"}`} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-text-primary">Lieferung möglich</p>
-                    <p className="text-xs text-text-muted">Ich kann den Artikel zum Set liefern</p>
-                  </div>
-                </label>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Maße / Abmessungen</label>
-                    <input value={form.dimensions} onChange={(e) => f("dimensions", e.target.value)} placeholder="z.B. 80 × 60 × 40 cm"
-                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Sicherheitshinweis</label>
-                    <input value={form.safety_note} onChange={(e) => f("safety_note", e.target.value)} placeholder="z.B. Scharfe Kanten, nur mit PSA"
-                      className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* ── TITLE ── */}
             <div>
               <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
@@ -1709,6 +1635,9 @@ export default function InseratPage() {
               />
             </div>
 
+            {(type === "prop" || type === "vehicle") && <MarketplaceOfferFields value={marketplace} vehicleOnly={type === "vehicle"} onChange={value=>{setMarketplace(value);if(value.category)setSelected(marketplaceItem(value.category));}} />}
+
+            {/* ── CONDITION + EXTRAS (props only) ── */}
             {(isLocation || selected.type === "prop") && (
               <ProductionCreditsEditor
                 value={productionCredits}
@@ -1722,9 +1651,9 @@ export default function InseratPage() {
 
             {isAnimal && <p className="text-sm leading-6 text-text-muted">{animals("portfolioHelp")}</p>}
             {/* ── PRICE + CITY ── */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className={`grid gap-4 ${type === "prop" || type === "vehicle" ? "grid-cols-1" : "grid-cols-2"}`}>
               <div>
-                {isAnimal ? <p className="text-sm text-text-secondary">{animals("conditions")}</p> : isLocation ? (
+                {type === "prop" || type === "vehicle" ? null : isAnimal ? <p className="text-sm text-text-secondary">{animals("conditions")}</p> : isLocation ? (
                   <div className="space-y-2">
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest">Preis</label>
                     <ListingPriceOptions onRequest={locPriceOnRequest} negotiable={priceNegotiable} onChange={value=>{setLocPriceOnRequest(value.priceOnRequest);setPriceNegotiable(value.priceNegotiable);}} />
@@ -1865,6 +1794,7 @@ export default function InseratPage() {
               <p>CineGenius ist vollständig kostenlos — keine Provision, keine Gebühren.</p>
             </div>
 
+            </div>
             {error && (
               <div className="flex items-start gap-3 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3">
                 <AlertTriangle size={16} className="shrink-0 mt-0.5" />
@@ -1874,16 +1804,17 @@ export default function InseratPage() {
 
             {/* ── SUBMIT ── */}
             <button
-              onClick={handleSubmit}
+              onClick={() => handleSubmit()}
               disabled={!listingDraft.loaded || !canSubmit() || loading || uploading || ((selected?.type === "prop" || selected?.type === "vehicle" || selected?.type === "animal") && (articleGalleryState.uploading || articleGalleryState.failed > 0)) || (selected?.type === "location" && (locationGalleryState.uploading || locationGalleryState.failed > 0))}
               className="w-full py-4 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
             >
               {loading ? (
-                <><Loader2 size={18} className="animate-spin" /> {selected?.type === "job" || selected?.type === "location" ? "Entwurf wird gespeichert…" : (selected?.type === "prop" || selected?.type === "vehicle") && responsible.profileName ? marketplaceText("publishing") : moderation("submitting")}</>
+                <><Loader2 size={18} className="animate-spin" /> {savingPrivate ? marketText("savingDraft") : selected?.type === "job" || selected?.type === "location" ? "Entwurf wird gespeichert…" : (selected?.type === "prop" || selected?.type === "vehicle") && responsible.profileName ? marketplaceText("publishing") : moderation("submitting")}</>
               ) : (
-                <>{selected?.type === "job" ? "Als Entwurf speichern" : selected?.type === "location" ? "Entwurf speichern und prüfen" : (selected?.type === "prop" || selected?.type === "vehicle") && responsible.profileName ? marketplaceText("publish") : moderation("submit")} <ArrowRight size={18} /></>
+                <>{(type === "prop" || type === "vehicle") && !marketReview ? marketText("review") : selected?.type === "job" ? "Als Entwurf speichern" : selected?.type === "location" ? "Entwurf speichern und prüfen" : (selected?.type === "prop" || selected?.type === "vehicle") && responsible.profileName ? marketplaceText("publish") : moderation("submit")} <ArrowRight size={18} /></>
               )}
             </button>
+            {(type === "prop" || type === "vehicle") && <button type="button" disabled={loading || uploading || articleGalleryState.uploading || articleGalleryState.failed>0} className="min-h-11 w-full rounded-xl border border-border px-4 py-3 text-sm" onClick={()=>handleSubmit(true)}>{marketText("saveDraft")}</button>}
           </div>
         </div>
       </div>
@@ -1909,7 +1840,7 @@ export default function InseratPage() {
         {createdIsDraft && <ResponsiblePersonFields value={responsible} onChange={setResponsible} errors={responsibleErrors} accountPrefill compactWhenProfile={selected?.type === "prop" || selected?.type === "vehicle"} />}
         <h2 className="font-display text-3xl font-bold text-text-primary mb-3">{createdPublished ? marketplaceText("publishedTitle") : error && (selected?.type === "prop" || selected?.type === "vehicle") ? marketplaceText("savedTitle") : moderation(createdIsDraft ? "draftSaved" : "statuses.pending")}</h2>
         <p className="text-text-muted mb-8">
-          {createdPublished ? marketplaceText("published") : error && (selected?.type === "prop" || selected?.type === "vehicle") ? marketplaceText("saveError") : moderation(createdIsDraft ? "privateNotice" : "submitted")}
+          {createdPublished ? marketplaceText("published") : error && (selected?.type === "prop" || selected?.type === "vehicle") ? marketplaceText("saveError") : (createdIsDraft && (selected?.type === "prop" || selected?.type === "vehicle") ? marketText("privateNotice") : moderation(createdIsDraft ? "privateNotice" : "submitted"))}
         </p>
         {error && <p role="alert" className="mb-5 text-sm text-red-400">{error}</p>}
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -1917,6 +1848,7 @@ export default function InseratPage() {
             onClick={() => {
               setStep(1);
               setSelected(null);
+              setMarketReview(false);setMarketplace(marketplaceDraft());setArticleImages([]);
               setError("");
               setImageUrl(null);
               setImagePreview(null);

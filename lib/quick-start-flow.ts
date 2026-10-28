@@ -1,3 +1,4 @@
+import { DEPARTMENTS, deptValues } from "@/lib/marketplaceCategories";
 import { ANIMAL_DEPARTMENT_ID, ANIMAL_LEGACY_REFERENCES, normalizeAnimalCompanyDetails, type AnimalCompanyDetails } from "@/lib/animal-taxonomy";
 import { responsiblePersonDraft, type ResponsiblePerson } from "./responsible-person";
 import { primaryOccupationForPositions, occupationReference, type PrimaryOccupation } from "./primary-occupation";
@@ -86,16 +87,7 @@ export const QUICK_START_CATEGORIES = {
     { label: "Fotostudio", value: "Fotostudio", example: "Studio für Foto- und Videoaufnahmen" },
     { label: "Etwas anderes", value: "Speziallocation", example: "Ein anderer passender Ort" },
   ],
-  equipment: [
-    { label: "Kamera und Zubehör", value: "Kameraequipment", example: "Kamera, Objektive oder Zubehör" },
-    { label: "Licht", value: "Lichttechnik", example: "Lampen, Leuchten oder Lichtformer" },
-    { label: "Möbel und Einrichtung", value: "Möbel / Szenenbild", example: "Möbel und Einrichtungsstücke" },
-    { label: "Requisiten und Dekoration", value: "Requisiten", example: "Gegenstände und Dekoration" },
-    { label: "Kostüme und Kleidung", value: "Kostüme", example: "Kleidung und Kostümteile" },
-    { label: "Ton und Audio", value: "Ton & Audio", example: "Mikrofone, Recorder und Zubehör" },
-    { label: "Fahrzeug", value: "Bild-Fahrzeug", example: "Fahrzeug für Bild oder Produktion" },
-    { label: "Etwas anderes", value: "Produktionsausstattung", example: "Anderes Equipment oder Setzubehör" },
-  ],
+  equipment: DEPARTMENTS.flatMap(department=>deptValues(department).map(value=>({value,label:department.groups.find(g=>g.id===value)?.label??department.label,example:department.label}))),
   company: COMPANY_CATEGORIES.map(({ label, id, examples }) => ({ label, value: id, example: examples })),
 } as const;
 

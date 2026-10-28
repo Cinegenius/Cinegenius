@@ -1,3 +1,4 @@
+import { marketplaceCategory } from "@/lib/marketplaceCategories";
 import { listingPriceMetadata } from "@/lib/listing-price";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
@@ -39,7 +40,7 @@ export default async function VehiclesPage() {
     return {
       id: l.id,
       title: l.title,
-      type: l.category ?? "Bild-Fahrzeug",
+      type: marketplaceCategory(l.category)?.subcategory ? marketplaceCategory(l.category)?.subcategory === "fahrzeuge-bild" ? "Bild-Fahrzeug" : "Produktionsfahrzeug" : l.category ?? "Bild-Fahrzeug",
       make: make || "",
       model: model || "",
       year,

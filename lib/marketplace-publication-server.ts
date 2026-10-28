@@ -1,3 +1,4 @@
+import { validateMarketplaceOffer } from "@/lib/marketplace-offer";
 import "server-only";
 import { db } from "@/lib/db";
 import { getListingProvider } from "@/lib/listing-provider";
@@ -14,6 +15,8 @@ export async function publishMarketplaceOffer(row: Record<string, unknown>, acto
     category: row.category as string, imageUrl: row.image_url as string, providerAssigned: provider.kind !== "unassigned",
     providerContactable: Boolean(provider.contactUserId) });
   if (validation) return { outcome: "incomplete", row, error: t("incomplete") };
+  const categoryIssue=validateMarketplaceOffer(row.category,String(row.type),(row.metadata as Record<string,unknown>|null)?.marketplace);
+  if(categoryIssue)return {outcome:"incomplete",row,error:(await getTranslations("MarketplaceOffer"))(categoryIssue)};
   const saved = await db.rpc("marketplace_publish_transition", { p_id: row.id, p_expected: row, p_actor: actor });
   if (saved.error) return { outcome: "error", row, error: t("saveError") };
   if (saved.data === "profile_required") return { outcome: "profile_required", row };

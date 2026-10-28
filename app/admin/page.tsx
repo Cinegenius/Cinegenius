@@ -8,6 +8,7 @@ import ResponsiblePersonAdmin from "@/components/ResponsiblePersonAdmin";
 import type { StoredResponsiblePerson } from "@/lib/responsible-person";
 
 import { useAuth } from "@clerk/nextjs";
+import { localizedMarketplaceDepartments } from "@/lib/marketplaceCategories";
 import { useTranslations } from "next-intl";
 import { useViewState } from "@/lib/use-view-state";
 
@@ -168,6 +169,10 @@ function ListingProviderControls({ listing, onSaved, onError }: { listing: Listi
 function AdminContent() {
   const { userId: reviewUserId } = useAuth();
   const reviewOwner = useContext(ServerAdminContext);
+  const market=useTranslations("MarketplaceOffer"),catalog=useTranslations("MarketplaceCatalog");
+  const marketDepartments=localizedMarketplaceDepartments(catalog);
+  const [listingDepartment,setListingDepartment]=useState("");
+  const [listingSubcategory,setListingSubcategory]=useState("");
   const reviewT = useTranslations("AdminReview");
   const moderation = useTranslations("OfferModeration");
   const accountsText = useTranslations("AdminAccounts");
@@ -295,13 +300,14 @@ function AdminContent() {
     let active = true;
     setListingsLoading(true); setListingsError("");
     const params = new URLSearchParams({ page: String(listingsPage), type: listingsType, status: listingsStatus });
+    if(listingDepartment)params.set("dept",listingDepartment);if(listingSubcategory)params.set("sub",listingSubcategory);
     if (listingsSearch.trim()) params.set("search", listingsSearch.trim());
     fetchJson<{ listings: Listing[]; total: number }>(`/api/admin/listings?${params}`)
       .then((data) => { if (active) { setListings(data.listings); setListingsTotal(data.total); } })
       .catch((error: Error) => { if (active) setListingsError(error.message); })
       .finally(() => { if (active) setListingsLoading(false); });
     return () => { active = false; };
-  }, [activeTab, listingsPage, listingsSearch, listingsType, listingsStatus, refreshKey]);
+  }, [activeTab, listingsPage, listingsSearch, listingsType, listingsStatus, listingDepartment, listingSubcategory, refreshKey]);
 
   useEffect(() => {
     let active = true;
@@ -596,6 +602,8 @@ function AdminContent() {
           </div>}
 
           {activeTab === "listings" && <div className="space-y-4">
+            <div className="mb-3 flex flex-wrap gap-3"><label className="min-w-0 text-sm">{market("choose")}<select className="ml-2 min-h-11 max-w-full rounded-lg border border-border bg-bg-secondary px-3" value={listingDepartment} onChange={event=>{setListingDepartment(event.target.value);setListingSubcategory("");setListingsPage(1);}}><option value="">{market("choose")}</option>{marketDepartments.map(d=><option value={d.id} key={d.id}>{d.label}</option>)}</select></label>{listingDepartment&&<label className="min-w-0 text-sm">{market("subcategory")}<select className="ml-2 min-h-11 max-w-full rounded-lg border border-border bg-bg-secondary px-3" value={listingSubcategory} onChange={event=>{setListingSubcategory(event.target.value);setListingsPage(1);}}><option value="">{market("allSubcategories")}</option>{marketDepartments.find(d=>d.id===listingDepartment)?.groups.map(g=><option key={g.id} value={g.id}>{g.label}</option>)}</select></label>}</div>
+
             <div className="flex flex-wrap items-center gap-2"><div className="relative min-w-[220px] flex-1"><Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" /><input value={listingsSearch} onChange={(e) => { setListingsSearch(e.target.value); setListingsPage(1); }} placeholder="Titel suchen…" className="w-full rounded-lg border border-border bg-bg-secondary py-2 pl-9 pr-3 text-sm text-text-primary" /></div><select value={listingsType} onChange={(e) => { setListingsType(e.target.value); setListingsPage(1); }} className="rounded-lg border border-border bg-bg-secondary px-3 py-2 text-sm text-text-primary"><option value="all">Alle Bereiche</option>{Object.entries(typeLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select><select value={listingsStatus} onChange={(e) => { setListingsStatus(e.target.value); setListingsPage(1); }} className="rounded-lg border border-border bg-bg-secondary px-3 py-2 text-sm text-text-primary"><option value="all">Alle Status</option><option value="published">Öffentlich</option>{OFFER_STATUSES.map(status => <option key={status} value={status}>{moderation("statuses." + status)}</option>)}</select><span className="text-sm text-text-muted">{listingsTotal} Einträge</span></div>
             {listingsError && <ErrorBox text={listingsError} onRetry={() => setRefreshKey((key) => key + 1)} />}
             {listingsLoading && !listings.length ? <p className="py-10 text-center text-sm text-text-muted">Inserate werden geladen…</p> : !listings.length ? <Empty title="Keine Inserate in dieser Auswahl" /> : <div className="space-y-2">{listings.map((listing) => <Panel key={listing.id} className="p-4"><div className="flex flex-wrap items-center gap-3"><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="font-medium text-text-primary">{listing.title}</p><StatusBadge tone={listing.published ? "success" : "muted"}><OfferModerationStatus item={listing} /></StatusBadge></div><p className="mt-1 text-xs text-text-muted">{typeLabels[listing.type] ?? listing.type} · {listing.city || "Kein Ort"} · {listing.priceLabel ?? (listing.price ? `${Number(listing.price).toLocaleString("de-DE")} €` : "Preis auf Anfrage")} · {new Date(listing.created_at).toLocaleDateString("de-DE")}</p><p className="mt-1 font-mono text-[10px] text-text-muted">ID {listing.id}</p></div>{listing.published && listing.detail_href && <a href={listing.detail_href} target="_blank" rel="noreferrer" className="rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold"><Eye className="mr-1 inline" size={12} />Öffentlich ansehen</a>}<AdminReviewLink kind="listing" id={listing.id} /><SupportMessageAction targetType="listing" targetId={listing.id} /></div><ListingProviderControls listing={listing} onSaved={() => setRefreshKey((key) => key + 1)} onError={(text) => setActionMessage({ text, error: true })} />{!listing.detail_href && <p className="mt-2 text-xs text-crimson-light">Für diesen Angebotstyp ist keine öffentliche Detailadresse eingerichtet.</p>}</Panel>)}</div>}
