@@ -1,6 +1,6 @@
 /** `published` is the effective public flag, maintained by the database guard.
  * Legacy public rows are explicitly marked for a human decision, never silently approved. */
-export const OFFER_STATUSES = ["draft", "pending", "approved", "changes_requested", "rejected", "hidden", "legacy_review_required"] as const;
+export const OFFER_STATUSES = ["draft", "pending", "approved", "owner_published", "changes_requested", "rejected", "hidden", "legacy_review_required"] as const;
 export type OfferStatus = typeof OFFER_STATUSES[number];
 export type OfferKind = "listing" | "company_equipment";
 export const OFFER_MODERATION_COLUMNS = "moderation_status,content_revision,reviewed_revision,submitted_at,reviewed_at,moderation_reason";

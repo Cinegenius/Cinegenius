@@ -1527,7 +1527,8 @@
       "changes_requested": "Changes required",
       "rejected": "Rejected",
       "hidden": "Hidden",
-      "legacy_review_required": "Legacy offer · check approval evidence"
+      "legacy_review_required": "Legacy offer · check approval evidence",
+      "owner_published": "Published"
     },
     "submitted": "Your offer has been submitted for review. It will become public after approval.",
     "submit": "Submit for review",
@@ -1562,6 +1563,20 @@
     "reviewHint": "Review all details before submitting.",
     "pendingCount": "Pending submissions",
     "legacyCount": "Public legacy offers without confirmed approval evidence",
-    "publicNotice": "Only approved offers become public."
+    "publicNotice": "Only approved offers become public.",
+    "ownerPublishedNotice": "Published publicly by the provider. Changes are saved without requiring admin approval."
+  },
+  "MarketplacePublishing": {
+    "publish": "Publish",
+    "publishedTitle": "Published",
+    "published": "Your offer is now public. Marketplace offers from an established profile do not require admin approval.",
+    "view": "View offer",
+    "profileError": "Your profile could not be checked. Your entries are retained. Please try again.",
+    "saveError": "Your offer is saved. Publication could not yet be confirmed. Check its status under My offers or try again here.",
+    "incomplete": "Please add a title, location, category, main image and a contactable provider.",
+    "restricted": "This offer is restricted by the administrators. Please contact Support.",
+    "stale": "The offer changed in the meantime. Reload the saved version.",
+    "savedTitle": "Saved – check status",
+    "publishing": "Publishing …"
   }
 }

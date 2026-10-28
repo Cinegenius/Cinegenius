@@ -1527,7 +1527,8 @@
       "changes_requested": "Nutné úpravy",
       "rejected": "Zamítnuto",
       "hidden": "Skryto",
-      "legacy_review_required": "Starší nabídka · ověřit schválení"
+      "legacy_review_required": "Starší nabídka · ověřit schválení",
+      "owner_published": "Zveřejněno"
     },
     "submitted": "Tvůj inzerát byl odeslán ke kontrole. Veřejný bude po schválení.",
     "submit": "Odeslat ke kontrole",
@@ -1562,6 +1563,20 @@
     "reviewHint": "Před odesláním zkontroluj všechny údaje.",
     "pendingCount": "Čekající žádosti",
     "legacyCount": "Veřejné starší nabídky bez dokladu o schválení",
-    "publicNotice": "Veřejné jsou až schválené nabídky."
+    "publicNotice": "Veřejné jsou až schválené nabídky.",
+    "ownerPublishedNotice": "Zveřejněno poskytovatelem. Změny se ukládají bez schválení správce."
+  },
+  "MarketplacePublishing": {
+    "publish": "Zveřejnit",
+    "publishedTitle": "Zveřejněno",
+    "published": "Vaše nabídka je nyní veřejná. Nabídky na tržišti s dokončeným profilem nevyžadují schválení správce.",
+    "view": "Zobrazit nabídku",
+    "profileError": "Profil se nepodařilo ověřit. Vaše údaje zůstávají zachovány. Zkuste to znovu.",
+    "saveError": "Nabídka je uložena. Zveřejnění zatím nebylo potvrzeno. Zkontrolujte stav v části Moje nabídky nebo to zkuste znovu zde.",
+    "incomplete": "Doplňte název, místo, kategorii, hlavní obrázek a kontaktovatelného poskytovatele.",
+    "restricted": "Správa tuto nabídku omezila. Kontaktujte podporu.",
+    "stale": "Nabídka se mezitím změnila. Načtěte uloženou verzi znovu.",
+    "savedTitle": "Uloženo – zkontrolujte stav",
+    "publishing": "Zveřejňování …"
   }
 }

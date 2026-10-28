@@ -1527,7 +1527,8 @@
       "changes_requested": "Modifiche necessarie",
       "rejected": "Rifiutato",
       "hidden": "Nascosto",
-      "legacy_review_required": "Annuncio precedente · verificare approvazione"
+      "legacy_review_required": "Annuncio precedente · verificare approvazione",
+      "owner_published": "Pubblicato"
     },
     "submitted": "Il tuo annuncio è stato inviato per la verifica. Sarà pubblico dopo l’approvazione.",
     "submit": "Invia per verifica",
@@ -1562,6 +1563,20 @@
     "reviewHint": "Verifica tutti i dati prima dell’invio.",
     "pendingCount": "Invii in attesa",
     "legacyCount": "Annunci precedenti pubblici senza prova di approvazione",
-    "publicNotice": "Solo gli annunci approvati diventano pubblici."
+    "publicNotice": "Solo gli annunci approvati diventano pubblici.",
+    "ownerPublishedNotice": "Pubblicato dal fornitore. Le modifiche vengono salvate senza approvazione amministrativa."
+  },
+  "MarketplacePublishing": {
+    "publish": "Pubblica",
+    "publishedTitle": "Pubblicato",
+    "published": "Il tuo annuncio è pubblico. Gli annunci del mercato con un profilo configurato non richiedono approvazione amministrativa.",
+    "view": "Vedi annuncio",
+    "profileError": "Non è stato possibile verificare il profilo. I dati sono conservati. Riprova.",
+    "saveError": "Il tuo annuncio è salvato. La pubblicazione non è ancora confermata. Controlla lo stato in I miei annunci o riprova qui.",
+    "incomplete": "Aggiungi titolo, luogo, categoria, immagine principale e un fornitore contattabile.",
+    "restricted": "Questo annuncio è soggetto a una restrizione amministrativa. Contatta il Supporto.",
+    "stale": "L’annuncio è cambiato. Ricarica la versione salvata.",
+    "savedTitle": "Salvato – controlla lo stato",
+    "publishing": "Pubblicazione in corso …"
   }
 }

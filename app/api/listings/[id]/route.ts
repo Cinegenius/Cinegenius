@@ -51,7 +51,9 @@ export async function PATCH(
     : { data: null };
   const responsibleAccountId = current.responsible_person?.userId || (current.company_id ? companyOwner.data?.owner_user_id : current.user_id);
   if (!responsibleAccountId) return NextResponse.json({ error: (await getTranslations("responsiblePerson"))("unauthorized"), field: "responsible_person" }, { status: 403 });
-  const responsible = await validateResponsiblePerson(body.responsible_person ?? current.responsible_person, responsibleAccountId, false, current.published === true && published !== false);
+  const responsible = (current.type === "prop" || current.type === "vehicle")
+    ? await (await import("@/lib/responsible-person-server")).validateMarketplaceResponsiblePerson(body.responsible_person ?? current.responsible_person, responsibleAccountId, current.published === true && published !== false)
+    : await validateResponsiblePerson(body.responsible_person ?? current.responsible_person, responsibleAccountId, false, current.published === true && published !== false);
   if (responsible.response) return responsible.response;
   if (userId !== responsibleAccountId && body.responsible_person !== undefined && JSON.stringify(responsible.person) !== JSON.stringify(bindResponsiblePerson(current.responsible_person, responsibleAccountId))) {
     return NextResponse.json({ error: (await getTranslations("responsiblePerson"))("unauthorized"), field: "responsible_person" }, { status: 403 });
@@ -144,7 +146,7 @@ export async function PATCH(
     .from("listings")
     .update({ ...updates, last_editor_id: userId })
     .eq("id", id)
-    .select("id, type, published, moderation_status, moderation_reason")
+    .select("*")
     .single();
 
   if (error) {
@@ -153,6 +155,12 @@ export async function PATCH(
   }
   if (!data) return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
 
+  let result = data;
+  let publicationError: string | undefined;
+  if (current.published && published !== false && (current.type === "prop" || current.type === "vehicle")) {
+    const publication = await (await import("@/lib/marketplace-publication-server")).publishMarketplaceOffer(data, userId);
+    result = publication.row; publicationError = publication.error;
+  }
   const pathMap: Record<string, string> = {
     job: "/jobs", location: "/locations", prop: "/props",
     vehicle: "/vehicles", creator: "/creators", animal: "/tiere",
@@ -161,7 +169,7 @@ export async function PATCH(
   revalidatePath("/", "layout");
   revalidateTag("listings", { expire: 0 });
 
-  return NextResponse.json({ success: true, data, message: data.moderation_status === "pending" ? (await getTranslations("OfferModeration"))("changed") : null }, { headers: { "Cache-Control": "private, no-store" } });
+  return NextResponse.json({ success: true, data: result, publicationError, message: result.moderation_status === "pending" ? (await getTranslations("OfferModeration"))("changed") : null }, { headers: { "Cache-Control": "private, no-store" } });
 }
 
 // DELETE /api/listings/[id] — delete own listing

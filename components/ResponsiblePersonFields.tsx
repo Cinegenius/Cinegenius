@@ -1,11 +1,11 @@
 "use client";
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { COMPANY_RESPONSIBLE_FUNCTIONS, OFFER_RESPONSIBLE_FUNCTIONS, responsiblePersonErrors, type ResponsiblePerson } from "@/lib/responsible-person";
 
-export default function ResponsiblePersonFields({ value, onChange, company = false, errors = {}, accountPrefill = false, disabled = false }: {
+export default function ResponsiblePersonFields({ value, onChange, company = false, errors = {}, accountPrefill = false, disabled = false, compactWhenProfile = false }: {
   value: ResponsiblePerson; onChange: (value: ResponsiblePerson) => void; company?: boolean;
-  errors?: Record<string, string>; accountPrefill?: boolean; disabled?: boolean;
+  errors?: Record<string, string>; accountPrefill?: boolean; disabled?: boolean; compactWhenProfile?: boolean;
 }) {
   const t = useTranslations("responsiblePerson");
   const invalid = responsiblePersonErrors(value, company);
@@ -13,17 +13,22 @@ export default function ResponsiblePersonFields({ value, onChange, company = fal
   const id = useId();
   const latest = useRef({ value, onChange });
   useEffect(() => { latest.current = { value, onChange }; }, [value, onChange]);
-  const hasName = Boolean(value.firstName || value.lastName);
+  const hasName = Boolean(value.firstName || value.lastName || value.profileName);
+  const shouldPrefill = accountPrefill && !disabled && (compactWhenProfile || !hasName);
+  const [prefilling, setPrefilling] = useState(accountPrefill && compactWhenProfile && !value.profileName);
   useEffect(() => {
-    if (!accountPrefill || disabled || hasName) return;
+    if (!shouldPrefill) return;
     const controller = new AbortController();
     fetch("/api/responsible-person", { cache: "no-store", signal: controller.signal }).then(async response => response.ok ? response.json() : null).then(data => {
       if (!data?.person || controller.signal.aborted) return;
       const current = latest.current;
-      if (!current.value.firstName && !current.value.lastName) current.onChange({ ...current.value, firstName: data.person.firstName, lastName: data.person.lastName });
-    }).catch(() => {});
+      if (data.person.profileName || (!current.value.firstName && !current.value.lastName)) current.onChange({ ...current.value,
+        firstName: current.value.firstName || data.person.firstName, lastName: current.value.lastName || data.person.lastName,
+        ...(data.person.profileName ? { profileName: data.person.profileName } : {}) });
+    }).catch(() => {}).finally(() => { if (!controller.signal.aborted) setPrefilling(false); });
     return () => controller.abort();
-  }, [accountPrefill, disabled, hasName]);
+  }, [shouldPrefill]);
+  if (compactWhenProfile && (prefilling || (value.profileName && !fieldErrors.function && !fieldErrors.customFunction))) return null;
   const inputClass = "min-h-11 w-full min-w-0 rounded-xl border border-border bg-bg-primary px-3 py-2 text-base text-text-primary focus:border-gold outline-none";
   return <fieldset data-responsible-person className="min-w-0 space-y-3 rounded-xl border border-border p-4" disabled={disabled}>
     <legend className="px-1 text-sm font-semibold text-text-primary">{t("title")}</legend>

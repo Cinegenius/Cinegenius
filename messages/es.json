@@ -1527,7 +1527,8 @@
       "changes_requested": "Se requieren cambios",
       "rejected": "Rechazado",
       "hidden": "Oculto",
-      "legacy_review_required": "Oferta antigua · comprobar aprobación"
+      "legacy_review_required": "Oferta antigua · comprobar aprobación",
+      "owner_published": "Publicado"
     },
     "submitted": "Tu anuncio se ha enviado para revisión. Será público tras su aprobación.",
     "submit": "Enviar para revisión",
@@ -1562,6 +1563,20 @@
     "reviewHint": "Revisa todos los datos antes de enviar.",
     "pendingCount": "Envíos pendientes",
     "legacyCount": "Ofertas antiguas públicas sin constancia de aprobación",
-    "publicNotice": "Solo los anuncios aprobados serán públicos."
+    "publicNotice": "Solo los anuncios aprobados serán públicos.",
+    "ownerPublishedNotice": "Publicado por el proveedor. Los cambios se guardan sin aprobación administrativa."
+  },
+  "MarketplacePublishing": {
+    "publish": "Publicar",
+    "publishedTitle": "Publicado",
+    "published": "Tu anuncio ya es público. Los anuncios del mercado de perfiles configurados no necesitan aprobación administrativa.",
+    "view": "Ver anuncio",
+    "profileError": "No se pudo comprobar tu perfil. Tus datos se conservan. Inténtalo de nuevo.",
+    "saveError": "Tu anuncio está guardado. Aún no se pudo confirmar la publicación. Consulta su estado en Mis anuncios o inténtalo de nuevo aquí.",
+    "incomplete": "Añade título, ubicación, categoría, imagen principal y un proveedor contactable.",
+    "restricted": "La administración ha restringido este anuncio. Contacta con Soporte.",
+    "stale": "El anuncio ha cambiado. Vuelve a cargar la versión guardada.",
+    "savedTitle": "Guardado – comprueba el estado",
+    "publishing": "Publicando …"
   }
 }

@@ -1,5 +1,5 @@
 export type ResponsiblePerson = {
-  firstName: string; lastName: string; function: string; customFunction: string; public: boolean;
+  firstName: string; lastName: string; function: string; customFunction: string; public: boolean; profileName?: string;
 };
 export type StoredResponsiblePerson = ResponsiblePerson & { userId: string };
 export const EMPTY_RESPONSIBLE_PERSON: ResponsiblePerson = { firstName: "", lastName: "", function: "", customFunction: "", public: false };
@@ -8,7 +8,7 @@ export const OFFER_RESPONSIBLE_FUNCTIONS = ["propertyOwner", "operator", "manage
 export function responsiblePersonDraft(value: unknown): ResponsiblePerson {
   const v = value && typeof value === "object" ? value as Record<string, unknown> : {};
   const text = (key: string, max: number) => typeof v[key] === "string" ? v[key].slice(0, max) : "";
-  return { firstName: text("firstName", 80), lastName: text("lastName", 100), function: text("function", 30), customFunction: text("customFunction", 80), public: v.public === true };
+  return { firstName: text("firstName", 80), lastName: text("lastName", 100), function: text("function", 30), customFunction: text("customFunction", 80), public: v.public === true, ...(typeof v.profileName === "string" && v.profileName.trim() ? { profileName: v.profileName.slice(0, 200) } : {}) };
 }
 export function responsiblePersonErrors(value: unknown, company = false): Record<string, string> {
   const v = responsiblePersonDraft(value);
@@ -24,5 +24,13 @@ export function responsiblePersonErrors(value: unknown, company = false): Record
 }
 export function bindResponsiblePerson(value: unknown, userId: string): StoredResponsiblePerson {
   const v = responsiblePersonDraft(value);
-  return { ...v, firstName: v.firstName.trim(), lastName: v.lastName.trim(), customFunction: v.function === "other" ? v.customFunction.trim() : "", userId };
+  return { function: v.function, public: v.public, firstName: v.firstName.trim(), lastName: v.lastName.trim(), customFunction: v.function === "other" ? v.customFunction.trim() : "", userId };
+}
+
+/** The server re-resolves this name from the authenticated profile before saving. */
+export function marketplaceResponsibleErrors(value: unknown): Record<string, string> {
+  const v = responsiblePersonDraft(value);
+  const errors = responsiblePersonErrors(v);
+  if (v.profileName) { delete errors.firstName; delete errors.lastName; }
+  return errors;
 }

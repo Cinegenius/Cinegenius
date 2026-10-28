@@ -1527,7 +1527,8 @@
       "changes_requested": "Javítás szükséges",
       "rejected": "Elutasítva",
       "hidden": "Elrejtve",
-      "legacy_review_required": "Korábbi ajánlat · jóváhagyás ellenőrzése"
+      "legacy_review_required": "Korábbi ajánlat · jóváhagyás ellenőrzése",
+      "owner_published": "Közzétéve"
     },
     "submitted": "A hirdetésedet beküldtük ellenőrzésre. A jóváhagyás után válik nyilvánossá.",
     "submit": "Beküldés ellenőrzésre",
@@ -1562,6 +1563,20 @@
     "reviewHint": "Beküldés előtt ellenőrizd az összes adatot.",
     "pendingCount": "Függő beküldések",
     "legacyCount": "Nyilvános korábbi ajánlatok igazolt jóváhagyás nélkül",
-    "publicNotice": "Csak a jóváhagyott ajánlatok válnak nyilvánossá."
+    "publicNotice": "Csak a jóváhagyott ajánlatok válnak nyilvánossá.",
+    "ownerPublishedNotice": "A szolgáltató nyilvánosan közzétette. A módosítások adminisztrátori jóváhagyás nélkül mentődnek."
+  },
+  "MarketplacePublishing": {
+    "publish": "Közzététel",
+    "publishedTitle": "Közzétéve",
+    "published": "Az ajánlatod nyilvános. A kitöltött profillal rendelkező piactéri ajánlatokhoz nem kell adminisztrátori jóváhagyás.",
+    "view": "Ajánlat megtekintése",
+    "profileError": "A profilodat nem sikerült ellenőrizni. Az adataid megmaradnak. Próbáld újra.",
+    "saveError": "Az ajánlatodat mentettük. A közzététel még nem megerősített. Ellenőrizd az állapotot a Saját ajánlatok alatt, vagy próbáld újra itt.",
+    "incomplete": "Add meg a címet, helyet, kategóriát, főképet és egy elérhető szolgáltatót.",
+    "restricted": "Az adminisztrátorok korlátozták ezt az ajánlatot. Fordulj az ügyfélszolgálathoz.",
+    "stale": "Az ajánlat időközben megváltozott. Töltsd be újra a mentett változatot.",
+    "savedTitle": "Mentve – ellenőrizd az állapotot",
+    "publishing": "Közzététel folyamatban …"
   }
 }

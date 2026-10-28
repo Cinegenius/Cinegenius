@@ -36,6 +36,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   } catch {
     return NextResponse.json({ error: "Berechtigung zur Firmenverwaltung konnte nicht geprüft werden." }, { status: 500 });
   }
+  if (listing.type === "prop" || listing.type === "vehicle") {
+    const publication = await (await import("@/lib/marketplace-publication-server")).publishMarketplaceOffer(listing, userId);
+    if (publication.outcome === "published") {
+      revalidatePath("/", "layout"); revalidateTag("listings", { expire: 0 });
+      return NextResponse.json({ success: true, submitted: false, published: true, moderation_status: "owner_published", message: (await getTranslations("MarketplacePublishing"))("published") }, { headers: { "Cache-Control": "private, no-store" } });
+    }
+    if (publication.outcome !== "profile_required") return NextResponse.json({ error: publication.error }, { status: publication.outcome === "stale" ? 409 : publication.outcome === "restricted" ? 403 : 503 });
+  }
   if (listing.moderation_status === "approved" || listing.moderation_status === "pending") return NextResponse.json({ success: true, submitted: listing.moderation_status === "pending", moderation_status: listing.moderation_status, published: listing.published, message: moderation(listing.moderation_status === "pending" ? "submitted" : "alreadyApproved") });
 
   if (!listing.responsible_person?.userId) {

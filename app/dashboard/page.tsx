@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 import OfferModerationStatus from "@/components/OfferModerationStatus";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
-import { EMPTY_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, type ResponsiblePerson } from "@/lib/responsible-person";
+import { EMPTY_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, marketplaceResponsibleErrors, type ResponsiblePerson } from "@/lib/responsible-person";
 
 import ListingPriceOptions from "@/components/ListingPriceOptions";
 import { listingPriceLabel } from "@/lib/listing-price";
@@ -87,6 +87,7 @@ const VALID_TABS = ["overview", "listings", "jobs", "favorites", "messages", "bo
 
 export default function DashboardPage() {
   const moderation = useTranslations("OfferModeration");
+  const marketplaceText = useTranslations("MarketplacePublishing");
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -333,7 +334,7 @@ export default function DashboardPage() {
       setEditError("Bitte lade fehlgeschlagene Bilder erneut hoch oder entferne sie.");
       return;
     }
-    const personErrors = responsiblePersonErrors(editResponsible);
+    const personErrors = (["prop", "vehicle"].includes(myListings.find(item => item.id === editingId)?.type ?? "")) ? marketplaceResponsibleErrors(editResponsible) : responsiblePersonErrors(editResponsible);
     setEditResponsibleErrors(personErrors);
     if (Object.keys(personErrors).length && myListings.find(item => item.id === editingId)?.published) { focusResponsiblePerson(); return; }
     if (!editForm.title.trim() || !editForm.city.trim()) {
@@ -378,7 +379,7 @@ export default function DashboardPage() {
           } } : usesGallery ? {metadata:{price_on_request:editLocationMeta.price_on_request,price_negotiable:editLocationMeta.price_negotiable}} : {}),
         }),
       });
-      const { error, data: savedListing } = await res.json();
+      const { error, publicationError, data: savedListing } = await res.json();
       if (error) throw new Error(error);
       setMyListings((prev) => prev.map((l) =>
         l.id === editingId
@@ -416,6 +417,7 @@ export default function DashboardPage() {
             }
           : l
       ));
+      if (publicationError) { setEditError(publicationError); return; }
       await editDraft.complete();
       setEditingId(null);
     } catch (err) {
@@ -1785,14 +1787,14 @@ export default function DashboardPage() {
                     </button>
                     <button
                       onClick={() => togglePublished(l.id, l.published)}
-                      disabled={l.moderation_status === "pending"}
+                      disabled={l.moderation_status === "pending" && l.type !== "prop" && l.type !== "vehicle"}
                       className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
                         l.published
                           ? "border border-gold/30 text-gold hover:bg-gold/10"
                           : "border border-success/30 text-success hover:bg-success/10"
                       }`}
                     >
-                      {moderation(l.published ? "hide" : l.moderation_status === "pending" ? "statuses.pending" : "submit")}
+                      {!l.published && (l.type === "prop" || l.type === "vehicle") ? marketplaceText("publish") : moderation(l.published ? "hide" : l.moderation_status === "pending" ? "statuses.pending" : "submit")}
                     </button>
                     <button
                       onClick={() => deleteListing(l.id)}
@@ -1891,7 +1893,7 @@ export default function DashboardPage() {
                     )}
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <ResponsiblePersonFields value={editResponsible} onChange={setEditResponsible} errors={editResponsibleErrors} accountPrefill={!l.responsible_person || l.responsible_person.userId === user?.id} disabled={Boolean(l.responsible_person && l.responsible_person.userId !== user?.id)} />
+                      <ResponsiblePersonFields compactWhenProfile={l.type === "prop" || l.type === "vehicle"} value={editResponsible} onChange={setEditResponsible} errors={editResponsibleErrors} accountPrefill={!l.responsible_person || l.responsible_person.userId === user?.id} disabled={Boolean(l.responsible_person && l.responsible_person.userId !== user?.id)} />
                       <div>
                         <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">Titel *</label>
                         <input

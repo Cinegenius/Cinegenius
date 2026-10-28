@@ -139,7 +139,10 @@ export async function POST(req: Request) {
     }
   }
 
-  const responsible = await validateResponsiblePerson(body.responsible_person, userId, false, draft !== true && type !== "job");
+  const marketplace = type === "prop" || type === "vehicle";
+  const responsible = marketplace
+    ? await (await import("@/lib/responsible-person-server")).validateMarketplaceResponsiblePerson(body.responsible_person, userId, draft !== true)
+    : await validateResponsiblePerson(body.responsible_person, userId, false, draft !== true && type !== "job");
   if (responsible.response) return responsible.response;
 
   // rental_type column doesn't exist — store it inside metadata
@@ -180,7 +183,7 @@ export async function POST(req: Request) {
       company_id: company_id ?? null,
       // Saving or completing an offer never grants public release.
       published: false,
-      moderation_status: draft === true || type === "job" ? "draft" : "pending",
+      moderation_status: draft === true || type === "job" || marketplace ? "draft" : "pending",
       last_editor_id: userId,
       metadata: mergedMetadata,
       ...(blocked_dates !== undefined && { blocked_dates }),
@@ -197,6 +200,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  let result = data;
+  let publicationError: string | undefined;
+  if (marketplace && draft !== true) {
+    const publication = await (await import("@/lib/marketplace-publication-server")).publishMarketplaceOffer(data, userId);
+    result = publication.row;
+    publicationError = publication.error;
+    if (publication.outcome === "profile_required") {
+      const submitted = await db.rpc("offer_review_transition", { p_kind: "listing", p_id: data.id, p_expected: data,
+        p_provider_company: null, p_provider_profile: null, p_action: "submit", p_actor: userId, p_reason: null, p_notification: null });
+      if (!submitted.error && ["saved", "unchanged"].includes(submitted.data)) result = { ...data, moderation_status: "pending", published: false };
+      else publicationError = (await getTranslations("MarketplacePublishing"))("saveError");
+    }
+  }
   // Revalidate the relevant listing page so the new entry shows up immediately
   const pathMap: Record<string, string> = {
     job: "/jobs",
@@ -210,7 +226,7 @@ export async function POST(req: Request) {
   revalidatePath("/", "layout");
   revalidateTag("listings", { expire: 0 });
 
-  return privateNoStoreJson({ data, submitted: data.moderation_status === "pending", message: data.moderation_status === "pending" ? (await getTranslations("OfferModeration"))("submitted") : null });
+  return privateNoStoreJson({ data: result, publicationError, submitted: result.moderation_status === "pending", message: result.published ? (await getTranslations("MarketplacePublishing"))("published") : result.moderation_status === "pending" ? (await getTranslations("OfferModeration"))("submitted") : null });
 }
 
 export async function DELETE(req: NextRequest) {

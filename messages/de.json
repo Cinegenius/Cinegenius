@@ -1527,7 +1527,8 @@
       "changes_requested": "Nachbesserung erforderlich",
       "rejected": "Abgelehnt",
       "hidden": "Ausgeblendet",
-      "legacy_review_required": "Alteintrag · Freigabenachweis prüfen"
+      "legacy_review_required": "Alteintrag · Freigabenachweis prüfen",
+      "owner_published": "Veröffentlicht"
     },
     "submitted": "Dein Inserat wurde eingereicht und wartet auf Prüfung. Nach der Freigabe ist es öffentlich sichtbar.",
     "submit": "Zur Prüfung einreichen",
@@ -1562,6 +1563,20 @@
     "reviewHint": "Vor Einreichen vollständig prüfen.",
     "pendingCount": "Offene Einreichungen",
     "legacyCount": "Öffentliche Alteinträge ohne gesicherten Freigabenachweis",
-    "publicNotice": "Nur bestätigte Angebote erscheinen öffentlich."
+    "publicNotice": "Nur bestätigte Angebote erscheinen öffentlich.",
+    "ownerPublishedNotice": "Öffentlich vom Anbieter veröffentlicht. Änderungen werden gespeichert; eine Adminfreigabe ist nicht erforderlich."
+  },
+  "MarketplacePublishing": {
+    "publish": "Veröffentlichen",
+    "publishedTitle": "Veröffentlicht",
+    "published": "Dein Angebot ist jetzt öffentlich sichtbar. Eine Adminfreigabe ist für Marktplatzangebote mit eingerichtetem Profil nicht erforderlich.",
+    "view": "Angebot ansehen",
+    "profileError": "Dein Profil konnte nicht geprüft werden. Deine Eingaben bleiben erhalten. Bitte versuche es erneut.",
+    "saveError": "Dein Angebot ist gespeichert. Die Veröffentlichung konnte noch nicht bestätigt werden. Prüfe den Status unter „Meine Angebote“ oder versuche es hier erneut.",
+    "incomplete": "Bitte ergänze Titel, Ort, Kategorie, Hauptbild und einen erreichbaren Anbieter.",
+    "restricted": "Für dieses Angebot besteht eine Einschränkung durch die Verwaltung. Bitte kläre sie mit dem Support.",
+    "stale": "Das Angebot wurde zwischenzeitlich geändert. Lade den gespeicherten Stand erneut.",
+    "savedTitle": "Gespeichert – Status prüfen",
+    "publishing": "Wird veröffentlicht …"
   }
 }

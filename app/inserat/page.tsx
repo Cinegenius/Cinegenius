@@ -2,7 +2,7 @@
 import { useTranslations } from "next-intl";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
-import { EMPTY_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, type ResponsiblePerson } from "@/lib/responsible-person";
+import { EMPTY_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, marketplaceResponsibleErrors, type ResponsiblePerson } from "@/lib/responsible-person";
 
 import ListingPriceOptions from "@/components/ListingPriceOptions";
 
@@ -310,6 +310,8 @@ const conditionOptions = ["Neuwertig", "Sehr gut", "Gut", "Akzeptabel"];
 
 export default function InseratPage() {
   const moderation = useTranslations("OfferModeration");
+  const marketplaceText = useTranslations("MarketplacePublishing");
+  const [createdPublished, setCreatedPublished] = useState(false);
   const router = useRouter();
   const { userId, isLoaded } = useAuth();
   const [responsible, setResponsible] = useState<ResponsiblePerson>(EMPTY_RESPONSIBLE_PERSON);
@@ -775,7 +777,7 @@ export default function InseratPage() {
       return;
     }
     if (!listingDraft.loaded) return;
-    const personErrors = responsiblePersonErrors(responsible);
+    const personErrors = (selected?.type === "prop" || selected?.type === "vehicle") ? marketplaceResponsibleErrors(responsible) : responsiblePersonErrors(responsible);
     setResponsibleErrors(personErrors);
     if (Object.keys(personErrors).length && selected?.type !== "location" && selected?.type !== "job") { focusResponsiblePerson(); return; }
     const usesGallery = selected?.type === "prop" || selected?.type === "vehicle" || selected?.type === "location";
@@ -793,7 +795,7 @@ export default function InseratPage() {
     const payload = buildPayload();
     if (!payload) { setLoading(false); return; }
 
-    let json: { error?: string; data?: { id?: string } } = {};
+    let json: { error?: string; publicationError?: string; data?: { id?: string; published?: boolean; moderation_status?: string } } = {};
     try {
       const res = await fetch("/api/listings", {
         method: "POST",
@@ -825,7 +827,9 @@ export default function InseratPage() {
     setLoading(false);
     await listingDraft.complete();
     setCreatedId(json.data?.id ?? null);
-    setCreatedIsDraft(selected?.type === "job" || selected?.type === "location");
+    setCreatedIsDraft(json.data?.moderation_status === "draft" || selected?.type === "job" || selected?.type === "location");
+    setCreatedPublished(json.data?.published === true);
+    if (json.publicationError) setError(json.publicationError);
     if (selected?.type === "location") {
       const cleared = await fetch("/api/onboarding?type=location-form", { method: "DELETE" }).catch(() => null);
       if (!cleared?.ok) setError("Die Location ist sicher als Entwurf gespeichert. Der private Formularstand konnte noch nicht bereinigt werden.");
@@ -835,7 +839,7 @@ export default function InseratPage() {
 
   async function handlePublishDraft() {
     if (!createdId || !createdIsDraft) return;
-    const errors = responsiblePersonErrors(responsible); setResponsibleErrors(errors);
+    const errors = (selected?.type === "prop" || selected?.type === "vehicle") ? marketplaceResponsibleErrors(responsible) : responsiblePersonErrors(responsible); setResponsibleErrors(errors);
     if (Object.keys(errors).length) { focusResponsiblePerson(); return; }
     setPublishingDraft(true);
     setError("");
@@ -854,6 +858,7 @@ export default function InseratPage() {
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error ?? moderation("saveError"));
       setCreatedIsDraft(false);
+      setCreatedPublished(result.published === true);
       setPendingImageFile(null);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : moderation("saveError"));
@@ -1068,7 +1073,7 @@ export default function InseratPage() {
 
           <div className="space-y-5">
 
-            <ResponsiblePersonFields value={responsible} onChange={setResponsible} errors={responsibleErrors} accountPrefill />
+            <ResponsiblePersonFields value={responsible} onChange={setResponsible} errors={responsibleErrors} accountPrefill compactWhenProfile={selected?.type === "prop" || selected?.type === "vehicle"} />
             {/* ── FIRMA VERKNÜPFEN ── */}
             {myCompanies.length > 0 && (
               <div>
@@ -1886,9 +1891,9 @@ export default function InseratPage() {
               className="w-full py-4 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
             >
               {loading ? (
-                <><Loader2 size={18} className="animate-spin" /> {selected?.type === "job" || selected?.type === "location" ? "Entwurf wird gespeichert…" : moderation("submitting")}</>
+                <><Loader2 size={18} className="animate-spin" /> {selected?.type === "job" || selected?.type === "location" ? "Entwurf wird gespeichert…" : (selected?.type === "prop" || selected?.type === "vehicle") && responsible.profileName ? marketplaceText("publishing") : moderation("submitting")}</>
               ) : (
-                <>{selected?.type === "job" ? "Als Entwurf speichern" : selected?.type === "location" ? "Entwurf speichern und prüfen" : moderation("submit")} <ArrowRight size={18} /></>
+                <>{selected?.type === "job" ? "Als Entwurf speichern" : selected?.type === "location" ? "Entwurf speichern und prüfen" : (selected?.type === "prop" || selected?.type === "vehicle") && responsible.profileName ? marketplaceText("publish") : moderation("submit")} <ArrowRight size={18} /></>
               )}
             </button>
           </div>
@@ -1913,10 +1918,10 @@ export default function InseratPage() {
         <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${createdIsDraft ? "bg-gold/10 border border-gold/20" : "bg-success/10 border border-success/20"}`}>
           <CheckCircle size={40} className={createdIsDraft ? "text-gold" : "text-success"} />
         </div>
-        {createdIsDraft && <ResponsiblePersonFields value={responsible} onChange={setResponsible} errors={responsibleErrors} accountPrefill />}
-        <h2 className="font-display text-3xl font-bold text-text-primary mb-3">{moderation(createdIsDraft ? "draftSaved" : "statuses.pending")}</h2>
+        {createdIsDraft && <ResponsiblePersonFields value={responsible} onChange={setResponsible} errors={responsibleErrors} accountPrefill compactWhenProfile={selected?.type === "prop" || selected?.type === "vehicle"} />}
+        <h2 className="font-display text-3xl font-bold text-text-primary mb-3">{createdPublished ? marketplaceText("publishedTitle") : error && (selected?.type === "prop" || selected?.type === "vehicle") ? marketplaceText("savedTitle") : moderation(createdIsDraft ? "draftSaved" : "statuses.pending")}</h2>
         <p className="text-text-muted mb-8">
-          {moderation(createdIsDraft ? "privateNotice" : "submitted")}
+          {createdPublished ? marketplaceText("published") : error && (selected?.type === "prop" || selected?.type === "vehicle") ? marketplaceText("saveError") : moderation(createdIsDraft ? "privateNotice" : "submitted")}
         </p>
         {error && <p role="alert" className="mb-5 text-sm text-red-400">{error}</p>}
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -1929,7 +1934,7 @@ export default function InseratPage() {
               setImagePreview(null);
               setPendingImageFile(null);
               setCreatedId(null);
-              setCreatedIsDraft(false);
+              setCreatedIsDraft(false); setCreatedPublished(false);
               setForm({ title: "", description: "", price: "", city: "", make: "", model: "", year: "", fuel_type: "", license_class: "", condition: "", vehicle_subtype: "", sqm: "", ceiling_height: "", max_crew: "", indoor_outdoor: "innen", power_available: false, power_details: "", parking_spots: "", natural_light: false, blackout_possible: false, loading_access: false, access_notes: "", shooting_hours: "", availability_notes: "", company: "", projectType: "", shoot_start: "", shoot_end: "", pay_type: "", role_label: "", urgent: false, content_nudity: false, content_violence: false, content_stunts: false, delivery: false, rental_type: "miete", dimensions: "", safety_note: "", skills: "", experience: "", animal_training: "", animal_handler: true, animal_count: "1", animal_skills: "" });
               setLocAmenities([]); setLocBlockedDates([]); setLocExtraImages([]); setLocFloorPlanUrl(null); setLocFloorPlanPreview(null);
               setLocRooms([]); setLocPriceOnRequest(true); setPriceNegotiable(false); setSelectedCompanyId(""); setFocalPoint(null);
@@ -1947,12 +1952,12 @@ export default function InseratPage() {
                 <a href={`${successHref(createdId)}?preview=1`} target="_blank" rel="noreferrer" className="px-6 py-3 border border-border text-text-secondary rounded-xl hover:border-gold hover:text-gold transition-all text-sm font-medium">Vorschau ansehen</a>
               )}
               <button type="button" onClick={handlePublishDraft} disabled={publishingDraft} className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm disabled:opacity-50">
-                {moderation(publishingDraft ? "submitting" : "submit")}
+                {!publishingDraft && (selected?.type === "prop" || selected?.type === "vehicle") && responsible.profileName ? marketplaceText("publish") : moderation(publishingDraft ? "submitting" : "submit")}
               </button>
             </>
           ) : (
-            <a href="/dashboard?tab=listings" className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm">
-              {moderation("myOffers")}
+            <a href={createdPublished ? successHref(createdId) : "/dashboard?tab=listings"} className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm">
+              {createdPublished ? marketplaceText("view") : moderation("myOffers")}
             </a>
           )}
         </div>
