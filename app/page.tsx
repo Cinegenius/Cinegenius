@@ -125,7 +125,7 @@ async function getHomeData(viewerId: string | null) {
       slug: profile.slug || profile.user_id,
       name: profile.display_name ?? "CineGenius Mitglied",
       tagline: profile.tagline ?? undefined,
-      avatar: typeof profile.avatar_url === "string" && profile.avatar_url.includes("supabase.co/storage") ? profile.avatar_url : undefined,
+      avatar: profile.avatar_url?.trim() || undefined,
       city: profile.location?.split(",")[0]?.trim() ?? "",
       verified: profile.verified ?? false,
       positions,
