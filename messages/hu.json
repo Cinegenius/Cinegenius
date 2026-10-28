@@ -1327,5 +1327,38 @@
     "setupAlreadyComplete": "Az alapbeállítás időközben elkészült. Frissíts és válassz megfelelő sablont.",
     "setupTemplateLabel": "Profil folytatása (opcionális emlékeztető)",
     "setupTemplateBody": "Szia! A CineGenius-fiókod már elkészült. Ha szeretnéd láthatóvá tenni a profilodat vagy egy ajánlatot, itt folytathatod a beállítást: '{{Bearbeitungslink}}'. Ha csak keresel, nem szükséges személyes profilt létrehoznod. Kérdés esetén válaszolj közvetlenül. A CineGenius ügyfélszolgálata"
+  },
+  "responsiblePerson": {
+    "title": "Felelős személy",
+    "help": "Add meg, ki felelős ezért az ajánlatért.",
+    "firstName": "Utónév",
+    "lastName": "Vezetéknév",
+    "function": "Feladatköröd (nem kötelező)",
+    "customFunction": "Más feladatkör",
+    "none": "Nincs megadva",
+    "noRights": "A feladatkör a munkádat írja le, és nem ad további adminisztrációs jogosultságot.",
+    "public": "A név és feladatkör nyilvános megjelenítése kapcsolattartóként",
+    "visibility": "Ellenkező esetben az adatok belső adminisztrációs célra maradnak. Ez a beállítás nem teszi nyilvánossá az e-mailt vagy telefonszámot. A nyilvános személyes profil nem kötelező.",
+    "contact": "Kapcsolattartó",
+    "required": "Add meg a felelős személy utó- és vezetéknevét.",
+    "invalidFirstName": "Utónevet adj meg, ne cégnevet, e-mailt vagy felhasználónevet.",
+    "invalidLastName": "Add meg a vezetéknevet.",
+    "invalidFunction": "Válassz feladatkört vagy adj meg egy rövid megnevezést.",
+    "missing": "Felelős személy megadása",
+    "functions": {
+      "owner": "Tulajdonos",
+      "founder": "Alapító",
+      "cofounder": "Társalapító",
+      "director": "Ügyvezető",
+      "department": "Részlegvezető",
+      "employee": "Munkatárs",
+      "contact": "Meghatalmazott kapcsolattartó",
+      "propertyOwner": "Ingatlantulajdonos",
+      "operator": "Üzemeltető",
+      "management": "Kezelés",
+      "rental": "Bérbeadás",
+      "other": "Más feladatkör"
+    },
+    "unauthorized": "Ezt a hozzárendelést csak a felelős személy vagy a jogosult cégtulajdonos módosíthatja."
   }
 }

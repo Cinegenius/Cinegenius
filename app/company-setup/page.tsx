@@ -1,4 +1,7 @@
 "use client";
+import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
+import { EMPTY_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, type ResponsiblePerson } from "@/lib/responsible-person";
+
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -55,7 +58,10 @@ async function prepareCompanyImage(file: File, dimensions: { maxWidth: number; m
 }
 
 export default function CompanySetupPage() {
-  const { isLoaded } = useUser();
+  const { isLoaded, user } = useUser();
+  const [responsible, setResponsible] = useState<ResponsiblePerson>(EMPTY_RESPONSIBLE_PERSON);
+  const [responsibleErrors, setResponsibleErrors] = useState<Record<string, string>>({});
+  const [responsibleAccountId, setResponsibleAccountId] = useState<string | null>(null);
   const router = useRouter();
 
   // Basic info
@@ -147,6 +153,8 @@ export default function CompanySetupPage() {
           const c = data[0];
           setCompanyAccessRole(permissionRole ?? (c.owner_user_id ? "owner" : null));
           setExistingId(c.id);
+          setResponsible(responsiblePersonDraft(c.responsible_person));
+          setResponsibleAccountId(c.responsible_person?.userId || c.owner_user_id);
           setExistingPublished(c.published !== false);
           setName(c.name ?? "");
           setCity(c.city ?? "");
@@ -206,6 +214,7 @@ export default function CompanySetupPage() {
     }).then((draft) => {
       if (!active) return;
       if (draft) {
+        setResponsible(responsiblePersonDraft(draft.responsible));
         setName(draft.name ?? ""); setCity(draft.city ?? ""); setDescription(draft.description ?? "");
         setWebsite(draft.website ?? ""); setEmail(draft.email ?? ""); setPhone(draft.phone ?? "");
         setEmailPublic(draft.emailPublic === true); setPhonePublic(draft.phonePublic === true); setHqAddressPublic(draft.hqAddressPublic === true);
@@ -232,7 +241,7 @@ export default function CompanySetupPage() {
       setCompanyDraftStatus("saving");
       try {
         const response = await fetch("/api/onboarding", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
-          intent: "company", setupComplete: false, companyDraft: { name, city, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep, updatedAt: new Date().toISOString() },
+          intent: "company", setupComplete: false, companyDraft: { responsible, name, city, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep, updatedAt: new Date().toISOString() },
         }) });
         const result = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(result.error ?? "Der Entwurf konnte nicht gespeichert werden.");
@@ -243,7 +252,7 @@ export default function CompanySetupPage() {
       }
     }, 650);
     return () => clearTimeout(timer);
-  }, [guidedSetup, companyDraftLoaded, loading, existingId, name, city, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, companyStep]);
+  }, [responsible, guidedSetup, companyDraftLoaded, loading, existingId, name, city, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, companyStep]);
 
   const handleSingleImageUpload = async (file: File | undefined, kind: "logo" | "cover") => {
     if (!file) return;
@@ -379,6 +388,9 @@ export default function CompanySetupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    const personErrors = responsiblePersonErrors(responsible, true);
+    setResponsibleErrors(personErrors);
+    if (Object.keys(personErrors).length) { focusResponsiblePerson(); return; }
     if (!name.trim()) { setError("Firmenname ist ein Pflichtfeld."); return; }
     if (!city.trim()) { setError("Standort ist ein Pflichtfeld."); return; }
 
@@ -389,6 +401,7 @@ export default function CompanySetupPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: existingId,
+          responsible_person: responsible,
           name, city, description, website, email, phone,
           email_public: emailPublic, phone_public: phonePublic, hq_address_public: hqAddressPublic,
           logo_url: logoUrl || null,
@@ -464,6 +477,7 @@ export default function CompanySetupPage() {
 
                 {companyStep === 1 && (
                   <section className="space-y-5" aria-labelledby="company-step-one">
+<ResponsiblePersonFields company value={responsible} onChange={setResponsible} errors={responsibleErrors} accountPrefill={!existingId || responsibleAccountId === user?.id} disabled={Boolean(existingId && responsibleAccountId && responsibleAccountId !== user?.id && !isCompanyOwner)} />
                     <div><h2 id="company-step-one" className="font-display text-2xl text-text-primary">Wie heißt dein Unternehmen?</h2><p className="mt-1 text-sm text-text-secondary">Nenne den Namen und den Ort, an dem ihr hauptsächlich arbeitet.</p></div>
                     <Field label="Firmenname" required>
                       <input autoComplete="organization" value={name} onChange={(e) => setName(e.target.value)} placeholder="Zum Beispiel: Lichtblick Verleih" required className="w-full rounded-xl border border-border bg-bg-secondary px-4 py-3 text-sm focus:border-gold focus:outline-none" />
@@ -520,7 +534,7 @@ export default function CompanySetupPage() {
                 <div className="flex gap-3 pt-2">
                   {companyStep > 1 && <button type="button" onClick={() => { setError(""); setCompanyStep((step) => step - 1); }} className="min-h-12 flex-1 rounded-xl border border-border px-4 text-sm font-medium text-text-secondary hover:text-text-primary">Zurück</button>}
                   {companyStep < 3 ? (
-                    <button type="button" onClick={() => { if (companyStep === 1 && (!name.trim() || !city.trim())) { setError("Bitte Firmenname und Standort ergänzen."); return; } setError(""); setCompanyStep((step) => step + 1); }} className="min-h-12 flex-1 rounded-xl bg-gold px-4 text-sm font-bold text-bg-primary hover:bg-gold-light">Weiter <ArrowRight size={15} className="ml-1 inline" /></button>
+                    <button type="button" onClick={() => { if (companyStep === 1) { const errors = responsiblePersonErrors(responsible, true); setResponsibleErrors(errors); if (Object.keys(errors).length) { focusResponsiblePerson(); return; } } if (companyStep === 1 && (!name.trim() || !city.trim())) { setError("Bitte Firmenname und Standort ergänzen."); return; } setError(""); setCompanyStep((step) => step + 1); }} className="min-h-12 flex-1 rounded-xl bg-gold px-4 text-sm font-bold text-bg-primary hover:bg-gold-light">Weiter <ArrowRight size={15} className="ml-1 inline" /></button>
                   ) : (
                     <button type="submit" disabled={saving || !name.trim() || !city.trim()} className="min-h-12 flex-1 rounded-xl bg-gold px-4 text-sm font-bold text-bg-primary hover:bg-gold-light disabled:opacity-50">{saving ? <><Loader2 size={15} className="mr-2 inline animate-spin" />Wird gespeichert…</> : <>Firma öffentlich eintragen <ArrowRight size={15} className="ml-1 inline" /></>}</button>
                   )}
@@ -572,6 +586,7 @@ export default function CompanySetupPage() {
               {coverPreview && !uploadingCover && <button type="button" onClick={() => { setCoverPreview(""); setCoverUrl(""); }} className="inline-flex min-h-10 items-center gap-2 text-xs text-text-muted hover:text-crimson-light"><X size={13} /> Titelbild entfernen</button>}
             </div>
 
+            <ResponsiblePersonFields company value={responsible} onChange={setResponsible} errors={responsibleErrors} accountPrefill={!existingId || responsibleAccountId === user?.id} disabled={Boolean(existingId && responsibleAccountId && responsibleAccountId !== user?.id && !isCompanyOwner)} />
             {/* Basic info */}
             <div className="space-y-4">
               <SectionDivider label="Pflichtfelder" />

@@ -1327,5 +1327,38 @@
     "setupAlreadyComplete": "Basic setup has since been completed. Please refresh and choose a suitable template.",
     "setupTemplateLabel": "Continue profile setup (optional reminder)",
     "setupTemplateBody": "Hello! Your CineGenius account has already been created. If you would like to make your profile or a listing visible, continue setup here: '{{Bearbeitungslink}}'. Search-only users do not need a personal profile. Feel free to reply directly with any questions. Your CineGenius Support"
+  },
+  "responsiblePerson": {
+    "title": "Responsible person",
+    "help": "Please tell us who is responsible for this offer.",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "function": "Your function (optional)",
+    "customFunction": "Other function",
+    "none": "Not specified",
+    "noRights": "Your function describes your work and does not grant additional administrative permissions.",
+    "public": "Show name and function publicly as the contact person",
+    "visibility": "Otherwise these details stay internal for administration. Email and phone are not made public by this choice. A public personal profile is optional.",
+    "contact": "Contact person",
+    "required": "Please enter the responsible person’s first and last names.",
+    "invalidFirstName": "Enter a first name, not a company, email address or username.",
+    "invalidLastName": "Please enter a last name.",
+    "invalidFunction": "Select an appropriate function or enter a short description.",
+    "missing": "Add the responsible person",
+    "functions": {
+      "owner": "Proprietor",
+      "founder": "Founder",
+      "cofounder": "Co-founder",
+      "director": "Managing director",
+      "department": "Department head",
+      "employee": "Employee",
+      "contact": "Authorized contact",
+      "propertyOwner": "Property owner",
+      "operator": "Operator",
+      "management": "Management",
+      "rental": "Rental",
+      "other": "Other function"
+    },
+    "unauthorized": "Only the responsible person or an authorized company owner may change this assignment."
   }
 }

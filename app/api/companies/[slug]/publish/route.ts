@@ -1,3 +1,4 @@
+import { validateResponsiblePerson } from "@/lib/responsible-person-server";
 import { db } from "@/lib/db";
 import { assertOwner, requireAuth } from "@/lib/guards";
 import { revalidatePath, revalidateTag } from "next/cache";
@@ -8,7 +9,7 @@ export async function POST(_request: Request, context: { params: Promise<{ slug:
   if (authResult instanceof NextResponse) return authResult;
   const { slug } = await context.params;
   const { data: company, error: lookupError } = await db.from("companies")
-    .select("id, owner_user_id, published")
+    .select("id, owner_user_id, published, responsible_person")
     .eq("slug", slug)
     .maybeSingle();
   if (lookupError) return NextResponse.json({ error: "Das Firmenprofil konnte nicht geladen werden." }, { status: 500 });
@@ -17,7 +18,9 @@ export async function POST(_request: Request, context: { params: Promise<{ slug:
   if (ownershipError) return ownershipError;
   if (company.published) return NextResponse.json({ published: true, alreadyPublished: true });
 
-  const { error } = await db.from("companies").update({ published: true, updated_at: new Date().toISOString() })
+  const responsible = await validateResponsiblePerson(company.responsible_person, company.responsible_person?.userId || company.owner_user_id, true);
+  if (responsible.response) return responsible.response;
+  const { error } = await db.from("companies").update({ responsible_person: responsible.person, published: true, updated_at: new Date().toISOString() })
     .eq("id", company.id).eq("owner_user_id", authResult.userId).eq("published", false);
   if (error) return NextResponse.json({ error: "Das Firmenprofil konnte nicht veröffentlicht werden." }, { status: 500 });
   revalidateTag("companies", { expire: 0 });

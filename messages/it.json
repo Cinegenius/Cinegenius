@@ -1327,5 +1327,38 @@
     "setupAlreadyComplete": "La configurazione di base è già stata completata. Aggiorna e scegli un modello adatto.",
     "setupTemplateLabel": "Continua il profilo (promemoria facoltativo)",
     "setupTemplateBody": "Ciao! Il tuo account CineGenius è già stato creato. Se vuoi rendere visibile il tuo profilo o un annuncio, continua qui: '{{Bearbeitungslink}}'. Chi cerca soltanto non ha bisogno di un profilo personale. Per qualsiasi domanda, rispondi direttamente. Il tuo supporto CineGenius"
+  },
+  "responsiblePerson": {
+    "title": "Persona responsabile",
+    "help": "Indica chi è responsabile di questa offerta.",
+    "firstName": "Nome",
+    "lastName": "Cognome",
+    "function": "La tua funzione (facoltativa)",
+    "customFunction": "Altra funzione",
+    "none": "Non specificata",
+    "noRights": "La funzione descrive il tuo lavoro e non concede ulteriori permessi amministrativi.",
+    "public": "Mostra pubblicamente nome e funzione come referente",
+    "visibility": "Altrimenti i dati restano interni per l’amministrazione. Questa scelta non pubblica email o telefono. Il profilo personale pubblico è facoltativo.",
+    "contact": "Referente",
+    "required": "Inserisci nome e cognome della persona responsabile.",
+    "invalidFirstName": "Inserisci un nome, non un’azienda, un’email o un nome utente.",
+    "invalidLastName": "Inserisci un cognome.",
+    "invalidFunction": "Scegli una funzione o inserisci una breve descrizione.",
+    "missing": "Aggiungi la persona responsabile",
+    "functions": {
+      "owner": "Titolare",
+      "founder": "Fondatore/Fondatrice",
+      "cofounder": "Cofondatore/Cofondatrice",
+      "director": "Amministratore/Amministratrice",
+      "department": "Responsabile di reparto",
+      "employee": "Dipendente",
+      "contact": "Referente autorizzato",
+      "propertyOwner": "Proprietario/a",
+      "operator": "Gestore",
+      "management": "Amministrazione",
+      "rental": "Noleggio",
+      "other": "Altra funzione"
+    },
+    "unauthorized": "Solo la persona responsabile o il titolare autorizzato dell’azienda può modificare questa assegnazione."
   }
 }

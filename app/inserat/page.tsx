@@ -1,4 +1,7 @@
 "use client";
+import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
+import { EMPTY_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, type ResponsiblePerson } from "@/lib/responsible-person";
+
 import ListingPriceOptions from "@/components/ListingPriceOptions";
 
 import UnoptimizedImage from "@/components/UnoptimizedImage";
@@ -304,6 +307,8 @@ const conditionOptions = ["Neuwertig", "Sehr gut", "Gut", "Akzeptabel"];
 export default function InseratPage() {
   const router = useRouter();
   const { userId, isLoaded } = useAuth();
+  const [responsible, setResponsible] = useState<ResponsiblePerson>(EMPTY_RESPONSIBLE_PERSON);
+  const [responsibleErrors, setResponsibleErrors] = useState<Record<string, string>>({});
 
   const LOCATION_ROOMS: Record<string, [string, string][]> = {
     "Wohnen": [
@@ -457,6 +462,7 @@ export default function InseratPage() {
 
   const buildLocationDraft = useCallback(() => ({
     version: 1,
+    responsible,
     categoryId: selected?.type === "location" ? selected.id : "",
     groupId: activeGroup ?? "drehorte",
     step,
@@ -478,7 +484,7 @@ export default function InseratPage() {
     selectedCompanyId,
     focalPoint,
     productionCredits,
-  }), [selected, activeGroup, step, form, locAmenities, locRooms, locBlockedDates, locExtraImages, locFloorPlanUrl, locPriceOnRequest, priceNegotiable, selectedCompanyId, focalPoint, productionCredits]);
+  }), [responsible, selected, activeGroup, step, form, locAmenities, locRooms, locBlockedDates, locExtraImages, locFloorPlanUrl, locPriceOnRequest, priceNegotiable, selectedCompanyId, focalPoint, productionCredits]);
 
   const persistLocationDraft = useCallback(async (draft: ReturnType<typeof buildLocationDraft>) => {
     const revision = ++locationDraftRevision.current;
@@ -529,6 +535,7 @@ export default function InseratPage() {
               ? saved.form as Record<string, unknown>
               : {};
             const text = (key: string) => typeof savedForm[key] === "string" ? String(savedForm[key]).slice(0, key === "description" ? 5000 : 500) : "";
+            setResponsible(responsiblePersonDraft(saved.responsible));
             setSelected(item);
             setActiveGroup(typeof saved.groupId === "string" && groups.some((group) => group.id === saved.groupId) ? saved.groupId : "drehorte");
             setStep(2);
@@ -809,6 +816,9 @@ export default function InseratPage() {
       router.push(`/sign-in?redirect_url=${encodeURIComponent(destination)}`);
       return;
     }
+    const personErrors = responsiblePersonErrors(responsible);
+    setResponsibleErrors(personErrors);
+    if (Object.keys(personErrors).length && selected?.type !== "location" && selected?.type !== "job") { focusResponsiblePerson(); return; }
     const usesGallery = selected?.type === "prop" || selected?.type === "vehicle" || selected?.type === "location";
     const galleryState = selected?.type === "location" ? locationGalleryState : articleGalleryState;
     if (usesGallery && galleryState.uploading) {
@@ -841,6 +851,7 @@ export default function InseratPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...payload,
+          responsible_person: responsible,
           image_url: selected?.type === "job" ? null
             : selected?.type === "location" ? locExtraImages[0] ?? null
             : (selected?.type === "prop" || selected?.type === "vehicle") ? articleImages[0] ?? null
@@ -874,9 +885,13 @@ export default function InseratPage() {
 
   async function handlePublishDraft() {
     if (!createdId || !createdIsDraft) return;
+    const errors = responsiblePersonErrors(responsible); setResponsibleErrors(errors);
+    if (Object.keys(errors).length) { focusResponsiblePerson(); return; }
     setPublishingDraft(true);
     setError("");
     try {
+      const responsibleSave = await fetch(`/api/listings/${createdId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ responsible_person: responsible }) });
+      if (!responsibleSave.ok) { const failure = await responsibleSave.json(); throw new Error(failure.error); }
       let response: Response;
       if (pendingImageFile) {
         const compressed = await compressImage(pendingImageFile, { maxWidth: 1920, quality: 0.85, maxBytes: MAX_FUNCTION_UPLOAD_BYTES });
@@ -1103,6 +1118,7 @@ export default function InseratPage() {
 
           <div className="space-y-5">
 
+            <ResponsiblePersonFields value={responsible} onChange={setResponsible} errors={responsibleErrors} accountPrefill />
             {/* ── FIRMA VERKNÜPFEN ── */}
             {myCompanies.length > 0 && (
               <div>
@@ -1947,6 +1963,7 @@ export default function InseratPage() {
         <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${createdIsDraft ? "bg-gold/10 border border-gold/20" : "bg-success/10 border border-success/20"}`}>
           <CheckCircle size={40} className={createdIsDraft ? "text-gold" : "text-success"} />
         </div>
+        {createdIsDraft && <ResponsiblePersonFields value={responsible} onChange={setResponsible} errors={responsibleErrors} accountPrefill />}
         <h2 className="font-display text-3xl font-bold text-text-primary mb-3">{createdIsDraft ? "Entwurf gespeichert" : "Veröffentlicht!"}</h2>
         <p className="text-text-muted mb-8">
           {createdIsDraft ? selected?.type === "location" ? "Diese Location ist nur für dich sichtbar. Prüfe deine Angaben und veröffentliche sie erst mit deiner ausdrücklichen Freigabe." : "Dieser Job ist nur für dich sichtbar. Prüfe die Vorschau und veröffentliche ihn erst mit deiner ausdrücklichen Freigabe." : "Dein Inserat ist jetzt live und für Produktionen sichtbar."}

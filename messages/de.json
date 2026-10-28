@@ -1327,5 +1327,38 @@
     "setupAlreadyComplete": "Die Grundeinrichtung ist inzwischen abgeschlossen. Bitte aktualisieren und eine passende Vorlage wählen.",
     "setupTemplateLabel": "Profilerstellung fortsetzen (freiwillige Erinnerung)",
     "setupTemplateBody": "Hallo! Dein CineGenius-Konto ist bereits erstellt. Wenn du dein Profil oder ein Angebot sichtbar machen möchtest, kannst du die Einrichtung hier fortsetzen: '{{Bearbeitungslink}}'. Ein Personenprofil ist für reine Suchende nicht erforderlich. Bei Fragen antworte uns gerne direkt. Dein CineGenius Support"
+  },
+  "responsiblePerson": {
+    "title": "Verantwortliche Person",
+    "help": "Bitte gib an, wer für dieses Angebot verantwortlich ist.",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "function": "Deine Funktion (optional)",
+    "customFunction": "Andere Funktion",
+    "none": "Keine Angabe",
+    "noRights": "Die Funktion beschreibt deine Aufgabe und vergibt keine zusätzlichen Verwaltungsrechte.",
+    "public": "Name und Funktion als Ansprechperson öffentlich anzeigen",
+    "visibility": "Ohne diese Auswahl bleiben die Angaben intern für die Verwaltung. E-Mail und Telefon werden dadurch nicht veröffentlicht. Ein öffentliches Personenprofil ist freiwillig.",
+    "contact": "Ansprechperson",
+    "required": "Bitte ergänze Vor- und Nachnamen der verantwortlichen Person.",
+    "invalidFirstName": "Bitte gib einen Vornamen ein, keine Firma, E-Mail-Adresse oder einen Nutzernamen.",
+    "invalidLastName": "Bitte gib einen Nachnamen ein.",
+    "invalidFunction": "Bitte wähle eine passende Funktion oder ergänze eine kurze Bezeichnung.",
+    "missing": "Verantwortliche Person noch ergänzen",
+    "functions": {
+      "owner": "Inhaber/in",
+      "founder": "Gründer/in",
+      "cofounder": "Mitgründer/in",
+      "director": "Geschäftsführer/in",
+      "department": "Abteilungsleitung",
+      "employee": "Mitarbeiter/in",
+      "contact": "Beauftragte Ansprechperson",
+      "propertyOwner": "Eigentümer/in",
+      "operator": "Betreiber/in",
+      "management": "Verwaltung",
+      "rental": "Vermietung",
+      "other": "Andere Funktion"
+    },
+    "unauthorized": "Nur die verantwortliche Person oder die berechtigte Firmeninhaberschaft darf diese Zuordnung ändern."
   }
 }

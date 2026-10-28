@@ -26,7 +26,7 @@ async function geocodeCity(city: string): Promise<{ lat: number; lng: number }> 
 async function getLocation(slug: string, viewerId: string | null = null) {
   const { data, error } = await db
     .from("listings")
-    .select("id, user_id, company_id, type, category, title, city, price, created_at, image_url, description, metadata, blocked_dates, floor_plan_url, extra_images, published")
+    .select("id, user_id, company_id, type, category, title, city, price, created_at, image_url, description, metadata, blocked_dates, floor_plan_url, extra_images, responsible_person, published")
     .eq("id", slug)
     .eq("type", "location")
     .eq("published", true)
@@ -37,7 +37,7 @@ async function getLocation(slug: string, viewerId: string | null = null) {
 
   const [{ lat, lng }, provider, ratingMap] = await Promise.all([
     geocodeCity(data.city ?? ""),
-    getListingProvider(data.user_id, data.company_id, viewerId),
+    getListingProvider(data.user_id, data.company_id, viewerId, data.responsible_person),
     fetchRatingSummaries([data.id], "listing"),
   ]);
   const summary = ratingMap[data.id] ?? { rating: 0, reviews: 0, ratingOnly: 0 };

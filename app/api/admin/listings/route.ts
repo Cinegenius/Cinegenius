@@ -1,3 +1,5 @@
+import { getTranslations } from "next-intl/server";
+import { validateResponsiblePerson } from "@/lib/responsible-person-server";
 import { listingPriceLabel } from "@/lib/listing-price";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
@@ -27,7 +29,7 @@ export async function GET(req: NextRequest) {
   }
 
   let query = db.from("listings")
-    .select("id, user_id, company_id, type, title, city, price, published, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type", { count: "exact" })
+    .select("id, responsible_person, user_id, company_id, type, title, city, price, published, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type", { count: "exact" })
     .order("created_at", { ascending: false })
     .range((page - 1) * pageSize, page * pageSize - 1);
   if (rawType !== "all") query = query.eq("type", rawType);
@@ -91,13 +93,13 @@ export async function PATCH(req: NextRequest) {
     }
 
     const { data: listing, error: listingError } = await db.from("listings")
-      .select("id, type, user_id, company_id")
+      .select("id, type, user_id, company_id, responsible_person")
       .eq("id", listingId)
       .maybeSingle();
     if (listingError) return NextResponse.json({ error: "Angebot konnte nicht geladen werden." }, { status: 500 });
     if (!listing) return NextResponse.json({ error: "Angebot nicht gefunden." }, { status: 404 });
 
-    let update: Record<string, string | null>;
+    let update: Record<string, unknown>;
     if (providerType === "person") {
       const { data: profile } = await db.from("profiles").select("user_id, display_name").eq("user_id", providerId).maybeSingle();
       if (!profile?.display_name?.trim()) return NextResponse.json({ error: "Das ausgewählte Personenprofil ist nicht verfügbar." }, { status: 400 });
@@ -112,10 +114,10 @@ export async function PATCH(req: NextRequest) {
       update = { company_id: providerId };
     }
 
-    const previousProvider = await getListingProvider(listing.user_id, listing.company_id, guard.userId);
+    const previousProvider = await getListingProvider(listing.user_id, listing.company_id, guard.userId, listing.responsible_person);
     const audit = await startAdminAudit({ actorUserId: guard.userId, action: "listing_provider_assign", entityType: "listing", entityId: listingId, reason, metadata: { providerType, providerId, previousUserId: listing.user_id, previousCompanyId: listing.company_id } });
     if (!audit) return NextResponse.json({ error: "Änderung gestoppt: Das Adminprotokoll ist nicht verfügbar." }, { status: 503 });
-    const { error: updateError } = await db.from("listings").update(update).eq("id", listingId);
+    const { error: updateError } = await db.from("listings").update({ ...update, responsible_person: null }).eq("id", listingId);
     if (updateError) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Anbieterzuordnung konnte nicht gespeichert werden." }, { status: 500 }); }
     const auditLogged = await finishAdminAudit(audit, "succeeded");
     const assignedCompany = providerType === "company"
@@ -143,16 +145,18 @@ export async function PATCH(req: NextRequest) {
 
   if (published) {
     const { data: listing, error: listingError } = await db.from("listings")
-      .select("id, user_id, company_id, type, title, city, category, image_url")
+      .select("id, responsible_person, user_id, company_id, type, title, city, category, image_url")
       .eq("id", listingId)
       .maybeSingle();
     if (listingError) return NextResponse.json({ error: "Angebot konnte vor der Freigabe nicht geprüft werden." }, { status: 500 });
     if (!listing) return NextResponse.json({ error: "Angebot nicht gefunden." }, { status: 404 });
+    const responsible = await validateResponsiblePerson(listing.responsible_person, listing.responsible_person?.userId || "", false);
+    if (!listing.responsible_person?.userId || responsible.response) return responsible.response || NextResponse.json({ error: (await getTranslations("responsiblePerson"))("required") }, { status: 400 });
     const companyResult = listing.company_id
       ? await db.from("companies").select("slug").eq("id", listing.company_id).maybeSingle()
       : { data: null };
     if (listing.company_id && !companyResult.data) return NextResponse.json({ error: "Die zugeordnete Firma konnte nicht geprüft werden." }, { status: 500 });
-    const provider = await getListingProvider(listing.user_id, listing.company_id, guard.userId);
+    const provider = await getListingProvider(listing.user_id, listing.company_id, guard.userId, listing.responsible_person);
     const validationError = validateListingPublication({
       type: listing.type,
       title: listing.title,

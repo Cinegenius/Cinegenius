@@ -1,4 +1,6 @@
 "use client";
+import ResponsiblePersonCard from "@/components/ResponsiblePersonCard";
+import type { PublicResponsiblePerson } from "@/lib/responsible-person-server";
 
 import { useEffect, useRef, useState } from "react";
 import FloatingPanel from "@/components/FloatingPanel";
@@ -67,6 +69,7 @@ type EquipmentItem = {
 };
 
 type Company = {
+  responsible?: PublicResponsiblePerson | null;
   id: string;
   slug: string;
   name: string;
@@ -552,6 +555,7 @@ export default function CompanyDetail({
           <div className="space-y-10 min-w-0">
 
             {/* About */}
+            <ResponsiblePersonCard person={company.responsible} />
             {(company.bio_short || company.description || company.usp) && (
               <section>
                 <SectionLabel>Über das Unternehmen</SectionLabel>

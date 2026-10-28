@@ -1327,5 +1327,38 @@
     "setupAlreadyComplete": "Základní nastavení již bylo dokončeno. Obnov stránku a vyber vhodnou šablonu.",
     "setupTemplateLabel": "Pokračovat v profilu (nepovinná připomínka)",
     "setupTemplateBody": "Ahoj! Tvůj účet CineGenius již existuje. Pokud chceš zveřejnit svůj profil nebo nabídku, pokračuj v nastavení zde: '{{Bearbeitungslink}}'. Pokud pouze hledáš, osobní profil nepotřebuješ. S dotazy nám odpověz přímo. Tvoje podpora CineGenius"
+  },
+  "responsiblePerson": {
+    "title": "Odpovědná osoba",
+    "help": "Uveďte, kdo je za tuto nabídku odpovědný.",
+    "firstName": "Jméno",
+    "lastName": "Příjmení",
+    "function": "Vaše funkce (nepovinné)",
+    "customFunction": "Jiná funkce",
+    "none": "Neuvedeno",
+    "noRights": "Funkce popisuje vaši práci a neuděluje další oprávnění ke správě.",
+    "public": "Veřejně zobrazit jméno a funkci kontaktní osoby",
+    "visibility": "Jinak údaje zůstanou interní pro správu. Tato volba nezveřejní e-mail ani telefon. Veřejný osobní profil je nepovinný.",
+    "contact": "Kontaktní osoba",
+    "required": "Uveďte jméno a příjmení odpovědné osoby.",
+    "invalidFirstName": "Zadejte jméno, nikoli firmu, e-mail nebo uživatelské jméno.",
+    "invalidLastName": "Zadejte příjmení.",
+    "invalidFunction": "Vyberte funkci nebo zadejte krátký popis.",
+    "missing": "Doplňte odpovědnou osobu",
+    "functions": {
+      "owner": "Majitel/ka",
+      "founder": "Zakladatel/ka",
+      "cofounder": "Spoluzakladatel/ka",
+      "director": "Jednatel/ka",
+      "department": "Vedoucí oddělení",
+      "employee": "Zaměstnanec/kyně",
+      "contact": "Pověřená kontaktní osoba",
+      "propertyOwner": "Vlastník/vlastnice",
+      "operator": "Provozovatel/ka",
+      "management": "Správa",
+      "rental": "Pronájem",
+      "other": "Jiná funkce"
+    },
+    "unauthorized": "Toto přiřazení může změnit pouze odpovědná osoba nebo oprávněný majitel firmy."
   }
 }

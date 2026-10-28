@@ -1,3 +1,4 @@
+import { publicResponsiblePerson, responsibleForCompany } from "@/lib/responsible-person-server";
 import { db } from "@/lib/db";
 import { requireAuth, assertOwner } from "@/lib/guards";
 import { NextRequest, NextResponse } from "next/server";
@@ -19,7 +20,7 @@ export async function GET(
     previewUserId = authResult.userId;
   }
 
-  const safeFields = "id, owner_user_id, slug, name, logo_url, cover_url, description, city, website, email_public, phone_public, hq_address_public, categories, services, portfolio_images, tagline, bio_short, usp, founded_year, legal_form, countries, industry_focus, social_links, catering_details, published, verified, created_at";
+  const safeFields = "id, owner_user_id, responsible_person, slug, name, logo_url, cover_url, description, city, website, email_public, phone_public, hq_address_public, categories, services, portfolio_images, tagline, bio_short, usp, founded_year, legal_form, countries, industry_focus, social_links, catering_details, published, verified, created_at";
   let query = db.from("companies")
     .select(safeFields)
     .eq("slug", slug);
@@ -39,6 +40,9 @@ export async function GET(
 
   const safeCompany = { ...company };
   delete safeCompany.owner_user_id;
+  delete safeCompany.responsible_person;
+  const responsible = await publicResponsiblePerson(await responsibleForCompany(company.responsible_person, company.id, company.owner_user_id), previewUserId);
+  Object.assign(safeCompany, { responsible });
   let visibleCompany: Record<string, unknown> = safeCompany;
   if (preview) {
     const { data: privateCompany, error: privateError } = await db.from("companies")

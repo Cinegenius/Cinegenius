@@ -1,3 +1,6 @@
+import { bindResponsiblePerson } from "@/lib/responsible-person";
+import { getTranslations } from "next-intl/server";
+import { accountResponsiblePerson, validateResponsiblePerson, responsibleForCompany } from "@/lib/responsible-person-server";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { revalidatePath, revalidateTag } from "next/cache";
@@ -26,7 +29,7 @@ function generateSlug(name: string): string {
 
 // Full company data — needed for the company editor/dashboard.
 const COMPANY_COLS_FULL =
-  "id, slug, owner_user_id, name, logo_url, cover_url, description, city, website, email, phone, " +
+  "id, slug, owner_user_id, responsible_person, name, logo_url, cover_url, description, city, website, email, phone, " +
   "categories, services, portfolio_images, tagline, bio_short, usp, founded_year, " +
   "legal_form, hq_address, countries, industry_focus, social_links, catering_details, published, " +
   "email_public, phone_public, hq_address_public, created_at, updated_at";
@@ -55,6 +58,9 @@ export async function GET(req: NextRequest) {
     if (!access || !canCompanyRole(access.role, "edit_company")) return NextResponse.json({ error: "Keine Berechtigung, diese Firmendaten zu bearbeiten." }, { status: 403 });
     const { data, error } = await db.from("companies").select(COMPANY_COLS_FULL).eq("id", companyId).single();
     if (error || !data) return NextResponse.json({ error: "Firma nicht gefunden" }, { status: 404 });
+    const editable = data as unknown as Record<string, unknown>;
+    const activeContact = await responsibleForCompany(editable.responsible_person, companyId, String(editable.owner_user_id));
+    editable.responsible_person = activeContact || (editable.owner_user_id === authResult.userId ? bindResponsiblePerson(await accountResponsiblePerson(authResult.userId), authResult.userId) : null);
     return NextResponse.json({ data: [data], permissionRole: access.role }, { headers: { "Cache-Control": "private, no-store" } });
   }
 
@@ -71,7 +77,10 @@ export async function GET(req: NextRequest) {
       .limit(50);           // a user realistically owns < 50 companies
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500, headers: { "Cache-Control": "private, no-store" } });
-    return NextResponse.json({ data: data ?? [] }, { headers: { "Cache-Control": "private, no-store" } });
+    const rows = data as unknown as Array<Record<string, unknown> & { id: string; owner_user_id: string; responsible_person?: { userId?: string } }> ?? [];
+    const fallback = rows.some(row => !row.responsible_person || row.responsible_person.userId !== row.owner_user_id) ? await accountResponsiblePerson(userId) : null;
+    const editableRows = await Promise.all(rows.map(async row => ({ ...row, responsible_person: await responsibleForCompany(row.responsible_person, row.id, row.owner_user_id) || bindResponsiblePerson(fallback, userId) })));
+    return NextResponse.json({ data: editableRows }, { headers: { "Cache-Control": "private, no-store" } });
   }
 
   let query = db
@@ -185,13 +194,21 @@ export async function POST(req: NextRequest) {
   if (id) {
     const { data: existing } = await db
       .from("companies")
-      .select("id, slug, owner_user_id, logo_url, cover_url, portfolio_images, email_public, phone_public, hq_address_public")
+      .select("id, slug, owner_user_id, responsible_person, logo_url, cover_url, portfolio_images, email_public, phone_public, hq_address_public")
       .eq("id", id)
       .single();
 
     if (!existing) return NextResponse.json({ error: "Firma nicht gefunden oder keine Berechtigung" }, { status: 403 });
     const access = await getCompanyAccess(id, userId);
     if (!access || !canCompanyRole(access.role, "edit_company")) return NextResponse.json({ error: "Keine Berechtigung, dieses Firmenprofil zu bearbeiten." }, { status: 403 });
+    const activeResponsible = await responsibleForCompany(existing.responsible_person, id, existing.owner_user_id);
+    const responsibleAccountId = activeResponsible?.userId || existing.owner_user_id;
+    const responsible = await validateResponsiblePerson(body.responsible_person ?? activeResponsible ?? undefined, responsibleAccountId, true);
+    if (responsible.response) return responsible.response;
+    // Editors preserve the existing contact; changing public function never grants rights.
+    if (userId !== responsibleAccountId && userId !== existing.owner_user_id && body.responsible_person !== undefined && JSON.stringify(responsible.person) !== JSON.stringify(bindResponsiblePerson(existing.responsible_person, responsibleAccountId))) {
+      return NextResponse.json({ error: (await getTranslations("responsiblePerson"))("unauthorized"), field: "responsible_person" }, { status: 403 });
+    }
     const storageUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
     const nextLogo = logo_url === undefined ? existing.logo_url : logo_url;
     const nextCover = cover_url === undefined ? existing.cover_url : cover_url;
@@ -207,6 +224,7 @@ export async function POST(req: NextRequest) {
     const { data, error } = await db
       .from("companies")
       .update({
+        ...((userId === responsibleAccountId || userId === existing.owner_user_id) && { responsible_person: responsible.person }),
         name: name.trim(),
         logo_url: nextLogo ?? null,
         cover_url: nextCover ?? null,
@@ -256,6 +274,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ data }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
   }
 
+  const responsible = await validateResponsiblePerson(body.responsible_person, userId, true);
+  if (responsible.response) return responsible.response;
+
   // Create new — generate unique slug
   const baseSlug = generateSlug(name.trim());
   let slug = baseSlug;
@@ -271,7 +292,7 @@ export async function POST(req: NextRequest) {
     if (existingRequest && existingRequest.owner_user_id === userId) {
       const { data: company, error: companyError } = await db
         .from("companies")
-        .update({ published: true, updated_at: new Date().toISOString() })
+        .update({ responsible_person: responsible.person, published: true, updated_at: new Date().toISOString() })
         .eq("id", existingRequest.id)
         .eq("owner_user_id", userId)
         .select(COMPANY_COLS_FULL)
@@ -297,6 +318,7 @@ export async function POST(req: NextRequest) {
     .from("companies")
     .insert({
       owner_user_id: userId,
+      responsible_person: responsible.person,
       slug,
       name: name.trim(),
       logo_url: logo_url ?? null,

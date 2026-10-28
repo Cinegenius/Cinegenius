@@ -1,3 +1,6 @@
+import { bindResponsiblePerson } from "@/lib/responsible-person";
+import { getTranslations } from "next-intl/server";
+import { validateResponsiblePerson } from "@/lib/responsible-person-server";
 import { listingPriceMetadataError } from "@/lib/listing-price";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
@@ -17,7 +20,7 @@ export async function PATCH(
 
   const { id } = await params;
   const { data: current, error: currentError } = await db.from("listings")
-    .select("id, user_id, company_id, type, image_url, extra_images, metadata, blocked_dates")
+    .select("id, user_id, company_id, type, image_url, extra_images, metadata, blocked_dates, responsible_person, published")
     .eq("id", id).maybeSingle();
   if (currentError) return NextResponse.json({ error: "Inserat konnte nicht geprüft werden." }, { status: 500 });
   if (!current) return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
@@ -44,7 +47,18 @@ export async function PATCH(
   if (image_url !== undefined && image_url !== null && (typeof image_url !== "string" || image_url.length > 2048))
     return NextResponse.json({ error: "Das Bild ist ungültig." }, { status: 400 });
 
+  const companyOwner = current.company_id && !current.responsible_person
+    ? await db.from("companies").select("owner_user_id").eq("id", current.company_id).maybeSingle()
+    : { data: null };
+  const responsibleAccountId = current.responsible_person?.userId || (current.company_id ? companyOwner.data?.owner_user_id : current.user_id);
+  if (!responsibleAccountId) return NextResponse.json({ error: (await getTranslations("responsiblePerson"))("unauthorized"), field: "responsible_person" }, { status: 403 });
+  const responsible = await validateResponsiblePerson(body.responsible_person ?? current.responsible_person, responsibleAccountId, false, current.published === true && published !== false);
+  if (responsible.response) return responsible.response;
+  if (userId !== responsibleAccountId && body.responsible_person !== undefined && JSON.stringify(responsible.person) !== JSON.stringify(bindResponsiblePerson(current.responsible_person, responsibleAccountId))) {
+    return NextResponse.json({ error: (await getTranslations("responsiblePerson"))("unauthorized"), field: "responsible_person" }, { status: 403 });
+  }
   const updates: Record<string, unknown> = {};
+  if (responsible.person && userId === responsibleAccountId) updates.responsible_person = responsible.person;
   if (title !== undefined)       updates.title       = title.trim();
   if (description !== undefined) updates.description = description;
   if (price !== undefined)       updates.price       = Math.max(0, Math.min(Number(price) || 0, 1_000_000));

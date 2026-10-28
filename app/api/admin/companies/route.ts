@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   const page = Math.max(1, Number.parseInt(params.get("page") ?? "1", 10) || 1);
   const pageSize = 30;
   let query = db.from("companies")
-    .select("id, slug, owner_user_id, name, logo_url, city, categories, services, verified, published, created_at", { count: "exact" })
+    .select("id, slug, responsible_person, owner_user_id, name, logo_url, city, categories, services, verified, published, created_at", { count: "exact" })
     .order("created_at", { ascending: false })
     .range((page - 1) * pageSize, page * pageSize - 1);
   if (search) query = query.or(`name.ilike.%${search}%,city.ilike.%${search}%`);

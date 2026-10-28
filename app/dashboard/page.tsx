@@ -1,4 +1,7 @@
 "use client";
+import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
+import { EMPTY_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, type ResponsiblePerson } from "@/lib/responsible-person";
+
 import ListingPriceOptions from "@/components/ListingPriceOptions";
 import { listingPriceLabel } from "@/lib/listing-price";
 
@@ -85,7 +88,7 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState(VALID_TABS.includes(tabParam) ? tabParam : "overview");
 
   // Real listings from Supabase
-  const [myListings, setMyListings] = useState<{ id: string; type: string; title: string; city: string; price: number; published: boolean; created_at: string; image_url: string | null; extra_images?: string[] | null; blocked_dates?: string[] | null; description: string; metadata?: Record<string, unknown> | null }[]>([]);
+  const [myListings, setMyListings] = useState<{ id: string; type: string; title: string; city: string; price: number; published: boolean; responsible_person?: ResponsiblePerson & { userId: string }; created_at: string; image_url: string | null; extra_images?: string[] | null; blocked_dates?: string[] | null; description: string; metadata?: Record<string, unknown> | null }[]>([]);
   const [listingsLoading, setListingsLoading] = useState(false);
   const [listingsError, setListingsError] = useState("");
 
@@ -231,6 +234,8 @@ export default function DashboardPage() {
     setMyListings((prev) => prev.filter((l) => l.id !== id));
   };
 
+  const [editResponsible, setEditResponsible] = useState<ResponsiblePerson>(EMPTY_RESPONSIBLE_PERSON);
+  const [editResponsibleErrors, setEditResponsibleErrors] = useState<Record<string, string>>({});
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ title: "", description: "", price: "", city: "", image_url: "" });
   const [editGallery, setEditGallery] = useState<string[]>([]);
@@ -249,6 +254,8 @@ export default function DashboardPage() {
 
   const startEdit = useCallback((l: typeof myListings[number]) => {
     setEditingId(l.id);
+    setEditResponsible(responsiblePersonDraft(l.responsible_person));
+    setEditResponsibleErrors({});
     setEditForm({ title: l.title, description: l.description ?? "", price: String(l.price), city: l.city, image_url: l.image_url ?? "" });
     setEditGallery([l.image_url, ...(l.extra_images ?? [])].filter((url): url is string => typeof url === "string" && !!url));
     setEditBlockedDates(Array.isArray(l.blocked_dates) ? l.blocked_dates.filter((date): date is string => typeof date === "string") : []);
@@ -312,6 +319,9 @@ export default function DashboardPage() {
       setEditError("Bitte lade fehlgeschlagene Bilder erneut hoch oder entferne sie.");
       return;
     }
+    const personErrors = responsiblePersonErrors(editResponsible);
+    setEditResponsibleErrors(personErrors);
+    if (Object.keys(personErrors).length && myListings.find(item => item.id === editingId)?.published) { focusResponsiblePerson(); return; }
     if (!editForm.title.trim() || !editForm.city.trim()) {
       setEditError("Titel und Stadt sind Pflichtfelder");
       return;
@@ -329,6 +339,7 @@ export default function DashboardPage() {
           description: editForm.description,
           price: ["location", "prop", "vehicle"].includes(editingListing?.type ?? "") && editLocationMeta.price_on_request ? 0 : parseFloat(editForm.price) || 0,
           city: editForm.city.trim(),
+          responsible_person: editResponsible,
           image_url: usesGallery ? editGallery[0] ?? null : editForm.image_url || null,
           ...(usesGallery ? { extra_images: editGallery.slice(1) } : {}),
           ...(editingListing?.type === "location" ? { blocked_dates: editBlockedDates } : {}),
@@ -1867,6 +1878,7 @@ export default function DashboardPage() {
                     )}
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <ResponsiblePersonFields value={editResponsible} onChange={setEditResponsible} errors={editResponsibleErrors} accountPrefill={!l.responsible_person || l.responsible_person.userId === user?.id} disabled={Boolean(l.responsible_person && l.responsible_person.userId !== user?.id)} />
                       <div>
                         <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">Titel *</label>
                         <input

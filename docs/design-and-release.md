@@ -29,6 +29,12 @@ For visual review, capture `/projects`, `/locations`, `/props`, `/creators`, `/c
 
 ## Production source and release
 
+### Responsible provider identity
+
+Before releasing the responsible-person fields, apply `supabase/migrations/20261028120000_responsible_person.sql` to the linked database. Verify both nullable `responsible_person` columns, service-role access, preserved existing rows, and denied direct `anon`/`authenticated` access to the new internal fields. Existing column access and row policies must remain intact. Unexpected inherited grants deliberately abort the migration; investigate them rather than skipping its checks. No bulk backfill or publication is part of this migration.
+
+Use structured Clerk first/last names only to prefill the real owner; never split a display name or use an email/company title as a person. Creation binds responsibility to the verified current account. Existing editors retain the stored contact and may not silently substitute themselves. A public function never becomes an access role. Only the explicit per-offer public choice projects the contact name/function; never serialize the raw snapshot in public responses. Public profile links require a real, currently visible profile. Admin provider reassignment clears the obsolete snapshot and requires the actual provider to complete it before a later publication. See `docs/test-reports/responsible-person-2026-10-28.md` for verification and remaining live checks.
+
 - Canonical Git source: `origin/main` in the CineGenius repository.
 - Use GitHub Desktop for Git operations that create or publish repository history: stage, commit, push, pull, and resolve synchronization. Do not create commits or push from the terminal. Make code edits in the project normally; after pushing through GitHub Desktop, confirm the working tree is clean and local `main` exactly matches `origin/main` before using the guarded release command.
 - The production Vercel project is linked locally through the ignored `.vercel/project.json`. Check the linked project and production alias in the Vercel dashboard before a release; keep those account-specific identifiers out of the public repository.

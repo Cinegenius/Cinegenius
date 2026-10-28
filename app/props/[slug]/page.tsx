@@ -13,7 +13,7 @@ async function getProp(slug: string, viewerId?: string | null) {
   try {
     const { data, error } = await db
       .from("listings")
-      .select("id, user_id, company_id, type, category, title, city, price, created_at, image_url, description, metadata, extra_images, published")
+      .select("id, user_id, company_id, type, category, title, city, price, created_at, image_url, description, metadata, extra_images, responsible_person, published")
       .eq("id", slug)
       .eq("type", "prop")
       .maybeSingle();
@@ -28,7 +28,7 @@ async function getProp(slug: string, viewerId?: string | null) {
       if (!ownsPersonalListing && !hasCompanyAccess) return null;
     }
 
-    const provider = await getListingProvider(data.user_id, data.company_id, viewerId ?? null);
+    const provider = await getListingProvider(data.user_id, data.company_id, viewerId ?? null, data.responsible_person);
 
     const rawMetadata = data.metadata && typeof data.metadata === "object" && !Array.isArray(data.metadata)
       ? data.metadata as Record<string, unknown>

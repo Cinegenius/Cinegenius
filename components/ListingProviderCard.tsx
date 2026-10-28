@@ -1,3 +1,4 @@
+import ResponsiblePersonCard from "@/components/ResponsiblePersonCard";
 import Image from "@/components/MediaImage";
 import Link from "next/link";
 import { Building2, UserRound } from "lucide-react";
@@ -18,7 +19,7 @@ export default function ListingProviderCard({ provider, compact = false }: { pro
     </>
   );
   const className = `flex items-center gap-3 rounded-xl border border-border bg-bg-secondary ${compact ? "p-3" : "p-4"} ${provider.href ? "transition-colors hover:border-gold/40 hover:bg-bg-elevated" : ""}`;
-  return provider.href
+  return <div className="space-y-3">{provider.href
     ? <Link href={provider.href} className={className}>{content}</Link>
-    : <div className={className}>{content}</div>;
+    : <div className={className}>{content}</div>}<ResponsiblePersonCard person={provider.responsible} /></div>;
 }

@@ -1327,5 +1327,38 @@
     "setupAlreadyComplete": "La configuración básica ya se ha completado. Actualiza y elige una plantilla adecuada.",
     "setupTemplateLabel": "Continuar el perfil (recordatorio opcional)",
     "setupTemplateBody": "¡Hola! Tu cuenta de CineGenius ya está creada. Si quieres hacer visible tu perfil o un anuncio, puedes continuar la configuración aquí: '{{Bearbeitungslink}}'. Quienes solo buscan no necesitan un perfil personal. Si tienes preguntas, responde directamente. Tu equipo de soporte de CineGenius"
+  },
+  "responsiblePerson": {
+    "title": "Persona responsable",
+    "help": "Indica quién es responsable de esta oferta.",
+    "firstName": "Nombre",
+    "lastName": "Apellidos",
+    "function": "Tu función (opcional)",
+    "customFunction": "Otra función",
+    "none": "Sin especificar",
+    "noRights": "La función describe tu trabajo y no concede permisos adicionales de administración.",
+    "public": "Mostrar públicamente el nombre y la función como contacto",
+    "visibility": "De lo contrario, los datos serán internos para la administración. Esta opción no publica el correo ni el teléfono. El perfil personal público es opcional.",
+    "contact": "Persona de contacto",
+    "required": "Introduce el nombre y los apellidos de la persona responsable.",
+    "invalidFirstName": "Introduce un nombre, no una empresa, correo o nombre de usuario.",
+    "invalidLastName": "Introduce los apellidos.",
+    "invalidFunction": "Selecciona una función o escribe una descripción breve.",
+    "missing": "Añadir persona responsable",
+    "functions": {
+      "owner": "Titular",
+      "founder": "Fundador/a",
+      "cofounder": "Cofundador/a",
+      "director": "Director/a gerente",
+      "department": "Jefe/a de departamento",
+      "employee": "Empleado/a",
+      "contact": "Contacto autorizado",
+      "propertyOwner": "Propietario/a",
+      "operator": "Operador/a",
+      "management": "Administración",
+      "rental": "Alquiler",
+      "other": "Otra función"
+    },
+    "unauthorized": "Solo la persona responsable o el titular autorizado de la empresa puede cambiar esta asignación."
   }
 }

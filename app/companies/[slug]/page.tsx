@@ -1,3 +1,4 @@
+import { publicResponsiblePerson, responsibleForCompany } from "@/lib/responsible-person-server";
 import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
@@ -8,7 +9,7 @@ import { isPublicCompanyMembership } from "@/lib/company-membership-requests";
 
 async function getCompany(slug: string) {
   const { data } = await db.from("companies")
-    .select("id, slug, owner_user_id, name, logo_url, cover_url, description, city, website, email_public, phone_public, categories, services, portfolio_images, tagline, bio_short, usp, founded_year, legal_form, hq_address_public, countries, industry_focus, social_links, catering_details, published, verified, created_at")
+    .select("id, slug, owner_user_id, responsible_person, name, logo_url, cover_url, description, city, website, email_public, phone_public, categories, services, portfolio_images, tagline, bio_short, usp, founded_year, legal_form, hq_address_public, countries, industry_focus, social_links, catering_details, published, verified, created_at")
     .eq("slug", slug).maybeSingle();
   if (!data) return null;
 
@@ -148,8 +149,10 @@ export default async function CompanyPage({
 
   const publicCompany = { ...company };
   delete (publicCompany as Record<string, unknown>).owner_user_id;
+  delete (publicCompany as Record<string, unknown>).responsible_person;
   const normalised = {
     ...publicCompany,
+    responsible: await publicResponsiblePerson(await responsibleForCompany(company.responsible_person, company.id, company.owner_user_id), userId),
     email: company.email_public === true ? (company as typeof company & { email?: string | null }).email ?? null : null,
     phone: company.phone_public === true ? (company as typeof company & { phone?: string | null }).phone ?? null : null,
     hq_address: company.hq_address_public === true ? (company as typeof company & { hq_address?: string | null }).hq_address ?? null : null,

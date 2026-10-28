@@ -1,3 +1,4 @@
+import { validateResponsiblePerson } from "@/lib/responsible-person-server";
 import { getTranslations } from "next-intl/server";
 import { storeProtectedMedia, removeUnusedProtectedMedia } from "@/lib/protected-media-server";
 import { db } from "@/lib/db";
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const { data: listing, error: listingError } = await db
     .from("listings")
-    .select("id, user_id, company_id, type, title, description, city, category, image_url, published")
+    .select("id, user_id, company_id, type, title, description, city, category, image_url, published, responsible_person")
     .eq("id", id)
     .maybeSingle();
   if (listingError) return NextResponse.json({ error: "Inserat konnte nicht geladen werden" }, { status: 500 });
@@ -35,6 +36,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Berechtigung zur Firmenverwaltung konnte nicht geprüft werden." }, { status: 500 });
   }
   if (listing.published) return NextResponse.json({ success: true, alreadyPublished: true });
+
+  if (!listing.responsible_person?.userId) {
+    const tResponsible = await getTranslations("responsiblePerson");
+    return NextResponse.json({ error: tResponsible("required"), field: "responsible_person" }, { status: 400 });
+  }
+  const responsible = await validateResponsiblePerson(listing.responsible_person, listing.responsible_person.userId, false);
+  if (responsible.response) return responsible.response;
 
   if (listing.type === "job") {
     const description = listing.description ?? "";
@@ -59,7 +67,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const upload = file instanceof File ? await validateUpload(file, { emptyMessage: t("empty"), tooLargeMessage: t("tooLarge"), unsupportedTypeMessage: t("invalid") }) : null;
   if (upload && "error" in upload) return NextResponse.json({ error: upload.error }, { status: upload.status });
 
-  const provider = await getListingProvider(listing.user_id, listing.company_id, userId);
+  const provider = await getListingProvider(listing.user_id, listing.company_id, userId, listing.responsible_person);
   const validationError = validateListingPublication({
     type: listing.type,
     title: listing.title,

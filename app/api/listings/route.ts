@@ -1,3 +1,5 @@
+import { bindResponsiblePerson } from "@/lib/responsible-person";
+import { accountResponsiblePerson, validateResponsiblePerson } from "@/lib/responsible-person-server";
 import { listingPriceMetadataError, listingPriceLabel } from "@/lib/listing-price";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
@@ -11,7 +13,7 @@ import { editableCompanyIdsForUser } from "@/lib/listing-access";
 // Explicit column list — avoids SELECT * sending unused data over the wire.
 // Update this list if new listing columns are added.
 const LISTING_COLS =
-  "id, user_id, type, category, title, description, price, city, " +
+  "id, user_id, responsible_person, type, category, title, description, price, city, " +
   "image_url, company_id, published, metadata, blocked_dates, " +
   "floor_plan_url, extra_images, created_at";
 
@@ -54,7 +56,8 @@ export async function GET(req: NextRequest) {
       const rows = [...(ownResult.data ?? []), ...(companyResult.data ?? [])] as unknown as Array<Record<string, unknown> & { id: string; created_at: string }>;
       const byId = new Map(rows.map((listing) => [listing.id, listing]));
       const data = [...byId.values()].sort((left, right) => Date.parse(right.created_at) - Date.parse(left.created_at)).slice(0, 200);
-      return privateNoStoreJson({ data });
+      const account = data.some(row => !row.responsible_person && !row.company_id && row.user_id === userId) ? await accountResponsiblePerson(userId) : null;
+      return privateNoStoreJson({ data: data.map(row => ({ ...row, responsible_person: row.responsible_person || (!row.company_id && row.user_id === userId ? bindResponsiblePerson(account, userId) : null) })) });
     } catch (error) {
       console.error("[listings GET mine]", error);
       return privateNoStoreJson({ error: error instanceof Error ? error.message : "Inserate konnten nicht geladen werden." }, 500);
@@ -133,6 +136,9 @@ export async function POST(req: Request) {
     }
   }
 
+  const responsible = await validateResponsiblePerson(body.responsible_person, userId, false, draft !== true && type !== "job");
+  if (responsible.response) return responsible.response;
+
   // rental_type column doesn't exist — store it inside metadata
   const mergedMetadata = {
     ...(metadata ?? {}),
@@ -153,13 +159,14 @@ export async function POST(req: Request) {
       console.error("[listings POST] onboarding retry lookup failed", lookupError);
       return NextResponse.json({ error: "Der gespeicherte Angebotsentwurf konnte nicht geprüft werden." }, { status: 500 });
     }
-    if (existing) return NextResponse.json({ data: existing });
+    if (existing) return privateNoStoreJson({ data: existing });
   }
 
   const { data, error } = await db
     .from("listings")
     .insert({
       user_id: userId,
+      responsible_person: responsible.person,
       type,
       category: category ?? null,
       title,
@@ -197,7 +204,7 @@ export async function POST(req: Request) {
   if (pathMap[type]) revalidatePath(pathMap[type]);
   revalidateTag("listings", { expire: 0 });
 
-  return NextResponse.json({ data });
+  return privateNoStoreJson({ data });
 }
 
 export async function DELETE(req: NextRequest) {

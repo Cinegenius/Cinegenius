@@ -1,3 +1,4 @@
+import { responsiblePersonDraft, type ResponsiblePerson } from "./responsible-person";
 import { primaryOccupationForPositions, occupationReference, type PrimaryOccupation } from "./primary-occupation";
 import { departments, getDepartmentRoleSearchTerms, getProfileTypesForDepartment } from "@/lib/departments";
 import { gripSearchTerms, normalizeOccupation } from "@/lib/gripTaxonomy";
@@ -16,6 +17,7 @@ export type QuickStartScreen = typeof QUICK_START_SCREENS[number];
 
 export type QuickStartRoleSelection = { departmentId: string; role: string };
 export type QuickStartIntentData = {
+  responsible?: ResponsiblePerson;
   category: string;
   title: string;
   city: string;
@@ -126,6 +128,7 @@ function normalizeIntentData(value: unknown): QuickStartIntentData {
     }).filter((item, index, list) => list.findIndex((other) => other.departmentId === item.departmentId && other.role === item.role) === index).slice(0, 100)
     : [];
   return {
+    responsible: responsiblePersonDraft(input.responsible),
     category: typeof input.category === "string" ? input.category.slice(0, 100) : "",
     title: typeof input.title === "string" ? input.title.slice(0, 200) : "",
     city: typeof input.city === "string" ? input.city.slice(0, 100) : "",
