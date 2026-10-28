@@ -88,6 +88,7 @@ const VALID_TABS = ["overview", "listings", "jobs", "favorites", "messages", "bo
 export default function DashboardPage() {
   const moderation = useTranslations("OfferModeration");
   const marketplaceText = useTranslations("MarketplacePublishing");
+  const animals = useTranslations("FilmAnimals");
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -245,6 +246,7 @@ export default function DashboardPage() {
   const [editResponsible, setEditResponsible] = useState<ResponsiblePerson>(EMPTY_RESPONSIBLE_PERSON);
   const [editResponsibleErrors, setEditResponsibleErrors] = useState<Record<string, string>>({});
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [editAnimalMeta, setEditAnimalMeta] = useState({ training_level: "", special_skills: "", count: "1", handler_included: true });
   const [editForm, setEditForm] = useState({ title: "", description: "", price: "", city: "", image_url: "" });
   const [editGallery, setEditGallery] = useState<string[]>([]);
   const [editBlockedDates, setEditBlockedDates] = useState<string[]>([]);
@@ -262,9 +264,10 @@ export default function DashboardPage() {
 
   const { leave: leaveEditor } = useFormNavigation();
   const editDraft = useFormDraft({ formKey: `listing:${editingId ?? "new"}`, enabled: !!editingId,
-    value: { form: editForm, responsible: editResponsible, gallery: editGallery, blockedDates: editBlockedDates, locationMeta: editLocationMeta, newBlockedDate },
+    value: { form: editForm, responsible: editResponsible, gallery: editGallery, blockedDates: editBlockedDates, locationMeta: editLocationMeta, animalMeta: editAnimalMeta, newBlockedDate },
     busy: editUploading || editGalleryState.uploading || editGalleryState.failed > 0 || editSaving,
-    restore: draft => { setEditForm(draft.form); setEditResponsible(draft.responsible); setEditGallery(draft.gallery); setEditBlockedDates(draft.blockedDates); setEditLocationMeta(draft.locationMeta); setNewBlockedDate(draft.newBlockedDate); },
+    restore: draft => { setEditForm(draft.form); setEditResponsible(draft.responsible); setEditGallery(draft.gallery); setEditBlockedDates(draft.blockedDates); setEditLocationMeta(draft.locationMeta);
+      if (draft.animalMeta) setEditAnimalMeta(draft.animalMeta); setNewBlockedDate(draft.newBlockedDate); },
   });
 
   const startEdit = useCallback((l: typeof myListings[number]) => {
@@ -276,6 +279,7 @@ export default function DashboardPage() {
     setEditBlockedDates(Array.isArray(l.blocked_dates) ? l.blocked_dates.filter((date): date is string => typeof date === "string") : []);
     setNewBlockedDate("");
     const meta = l.metadata ?? {};
+    setEditAnimalMeta({training_level:String(meta.training_level ?? ""),special_skills:String(meta.special_skills ?? ""),count:String(meta.count ?? "1"),handler_included:meta.handler_included === true});
     setEditLocationMeta({
       indoor_outdoor: typeof meta.indoor_outdoor === "string" ? meta.indoor_outdoor : "innen",
       sqm: meta.sqm == null ? "" : String(meta.sqm),
@@ -345,7 +349,7 @@ export default function DashboardPage() {
     setEditError("");
     try {
       const editingListing = myListings.find((listing) => listing.id === editingId);
-      const usesGallery = editingListing?.type === "prop" || editingListing?.type === "vehicle" || editingListing?.type === "location";
+      const usesGallery = editingListing?.type === "prop" || editingListing?.type === "vehicle" || editingListing?.type === "animal" || editingListing?.type === "location";
       const res = await fetch(`/api/listings/${editingId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -376,7 +380,7 @@ export default function DashboardPage() {
             price_negotiable: editLocationMeta.price_negotiable,
             rooms: editLocationMeta.rooms,
             amenities: editLocationMeta.amenities,
-          } } : usesGallery ? {metadata:{price_on_request:editLocationMeta.price_on_request,price_negotiable:editLocationMeta.price_negotiable}} : {}),
+          } } : editingListing?.type === "animal" ? {metadata:editAnimalMeta} : usesGallery ? {metadata:{price_on_request:editLocationMeta.price_on_request,price_negotiable:editLocationMeta.price_negotiable}} : {}),
         }),
       });
       const { error, publicationError, data: savedListing } = await res.json();
@@ -411,9 +415,9 @@ export default function DashboardPage() {
             price_negotiable: editLocationMeta.price_negotiable,
                 rooms: editLocationMeta.rooms,
                 amenities: editLocationMeta.amenities,
-              } } : ["prop", "vehicle"].includes(l.type) ? {metadata:{...l.metadata,price_on_request:editLocationMeta.price_on_request,price_negotiable:editLocationMeta.price_negotiable}} : {}),
+              } } : l.type === "animal" ? { metadata: { ...l.metadata, ...editAnimalMeta } } : ["prop", "vehicle"].includes(l.type) ? {metadata:{...l.metadata,price_on_request:editLocationMeta.price_on_request,price_negotiable:editLocationMeta.price_negotiable}} : {}),
               ...(l.type === "location" ? { blocked_dates: editBlockedDates } : {}),
-              ...(l.type === "prop" || l.type === "vehicle" || l.type === "location" ? { image_url: editGallery[0] ?? null, extra_images: editGallery.slice(1) } : { image_url: editForm.image_url || null }),
+              ...(l.type === "prop" || l.type === "vehicle" || l.type === "animal" || l.type === "location" ? { image_url: editGallery[0] ?? null, extra_images: editGallery.slice(1) } : { image_url: editForm.image_url || null }),
             }
           : l
       ));
@@ -431,6 +435,7 @@ export default function DashboardPage() {
     location: "Location",
     prop: "Marktplatz",
     vehicle: "Fahrzeug",
+    animal: animals("portfolio"),
     job: "Job",
     creator: "Creator",
   };
@@ -439,6 +444,7 @@ export default function DashboardPage() {
     if (l.type === "location") return `/locations/${l.id}`;
     if (l.type === "prop") return `/props/${l.id}`;
     if (l.type === "vehicle") return `/vehicles/${l.id}`;
+    if (l.type === "animal") return `/tiere/${l.id}`;
     if (l.type === "job") return `/jobs/${l.id}`;
     if (l.type === "creator") return `/creators/${l.id}`;
     return "#";
@@ -1814,7 +1820,7 @@ export default function DashboardPage() {
                       <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{editError}</p>
                     )}
                     {/* Image upload */}
-                    {l.type === "prop" || l.type === "vehicle" || l.type === "location" ? (
+                    {l.type === "prop" || l.type === "vehicle" || l.type === "animal" || l.type === "location" ? (
                       <ListingImageManager
                         value={editGallery}
                         maxImages={l.type === "location" ? MAX_LOCATION_IMAGES : MAX_LISTING_IMAGES}
@@ -1893,6 +1899,7 @@ export default function DashboardPage() {
                     )}
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {l.type === "animal" && <fieldset className="space-y-3 rounded-xl border border-border p-4"><legend className="px-1 text-sm text-text-primary">{animals("portfolioDetails")}</legend><label className="block text-sm">{animals("training")}<input value={editAnimalMeta.training_level} maxLength={120} onChange={event=>setEditAnimalMeta(value=>({...value,training_level:event.target.value}))} className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3" /></label><label className="block text-sm">{animals("skills")}<textarea value={editAnimalMeta.special_skills} maxLength={2000} onChange={event=>setEditAnimalMeta(value=>({...value,special_skills:event.target.value}))} className="mt-1 min-h-24 w-full rounded-lg border border-border bg-bg-primary p-3" /></label><p className="text-xs text-text-muted">{animals("conditions")}</p></fieldset>}
                       <ResponsiblePersonFields compactWhenProfile={l.type === "prop" || l.type === "vehicle"} value={editResponsible} onChange={setEditResponsible} errors={editResponsibleErrors} accountPrefill={!l.responsible_person || l.responsible_person.userId === user?.id} disabled={Boolean(l.responsible_person && l.responsible_person.userId !== user?.id)} />
                       <div>
                         <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">Titel *</label>
@@ -1917,7 +1924,7 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       {["location", "prop", "vehicle"].includes(l.type) && <ListingPriceOptions onRequest={editLocationMeta.price_on_request} negotiable={editLocationMeta.price_negotiable} onChange={value=>setEditLocationMeta(current=>({...current,price_on_request:value.priceOnRequest,price_negotiable:value.priceNegotiable}))} />}
-                      {!editLocationMeta.price_on_request || !["location", "prop", "vehicle"].includes(l.type) ? <>
+                      {l.type === "animal" ? <p className="text-xs text-text-muted">{animals("conditions")}</p> : !editLocationMeta.price_on_request || !["location", "prop", "vehicle"].includes(l.type) ? <>
                         <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">{l.type === "location" ? "Preis pro Drehtag (€)" : "Preis / Tag (€)"}</label>
                         <input type="number" min="0" value={editForm.price} onChange={(e) => { setEditLocationMeta((current) => ({ ...current, price_on_request: false })); setEditForm((p) => ({ ...p, price: e.target.value })); }} className="w-full rounded-lg border border-border bg-bg-elevated px-3 py-2 text-sm transition-colors focus:border-gold focus:outline-none" placeholder="z. B. 500" />
                       </> : <p className="text-xs text-text-muted">Der Preis wird öffentlich als „Auf Anfrage“ angezeigt.</p>}

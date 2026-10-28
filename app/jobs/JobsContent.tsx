@@ -14,6 +14,7 @@ import {
   Film, Smartphone, Aperture, Globe, ArrowUpDown,
 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
+import { ANIMAL_DEPARTMENT_ID, animalRoleLabel, animalOccupation } from "@/lib/animal-taxonomy";
 import { FILM_DEPARTMENTS, DEPT_KEYWORDS, ALL_ROLES } from "@/lib/filmRoles";
 import { matchesGripOccupation, normalizeGripDepartmentId, normalizeGripRoleId } from "@/lib/gripTaxonomy";
 import { useTranslations } from "next-intl";
@@ -167,6 +168,7 @@ function JobDeptPanel({
   onClose: () => void;
   clearLabel: string; clearSelectionLabel: string;
 }) {
+  const animals = useTranslations("FilmAnimals");
   const activeDept = FILM_DEPARTMENTS.find((d) => d.id === activeDeptId) ?? FILM_DEPARTMENTS[0];
 
   return (
@@ -185,7 +187,7 @@ function JobDeptPanel({
                   isActive ? `${dept.bg} ${dept.color} border-transparent` : "border-border text-text-muted"
                 }`}>
                 <Icon size={11} className={isActive ? dept.color : "text-text-muted"} />
-                {dept.label}
+                {dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : dept.label}
                 {isSelected && <span className="w-3.5 h-3.5 rounded-full bg-gold text-bg-primary text-[8px] font-bold flex items-center justify-center">✓</span>}
               </button>
             );
@@ -207,7 +209,7 @@ function JobDeptPanel({
                   className={`text-left px-3 py-2.5 rounded-lg text-xs border transition-all ${
                     isSelected ? `${activeDept.bg} ${activeDept.color} font-semibold` : "border-border/60 text-text-muted"
                   }`}>
-                  <div className="font-medium leading-tight">{role.label}</div>
+                  <div className="font-medium leading-tight">{animalRoleLabel(role.id, animals) === role.id ? role.label : animalRoleLabel(role.id, animals)}</div>
                   {role.labelEn && <div className="mt-0.5 text-[10px] opacity-50">{role.labelEn}</div>}
                   {role.description && <div className="mt-1 text-[10px] leading-4 opacity-70">{role.description}</div>}
                 </button>
@@ -243,7 +245,7 @@ function JobDeptPanel({
                         <span className={`w-5 h-5 rounded flex items-center justify-center shrink-0 border ${isActive ? dept.bg : "bg-bg-elevated border-border"}`}>
                           <Icon size={10} className={isActive ? dept.color : "text-text-muted"} />
                         </span>
-                        <span className={`truncate ${isActive ? dept.color : ""}`}>{dept.label}</span>
+                        <span className={`truncate ${isActive ? dept.color : ""}`}>{dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : dept.label}</span>
                       </div>
                       {isSelected && <span className="w-3.5 h-3.5 rounded-full bg-gold text-bg-primary text-[8px] font-bold flex items-center justify-center shrink-0">✓</span>}
                     </button>
@@ -269,7 +271,7 @@ function JobDeptPanel({
                   className={`text-left px-3 py-2 rounded-lg text-xs border transition-all ${
                     isSelected ? `${activeDept.bg} ${activeDept.color} font-semibold` : "border-border/60 text-text-muted hover:text-text-secondary hover:border-border hover:bg-white/[0.02]"
                   }`}>
-                  <div className="font-medium leading-tight">{role.label}</div>
+                  <div className="font-medium leading-tight">{animalRoleLabel(role.id, animals) === role.id ? role.label : animalRoleLabel(role.id, animals)}</div>
                   {role.labelEn && <div className="text-[10px] opacity-50 mt-0.5">{role.labelEn}</div>}
                   {role.description && <div className="mt-1 text-[10px] leading-4 opacity-70">{role.description}</div>}
                 </button>
@@ -287,6 +289,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("jobs");
+  const animals = useTranslations("FilmAnimals");
 
   const allJobs = useMemo(() => serverJobs, [serverJobs]);
 
@@ -344,7 +347,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
             const meta = j.description.split("\n\n")[0] ?? "";
             const roleMeta = meta.match(/Rolle: ([^·\n]+)/)?.[1]?.toLowerCase() ?? "";
             if (roleMeta && (role.aliases?.length
-              ? matchesGripOccupation(roleMeta, role.label)
+              ? (selectedDeptId === ANIMAL_DEPARTMENT_ID ? animalOccupation(roleMeta)?.id === role.id : matchesGripOccupation(roleMeta, role.label))
               : roleLabels.some((label) => roleMeta.includes(label)))) return true;
           }
           return false;
@@ -459,7 +462,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
         onSortChange={setSortKey}
         categoryLabel={t("filterDeptRole")}
         allCategoryLabel={t("filterAll") + " Bereiche"}
-        categories={FILM_DEPARTMENTS.map((dept) => ({ value: dept.id, label: dept.label }))}
+        categories={FILM_DEPARTMENTS.map((dept) => ({ value: dept.id, label: dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : dept.label }))}
         categoryValue={selectedDeptId ?? ""}
         onCategoryChange={(value) => { setSelectedDeptId(value || null); setSelectedRoleId(null); }}
         resultSummary={t("results", { count: filtered.length })}
@@ -479,7 +482,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
               setSelectedRoleId(roleId);
             }}
             placeholder="Alle Rollen"
-            options={FILM_DEPARTMENTS.flatMap((dept) => dept.roles.map((role) => ({ value: `${dept.id}:${role.id}`, label: `${dept.label} · ${role.label}` })))}
+            options={FILM_DEPARTMENTS.flatMap((dept) => dept.roles.map((role) => ({ value: `${dept.id}:${role.id}`, label: `${dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : dept.label} · ${animalRoleLabel(role.id, animals) === role.id ? role.label : animalRoleLabel(role.id, animals)}` })))}
           />
         </MobileFilterField>
         <MobileFilterField label={t("filterProjectType")}>
@@ -675,7 +678,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
                     }`}
                   >
                     <Icon size={14} className={isActive ? "text-gold" : "text-text-muted"} />
-                    {dept.label}
+                    {dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : dept.label}
                   </button>
                 );
               })}
@@ -709,7 +712,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
                         : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
                     }`}
                   >
-                    {dept.label}
+                    {dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : dept.label}
                   </button>
                 );
               })}

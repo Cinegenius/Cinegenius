@@ -17,11 +17,14 @@ import {
   Calendar, Scale, Globe2, Quote, MessageSquare,
 } from "lucide-react";
 import { COMPANY_CATEGORY_BY_ID } from "@/lib/companyCategories";
+import { AnimalCompanySummary } from "@/components/AnimalCompanyFields";
+import { normalizeAnimalCompanyDetails, isAnimalCompany, animalCategoryLabel } from "@/lib/animal-taxonomy";
 import { CATERING_COMPANY_CATEGORY, normalizeCateringCompanyDetails } from "@/lib/catering-taxonomy";
 import {
   EQUIPMENT_CATEGORY_BY_ID, CONDITION_LABELS, CONDITION_COLORS, SERVICE_TYPE_BY_ID,
 } from "@/lib/equipment-categories";
 import { COMPANY_PUBLIC_TITLE_SUGGESTIONS, normalizeCompanyPublicTitles } from "@/lib/company-roles";
+import MediaImage from "@/components/MediaImage";
 import CompanyLogo from "@/components/CompanyLogo";
 import Lightbox from "@/components/Lightbox";
 import { listingDetailPath } from "@/lib/listing-routes";
@@ -95,6 +98,7 @@ type Company = {
   categories: string[];
   services: string[];
   catering_details?: unknown;
+  animal_details?: unknown;
   portfolio_images: string[];
   social_links: Record<string, string> | null;
   verified: boolean;
@@ -125,6 +129,7 @@ export default function CompanyDetail({
 }) {
   const { user, isLoaded } = useUser();
   const messageText = useTranslations("companyMessages");
+  const animals = useTranslations("FilmAnimals");
   const currentUserId = isLoaded ? user?.id ?? null : initialUserId;
   const searchParams = useSearchParams();
   const isWelcome = searchParams.get("welcome") === "1";
@@ -331,7 +336,7 @@ export default function CompanyDetail({
                 <div className="flex flex-wrap gap-1 mb-1.5">
                   {cats.map((cat) => (
                     <span key={cat.id} className={`px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded-full border ${cat.bg} ${cat.color}`}>
-                      {cat.label}
+                      {animalCategoryLabel(cat.id, cat.label, animals)}
                     </span>
                   ))}
                 </div>
@@ -709,7 +714,7 @@ export default function CompanyDetail({
                             </span>
                           </div>
                           <div className="flex items-center gap-2 mt-0.5 text-[11px] text-text-muted">
-                            {cat && <span>{cat.label}</span>}
+                            {cat && <span>{animalCategoryLabel(cat.id, cat.label, animals)}</span>}
                             {item.subcategory && <span>· {item.subcategory}</span>}
                             {item.quantity > 1 && <span>· {item.quantity}×</span>}
                           </div>
@@ -747,16 +752,16 @@ export default function CompanyDetail({
                         className="flex items-center gap-3 py-3 group -mx-1 px-1 rounded-lg hover:bg-bg-secondary/60 transition-colors">
                         {listing.image_url
                           // eslint-disable-next-line @next/next/no-img-element
-                          ? <img src={listing.image_url} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                          ? <MediaImage src={listing.image_url} width={40} height={40} alt={listing.title} className="w-10 h-10 rounded-lg object-cover shrink-0" />
                           : <div className="w-10 h-10 rounded-lg bg-bg-elevated flex items-center justify-center shrink-0"><Icon size={16} className="text-text-muted" /></div>
                         }
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-text-primary group-hover:text-gold transition-colors truncate">{listing.title}</p>
                           <div className="flex items-center gap-2 text-[11px] text-text-muted mt-0.5">
-                            <span>{listingTypeLabel[listing.type] ?? listing.type}</span>
+                            <span>{listing.type === "animal" ? animals("portfolio") : listingTypeLabel[listing.type] ?? listing.type}</span>
                             <span>·</span>
                             <span>{listing.city}</span>
-                            {listing.price > 0 && <><span>·</span><span className="text-gold">{listing.price} €</span></>}
+                            {listing.type !== "animal" && listing.price > 0 && <><span>·</span><span className="text-gold">{listing.price} €</span></>}
                           </div>
                         </div>
                         <ChevronRight size={13} className="text-text-muted shrink-0 group-hover:text-gold transition-colors" />
@@ -838,6 +843,7 @@ export default function CompanyDetail({
             )}
 
             {/* Services keywords */}
+            {isAnimalCompany(company.categories) && <section className="space-y-4"><AnimalCompanySummary value={normalizeAnimalCompanyDetails(company.animal_details)} />{isOwner && <Link href={`/inserat?animal=1&company_id=${company.id}`} className="inline-flex min-h-11 items-center rounded-xl border border-border px-4 text-sm text-gold">{animals("addPortfolio")}</Link>}<p className="text-xs leading-5 text-text-muted">{animals("portfolioHelp")}</p></section>}
             {company.services.length > 0 && (
               <section>
                 <SectionLabel>Leistungen</SectionLabel>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { Send, CheckCircle, Shield, Clock, ChevronRight, Loader2, LogIn } from "lucide-react";
@@ -15,6 +16,7 @@ type Props = {
 
 export default function InquiryForm({ listingId, listingTitle, listingType, ownerId, ownerName }: Props) {
   const router = useRouter();
+  const animals = useTranslations("FilmAnimals");
   const { user, isLoaded } = useUser();
 
   const [step, setStep] = useState<"form" | "sent">("form");
@@ -123,7 +125,7 @@ export default function InquiryForm({ listingId, listingTitle, listingType, owne
   return (
     <div className="bg-bg-secondary border border-border rounded-xl p-6 space-y-5">
       <div>
-        <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-0.5">Buchungsanfrage</p>
+        <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-0.5">{listingType === "animal" ? animals("portfolio") : "Buchungsanfrage"}</p>
         <h3 className="font-display text-lg font-bold text-text-primary">Projekt anfragen</h3>
         <p className="text-xs text-text-muted mt-1 leading-relaxed">
           Konditionen werden privat verhandelt — keine öffentliche Preisangabe nötig.
@@ -202,7 +204,7 @@ export default function InquiryForm({ listingId, listingTitle, listingType, owne
           <li className="flex items-start gap-2"><span className="w-4 h-4 bg-gold/20 rounded-full flex items-center justify-center text-[10px] font-bold text-gold shrink-0 mt-0.5">1</span>Anfrage mit Projektdetails senden</li>
           <li className="flex items-start gap-2"><span className="w-4 h-4 bg-gold/20 rounded-full flex items-center justify-center text-[10px] font-bold text-gold shrink-0 mt-0.5">2</span>{firstName} antwortet mit Konditionen</li>
           <li className="flex items-start gap-2"><span className="w-4 h-4 bg-gold/20 rounded-full flex items-center justify-center text-[10px] font-bold text-gold shrink-0 mt-0.5">3</span>Preis & Details privat verhandeln</li>
-          <li className="flex items-start gap-2"><span className="w-4 h-4 bg-gold/20 rounded-full flex items-center justify-center text-[10px] font-bold text-gold shrink-0 mt-0.5">4</span>Buchung bestätigen</li>
+          <li className="flex items-start gap-2"><span className="w-4 h-4 bg-gold/20 rounded-full flex items-center justify-center text-[10px] font-bold text-gold shrink-0 mt-0.5">4</span>{listingType === "animal" ? animals("conditions") : "Buchung bestätigen"}</li>
         </ol>
       </div>
     </div>

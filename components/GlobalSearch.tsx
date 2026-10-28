@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   Search, X, MapPin, Car, Package, Briefcase, Users,
-  Loader2, Clock, ArrowRight, User, Building2,
+  Loader2, Clock, ArrowRight, User, Building2, PawPrint,
 } from "lucide-react";
 
 type Result = {
@@ -20,7 +20,7 @@ type Result = {
 };
 
 // Type order for display
-const TYPE_ORDER = ["profile", "creator", "job", "location", "vehicle", "prop", "company"];
+const TYPE_ORDER = ["profile", "creator", "job", "location", "vehicle", "prop", "company", "animal"];
 
 const RECENT_KEY = "cg_recent_searches";
 const MAX_RECENT = 5;
@@ -38,6 +38,7 @@ function clearRecentSearches() {
 
 export default function GlobalSearch() {
   const t = useTranslations("search");
+  const animals = useTranslations("FilmAnimals");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Result[]>([]);
@@ -60,6 +61,7 @@ export default function GlobalSearch() {
     job:      { label: t("typeJobs"),      icon: Briefcase, href: (id) => `/jobs/${id}`,       color: "text-emerald-400" },
     creator:  { label: t("typeCreators"), icon: Users,     href: (id) => `/profile/${id}`,    color: "text-gold"        },
     profile:  { label: t("typeCreators"), icon: User,      href: (id) => `/profile/${id}`,    color: "text-gold"        },
+    animal: {label: animals("portfolio"), icon: PawPrint, href: id => `/tiere/${id}`, color: "text-amber-400"},
     company:  { label: t("typeCompanies"),icon: Building2, href: (id) => `/companies/${id}`,  color: "text-blue-400"    },
   };
 
@@ -288,7 +290,7 @@ export default function GlobalSearch() {
                         {isProfile && r.available !== null && (
                           <span className={`w-2 h-2 rounded-full ${r.available ? "bg-success" : "bg-text-muted"}`} />
                         )}
-                        {!isProfile && (r.priceLabel || r.price > 0) && (
+                        {!isProfile && r.type !== "animal" && (r.priceLabel || r.price > 0) && (
                           <span className="text-xs font-mono text-gold">{r.priceLabel ?? `${r.price.toLocaleString()} €`}</span>
                         )}
                       </div>

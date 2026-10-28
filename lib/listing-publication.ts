@@ -18,7 +18,7 @@ export function validateListingPublication(input: ListingPublicationInput): stri
   if (!input.title?.trim() || !input.city?.trim()) {
     return "Vor der Veröffentlichung müssen Titel und Ort eingetragen sein.";
   }
-  const visualListing = ["location", "prop", "vehicle"].includes(input.type);
+  const visualListing = ["location", "prop", "vehicle", "animal"].includes(input.type);
   if (visualListing && !input.category?.trim()) {
     return "Vor der Veröffentlichung muss eine passende Kategorie ausgewählt sein.";
   }

@@ -1,4 +1,5 @@
 "use client";
+import { animalCategoryLabel, animalCompanySearchText, isAnimalCompany } from "@/lib/animal-taxonomy";
 
 import { useViewState } from "@/lib/use-view-state";
 
@@ -29,6 +30,7 @@ type Company = {
   categories: string[];
   services: string[];
   catering_details?: unknown;
+  animal_details?: unknown;
   verified: boolean;
   created_at: string;
 };
@@ -107,6 +109,7 @@ function FilterDropdown({
 // ─── Main ─────────────────────────────────────────────────────────
 export default function CompaniesContent({ initialCompanies }: { initialCompanies: Company[] }) {
   const t = useTranslations("companies");
+  const animals = useTranslations("FilmAnimals");
 
   const [search, setSearch] = useViewState("companies.search", "");
   const [selectedCategory, setSelectedCategory] = useViewState<string | null>("companies.selectedCategory", null);
@@ -132,7 +135,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
         c.city.toLowerCase().includes(q) ||
         c.services.some((s) => s.toLowerCase().includes(q)) ||
         c.categories.some((id) => (COMPANY_CATEGORY_BY_ID[id]?.label ?? id).toLowerCase().includes(q)) ||
-        cateringSearchText(c).includes(q)
+        cateringSearchText(c).includes(q) || (isAnimalCompany(c.categories) && animalCompanySearchText(c.animal_details, c.categories).toLowerCase().includes(q))
       );
     }
     if (selectedCategory) result = result.filter((c) => c.categories.includes(selectedCategory));
@@ -183,7 +186,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
         onSortChange={setSortKey}
         categoryLabel={t("filterCategory")}
         allCategoryLabel="Alle Firmen"
-        categories={COMPANY_CATEGORIES.map((category) => ({ value: category.id, label: category.label }))}
+        categories={COMPANY_CATEGORIES.map((category) => ({ value: category.id, label: animalCategoryLabel(category.id, category.label, animals) }))}
         categoryValue={selectedCategory ?? ""}
         onCategoryChange={(value) => setSelectedCategory(value || null)}
         resultSummary={`${filtered.length} ${t("resultsCount")}`}
@@ -342,7 +345,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                     }`}
                   >
                     <Icon size={14} className={isActive ? "text-gold" : "text-text-muted"} />
-                    <span className="truncate">{cat.label}</span>
+                    <span className="truncate">{animalCategoryLabel(cat.id, cat.label, animals)}</span>
                   </button>
                 );
               })}
@@ -372,7 +375,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                       isActive ? "bg-gold/10 text-gold border-gold/40" : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
                     }`}
                   >
-                    {cat.label}
+                    {animalCategoryLabel(cat.id, cat.label, animals)}
                   </button>
                 );
               })}
@@ -433,6 +436,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
 
 // ─── Grid card ────────────────────────────────────────────────────
 function CompanyCard({ company }: { company: Company }) {
+  const animals = useTranslations("FilmAnimals");
   const cats = company.categories.slice(0, 2).map((id) => COMPANY_CATEGORY_BY_ID[id]).filter(Boolean);
   return (
     <Link href={`/companies/${company.slug}`}
@@ -455,7 +459,7 @@ function CompanyCard({ company }: { company: Company }) {
       {cats.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-2.5">
           {cats.map((cat) => (
-            <span key={cat.id} className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${cat.bg} ${cat.color}`}>{cat.label}</span>
+            <span key={cat.id} className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${cat.bg} ${cat.color}`}>{animalCategoryLabel(cat.id, cat.label, animals)}</span>
           ))}
           {company.categories.length > 2 && (
             <span className="px-2 py-0.5 text-[10px] font-medium rounded-full border border-border text-text-muted">+{company.categories.length - 2}</span>
@@ -470,6 +474,7 @@ function CompanyCard({ company }: { company: Company }) {
 
 // ─── List row ─────────────────────────────────────────────────────
 function CompanyListRow({ company }: { company: Company }) {
+  const animals = useTranslations("FilmAnimals");
   const cats = company.categories.slice(0, 3).map((id) => COMPANY_CATEGORY_BY_ID[id]).filter(Boolean);
   return (
     <Link href={`/companies/${company.slug}`}
@@ -484,7 +489,7 @@ function CompanyListRow({ company }: { company: Company }) {
       </div>
       <div className="hidden sm:flex items-center gap-1.5 flex-wrap justify-end">
         {cats.map((cat) => (
-          <span key={cat.id} className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${cat.bg} ${cat.color}`}>{cat.label}</span>
+          <span key={cat.id} className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${cat.bg} ${cat.color}`}>{animalCategoryLabel(cat.id, cat.label, animals)}</span>
         ))}
       </div>
       <ChevronRight size={14} className="text-text-muted shrink-0 group-hover:text-gold transition-colors" />

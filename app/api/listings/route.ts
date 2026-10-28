@@ -108,7 +108,7 @@ export async function POST(req: Request) {
   if (!VALID_LISTING_TYPES.has(type)) {
     return NextResponse.json({ error: "Ungültiger Inserat-Typ" }, { status: 400 });
   }
-  if (type === "location" || type === "prop" || type === "vehicle") {
+  if (type === "location" || type === "prop" || type === "vehicle" || type === "animal") {
     const gallery = normalizeListingImageGallery(image_url, extra_images, maxImagesForListingType(type));
     if (!gallery.ok) return NextResponse.json({ error: gallery.error }, { status: 400 });
     storedImageUrl = gallery.gallery.imageUrl;
@@ -145,11 +145,13 @@ export async function POST(req: Request) {
     : await validateResponsiblePerson(body.responsible_person, userId, false, draft !== true && type !== "job");
   if (responsible.response) return responsible.response;
 
+  const animalData = type === "animal" ? (await import("@/lib/animal-taxonomy")).animalPortfolioMetadata(category, metadata, rental_type) : null;
+  if (type === "animal" && !animalData) return privateNoStoreJson({ error: (await getTranslations("FilmAnimals"))("portfolioHelp") }, 400);
   // rental_type column doesn't exist — store it inside metadata
   const mergedMetadata = {
-    ...(metadata ?? {}),
+    ...(type === "animal" ? animalData : metadata ?? {}),
     ...(typeof onboarding_request_key === "string" && { onboarding_request_key }),
-    ...(rental_type !== undefined && { rental_type }),
+    ...(type !== "animal" && rental_type !== undefined && { rental_type }),
   };
 
   // A private setup draft can be retried after a lost browser response. Reuse
@@ -177,7 +179,7 @@ export async function POST(req: Request) {
       category: category ?? null,
       title,
       description: description ?? "",
-      price: safePrice,
+      price: type === "animal" ? 0 : safePrice,
       city,
       image_url: storedImageUrl,
       company_id: company_id ?? null,
@@ -188,7 +190,7 @@ export async function POST(req: Request) {
       metadata: mergedMetadata,
       ...(blocked_dates !== undefined && { blocked_dates }),
       ...(floor_plan_url !== undefined && { floor_plan_url }),
-      ...((type === "prop" || type === "vehicle")
+      ...((type === "prop" || type === "vehicle" || type === "animal")
         ? { extra_images: storedExtraImages }
         : extra_images !== undefined && { extra_images }),
     })

@@ -4,6 +4,7 @@
  * Umfasst Film, Social Media und Fotografie.
  */
 
+import { ANIMAL_DEPARTMENT_ID, ANIMAL_DEPARTMENT_LABEL, ANIMAL_OCCUPATIONS, animalSearchTerms } from "@/lib/animal-taxonomy";
 import { GRIP_DEPARTMENT_LABEL, GRIP_OCCUPATIONS } from "@/lib/gripTaxonomy";
 import { CATERING_DEPARTMENT_ID, CATERING_DEPARTMENT_LABEL, CATERING_OCCUPATIONS } from "@/lib/catering-taxonomy";
 
@@ -815,10 +816,6 @@ export const FILM_DEPARTMENTS: FilmDepartment[] = [
       { id: "parkour-artist",             label: "Parkour Artists",                      labelEn: "Parkour Artist" },
       { id: "prazisionsfahrer",           label: "Präzisionsfahrer*in",                  labelEn: "Precision Driver" },
       { id: "coachmen",                   label: "Coachmen*women",                       labelEn: "Coachman / Coachwoman" },
-      { id: "horse-master",               label: "Horse Master",                         labelEn: "Horse Master" },
-      { id: "assistant-horse-master",     label: "Assistant Horse Master",               labelEn: "Assistant Horse Master" },
-      { id: "horse-trainer",              label: "Horse Trainer",                        labelEn: "Horse Trainer" },
-      { id: "horse-wrangler",             label: "Horse Wrangler",                       labelEn: "Horse Wrangler" },
     ],
   },
 
@@ -963,8 +960,6 @@ export const FILM_DEPARTMENTS: FilmDepartment[] = [
       { id: "vertrauensperson",             label: "Vertrauensperson",                           labelEn: "Wellbeing Officer / Person of Trust" },
       { id: "fachkraft-arbeitssicherheit",  label: "Fachkraft für Arbeitssicherheit",            labelEn: "Health & Safety Officer" },
       { id: "hygienebeauftragte",           label: "Hygienebeauftragte*r (Coronaschutz)",        labelEn: "Hygiene Officer (Covid)" },
-      { id: "tiertrainer",                  label: "Tiertrainer*in",                             labelEn: "Animal Trainer" },
-      { id: "tierbetreuer",                 label: "Tierbetreuer*in",                            labelEn: "Animal Handler / Wrangler" },
       { id: "marine-coordinator",           label: "Marine Coordinator",                         labelEn: "Marine Coordinator" },
       { id: "underwater-dive-coordinator",  label: "Underwater / Dive Coordinator",              labelEn: "Underwater / Dive Coordinator" },
       { id: "sattel-schirrmeister",         label: "Sattel-, Schirrmeister*in",                  labelEn: "Saddle / Harness Master" },
@@ -1011,6 +1006,13 @@ export const FILM_DEPARTMENTS: FilmDepartment[] = [
       aliases: occupation.aliases,
       description: occupation.description,
     })),
+  },
+
+  {
+    id: ANIMAL_DEPARTMENT_ID,
+    label: ANIMAL_DEPARTMENT_LABEL,
+    color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20", platform: "film",
+    roles: ANIMAL_OCCUPATIONS.map(role => ({ ...role })),
   },
 
   // ── SOCIAL MEDIA ─────────────────────────────────────────────────────────
@@ -1093,6 +1095,7 @@ export const ROLE_BY_ID = Object.fromEntries(ALL_ROLES.map((r) => [r.id, r]));
  * Wird in CreatorsContent und JobsContent für Keyword-Matching verwendet.
  */
 export const DEPT_KEYWORDS: Record<string, string[]> = {
+  [ANIMAL_DEPARTMENT_ID]: animalSearchTerms(),
   [CATERING_DEPARTMENT_ID]: [
     "catering", "filmcatering", "film catering", "set catering", "setverpflegung", "setkoch", "setköchin", "chef",
     "kitchen assistant", "küchenhilfe", "craft service", "craft services", "food service", "essensausgabe",
@@ -1223,7 +1226,7 @@ export const DEPT_KEYWORDS: Record<string, string[]> = {
     "stunt coordinator", "fight choreographer", "action regisseur",
     "aerial coordinator", "stunt rigger", "stunt technician",
     "stunt rescue diver", "parkour", "präzisionsfahrer", "precision driver",
-    "coachmen", "horse master", "horse trainer", "horse wrangler",
+    "coachmen",
   ],
   "ton-post": [
     "ton post", "sound post", "mischtonmeister", "re-recording mixer",
@@ -1256,7 +1259,7 @@ export const DEPT_KEYWORDS: Record<string, string[]> = {
     "deaf supervisor", "diversity consultant", "sensivity reader",
     "dolmetscher", "stand-in", "set medic", "set lehrer", "kinderbetreuer",
     "kindeswohlbeauftragte", "mental health", "vertrauensperson",
-    "hygienebeauftragte", "caterer", "tiertrainer", "tierbetreuer",
+    "hygienebeauftragte", "caterer",
     "marine coordinator", "dive coordinator", "sattel", "schirrmeister",
     "zuschauerbetreuuer", "consultant director", "fachberater",
     "impact producer", "green consultant", "epk", "behind the scenes",

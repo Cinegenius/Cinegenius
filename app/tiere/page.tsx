@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import PageHeader from "@/components/PageHeader";
@@ -5,17 +6,10 @@ import TiereContent from "./TiereContent";
 
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  title: "Film-Tiere mieten — Hunde, Pferde, Katzen & mehr für Produktion",
-  description: "Ausgebildete Film-Tiere buchen: Hunde, Pferde, Katzen, Vögel, Reptilien, Nutztiere und Exoten für Film, Werbung und Fotoproduktionen.",
-  keywords: ["Film Tiere", "Hund Filmset", "Pferd Produktion", "Tier mieten Film", "Filmtier buchen", "Tier Werbung"],
-  openGraph: {
-    title: "Film-Tiere für Produktion — CineGenius",
-    description: "Ausgebildete Tiere für Filmproduktionen, Werbung und Fotoshootings buchen.",
-  },
-};
+export async function generateMetadata():Promise<Metadata> { const t=await getTranslations("FilmAnimals"); return {title:t("portfolio"),description:t("description")}; }
 
 export default async function TierePage() {
+  const t = await getTranslations("FilmAnimals");
   const { data } = await db
     .from("listings")
     .select("id, user_id, type, title, category, city, price, image_url, description, metadata")
@@ -49,11 +43,10 @@ export default async function TierePage() {
   return (
     <div className="min-h-screen bg-bg-primary">
       <PageHeader
-        badge="Film-Tiere"
-        title="Ausgebildete Tiere"
-        titleHighlight="für deine Produktion"
-        description="Von dressierten Hunden bis zu exotischen Tieren — finde den perfekten vierbeinigen Star für deinen Film, deine Werbung oder dein Fotoshooting."
-        cta={{ label: "Tier inserieren", href: "/inserat" }}
+        badge={t("department")}
+        title={t("browse")}
+        description={t("description")}
+        cta={{label:t("addPortfolio"),href:"/inserat?animal=1"}}
       />
       <div className="site-container py-4 sm:py-8">
         <TiereContent serverListings={serverListings} />

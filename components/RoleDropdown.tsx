@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+import { animalRoleLabel, animalOccupation } from "@/lib/animal-taxonomy";
 import { useState, useRef } from "react";
 import FloatingPanel from "@/components/FloatingPanel";
 import { ChevronDown, Search } from "lucide-react";
@@ -18,13 +20,14 @@ export default function RoleDropdown({
   placeholder?: string;
   className?: string;
 }) {
+  const animals = useTranslations("FilmAnimals");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   const normalizedQuery = normalizeOccupation(query);
   const filtered = options.filter((option) =>
-    !normalizedQuery || normalizeOccupation(gripSearchTerms(option).join(" ")).includes(normalizedQuery),
+    !normalizedQuery || normalizeOccupation([...gripSearchTerms(option), animalRoleLabel(option, animals), ...((role => role ? [role.labelEn, ...role.aliases] : [])(animalOccupation(option)))].join(" ")).includes(normalizedQuery),
   );
 
   return (
@@ -36,7 +39,7 @@ export default function RoleDropdown({
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm hover:border-gold/50 focus:outline-none focus:border-gold transition-colors"
       >
-        <span className={value ? "text-text-primary" : "text-text-muted"}>{value || placeholder}</span>
+        <span className={value ? "text-text-primary" : "text-text-muted"}>{value ? animalRoleLabel(value, animals) : placeholder}</span>
         <ChevronDown size={13} className={`shrink-0 text-text-muted transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
@@ -61,7 +64,7 @@ export default function RoleDropdown({
                 onClick={() => { onChange(o); setOpen(false); setQuery(""); }}
                 className={`w-full text-left px-3 py-2 text-sm transition-colors hover:bg-bg-secondary ${value === o ? "text-gold font-semibold" : "text-text-primary"}`}
               >
-                {o}
+                {animalRoleLabel(o, animals)}
               </button>
             ))}
           </div>

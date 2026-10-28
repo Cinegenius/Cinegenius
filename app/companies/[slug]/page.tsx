@@ -9,7 +9,7 @@ import { isPublicCompanyMembership } from "@/lib/company-membership-requests";
 
 async function getCompany(slug: string) {
   const { data } = await db.from("companies")
-    .select("id, slug, owner_user_id, responsible_person, name, logo_url, cover_url, description, city, website, email_public, phone_public, categories, services, portfolio_images, tagline, bio_short, usp, founded_year, legal_form, hq_address_public, countries, industry_focus, social_links, catering_details, published, verified, created_at")
+    .select("id, slug, owner_user_id, responsible_person, name, logo_url, cover_url, description, city, website, email_public, phone_public, categories, services, portfolio_images, tagline, bio_short, usp, founded_year, legal_form, hq_address_public, countries, industry_focus, social_links, catering_details, animal_details, published, verified, created_at")
     .eq("slug", slug).maybeSingle();
   if (!data) return null;
 

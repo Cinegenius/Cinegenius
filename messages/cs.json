@@ -1578,5 +1578,71 @@
     "stale": "Nabídka se mezitím změnila. Načtěte uloženou verzi znovu.",
     "savedTitle": "Uloženo – zkontrolujte stav",
     "publishing": "Zveřejňování …"
+  },
+  "FilmAnimals": {
+    "department": "Filmová zvířata a výcvik",
+    "categories": {
+      "tiervermittlung": "Agentura filmových zvířat",
+      "filmhundagentur": "Agentura filmových psů",
+      "tiertraining-film-medien": "Výcvik zvířat pro film a média"
+    },
+    "roles": {
+      "tiertrainer": "Trenér/ka filmových zvířat",
+      "filmhundetrainer": "Trenér/ka filmových psů",
+      "tierbetreuer": "Psovod / Animal Handler",
+      "tierkoordination": "Koordinace zvířat",
+      "set-tierbetreuung": "Péče o zvířata na place",
+      "horse-master": "Koordinace koní",
+      "assistant-horse-master": "Asistence koordinace koní",
+      "horse-trainer": "Trenér/ka filmových koní",
+      "horse-wrangler": "Ošetřovatel/ka koní"
+    },
+    "species": {
+      "dogs": "Psi",
+      "horses": "Koně a poníci",
+      "cats": "Kočky",
+      "birds": "Ptáci",
+      "reptiles": "Plazi",
+      "livestock": "Hospodářská zvířata",
+      "exotics": "Exotická zvířata",
+      "other": "Další druhy"
+    },
+    "services": {
+      "animal-agency": "Agentura filmových zvířat",
+      "dog-agency": "Agentura filmových psů",
+      "animal-training": "Výcvik zvířat",
+      "dog-training": "Výcvik filmových psů",
+      "animal-handling": "Práce se zvířaty",
+      "animal-coordination": "Koordinace zvířat",
+      "set-care": "Péče na place"
+    },
+    "servicesLabel": "Služby (nepovinné)",
+    "speciesLabel": "Druhy zvířat (více možností, nepovinné)",
+    "otherSpeciesLabel": "Další druhy nebo specializace (nepovinné)",
+    "selfReported": "Tyto údaje popisují vaše služby. Neověřují oprávnění ani certifikaci.",
+    "portfolio": "Portfolio zvířat",
+    "addPortfolio": "Přidat portfolio zvířat",
+    "portfolioHelp": "Představte zvířata jménem, druhem, fotografiemi a dovednostmi. Portfolia podléhají kontrole a nejsou zveřejňována jako prodej nebo pronájem.",
+    "inquire": "Poptat projekt",
+    "noProvider": "Poskytovatel není propojen.",
+    "back": "Zpět na portfolia",
+    "gallery": "Galerie zvířat",
+    "about": "O tomto zvířeti",
+    "skills": "Dovednosti a zkušenosti",
+    "viewProvider": "Zobrazit poskytovatele",
+    "animalName": "Jméno zvířete",
+    "speciesField": "Druh zvířete",
+    "conditions": "Péče a podmínky natáčení se dohodnou přímo s agenturou nebo odpovědnou osobou.",
+    "portfolioDetails": "Podrobnosti portfolia",
+    "training": "Úroveň výcviku (vlastní údaj)",
+    "description": "Portfolia a agentury zvířat pro film, televizi, reklamu a fotografii.",
+    "allSpecies": "Všechny druhy",
+    "empty": "Nebyla nalezena odpovídající portfolia.",
+    "browse": "Prohlédnout portfolia",
+    "locationRequest": "Místo na vyžádání",
+    "previewNotice": "Toto portfolio čeká na schválení a je viditelné pouze v chráněném náhledu.",
+    "count": "Počet zvířat (nepovinné)",
+    "handler": "Plánovaný doprovod trenéra nebo handlera",
+    "delivery": "Možnost dopravy na natáčení"
   }
 }

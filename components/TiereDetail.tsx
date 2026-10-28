@@ -1,11 +1,13 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+import { animalSpecies } from "@/lib/animal-taxonomy";
+import MediaImage from "@/components/MediaImage";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
-  ArrowLeft, Star, CheckCircle, MapPin, Shield,
-  Truck, Pencil, PawPrint, Users, Zap, Calendar,
+  ArrowLeft, Star, MapPin,
+  Truck, Pencil, PawPrint, Users,
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import InquiryForm from "@/components/InquiryForm";
@@ -39,30 +41,21 @@ type Animal = {
   ownerId?: string;
   ownerName?: string;
   ownerAvatar?: string | null;
-  ownerSlug?: string | null;
+  ownerHref?: string | null;
+  canEdit?: boolean;
+  privatePreview?: boolean;
   extra_images?: string[];
 };
 
 export default function TiereDetail({ animal }: { animal: Animal }) {
   const { user } = useUser();
-  const router = useRouter();
-  const isOwner = !!user && user.id === animal.ownerId;
+  const animals = useTranslations("FilmAnimals");
+
+  const isOwner = animal.canEdit === true || (!!user && user.id === animal.ownerId);
 
   const [liveRating, setLiveRating] = useState<{ avg: number; count: number } | null>(null);
   const [myRating, setMyRating] = useState(0);
   const [eligible, setEligible] = useState(false);
-  const [bookStart, setBookStart] = useState("");
-  const [bookEnd, setBookEnd] = useState("");
-  const today = new Date().toISOString().split("T")[0];
-  const bookDays = bookStart && bookEnd
-    ? Math.max(1, Math.ceil((new Date(bookEnd).getTime() - new Date(bookStart).getTime()) / 86_400_000))
-    : 0;
-  const bookTotal = animal.dailyRate > 0 && bookDays > 0 ? animal.dailyRate * bookDays : 0;
-  const handleCheckout = () => {
-    const start = bookStart || today;
-    const end = bookEnd || new Date(new Date(start).getTime() + 86_400_000).toISOString().split("T")[0];
-    router.push(`/booking/checkout?type=animal&id=${animal.id}&title=${encodeURIComponent(animal.title)}&price=${animal.dailyRate}&days=${bookDays || 1}&startDate=${start}&endDate=${end}`);
-  };
 
   useEffect(() => {
     fetch(`/api/listing-ratings?ids=${animal.id}`)
@@ -101,15 +94,16 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
 
   return (
     <div className="pt-16 min-h-screen">
+      {animal.privatePreview && <p role="status" className="site-container pt-8 text-sm text-gold">{animals("previewNotice")}</p>}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Link href="/tiere" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors mb-6">
-          <ArrowLeft size={14} /> Zurück zu Film-Tieren
+          <ArrowLeft size={14} /> {animals("back")}
         </Link>
 
         <ListingPhotoGallery
           images={images}
           title={animal.title}
-          label="Tiergalerie"
+          label={animals("gallery")}
           focalPoint={animal.focalPoint}
           fallback={<PawPrint size={48} className="text-text-muted/20" />}
         />
@@ -119,7 +113,7 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap gap-2 mb-3">
               <span className="px-2.5 py-1 bg-bg-secondary border border-border text-text-muted text-xs rounded-full flex items-center gap-1">
-                <PawPrint size={11} /> {animal.category}
+                <PawPrint size={11} /> {animalSpecies(animal.category) ? animals(`species.${animalSpecies(animal.category)!.id}`) : animal.category}
               </span>
               {animal.trainingLevel && (
                 <span className={`px-2.5 py-1 border text-xs rounded-full font-medium ${TRAINING_COLORS[animal.trainingLevel] ?? TRAINING_COLORS["Grundgehorsam"]}`}>
@@ -133,7 +127,7 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
               )}
               {animal.handlerIncluded && (
                 <span className="px-2.5 py-1 bg-bg-secondary border border-border text-text-secondary text-xs rounded-full flex items-center gap-1">
-                  <Users size={11} className="text-gold" /> Handler inklusive
+                  <Users size={11} className="text-gold" /> {animals("handler")}
                 </span>
               )}
             </div>
@@ -182,12 +176,10 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
             </div>
 
             {/* Specs */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+            <div className="grid grid-cols-2 gap-3 mb-8">
               {[
-                { label: "Tierart", value: animal.category, icon: <PawPrint size={14} className="text-gold" /> },
-                { label: "Anzahl", value: animal.count, icon: <Users size={14} className="text-gold" /> },
-                { label: "Tagesrate", value: animal.dailyRate > 0 ? `${animal.dailyRate.toLocaleString()} €` : "Auf Anfrage", icon: <Zap size={14} className="text-gold" /> },
-                { label: "Lieferung", value: animal.delivery ? "Möglich" : "Nur Abholung", icon: <Truck size={14} className="text-gold" /> },
+                { label: animals("speciesField"), value: animalSpecies(animal.category) ? animals(`species.${animalSpecies(animal.category)!.id}`) : animal.category, icon: <PawPrint size={14} className="text-gold" /> },
+                { label: animals("count"), value: animal.count, icon: <Users size={14} className="text-gold" /> },
               ].map(({ label, value, icon }) => (
                 <div key={label} className="p-4 bg-bg-secondary border border-border rounded-xl text-center">
                   <div className="flex justify-center mb-1">{icon}</div>
@@ -200,7 +192,7 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
             {/* Description */}
             {animal.description && (
               <div className="mb-8">
-                <h2 className="font-display text-xl font-bold text-text-primary mb-3">Über dieses Tier</h2>
+                <h2 className="font-display text-xl font-bold text-text-primary mb-3">{animals("about")}</h2>
                 <p className="text-text-secondary text-sm leading-relaxed whitespace-pre-line">{animal.description}</p>
               </div>
             )}
@@ -209,50 +201,32 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
             {animal.specialSkills && (
               <div className="mb-8 p-4 bg-bg-secondary border border-border rounded-xl">
                 <h2 className="font-display text-base font-bold text-text-primary mb-2 flex items-center gap-2">
-                  <Star size={15} className="text-gold" /> Besondere Fähigkeiten
+                  <Star size={15} className="text-gold" /> {animals("skills")}
                 </h2>
                 <p className="text-sm text-text-secondary leading-relaxed">{animal.specialSkills}</p>
               </div>
             )}
 
-            {/* What's included */}
-            <div className="mb-8">
-              <h2 className="font-display text-xl font-bold text-text-primary mb-4">Im Lieferumfang</h2>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {[
-                  "Tier wie beschrieben, gepflegt und einsatzbereit",
-                  ...(animal.handlerIncluded ? ["Professioneller Handler vor Ort"] : []),
-                  "Grundlegende Verhaltensanweisungen",
-                  "Anbieter-Kontakt während der Produktion",
-                  "Digitaler Mietvertrag",
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 text-sm text-text-secondary">
-                    <CheckCircle size={14} className="text-success mt-0.5 shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <p className="mb-8 text-sm leading-6 text-text-secondary">{animals("conditions")}</p>
 
             <div className="mb-8">
               <ReviewsSection targetId={animal.id} targetType="animal" targetName={animal.title} />
             </div>
 
             {/* Owner card */}
-            {animal.ownerSlug ? (
-              <Link href={`/profile/${animal.ownerSlug}`}
+            {animal.ownerHref ? (
+              <Link href={animal.ownerHref}
                 className="group p-5 bg-bg-secondary border border-border rounded-xl flex items-center gap-4 hover:border-gold/40 hover:bg-bg-elevated transition-all">
                 <div className="w-12 h-12 rounded-full bg-gold/10 border border-gold/20 overflow-hidden flex items-center justify-center shrink-0">
                   {animal.ownerAvatar
-                    // eslint-disable-next-line @next/next/no-img-element
-                    ? <img src={animal.ownerAvatar} alt={animal.ownerName} className="w-full h-full object-cover" />
+                    ? <MediaImage width={48} height={48} src={animal.ownerAvatar} alt={animal.ownerName ?? ""} className="w-full h-full object-cover" />
                     : <PawPrint size={20} className="text-gold" />}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-text-primary group-hover:text-gold transition-colors">{animal.ownerName}</p>
                   <p className="text-xs text-text-muted mt-0.5 flex items-center gap-1"><MapPin size={11} /> {animal.location}</p>
                 </div>
-                <span className="text-xs text-text-muted group-hover:text-gold transition-colors shrink-0">Profil →</span>
+                <span className="text-xs text-text-muted group-hover:text-gold transition-colors shrink-0">{animals("viewProvider")}</span>
               </Link>
             ) : (
               <div className="p-5 bg-bg-secondary border border-border rounded-xl flex items-center gap-4">
@@ -271,52 +245,11 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
           <div className="lg:w-[360px] shrink-0">
             <div className="sticky top-20">
               <div className="bg-bg-secondary border border-border rounded-xl p-6">
-                <div className="flex items-end gap-1 mb-5">
-                  <span className="text-3xl font-bold font-display text-text-primary">
-                    {animal.dailyRate > 0 ? `${animal.dailyRate.toLocaleString()} €` : "Auf Anfrage"}
-                  </span>
-                  {animal.dailyRate > 0 && <span className="text-text-muted mb-1">/Tag</span>}
-                </div>
+                <h2 className="mb-4 font-display text-2xl font-bold text-text-primary">{animals("inquire")}</h2>
 
-                {animal.ownerId && !isOwner ? (
-                  animal.dailyRate > 0 ? (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Von</label>
-                          <input type="date" value={bookStart} min={today}
-                            onChange={e => { setBookStart(e.target.value); if (bookEnd && bookEnd <= e.target.value) setBookEnd(""); }}
-                            className="w-full py-2 px-3 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-gold transition-colors" />
-                        </div>
-                        <div>
-                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Bis</label>
-                          <input type="date" value={bookEnd} min={bookStart || today}
-                            onChange={e => setBookEnd(e.target.value)}
-                            className="w-full py-2 px-3 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-gold transition-colors" />
-                        </div>
-                      </div>
-                      {bookDays > 0 && (
-                        <div className="flex justify-between text-sm px-1">
-                          <span className="text-text-muted">{animal.dailyRate.toLocaleString()} € × {bookDays} Tag{bookDays !== 1 ? "e" : ""}</span>
-                          <span className="font-semibold text-text-primary">{bookTotal.toLocaleString()} €</span>
-                        </div>
-                      )}
-                      <button onClick={handleCheckout}
-                        className="w-full py-3 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors flex items-center justify-center gap-2">
-                        <Calendar size={15} /> Buchung anfragen
-                      </button>
-                      <p className="text-center text-xs text-text-muted flex items-center justify-center gap-1">
-                        <Shield size={11} /> Keine Belastung vor Bestätigung
-                      </p>
-                    </div>
-                  ) : (
-                    <InquiryForm listingId={animal.id} listingTitle={animal.title}
-                      listingType="animal" ownerId={animal.ownerId}
-                      ownerName={animal.ownerName ?? "Anbieter"} />
-                  )
-                ) : !animal.ownerId ? (
-                  <div className="py-8 text-center text-text-muted text-sm">Kein Anbieter verknüpft.</div>
-                ) : null}
+                <p className="mb-4 text-xs leading-5 text-text-muted">{animals("conditions")}</p>
+                {animal.ownerId && !isOwner ? <InquiryForm listingId={animal.id} listingTitle={animal.title} listingType="animal" ownerId={animal.ownerId} ownerName={animal.ownerName ?? ""} /> : !animal.ownerId ? <p className="text-sm text-text-muted">{animals("noProvider")}</p> : null}
+
               </div>
             </div>
           </div>

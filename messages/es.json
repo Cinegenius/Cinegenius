@@ -1578,5 +1578,71 @@
     "stale": "El anuncio ha cambiado. Vuelve a cargar la versión guardada.",
     "savedTitle": "Guardado – comprueba el estado",
     "publishing": "Publicando …"
+  },
+  "FilmAnimals": {
+    "department": "Animales de cine y adiestramiento",
+    "categories": {
+      "tiervermittlung": "Agencia de animales de cine",
+      "filmhundagentur": "Agencia de perros de cine",
+      "tiertraining-film-medien": "Adiestramiento para cine y medios"
+    },
+    "roles": {
+      "tiertrainer": "Adiestrador/a de animales de cine",
+      "filmhundetrainer": "Adiestrador/a de perros de cine",
+      "tierbetreuer": "Cuidador/a de animales / Animal Handler",
+      "tierkoordination": "Coordinación de animales",
+      "set-tierbetreuung": "Cuidado de animales en rodaje",
+      "horse-master": "Coordinación de caballos",
+      "assistant-horse-master": "Asistencia de coordinación de caballos",
+      "horse-trainer": "Adiestrador/a de caballos de cine",
+      "horse-wrangler": "Cuidador/a de caballos"
+    },
+    "species": {
+      "dogs": "Perros",
+      "horses": "Caballos y ponis",
+      "cats": "Gatos",
+      "birds": "Aves",
+      "reptiles": "Reptiles",
+      "livestock": "Animales de granja",
+      "exotics": "Animales exóticos",
+      "other": "Otras especies"
+    },
+    "services": {
+      "animal-agency": "Agencia de animales de cine",
+      "dog-agency": "Agencia de perros de cine",
+      "animal-training": "Adiestramiento de animales",
+      "dog-training": "Adiestramiento de perros de cine",
+      "animal-handling": "Manejo de animales",
+      "animal-coordination": "Coordinación de animales",
+      "set-care": "Cuidado en rodaje"
+    },
+    "servicesLabel": "Servicios (opcional)",
+    "speciesLabel": "Especies (selección múltiple, opcional)",
+    "otherSpeciesLabel": "Otras especies o especialización (opcional)",
+    "selfReported": "Estos datos describen vuestros servicios. No acreditan licencias ni certificaciones.",
+    "portfolio": "Portfolio de animales",
+    "addPortfolio": "Añadir portfolio de animales",
+    "portfolioHelp": "Presenta animales con nombre, especie, fotos y habilidades. Los portfolios se revisan y no se publican como artículos de venta o alquiler.",
+    "inquire": "Consultar un proyecto",
+    "noProvider": "No hay proveedor vinculado.",
+    "back": "Volver a los portfolios",
+    "gallery": "Galería de animales",
+    "about": "Sobre este animal",
+    "skills": "Habilidades y experiencia",
+    "viewProvider": "Ver proveedor",
+    "animalName": "Nombre del animal",
+    "speciesField": "Especie",
+    "conditions": "El cuidado y las condiciones de rodaje se acuerdan directamente con la agencia o persona responsable.",
+    "portfolioDetails": "Detalles del portfolio",
+    "training": "Nivel de adiestramiento (declarado)",
+    "description": "Portfolios y agencias de animales para cine, televisión, publicidad y fotografía.",
+    "allSpecies": "Todas las especies",
+    "empty": "No se encontraron portfolios adecuados.",
+    "browse": "Explorar portfolios",
+    "locationRequest": "Ubicación bajo consulta",
+    "previewNotice": "Este portfolio está pendiente de aprobación y solo es visible como vista previa protegida.",
+    "count": "Número de animales (opcional)",
+    "handler": "Supervisión por un entrenador o cuidador prevista",
+    "delivery": "Transporte al set disponible"
   }
 }

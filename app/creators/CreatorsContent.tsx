@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
-import { departments, deptColors, getDeptLabel, getOccupationSearchTerms, getDepartmentRoleSearchTerms, type Department } from "@/lib/departments";
+import { departments, deptColors, getDeptLabel, getOccupationSearchTerms, getDepartmentRoleSearchTerms, getDepartmentRoleLabel, type Department } from "@/lib/departments";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 import { rankByRatingConfidence } from "@/lib/rating-ranking";
 import { gripSearchTerms, isGripDepartmentSearch, isGripOccupation, normalizeOccupation } from "@/lib/gripTaxonomy";
@@ -297,6 +297,7 @@ function RolePanel({
   locale: string;
 }) {
   const t = useTranslations("creators");
+  const animals = useTranslations("FilmAnimals");
   const [search, setSearch] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const colors = deptColors(dept.color);
@@ -320,7 +321,7 @@ function RolePanel({
       {/* Header */}
       <div className={`flex items-center justify-between pb-2 mb-2 border-b border-border/60`}>
         <div className="flex items-center gap-2">
-          <span className={`text-xs font-semibold ${colors.text}`}>{getDeptLabel(dept, locale)}</span>
+          <span className={`text-xs font-semibold ${colors.text}`}>{getDeptLabel(dept, locale, animals)}</span>
           <span className="text-[11px] text-text-muted">{t("deptRoles", { count: deptRoles.length })}</span>
           {selectedCount > 0 && (
             <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${colors.bg} ${colors.border} border ${colors.text}`}>
@@ -372,7 +373,7 @@ function RolePanel({
                     {active && <div className="w-1.5 h-1.5 rounded-sm bg-current" />}
                   </div>
                   <input type="checkbox" checked={active} onChange={() => onToggle(occupationId(dept.id, role))} className="sr-only" />
-                  <span className="text-[11px] leading-snug">{role}</span>
+                  <span className="text-[11px] leading-snug">{getDepartmentRoleLabel(dept.id, role, locale, animals)}</span>
                 </label>
               );
             })}
@@ -396,6 +397,7 @@ function CreatorsInner({
 }) {
   const tc = useTranslations("common");
   const t = useTranslations("creators");
+  const animals = useTranslations("FilmAnimals");
   const locale = useLocale();
 
   const [query, setQuery] = useViewState("crew.query", () => initialFilters.query);
@@ -687,7 +689,7 @@ function CreatorsInner({
   ].filter(Boolean).length + selectedRoles.size;
 
   const mobileChips: BrowseChip[] = [
-    ...(sidebarDept ? [{ id: "area", label: sidebarDept === "__locations" ? "Locations" : sidebarDept === "__marktplatz" ? "Marktplatz" : getDeptLabel(departments.find((department) => department.id === sidebarDept) ?? departments[0], locale), onRemove: () => chooseSidebarDept(null) }] : []),
+    ...(sidebarDept ? [{ id: "area", label: sidebarDept === "__locations" ? "Locations" : sidebarDept === "__marktplatz" ? "Marktplatz" : getDeptLabel(departments.find((department) => department.id === sidebarDept) ?? departments[0], locale, animals), onRemove: () => chooseSidebarDept(null) }] : []),
     ...[...selectedRoles].map((role) => ({ id: `role-${role}`, label: occupationById(role)?.label ?? role, onRemove: () => removeRole(role) })),
     ...(cityFilter ? [{ id: "city", label: cityFilter, onRemove: () => setCityFilter("") }] : []),
     ...(countryFilter ? [{ id: "country", label: countryFilter, onRemove: () => setCountryFilter("") }] : []),
@@ -726,7 +728,7 @@ function CreatorsInner({
         categoryLabel={t("deptFilter")}
         allCategoryLabel="Alle Bereiche"
         categories={[
-          ...departments.map((department) => ({ value: department.id, label: getDeptLabel(department, locale) })),
+          ...departments.map((department) => ({ value: department.id, label: getDeptLabel(department, locale, animals) })),
           { value: LOCATION_PROVIDER_FILTER, label: "Locations – Anbieter" },
           { value: MARKETPLACE_PROVIDER_FILTER, label: "Marktplatz – Anbieter" },
         ]}
@@ -743,7 +745,7 @@ function CreatorsInner({
           <MobileFilterSelect value={profileTypeFilter} onChange={setProfileTypeFilter} placeholder={t("filterAll")} options={availableProfileTypes.map((value) => ({ value, label: PROFILE_TYPE_MAP[value] ?? value }))} />
         </MobileFilterField>
         {!isProviderFilter(sidebarDept) && <MobileFilterField label="Rolle">
-          <MobileFilterSelect value={[...selectedRoles][0] ?? ""} onChange={(value) => setSelectedRoles(value ? new Set([value]) : new Set())} placeholder="Alle Rollen" options={occupationCatalogue.filter(option => !sidebarDept || option.departmentId === sidebarDept).map(option => ({ value: option.roleId, label: `${option.departmentLabel} → ${option.label}` }))} />
+          <MobileFilterSelect value={[...selectedRoles][0] ?? ""} onChange={(value) => setSelectedRoles(value ? new Set([value]) : new Set())} placeholder="Alle Rollen" options={occupationCatalogue.filter(option => !sidebarDept || option.departmentId === sidebarDept).map(option => ({ value: option.roleId, label: `${getDeptLabel(departments.find(department=>department.id === option.departmentId)!, locale, animals)} → ${getDepartmentRoleLabel(option.departmentId, option.label, locale, animals)}` }))} />
         </MobileFilterField>}
         <MobileFilterField label={t("filterCity")}>
           <MobileFilterSelect value={cityFilter} onChange={setCityFilter} placeholder="Alle Städte" options={availableCities.map((value) => ({ value, label: value }))} />
@@ -909,7 +911,7 @@ function CreatorsInner({
                 return (
                   <div key={dept.id}>
                     <p className={`text-[11px] uppercase tracking-widest font-semibold mb-2.5 ${colors.text}`}>
-                      {dept.emoji} {getDeptLabel(dept, locale)}
+                      {dept.emoji} {getDeptLabel(dept, locale, animals)}
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {deptRoles.map((role) => {
@@ -922,7 +924,7 @@ function CreatorsInner({
                               active ? `${colors.bg} ${colors.text} border-transparent` : "border-border text-text-muted bg-bg-secondary"
                             }`}
                           >
-                            {role}
+                            {getDepartmentRoleLabel(dept.id, role, locale, animals)}
                           </button>
                         );
                       })}
@@ -1226,7 +1228,7 @@ function CreatorsInner({
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border shrink-0 transition-all ${
                           isActive ? `${colors.bg} ${colors.text} border-transparent` : "border-border text-text-muted"
                         }`}>
-                        {dept.emoji} {getDeptLabel(dept, locale)}
+                        {dept.emoji} {getDeptLabel(dept, locale, animals)}
                         {deptSelected > 0 && <span className={`w-3.5 h-3.5 rounded-full text-[8px] font-bold flex items-center justify-center ${colors.bg} ${colors.text}`}>{deptSelected}</span>}
                       </button>
                     );
@@ -1249,7 +1251,7 @@ function CreatorsInner({
                         className={`w-full flex items-center justify-between px-3 py-2 text-left text-xs transition-colors border-b border-border/40 last:border-0 ${
                           isActive ? `${colors.bg} ${colors.text} font-semibold` : "text-text-muted hover:text-text-secondary hover:bg-white/[0.02]"
                         }`}>
-                        <span>{getDeptLabel(dept, locale)}</span>
+                        <span>{getDeptLabel(dept, locale, animals)}</span>
                         {deptSelected > 0 && (
                           <span className={`text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${colors.bg} border ${colors.border} ${colors.text}`}>{deptSelected}</span>
                         )}

@@ -1578,5 +1578,71 @@
     "stale": "Das Angebot wurde zwischenzeitlich geändert. Lade den gespeicherten Stand erneut.",
     "savedTitle": "Gespeichert – Status prüfen",
     "publishing": "Wird veröffentlicht …"
+  },
+  "FilmAnimals": {
+    "department": "Filmtiere & Tiertraining",
+    "categories": {
+      "tiervermittlung": "Filmtieragentur",
+      "filmhundagentur": "Filmhundagentur",
+      "tiertraining-film-medien": "Tiertraining für Film und Medien"
+    },
+    "roles": {
+      "tiertrainer": "Filmtiertrainer/in",
+      "filmhundetrainer": "Filmhundetrainer/in",
+      "tierbetreuer": "Tierhandler/in / Animal Handler",
+      "tierkoordination": "Tierkoordination / Animal Coordinator",
+      "set-tierbetreuung": "Set-Tierbetreuung",
+      "horse-master": "Horse Master / Pferdekoordination",
+      "assistant-horse-master": "Assistenz der Pferdekoordination",
+      "horse-trainer": "Filmpferdetrainer/in",
+      "horse-wrangler": "Pferdehandler/in"
+    },
+    "species": {
+      "dogs": "Hunde",
+      "horses": "Pferde & Ponys",
+      "cats": "Katzen",
+      "birds": "Vögel",
+      "reptiles": "Reptilien",
+      "livestock": "Nutztiere",
+      "exotics": "Exoten",
+      "other": "Weitere Tierarten"
+    },
+    "services": {
+      "animal-agency": "Filmtieragentur",
+      "dog-agency": "Filmhundagentur",
+      "animal-training": "Tiertraining",
+      "dog-training": "Filmhundetraining",
+      "animal-handling": "Animal Handling",
+      "animal-coordination": "Tierkoordination",
+      "set-care": "Set-Tierbetreuung"
+    },
+    "servicesLabel": "Leistungen (optional)",
+    "speciesLabel": "Tierarten (Mehrfachauswahl, optional)",
+    "otherSpeciesLabel": "Weitere Tierarten oder Spezialisierung (optional)",
+    "selfReported": "Diese Angaben beschreiben euer Angebot. Sie sind kein Nachweis einer Zulassung oder Zertifizierung.",
+    "portfolio": "Tierportfolio",
+    "addPortfolio": "Tierportfolio ergänzen",
+    "portfolioHelp": "Stelle Tiere mit Namen, Tierart, Fotos und Fähigkeiten vor. Tierportfolios werden geprüft und nicht als Verkaufs- oder Mietartikel veröffentlicht.",
+    "inquire": "Projekt anfragen",
+    "noProvider": "Kein Anbieter verknüpft.",
+    "back": "Zurück zu den Tierportfolios",
+    "gallery": "Tiergalerie",
+    "about": "Über dieses Tier",
+    "skills": "Fähigkeiten und Erfahrungen",
+    "viewProvider": "Anbieter ansehen",
+    "animalName": "Name des Tieres",
+    "speciesField": "Tierart",
+    "conditions": "Betreuung und Einsatzbedingungen werden direkt mit der Agentur oder verantwortlichen Person vereinbart.",
+    "portfolioDetails": "Details zum Tierportfolio",
+    "training": "Ausbildungsstand (eigene Angabe)",
+    "description": "Tierportfolio und Agenturen für Film, Fernsehen, Werbung und Fotografie.",
+    "allSpecies": "Alle Tierarten",
+    "empty": "Keine passenden Tierportfolios gefunden.",
+    "browse": "Tierportfolios entdecken",
+    "locationRequest": "Standort auf Anfrage",
+    "previewNotice": "Dieses Tierportfolio wartet noch auf Freigabe und ist nur als geschützte Vorschau sichtbar.",
+    "count": "Anzahl (optional)",
+    "handler": "Betreuung durch Trainer/in oder Handler vorgesehen",
+    "delivery": "Transport zum Set möglich"
   }
 }

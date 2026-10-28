@@ -1578,5 +1578,71 @@
     "stale": "Az ajánlat időközben megváltozott. Töltsd be újra a mentett változatot.",
     "savedTitle": "Mentve – ellenőrizd az állapotot",
     "publishing": "Közzététel folyamatban …"
+  },
+  "FilmAnimals": {
+    "department": "Filmes állatok és állatkiképzés",
+    "categories": {
+      "tiervermittlung": "Filmes állatügynökség",
+      "filmhundagentur": "Filmes kutyaügynökség",
+      "tiertraining-film-medien": "Állatkiképzés filmhez és médiához"
+    },
+    "roles": {
+      "tiertrainer": "Filmes állatkiképző",
+      "filmhundetrainer": "Filmes kutyakiképző",
+      "tierbetreuer": "Állatkezelő / Animal Handler",
+      "tierkoordination": "Állatkoordinátor",
+      "set-tierbetreuung": "Állatgondozás a forgatáson",
+      "horse-master": "Lókoordinátor",
+      "assistant-horse-master": "Lókoordinációs asszisztens",
+      "horse-trainer": "Filmes lókiképző",
+      "horse-wrangler": "Lógondozó"
+    },
+    "species": {
+      "dogs": "Kutyák",
+      "horses": "Lovak és pónik",
+      "cats": "Macskák",
+      "birds": "Madarak",
+      "reptiles": "Hüllők",
+      "livestock": "Haszonállatok",
+      "exotics": "Egzotikus állatok",
+      "other": "Egyéb állatfajok"
+    },
+    "services": {
+      "animal-agency": "Filmes állatügynökség",
+      "dog-agency": "Filmes kutyaügynökség",
+      "animal-training": "Állatkiképzés",
+      "dog-training": "Filmes kutyakiképzés",
+      "animal-handling": "Állatkezelés",
+      "animal-coordination": "Állatkoordináció",
+      "set-care": "Állatgondozás a forgatáson"
+    },
+    "servicesLabel": "Szolgáltatások (nem kötelező)",
+    "speciesLabel": "Állatfajok (több választható, nem kötelező)",
+    "otherSpeciesLabel": "További fajok vagy szakterület (nem kötelező)",
+    "selfReported": "Ezek az adatok a szolgáltatásokat írják le. Nem igazolnak engedélyt vagy tanúsítványt.",
+    "portfolio": "Állatportfólió",
+    "addPortfolio": "Állatportfólió hozzáadása",
+    "portfolioHelp": "Mutasd be az állatokat névvel, fajjal, fotókkal és képességekkel. A portfóliókat ellenőrizzük, és nem értékesítési vagy bérleti termékként tesszük közzé.",
+    "inquire": "Érdeklődés projektről",
+    "noProvider": "Nincs kapcsolt szolgáltató.",
+    "back": "Vissza a portfóliókhoz",
+    "gallery": "Állatgaléria",
+    "about": "Az állatról",
+    "skills": "Képességek és tapasztalat",
+    "viewProvider": "Szolgáltató megtekintése",
+    "animalName": "Az állat neve",
+    "speciesField": "Állatfaj",
+    "conditions": "A gondozás és a forgatás feltételei közvetlenül az ügynökséggel vagy a felelős személlyel egyeztethetők.",
+    "portfolioDetails": "Állatportfólió részletei",
+    "training": "Kiképzési szint (saját adat)",
+    "description": "Állatportfóliók és ügynökségek filmhez, televízióhoz, reklámhoz és fotózáshoz.",
+    "allSpecies": "Minden faj",
+    "empty": "Nincs megfelelő állatportfólió.",
+    "browse": "Állatportfóliók böngészése",
+    "locationRequest": "Helyszín kérésre",
+    "previewNotice": "Ez a portfólió jóváhagyásra vár, és csak védett előnézetként látható.",
+    "count": "Állatok száma (nem kötelező)",
+    "handler": "Tervezett felügyelet trénerrel vagy állatkezelővel",
+    "delivery": "Szállítás a forgatásra lehetséges"
   }
 }

@@ -1,3 +1,4 @@
+import { ANIMAL_DEPARTMENT_ID, ANIMAL_DEPARTMENT_LABEL, animalRoleLabel, type AnimalTranslator } from "@/lib/animal-taxonomy";
 import { GRIP_DEPARTMENT_LABEL, GRIP_OCCUPATIONS } from "@/lib/gripTaxonomy";
 import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
 import { CATERING_DEPARTMENT_ID, CATERING_DEPARTMENT_LABEL } from "@/lib/catering-taxonomy";
@@ -15,8 +16,8 @@ export type Department = {
   roleLabels?: Record<string, Record<string, string>>;
 };
 
-export function getDeptLabel(dept: Department, locale: string): string {
-  return dept.labels[locale] ?? dept.label;
+export function getDeptLabel(dept: Department, locale: string, animals?: AnimalTranslator): string {
+  return dept.id === ANIMAL_DEPARTMENT_ID && animals ? animals("department") : dept.labels[locale] ?? dept.label;
 }
 
 export const departments: Department[] = [
@@ -374,7 +375,6 @@ export const departments: Department[] = [
       "Aerial Coordinator",
       "Stunt Rider", "Stunt Technician", "Stunt Rescue Diver",
       "Parkour Artist", "Präzisionsfahrer*in",
-      "Horse Master", "Horse Wrangler",
       "Intimacy Coordinator",
       "Casting Associate", "Castingassistent*in",
     ],
@@ -546,6 +546,7 @@ const FILM_TO_PROFILE_DEPARTMENT: Record<string, string> = {
   "public-relation": "public-relations",
   "weitere-crew": "set-logistik",
   [CATERING_DEPARTMENT_ID]: CATERING_DEPARTMENT_ID,
+  [ANIMAL_DEPARTMENT_ID]: ANIMAL_DEPARTMENT_ID,
   "content-creation": "social",
   "social-video": "social",
   fotografie: "foto",
@@ -571,7 +572,7 @@ const ADDITIONAL_DEPARTMENTS: Department[] = [
   },
 ];
 
-departments.push(...ADDITIONAL_DEPARTMENTS);
+departments.push(...ADDITIONAL_DEPARTMENTS, { id: ANIMAL_DEPARTMENT_ID, label: ANIMAL_DEPARTMENT_LABEL, labels: {de: ANIMAL_DEPARTMENT_LABEL}, emoji: "🐾", color: "emerald", roles: [] });
 
 function roleKey(value: string): string {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("de").replace(/[^a-z0-9]+/g, " ").trim();
@@ -617,6 +618,7 @@ export const DEPARTMENT_TO_PROFILE_TYPES: Record<string, ProfileType[]> = {
   kamera: ["camera"], grip: ["camera"], licht: ["lighting"], ton: ["sound"],
   produktion: ["production"], regie: ["director"], art: ["art_department"],
   [CATERING_DEPARTMENT_ID]: ["production"],
+  [ANIMAL_DEPARTMENT_ID]: ["production"],
   kostuem: ["costume"], maske: ["makeup"], post: ["postproduction"],
   sfx: ["sfx"], broadcast: ["broadcast"], virtual: ["vfx"],
   "set-logistik": ["production"], redaktion: ["filmmaker"], social: ["creator"],
@@ -706,6 +708,7 @@ export function deptColors(color: string) {
 }
 
 /** Display only; stored occupation titles and stable role IDs never change. */
-export function getDepartmentRoleLabel(departmentId: string, role: string, locale: string): string {
+export function getDepartmentRoleLabel(departmentId: string, role: string, locale: string, animals?: AnimalTranslator): string {
+  if (departmentId === ANIMAL_DEPARTMENT_ID && animals) return animalRoleLabel(role, animals);
   return departments.find(department=>department.id===departmentId)?.roleLabels?.[role]?.[locale] ?? role;
 }

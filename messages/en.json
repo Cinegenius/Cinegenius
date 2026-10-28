@@ -1578,5 +1578,71 @@
     "stale": "The offer changed in the meantime. Reload the saved version.",
     "savedTitle": "Saved – check status",
     "publishing": "Publishing …"
+  },
+  "FilmAnimals": {
+    "department": "Film Animals & Animal Training",
+    "categories": {
+      "tiervermittlung": "Film Animal Agency",
+      "filmhundagentur": "Film Dog Agency",
+      "tiertraining-film-medien": "Animal Training for Film and Media"
+    },
+    "roles": {
+      "tiertrainer": "Animal Trainer",
+      "filmhundetrainer": "Film Dog Trainer",
+      "tierbetreuer": "Animal Handler",
+      "tierkoordination": "Animal Coordinator",
+      "set-tierbetreuung": "On-Set Animal Care",
+      "horse-master": "Horse Master",
+      "assistant-horse-master": "Assistant Horse Master",
+      "horse-trainer": "Film Horse Trainer",
+      "horse-wrangler": "Horse Wrangler"
+    },
+    "species": {
+      "dogs": "Dogs",
+      "horses": "Horses & Ponies",
+      "cats": "Cats",
+      "birds": "Birds",
+      "reptiles": "Reptiles",
+      "livestock": "Livestock",
+      "exotics": "Exotic Animals",
+      "other": "Other Species"
+    },
+    "services": {
+      "animal-agency": "Film Animal Agency",
+      "dog-agency": "Film Dog Agency",
+      "animal-training": "Animal Training",
+      "dog-training": "Film Dog Training",
+      "animal-handling": "Animal Handling",
+      "animal-coordination": "Animal Coordination",
+      "set-care": "On-Set Animal Care"
+    },
+    "servicesLabel": "Services (optional)",
+    "speciesLabel": "Species (multiple selections, optional)",
+    "otherSpeciesLabel": "Other species or specialisation (optional)",
+    "selfReported": "These details describe your services. They do not verify licensing or certification.",
+    "portfolio": "Animal Portfolio",
+    "addPortfolio": "Add an Animal Portfolio",
+    "portfolioHelp": "Present animals with a name, species, photos and skills. Animal portfolios require review and are not published as sale or rental items.",
+    "inquire": "Enquire about a project",
+    "noProvider": "No provider linked.",
+    "back": "Back to animal portfolios",
+    "gallery": "Animal gallery",
+    "about": "About this animal",
+    "skills": "Skills and experience",
+    "viewProvider": "View provider",
+    "animalName": "Animal name",
+    "speciesField": "Species",
+    "conditions": "Care and production conditions are agreed directly with the agency or responsible person.",
+    "portfolioDetails": "Animal portfolio details",
+    "training": "Training level (self-reported)",
+    "description": "Animal portfolios and agencies for film, television, advertising and photography.",
+    "allSpecies": "All species",
+    "empty": "No matching animal portfolios found.",
+    "browse": "Explore animal portfolios",
+    "locationRequest": "Location on request",
+    "previewNotice": "This animal portfolio is awaiting approval and is only visible as a protected preview.",
+    "count": "Number of animals (optional)",
+    "handler": "Trainer or handler supervision planned",
+    "delivery": "Transport to the set available"
   }
 }

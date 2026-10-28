@@ -17,6 +17,8 @@ import {
   Users, Check, UserX, Clock, Calendar, Scale, Tag,
   Quote, Globe2,
 } from "lucide-react";
+import AnimalCompanyFields, { AnimalCompanySummary } from "@/components/AnimalCompanyFields";
+import { normalizeAnimalCompanyDetails, isAnimalCompany, animalCategoryLabel } from "@/lib/animal-taxonomy";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import { compressImage, MAX_FUNCTION_UPLOAD_BYTES, safeObjectURL } from "@/lib/compressImage";
 import { MAX_COMPANY_GALLERY_IMAGES, moveCompanyGalleryImage } from "@/lib/company-media";
@@ -63,6 +65,7 @@ async function prepareCompanyImage(file: File, dimensions: { maxWidth: number; m
 }
 
 export default function CompanySetupPage() {
+  const animals = useTranslations("FilmAnimals");
   const { isLoaded, user } = useUser();
   const tDraft = useTranslations("FormDraft");
   const [responsible, setResponsible] = useState<ResponsiblePerson>(EMPTY_RESPONSIBLE_PERSON);
@@ -105,6 +108,7 @@ export default function CompanySetupPage() {
   // Categories
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const [animalDetails, setAnimalDetails] = useState(() => normalizeAnimalCompanyDetails(null));
   const [cateringDetails, setCateringDetails] = useState<CateringCompanyDetails>(EMPTY_CATERING_COMPANY_DETAILS);
 
   // Services (free text tags)
@@ -175,6 +179,7 @@ export default function CompanySetupPage() {
           setCoverPreview(c.cover_url ?? "");
           setSelectedCategories(c.categories ?? []);
           setCateringDetails(normalizeCateringCompanyDetails(c.catering_details));
+        setAnimalDetails(normalizeAnimalCompanyDetails(c.animal_details));
           setServices(c.services ?? []);
           setPortfolioImages(c.portfolio_images ?? []);
           setTagline(c.tagline ?? "");
@@ -226,6 +231,7 @@ export default function CompanySetupPage() {
         setCoverUrl(draft.coverUrl ?? ""); setCoverPreview(draft.coverUrl ?? "");
         setPortfolioImages(draft.portfolioImages ?? []); setSelectedCategories(draft.selectedCategories ?? []);
         setCateringDetails(normalizeCateringCompanyDetails(draft.cateringDetails));
+        setAnimalDetails(normalizeAnimalCompanyDetails(draft.animalDetails));
         setServices(draft.services ?? []); setTagline(draft.tagline ?? ""); setBioShort(draft.bioShort ?? "");
         setUsp(draft.usp ?? ""); setFoundedYear(draft.foundedYear ?? ""); setLegalForm(draft.legalForm ?? "");
         setHqAddress(draft.hqAddress ?? ""); setCountries(draft.countries ?? []);
@@ -241,7 +247,7 @@ export default function CompanySetupPage() {
 
   const companyDraft = useFormDraft({
     formKey: `company:${existingId ?? "new"}`,
-    value: { responsible, name, city, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep },
+    value: { responsible, name, city, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, animalDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep },
     ready: !loading && (!guidedSetup || !!existingId || companyDraftLoaded),
     busy: uploadingLogo || uploadingCover || uploadingPortfolio || portfolioUploads.some(entry => entry.status === "failed") || saving,
     restore: (draft) => {
@@ -253,6 +259,7 @@ export default function CompanySetupPage() {
         setCoverUrl(draft.coverUrl ?? ""); setCoverPreview(draft.coverUrl ?? "");
         setPortfolioImages(draft.portfolioImages ?? []); setSelectedCategories(draft.selectedCategories ?? []);
         setCateringDetails(normalizeCateringCompanyDetails(draft.cateringDetails));
+        setAnimalDetails(normalizeAnimalCompanyDetails(draft.animalDetails));
         setServices(draft.services ?? []); setTagline(draft.tagline ?? ""); setBioShort(draft.bioShort ?? "");
         setUsp(draft.usp ?? ""); setFoundedYear(draft.foundedYear ?? ""); setLegalForm(draft.legalForm ?? "");
         setHqAddress(draft.hqAddress ?? ""); setCountries(draft.countries ?? []);
@@ -414,6 +421,7 @@ export default function CompanySetupPage() {
           logo_url: logoUrl || null,
           categories: selectedCategories,
           services,
+          animal_details: animalDetails,
           catering_details: selectedCategories.includes(CATERING_COMPANY_CATEGORY.id) ? cateringDetails : EMPTY_CATERING_COMPANY_DETAILS,
           portfolio_images: portfolioImages,
           owner_title: ownerTitle.trim() || null,
@@ -500,12 +508,13 @@ export default function CompanySetupPage() {
                       <div className="flex flex-wrap gap-2">
                         {COMPANY_CATEGORIES.map((category) => {
                           const active = selectedCategories.includes(category.id);
-                          return <button key={category.id} type="button" aria-pressed={active} onClick={() => toggleCategory(category.id)} className={`min-h-11 rounded-full border px-3 py-2 text-sm transition-colors ${active ? "border-gold/50 bg-gold/10 text-gold" : "border-border bg-bg-secondary text-text-secondary hover:border-gold/40"}`}>{category.label}</button>;
+                          return <button key={category.id} type="button" aria-pressed={active} onClick={() => toggleCategory(category.id)} className={`min-h-11 rounded-full border px-3 py-2 text-sm transition-colors ${active ? "border-gold/50 bg-gold/10 text-gold" : "border-border bg-bg-secondary text-text-secondary hover:border-gold/40"}`}>{animalCategoryLabel(category.id, category.label, animals)}</button>;
                         })}
                       </div>
                       <p className="text-xs text-text-muted">Weitere Angaben kannst du später im Firmenprofil ergänzen.</p>
                     </fieldset>
-                    {selectedCategories.includes(CATERING_COMPANY_CATEGORY.id) && <>
+                    {isAnimalCompany(selectedCategories) && <AnimalCompanyFields value={animalDetails} onChange={setAnimalDetails} />}
+              {selectedCategories.includes(CATERING_COMPANY_CATEGORY.id) && <>
                       <CateringCompanyFields value={cateringDetails} onChange={setCateringDetails} />
                       <p className="text-xs text-text-muted">Wenn du diese Firmenkategorie abwählst, werden auch ihre Catering-Angaben entfernt.</p>
                     </>}
@@ -533,7 +542,8 @@ export default function CompanySetupPage() {
                     <div className="space-y-3 rounded-2xl border border-border bg-bg-secondary p-4">
                       <div><p className="text-xs uppercase tracking-wide text-text-muted">Unternehmen</p><p className="mt-1 font-semibold text-text-primary">{name || "Noch kein Firmenname"}</p><p className="text-sm text-text-secondary">{city || "Standort fehlt"}</p></div>
                       {selectedCategories.length > 0 && <div><p className="text-xs uppercase tracking-wide text-text-muted">Angebot</p><p className="mt-1 text-sm text-text-primary">{selectedCategories.map((id) => COMPANY_CATEGORIES.find((item) => item.id === id)?.label).filter(Boolean).join(", ")}</p></div>}
-                      {selectedCategories.includes(CATERING_COMPANY_CATEGORY.id) && (cateringDetails.serviceTypes.length > 0 || cateringDetails.capacity || cateringDetails.serviceAreas) && <div><p className="text-xs uppercase tracking-wide text-text-muted">Catering</p><p className="mt-1 text-sm text-text-primary">{[...cateringDetails.serviceTypes, cateringDetails.capacity ? `Kapazität: bis ${cateringDetails.capacity} Personen` : "", cateringDetails.serviceAreas].filter(Boolean).join(" · ")}</p></div>}
+                      {isAnimalCompany(selectedCategories) && <AnimalCompanySummary value={animalDetails} />}
+              {selectedCategories.includes(CATERING_COMPANY_CATEGORY.id) && (cateringDetails.serviceTypes.length > 0 || cateringDetails.capacity || cateringDetails.serviceAreas) && <div><p className="text-xs uppercase tracking-wide text-text-muted">Catering</p><p className="mt-1 text-sm text-text-primary">{[...cateringDetails.serviceTypes, cateringDetails.capacity ? `Kapazität: bis ${cateringDetails.capacity} Personen` : "", cateringDetails.serviceAreas].filter(Boolean).join(" · ")}</p></div>}
                       {bioShort.trim() && <div><p className="text-xs uppercase tracking-wide text-text-muted">Kurzvorstellung</p><p className="mt-1 text-sm text-text-secondary">{bioShort}</p></div>}
                     </div>
                     <p className="text-xs leading-relaxed text-text-muted">Logo, Kontaktdaten, weitere Kategorien und Teamangaben kannst du später im Firmenprofil ergänzen.</p>
@@ -645,7 +655,7 @@ export default function CompanySetupPage() {
                     if (!cat) return null;
                     return (
                       <span key={id} className={`flex items-center gap-1 px-2.5 py-1 ${cat.bg} text-xs ${cat.color} rounded-full font-medium border`}>
-                        {cat.label}
+                        {animalCategoryLabel(cat.id, cat.label, animals)}
                         <button type="button" onClick={() => toggleCategory(id)} className="hover:opacity-70 ml-0.5">
                           <X size={10} />
                         </button>
@@ -680,8 +690,8 @@ export default function CompanySetupPage() {
                         }`}
                       >
                         <div>
-                          <div className="font-semibold">{cat.label}</div>
-                          <div className="text-[10px] opacity-70 mt-0.5">{cat.examples}</div>
+                          <div className="font-semibold">{animalCategoryLabel(cat.id, cat.label, animals)}</div>
+                          <div className="text-[10px] opacity-70 mt-0.5">{isAnimalCompany([cat.id]) ? animals("description") : cat.examples}</div>
                         </div>
                         {isSelected && <CheckCircle size={13} className="shrink-0 ml-2" />}
                       </button>
@@ -689,6 +699,7 @@ export default function CompanySetupPage() {
                   })}
                 </div>
               )}
+              {isAnimalCompany(selectedCategories) && <AnimalCompanyFields value={animalDetails} onChange={setAnimalDetails} />}
               {selectedCategories.includes(CATERING_COMPANY_CATEGORY.id) && <>
                 <CateringCompanyFields value={cateringDetails} onChange={setCateringDetails} />
                 <p className="text-xs text-text-muted">Wenn du diese Firmenkategorie abwählst, werden auch ihre Catering-Angaben entfernt.</p>

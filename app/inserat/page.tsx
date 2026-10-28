@@ -23,6 +23,7 @@ import {
   Film, Palette, Drama, X, ImageIcon, Search,
   Smartphone, Video, Aperture, PawPrint,
 } from "lucide-react";
+import { animalSpecies, animalRoleLabel, ANIMAL_DEPARTMENT_ID, ANIMAL_SPECIES } from "@/lib/animal-taxonomy";
 import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
 import { PROP_CATEGORY_FIELDS } from "@/lib/propCategoryFields";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
@@ -311,6 +312,7 @@ const conditionOptions = ["Neuwertig", "Sehr gut", "Gut", "Akzeptabel"];
 export default function InseratPage() {
   const moderation = useTranslations("OfferModeration");
   const marketplaceText = useTranslations("MarketplacePublishing");
+  const animals = useTranslations("FilmAnimals");
   const [createdPublished, setCreatedPublished] = useState(false);
   const router = useRouter();
   const { userId, isLoaded } = useAuth();
@@ -556,7 +558,7 @@ export default function InseratPage() {
     if (!userId) return;
     fetch("/api/companies?mine=true&limit=50")
       .then((r) => r.json())
-      .then((d) => setMyCompanies(d.companies ?? []))
+      .then((d) => setMyCompanies(d.data ?? d.companies ?? []))
       .catch(() => {});
   }, [userId]);
 
@@ -573,6 +575,18 @@ export default function InseratPage() {
     setProductionCredits([]);
     setStep(2);
   }
+
+  useEffect(() => {
+    if (!listingDraft.loaded || selected || form.title || createdId) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("animal") !== "1") return;
+    const companyId = params.get("company_id");
+    if (companyId && !myCompanies.some(company => company.id === companyId)) return;
+    const category = groups.flatMap(group => group.items).find(item => item.type === "animal");
+    if (!category) return;
+    setSelected(category); setStep(2);
+    if (companyId) setSelectedCompanyId(companyId);
+  }, [listingDraft.loaded, selected, form.title, createdId, myCompanies]);
 
   function buildPayload() {
     if (!selected) return null;
@@ -673,9 +687,11 @@ export default function InseratPage() {
         category,
         title: form.title,
         description: form.description || "",
-        price: parseFloat(form.price) || 0,
+        price: 0,
         city: form.city,
         metadata: {
+          offer_kind: "animal_portfolio",
+          species: animalSpecies(category)?.id,
           training_level: form.animal_training || null,
           handler_included: form.animal_handler,
           count: form.animal_count || null,
@@ -780,7 +796,7 @@ export default function InseratPage() {
     const personErrors = (selected?.type === "prop" || selected?.type === "vehicle") ? marketplaceResponsibleErrors(responsible) : responsiblePersonErrors(responsible);
     setResponsibleErrors(personErrors);
     if (Object.keys(personErrors).length && selected?.type !== "location" && selected?.type !== "job") { focusResponsiblePerson(); return; }
-    const usesGallery = selected?.type === "prop" || selected?.type === "vehicle" || selected?.type === "location";
+    const usesGallery = selected?.type === "prop" || selected?.type === "vehicle" || selected?.type === "animal" || selected?.type === "location";
     const galleryState = selected?.type === "location" ? locationGalleryState : articleGalleryState;
     if (usesGallery && galleryState.uploading) {
       setError("Bitte warte, bis alle Bilder fertig hochgeladen sind.");
@@ -805,10 +821,10 @@ export default function InseratPage() {
           responsible_person: responsible,
           image_url: selected?.type === "job" ? null
             : selected?.type === "location" ? locExtraImages[0] ?? null
-            : (selected?.type === "prop" || selected?.type === "vehicle") ? articleImages[0] ?? null
+            : (selected?.type === "prop" || selected?.type === "vehicle" || selected?.type === "animal") ? articleImages[0] ?? null
             : imageUrl,
           ...((selected?.type === "location") ? { extra_images: locExtraImages.slice(1) }
-            : (selected?.type === "prop" || selected?.type === "vehicle") ? { extra_images: articleImages.slice(1) } : {}),
+            : (selected?.type === "prop" || selected?.type === "vehicle" || selected?.type === "animal") ? { extra_images: articleImages.slice(1) } : {}),
           company_id: selectedCompanyId || null,
           draft: selected?.type === "job" || selected?.type === "location",
         }),
@@ -973,7 +989,7 @@ export default function InseratPage() {
             )}
             <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Inserat erstellen</p>
             <h1 className="font-display text-2xl font-bold text-text-primary mb-1">
-              {activeGroup ? currentGroup?.label : "Was möchtest du inserieren?"}
+              {activeGroup === "tiere" ? animals("portfolio") : activeGroup ? currentGroup?.label : "Was möchtest du inserieren?"}
             </h1>
             <p className="text-text-muted text-sm">
               {activeGroup ? "Wähle eine Kategorie aus." : "Wähle einen Bereich — der Rest passt sich an."}
@@ -999,8 +1015,8 @@ export default function InseratPage() {
                     <tile.icon size={20} className={tile.color} />
                   </div>
                   <div>
-                    <p className="font-semibold text-text-primary text-sm mb-0.5">{tile.label}</p>
-                    <p className="text-xs text-text-muted leading-relaxed">{tile.sub}</p>
+                    <p className="font-semibold text-text-primary text-sm mb-0.5">{tile.id === "tiere" ? animals("addPortfolio") : tile.label}</p>
+                    <p className="text-xs text-text-muted leading-relaxed">{tile.id === "tiere" ? animals("description") : tile.sub}</p>
                   </div>
                 </button>
               ))}
@@ -1021,10 +1037,10 @@ export default function InseratPage() {
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-text-primary leading-snug group-hover:text-current transition-colors">
-                      {item.label}
+                      {item.type === "animal" ? animals(`species.${animalSpecies(item.category)!.id}`) : item.id.endsWith(ANIMAL_DEPARTMENT_ID) ? animals("department") : item.label}
                     </p>
                     {item.sub && (
-                      <p className="text-xs text-text-muted mt-0.5 leading-relaxed truncate">{item.sub}</p>
+                      <p className="text-xs text-text-muted mt-0.5 leading-relaxed truncate">{item.type === "animal" ? animals("portfolioHelp") : item.sub}</p>
                     )}
                   </div>
                 </button>
@@ -1067,7 +1083,7 @@ export default function InseratPage() {
             <div>
               <p className="text-xs uppercase tracking-widest text-gold font-semibold">Inserat erstellen</p>
               <FormDraftStatus draft={listingDraft} />
-              <h1 className="font-display text-2xl font-bold text-text-primary">{label}</h1>
+              <h1 className="font-display text-2xl font-bold text-text-primary">{isAnimal ? animals("portfolio") : dept?.id === ANIMAL_DEPARTMENT_ID ? animals("department") : label}</h1>
             </div>
           </div>
 
@@ -1143,50 +1159,21 @@ export default function InseratPage() {
               </div>
             )}
 
-            {/* ── ANIMAL FIELDS ── */}
-            {isAnimal && (
-              <div className="space-y-5">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Dressur-Level</label>
-                    <FormSelect value={form.animal_training} onChange={(v) => f("animal_training", v)}
-                      placeholder="Bitte wählen…"
-                      options={["Kinoprofi", "Erfahren", "Grundgehorsam", "Ungeübt"].map(o => ({ value: o, label: o }))} />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Anzahl</label>
-                    <FormSelect value={form.animal_count} onChange={(v) => f("animal_count", v)}
-                      options={["1 Tier", "2–5 Tiere", "Gruppe (6+)"].map(o => ({ value: o, label: o }))} />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Besonderheiten / Tricks</label>
-                  <input type="text" value={form.animal_skills} onChange={(e) => f("animal_skills", e.target.value)}
-                    placeholder="z.B. sitzt, Männchen, läuft auf Kommando, apportiert"
-                    className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
-                </div>
-                <label className="flex items-center gap-3 cursor-pointer select-none">
-                  <div onClick={() => f("animal_handler", !form.animal_handler)}
-                    className={`w-10 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${form.animal_handler ? "bg-gold" : "bg-border"}`}>
-                    <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${form.animal_handler ? "left-5" : "left-1"}`} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-text-primary">Handler / Trainer dabei</p>
-                    <p className="text-xs text-text-muted">Professionelle Betreuung am Set inklusive</p>
-                  </div>
-                </label>
-                <label className="flex items-center gap-3 cursor-pointer select-none">
-                  <div onClick={() => f("delivery", !form.delivery)}
-                    className={`w-10 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${form.delivery ? "bg-gold" : "bg-border"}`}>
-                    <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${form.delivery ? "left-5" : "left-1"}`} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-text-primary">Anlieferung zum Set möglich</p>
-                    <p className="text-xs text-text-muted">Das Tier kann zur Location gebracht werden</p>
-                  </div>
-                </label>
-              </div>
-            )}
+            {/* Animal information describes a supervised production portfolio. */}
+            {isAnimal && <fieldset className="space-y-4 rounded-xl border border-border p-4">
+              <legend className="px-1 text-sm font-semibold">{animals("portfolioDetails")}</legend>
+              <label className="block text-sm">{animals("speciesField")}
+                <select value={animalSpecies(selected.category)?.id ?? "dogs"} onChange={event => { const species = ANIMAL_SPECIES.find(item => item.id === event.target.value); const item = groups.flatMap(group => group.items).find(item => item.type === "animal" && item.category === species?.category); if (item) setSelected(item); }} className="mt-2 min-h-11 w-full rounded-xl border border-border bg-bg-elevated px-3 text-text-primary">
+                  {ANIMAL_SPECIES.map(species => <option key={species.id} value={species.id}>{animals(`species.${species.id}`)}</option>)}
+                </select>
+              </label>
+              <label className="block text-sm">{animals("training")}<input value={form.animal_training} onChange={event => f("animal_training",event.target.value)} maxLength={120} className="mt-2 min-h-11 w-full rounded-xl border border-border bg-bg-elevated px-3" /></label>
+              <label className="block text-sm">{animals("count")}<input value={form.animal_count} onChange={event => f("animal_count",event.target.value)} maxLength={40} className="mt-2 min-h-11 w-full rounded-xl border border-border bg-bg-elevated px-3" /></label>
+              <label className="block text-sm">{animals("skills")}<textarea value={form.animal_skills} onChange={event => f("animal_skills",event.target.value)} maxLength={2000} className="mt-2 min-h-24 w-full rounded-xl border border-border bg-bg-elevated p-3" /></label>
+              <label className="flex min-h-11 items-center gap-3 text-sm"><input type="checkbox" checked={form.animal_handler} onChange={event => f("animal_handler",event.target.checked)} className="accent-gold" />{animals("handler")}</label>
+              <label className="flex min-h-11 items-center gap-3 text-sm"><input type="checkbox" checked={form.delivery} onChange={event => f("delivery",event.target.checked)} className="accent-gold" />{animals("delivery")}</label>
+              <p className="text-xs leading-5 text-text-muted">{animals("selfReported")}</p>
+            </fieldset>}
 
             {/* ── LOCATION FIELDS ── */}
             {isLocation && (
@@ -1687,13 +1674,13 @@ export default function InseratPage() {
             {/* ── TITLE ── */}
             <div>
               <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
-                {isVehicle ? "Titel (optional)" : isJob ? "Anzeigentitel *" : isCreator ? "Dein Name *" : "Titel *"}
+                {isAnimal ? animals("animalName") : isVehicle ? "Titel (optional)" : isJob ? "Anzeigentitel *" : isCreator ? "Dein Name *" : "Titel *"}
               </label>
               <input
                 value={form.title}
                 onChange={(e) => f("title", e.target.value)}
                 placeholder={
-                  isVehicle ? "z.B. 1969 Ford Mustang Fastback" :
+                  isAnimal ? animals("animalName") : isVehicle ? "z.B. 1969 Ford Mustang Fastback" :
                   isLocation ? "z.B. Loft-Wohnung mit Industriecharme, Berlin Mitte" :
                   isJob ? (form.role_label ? `z.B. ${form.role_label} für Kurzfilm gesucht` : `z.B. ${dept?.label ?? ""}-Stelle für Kurzfilm`) :
                   isCreator ? "z.B. Max Müller" :
@@ -1733,10 +1720,11 @@ export default function InseratPage() {
               />
             )}
 
+            {isAnimal && <p className="text-sm leading-6 text-text-muted">{animals("portfolioHelp")}</p>}
             {/* ── PRICE + CITY ── */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                {isLocation ? (
+                {isAnimal ? <p className="text-sm text-text-secondary">{animals("conditions")}</p> : isLocation ? (
                   <div className="space-y-2">
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest">Preis</label>
                     <ListingPriceOptions onRequest={locPriceOnRequest} negotiable={priceNegotiable} onChange={value=>{setLocPriceOnRequest(value.priceOnRequest);setPriceNegotiable(value.priceNegotiable);}} />
@@ -1769,7 +1757,7 @@ export default function InseratPage() {
 
             {/* ── IMAGE UPLOAD ── */}
             <div>
-              {selected?.type === "prop" || selected?.type === "vehicle" ? (
+              {selected?.type === "prop" || selected?.type === "vehicle" || selected?.type === "animal" ? (
                 <div className="space-y-3">
                   <ListingImageManager
                     value={articleImages}
@@ -1778,7 +1766,7 @@ export default function InseratPage() {
                       setArticleImages(urls);
                     }}
                     onStatusChange={setArticleGalleryState}
-                    label="Artikelbilder"
+                    label={isAnimal ? animals("gallery") : "Artikelbilder"}
                   />
                   {articleImages[0] && (
                     <button
@@ -1887,7 +1875,7 @@ export default function InseratPage() {
             {/* ── SUBMIT ── */}
             <button
               onClick={handleSubmit}
-              disabled={!listingDraft.loaded || !canSubmit() || loading || uploading || ((selected?.type === "prop" || selected?.type === "vehicle") && (articleGalleryState.uploading || articleGalleryState.failed > 0)) || (selected?.type === "location" && (locationGalleryState.uploading || locationGalleryState.failed > 0))}
+              disabled={!listingDraft.loaded || !canSubmit() || loading || uploading || ((selected?.type === "prop" || selected?.type === "vehicle" || selected?.type === "animal") && (articleGalleryState.uploading || articleGalleryState.failed > 0)) || (selected?.type === "location" && (locationGalleryState.uploading || locationGalleryState.failed > 0))}
               className="w-full py-4 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
             >
               {loading ? (

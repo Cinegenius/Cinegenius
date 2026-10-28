@@ -1,107 +1,39 @@
 import JsonLd from "@/components/JsonLd";
 import { notFound } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
+import { getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
+import { canEditListing } from "@/lib/listing-access";
+import { getListingProvider } from "@/lib/listing-provider";
 import type { Metadata } from "next";
 import TiereDetail from "@/components/TiereDetail";
 
-async function getAnimal(slug: string) {
-  try {
-    const { data, error } = await db
-      .from("listings")
-      .select("id, user_id, type, title, category, city, price, image_url, description, metadata, extra_images, published")
-      .eq("id", slug)
-      .eq("type", "animal")
-      .eq("published", true)
-      .single();
-
-    if (error || !data) return null;
-
-    const ownerRes = data.user_id
-      ? await db.from("profiles").select("display_name, avatar_url, slug").eq("user_id", data.user_id).single()
-      : { data: null };
-
-    type OwnerRow = { display_name: string | null; avatar_url: string | null; slug: string | null } | null;
-    const owner = (ownerRes as { data: OwnerRow }).data;
-
-    const meta = (data.metadata ?? {}) as Record<string, unknown>;
-
-    return {
-      id: data.id,
-      title: data.title ?? "Film-Tier",
-      category: data.category ?? "Sonstige Tiere",
-      location: data.city ?? "",
-      dailyRate: data.price ?? 0,
-      image: data.image_url ?? "",
-      trainingLevel: (meta.training_level as string) ?? null,
-      handlerIncluded: (meta.handler_included as boolean) ?? false,
-      count: (meta.count as string) ?? "1 Tier",
-      specialSkills: (meta.special_skills as string) ?? null,
-      delivery: (meta.delivery as boolean) ?? false,
-      focalPoint: (meta.focal_point as { x: number; y: number } | null) ?? null,
-      description: data.description ?? "",
-      ownerId: data.user_id ?? "",
-      ownerName: owner?.display_name ?? "Anbieter",
-      ownerAvatar: owner?.avatar_url ?? null,
-      ownerSlug: owner?.slug ?? data.user_id ?? null,
-      extra_images: data.extra_images ?? [],
-    };
-  } catch {
-    return null;
-  }
+async function getAnimal(slug: string, viewerId: string | null = null, preview = false) {
+  if (!/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(slug)) return null;
+  const {data,error} = await db.from("listings")
+    .select("id,user_id,company_id,responsible_person,type,title,category,city,price,image_url,description,metadata,extra_images,published")
+    .eq("id",slug).eq("type","animal").maybeSingle();
+  if (error) throw new Error("Animal portfolio could not be loaded");
+  if (!data) return null;
+  const canEdit = viewerId ? await canEditListing(viewerId,data) : false;
+  if (!data.published && !(preview && canEdit)) return null;
+  const provider = await getListingProvider(data.user_id,data.company_id,viewerId,data.responsible_person);
+  const meta = (data.metadata ?? {}) as Record<string,unknown>;
+  return { id:data.id,title:data.title,category:data.category ?? "",location:data.city ?? "",dailyRate:data.price ?? 0,image:data.image_url ?? "",
+    trainingLevel:typeof meta.training_level === "string" ? meta.training_level : null,handlerIncluded:meta.handler_included === true,
+    count:String(meta.count ?? "1"),specialSkills:typeof meta.special_skills === "string" ? meta.special_skills : null,delivery:meta.delivery === true,
+    focalPoint:meta.focal_point as {x:number;y:number}|null,description:data.description ?? "",extra_images:data.extra_images ?? [],
+    ownerId:provider.contactUserId ?? undefined,ownerName:provider.name,ownerAvatar:provider.imageUrl,ownerHref:provider.href,canEdit,privatePreview:!data.published };
 }
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  const { slug } = await params;
-  const animal = await getAnimal(slug);
-  if (!animal) return {};
-  return {
-    title: animal.title,
-    description: `${animal.category} für Filmproduktionen — ${animal.dailyRate > 0 ? `ab ${animal.dailyRate.toLocaleString()} € / Tag` : "Preis auf Anfrage"}. Jetzt auf CineGenius buchen.`,
-    openGraph: {
-      title: `${animal.title} | CineGenius Film-Tiere`,
-      description: `${animal.category} · ${animal.trainingLevel ?? "Auf Anfrage"} · ${animal.location}`,
-      ...(animal.image ? { images: [{ url: animal.image, width: 800, height: 600, alt: animal.title }] } : {}),
-    },
-  };
+export async function generateMetadata({params}:{params:Promise<{slug:string}>}):Promise<Metadata> {
+  const animal = await getAnimal((await params).slug);
+  if (!animal) return {robots:{index:false,follow:false}};
+  const t = await getTranslations("FilmAnimals");
+  return {title:animal.title,description:animal.description?.slice(0,155) || t("description"),openGraph:{title:animal.title,description:t("description")}};
 }
-
-export default async function AnimalDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const animal = await getAnimal(slug);
+export default async function AnimalDetailPage({params,searchParams}:{params:Promise<{slug:string}>;searchParams:Promise<{preview?:string}>}) {
+  const {userId} = await auth();
+  const animal = await getAnimal((await params).slug,userId,(await searchParams).preview === "1");
   if (!animal) notFound();
-
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "name": animal.title,
-    "description": animal.description || `${animal.category} für Filmproduktionen`,
-    "image": animal.image || undefined,
-    "offers": {
-      "@type": "Offer",
-      "price": animal.dailyRate,
-      "priceCurrency": "EUR",
-      "availability": "https://schema.org/InStock",
-      "priceSpecification": {
-        "@type": "UnitPriceSpecification",
-        "price": animal.dailyRate,
-        "priceCurrency": "EUR",
-        "unitText": "DAY",
-      },
-    },
-  };
-
-  return (
-    <>
-      <JsonLd data={jsonLd} />
-      <TiereDetail animal={animal} />
-    </>
-  );
+  return <>{!animal.privatePreview && <JsonLd data={{"@context":"https://schema.org","@type":"CreativeWork",name:animal.title,description:animal.description,image:animal.image || undefined}} />}<TiereDetail animal={animal} /></>;
 }

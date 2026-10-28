@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
+import { useTranslations } from "next-intl";
+import { ANIMAL_DEPARTMENT_LABEL } from "@/lib/animal-taxonomy";
+import MediaImage from "@/components/MediaImage";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useViewUrl } from "@/lib/use-view-url";
 import {
   Search, X, MapPin, Car, Package, Briefcase, Users, User,
-  Loader2, ArrowRight, Building2,
+  Loader2, ArrowRight, Building2, PawPrint,
 } from "lucide-react";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -38,6 +41,7 @@ const typeConfig: Record<string, {
   vehicle:  { label: "Fahrzeug",    pluralLabel: "Fahrzeuge",   icon: Car,       href: (id) => `/vehicles/${id}`,  color: "text-orange-400",    bgColor: "bg-orange-500/10 border-orange-500/20" },
   prop:     { label: "Requisite",   pluralLabel: "Requisiten",  icon: Package,   href: (id) => `/props/${id}`,     color: "text-violet-400",    bgColor: "bg-violet-500/10 border-violet-500/20" },
   job:      { label: "Job",         pluralLabel: "Jobs",        icon: Briefcase, href: (id) => `/jobs/${id}`,      color: "text-emerald-400",   bgColor: "bg-emerald-500/10 border-emerald-500/20" },
+  animal: {label: ANIMAL_DEPARTMENT_LABEL, pluralLabel: ANIMAL_DEPARTMENT_LABEL, icon: PawPrint, href: id => `/tiere/${id}`, color: "text-amber-400", bgColor: "bg-amber-500/10 border-amber-500/20"},
   company:  { label: "Firma",       pluralLabel: "Firmen",      icon: Building2, href: (id) => `/companies/${id}`, color: "text-blue-400",      bgColor: "bg-blue-500/10 border-blue-500/20" },
 };
 
@@ -49,6 +53,7 @@ const TABS = [
   { id: "vehicle",  label: "Fahrzeuge",  icon: Car      },
   { id: "prop",     label: "Requisiten", icon: Package  },
   { id: "company",  label: "Firmen",     icon: Building2 },
+  {id:"animal", label:ANIMAL_DEPARTMENT_LABEL, icon:PawPrint},
 ] as const;
 
 // ─── Suggestion chips ──────────────────────────────────────────────────────────
@@ -67,6 +72,7 @@ const SUGGESTIONS = [
 // ─── Result Card ───────────────────────────────────────────────────────────────
 
 function ResultCard({ result }: { result: Result }) {
+  const animals = useTranslations("FilmAnimals");
   const cfg = typeConfig[result.type];
   if (!cfg) return null;
   const Icon = cfg.icon;
@@ -81,7 +87,8 @@ function ResultCard({ result }: { result: Result }) {
       <div className="relative aspect-video bg-bg-elevated overflow-hidden">
         {result.image ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <MediaImage
+            fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px" mediaSize="thumbnail"
             src={result.image}
             alt={result.title}
             className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${isProfile ? "object-top" : "object-center"}`}
@@ -94,7 +101,7 @@ function ResultCard({ result }: { result: Result }) {
         {/* Type badge */}
         <div className={`absolute top-2.5 left-2.5 flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-semibold border backdrop-blur-sm ${cfg.bgColor}`}>
           <Icon size={10} className={cfg.color} />
-          <span className={cfg.color}>{cfg.label}</span>
+          <span className={cfg.color}>{result.type === "animal" ? animals("portfolio") : cfg.label}</span>
         </div>
         {/* Availability dot for profiles */}
         {isProfile && result.available !== null && (
@@ -109,7 +116,7 @@ function ResultCard({ result }: { result: Result }) {
           {result.title}
         </h3>
         <p className="text-xs text-text-muted line-clamp-1 flex-1">{result.subtitle}</p>
-        {!isProfile && (result.priceLabel || result.price > 0) && (
+        {!isProfile && result.type !== "animal" && (result.priceLabel || result.price > 0) && (
           <p className="mt-2 text-sm font-semibold font-mono text-gold">
             {result.priceLabel ?? `${result.price.toLocaleString("de-DE")} €/Tag`}
           </p>
@@ -148,6 +155,7 @@ function EmptyState({ query }: { query: string }) {
 // ─── Main Search Content ───────────────────────────────────────────────────────
 
 function SearchContent() {
+  const animals = useTranslations("FilmAnimals");
   const searchParams = useSearchParams();
 
   const initialQ = searchParams.get("q") ?? "";
@@ -305,7 +313,7 @@ function SearchContent() {
                   }`}
                 >
                   <Icon size={13} />
-                  {label}
+                  {id === "animal" ? animals("portfolio") : label}
                   {results.length > 0 && count > 0 && (
                     <span className={`ml-0.5 text-xs px-1.5 py-0.5 rounded-full ${isActive ? "bg-gold/15 text-gold" : "bg-bg-elevated text-text-muted"}`}>
                       {count}
@@ -341,7 +349,7 @@ function SearchContent() {
                     className={`flex flex-col items-center gap-2 p-3 rounded-xl border ${cfg.bgColor} hover:scale-105 transition-transform`}
                   >
                     <Icon size={18} className={cfg.color} />
-                    <span className={`text-[10px] font-medium ${cfg.color}`}>{cfg.pluralLabel}</span>
+                    <span className={`text-[10px] font-medium ${cfg.color}`}>{key === "animal" ? animals("portfolio") : cfg.pluralLabel}</span>
                   </Link>
                 );
               })}

@@ -1,7 +1,9 @@
 "use client";
 
-import UnoptimizedImage from "@/components/UnoptimizedImage";
+import MediaImage from "@/components/MediaImage";
 
+import { useTranslations } from "next-intl";
+import { animalSpecies } from "@/lib/animal-taxonomy";
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Search, PawPrint, X, Truck, MapPin, Users, Heart, ChevronDown } from "lucide-react";
@@ -30,6 +32,8 @@ type Animal = {
 function FilterDropdown({ value, options, onChange, placeholder }: {
   value: string; options: string[]; onChange: (v: string) => void; placeholder?: string;
 }) {
+  const animals = useTranslations("FilmAnimals");
+  const display = (item: string) => animalSpecies(item) ? animals(`species.${animalSpecies(item)!.id}`) : item === "Alle" && options === SPECIES ? animals("allSpecies") : item;
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -44,7 +48,7 @@ function FilterDropdown({ value, options, onChange, placeholder }: {
         className={`flex items-center gap-2 h-10 px-3 rounded-xl text-sm font-medium border transition-all bg-bg-elevated ${
           value !== options[0] ? "border-gold/40 text-gold" : "border-border text-text-secondary hover:border-gold/30 hover:text-text-primary"
         }`}>
-        {value || placeholder}
+        {value ? display(value) : placeholder}
         <ChevronDown size={13} className={`transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
@@ -52,7 +56,7 @@ function FilterDropdown({ value, options, onChange, placeholder }: {
           {options.map((o) => (
             <button key={o} onClick={() => { onChange(o); setOpen(false); }}
               className={`w-full text-left px-3 py-2 text-sm transition-colors hover:bg-white/[0.04] ${value === o ? "text-gold font-medium" : "text-text-secondary"}`}>
-              {o}
+              {display(o)}
             </button>
           ))}
         </div>
@@ -70,6 +74,7 @@ const TRAINING_COLORS: Record<string, string> = {
 
 export default function TiereContent({ serverListings }: { serverListings: Animal[] }) {
   const { isSignedIn } = useAuth();
+  const animals = useTranslations("FilmAnimals");
   const [search, setSearch] = useState("");
   const [species, setSpecies] = useState("Alle");
   const [training, setTraining] = useState("Alle");
@@ -152,7 +157,7 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
     return serverListings.filter((a) => {
       if (search && !a.title.toLowerCase().includes(search.toLowerCase()) &&
           !a.category.toLowerCase().includes(search.toLowerCase())) return false;
-      if (species !== "Alle" && a.category !== species) return false;
+      if (species !== "Alle" && animalSpecies(a.category)?.id !== animalSpecies(species)?.id) return false;
       if (training !== "Alle" && a.trainingLevel !== training) return false;
       if (deliveryOnly && !a.delivery) return false;
       return true;
@@ -218,10 +223,10 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
           <div className="w-16 h-16 bg-bg-secondary border border-border rounded-2xl flex items-center justify-center mb-5">
             <PawPrint size={28} className="text-text-muted" />
           </div>
-          <h3 className="font-display text-xl font-bold text-text-primary mb-2">Keine Tiere gefunden</h3>
-          <p className="text-text-muted text-sm max-w-xs leading-relaxed mb-6">Passe deine Filter an oder inseriere als Erster ein Tier.</p>
-          <Link href="/inserat" className="px-5 py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors">
-            Tier inserieren
+          <h3 className="font-display text-xl font-bold text-text-primary mb-2">{animals("empty")}</h3>
+          <p className="text-text-muted text-sm max-w-xs leading-relaxed mb-6">{animals("portfolioHelp")}</p>
+          <Link href="/inserat?animal=1" className="px-5 py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors">
+            {animals("addPortfolio")}
           </Link>
         </div>
       ) : (
@@ -231,7 +236,8 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
               className="group bg-bg-secondary border border-border rounded-2xl overflow-hidden hover:border-gold/40 transition-all hover:shadow-lg hover:shadow-gold/5">
               <div className="relative h-48 overflow-hidden bg-bg-elevated">
                 {animal.image ? (
-                  <UnoptimizedImage
+                  <MediaImage
+                    fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px" mediaSize="thumbnail"
                     src={animal.image}
                     alt={animal.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -259,7 +265,7 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
 
               <div className="p-4">
                 <div className="flex flex-wrap gap-1.5 mb-2">
-                  <span className="px-2 py-0.5 bg-bg-elevated border border-border text-text-muted text-[10px] rounded">{animal.category}</span>
+                  <span className="px-2 py-0.5 bg-bg-elevated border border-border text-text-muted text-[10px] rounded">{animalSpecies(animal.category) ? animals(`species.${animalSpecies(animal.category)!.id}`) : animal.category}</span>
                   {animal.trainingLevel && (
                     <span className={`px-2 py-0.5 border text-[10px] rounded font-medium ${TRAINING_COLORS[animal.trainingLevel] ?? TRAINING_COLORS["Grundgehorsam"]}`}>
                       {animal.trainingLevel}
@@ -277,15 +283,15 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
 
                 {animal.handlerIncluded && (
                   <div className="flex items-center gap-1 text-[10px] text-text-muted mb-2">
-                    <Users size={10} className="text-gold" /> Handler inklusive
+                    <Users size={10} className="text-gold" /> {animals("handler")}
                   </div>
                 )}
 
                 <div className="flex items-center justify-between pt-2 border-t border-border">
                   <span className="font-display font-bold text-gold">
-                    {animal.dailyRate > 0 ? `${animal.dailyRate.toLocaleString()} €` : "Auf Anfrage"}
+                    {animals("inquire")}
                   </span>
-                  {animal.dailyRate > 0 && <span className="text-xs text-text-muted">/Tag</span>}
+
                 </div>
                 <div className="flex items-center justify-between mt-1.5 pt-1.5 border-t border-border/30"
                   onClick={(e) => e.stopPropagation()}>

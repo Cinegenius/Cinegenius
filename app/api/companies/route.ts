@@ -1,3 +1,4 @@
+import { normalizeAnimalCompanyDetails, animalCompanySearchFilter } from "@/lib/animal-taxonomy";
 import { bindResponsiblePerson } from "@/lib/responsible-person";
 import { getTranslations } from "next-intl/server";
 import { accountResponsiblePerson, validateResponsiblePerson, responsibleForCompany } from "@/lib/responsible-person-server";
@@ -31,13 +32,13 @@ function generateSlug(name: string): string {
 const COMPANY_COLS_FULL =
   "id, slug, owner_user_id, responsible_person, name, logo_url, cover_url, description, city, website, email, phone, " +
   "categories, services, portfolio_images, tagline, bio_short, usp, founded_year, " +
-  "legal_form, hq_address, countries, industry_focus, social_links, catering_details, published, " +
+  "legal_form, hq_address, countries, industry_focus, social_links, catering_details, animal_details, published, " +
   "email_public, phone_public, hq_address_public, created_at, updated_at";
 
 // Lighter set for public directory listings.
 const COMPANY_COLS_PUBLIC =
   "id, slug, name, logo_url, description, city, categories, services, tagline, " +
-  "founded_year, catering_details, published, created_at";
+  "founded_year, catering_details, animal_details, published, created_at";
 
 // GET — list published companies (with optional filters)
 export async function GET(req: NextRequest) {
@@ -94,7 +95,7 @@ export async function GET(req: NextRequest) {
   if (city)     query = query.ilike("city", `%${city.trim().slice(0, 80).replace(/[%,()]/g, "")}%`);
   if (q) {
     const safeQ = q.trim().slice(0, 80).replace(/[%,()]/g, "");
-    if (safeQ) query = query.or(`name.ilike.%${safeQ}%,description.ilike.%${safeQ}%,city.ilike.%${safeQ}%`);
+    if (safeQ) query = query.or(`name.ilike.%${safeQ}%,description.ilike.%${safeQ}%,city.ilike.%${safeQ}%${animalCompanySearchFilter(safeQ) ? `,${animalCompanySearchFilter(safeQ)}` : ""}`);
   }
 
   const { data, error } = await query;
@@ -166,7 +167,7 @@ export async function POST(req: NextRequest) {
     tagline, bio_short, usp, founded_year, legal_form, hq_address, countries, industry_focus,
     email_public, phone_public, hq_address_public,
     social_links,
-    catering_details,
+    catering_details, animal_details,
     onboarding_request_key,
   } = body;
 
@@ -248,6 +249,7 @@ export async function POST(req: NextRequest) {
         countries: countries ?? [],
         industry_focus: industry_focus ?? [],
         social_links: social_links ?? {},
+        ...(animal_details !== undefined && { animal_details: normalizeAnimalCompanyDetails(animal_details) }),
         ...(catering_details !== undefined && { catering_details: normalizeCateringCompanyDetails(catering_details) }),
         // Saving a company profile makes it publicly discoverable. Keep this
         // policy server-side so older clients cannot accidentally create drafts.
@@ -343,6 +345,7 @@ export async function POST(req: NextRequest) {
       countries: countries ?? [],
       industry_focus: industry_focus ?? [],
       social_links: social_links ?? {},
+      animal_details: normalizeAnimalCompanyDetails(animal_details),
       catering_details: normalizeCateringCompanyDetails(catering_details),
       published: true,
     })

@@ -1,3 +1,4 @@
+import { ANIMAL_COMPANY_CATEGORIES } from "@/lib/animal-taxonomy";
 /**
  * CineGenius — Firmen-Kategorien
  * Single source of truth für alle Dienstleistungsbereiche von Firmen.
@@ -31,9 +32,9 @@ export const COMPANY_CATEGORIES: CompanyCategory[] = [
   { id: "werbeagentur",       label: "Werbe-/Contentagentur",color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/20", examples: "TVC, Social, Brand Content" },
   { id: "fahrzeugverleih",    label: "Fahrzeugverleih",      color: "text-yellow-400",  bg: "bg-yellow-500/10 border-yellow-500/20", examples: "Bild-Fahrzeuge, Stunt, Oldtimer" },
   { id: "equipment-hersteller", label: "Hersteller & Händler", color: "text-orange-300",  bg: "bg-orange-400/10 border-orange-400/20", examples: "Kamera, Licht, Ton, Grip" },
-  { id: "tiervermittlung",    label: "Film-Tiere",           color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20", examples: "Hunde, Pferde, Exoten" },
   { id: "talent-agentur",    label: "Talent-Agentur",       color: "text-fuchsia-400", bg: "bg-fuchsia-500/10 border-fuchsia-500/20", examples: "Booking, Management, Vermittlung" },
   CATERING_COMPANY_CATEGORY,
+  ...ANIMAL_COMPANY_CATEGORIES,
   { id: "drohnen",           label: "Drohnen & Aerial",     color: "text-sky-300",     bg: "bg-sky-400/10 border-sky-400/20",         examples: "UAV, Helikopter, Kran" },
   { id: "musikproduktion",   label: "Musikproduktion",      color: "text-violet-300",  bg: "bg-violet-400/10 border-violet-400/20",   examples: "Score, Soundtrack, Jingle" },
   { id: "onlinemedien",      label: "Online & Digital",     color: "text-cyan-300",    bg: "bg-cyan-400/10 border-cyan-400/20",       examples: "Webseite, Plattform, Streaming" },

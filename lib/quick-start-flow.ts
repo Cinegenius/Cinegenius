@@ -1,3 +1,4 @@
+import { ANIMAL_DEPARTMENT_ID, ANIMAL_LEGACY_REFERENCES, normalizeAnimalCompanyDetails, type AnimalCompanyDetails } from "@/lib/animal-taxonomy";
 import { responsiblePersonDraft, type ResponsiblePerson } from "./responsible-person";
 import { primaryOccupationForPositions, occupationReference, type PrimaryOccupation } from "./primary-occupation";
 import { departments, getDepartmentRoleSearchTerms, getProfileTypesForDepartment } from "@/lib/departments";
@@ -33,6 +34,7 @@ export type QuickStartIntentData = {
   contactPhone: string;
   website: string;
   cateringDetails: CateringCompanyDetails;
+  animalDetails: AnimalCompanyDetails;
 };
 export type QuickStartDraft = {
   version: 3;
@@ -110,7 +112,7 @@ export function getQuickStartDepartments() {
 }
 
 export function createQuickStartIntentData(): QuickStartIntentData {
-  return { category: "", title: "", city: "", description: "", imageUrl: "", price: "", priceOnRequest: true, departmentIds: [], roles: [], categoryIds: [], contactEmail: "", contactPhone: "", website: "", cateringDetails: { serviceTypes: [], serviceAreas: "", capacity: null, dietaryOptions: [], mobileEquipment: [] } };
+  return { category: "", title: "", city: "", description: "", imageUrl: "", price: "", priceOnRequest: true, departmentIds: [], roles: [], categoryIds: [], contactEmail: "", contactPhone: "", website: "", animalDetails: normalizeAnimalCompanyDetails(null), cateringDetails: { serviceTypes: [], serviceAreas: "", capacity: null, dietaryOptions: [], mobileEquipment: [] } };
 }
 
 function normalizeIntentData(value: unknown): QuickStartIntentData {
@@ -121,7 +123,12 @@ function normalizeIntentData(value: unknown): QuickStartIntentData {
   const roles = Array.isArray(input.roles)
     ? input.roles.flatMap((candidate) => {
       if (!candidate || typeof candidate !== "object") return [];
-      const selection = candidate as Partial<QuickStartRoleSelection>;
+      let selection = candidate as Partial<QuickStartRoleSelection>;
+      const previous = ANIMAL_LEGACY_REFERENCES.find(ref => ref.roleId === `${selection.departmentId}/${encodeURIComponent(String(selection.role))}`);
+      if (previous && departmentIds.includes(String(selection.departmentId))) {
+        selection = { departmentId: ANIMAL_DEPARTMENT_ID, role: previous.targetLabel };
+        if (!departmentIds.includes(ANIMAL_DEPARTMENT_ID)) departmentIds.push(ANIMAL_DEPARTMENT_ID);
+      }
       const department = typeof selection.departmentId === "string" ? departmentById.get(selection.departmentId) : null;
       if (!department || !departmentIds.includes(department.id) || typeof selection.role !== "string" || !department.roles.includes(selection.role)) return [];
       return [{ departmentId: department.id, role: selection.role }];
@@ -146,6 +153,7 @@ function normalizeIntentData(value: unknown): QuickStartIntentData {
     contactPhone: typeof input.contactPhone === "string" ? input.contactPhone.slice(0, 80) : "",
     website: typeof input.website === "string" ? input.website.slice(0, 300) : "",
     cateringDetails: normalizeCateringCompanyDetails(input.cateringDetails),
+    animalDetails: normalizeAnimalCompanyDetails(input.animalDetails),
   };
 }
 

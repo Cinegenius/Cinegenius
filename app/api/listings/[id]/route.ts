@@ -78,7 +78,7 @@ export async function PATCH(
       updates.blocked_dates = [...new Set(blocked_dates)];
     }
 
-    if ((image_url !== undefined || extra_images !== undefined) && (current.type === "prop" || current.type === "vehicle" || current.type === "location")) {
+    if ((image_url !== undefined || extra_images !== undefined) && (current.type === "prop" || current.type === "vehicle" || current.type === "animal" || current.type === "location")) {
       const gallery = normalizeListingImageGallery(
         image_url !== undefined ? image_url : current.image_url,
         extra_images !== undefined ? extra_images : current.extra_images,
@@ -94,7 +94,13 @@ export async function PATCH(
       if (image_url !== undefined) updates.image_url = image_url || null;
     }
 
-    if (metadata !== undefined) {
+    if (metadata !== undefined && current.type === "animal") {
+      const currentCategory = await db.from("listings").select("category").eq("id",id).maybeSingle();
+      if (currentCategory.error) return NextResponse.json({error:(await getTranslations("FilmAnimals"))("portfolioDetails")},{status:503});
+      const animalData = (await import("@/lib/animal-taxonomy")).animalPortfolioMetadata(currentCategory.data?.category, { ...(current.metadata as Record<string,unknown> ?? {}), ...(metadata && typeof metadata === "object" && !Array.isArray(metadata) ? metadata : {}) });
+      if (!animalData) return NextResponse.json({error:(await getTranslations("FilmAnimals"))("portfolioHelp")},{status:400});
+      updates.metadata = {...(current.metadata as Record<string,unknown> ?? {}), ...animalData};
+    } else if (metadata !== undefined) {
       if (!["location", "prop", "vehicle"].includes(current.type)) return NextResponse.json({ error: "Preisangaben können nur bei Locations und Marktplatzangeboten geändert werden." }, { status: 400 });
       const pricingError = listingPriceMetadataError(metadata);
       if (pricingError) return NextResponse.json({ error: pricingError }, { status: 400 });
