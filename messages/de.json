@@ -1889,5 +1889,11 @@
     "companyGallery": "Firmen-Galerie (optional)",
     "skip": "Ohne Foto weiter",
     "continue": "Weiter"
+  },
+  "messagesNavigation": {
+    "back": "Zurück",
+    "contacts": "Kontakte",
+    "contactsLoading": "Kontakte …",
+    "contactsCount": "Kontakte ({count})"
   }
 }

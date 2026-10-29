@@ -1889,5 +1889,11 @@
     "companyGallery": "Firemní galerie (nepovinná)",
     "skip": "Pokračovat bez fotografie",
     "continue": "Pokračovat"
+  },
+  "messagesNavigation": {
+    "back": "Zpět",
+    "contacts": "Kontakty",
+    "contactsLoading": "Kontakty …",
+    "contactsCount": "Kontakty ({count})"
   }
 }

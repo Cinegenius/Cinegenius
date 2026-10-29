@@ -1889,5 +1889,11 @@
     "companyGallery": "Céges galéria (nem kötelező)",
     "skip": "Folytatás fénykép nélkül",
     "continue": "Tovább"
+  },
+  "messagesNavigation": {
+    "back": "Vissza",
+    "contacts": "Kapcsolatok",
+    "contactsLoading": "Kapcsolatok …",
+    "contactsCount": "Kapcsolatok ({count})"
   }
 }

@@ -14,6 +14,7 @@ import { notifyMessagesRead, subscribeToMessageReads } from "@/lib/message-read-
 import { mergeMessagesById } from "@/lib/conversation-logic";
 import { conversationPeerProfileHref, SUPPORT_AVATAR_URL, SUPPORT_NAME } from "@/lib/support-identity";
 import { findContactConversation, mergeVisibleMessagePage } from "@/lib/message-actions";
+import { backFromMessageView, navigateMessageView } from "@/lib/message-navigation";
 
 type Message = {
   id: string;
@@ -67,6 +68,7 @@ function formatTime(iso: string) {
 
 function MessagesContent() {
   const navigationText = useTranslations("navigationStability");
+  const messageNavigationText = useTranslations("messagesNavigation");
   const companyText = useTranslations("companyMessages");
   const { user } = useUser();
   const searchParams = useSearchParams();
@@ -117,8 +119,6 @@ function MessagesContent() {
   const atBottomRef = useRef(true);
   const messagesRef = useRef<Message[]>([]);
   const activeIdRef = useRef<string | null>(null);
-  const autoOpenedConversationRef = useRef<string | null>(null);
-  const autoOpenedRecipientRef = useRef<string | null>(null);
   useEffect(() => { activeIdRef.current = activeId; }, [activeId]);
   useEffect(() => { messagesRef.current = messages; }, [messages]);
 
@@ -140,7 +140,7 @@ function MessagesContent() {
   const messageRequestSequence = useRef(0);
   const conversationRequestSequence = useRef(0);
   const currentUserRef = useRef(user?.id);
-  currentUserRef.current = user?.id;
+  useEffect(() => { currentUserRef.current = user?.id; }, [user?.id]);
 
   // Mobile: true = zeige Chat, false = zeige Liste
   const showChat = !!(activeId || newConvRecipient);
@@ -228,17 +228,32 @@ function MessagesContent() {
   useEffect(() => {
     setConversations([]); setContacts([]); setFriendRequests([]); setMessages([]);
     setActiveId(null); activeIdRef.current = null; messagesRef.current = [];
-    setNewConvRecipient(toParam); setRecipientName(""); setLoadingRecipient(Boolean(toParam));
+    setNewConvRecipient(null); setRecipientName(""); setLoadingRecipient(false);
     hiddenMessageIds.current.clear(); drafts.current.clear(); setMessageNotice(""); setText(""); setNewMessagesAvailable(false);
     messageRequestSequence.current += 1;
     setSendError(""); setContactSearch(""); setGroupModalMode(null);
     setDismissedIds(new Set());
-    autoOpenedConversationRef.current = null; autoOpenedRecipientRef.current = null;
+    setLoading(true); setContactsLoading(true);
     if (!user?.id) return;
-    setLoading(true);
     loadConversations();
     loadFriendRequests();
-  }, [user?.id, toParam, loadConversations, loadFriendRequests]);
+  }, [user?.id, loadConversations, loadFriendRequests]);
+
+  // The URL is the selection, including browser Back/Forward and native swipe.
+  // Changing a chat must not clear the account's contacts or unsent text drafts.
+  useEffect(() => {
+    const id = user?.id ? convParam : null;
+    const recipient = user?.id && !id ? toParam : null;
+    activeIdRef.current = id; messagesRef.current = [];
+    messageRequestSequence.current += 1;
+    // Synchronize the external browser URL with the selected chat in one render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setActiveId(id); setNewConvRecipient(recipient); setMessages([]);
+    setHasOlderMessages(false); setNewMessagesAvailable(false);
+    setRecipientName(""); setLoadingRecipient(Boolean(recipient));
+    setSendError(""); setMessageNotice(""); setGroupModalMode(null);
+    atBottomRef.current = true;
+  }, [convParam, toParam, user?.id]);
 
   useEffect(() => {
     if (!toParam) return;
@@ -255,22 +270,15 @@ function MessagesContent() {
   }, [toParam, user?.id, companyLabel]);
 
   useEffect(() => {
-    if (!toParam) {
-      autoOpenedRecipientRef.current = null;
-      return;
-    }
-    if (loading || autoOpenedRecipientRef.current === toParam) return;
+    if (!toParam || convParam || loading || !user?.id) return;
     const existing = findContactConversation(conversations, user?.id ?? "", toParam);
     if (existing) {
-      autoOpenedRecipientRef.current = toParam;
-      activeIdRef.current = existing.id;
-      setActiveId(existing.id);
-      messagesRef.current = [];
-      setMessages([]);
-      setNewConvRecipient(null);
+      const draft = drafts.current.get(toParam);
+      if (draft && !drafts.current.has(existing.id)) drafts.current.set(existing.id, draft);
+      navigateMessageView(window, user.id, { conversationId: existing.id, recipientId: requestedCompanySlug ? toParam : null, companySlug: requestedCompanySlug }, true);
     }
 
-  }, [toParam, loading, conversations, user?.id]);
+  }, [toParam, convParam, requestedCompanySlug, loading, conversations, user?.id]);
 
   useEffect(() => {
     const query = groupSearch.trim();
@@ -287,25 +295,6 @@ function MessagesContent() {
     }, 250);
     return () => { window.clearTimeout(timer); controller.abort(); };
   }, [groupSearch]);
-
-  // Open a specific conversation by ID (from notification links: ?conv=...)
-  useEffect(() => {
-    if (!convParam) {
-      autoOpenedConversationRef.current = null;
-      return;
-    }
-    if (loading || autoOpenedConversationRef.current === convParam) return;
-    const existing = conversations.find(c => c.id === convParam);
-    if (existing) {
-      autoOpenedConversationRef.current = convParam;
-      activeIdRef.current = existing.id;
-      setActiveId(existing.id);
-      messagesRef.current = [];
-      setMessages([]);
-      setNewConvRecipient(null);
-    }
-
-  }, [convParam, loading, conversations]);
 
   const loadMessages = useCallback(async (
     convId: string,
@@ -333,8 +322,8 @@ function MessagesContent() {
       const hasNewVisibleMessage = snapshot.some((message) => !currentIds.has(message.id));
       setMessages((current) => mergeVisibleMessagePage(current, snapshot, hiddenMessageIds.current, !options.before));
       if (conversation?.id === convId) setConversations(current => current.some(c => c.id === convId) ? current : [{ ...conversation, messages: snapshot, updated_at: snapshot.at(-1)?.created_at ?? "" }, ...current]);
-      const messageIds = incomingUnreadMessageIds(snapshot, user?.id ?? "");
-      if (messageIds.length > 0 && user?.id) {
+      const messageIds = incomingUnreadMessageIds(snapshot, owner);
+      if (messageIds.length > 0) {
         const readResponse = await fetch(`/api/conversations/${convId}/read`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -351,7 +340,7 @@ function MessagesContent() {
             unread_count: readState.byConversation?.[convId] ?? conversation.unread_count ?? 0,
             messages: applyReadReceiptTimestamps(conversation.messages ?? [], readMessages),
           }));
-          if (user?.id) notifyMessagesRead(user.id);
+          notifyMessagesRead(owner);
         }
       }
       if (olderViewport) {
@@ -369,7 +358,7 @@ function MessagesContent() {
         setNewMessagesAvailable(true);
       }
     } catch { /* silent */ }
-  }, [user?.id]);
+  }, []);
 
   // Message data is delivered only through membership-checked server routes.
   // Polling every few seconds avoids exposing raw message rows to anonymous
@@ -393,22 +382,14 @@ function MessagesContent() {
   }, [loadConversations, loadFriendRequests]);
 
   function openConversation(conv: Conversation) {
-    activeIdRef.current = conv.id;
-    messagesRef.current = [];
-    setActiveId(conv.id);
-    setMessages([]);
-    setHasOlderMessages(false);
-    setNewConvRecipient(null);
-    atBottomRef.current = true;
-    setNewMessagesAvailable(false);
-    setText(drafts.current.get(conv.id) ?? "");
-    setSendError(""); setMessageNotice("");
+    if (user?.id) navigateMessageView(window, user.id, { conversationId: conv.id });
   }
 
   async function openContact(contact: FriendRequest) {
     if (!user?.id || contactOpeningRef.current) return;
     contactOpeningRef.current = true; setOpeningContact(contact.user_id); setContactsError("");
     const owner = user.id;
+    const sourceHref = window.location.href;
     try {
       const existing = findContactConversation(conversations, owner, contact.user_id);
       let id = existing?.id;
@@ -418,13 +399,8 @@ function MessagesContent() {
         if (!response.ok) throw new Error(payload.error ?? "Unterhaltung konnte nicht geöffnet werden.");
         id = payload.conversationId;
       }
-      if (currentUserRef.current !== owner) return;
-      autoOpenedRecipientRef.current = toParam;
-      autoOpenedConversationRef.current = convParam;
-      setText(""); setSendError(""); setMessageNotice(""); setHasOlderMessages(false);
-      activeIdRef.current = id ?? null; messagesRef.current = []; setMessages([]); setActiveId(id ?? null);
-      setNewConvRecipient(id ? null : contact.user_id);
-      setRecipientName(contact.display_name); setLoadingRecipient(false);
+      if (currentUserRef.current !== owner || window.location.href !== sourceHref) return;
+      navigateMessageView(window, owner, id ? { conversationId: id } : { recipientId: contact.user_id });
     } catch (error) { if (currentUserRef.current === owner) setContactsError(error instanceof Error ? error.message : "Unterhaltung konnte nicht geöffnet werden."); }
     finally { contactOpeningRef.current = false; setOpeningContact(null); }
   }
@@ -452,11 +428,7 @@ function MessagesContent() {
   }
 
   function closeChat() {
-    activeIdRef.current = null;
-    messagesRef.current = [];
-    setActiveId(null);
-    setNewConvRecipient(null);
-    setMessages([]);
+    if (user?.id) backFromMessageView(window, user.id);
   }
 
   function openCreateGroup() {
@@ -496,12 +468,8 @@ function MessagesContent() {
       if (!response.ok) throw new Error(payload.error ?? "Gruppe konnte nicht erstellt werden.");
       const conversationId = payload.conversationId as string;
       setGroupModalMode(null);
+      if (currentUserRef.current === user?.id && user?.id) navigateMessageView(window, user.id, { conversationId });
       await loadConversations();
-      activeIdRef.current = conversationId;
-      setActiveId(conversationId);
-      messagesRef.current = [];
-      setMessages([]);
-      setHasOlderMessages(false);
     } catch (error) {
       setGroupError(error instanceof Error ? error.message : "Gruppe konnte nicht erstellt werden.");
     } finally {
@@ -545,7 +513,7 @@ function MessagesContent() {
       setGroupSearch("");
       if (action === "leave") {
         setGroupModalMode(null);
-        closeChat();
+        if (user?.id) navigateMessageView(window, user.id, {}, true);
         await loadConversations();
       } else {
         await loadConversations();
@@ -623,8 +591,10 @@ function MessagesContent() {
   async function sendMessage() {
     if (!text.trim() || sending) return;
     const owner = currentUserRef.current;
+    if (!owner) return;
     const conversationAtSend = activeId;
     const recipientAtSend = newConvRecipient;
+    const sourceHref = window.location.href;
     const sentText = text;
     setSending(true);
     setSendError("");
@@ -640,14 +610,11 @@ function MessagesContent() {
         if (!res.ok || error || typeof conversationId !== "string") throw new Error(error ?? "Nachricht konnte nicht gesendet werden.");
         if (currentUserRef.current !== owner) return;
         if (recipientAtSend && drafts.current.get(recipientAtSend) === sentText) drafts.current.delete(recipientAtSend);
-        if (activeIdRef.current !== conversationAtSend) { await loadConversations(); return; }
-        setText("");
-        setNewConvRecipient(null);
+        if (activeIdRef.current !== conversationAtSend || window.location.href !== sourceHref) { await loadConversations(); return; }
+        const remainingDraft = recipientAtSend ? drafts.current.get(recipientAtSend) : null;
+        if (remainingDraft) drafts.current.set(conversationId, remainingDraft);
+        navigateMessageView(window, owner, { conversationId, recipientId: requestedCompanySlug ? recipientAtSend : null, companySlug: requestedCompanySlug }, true);
         await loadConversations();
-        activeIdRef.current = conversationId;
-        setActiveId(conversationId);
-        messagesRef.current = [];
-        setMessages([]);
       } else if (activeId) {
         const res = await fetch(`/api/conversations/${activeId}`, {
           method: "POST",
@@ -709,7 +676,7 @@ function MessagesContent() {
 
         <div className="flex shrink-0 gap-2 border-b border-border px-4 py-2" aria-label="Nachrichtenansicht">
           <button type="button" aria-pressed={sidebarView === "chats"} onClick={() => setSidebarView("chats")} className={`min-h-11 flex-1 rounded-lg px-2 text-sm ${sidebarView === "chats" ? "bg-bg-elevated text-gold" : "text-text-muted"}`}>Unterhaltungen</button>
-          <button type="button" aria-pressed={sidebarView === "contacts"} onClick={() => setSidebarView("contacts")} className={`min-h-11 flex-1 rounded-lg px-2 text-sm ${sidebarView === "contacts" ? "bg-bg-elevated text-gold" : "text-text-muted"}`}>Kontakte ({contacts.length})</button>
+          <button type="button" aria-pressed={sidebarView === "contacts"} onClick={() => setSidebarView("contacts")} className={`min-h-11 flex-1 rounded-lg px-2 text-sm ${sidebarView === "contacts" ? "bg-bg-elevated text-gold" : "text-text-muted"}`}>{contactsLoading && !contacts.length ? messageNavigationText("contactsLoading") : contactsError && !contacts.length ? messageNavigationText("contacts") : messageNavigationText("contactsCount", { count: contacts.length })}</button>
         </div>
 
         {sidebarView === "contacts" ? <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
@@ -870,7 +837,7 @@ function MessagesContent() {
             <div className="px-4 py-3.5 border-b border-border flex items-center gap-3 shrink-0">
               <button
                 onClick={closeChat}
-                aria-label="Zurück zur Nachrichtenliste"
+                aria-label={messageNavigationText("back")}
                 className="flex min-h-11 min-w-11 -ml-1 items-center justify-center text-text-muted hover:text-text-primary active:scale-95 transition-all"
               >
                 <ArrowLeft size={20} />

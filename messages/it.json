@@ -1889,5 +1889,11 @@
     "companyGallery": "Galleria aziendale (facoltativa)",
     "skip": "Continua senza foto",
     "continue": "Continua"
+  },
+  "messagesNavigation": {
+    "back": "Indietro",
+    "contacts": "Contatti",
+    "contactsLoading": "Contatti …",
+    "contactsCount": "Contatti ({count})"
   }
 }

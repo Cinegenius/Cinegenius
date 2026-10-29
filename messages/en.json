@@ -1889,5 +1889,11 @@
     "companyGallery": "Company gallery (optional)",
     "skip": "Continue without a photo",
     "continue": "Continue"
+  },
+  "messagesNavigation": {
+    "back": "Back",
+    "contacts": "Contacts",
+    "contactsLoading": "Contacts …",
+    "contactsCount": "Contacts ({count})"
   }
 }
