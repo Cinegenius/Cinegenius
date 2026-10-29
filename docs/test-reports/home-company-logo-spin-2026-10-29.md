@@ -111,3 +111,22 @@ Changed implementation: `components/HomeCompanyPartners.tsx`, `lib/company-logo-
 - Browser evidence: `company-logo-demo-resume-proof.json`, `company-logo-demo-resume-mobile.png`, `company-logo-demo-resume-mobile-rows.png` in the task visualization directory. Test companies and diagnostics exist only in the external local fixture and are not shipped.
 
 These are desktop-browser and phone-viewport simulations, not physical iPhone/Safari or Android device tests. Session storage can be unavailable and mobile process termination may omit lifecycle events; an interrupted turn can only restore its last checkpoint in those circumstances. See [MDN pagehide lifecycle limitations](https://developer.mozilla.org/en-US/docs/Web/API/Window/pagehide_event). No user/company data or original media was altered.
+
+
+## Operator change: replay on reload and return navigation
+
+The operator explicitly replaced the once-per-session rule: logos must demonstrate again after reloading or returning to the homepage. This section supersedes the earlier session-persistence behavior.
+
+`lib/company-logo-demo.ts` now keeps completion and in-progress angles only in the current observer/page visit. No browser-storage reads or writes are performed. Remount/reload starts a fresh visit. A persisted `pageshow` (browser Back/Forward cache restoration) cancels the previous visit, resets motion/gesture state and re-observes each logo for fresh visibility before replay. `pagehide` keeps all work paused until `pageshow`, including late image/visibility/pointer events. Ordinary tab switching and scrolling retain completion for the current visit and therefore do not cause constant repetition. The obsolete demo-session key is removed from `lib/company-logo-motion.ts`; manual gesture math/physics, two faces, link behavior, CSS and company selection are unchanged. Old storage flags are harmless and ignored.
+
+No additional photos, dependency or network service is added. A visit stores at most the displayed logo IDs and active motion objects in memory; the short existing transform animation uses processing/compositing work only while eligible. No quantitative battery/GPU-memory benchmark or physical-phone stability guarantee is claimed.
+
+### Executed checks
+
+- 23 targeted scheduler/manual/homepage tests passed. New regressions cover replay after completed/partial remount despite legacy storage flags; completed/interrupted browser-cache return; no replay on scrolling, tab switching or ordinary initial pageshow; page-hidden scheduling guard; fresh offscreen-row eligibility; gesture cleanup and reduced motion.
+- Production build with type/i18n checking, scoped ESLint and whitespace check passed. No interface text changed.
+- Actual-component local browser fixture at 1280x720: all six fictitious logos completed; reload then started all six again. Opening Beta via normal click and browser Back, then revealing the restored homepage section, started a fresh demonstration.
+- 390x650 browser-size simulation: top four logos finished, bottom two waited for their own visibility and then finished. Scrolling back did not replay completed logos. Reload restarted the visible four. No horizontal overflow, no console errors; simulated reduced motion stopped all rotations.
+- Browser Back via Next's client navigation was actually exercised. Persisted document-cache restoration was tested through controlled lifecycle events in the automated scheduler tests, not claimed as an actual physical iPhone test.
+
+Evidence: `company-logo-visit-reload.png`, `company-logo-visit-back.png` and `company-logo-per-visit-proof.json` in the task visualization directory. Test companies/diagnostics remain outside the repository. No production content, image originals, account data or permissions were changed.

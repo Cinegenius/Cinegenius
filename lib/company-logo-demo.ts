@@ -1,10 +1,5 @@
-import { COMPANY_LOGO_DEMO_KEY } from "./company-logo-motion";
-
 type DemoMotion = { angle: number; rotor: HTMLElement; gesture: unknown; frame: number };
-type DemoProgress = { elapsed: number; delay: number; duration: number; target: number };
-type Demo = DemoProgress & { coin: HTMLElement; motion: DemoMotion; id: string; last: number | null; frame: number };
-const completedInPageSession = new Set<string>();
-const progressInPageSession = new Map<string, DemoProgress>();
+type Demo = { coin: HTMLElement; motion: DemoMotion; id: string; elapsed: number; delay: number; duration: number; target: number; last: number | null; frame: number };
 
 export function logoDemoPlan(index: number) {
   const slot = index % 6;
@@ -15,7 +10,7 @@ export function logoDemoPlan(index: number) {
   };
 }
 
-/** Demo scheduling only: manual drag/coasting continue to use their existing physics. */
+/** One demonstration per page visit; manual drag/coasting retain their existing physics. */
 export function observeCompanyLogoDemos(root: HTMLElement, options: {
   motionFor: (coin: HTMLElement) => DemoMotion | null;
   reduced: () => boolean;
@@ -24,60 +19,23 @@ export function observeCompanyLogoDemos(root: HTMLElement, options: {
 }) {
   const coins = [...root.querySelectorAll<HTMLElement>("[data-logo-coin]")];
   const visible = new Set<HTMLElement>();
+  const completed = new Set<string>();
   const demos = new Map<HTMLElement, Demo>();
   let held = false;
+  let pageHidden = false;
   let disposed = false;
-  try {
-    const saved = JSON.parse(sessionStorage.getItem(COMPANY_LOGO_DEMO_KEY) ?? "{}");
-    if (saved && typeof saved === "object" && !Array.isArray(saved)) {
-      if (Array.isArray(saved.completed)) for (const id of saved.completed) if (typeof id === "string") completedInPageSession.add(id);
-      if (saved.pending && typeof saved.pending === "object" && !Array.isArray(saved.pending)) {
-        for (const [id, value] of Object.entries(saved.pending)) {
-          if (!value || typeof value !== "object") continue;
-          const item = value as DemoProgress;
-          if ([item.elapsed, item.delay, item.duration, item.target].every(Number.isFinite)
-            && item.elapsed >= 0 && item.delay >= 180 && item.delay <= 520
-            && item.duration >= 1600 && item.duration <= 2050
-            && Math.abs(item.target) === 360 && item.elapsed < item.delay + item.duration
-            && !completedInPageSession.has(id) && !progressInPageSession.has(id)) progressInPageSession.set(id, { elapsed: item.elapsed, delay: item.delay, duration: item.duration, target: item.target });
-        }
-      }
-    }
-  } catch { /* Session memory also works when storage is unavailable. */ }
 
-  function persist() {
-    try { sessionStorage.setItem(COMPANY_LOGO_DEMO_KEY, JSON.stringify({ completed: [...completedInPageSession], pending: Object.fromEntries(progressInPageSession) })); } catch { /* Keep in-memory completion and progress. */ }
-  }
-  function complete(id: string) {
-    completedInPageSession.add(id);
-    progressInPageSession.delete(id);
-    persist();
-  }
-  function checkpoint(demo: Demo) {
-    const previous = progressInPageSession.get(demo.id);
-    if (previous?.elapsed === demo.elapsed) return;
-    progressInPageSession.set(demo.id, { elapsed: demo.elapsed, delay: demo.delay, duration: demo.duration, target: demo.target });
-    persist();
-  }
-  function draw(demo: Demo) {
-    const progress = Math.min(1, Math.max(0, (demo.elapsed - demo.delay) / demo.duration));
-    demo.motion.angle = demo.target * (0.5 - Math.cos(progress * Math.PI) / 2);
-    demo.motion.rotor.style.willChange = "transform";
-    demo.motion.rotor.style.transform = `rotateY(${demo.motion.angle}deg)`;
-    return progress;
-  }
   function loaded(coin: HTMLElement) {
     return coin.dataset.logoFailed !== "true" && [...coin.querySelectorAll("img")].some(image => image.complete && image.naturalWidth > 0);
   }
   function allowed(coin: HTMLElement) {
-    return !disposed && !held && !options.busy() && !options.reduced() && document.visibilityState === "visible" && visible.has(coin) && coin.isConnected && loaded(coin);
+    return !disposed && !pageHidden && !held && !options.busy() && !options.reduced() && document.visibilityState === "visible" && visible.has(coin) && coin.isConnected && loaded(coin);
   }
   function pause(demo: Demo) {
     cancelAnimationFrame(demo.frame);
     demo.frame = 0;
     demo.last = null;
     demo.motion.rotor.style.willChange = "";
-    checkpoint(demo);
   }
   function schedule(demo: Demo) {
     if (demo.frame || !allowed(demo.coin)) return;
@@ -87,7 +45,11 @@ export function observeCompanyLogoDemos(root: HTMLElement, options: {
       if (demo.last !== null) demo.elapsed += Math.max(0, now - demo.last);
       demo.last = now;
       if (demo.elapsed >= demo.delay) {
-        if (draw(demo) === 1) { complete(demo.id); demos.delete(demo.coin); options.reset(demo.coin, demo.motion); return; }
+        const progress = Math.min(1, (demo.elapsed - demo.delay) / demo.duration);
+        demo.motion.angle = demo.target * (0.5 - Math.cos(progress * Math.PI) / 2);
+        demo.motion.rotor.style.willChange = "transform";
+        demo.motion.rotor.style.transform = `rotateY(${demo.motion.angle}deg)`;
+        if (progress === 1) { completed.add(demo.id); demos.delete(demo.coin); options.reset(demo.coin, demo.motion); return; }
       }
       schedule(demo);
     });
@@ -101,16 +63,14 @@ export function observeCompanyLogoDemos(root: HTMLElement, options: {
     for (const demo of demos.values()) {
       if (allowed(demo.coin)) schedule(demo); else pause(demo);
     }
-    if (disposed || held || options.busy() || document.visibilityState !== "visible") return;
+    if (disposed || pageHidden || held || options.busy() || document.visibilityState !== "visible") return;
     coins.forEach((coin, index) => {
       const id = coin.dataset.logoDemoId;
-      if (!id || completedInPageSession.has(id) || demos.has(coin) || !allowed(coin)) return;
+      if (!id || completed.has(id) || demos.has(coin) || !allowed(coin)) return;
       const motion = options.motionFor(coin);
       if (!motion || motion.frame || motion.gesture) return;
-      const saved = progressInPageSession.get(id);
-      const demo: Demo = { coin, motion, id, last: null, frame: 0, ...(saved ?? { elapsed: 0, ...logoDemoPlan(index) }) };
+      const demo: Demo = { coin, motion, id, elapsed: 0, last: null, frame: 0, ...logoDemoPlan(index) };
       demos.set(coin, demo);
-      if (saved && saved.elapsed >= saved.delay) draw(demo);
       schedule(demo);
     });
   }
@@ -125,13 +85,28 @@ export function observeCompanyLogoDemos(root: HTMLElement, options: {
   coins.forEach(coin => observer.observe(coin));
   const release = () => { held = false; refresh(); };
   const visibility = () => { if (document.visibilityState === "hidden") held = false; refresh(); };
-  const pageHide = () => { held = false; for (const demo of demos.values()) pause(demo); };
+  const pageHide = () => { pageHidden = true; held = false; for (const demo of demos.values()) pause(demo); };
+  const pageShow = (event: PageTransitionEvent) => {
+    pageHidden = false;
+    if (event.persisted) {
+      // Browser Back can restore the whole document without remounting React.
+      for (const demo of demos.values()) pause(demo);
+      demos.clear(); completed.clear(); visible.clear(); held = false;
+      for (const coin of coins) {
+        const motion = options.motionFor(coin);
+        if (motion) options.reset(coin, motion);
+      }
+      observer.disconnect();
+      coins.forEach(coin => observer.observe(coin));
+    }
+    refresh();
+  };
   root.addEventListener("load", refresh, true);
   document.addEventListener("visibilitychange", visibility);
   document.addEventListener("pointerup", release);
   document.addEventListener("pointercancel", release);
   window.addEventListener("pagehide", pageHide);
-  window.addEventListener("pageshow", refresh);
+  window.addEventListener("pageshow", pageShow);
   return {
     refresh,
     pause() { held = true; for (const demo of demos.values()) pause(demo); },
@@ -140,7 +115,7 @@ export function observeCompanyLogoDemos(root: HTMLElement, options: {
       const demo = demos.get(coin);
       if (demo) { pause(demo); demos.delete(coin); }
       const id = coin.dataset.logoDemoId;
-      if (id) complete(id);
+      if (id) completed.add(id);
       return Boolean(demo);
     },
     release,
@@ -152,7 +127,7 @@ export function observeCompanyLogoDemos(root: HTMLElement, options: {
       document.removeEventListener("pointerup", release);
       document.removeEventListener("pointercancel", release);
       window.removeEventListener("pagehide", pageHide);
-      window.removeEventListener("pageshow", refresh);
+      window.removeEventListener("pageshow", pageShow);
       for (const demo of demos.values()) { pause(demo); options.reset(demo.coin, demo.motion); }
       demos.clear();
     },
