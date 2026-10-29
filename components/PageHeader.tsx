@@ -10,6 +10,8 @@ type PageBackdropProps = {
   image?: string;
   imagePosition?: string;
   imageOpacity?: number;
+  /** Opt in for public backdrops that can use responsive image derivatives. */
+  optimizeImage?: boolean;
   overlayClassName?: string;
   className?: string;
 };
@@ -19,6 +21,7 @@ export function PageBackdrop({
   image = PROJECTS_BACKDROP_IMAGE,
   imagePosition = "center 42%",
   imageOpacity = 20,
+  optimizeImage = false,
   overlayClassName = "absolute inset-0 bg-gradient-to-b from-bg-primary/60 via-bg-primary/40 to-bg-primary/80",
   className = "absolute inset-0 z-0",
 }: PageBackdropProps) {
@@ -28,7 +31,8 @@ export function PageBackdrop({
         src={image}
         alt=""
         fill
-        unoptimized
+        unoptimized={!optimizeImage}
+        sizes={optimizeImage ? "100vw" : undefined}
         priority
         className="object-cover"
         style={{ objectPosition: imagePosition, opacity: imageOpacity / 100 }}

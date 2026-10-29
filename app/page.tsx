@@ -241,6 +241,7 @@ export default async function HomePage() {
   return (
     <main className="relative isolate min-h-screen">
       <PageBackdrop
+        optimizeImage
         image="/hero-bg.jpg"
         imagePosition="center 42%"
         imageOpacity={100}
