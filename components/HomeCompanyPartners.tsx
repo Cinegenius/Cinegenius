@@ -192,9 +192,14 @@ export default function HomeCompanyPartners({ companies }: { companies: Partner[
             coin.dataset.logoFailed = "true";
             const motion = motions.current.get(coin);
             if (motion) reset(coin, motion);
-            demos.current?.takeover(coin);
+            demos.current?.refresh();
           }}
-          onLoadCapture={event => { if (event.target instanceof HTMLImageElement && event.target.naturalWidth > 0) delete event.currentTarget.dataset.logoFailed; }}
+          onLoadCapture={event => {
+            if (event.target instanceof HTMLImageElement && event.target.naturalWidth > 0) {
+              delete event.currentTarget.dataset.logoFailed;
+              demos.current?.refresh();
+            }
+          }}
           onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerEnd} onPointerCancel={pointerEnd}
           onLostPointerCapture={event => {
             // Touch implicitly captures the hit-tested child. Its bubbling

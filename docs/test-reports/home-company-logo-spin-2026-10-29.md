@@ -92,3 +92,22 @@ Browser fixture used the actual production components with six fictitious local 
 - Offscreen/hidden-tab pause timing, unloaded/error states and listener/frame cleanup are tested with controlled browser-API boundaries; no actual OS background-tab timing or physical iPhone/Android test is claimed.
 
 Screenshot: `company-six-logo-demo-desktop.png` in the task visualization folder. No test messages, invitations, production data or original image files were changed.
+
+
+## Follow-up: automatic demonstration suppressed before visible completion
+
+The user reported that the automatic demonstration stayed absent. The released v2 scheduler wrote the session's consumed flag at the first eligible animation frame, even if its angle was still exactly 0 degrees. A component remount or reload then suppressed the logo permanently for that session. The new regression was executed against v2 first and failed with `a zero-degree frame must not consume the only visible demonstration`; the other five scheduler tests passed. This is a demonstrated defect consistent with the report, not an instrumented diagnosis of the user's physical phone.
+
+The corrected v3 session schema distinguishes completed demonstrations from pending elapsed progress. Only a full visible turn is recorded as completed (or deliberate manual/keyboard takeover, which supersedes the demonstration). Visibility changes, component cleanup and pagehide checkpoint an incomplete turn; remount/reload restores its phase. A small 180ms initial dwell gives the loaded logo time to be visible, with the existing varied offsets, directions and gentle durations preserved. The ambiguous v2 start flags are not imported, so they cannot keep suppressing the corrected demonstration. A failed image pauses rather than consumes its demo; successful image load explicitly refreshes eligibility. No layout, styling, company selection, manual drag/coasting physics, copy, permissions or database change is included.
+
+Changed implementation: `components/HomeCompanyPartners.tsx`, `lib/company-logo-demo.ts`, `lib/company-logo-motion.ts`. Regression coverage: `lib/company-logo-demo.test.mjs`, `lib/company-logo-motion.test.mjs`.
+
+### Executed checks for this correction
+
+- 22 targeted demo/motion/homepage integration tests passed. New tests cover zero-angle interruption, pagehide checkpointing, remount and fresh-document restoration, plus error-image recovery without falsely completing a demo. Existing tests retain the six variants, loaded-only eligibility, visibility pause, reduced motion, immediate manual takeover, click suppression and manual touch capture/velocity behavior.
+- Production build (including type checking, six-catalog localization validation and design checks), scoped ESLint and diff whitespace checks passed. No interface strings were changed.
+- Actual-component browser fixture, desktop 1280x720: scrolled the six fictitious companies into view and reloaded while only Alpha had begun moving. After reload the demonstration continued (Alpha about 14 degrees, Beta and CineGenius beginning negative rotation), all six completed with both directions, then a second reload showed no new demonstration. This is an actual browser reload, not just the mocked scheduler test.
+- Phone-sized 390x650: first four logos completed once; the bottom two stayed still until scrolled into visibility. They then completed once. Reload after all six finished showed `Starts: 0`, zero active rotations and no horizontal overflow. A subsequent Delta drag produced a 465-degree coasting transform without navigation; a normal Gamma click opened exactly `/companies/gamma`. Returning preserved the completed state. Simulated reduced-motion preference yielded zero rotating logos.
+- Browser evidence: `company-logo-demo-resume-proof.json`, `company-logo-demo-resume-mobile.png`, `company-logo-demo-resume-mobile-rows.png` in the task visualization directory. Test companies and diagnostics exist only in the external local fixture and are not shipped.
+
+These are desktop-browser and phone-viewport simulations, not physical iPhone/Safari or Android device tests. Session storage can be unavailable and mobile process termination may omit lifecycle events; an interrupted turn can only restore its last checkpoint in those circumstances. See [MDN pagehide lifecycle limitations](https://developer.mozilla.org/en-US/docs/Web/API/Window/pagehide_event). No user/company data or original media was altered.
