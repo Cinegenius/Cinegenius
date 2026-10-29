@@ -1,4 +1,4 @@
-export const COMPANY_LOGO_DEMO_KEY = "cinegenius:home-company-logo-demo:v1";
+export const COMPANY_LOGO_DEMO_KEY = "cinegenius:home-company-logo-demo:v2";
 
 export function isLogoDragClick(detail: number, blockedUntil: number, now: number) {
   return detail > 0 && now < blockedUntil;

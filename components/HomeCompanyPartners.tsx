@@ -5,13 +5,13 @@ import { useEffect, useRef, type PointerEvent } from "react";
 import { useTranslations } from "next-intl";
 import { MoveHorizontal } from "lucide-react";
 import CompanyLogo from "@/components/CompanyLogo";
-import { COMPANY_LOGO_DEMO_KEY, isLogoDragClick, logoDragAngle, logoDragVelocity, logoGestureAxis, logoSpinAngle, logoSpinPlan } from "@/lib/company-logo-motion";
+import { isLogoDragClick, logoDragAngle, logoDragVelocity, logoGestureAxis, logoSpinAngle, logoSpinPlan } from "@/lib/company-logo-motion";
+import { observeCompanyLogoDemos } from "@/lib/company-logo-demo";
 import styles from "./HomeCompanyPartners.module.css";
 
 type Partner = { id: string; href: string; name: string; logo: string | null; category?: string; city: string };
-type Gesture = { id: number; x: number; y: number; lastX: number; time: number; origin: number; width: number; velocity: number; dragging: boolean; vertical: boolean; canSpin: boolean };
+type Gesture = { id: number; x: number; y: number; lastX: number; time: number; origin: number; width: number; velocity: number; dragging: boolean; vertical: boolean; canSpin: boolean; demo: boolean };
 type Motion = { rotor: HTMLElement; angle: number; frame: number; gesture: Gesture | null };
-let demoConsumedInPageSession = false;
 
 /** Homepage-only interaction. Names and links never rotate with the logo. */
 export default function HomeCompanyPartners({ companies }: { companies: Partner[] }) {
@@ -20,8 +20,7 @@ export default function HomeCompanyPartners({ companies }: { companies: Partner[
   const root = useRef<HTMLDivElement>(null);
   const motions = useRef(new Map<HTMLElement, Motion>());
   const reduced = useRef(true);
-  const interacted = useRef(false);
-  const demo = useRef<HTMLElement | null>(null);
+  const demos = useRef<ReturnType<typeof observeCompanyLogoDemos> | null>(null);
   const dragClick = useRef<{ link: Element | null; until: number } | null>(null);
 
   function motionFor(coin: HTMLElement) {
@@ -53,25 +52,20 @@ export default function HomeCompanyPartners({ companies }: { companies: Partner[
       motion.angle = logoSpinAngle(from, target, now - started, duration);
       motion.rotor.style.transform = `rotateY(${motion.angle}deg)`;
       if (now - started < duration) motion.frame = requestAnimationFrame(tick);
-      else { reset(coin, motion); if (demo.current === coin) demo.current = null; }
+      else reset(coin, motion);
     };
     motion.frame = requestAnimationFrame(tick);
   }
 
-  function consumeDemo() {
-    if (demoConsumedInPageSession) return;
-    demoConsumedInPageSession = true;
-    try { sessionStorage.setItem(COMPANY_LOGO_DEMO_KEY, "1"); } catch { /* Storage may be unavailable; retain the in-memory session flag. */ }
-  }
-
-  function beginInteraction() {
-    interacted.current = true;
-    consumeDemo();
-    const coin = demo.current;
-    if (coin) {
+  function keyboardInteraction(target: EventTarget) {
+    const coin = target instanceof Element ? target.closest<HTMLElement>("[data-logo-coin]") ?? target.closest("a")?.querySelector<HTMLElement>("[data-logo-coin]") : null;
+    if (!coin || motions.current.get(coin)?.gesture) return;
+    if (demos.current?.takeover(coin)) {
       const motion = motions.current.get(coin);
-      if (motion) reset(coin, motion);
-      demo.current = null;
+      if (motion?.angle) {
+        const plan = logoSpinPlan(motion.angle, 0, Math.sign(motion.angle));
+        animate(coin, motion, plan.target, 650);
+      }
     }
   }
 
@@ -86,48 +80,34 @@ export default function HomeCompanyPartners({ companies }: { companies: Partner[
       reduced.current = preference.matches;
       element.dataset.reducedMotion = String(preference.matches);
       if (preference.matches) {
+        demos.current?.refresh();
         for (const [coin, motion] of motionMap) reset(coin, motion);
-        demo.current = null;
-      }
+      } else demos.current?.refresh();
     };
     preference.addEventListener("change", onPreference);
-    const visible = new Set<HTMLElement>();
-    const tryDemo = () => {
-      if (reduced.current || interacted.current || demoConsumedInPageSession || document.visibilityState !== "visible") return;
-      try { if (sessionStorage.getItem(COMPANY_LOGO_DEMO_KEY)) { demoConsumedInPageSession = true; return; } } catch { /* Use the in-memory flag. */ }
-      const coin = [...visible].find(candidate => [...candidate.querySelectorAll("img")].some(image => image.complete && image.naturalWidth > 0));
-      if (!coin) return;
-      const motion = motionFor(coin);
-      if (!motion) return;
-      consumeDemo(); demo.current = coin;
-      animate(coin, motion, 360, 1400);
-    };
-    const observer = new IntersectionObserver(entries => {
-      for (const entry of entries) {
-        const coin = entry.target as HTMLElement;
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.7) visible.add(coin);
-        else { visible.delete(coin); if (demo.current === coin) { const motion = motionMap.get(coin); if (motion) reset(coin, motion); demo.current = null; } }
-      }
-      tryDemo();
-    }, { threshold: [0, 0.7], rootMargin: "-96px 0px -80px 0px" });
-    element.querySelectorAll<HTMLElement>("[data-logo-coin]").forEach(coin => observer.observe(coin));
+    const controller = observeCompanyLogoDemos(element, {
+      motionFor, reduced: () => reduced.current,
+      busy: () => [...motionMap.values()].some(motion => motion.gesture),
+      reset: (coin, motion) => reset(coin, motion as Motion),
+    });
+    demos.current = controller;
     const onVisibility = () => {
       if (document.visibilityState === "hidden") {
-        for (const [coin, motion] of motionMap) reset(coin, motion);
-        demo.current = null;
-      } else tryDemo();
+        for (const [coin, motion] of motionMap) {
+          if (motion.gesture?.demo) motion.gesture = null;
+          else if (motion.frame || motion.gesture) reset(coin, motion);
+        }
+      } else controller.refresh();
     };
-    element.addEventListener("load", tryDemo, true);
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
-      observer.disconnect(); preference.removeEventListener("change", onPreference);
-      element.removeEventListener("load", tryDemo, true);
+      controller.dispose(); demos.current = null;
+      preference.removeEventListener("change", onPreference);
       document.removeEventListener("visibilitychange", onVisibility);
       for (const [coin, motion] of motionMap) reset(coin, motion);
       motionMap.clear();
     };
   // Handlers use stable refs; re-observe only when the actual logo sources change.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [logoSources]);
 
   function pointerDown(event: PointerEvent<HTMLDivElement>) {
@@ -137,7 +117,7 @@ export default function HomeCompanyPartners({ companies }: { companies: Partner[
     const motion = motionFor(coin);
     if (!motion) return;
     cancelAnimationFrame(motion.frame); motion.frame = 0;
-    motion.gesture = { id: event.pointerId, x: event.clientX, y: event.clientY, lastX: event.clientX, time: event.timeStamp, origin: motion.angle, width: coin.getBoundingClientRect().width, velocity: 0, dragging: false, vertical: false, canSpin };
+    motion.gesture = { id: event.pointerId, x: event.clientX, y: event.clientY, lastX: event.clientX, time: event.timeStamp, origin: motion.angle, width: coin.getBoundingClientRect().width, velocity: 0, dragging: false, vertical: false, canSpin, demo: demos.current?.has(coin) ?? false };
   }
 
   function pointerMove(event: PointerEvent<HTMLDivElement>) {
@@ -156,12 +136,14 @@ export default function HomeCompanyPartners({ companies }: { companies: Partner[
         // Do not cancel native vertical scrolling, but ignore a browser-generated
         // click at the end of a deliberate vertical mouse drag as well.
         dragClick.current = { link: coin.closest("a"), until: performance.now() + 600 };
-        reset(coin, motion); gesture.vertical = true; motion.gesture = gesture;
+        if (!gesture.demo) reset(coin, motion);
+        gesture.vertical = true; motion.gesture = gesture;
         coin.setPointerCapture(event.pointerId);
         return;
       }
       if (axis !== "horizontal") return;
       gesture.dragging = true;
+      demos.current?.takeover(coin); gesture.demo = false;
       if (gesture.canSpin) coin.dataset.dragging = "true";
       coin.setPointerCapture(event.pointerId);
       if (gesture.canSpin) motion.rotor.style.willChange = "transform";
@@ -183,13 +165,14 @@ export default function HomeCompanyPartners({ companies }: { companies: Partner[
     if (gesture.dragging || gesture.vertical) dragClick.current = { link: coin.closest("a"), until: performance.now() + 600 };
     motion.gesture = null; delete coin.dataset.dragging;
     if (coin.hasPointerCapture(event.pointerId)) coin.releasePointerCapture(event.pointerId);
+    if (gesture.demo) return; // Resume a paused demonstration without rewinding after a tap/scroll.
     if (event.type === "pointercancel") { reset(coin, motion); return; }
     if (!gesture.dragging || !gesture.canSpin || reduced.current) { reset(coin, motion); return; }
     const plan = logoSpinPlan(motion.angle, event.timeStamp - gesture.time > 100 ? 0 : gesture.velocity, event.clientX - gesture.x);
     animate(coin, motion, plan.target, plan.duration);
   }
 
-  return <div ref={root} className={styles.partners} onPointerDownCapture={() => { dragClick.current = null; beginInteraction(); }} onKeyDownCapture={beginInteraction} onFocusCapture={beginInteraction} onWheelCapture={beginInteraction}>
+  return <div ref={root} className={styles.partners} onPointerDownCapture={() => { dragClick.current = null; demos.current?.pause(); }} onKeyDownCapture={event => keyboardInteraction(event.target)} onFocusCapture={event => keyboardInteraction(event.target)}>
     {companies.some(company => company.logo) && <p className={`${styles.hint} mb-4 flex items-center justify-end gap-1.5 text-xs text-text-muted`}>
       <MoveHorizontal size={14} aria-hidden="true" />
       <span className={styles.touchHint}>{t("touchHint")}</span><span className={styles.dragHint}>{t("dragHint")}</span>
@@ -203,13 +186,13 @@ export default function HomeCompanyPartners({ companies }: { companies: Partner[
           dragClick.current = null;
           if (blocked) { event.preventDefault(); event.stopPropagation(); }
         }}>
-        <div className={styles.coin} data-logo-coin={company.logo ? "" : undefined}
+        <div className={styles.coin} data-logo-coin={company.logo ? "" : undefined} data-logo-demo-id={company.logo ? company.id : undefined}
           onErrorCapture={event => {
             const coin = event.currentTarget;
             coin.dataset.logoFailed = "true";
             const motion = motions.current.get(coin);
             if (motion) reset(coin, motion);
-            if (demo.current === coin) demo.current = null;
+            demos.current?.takeover(coin);
           }}
           onLoadCapture={event => { if (event.target instanceof HTMLImageElement && event.target.naturalWidth > 0) delete event.currentTarget.dataset.logoFailed; }}
           onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerEnd} onPointerCancel={pointerEnd}
@@ -218,7 +201,10 @@ export default function HomeCompanyPartners({ companies }: { companies: Partner[
             // capture-loss event during transfer is not loss by this logo.
             if (event.target !== event.currentTarget) return;
             const motion = motions.current.get(event.currentTarget);
-            if (motion?.gesture?.id === event.pointerId) reset(event.currentTarget, motion);
+            if (motion?.gesture?.id === event.pointerId) {
+              if (motion.gesture.demo) { motion.gesture = null; demos.current?.release(); }
+              else reset(event.currentTarget, motion);
+            }
           }}>
           <div className={styles.rotor} data-logo-rotor>
             <div className={styles.face} aria-hidden="true"><CompanyLogo src={company.logo} name={company.name} className="h-full w-full" /></div>

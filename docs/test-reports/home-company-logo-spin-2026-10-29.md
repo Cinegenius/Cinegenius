@@ -66,3 +66,29 @@ Correction is limited to the homepage component and its CSS: the rotor's visual 
 Verification: the 13 targeted motion/homepage tests pass, including child-to-logo capture transfer, unrelated pointer loss, actual own-capture loss, reversal and release momentum. Production build/type check, six-language validation and scoped lint pass. In the local browser fixture, an explicit test-only control captures the native active pointer on a child before production handlers transfer it to the logo. The browser emitted both real capture-loss events, while Alpha and Beta continued rotating in opposite directions; metadata stayed fixed, each settled frontally, ordinary click opened the correct company, vertical drag did not open a company and simulated reduced motion remained static. DOM hit testing returned the outer logo for all logo centres. No product test controls or data were added.
 
 The captured browser sequence is faithful pointer-capture simulation with mouse hardware, not a physical iPhone test. A real iPhone recheck remains necessary before claiming that every touch-browser behaviour is verified. Evidence: `home-company-logo-touch-transfer-fixed.png` in the task visualization folder. No database or translation changes are required.
+
+## Follow-up: demonstration for every visible logo
+
+The previous global session flag admitted only one demonstration for the whole section. It is replaced by a per-company session list (v2). Existing v1 suppression does not prevent members from seeing the new, individual demonstration once. The homepage still supplies the same six existing companies; no selection, logo size, surface, label or link changed.
+
+- `lib/company-logo-demo.ts` owns only demonstration scheduling: 70% logo visibility inside the existing fixed-navigation margins, deferred image readiness, six stable variants with alternating directions, 0–340ms start offsets and 1.6–2.05s durations. The demonstration has a gentle cosine ease and ends at an exact frontal turn. Manual gesture math and release physics are unchanged.
+- On small screens each row waits for its own visibility. Leaving the viewport or hiding the browser tab pauses time and angle rather than rewinding. Pending/paused work does not advance in the background. No repeat after completion, return navigation or reload in the same session. If session storage is unavailable, in-memory suppression remains for the current document/application session; persistence across a full reload cannot be guaranteed in that browser condition.
+- Pointer contact pauses demonstrations. A horizontal gesture takes over the current angle without overlapping animation. A tap or vertical gesture does not rewind the demonstration. Keyboard focus preserves normal anchor access and gently settles an interrupted logo. Reduced-motion preference clears/blocks demonstrations; missing or failed images stay static.
+- The existing two-sided logo faces, pointer-capture protection, click suppression and vertical-scroll CSS are retained. No CSS, database, API, company record or translation changes are required. Existing translated gesture hints remain unchanged.
+
+Changed implementation: `components/HomeCompanyPartners.tsx`, new `lib/company-logo-demo.ts`, and the demo session-key version in `lib/company-logo-motion.ts`. Tests: new `lib/company-logo-demo.test.mjs` and the existing `lib/company-logo-motion.test.mjs`. This report is the only additional documentation change.
+
+### Executed verification
+
+19 targeted tests passed across demo scheduling, manual touch handlers and homepage integration. Covered: all six variants, individual visibility, hidden-tab pause/resume without time jumps, reduced motion, delayed/failed image readiness, per-logo once-per-session behavior, cleanup, exact manual takeover angle, vertical gestures/taps without rewind, existing direction/velocity/coasting and click suppression. Production build/type checking, all-six-language validation, scoped ESLint and shared-design checks passed.
+
+Browser fixture used the actual production components with six fictitious local companies and diagnostic text rendered in the page. It is outside the repository and is not shipped:
+
+- Desktop 1280px: all six start once, rotate both ways with observed durations about 1600/1700/1750/1850/1900/2050ms, then all transforms clear. Company-name coordinates remain unchanged at y=345 during rotation, manual takeover and rest. No horizontal overflow.
+- Phone-sized 390×650px: first four eligible logos animate while the last row remains below the visible threshold. Gamma and Delta only begin after scrolling to them; all six counters finish at one. This is a browser-size simulation with mouse input, not a physical phone test.
+- A deliberate drag during the running demonstration with the existing test-only child-capture transfer enabled keeps rotating, emits the expected child-to-logo capture loss, does not open a link, and leaves labels stationary. The actual handler regression additionally verifies exact angle continuity (125° becomes 137° after a 6px swipe, rather than restarting at zero).
+- Ordinary click opens the exact Delta test-company route; Enter opens the exact Beta route. Return navigation and reload show zero new demonstrations. Manual Beta dragging after completed demos continues to produce coasting without navigation.
+- Simulated reduced-motion preference: no demonstration or drag rotation; keyboard link activation still works. This preference was simulated at the local fixture's matchMedia boundary, not by changing OS settings.
+- Offscreen/hidden-tab pause timing, unloaded/error states and listener/frame cleanup are tested with controlled browser-API boundaries; no actual OS background-tab timing or physical iPhone/Android test is claimed.
+
+Screenshot: `company-six-logo-demo-desktop.png` in the task visualization folder. No test messages, invitations, production data or original image files were changed.
