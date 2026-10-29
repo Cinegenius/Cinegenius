@@ -1446,15 +1446,15 @@ function CreatorsInner({
 
               {/* Grid: large profile cards */}
               {viewMode === "grid" && (
-              <div className="grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
                 {crewVisible.map((c) => {
                   const displayPositions = getPositions(c);
                   const href = c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`;
                   const photo = crewPhotoInput(c);
                   return (
                     <Link key={c.id} href={href} suppressHydrationWarning
-                      className="browse-card card-hover group flex min-w-0 items-center gap-2 p-2.5 sm:gap-3 sm:p-3">
-                      <ProfileCardPhoto {...photo} name={c.name} className="h-20 w-20 rounded-lg border border-border/60 sm:h-[88px] sm:w-[88px] lg:h-24 lg:w-24" sizes="(min-width: 1024px) 96px, (min-width: 640px) 88px, 80px" />
+                      className="browse-card card-hover group flex min-w-0 items-center gap-1.5 p-2 sm:gap-3 sm:p-3">
+                      <ProfileCardPhoto {...photo} name={c.name} className="h-12 w-12 rounded-lg border border-border/60 min-[375px]:h-14 min-[375px]:w-14 sm:h-[88px] sm:w-[88px] lg:h-24 lg:w-24" sizes="(min-width: 1024px) 96px, (min-width: 640px) 88px, (min-width: 375px) 56px, 48px" />
                       <div className="min-w-0 flex-1 py-0.5">
                         <div className="flex items-start justify-between gap-1 mb-0.5">
                           <h3 className="min-w-0 break-words [overflow-wrap:anywhere] font-semibold text-text-primary text-[13px] leading-snug sm:text-sm">{c.name}</h3>
