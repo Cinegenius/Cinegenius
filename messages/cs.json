@@ -1899,5 +1899,25 @@
   "homeCompanyLogos": {
     "touchHint": "Přejetím otočíte · Klepnutím otevřete",
     "dragHint": "Tažením otočíte · Kliknutím otevřete"
+  },
+  "ProfilePhotoCrop": {
+    "title": "Výřez fotografie na kartě štábu",
+    "description": "Upravuješ pouze náhled v přehledu štábu. Původní fotografie a titulní obrázek zůstanou beze změny.",
+    "preview": "Náhled karty štábu",
+    "move": "Posuň fotografii myší nebo prstem",
+    "horizontal": "Vodorovně",
+    "vertical": "Svisle",
+    "zoom": "Zvětšení",
+    "zoomValue": "{percent} %",
+    "reset": "Obnovit výřez",
+    "apply": "Použít výřez",
+    "cancel": "Zrušit",
+    "close": "Zavřít",
+    "saveHint": "Pro trvalé uložení výřezu ulož svůj profil.",
+    "savedDraft": "Výřez byl přidán do konceptu. Pro zveřejnění ulož svůj profil.",
+    "edit": "Upravit výřez",
+    "loading": "Načítání fotografie…",
+    "loadError": "Fotografii se nepodařilo načíst. Zavři náhled a zkus to znovu.",
+    "zoomHint": "Podle potřeby fotografii zvětši, aby se skryly okraje, které jsou již součástí obrázku."
   }
 }

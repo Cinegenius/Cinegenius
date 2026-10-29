@@ -1,5 +1,5 @@
 export type CoverPosition = { x: number; y: number };
-export type ProfileFocalPoint = { x: number; y: number; opacity?: number; cover?: CoverPosition };
+export type ProfileFocalPoint = { x: number; y: number; opacity?: number; cover?: CoverPosition; card?: { x: number; y: number; zoom: number } };
 
 function bounded(value: unknown, fallback: number, min: number, max: number): number {
   return typeof value === "number" && Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : fallback;
@@ -43,6 +43,11 @@ export function validProfileFocalPoint(value: unknown): boolean {
     if (!item.cover || typeof item.cover !== "object" || Array.isArray(item.cover)) return false;
     const point = item.cover as Record<string, unknown>;
     if (!numberIn(point.x, 0, 100) || !numberIn(point.y, 0, 100)) return false;
+  }
+  if (item.card !== undefined) {
+    if (!item.card || typeof item.card !== "object" || Array.isArray(item.card)) return false;
+    const crop = item.card as Record<string, unknown>;
+    if (!numberIn(crop.x, 0, 100) || !numberIn(crop.y, 0, 100) || !numberIn(crop.zoom, 1, 3)) return false;
   }
   return true;
 }

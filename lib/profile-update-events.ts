@@ -1,3 +1,5 @@
+import { validProfileFocalPoint, type ProfileFocalPoint } from "./profile-cover";
+
 export const PROFILE_UPDATED_EVENT = "cinegenius:profile-updated";
 const PROFILE_UPDATED_STORAGE_KEY = "cg-profile-updated-event";
 
@@ -6,6 +8,7 @@ export type ProfileUpdatedDetail = {
   displayName?: string;
   avatarUrl?: string | null;
   previousAvatarUrl?: string | null;
+  focalPoint?: ProfileFocalPoint | null;
 };
 
 function isProfileUpdatedDetail(value: unknown): value is ProfileUpdatedDetail {
@@ -13,6 +16,7 @@ function isProfileUpdatedDetail(value: unknown): value is ProfileUpdatedDetail {
   const detail = value as ProfileUpdatedDetail;
   return typeof detail.userId === "string"
     && (detail.avatarUrl === undefined || detail.avatarUrl === null || typeof detail.avatarUrl === "string")
+    && (detail.focalPoint === undefined || validProfileFocalPoint(detail.focalPoint))
     && (detail.displayName === undefined || typeof detail.displayName === "string");
 }
 

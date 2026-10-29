@@ -463,7 +463,7 @@ export interface UserProfile {
 
   // Medien
   profile_images: ProfileImage[] | null;
-  focal_point?: { x: number; y: number; opacity?: number; cover?: { x: number; y: number } } | null;
+  focal_point?: { x: number; y: number; opacity?: number; cover?: { x: number; y: number }; card?: { x: number; y: number; zoom: number } } | null;
   showreel_url: string | null;
   reel_url?: string | null;
   video_links?: string[] | null;

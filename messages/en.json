@@ -1899,5 +1899,25 @@
   "homeCompanyLogos": {
     "touchHint": "Swipe to spin · Tap to open",
     "dragHint": "Drag to spin · Click to open"
+  },
+  "ProfilePhotoCrop": {
+    "title": "Crew card photo crop",
+    "description": "Adjust only the preview in the crew directory. Your original photo and cover stay unchanged.",
+    "preview": "Crew card preview",
+    "move": "Drag the photo with your mouse or finger",
+    "horizontal": "Horizontal",
+    "vertical": "Vertical",
+    "zoom": "Zoom",
+    "zoomValue": "{percent}%",
+    "reset": "Reset crop",
+    "apply": "Apply crop",
+    "cancel": "Cancel",
+    "close": "Close",
+    "saveHint": "Save your profile to store this crop permanently.",
+    "savedDraft": "Crop added to your draft. Save your profile to publish it.",
+    "edit": "Adjust crop",
+    "loading": "Loading photo…",
+    "loadError": "The photo could not be loaded. Close the preview and try again.",
+    "zoomHint": "Zoom in if needed to hide borders already contained in the photo."
   }
 }

@@ -1899,5 +1899,25 @@
   "homeCompanyLogos": {
     "touchHint": "Zum Drehen wischen · Zum Öffnen tippen",
     "dragHint": "Zum Drehen ziehen · Zum Öffnen klicken"
+  },
+  "ProfilePhotoCrop": {
+    "title": "Fotoausschnitt für Crewkarten",
+    "description": "Passe nur die Vorschau in der Crewübersicht an. Dein Originalfoto und das Cover bleiben unverändert.",
+    "preview": "Crewkarten-Vorschau",
+    "move": "Foto mit Maus oder Finger verschieben",
+    "horizontal": "Horizontal",
+    "vertical": "Vertikal",
+    "zoom": "Vergrößerung",
+    "zoomValue": "{percent} %",
+    "reset": "Ausschnitt zurücksetzen",
+    "apply": "Ausschnitt übernehmen",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "saveHint": "Mit „Profil speichern“ wird dieser Ausschnitt dauerhaft übernommen.",
+    "savedDraft": "Ausschnitt im Entwurf übernommen. Speichere dein Profil, um ihn zu veröffentlichen.",
+    "edit": "Ausschnitt anpassen",
+    "loading": "Foto wird geladen …",
+    "loadError": "Foto konnte nicht geladen werden. Schließe die Vorschau und versuche es erneut.",
+    "zoomHint": "Vergrößere das Foto bei Bedarf, um bereits enthaltene Bildränder auszublenden."
   }
 }

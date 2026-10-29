@@ -7,7 +7,9 @@ import { filterCrewOccupations } from "@/lib/crew-occupations";
 
 import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import Image from "@/components/MediaImage";
+import ProfileCardPhoto from "@/components/ProfileCardPhoto";
+import { crewPhotoInput } from "@/lib/profile-photo";
+import type { ProfileFocalPoint } from "@/lib/profile-cover";
 import { useTranslations, useLocale } from "next-intl";
 import {
   MapPin, CheckCircle, Search, X, LayoutGrid, List, SlidersHorizontal, ChevronDown, Users, Globe, Languages, ArrowUpDown, Plus, ShoppingBag,
@@ -78,7 +80,7 @@ export type ServerCreator = {
   playing_age_max?: number | null;
   height_cm?: number | null;
   travel?: string;
-  focal_point?: { x: number; y: number };
+  focal_point?: ProfileFocalPoint;
   isVendor?: boolean;
   last_seen_at?: string | null;
 };
@@ -91,55 +93,6 @@ function parseLocation(loc: string): { city: string; country: string } {
 function getPositions(c: ServerCreator): string[] {
   if (Array.isArray(c.positions) && c.positions.length > 0) return c.positions;
   return [c.role];
-}
-
-function isSupabaseStorageImage(src: string): boolean {
-  try {
-    const url = new URL(src);
-    return url.protocol === "https:" && url.hostname.endsWith(".supabase.co") && url.pathname.includes("/storage/v1/object/public/");
-  } catch {
-    return false;
-  }
-}
-
-function DirectoryImage({
-  src,
-  alt,
-  className,
-  objectPosition,
-  size,
-}: {
-  src: string;
-  alt: string;
-  className: string;
-  objectPosition?: string;
-  size: "avatar" | "card";
-}) {
-  const isAvatar = size === "avatar";
-  const dimensions = isAvatar ? { width: 96, height: 96 } : { width: 168, height: 224 };
-  const sizes = isAvatar ? "36px" : "(min-width: 1024px) 84px, (min-width: 640px) 72px, 56px";
-
-  if (isSupabaseStorageImage(src)) {
-    return (
-      <Image
-        src={src}
-        alt={alt}
-        width={dimensions.width}
-        height={dimensions.height}
-        sizes={sizes}
-        quality={75}
-        loading="lazy"
-        decoding="async"
-        className={className}
-        style={objectPosition ? { objectPosition } : undefined}
-      />
-    );
-  }
-
-  // Keep existing support for externally hosted profile images that are not
-  // included in next.config.ts remotePatterns.
-  // eslint-disable-next-line @next/next/no-img-element
-  return <img src={src} alt={alt} loading="lazy" decoding="async" className={className} style={objectPosition ? { objectPosition } : undefined} />;
 }
 
 function hasProfileType(c: ServerCreator, ...types: string[]): boolean {
@@ -419,13 +372,16 @@ function CreatorsInner({
     setLoadError(false);
   }, [serverCreators, hasMoreProfiles]);
 
-  useEffect(() => subscribeToProfileUpdated(({ userId, avatarUrl, previousAvatarUrl }) => {
-    if (!userId || avatarUrl === undefined) return;
+  useEffect(() => subscribeToProfileUpdated(({ userId, avatarUrl, previousAvatarUrl, focalPoint }) => {
+    if (!userId || (avatarUrl === undefined && focalPoint === undefined)) return;
     setAllCreators((current) => current.map((creator) => {
       if (creator.id !== userId) return creator;
       const imageUsedAvatar = creator.image === creator.avatar || creator.image === previousAvatarUrl;
       const nextAvatar = avatarUrl ?? "";
-      return { ...creator, avatar: nextAvatar, ...(imageUsedAvatar ? { image: nextAvatar } : {}) };
+      return { ...creator,
+        ...(avatarUrl !== undefined ? { avatar: nextAvatar, ...(imageUsedAvatar ? { image: nextAvatar } : {}) } : {}),
+        ...(focalPoint !== undefined ? { focal_point: focalPoint ?? undefined } : {}),
+      };
     }));
   }), []);
 
@@ -1297,7 +1253,6 @@ function CreatorsInner({
       {loadError && <div className="site-container py-3"><p role="alert" className="text-sm text-text-muted">Weitere Profile konnten nicht geladen werden. Die Trefferzahl ist noch unvollständig. <button className="min-h-11 text-gold underline" onClick={() => setLoadError(false)}>Erneut versuchen</button></p></div>}
       {/* ── Results ─────────────────────────────────────────────────────────── */}
       {(() => {
-        const isAllAreas = sidebarDept === null;
         const filteredCrew = filtered;
         const crewVisible  = filteredCrew.slice(0, visibleCount);
 
@@ -1460,16 +1415,7 @@ function CreatorsInner({
                       <Link key={c.id} href={href} suppressHydrationWarning
                         className="group flex items-center gap-3 px-4 py-2.5 hover:bg-bg-elevated transition-colors">
                         {/* Avatar */}
-                        {c.avatar ? (
-                          <DirectoryImage src={c.avatar} alt={c.name}
-                            className="w-9 h-9 rounded-full object-cover border border-border/60 shrink-0"
-                            objectPosition={c.focal_point ? `${c.focal_point.x}% ${c.focal_point.y}%` : "50% 33%"}
-                            size="avatar" />
-                        ) : (
-                          <div className="w-9 h-9 rounded-full bg-bg-elevated border border-border/60 flex items-center justify-center text-text-muted text-sm font-bold shrink-0">
-                            {c.name[0]}
-                          </div>
-                        )}
+                        <ProfileCardPhoto src={c.avatar} name={c.name} focalPoint={c.focal_point} className="h-9 w-9 rounded-full border border-border/60" sizes="36px" />
                         {/* Name + role */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
@@ -1500,27 +1446,18 @@ function CreatorsInner({
 
               {/* Grid: large profile cards */}
               {viewMode === "grid" && (
-              <div className={`grid grid-cols-2 gap-2.5 sm:gap-3 ${isAllAreas ? "xl:grid-cols-4" : "lg:grid-cols-3"}`}>
+              <div className="grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
                 {crewVisible.map((c) => {
                   const displayPositions = getPositions(c);
                   const href = c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`;
+                  const photo = crewPhotoInput(c);
                   return (
                     <Link key={c.id} href={href} suppressHydrationWarning
                       className="browse-card card-hover group flex min-w-0 items-center gap-2 p-2.5 sm:gap-3 sm:p-3">
-                      <div className="relative flex h-[88px] w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/60 bg-bg-primary sm:h-24 sm:w-[72px] lg:h-28 lg:w-[84px]">
-                        {c.image || c.avatar ? (
-                          <DirectoryImage src={c.image || c.avatar} alt={c.name}
-                            className="h-full w-full object-contain p-0.5 transition-transform duration-300 group-hover:scale-[1.03]"
-                            size="card" />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center text-xl font-bold text-text-muted/30">
-                            {c.name[0]}
-                          </div>
-                        )}
-                      </div>
+                      <ProfileCardPhoto {...photo} name={c.name} className="h-20 w-20 rounded-lg border border-border/60 sm:h-[88px] sm:w-[88px] lg:h-24 lg:w-24" sizes="(min-width: 1024px) 96px, (min-width: 640px) 88px, 80px" />
                       <div className="min-w-0 flex-1 py-0.5">
                         <div className="flex items-start justify-between gap-1 mb-0.5">
-                          <h3 className="font-semibold text-text-primary text-[13px] leading-snug truncate sm:text-sm">{c.name}</h3>
+                          <h3 className="min-w-0 break-words [overflow-wrap:anywhere] font-semibold text-text-primary text-[13px] leading-snug sm:text-sm">{c.name}</h3>
                           {c.verified && <CheckCircle size={12} className="text-gold/60 shrink-0 mt-0.5" />}
                         </div>
                         <p className="line-clamp-2 text-[11px] leading-snug text-gold font-medium sm:text-xs">{displayPositions.slice(0, 2).join(" · ")}</p>

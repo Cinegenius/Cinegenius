@@ -1899,5 +1899,25 @@
   "homeCompanyLogos": {
     "touchHint": "Scorri per ruotare · Tocca per aprire",
     "dragHint": "Trascina per ruotare · Clicca per aprire"
+  },
+  "ProfilePhotoCrop": {
+    "title": "Inquadratura della foto nelle schede crew",
+    "description": "Modifica solo l’anteprima nell’elenco crew. La foto originale e la copertina restano invariate.",
+    "preview": "Anteprima della scheda crew",
+    "move": "Trascina la foto con il mouse o con il dito",
+    "horizontal": "Orizzontale",
+    "vertical": "Verticale",
+    "zoom": "Ingrandimento",
+    "zoomValue": "{percent}%",
+    "reset": "Reimposta inquadratura",
+    "apply": "Applica inquadratura",
+    "cancel": "Annulla",
+    "close": "Chiudi",
+    "saveHint": "Salva il profilo per memorizzare questa inquadratura.",
+    "savedDraft": "Inquadratura aggiunta alla bozza. Salva il profilo per pubblicarla.",
+    "edit": "Regola inquadratura",
+    "loading": "Caricamento foto…",
+    "loadError": "Impossibile caricare la foto. Chiudi l’anteprima e riprova.",
+    "zoomHint": "Ingrandisci la foto se necessario per nascondere i bordi già presenti nell’immagine."
   }
 }

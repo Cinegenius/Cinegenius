@@ -477,6 +477,7 @@ export default function ProfilePage() {
   const { user, isLoaded } = useUser();
   const t = useTranslations("profile");
   const optionalMedia = useTranslations("OptionalMedia");
+  const photoCropText = useTranslations("ProfilePhotoCrop");
   const profileMediaLimitsText = t("uploadMediaLimits", {
     sourceMaxMb: PROFILE_MEDIA_SOURCE_MAX_BYTES / (1024 * 1024),
     compressedMaxMb: PROFILE_MEDIA_MAX_BYTES / (1024 * 1024),
@@ -1179,7 +1180,7 @@ export default function ProfilePage() {
       setEditorStep(0);
       setEditorRevision(0);
       const url = avatarUrl || null;
-      publishProfileUpdated({ userId: user?.id, displayName: form.name, avatarUrl: url });
+      publishProfileUpdated({ userId: user?.id, displayName: form.name, avatarUrl: url, focalPoint });
       const unavailableFields: string[] = baseResult.unavailableFields ?? [];
       try {
         await fetch("/api/onboarding?type=profile-edit", { method: "DELETE" });
@@ -1462,10 +1463,10 @@ export default function ProfilePage() {
   }
 
   async function saveFocalPoint(point: FocalPoint) {
-    setFocalPoint(current => ({ ...current, x: point.x, y: point.y }));
+    setFocalPoint(current => ({ ...current, card: point.card }));
     setFocalPickerImage(null);
     markEditorChanged();
-    addToast("Bildposition im Entwurf übernommen. Speichere dein Profil, um sie zu veröffentlichen.", "success");
+    addToast(photoCropText("savedDraft"), "success");
   }
 
   return (
@@ -1697,12 +1698,17 @@ export default function ProfilePage() {
                         {[positions[0] ?? PROFILE_TYPE_LABELS[primaryProfileType as ProfileType], form.city]
                           .filter(Boolean).join(" · ") || clerkEmail}
                       </p>
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         <button onClick={() => fileRef.current?.click()}
                           disabled={avatarUploading}
                           className="px-3 py-1.5 text-xs border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-colors">
                           {avatarUploading ? "Foto wird gespeichert …" : t("photoUpload")}
                         </button>
+                        {avatarPreview && (
+                          <button type="button" disabled={avatarUploading} onClick={() => setFocalPickerImage(avatarUrl || avatarPreview)} className="min-h-11 rounded-lg border border-border px-3 py-1.5 text-xs text-text-secondary hover:border-gold hover:text-gold disabled:opacity-50">
+                            {photoCropText("edit")}
+                          </button>
+                        )}
                         {avatarPreview && (
                           <button onClick={removeAvatar} className="px-3 py-1.5 text-xs text-text-muted hover:text-crimson-light transition-colors">
                             {t("removePhoto")}

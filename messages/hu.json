@@ -1899,5 +1899,25 @@
   "homeCompanyLogos": {
     "touchHint": "Húzd el a forgatáshoz · Koppints a megnyitáshoz",
     "dragHint": "Húzd a forgatáshoz · Kattints a megnyitáshoz"
+  },
+  "ProfilePhotoCrop": {
+    "title": "Fotókivágás a stábkártyákhoz",
+    "description": "Csak a stáblistában megjelenő előnézetet módosítod. Az eredeti fotó és a borítókép nem változik.",
+    "preview": "Stábkártya előnézete",
+    "move": "Mozgasd a fotót egérrel vagy ujjal",
+    "horizontal": "Vízszintesen",
+    "vertical": "Függőlegesen",
+    "zoom": "Nagyítás",
+    "zoomValue": "{percent}%",
+    "reset": "Kivágás visszaállítása",
+    "apply": "Kivágás alkalmazása",
+    "cancel": "Mégse",
+    "close": "Bezárás",
+    "saveHint": "A kivágás végleges tárolásához mentsd a profilodat.",
+    "savedDraft": "A kivágás a piszkozatba került. A közzétételhez mentsd a profilodat.",
+    "edit": "Kivágás beállítása",
+    "loading": "Fotó betöltése…",
+    "loadError": "A fotó nem tölthető be. Zárd be az előnézetet, és próbáld újra.",
+    "zoomHint": "Szükség esetén nagyítsd a fotót a képbe beépített szegélyek elrejtéséhez."
   }
 }

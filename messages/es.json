@@ -1899,5 +1899,25 @@
   "homeCompanyLogos": {
     "touchHint": "Desliza para girar · Toca para abrir",
     "dragHint": "Arrastra para girar · Haz clic para abrir"
+  },
+  "ProfilePhotoCrop": {
+    "title": "Encuadre de foto para tarjetas de equipo",
+    "description": "Ajusta solo la vista previa del directorio de profesionales. Tu foto original y la portada no cambian.",
+    "preview": "Vista previa de la tarjeta",
+    "move": "Arrastra la foto con el ratón o el dedo",
+    "horizontal": "Horizontal",
+    "vertical": "Vertical",
+    "zoom": "Ampliación",
+    "zoomValue": "{percent} %",
+    "reset": "Restablecer encuadre",
+    "apply": "Aplicar encuadre",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "saveHint": "Guarda tu perfil para conservar este encuadre.",
+    "savedDraft": "Encuadre añadido al borrador. Guarda tu perfil para publicarlo.",
+    "edit": "Ajustar encuadre",
+    "loading": "Cargando foto…",
+    "loadError": "No se ha podido cargar la foto. Cierra la vista previa e inténtalo de nuevo.",
+    "zoomHint": "Amplía la foto si necesitas ocultar bordes que ya forman parte de la imagen."
   }
 }
