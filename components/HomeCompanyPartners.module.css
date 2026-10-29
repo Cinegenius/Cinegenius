@@ -16,6 +16,8 @@
 .rotor {
   position: absolute;
   inset: 0;
+  /* Keep the stable logo hitbox as the touch capture target, not a 3D face. */
+  pointer-events: none;
   transform-style: preserve-3d;
 }
 

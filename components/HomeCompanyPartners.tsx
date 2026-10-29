@@ -212,7 +212,14 @@ export default function HomeCompanyPartners({ companies }: { companies: Partner[
             if (demo.current === coin) demo.current = null;
           }}
           onLoadCapture={event => { if (event.target instanceof HTMLImageElement && event.target.naturalWidth > 0) delete event.currentTarget.dataset.logoFailed; }}
-          onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerEnd} onPointerCancel={pointerEnd} onLostPointerCapture={event => { const motion = motions.current.get(event.currentTarget); if (motion?.gesture) reset(event.currentTarget, motion); }}>
+          onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerEnd} onPointerCancel={pointerEnd}
+          onLostPointerCapture={event => {
+            // Touch implicitly captures the hit-tested child. Its bubbling
+            // capture-loss event during transfer is not loss by this logo.
+            if (event.target !== event.currentTarget) return;
+            const motion = motions.current.get(event.currentTarget);
+            if (motion?.gesture?.id === event.pointerId) reset(event.currentTarget, motion);
+          }}>
           <div className={styles.rotor} data-logo-rotor>
             <div className={styles.face} aria-hidden="true"><CompanyLogo src={company.logo} name={company.name} className="h-full w-full" /></div>
             {company.logo && <div className={`${styles.face} ${styles.back}`} aria-hidden="true"><CompanyLogo src={company.logo} name={company.name} className="h-full w-full" /></div>}
