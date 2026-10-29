@@ -39,3 +39,18 @@ Automated checks: seven new motion tests, three existing homepage integration te
 ## Limitations / release state
 
 No physical iPhone/Safari or Android/Chrome touch test was available. Touch direction thresholds and native-scroll CSS policy were tested; the viewport simulation uses mouse input and does not prove a real touch fling or pinch gesture. This change is local and has not been deployed. No dependency or database migration is required.
+
+## Follow-up: direct swipe tracking and proportional momentum
+
+The initial version above was released as `5aced9132233a72a385e8eac55735fcfd73ae515`. A subsequent user request asked for more immediate movement during finger contact and continuously variable speed. This follow-up is local, not yet deployed.
+
+- Horizontal intent now starts at 6 px for touch/pen and 4 px for mouse; ordinary small tap jitter remains pending and vertical/diagonal intent retains scrolling.
+- The rotor follows the current horizontal displacement directly, including reversals, at one turn per rendered logo width. The old fixed 0.9 degrees per pixel is removed.
+- Release speed uses time-based smoothing, independent of pointer-event frequency. Momentum and easing duration derive from actual angular velocity rather than two fixed turn counts. Slow gestures settle gently; faster gestures coast faster/further. Speed and duration remain bounded (maximum 2.4 seconds), ending frontally. Both faces and stationary metadata are unchanged.
+- Changed implementation: `components/HomeCompanyPartners.tsx`, `lib/company-logo-motion.ts`; regression coverage: `lib/company-logo-motion.test.mjs`.
+
+Passed: 13 targeted motion/homepage tests, production build including types and six-language i18n validation, scoped ESLint and diff whitespace validation. The touch-handler integration test invokes the actual component handlers with simulated touch pointer events: the rotor changes before pointer-up, reverses immediately and only schedules coasting after release. Slow/medium/fast release momentum and different event frequencies are covered.
+
+Browser verification used the actual component with fictitious local companies: positive and negative drags ran independently at 1280 px and 390 px; metadata remained stationary; all rotors settled frontally; no drag opened a link; ordinary click opened the exact company route; simulated reduced-motion preference disabled rotation/hints; vertical dragging and scrolling retained the page; document width equaled client width. No unexpected browser errors (the intentionally missing fixture image is a static placeholder). Screenshot: `home-company-logos-direct-swipe.png` in the task visualization folder.
+
+The phone-width browser uses mouse input. There is still no physical iPhone/Android touch test, so real-device touch/pinch behavior is not claimed as verified. No product copy, database, media, permissions or other site surfaces were changed.

@@ -5,11 +5,11 @@ import { useEffect, useRef, type PointerEvent } from "react";
 import { useTranslations } from "next-intl";
 import { MoveHorizontal } from "lucide-react";
 import CompanyLogo from "@/components/CompanyLogo";
-import { COMPANY_LOGO_DEMO_KEY, isLogoDragClick, logoGestureAxis, logoSpinAngle, logoSpinPlan } from "@/lib/company-logo-motion";
+import { COMPANY_LOGO_DEMO_KEY, isLogoDragClick, logoDragAngle, logoDragVelocity, logoGestureAxis, logoSpinAngle, logoSpinPlan } from "@/lib/company-logo-motion";
 import styles from "./HomeCompanyPartners.module.css";
 
 type Partner = { id: string; href: string; name: string; logo: string | null; category?: string; city: string };
-type Gesture = { id: number; x: number; y: number; lastX: number; time: number; origin: number; velocity: number; dragging: boolean; vertical: boolean; canSpin: boolean };
+type Gesture = { id: number; x: number; y: number; lastX: number; time: number; origin: number; width: number; velocity: number; dragging: boolean; vertical: boolean; canSpin: boolean };
 type Motion = { rotor: HTMLElement; angle: number; frame: number; gesture: Gesture | null };
 let demoConsumedInPageSession = false;
 
@@ -137,7 +137,7 @@ export default function HomeCompanyPartners({ companies }: { companies: Partner[
     const motion = motionFor(coin);
     if (!motion) return;
     cancelAnimationFrame(motion.frame); motion.frame = 0;
-    motion.gesture = { id: event.pointerId, x: event.clientX, y: event.clientY, lastX: event.clientX, time: event.timeStamp, origin: motion.angle, velocity: 0, dragging: false, vertical: false, canSpin };
+    motion.gesture = { id: event.pointerId, x: event.clientX, y: event.clientY, lastX: event.clientX, time: event.timeStamp, origin: motion.angle, width: coin.getBoundingClientRect().width, velocity: 0, dragging: false, vertical: false, canSpin };
   }
 
   function pointerMove(event: PointerEvent<HTMLDivElement>) {
@@ -169,10 +169,9 @@ export default function HomeCompanyPartners({ companies }: { companies: Partner[
     dragClick.current = { link: coin.closest("a"), until: performance.now() + 600 };
     event.preventDefault();
     if (!gesture.canSpin || reduced.current) return;
-    const dt = Math.max(1, event.timeStamp - gesture.time);
-    gesture.velocity = Math.max(-1.6, Math.min(1.6, gesture.velocity * 0.55 + (event.clientX - gesture.lastX) * 0.9 / dt * 0.45));
+    gesture.velocity = logoDragVelocity(gesture.velocity, logoDragAngle(0, event.clientX - gesture.lastX, gesture.width), event.timeStamp - gesture.time);
     gesture.lastX = event.clientX; gesture.time = event.timeStamp;
-    motion.angle = gesture.origin + dx * 0.9;
+    motion.angle = logoDragAngle(gesture.origin, dx, gesture.width);
     motion.rotor.style.transform = `rotateY(${motion.angle}deg)`;
   }
 
