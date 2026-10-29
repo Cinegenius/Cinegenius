@@ -476,6 +476,7 @@ export default function ProfilePage() {
   const { addToast } = useToast();
   const { user, isLoaded } = useUser();
   const t = useTranslations("profile");
+  const optionalMedia = useTranslations("OptionalMedia");
   const profileMediaLimitsText = t("uploadMediaLimits", {
     sourceMaxMb: PROFILE_MEDIA_SOURCE_MAX_BYTES / (1024 * 1024),
     compressedMaxMb: PROFILE_MEDIA_MAX_BYTES / (1024 * 1024),
@@ -1667,7 +1668,7 @@ export default function ProfilePage() {
                 </div>
                 {/* Avatar */}
                 <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
-                  <h2 className="font-semibold text-text-primary mb-5">{t("sectionAvatar")}</h2>
+                  <h2 className="font-semibold text-text-primary mb-5">{t("sectionAvatar")} <span className="text-xs font-normal text-text-muted">({optionalMedia("optional")})</span></h2>
                   <div className="flex items-center gap-5">
                     <div className="relative shrink-0">
                       {avatarPreview ? (
@@ -1728,7 +1729,7 @@ export default function ProfilePage() {
                   />
                   <div className="flex items-start justify-between gap-4 mb-4">
                     <div>
-                      <h2 className="font-semibold text-text-primary mb-0.5">{t("sectionPhotos")}</h2>
+                      <h2 className="font-semibold text-text-primary mb-0.5">{t("sectionPhotos")} <span className="text-xs font-normal text-text-muted">({optionalMedia("optional")})</span></h2>
                       <p className="text-xs text-text-muted">
                         {showTalentSections
                           ? t("sectionPhotosDescTalent")
@@ -1803,7 +1804,7 @@ export default function ProfilePage() {
                 {!showTalentSections && <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
                   <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <h2 className="font-semibold text-text-primary mb-0.5">{t("sectionCover")}</h2>
+                      <h2 className="font-semibold text-text-primary mb-0.5">{t("sectionCover")} <span className="text-xs font-normal text-text-muted">({optionalMedia("optional")})</span></h2>
                     <p className="text-xs text-text-muted">{t("sectionCoverDesc")}</p>
                     <p className="mt-1 text-xs text-text-muted">{profileMediaLimitsText}</p>
                     </div>

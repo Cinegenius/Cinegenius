@@ -819,7 +819,7 @@
     "hintCity": "Add your city",
     "hintBio": "Write a short bio",
     "hintType": "Select your profile type",
-    "hintPhotos": "Upload at least 2 photos",
+    "hintPhotos": "Add photos (optional)",
     "hintVideo": "Add a video / showreel",
     "hintLanguages": "Add languages",
     "hintHeight": "Enter your height",
@@ -1867,5 +1867,16 @@
     "savingDraft": "Saving private draft …",
     "privateNotice": "Your offer stays private. You can explicitly publish it later. An established profile needs no additional admin approval.",
     "fulfilment": "Handover"
+  },
+  "OptionalMedia": {
+    "optional": "Optional",
+    "hint": "Photos are optional. You can add them later.",
+    "noPhotos": "No photos yet",
+    "galleryHelp": "Up to {count} photos; the first image is the main photo.",
+    "cover": "Cover image (optional)",
+    "logoUpload": "Upload logo (optional)",
+    "companyGallery": "Company gallery (optional)",
+    "skip": "Continue without a photo",
+    "continue": "Continue"
   }
 }

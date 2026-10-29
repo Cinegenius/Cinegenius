@@ -62,7 +62,6 @@ export async function loadAdminReview(rawKind: string, rawId: string) {
     if (!text(record.city)) issues.push("city");
     if (["location", "vehicle", "prop"].includes(String(record.type))) {
       if (!text(record.category)) issues.push("category");
-      if (!text(record.image_url)) issues.push("image");
     }
     if (!publicHref) issues.push("route");
     if (!userId || (companyId && (!providerCompany || providerCompany.published !== true || !companySlug))) issues.push("provider");

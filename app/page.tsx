@@ -93,7 +93,7 @@ async function getHomeData(viewerId: string | null) {
   ] = await Promise.all([
     db.from("listings").select("id,title,city,price,image_url,metadata,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(3),
     db.from("listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
-    db.from("listings").select("id,user_id,company_id,title,city,price,image_url,type,metadata,created_at").in("type", ["prop", "vehicle"]).eq("published", true).not("image_url", "is", null).order("created_at", { ascending: false }).limit(4),
+    db.from("listings").select("id,user_id,company_id,title,city,price,image_url,type,metadata,created_at").in("type", ["prop", "vehicle"]).eq("published", true).order("created_at", { ascending: false }).limit(4),
     db.from("companies").select("id,slug,name,logo_url,city,categories").eq("published", true).order("created_at", { ascending: false }).limit(6),
     db.from("profiles").select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,profile_type,profile_types,profile_images,portfolio_images,created_at").not("display_name", "is", null).neq("display_name", "").order("created_at", { ascending: false }).limit(300),
     db.from("projects").select("id,title,year,type,director,poster_url").order("year", { ascending: false }).limit(3),
@@ -346,7 +346,7 @@ export default async function HomePage() {
               {liveLocations.map((loc) => (
                 <Link key={loc.id} href={`/locations/${loc.id}`} className="card-hover group rounded-xl border border-border bg-bg-elevated overflow-hidden block">
                   <div className="relative overflow-hidden aspect-video bg-bg-elevated">
-                    {loc.image && (
+                    {loc.image ? (
                       <Image
                         src={loc.image}
                         alt={loc.title}
@@ -355,7 +355,7 @@ export default async function HomePage() {
                         style={{ objectPosition: loc.focalPoint ? `${loc.focalPoint.x}% ${loc.focalPoint.y}%` : "50% 50%" }}
                         sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw"
                       />
-                    )}
+                    ) : <div className="absolute inset-0 flex items-center justify-center text-text-muted/30"><MapPin size={36} aria-hidden="true" /></div>}
                     <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/70 to-transparent" />
                     <div className="absolute bottom-2 left-3 right-3">
                       <h3 className="font-semibold text-white text-sm leading-tight">{loc.title}</h3>
@@ -480,14 +480,14 @@ export default async function HomePage() {
                   className="card-hover group rounded-xl border border-border bg-bg-elevated overflow-hidden block"
                 >
                   <div className="relative overflow-hidden aspect-video bg-bg-elevated">
-                    <Image
+                    {prop.image ? <Image
                       src={prop.image}
                       alt={prop.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                       style={{ objectPosition: prop.focalPoint ? `${prop.focalPoint.x}% ${prop.focalPoint.y}%` : "50% 66%" }}
                       sizes="(max-width:1023px) 50vw,25vw"
-                    />
+                    /> : <div className="absolute inset-0 flex items-center justify-center text-text-muted/30"><Package2 size={36} aria-hidden="true" /></div>}
                     <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/70 to-transparent" />
                     <div className="absolute top-2 left-2">
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-bg-primary/80 backdrop-blur-sm border border-border text-[10px] font-semibold text-text-secondary">

@@ -819,7 +819,7 @@
     "hintCity": "Aggiungi la tua città",
     "hintBio": "Scrivi una breve descrizione",
     "hintType": "Seleziona il tipo di profilo",
-    "hintPhotos": "Carica almeno 2 foto",
+    "hintPhotos": "Aggiungi foto (facoltativo)",
     "hintVideo": "Aggiungi un video / showreel",
     "hintLanguages": "Aggiungi lingue",
     "hintHeight": "Inserisci la tua altezza",
@@ -1867,5 +1867,16 @@
     "savingDraft": "Salvataggio bozza privata…",
     "privateNotice": "La tua offerta resta privata. Puoi pubblicarla esplicitamente in seguito. Con un profilo configurato non serve un'ulteriore approvazione.",
     "fulfilment": "Consegna e ritiro"
+  },
+  "OptionalMedia": {
+    "optional": "Facoltativo",
+    "hint": "Le foto sono facoltative. Puoi aggiungerle in seguito.",
+    "noPhotos": "Nessuna foto al momento",
+    "galleryHelp": "Fino a {count} foto; la prima sarà la foto principale.",
+    "cover": "Immagine di copertina (facoltativa)",
+    "logoUpload": "Carica logo (facoltativo)",
+    "companyGallery": "Galleria aziendale (facoltativa)",
+    "skip": "Continua senza foto",
+    "continue": "Continua"
   }
 }

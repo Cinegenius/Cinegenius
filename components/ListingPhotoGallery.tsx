@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import type { ReactNode, TouchEvent as ReactTouchEvent } from "react";
 import Image from "@/components/MediaImage";
 import dynamic from "next/dynamic";
-import { Expand, ImageOff } from "lucide-react";
+import { Expand, ImageOff, ImageIcon } from "lucide-react";
 import { getListingGalleryPreview } from "@/lib/listing-image-gallery";
 
 const Lightbox = dynamic(() => import("@/components/Lightbox"), { ssr: false });
@@ -30,6 +30,7 @@ export default function ListingPhotoGallery({
   focalPoint,
 }: ListingPhotoGalleryProps) {
   const t = useTranslations("MediaGallery");
+  const optionalMedia = useTranslations("OptionalMedia");
   const galleryLabel = label || t("listingPhotos");
   const images = [...new Set(rawImages.filter((url) => typeof url === "string").map((url) => url.trim()).filter(Boolean))];
   const [activeImage, setActiveImage] = useState<string | null>(null);
@@ -79,6 +80,13 @@ export default function ListingPhotoGallery({
   const thumbnailGridClass = preview.thumbnails.length === 1
     ? "grid-cols-1 grid-rows-1"
     : "grid-cols-2 grid-rows-2";
+
+  if (images.length === 0) return (
+    <div data-empty-gallery className="mb-6 flex min-w-0 items-center gap-3 rounded-xl border border-border bg-bg-secondary px-4 py-4 text-sm text-text-muted">
+      <span aria-hidden="true" className="shrink-0">{fallback ?? <ImageIcon size={22} />}</span>
+      <span>{optionalMedia("noPhotos")}</span>
+    </div>
+  );
 
   return (
     <>

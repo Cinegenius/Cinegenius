@@ -819,7 +819,7 @@
     "hintCity": "Adja meg városát",
     "hintBio": "Írjon rövid bemutatkozást",
     "hintType": "Válassza ki a profil típusát",
-    "hintPhotos": "Töltsön fel legalább 2 fotót",
+    "hintPhotos": "Fényképek hozzáadása (nem kötelező)",
     "hintVideo": "Adjon hozzá videót / showreelt",
     "hintLanguages": "Adjon hozzá nyelveket",
     "hintHeight": "Adja meg magasságát",
@@ -1867,5 +1867,16 @@
     "savingDraft": "Privát vázlat mentése…",
     "privateNotice": "Az ajánlat privát marad. Később kifejezetten közzéteheted. Beállított profillal nem kell további adminisztrátori jóváhagyás.",
     "fulfilment": "Átadás"
+  },
+  "OptionalMedia": {
+    "optional": "Nem kötelező",
+    "hint": "A fényképek feltöltése nem kötelező. Később is hozzáadhatod őket.",
+    "noPhotos": "Még nincsenek fényképek",
+    "galleryHelp": "Legfeljebb {count} fénykép; az első lesz a fő kép.",
+    "cover": "Borítókép (nem kötelező)",
+    "logoUpload": "Logó feltöltése (nem kötelező)",
+    "companyGallery": "Céges galéria (nem kötelező)",
+    "skip": "Folytatás fénykép nélkül",
+    "continue": "Tovább"
   }
 }

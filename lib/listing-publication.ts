@@ -22,9 +22,6 @@ export function validateListingPublication(input: ListingPublicationInput): stri
   if (visualListing && !input.category?.trim()) {
     return "Vor der Veröffentlichung muss eine passende Kategorie ausgewählt sein.";
   }
-  if (visualListing && !input.imageUrl && !input.imageWillBeUploaded) {
-    return "Vor der Veröffentlichung braucht dieses Angebot mindestens ein Hauptbild.";
-  }
   if (input.imageUrl && !protectedMediaKey(input.imageUrl)) {
     try {
       if (new URL(input.imageUrl).protocol !== "https:") throw new Error("invalid image protocol");

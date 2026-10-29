@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ArrowDown, ArrowUp, Check, Loader2, RefreshCw, Star, Trash2, Upload } from "lucide-react";
 import UnoptimizedImage from "@/components/UnoptimizedImage";
 import { compressImage, MAX_FUNCTION_UPLOAD_BYTES, safeObjectURL } from "@/lib/compressImage";
@@ -69,6 +70,7 @@ function uploadFile(file: File, onProgress: (progress: number) => void, uploadId
 }
 
 export default function ListingImageManager({ value, onChange, onStatusChange, label = "Artikelbilder", maxImages = MAX_LISTING_IMAGES }: Props) {
+  const optionalMedia = useTranslations("OptionalMedia");
   const initial = uniqueUrls(value).map((url) => ({
     id: `saved:${url}`,
     url,
@@ -296,12 +298,13 @@ export default function ListingImageManager({ value, onChange, onStatusChange, l
     <section aria-label={label} className="space-y-3">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest">{label}</label>
+          <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest">{label} <span className="font-normal normal-case">({optionalMedia("optional")})</span></label>
           <p className="mt-1 text-xs text-text-muted">JPG, PNG, WebP oder HEIC/HEIF · große Fotos werden automatisch verkleinert (max. 4 MB pro Foto nach der Verkleinerung).</p>
         </div>
         <span className="text-xs text-text-muted">{entries.length} / {maxImages} Bilder</span>
       </div>
 
+      {entries.length === 0 && <p className="text-xs leading-5 text-text-muted">{optionalMedia("hint")}</p>}
       {entries.length > 0 && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {entries.map((entry, index) => {

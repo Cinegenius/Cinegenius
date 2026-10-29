@@ -51,3 +51,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Guard explicit cancel/back/sign-out actions through `useFormNavigation` or `useFormRouter`. Preserve actual browser history; never add sentinel entries to intercept Back. Opening a section alone is not a content edit.
 - Never store passwords, session material, local preview URLs or File objects in recovery snapshots. Recheck current content-edit rights, preserve the last confirmed draft on errors, and never delete published media when discarding unsaved input.
 - Apply and verify `20261028180000_private_form_drafts.sql` before deploying the dependent recovery UI. No public content-table backfill is required.
+
+## Optional photos
+
+- Profile photos, company logos/covers, listing images and project/post photos are optional. Missing images must never block a private draft, submission, admin approval or otherwise authorized publication. Preserve the existing per-type publication rules and validate any supplied files/URLs normally.
+- Keep ordinary public cards discoverable without media and use compact existing placeholders. Pure photo discovery must contain actual eligible public uploads only. Do not auto-add placeholders as media, rewrite existing images or remove originals during this change.
+- Keep `20261029010000_optional_listing_images.sql` coordinated with the optional-image UI: it removes only the marketplace database photo requirement, preserving service-only execution, ownership, profile checks, revision checks and admin restrictions.

@@ -383,6 +383,7 @@ export default function InseratPage() {
   const [activeGroup, setActiveGroup] = useState<string | null>(null); // null = main view
   // Category-specific metadata (dynamic per prop category)
   const [marketplace, setMarketplace] = useState(() => marketplaceDraft());
+  const optionalMedia = useTranslations("OptionalMedia");
   const marketText = useTranslations("MarketplaceOffer");
   const marketCatalog = useTranslations("MarketplaceCatalog");
   const [catMeta, setCatMeta] = useState<Record<string, string>>({});
@@ -924,7 +925,7 @@ export default function InseratPage() {
     }
     if (type === "job") return form.role_label.trim() && form.title.trim() && hasCity && form.shoot_start !== "";
     if (type === "creator") return form.title.trim() && hasCity;
-    if (type === "location") return form.title.trim() && hasCity && locExtraImages.length > 0;
+    if (type === "location") return form.title.trim() && hasCity;
     return form.title.trim() && hasCity;
   };
 
@@ -1720,14 +1721,14 @@ export default function InseratPage() {
                     onStatusChange={setLocationGalleryState}
                     label="Locationfotos"
                   />
-                  <p className="text-xs text-text-muted">Für die Veröffentlichung wird mindestens ein Foto benötigt. Bis zu 20 Bilder; das erste ist das Hauptbild.</p>
                   {locExtraImages[0] && <button type="button" onClick={() => setShowFocalPicker(true)} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-gold/30 px-3 py-2 text-xs text-gold transition-colors hover:border-gold"><ImageIcon size={12} />{focalPoint ? "Fokuspunkt des Hauptbilds ändern" : "Fokuspunkt des Hauptbilds setzen"}</button>}
                 </div>
               ) : (
                 <>
               <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
-                Titelbild
+                {optionalMedia("cover")}
               </label>
+              <p className="mb-3 text-xs text-text-muted">{optionalMedia("hint")}</p>
               {imagePreview ? (
                 <div className="space-y-2">
                   <div className="relative rounded-xl overflow-hidden border border-border aspect-video w-full">

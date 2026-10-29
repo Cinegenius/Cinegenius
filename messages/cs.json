@@ -819,7 +819,7 @@
     "hintCity": "Přidejte město",
     "hintBio": "Napište krátký popis",
     "hintType": "Vyberte typ profilu",
-    "hintPhotos": "Nahrajte alespoň 2 fotografie",
+    "hintPhotos": "Přidat fotografie (nepovinné)",
     "hintVideo": "Přidejte video / showreel",
     "hintLanguages": "Přidejte jazyky",
     "hintHeight": "Zadejte výšku",
@@ -1867,5 +1867,16 @@
     "savingDraft": "Ukládání soukromého konceptu…",
     "privateNotice": "Nabídka zůstává soukromá. Později ji můžete výslovně zveřejnit. S nastaveným profilem není potřeba další schválení správce.",
     "fulfilment": "Předání"
+  },
+  "OptionalMedia": {
+    "optional": "Nepovinné",
+    "hint": "Fotografie jsou nepovinné. Můžeš je přidat později.",
+    "noPhotos": "Zatím žádné fotografie",
+    "galleryHelp": "Až {count} fotografií; první bude hlavní fotografie.",
+    "cover": "Úvodní obrázek (nepovinný)",
+    "logoUpload": "Nahrát logo (nepovinné)",
+    "companyGallery": "Firemní galerie (nepovinná)",
+    "skip": "Pokračovat bez fotografie",
+    "continue": "Pokračovat"
   }
 }

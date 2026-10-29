@@ -66,6 +66,7 @@ async function prepareCompanyImage(file: File, dimensions: { maxWidth: number; m
 
 export default function CompanySetupPage() {
   const animals = useTranslations("FilmAnimals");
+  const optionalMedia = useTranslations("OptionalMedia");
   const { isLoaded, user } = useUser();
   const tDraft = useTranslations("FormDraft");
   const [responsible, setResponsible] = useState<ResponsiblePerson>(EMPTY_RESPONSIBLE_PERSON);
@@ -576,7 +577,7 @@ export default function CompanySetupPage() {
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full gap-1.5">
                     <Upload size={22} className="text-text-muted group-hover:text-gold transition-colors" />
-                    <span className="text-[10px] text-text-muted group-hover:text-gold">Logo hochladen</span>
+                    <span className="text-[10px] text-text-muted group-hover:text-gold">{optionalMedia("logoUpload")}</span>
                   </div>
                 )}
                 {uploadingLogo && <div className="absolute inset-0 bg-bg-primary/80 flex flex-col items-center justify-center gap-2"><Loader2 size={18} className="animate-spin text-gold" /><span className="text-[10px] text-text-primary">{logoProgress}%</span></div>}
@@ -595,7 +596,7 @@ export default function CompanySetupPage() {
 
             {/* Company cover image */}
             <div className="space-y-3">
-              <SectionDivider label="Titelbild" />
+              <SectionDivider label={optionalMedia("cover")} />
               <p className="text-xs text-text-muted">Ein Titelbild zeigt eure Räume, euer Team oder eure Arbeit. JPG, PNG, WEBP und HEIC werden passend verarbeitet.</p>
               <input ref={coverRef} type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" className="sr-only" onChange={(event) => { void handleSingleImageUpload(event.target.files?.[0], "cover"); event.currentTarget.value = ""; }} />
               <button type="button" onClick={() => coverRef.current?.click()} disabled={uploadingCover} className="relative block min-h-36 w-full overflow-hidden rounded-xl border border-dashed border-border bg-bg-secondary text-left hover:border-gold/50 disabled:opacity-60">
@@ -1073,7 +1074,7 @@ export default function CompanySetupPage() {
 
             {/* Company gallery */}
             <div className="space-y-3">
-              <SectionDivider label="Firmen-Galerie" />
+              <SectionDivider label={optionalMedia("companyGallery")} />
               <p className="text-xs text-text-muted">Bis zu {MAX_PORTFOLIO} Fotos von Team, Räumen, Equipment oder Arbeitsbeispielen. Das erste Foto steht vorne im öffentlichen Profil. {portfolioImages.length}/{MAX_PORTFOLIO}</p>
               <input ref={portfolioRef} type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple className="sr-only" onChange={(event) => void handlePortfolioUpload(event)} />
               <input ref={replacePortfolioInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" className="sr-only" onChange={(event) => void handleReplacePortfolioUpload(event)} />

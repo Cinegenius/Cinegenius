@@ -819,7 +819,7 @@
     "hintCity": "Stadt angeben",
     "hintBio": "Kurzbeschreibung schreiben",
     "hintType": "Profiltyp auswählen",
-    "hintPhotos": "Mindestens 2 Fotos hochladen",
+    "hintPhotos": "Fotos ergänzen (optional)",
     "hintVideo": "Video / Showreel hinzufügen",
     "hintLanguages": "Sprachen eintragen",
     "hintHeight": "Größe eintragen",
@@ -1867,5 +1867,16 @@
     "savingDraft": "Privater Entwurf wird gespeichert …",
     "privateNotice": "Dein Angebot bleibt privat. Du kannst es später ausdrücklich veröffentlichen. Mit eingerichtetem Profil ist keine zusätzliche Adminfreigabe erforderlich.",
     "fulfilment": "Übergabe"
+  },
+  "OptionalMedia": {
+    "optional": "Optional",
+    "hint": "Fotos sind freiwillig. Du kannst sie auch später hinzufügen.",
+    "noPhotos": "Noch keine Fotos",
+    "galleryHelp": "Bis zu {count} Fotos; das erste Bild ist das Hauptbild.",
+    "cover": "Titelbild (optional)",
+    "logoUpload": "Logo hochladen (optional)",
+    "companyGallery": "Firmen-Galerie (optional)",
+    "skip": "Ohne Foto weiter",
+    "continue": "Weiter"
   }
 }

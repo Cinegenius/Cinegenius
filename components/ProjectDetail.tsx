@@ -15,6 +15,7 @@ import { useFormDraft, useUnsavedForm } from "@/lib/use-form-draft";
 import { useFormNavigation } from "@/contexts/FormDraftContext";
 import FormDraftStatus from "@/components/FormDraftStatus";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@clerk/nextjs";
 
 import Link from "next/link";
@@ -260,6 +261,7 @@ export default function ProjectDetail({
   userProfile?: { display_name: string | null; avatar_url: string | null } | null;
   isAdmin?: boolean;
 }) {
+  const optionalMedia = useTranslations("OptionalMedia");
   const [project, setProject] = useState(initialProject);
   const [credits, setCredits] = useState(initialCredits);
   const [myCredit, setMyCredit] = useState(initialMyCredit);
@@ -838,9 +840,9 @@ export default function ProjectDetail({
               </div>
             )}
             {project.images.length === 0 ? (
-              <div className="text-center py-20">
-                <Film size={40} className="mx-auto mb-4 text-text-muted opacity-20" />
-                <p className="text-sm text-text-muted">{isCreator ? "Lade Set-Fotos, Stills oder Behind-the-Scenes-Bilder hoch" : "Noch keine Fotos vorhanden"}</p>
+              <div className="flex items-center gap-3 rounded-xl border border-border bg-bg-secondary px-4 py-4 text-text-muted">
+                <Film size={24} className="shrink-0 opacity-50" aria-hidden="true" />
+                <p className="text-sm">{optionalMedia("noPhotos")}</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
