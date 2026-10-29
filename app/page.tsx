@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import HeroSearch from "@/components/HeroSearch";
 import CommunityBoard from "@/components/CommunityBoard";
-import CompanyLogo from "@/components/CompanyLogo";
+import HomeCompanyPartners from "@/components/HomeCompanyPartners";
 import { PageBackdrop } from "@/components/PageHeader";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import { HomePhotoDiscovery, type DiscoverPhoto } from "@/components/HomePhotoDiscovery";
@@ -533,22 +533,11 @@ export default async function HomePage() {
                 {tc("viewAll")} <ArrowRight size={14} />
               </Link>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-              {companies.map((c) => (
-                <Link key={c.id} href={`/companies/${c.slug ?? c.id}`} className="card-hover group flex flex-col items-center text-center gap-2">
-                  <CompanyLogo src={c.logo} name={c.name} className="h-24 w-full sm:h-28" />
-                  <div className="min-w-0 w-full">
-                    <h3 className="font-semibold text-text-secondary group-hover:text-text-primary text-xs leading-snug break-words [overflow-wrap:anywhere] transition-colors">{c.name}</h3>
-                    {c.category && (
-                      <p className="text-[10px] text-gold/70 truncate">
-                        {COMPANY_CATEGORIES.find(cat => cat.id === c.category)?.label}
-                      </p>
-                    )}
-                    {c.city && <p className="text-[10px] text-text-muted truncate">{c.city}</p>}
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <HomeCompanyPartners companies={companies.map(c => ({
+              id: c.id, href: `/companies/${c.slug ?? c.id}`, name: c.name,
+              logo: c.logo, city: c.city,
+              category: COMPANY_CATEGORIES.find(category => category.id === c.category)?.label,
+            }))} />
           </div>
         </section>
       )}

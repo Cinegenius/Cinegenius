@@ -1,0 +1,46 @@
+.coin {
+  position: relative;
+  width: 100%;
+  height: 6rem;
+  perspective: 900px;
+  touch-action: pan-y pinch-zoom;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.coin[data-dragging="true"] { cursor: grabbing; }
+.coin:not([data-logo-coin]), .coin[data-logo-failed="true"] { cursor: inherit; touch-action: auto; }
+.coin img { pointer-events: none; -webkit-user-drag: none; }
+
+.rotor {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.back { transform: rotateY(180deg); }
+.dragHint { display: none; }
+.partners[data-reduced-motion="true"] .coin { cursor: inherit; }
+.partners[data-reduced-motion="true"] .rotor { transform: none !important; }
+.partners[data-reduced-motion="true"] .hint,
+.partners[data-reduced-motion="true"] .back { display: none; }
+
+@media (min-width: 640px) { .coin { height: 7rem; } }
+@media (hover: hover) and (pointer: fine) {
+  .touchHint { display: none; }
+  .dragHint { display: inline; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coin { cursor: inherit; }
+  .rotor { transform: none !important; }
+  .hint, .back { display: none; }
+}

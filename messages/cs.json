@@ -1895,5 +1895,9 @@
     "contacts": "Kontakty",
     "contactsLoading": "Kontakty …",
     "contactsCount": "Kontakty ({count})"
+  },
+  "homeCompanyLogos": {
+    "touchHint": "Přejetím otočíte · Klepnutím otevřete",
+    "dragHint": "Tažením otočíte · Kliknutím otevřete"
   }
 }

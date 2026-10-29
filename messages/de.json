@@ -1895,5 +1895,9 @@
     "contacts": "Kontakte",
     "contactsLoading": "Kontakte …",
     "contactsCount": "Kontakte ({count})"
+  },
+  "homeCompanyLogos": {
+    "touchHint": "Zum Drehen wischen · Zum Öffnen tippen",
+    "dragHint": "Zum Drehen ziehen · Zum Öffnen klicken"
   }
 }

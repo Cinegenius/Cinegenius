@@ -1895,5 +1895,9 @@
     "contacts": "Kapcsolatok",
     "contactsLoading": "Kapcsolatok …",
     "contactsCount": "Kapcsolatok ({count})"
+  },
+  "homeCompanyLogos": {
+    "touchHint": "Húzd el a forgatáshoz · Koppints a megnyitáshoz",
+    "dragHint": "Húzd a forgatáshoz · Kattints a megnyitáshoz"
   }
 }
