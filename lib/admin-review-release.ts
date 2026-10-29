@@ -5,10 +5,8 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { readReviewImage } from "@/lib/admin-review-media";
 import { db } from "@/lib/db";
 import { loadAdminReview, REVIEW_HEADERS, ReviewError } from "@/lib/admin-review-server";
-import { validateAdminReason } from "@/lib/admin-audit";
-import { getListingProvider } from "@/lib/listing-provider";
+import { adminReviewReason } from "@/lib/admin-review";
 import { responsibleForCompany } from "@/lib/responsible-person-server";
-import { validateListingPublication } from "@/lib/listing-publication";
 
 export async function releaseReviewedListing(id: string, body: Record<string, unknown>, kind: "listing" | "company_equipment" = "listing") {
   const t = await getTranslations("AdminReview");
@@ -18,24 +16,23 @@ export async function releaseReviewedListing(id: string, body: Record<string, un
     // Guard runs before validation/database reads, including calls through the older endpoint.
     const review = await loadAdminReview(kind, id);
     const action = body.action ?? (body.published === true ? "approve" : body.published === false ? "hide" : null);
-    const reason = validateAdminReason(body.reason);
+    const reason = adminReviewReason(String(action), body.reason, t("approvalReasonDefault"));
     if (typeof body.revision !== "string" || !/^[a-f0-9]{64}$/.test(body.revision) || !["approve", "hide", "changes_requested", "reject"].includes(String(action)) || !reason) return fail("reviewRequired", 400);
     if (review.dto.revision !== body.revision) return fail("stale", 409);
     const listing = review.record;
+    const warnings = [...review.dto.issues];
     if (action === "approve") {
       if (!review.dto.canPublish) return fail("incomplete", 422);
-      if (kind === "listing" && listing.company_id && !await responsibleForCompany(listing.responsible_person, String(listing.company_id), String(review.providerCompany?.owner_user_id ?? ""))) return fail("incomplete", 422);
-      if (kind === "listing" && !listing.company_id && (listing.responsible_person as { userId?: string })?.userId !== listing.user_id) return fail("incomplete", 422);
-      if (kind === "listing") {
-      const provider = await getListingProvider(listing.user_id as string, listing.company_id as string, review.admin.userId, listing.responsible_person);
-      const validation = validateListingPublication({ type: String(listing.type), title: listing.title as string, city: listing.city as string, category: listing.category as string, imageUrl: listing.image_url as string, companySlug: review.providerCompany?.slug as string, providerAssigned: provider.kind !== "unassigned", providerContactable: Boolean(provider.contactUserId) });
-      if (validation) return fail("incomplete", 422);
-      }
-      // Verify every current attached file; no success from a local preview alone.
-      // Bound concurrency avoids loading all large originals into memory at once.
+      const responsibleId = (listing.responsible_person as { userId?: string } | null)?.userId;
+      // Missing business details are advisory; a foreign or former contact is not.
+      if (kind === "listing" && listing.company_id && responsibleId && !await responsibleForCompany(listing.responsible_person, String(listing.company_id), String(review.providerCompany?.owner_user_id ?? ""))) return fail("responsibleMismatch", 422);
+      // Keep media-origin checks. A missing/corrupt original is an advisory quality issue,
+      // but a foreign parent or an unavailable authorization check must still fail closed.
       for (let index = 0; index < review.images.length; index += 3) {
-        try { await Promise.all(review.images.slice(index, index + 3).map((_, offset) => readReviewImage(review, index + offset, 480))); }
-        catch { return fail("mediaError", 422); }
+        await Promise.all(review.images.slice(index, index + 3).map(async (_, offset) => {
+          try { await readReviewImage(review, index + offset, 480); }
+          catch (error) { if (error instanceof ReviewError && error.code === "mediaError") warnings.push("mediaUnavailable"); else throw error; }
+        }));
       }
     }
     const result = await db.rpc("offer_review_transition", {
@@ -55,6 +52,6 @@ export async function releaseReviewedListing(id: string, body: Record<string, un
       revalidatePath("/", "layout");
       revalidateTag("listings", { expire: 0 });
     } catch { cacheRefreshed = false; console.error("[admin-review] cache revalidation failed after saved transition"); }
-    return NextResponse.json({ success: true, published: action === "approve", moderation_status: ({ approve: "approved", hide: "hidden", changes_requested: "changes_requested", reject: "rejected" }[String(action)]), cacheRefreshed }, { headers: REVIEW_HEADERS });
+    return NextResponse.json({ success: true, published: action === "approve", moderation_status: ({ approve: "approved", hide: "hidden", changes_requested: "changes_requested", reject: "rejected" }[String(action)]), warnings: action === "approve" ? [...new Set(warnings)] : [], cacheRefreshed }, { headers: REVIEW_HEADERS });
   } catch (error) { return fail(error instanceof ReviewError ? error.code : "saveError", error instanceof ReviewError ? error.status : 503); }
 }

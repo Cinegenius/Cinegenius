@@ -57,19 +57,21 @@ export async function loadAdminReview(rawKind: string, rawId: string) {
     : kind === "community_post" ? Date.parse(String(record.expires_at)) > Date.now()
     : typeof record.published === "boolean" ? record.published : null;
   const issues: string[] = [];
+  const blockingIssues: string[] = [];
   if (!title.trim()) issues.push("title");
   if (kind === "listing") {
     if (!text(record.city)) issues.push("city");
     if (["location", "vehicle", "prop"].includes(String(record.type))) {
       if (!text(record.category)) issues.push("category");
     }
-    if (!publicHref) issues.push("route");
-    if (!userId || (companyId && (!providerCompany || providerCompany.published !== true || !companySlug))) issues.push("provider");
+    if (!publicHref) blockingIssues.push("route");
+    if (!userId || (companyId && (!providerCompany || providerCompany.published !== true || !companySlug))) blockingIssues.push("provider");
     if (Object.keys(responsiblePersonErrors(snapshot)).length || !responsibleUser) issues.push("responsible");
+    if (!companyId && responsibleUser && responsibleUser !== userId) blockingIssues.push("responsibleOwnership");
   }
   if (kind === "company_equipment") {
     if (!text(record.category)) issues.push("category");
-    if (!providerCompany || providerCompany.published !== true || !companySlug || !userId) issues.push("provider");
+    if (!providerCompany || providerCompany.published !== true || !companySlug || !userId) blockingIssues.push("provider");
   }
   const offer = kind === "listing" || kind === "company_equipment";
   const history = offer ? await db.from("offer_moderation_events").select("event,actor_user_id,to_status,content_revision,reason,created_at").eq("offer_kind", kind).eq("offer_id", id).order("created_at", { ascending: false }).limit(30) : { data: [] };
@@ -88,7 +90,7 @@ export async function loadAdminReview(rawKind: string, rawId: string) {
     technicalCreator: text(record.user_id) || text(record.created_by) || text(record.author_id) || text(record.owner_user_id),
     publicHref: kind === "company_equipment" && companySlug ? `/companies/${encodeURIComponent(companySlug)}` : publicHref,
     ...(offer ? { moderation: { status: String(record.moderation_status || (published ? "legacy_review_required" : "draft")), reason: text(record.moderation_reason), submittedAt: text(record.submitted_at), reviewedAt: text(record.reviewed_at), contentRevision: Number(record.content_revision || 1), events: (history.data ?? []).map(row => ({ event: String(row.event), actor: row.actor_user_id as string | null, status: String(row.to_status), revision: Number(row.content_revision), reason: row.reason as string | null, at: String(row.created_at) })) } } : {}),
-    issues, canPublish: offer && issues.length === 0 && ["pending", "legacy_review_required"].includes(String(record.moderation_status)),
+    issues, blockingIssues, canPublish: offer && blockingIssues.length === 0,
     support: kind === "listing" || kind === "company" || kind === "profile" ? { type: kind, id } : null,
   };
   return { admin, kind, id, record, providerCompany, providerProfile, dto, images };

@@ -13,7 +13,7 @@ export type ListingPublicationInput = {
   providerContactable: boolean;
 };
 
-/** Shared checks for both admin release and an owner's explicit publish action. */
+/** Completeness checks for provider submission/publication. Admin quality decisions are separate. */
 export function validateListingPublication(input: ListingPublicationInput): string | null {
   if (!input.title?.trim() || !input.city?.trim()) {
     return "Vor der Veröffentlichung müssen Titel und Ort eingetragen sein.";

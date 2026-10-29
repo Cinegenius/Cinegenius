@@ -1,3 +1,11 @@
+import { validateAdminReason } from "./admin-policy";
+
+/** Approval itself is the audited decision; other moderation actions need an explanation. */
+export function adminReviewReason(action: string, value: unknown, defaultApprovalReason: string): string | null {
+  if (action === "approve" && (value === undefined || value === null || value === "" || (typeof value === "string" && !value.trim()))) return validateAdminReason(defaultApprovalReason);
+  return validateAdminReason(value);
+}
+
 /** Explicit review sources: never messages, support attachments or arbitrary tables. */
 export const REVIEW_SOURCES = {
   listing: { table: "listings", key: "id" },
@@ -62,5 +70,5 @@ export type AdminReview = {
   provider: { name: string | null; userId: string | null; href: string | null; companyHref: string | null };
   technicalCreator: string | null; publicHref: string | null;
   moderation?: { status: string; reason: string | null; submittedAt: string | null; reviewedAt: string | null; contentRevision: number; events: { event: string; actor: string | null; status: string; revision: number; reason: string | null; at: string }[] };
-  issues: string[]; canPublish: boolean; support: { type: "listing" | "company" | "profile"; id: string } | null;
+  issues: string[]; blockingIssues: string[]; canPublish: boolean; support: { type: "listing" | "company" | "profile"; id: string } | null;
 };

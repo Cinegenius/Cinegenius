@@ -43,6 +43,8 @@ export async function readReviewImage(review: Awaited<ReturnType<typeof loadRevi
       bytes = Buffer.concat(chunks);
     }
   }
-  const image = await sharp(bytes, { limitInputPixels: 50_000_000 }).rotate().resize({ width, height: width, fit: "inside", withoutEnlargement: true }).webp({ quality: 85 }).toBuffer();
-  return new Uint8Array(image);
+  try {
+    const image = await sharp(bytes, { limitInputPixels: 50_000_000 }).rotate().resize({ width, height: width, fit: "inside", withoutEnlargement: true }).webp({ quality: 85 }).toBuffer();
+    return new Uint8Array(image);
+  } catch { throw new ReviewError("mediaError", 422); }
 }
