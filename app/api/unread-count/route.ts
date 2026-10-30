@@ -6,7 +6,7 @@ import { getUnreadMessageCounts } from "@/lib/unread-message-counts";
 export async function GET() {
   const user = await getCurrentUser();
   const noStore = { headers: { "Cache-Control": "no-store, max-age=0" } };
-  if (!user) return NextResponse.json({ count: 0 }, noStore);
+  if (!user) return NextResponse.json({ code: "account" }, { status: 401, ...noStore });
 
   const { userId } = user;
 

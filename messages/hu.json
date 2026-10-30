@@ -100,7 +100,12 @@
     "empty": "Nincsenek értesítések",
     "emptyDesc": "Foglalások, megkeresések és egyebek itt fognak megjelenni.",
     "viewAll": "Összes értesítés →",
-    "messages": "Üzenetek"
+    "messages": "Üzenetek",
+    "loading": "Értesítések betöltése.",
+    "loadError": "Az üzenetek és értesítések betöltése nem sikerült. Próbáld újra.",
+    "sessionExpired": "A munkamenetedet nem sikerült ellenőrizni. Próbáld újra, vagy jelentkezz be ismét.",
+    "retry": "Újrapróbálkozás",
+    "signIn": "Bejelentkezés"
   },
   "menu": {
     "crewGroup1": "🎬 Film — Tehetség",

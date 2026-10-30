@@ -239,8 +239,21 @@ export default clerkMiddleware(async (auth, request) => {
   // when strict-dynamic is present, giving nonce-level protection while keeping
   // unsafe-inline as a fallback for legacy browsers and Clerk's UI scripts.
   const nonce = generateNonce();
+  const contentSecurityPolicy = [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""} https://*.clerk.com https://*.clerk.accounts.dev https://*.cinegenius.co https://js.stripe.com https://challenges.cloudflare.com https://*.protect.clerk.com`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https://*.supabase.co https://www.google.com https://images.unsplash.com https://plus.unsplash.com https://upload.wikimedia.org https://img.clerk.com https://*.cinegenius.co https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com",
+    "font-src 'self' data:",
+    `connect-src 'self'${process.env.NODE_ENV !== "production" ? " ws://localhost:* wss://localhost:* http://localhost:*" : ""} https://*.supabase.co https://*.clerk.com https://api.clerk.com https://*.clerk.accounts.dev https://*.cinegenius.co wss://*.supabase.co https://*.protect.clerk.com:*`,
+    "frame-src https://js.stripe.com https://hooks.stripe.com https://*.clerk.com https://*.clerk.accounts.dev https://*.cinegenius.co https://challenges.cloudflare.com https://*.protect.clerk.com",
+    "worker-src 'self' blob:",
+    "frame-ancestors 'none'",
+  ].join("; ");
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("X-Nonce", nonce); // Clerk v7 reads this automatically
+  requestHeaders.set("X-Nonce", nonce);
+  // Next and Clerk must render against the exact policy sent to this document.
+  requestHeaders.set("Content-Security-Policy", contentSecurityPolicy);
   // Override any client-supplied value; the dashboard uses this only as a safe return path.
   const returnUrl = new URL(request.url);
   returnUrl.searchParams.delete("_rsc");
@@ -257,20 +270,7 @@ export default clerkMiddleware(async (auth, request) => {
   res.headers.set("X-Frame-Options", "DENY");
   res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
-  res.headers.set(
-    "Content-Security-Policy",
-    [
-      "default-src 'self'",
-      `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""} https://*.clerk.com https://*.clerk.accounts.dev https://*.cinegenius.co https://js.stripe.com`,
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://*.supabase.co https://www.google.com https://images.unsplash.com https://plus.unsplash.com https://upload.wikimedia.org https://img.clerk.com https://*.cinegenius.co https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com",
-      "font-src 'self' data:",
-      `connect-src 'self'${process.env.NODE_ENV !== "production" ? " ws://localhost:* wss://localhost:* http://localhost:*" : ""} https://*.supabase.co https://*.clerk.com https://api.clerk.com https://*.clerk.accounts.dev https://*.cinegenius.co wss://*.supabase.co`,
-      "frame-src https://js.stripe.com https://hooks.stripe.com https://*.clerk.com https://*.clerk.accounts.dev https://*.cinegenius.co",
-      "worker-src 'self' blob:",
-      "frame-ancestors 'none'",
-    ].join("; ")
-  );
+  res.headers.set("Content-Security-Policy", contentSecurityPolicy);
   return res;
 });
 

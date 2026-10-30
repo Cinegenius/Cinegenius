@@ -100,7 +100,12 @@
     "empty": "Keine Benachrichtigungen",
     "emptyDesc": "Hier erscheinen Buchungen, Anfragen und mehr.",
     "viewAll": "Alle Benachrichtigungen →",
-    "messages": "Nachrichten"
+    "messages": "Nachrichten",
+    "loading": "Benachrichtigungen werden geladen.",
+    "loadError": "Nachrichten und Benachrichtigungen konnten nicht geladen werden. Bitte versuche es erneut.",
+    "sessionExpired": "Deine Sitzung konnte nicht bestätigt werden. Versuche es erneut oder melde dich neu an.",
+    "retry": "Erneut versuchen",
+    "signIn": "Anmelden"
   },
   "menu": {
     "crewGroup1": "🎬 Film — Talent",

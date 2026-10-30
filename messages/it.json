@@ -100,7 +100,12 @@
     "empty": "Nessuna notifica",
     "emptyDesc": "Qui appariranno prenotazioni, richieste e altro.",
     "viewAll": "Tutte le notifiche →",
-    "messages": "Messaggi"
+    "messages": "Messaggi",
+    "loading": "Caricamento delle notifiche.",
+    "loadError": "Impossibile caricare messaggi e notifiche. Riprova.",
+    "sessionExpired": "Non è stato possibile verificare la sessione. Riprova o accedi di nuovo.",
+    "retry": "Riprova",
+    "signIn": "Accedi"
   },
   "menu": {
     "crewGroup1": "🎬 Film — Talento",

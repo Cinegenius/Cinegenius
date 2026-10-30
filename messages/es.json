@@ -100,7 +100,12 @@
     "empty": "Sin notificaciones",
     "emptyDesc": "Aquí aparecerán reservas, consultas y más.",
     "viewAll": "Todas las notificaciones →",
-    "messages": "Mensajes"
+    "messages": "Mensajes",
+    "loading": "Cargando notificaciones.",
+    "loadError": "No se pudieron cargar los mensajes y las notificaciones. Inténtalo de nuevo.",
+    "sessionExpired": "No se pudo verificar tu sesión. Inténtalo de nuevo o vuelve a iniciar sesión.",
+    "retry": "Volver a intentar",
+    "signIn": "Iniciar sesión"
   },
   "menu": {
     "crewGroup1": "🎬 Film — Talento",

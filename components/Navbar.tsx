@@ -16,8 +16,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useFormNavigation } from "@/contexts/FormDraftContext";
 import { useTranslations } from "next-intl";
 import { useToast } from "@/contexts/ToastContext";
-import { subscribeToMessageReads } from "@/lib/message-read-sync";
-import { publishUnreadCount } from "@/lib/unread-count-store";
+import { useAuthenticatedInbox } from "@/lib/use-authenticated-inbox";
 import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
 
 const desktopNavHrefs = [
@@ -43,7 +42,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
   const profileUpdateRevision = useRef(0);
   const [signingOut, setSigningOut] = useState(false);
   const signingOutRef = useRef(false);
-  const [unreadData, setUnreadData] = useState<{ userId: string; count: number } | null>(null);
+  const inbox = useAuthenticatedInbox();
   const pathname = usePathname();
   const { isSignedIn, isLoaded } = useAuth();
   const { user } = useUser();
@@ -52,14 +51,10 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
   const userMenuRef = useRef<HTMLDivElement>(null);
   const activeUserId = isSignedIn ? user?.id : null;
   const showAdminLink = !!initialAdminUserId && initialAdminUserId === activeUserId;
-  const hasSignedInSession = isLoaded ? !!isSignedIn : initialIsSignedIn;
+  const hasSignedInSession = inbox.status === "expired" ? false : isLoaded ? !!isSignedIn : initialIsSignedIn;
   const profileDisplayName = profileData?.userId === activeUserId ? profileData?.displayName ?? "" : "";
   const profileAvatarUrl = profileData?.userId === activeUserId ? profileData?.avatarUrl ?? "" : "";
-  const unreadMessages = unreadData?.userId === activeUserId ? unreadData?.count ?? 0 : 0;
-
-  useEffect(() => {
-    publishUnreadCount(activeUserId ?? null, unreadMessages);
-  }, [activeUserId, unreadMessages]);
+  const unreadMessages = inbox.status === "ready" ? inbox.count ?? 0 : 0;
 
   const closeAll = () => { setUserMenuOpen(false); };
 
@@ -105,27 +100,10 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
         });
       })
       .catch(() => {});
-    fetch("/api/unread-count", { signal, cache: "no-store" })
-      .then(r => r.ok ? r.json() : null)
-      .then((json) => { if (current && json) setUnreadData({ userId: activeUserId, count: json.count ?? 0 }); })
-      .catch(() => {});
-
-    const refreshUnreadMessages = () => {
-      fetch("/api/unread-count", { cache: "no-store", signal })
-        .then(r => r.ok ? r.json() : null)
-        .then((json) => { if (current && json) setUnreadData({ userId: activeUserId, count: json.count ?? 0 }); })
-        .catch(() => {});
-    };
-    const unsubscribeMessageReads = subscribeToMessageReads(activeUserId, refreshUnreadMessages);
-    const refreshInterval = window.setInterval(() => {
-      if (document.visibilityState === "visible") refreshUnreadMessages();
-    }, 10_000);
 
     return () => {
       current = false;
       controller.abort();
-      unsubscribeMessageReads();
-      window.clearInterval(refreshInterval);
     };
   }, [isLoaded, activeUserId]);
 
@@ -225,7 +203,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                 </button>
               )}
               <LanguageSwitcher />
-              <NotificationCenter />
+              <NotificationCenter inbox={inbox} />
               {!hasSignedInSession && (
                 <>
                   <Link
@@ -355,7 +333,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
               {hasSignedInSession && (() => {
                 return (
                   <>
-                    <NotificationCenter />
+                    <NotificationCenter inbox={inbox} />
                     <Link
                       href="/dashboard"
                       className="relative w-9 h-9 rounded-full border border-gold/30 shrink-0 flex items-center justify-center bg-gold/10 overflow-hidden"

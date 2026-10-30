@@ -20,9 +20,10 @@ import { NextRequest, NextResponse } from "next/server";
 // GET /api/notifications — list notifications for current user
 export async function GET() {
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ notifications: [] });
+  const noStore = { headers: { "Cache-Control": "private, no-store, max-age=0" } };
+  if (!user) return NextResponse.json({ code: "account" }, { status: 401, ...noStore });
 
-  const { data } = await db
+  const { data, error } = await db
     .from("notifications")
     .select("id, type, title, body, href, read, created_at")
     .eq("user_id", user.userId)
@@ -32,9 +33,8 @@ export async function GET() {
     .order("created_at", { ascending: false })
     .limit(30);
 
-  return NextResponse.json({ notifications: data ?? [] }, {
-    headers: { "Cache-Control": "no-store, max-age=0" },
-  });
+  if (error) return NextResponse.json({ code: "notifications_unavailable" }, { status: 500, ...noStore });
+  return NextResponse.json({ notifications: data ?? [] }, noStore);
 }
 
 // PATCH /api/notifications — mark all as read
@@ -43,11 +43,13 @@ export async function PATCH() {
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
-  await db
+  const { error } = await db
     .from("notifications")
     .update({ read: true })
     .eq("user_id", userId)
     .eq("read", false);
+
+  if (error) return NextResponse.json({ code: "notification_read_failed" }, { status: 500 });
 
   return NextResponse.json({ success: true });
 }

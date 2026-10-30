@@ -100,7 +100,12 @@
     "empty": "No notifications",
     "emptyDesc": "Bookings, inquiries and more will appear here.",
     "viewAll": "All notifications →",
-    "messages": "Messages"
+    "messages": "Messages",
+    "loading": "Loading notifications.",
+    "loadError": "Messages and notifications could not be loaded. Please try again.",
+    "sessionExpired": "Your session could not be verified. Try again or sign in again.",
+    "retry": "Try again",
+    "signIn": "Sign in"
   },
   "menu": {
     "crewGroup1": "🎬 Film — Talent",

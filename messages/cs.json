@@ -100,7 +100,12 @@
     "empty": "Žádná oznámení",
     "emptyDesc": "Zde se zobrazí rezervace, dotazy a další.",
     "viewAll": "Všechna oznámení →",
-    "messages": "Zprávy"
+    "messages": "Zprávy",
+    "loading": "Načítání oznámení.",
+    "loadError": "Zprávy a oznámení se nepodařilo načíst. Zkus to znovu.",
+    "sessionExpired": "Tvou relaci se nepodařilo ověřit. Zkus to znovu nebo se znovu přihlas.",
+    "retry": "Zkusit znovu",
+    "signIn": "Přihlásit se"
   },
   "menu": {
     "crewGroup1": "🎬 Film — Talent",

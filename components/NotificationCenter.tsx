@@ -1,26 +1,15 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Bell, Check, BookOpen, MessageSquare, Star,
   Wallet, ShieldCheck, FileCheck, Briefcase, UserPlus, Users,
 } from "lucide-react";
-import { useAuth } from "@clerk/nextjs";
 import { useTranslations } from "next-intl";
 import { timeAgo, notificationMeta, type NotificationType } from "@/lib/notifications";
-import { subscribeToMessageReads } from "@/lib/message-read-sync";
-
-type Notification = {
-  id: string;
-  type: NotificationType;
-  title: string;
-  body: string;
-  href: string;
-  read: boolean;
-  created_at: string;
-};
+import type { AuthenticatedInbox } from "@/lib/use-authenticated-inbox";
 
 const typeIcons: Record<NotificationType, React.ComponentType<{ size?: number; className?: string }>> = {
   booking_confirmed:     BookOpen,
@@ -37,78 +26,22 @@ const typeIcons: Record<NotificationType, React.ComponentType<{ size?: number; c
   friend_accepted:       Users,
 };
 
-export default function NotificationCenter() {
+export default function NotificationCenter({ inbox }: { inbox: AuthenticatedInbox }) {
   const router = useRouter();
   const tn = useTranslations("notifications");
-  const [snapshot, setSnapshot] = useState<{
-    userId: string;
-    sessionId: string;
-    notifications: Notification[];
-    unreadMessages: number;
-  } | null>(null);
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const { isSignedIn, userId, sessionId } = useAuth();
-  const activeSessionKey = `${userId ?? ""}:${sessionId ?? ""}`;
-  const activeSessionKeyRef = useRef(activeSessionKey);
-
-  useEffect(() => {
-    activeSessionKeyRef.current = activeSessionKey;
-  }, [activeSessionKey]);
-
-  const currentSnapshot = isSignedIn && userId && sessionId && snapshot?.userId === userId && snapshot.sessionId === sessionId
-    ? snapshot
-    : null;
-  const currentNotifications = currentSnapshot?.notifications ?? [];
-  const unreadMessagesCount = currentSnapshot?.unreadMessages ?? 0;
+  const currentNotifications = inbox.notifications;
+  const unreadMessagesCount = inbox.count ?? 0;
   const unreadNotifs = currentNotifications.filter((n) => !n.read).length;
   const totalUnread = unreadMessagesCount + unreadNotifs;
+  const loading = inbox.status === "loading";
+  const failed = inbox.status === "error" || inbox.status === "expired";
+  const ready = inbox.status === "ready";
 
-  const fetchAll = useCallback(async (showLoading = false) => {
-    if (!isSignedIn || !userId || !sessionId) return;
-    if (showLoading) setLoading(true);
-    const requestedSessionKey = `${userId}:${sessionId}`;
-    try {
-      const [msgRes, notifRes] = await Promise.all([
-        fetch("/api/unread-count", { cache: "no-store" }),
-        fetch("/api/notifications", { cache: "no-store" }),
-      ]);
-      if (!msgRes.ok || !notifRes.ok) return;
-      const [{ count }, { notifications: data }] = await Promise.all([msgRes.json(), notifRes.json()]);
-      if (activeSessionKeyRef.current !== requestedSessionKey) return;
-      setSnapshot({
-        userId,
-        sessionId,
-        notifications: Array.isArray(data) ? data : [],
-        unreadMessages: typeof count === "number" ? count : 0,
-      });
-    } catch {
-      // silently ignore
-    } finally {
-      if (showLoading) setLoading(false);
-    }
-  }, [isSignedIn, sessionId, userId]);
-
-  // Initial fetch + authenticated refresh for message and notification counts.
-  useEffect(() => {
-    if (!isSignedIn || !userId || !sessionId) return;
-    void fetchAll(true);
-    const interval = setInterval(() => { void fetchAll(); }, 10_000);
-    return () => clearInterval(interval);
-  }, [fetchAll, isSignedIn, sessionId, userId]);
-
-  useEffect(() => {
-    if (!userId) return;
-    return subscribeToMessageReads(userId, fetchAll);
-  }, [fetchAll, userId]);
-
-  // Fetch when opening the panel
   const handleOpen = () => {
-    setOpen((v) => !v);
-    if (!open) {
-      void fetchAll(true);
-    }
+    setOpen(v => !v);
+    if (!open) void inbox.refresh();
   };
 
   // Close on outside click
@@ -120,32 +53,8 @@ export default function NotificationCenter() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const markAllRead = async () => {
-    const response = await fetch("/api/notifications", { method: "PATCH" });
-    if (response.ok && userId && sessionId) {
-      setSnapshot((prev) => prev?.userId === userId && prev.sessionId === sessionId
-        ? { ...prev, notifications: prev.notifications.map((n) => ({ ...n, read: true })) }
-        : prev);
-    }
-  };
-
-  const markRead = async (id: string) => {
-    try {
-      const response = await fetch("/api/notifications", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
-      if (!response.ok) return;
-      if (userId && sessionId) {
-        setSnapshot((prev) => prev?.userId === userId && prev.sessionId === sessionId
-          ? { ...prev, notifications: prev.notifications.map((n) => (n.id === id ? { ...n, read: true } : n)) }
-          : prev);
-      }
-    } catch {
-      // Keep the notification unread if the server couldn't persist the read state.
-    }
-  };
+  const markAllRead = () => inbox.markRead();
+  const markRead = (id: string) => inbox.markRead(id);
 
   return (
     <div className="relative" ref={ref}>
@@ -153,9 +62,11 @@ export default function NotificationCenter() {
         onClick={handleOpen}
         className="relative w-8 h-8 flex items-center justify-center rounded-md text-text-muted hover:text-gold hover:bg-bg-elevated transition-all"
         aria-label={tn("ariaLabel")}
+        title={failed ? tn(inbox.status === "expired" ? "sessionExpired" : "loadError") : tn("ariaLabel")}
       >
         <Bell size={17} />
-        {currentSnapshot && totalUnread > 0 && (
+        {failed && <span aria-hidden="true" className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-gold" />}
+        {ready && totalUnread > 0 && (
           <span className="absolute top-0.5 right-0.5 w-4 h-4 bg-gold text-bg-primary text-[9px] font-bold rounded-full flex items-center justify-center leading-none">
             {totalUnread > 9 ? "9+" : totalUnread}
           </span>
@@ -168,13 +79,13 @@ export default function NotificationCenter() {
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-semibold text-text-primary">{tn("heading")}</h3>
-              {totalUnread > 0 && (
+              {ready && totalUnread > 0 && (
                 <span className="px-1.5 py-0.5 bg-gold text-bg-primary text-[10px] font-bold rounded-full">
                   {totalUnread} {tn("newBadge")}
                 </span>
               )}
             </div>
-            {unreadNotifs > 0 && (
+            {ready && unreadNotifs > 0 && (
               <button
                 onClick={markAllRead}
                 className="flex items-center gap-1 text-xs text-gold hover:text-gold-light transition-colors"
@@ -187,7 +98,7 @@ export default function NotificationCenter() {
           {/* List */}
           <div className="max-h-[420px] overflow-y-auto divide-y divide-border">
             {/* Real unread messages entry */}
-            {unreadMessagesCount > 0 && (
+            {!failed && unreadMessagesCount > 0 && (
               <Link
                 href="/messages"
                 onClick={() => setOpen(false)}
@@ -210,15 +121,37 @@ export default function NotificationCenter() {
               </Link>
             )}
 
+            {failed && (
+              <div className="px-4 py-6 text-sm text-text-muted" role="status">
+                <p>{tn(inbox.status === "expired" ? "sessionExpired" : "loadError")}</p>
+                <button onClick={() => void inbox.refresh(true)} className="mt-2 min-h-11 text-gold hover:text-gold-light">
+                  {tn("retry")}
+                </button>
+                {inbox.status === "expired" && (
+                  <Link href="/sign-in?redirect_url=%2Fnotifications" onClick={() => setOpen(false)} className="ml-4 inline-flex min-h-11 items-center text-gold">
+                    {tn("signIn")}
+                  </Link>
+                )}
+              </div>
+            )}
+
+            {inbox.status === "idle" && (
+              <div className="px-4 py-6">
+                <Link href="/sign-in?redirect_url=%2Fnotifications" onClick={() => setOpen(false)} className="inline-flex min-h-11 items-center text-sm text-gold">
+                  {tn("signIn")}
+                </Link>
+              </div>
+            )}
+
             {/* Loading */}
             {loading && currentNotifications.length === 0 && (
-              <div className="py-8 text-center">
+              <div className="py-8 text-center" role="status" aria-label={tn("loading")}>
                 <div className="w-5 h-5 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto" />
               </div>
             )}
 
             {/* Empty state */}
-            {!loading && currentNotifications.length === 0 && unreadMessagesCount === 0 && (
+            {ready && currentNotifications.length === 0 && unreadMessagesCount === 0 && (
               <div className="py-12 text-center">
                 <Bell size={28} className="text-text-muted mx-auto mb-3 opacity-40" />
                 <p className="text-sm text-text-muted">{tn("empty")}</p>
@@ -229,7 +162,7 @@ export default function NotificationCenter() {
             )}
 
             {/* Real notifications */}
-            {currentNotifications.map((n) => {
+            {!failed && currentNotifications.map((n) => {
               const Icon = typeIcons[n.type] ?? Bell;
               const meta = notificationMeta[n.type] ?? { color: "text-text-muted", dot: "bg-text-muted" };
               return (
