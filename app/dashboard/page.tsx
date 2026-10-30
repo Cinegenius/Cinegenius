@@ -1,5 +1,6 @@
 "use client";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
+import DashboardDate from "@/components/DashboardDate";
 import { useTranslations, useLocale } from "next-intl";
 import OfferModerationStatus from "@/components/OfferModerationStatus";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
@@ -940,7 +941,7 @@ export default function DashboardPage() {
                   Hallo, {profileDisplayName || user?.firstName || user?.emailAddresses[0]?.emailAddress?.split("@")[0] || ""}
                 </h2>
                 <p className="text-text-muted text-sm mt-1">
-                  {new Date().toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" })}
+                  <DashboardDate />
                 </p>
               </div>
 

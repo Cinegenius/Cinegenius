@@ -6,7 +6,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { deDE, enUS, esES, csCZ, huHU, itIT } from "@clerk/localizations";
 import AppIntlProvider from "@/components/AppIntlProvider";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale, getMessages, getNow } from "next-intl/server";
 import "./globals.css";
 import AppChrome from "@/components/AppChrome";
 import { isConfiguredAdmin } from "@/lib/admin-policy";
@@ -103,7 +103,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [locale, messages, { userId, sessionId }] = await Promise.all([getLocale(), getMessages(), auth()]);
+  const [locale, messages, now, { userId, sessionId }] = await Promise.all([getLocale(), getMessages(), getNow(), auth()]);
   const clerkLocalization = CLERK_LOCALIZATIONS[locale] ?? deDE;
   const htmlLang = HTML_LANG[locale] ?? "de";
 
@@ -129,7 +129,7 @@ export default async function RootLayout({
           <link rel="dns-prefetch" href="https://clerk.com" />
         </head>
         <body className="min-h-screen flex flex-col bg-bg-primary text-text-primary font-sans">
-          <AppIntlProvider locale={locale} messages={messages}>
+          <AppIntlProvider locale={locale} messages={messages} now={now}>
           <ThemeProvider>
             <ToastProvider>
               <AuthSessionBoundary initialSessionId={sessionId}>
