@@ -22,7 +22,8 @@ import { useToast } from "@/contexts/ToastContext";
 import FocalPointPicker, { type FocalPoint } from "@/components/FocalPointPicker";
 import PrimaryOccupationPicker from "@/components/PrimaryOccupationPicker";
 import { selectedCrewOccupations } from "@/lib/crew-occupations";
-import { occupationId, occupationById, primaryOccupationForPositions, occupationReference, orderPositionsByPrimary, type PrimaryOccupation } from "@/lib/primary-occupation";
+import { removeProfilePosition, toggleProfileOccupation, type ProfileOccupationEdit } from "@/lib/profile-occupation-editor";
+import { occupationId, primaryOccupationForPositions, occupationReference, orderPositionsByPrimary, type PrimaryOccupation } from "@/lib/primary-occupation";
 import ProfileCoverEditor from "@/components/ProfileCoverEditor";
 import { profileCoverSettings } from "@/lib/profile-cover";
 import { getDeptLabel, getDepartmentRoleLabel, departments, deptColors, DEPARTMENT_TO_PROFILE_TYPE, getDepartmentRoleSearchTerms } from "@/lib/departments";
@@ -123,26 +124,23 @@ function TypeChipPicker({
   const [expandedDepartments, setExpandedDepartments] = useState<Record<string, boolean>>({});
   const [chosenDepartments, setChosenDepartments] = useState<string[]>([]);
 
+  function applyOccupationEdit(next: ProfileOccupationEdit) {
+    const current = selectedCrewOccupations(positions, occupationSelections);
+    const currentIds = new Set(current.map(option => option.roleId));
+    const nextIds = new Set(next.occupations.map(option => option.roleId));
+    const changedDepartments = [...current.filter(option => !nextIds.has(option.roleId)), ...next.occupations.filter(option => !currentIds.has(option.roleId))].map(option => option.departmentId);
+    const affectedTypes = new Set(changedDepartments.map(id => DEPARTMENT_TO_PROFILE_TYPE[id]).filter(Boolean));
+    const remainingTypes = new Set(next.occupations.map(option => DEPARTMENT_TO_PROFILE_TYPE[option.departmentId]).filter(Boolean));
+    const nextTypes = selectedTypes.filter(type => !affectedTypes.has(type) || remainingTypes.has(type));
+    for (const type of affectedTypes) if (remainingTypes.has(type) && !nextTypes.includes(type)) nextTypes.push(type);
+    onOccupationsChange?.(next.occupations);
+    onPositionsChange(next.positions);
+    if (nextTypes.join("|") !== selectedTypes.join("|")) onTypesChange(nextTypes);
+  }
+
   function togglePosition(job: string, deptId: string) {
-    const current = occupationSelections ?? selectedCrewOccupations(positions);
-    const roleId = occupationId(deptId, job);
-    const isSel = current.some(option => option.roleId === roleId);
-    const nextSelections = isSel ? current.filter(option => option.roleId !== roleId) : [...current, {departmentId: deptId, roleId}];
-    const stillSelected = nextSelections.some(option => occupationById(option.roleId)?.label === job);
-    const next = isSel && !stillSelected ? positions.filter(x => x !== job) : positions.includes(job) ? positions : [...positions, job];
-    onOccupationsChange?.(nextSelections);
-    onPositionsChange(next);
-    setChosenDepartments((current) => current.includes(deptId) ? current : [...current, deptId]);
-    const mapped = DEPARTMENT_TO_PROFILE_TYPE[deptId];
-    if (!mapped) return;
-    if (!isSel) {
-      if (!selectedTypes.includes(mapped)) onTypesChange([...selectedTypes, mapped]);
-    } else {
-      const stillRepresented = departments.some((department) =>
-        department.roles.some((role) => next.includes(role) && DEPARTMENT_TO_PROFILE_TYPE[department.id] === mapped),
-      );
-      if (!stillRepresented) onTypesChange(selectedTypes.filter((type) => type !== mapped));
-    }
+    applyOccupationEdit(toggleProfileOccupation(positions, occupationSelections, {departmentId: deptId, roleId: occupationId(deptId, job)}));
+    setChosenDepartments(current => current.includes(deptId) ? current : [...current, deptId]);
   }
 
   function toggleType(type: string) {
@@ -202,9 +200,7 @@ function TypeChipPicker({
               <span key={position} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-3 text-sm text-gold">
                 {position}
                 <button type="button" onClick={() => {
-                  const selected = (occupationSelections ?? selectedCrewOccupations(positions)).find(option => occupationById(option.roleId)?.label === position);
-                  const dept = selected?.departmentId ?? departments.find(item => item.roles.includes(position))?.id;
-                  if (dept) togglePosition(position, dept);
+                  applyOccupationEdit(removeProfilePosition(positions, occupationSelections, position));
                 }} className="inline-flex h-7 w-7 items-center justify-center rounded-full hover:bg-red-500/10" aria-label={`${position} entfernen`}><X size={14} /></button>
               </span>
             ))}
@@ -1655,6 +1651,7 @@ export default function ProfilePage() {
                     <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-text-muted">Filmcrew und Kreativberufe <span className="text-text-muted">· Weitere Tätigkeiten optional</span></p>
                     <TypeChipPicker mode="roles" occupationSelections={occupationSelections} onOccupationsChange={setOccupationSelections} selectedTypes={currentProfileTypes} onTypesChange={setCurrentProfileTypes} positions={positions} onPositionsChange={(next) => {
                       setPositions(next);
+                      setPrimaryOccupation(current => occupationReference(primaryOccupationForPositions(current, next)));
                       if (next.length > 0 || currentProfileTypes.length > 0) setFieldErrors((previous) => ({ ...previous, activity: undefined }));
                     }} />
                     <PrimaryOccupationPicker positions={positions} value={primaryOccupation} onChange={value => { setPrimaryOccupation(value); if (value) setOccupationSelections(current => selectedCrewOccupations(positions, [...current, value])); }} />
