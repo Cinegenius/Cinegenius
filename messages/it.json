@@ -1920,5 +1920,37 @@
     "loading": "Caricamento foto…",
     "loadError": "Impossibile caricare la foto. Chiudi l’anteprima e riprova.",
     "zoomHint": "Ingrandisci la foto se necessario per nascondere i bordi già presenti nell’immagine."
+  },
+  "AdminStartedOffers": {
+    "title": "Offerte iniziate",
+    "explanation": "Qui trovi i moduli salvati automaticamente durante la configurazione e la creazione, prima che diventino offerte salvate. Restano privati. Annunci e aziende già salvati sono nelle rispettive liste. «Invia promemoria» apre un messaggio di supporto modificabile; nulla viene inviato automaticamente. Gli account vengono controllati per pagine.",
+    "search": "Cerca persona o account",
+    "kind": "Tipo di offerta",
+    "refresh": "Aggiorna",
+    "loading": "Controllo delle offerte iniziate…",
+    "loadError": "Impossibile caricare le offerte iniziate. Riprova.",
+    "empty": "Nessun’altra offerta iniziata trovata.",
+    "emptyPage": "Nessuna bozza corrispondente in questa sezione. Controlla la pagina successiva.",
+    "unnamedAccount": "Membro senza nome account",
+    "untitled": "Ancora senza titolo",
+    "status": "Iniziato · privato",
+    "startedBy": "Iniziato da {name}",
+    "savedAt": "Ultimo salvataggio: {date}",
+    "noDate": "Salvato durante la configurazione · data non disponibile",
+    "remind": "Invia promemoria",
+    "page": "Pagina {page}",
+    "previous": "Pagina precedente",
+    "next": "Pagina successiva",
+    "unavailable": "Questa bozza non è più disponibile oppure è già stata salvata come offerta. Aggiorna la lista.",
+    "templateLabel": "Riprendere un’offerta iniziata",
+    "templateBody": "Ciao '{{Vorname}}', hai iniziato «'{{Inserattitel}}'». Se vuoi continuare, trovi la bozza salvata qui: '{{Bearbeitungslink}}'. Se hai domande, rispondi direttamente. Il supporto CineGenius",
+    "kinds": {
+      "all": "Tutti i tipi",
+      "location": "Location",
+      "marketplace": "Mercatino",
+      "company": "Azienda",
+      "animal": "Portfolio animali",
+      "job": "Lavoro"
+    }
   }
 }

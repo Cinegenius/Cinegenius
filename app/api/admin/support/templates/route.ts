@@ -5,6 +5,7 @@ import { finishAdminAudit, startAdminAudit, validateAdminReason } from "@/lib/ad
 import { validateSupportTemplateBody } from "@/lib/admin-support";
 import { getTranslations } from "next-intl/server";
 import { SETUP_TEMPLATE_KEY, setupSupportTemplate } from "@/lib/support-setup-template";
+import { STARTED_OFFER_TEMPLATE_KEY, startedOfferTemplate } from "@/lib/support-started-offer-template";
 
 export async function GET() {
   const admin = await requireAdmin();
@@ -16,6 +17,9 @@ export async function GET() {
   const templates = data ?? [];
   if (!templates.some(template => template.template_key === SETUP_TEMPLATE_KEY)) {
     templates.push({ ...setupSupportTemplate(await getTranslations("AdminAccounts")), updated_at: null });
+  }
+  if (!templates.some(template => template.template_key === STARTED_OFFER_TEMPLATE_KEY)) {
+    templates.push({ ...startedOfferTemplate(await getTranslations("AdminStartedOffers")), updated_at: null });
   }
   return NextResponse.json({ templates }, { headers: { "Cache-Control": "private, no-store" } });
 }
@@ -67,7 +71,7 @@ export async function PATCH(request: NextRequest) {
   });
   if (!audit) return NextResponse.json({ error: "Adminprotokoll nicht verfügbar; Vorlage wurde nicht gespeichert." }, { status: 503 });
   const values = { label, body: content, enabled, updated_by: admin.userId, updated_at: new Date().toISOString() };
-  const query = key === SETUP_TEMPLATE_KEY
+  const query = [SETUP_TEMPLATE_KEY, STARTED_OFFER_TEMPLATE_KEY].includes(key)
     ? db.from("support_message_templates").upsert({ template_key: key, ...values }, { onConflict: "template_key" })
     : db.from("support_message_templates").update(values).eq("template_key", key);
   const { data, error } = await query.select("template_key, label, body, enabled, updated_at").maybeSingle();

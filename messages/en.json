@@ -1920,5 +1920,37 @@
     "loading": "Loading photo…",
     "loadError": "The photo could not be loaded. Close the preview and try again.",
     "zoomHint": "Zoom in if needed to hide borders already contained in the photo."
+  },
+  "AdminStartedOffers": {
+    "title": "Started offers",
+    "explanation": "Automatically saved forms from setup and offer creation appear here before they become saved offers. They remain private. Saved listings and companies are in their existing admin lists. “Remind” opens an editable support message; nothing is sent automatically. Accounts are checked in pages.",
+    "search": "Search person or account",
+    "kind": "Offer area",
+    "refresh": "Refresh",
+    "loading": "Checking started offers…",
+    "loadError": "Started offers could not be loaded. Please try again.",
+    "empty": "No more started offers found.",
+    "emptyPage": "No matching drafts in this section. Check the next page.",
+    "unnamedAccount": "Member without an account name",
+    "untitled": "No title yet",
+    "status": "Started · private",
+    "startedBy": "Started by {name}",
+    "savedAt": "Last saved: {date}",
+    "noDate": "Saved during setup · time unavailable",
+    "remind": "Remind",
+    "page": "Page {page}",
+    "previous": "Previous page",
+    "next": "Next page",
+    "unavailable": "This draft is no longer available or has already been saved as an offer. Please refresh the list.",
+    "templateLabel": "Continue a started offer",
+    "templateBody": "Hello '{{Vorname}}', you started “'{{Inserattitel}}'”. If you would like to continue, your saved draft is here: '{{Bearbeitungslink}}'. Feel free to reply if you need help. Your CineGenius Support",
+    "kinds": {
+      "all": "All offer areas",
+      "location": "Location",
+      "marketplace": "Marketplace",
+      "company": "Company",
+      "animal": "Animal portfolio",
+      "job": "Job"
+    }
   }
 }

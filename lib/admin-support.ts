@@ -4,9 +4,11 @@ import { db } from "@/lib/db";
 import { clerkClient } from "@clerk/nextjs/server";
 import { getTranslations } from "next-intl/server";
 import { hasProfileBasics, requiredSetupDestination, type SetupProgress } from "@/lib/profile-setup-flow";
+import { parseStartedOfferId } from "@/lib/admin-started-offers";
+import { loadStartedOffers } from "@/lib/admin-started-offers-server";
 export { fillSupportTemplate, validateSupportTemplateBody } from "@/lib/support-message-templates";
 
-export type AdminSupportTargetType = "profile" | "company" | "listing";
+export type AdminSupportTargetType = "profile" | "company" | "listing" | "started_offer";
 export type AdminSupportTarget = {
   targetType: "profile" | "company" | "location" | "marketplace";
   targetId: string; targetLabel: string; editUrl: string; recipientUserId: string;
@@ -14,6 +16,7 @@ export type AdminSupportTarget = {
   firstName: string | null; companyName: string | null; listingTitle: string | null;
   missingFields: string[]; isDraft: boolean;
   setupIncomplete?: boolean;
+  startedOffer?: boolean;
 };
 export class SupportTargetError extends Error {
   constructor(message: string, public status = 404) { super(message); }
@@ -22,6 +25,25 @@ export class SupportTargetError extends Error {
 export async function resolveAdminSupportTarget(
   type: AdminSupportTargetType, id: string, adminUserId: string,
 ): Promise<AdminSupportTarget> {
+  if (type === "started_offer") {
+    const t = await getTranslations("AdminStartedOffers");
+    const parsed = parseStartedOfferId(id);
+    if (!parsed) throw new SupportTargetError(t("unavailable"), 400);
+    let member;
+    try { member = await (await clerkClient()).users.getUser(parsed.userId); }
+    catch { throw new SupportTargetError(t("unavailable"), 404); }
+    const offer = (await loadStartedOffers([member])).find(candidate => candidate.id === id);
+    if (!offer) throw new SupportTargetError(t("unavailable"), 409);
+    const name = [member.firstName, member.lastName].filter(Boolean).join(" ").trim();
+    const label = offer.title || t("untitled");
+    const target = finishTarget({
+      targetType: ["company", "location", "marketplace"].includes(offer.kind) ? offer.kind as "company" | "location" | "marketplace" : "profile",
+      targetId: id, targetLabel: `${label} · ${t("kinds." + offer.kind)}`, editUrl: offer.editUrl,
+      recipientUserId: member.id, profileName: name || t("unnamedAccount"), profileSlug: null, avatarUrl: null,
+      companyName: offer.kind === "company" ? label : null, listingTitle: label, missingFields: [], isDraft: true,
+    }, adminUserId);
+    return { ...target, recipientProfileUrl: null, firstName: member.firstName || null, startedOffer: true };
+  }
   let recipientUserId = "";
   let targetType: AdminSupportTarget["targetType"] = "profile";
   let targetId = id;

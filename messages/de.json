@@ -1920,5 +1920,37 @@
     "loading": "Foto wird geladen …",
     "loadError": "Foto konnte nicht geladen werden. Schließe die Vorschau und versuche es erneut.",
     "zoomHint": "Vergrößere das Foto bei Bedarf, um bereits enthaltene Bildränder auszublenden."
+  },
+  "AdminStartedOffers": {
+    "title": "Begonnene Angebote",
+    "explanation": "Hier findest du automatisch gesicherte, noch nicht als Angebot gespeicherte Formulare aus der Einrichtung und Angebotserstellung. Sie bleiben privat. Bereits gespeicherte Inserate und Firmen findest du in den jeweiligen Verwaltungslisten. „Erinnern“ öffnet eine bearbeitbare Supportnachricht; es wird nichts automatisch gesendet. Die Konten werden seitenweise geprüft.",
+    "search": "Person oder Konto suchen",
+    "kind": "Angebotsbereich",
+    "refresh": "Aktualisieren",
+    "loading": "Begonnene Angebote werden geprüft…",
+    "loadError": "Begonnene Angebote konnten nicht geladen werden. Bitte erneut versuchen.",
+    "empty": "Keine weiteren begonnenen Angebote gefunden.",
+    "emptyPage": "In diesem Abschnitt wurden keine passenden Entwürfe gefunden. Prüfe die nächste Seite.",
+    "unnamedAccount": "Mitglied ohne Kontonamen",
+    "untitled": "Noch ohne Titel",
+    "status": "Begonnen · privat",
+    "startedBy": "Begonnen von {name}",
+    "savedAt": "Zuletzt gesichert: {date}",
+    "noDate": "Gesichert während der Einrichtung · Zeitpunkt nicht verfügbar",
+    "remind": "Erinnern",
+    "page": "Seite {page}",
+    "previous": "Vorherige Seite",
+    "next": "Nächste Seite",
+    "unavailable": "Dieser begonnene Entwurf ist nicht mehr verfügbar oder wurde bereits als Angebot gespeichert. Bitte die Liste aktualisieren.",
+    "templateLabel": "Begonnenes Angebot fortsetzen",
+    "templateBody": "Hallo '{{Vorname}}', du hast „'{{Inserattitel}}'“ begonnen. Wenn du weitermachen möchtest, findest du deinen gespeicherten Entwurf hier: '{{Bearbeitungslink}}'. Bei Fragen antworte uns gerne direkt. Dein CineGenius Support",
+    "kinds": {
+      "all": "Alle Angebotsbereiche",
+      "location": "Location",
+      "marketplace": "Marktplatz",
+      "company": "Firma",
+      "animal": "Tierportfolio",
+      "job": "Job"
+    }
   }
 }

@@ -22,7 +22,7 @@ export function fillSupportTemplate(body: string, target: SupportTemplateTarget,
   const filled = body.replace(/\{\{([^}]+)\}\}/g, (match, key: string) =>
     Object.hasOwn(values, key) ? values[key] : match,
   );
-  return target.firstName ? filled : filled.replace(/Hallo\s+,/g, "Hallo,").replace(/Hallo\s+bei/g, "Hallo, bei");
+  return target.firstName ? filled : filled.replace(/(Hallo|Hello|Hola|Ciao|Dobrý den|Kedves)\s+,/g, "$1,").replace(/Hallo\s+bei/g, "Hallo, bei");
 }
 
 export function validateSupportTemplateBody(body: string): string | null {

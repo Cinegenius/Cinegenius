@@ -1920,5 +1920,37 @@
     "loading": "Fotó betöltése…",
     "loadError": "A fotó nem tölthető be. Zárd be az előnézetet, és próbáld újra.",
     "zoomHint": "Szükség esetén nagyítsd a fotót a képbe beépített szegélyek elrejtéséhez."
+  },
+  "AdminStartedOffers": {
+    "title": "Megkezdett ajánlatok",
+    "explanation": "Itt láthatók a beállítás és létrehozás során automatikusan mentett űrlapok, mielőtt mentett ajánlattá válnának. Privátak maradnak. A mentett hirdetések és cégek a meglévő listákban találhatók. Az „Emlékeztetés” szerkeszthető támogatási üzenetet nyit meg; semmi nem kerül automatikusan elküldésre. A fiókok ellenőrzése oldalanként történik.",
+    "search": "Személy vagy fiók keresése",
+    "kind": "Ajánlat területe",
+    "refresh": "Frissítés",
+    "loading": "Megkezdett ajánlatok ellenőrzése…",
+    "loadError": "A megkezdett ajánlatokat nem sikerült betölteni. Próbáld újra.",
+    "empty": "Nincs több megkezdett ajánlat.",
+    "emptyPage": "Ebben a részben nincs megfelelő vázlat. Nézd meg a következő oldalt.",
+    "unnamedAccount": "Fióknév nélküli tag",
+    "untitled": "Még nincs cím",
+    "status": "Megkezdett · privát",
+    "startedBy": "Megkezdte: {name}",
+    "savedAt": "Utoljára mentve: {date}",
+    "noDate": "Beállítás közben mentve · az időpont nem elérhető",
+    "remind": "Emlékeztetés",
+    "page": "{page}. oldal",
+    "previous": "Előző oldal",
+    "next": "Következő oldal",
+    "unavailable": "Ez a vázlat már nem érhető el, vagy már ajánlatként mentették. Frissítsd a listát.",
+    "templateLabel": "Megkezdett ajánlat folytatása",
+    "templateBody": "Kedves '{{Vorname}}', megkezdted ezt: „'{{Inserattitel}}'”. Ha folytatni szeretnéd, a mentett vázlat itt található: '{{Bearbeitungslink}}'. Ha segítségre van szükséged, válaszolj közvetlenül. A CineGenius ügyfélszolgálata",
+    "kinds": {
+      "all": "Minden terület",
+      "location": "Helyszín",
+      "marketplace": "Piactér",
+      "company": "Cég",
+      "animal": "Állatportfólió",
+      "job": "Munka"
+    }
   }
 }

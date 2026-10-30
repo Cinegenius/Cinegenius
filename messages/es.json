@@ -1920,5 +1920,37 @@
     "loading": "Cargando foto…",
     "loadError": "No se ha podido cargar la foto. Cierra la vista previa e inténtalo de nuevo.",
     "zoomHint": "Amplía la foto si necesitas ocultar bordes que ya forman parte de la imagen."
+  },
+  "AdminStartedOffers": {
+    "title": "Ofertas iniciadas",
+    "explanation": "Aquí aparecen los formularios guardados automáticamente durante la configuración y creación, antes de guardarse como ofertas. Siguen siendo privados. Los anuncios y empresas guardados están en sus listas habituales. «Recordar» abre un mensaje de soporte editable; no se envía nada automáticamente. Las cuentas se revisan por páginas.",
+    "search": "Buscar persona o cuenta",
+    "kind": "Área de la oferta",
+    "refresh": "Actualizar",
+    "loading": "Revisando ofertas iniciadas…",
+    "loadError": "No se pudieron cargar las ofertas iniciadas. Inténtalo de nuevo.",
+    "empty": "No hay más ofertas iniciadas.",
+    "emptyPage": "No hay borradores coincidentes en esta sección. Consulta la siguiente página.",
+    "unnamedAccount": "Miembro sin nombre de cuenta",
+    "untitled": "Aún sin título",
+    "status": "Iniciado · privado",
+    "startedBy": "Iniciado por {name}",
+    "savedAt": "Último guardado: {date}",
+    "noDate": "Guardado durante la configuración · fecha no disponible",
+    "remind": "Recordar",
+    "page": "Página {page}",
+    "previous": "Página anterior",
+    "next": "Página siguiente",
+    "unavailable": "Este borrador ya no está disponible o ya se guardó como oferta. Actualiza la lista.",
+    "templateLabel": "Continuar una oferta iniciada",
+    "templateBody": "Hola '{{Vorname}}', empezaste «'{{Inserattitel}}'». Si quieres continuar, aquí está tu borrador guardado: '{{Bearbeitungslink}}'. Si necesitas ayuda, responde directamente. Tu equipo de soporte de CineGenius",
+    "kinds": {
+      "all": "Todas las áreas",
+      "location": "Localización",
+      "marketplace": "Mercado",
+      "company": "Empresa",
+      "animal": "Portafolio de animales",
+      "job": "Empleo"
+    }
   }
 }

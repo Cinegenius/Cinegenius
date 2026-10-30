@@ -1920,5 +1920,37 @@
     "loading": "Načítání fotografie…",
     "loadError": "Fotografii se nepodařilo načíst. Zavři náhled a zkus to znovu.",
     "zoomHint": "Podle potřeby fotografii zvětši, aby se skryly okraje, které jsou již součástí obrázku."
+  },
+  "AdminStartedOffers": {
+    "title": "Rozpracované nabídky",
+    "explanation": "Zde najdete formuláře automaticky uložené během nastavení a tvorby, než vznikne uložená nabídka. Zůstávají soukromé. Uložené inzeráty a firmy jsou ve stávajících seznamech. „Připomenout“ otevře upravitelnou zprávu podpory; nic se neodesílá automaticky. Účty se kontrolují po stránkách.",
+    "search": "Hledat osobu nebo účet",
+    "kind": "Oblast nabídky",
+    "refresh": "Obnovit",
+    "loading": "Kontrola rozpracovaných nabídek…",
+    "loadError": "Rozpracované nabídky se nepodařilo načíst. Zkuste to znovu.",
+    "empty": "Žádné další rozpracované nabídky.",
+    "emptyPage": "V této části nejsou odpovídající koncepty. Zkontrolujte další stránku.",
+    "unnamedAccount": "Člen bez názvu účtu",
+    "untitled": "Zatím bez názvu",
+    "status": "Rozpracováno · soukromé",
+    "startedBy": "Rozpracoval/a {name}",
+    "savedAt": "Naposledy uloženo: {date}",
+    "noDate": "Uloženo během nastavení · čas není dostupný",
+    "remind": "Připomenout",
+    "page": "Stránka {page}",
+    "previous": "Předchozí stránka",
+    "next": "Další stránka",
+    "unavailable": "Tento koncept již není dostupný nebo byl uložen jako nabídka. Obnovte seznam.",
+    "templateLabel": "Pokračovat v rozpracované nabídce",
+    "templateBody": "Dobrý den '{{Vorname}}', začali jste vytvářet „'{{Inserattitel}}'“. Pokud chcete pokračovat, uložený koncept najdete zde: '{{Bearbeitungslink}}'. Pokud potřebujete pomoc, odpovězte přímo. Vaše podpora CineGenius",
+    "kinds": {
+      "all": "Všechny oblasti",
+      "location": "Lokace",
+      "marketplace": "Tržiště",
+      "company": "Firma",
+      "animal": "Portfolio zvířat",
+      "job": "Práce"
+    }
   }
 }

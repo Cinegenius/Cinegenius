@@ -3,12 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { clerkClient } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
-import { resolveAdminSupportTarget, SupportTargetError } from "@/lib/admin-support";
+import { resolveAdminSupportTarget, SupportTargetError, type AdminSupportTargetType } from "@/lib/admin-support";
 import { sendNewMessageEmail } from "@/lib/email";
 import { rateLimit } from "@/lib/rateLimit";
 import { getTranslations } from "next-intl/server";
 import { SETUP_TEMPLATE_KEY, setupSupportTemplate } from "@/lib/support-setup-template";
 import { adminSupportParticipants } from "@/lib/admin-support-participants";
+import { STARTED_OFFER_TEMPLATE_KEY, startedOfferTemplate } from "@/lib/support-started-offer-template";
 
 const PAGE_SIZE = 30;
 
@@ -70,21 +71,25 @@ export async function POST(request: NextRequest) {
   const templateKey = typeof body?.templateKey === "string" ? body.templateKey : "";
   const content = typeof body?.content === "string" ? body.content.trim() : "";
   const idempotencyKey = typeof body?.idempotencyKey === "string" ? body.idempotencyKey : "";
-  if (!["profile", "company", "listing"].includes(type) || !id || id.length > 160 || !content || content.length > 5000 || !/^[0-9a-f-]{36}$/i.test(idempotencyKey)) {
+  if (!["profile", "company", "listing", "started_offer"].includes(type) || !id || id.length > 160 || !content || content.length > 5000 || !/^[0-9a-f-]{36}$/i.test(idempotencyKey)) {
     return NextResponse.json({ error: "Empfänger, Nachricht und sichere Versandkennung sind erforderlich." }, { status: 400 });
   }
   const { data: savedTemplate, error: templateError } = await db.from("support_message_templates")
     .select("template_key, body, enabled").eq("template_key", templateKey).maybeSingle();
   if (templateError) return NextResponse.json({ error: "Supportvorlage konnte nicht geprüft werden." }, { status: 503 });
-  const template = savedTemplate ?? (templateKey === SETUP_TEMPLATE_KEY ? setupSupportTemplate(await getTranslations("AdminAccounts")) : null);
+  const template = savedTemplate ?? (templateKey === SETUP_TEMPLATE_KEY ? setupSupportTemplate(await getTranslations("AdminAccounts"))
+    : templateKey === STARTED_OFFER_TEMPLATE_KEY ? startedOfferTemplate(await getTranslations("AdminStartedOffers")) : null);
   if (!template?.enabled) return NextResponse.json({ error: "Diese Supportvorlage ist nicht verfügbar." }, { status: 400 });
   if (/\{\{[^}]+\}\}/.test(content)) return NextResponse.json({ error: "Die Nachricht enthält noch nicht ersetzte Platzhalter." }, { status: 400 });
 
   let target;
   try {
-    target = await resolveAdminSupportTarget(type as "profile" | "company" | "listing", id, admin.userId);
+    target = await resolveAdminSupportTarget(type as AdminSupportTargetType, id, admin.userId);
   } catch (error) {
     return NextResponse.json({ error: error instanceof SupportTargetError ? error.message : "Empfänger konnte nicht sicher ermittelt werden." }, { status: error instanceof SupportTargetError ? error.status : 500 });
+  }
+  if (templateKey === STARTED_OFFER_TEMPLATE_KEY && !target.startedOffer) {
+    return NextResponse.json({ error: (await getTranslations("AdminStartedOffers"))("unavailable") }, { status: 409 });
   }
   if (templateKey === SETUP_TEMPLATE_KEY && !target.setupIncomplete) {
     const t = await getTranslations("AdminAccounts");

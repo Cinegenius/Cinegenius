@@ -7,8 +7,9 @@ import { Check, Loader2, Mail, MessageSquareText, Send, X } from "lucide-react";
 import { SUPPORT_AVATAR_URL } from "@/lib/support-identity";
 import { fillSupportTemplate } from "@/lib/support-message-templates";
 import { SETUP_TEMPLATE_KEY } from "@/lib/support-setup-template";
+import { STARTED_OFFER_TEMPLATE_KEY } from "@/lib/support-started-offer-template";
 
-type TargetType = "profile" | "company" | "listing";
+type TargetType = "profile" | "company" | "listing" | "started_offer";
 type Template = { template_key: string; label: string; body: string; enabled: boolean };
 type Target = {
   targetType: "profile" | "company" | "location" | "marketplace";
@@ -17,6 +18,7 @@ type Target = {
   firstName: string | null; companyName: string | null; listingTitle: string | null;
   missingFields: string[]; isDraft: boolean;
   setupIncomplete?: boolean;
+  startedOffer?: boolean;
 };
 type Previous = { id: string; support_target_label: string; updated_at: string };
 
@@ -27,6 +29,7 @@ async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
   return data as T;
 }
 function defaultKey(target: Target) {
+  if (target.startedOffer) return STARTED_OFFER_TEMPLATE_KEY;
   if (target.setupIncomplete) return SETUP_TEMPLATE_KEY;
   if (target.targetType === "profile" && !target.recipientProfileUrl) return "check_in";
   if (target.targetType === "profile") return "crew_profile";
@@ -34,6 +37,8 @@ function defaultKey(target: Target) {
   return target.targetType === "location" ? "location" : "marketplace_listing";
 }
 function applies(template: Template, target: Target) {
+  if (template.template_key === STARTED_OFFER_TEMPLATE_KEY) return target.startedOffer === true;
+  if (target.startedOffer) return ["check_in", "resume_draft"].includes(template.template_key);
   if (template.template_key === SETUP_TEMPLATE_KEY) return target.setupIncomplete === true;
   if (template.template_key === "crew_profile") return target.targetType === "profile" && Boolean(target.recipientProfileUrl);
   if (template.template_key === "company_profile") return target.targetType === "company";
