@@ -34,7 +34,7 @@ export async function resolveAdminSupportTarget(
     catch { throw new SupportTargetError(t("unavailable"), 404); }
     const offer = (await loadStartedOffers([member])).find(candidate => candidate.id === id);
     if (!offer) throw new SupportTargetError(t("unavailable"), 409);
-    const name = [member.firstName, member.lastName].filter(Boolean).join(" ").trim();
+    const name = offer.accountName || [member.firstName, member.lastName].filter(Boolean).join(" ").trim();
     const label = offer.title || t("untitled");
     const target = finishTarget({
       targetType: ["company", "location", "marketplace"].includes(offer.kind) ? offer.kind as "company" | "location" | "marketplace" : "profile",
@@ -42,7 +42,7 @@ export async function resolveAdminSupportTarget(
       recipientUserId: member.id, profileName: name || t("unnamedAccount"), profileSlug: null, avatarUrl: null,
       companyName: offer.kind === "company" ? label : null, listingTitle: label, missingFields: [], isDraft: true,
     }, adminUserId);
-    return { ...target, recipientProfileUrl: null, firstName: member.firstName || null, startedOffer: true };
+    return { ...target, recipientProfileUrl: null, firstName: member.firstName || name.split(/\s+/)[0] || null, startedOffer: true };
   }
   let recipientUserId = "";
   let targetType: AdminSupportTarget["targetType"] = "profile";

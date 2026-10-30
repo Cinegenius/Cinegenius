@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       const summaries = await loadStartedOffers(users);
       const names = new Map(users.map(user => [user.id, [user.firstName, user.lastName].filter(Boolean).join(" ").trim()]));
       offers.push(...summaries.filter(offer => kind === "all" || offer.kind === kind)
-        .map(offer => ({ ...offer, accountName: names.get(offer.userId) || t("unnamedAccount") })));
+        .map(offer => ({ ...offer, accountName: offer.accountName || names.get(offer.userId) || t("unnamedAccount") })));
       next += users.length;
       hasMore = users.length > 0 && next < totalCount;
       if (offers.length >= 10 || !hasMore) break;

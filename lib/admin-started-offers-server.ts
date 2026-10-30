@@ -15,16 +15,18 @@ export async function loadStartedOffers(users: DraftAccount[]) {
   const candidates = users.flatMap(user => startedOffersForAccount(user.id, user.privateMetadata, rows ?? []));
   if (!candidates.length) return [];
   const titles = [...new Set(candidates.map(offer => offer.title).filter(Boolean))];
-  const [{ data: companies, error: companyError }, { data: listings, error: listingError }] = await Promise.all([
+  const [{ data: companies, error: companyError }, { data: listings, error: listingError }, { data: profiles, error: profileError }] = await Promise.all([
     db.from("companies").select("owner_user_id").in("owner_user_id", ids).limit(1000),
     titles.length ? db.from("listings").select("user_id, title, type").in("user_id", ids).in("title", titles).limit(1000)
       : Promise.resolve({ data: [], error: null }),
+    db.from("profiles").select("user_id, display_name").in("user_id", ids).limit(50),
   ]);
-  if (companyError || listingError) throw new Error("started_offer_state_failed");
+  if (companyError || listingError || profileError) throw new Error("started_offer_state_failed");
+  const names = new Map((profiles ?? []).map(profile => [profile.user_id, profile.display_name?.trim()]));
   return candidates.filter(offer => {
     // /company-setup resumes the user's existing company; do not send them to an unrelated new snapshot.
     if (offer.kind === "company") return !companies?.some(company => company.owner_user_id === offer.userId);
     return !listings?.some(listing => listing.user_id === offer.userId && listing.title === offer.title
       && (offer.kind === "marketplace" ? ["prop", "vehicle"].includes(listing.type) : listing.type === offer.kind));
-  });
+  }).map(offer => ({ ...offer, accountName: names.get(offer.userId) || "" }));
 }
