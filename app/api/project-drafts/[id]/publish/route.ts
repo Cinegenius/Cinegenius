@@ -3,6 +3,8 @@ import { requireAuth } from "@/lib/auth";
 import { projectDraftMetadata } from "@/lib/project-drafts";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
+import { projectMediaGrant, projectMediaUrls } from "@/lib/project-media-rights";
 
 function slugifyName(name: string) {
   return name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -39,7 +41,7 @@ async function findOrCreateUnclaimedProfile(name: string, role: string, userId: 
   return { id: null, error: new Error("Kein eindeutiger Profilname verfügbar") };
 }
 
-export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -53,6 +55,12 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
   if (draft.published_project_id) return NextResponse.json({ projectId: draft.published_project_id, alreadyPublished: true });
 
   const data = (draft.draft_data ?? {}) as Record<string, unknown>;
+  const body = await req.json().catch(() => null);
+  const rights = projectMediaGrant(data, body?.mediaRights ?? data.mediaRights, userId);
+  if (projectMediaUrls(data).length && !rights) {
+    return NextResponse.json({ error: (await getTranslations("ProjectMediaRights"))("required") }, { status: 400 });
+  }
+  const publicationMetadata = { ...projectDraftMetadata(data, id), media_rights: rights };
   const title = typeof data.title === "string" ? data.title.trim() : "";
   if (!title) return NextResponse.json({ error: "Titel ist Pflichtfeld" }, { status: 400 });
   if (typeof data.type !== "string" || !data.type.trim()) {
@@ -72,7 +80,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
 
   if (draft.source_project_id) {
     const updates: Record<string, unknown> = { ...baseProjectFields, updated_at: new Date().toISOString() };
-    updates.metadata = projectDraftMetadata(data, id);
+    updates.metadata = publicationMetadata;
     delete (updates.metadata as Record<string, unknown>).draft_id;
     const { data: project, error } = await db.from("projects").update(updates)
       .eq("id", draft.source_project_id).eq("created_by", userId)
@@ -89,7 +97,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
       const insert: Record<string, unknown> = {
         ...baseProjectFields,
         created_by: userId,
-        metadata: projectDraftMetadata(data, id),
+        metadata: publicationMetadata,
       };
       const { data: created, error } = await db.from("projects").insert(insert).select("id").single();
       if (created) projectId = created.id;

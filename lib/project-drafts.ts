@@ -1,7 +1,7 @@
 import { PROJECT_DETAIL_METADATA_FIELDS } from "@/lib/project-record";
 
 const ALLOWED_DRAFT_FIELDS = new Set([
-  "title", "year", "type", "description", "director", "poster_url", "images",
+  "title", "year", "type", "description", "director", "poster_url", "images", "mediaRights",
   "myRole", "genre", "productionCompany", "location", "equipment", "link", "alsoOnCrewUnited",
   "linked_companies", "linked_locations", "crew_entries", "status", "logline", "runtime_minutes",
   "trailer_url", "release_cinema", "release_streaming", "release_tv", "production_company", "prep_start", "prep_end",

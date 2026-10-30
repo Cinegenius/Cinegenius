@@ -1952,5 +1952,49 @@
       "animal": "Portfolio zvířat",
       "job": "Práce"
     }
+  },
+  "AiTransparency": {
+    "badge": "Transparentnost",
+    "title": "AI a transparentnost",
+    "description": "Jak CineGenius využívá umělou inteligenci.",
+    "footerNote": "Vyvinuto s pomocí AI · Informace o AI",
+    "developmentTitle": "Vývoj s pomocí AI",
+    "developmentBody": "CineGenius se vyvíjí a zlepšuje s pomocí umělé inteligence. O designu, funkcích a zveřejňování nadále rozhoduje provozovatel.",
+    "imagesTitle": "Obrázky webu vytvořené pomocí AI",
+    "imagesBody": "Označení „Vytvořeno pomocí AI“ se vztahuje ke konkrétnímu dekorativnímu obrázku webu. Byl vytvořen uměle a není dokumentární fotografií. Označení neznamená, že všechny obrázky na CineGenius vznikly pomocí AI.",
+    "membersBody": "Toto upozornění neoznačuje fotografie, firemní loga, ukázky práce ani obrázky inzerátů členů jako vytvořené pomocí AI. Původ obrázku neurčujeme pouze podle jeho vzhledu.",
+    "contactTitle": "Dotazy nebo nesprávná označení",
+    "contactBody": "Máte-li dotaz k využití AI nebo narazíte-li na nesprávné označení, napište nám a přiložte odkaz na příslušnou stránku.",
+    "backHome": "Zpět na úvodní stránku",
+    "imageLabel": "Vytvořeno pomocí AI",
+    "imageLabelAccessible": "Obrázek webu vytvořený pomocí AI – otevřít informace o využití AI",
+    "contactEmail": "cinegenius.co@gmail.com"
+  },
+  "ProjectMediaRights": {
+    "title": "Práva k obrázkům projektu",
+    "explanation": "Zveřejňujte pouze obrázky, které smíte používat. Obrázek na IMDb nebo jiném webu není souhlas s použitím. Bez obrázků potvrzení není potřeba.",
+    "basis": "Právní základ použití",
+    "choose": "Vyberte možnost",
+    "holder": "Držitel práv nebo oprávněná společnost",
+    "source": "Zdroj nebo základ souhlasu",
+    "sourceHint": "Například souhlas filmové společnosti, schválené tiskové materiály nebo odkaz na licenci. Nevkládejte důvěrné dokumenty.",
+    "credit": "Veřejný kredit obrázku (volitelné)",
+    "confirm": "Potvrzuji, že tyto konkrétní obrázky smím veřejně zobrazovat na CineGenius a mohu poskytnout potřebná práva k použití.",
+    "required": "Potvrďte práva k obrázkům a uveďte držitele práv a případně základ souhlasu. Projekt lze také zveřejnit bez obrázků.",
+    "bases": {
+      "own": "Vlastní obrázky / vlastní práva",
+      "permission": "Souhlas držitele práv",
+      "press": "Schválené tiskové / filmové materiály",
+      "license": "Licence / smluvní souhlas"
+    },
+    "pageTitle": "Práva k obrázkům a hlášení",
+    "pageDescription": "Informace o obrázcích projektů a hlášení chybějících práv.",
+    "pageHeading": "Obrázky potřebují základ k použití",
+    "pageBody": "Plakáty a fotografie projektů se veřejně zobrazují až po potvrzení oprávnění odpovědnou osobou pro konkrétní obrázky. Toto potvrzení není úřední kontrolou a nenahrazuje skutečně potřebný souhlas.",
+    "reportTitle": "Nahlásit obrázek",
+    "reportBody": "Pošlete odkaz na projekt, určete obrázek a popište problém. Pokud uplatňujete vlastní práva, vysvětlete, kdo je držitelem a jak vás kontaktovat. Hlášení prověřujeme a během objasňování můžeme zobrazení pozastavit.",
+    "limitBody": "Stažení obrázku ani uvedení autora samo o sobě nezakládá právo k použití. Za správnost potvrzení odpovídá zveřejňující osoba.",
+    "reportLink": "Vyjasnit nebo nahlásit práva k obrázku",
+    "email": "cinegenius.co@gmail.com"
   }
 }

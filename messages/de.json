@@ -1952,5 +1952,49 @@
       "animal": "Tierportfolio",
       "job": "Job"
     }
+  },
+  "AiTransparency": {
+    "badge": "Transparenz",
+    "title": "KI & Transparenz",
+    "description": "So wird künstliche Intelligenz bei CineGenius eingesetzt.",
+    "footerNote": "Mit KI-Unterstützung entwickelt · KI-Hinweis",
+    "developmentTitle": "Entwicklung mit KI-Unterstützung",
+    "developmentBody": "CineGenius wird mit Unterstützung künstlicher Intelligenz entwickelt und verbessert. Entscheidungen über Gestaltung, Funktionen und Veröffentlichungen bleiben beim Betreiber.",
+    "imagesTitle": "KI-generierte Websitebilder",
+    "imagesBody": "Die Kennzeichnung „KI-generiert“ bezieht sich auf das jeweilige gestalterische Websitebild. Dieses wurde künstlich erzeugt und ist keine dokumentarische Aufnahme. Die Kennzeichnung bedeutet nicht, dass alle Bilder auf CineGenius mit KI erstellt wurden.",
+    "membersBody": "Fotos, Firmenlogos, Arbeitsproben und Inseratsbilder von Mitgliedern werden durch diesen Website-Hinweis nicht als KI-generiert eingestuft. Wir leiten die Herkunft eines Bildes nicht allein aus seinem Aussehen ab.",
+    "contactTitle": "Fragen oder eine falsche Kennzeichnung melden",
+    "contactBody": "Wenn du Fragen zum KI-Einsatz hast oder dir eine unzutreffende Kennzeichnung auffällt, schreibe uns bitte mit einem Link zur betroffenen Seite.",
+    "backHome": "Zur Startseite",
+    "imageLabel": "KI-generiert",
+    "imageLabelAccessible": "KI-generiertes Websitebild – Hinweise zum KI-Einsatz öffnen",
+    "contactEmail": "cinegenius.co@gmail.com"
+  },
+  "ProjectMediaRights": {
+    "title": "Bildrechte für dieses Projekt",
+    "explanation": "Veröffentliche nur Bilder, die du selbst nutzen darfst. Ein Bild bei IMDb oder einer anderen Website ist keine Nutzungserlaubnis. Ohne Bilder ist keine Bestätigung nötig.",
+    "basis": "Grundlage der Nutzung",
+    "choose": "Bitte auswählen",
+    "holder": "Rechteinhaber/in oder berechtigtes Unternehmen",
+    "source": "Quelle oder Grundlage der Erlaubnis",
+    "sourceHint": "Zum Beispiel eine Zustimmung der Filmfirma, ein freigegebenes Pressepaket oder eine Lizenzreferenz. Keine vertraulichen Dokumente hier einfügen.",
+    "credit": "Öffentlicher Bildnachweis (optional)",
+    "confirm": "Ich bestätige, dass ich diese konkreten Bilder auf CineGenius öffentlich anzeigen darf und die dafür erforderlichen Nutzungsrechte einräumen kann.",
+    "required": "Bitte bestätige die Bildrechte und ergänze Rechteinhaber sowie gegebenenfalls die Grundlage der Erlaubnis. Du kannst das Projekt alternativ ohne Bilder veröffentlichen.",
+    "bases": {
+      "own": "Eigene Bilder / eigene Rechte",
+      "permission": "Erlaubnis der Rechteinhaber",
+      "press": "Freigegebenes Presse-/Filmmaterial",
+      "license": "Lizenz / vertragliche Erlaubnis"
+    },
+    "pageTitle": "Bildrechte & Meldung",
+    "pageDescription": "Hinweise zu Projektbildern und zum Melden fehlender Rechte.",
+    "pageHeading": "Projektbilder benötigen eine Nutzungsgrundlage",
+    "pageBody": "Projektplakate und Projektfotos werden erst öffentlich angezeigt, wenn eine verantwortliche Person ihre Berechtigung für die konkreten Bilder bestätigt hat. Eine solche Bestätigung ist keine behördliche Prüfung und ersetzt keine tatsächlich erforderliche Erlaubnis.",
+    "reportTitle": "Ein Bild melden",
+    "reportBody": "Bitte sende uns den Link zum Projekt, die Bezeichnung des betroffenen Bildes und eine Beschreibung des Problems. Wenn du selbst Rechte geltend machst, erläutere bitte, wer Rechteinhaber ist und wie wir dich erreichen können. Wir prüfen die Meldung und können die Darstellung zur Klärung aussetzen.",
+    "limitBody": "Ein Download oder ein Bildnachweis allein verleiht keine Nutzungsrechte. Die Verantwortung für eine zutreffende Bestätigung bleibt bei der veröffentlichenden Person.",
+    "reportLink": "Bildrechte klären oder melden",
+    "email": "cinegenius.co@gmail.com"
   }
 }

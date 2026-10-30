@@ -1,3 +1,4 @@
+import { publicProjectMedia } from "@/lib/project-media-rights";
 import { db } from "@/lib/db";
 import Image from "@/components/MediaImage";
 import Link from "next/link";
@@ -36,11 +37,11 @@ function typeColor(type: string): string {
 export default async function ProjectCategoryPage({ config }: { config: CategoryConfig }) {
   const { data: allProjects } = await db
     .from("projects")
-    .select("id, title, year, type, director, poster_url")
+    .select("id, title, year, type, director, poster_url, metadata, created_by")
     .order("year", { ascending: false })
     .limit(300);
 
-  const projects = (allProjects ?? []).filter((p: { type: string | null }) =>
+  const projects = (allProjects ?? []).map(project => publicProjectMedia(project)).filter((p: { type: string | null }) =>
     config.typeKeywords.some((kw) =>
       (p.type ?? "").toLowerCase() === kw.toLowerCase()
     )

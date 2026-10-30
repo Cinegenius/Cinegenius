@@ -8,6 +8,8 @@ import { useTranslations } from "next-intl";
 export default function Footer() {
   const pathname = usePathname();
   const tf = useTranslations("footer");
+  const ai = useTranslations("AiTransparency");
+  const rights = useTranslations("ProjectMediaRights");
   if (pathname?.startsWith("/dashboard")) return null;
 
   const columns = [
@@ -80,10 +82,12 @@ export default function Footer() {
 
         {/* Unterzeile */}
         <div className="mt-4 pt-3 sm:mt-8 sm:pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
-          <p className="text-xs text-text-muted">
-            © {new Date().getFullYear()} CineGenius. {tf("rights")}
-          </p>
+          <div className="text-center text-xs text-text-muted sm:text-left">
+            <p>© {new Date().getFullYear()} CineGenius. {tf("rights")}</p>
+            <Link href="/ki-transparenz" className="mt-1 inline-flex min-h-9 items-center hover:text-text-secondary">{ai("footerNote")}</Link>
+          </div>
           <div className="flex max-w-full flex-wrap justify-center gap-x-6 gap-y-2">
+            <Link href="/bildrechte" className="inline-flex min-h-11 items-center text-sm text-text-muted hover:text-text-secondary">{rights("pageTitle")}</Link>
             {[
               { labelKey: "links_privacy", href: "/datenschutz" },
               { labelKey: "links_terms", href: "/agb" },

@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { saveProjectDraft } from "@/lib/project-drafts-server";
+import { publicProjectMedia } from "@/lib/project-media-rights";
 
 function privateNoStoreJson(body: unknown, status = 200) {
   const response = NextResponse.json(body, { status });
@@ -33,7 +34,7 @@ export async function GET(req: NextRequest) {
 
   let query = db
     .from("projects")
-    .select("id, title, year, type, director, poster_url")
+    .select("id, title, year, type, director, poster_url, metadata, created_by")
     .order("year", { ascending: false })
     .limit(limit);
 
@@ -43,7 +44,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ projects: data ?? [] }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
+  return NextResponse.json({ projects: (data ?? []).map(project => publicProjectMedia(project)) }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 }
 
 // POST /api/projects — create a private draft; publication is a separate action.

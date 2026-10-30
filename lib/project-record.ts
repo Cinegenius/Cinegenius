@@ -1,3 +1,4 @@
+import { publicProjectMedia } from "@/lib/project-media-rights";
 /** Columns guaranteed by supabase/migrations/projects.sql and project_drafts.sql. */
 export const PROJECT_RECORD_COLUMNS =
   "id, title, year, type, description, director, poster_url, images, created_by, created_at, updated_at, metadata";
@@ -99,7 +100,7 @@ export function projectRecordWithDetails(project: Record<string, unknown>): Proj
 /** Internal ownership and draft bookkeeping must never be serialized publicly. */
 export function toPublicProjectRecord(project: Record<string, unknown>): Omit<ProjectRecord, "created_by" | "metadata"> {
   const merged = projectRecordWithDetails(project);
-  return Object.fromEntries(Object.entries(merged).filter(([key]) => key !== "created_by" && key !== "metadata")) as Omit<ProjectRecord, "created_by" | "metadata">;
+  return publicProjectMedia(merged) as Omit<ProjectRecord, "created_by" | "metadata">;
 }
 
 export function isProjectId(value: string): boolean {

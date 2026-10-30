@@ -30,6 +30,7 @@ import HeroSearch from "@/components/HeroSearch";
 import CommunityBoard from "@/components/CommunityBoard";
 import HomeCompanyPartners from "@/components/HomeCompanyPartners";
 import { PageBackdrop } from "@/components/PageHeader";
+import AiDisclosureBadge from "@/components/AiDisclosureBadge";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import { HomePhotoDiscovery, type DiscoverPhoto } from "@/components/HomePhotoDiscovery";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
@@ -91,7 +92,7 @@ async function getHomeData(viewerId: string | null) {
     db.from("listings").select("id,user_id,company_id,title,city,price,image_url,type,metadata,created_at").in("type", ["prop", "vehicle"]).eq("published", true).order("created_at", { ascending: false }).limit(4),
     db.from("companies").select("id,slug,name,logo_url,city,categories").eq("published", true).order("created_at", { ascending: false }).limit(6),
     db.from("profiles").select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,profile_type,profile_types,profile_images,portfolio_images,created_at").not("display_name", "is", null).neq("display_name", "").order("created_at", { ascending: false }).limit(300),
-    db.from("projects").select("id,title,year,type,director,poster_url").order("year", { ascending: false }).limit(3),
+    db.from("projects").select("id,title,year,type,director").order("year", { ascending: false }).limit(3),
   ]);
   if (results.some(result => result.error)) throw new Error("Homepage recommendations unavailable");
   const [
@@ -567,6 +568,7 @@ export default async function HomePage() {
           </div>
           <div className="max-w-xl mx-auto">
             <HeroSearch />
+            <div className="mt-2 flex justify-end"><AiDisclosureBadge source="/hero-bg.jpg" /></div>
           </div>
         </div>
       </section>

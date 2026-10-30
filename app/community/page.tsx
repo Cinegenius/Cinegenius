@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { getTranslations } from "next-intl/server";
 import { MessageSquareText } from "lucide-react";
 import CommunityBoard from "@/components/CommunityBoard";
+import AiDisclosureBadge from "@/components/AiDisclosureBadge";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("home");
@@ -28,6 +29,7 @@ export default async function CommunityPage() {
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-text-secondary sm:text-base">
             {t("boardPageDescription")}
           </p>
+          <div className="mt-3 flex justify-end"><AiDisclosureBadge source="/hero-bg.jpg" /></div>
         </div>
       </header>
       <CommunityBoard fullPage loggedIn={!!userId} />

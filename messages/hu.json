@@ -1952,5 +1952,49 @@
       "animal": "Állatportfólió",
       "job": "Munka"
     }
+  },
+  "AiTransparency": {
+    "badge": "Átláthatóság",
+    "title": "MI és átláthatóság",
+    "description": "Így használjuk a mesterséges intelligenciát a CineGenius oldalán.",
+    "footerNote": "MI segítségével fejlesztve · MI-tájékoztató",
+    "developmentTitle": "Fejlesztés MI segítségével",
+    "developmentBody": "A CineGenius fejlesztése és javítása mesterséges intelligencia segítségével történik. A megjelenésről, funkciókról és közzétételről továbbra is az üzemeltető dönt.",
+    "imagesTitle": "MI-vel létrehozott weboldalképek",
+    "imagesBody": "Az „MI-vel létrehozva” jelölés az adott dekoratív weboldalképre vonatkozik. Mesterségesen állították elő, és nem dokumentarista fénykép. A jelölés nem jelenti azt, hogy a CineGenius összes képe MI-vel készült.",
+    "membersBody": "Ez a tájékoztató nem minősíti MI-vel létrehozottnak a tagok fényképeit, céglogóit, munkamintáit vagy hirdetési képeit. A kép eredetére nem következtetünk pusztán a megjelenéséből.",
+    "contactTitle": "Kérdések vagy téves jelölések",
+    "contactBody": "Ha kérdésed van az MI használatáról, vagy téves jelölést találsz, írj nekünk az érintett oldal hivatkozásával.",
+    "backHome": "Vissza a kezdőlapra",
+    "imageLabel": "MI-vel létrehozva",
+    "imageLabelAccessible": "MI-vel létrehozott weboldalkép – tájékoztató megnyitása az MI használatáról",
+    "contactEmail": "cinegenius.co@gmail.com"
+  },
+  "ProjectMediaRights": {
+    "title": "A projekt képeinek felhasználási jogai",
+    "explanation": "Csak olyan képeket tegyél közzé, amelyek használatára jogosult vagy. Egy kép az IMDb-n vagy más weboldalon nem jelent felhasználási engedélyt. Képek nélkül nem kell nyilatkozat.",
+    "basis": "A felhasználás alapja",
+    "choose": "Válassz egy lehetőséget",
+    "holder": "Jogtulajdonos vagy jogosult cég",
+    "source": "Az engedély forrása vagy alapja",
+    "sourceHint": "Például a filmgyártó engedélye, jóváhagyott sajtóanyag vagy licenchivatkozás. Bizalmas dokumentumot ne adj meg.",
+    "credit": "Nyilvános képfelirat / forrásmegjelölés (nem kötelező)",
+    "confirm": "Megerősítem, hogy ezeket a konkrét képeket nyilvánosan megjeleníthetem a CineGenius oldalán, és megadhatom a szükséges felhasználási jogokat.",
+    "required": "Erősítsd meg a képek felhasználási jogait, add meg a jogtulajdonost és szükség esetén az engedély alapját. A projekt képek nélkül is közzétehető.",
+    "bases": {
+      "own": "Saját képek / saját jogok",
+      "permission": "A jogtulajdonos engedélye",
+      "press": "Engedélyezett sajtó- / filmanyag",
+      "license": "Licenc / szerződéses engedély"
+    },
+    "pageTitle": "Képjogok és bejelentések",
+    "pageDescription": "Tájékoztatás a projektképekről és a hiányzó jogok bejelentéséről.",
+    "pageHeading": "A képekhez felhasználási alap szükséges",
+    "pageBody": "A projektplakátok és fotók csak akkor jelennek meg nyilvánosan, ha egy felelős személy megerősítette jogosultságát az adott képekre. Ez nem hatósági ellenőrzés, és nem helyettesíti a ténylegesen szükséges engedélyt.",
+    "reportTitle": "Kép bejelentése",
+    "reportBody": "Küldd el a projekt hivatkozását, nevezd meg a képet és írd le a problémát. Ha jogokat érvényesítesz, add meg a jogtulajdonost és az elérhetőségedet. A bejelentéseket megvizsgáljuk, és a tisztázás idejére felfüggeszthetjük a megjelenítést.",
+    "limitBody": "A letöltés vagy a forrásmegjelölés önmagában nem ad felhasználási jogot. A közzétevő felel a nyilatkozat helyességéért.",
+    "reportLink": "Képjogok tisztázása vagy bejelentése",
+    "email": "cinegenius.co@gmail.com"
   }
 }

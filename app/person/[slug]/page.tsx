@@ -1,3 +1,4 @@
+import { publicProjectCredits } from "@/lib/project-media-rights";
 import { notFound, redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
@@ -34,11 +35,11 @@ async function getData(slug: string) {
 
   const { data: credits } = await db
     .from("project_credits")
-    .select("id, role, created_at, projects(id, title, year, type, director, poster_url)")
+    .select("id, role, created_at, projects(id, title, year, type, director, poster_url, metadata, created_by)")
     .eq("unclaimed_profile_id", profile.id)
     .order("created_at", { ascending: false });
 
-  return { profile, credits: (credits ?? []) as unknown as Credit[] };
+  return { profile, credits: publicProjectCredits(credits ?? []) as unknown as Credit[] };
 }
 
 export async function generateMetadata({

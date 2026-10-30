@@ -1,8 +1,12 @@
 "use client";
 
 import UnoptimizedImage from "@/components/UnoptimizedImage";
+import ProjectMediaRightsFields from "@/components/ProjectMediaRightsFields";
+import FormDraftStatus from "@/components/FormDraftStatus";
+import { useExistingDraftProtection, type FormDraftStatus as DraftStatus } from "@/lib/use-form-draft";
+import { EMPTY_PROJECT_MEDIA_RIGHTS, normalizeProjectMediaRights, projectMediaUrls } from "@/lib/project-media-rights";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Clapperboard, Loader2, Send, Trash2 } from "lucide-react";
@@ -21,6 +25,30 @@ export default function ProjectDraftPreviewPage() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [mediaRights, setMediaRights] = useState(EMPTY_PROJECT_MEDIA_RIGHTS);
+  const savedRights = useRef("");
+  const [rightsStatus, setRightsStatus] = useState<DraftStatus>("idle");
+  const persistRights = useCallback(async (value: typeof mediaRights) => {
+    setRightsStatus("saving");
+    try {
+      const response = await fetch(`/api/project-drafts/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ draftData: { mediaRights: value } }) });
+      if (!response.ok) throw new Error("save_failed");
+      savedRights.current = JSON.stringify(value);
+      setRightsStatus("saved");
+      return true;
+    } catch {
+      setRightsStatus("error");
+      return false;
+    }
+  }, [id]);
+  const rightsProtection = useExistingDraftProtection({ value: mediaRights, ready: !!draft && !loading, busy,
+    enabled: !draft?.published_project_id, save: persistRights, saved: value => savedRights.current === JSON.stringify(value) });
+  useEffect(() => {
+    if (!draft || loading || busy || draft.published_project_id || savedRights.current === JSON.stringify(mediaRights)) return;
+    setRightsStatus("pending");
+    const timer = setTimeout(() => { void persistRights(mediaRights); }, 900);
+    return () => clearTimeout(timer);
+  }, [draft, loading, busy, mediaRights, persistRights]);
 
   useEffect(() => {
     let alive = true;
@@ -30,7 +58,7 @@ export default function ProjectDraftPreviewPage() {
         if (!response.ok) throw new Error(json.error ?? "Entwurf konnte nicht geladen werden");
         return json.draft as Draft;
       })
-      .then((value) => { if (alive) setDraft(value); })
+      .then((value) => { if (alive) { const rights = normalizeProjectMediaRights(value.draft_data.mediaRights); savedRights.current = JSON.stringify(rights); setDraft(value); setMediaRights(rights); } })
       .catch((reason: unknown) => { if (alive) setError(reason instanceof Error ? reason.message : "Fehler beim Laden"); })
       .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
@@ -40,9 +68,10 @@ export default function ProjectDraftPreviewPage() {
     if (!draft) return;
     setBusy(true); setError("");
     try {
-      const response = await fetch(`/api/project-drafts/${id}/publish`, { method: "POST" });
+      const response = await fetch(`/api/project-drafts/${id}/publish`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mediaRights }) });
       const json = await response.json();
       if (!response.ok) throw new Error(json.error ?? "Veröffentlichung fehlgeschlagen");
+      rightsProtection.complete();
       router.push(`/projects/${json.projectId}`);
     } catch (reason: unknown) {
       setError(reason instanceof Error ? reason.message : "Veröffentlichung fehlgeschlagen");
@@ -57,6 +86,7 @@ export default function ProjectDraftPreviewPage() {
       const response = await fetch(`/api/project-drafts/${id}`, { method: "DELETE" });
       const json = await response.json();
       if (!response.ok) throw new Error(json.error ?? "Entwurf konnte nicht gelöscht werden");
+      rightsProtection.complete();
       router.push("/projects");
     } catch (reason: unknown) {
       setError(reason instanceof Error ? reason.message : "Entwurf konnte nicht gelöscht werden");
@@ -117,6 +147,8 @@ export default function ProjectDraftPreviewPage() {
                   )}
                 </div>
               </div>
+              {projectMediaUrls(data).length > 0 && <><ProjectMediaRightsFields value={mediaRights} onChange={setMediaRights} disabled={busy || !!draft?.published_project_id} />
+                <FormDraftStatus draft={{ status: rightsStatus, error: "", loaded: true, flush: () => persistRights(mediaRights), reload: () => {} }} /></>}
               {error && <p role="alert" className="mt-5 text-sm text-red-400">{error}</p>}
               <div className="mt-8 pt-5 border-t border-border flex flex-col-reverse sm:flex-row sm:justify-between gap-3">
                 <button onClick={removeDraft} disabled={busy || !draft} className="min-h-11 px-4 rounded-xl border border-border text-text-secondary hover:text-red-400 disabled:opacity-50 inline-flex items-center justify-center gap-2">

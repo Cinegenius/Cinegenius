@@ -1952,5 +1952,49 @@
       "animal": "Portfolio animali",
       "job": "Lavoro"
     }
+  },
+  "AiTransparency": {
+    "badge": "Trasparenza",
+    "title": "IA e trasparenza",
+    "description": "Come viene utilizzata l’intelligenza artificiale su CineGenius.",
+    "footerNote": "Sviluppato con il supporto dell’IA · Informativa IA",
+    "developmentTitle": "Sviluppo con il supporto dell’IA",
+    "developmentBody": "CineGenius viene sviluppato e migliorato con il supporto dell’intelligenza artificiale. Le decisioni su design, funzioni e pubblicazione restano al gestore.",
+    "imagesTitle": "Immagini del sito generate con IA",
+    "imagesBody": "L’etichetta «Generato con IA» si riferisce alla specifica immagine decorativa del sito. È stata generata artificialmente e non è una fotografia documentaria. L’etichetta non significa che tutte le immagini su CineGenius siano state create con IA.",
+    "membersBody": "Questa informativa non classifica come generate con IA le foto, i loghi aziendali, i lavori e le immagini degli annunci dei membri. Non deduciamo l’origine di un’immagine solo dal suo aspetto.",
+    "contactTitle": "Domande o etichette errate",
+    "contactBody": "Per domande sull’uso dell’IA o per segnalare un’etichetta errata, scrivici includendo il link alla pagina interessata.",
+    "backHome": "Torna alla pagina iniziale",
+    "imageLabel": "Generato con IA",
+    "imageLabelAccessible": "Immagine del sito generata con IA: apri le informazioni sull’uso dell’IA",
+    "contactEmail": "cinegenius.co@gmail.com"
+  },
+  "ProjectMediaRights": {
+    "title": "Diritti delle immagini del progetto",
+    "explanation": "Pubblica solo immagini che hai diritto di usare. Un’immagine su IMDb o su un altro sito non costituisce un’autorizzazione. Senza immagini non serve conferma.",
+    "basis": "Base dell’utilizzo",
+    "choose": "Scegli un’opzione",
+    "holder": "Titolare dei diritti o azienda autorizzata",
+    "source": "Fonte o base dell’autorizzazione",
+    "sourceHint": "Ad esempio il consenso della casa di produzione, materiale stampa autorizzato o un riferimento di licenza. Non inserire documenti riservati.",
+    "credit": "Credito pubblico dell’immagine (facoltativo)",
+    "confirm": "Confermo di poter mostrare pubblicamente queste specifiche immagini su CineGenius e concedere i necessari diritti di utilizzo.",
+    "required": "Conferma i diritti e indica il titolare e, se necessario, la base dell’autorizzazione. Puoi anche pubblicare il progetto senza immagini.",
+    "bases": {
+      "own": "Immagini e diritti propri",
+      "permission": "Permesso del titolare dei diritti",
+      "press": "Materiale stampa / cinematografico autorizzato",
+      "license": "Licenza / permesso contrattuale"
+    },
+    "pageTitle": "Diritti delle immagini e segnalazioni",
+    "pageDescription": "Informazioni sulle immagini dei progetti e sulle segnalazioni di diritti mancanti.",
+    "pageHeading": "Le immagini richiedono una base di utilizzo",
+    "pageBody": "Locandine e foto dei progetti vengono mostrate pubblicamente solo dopo la conferma di una persona responsabile per quelle specifiche immagini. La conferma non è una verifica ufficiale e non sostituisce un’autorizzazione necessaria.",
+    "reportTitle": "Segnalare un’immagine",
+    "reportBody": "Inviaci il link del progetto, identifica l’immagine e descrivi il problema. Se rivendichi diritti, indica chi ne è titolare e come contattarti. Esaminiamo le segnalazioni e possiamo sospendere la visualizzazione durante i chiarimenti.",
+    "limitBody": "Un download o un credito non concedono da soli diritti di utilizzo. Chi pubblica resta responsabile della correttezza della conferma.",
+    "reportLink": "Chiarire o segnalare i diritti delle immagini",
+    "email": "cinegenius.co@gmail.com"
   }
 }

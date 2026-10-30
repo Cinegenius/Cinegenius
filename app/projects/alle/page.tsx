@@ -1,3 +1,4 @@
+import { publicProjectMedia } from "@/lib/project-media-rights";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import ProjectsContent from "@/app/projects/ProjectsContent";
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 export default async function AlleProjectsPage() {
   const { data: projects } = await db
     .from("projects")
-    .select("id, title, year, type, director, poster_url")
+    .select("id, title, year, type, director, poster_url, metadata, created_by")
     .order("year", { ascending: false })
     .limit(200);
 
@@ -33,7 +34,7 @@ export default async function AlleProjectsPage() {
     );
   }
 
-  const projectsWithCount = (projects ?? []).map(
+  const projectsWithCount = (projects ?? []).map(project => publicProjectMedia(project)).map(
     (p: { id: string; title: string; year: number | null; type: string | null; director: string | null; poster_url: string | null }) => ({
       ...p,
       crew_count: creditCounts[p.id] ?? 0,

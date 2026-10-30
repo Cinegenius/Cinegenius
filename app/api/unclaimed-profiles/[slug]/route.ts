@@ -1,3 +1,4 @@
+import { publicProjectCredits } from "@/lib/project-media-rights";
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -17,9 +18,9 @@ export async function GET(
 
   const { data: credits } = await db
     .from("project_credits")
-    .select("id, role, created_at, projects(id, title, year, type, director, poster_url)")
+    .select("id, role, created_at, projects(id, title, year, type, director, poster_url, metadata, created_by)")
     .eq("unclaimed_profile_id", profile.id)
     .order("created_at", { ascending: false });
 
-  return NextResponse.json({ profile, credits: credits ?? [] });
+  return NextResponse.json({ profile, credits: publicProjectCredits(credits ?? []) });
 }

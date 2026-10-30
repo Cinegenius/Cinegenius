@@ -66,7 +66,7 @@ export async function generateMetadata({
   const { id } = await params;
   const data = await getProject(id);
   if (!data) return {};
-  const { project } = data;
+  const project = toPublicProjectRecord(data.project);
   return {
     title: `${project.title} (${project.year ?? "—"}) — CineGenius`,
     description: project.description ?? `${project.type ?? "Film"} · ${project.year ?? ""}`,

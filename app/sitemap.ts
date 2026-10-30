@@ -45,6 +45,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/agb`,                         lastModified: now, changeFrequency: "yearly",  priority: 0.3 },
     { url: `${BASE}/datenschutz`,                 lastModified: now, changeFrequency: "yearly",  priority: 0.3 },
     { url: `${BASE}/impressum`,                   lastModified: now, changeFrequency: "yearly",  priority: 0.3 },
+    { url: `${BASE}/ki-transparenz`,              lastModified: now, changeFrequency: "monthly", priority: 0.3 },
+    { url: `${BASE}/bildrechte`,                  lastModified: now, changeFrequency: "monthly", priority: 0.3 },
   ];
 
   let dynamicListings: MetadataRoute.Sitemap = [];

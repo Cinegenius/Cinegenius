@@ -77,6 +77,7 @@ type Project = {
   poster_url: string | null;
   verified?: boolean | null;
   images: string[];
+  image_credit?: string | null;
   // Status & story
   status?: string | null;
   logline?: string | null;
@@ -262,6 +263,7 @@ export default function ProjectDetail({
   isAdmin?: boolean;
 }) {
   const optionalMedia = useTranslations("OptionalMedia");
+  const mediaRightsText = useTranslations("ProjectMediaRights");
   const [project, setProject] = useState(initialProject);
   const [credits, setCredits] = useState(initialCredits);
   const [myCredit, setMyCredit] = useState(initialMyCredit);
@@ -543,6 +545,7 @@ export default function ProjectDetail({
                   : <div className="flex flex-col items-center gap-2 text-text-muted"><Clapperboard size={32} /></div>
               }
             </div>
+            {project.image_credit && <p className="mt-2 break-words text-xs text-text-muted">{project.image_credit}</p>}
           </div>
 
           {/* Info */}
@@ -834,6 +837,7 @@ export default function ProjectDetail({
         {/* ════════ TAB: FOTOS ════════ */}
         {activeTab === "fotos" && (
           <div>
+            <Link href="/bildrechte" className="mb-4 inline-flex min-h-11 items-center text-xs text-gold hover:underline">{mediaRightsText("reportLink")}</Link>
             {isCreator && (
               <div className="flex justify-end mb-5">
                 <span className="text-xs text-text-muted">Neue Bilddateien werden erst unterstützt, wenn sie sicher privat im Entwurf abgelegt werden können.</span>

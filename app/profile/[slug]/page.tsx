@@ -1,3 +1,4 @@
+import { publicProjectCredits } from "@/lib/project-media-rights";
 import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
@@ -110,13 +111,13 @@ export async function generateMetadata(
 async function getProjectCredits(userId: string): Promise<ProjectCredit[]> {
   const { data, error } = await db
     .from("project_credits")
-    .select("id, role, project_id, projects(id, title, year, type, director, poster_url)")
+    .select("id, role, project_id, projects(id, title, year, type, director, poster_url, metadata, created_by)")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(50);
   if (error || !data) return [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return data as any;
+  return publicProjectCredits(data) as any;
 }
 
 function getExternalProfiles(userId: string): Promise<ExternalProfileRow[]> {

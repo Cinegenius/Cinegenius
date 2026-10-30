@@ -1,3 +1,4 @@
+import { publicProjectCredits } from "@/lib/project-media-rights";
 import { auth } from "@clerk/nextjs/server";
 import { canViewProfile } from "@/lib/trust";
 import { db } from "@/lib/db";
@@ -131,10 +132,10 @@ export async function GET(req: NextRequest) {
 
   const { data: credits, error } = await db
     .from("project_credits")
-    .select("id, role, created_at, project_id, projects(id, title, year, type, director, poster_url)")
+    .select("id, role, created_at, project_id, projects(id, title, year, type, director, poster_url, metadata, created_by)")
     .eq("user_id", user_id)
     .order("created_at", { ascending: false });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ credits: credits ?? [] });
+  return NextResponse.json({ credits: publicProjectCredits(credits ?? []) });
 }
