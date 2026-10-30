@@ -69,6 +69,7 @@ export default function Footer() {
                   <li key={link.labelKey}>
                     <Link
                       href={link.href}
+                      prefetch={false}
                       className="inline-flex min-h-9 sm:min-h-11 items-center text-sm text-text-secondary hover:text-gold transition-colors [overflow-wrap:anywhere]"
                     >
                       {tf(link.labelKey as Parameters<typeof tf>[0])}
@@ -84,10 +85,10 @@ export default function Footer() {
         <div className="mt-4 pt-3 sm:mt-8 sm:pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
           <div className="text-center text-xs text-text-muted sm:text-left">
             <p>© {new Date().getFullYear()} CineGenius. {tf("rights")}</p>
-            <Link href="/ki-transparenz" className="mt-1 inline-flex min-h-9 items-center hover:text-text-secondary">{ai("footerNote")}</Link>
+            <Link href="/ki-transparenz" prefetch={false} className="mt-1 inline-flex min-h-9 items-center hover:text-text-secondary">{ai("footerNote")}</Link>
           </div>
           <div className="flex max-w-full flex-wrap justify-center gap-x-6 gap-y-2">
-            <Link href="/bildrechte" className="inline-flex min-h-11 items-center text-sm text-text-muted hover:text-text-secondary">{rights("pageTitle")}</Link>
+            <Link href="/bildrechte" prefetch={false} className="inline-flex min-h-11 items-center text-sm text-text-muted hover:text-text-secondary">{rights("pageTitle")}</Link>
             {[
               { labelKey: "links_privacy", href: "/datenschutz" },
               { labelKey: "links_terms", href: "/agb" },
@@ -96,6 +97,7 @@ export default function Footer() {
               <Link
                 key={labelKey}
                 href={href}
+                prefetch={false}
                 className="inline-flex min-h-11 items-center text-sm text-text-muted hover:text-text-secondary transition-colors"
               >
                 {tf(labelKey as Parameters<typeof tf>[0])}

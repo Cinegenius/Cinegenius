@@ -44,6 +44,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
   const signingOutRef = useRef(false);
   const inbox = useAuthenticatedInbox();
   const pathname = usePathname();
+  const authRoute = pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up");
   const { isSignedIn, isLoaded } = useAuth();
   const { user } = useUser();
   const { signOut } = useClerk();
@@ -181,6 +182,7 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                   <Link
                     key={href}
                     href={href}
+                    prefetch={authRoute || signingOut ? false : null}
                     className={`px-3 py-2 text-sm font-medium transition-colors uppercase tracking-widest rounded-md ${isActive(basePath) ? navActive : navBase}`}
                   >
                     {t(key)}
