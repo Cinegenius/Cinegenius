@@ -442,7 +442,8 @@
     "boardPageHeading": "Tablón de la comunidad",
     "boardPageDescription": "Haz preguntas, comparte recomendaciones y encuentra a las personas o recursos adecuados. Las publicaciones permanecen visibles hasta 2 días.",
     "offerServicesAction": "Presentar un servicio",
-    "ctaLoggedInDesc": "Continúa en tu espacio personal y con tu próximo proyecto."
+    "ctaLoggedInDesc": "Continúa en tu espacio personal y con tu próximo proyecto.",
+    "recommendationsUnavailable": "Las recomendaciones no están disponibles temporalmente. Puedes seguir usando la búsqueda y las secciones de arriba."
   },
   "locations": {
     "heroTitle": "La locación perfecta",

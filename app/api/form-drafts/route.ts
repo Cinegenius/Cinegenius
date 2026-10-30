@@ -7,6 +7,9 @@ import { rateLimit } from "@/lib/rateLimit";
 
 const headers = { "Cache-Control": "private, no-store", "CDN-Cache-Control": "no-store", "Vercel-CDN-Cache-Control": "no-store" };
 const json = (data: unknown, status = 200) => NextResponse.json(data, { status, headers });
+// Stop abandoned recovery requests before the browser's own 12-second deadline.
+// A lost acknowledgement remains safely retryable through the versioned writer.
+const draftSignal = (request: NextRequest) => AbortSignal.any([request.signal, AbortSignal.timeout(8_000)]);
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuth();
@@ -16,7 +19,9 @@ export async function GET(request: NextRequest) {
   if (!validFormDraftKey(key)) return json({ code: "invalid" }, 400);
   try { if (!await canUseFormDraft(auth.userId, key)) return json({ code: "forbidden" }, 403); }
   catch { return json({ code: "unavailable" }, 503); }
-  const result = await db.from("private_form_drafts").select("draft_data, revision, updated_at").eq("user_id", auth.userId).eq("form_key", key).maybeSingle();
+  const result = await db.from("private_form_drafts").select("draft_data, revision, updated_at").eq("user_id", auth.userId).eq("form_key", key)
+    .abortSignal(draftSignal(request)).maybeSingle().then(result => result, () => null);
+  if (!result) return json({ code: "unavailable" }, 503);
   if (result.error) return json({ code: "unavailable" }, 503);
   return json({ data: result.data?.draft_data ?? null, revision: result.data?.revision ?? 0, updatedAt: result.data?.updated_at ?? null });
 }
@@ -35,8 +40,13 @@ export async function PUT(request: NextRequest) {
   if (!(await rateLimit(`form-draft:${auth.userId}`, 120, 60)).allowed) return json({ code: "rate_limit" }, 429);
   // The account comes exclusively from Clerk, never from client data. Even admins
   // cannot use this endpoint to read or overwrite another member's private draft.
-  const result = await db.rpc("save_private_form_draft", { p_user: auth.userId, p_key: body.key, p_expected: body.revision, p_data: body.data });
-  if (result.error) return json({ code: result.error.code === "40001" ? "conflict" : "unavailable" }, result.error.code === "40001" ? 409 : 503);
+  const result = await db.rpc("save_private_form_draft", { p_user: auth.userId, p_key: body.key, p_expected: body.revision, p_data: body.data })
+    .abortSignal(draftSignal(request)).then(result => result, () => null);
+  if (!result) return json({ code: "unavailable" }, 503);
+  if (result.error) {
+    const conflict = result.error.code === "PT409" || result.error.code === "40001";
+    return json({ code: conflict ? "conflict" : "unavailable" }, conflict ? 409 : 503);
+  }
   const saved = Array.isArray(result.data) ? result.data[0] : result.data;
   if (!saved || !Number.isSafeInteger(saved.revision)) return json({ code: "unavailable" }, 503);
   return json({ saved: true, revision: saved.revision });

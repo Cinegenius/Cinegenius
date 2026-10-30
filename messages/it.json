@@ -442,7 +442,8 @@
     "boardPageHeading": "Bacheca della community",
     "boardPageDescription": "Fai domande, condividi consigli e trova le persone o le risorse giuste. I post restano visibili per un massimo di 2 giorni.",
     "offerServicesAction": "Presenta un servizio",
-    "ctaLoggedInDesc": "Vai alla tua area personale e continua con il prossimo progetto."
+    "ctaLoggedInDesc": "Vai alla tua area personale e continua con il prossimo progetto.",
+    "recommendationsUnavailable": "I suggerimenti non sono al momento disponibili. Puoi continuare a usare la ricerca e le sezioni qui sopra."
   },
   "locations": {
     "heroTitle": "La location perfetta",

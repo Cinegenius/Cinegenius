@@ -7,6 +7,8 @@ import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import Image from "@/components/MediaImage";
 import { getTranslations, getLocale } from "next-intl/server";
+import { Suspense } from "react";
+import { SkeletonBox } from "@/components/Skeleton";
 
 export const metadata: Metadata = {
   title: "CineGenius — Film, Fotografie und Content",
@@ -83,14 +85,7 @@ async function getHomeData(viewerId: string | null) {
     };
   }
 
-  const [
-    { data: recentLocations },
-    { data: recentJobs },
-    { data: recentProps },
-    { data: liveCompanies },
-    { data: profilesRaw },
-    { data: recentProjects },
-  ] = await Promise.all([
+  const results = await Promise.all([
     db.from("listings").select("id,title,city,price,image_url,metadata,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(3),
     db.from("listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
     db.from("listings").select("id,user_id,company_id,title,city,price,image_url,type,metadata,created_at").in("type", ["prop", "vehicle"]).eq("published", true).order("created_at", { ascending: false }).limit(4),
@@ -98,11 +93,23 @@ async function getHomeData(viewerId: string | null) {
     db.from("profiles").select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,profile_type,profile_types,profile_images,portfolio_images,created_at").not("display_name", "is", null).neq("display_name", "").order("created_at", { ascending: false }).limit(300),
     db.from("projects").select("id,title,year,type,director,poster_url").order("year", { ascending: false }).limit(3),
   ]);
+  if (results.some(result => result.error)) throw new Error("Homepage recommendations unavailable");
+  const [
+    { data: recentLocations },
+    { data: recentJobs },
+    { data: recentProps },
+    { data: liveCompanies },
+    { data: profilesRaw },
+    { data: recentProjects },
+  ] = results;
 
   const profileRows = (profilesRaw ?? []) as HomeProfileRow[];
   const privateIds = await getPrivateProfileIds(profileRows.map((profile) => profile.user_id));
   const publicProfiles = profileRows.filter((profile) => !privateIds.has(profile.user_id));
-  const { photos } = await getCommunityMedia({ limit: 24, viewerId, diverse: true });
+  const { photos } = await getCommunityMedia({ limit: 24, viewerId, diverse: true, includeTotal: false, signal: AbortSignal.timeout(4000) }).catch(() => {
+    console.error("[homepage] Photo discovery unavailable");
+    return { photos: [] };
+  });
   const profileIds = publicProfiles.map((profile) => profile.user_id);
   const crewRatingSummaries = await fetchRatingSummaries(profileIds, "user").catch(() => ({} as Awaited<ReturnType<typeof fetchRatingSummaries>>));
   const newPhotos: DiscoverPhoto[] = photos.slice(0, 24);
@@ -211,13 +218,16 @@ async function getHomeData(viewerId: string | null) {
   };
 }
 
-export default async function HomePage() {
-  const { userId } = await auth();
-  const isLoggedIn = !!userId;
-  const ctaHref = isLoggedIn ? "/dashboard" : "/sign-up";
-
-  const t = await getTranslations("home");
-  const tc = await getTranslations("common");
+async function HomeRecommendations({ viewerId }: { viewerId: string | null }) {
+  const [t, tc] = await Promise.all([getTranslations("home"), getTranslations("common")]);
+  let data: Awaited<ReturnType<typeof getHomeData>>;
+  try {
+    data = await getHomeData(viewerId);
+  } catch {
+    console.error("[homepage] Recommendations unavailable");
+    return <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"><p role="status" className="rounded-xl border border-border bg-bg-secondary px-4 py-6 text-sm text-text-muted">{t("recommendationsUnavailable")}</p></section>;
+  }
+  const { liveLocations, liveJobs, liveProps, companies, projects, topCreators, newCrew, newPhotos, currentTime } = data;
 
   function formatDate(iso: string): string {
     if (!iso) return "";
@@ -229,103 +239,7 @@ export default async function HomePage() {
     return tc("weeksAgo", { weeks: Math.floor(diff / 7) });
   }
 
-  const { liveLocations, liveJobs, liveProps, companies, projects, topCreators, newCrew, newPhotos, currentTime } = await getHomeData(userId);
-
-  const findCards = [
-    { title: t("findLocationsTitle"), description: t("findLocationsDescription"), href: "/locations", icon: MapPin },
-    { title: t("findCrewTitle"), description: t("findCrewDescription"), href: "/creators", icon: UsersRound },
-    { title: t("findEquipmentTitle"), description: t("findEquipmentDescription"), href: "/props", icon: Package2 },
-    { title: t("findCompaniesTitle"), description: t("findCompaniesDescription"), href: "/companies", icon: Building2 },
-  ];
-
-  return (
-    <main className="relative isolate min-h-screen">
-      <PageBackdrop
-        optimizeImage
-        image="/hero-bg.jpg"
-        imagePosition="center 42%"
-        imageOpacity={100}
-        overlayClassName="absolute inset-0 bg-bg-primary/72"
-        className="pointer-events-none fixed inset-0 z-[-1]"
-      />
-      {/* ══════════════════════════════════════════════
-          HERO — minimal, kein Leerraum
-      ══════════════════════════════════════════════ */}
-      <section className="relative isolate overflow-hidden border-b border-border">
-        <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-9 sm:py-11 text-center">
-          <h1 className="font-display text-[2rem] sm:text-[2.8rem] font-bold tracking-tight text-text-primary mb-2 leading-tight">
-            {t("homepageTitle")}
-          </h1>
-          <p className="mx-auto mb-5 max-w-2xl text-text-muted text-sm sm:text-base">
-            {t("homepageDescription")}
-          </p>
-          <div className="mb-5 flex flex-col min-[440px]:flex-row items-stretch justify-center gap-2">
-            <Link href="/search" prefetch className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gold px-5 py-2.5 text-sm font-bold text-bg-primary shadow-lg shadow-gold/15 transition-colors hover:bg-gold-light">
-              {t("heroSearchAction")} <ArrowRight size={15} />
-            </Link>
-            <Link href={ctaHref} prefetch className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-bg-primary/50 px-5 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:border-gold hover:text-gold">
-              {isLoggedIn ? t("heroManageAction") : t("heroPresentAction")} <ArrowRight size={15} />
-            </Link>
-          </div>
-          <div className="max-w-xl mx-auto">
-            <HeroSearch />
-          </div>
-        </div>
-      </section>
-
-      {/* Finden: kompakte, direkte Einstiege in die bestehenden Verzeichnisse */}
-      <section className="py-8 sm:py-10" aria-labelledby="home-find-title">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-4">
-            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("findLabel")}</p>
-            <h2 id="home-find-title" className="font-display text-xl sm:text-2xl font-bold text-text-primary">{t("findTitle")}</h2>
-          </div>
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-            {findCards.map(({ title, description, href, icon: Icon }) => (
-              <Link key={href} href={href} className="group min-w-0 rounded-xl border border-border bg-bg-secondary/90 p-3.5 transition-colors hover:border-gold/40 sm:p-4">
-                <Icon size={18} className="mb-2 text-gold" />
-                <h3 className="text-sm font-semibold leading-snug text-text-primary group-hover:text-gold">{title}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-text-muted">{description}</p>
-              </Link>
-            ))}
-            <div className="col-span-2 min-w-0 rounded-xl border border-border bg-bg-secondary/90 p-3.5 sm:p-4 lg:col-span-1">
-              <Film size={18} className="mb-2 text-gold" />
-              <h3 className="text-sm font-semibold leading-snug text-text-primary">{t("findJobsTitle")}</h3>
-              <p className="mt-1 text-xs leading-relaxed text-text-muted">{t("findJobsDescription")}</p>
-              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold">
-                <Link href="/jobs" className="inline-flex min-h-8 items-center gap-1 text-gold hover:text-gold-light">{t("findJobsLink")} <ArrowRight size={12} /></Link>
-                <Link href="/projects/alle" className="inline-flex min-h-8 items-center gap-1 text-gold hover:text-gold-light">{t("findProjectsLink")} <ArrowRight size={12} /></Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Anbieter verständlich ansprechen, ohne neue Produktwege zu erfinden */}
-      <section className="border-y border-border bg-bg-secondary/55 py-8 sm:py-10" aria-labelledby="home-offer-title">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-4">
-            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("offerLabel")}</p>
-            <h2 id="home-offer-title" className="font-display text-xl sm:text-2xl font-bold text-text-primary">{t("offerTitle")}</h2>
-          </div>
-          <div className="grid gap-3 md:grid-cols-3">
-            {[
-              { title: t("offerLocationTitle"), description: t("offerLocationDescription"), action: t("offerLocationAction"), href: isLoggedIn ? "/inserat" : "/sign-up", icon: MapPin },
-              { title: t("offerTalentTitle"), description: t("offerTalentDescription"), action: t("offerTalentAction"), href: isLoggedIn ? "/profile" : "/sign-up", icon: UsersRound },
-              { title: t("offerEquipmentTitle"), description: t("offerEquipmentDescription"), action: t("offerEquipmentAction"), href: isLoggedIn ? "/inserat" : "/sign-up", serviceAction: t("offerServicesAction"), serviceHref: isLoggedIn ? "/company-setup" : "/sign-up", icon: Package2 },
-            ].map(({ title, description, action, href, serviceAction, serviceHref, icon: Icon }) => (
-              <article key={title} className="min-w-0 rounded-xl border border-border bg-bg-primary/70 p-4 sm:p-5">
-                <Icon size={18} className="mb-2 text-gold" />
-                <h3 className="font-semibold text-text-primary">{title}</h3>
-                <p className="mt-1 text-sm leading-relaxed text-text-muted">{description}</p>
-                <Link href={href} className="mt-3 inline-flex min-h-10 items-center gap-1.5 text-sm font-semibold text-gold hover:text-gold-light">{action} <ArrowRight size={14} /></Link>
-                {serviceAction && serviceHref && <Link href={serviceHref} className="mt-1 inline-flex min-h-10 items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-gold">{serviceAction} <ArrowRight size={14} /></Link>}
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
+  return <>
       <HomePhotoDiscovery ratedPhotos={[]} newPhotos={newPhotos} />
 
       {/* ══════════════════════════════════════════════
@@ -605,6 +519,114 @@ export default async function HomePage() {
           </div>
         </div>
       </section>}
+  </>;
+}
+
+export default async function HomePage() {
+  const { userId } = await auth();
+  const isLoggedIn = !!userId;
+  const ctaHref = isLoggedIn ? "/dashboard" : "/sign-up";
+
+  const t = await getTranslations("home");
+
+  const findCards = [
+    { title: t("findLocationsTitle"), description: t("findLocationsDescription"), href: "/locations", icon: MapPin },
+    { title: t("findCrewTitle"), description: t("findCrewDescription"), href: "/creators", icon: UsersRound },
+    { title: t("findEquipmentTitle"), description: t("findEquipmentDescription"), href: "/props", icon: Package2 },
+    { title: t("findCompaniesTitle"), description: t("findCompaniesDescription"), href: "/companies", icon: Building2 },
+  ];
+
+  return (
+    <main className="relative isolate min-h-screen">
+      <PageBackdrop
+        optimizeImage
+        image="/hero-bg.jpg"
+        imagePosition="center 42%"
+        imageOpacity={100}
+        overlayClassName="absolute inset-0 bg-bg-primary/72"
+        className="pointer-events-none fixed inset-0 z-[-1]"
+      />
+      {/* ══════════════════════════════════════════════
+          HERO — minimal, kein Leerraum
+      ══════════════════════════════════════════════ */}
+      <section className="relative isolate overflow-hidden border-b border-border">
+        <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-9 sm:py-11 text-center">
+          <h1 className="font-display text-[2rem] sm:text-[2.8rem] font-bold tracking-tight text-text-primary mb-2 leading-tight">
+            {t("homepageTitle")}
+          </h1>
+          <p className="mx-auto mb-5 max-w-2xl text-text-muted text-sm sm:text-base">
+            {t("homepageDescription")}
+          </p>
+          <div className="mb-5 flex flex-col min-[440px]:flex-row items-stretch justify-center gap-2">
+            <Link href="/search" prefetch className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gold px-5 py-2.5 text-sm font-bold text-bg-primary shadow-lg shadow-gold/15 transition-colors hover:bg-gold-light">
+              {t("heroSearchAction")} <ArrowRight size={15} />
+            </Link>
+            <Link href={ctaHref} prefetch className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-bg-primary/50 px-5 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:border-gold hover:text-gold">
+              {isLoggedIn ? t("heroManageAction") : t("heroPresentAction")} <ArrowRight size={15} />
+            </Link>
+          </div>
+          <div className="max-w-xl mx-auto">
+            <HeroSearch />
+          </div>
+        </div>
+      </section>
+
+      {/* Finden: kompakte, direkte Einstiege in die bestehenden Verzeichnisse */}
+      <section className="py-8 sm:py-10" aria-labelledby="home-find-title">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-4">
+            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("findLabel")}</p>
+            <h2 id="home-find-title" className="font-display text-xl sm:text-2xl font-bold text-text-primary">{t("findTitle")}</h2>
+          </div>
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+            {findCards.map(({ title, description, href, icon: Icon }) => (
+              <Link key={href} href={href} className="group min-w-0 rounded-xl border border-border bg-bg-secondary/90 p-3.5 transition-colors hover:border-gold/40 sm:p-4">
+                <Icon size={18} className="mb-2 text-gold" />
+                <h3 className="text-sm font-semibold leading-snug text-text-primary group-hover:text-gold">{title}</h3>
+                <p className="mt-1 text-xs leading-relaxed text-text-muted">{description}</p>
+              </Link>
+            ))}
+            <div className="col-span-2 min-w-0 rounded-xl border border-border bg-bg-secondary/90 p-3.5 sm:p-4 lg:col-span-1">
+              <Film size={18} className="mb-2 text-gold" />
+              <h3 className="text-sm font-semibold leading-snug text-text-primary">{t("findJobsTitle")}</h3>
+              <p className="mt-1 text-xs leading-relaxed text-text-muted">{t("findJobsDescription")}</p>
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold">
+                <Link href="/jobs" className="inline-flex min-h-8 items-center gap-1 text-gold hover:text-gold-light">{t("findJobsLink")} <ArrowRight size={12} /></Link>
+                <Link href="/projects/alle" className="inline-flex min-h-8 items-center gap-1 text-gold hover:text-gold-light">{t("findProjectsLink")} <ArrowRight size={12} /></Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Anbieter verständlich ansprechen, ohne neue Produktwege zu erfinden */}
+      <section className="border-y border-border bg-bg-secondary/55 py-8 sm:py-10" aria-labelledby="home-offer-title">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-4">
+            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("offerLabel")}</p>
+            <h2 id="home-offer-title" className="font-display text-xl sm:text-2xl font-bold text-text-primary">{t("offerTitle")}</h2>
+          </div>
+          <div className="grid gap-3 md:grid-cols-3">
+            {[
+              { title: t("offerLocationTitle"), description: t("offerLocationDescription"), action: t("offerLocationAction"), href: isLoggedIn ? "/inserat" : "/sign-up", icon: MapPin },
+              { title: t("offerTalentTitle"), description: t("offerTalentDescription"), action: t("offerTalentAction"), href: isLoggedIn ? "/profile" : "/sign-up", icon: UsersRound },
+              { title: t("offerEquipmentTitle"), description: t("offerEquipmentDescription"), action: t("offerEquipmentAction"), href: isLoggedIn ? "/inserat" : "/sign-up", serviceAction: t("offerServicesAction"), serviceHref: isLoggedIn ? "/company-setup" : "/sign-up", icon: Package2 },
+            ].map(({ title, description, action, href, serviceAction, serviceHref, icon: Icon }) => (
+              <article key={title} className="min-w-0 rounded-xl border border-border bg-bg-primary/70 p-4 sm:p-5">
+                <Icon size={18} className="mb-2 text-gold" />
+                <h3 className="font-semibold text-text-primary">{title}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-text-muted">{description}</p>
+                <Link href={href} className="mt-3 inline-flex min-h-10 items-center gap-1.5 text-sm font-semibold text-gold hover:text-gold-light">{action} <ArrowRight size={14} /></Link>
+                {serviceAction && serviceHref && <Link href={serviceHref} className="mt-1 inline-flex min-h-10 items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-gold">{serviceAction} <ArrowRight size={14} /></Link>}
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <Suspense fallback={<div aria-hidden="true" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"><SkeletonBox className="mb-4 h-6 w-48" /><SkeletonBox className="h-28 w-full" /></div>}>
+        <HomeRecommendations viewerId={userId} />
+      </Suspense>
 
 
       <section className="border-y border-border bg-bg-secondary/55 py-8 sm:py-10" aria-labelledby="home-how-title">

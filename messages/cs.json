@@ -442,7 +442,8 @@
     "boardPageHeading": "Komunitní nástěnka",
     "boardPageDescription": "Pokládejte otázky, sdílejte doporučení a najděte správné lidi nebo zdroje. Příspěvky zůstávají viditelné až 2 dny.",
     "offerServicesAction": "Představit službu",
-    "ctaLoggedInDesc": "Pokračuj do své osobní sekce a k dalšímu projektu."
+    "ctaLoggedInDesc": "Pokračuj do své osobní sekce a k dalšímu projektu.",
+    "recommendationsUnavailable": "Doporučení jsou dočasně nedostupná. Vyhledávání a sekce výše můžeš dál používat."
   },
   "locations": {
     "heroTitle": "Perfektní lokace",

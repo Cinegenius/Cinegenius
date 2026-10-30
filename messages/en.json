@@ -442,7 +442,8 @@
     "boardPageHeading": "Community board",
     "boardPageDescription": "Ask questions, share recommendations, and find the right people or resources. Posts stay visible for up to 2 days.",
     "offerServicesAction": "Showcase a service",
-    "ctaLoggedInDesc": "Continue to your personal space and your next project."
+    "ctaLoggedInDesc": "Continue to your personal space and your next project.",
+    "recommendationsUnavailable": "Recommendations are temporarily unavailable. You can still use search and the sections above."
   },
   "locations": {
     "heroTitle": "The perfect location",

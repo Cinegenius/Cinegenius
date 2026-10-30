@@ -51,6 +51,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Guard explicit cancel/back/sign-out actions through `useFormNavigation` or `useFormRouter`. Preserve actual browser history; never add sentinel entries to intercept Back. Opening a section alone is not a content edit.
 - Never store passwords, session material, local preview URLs or File objects in recovery snapshots. Recheck current content-edit rights, preserve the last confirmed draft on errors, and never delete published media when discarding unsaved input.
 - Apply and verify `20261028180000_private_form_drafts.sql` before deploying the dependent recovery UI. No public content-table backfill is required.
+- Application-level RPC conflicts must use explicit HTTP SQLSTATEs such as `PT409`, never PostgreSQL transaction-retry codes `40001` or `40P01`. PostgREST may automatically repeat those transactions indefinitely when application input cannot change. Preserve expected-version checks, idempotency, account scope and service-only execution; do not replace a conflict with an unchecked write. Apply and verify `20261030150000_nonblocking_private_form_drafts.sql` before releasing its dependent recovery API. A busy snapshot must fail promptly and retain the last confirmed draft and unsaved input; never interpret failure as a saved acknowledgement.
 
 ## Optional photos
 

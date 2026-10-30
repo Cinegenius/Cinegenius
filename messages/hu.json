@@ -442,7 +442,8 @@
     "boardPageHeading": "Közösségi hirdetőtábla",
     "boardPageDescription": "Tegyél fel kérdéseket, ossz meg ajánlásokat, és találd meg a megfelelő embereket vagy eszközöket. A bejegyzések legfeljebb 2 napig láthatók.",
     "offerServicesAction": "Szolgáltatás bemutatása",
-    "ctaLoggedInDesc": "Folytasd a személyes felületeden és a következő projekteddel."
+    "ctaLoggedInDesc": "Folytasd a személyes felületeden és a következő projekteddel.",
+    "recommendationsUnavailable": "Az ajánlások átmenetileg nem érhetők el. A keresést és a fenti részeket továbbra is használhatod."
   },
   "locations": {
     "heroTitle": "A tökéletes helyszín",

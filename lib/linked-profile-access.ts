@@ -2,12 +2,14 @@ import "server-only";
 import { db } from "@/lib/db";
 
 /** Blocked sources are excluded before community pagination and file access. */
-export async function blockedMediaOwnerIds(viewerId: string | null): Promise<string[]> {
+export async function blockedMediaOwnerIds(viewerId: string | null, signal?: AbortSignal): Promise<string[]> {
   if (!viewerId) return [];
-  const [outgoing, incoming] = await Promise.all([
+  const queries = [
     db.from("blocks").select("blocked_id").eq("blocker_id", viewerId),
     db.from("blocks").select("blocker_id").eq("blocked_id", viewerId),
-  ]);
+  ] as const;
+  if (signal) queries.forEach(query => query.abortSignal(signal));
+  const [outgoing, incoming] = await Promise.all(queries);
   if (outgoing.error || incoming.error) throw new Error("Media block lookup unavailable");
   return [...new Set([...(outgoing.data ?? []).map(row => row.blocked_id), ...(incoming.data ?? []).map(row => row.blocker_id)])];
 }

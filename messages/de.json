@@ -442,7 +442,8 @@
     "boardPageHeading": "Das Schwarze Brett",
     "boardPageDescription": "Fragen stellen, Empfehlungen teilen und passende Menschen oder Dinge finden. Aushänge bleiben bis zu 2 Tage sichtbar.",
     "offerServicesAction": "Dienstleistung vorstellen",
-    "ctaLoggedInDesc": "Weiter zu deinem persönlichen Bereich und deinem nächsten Projekt."
+    "ctaLoggedInDesc": "Weiter zu deinem persönlichen Bereich und deinem nächsten Projekt.",
+    "recommendationsUnavailable": "Empfehlungen sind gerade nicht verfügbar. Du kannst die Suche und die Bereiche oben weiter nutzen."
   },
   "locations": {
     "heroTitle": "Die perfekte Location",
