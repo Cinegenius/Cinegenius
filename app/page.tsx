@@ -568,9 +568,9 @@ export default async function HomePage() {
           </div>
           <div className="max-w-xl mx-auto">
             <HeroSearch />
-            <div className="mt-2 flex justify-end"><AiDisclosureBadge source="/hero-bg.jpg" /></div>
           </div>
         </div>
+        <AiDisclosureBadge source="/hero-bg.jpg" subtle className="absolute bottom-0.5 right-4 z-10 sm:right-6 lg:right-8" />
       </section>
 
       {/* Finden: kompakte, direkte Einstiege in die bestehenden Verzeichnisse */}
