@@ -113,7 +113,9 @@ export async function resolveAdminSupportTarget(
       .select("user_id, display_name, slug, avatar_url")
       .eq("user_id", recipientUserId).maybeSingle();
     if (ownerError) throw new SupportTargetError("Firmenverantwortliche konnten nicht geprüft werden.", 500);
-    if (!owner) throw new SupportTargetError("Für diese Firma ist kein erreichbares Inhaberkonto hinterlegt.", 409);
+    if (!owner) return finishAccountOnlyTarget({
+      targetType, targetId, targetLabel, editUrl, recipientUserId, avatarUrl: null, companyName, missingFields, isDraft,
+    }, adminUserId);
     return finishTarget({
       targetType, targetId, targetLabel, editUrl, recipientUserId, profileName: owner.display_name,
       profileSlug: owner.slug, avatarUrl: owner.avatar_url, companyName, missingFields, isDraft,
@@ -146,7 +148,9 @@ export async function resolveAdminSupportTarget(
       .select("user_id, display_name, slug, avatar_url")
       .eq("user_id", recipientUserId).maybeSingle();
     if (ownerError) throw new SupportTargetError("Anbieterprofil konnte nicht geprüft werden.", 500);
-    if (!owner) throw new SupportTargetError("Das verantwortliche Firmenkonto besitzt kein erreichbares Profil.", 409);
+    if (!owner) return finishAccountOnlyTarget({
+      targetType, targetId, targetLabel, editUrl, recipientUserId, avatarUrl: null, companyName, listingTitle, missingFields, isDraft,
+    }, adminUserId);
     return finishTarget({
       targetType, targetId, targetLabel, editUrl, recipientUserId, profileName: owner.display_name,
       profileSlug: owner.slug, avatarUrl: company.logo_url ?? owner.avatar_url, companyName, listingTitle,
@@ -160,11 +164,30 @@ export async function resolveAdminSupportTarget(
     .select("user_id, display_name, slug, avatar_url")
     .eq("user_id", recipientUserId).maybeSingle();
   if (ownerError) throw new SupportTargetError("Anbieterprofil konnte nicht geprüft werden.", 500);
-  if (!owner) throw new SupportTargetError("Das Anbieterprofil ist nicht verfügbar.", 409);
+  if (!owner) return finishAccountOnlyTarget({
+    targetType, targetId, targetLabel, editUrl, recipientUserId, avatarUrl: null, listingTitle, missingFields, isDraft,
+  }, adminUserId);
   return finishTarget({
     targetType, targetId, targetLabel, editUrl, recipientUserId, profileName: owner.display_name,
     profileSlug: owner.slug, avatarUrl: owner.avatar_url, listingTitle, missingFields, isDraft,
   }, adminUserId);
+}
+
+/** A real responsible account is sufficient for support; a public person profile is optional. */
+async function finishAccountOnlyTarget(
+  input: Omit<Parameters<typeof finishTarget>[0], "profileName" | "profileSlug">, adminUserId: string,
+): Promise<AdminSupportTarget> {
+  const t = await getTranslations("AdminAccounts");
+  let member;
+  try { member = await (await clerkClient()).users.getUser(input.recipientUserId); }
+  catch (error) {
+    throw new SupportTargetError(t("accountLookupError"), (error as { status?: number }).status === 404 ? 404 : 503);
+  }
+  const name = [member.firstName, member.lastName].filter(Boolean).join(" ").trim();
+  return {
+    ...finishTarget({ ...input, profileName: name || t("unnamed"), profileSlug: null }, adminUserId),
+    recipientProfileUrl: null, firstName: member.firstName || null,
+  };
 }
 
 function finishTarget(
