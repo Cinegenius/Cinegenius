@@ -112,6 +112,7 @@ const isAdminRoute = createRouteMatcher(["/admin(.*)", "/api/admin(.*)"]);
 // Public page routes — no session required.
 const isPublicRoute = createRouteMatcher([
   "/",
+  "/manifest.webmanifest",
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/companies(.*)",

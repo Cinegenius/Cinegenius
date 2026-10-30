@@ -398,7 +398,6 @@ function ExternalProfilesDisplay({ profiles }: { profiles: ExternalProfileRow[] 
             entry.platform_type === "other" && entry.platform_name
               ? entry.platform_name
               : plat.name;
-          const faviconDomain = plat.urlHints[0] ?? null;
           return (
             <a
               key={entry.id}
@@ -407,18 +406,8 @@ function ExternalProfilesDisplay({ profiles }: { profiles: ExternalProfileRow[] 
               rel="noopener noreferrer"
               className="inline-flex min-h-11 min-w-0 max-w-full items-center gap-1.5 px-2.5 py-2 bg-bg-elevated border border-border rounded-lg text-xs text-text-secondary hover:border-gold/40 hover:text-gold transition-all group"
             >
-              {faviconDomain ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={`https://www.google.com/s2/favicons?domain=${faviconDomain}&sz=32`}
-                  alt=""
-                  width={14}
-                  height={14}
-                  className="w-3.5 h-3.5 rounded-sm shrink-0 opacity-80 group-hover:opacity-100"
-                  onError={(e) => { const el = e.target as HTMLImageElement; el.style.display = "none"; el.nextElementSibling?.classList.remove("hidden"); }}
-                />
-              ) : null}
-              <span className={`text-[10px] font-bold shrink-0 ${plat.textCls}${faviconDomain ? " hidden" : ""}`}>{plat.abbr}</span>
+              {/* Existing platform initials avoid third-party favicon redirects and preserve the fallback style. */}
+              <span className={`text-[10px] font-bold shrink-0 ${plat.textCls}`} aria-hidden="true">{plat.abbr}</span>
               <span className="min-w-0 [overflow-wrap:anywhere]">{displayName}{entry.custom_label ? ` · ${entry.custom_label}` : ""}</span>
               <ExternalLink size={9} className="shrink-0 opacity-40 group-hover:opacity-70" />
             </a>
