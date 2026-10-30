@@ -49,8 +49,12 @@ async function runAuthAction<T>(action: () => Promise<T>, setError: (message: st
   }
 }
 
-function finishNavigation(url: string, fallback: string) {
-  window.location.replace(resolveAuthNavigationUrl(url, window.location.origin, fallback));
+function finishNavigation(url: string, fallback: string, replace: (url: string) => void) {
+  const target = resolveAuthNavigationUrl(url, window.location.origin, fallback);
+  // Keep the document alive for ordinary routes. Clerk's external Safari ITP
+  // touch URL still needs a document navigation to establish its cookie.
+  if (target.startsWith("/")) replace(target);
+  else window.location.replace(target);
 }
 
 export default function AuthForm({ mode, destination, signUpDestination, signInDestination }: AuthFormProps) {
@@ -63,6 +67,7 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
   const t = useTranslations("auth");
   const { signIn, errors, fetchStatus } = useSignIn();
   const { isLoaded, isSignedIn } = useAuth();
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
@@ -97,8 +102,8 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
   const navigateOnce = useCallback((url: string) => {
     if (navigationStarted.current) return;
     navigationStarted.current = true;
-    finishNavigation(url, destination);
-  }, [destination]);
+    finishNavigation(url, destination, (target) => router.replace(target));
+  }, [destination, router]);
 
   const beginSubmission = () => {
     if (!signIn || busy || submissionInFlight.current) return false;
@@ -617,7 +622,7 @@ function SignUpForm({ destination, signInDestination }: { destination: string; s
       () => finalizeThenNavigate(
         (params) => signUp.finalize(params),
         destination,
-        (url) => finishNavigation(url, destination),
+        (url) => finishNavigation(url, destination, (target) => router.replace(target)),
       ),
       setError,
       "Konto konnte nicht abgeschlossen werden. Bitte versuche es erneut.",

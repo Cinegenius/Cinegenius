@@ -7,24 +7,23 @@ type FinalizeNavigation = {
 type FinalizeResult = { error: unknown | null };
 
 /**
- * Clerk invokes its navigation callback while finalizing the session. Capture
- * the Safari-aware URL there, but navigate only after finalize() resolves so
- * the new session cookie is active before the destination is requested.
+ * Clerk invokes navigate at its session commit point, before publishing the
+ * new auth state to observers. Navigate there, not after finalize resolves:
+ * otherwise the SDK can refresh the old route before our navigation starts.
  */
 export async function finalizeThenNavigate(
   finalize: (params: FinalizeNavigation) => Promise<FinalizeResult>,
   destination: string,
   navigate: (url: string) => void,
 ): Promise<FinalizeResult> {
-  let decoratedDestination = destination;
-  const result = await finalize({
+  let navigationStarted = false;
+  return finalize({
     navigate: ({ decorateUrl }) => {
-      decoratedDestination = decorateUrl(destination);
+      if (navigationStarted) return;
+      navigationStarted = true;
+      navigate(decorateUrl(destination));
     },
   });
-
-  if (!result.error) navigate(decoratedDestination);
-  return result;
 }
 
 /** Keep same-origin redirects on the app host while preserving Clerk's HTTPS ITP URL. */
