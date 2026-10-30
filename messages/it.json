@@ -1996,5 +1996,22 @@
     "limitBody": "Un download o un credito non concedono da soli diritti di utilizzo. Chi pubblica resta responsabile della correttezza della conferma.",
     "reportLink": "Chiarire o segnalare i diritti delle immagini",
     "email": "cinegenius.co@gmail.com"
+  },
+  "ContentUsageNotice": {
+    "configured": "La visibilità pubblica dipende dall’autorizzazione alla pubblicazione e dalle tue impostazioni. Il solo caricamento non pubblica una bozza privata.",
+    "short": "Le foto sono facoltative. Carica solo contenuti che hai il diritto di utilizzare qui.",
+    "details": "Utilizzo e visibilità",
+    "rights": "I diritti restano a te o ai rispettivi titolari. Rispetta anche i diritti delle persone ritratte e quelli sui loghi. CineGenius può archiviare, ridimensionare e distribuire immagini per le funzioni della piattaforma che scegli. La pubblicità esterna richiede un fondamento distinto.",
+    "learnMore": "Ulteriori informazioni sui diritti d’immagine",
+    "private": "Questa bozza e le sue immagini non sono pubbliche.",
+    "restricted": "Solo le persone autorizzate dalle tue impostazioni possono vedere questi contenuti. Sono esclusi dalla selezione pubblica della community.",
+    "pending": "Il contenuto inviato resta non pubblico fino all’approvazione.",
+    "public": {
+      "profile": "Le foto del profilo, le copertine e le foto caricate direttamente nel portfolio, se pubbliche, possono apparire anche nelle novità della community.",
+      "company": "I loghi, le copertine e le foto delle gallerie aziendali, se pubblici, possono apparire anche nelle novità della community.",
+      "offer": "Le immagini pubbliche degli annunci possono apparire negli elenchi e nei risultati di ricerca pertinenti. Sono escluse dalle novità della community.",
+      "project": "Le immagini pubbliche dei progetti possono apparire nelle viste dei progetti. Sono escluse dalle novità della community.",
+      "board": "Le immagini pubbliche dei post possono apparire con il post e negli elenchi pertinenti. Sono escluse dalle novità della community."
+    }
   }
 }

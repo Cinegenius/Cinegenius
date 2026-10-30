@@ -1,4 +1,5 @@
 "use client";
+import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import { useExistingDraftProtection } from "@/lib/use-form-draft";
 import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
@@ -550,6 +551,7 @@ export default function ProfileSetupWizard() {
   function renderPhotoInput(intent: QuickStartIntent, label: string) {
     const data = draft.sections[intent] ?? createQuickStartIntentData();
     return <div className="space-y-3">
+      <ContentUsageNotice context={intent === "company" ? "company" : intent === "crew" || intent === "talent" ? "profile" : "offer"} visibility="configured" />
       {data.imageUrl ? <div className="space-y-3"><Image src={data.imageUrl} alt={label} width={960} height={640} sizes="(max-width: 640px) 100vw, 720px" className="max-h-64 w-full rounded-xl border border-border object-contain" /><button type="button" onClick={() => updateSection(intent, { imageUrl: "" })} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm text-text-secondary"><Trash2 size={15} /> {t("copy0")}</button></div> : <label className={`flex min-h-40 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-bg-primary p-5 text-center hover:border-gold/50 ${uploading ? "pointer-events-none opacity-60" : ""}`}><ImagePlus className="text-gold" /><span className="text-sm font-medium text-text-primary">{uploading ? "Foto wird hochgeladen …" : label}</span><span className="text-xs text-text-muted">{t("copy1")}</span><input type="file" accept="image/jpeg,image/png,image/webp,image/heic" className="sr-only" onChange={(event) => { void upload(event.target.files?.[0], intent); event.currentTarget.value = ""; }} /></label>}
       {uploading && <p role="status" className="flex items-center gap-2 text-xs text-text-muted"><Loader2 size={14} className="animate-spin" /> {t("copy2")}</p>}
     </div>;

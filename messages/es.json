@@ -1996,5 +1996,22 @@
     "limitBody": "Una descarga o un crédito de imagen por sí solos no conceden derechos de uso. La persona que publica sigue siendo responsable de una confirmación correcta.",
     "reportLink": "Consultar o comunicar derechos de imagen",
     "email": "cinegenius.co@gmail.com"
+  },
+  "ContentUsageNotice": {
+    "configured": "La visibilidad pública depende de la publicación autorizada y de tus ajustes de visibilidad. Subir un archivo no publica por sí solo un borrador privado.",
+    "short": "Las fotos son opcionales. Sube solo contenido que tengas derecho a utilizar aquí.",
+    "details": "Uso y visibilidad",
+    "rights": "Tus derechos siguen siendo tuyos o de sus respectivos titulares. Respeta también los derechos de las personas que aparecen y los derechos sobre los logotipos. CineGenius puede almacenar, reducir y mostrar imágenes para las funciones de la plataforma que elijas. La publicidad externa requiere una base independiente.",
+    "learnMore": "Más sobre los derechos de imagen",
+    "private": "Este borrador y sus imágenes no son públicos.",
+    "restricted": "Solo las personas autorizadas según tus ajustes pueden ver este contenido. No aparece en la selección pública de la comunidad.",
+    "pending": "Tu propuesta no será pública hasta que se apruebe.",
+    "public": {
+      "profile": "Las fotos de perfil, portadas y fotos subidas directamente al portfolio que sean públicas también pueden aparecer en las novedades de la comunidad.",
+      "company": "Los logotipos, portadas y fotos de galería de empresas que sean públicos también pueden aparecer en las novedades de la comunidad.",
+      "offer": "Las imágenes públicas de anuncios pueden aparecer en los directorios y resultados de búsqueda correspondientes. No aparecen en las novedades de la comunidad.",
+      "project": "Las imágenes públicas de proyectos pueden aparecer en las vistas de proyectos. No aparecen en las novedades de la comunidad.",
+      "board": "Las imágenes públicas de publicaciones pueden aparecer con la publicación y en los listados correspondientes. No aparecen en las novedades de la comunidad."
+    }
   }
 }

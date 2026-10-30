@@ -1,4 +1,5 @@
 "use client";
+import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
 import { EMPTY_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, type ResponsiblePerson } from "@/lib/responsible-person";
@@ -565,6 +566,7 @@ export default function CompanySetupPage() {
             ) : (
               <>
 
+            <ContentUsageNotice context="company" visibility="configured" />
             {/* Logo */}
             <div className="flex flex-col items-center gap-3">
               <input id="logo-upload" ref={logoRef} type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,image/svg+xml" className="sr-only" onChange={(event) => { void handleSingleImageUpload(event.target.files?.[0], "logo"); event.currentTarget.value = ""; }} />

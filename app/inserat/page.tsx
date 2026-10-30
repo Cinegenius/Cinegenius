@@ -1,4 +1,5 @@
 "use client";
+import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { useTranslations } from "next-intl";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
@@ -1787,6 +1788,7 @@ export default function InseratPage() {
               )}
                 </>
               )}
+              <ContentUsageNotice context="offer" visibility="configured" />
             </div>
 
             {/* ── HINT ── */}

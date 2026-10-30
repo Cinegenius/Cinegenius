@@ -1,4 +1,5 @@
 "use client";
+import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { useTranslations, useLocale } from "next-intl";
 import OfferModerationStatus from "@/components/OfferModerationStatus";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
@@ -1859,6 +1860,7 @@ export default function DashboardPage() {
                         )}
                       </div>
                     </div>}
+                    <ContentUsageNotice context="offer" visibility="configured" />
 
                     {l.type === "location" && (
                       <div className="space-y-3 rounded-lg border border-border bg-bg-secondary p-3">

@@ -1996,5 +1996,22 @@
     "limitBody": "Stažení obrázku ani uvedení autora samo o sobě nezakládá právo k použití. Za správnost potvrzení odpovídá zveřejňující osoba.",
     "reportLink": "Vyjasnit nebo nahlásit práva k obrázku",
     "email": "cinegenius.co@gmail.com"
+  },
+  "ContentUsageNotice": {
+    "configured": "Veřejná viditelnost závisí na schválení zveřejnění a tvém nastavení viditelnosti. Samotné nahrání nezveřejní soukromý koncept.",
+    "short": "Fotografie jsou volitelné. Nahrávej pouze obsah, který zde smíš používat.",
+    "details": "Použití a viditelnost",
+    "rights": "Práva zůstávají tobě nebo příslušným držitelům práv. Respektuj také práva zobrazených osob a práva k logům. CineGenius smí obrázky ukládat, zmenšovat a poskytovat pro zvolené funkce platformy. Externí reklama vyžaduje samostatný právní základ.",
+    "learnMore": "Více o právech k obrázkům",
+    "private": "Tento koncept a jeho obrázky nejsou veřejné.",
+    "restricted": "Tento obsah vidí pouze osoby oprávněné podle tvého nastavení. Do veřejného výběru komunity není zařazen.",
+    "pending": "Odeslaný obsah zůstává neveřejný až do schválení.",
+    "public": {
+      "profile": "Veřejné profilové a titulní fotografie a fotografie nahrané přímo do portfolia se mohou objevit také v novinkách z komunity.",
+      "company": "Veřejná firemní loga, titulní fotografie a fotografie z firemních galerií se mohou objevit také v novinkách z komunity.",
+      "offer": "Veřejné obrázky nabídek se mohou zobrazovat v příslušných přehledech a výsledcích vyhledávání. Do novinek z komunity nepatří.",
+      "project": "Veřejné obrázky projektů se mohou zobrazovat v přehledech projektů. Do novinek z komunity nepatří.",
+      "board": "Veřejné obrázky příspěvků se mohou zobrazovat u příspěvku a v příslušných přehledech. Do novinek z komunity nepatří."
+    }
   }
 }

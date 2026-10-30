@@ -1996,5 +1996,22 @@
     "limitBody": "A download or an image credit alone does not grant usage rights. The publishing person remains responsible for an accurate confirmation.",
     "reportLink": "Clarify or report image rights",
     "email": "cinegenius.co@gmail.com"
+  },
+  "ContentUsageNotice": {
+    "configured": "Public visibility depends on publication approval and your visibility settings. Uploading alone does not publish a private draft.",
+    "short": "Photos are optional. Only upload content you are allowed to use here.",
+    "details": "Use and visibility",
+    "rights": "Your rights remain with you or the respective rights holders. Also respect the rights of people shown and rights in logos. CineGenius may store, resize and deliver images for the platform features you choose. External advertising requires a separate basis.",
+    "learnMore": "More about image rights",
+    "private": "This draft and its images are not public.",
+    "restricted": "Only people authorised by your settings can see this content. It is excluded from public Community discovery.",
+    "pending": "Your submission stays non-public until approved.",
+    "public": {
+      "profile": "Public profile photos, covers and directly uploaded portfolio photos may also appear in Community insights.",
+      "company": "Public company logos, covers and gallery photos may also appear in Community insights.",
+      "offer": "Public listing images may appear in relevant directories and search results. They are excluded from Community insights.",
+      "project": "Public project images may appear in project views. They are excluded from Community insights.",
+      "board": "Public post images may appear with the post and in relevant directories. They are excluded from Community insights."
+    }
   }
 }

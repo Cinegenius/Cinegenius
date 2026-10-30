@@ -1996,5 +1996,22 @@
     "limitBody": "Ein Download oder ein Bildnachweis allein verleiht keine Nutzungsrechte. Die Verantwortung für eine zutreffende Bestätigung bleibt bei der veröffentlichenden Person.",
     "reportLink": "Bildrechte klären oder melden",
     "email": "cinegenius.co@gmail.com"
+  },
+  "ContentUsageNotice": {
+    "configured": "Welche Inhalte öffentlich erscheinen, richtet sich nach ihrer Freigabe und deinen Sichtbarkeitseinstellungen. Ein Upload allein veröffentlicht keinen privaten Entwurf.",
+    "short": "Fotos sind freiwillig. Lade nur Inhalte hoch, die du hier verwenden darfst.",
+    "details": "Nutzung und Sichtbarkeit",
+    "rights": "Deine Rechte bleiben bei dir beziehungsweise den Rechteinhabern. Beachte auch Rechte abgebildeter Personen und an Logos. CineGenius darf Bilder für die gewählten Plattformfunktionen speichern, verkleinern und ausliefern. Externe Werbung benötigt eine gesonderte Grundlage.",
+    "learnMore": "Mehr zu Bildrechten",
+    "private": "Dieser Entwurf und seine Bilder sind nicht öffentlich.",
+    "restricted": "Nur die nach deinen Einstellungen berechtigten Personen können diese Inhalte sehen. Sie erscheinen nicht in der öffentlichen Community-Auswahl.",
+    "pending": "Deine Einreichung bleibt bis zur Freigabe nicht öffentlich.",
+    "public": {
+      "profile": "Öffentliche Profilfotos, Cover und direkt hochgeladene Portfoliofotos können auch in „Frische Einblicke“ erscheinen.",
+      "company": "Öffentliche Firmenlogos, Cover und Galeriefotos können auch in „Frische Einblicke“ erscheinen.",
+      "offer": "Öffentliche Angebotsbilder können in passenden Übersichten und Suchergebnissen erscheinen. Sie gehören nicht in „Frische Einblicke“.",
+      "project": "Öffentliche Projektbilder können in Projektansichten erscheinen. Sie gehören nicht in „Frische Einblicke“.",
+      "board": "Öffentliche Beitragsbilder können beim Beitrag und in passenden Übersichten erscheinen. Sie gehören nicht in „Frische Einblicke“."
+    }
   }
 }

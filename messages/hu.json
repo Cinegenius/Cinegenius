@@ -1996,5 +1996,22 @@
     "limitBody": "A letöltés vagy a forrásmegjelölés önmagában nem ad felhasználási jogot. A közzétevő felel a nyilatkozat helyességéért.",
     "reportLink": "Képjogok tisztázása vagy bejelentése",
     "email": "cinegenius.co@gmail.com"
+  },
+  "ContentUsageNotice": {
+    "configured": "A nyilvános láthatóság a közzététel engedélyezésétől és a láthatósági beállításaidtól függ. A feltöltés önmagában nem tesz közzé privát piszkozatot.",
+    "short": "A fotók megadása nem kötelező. Csak olyan tartalmat tölts fel, amelyet jogosult vagy itt használni.",
+    "details": "Felhasználás és láthatóság",
+    "rights": "A jogaid nálad, illetve az adott jogosultaknál maradnak. Tartsd tiszteletben a képen szereplő személyek és a logók jogosultjainak jogait is. A CineGenius a választott platformfunkciókhoz tárolhatja, átméretezheti és megjelenítheti a képeket. A külső reklámcélú használathoz külön jogalap szükséges.",
+    "learnMore": "További információ a képekhez kapcsolódó jogokról",
+    "private": "Ez a piszkozat és a képei nem nyilvánosak.",
+    "restricted": "Ezt a tartalmat csak a beállításaid szerint jogosult személyek láthatják. Nem kerül a nyilvános közösségi válogatásba.",
+    "pending": "A beküldött tartalom a jóváhagyásig nem nyilvános.",
+    "public": {
+      "profile": "A nyilvános profilképek, borítóképek és közvetlenül a portfólióba feltöltött fotók a közösségi betekintések között is megjelenhetnek.",
+      "company": "A nyilvános céges logók, borítóképek és galériafotók a közösségi betekintések között is megjelenhetnek.",
+      "offer": "A nyilvános hirdetésképek a kapcsolódó listákban és keresési találatokban jelenhetnek meg. Nem kerülnek a közösségi betekintések közé.",
+      "project": "A nyilvános projektképek a projektnézetekben jelenhetnek meg. Nem kerülnek a közösségi betekintések közé.",
+      "board": "A nyilvános bejegyzésképek a bejegyzésnél és a kapcsolódó listákban jelenhetnek meg. Nem kerülnek a közösségi betekintések közé."
+    }
   }
 }

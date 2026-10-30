@@ -1,4 +1,5 @@
 "use client";
+import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 
 import { useFormDraft } from "@/lib/use-form-draft";
@@ -1662,6 +1663,7 @@ export default function ProfilePage() {
                 )}
 
                 {editorStep === 4 && !draftLoading && !draftLoadError && <div className="space-y-6">
+                <ContentUsageNotice context="profile" visibility="configured" />
                 <div className="rounded-xl border border-border bg-bg-secondary p-4 sm:p-6">
                   <div className="mb-2 flex items-center justify-between gap-3"><label htmlFor="profile-bio" className="text-sm font-semibold text-text-primary">{t("fieldBio")}</label><span className="text-xs text-text-muted">Optional</span></div>
                   <textarea id="profile-bio" rows={4} value={form.bio ?? ""} onChange={(e) => setForm((p) => ({ ...p, bio: e.target.value }))} maxLength={500} placeholder="Ein paar Sätze zu dir und deiner Arbeit …" className="w-full resize-y rounded-lg border border-border bg-bg-elevated px-3 py-2.5 text-sm focus:border-gold focus:outline-none" />
