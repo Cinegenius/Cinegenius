@@ -29,3 +29,15 @@ Eine quantitative Vorher-/Nachher-Messung des automatischen Prefetch-Volumens li
 Der vollständige echte Safari-Ab-/Anmeldevorgang nach diesem Schritt ist noch nicht als bestanden dokumentiert. Der bisherige Nutzer-Test bestätigte funktionierende An-/Abmeldung, aber eben diese neuen RSC-Einträge. Keine pauschale Aussage, dass sämtliche WebKit-Abbruchmeldungen beseitigt seien. Reale mobile Gerätetests und ein neuer Kontowechsel wurden in diesem Nachschritt nicht durchgeführt.
 
 Primärgrundlage: installierte Next.js-Dokumentation `node_modules/next/dist/docs/01-app/02-guides/prefetching.md` und `03-api-reference/02-components/link.md`: `prefetch={false}` verhindert automatisches Vorausladen; die normale Linknavigation bleibt bestehen.
+
+## Gemeinsamer Safari-Test am Morgen und verbleibender privater Link
+
+Der Nutzer hat An- und Abmeldung anschließend bewusst getrennt durchgeführt. Nach „angemeldet“: `/dashboard`, keine roten Konsoleneinträge, drei Schriftlade-Warnungen. Im begrenzten Server-Prüffenster ab 07:56:50 UTC antworteten Dashboard und beide Inbox-Endpunkte ausschließlich mit 200 (18 Notifications-, 17 Unread- und drei Dashboard-Antworten). Die Abfrage ist zeit-/deploymentbegrenzt, kein Protokoll aller Konten oder aller vorherigen Schritte.
+
+Nach dem getrennten Abmelden: öffentliche Startseite mit Anmelden-/Registrierungslinks; Safari-Konsole ab 09:00:34 Europe/Berlin enthält **genau eine** verbliebene `Fetch API cannot load`-Meldung zu `/dashboard?tab=listings&_rsc=...`. Dieser konkrete Fall stammt aus der weiterhin automatisch vorausladenden gemeinsamen persönlichen Navigation. Der Anmeldeschritt und der Fehler beim Abmelden werden deshalb nicht mehr gleichgesetzt.
+
+Zusätzliche minimale Korrektur: `components/PersonalAreaNavigation.tsx` setzt `prefetch={false}` an den drei gemeinsam gerenderten Linkstellen (Hauptziele für Desktop/Mobil, zusätzliche Bereiche, Sicherheit). Links, aktuelle Auswahl, Nachrichtenanzeige, Rechte, Entwurfsschutz und tatsächliche Navigation bleiben unverändert. Keine weiteren Änderungen an Clerk, CSP, Weiterleitungen oder Datenbank. Keine Annahme, ein Umbenennen des Fehlers oder eine breite CORS-Freigabe würde die Ursache lösen.
+
+`lib/auth-prefetch.test.mjs` rendert jetzt auch die tatsächliche persönliche Navigation für alle sechs Sprachen mit geschlossenem und geöffnetem Mehr-Menü. Alle acht Desktop-/Mobil-Hauptlinks und die neun zusätzlichen Ziele bleiben erreichbar und laden keine privaten Seiten spekulativ vor. Auf öffentlichen/Auth-Seiten erscheint diese Navigation weiterhin nicht. 450 gezielte Tests, TypeScript, ESLint, Sprachprüfung und Produktionsbuild bestanden.
+
+Der vollständige erneute Safari-Abmeldevorgang nach dieser zusätzlichen privaten Navigationskorrektur ist vor Veröffentlichung noch offen. Der vom Nutzer bereits tatsächlich durchgeführte Ablauf ist oben dokumentiert; er wird nicht nachträglich als fehlerfrei umgedeutet.

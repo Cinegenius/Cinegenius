@@ -96,6 +96,7 @@ function AreaNavigation({ pathname, dashboardTab }: { pathname: string; dashboar
           <Link
             key={id}
             href={href}
+            prefetch={false}
             aria-current={active ? "page" : undefined}
             onClick={() => setMoreOpen(false)}
             className={mobile
@@ -164,6 +165,7 @@ function AreaNavigation({ pathname, dashboardTab }: { pathname: string; dashboar
                 <Link
                   key={href}
                   href={href}
+                  prefetch={false}
                   onClick={() => setMoreOpen(false)}
                   className="flex min-h-12 items-center gap-2 rounded-xl border border-border bg-bg-elevated px-3 py-2 text-sm text-text-secondary transition-colors hover:border-gold/40 hover:text-gold"
                 >
@@ -173,6 +175,7 @@ function AreaNavigation({ pathname, dashboardTab }: { pathname: string; dashboar
               ))}
               <Link
                 href="/profile?tab=security"
+                prefetch={false}
                 onClick={() => setMoreOpen(false)}
                 className="flex min-h-12 items-center gap-2 rounded-xl border border-border bg-bg-elevated px-3 py-2 text-sm text-text-secondary transition-colors hover:border-gold/40 hover:text-gold"
               >
