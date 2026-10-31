@@ -4,7 +4,7 @@
 
 The studio `9f17db40-f9b5-4f0e-b759-aae87c8aef18` has a correctly bound responsible account and structured name, but its stored responsibility snapshot has `public:false`. The public page therefore displayed the generic contact label. This real offer was only inspected; no name or visibility flag was changed.
 
-The Volvo example supplied by the operator has an identified provider profile but an empty separate contact snapshot. The admin view previously showed an empty contact heading followed by a private-name warning. The view now falls back to the verified same-account provider name and distinguishes that provider association from separately private contact data. No Volvo data was changed.
+The Volvo example supplied by the operator has an identified provider profile but an empty separate contact snapshot. The admin view previously showed an empty contact heading followed by a private-name warning. The view now falls back to the verified same-account provider name, avoids an incorrect missing-name advisory when that identity is already present, and distinguishes that provider association from separately private contact data. No Volvo data was changed.
 
 ## Changes
 

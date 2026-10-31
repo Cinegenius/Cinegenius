@@ -46,6 +46,10 @@ export async function loadAdminReview(rawKind: string, rawId: string) {
   const snapshot = responsiblePersonDraft(record.responsible_person);
   const storedResponsible = reviewObject(record.responsible_person);
   const responsibleUser = text(storedResponsible.userId);
+  const providerPersonName = text(providerProfile?.display_name);
+  const linkedProviderName = responsibleUser && responsibleUser === userId && providerPersonName && !providerPersonName.includes("@") ? providerPersonName : null;
+  const responsibilityErrors = responsiblePersonErrors(snapshot);
+  if (linkedProviderName) { delete responsibilityErrors.firstName; delete responsibilityErrors.lastName; }
   const title = text(item.title) || text(item.name) || text(item.display_name) || "";
   const companySlug = text(providerCompany?.slug);
   const publicHref = kind === "listing" ? listingDetailPath(String(record.type ?? ""), id, companySlug)
@@ -66,7 +70,7 @@ export async function loadAdminReview(rawKind: string, rawId: string) {
     }
     if (!publicHref) blockingIssues.push("route");
     if (!userId || (companyId && (!providerCompany || providerCompany.published !== true || !companySlug))) blockingIssues.push("provider");
-    if (Object.keys(responsiblePersonErrors(snapshot)).length || !responsibleUser) issues.push("responsible");
+    if (Object.keys(responsibilityErrors).length || !responsibleUser) issues.push("responsible");
     if (!companyId && responsibleUser && responsibleUser !== userId) blockingIssues.push("responsibleOwnership");
   }
   if (kind === "company_equipment") {
@@ -87,7 +91,7 @@ export async function loadAdminReview(rawKind: string, rawId: string) {
     createdAt: text(record.created_at), updatedAt: text(record.updated_at),
     fields: reviewFields(kind, record),
     images: images.map((reference, index) => ({ src: `${base}?index=${index}&ref=${reviewRevision(reference)}`, number: index + 1 })),
-    responsible: responsibleUser ? { name: [snapshot.firstName, snapshot.lastName].filter(Boolean).join(" "), function: snapshot.function === "other" ? snapshot.customFunction : snapshot.function, userId: responsibleUser, public: snapshot.public } : null,
+    responsible: responsibleUser ? { name: snapshot.profileName || [snapshot.firstName, snapshot.lastName].filter(Boolean).join(" ") || linkedProviderName || "", function: snapshot.function === "other" ? snapshot.customFunction : snapshot.function, userId: responsibleUser, public: snapshot.public } : null,
     provider: { name: text(providerCompany?.name) || text(providerProfile?.display_name) || (responsibleUser === userId ? text([snapshot.firstName, snapshot.lastName].filter(Boolean).join(" ")) : null), userId,
       href: userId && providerProfile ? reviewPath("profile", userId) : null,
       companyHref: providerCompany ? reviewPath("company", String(providerCompany.id)) : null },
