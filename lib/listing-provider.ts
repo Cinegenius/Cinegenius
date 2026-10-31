@@ -74,8 +74,8 @@ export async function getListingProvider(
 }
 
 export async function getListingProviders(
-  listings: Array<{ user_id?: string | null; company_id?: string | null }>,
+  listings: Array<{ user_id?: string | null; company_id?: string | null; responsible_person?: unknown }>,
   viewerId: string | null = null,
 ): Promise<ListingProvider[]> {
-  return Promise.all(listings.map((listing) => getListingProvider(listing.user_id, listing.company_id, viewerId)));
+  return Promise.all(listings.map((listing) => getListingProvider(listing.user_id, listing.company_id, viewerId, listing.responsible_person)));
 }

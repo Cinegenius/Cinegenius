@@ -2,7 +2,7 @@
 import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
-import { EMPTY_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, type ResponsiblePerson } from "@/lib/responsible-person";
+import { NEW_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, type ResponsiblePerson } from "@/lib/responsible-person";
 
 
 import { useTranslations } from "next-intl";
@@ -70,7 +70,7 @@ export default function CompanySetupPage() {
   const optionalMedia = useTranslations("OptionalMedia");
   const { isLoaded, user } = useUser();
   const tDraft = useTranslations("FormDraft");
-  const [responsible, setResponsible] = useState<ResponsiblePerson>(EMPTY_RESPONSIBLE_PERSON);
+  const [responsible, setResponsible] = useState<ResponsiblePerson>(NEW_RESPONSIBLE_PERSON);
   const [responsibleErrors, setResponsibleErrors] = useState<Record<string, string>>({});
   const [responsibleAccountId, setResponsibleAccountId] = useState<string | null>(null);
   const router = useRouter();

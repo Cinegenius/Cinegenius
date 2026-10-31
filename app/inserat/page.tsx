@@ -3,7 +3,7 @@ import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { useTranslations } from "next-intl";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
-import { EMPTY_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, marketplaceResponsibleErrors, type ResponsiblePerson } from "@/lib/responsible-person";
+import { NEW_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, marketplaceResponsibleErrors, type ResponsiblePerson } from "@/lib/responsible-person";
 
 import ListingPriceOptions from "@/components/ListingPriceOptions";
 
@@ -320,7 +320,7 @@ export default function InseratPage() {
   const [createdPublished, setCreatedPublished] = useState(false);
   const router = useRouter();
   const { userId, isLoaded } = useAuth();
-  const [responsible, setResponsible] = useState<ResponsiblePerson>(EMPTY_RESPONSIBLE_PERSON);
+  const [responsible, setResponsible] = useState<ResponsiblePerson>(NEW_RESPONSIBLE_PERSON);
   const [responsibleErrors, setResponsibleErrors] = useState<Record<string, string>>({});
 
   const LOCATION_ROOMS: Record<string, [string, string][]> = {

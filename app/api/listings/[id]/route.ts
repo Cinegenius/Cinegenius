@@ -56,7 +56,7 @@ export async function PATCH(
     ? await (await import("@/lib/responsible-person-server")).validateMarketplaceResponsiblePerson(body.responsible_person ?? current.responsible_person, responsibleAccountId, current.published === true && published !== false)
     : await validateResponsiblePerson(body.responsible_person ?? current.responsible_person, responsibleAccountId, false, current.published === true && published !== false);
   if (responsible.response) return responsible.response;
-  if (userId !== responsibleAccountId && body.responsible_person !== undefined && JSON.stringify(responsible.person) !== JSON.stringify(bindResponsiblePerson(current.responsible_person, responsibleAccountId))) {
+  if (userId !== responsibleAccountId && body.responsible_person !== undefined && JSON.stringify(bindResponsiblePerson(responsible.person, responsibleAccountId)) !== JSON.stringify(bindResponsiblePerson(current.responsible_person, responsibleAccountId))) {
     return NextResponse.json({ error: (await getTranslations("responsiblePerson"))("unauthorized"), field: "responsible_person" }, { status: 403 });
   }
   const marketplace = current.type === "prop" || current.type === "vehicle";

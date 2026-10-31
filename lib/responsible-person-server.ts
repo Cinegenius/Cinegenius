@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { hasProfileBasics } from "@/lib/profile-setup-flow";
 import { db } from "@/lib/db";
 import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
-import { bindResponsiblePerson, EMPTY_RESPONSIBLE_PERSON, responsiblePersonErrors, type StoredResponsiblePerson } from "@/lib/responsible-person";
+import { ACCOUNT_RESPONSIBLE_PERSON_KEY, responsibleAccountName, responsiblePersonDraft, bindResponsiblePerson, EMPTY_RESPONSIBLE_PERSON, responsiblePersonErrors, type StoredResponsiblePerson } from "@/lib/responsible-person";
 
 export async function accountResponsiblePerson(userId: string) {
   try {
@@ -14,7 +14,25 @@ export async function accountResponsiblePerson(userId: string) {
       db.from("profiles").select("display_name,location,positions,role,profile_type,profile_types").eq("user_id", userId).maybeSingle(),
     ]);
     const profileName = !profile.error && profile.data && hasProfileBasics(profile.data) && !profile.data.display_name?.includes("@") ? profile.data.display_name.trim() : undefined;
-    return { ...EMPTY_RESPONSIBLE_PERSON, firstName: user?.firstName ?? "", lastName: user?.lastName ?? "", ...(profileName ? { profileName } : {}) };
+    const saved = responsibleAccountName(user?.privateMetadata?.[ACCOUNT_RESPONSIBLE_PERSON_KEY])
+      ?? responsibleAccountName(user);
+    // Recover only an unambiguous, structured name already bound to this account.
+    // Never derive a person's name from an email, company title or technical creator.
+    let name = saved;
+    if (!name) {
+      const [offers, companies] = await Promise.all([
+        db.from("listings").select("responsible_person").eq("user_id", userId).limit(100),
+        db.from("companies").select("responsible_person").eq("owner_user_id", userId).limit(100),
+      ]);
+      const names = new Map<string, { firstName: string; lastName: string }>();
+      if (!offers.error && !companies.error) for (const row of [...(offers.data ?? []), ...(companies.data ?? [])]) {
+        if (row.responsible_person?.userId !== userId) continue;
+        const candidate = responsibleAccountName(row.responsible_person);
+        if (candidate) names.set(JSON.stringify(candidate), candidate);
+      }
+      if (names.size === 1 && (offers.data?.length ?? 0) < 100 && (companies.data?.length ?? 0) < 100) name = [...names.values()][0];
+    }
+    return { ...EMPTY_RESPONSIBLE_PERSON, ...(name ?? {}), ...(profileName ? { profileName } : {}) };
   } catch {
     // Prefilling is optional. Identity still comes from the verified session;
     // unavailable account names must not break the offer list or erase a draft.
@@ -29,13 +47,23 @@ export async function validateResponsiblePerson(value: unknown, userId: string, 
     const t = await getTranslations("responsiblePerson");
     return { response: NextResponse.json({ error: t("unauthorized"), field: "responsible_person" }, { status: 403 }) };
   }
-  const input = value === undefined ? await accountResponsiblePerson(userId) : value;
+  let input = value === undefined ? await accountResponsiblePerson(userId) : value;
+  // A browser may request reuse, but only the server may resolve the profile name.
+  const requested = responsiblePersonDraft(input);
+  if (requested.profileName || (required && !requested.firstName && !requested.lastName)) {
+    const account = await accountResponsiblePerson(userId);
+    input = { ...requested,
+      ...(!requested.firstName && !requested.lastName ? { firstName: account.firstName, lastName: account.lastName } : {}),
+      profileName: account.profileName,
+    };
+  }
   const errors = responsiblePersonErrors(input, company);
   if (Object.keys(errors).length && required) {
     const t = await getTranslations("responsiblePerson");
     return { response: NextResponse.json({ error: t("required"), fieldErrors: Object.fromEntries(Object.entries(errors).map(([field, key]) => [field, t(key)])), field: "responsible_person" }, { status: 400 }) };
   }
-  return { person: bindResponsiblePerson(input, userId) };
+  const profileName = input && typeof input === "object" && "profileName" in input && typeof input.profileName === "string" ? input.profileName : undefined;
+  return { person: { ...bindResponsiblePerson(input, userId), ...(profileName ? { profileName } : {}) } };
 }
 
 export type PublicResponsiblePerson = { name: string; function: string; customFunction: string; href: string | null };

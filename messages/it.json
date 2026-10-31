@@ -1391,7 +1391,23 @@
       "rental": "Noleggio",
       "other": "Altra funzione"
     },
-    "unauthorized": "Solo la persona responsabile o il titolare autorizzato dell’azienda può modificare questa assegnazione."
+    "unauthorized": "Solo la persona responsabile o il titolare autorizzato dell’azienda può modificare questa assegnazione.",
+    "accountName": "Il tuo nome",
+    "useName": "Usa questo nome",
+    "editName": "Modifica nome",
+    "accountReuse": "Salvato una volta nell’account e riutilizzato nelle tue altre offerte. Non serve un profilo della troupe.",
+    "publicPreview": "Offerto da {name}: questo nome sarà pubblico al momento della pubblicazione.",
+    "publicBeforeSave": "Alla pubblicazione, il nome indicato qui compare come referente.",
+    "keptPrivate": "Questo nome è stato salvato come privato e resta nascosto finché non confermi.",
+    "showName": "Mostra questo nome pubblicamente",
+    "contactPrivacy": "Questo non pubblica il tuo indirizzo email o numero di telefono.",
+    "functionOptions": "Funzione e visibilità (facoltativo)",
+    "hideName": "Usa questo nome solo internamente",
+    "accountSaving": "Salvataggio del nome dell’account…",
+    "accountSaved": "Nome dell’account salvato",
+    "accountSaveError": "Impossibile salvare il nome nel tuo account. I dati inseriti vengono conservati. Riprova.",
+    "retry": "Riprova",
+    "providerContact": "La persona responsabile è collegata all’account del fornitore indicato sopra. I dati del referente salvati separatamente restano privati."
   },
   "AdminReview": {
     "open": "Visualizza tutto / Esamina",

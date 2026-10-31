@@ -1391,7 +1391,23 @@
       "rental": "Rental",
       "other": "Other function"
     },
-    "unauthorized": "Only the responsible person or an authorized company owner may change this assignment."
+    "unauthorized": "Only the responsible person or an authorized company owner may change this assignment.",
+    "accountName": "Your name",
+    "useName": "Use this name",
+    "editName": "Change name",
+    "accountReuse": "Saved once in your account and reused for your other offers. No crew profile needed.",
+    "publicPreview": "Offered by {name} – this name will be public when published.",
+    "publicBeforeSave": "When published, the name entered here is shown as the contact person.",
+    "keptPrivate": "This name was saved privately and remains hidden until you confirm.",
+    "showName": "Show this name publicly",
+    "contactPrivacy": "This does not publish your email address or phone number.",
+    "functionOptions": "Role and visibility (optional)",
+    "hideName": "Use this name internally only",
+    "accountSaving": "Saving account name …",
+    "accountSaved": "Account name saved",
+    "accountSaveError": "The name could not be saved to your account. Your entries are kept. Please try again.",
+    "retry": "Try again",
+    "providerContact": "The responsible person is linked to the provider account above. Separately saved contact person details remain private."
   },
   "AdminReview": {
     "open": "View fully / Review",

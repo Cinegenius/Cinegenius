@@ -1391,7 +1391,23 @@
       "rental": "Pronájem",
       "other": "Jiná funkce"
     },
-    "unauthorized": "Toto přiřazení může změnit pouze odpovědná osoba nebo oprávněný majitel firmy."
+    "unauthorized": "Toto přiřazení může změnit pouze odpovědná osoba nebo oprávněný majitel firmy.",
+    "accountName": "Tvé jméno",
+    "useName": "Použít toto jméno",
+    "editName": "Změnit jméno",
+    "accountReuse": "Stačí uložit do účtu jednou. Jméno se použije i pro tvé další nabídky. Profil člena štábu není potřeba.",
+    "publicPreview": "Nabízí {name} – toto jméno bude po zveřejnění veřejné.",
+    "publicBeforeSave": "Po zveřejnění se zde zadané jméno zobrazí jako kontaktní osoba.",
+    "keptPrivate": "Toto jméno bylo uloženo jako soukromé a bez tvého potvrzení zůstane skryté.",
+    "showName": "Zobrazit toto jméno veřejně",
+    "contactPrivacy": "Tvůj e-mail ani telefonní číslo se tím nezveřejní.",
+    "functionOptions": "Funkce a viditelnost (volitelné)",
+    "hideName": "Používat toto jméno pouze interně",
+    "accountSaving": "Ukládání jména do účtu…",
+    "accountSaved": "Jméno uloženo do účtu",
+    "accountSaveError": "Jméno se nepodařilo uložit do účtu. Zadané údaje zůstávají zachovány. Zkus to znovu.",
+    "retry": "Zkusit znovu",
+    "providerContact": "Odpovědná osoba je propojena s výše uvedeným účtem poskytovatele. Samostatně uložené údaje kontaktní osoby zůstávají soukromé."
   },
   "AdminReview": {
     "open": "Zobrazit vše / Zkontrolovat",

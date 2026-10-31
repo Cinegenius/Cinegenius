@@ -206,8 +206,11 @@ export async function POST(req: NextRequest) {
     const responsibleAccountId = activeResponsible?.userId || existing.owner_user_id;
     const responsible = await validateResponsiblePerson(body.responsible_person ?? activeResponsible ?? undefined, responsibleAccountId, true);
     if (responsible.response) return responsible.response;
+    if (userId !== responsibleAccountId && activeResponsible?.public === false && responsible.person?.public === true) {
+      return NextResponse.json({ error: (await getTranslations("responsiblePerson"))("unauthorized"), field: "responsible_person" }, { status: 403 });
+    }
     // Editors preserve the existing contact; changing public function never grants rights.
-    if (userId !== responsibleAccountId && userId !== existing.owner_user_id && body.responsible_person !== undefined && JSON.stringify(responsible.person) !== JSON.stringify(bindResponsiblePerson(existing.responsible_person, responsibleAccountId))) {
+    if (userId !== responsibleAccountId && userId !== existing.owner_user_id && body.responsible_person !== undefined && JSON.stringify(bindResponsiblePerson(responsible.person, responsibleAccountId)) !== JSON.stringify(bindResponsiblePerson(existing.responsible_person, responsibleAccountId))) {
       return NextResponse.json({ error: (await getTranslations("responsiblePerson"))("unauthorized"), field: "responsible_person" }, { status: 403 });
     }
     const storageUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";

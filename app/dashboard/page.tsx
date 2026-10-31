@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import OfferModerationStatus from "@/components/OfferModerationStatus";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
-import { EMPTY_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, marketplaceResponsibleErrors, type ResponsiblePerson } from "@/lib/responsible-person";
+import { NEW_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, marketplaceResponsibleErrors, type ResponsiblePerson } from "@/lib/responsible-person";
 
 import MarketplaceOfferFields from "@/components/MarketplaceOfferFields";
 import { marketplaceDraft, marketplaceMetadataPatch, serializeMarketplaceDraft, validateMarketplaceOffer } from "@/lib/marketplace-offer";
@@ -247,7 +247,7 @@ export default function DashboardPage() {
     setMyListings((prev) => prev.filter((l) => l.id !== id));
   };
 
-  const [editResponsible, setEditResponsible] = useState<ResponsiblePerson>(EMPTY_RESPONSIBLE_PERSON);
+  const [editResponsible, setEditResponsible] = useState<ResponsiblePerson>(NEW_RESPONSIBLE_PERSON);
   const [editResponsibleErrors, setEditResponsibleErrors] = useState<Record<string, string>>({});
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editAnimalMeta, setEditAnimalMeta] = useState({ training_level: "", special_skills: "", count: "1", handler_included: true });

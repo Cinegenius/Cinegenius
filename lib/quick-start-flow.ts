@@ -1,6 +1,6 @@
 import { DEPARTMENTS, deptValues } from "@/lib/marketplaceCategories";
 import { ANIMAL_DEPARTMENT_ID, ANIMAL_LEGACY_REFERENCES, normalizeAnimalCompanyDetails, type AnimalCompanyDetails } from "@/lib/animal-taxonomy";
-import { responsiblePersonDraft, type ResponsiblePerson } from "./responsible-person";
+import { responsiblePersonDraft, NEW_RESPONSIBLE_PERSON, type ResponsiblePerson } from "./responsible-person";
 import { primaryOccupationForPositions, occupationReference, type PrimaryOccupation } from "./primary-occupation";
 import { departments, getDepartmentRoleSearchTerms, getProfileTypesForDepartment } from "@/lib/departments";
 import { gripSearchTerms, normalizeOccupation } from "@/lib/gripTaxonomy";
@@ -43,6 +43,7 @@ export type QuickStartDraft = {
   step: QuickStartScreen;
   intents: QuickStartIntent[];
   name: string;
+  accountPerson?: ResponsiblePerson;
   personCity: string;
   personCountry: string;
   activeIntent: QuickStartIntent | null;
@@ -127,7 +128,7 @@ function normalizeIntentData(value: unknown): QuickStartIntentData {
     }).filter((item, index, list) => list.findIndex((other) => other.departmentId === item.departmentId && other.role === item.role) === index).slice(0, 100)
     : [];
   return {
-    responsible: responsiblePersonDraft(input.responsible),
+    responsible: input.responsible ? responsiblePersonDraft(input.responsible) : { ...NEW_RESPONSIBLE_PERSON },
     category: typeof input.category === "string" ? input.category.slice(0, 100) : "",
     title: typeof input.title === "string" ? input.title.slice(0, 200) : "",
     city: typeof input.city === "string" ? input.city.slice(0, 100) : "",
@@ -219,6 +220,7 @@ export function normalizeQuickStartDraft(value: unknown): QuickStartDraft {
     : oldStepIntent && intents.includes(oldStepIntent) ? oldStepIntent
       : intents.find((intent) => intent !== "search") ?? null;
   return {
+    ...(input.accountPerson ? { accountPerson: responsiblePersonDraft(input.accountPerson) } : {}),
     version: 3,
     welcomeAcknowledged: input.welcomeAcknowledged !== false,
     step: migratedStep,

@@ -3,7 +3,7 @@ import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import { useExistingDraftProtection } from "@/lib/use-form-draft";
 import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
-import { EMPTY_RESPONSIBLE_PERSON, responsiblePersonErrors } from "@/lib/responsible-person";
+import { NEW_RESPONSIBLE_PERSON, responsibleAccountName, responsiblePersonErrors } from "@/lib/responsible-person";
 
 
 import { useLocale, useTranslations } from "next-intl";
@@ -95,6 +95,7 @@ function screenForField(field: string): QuickStartScreen {
 export default function ProfileSetupWizard() {
   const t = useTranslations("setup");
   const marketCatalog=useTranslations("MarketplaceCatalog");
+  const contact = useTranslations("responsiblePerson");
   const locale = useLocale();
   const animals = useTranslations("FilmAnimals");
   const router = useRouter();
@@ -181,7 +182,7 @@ export default function ProfileSetupWizard() {
       const existingName = typeof profile?.profile?.display_name === "string" ? profile.profile.display_name : user?.fullName ?? "";
       let nextDraft = hasInProgressDraft
         ? normalizeQuickStartDraft(saved.quickStart)
-        : { ...START_QUICK_START_DRAFT, name: existingName };
+        : { ...START_QUICK_START_DRAFT, name: existingName, ...(responsibleAccountName({ firstName: user?.firstName, lastName: user?.lastName }) ? { accountPerson: { ...NEW_RESPONSIBLE_PERSON, ...responsibleAccountName({ firstName: user?.firstName, lastName: user?.lastName })! } } : {}) };
       if (hasInProgressDraft) saveQueue.acknowledge(normalizeQuickStartDraft(saved.quickStart));
       if (!profileComplete && nextDraft.completed.profile) nextDraft = { ...nextDraft, completed: { ...nextDraft.completed, profile: false } };
       if (resumeIncomplete && hasInProgressDraft) {
@@ -197,12 +198,9 @@ export default function ProfileSetupWizard() {
       setReady(true);
     });
     return () => { active = false; };
-  }, [isNewRegistration, resumeIncomplete, loadAttempt, redirectTo, router, user?.fullName, saveQueue]);
+  }, [isNewRegistration, resumeIncomplete, loadAttempt, redirectTo, router, user?.fullName, user?.firstName, user?.lastName, saveQueue]);
 
-  useEffect(() => {
-    if (!ready || draft.name || !user?.fullName) return;
-    setDraft((current) => current.name ? current : { ...current, name: user.fullName ?? "" });
-  }, [ready, draft.name, user?.fullName]);
+
 
   const persist = useCallback((value: QuickStartDraft) => saveQueue.save(value), [saveQueue]);
 
@@ -317,6 +315,13 @@ export default function ProfileSetupWizard() {
     const next = { ...draft, step, activeIntent: intent };
     setSaving(true);
     try {
+      if (draft.step === "name" && step !== "name" && draft.accountPerson) {
+        const name = responsibleAccountName(draft.accountPerson);
+        if (!name) { setResponsibleErrors(responsiblePersonErrors(draft.accountPerson)); focusResponsiblePerson(); return; }
+        const response = await fetch("/api/responsible-person", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...name, userId: user?.id }) });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || result.saved !== true) { setError(result.error || contact("accountSaveError")); return; }
+      }
       if (await persist(next)) {
         setDraft(next);
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -608,7 +613,7 @@ export default function ProfileSetupWizard() {
     if (intent === "location" || intent === "equipment") {
       const choices = QUICK_START_CATEGORIES[intent];
       return <div className="space-y-5">
-        <ResponsiblePersonFields value={data.responsible ?? EMPTY_RESPONSIBLE_PERSON} onChange={value => updateSection(intent, { responsible: value })} accountPrefill compactWhenProfile={intent === "equipment"} />
+        <ResponsiblePersonFields value={data.responsible ?? NEW_RESPONSIBLE_PERSON} onChange={value => updateSection(intent, { responsible: value })} accountPrefill compactWhenProfile={intent === "equipment"} />
         {intent === "equipment" ? <MarketplaceCategoryPicker value={data.category} onChange={value=>updateSection(intent,{category:value})} /> : <div><p className="mb-2 text-sm font-medium text-text-primary">{t("copy9")}</p><div id={`quick-start-${intent}-category`} tabIndex={-1} className="grid gap-2 sm:grid-cols-2">{choices.map((item) => <button key={item.value} type="button" aria-pressed={data.category === item.value} onClick={() => updateSection(intent, { category: item.value })} className={`min-h-14 min-w-0 rounded-xl border px-4 py-3 text-left ${data.category === item.value ? "border-gold bg-gold/10" : "border-border bg-bg-primary"}`}><span className="block break-words text-sm font-semibold text-text-primary">{item.label}</span><span className="mt-1 block break-words text-xs text-text-muted">{item.example}</span></button>)}</div></div>}
         <div><label htmlFor={`quick-start-${intent}-title`} className="mb-2 block text-sm font-medium text-text-primary">{t("copy10")}<span className="text-gold">*</span></label><input id={`quick-start-${intent}-title`} maxLength={200} value={data.title} onChange={(event) => updateSection(intent, { title: event.target.value })} placeholder={intent === "location" ? "Zum Beispiel Altbauwohnung mit Balkon" : "Zum Beispiel LED-Flächenleuchte"} className={inputClass} /></div>
         <div><label htmlFor={`quick-start-${intent}-city`} className="mb-2 block text-sm font-medium text-text-primary">{t("copy11")}<span className="text-gold">*</span></label><input id={`quick-start-${intent}-city`} autoComplete="address-level2" maxLength={100} value={data.city} onChange={(event) => updateSection(intent, { city: event.target.value })} placeholder={t("copy12")} className={inputClass} /></div>
@@ -621,7 +626,7 @@ export default function ProfileSetupWizard() {
       return !query || terms.includes(query);
     });
     return <div className="space-y-4">
-      <ResponsiblePersonFields errors={responsibleErrors} company value={company.responsible ?? EMPTY_RESPONSIBLE_PERSON} onChange={value => updateSection("company", { responsible: value })} accountPrefill />
+      <ResponsiblePersonFields errors={responsibleErrors} company value={company.responsible ?? NEW_RESPONSIBLE_PERSON} onChange={value => updateSection("company", { responsible: value })} accountPrefill />
       <div><label htmlFor="quick-start-company-title" className="mb-2 block text-sm font-medium text-text-primary">{t("copy13")}<span className="text-gold">*</span></label><input id="quick-start-company-title" autoComplete="organization" maxLength={200} value={company.title} onChange={(event) => updateSection("company", { title: event.target.value })} placeholder={t("copy14")} className={inputClass} /></div>
       <div><label htmlFor="quick-start-company-city" className="mb-2 block text-sm font-medium text-text-primary">{t("copy15")}<span className="text-gold">*</span></label><input id="quick-start-company-city" autoComplete="address-level2" maxLength={100} value={company.city} onChange={(event) => updateSection("company", { city: event.target.value })} placeholder={t("copy12")} className={inputClass} /></div>
       <div><label htmlFor="quick-start-company-category-search" className="mb-2 block text-sm font-medium text-text-primary">{t("copy17")}<span className="text-gold">*</span></label><div className="relative mb-3"><Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" /><input id="quick-start-company-category-search" autoComplete="off" value={companyCategorySearch} onChange={(event) => setCompanyCategorySearch(event.target.value)} placeholder={t("copy18")} className={`${inputClass} pl-10`} /></div>
@@ -685,7 +690,7 @@ export default function ProfileSetupWizard() {
       <p className="mb-6 max-w-2xl text-sm leading-6 text-text-muted">{localizeSetupMessage(currentContent.description, t)}</p>
 
       <section className="min-w-0 rounded-2xl border border-border bg-bg-secondary p-4 sm:p-7">
-        {draft.step === "name" && <div><label htmlFor="quick-start-name" className="mb-2 block text-sm font-medium text-text-primary">{t("copy65")}<span className="text-gold">*</span></label><input id="quick-start-name" autoComplete="name" maxLength={120} value={draft.name} onChange={(event) => update("name", event.target.value)} placeholder={t("copy66")} className={inputClass} aria-describedby="quick-start-name-help" /><p id="quick-start-name-help" className="mt-2 text-xs leading-5 text-text-muted">{t("copy67")}</p></div>}
+        {draft.step === "name" && (draft.name && !draft.accountPerson ? <div><label htmlFor="quick-start-name" className="mb-2 block text-sm font-medium text-text-primary">{t("copy65")}<span className="text-gold">*</span></label><input id="quick-start-name" autoComplete="name" maxLength={120} value={draft.name} onChange={(event) => update("name", event.target.value)} placeholder={t("copy66")} className={inputClass} aria-describedby="quick-start-name-help" /><p id="quick-start-name-help" className="mt-2 text-xs leading-5 text-text-muted">{t("copy67")}</p></div> : <ResponsiblePersonFields identityOnly accountPrefill value={draft.accountPerson ?? NEW_RESPONSIBLE_PERSON} errors={responsibleErrors} onChange={person => { setResponsibleErrors({}); setDraft(current => ({ ...current, accountPerson: person, name: `${person.firstName} ${person.lastName}`.trim() })); }} />)}
 
         {draft.step === "location" && <div className="space-y-4"><div><label htmlFor="quick-start-person-city" className="mb-2 block text-sm font-medium text-text-primary">{t("copy12")}{hasProfileIntent && <span className="text-gold">*</span>}</label><input id="quick-start-person-city" autoComplete="address-level2" maxLength={100} value={draft.personCity} onChange={(event) => update("personCity", event.target.value)} placeholder={t("copy69")} className={inputClass} /></div><div><label htmlFor="quick-start-person-country" className="mb-2 block text-sm font-medium text-text-primary">{t("copy70")}{hasProfileIntent && <span className="text-gold">*</span>}</label><select id="quick-start-person-country" value={countryOther ? "Andere" : draft.personCountry || t("copy71")} onChange={(event) => { const other = event.target.value === "Andere"; setCountryOther(other); update("personCountry", other ? "" : event.target.value); }} className={inputClass}><option>{t("copy71")}</option><option>{t("copy72")}</option><option>{t("copy73")}</option><option value="Andere">{t("copy74")}</option></select>{countryOther && <input aria-label={t("copy75")} autoComplete="country-name" maxLength={100} value={draft.personCountry} onChange={(event) => update("personCountry", event.target.value)} placeholder={t("copy75")} className={`${inputClass} mt-3`} />}</div>{!hasProfileIntent && <p className="text-xs leading-5 text-text-muted">{t("copy77")}</p>}</div>}
 

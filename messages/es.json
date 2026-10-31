@@ -1391,7 +1391,23 @@
       "rental": "Alquiler",
       "other": "Otra función"
     },
-    "unauthorized": "Solo la persona responsable o el titular autorizado de la empresa puede cambiar esta asignación."
+    "unauthorized": "Solo la persona responsable o el titular autorizado de la empresa puede cambiar esta asignación.",
+    "accountName": "Tu nombre",
+    "useName": "Usar este nombre",
+    "editName": "Cambiar nombre",
+    "accountReuse": "Se guarda una vez en tu cuenta y se reutiliza en tus otras ofertas. No necesitas un perfil de equipo.",
+    "publicPreview": "Ofrecido por {name}: este nombre será público al publicar.",
+    "publicBeforeSave": "Al publicar, el nombre indicado aquí aparecerá como persona de contacto.",
+    "keptPrivate": "Este nombre se guardó de forma privada y seguirá oculto hasta que lo confirmes.",
+    "showName": "Mostrar este nombre públicamente",
+    "contactPrivacy": "Esto no publica tu correo electrónico ni tu teléfono.",
+    "functionOptions": "Función y visibilidad (opcional)",
+    "hideName": "Usar este nombre solo internamente",
+    "accountSaving": "Guardando el nombre de la cuenta…",
+    "accountSaved": "Nombre de la cuenta guardado",
+    "accountSaveError": "No se pudo guardar el nombre en tu cuenta. Tus datos se conservan. Vuelve a intentarlo.",
+    "retry": "Reintentar",
+    "providerContact": "La persona responsable está vinculada a la cuenta del proveedor indicada arriba. Los datos de contacto guardados por separado siguen siendo privados."
   },
   "AdminReview": {
     "open": "Ver completo / Revisar",

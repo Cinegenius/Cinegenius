@@ -1391,7 +1391,23 @@
       "rental": "Vermietung",
       "other": "Andere Funktion"
     },
-    "unauthorized": "Nur die verantwortliche Person oder die berechtigte Firmeninhaberschaft darf diese Zuordnung ändern."
+    "unauthorized": "Nur die verantwortliche Person oder die berechtigte Firmeninhaberschaft darf diese Zuordnung ändern.",
+    "accountName": "Dein Name",
+    "useName": "Namen übernehmen",
+    "editName": "Name ändern",
+    "accountReuse": "Einmal im Konto hinterlegt, für weitere eigene Angebote übernommen. Kein Crewprofil nötig.",
+    "publicPreview": "Angeboten von {name} – dieser Name erscheint bei Veröffentlichung öffentlich.",
+    "publicBeforeSave": "Beim Veröffentlichen erscheint der hier angegebene Name als Ansprechperson.",
+    "keptPrivate": "Dieser Name wurde privat gespeichert und bleibt ohne deine Bestätigung verborgen.",
+    "showName": "Diesen Namen öffentlich anzeigen",
+    "contactPrivacy": "E-Mail und Telefonnummer werden dadurch nicht veröffentlicht.",
+    "functionOptions": "Funktion und Sichtbarkeit (optional)",
+    "hideName": "Diesen Namen nur intern verwenden",
+    "accountSaving": "Kontoname wird gespeichert …",
+    "accountSaved": "Kontoname gespeichert",
+    "accountSaveError": "Der Name konnte nicht im Konto gespeichert werden. Deine Eingaben bleiben erhalten. Bitte erneut versuchen.",
+    "retry": "Erneut versuchen",
+    "providerContact": "Die verantwortliche Person ist dem oben verknüpften Anbieterkonto zugeordnet. Separat gespeicherte Ansprechpersonendaten bleiben privat."
   },
   "AdminReview": {
     "open": "Vollständig ansehen / Prüfen",

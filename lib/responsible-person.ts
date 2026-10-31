@@ -3,6 +3,15 @@ export type ResponsiblePerson = {
 };
 export type StoredResponsiblePerson = ResponsiblePerson & { userId: string };
 export const EMPTY_RESPONSIBLE_PERSON: ResponsiblePerson = { firstName: "", lastName: "", function: "", customFunction: "", public: false };
+/** New forms disclose the contact name before an explicit save/submission.
+ * Existing snapshots keep their original public flag, including explicit false. */
+export const NEW_RESPONSIBLE_PERSON: ResponsiblePerson = { ...EMPTY_RESPONSIBLE_PERSON, public: true };
+export const ACCOUNT_RESPONSIBLE_PERSON_KEY = "cinegeniusResponsiblePerson";
+export function responsibleAccountName(value: unknown): { firstName: string; lastName: string } | null {
+  const v = responsiblePersonDraft(value);
+  const errors = responsiblePersonErrors({ ...v, profileName: undefined, function: "", customFunction: "" });
+  return errors.firstName || errors.lastName ? null : { firstName: v.firstName.trim(), lastName: v.lastName.trim() };
+}
 export const COMPANY_RESPONSIBLE_FUNCTIONS = ["owner", "founder", "cofounder", "director", "department", "employee", "contact", "other"] as const;
 export const OFFER_RESPONSIBLE_FUNCTIONS = ["propertyOwner", "operator", "management", "rental", "contact", "other"] as const;
 export function responsiblePersonDraft(value: unknown): ResponsiblePerson {
@@ -15,8 +24,8 @@ export function responsiblePersonErrors(value: unknown, company = false): Record
   const errors: Record<string, string> = {};
   // Accept international names, apostrophes, hyphens and spaces. Do not split or guess names.
   const name = (s: string) => /^[\p{L}\p{M}][\p{L}\p{M}\s.'’\-]*$/u.test(s.trim());
-  if (!name(v.firstName)) errors.firstName = "invalidFirstName";
-  if (!name(v.lastName)) errors.lastName = "invalidLastName";
+  if (!v.profileName && !name(v.firstName)) errors.firstName = "invalidFirstName";
+  if (!v.profileName && !name(v.lastName)) errors.lastName = "invalidLastName";
   const functions: readonly string[] = company ? COMPANY_RESPONSIBLE_FUNCTIONS : OFFER_RESPONSIBLE_FUNCTIONS;
   if (v.function && !functions.includes(v.function)) errors.function = "invalidFunction";
   if (v.function === "other" && (!v.customFunction.trim() || /[\u0000-\u001f\u007f]/.test(v.customFunction))) errors.customFunction = "invalidFunction";

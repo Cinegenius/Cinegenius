@@ -1391,7 +1391,23 @@
       "rental": "Bérbeadás",
       "other": "Más feladatkör"
     },
-    "unauthorized": "Ezt a hozzárendelést csak a felelős személy vagy a jogosult cégtulajdonos módosíthatja."
+    "unauthorized": "Ezt a hozzárendelést csak a felelős személy vagy a jogosult cégtulajdonos módosíthatja.",
+    "accountName": "A neved",
+    "useName": "Név használata",
+    "editName": "Név módosítása",
+    "accountReuse": "Egyszer mented a fiókba, és a további saját ajánlataidhoz is használjuk. Stábprofil nem szükséges.",
+    "publicPreview": "Ajánlattevő: {name} – ez a név közzétételkor nyilvános lesz.",
+    "publicBeforeSave": "Közzétételkor az itt megadott név kapcsolattartóként jelenik meg.",
+    "keptPrivate": "Ezt a nevet privátként mentetted, és a megerősítésedig rejtve marad.",
+    "showName": "Név nyilvános megjelenítése",
+    "contactPrivacy": "Ez nem teszi nyilvánossá az e-mail-címedet vagy telefonszámodat.",
+    "functionOptions": "Funkció és láthatóság (nem kötelező)",
+    "hideName": "Név használata csak belső célra",
+    "accountSaving": "Fióknév mentése…",
+    "accountSaved": "Fióknév mentve",
+    "accountSaveError": "A nevet nem sikerült a fiókba menteni. A megadott adatok megmaradnak. Próbáld újra.",
+    "retry": "Újrapróbálkozás",
+    "providerContact": "A felelős személy a fent hivatkozott ajánlattevői fiókhoz tartozik. A külön mentett kapcsolattartói adatok privátak maradnak."
   },
   "AdminReview": {
     "open": "Teljes nézet / Ellenőrzés",
