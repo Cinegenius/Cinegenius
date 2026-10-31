@@ -14,14 +14,14 @@ type FinalizeResult = { error: unknown | null };
 export async function finalizeThenNavigate(
   finalize: (params: FinalizeNavigation) => Promise<FinalizeResult>,
   destination: string,
-  navigate: (url: string) => void,
+  navigate: (url: string) => void | Promise<unknown>,
 ): Promise<FinalizeResult> {
   let navigationStarted = false;
   return finalize({
     navigate: ({ decorateUrl }) => {
       if (navigationStarted) return;
       navigationStarted = true;
-      navigate(decorateUrl(destination));
+      return navigate(decorateUrl(destination));
     },
   });
 }

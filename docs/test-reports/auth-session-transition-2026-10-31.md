@@ -137,3 +137,49 @@ abschließenden Dokumentnavigation ersetzt. Es wird deshalb kein nicht beobachte
 HTTP-Status dieser vier Fehlversuche behauptet. Keine Cookies, Tokens, Codes,
 Kennwörter oder privaten Nachrichteninhalte wurden für diesen Test ausgelesen.
 Der Nachtest mit der ergänzten frühen Zustandsprüfung steht noch aus.
+
+## Anmeldung: abwartbare SDK-Navigation und Safari-Entladesignal
+
+Nach Veröffentlichung von `13d2ff3` meldet der Nutzer: Abmelden ohne rote
+Meldungen, beim Anmelden weiterhin rote Meldungen. Im geöffneten Safari-Tab
+sind nun ausschließlich ein Clerk-Blob-Worker sowie Clerk `/v1/environment`
+und `/v1/client` als Zugriffsfehler sichtbar; die frühere lange RSC-Fehlerliste
+ist in diesem Konsolenausschnitt nicht vorhanden. Eine erhaltene erfolgreiche
+Environment-Anfrage hat Status 200, Origin `https://www.cinegenius.co` sowie
+passendes `Access-Control-Allow-Origin` und `Allow-Credentials: true`.
+Das ist keine nachgewiesene allgemeine CORS-Fehlkonfiguration. Der HTTP-Status
+der vor dem Dokumentwechsel fehlgeschlagenen Anfragen ist nicht erhalten.
+
+Im App-Code sind zwei konkrete Synchronisierungslücken nachgewiesen:
+
+- `finalizeThenNavigate` verwirft die Rückgabe seines Navigationscallbacks;
+  `finishNavigation` verwirft außerdem die Rückgabe des Routers. Der tatsächliche
+  Next-Router liefert ohnehin `void`. Clerk kann so vor dem Seitenwechsel seine
+  Auth-Zustandsänderung und den nachgelagerten Refresh ausführen.
+- Der externe Safari-ITP-Weg verwendet `window.location.replace` direkt.
+  Clerk 6.41.0 verfolgt Dokumentwechsel zusätzlich über ein synchrones internes
+  Navigationsereignis in `__internal_windowNavigate`. Die direkte Browseraktion
+  sendet dieses Signal nicht. `setActive` kann dadurch noch emit/refresh ausführen,
+  während der Browser bereits zum Cookie-Touch weiterleitet.
+
+Kandidat: beide Formulare delegieren nach unveränderter URL-Prüfung an das
+öffentliche `clerk.navigate(target, {replace:true})`. Interne Ziele verwenden
+damit den installierten Next-Adapter `useAwaitableReplace`/`useInternalNavFun`;
+externe ITP-Ziele den SDK-Dokumentwechsel einschließlich Entladesignal.
+Die Promises werden bis zum Finalize-Callback zurückgegeben. Fehlgeschlagene
+Navigation wird nicht als Erfolg quittiert; der Einmal-Guard wird zurückgesetzt.
+Keine zusätzlichen Timer, Reload-Schleifen, CSP/CORS-Erweiterungen oder
+Änderungen an Zugriffskontrollen. Anmeldung und Registrierung teilen den Weg.
+
+Regression vor der Korrektur: ein kontrolliert noch nicht abgeschlossener
+Seitenwechsel führt bereits zu „session published“ (Test fehlgeschlagen).
+Danach 429 gezielte Tests bestanden, darunter Aufschieben der Aktivierung bis
+zur Navigationsbestätigung, Fehlerweitergabe, ITP-Delegation, stabile Ziele,
+Duplikatsperre, bestehende Sitzungswechsel und private API-Ablehnungen.
+Dies sind lokale Komponenten-/Ablauftests, kein echter Safari-Anmeldenachweis.
+TypeScript, Komponenten-Lint und Sprachprüfung bestanden; keine neuen Texte.
+
+Offizielle Grundlage: https://clerk.com/docs/reference/objects/clerk#navigate
+beschreibt die abwartbare Navigation. Der installierte Next-Adapter und der
+ausgelieferte Clerk-Code wurden zusätzlich direkt gelesen. Ob damit sämtliche
+verbliebenen Safari-Fehler entfallen, muss ein echter Nachtest bestätigen.

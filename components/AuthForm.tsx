@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth, useSignIn, useSignUp } from "@clerk/nextjs";
+import { useAuth, useClerk, useSignIn, useSignUp } from "@clerk/nextjs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -49,12 +49,11 @@ async function runAuthAction<T>(action: () => Promise<T>, setError: (message: st
   }
 }
 
-function finishNavigation(url: string, fallback: string, replace: (url: string) => void) {
+function finishNavigation(url: string, fallback: string, navigate: (url: string) => void | Promise<unknown>) {
   const target = resolveAuthNavigationUrl(url, window.location.origin, fallback);
-  // Keep the document alive for ordinary routes. Clerk's external Safari ITP
-  // touch URL still needs a document navigation to establish its cookie.
-  if (target.startsWith("/")) replace(target);
-  else window.location.replace(target);
+  // The SDK awaits Next.js transitions and signals its own document redirects.
+  // Bypassing it for Safari's ITP URL lets setActive refresh a departing page.
+  return navigate(target);
 }
 
 export default function AuthForm({ mode, destination, signUpDestination, signInDestination }: AuthFormProps) {
@@ -66,8 +65,8 @@ export default function AuthForm({ mode, destination, signUpDestination, signInD
 function SignInForm({ destination, signUpDestination }: { destination: string; signUpDestination: string }) {
   const t = useTranslations("auth");
   const { signIn, errors, fetchStatus } = useSignIn();
+  const clerk = useClerk();
   const { isLoaded, isSignedIn } = useAuth();
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
@@ -99,11 +98,18 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
     return () => window.clearTimeout(timer);
   }, [resetCooldownSeconds]);
 
-  const navigateOnce = useCallback((url: string) => {
+  const navigateOnce = useCallback(async (url: string) => {
     if (navigationStarted.current) return;
     navigationStarted.current = true;
-    finishNavigation(url, destination, (target) => router.replace(target));
-  }, [destination, router]);
+    // Clerk's Next.js adapter resolves after the route transition commits.
+    // A raw router.replace returns void and lets finalization refresh too early.
+    try {
+      return await finishNavigation(url, destination, (target) => clerk.navigate(target, { replace: true }));
+    } catch (error) {
+      navigationStarted.current = false;
+      throw error;
+    }
+  }, [clerk, destination]);
 
   const beginSubmission = () => {
     if (!signIn || busy || submissionInFlight.current) return false;
@@ -121,9 +127,9 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
     // If Clerk has activated a session but a later finalize step reports an
     // error, let the active session win and recover to the destination.
     if (shouldRedirectForActiveSession(isLoaded, !!isSignedIn, signInAttemptStarted.current && !error)) {
-      navigateOnce(destination);
+      void navigateOnce(destination).catch((error) => setError(readableAuthError(error, t("finishError"))));
     }
-  }, [destination, error, isLoaded, isSignedIn, navigateOnce]);
+  }, [destination, error, isLoaded, isSignedIn, navigateOnce, t]);
 
   const completeSignIn = async () => {
     const result = await runAuthAction(
@@ -596,6 +602,7 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
 function SignUpForm({ destination, signInDestination }: { destination: string; signInDestination: string }) {
   const t = useTranslations("auth");
   const { signUp, errors, fetchStatus } = useSignUp();
+  const clerk = useClerk();
   const { isLoaded, isSignedIn } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -622,7 +629,7 @@ function SignUpForm({ destination, signInDestination }: { destination: string; s
       () => finalizeThenNavigate(
         (params) => signUp.finalize(params),
         destination,
-        (url) => finishNavigation(url, destination, (target) => router.replace(target)),
+        (url) => finishNavigation(url, destination, (target) => clerk.navigate(target, { replace: true })),
       ),
       setError,
       "Konto konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
