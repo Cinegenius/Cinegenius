@@ -42,7 +42,13 @@ const MAX_CACHE_BYTES = 8 * 1024 * 1024;
 let cacheBytes = 0;
 export async function cachedCommunityPreview(key: string, create: () => Promise<Buffer>) {
   const hit = cache.get(key);
-  if (hit) return hit;
+  if (hit) {
+    // Keep frequently displayed previews hot within the same bounded memory.
+    // Callers must still check current source permissions before every lookup.
+    cache.delete(key);
+    cache.set(key, hit);
+    return hit;
+  }
   const running = pending.get(key);
   if (running) return running;
   const task = create().then((result) => {

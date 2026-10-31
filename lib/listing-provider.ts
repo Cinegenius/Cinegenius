@@ -77,5 +77,17 @@ export async function getListingProviders(
   listings: Array<{ user_id?: string | null; company_id?: string | null; responsible_person?: unknown }>,
   viewerId: string | null = null,
 ): Promise<ListingProvider[]> {
-  return Promise.all(listings.map((listing) => getListingProvider(listing.user_id, listing.company_id, viewerId, listing.responsible_person)));
+  // Resolve an identical provider/contact only once within this list request.
+  // Include the complete responsibility snapshot: private/delegated contacts
+  // must not inherit another offer's public name or company function.
+  const pending = new Map<string, Promise<ListingProvider>>();
+  return Promise.all(listings.map(listing => {
+    const key = JSON.stringify([listing.user_id ?? null, listing.company_id ?? null, listing.responsible_person ?? null]);
+    let provider = pending.get(key);
+    if (!provider) {
+      provider = getListingProvider(listing.user_id, listing.company_id, viewerId, listing.responsible_person);
+      pending.set(key, provider);
+    }
+    return provider;
+  }));
 }

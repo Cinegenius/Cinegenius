@@ -14,6 +14,7 @@
 // CREATE INDEX notifications_user_id_idx ON notifications(user_id, created_at DESC);
 
 import { db } from "@/lib/db";
+import { getInboxNotifications } from "@/lib/inbox-data";
 import { getCurrentUser, requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -23,18 +24,11 @@ export async function GET() {
   const noStore = { headers: { "Cache-Control": "private, no-store, max-age=0" } };
   if (!user) return NextResponse.json({ code: "account" }, { status: 401, ...noStore });
 
-  const { data, error } = await db
-    .from("notifications")
-    .select("id, type, title, body, href, read, created_at")
-    .eq("user_id", user.userId)
-    // Chat unread state is represented by the per-message read receipts and
-    // the separate unread-message entry in NotificationCenter.
-    .neq("type", "new_message")
-    .order("created_at", { ascending: false })
-    .limit(30);
-
-  if (error) return NextResponse.json({ code: "notifications_unavailable" }, { status: 500, ...noStore });
-  return NextResponse.json({ notifications: data ?? [] }, noStore);
+  try {
+    return NextResponse.json({ notifications: await getInboxNotifications(user.userId) }, noStore);
+  } catch {
+    return NextResponse.json({ code: "notifications_unavailable" }, { status: 500, ...noStore });
+  }
 }
 
 // PATCH /api/notifications — mark all as read

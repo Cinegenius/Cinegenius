@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { recordProfileView } from "@/lib/profile-views";
 import { unstable_cache } from "next/cache";
+import { cache } from "react";
 import { listingPriceMetadata } from "@/lib/listing-price";
 import JsonLd from "@/components/JsonLd";
 import type { Metadata } from "next";
@@ -79,13 +80,15 @@ async function _getProfile(slug: string): Promise<UserProfile | null> {
   return { ...data, profile_type: type, profile_types: profileTypes, modules } as UserProfile;
 }
 
-function getProfile(slug: string): Promise<UserProfile | null> {
+// Share the same existing cached read between metadata and page in one render.
+// React cache is request-scoped; visibility/contact checks stay outside it.
+const getProfile = cache(function getProfile(slug: string): Promise<UserProfile | null> {
   return unstable_cache(
     () => _getProfile(slug),
     ["profile", slug],
     { revalidate: 300, tags: ["profiles"] }
   )();
-}
+});
 
 export async function generateMetadata(
   { params }: { params: Promise<{ slug: string }> }

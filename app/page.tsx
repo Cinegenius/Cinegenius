@@ -51,8 +51,6 @@ type HomeProfileRow = {
   positions: string[] | null;
   profile_type: string | null;
   profile_types: string[] | null;
-  profile_images: unknown;
-  portfolio_images: unknown;
   created_at?: string | null;
 };
 
@@ -91,7 +89,7 @@ async function getHomeData(viewerId: string | null) {
     db.from("listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
     db.from("listings").select("id,user_id,company_id,responsible_person,title,city,price,image_url,type,metadata,created_at").in("type", ["prop", "vehicle"]).eq("published", true).order("created_at", { ascending: false }).limit(4),
     db.from("companies").select("id,slug,name,logo_url,city,categories").eq("published", true).order("created_at", { ascending: false }).limit(6),
-    db.from("profiles").select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,profile_type,profile_types,profile_images,portfolio_images,created_at").not("display_name", "is", null).neq("display_name", "").order("created_at", { ascending: false }).limit(300),
+    db.from("profiles").select("user_id,slug,display_name,tagline,avatar_url,location,verified,role,positions,profile_type,profile_types,created_at").not("display_name", "is", null).neq("display_name", "").order("created_at", { ascending: false }).limit(300),
     db.from("projects").select("id,title,year,type,director").order("year", { ascending: false }).limit(3),
   ]);
   if (results.some(result => result.error)) throw new Error("Homepage recommendations unavailable");
@@ -107,13 +105,10 @@ async function getHomeData(viewerId: string | null) {
   const profileRows = (profilesRaw ?? []) as HomeProfileRow[];
   const privateIds = await getPrivateProfileIds(profileRows.map((profile) => profile.user_id));
   const publicProfiles = profileRows.filter((profile) => !privateIds.has(profile.user_id));
-  const { photos } = await getCommunityMedia({ limit: 24, viewerId, diverse: true, includeTotal: false, signal: AbortSignal.timeout(4000) }).catch(() => {
+  const photosTask = getCommunityMedia({ limit: 24, viewerId, diverse: true, includeTotal: false, signal: AbortSignal.timeout(4000) }).catch(() => {
     console.error("[homepage] Photo discovery unavailable");
     return { photos: [] };
   });
-  const profileIds = publicProfiles.map((profile) => profile.user_id);
-  const crewRatingSummaries = await fetchRatingSummaries(profileIds, "user").catch(() => ({} as Awaited<ReturnType<typeof fetchRatingSummaries>>));
-  const newPhotos: DiscoverPhoto[] = photos.slice(0, 24);
 
   const crewTypeLabels = new Set(
     (Object.entries(PROFILE_TYPE_LABELS) as [ProfileType, string][])
@@ -126,6 +121,11 @@ async function getHomeData(viewerId: string | null) {
     const positions = [...(profile.positions ?? []), profile.role ?? ""].map((position) => position.toLocaleLowerCase("de"));
     return positions.some((position) => [...crewTypeLabels].some((label) => position === label || position.includes(label)));
   });
+  const [{ photos }, crewRatingSummaries] = await Promise.all([
+    photosTask,
+    fetchRatingSummaries(crewProfiles.map(profile => profile.user_id), "user").catch(() => ({} as Awaited<ReturnType<typeof fetchRatingSummaries>>)),
+  ]);
+  const newPhotos: DiscoverPhoto[] = photos.slice(0, 24);
   const crewSummaries = crewProfiles.map((profile) => {
     const summary = crewRatingSummaries[profile.user_id] ?? { rating: 0, reviews: 0, ratingOnly: 0 };
     const positions = [...new Set([...(profile.positions ?? []), ...(profile.role ? [profile.role] : [])].map((position) => position.trim()).filter(Boolean))];

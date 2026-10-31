@@ -77,29 +77,24 @@ export function createInboxPolling(identity: Identity | null, getToken: TokenGet
     if (retry || snapshot.count === null) update({ ...snapshot, status: "loading" });
     inFlight = (async () => {
       try {
-        // Obtain one fresh SDK token before starting either protected request.
+        // Obtain the SDK token before the single protected snapshot request.
         const token = await tokenBeforeTimeout(controller.signal, retry);
         if (stopped || controller.signal.aborted) return;
         if (!token) { expire(); return; }
-        const fetchPart = async (url: string) => {
-          const response = await request(url, {
-            signal: controller.signal, cache: "no-store", credentials: "same-origin",
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (response.status === 401) { expire(); throw new Error("session"); }
-          if (!response.ok) throw new Error("request");
-          return response.json();
-        };
-        const [messages, notifications] = await Promise.all([
-          fetchPart("/api/unread-count"), fetchPart("/api/notifications"),
-        ]);
+        const response = await request("/api/inbox", {
+          signal: controller.signal, cache: "no-store", credentials: "same-origin",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (response.status === 401) { expire(); throw new Error("session"); }
+        if (!response.ok) throw new Error("request");
+        const inbox = await response.json();
         if (stopped || controller.signal.aborted || snapshot.status === "expired") return;
-        if (!Number.isInteger(messages.count) || messages.count < 0 || !Array.isArray(notifications.notifications)) throw new Error("response");
+        if (!Number.isInteger(inbox.count) || inbox.count < 0 || !Array.isArray(inbox.notifications)) throw new Error("response");
         failureCount = 0;
         retryAt = 0;
         // A concurrent successful read must not be undone by an older list response.
         if (revision !== readRevision) return;
-        update({ status: "ready", count: messages.count, notifications: notifications.notifications });
+        update({ status: "ready", count: inbox.count, notifications: inbox.notifications });
       } catch {
         if (stopped || snapshot.status === "expired") return;
         controller.abort();
