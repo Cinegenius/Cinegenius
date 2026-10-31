@@ -182,17 +182,18 @@ export default function GlobalSearch() {
             : <Search size={18} className="text-text-muted shrink-0" />
           }
           <input
+            aria-label={t("accessibleLabel")}
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => { setQuery(e.target.value); setSelectedIdx(-1); }}
             onKeyDown={handleKeyDown}
             placeholder={t("inputPlaceholder")}
-            className="flex-1 bg-transparent text-text-primary placeholder:text-text-muted text-base focus:outline-none"
+            className="min-w-0 flex-1 bg-transparent text-text-primary placeholder:text-text-muted text-base focus:outline-none"
           />
           <div className="flex items-center gap-2 shrink-0">
             {query && (
-              <button onClick={() => setQuery("")} className="text-text-muted hover:text-gold transition-colors">
+              <button type="button" aria-label={t("clearSearch")} onClick={() => {setQuery(""); inputRef.current?.focus();}} className="min-h-11 min-w-11 flex items-center justify-center text-text-muted hover:text-gold transition-colors">
                 <X size={16} />
               </button>
             )}

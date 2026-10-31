@@ -8,7 +8,7 @@ import ContextBackLink from "@/components/ContextBackLink";
 import Image from "@/components/MediaImage";
 import {
   ArrowLeft, MapPin, Star, CheckCircle, Shield,
-  MessageSquare, ChevronRight, Film, Users, Loader2,
+  MessageSquare, ChevronRight, Users, Loader2,
   UserPlus, UserCheck, Clock, Check, X, Lock,
   ExternalLink, Globe, Plane, Play, Quote, Pencil, Trash2,
   AtSign, PlayCircle, Video, Clapperboard, Calendar,
@@ -121,6 +121,7 @@ export default function CreatorDetail({
   currentUserId?: string | null;
 }) {
   const tc = useTranslations("common");
+  const bookingCopy = useTranslations("BookingRequest");
   const tcr = useTranslations("creators");
   const [activeSection, setActiveSection] = useState<"inquiry" | "message">("inquiry");
   const [message, setMessage] = useState("");
@@ -708,10 +709,8 @@ export default function CreatorDetail({
 
               <div className="p-4 bg-bg-secondary border border-border rounded-xl space-y-3">
                 {[
-                  { icon: Shield,       text: "Zahlungen über Treuhand gesichert" },
-                  { icon: CheckCircle,  text: "Verifizierter Filmschaffender" },
-                  { icon: Film,         text: `${creator.reviews} abgeschlossene Projekte` },
-                  { icon: Users,        text: "Preisverhandlung findet privat statt" },
+                  { icon: Shield, text: bookingCopy("directTerms") },
+                  { icon: Users, text: bookingCopy("noCommission") },
                 ].map(({ icon: Icon, text }) => (
                   <div key={text} className="flex items-center gap-2.5 text-xs text-text-muted">
                     <Icon size={13} className="text-gold shrink-0" />{text}
@@ -720,9 +719,9 @@ export default function CreatorDetail({
               </div>
 
               <div className="p-4 bg-gold-subtle border border-gold/20 rounded-xl">
-                <p className="text-xs font-semibold text-gold mb-2 flex items-center gap-1"><ChevronRight size={12} /> So läuft es ab</p>
+                <p className="text-xs font-semibold text-gold mb-2 flex items-center gap-1"><ChevronRight size={12} /> {bookingCopy("howItWorks")}</p>
                 <ol className="space-y-1.5 text-xs text-text-muted">
-                  {["Anfrage senden mit Projektdetails", `${creator.name.split(" ")[0]} antwortet mit Konditionen`, "Preis & Details privat verhandeln", "Buchung bestätigen & sicher bezahlen"].map((step, i) => (
+                  {[bookingCopy("flow1"), bookingCopy("flow2"), bookingCopy("flow3"), bookingCopy("flow4")].map((step, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <span className="w-4 h-4 bg-gold/20 rounded-full flex items-center justify-center text-[10px] font-bold text-gold shrink-0 mt-0.5">{i + 1}</span>
                       {step}

@@ -1,3 +1,5 @@
+import {getTranslations} from "next-intl/server";
+import {DEFAULT_LOCALE, type AppLocale} from "@/lib/i18n/locales";
 import { Resend } from "resend";
 
 // Gracefully degrade if RESEND_API_KEY is not set
@@ -213,15 +215,16 @@ export async function sendWelcomeEmail(to: string, displayName: string) {
   );
 }
 
-export async function sendNewBookingEmail(to: string, listingTitle: string, guestName: string) {
+export async function sendNewBookingEmail(to: string, listingTitle: string, guestName: string, locale: AppLocale = DEFAULT_LOCALE) {
+  const t = await getTranslations({locale, namespace: "BookingRequest"});
   await send(
     to,
-    `Neue Buchung: „${listingTitle}"`,
+    t("incomingSubject", {title: listingTitle}),
     wrap(`
-      ${h1("Neue Buchung erhalten")}
-      ${p(`<strong style="color:#f0f0f0">${guestName}</strong> hat dein Inserat gebucht:`)}
-      <p style="margin:16px 0;padding:12px 16px;background:#1a1a1a;border:1px solid #222;border-radius:8px;font-size:14px;color:#d4a843;font-weight:600">${listingTitle}</p>
-      ${btn("Buchung ansehen", `${BASE}/dashboard?tab=bookings`)}
+      ${h1(escapeHtml(t("incomingTitle")))}
+      ${p(escapeHtml(t("incomingBody", {name: guestName, title: listingTitle})))}
+      ${p(escapeHtml(t("requestOnly")))}
+      ${btn(escapeHtml(t("viewRequest")), `${BASE}/dashboard?tab=bookings`)}
     `)
   );
 }

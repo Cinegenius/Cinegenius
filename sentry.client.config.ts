@@ -12,14 +12,7 @@ Sentry.init({
   // Alle Fehler erfassen
   sampleRate: 1.0,
 
-  // Replay nur bei echten Errors (spart Quota)
-  replaysOnErrorSampleRate: 1.0,
+  // Session Replay stays disabled until its purpose, legal basis and consent flow are reviewed.
+  replaysOnErrorSampleRate: 0,
   replaysSessionSampleRate: 0,
-
-  integrations: [
-    Sentry.replayIntegration({
-      maskAllText: true,
-      blockAllMedia: false,
-    }),
-  ],
 });

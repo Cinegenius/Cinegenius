@@ -87,7 +87,9 @@
     "suggestion1": "Camarógrafo",
     "suggestion2": "Almacén Berlín",
     "suggestion3": "Coche clásico",
-    "suggestion4": "Director buscado"
+    "suggestion4": "Director buscado",
+    "accessibleLabel": "Buscar en el sitio web",
+    "clearSearch": "Borrar búsqueda"
   },
   "notifications": {
     "ariaLabel": "Notificaciones",
@@ -303,7 +305,7 @@
     "step2Title": "Ofrece o busca",
     "step2Desc": "Publica una locación, contrata equipo o publica un empleo.",
     "step3Title": "Empieza directamente",
-    "step3Desc": "Contacto directo, sin agencia. Pago mediante fideicomiso.",
+    "step3Desc": "Contacto directo, sin agencia. Acuerda las condiciones y el pago directamente.",
     "platformLabel": "Todo en una plataforma",
     "platformTitle": "El Mercado para Creativos",
     "platformDiscoverAll": "Descubrir todo",
@@ -1111,7 +1113,10 @@
     "join": "Te damos la bienvenida a CineGenius",
     "startFree": "Empieza gratis",
     "loadingLabel": "Cargando formulario de acceso",
-    "loading": "Cargando formulario…"
+    "loading": "Cargando formulario…",
+    "acceptTerms": "Acepto las <terms>condiciones de uso</terms>.",
+    "registrationLegalNotice": "Al seleccionar «Crear cuenta», aceptas las <terms>condiciones de uso</terms>. El <privacy>aviso de privacidad</privacy> explica cómo tratamos tus datos.",
+    "registrationPrivacyNotice": "El <privacy>aviso de privacidad</privacy> explica cómo tratamos tus datos."
   },
   "language": {
     "choose": "Elegir idioma",
@@ -2022,5 +2027,70 @@
   "SessionTransition": {
     "loading": "Actualizando tu sesión …",
     "home": "Abrir la página de inicio"
+  },
+  "BookingRequest": {
+    "request": "Solicitar reserva",
+    "step": "Paso {step} de 2",
+    "details": "Datos de la solicitud",
+    "review": "Revisar solicitud",
+    "choosePeriod": "Elegir fechas",
+    "from": "Desde",
+    "until": "Hasta",
+    "notes": "Detalles de producción (opcional)",
+    "notesPlaceholder": "Descripción del proyecto, tamaño del equipo, requisitos especiales …",
+    "directAgreement": "Acuerdo directo",
+    "directTerms": "Acuerda el precio, la disponibilidad, el pago y la cancelación directamente con el proveedor. CineGenius no ofrece pagos en depósito aquí.",
+    "continue": "Continuar al resumen",
+    "listing": "Anuncio",
+    "period": "Fechas",
+    "duration": "Duración",
+    "estimatedTotal": "Resumen de precio orientativo",
+    "howItWorks": "Cómo funciona la solicitud",
+    "flow1": "Envía una solicitud con los detalles de tu proyecto.",
+    "flow2": "El proveedor revisa la solicitud y responde con sus condiciones.",
+    "flow3": "Acuerda directamente el precio, la disponibilidad y las condiciones.",
+    "flow4": "Acuerda una reserva vinculante y el pago por separado con el proveedor.",
+    "acknowledgement": "Entiendo que esto es una solicitud, todavía no una reserva vinculante ni un pago. Se aplican las <terms>condiciones de uso</terms>.",
+    "back": "Atrás",
+    "sending": "Enviando solicitud …",
+    "send": "Enviar solicitud",
+    "summary": "Resumen de la solicitud",
+    "requestOnly": "Esta solicitud no incluye un pago",
+    "noCommission": "Sin comisión de la plataforma",
+    "submitError": "No se ha confirmado que la solicitud esté guardada. Revisa tus solicitudes en el panel antes de enviarla de nuevo. Tus datos se conservan.",
+    "typeLocation": "Localización",
+    "typeVehicle": "Vehículo",
+    "typeProp": "Artículo del mercado",
+    "typeCreator": "Profesional audiovisual",
+    "days": "{count, plural, one {# día} other {# días}}",
+    "sentTitle": "Solicitud de reserva enviada",
+    "sentBody": "Se ha enviado tu solicitud para «{title}». Referencia: {ref}",
+    "incomingTitle": "Nueva solicitud de reserva",
+    "incomingBody": "{name} ha enviado una solicitud para «{title}». Aún no se ha confirmado ninguna reserva.",
+    "incomingSubject": "Nueva solicitud: «{title}»",
+    "viewRequest": "Ver solicitud"
+  },
+  "AvailabilityCalendar": {
+    "prevMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "date": "{date}",
+    "bookedDate": "{date}, no disponible",
+    "pastDate": "{date}, en el pasado",
+    "selected": "Seleccionado",
+    "booked": "No disponible",
+    "available": "Disponible",
+    "chooseStart": "Elige una fecha de inicio",
+    "chooseEnd": "{date} seleccionado – elige la fecha final",
+    "total": "Total",
+    "reset": "Restablecer selección",
+    "days": "{count, plural, one {# día} other {# días}}"
+  },
+  "LegalAuditOriginal": {
+    "scope": "Diese Allgemeinen Geschäftsbedingungen (nachfolgend „AGB“) gelten für die Nutzung der Online-Plattform CineGenius unter der Domain cinegenius.co, betrieben von Markus Müller, Plinganserstr. 19, 81369 München (nachfolgend „Betreiber“). Vor dem Erstellen deines Kontos kannst du diese AGB über den Hinweis im Registrierungsformular aufrufen. Mit dem Erstellen des Kontos stimmst du den dort verlinkten AGB zu. Der bloße Besuch der Website gilt nicht als Zustimmung. Abweichende Bedingungen der Nutzer gelten nicht, es sei denn, der Betreiber stimmt ihrer Geltung ausdrücklich schriftlich zu.",
+    "termsDate": "Stand: 31. Oktober 2026",
+    "privacyDate": "Gemäß DSGVO, BDSG und TDDDG — Stand: 31. Oktober 2026",
+    "sentryPrepared": "Für die Fehlerdiagnose sind Konfigurationsdateien für Sentry (Functional Software Inc., San Francisco, USA) vorbereitet. Diese Dateien allein aktivieren noch keine Übermittlung; in der aktuellen Anwendung ist keine Sentry-Initialisierung eingebunden.",
+    "replayDisabled": "Session Replay ist auch in der vorbereiteten Konfiguration deaktiviert. Es werden dadurch keine Sitzungsaufzeichnungen oder vorgelagerten Replay-Puffer erstellt. Eine spätere Aktivierung erfordert zuvor die Prüfung des Zwecks, der Rechtsgrundlage und gegebenenfalls eine wirksame Einwilligung. Dieser Datenschutzhinweis ersetzt keine Einwilligung.",
+    "sentryPurpose": "Fehlerdiagnose vorbereitet; Session Replay deaktiviert (siehe Abschnitt 12)"
   }
 }

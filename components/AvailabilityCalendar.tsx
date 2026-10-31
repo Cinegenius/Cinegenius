@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { bookingDateKey, bookingDays } from "@/lib/booking-request";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function toKey(d: Date) {
-  return d.toISOString().split("T")[0];
+  return bookingDateKey(d);
 }
 
 function sameDay(a: Date, b: Date) {
@@ -25,7 +27,7 @@ function addDays(d: Date, n: number) {
 }
 
 function diffDays(a: Date, b: Date) {
-  return Math.round(Math.abs(b.getTime() - a.getTime()) / 86_400_000) + 1;
+  return bookingDays(toKey(a), toKey(b));
 }
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -34,12 +36,16 @@ interface Props {
   dailyRate: number;
   currency?: string;
   onSelect: (start: Date, end: Date, days: number) => void;
+  onReset?: () => void;
   blockedDates?: string[]; // ISO date strings "YYYY-MM-DD"
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function AvailabilityCalendar({ dailyRate, currency = "€", onSelect, blockedDates }: Props) {
+export default function AvailabilityCalendar({ dailyRate, currency = "€", onSelect, onReset, blockedDates }: Props) {
+  const locale = useLocale();
+  const t = useTranslations("AvailabilityCalendar");
+  const formatDate = (date: Date) => date.toLocaleDateString(locale, {day: "numeric", month: "short", year: "numeric"});
   const today = useMemo(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
@@ -99,11 +105,12 @@ export default function AvailabilityCalendar({ dailyRate, currency = "€", onSe
       // Start fresh
       setStart(d);
       setEnd(null);
+      onReset?.();
       return;
     }
 
     // Setting end
-    if (d.getTime() <= start.getTime()) {
+    if (d.getTime() < start.getTime()) {
       setStart(d);
       return;
     }
@@ -112,6 +119,7 @@ export default function AvailabilityCalendar({ dailyRate, currency = "€", onSe
       // Can't select range crossing booked dates — restart from clicked day
       setStart(d);
       setEnd(null);
+      onReset?.();
       return;
     }
 
@@ -126,8 +134,8 @@ export default function AvailabilityCalendar({ dailyRate, currency = "€", onSe
   const selectedDays = start && end ? diffDays(start, end) : 0;
   const subtotal = selectedDays * dailyRate;
 
-  const monthNames = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
-  const dayHeaders = ["Mo","Di","Mi","Do","Fr","Sa","So"];
+  const monthLabel = new Date(viewYear, viewMonth, 1).toLocaleDateString(locale, {month: "long", year: "numeric"});
+  const dayHeaders = Array.from({length: 7}, (_, i) => new Date(2026, 9, 26 + i).toLocaleDateString(locale, {weekday: "short"}));
 
   const getCellStyle = (d: Date) => {
     const past    = isPast(d);
@@ -179,17 +187,21 @@ export default function AvailabilityCalendar({ dailyRate, currency = "€", onSe
       {/* Calendar header */}
       <div className="flex items-center justify-between mb-2">
         <button
+          type="button"
+          aria-label={t("prevMonth")}
           onClick={prevMonth}
-          className="w-7 h-7 flex items-center justify-center rounded-lg text-text-muted hover:text-gold hover:bg-bg-elevated transition-all"
+          className="min-w-11 min-h-11 flex items-center justify-center rounded-lg text-text-muted hover:text-gold hover:bg-bg-elevated transition-all"
         >
           <ChevronLeft size={15} />
         </button>
-        <span className="text-sm font-semibold text-text-primary">
-          {monthNames[viewMonth]} {viewYear}
+        <span aria-live="polite" className="text-sm font-semibold text-text-primary">
+          {monthLabel}
         </span>
         <button
+          type="button"
+          aria-label={t("nextMonth")}
           onClick={nextMonth}
-          className="w-7 h-7 flex items-center justify-center rounded-lg text-text-muted hover:text-gold hover:bg-bg-elevated transition-all"
+          className="min-w-11 min-h-11 flex items-center justify-center rounded-lg text-text-muted hover:text-gold hover:bg-bg-elevated transition-all"
         >
           <ChevronRight size={15} />
         </button>
@@ -210,16 +222,20 @@ export default function AvailabilityCalendar({ dailyRate, currency = "€", onSe
           if (!d) return <div key={`empty-${i}`} />;
           const { cell, text, dot } = getCellStyle(d);
           return (
-            <div
+            <button
+              type="button"
+              disabled={isPast(d) || isBooked(d)}
+              aria-label={t(isBooked(d) ? "bookedDate" : isPast(d) ? "pastDate" : "date", {date: d.toLocaleDateString(locale, {dateStyle: "full"})})}
+              aria-pressed={Boolean(start && (sameDay(d, start) || (end && (sameDay(d, end) || inRange(d, start, end)))))}
               key={toKey(d)}
-              className={`relative flex items-center justify-center h-9 text-sm transition-all select-none ${cell}`}
+              className={`relative flex items-center justify-center min-h-11 text-sm transition-all select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:z-10 ${cell}`}
               onClick={() => handleClick(d)}
               onMouseEnter={() => setHover(d)}
               onMouseLeave={() => setHover(null)}
             >
               <span className={text}>{d.getDate()}</span>
               {dot && <span className={`absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full ${dot}`} />}
-            </div>
+            </button>
           );
         })}
       </div>
@@ -228,27 +244,27 @@ export default function AvailabilityCalendar({ dailyRate, currency = "€", onSe
       <div className="flex items-center gap-4 pt-2 border-t border-border">
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-full bg-gold" />
-          <span className="text-[10px] text-text-muted">Ausgewählt</span>
+          <span className="text-[10px] text-text-muted">{t("selected")}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-full bg-crimson/30" />
-          <span className="text-[10px] text-text-muted">Belegt</span>
+          <span className="text-[10px] text-text-muted">{t("booked")}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-full bg-bg-elevated border border-border" />
-          <span className="text-[10px] text-text-muted">Verfügbar</span>
+          <span className="text-[10px] text-text-muted">{t("available")}</span>
         </div>
       </div>
 
       {/* Selection state hint */}
       {!start && (
-        <p className="text-xs text-text-muted text-center py-2">
-          Startdatum auswählen
+        <p role="status" className="text-xs text-text-muted text-center py-2">
+          {t("chooseStart")}
         </p>
       )}
       {start && !end && (
-        <p className="text-xs text-gold text-center py-2">
-          {start.toLocaleDateString("de-DE", { day: "numeric", month: "short" })} gewählt — jetzt Enddatum wählen
+        <p role="status" className="text-xs text-gold text-center py-2">
+          {t("chooseEnd", {date: formatDate(start)})}
         </p>
       )}
 
@@ -257,28 +273,29 @@ export default function AvailabilityCalendar({ dailyRate, currency = "€", onSe
         <div className="bg-bg-elevated border border-gold/20 rounded-xl p-4 space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-text-muted">
-              {start.toLocaleDateString("de-DE", { day: "numeric", month: "short" })}
+              {formatDate(start)}
               {" – "}
-              {end.toLocaleDateString("de-DE", { day: "numeric", month: "short", year: "numeric" })}
+              {formatDate(end)}
             </span>
-            <span className="text-text-primary font-medium">{selectedDays} {selectedDays === 1 ? "Tag" : "Tage"}</span>
+            <span className="text-text-primary font-medium">{t("days", {count: selectedDays})}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-text-muted">{dailyRate.toLocaleString()} {currency} × {selectedDays} Tage</span>
-            <span className="text-text-primary">{subtotal.toLocaleString()} {currency}</span>
+            <span className="text-text-muted">{dailyRate.toLocaleString(locale)} {currency} × {t("days", {count: selectedDays})}</span>
+            <span className="text-text-primary">{subtotal.toLocaleString(locale)} {currency}</span>
           </div>
           <div className="flex justify-between font-bold text-base pt-2 border-t border-border">
-            <span className="text-text-primary">Gesamt</span>
-            <span className="text-gold font-display">{subtotal.toLocaleString()} {currency}</span>
+            <span className="text-text-primary">{t("total")}</span>
+            <span className="text-gold font-display">{subtotal.toLocaleString(locale)} {currency}</span>
           </div>
           <button
+            type="button"
             onClick={() => {
-              const reset = () => { setStart(null); setEnd(null); };
+              const reset = () => { setStart(null); setEnd(null); setHover(null); onReset?.(); };
               reset();
             }}
             className="text-xs text-text-muted hover:text-gold transition-colors w-full text-center pt-1"
           >
-            Auswahl zurücksetzen
+            {t("reset")}
           </button>
         </div>
       )}

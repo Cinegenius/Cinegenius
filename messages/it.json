@@ -87,7 +87,9 @@
     "suggestion1": "Cameraman",
     "suggestion2": "Magazzino Berlino",
     "suggestion3": "Auto d'epoca",
-    "suggestion4": "Regista cercato"
+    "suggestion4": "Regista cercato",
+    "accessibleLabel": "Cerca nel sito",
+    "clearSearch": "Cancella ricerca"
   },
   "notifications": {
     "ariaLabel": "Notifiche",
@@ -303,7 +305,7 @@
     "step2Title": "Offri o cerca",
     "step2Desc": "Pubblica una location, prenota crew o inserisci un lavoro.",
     "step3Title": "Inizia direttamente",
-    "step3Desc": "Contatto diretto, nessuna agenzia. Pagamento tramite deposito.",
+    "step3Desc": "Contatto diretto, senza agenzia. Concorda direttamente condizioni e pagamento.",
     "platformLabel": "Tutto su una piattaforma",
     "platformTitle": "Il Marketplace per i Creativi",
     "platformDiscoverAll": "Scopri tutto",
@@ -1111,7 +1113,10 @@
     "join": "Benvenuto/a su CineGenius",
     "startFree": "Inizia gratis",
     "loadingLabel": "Caricamento del modulo di accesso",
-    "loading": "Caricamento modulo…"
+    "loading": "Caricamento modulo…",
+    "acceptTerms": "Accetto le <terms>condizioni di utilizzo</terms>.",
+    "registrationLegalNotice": "Selezionando «Crea account», accetti le <terms>condizioni di utilizzo</terms>. L’<privacy>informativa sulla privacy</privacy> spiega come trattiamo i tuoi dati.",
+    "registrationPrivacyNotice": "L’<privacy>informativa sulla privacy</privacy> spiega come trattiamo i tuoi dati."
   },
   "language": {
     "choose": "Scegli lingua",
@@ -2022,5 +2027,70 @@
   "SessionTransition": {
     "loading": "Aggiornamento della sessione …",
     "home": "Apri la pagina iniziale"
+  },
+  "BookingRequest": {
+    "request": "Richiedi una prenotazione",
+    "step": "Passaggio {step} di 2",
+    "details": "Dettagli della richiesta",
+    "review": "Controlla la richiesta",
+    "choosePeriod": "Scegli le date",
+    "from": "Dal",
+    "until": "Al",
+    "notes": "Dettagli di produzione (facoltativi)",
+    "notesPlaceholder": "Descrizione del progetto, dimensioni del team, esigenze particolari …",
+    "directAgreement": "Accordo diretto",
+    "directTerms": "Concorda prezzo, disponibilità, pagamento e cancellazione direttamente con il fornitore. CineGenius non offre pagamenti in deposito qui.",
+    "continue": "Continua al riepilogo",
+    "listing": "Annuncio",
+    "period": "Date",
+    "duration": "Durata",
+    "estimatedTotal": "Riepilogo indicativo del prezzo",
+    "howItWorks": "Come funziona la richiesta",
+    "flow1": "Invia una richiesta con i dettagli del progetto.",
+    "flow2": "Il fornitore esamina la richiesta e risponde con le proprie condizioni.",
+    "flow3": "Concorda direttamente prezzo, disponibilità e condizioni.",
+    "flow4": "Concorda separatamente una prenotazione vincolante e il pagamento con il fornitore.",
+    "acknowledgement": "Comprendo che questa è una richiesta, non ancora una prenotazione vincolante o un pagamento. Si applicano le <terms>condizioni di utilizzo</terms>.",
+    "back": "Indietro",
+    "sending": "Invio della richiesta …",
+    "send": "Invia richiesta",
+    "summary": "Riepilogo della richiesta",
+    "requestOnly": "Nessun pagamento con questa richiesta",
+    "noCommission": "Nessuna commissione della piattaforma",
+    "submitError": "Il salvataggio della richiesta non è stato confermato. Controlla le richieste nel pannello prima di inviarla di nuovo. I dati inseriti sono conservati.",
+    "typeLocation": "Location",
+    "typeVehicle": "Veicolo",
+    "typeProp": "Articolo del marketplace",
+    "typeCreator": "Professionista del cinema",
+    "days": "{count, plural, one {# giorno} other {# giorni}}",
+    "sentTitle": "Richiesta di prenotazione inviata",
+    "sentBody": "La tua richiesta per «{title}» è stata inviata. Riferimento: {ref}",
+    "incomingTitle": "Nuova richiesta di prenotazione",
+    "incomingBody": "{name} ha inviato una richiesta per «{title}». Nessuna prenotazione è ancora confermata.",
+    "incomingSubject": "Nuova richiesta: «{title}»",
+    "viewRequest": "Visualizza richiesta"
+  },
+  "AvailabilityCalendar": {
+    "prevMonth": "Mese precedente",
+    "nextMonth": "Mese successivo",
+    "date": "{date}",
+    "bookedDate": "{date}, non disponibile",
+    "pastDate": "{date}, nel passato",
+    "selected": "Selezionato",
+    "booked": "Non disponibile",
+    "available": "Disponibile",
+    "chooseStart": "Scegli una data di inizio",
+    "chooseEnd": "{date} selezionato – ora scegli la data finale",
+    "total": "Totale",
+    "reset": "Reimposta selezione",
+    "days": "{count, plural, one {# giorno} other {# giorni}}"
+  },
+  "LegalAuditOriginal": {
+    "scope": "Diese Allgemeinen Geschäftsbedingungen (nachfolgend „AGB“) gelten für die Nutzung der Online-Plattform CineGenius unter der Domain cinegenius.co, betrieben von Markus Müller, Plinganserstr. 19, 81369 München (nachfolgend „Betreiber“). Vor dem Erstellen deines Kontos kannst du diese AGB über den Hinweis im Registrierungsformular aufrufen. Mit dem Erstellen des Kontos stimmst du den dort verlinkten AGB zu. Der bloße Besuch der Website gilt nicht als Zustimmung. Abweichende Bedingungen der Nutzer gelten nicht, es sei denn, der Betreiber stimmt ihrer Geltung ausdrücklich schriftlich zu.",
+    "termsDate": "Stand: 31. Oktober 2026",
+    "privacyDate": "Gemäß DSGVO, BDSG und TDDDG — Stand: 31. Oktober 2026",
+    "sentryPrepared": "Für die Fehlerdiagnose sind Konfigurationsdateien für Sentry (Functional Software Inc., San Francisco, USA) vorbereitet. Diese Dateien allein aktivieren noch keine Übermittlung; in der aktuellen Anwendung ist keine Sentry-Initialisierung eingebunden.",
+    "replayDisabled": "Session Replay ist auch in der vorbereiteten Konfiguration deaktiviert. Es werden dadurch keine Sitzungsaufzeichnungen oder vorgelagerten Replay-Puffer erstellt. Eine spätere Aktivierung erfordert zuvor die Prüfung des Zwecks, der Rechtsgrundlage und gegebenenfalls eine wirksame Einwilligung. Dieser Datenschutzhinweis ersetzt keine Einwilligung.",
+    "sentryPurpose": "Fehlerdiagnose vorbereitet; Session Replay deaktiviert (siehe Abschnitt 12)"
   }
 }

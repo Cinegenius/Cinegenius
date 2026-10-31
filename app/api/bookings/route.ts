@@ -14,11 +14,14 @@
 //   platform_fee numeric NOT NULL DEFAULT 0,
 //   total numeric NOT NULL DEFAULT 0,
 //   notes text,
-//   status text NOT NULL DEFAULT 'confirmed',
+//   status text NOT NULL DEFAULT 'pending',
 //   created_at timestamptz DEFAULT now()
 // );
 // CREATE INDEX bookings_user_id_idx ON bookings(user_id, created_at DESC);
 
+import {getTranslations} from "next-intl/server";
+import {resolveLocale} from "@/lib/i18n/locales";
+import {bookingDays} from "@/lib/booking-request";
 import { db } from "@/lib/db";
 import { requireAuth, getCurrentUser } from "@/lib/auth";
 import { clerkClient } from "@clerk/nextjs/server";
@@ -34,6 +37,7 @@ export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
+  const t = await getTranslations("BookingRequest");
 
   const body = await req.json();
   const { listingId, startDate, endDate, notes } = body;
@@ -59,7 +63,7 @@ export async function POST(req: NextRequest) {
   if (isNaN(start.getTime()) || isNaN(end.getTime()) || end < start) {
     return NextResponse.json({ error: "Ungültige Datumsangaben" }, { status: 400 });
   }
-  const days         = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / 86_400_000));
+  const days         = bookingDays(startDate, endDate);
   const listingTitle = listing.title;
   const dailyRate    = Number(listing.price) || 0;
   const subtotal  = dailyRate * days;
@@ -89,7 +93,7 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error) {
-    console.error("Booking insert error:", error);
+    console.error("Booking insert failed", {code: error.code ?? "UNKNOWN"});
     return NextResponse.json({ error: "Buchung konnte nicht gespeichert werden" }, { status: 500 });
   }
 
@@ -97,8 +101,8 @@ export async function POST(req: NextRequest) {
   await db.from("notifications").insert({
     user_id: userId,
     type: "booking_request",
-    title: "Buchungsanfrage gesendet",
-    body: `Deine Anfrage für „${listingTitle}" wurde gesendet. Referenz: ${ref}`,
+    title: t("sentTitle"),
+    body: t("sentBody", {title: listingTitle, ref}),
     href: `/dashboard?tab=bookings`,
   });
 
@@ -119,18 +123,22 @@ export async function POST(req: NextRequest) {
         .maybeSingle();
 
       if (listingData?.user_id && listingData.user_id !== userId) {
+        let ownerUser = null;
+        try {
+          ownerUser = await (await clerkClient()).users.getUser(listingData.user_id);
+        } catch { /* In-app delivery must not depend on the email account lookup. */ }
+        const ownerLocale = resolveLocale(ownerUser?.unsafeMetadata?.locale ?? ownerUser?.publicMetadata?.locale);
+        const ownerCopy = await getTranslations({locale: ownerLocale, namespace: "BookingRequest"});
         await db.from("notifications").insert({
           user_id: listingData.user_id,
           type: "booking_request",
-          title: "Neue Buchungsanfrage",
-          body: `${guestName} hat „${listingTitle}" gebucht.`,
+          title: ownerCopy("incomingTitle"),
+          body: ownerCopy("incomingBody", {name: guestName, title: listingTitle}),
           href: "/dashboard?tab=bookings",
         });
 
-        const clerk = await clerkClient();
-        const ownerUser = await clerk.users.getUser(listingData.user_id);
-        const ownerEmail = ownerUser.emailAddresses[0]?.emailAddress;
-        if (ownerEmail) await sendNewBookingEmail(ownerEmail, listingTitle, guestName);
+        const ownerEmail = ownerUser?.emailAddresses[0]?.emailAddress;
+        if (ownerEmail) await sendNewBookingEmail(ownerEmail, listingTitle, guestName, ownerLocale);
       }
     }
   } catch { /* email is best-effort */ }

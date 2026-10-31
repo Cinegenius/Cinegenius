@@ -4,6 +4,8 @@ import { listingPriceLabel } from "@/lib/listing-price";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { bookingDateKey } from "@/lib/booking-request";
 import ContextBackLink from "@/components/ContextBackLink";
 import {
   MapPin, Star, CheckCircle, Users, Zap, ArrowLeft,
@@ -74,6 +76,7 @@ const AMENITY_ICONS: Record<string, React.ComponentType<{ size?: number; classNa
 };
 
 export default function LocationDetail({ location }: { location: Location }) {
+  const bookingCopy = useTranslations("BookingRequest");
   const { user } = useUser();
   const isOwner = !!user && user.id === location.ownerId;
 
@@ -142,8 +145,8 @@ export default function LocationDetail({ location }: { location: Location }) {
       `/booking/checkout?type=location&id=${location.id}` +
       `&title=${encodeURIComponent(location.title)}` +
       `&price=${location.price}&days=${bookingDays}` +
-      `&startDate=${bookingStart.toISOString().split("T")[0]}` +
-      `&endDate=${bookingEnd.toISOString().split("T")[0]}`
+      `&startDate=${bookingDateKey(bookingStart)}` +
+      `&endDate=${bookingDateKey(bookingEnd)}`
     );
   };
 
@@ -365,6 +368,7 @@ export default function LocationDetail({ location }: { location: Location }) {
                 <AvailabilityCalendar
                   dailyRate={location.price}
                   onSelect={handleCalendarSelect}
+                  onReset={() => {setBookingStart(null); setBookingEnd(null); setBookingDays(0);}}
                   blockedDates={location.blocked_dates}
                 />
 
@@ -372,10 +376,10 @@ export default function LocationDetail({ location }: { location: Location }) {
                   className={`w-full mt-4 py-3 font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 ${
                     location.ownerId && bookingStart && bookingEnd ? "bg-gold text-bg-primary hover:bg-gold-light cursor-pointer" : "bg-border text-text-muted cursor-not-allowed"
                   }`}>
-                  {location.instantBook ? <><Zap size={15} /> Sofort buchen</> : <><MessageSquare size={15} /> Buchung anfragen</>}
+                  <MessageSquare size={15} /> {bookingCopy("request")}
                 </button>
                 <p className="text-center text-xs text-text-muted flex items-center justify-center gap-1 mt-2">
-                  <Shield size={11} /> Sichere Zahlung · Geld in Treuhand bis Bestätigung
+                  <Shield size={11} /> {bookingCopy("directTerms")}
                 </p>
               </div>
 

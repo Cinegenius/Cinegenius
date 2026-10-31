@@ -87,7 +87,9 @@
     "suggestion1": "Kameraman",
     "suggestion2": "Sklad Berlín",
     "suggestion3": "Veterán",
-    "suggestion4": "Hledá se režisér"
+    "suggestion4": "Hledá se režisér",
+    "accessibleLabel": "Prohledat web",
+    "clearSearch": "Vymazat hledání"
   },
   "notifications": {
     "ariaLabel": "Oznámení",
@@ -303,7 +305,7 @@
     "step2Title": "Nabídni nebo hledej",
     "step2Desc": "Zveřejni lokaci, najmi štáb nebo vypiš práci.",
     "step3Title": "Začni přímo",
-    "step3Desc": "Přímý kontakt, žádná agentura. Platba přes escrow.",
+    "step3Desc": "Přímý kontakt, bez agentury. Podmínky a platbu si dohodni přímo.",
     "platformLabel": "Vše na jedné platformě",
     "platformTitle": "Tržiště pro kreativce",
     "platformDiscoverAll": "Objevit vše",
@@ -1111,7 +1113,10 @@
     "join": "Vítejte na CineGenius",
     "startFree": "Začít zdarma",
     "loadingLabel": "Načítání přihlašovacího formuláře",
-    "loading": "Načítání formuláře…"
+    "loading": "Načítání formuláře…",
+    "acceptTerms": "Přijímám <terms>podmínky použití</terms>.",
+    "registrationLegalNotice": "Výběrem „Vytvořit účet“ přijímáš <terms>podmínky použití</terms>. Zpracování údajů vysvětlují <privacy>informace o ochraně osobních údajů</privacy>.",
+    "registrationPrivacyNotice": "Zpracování údajů vysvětlují <privacy>informace o ochraně osobních údajů</privacy>."
   },
   "language": {
     "choose": "Vybrat jazyk",
@@ -2022,5 +2027,70 @@
   "SessionTransition": {
     "loading": "Aktualizace relace …",
     "home": "Otevřít úvodní stránku"
+  },
+  "BookingRequest": {
+    "request": "Požádat o rezervaci",
+    "step": "Krok {step} ze 2",
+    "details": "Údaje poptávky",
+    "review": "Zkontrolovat poptávku",
+    "choosePeriod": "Vybrat termín",
+    "from": "Od",
+    "until": "Do",
+    "notes": "Podrobnosti produkce (nepovinné)",
+    "notesPlaceholder": "Popis projektu, velikost týmu, zvláštní požadavky …",
+    "directAgreement": "Přímá dohoda",
+    "directTerms": "Cenu, dostupnost, platbu a storno si dohodni přímo s poskytovatelem. CineGenius zde nenabízí platby přes úschovu.",
+    "continue": "Pokračovat na přehled",
+    "listing": "Inzerát",
+    "period": "Termín",
+    "duration": "Délka",
+    "estimatedTotal": "Orientační přehled ceny",
+    "howItWorks": "Jak poptávka funguje",
+    "flow1": "Pošli poptávku s podrobnostmi projektu.",
+    "flow2": "Poskytovatel poptávku posoudí a odpoví se svými podmínkami.",
+    "flow3": "Dohodni si přímo cenu, dostupnost a podmínky.",
+    "flow4": "Závaznou rezervaci a platbu si dohodni zvlášť s poskytovatelem.",
+    "acknowledgement": "Rozumím, že jde o poptávku, nikoli ještě o závaznou rezervaci nebo platbu. Platí <terms>podmínky použití</terms>.",
+    "back": "Zpět",
+    "sending": "Odesílání poptávky …",
+    "send": "Odeslat poptávku",
+    "summary": "Přehled poptávky",
+    "requestOnly": "Tato poptávka nevyžaduje platbu",
+    "noCommission": "Bez provize platformy",
+    "submitError": "Uložení poptávky nebylo potvrzeno. Před dalším odesláním zkontroluj poptávky v přehledu. Zadané údaje zůstanou zachovány.",
+    "typeLocation": "Lokace",
+    "typeVehicle": "Vozidlo",
+    "typeProp": "Položka tržiště",
+    "typeCreator": "Filmový profesionál",
+    "days": "{count, plural, one {# den} few {# dny} other {# dní}}",
+    "sentTitle": "Poptávka rezervace odeslána",
+    "sentBody": "Tvá poptávka pro „{title}“ byla odeslána. Reference: {ref}",
+    "incomingTitle": "Nová poptávka rezervace",
+    "incomingBody": "{name} poslal(a) poptávku pro „{title}“. Rezervace zatím není potvrzena.",
+    "incomingSubject": "Nová poptávka: „{title}“",
+    "viewRequest": "Zobrazit poptávku"
+  },
+  "AvailabilityCalendar": {
+    "prevMonth": "Předchozí měsíc",
+    "nextMonth": "Další měsíc",
+    "date": "{date}",
+    "bookedDate": "{date}, obsazeno",
+    "pastDate": "{date}, v minulosti",
+    "selected": "Vybráno",
+    "booked": "Obsazeno",
+    "available": "Dostupné",
+    "chooseStart": "Vyber počáteční datum",
+    "chooseEnd": "Vybráno {date} – nyní vyber koncové datum",
+    "total": "Celkem",
+    "reset": "Zrušit výběr",
+    "days": "{count, plural, one {# den} few {# dny} other {# dní}}"
+  },
+  "LegalAuditOriginal": {
+    "scope": "Diese Allgemeinen Geschäftsbedingungen (nachfolgend „AGB“) gelten für die Nutzung der Online-Plattform CineGenius unter der Domain cinegenius.co, betrieben von Markus Müller, Plinganserstr. 19, 81369 München (nachfolgend „Betreiber“). Vor dem Erstellen deines Kontos kannst du diese AGB über den Hinweis im Registrierungsformular aufrufen. Mit dem Erstellen des Kontos stimmst du den dort verlinkten AGB zu. Der bloße Besuch der Website gilt nicht als Zustimmung. Abweichende Bedingungen der Nutzer gelten nicht, es sei denn, der Betreiber stimmt ihrer Geltung ausdrücklich schriftlich zu.",
+    "termsDate": "Stand: 31. Oktober 2026",
+    "privacyDate": "Gemäß DSGVO, BDSG und TDDDG — Stand: 31. Oktober 2026",
+    "sentryPrepared": "Für die Fehlerdiagnose sind Konfigurationsdateien für Sentry (Functional Software Inc., San Francisco, USA) vorbereitet. Diese Dateien allein aktivieren noch keine Übermittlung; in der aktuellen Anwendung ist keine Sentry-Initialisierung eingebunden.",
+    "replayDisabled": "Session Replay ist auch in der vorbereiteten Konfiguration deaktiviert. Es werden dadurch keine Sitzungsaufzeichnungen oder vorgelagerten Replay-Puffer erstellt. Eine spätere Aktivierung erfordert zuvor die Prüfung des Zwecks, der Rechtsgrundlage und gegebenenfalls eine wirksame Einwilligung. Dieser Datenschutzhinweis ersetzt keine Einwilligung.",
+    "sentryPurpose": "Fehlerdiagnose vorbereitet; Session Replay deaktiviert (siehe Abschnitt 12)"
   }
 }

@@ -1,3 +1,4 @@
+import {getTranslations} from "next-intl/server";
 import Link from "next/link";
 
 export const metadata = {
@@ -5,7 +6,8 @@ export const metadata = {
   description: "Allgemeine Geschäftsbedingungen von CineGenius",
 };
 
-export default function AgbPage() {
+export default async function AgbPage() {
+  const t = await getTranslations("LegalAuditOriginal");
   return (
     <div className="pt-16 min-h-screen min-w-0 bg-bg-primary [overflow-wrap:anywhere]">
       <div className="max-w-2xl mx-auto px-4 py-16">
@@ -13,7 +15,7 @@ export default function AgbPage() {
         <div className="mb-10">
           <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-3">Rechtliches</p>
           <h1 className="font-display text-3xl font-bold text-text-primary mb-2">Allgemeine Geschäftsbedingungen</h1>
-          <p className="text-text-muted text-sm">Stand: 26. Oktober 2026</p>
+          <p className="text-text-muted text-sm">{t("termsDate")}</p>
         </div>
 
         <div className="space-y-8 text-text-secondary">
@@ -21,12 +23,7 @@ export default function AgbPage() {
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-2">§ 1 Geltungsbereich</h2>
             <p className="text-sm leading-relaxed">
-              Diese Allgemeinen Geschäftsbedingungen (nachfolgend „AGB“) gelten für die Nutzung der
-              Online-Plattform CineGenius unter der Domain cinegenius.co, betrieben von Markus Müller,
-              Plinganserstr. 19, 81369 München (nachfolgend „Betreiber“). Mit der Registrierung oder
-              der erstmaligen Nutzung der Plattform erkennst du diese AGB in ihrer jeweils gültigen
-              Fassung an. Abweichende Bedingungen der Nutzer gelten nicht, es sei denn, der Betreiber
-              stimmt ihrer Geltung ausdrücklich schriftlich zu.
+              {t("scope")}
             </p>
           </section>
 
@@ -85,7 +82,6 @@ export default function AgbPage() {
               <li>Verwendung urheberrechtlich geschützten Materials ohne ausdrückliche Erlaubnis</li>
               <li>Spam, automatisierte Masseneintragungen oder Scraping</li>
               <li>Umgehung von Sicherheitsmechanismen oder missbräuchliche Nutzung der API</li>
-              <li>Direktkontakt-Verlagerung zur Umgehung der Plattformprovision</li>
               <li>Veröffentlichung personenbezogener Daten Dritter ohne deren Einwilligung</li>
               <li>Inserate, die nicht der tatsächlich angebotenen Leistung entsprechen</li>
             </ul>

@@ -1,3 +1,4 @@
+import {getTranslations} from "next-intl/server";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -6,7 +7,8 @@ export const metadata: Metadata = {
   description: "Datenschutzerklärung gemäß DSGVO für CineGenius — vollständige Informationen über Datenverarbeitung, eingesetzte Dienste und deine Rechte.",
 };
 
-export default function DatenschutzPage() {
+export default async function DatenschutzPage() {
+  const t = await getTranslations("LegalAuditOriginal");
   return (
     <div className="pt-16 min-h-screen min-w-0 bg-bg-primary [overflow-wrap:anywhere]">
       <div className="max-w-2xl mx-auto px-4 py-16">
@@ -14,7 +16,7 @@ export default function DatenschutzPage() {
         <div className="mb-10">
           <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-3">Rechtliches</p>
           <h1 className="font-display text-3xl font-bold text-text-primary mb-2">Datenschutzerklärung</h1>
-          <p className="text-text-muted text-sm">Gemäß DSGVO, BDSG und TDDDG — Stand: 26. Oktober 2026</p>
+          <p className="text-text-muted text-sm">{t("privacyDate")}</p>
         </div>
 
         <div className="space-y-10 text-text-secondary text-sm leading-relaxed">
@@ -47,7 +49,7 @@ export default function DatenschutzPage() {
                     ["Supabase", "Datenbank & Dateispeicher", "EU (Frankfurt)"],
                     ["Vercel", "Hosting & CDN", "USA"],
                     ["Stripe", "Zahlungsabwicklung", "USA"],
-                    ["Sentry", "Fehler-Tracking", "USA"],
+                    ["Sentry", t("sentryPurpose"), "USA"],
                     ["Resend", "Transaktions-E-Mails", "USA"],
                     ["Vercel Analytics", "Nutzungsstatistiken (cookielos)", "USA"],
                     ["Vercel Speed Insights", "Performance-Messung (cookielos)", "USA"],
@@ -140,10 +142,10 @@ export default function DatenschutzPage() {
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">12. Fehler-Tracking (Sentry)</h2>
             <p>
-              Zur Erkennung und Behebung technischer Fehler setzen wir <strong className="text-text-primary">Sentry</strong> (Functional Software Inc., San Francisco, USA) ein. Tritt ein Fehler auf, werden technische Informationen — Fehlermeldung, Stack-Trace, Browsertyp, Betriebssystem sowie deine pseudonymisierte Nutzer-ID (kein Name, keine E-Mail) — an Sentry übermittelt. Sentry ist ausschließlich in der Produktionsumgebung aktiv.
+              {t("sentryPrepared")}
             </p>
             <p className="mt-2">
-              Für Sitzungswiederholungen ist normales Session-Sampling deaktiviert; die Fehler-Samplingrate beträgt 100 %. Die Replay-Integration kann dafür einen Puffer der Sitzung vor dem Fehler verwenden. Texte werden maskiert, Medien sind in der aktuellen Konfiguration nicht pauschal blockiert. Eine Behauptung, dass keinerlei Nutzungsabschnitte vor einem Fehler erfasst werden, wäre daher unzutreffend. Die datenschutzrechtliche Grundlage und eine gegebenenfalls erforderliche Einwilligung für diese Aufzeichnung müssen gesondert berücksichtigt werden; dieser Text stellt keine Einwilligung dar.<br />
+              {t("replayDisabled")}<br />
               Datenschutz Sentry: <a href="https://sentry.io/privacy/" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">sentry.io/privacy</a>
             </p>
           </section>

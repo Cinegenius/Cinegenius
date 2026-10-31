@@ -1,14 +1,20 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import {useLocale, useTranslations} from "next-intl";
+import {bookingDateKey, bookingDays, submitBookingRequest} from "@/lib/booking-request";
 import {
   Shield, CreditCard, Calendar, MapPin, Info, Lock,
   ChevronRight, CheckCircle, ArrowLeft, AlertCircle,
 } from "lucide-react";
 
 function CheckoutContent() {
+  const t = useTranslations("BookingRequest");
+  const locale = useLocale();
+  const pending = useRef(false);
+  const [submitError, setSubmitError] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -20,7 +26,7 @@ function CheckoutContent() {
   const urlEnd   = searchParams.get("endDate") ?? "";
   const urlDays  = Number(searchParams.get("days") ?? 1);
 
-  const [days, setDays] = useState(() => urlDays > 0 ? urlDays : 1);
+  const [days, setDays] = useState(() => urlStart && urlEnd ? bookingDays(urlStart, urlEnd) : urlDays > 0 ? urlDays : 1);
   const [startDate, setStartDate] = useState(urlStart);
   const [endDate, setEndDate] = useState(urlEnd);
   const [notes, setNotes] = useState("");
@@ -28,40 +34,29 @@ function CheckoutContent() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = bookingDateKey(new Date());
 
   // Auto-calculate days when both dates are set
   const calcDays = (start: string, end: string) => {
     if (!start || !end) return;
-    const diff = Math.round((new Date(end).getTime() - new Date(start).getTime()) / 86400000);
-    if (diff >= 1) setDays(diff);
+    setDays(bookingDays(start, end));
   };
 
   const subtotal = listingPrice * days;
   const total = subtotal;
 
-  const canProceedStep1 = startDate && endDate && days >= 1;
+  const canProceedStep1 = startDate >= today && endDate >= startDate && days >= 1;
   const canProceedStep2 = agreeTerms;
 
   const handleSubmit = async () => {
+    if (pending.current || !canProceedStep1 || !canProceedStep2) return;
+    pending.current = true;
     setLoading(true);
+    setSubmitError(false);
     try {
-      const res = await fetch("/api/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          listingId: searchParams.get("id"),
-          listingTitle,
-          listingType,
-          startDate,
-          endDate,
-          days,
-          dailyRate: listingPrice,
-          notes,
-        }),
+      const ref = await submitBookingRequest({
+        listingId: searchParams.get("id"), startDate, endDate, notes,
       });
-      const data = await res.json();
-      const ref = res.ok ? data.ref : "CG-" + Math.random().toString(36).slice(2, 8).toUpperCase();
       const params = new URLSearchParams({
         ref,
         title: listingTitle,
@@ -73,15 +68,17 @@ function CheckoutContent() {
       });
       router.push(`/booking/confirmation?${params.toString()}`);
     } catch {
+      setSubmitError(true);
+      pending.current = false;
       setLoading(false);
     }
   };
 
   const typeLabels: Record<string, string> = {
-    location: "Location",
-    vehicle: "Fahrzeug",
-    prop: "Requisite",
-    creator: "Filmschaffende/r",
+    location: t("typeLocation"),
+    vehicle: t("typeVehicle"),
+    prop: t("typeProp"),
+    creator: t("typeCreator"),
   };
 
   return (
@@ -90,18 +87,18 @@ function CheckoutContent() {
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
           <Link href="#" onClick={(e) => { e.preventDefault(); router.back(); }}
-            className="w-9 h-9 rounded-lg border border-border flex items-center justify-center text-text-secondary hover:border-gold hover:text-gold transition-all">
+            aria-label={t("back")} className="min-w-11 min-h-11 rounded-lg border border-border flex items-center justify-center text-text-secondary hover:border-gold hover:text-gold transition-all">
             <ArrowLeft size={16} />
           </Link>
           <div>
-            <h1 className="font-display text-2xl font-bold text-text-primary">Sichere Buchung</h1>
-            <p className="text-xs text-text-muted">Schritt {step} von 2</p>
+            <h1 className="font-display text-2xl font-bold text-text-primary">{t("request")}</h1>
+            <p className="text-xs text-text-muted">{t("step", {step})}</p>
           </div>
         </div>
 
         {/* Progress */}
         <div className="flex items-center gap-3 mb-8">
-          {[{ n: 1, label: "Buchungsdetails" }, { n: 2, label: "Zahlung" }].map(({ n, label }) => (
+          {[{ n: 1, label: t("details") }, { n: 2, label: t("review") }].map(({ n, label }) => (
             <div key={n} className="flex items-center gap-3">
               <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${
                 step === n ? "bg-gold text-bg-primary" :
@@ -124,13 +121,13 @@ function CheckoutContent() {
               <>
                 <div className="p-6 rounded-2xl border border-border bg-bg-secondary">
                   <h2 className="font-semibold text-text-primary mb-5 flex items-center gap-2">
-                    <Calendar size={16} className="text-gold" /> Zeitraum wählen
+                    <Calendar size={16} className="text-gold" /> {t("choosePeriod")}
                   </h2>
-                  <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                     <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">Von</label>
+                      <label htmlFor="request-start" className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{t("from")}</label>
                       <input
-                        type="date"
+                        id="request-start" type="date"
                         value={startDate}
                         min={today}
                         onChange={(e) => {
@@ -143,9 +140,9 @@ function CheckoutContent() {
                       />
                     </div>
                     <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">Bis</label>
+                      <label htmlFor="request-end" className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{t("until")}</label>
                       <input
-                        type="date"
+                        id="request-end" type="date"
                         value={endDate}
                         min={startDate || today}
                         onChange={(e) => {
@@ -159,32 +156,31 @@ function CheckoutContent() {
                   </div>
                   {startDate && endDate && (
                     <p className="text-xs text-text-muted">
-                      <span className="text-gold font-semibold">{days} Tag{days !== 1 ? "e" : ""}</span> · {(listingPrice * days).toLocaleString()} € Netto
+                      <span className="text-gold font-semibold">{t("days", {count: days})}</span> · {(listingPrice * days).toLocaleString(locale)} €
                     </p>
                   )}
                 </div>
 
                 <div className="p-6 rounded-2xl border border-border bg-bg-secondary">
                   <h2 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
-                    <Info size={16} className="text-gold" /> Produktionsdetails (optional)
+                    <Info size={16} className="text-gold" /> {t("notes")}
                   </h2>
                   <textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Projektbeschreibung, Team-Größe, spezielle Anforderungen..."
+                    aria-label={t("notes")} placeholder={t("notesPlaceholder")}
                     rows={4}
                     className="w-full py-2.5 px-3 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors resize-none"
                   />
                 </div>
 
-                {/* Anti-bypass hinweis */}
+                {/* Direct request terms */}
                 <div className="flex items-start gap-3 p-4 bg-bg-elevated border border-gold/20 rounded-xl">
                   <AlertCircle size={16} className="text-gold shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-medium text-text-primary mb-1">Alle Kommunikation über die Plattform</p>
+                    <p className="text-sm font-medium text-text-primary mb-1">{t("directAgreement")}</p>
                     <p className="text-xs text-text-muted leading-relaxed">
-                      Bitte tausche keine externen Kontaktdaten aus, bevor die Buchung abgeschlossen ist.
-                      Unsere In-Plattform-Nachrichten schützen beide Seiten und sichern deine Zahlung.
+                      {t("directTerms")}
                     </p>
                   </div>
                 </div>
@@ -194,7 +190,7 @@ function CheckoutContent() {
                   disabled={!canProceedStep1}
                   className="w-full py-3.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  Weiter zur Zahlung <ChevronRight size={16} />
+                  {t("continue")} <ChevronRight size={16} />
                 </button>
               </>
             )}
@@ -204,41 +200,41 @@ function CheckoutContent() {
               <>
                 <div className="p-6 rounded-2xl border border-border bg-bg-secondary">
                   <h2 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
-                    <CreditCard size={16} className="text-gold" /> Buchung bestätigen
+                    <CreditCard size={16} className="text-gold" /> {t("review")}
                   </h2>
 
 
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between py-2 border-b border-border">
-                      <span className="text-text-muted">Inserat</span>
+                      <span className="text-text-muted">{t("listing")}</span>
                       <span className="text-text-primary font-medium truncate max-w-[200px]">{listingTitle}</span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-border">
-                      <span className="text-text-muted">Zeitraum</span>
+                      <span className="text-text-muted">{t("period")}</span>
                       <span className="text-text-primary font-medium">{startDate} → {endDate}</span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-border">
-                      <span className="text-text-muted">Dauer</span>
-                      <span className="text-text-primary font-medium">{days} Tag{days > 1 ? "e" : ""}</span>
+                      <span className="text-text-muted">{t("duration")}</span>
+                      <span className="text-text-primary font-medium">{t("days", {count: days})}</span>
                     </div>
                     <div className="flex justify-between py-2">
-                      <span className="text-text-muted font-semibold">Gesamtbetrag</span>
-                      <span className="text-gold font-bold font-display">{total.toLocaleString()} €</span>
+                      <span className="text-text-muted font-semibold">{t("estimatedTotal")}</span>
+                      <span className="text-gold font-bold font-display">{total.toLocaleString(locale)} €</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Escrow Erklärung */}
+                {/* Request workflow */}
                 <div className="p-5 rounded-xl border border-border bg-bg-secondary">
                   <h3 className="font-semibold text-text-primary mb-3 flex items-center gap-2 text-sm">
-                    <Shield size={15} className="text-gold" /> Treuhand-System (Escrow)
+                    <Shield size={15} className="text-gold" /> {t("howItWorks")}
                   </h3>
                   <div className="space-y-3">
                     {[
-                      { step: "1", text: "Du zahlst den Gesamtbetrag sicher über CineGenius." },
-                      { step: "2", text: "Das Geld wird von der Plattform treuhänderisch gehalten." },
-                      { step: "3", text: "Zahlung wird nach erfolgreicher Nutzung freigegeben." },
-                      { step: "4", text: "Zahlung wird nach Abschluss an den Anbieter freigegeben." },
+                      { step: "1", text: t("flow1") },
+                      { step: "2", text: t("flow2") },
+                      { step: "3", text: t("flow3") },
+                      { step: "4", text: t("flow4") },
                     ].map(({ step: s, text }) => (
                       <div key={s} className="flex items-start gap-3">
                         <span className="w-5 h-5 rounded-full bg-gold/10 border border-gold/30 text-gold text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5">
@@ -259,19 +255,18 @@ function CheckoutContent() {
                     className="accent-gold mt-0.5"
                   />
                   <span className="text-xs text-text-muted leading-relaxed">
-                    Ich stimme den{" "}
-                    <Link href="/help" className="text-gold hover:text-gold-light">Nutzungsbedingungen</Link>,{" "}
-                    der <Link href="/help" className="text-gold hover:text-gold-light">Stornierungsrichtlinie</Link> und
-                    der treuhänderischen Zahlungsabwicklung durch CineGenius zu.
+                    {t.rich("acknowledgement", {terms: chunks => <Link href="/agb" className="text-gold hover:text-gold-light">{chunks}</Link>})}
                   </span>
                 </label>
 
+                {submitError && <p role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">{t("submitError")}</p>}
                 <div className="flex gap-3">
                   <button
                     onClick={() => setStep(1)}
+                    disabled={loading}
                     className="px-5 py-3.5 border border-border text-text-secondary rounded-xl hover:border-gold hover:text-gold transition-all text-sm font-medium"
                   >
-                    Zurück
+                    {t("back")}
                   </button>
                   <button
                     onClick={handleSubmit}
@@ -281,11 +276,11 @@ function CheckoutContent() {
                     {loading ? (
                       <>
                         <div className="w-4 h-4 border-2 border-bg-primary/40 border-t-bg-primary rounded-full animate-spin" />
-                        Zahlung wird verarbeitet...
+                        {t("sending")}
                       </>
                     ) : (
                       <>
-                        <CheckCircle size={15} /> Buchung jetzt bestätigen
+                        <CheckCircle size={15} /> {t("send")}
                       </>
                     )}
                   </button>
@@ -298,7 +293,7 @@ function CheckoutContent() {
           <div className="lg:col-span-2">
             <div className="sticky top-24">
               <div className="p-6 rounded-2xl border border-border bg-bg-secondary">
-                <h2 className="font-semibold text-text-primary mb-5">Buchungsübersicht</h2>
+                <h2 className="font-semibold text-text-primary mb-5">{t("summary")}</h2>
 
                 <div className="flex items-start gap-3 pb-5 border-b border-border mb-5">
                   <div className="w-16 h-12 rounded-lg bg-bg-elevated border border-border overflow-hidden shrink-0">
@@ -317,21 +312,21 @@ function CheckoutContent() {
                 {/* Preisaufschlüsselung */}
                 <div className="space-y-2.5 mb-5">
                   <div className="flex justify-between text-sm">
-                    <span className="text-text-muted">{listingPrice.toLocaleString()} € × {days} Tag{days > 1 ? "e" : ""}</span>
-                    <span className="text-text-primary">{subtotal.toLocaleString()} €</span>
+                    <span className="text-text-muted">{listingPrice.toLocaleString(locale)} € × {t("days", {count: days})}</span>
+                    <span className="text-text-primary">{subtotal.toLocaleString(locale)} €</span>
                   </div>
                   <div className="flex justify-between text-sm font-bold text-text-primary pt-3 border-t border-border">
-                    <span>Gesamtbetrag</span>
-                    <span className="text-gold font-display text-lg">{total.toLocaleString()} €</span>
+                    <span>{t("estimatedTotal")}</span>
+                    <span className="text-gold font-display text-lg">{total.toLocaleString(locale)} €</span>
                   </div>
                 </div>
 
                 {/* Trust badges */}
                 <div className="space-y-2 text-xs text-text-muted">
                   {[
-                    { icon: Shield, text: "Sichere Buchungsabwicklung" },
-                    { icon: CheckCircle, text: "Kostenlose Stornierung bis 48h vorher" },
-                    { icon: Lock, text: "Zahlung wird treuhänderisch abgewickelt" },
+                    { icon: Shield, text: t("requestOnly") },
+                    { icon: CheckCircle, text: t("noCommission") },
+                    { icon: Lock, text: t("directTerms") },
                   ].map(({ icon: Icon, text }) => (
                     <div key={text} className="flex items-center gap-2">
                       <Icon size={12} className="text-gold shrink-0" />
@@ -349,8 +344,9 @@ function CheckoutContent() {
 }
 
 export default function CheckoutPage() {
+  const t = useTranslations("common");
   return (
-    <Suspense fallback={<div className="pt-32 text-center text-text-muted">Laden...</div>}>
+    <Suspense fallback={<div className="pt-32 text-center text-text-muted">{t("loading")}</div>}>
       <CheckoutContent />
     </Suspense>
   );

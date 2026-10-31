@@ -87,7 +87,9 @@
     "suggestion1": "Operatőr",
     "suggestion2": "Raktár Berlin",
     "suggestion3": "Veterán autó",
-    "suggestion4": "Rendezőt keresünk"
+    "suggestion4": "Rendezőt keresünk",
+    "accessibleLabel": "Keresés a webhelyen",
+    "clearSearch": "Keresés törlése"
   },
   "notifications": {
     "ariaLabel": "Értesítések",
@@ -303,7 +305,7 @@
     "step2Title": "Kínálj vagy keress",
     "step2Desc": "Hirdess helyszínt, foglalj stábot vagy adj fel állást.",
     "step3Title": "Kezdj el közvetlenül",
-    "step3Desc": "Közvetlen kapcsolat, nincs ügynökség. Fizetés letéten keresztül.",
+    "step3Desc": "Közvetlen kapcsolat, ügynökség nélkül. Egyeztessétek közvetlenül a feltételeket és a fizetést.",
     "platformLabel": "Minden egy platformon",
     "platformTitle": "A Kreatívok Piactere",
     "platformDiscoverAll": "Fedezz fel mindent",
@@ -1111,7 +1113,10 @@
     "join": "Üdvözlünk a CineGeniuson",
     "startFree": "Kezdd ingyen",
     "loadingLabel": "Bejelentkezési űrlap betöltése",
-    "loading": "Űrlap betöltése…"
+    "loading": "Űrlap betöltése…",
+    "acceptTerms": "Elfogadom a <terms>felhasználási feltételeket</terms>.",
+    "registrationLegalNotice": "A „Fiók létrehozása” választásával elfogadod a <terms>felhasználási feltételeket</terms>. Az <privacy>adatvédelmi tájékoztató</privacy> ismerteti az adatkezelést.",
+    "registrationPrivacyNotice": "Az <privacy>adatvédelmi tájékoztató</privacy> ismerteti az adatkezelést."
   },
   "language": {
     "choose": "Nyelv kiválasztása",
@@ -2022,5 +2027,70 @@
   "SessionTransition": {
     "loading": "A munkamenet frissítése …",
     "home": "Kezdőlap megnyitása"
+  },
+  "BookingRequest": {
+    "request": "Foglalási érdeklődés",
+    "step": "{step}. lépés a 2-ből",
+    "details": "Az érdeklődés adatai",
+    "review": "Érdeklődés ellenőrzése",
+    "choosePeriod": "Időszak kiválasztása",
+    "from": "Ettől",
+    "until": "Eddig",
+    "notes": "Produkciós részletek (opcionális)",
+    "notesPlaceholder": "Projektleírás, csapatméret, különleges igények …",
+    "directAgreement": "Közvetlen megállapodás",
+    "directTerms": "Az árat, elérhetőséget, fizetést és lemondást közvetlenül a szolgáltatóval egyeztesd. A CineGenius itt nem kínál letéti fizetést.",
+    "continue": "Tovább az összesítéshez",
+    "listing": "Hirdetés",
+    "period": "Időszak",
+    "duration": "Időtartam",
+    "estimatedTotal": "Tájékoztató árösszesítés",
+    "howItWorks": "Az érdeklődés menete",
+    "flow1": "Küldd el az érdeklődést a projekt részleteivel.",
+    "flow2": "A szolgáltató áttekinti az érdeklődést, és válaszol a feltételeivel.",
+    "flow3": "Egyeztessétek közvetlenül az árat, elérhetőséget és feltételeket.",
+    "flow4": "A kötelező foglalást és fizetést külön egyeztesd a szolgáltatóval.",
+    "acknowledgement": "Tudomásul veszem, hogy ez érdeklődés, még nem kötelező foglalás vagy fizetés. A <terms>felhasználási feltételek</terms> érvényesek.",
+    "back": "Vissza",
+    "sending": "Érdeklődés küldése …",
+    "send": "Érdeklődés elküldése",
+    "summary": "Érdeklődés összesítése",
+    "requestOnly": "Az érdeklődéshez nem tartozik fizetés",
+    "noCommission": "Nincs platformjutalék",
+    "submitError": "Az érdeklődés mentése nem lett megerősítve. Újraküldés előtt ellenőrizd az érdeklődéseidet a vezérlőpulton. A beírt adatok megmaradnak.",
+    "typeLocation": "Helyszín",
+    "typeVehicle": "Jármű",
+    "typeProp": "Piactéri tétel",
+    "typeCreator": "Filmszakember",
+    "days": "{count, plural, one {# nap} other {# nap}}",
+    "sentTitle": "Foglalási érdeklődés elküldve",
+    "sentBody": "A(z) „{title}” iránti érdeklődésed elküldve. Hivatkozás: {ref}",
+    "incomingTitle": "Új foglalási érdeklődés",
+    "incomingBody": "{name} érdeklődést küldött a(z) „{title}” hirdetésre. A foglalás még nincs megerősítve.",
+    "incomingSubject": "Új érdeklődés: „{title}”",
+    "viewRequest": "Érdeklődés megtekintése"
+  },
+  "AvailabilityCalendar": {
+    "prevMonth": "Előző hónap",
+    "nextMonth": "Következő hónap",
+    "date": "{date}",
+    "bookedDate": "{date}, nem elérhető",
+    "pastDate": "{date}, elmúlt",
+    "selected": "Kiválasztva",
+    "booked": "Nem elérhető",
+    "available": "Elérhető",
+    "chooseStart": "Válassz kezdő dátumot",
+    "chooseEnd": "{date} kiválasztva – válassz záró dátumot",
+    "total": "Összesen",
+    "reset": "Kiválasztás törlése",
+    "days": "{count, plural, one {# nap} other {# nap}}"
+  },
+  "LegalAuditOriginal": {
+    "scope": "Diese Allgemeinen Geschäftsbedingungen (nachfolgend „AGB“) gelten für die Nutzung der Online-Plattform CineGenius unter der Domain cinegenius.co, betrieben von Markus Müller, Plinganserstr. 19, 81369 München (nachfolgend „Betreiber“). Vor dem Erstellen deines Kontos kannst du diese AGB über den Hinweis im Registrierungsformular aufrufen. Mit dem Erstellen des Kontos stimmst du den dort verlinkten AGB zu. Der bloße Besuch der Website gilt nicht als Zustimmung. Abweichende Bedingungen der Nutzer gelten nicht, es sei denn, der Betreiber stimmt ihrer Geltung ausdrücklich schriftlich zu.",
+    "termsDate": "Stand: 31. Oktober 2026",
+    "privacyDate": "Gemäß DSGVO, BDSG und TDDDG — Stand: 31. Oktober 2026",
+    "sentryPrepared": "Für die Fehlerdiagnose sind Konfigurationsdateien für Sentry (Functional Software Inc., San Francisco, USA) vorbereitet. Diese Dateien allein aktivieren noch keine Übermittlung; in der aktuellen Anwendung ist keine Sentry-Initialisierung eingebunden.",
+    "replayDisabled": "Session Replay ist auch in der vorbereiteten Konfiguration deaktiviert. Es werden dadurch keine Sitzungsaufzeichnungen oder vorgelagerten Replay-Puffer erstellt. Eine spätere Aktivierung erfordert zuvor die Prüfung des Zwecks, der Rechtsgrundlage und gegebenenfalls eine wirksame Einwilligung. Dieser Datenschutzhinweis ersetzt keine Einwilligung.",
+    "sentryPurpose": "Fehlerdiagnose vorbereitet; Session Replay deaktiviert (siehe Abschnitt 12)"
   }
 }

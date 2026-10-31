@@ -87,7 +87,9 @@
     "suggestion1": "Kamerafrau/-mann",
     "suggestion2": "Warehouse Berlin",
     "suggestion3": "Oldtimer",
-    "suggestion4": "Regie gesucht"
+    "suggestion4": "Regie gesucht",
+    "accessibleLabel": "Website durchsuchen",
+    "clearSearch": "Suche leeren"
   },
   "notifications": {
     "ariaLabel": "Benachrichtigungen",
@@ -303,7 +305,7 @@
     "step2Title": "Anbieten oder suchen",
     "step2Desc": "Location inserieren, Crew buchen oder Job ausschreiben.",
     "step3Title": "Direkt loslegen",
-    "step3Desc": "Direkte Kontaktaufnahme, keine Agentur. Zahlung über Treuhand.",
+    "step3Desc": "Direkter Kontakt, keine Agentur. Bedingungen und Zahlung direkt vereinbaren.",
     "platformLabel": "Alles auf einer Plattform",
     "platformTitle": "Der Marktplatz für Kreative",
     "platformDiscoverAll": "Alles entdecken",
@@ -1111,7 +1113,10 @@
     "neutralReset": "Wenn diese Adresse zu einem CineGenius-Konto mit Passwort gehört, erhältst du einen Wiederherstellungscode. Falls kein Code eintrifft oder dein Konto kein Passwort nutzt, melde dich mit „Mit E-Mail-Code anmelden“ oder der ursprünglich verwendeten Anmeldemethode an.",
     "startFree": "Kostenlos starten",
     "loadingLabel": "Anmeldeformular wird geladen",
-    "loading": "Formular wird geladen …"
+    "loading": "Formular wird geladen …",
+    "acceptTerms": "Ich akzeptiere die <terms>Nutzungsbedingungen</terms>.",
+    "registrationLegalNotice": "Mit „Konto erstellen“ akzeptierst du die <terms>Nutzungsbedingungen</terms>. Wie wir deine Daten verarbeiten, erklären die <privacy>Datenschutzhinweise</privacy>.",
+    "registrationPrivacyNotice": "Informationen zur Verarbeitung deiner Daten findest du in den <privacy>Datenschutzhinweisen</privacy>."
   },
   "language": {
     "choose": "Sprache wählen",
@@ -2022,5 +2027,70 @@
   "SessionTransition": {
     "loading": "Deine Sitzung wird aktualisiert …",
     "home": "Startseite öffnen"
+  },
+  "BookingRequest": {
+    "request": "Buchung anfragen",
+    "step": "Schritt {step} von 2",
+    "details": "Anfragedetails",
+    "review": "Anfrage prüfen",
+    "choosePeriod": "Zeitraum wählen",
+    "from": "Von",
+    "until": "Bis",
+    "notes": "Produktionsdetails (optional)",
+    "notesPlaceholder": "Projektbeschreibung, Teamgröße, besondere Anforderungen …",
+    "directAgreement": "Direkte Vereinbarung",
+    "directTerms": "Preis, Verfügbarkeit, Zahlung und Stornierung vereinbarst du direkt mit dem Anbieter. CineGenius bietet hier keine Treuhandzahlung.",
+    "continue": "Weiter zur Übersicht",
+    "listing": "Inserat",
+    "period": "Zeitraum",
+    "duration": "Dauer",
+    "estimatedTotal": "Unverbindliche Preisübersicht",
+    "howItWorks": "So läuft die Anfrage ab",
+    "flow1": "Anfrage mit deinen Projektdetails senden.",
+    "flow2": "Der Anbieter prüft die Anfrage und antwortet mit seinen Konditionen.",
+    "flow3": "Preis, Verfügbarkeit und Bedingungen direkt vereinbaren.",
+    "flow4": "Eine verbindliche Buchung und Zahlung separat mit dem Anbieter vereinbaren.",
+    "acknowledgement": "Ich habe verstanden, dass dies eine Anfrage und noch keine verbindliche Buchung oder Zahlung ist. Es gelten die <terms>Nutzungsbedingungen</terms>.",
+    "back": "Zurück",
+    "sending": "Anfrage wird gesendet …",
+    "send": "Anfrage senden",
+    "summary": "Anfrageübersicht",
+    "requestOnly": "Keine Zahlung bei dieser Anfrage",
+    "noCommission": "Keine Plattformprovision",
+    "submitError": "Die Speicherung der Anfrage wurde nicht bestätigt. Bitte prüfe deine Anfragen im Dashboard, bevor du erneut sendest. Deine Eingaben bleiben erhalten.",
+    "typeLocation": "Location",
+    "typeVehicle": "Fahrzeug",
+    "typeProp": "Marktplatzartikel",
+    "typeCreator": "Filmschaffende/r",
+    "days": "{count, plural, one {# Tag} other {# Tage}}",
+    "sentTitle": "Buchungsanfrage gesendet",
+    "sentBody": "Deine Anfrage für „{title}“ wurde gesendet. Referenz: {ref}",
+    "incomingTitle": "Neue Buchungsanfrage",
+    "incomingBody": "{name} hat eine Anfrage für „{title}“ gesendet. Eine Buchung ist noch nicht bestätigt.",
+    "incomingSubject": "Neue Anfrage: „{title}“",
+    "viewRequest": "Anfrage ansehen"
+  },
+  "AvailabilityCalendar": {
+    "prevMonth": "Vorheriger Monat",
+    "nextMonth": "Nächster Monat",
+    "date": "{date}",
+    "bookedDate": "{date}, belegt",
+    "pastDate": "{date}, vergangen",
+    "selected": "Ausgewählt",
+    "booked": "Belegt",
+    "available": "Verfügbar",
+    "chooseStart": "Startdatum auswählen",
+    "chooseEnd": "{date} gewählt – jetzt Enddatum wählen",
+    "total": "Gesamt",
+    "reset": "Auswahl zurücksetzen",
+    "days": "{count, plural, one {# Tag} other {# Tage}}"
+  },
+  "LegalAuditOriginal": {
+    "scope": "Diese Allgemeinen Geschäftsbedingungen (nachfolgend „AGB“) gelten für die Nutzung der Online-Plattform CineGenius unter der Domain cinegenius.co, betrieben von Markus Müller, Plinganserstr. 19, 81369 München (nachfolgend „Betreiber“). Vor dem Erstellen deines Kontos kannst du diese AGB über den Hinweis im Registrierungsformular aufrufen. Mit dem Erstellen des Kontos stimmst du den dort verlinkten AGB zu. Der bloße Besuch der Website gilt nicht als Zustimmung. Abweichende Bedingungen der Nutzer gelten nicht, es sei denn, der Betreiber stimmt ihrer Geltung ausdrücklich schriftlich zu.",
+    "termsDate": "Stand: 31. Oktober 2026",
+    "privacyDate": "Gemäß DSGVO, BDSG und TDDDG — Stand: 31. Oktober 2026",
+    "sentryPrepared": "Für die Fehlerdiagnose sind Konfigurationsdateien für Sentry (Functional Software Inc., San Francisco, USA) vorbereitet. Diese Dateien allein aktivieren noch keine Übermittlung; in der aktuellen Anwendung ist keine Sentry-Initialisierung eingebunden.",
+    "replayDisabled": "Session Replay ist auch in der vorbereiteten Konfiguration deaktiviert. Es werden dadurch keine Sitzungsaufzeichnungen oder vorgelagerten Replay-Puffer erstellt. Eine spätere Aktivierung erfordert zuvor die Prüfung des Zwecks, der Rechtsgrundlage und gegebenenfalls eine wirksame Einwilligung. Dieser Datenschutzhinweis ersetzt keine Einwilligung.",
+    "sentryPurpose": "Fehlerdiagnose vorbereitet; Session Replay deaktiviert (siehe Abschnitt 12)"
   }
 }

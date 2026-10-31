@@ -155,6 +155,7 @@ function EmptyState({ query }: { query: string }) {
 // ─── Main Search Content ───────────────────────────────────────────────────────
 
 function SearchContent() {
+  const t = useTranslations("search");
   const animals = useTranslations("FilmAnimals");
   const searchParams = useSearchParams();
 
@@ -255,6 +256,7 @@ function SearchContent() {
               : <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
             }
             <input
+              aria-label={t("accessibleLabel")}
               ref={inputRef}
               type="text"
               value={inputValue}
@@ -266,14 +268,15 @@ function SearchContent() {
                   doSearch(inputValue.trim());
                 }
               }}
-              placeholder="Crew, Locations, Jobs, Requisiten, Fahrzeuge…"
+              placeholder={t("inputPlaceholder")}
               className="w-full pl-11 pr-12 py-3.5 bg-bg-elevated border border-border rounded-xl text-base text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors"
               autoFocus={!initialQ}
             />
             {inputValue && (
               <button
+                type="button" aria-label={t("clearSearch")}
                 onClick={() => { setInputValue(""); setResults([]); setHasSearched(false); inputRef.current?.focus(); }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-gold transition-colors"
+                className="absolute right-1 top-1/2 -translate-y-1/2 min-h-11 min-w-11 flex items-center justify-center text-text-muted hover:text-gold transition-colors"
               >
                 <X size={16} />
               </button>

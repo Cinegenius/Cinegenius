@@ -743,9 +743,10 @@ function SignUpForm({ destination, signInDestination }: { destination: string; s
           </label>}
           {required.has("legal_accepted") && <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary">
             <input type="checkbox" required checked={legalAccepted} onChange={(event) => setLegalAccepted(event.target.checked)} className="h-5 w-5 accent-[var(--color-gold)]" />
-            <span>{t("agree")}<Link href="/agb" target="_blank" className="underline hover:text-gold">{t("terms")}</Link> {t("and")}<Link href="/datenschutz" target="_blank" className="underline hover:text-gold">{t("privacy")}</Link> {t("agreeEnd")}</span>
+            <span>{t.rich("acceptTerms", {terms: chunks => <Link href="/agb" target="_blank" rel="noopener noreferrer" className="underline hover:text-gold">{chunks}</Link>})}</span>
             {errors.fields.legalAccepted && <span className="text-sm text-red-400">{errors.fields.legalAccepted.message}</span>}
           </label>}
+          <p className="text-xs leading-5 text-text-muted">{t.rich(required.has("legal_accepted") ? "registrationPrivacyNotice" : "registrationLegalNotice", {terms: chunks => <Link href="/agb" target="_blank" rel="noopener noreferrer" className="underline hover:text-gold">{chunks}</Link>, privacy: chunks => <Link href="/datenschutz" target="_blank" rel="noopener noreferrer" className="underline hover:text-gold">{chunks}</Link>})}</p>
           <button type="submit" disabled={!signUp || busy || (required.has("legal_accepted") && !legalAccepted)} className={buttonClass}>{busy ? t("creatingAccount") : t("createAccount")}</button>
           <p className="text-center text-xs leading-5 text-text-muted">{t("accountOnly")}</p>
           <div id="clerk-captcha" />
