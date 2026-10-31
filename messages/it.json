@@ -2018,5 +2018,9 @@
       "project": "Le immagini pubbliche dei progetti possono apparire nelle viste dei progetti. Sono escluse dalle novità della community.",
       "board": "Le immagini pubbliche dei post possono apparire con il post e negli elenchi pertinenti. Sono escluse dalle novità della community."
     }
+  },
+  "SessionTransition": {
+    "loading": "Aggiornamento della sessione …",
+    "home": "Apri la pagina iniziale"
   }
 }

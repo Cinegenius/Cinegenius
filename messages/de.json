@@ -2018,5 +2018,9 @@
       "project": "Öffentliche Projektbilder können in Projektansichten erscheinen. Sie gehören nicht in „Frische Einblicke“.",
       "board": "Öffentliche Beitragsbilder können beim Beitrag und in passenden Übersichten erscheinen. Sie gehören nicht in „Frische Einblicke“."
     }
+  },
+  "SessionTransition": {
+    "loading": "Deine Sitzung wird aktualisiert …",
+    "home": "Startseite öffnen"
   }
 }

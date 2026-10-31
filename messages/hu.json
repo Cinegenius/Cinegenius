@@ -2018,5 +2018,9 @@
       "project": "A nyilvános projektképek a projektnézetekben jelenhetnek meg. Nem kerülnek a közösségi betekintések közé.",
       "board": "A nyilvános bejegyzésképek a bejegyzésnél és a kapcsolódó listákban jelenhetnek meg. Nem kerülnek a közösségi betekintések közé."
     }
+  },
+  "SessionTransition": {
+    "loading": "A munkamenet frissítése …",
+    "home": "Kezdőlap megnyitása"
   }
 }

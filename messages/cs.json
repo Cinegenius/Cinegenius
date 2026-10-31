@@ -2018,5 +2018,9 @@
       "project": "Veřejné obrázky projektů se mohou zobrazovat v přehledech projektů. Do novinek z komunity nepatří.",
       "board": "Veřejné obrázky příspěvků se mohou zobrazovat u příspěvku a v příslušných přehledech. Do novinek z komunity nepatří."
     }
+  },
+  "SessionTransition": {
+    "loading": "Aktualizace relace …",
+    "home": "Otevřít úvodní stránku"
   }
 }

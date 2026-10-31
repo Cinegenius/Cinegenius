@@ -2018,5 +2018,9 @@
       "project": "Public project images may appear in project views. They are excluded from Community insights.",
       "board": "Public post images may appear with the post and in relevant directories. They are excluded from Community insights."
     }
+  },
+  "SessionTransition": {
+    "loading": "Updating your session …",
+    "home": "Open homepage"
   }
 }

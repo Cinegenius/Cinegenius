@@ -2018,5 +2018,9 @@
       "project": "Las imágenes públicas de proyectos pueden aparecer en las vistas de proyectos. No aparecen en las novedades de la comunidad.",
       "board": "Las imágenes públicas de publicaciones pueden aparecer con la publicación y en los listados correspondientes. No aparecen en las novedades de la comunidad."
     }
+  },
+  "SessionTransition": {
+    "loading": "Actualizando tu sesión …",
+    "home": "Abrir la página de inicio"
   }
 }
