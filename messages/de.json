@@ -1348,7 +1348,7 @@
     "contentPrivate": "Privat · nicht öffentlich",
     "manageContent": "Verwalten",
     "reviewAndPublish": "Ansehen und freigeben",
-    "nonPersonalSetupNotice": "Die Grundeinrichtung ist abgeschlossen. Ein Personenprofil ist für Firmen- und Angebotskonten nicht erforderlich. Der Veröffentlichungsstatus steht beim jeweiligen Eintrag.",
+    "nonPersonalSetupNotice": "Ein Personenprofil ist für reine Firmen-, Angebots- und Suchkonten freiwillig. Kontoeinrichtung und Veröffentlichungsstatus werden getrennt angezeigt.",
     "contentKinds": {
       "location": "Location",
       "prop": "Marktplatz",
@@ -1358,6 +1358,18 @@
       "service": "Dienstleistung",
       "animal": "Tierportfolio",
       "other": "Inserat"
+    },
+    "accountOnly": "Konto",
+    "providerReady": "Anbieterkonto eingerichtet",
+    "notSubmitted": "Privater Entwurf – noch nicht eingereicht",
+    "remindSubmission": "An Einreichung erinnern",
+    "purposes": {
+      "crew": "Crewprofil",
+      "talent": "Talentprofil",
+      "company": "Firmenanbieter",
+      "location": "Locationanbieter",
+      "equipment": "Marktplatzanbieter",
+      "search": "Suchendes Mitglied"
     }
   },
   "responsiblePerson": {
@@ -2130,5 +2142,30 @@
     "sentryPrepared": "Für die Fehlerdiagnose sind Konfigurationsdateien für Sentry (Functional Software Inc., San Francisco, USA) vorbereitet. Diese Dateien allein aktivieren noch keine Übermittlung; in der aktuellen Anwendung ist keine Sentry-Initialisierung eingebunden.",
     "replayDisabled": "Session Replay ist auch in der vorbereiteten Konfiguration deaktiviert. Es werden dadurch keine Sitzungsaufzeichnungen oder vorgelagerten Replay-Puffer erstellt. Eine spätere Aktivierung erfordert zuvor die Prüfung des Zwecks, der Rechtsgrundlage und gegebenenfalls eine wirksame Einwilligung. Dieser Datenschutzhinweis ersetzt keine Einwilligung.",
     "sentryPurpose": "Fehlerdiagnose vorbereitet; Session Replay deaktiviert (siehe Abschnitt 12)"
+  },
+  "SetupOffers": {
+    "accountReady": "Dein Anbieterkonto ist eingerichtet.",
+    "nextStep": "Dein Angebot ist separat gespeichert. Prüfe jetzt seinen Status und wähle den nächsten Schritt.",
+    "location": "Deine Location",
+    "equipment": "Dein Marktplatzangebot",
+    "states": {
+      "loading": "Angebotsstatus wird geladen …",
+      "draft": "Privater Entwurf – noch nicht eingereicht.",
+      "pending": "Eingereicht – wartet auf Adminfreigabe.",
+      "published": "Öffentlich sichtbar.",
+      "changes_requested": "Nachbesserung erforderlich. Bitte bearbeite dein Angebot.",
+      "rejected": "Nicht freigegeben. Öffne dein Angebot für die Begründung und weitere Bearbeitung.",
+      "hidden": "Ausgeblendet – nicht öffentlich sichtbar.",
+      "unavailable": "Der aktuelle Angebotsstatus konnte nicht geladen werden."
+    },
+    "locationRule": "Deine Location bleibt bis zur Adminfreigabe privat. Ein Crewprofil ist nicht erforderlich.",
+    "marketplaceRule": "Du reichst dein Angebot ausdrücklich zur Veröffentlichung ein. Falls eine Prüfung erforderlich ist, bleibt es bis zur Freigabe privat. Ein zusätzliches Crewprofil ist nicht nötig.",
+    "submitLocation": "Location zur Prüfung einreichen",
+    "submitMarketplace": "Angebot zur Veröffentlichung einreichen",
+    "submitting": "Wird eingereicht …",
+    "reload": "Status erneut laden",
+    "openPublic": "Öffentliches Angebot ansehen",
+    "edit": "Angebot bearbeiten",
+    "saveError": "Die Einreichung konnte nicht bestätigt werden. Dein gespeicherter Entwurf bleibt erhalten. Bitte prüfe den Status oder versuche es erneut."
   }
 }

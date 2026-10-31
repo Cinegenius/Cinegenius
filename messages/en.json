@@ -1348,7 +1348,7 @@
     "contentPrivate": "Private · not public",
     "manageContent": "Manage",
     "reviewAndPublish": "Review and publish",
-    "nonPersonalSetupNotice": "Basic setup is complete. Company and offer accounts do not require a personal profile. Publication status is shown for each entry.",
+    "nonPersonalSetupNotice": "A personal profile is optional for company, offer and search-only accounts. Account setup and publication status are shown separately.",
     "contentKinds": {
       "location": "Location",
       "prop": "Marketplace",
@@ -1358,6 +1358,18 @@
       "service": "Service",
       "animal": "Animal portfolio",
       "other": "Listing"
+    },
+    "accountOnly": "Account",
+    "providerReady": "Provider account set up",
+    "notSubmitted": "Private draft – not yet submitted",
+    "remindSubmission": "Remind about submission",
+    "purposes": {
+      "crew": "Crew profile",
+      "talent": "Talent profile",
+      "company": "Company provider",
+      "location": "Location provider",
+      "equipment": "Marketplace provider",
+      "search": "Searching member"
     }
   },
   "responsiblePerson": {
@@ -2130,5 +2142,30 @@
     "sentryPrepared": "Für die Fehlerdiagnose sind Konfigurationsdateien für Sentry (Functional Software Inc., San Francisco, USA) vorbereitet. Diese Dateien allein aktivieren noch keine Übermittlung; in der aktuellen Anwendung ist keine Sentry-Initialisierung eingebunden.",
     "replayDisabled": "Session Replay ist auch in der vorbereiteten Konfiguration deaktiviert. Es werden dadurch keine Sitzungsaufzeichnungen oder vorgelagerten Replay-Puffer erstellt. Eine spätere Aktivierung erfordert zuvor die Prüfung des Zwecks, der Rechtsgrundlage und gegebenenfalls eine wirksame Einwilligung. Dieser Datenschutzhinweis ersetzt keine Einwilligung.",
     "sentryPurpose": "Fehlerdiagnose vorbereitet; Session Replay deaktiviert (siehe Abschnitt 12)"
+  },
+  "SetupOffers": {
+    "accountReady": "Your provider account is set up.",
+    "nextStep": "Your offer is saved separately. Check its status and choose the next step.",
+    "location": "Your location",
+    "equipment": "Your marketplace offer",
+    "states": {
+      "loading": "Loading offer status …",
+      "draft": "Private draft – not yet submitted.",
+      "pending": "Submitted – awaiting admin approval.",
+      "published": "Publicly visible.",
+      "changes_requested": "Changes requested. Please edit your offer.",
+      "rejected": "Not approved. Open your offer to see the reason and continue editing.",
+      "hidden": "Hidden – not publicly visible.",
+      "unavailable": "The current offer status could not be loaded."
+    },
+    "locationRule": "Your location stays private until admin approval. A crew profile is not required.",
+    "marketplaceRule": "You explicitly submit your offer for publication. If review is required, it stays private until approval. An additional crew profile is not necessary.",
+    "submitLocation": "Submit location for review",
+    "submitMarketplace": "Submit offer for publication",
+    "submitting": "Submitting …",
+    "reload": "Reload status",
+    "openPublic": "View public offer",
+    "edit": "Edit offer",
+    "saveError": "Submission could not be confirmed. Your saved draft is preserved. Please check the status or try again."
   }
 }

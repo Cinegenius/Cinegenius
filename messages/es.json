@@ -1348,7 +1348,7 @@
     "contentPrivate": "Privado · no público",
     "manageContent": "Gestionar",
     "reviewAndPublish": "Revisar y publicar",
-    "nonPersonalSetupNotice": "La configuración básica está completa. Las cuentas de empresas y ofertas no necesitan un perfil personal. El estado de publicación aparece en cada entrada.",
+    "nonPersonalSetupNotice": "El perfil personal es opcional para cuentas solo de empresas, anuncios o búsquedas. La configuración de la cuenta y el estado de publicación se muestran por separado.",
     "contentKinds": {
       "location": "Localización",
       "prop": "Mercado",
@@ -1358,6 +1358,18 @@
       "service": "Servicio",
       "animal": "Portafolio de animales",
       "other": "Anuncio"
+    },
+    "accountOnly": "Cuenta",
+    "providerReady": "Cuenta de anunciante configurada",
+    "notSubmitted": "Borrador privado: todavía no enviado",
+    "remindSubmission": "Recordar el envío",
+    "purposes": {
+      "crew": "Perfil de equipo",
+      "talent": "Perfil de talento",
+      "company": "Proveedor de empresa",
+      "location": "Proveedor de localizaciones",
+      "equipment": "Anunciante del mercado",
+      "search": "Miembro que busca"
     }
   },
   "responsiblePerson": {
@@ -2130,5 +2142,30 @@
     "sentryPrepared": "Für die Fehlerdiagnose sind Konfigurationsdateien für Sentry (Functional Software Inc., San Francisco, USA) vorbereitet. Diese Dateien allein aktivieren noch keine Übermittlung; in der aktuellen Anwendung ist keine Sentry-Initialisierung eingebunden.",
     "replayDisabled": "Session Replay ist auch in der vorbereiteten Konfiguration deaktiviert. Es werden dadurch keine Sitzungsaufzeichnungen oder vorgelagerten Replay-Puffer erstellt. Eine spätere Aktivierung erfordert zuvor die Prüfung des Zwecks, der Rechtsgrundlage und gegebenenfalls eine wirksame Einwilligung. Dieser Datenschutzhinweis ersetzt keine Einwilligung.",
     "sentryPurpose": "Fehlerdiagnose vorbereitet; Session Replay deaktiviert (siehe Abschnitt 12)"
+  },
+  "SetupOffers": {
+    "accountReady": "Tu cuenta de anunciante está configurada.",
+    "nextStep": "Tu anuncio se guarda por separado. Revisa su estado y elige el siguiente paso.",
+    "location": "Tu localización",
+    "equipment": "Tu anuncio del mercado",
+    "states": {
+      "loading": "Cargando el estado del anuncio …",
+      "draft": "Borrador privado: todavía no enviado.",
+      "pending": "Enviado: pendiente de aprobación administrativa.",
+      "published": "Visible públicamente.",
+      "changes_requested": "Se requieren cambios. Edita tu anuncio.",
+      "rejected": "No aprobado. Abre tu anuncio para ver el motivo y seguir editándolo.",
+      "hidden": "Oculto: no es visible públicamente.",
+      "unavailable": "No se ha podido cargar el estado actual del anuncio."
+    },
+    "locationRule": "Tu localización seguirá siendo privada hasta su aprobación administrativa. No hace falta un perfil de equipo.",
+    "marketplaceRule": "Envías expresamente tu anuncio para su publicación. Si requiere revisión, seguirá siendo privado hasta su aprobación. No necesitas un perfil de equipo adicional.",
+    "submitLocation": "Enviar localización a revisión",
+    "submitMarketplace": "Enviar anuncio para publicación",
+    "submitting": "Enviando …",
+    "reload": "Volver a cargar el estado",
+    "openPublic": "Ver anuncio público",
+    "edit": "Editar anuncio",
+    "saveError": "No se ha podido confirmar el envío. Se conserva tu borrador guardado. Comprueba el estado o vuelve a intentarlo."
   }
 }

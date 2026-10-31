@@ -49,7 +49,7 @@ function applies(template: Template, target: Target) {
   return true;
 }
 
-export function SupportMessageAction({ targetType, targetId, label }: { targetType: TargetType; targetId: string; label?: string }) {
+export function SupportMessageAction({ targetType, targetId, label, preferredTemplate }: { targetType: TargetType; targetId: string; label?: string; preferredTemplate?: string }) {
   const t = useTranslations("AdminAccounts");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -82,7 +82,8 @@ export function SupportMessageAction({ targetType, targetId, label }: { targetTy
       setTarget(resolved.target); setPrevious(resolved.previousContacts);
       const enabled = templateList.templates.filter((template) => template.enabled && applies(template, resolved.target));
       setTemplates(enabled);
-      const first = enabled.find((template) => template.template_key === defaultKey(resolved.target))
+      const first = enabled.find((template) => preferredTemplate && template.template_key === preferredTemplate)
+        ?? enabled.find((template) => template.template_key === defaultKey(resolved.target))
         ?? enabled.find((template) => template.template_key === "check_in") ?? enabled[0];
       setTemplateKey(first?.template_key ?? "");
       setMessage(first ? fillSupportTemplate(first.body, resolved.target, window.location.origin) : "");

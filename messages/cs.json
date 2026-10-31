@@ -1348,7 +1348,7 @@
     "contentPrivate": "Soukromé · neveřejné",
     "manageContent": "Spravovat",
     "reviewAndPublish": "Zkontrolovat a zveřejnit",
-    "nonPersonalSetupNotice": "Základní nastavení je dokončeno. Firemní účty a účty nabídek nepotřebují osobní profil. Stav zveřejnění je uveden u každé položky.",
+    "nonPersonalSetupNotice": "Osobní profil je pro účty sloužící pouze firmám, nabídkám nebo hledání dobrovolný. Nastavení účtu a stav zveřejnění se zobrazují odděleně.",
     "contentKinds": {
       "location": "Lokace",
       "prop": "Tržiště",
@@ -1358,6 +1358,18 @@
       "service": "Služba",
       "animal": "Portfolio zvířat",
       "other": "Inzerát"
+    },
+    "accountOnly": "Účet",
+    "providerReady": "Účet poskytovatele je nastavený",
+    "notSubmitted": "Soukromý koncept – zatím neodeslaný",
+    "remindSubmission": "Připomenout odeslání",
+    "purposes": {
+      "crew": "Profil člena štábu",
+      "talent": "Profil talentu",
+      "company": "Firemní poskytovatel",
+      "location": "Poskytovatel lokací",
+      "equipment": "Poskytovatel na tržišti",
+      "search": "Hledající člen"
     }
   },
   "responsiblePerson": {
@@ -2130,5 +2142,30 @@
     "sentryPrepared": "Für die Fehlerdiagnose sind Konfigurationsdateien für Sentry (Functional Software Inc., San Francisco, USA) vorbereitet. Diese Dateien allein aktivieren noch keine Übermittlung; in der aktuellen Anwendung ist keine Sentry-Initialisierung eingebunden.",
     "replayDisabled": "Session Replay ist auch in der vorbereiteten Konfiguration deaktiviert. Es werden dadurch keine Sitzungsaufzeichnungen oder vorgelagerten Replay-Puffer erstellt. Eine spätere Aktivierung erfordert zuvor die Prüfung des Zwecks, der Rechtsgrundlage und gegebenenfalls eine wirksame Einwilligung. Dieser Datenschutzhinweis ersetzt keine Einwilligung.",
     "sentryPurpose": "Fehlerdiagnose vorbereitet; Session Replay deaktiviert (siehe Abschnitt 12)"
+  },
+  "SetupOffers": {
+    "accountReady": "Tvůj účet poskytovatele je nastavený.",
+    "nextStep": "Tvá nabídka je uložena samostatně. Zkontroluj její stav a zvol další krok.",
+    "location": "Tvá lokace",
+    "equipment": "Tvá nabídka na tržišti",
+    "states": {
+      "loading": "Načítání stavu nabídky …",
+      "draft": "Soukromý koncept – zatím neodeslaný.",
+      "pending": "Odesláno – čeká na schválení administrátorem.",
+      "published": "Veřejně viditelné.",
+      "changes_requested": "Jsou vyžadovány úpravy. Uprav svou nabídku.",
+      "rejected": "Neschváleno. Otevři nabídku, zjisti důvod a pokračuj v úpravách.",
+      "hidden": "Skryté – není veřejně viditelné.",
+      "unavailable": "Aktuální stav nabídky se nepodařilo načíst."
+    },
+    "locationRule": "Tvá lokace zůstane soukromá do schválení administrátorem. Profil člena štábu není nutný.",
+    "marketplaceRule": "Svou nabídku výslovně odesíláš ke zveřejnění. Pokud je nutná kontrola, zůstane do schválení soukromá. Další profil člena štábu není potřeba.",
+    "submitLocation": "Odeslat lokaci ke kontrole",
+    "submitMarketplace": "Odeslat nabídku ke zveřejnění",
+    "submitting": "Odesílání …",
+    "reload": "Načíst stav znovu",
+    "openPublic": "Zobrazit veřejnou nabídku",
+    "edit": "Upravit nabídku",
+    "saveError": "Odeslání se nepodařilo potvrdit. Tvůj uložený koncept zůstává zachován. Zkontroluj stav nebo to zkus znovu."
   }
 }

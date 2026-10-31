@@ -1348,7 +1348,7 @@
     "contentPrivate": "Privát · nem nyilvános",
     "manageContent": "Kezelés",
     "reviewAndPublish": "Ellenőrzés és közzététel",
-    "nonPersonalSetupNotice": "Az alapbeállítás kész. A céges és ajánlati fiókokhoz nem szükséges személyes profil. A közzétételi állapot minden bejegyzésnél látható.",
+    "nonPersonalSetupNotice": "A személyes profil a kizárólag céges, ajánlati vagy keresési fiókoknál választható. A fiók beállítása és a közzétételi állapot külön jelenik meg.",
     "contentKinds": {
       "location": "Helyszín",
       "prop": "Piactér",
@@ -1358,6 +1358,18 @@
       "service": "Szolgáltatás",
       "animal": "Állatportfólió",
       "other": "Hirdetés"
+    },
+    "accountOnly": "Fiók",
+    "providerReady": "Szolgáltatói fiók beállítva",
+    "notSubmitted": "Privát piszkozat – még nincs beküldve",
+    "remindSubmission": "Beküldési emlékeztető",
+    "purposes": {
+      "crew": "Stábprofil",
+      "talent": "Tehetségprofil",
+      "company": "Céges szolgáltató",
+      "location": "Helyszínszolgáltató",
+      "equipment": "Piactéri szolgáltató",
+      "search": "Kereső tag"
     }
   },
   "responsiblePerson": {
@@ -2130,5 +2142,30 @@
     "sentryPrepared": "Für die Fehlerdiagnose sind Konfigurationsdateien für Sentry (Functional Software Inc., San Francisco, USA) vorbereitet. Diese Dateien allein aktivieren noch keine Übermittlung; in der aktuellen Anwendung ist keine Sentry-Initialisierung eingebunden.",
     "replayDisabled": "Session Replay ist auch in der vorbereiteten Konfiguration deaktiviert. Es werden dadurch keine Sitzungsaufzeichnungen oder vorgelagerten Replay-Puffer erstellt. Eine spätere Aktivierung erfordert zuvor die Prüfung des Zwecks, der Rechtsgrundlage und gegebenenfalls eine wirksame Einwilligung. Dieser Datenschutzhinweis ersetzt keine Einwilligung.",
     "sentryPurpose": "Fehlerdiagnose vorbereitet; Session Replay deaktiviert (siehe Abschnitt 12)"
+  },
+  "SetupOffers": {
+    "accountReady": "A szolgáltatói fiókod beállítása kész.",
+    "nextStep": "Az ajánlatod külön van elmentve. Ellenőrizd az állapotát, és válaszd ki a következő lépést.",
+    "location": "A forgatási helyszíned",
+    "equipment": "A piactéri ajánlatod",
+    "states": {
+      "loading": "Az ajánlat állapotának betöltése …",
+      "draft": "Privát piszkozat – még nincs beküldve.",
+      "pending": "Beküldve – adminisztrátori jóváhagyásra vár.",
+      "published": "Nyilvánosan látható.",
+      "changes_requested": "Módosítás szükséges. Szerkeszd az ajánlatodat.",
+      "rejected": "Nincs jóváhagyva. Nyisd meg az ajánlatot az indoklás megtekintéséhez és a további szerkesztéshez.",
+      "hidden": "Elrejtve – nyilvánosan nem látható.",
+      "unavailable": "Az ajánlat aktuális állapotát nem sikerült betölteni."
+    },
+    "locationRule": "A helyszíned az adminisztrátori jóváhagyásig privát marad. Stábprofil nem szükséges.",
+    "marketplaceRule": "Kifejezetten közzétételre küldöd be az ajánlatodat. Ha ellenőrzés szükséges, a jóváhagyásig privát marad. Külön stábprofilra nincs szükség.",
+    "submitLocation": "Helyszín beküldése ellenőrzésre",
+    "submitMarketplace": "Ajánlat beküldése közzétételre",
+    "submitting": "Beküldés …",
+    "reload": "Állapot újratöltése",
+    "openPublic": "Nyilvános ajánlat megtekintése",
+    "edit": "Ajánlat szerkesztése",
+    "saveError": "A beküldést nem sikerült megerősíteni. A mentett piszkozatod megmarad. Ellenőrizd az állapotot, vagy próbáld újra."
   }
 }

@@ -1348,7 +1348,7 @@
     "contentPrivate": "Privato · non pubblico",
     "manageContent": "Gestisci",
     "reviewAndPublish": "Esamina e pubblica",
-    "nonPersonalSetupNotice": "La configurazione di base è completa. Gli account aziendali e di offerte non richiedono un profilo personale. Lo stato di pubblicazione è indicato per ogni voce.",
+    "nonPersonalSetupNotice": "Il profilo personale è facoltativo per gli account dedicati solo ad aziende, annunci o ricerche. La configurazione dell’account e lo stato di pubblicazione sono mostrati separatamente.",
     "contentKinds": {
       "location": "Location",
       "prop": "Mercato",
@@ -1358,6 +1358,18 @@
       "service": "Servizio",
       "animal": "Portfolio di animali",
       "other": "Annuncio"
+    },
+    "accountOnly": "Account",
+    "providerReady": "Account del fornitore configurato",
+    "notSubmitted": "Bozza privata: non ancora inviata",
+    "remindSubmission": "Ricorda di inviare",
+    "purposes": {
+      "crew": "Profilo troupe",
+      "talent": "Profilo talento",
+      "company": "Fornitore aziendale",
+      "location": "Fornitore di location",
+      "equipment": "Inserzionista marketplace",
+      "search": "Membro in cerca"
     }
   },
   "responsiblePerson": {
@@ -2130,5 +2142,30 @@
     "sentryPrepared": "Für die Fehlerdiagnose sind Konfigurationsdateien für Sentry (Functional Software Inc., San Francisco, USA) vorbereitet. Diese Dateien allein aktivieren noch keine Übermittlung; in der aktuellen Anwendung ist keine Sentry-Initialisierung eingebunden.",
     "replayDisabled": "Session Replay ist auch in der vorbereiteten Konfiguration deaktiviert. Es werden dadurch keine Sitzungsaufzeichnungen oder vorgelagerten Replay-Puffer erstellt. Eine spätere Aktivierung erfordert zuvor die Prüfung des Zwecks, der Rechtsgrundlage und gegebenenfalls eine wirksame Einwilligung. Dieser Datenschutzhinweis ersetzt keine Einwilligung.",
     "sentryPurpose": "Fehlerdiagnose vorbereitet; Session Replay deaktiviert (siehe Abschnitt 12)"
+  },
+  "SetupOffers": {
+    "accountReady": "Il tuo account come fornitore è configurato.",
+    "nextStep": "Il tuo annuncio è salvato separatamente. Controlla il suo stato e scegli il prossimo passo.",
+    "location": "La tua location",
+    "equipment": "Il tuo annuncio del marketplace",
+    "states": {
+      "loading": "Caricamento dello stato dell’annuncio …",
+      "draft": "Bozza privata: non ancora inviata.",
+      "pending": "Inviato: in attesa di approvazione dell’amministratore.",
+      "published": "Visibile pubblicamente.",
+      "changes_requested": "Sono richieste modifiche. Modifica il tuo annuncio.",
+      "rejected": "Non approvato. Apri l’annuncio per conoscere il motivo e continuare a modificarlo.",
+      "hidden": "Nascosto: non visibile pubblicamente.",
+      "unavailable": "Impossibile caricare lo stato attuale dell’annuncio."
+    },
+    "locationRule": "La tua location rimane privata fino all’approvazione dell’amministratore. Non è richiesto un profilo della troupe.",
+    "marketplaceRule": "Invii esplicitamente il tuo annuncio per la pubblicazione. Se è richiesta una revisione, rimane privato fino all’approvazione. Non è necessario un ulteriore profilo della troupe.",
+    "submitLocation": "Invia location per la revisione",
+    "submitMarketplace": "Invia annuncio per la pubblicazione",
+    "submitting": "Invio in corso …",
+    "reload": "Ricarica stato",
+    "openPublic": "Vedi annuncio pubblico",
+    "edit": "Modifica annuncio",
+    "saveError": "Impossibile confermare l’invio. La bozza salvata viene conservata. Controlla lo stato o riprova."
   }
 }

@@ -1,4 +1,5 @@
 "use client";
+import SetupCompletionOffers from "@/components/SetupCompletionOffers";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import { useExistingDraftProtection } from "@/lib/use-form-draft";
@@ -96,6 +97,7 @@ export default function ProfileSetupWizard() {
   const t = useTranslations("setup");
   const marketCatalog=useTranslations("MarketplaceCatalog");
   const contact = useTranslations("responsiblePerson");
+  const offersText = useTranslations("SetupOffers");
   const locale = useLocale();
   const animals = useTranslations("FilmAnimals");
   const router = useRouter();
@@ -655,19 +657,25 @@ export default function ProfileSetupWizard() {
     </div>;
   }
 
+  const finishedOffers = finished ? (["location", "equipment"] as const).flatMap(kind => {
+    const id = finished.completed.listings[kind];
+    return id ? [{ id, kind, title: finished.sections[kind]?.title ?? "" }] : [];
+  }) : [];
+
   if (!ready) return <div className="min-h-screen bg-bg-primary px-4 pt-20 text-center text-sm text-text-muted"><Loader2 className="mx-auto mb-3 animate-spin" />{t("copy47")}</div>;
   if (loadError) return <div className="min-h-[75vh] bg-bg-primary px-4 pb-8 pt-8 sm:pt-12"><section className="mx-auto max-w-xl rounded-2xl border border-border bg-bg-secondary p-6 text-center"><p role="alert" className="text-sm leading-6 text-red-300">{localizeSetupError(loadError, t, locale)}</p><p className="mt-2 text-xs leading-5 text-text-muted">{t("copy48")}</p><button type="button" onClick={() => { setReady(false); setLoadError(""); setLoadAttempt((value) => value + 1); }} className="mt-5 min-h-12 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary">{t("copy49")}</button></section></div>;
 
   if (finished) return <div className="min-h-screen bg-bg-primary px-4 py-8 sm:py-12"><section className="mx-auto max-w-xl rounded-2xl border border-border bg-bg-secondary p-5 sm:p-7">
     <CheckCircle2 size={36} className="mb-5 text-gold" />
     <p className="mb-2 text-xs font-semibold text-gold">{t("copy50")}</p>
-    <h1 className="font-display text-2xl font-bold sm:text-3xl">{finished.completed.profile ? profilePublic ? "Dein Profil ist jetzt öffentlich sichtbar." : "Dein Profil ist erstellt." : finished.completed.company ? "Dein Firmenprofil ist erstellt." : finished.intents.every(intent => intent === "search") ? "Du kannst jetzt entdecken." : "Deine Angebotsentwürfe sind gespeichert."}</h1>
+    <h1 className="font-display text-2xl font-bold sm:text-3xl">{finishedOffers.length && !finished.completed.profile && !finished.completed.company ? offersText("accountReady") : finished.completed.profile ? profilePublic ? "Dein Profil ist jetzt öffentlich sichtbar." : "Dein Profil ist erstellt." : finished.completed.company ? "Dein Firmenprofil ist erstellt." : finished.intents.every(intent => intent === "search") ? "Du kannst jetzt entdecken." : "Deine Angebotsentwürfe sind gespeichert."}</h1>
     <p className="mt-4 text-sm leading-6 text-text-secondary">{finished.completed.profile ? profilePublic ? "Andere können dich jetzt finden und dein Profil ansehen." : "Deine bisherigen Sichtbarkeitseinstellungen bleiben erhalten. Ein privates Profil bleibt privat." : finished.completed.company ? "Deine Firma wurde gespeichert. Etwaige Inserate haben einen eigenen Veröffentlichungsstatus." : "Deine Einrichtung ist abgeschlossen. Du kannst jederzeit weitere Bereiche ergänzen."}</p>
     <div className="mt-6 space-y-3">
-      <Link href="/" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary">{t("copy51")}<ArrowRight size={16} /></Link>
+      {finishedOffers.length > 0 && <SetupCompletionOffers offers={finishedOffers} />}
+
       {finished.completed.profile && user?.id && <a href={`/profile/${encodeURIComponent(user.id)}`} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-border px-5 text-sm font-semibold text-text-primary">{profilePublic ? "Öffentliches Profil ansehen" : "Profil ansehen"}<ArrowRight size={16} /></a>}
       {finished.completed.company && <a href={`/companies/${encodeURIComponent(finished.completed.company)}`} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-gold/30 px-5 text-sm font-semibold text-gold">{t("copy52")}<ArrowRight size={16} /></a>}
-      {(finished.completed.listings.location || finished.completed.listings.equipment) && <><p className="rounded-xl border border-border bg-bg-primary p-4 text-xs leading-5 text-text-muted">{t("copy53")}</p>{Object.entries(finished.completed.listings).map(([kind, id]) => <a key={id} href={`/dashboard?tab=listings&editListing=${encodeURIComponent(id!)}`} className="flex min-h-12 items-center justify-center rounded-xl border border-border px-4 text-sm text-text-primary">{kind === "location" ? "Locationentwurf fortsetzen" : "Marktplatzentwurf fortsetzen"}</a>)}</>}
+      <Link href="/" className={`flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 text-sm font-semibold ${finishedOffers.length ? "border border-border text-text-secondary" : "bg-gold text-bg-primary"}`}>{t("copy51")}<ArrowRight size={16} /></Link>
       {redirectTo && redirectTo !== "/dashboard" && <button type="button" onClick={() => router.replace(redirectTo)} className="flex min-h-12 w-full items-center justify-center rounded-xl border border-border px-4 text-sm text-text-primary">{t("copy54")}</button>}
     </div>
   </section></div>;
