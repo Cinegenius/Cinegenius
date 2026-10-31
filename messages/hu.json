@@ -1524,7 +1524,8 @@
     "draftPublishEffect": "A jóváhagyásod nyilvánossá teszi ezt a még be nem küldött piszkozatot. Más piszkozatok privátak maradnak.",
     "approvedWithWarnings": "Jóváhagyva a következő jelzések ellenére: {details}.",
     "responsibleMismatch": "A kapcsolattartó nem a cég megerősített tagja. Javítsd a hozzárendelést.",
-    "privateDecisionEffect": "Ezzel a döntéssel a bejegyzés nem lesz nyilvános. Később újabb ellenőrzés után jóváhagyhatod."
+    "privateDecisionEffect": "Ezzel a döntéssel a bejegyzés nem lesz nyilvános. Később újabb ellenőrzés után jóváhagyhatod.",
+    "companyPublishEffect": "Ez a jóváhagyás kifejezetten közzéteszi az eddig privát cégprofilt és a hozzá tartozó céges képeket. A többi vázlat és tagság változatlan marad. Előbb ellenőrizd a teljes tartalmat és a felelős személyt."
   },
   "MediaGallery": {
     "gallery": "Fényképgaléria",

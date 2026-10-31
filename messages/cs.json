@@ -1524,7 +1524,8 @@
     "draftPublishEffect": "Tvým schválením se tento dosud neodeslaný koncept zveřejní. Ostatní koncepty zůstanou soukromé.",
     "approvedWithWarnings": "Schváleno navzdory těmto upozorněním: {details}.",
     "responsibleMismatch": "Kontaktní osoba není potvrzeným členem této firmy. Oprav přiřazení.",
-    "privateDecisionEffect": "Tímto rozhodnutím záznam zůstane neveřejný. Později jej můžeš po nové kontrole schválit."
+    "privateDecisionEffect": "Tímto rozhodnutím záznam zůstane neveřejný. Později jej můžeš po nové kontrole schválit.",
+    "companyPublishEffect": "Toto schválení výslovně zveřejní dosud soukromý firemní profil a přiřazené firemní obrázky. Ostatní koncepty a členství se nemění. Nejprve zkontrolujte celý obsah a odpovědnou osobu."
   },
   "MediaGallery": {
     "gallery": "Fotogalerie",

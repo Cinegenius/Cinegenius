@@ -1524,7 +1524,8 @@
     "draftPublishEffect": "Your approval makes this unsubmitted draft public. Other drafts remain private.",
     "approvedWithWarnings": "Approved despite these notes: {details}.",
     "responsibleMismatch": "The assigned contact is not a confirmed member of this company. Correct the assignment first.",
-    "privateDecisionEffect": "This decision keeps the record non-public. You can approve it later after reviewing it again."
+    "privateDecisionEffect": "This decision keeps the record non-public. You can approve it later after reviewing it again.",
+    "companyPublishEffect": "This approval explicitly publishes the previously private company profile and its associated company images. Other drafts and memberships remain unchanged. Review the complete content and responsible person first."
   },
   "MediaGallery": {
     "gallery": "Photo gallery",

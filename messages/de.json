@@ -1524,7 +1524,8 @@
     "draftPublishEffect": "Dieser noch nicht eingereichte Entwurf wird mit deiner Freigabe öffentlich. Andere Entwürfe bleiben privat.",
     "approvedWithWarnings": "Freigegeben trotz folgender Hinweise: {details}.",
     "responsibleMismatch": "Die eingetragene Ansprechperson ist kein bestätigtes Mitglied dieser Firma. Bitte die Zuordnung korrigieren.",
-    "privateDecisionEffect": "Mit dieser Entscheidung bleibt der Eintrag nicht öffentlich. Eine spätere Freigabe kannst du nach erneuter Prüfung vornehmen."
+    "privateDecisionEffect": "Mit dieser Entscheidung bleibt der Eintrag nicht öffentlich. Eine spätere Freigabe kannst du nach erneuter Prüfung vornehmen.",
+    "companyPublishEffect": "Diese Freigabe veröffentlicht bewusst das bisher private Firmenprofil einschließlich seiner zugeordneten Firmenbilder. Andere Entwürfe und Mitgliedschaften bleiben unverändert. Prüfe vorher den vollständigen Inhalt und die verantwortliche Person."
   },
   "MediaGallery": {
     "gallery": "Fotogalerie",

@@ -1524,7 +1524,8 @@
     "draftPublishEffect": "Tu aprobación hace público este borrador aún no enviado. Los demás borradores siguen siendo privados.",
     "approvedWithWarnings": "Aprobado a pesar de estos avisos: {details}.",
     "responsibleMismatch": "La persona de contacto no es miembro confirmado de esta empresa. Corrige la vinculación.",
-    "privateDecisionEffect": "Con esta decisión, el contenido no será público. Puedes aprobarlo más adelante tras revisarlo de nuevo."
+    "privateDecisionEffect": "Con esta decisión, el contenido no será público. Puedes aprobarlo más adelante tras revisarlo de nuevo.",
+    "companyPublishEffect": "Esta aprobación publica expresamente el perfil de empresa hasta ahora privado y sus imágenes asociadas. Los demás borradores y membresías no cambian. Revisa primero todo el contenido y la persona responsable."
   },
   "MediaGallery": {
     "gallery": "Galería de fotos",

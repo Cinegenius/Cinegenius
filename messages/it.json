@@ -1524,7 +1524,8 @@
     "draftPublishEffect": "La tua approvazione rende pubblica questa bozza non ancora inviata. Le altre bozze restano private.",
     "approvedWithWarnings": "Approvato nonostante queste indicazioni: {details}.",
     "responsibleMismatch": "Il referente non è un membro confermato di questa azienda. Correggi il collegamento.",
-    "privateDecisionEffect": "Con questa decisione il contenuto rimane non pubblico. Potrai approvarlo in seguito dopo una nuova verifica."
+    "privateDecisionEffect": "Con questa decisione il contenuto rimane non pubblico. Potrai approvarlo in seguito dopo una nuova verifica.",
+    "companyPublishEffect": "Questa approvazione pubblica esplicitamente il profilo aziendale finora privato e le immagini aziendali associate. Le altre bozze e appartenenze restano invariate. Controlla prima tutti i contenuti e la persona responsabile."
   },
   "MediaGallery": {
     "gallery": "Galleria fotografica",
