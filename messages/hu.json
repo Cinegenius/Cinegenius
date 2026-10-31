@@ -1337,7 +1337,28 @@
     "accountTarget": "Fiók beállítása",
     "setupAlreadyComplete": "Az alapbeállítás időközben elkészült. Frissíts és válassz megfelelő sablont.",
     "setupTemplateLabel": "Profil folytatása (opcionális emlékeztető)",
-    "setupTemplateBody": "Szia! A CineGenius-fiókod már elkészült. Ha szeretnéd láthatóvá tenni a profilodat vagy egy ajánlatot, itt folytathatod a beállítást: '{{Bearbeitungslink}}'. Ha csak keresel, nem szükséges személyes profilt létrehoznod. Kérdés esetén válaszolj közvetlenül. A CineGenius ügyfélszolgálata"
+    "setupTemplateBody": "Szia! A CineGenius-fiókod már elkészült. Ha szeretnéd láthatóvá tenni a profilodat vagy egy ajánlatot, itt folytathatod a beállítást: '{{Bearbeitungslink}}'. Ha csak keresel, nem szükséges személyes profilt létrehoznod. Kérdés esetén válaszolj közvetlenül. A CineGenius ügyfélszolgálata",
+    "contentEmpty": "Nincs mentett cég, hirdetés vagy megkezdett ajánlatvázlat.",
+    "ownedCompanies": "Saját cégek",
+    "createdListings": "Ezzel a fiókkal létrehozott hirdetések",
+    "creatorNotice": "A létrehozó és a tényleges szolgáltató eltérhet. Az előnézet és az ügyfélszolgálat újra ellenőrzi a szolgáltató hozzárendelését.",
+    "privateDrafts": "Privát űrlapvázlatok",
+    "draftNotice": "Ez még nem mentett hirdetés: itt célzott emlékeztetőt küldhetsz. A jóváhagyás csak a meglévő tartalomellenőrzésben lehetséges.",
+    "contentPublic": "Nyilvános",
+    "contentPrivate": "Privát · nem nyilvános",
+    "manageContent": "Kezelés",
+    "reviewAndPublish": "Ellenőrzés és közzététel",
+    "nonPersonalSetupNotice": "Az alapbeállítás kész. A céges és ajánlati fiókokhoz nem szükséges személyes profil. A közzétételi állapot minden bejegyzésnél látható.",
+    "contentKinds": {
+      "location": "Helyszín",
+      "prop": "Piactér",
+      "vehicle": "Jármű",
+      "job": "Állás",
+      "creator": "Stáb / Tehetségek",
+      "service": "Szolgáltatás",
+      "animal": "Állatportfólió",
+      "other": "Hirdetés"
+    }
   },
   "responsiblePerson": {
     "title": "Felelős személy",

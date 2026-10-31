@@ -1337,7 +1337,28 @@
     "accountTarget": "Account setup",
     "setupAlreadyComplete": "Basic setup has since been completed. Please refresh and choose a suitable template.",
     "setupTemplateLabel": "Continue profile setup (optional reminder)",
-    "setupTemplateBody": "Hello! Your CineGenius account has already been created. If you would like to make your profile or a listing visible, continue setup here: '{{Bearbeitungslink}}'. Search-only users do not need a personal profile. Feel free to reply directly with any questions. Your CineGenius Support"
+    "setupTemplateBody": "Hello! Your CineGenius account has already been created. If you would like to make your profile or a listing visible, continue setup here: '{{Bearbeitungslink}}'. Search-only users do not need a personal profile. Feel free to reply directly with any questions. Your CineGenius Support",
+    "contentEmpty": "No saved company, listing or started offer draft.",
+    "ownedCompanies": "Owned companies",
+    "createdListings": "Listings created with this account",
+    "creatorNotice": "The creator and actual provider may differ. Preview and support check the provider association again.",
+    "privateDrafts": "Private form drafts",
+    "draftNotice": "Not yet a saved listing: you can send a targeted reminder here. Approval is available only in the existing content review.",
+    "contentPublic": "Public",
+    "contentPrivate": "Private · not public",
+    "manageContent": "Manage",
+    "reviewAndPublish": "Review and publish",
+    "nonPersonalSetupNotice": "Basic setup is complete. Company and offer accounts do not require a personal profile. Publication status is shown for each entry.",
+    "contentKinds": {
+      "location": "Location",
+      "prop": "Marketplace",
+      "vehicle": "Vehicle",
+      "job": "Job",
+      "creator": "Crew / Talent",
+      "service": "Service",
+      "animal": "Animal portfolio",
+      "other": "Listing"
+    }
   },
   "responsiblePerson": {
     "title": "Responsible person",

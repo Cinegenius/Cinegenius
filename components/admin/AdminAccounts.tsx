@@ -7,8 +7,25 @@ import Image from "@/components/MediaImage";
 import { SupportMessageAction } from "./SupportMessageAction";
 import AdminReviewLink from "./AdminReviewLink";
 import type { adminAccountRow } from "@/lib/admin-account-status";
+import type { AccountContent } from "@/lib/admin-account-content";
+import { reviewPath } from "@/lib/admin-review";
+import Link from "next/link";
 
-type Account = ReturnType<typeof adminAccountRow>;
+type Account = ReturnType<typeof adminAccountRow> & { content: AccountContent };
+
+function AccountContents({ content }: { content: AccountContent }) {
+  const t = useTranslations("AdminAccounts");
+  const moderation = useTranslations("OfferModeration");
+  const drafts = useTranslations("AdminStartedOffers");
+  const actionClass = "inline-flex min-h-11 items-center rounded-lg border border-border px-3 py-2 text-xs text-text-secondary hover:border-gold hover:text-gold";
+  const kinds = new Set(["location", "prop", "vehicle", "job", "creator", "service", "animal"]);
+  if (!content.companies.length && !content.listings.length && !content.drafts.length) return <p className="text-xs text-text-muted">{t("contentEmpty")}</p>;
+  return <div className="min-w-0 space-y-4">
+    {content.companies.length > 0 && <section aria-label={t("ownedCompanies")}><h3 className="text-xs font-semibold text-text-secondary">{t("ownedCompanies")} ({content.companies.length})</h3><ul className="mt-2 space-y-2">{content.companies.map(company => <li key={company.id} className="flex min-w-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-border p-3"><div className="min-w-0 flex-1 basis-40 break-words [overflow-wrap:anywhere]"><p className="text-sm text-text-primary">{company.title || drafts("untitled")}</p><p className={`mt-1 text-xs ${company.published ? "text-success" : "text-text-muted"}`}>{t(company.published ? "contentPublic" : "contentPrivate")}</p></div><div className="flex flex-wrap gap-2"><Link href={reviewPath("company", company.id)} prefetch={false} className={actionClass}>{t(company.published ? "manageContent" : "reviewAndPublish")}</Link><SupportMessageAction targetType="company" targetId={company.id} /></div></li>)}</ul></section>}
+    {content.listings.length > 0 && <section aria-label={t("createdListings")}><h3 className="text-xs font-semibold text-text-secondary">{t("createdListings")} ({content.listings.length})</h3><p className="mt-1 text-xs text-text-muted">{t("creatorNotice")}</p><ul className="mt-2 space-y-2">{content.listings.map(listing => <li key={listing.id} className="flex min-w-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-border p-3"><div className="min-w-0 flex-1 basis-40 break-words [overflow-wrap:anywhere]"><p className="text-sm text-text-primary">{listing.title || drafts("untitled")}</p><p className="mt-1 text-xs text-text-muted">{t("contentKinds." + (kinds.has(listing.type) ? listing.type : "other"))} · {t(listing.published ? "contentPublic" : "contentPrivate")} · {moderation("statuses." + listing.status)}</p></div><div className="flex flex-wrap gap-2"><Link href={reviewPath("listing", listing.id)} prefetch={false} className={actionClass}>{t(listing.published ? "manageContent" : "reviewAndPublish")}</Link><SupportMessageAction targetType="listing" targetId={listing.id} /></div></li>)}</ul></section>}
+    {content.drafts.length > 0 && <section aria-label={t("privateDrafts")}><h3 className="text-xs font-semibold text-text-secondary">{t("privateDrafts")} ({content.drafts.length})</h3><p className="mt-1 text-xs text-text-muted">{t("draftNotice")}</p><ul className="mt-2 space-y-2">{content.drafts.map(draft => <li key={draft.id} className="flex min-w-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-border p-3"><div className="min-w-0 flex-1 basis-40 break-words [overflow-wrap:anywhere]"><p className="text-sm text-text-primary">{draft.title || drafts("untitled")}</p><p className="mt-1 text-xs text-text-muted">{drafts("kinds." + draft.kind)} · {drafts("status")}</p></div><SupportMessageAction targetType="started_offer" targetId={draft.id} label={drafts("remind")} /></li>)}</ul></section>}
+  </div>;
+}
 export function AdminAccounts() {
   const t = useTranslations("AdminAccounts");
   const format = useFormatter();
@@ -53,8 +70,12 @@ export function AdminAccounts() {
         <p className="mt-1 font-mono text-[10px] text-text-muted">{account.userId}</p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        {account.profileUrl && <AdminReviewLink kind="profile" id={account.userId} />}{account.profileUrl && <a href={account.profileUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center rounded-lg border border-border px-3 text-xs text-text-secondary hover:text-gold">{t("openProfile")}</a>}
+        {account.profileStatus !== "missing" && <AdminReviewLink kind="profile" id={account.userId} />}{account.profileUrl && <a href={account.profileUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center rounded-lg border border-border px-3 text-xs text-text-secondary hover:text-gold">{t("openProfile")}</a>}
         <SupportMessageAction targetType="profile" targetId={account.userId} />
+      </div>
+      <div className="min-w-0 w-full basis-full border-t border-border pt-3">
+        {account.profileStatus === "missing" && !account.needsSetup && <p className="mb-3 text-xs leading-5 text-text-muted">{t("nonPersonalSetupNotice")}</p>}
+        <AccountContents content={account.content} />
       </div>
     </li>)}</ul>}
     <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-text-muted">

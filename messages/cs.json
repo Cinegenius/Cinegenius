@@ -1337,7 +1337,28 @@
     "accountTarget": "Nastavení účtu",
     "setupAlreadyComplete": "Základní nastavení již bylo dokončeno. Obnov stránku a vyber vhodnou šablonu.",
     "setupTemplateLabel": "Pokračovat v profilu (nepovinná připomínka)",
-    "setupTemplateBody": "Ahoj! Tvůj účet CineGenius již existuje. Pokud chceš zveřejnit svůj profil nebo nabídku, pokračuj v nastavení zde: '{{Bearbeitungslink}}'. Pokud pouze hledáš, osobní profil nepotřebuješ. S dotazy nám odpověz přímo. Tvoje podpora CineGenius"
+    "setupTemplateBody": "Ahoj! Tvůj účet CineGenius již existuje. Pokud chceš zveřejnit svůj profil nebo nabídku, pokračuj v nastavení zde: '{{Bearbeitungslink}}'. Pokud pouze hledáš, osobní profil nepotřebuješ. S dotazy nám odpověz přímo. Tvoje podpora CineGenius",
+    "contentEmpty": "Žádná uložená firma, inzerát ani rozpracovaný návrh nabídky.",
+    "ownedCompanies": "Vlastněné firmy",
+    "createdListings": "Inzeráty vytvořené tímto účtem",
+    "creatorNotice": "Tvůrce a skutečný poskytovatel se mohou lišit. Náhled a podpora znovu ověřují přiřazení poskytovatele.",
+    "privateDrafts": "Soukromé koncepty formulářů",
+    "draftNotice": "Zatím nejde o uložený inzerát: zde můžete odeslat cílenou připomínku. Schválení je možné pouze ve stávající kontrole obsahu.",
+    "contentPublic": "Veřejné",
+    "contentPrivate": "Soukromé · neveřejné",
+    "manageContent": "Spravovat",
+    "reviewAndPublish": "Zkontrolovat a zveřejnit",
+    "nonPersonalSetupNotice": "Základní nastavení je dokončeno. Firemní účty a účty nabídek nepotřebují osobní profil. Stav zveřejnění je uveden u každé položky.",
+    "contentKinds": {
+      "location": "Lokace",
+      "prop": "Tržiště",
+      "vehicle": "Vozidlo",
+      "job": "Práce",
+      "creator": "Štáb / Talenti",
+      "service": "Služba",
+      "animal": "Portfolio zvířat",
+      "other": "Inzerát"
+    }
   },
   "responsiblePerson": {
     "title": "Odpovědná osoba",

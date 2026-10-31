@@ -1337,7 +1337,28 @@
     "accountTarget": "Configuración de la cuenta",
     "setupAlreadyComplete": "La configuración básica ya se ha completado. Actualiza y elige una plantilla adecuada.",
     "setupTemplateLabel": "Continuar el perfil (recordatorio opcional)",
-    "setupTemplateBody": "¡Hola! Tu cuenta de CineGenius ya está creada. Si quieres hacer visible tu perfil o un anuncio, puedes continuar la configuración aquí: '{{Bearbeitungslink}}'. Quienes solo buscan no necesitan un perfil personal. Si tienes preguntas, responde directamente. Tu equipo de soporte de CineGenius"
+    "setupTemplateBody": "¡Hola! Tu cuenta de CineGenius ya está creada. Si quieres hacer visible tu perfil o un anuncio, puedes continuar la configuración aquí: '{{Bearbeitungslink}}'. Quienes solo buscan no necesitan un perfil personal. Si tienes preguntas, responde directamente. Tu equipo de soporte de CineGenius",
+    "contentEmpty": "No hay empresas, anuncios ni borradores de ofertas guardados.",
+    "ownedCompanies": "Empresas propias",
+    "createdListings": "Anuncios creados con esta cuenta",
+    "creatorNotice": "El creador y el proveedor real pueden ser distintos. La vista previa y soporte vuelven a comprobar el proveedor.",
+    "privateDrafts": "Borradores privados de formularios",
+    "draftNotice": "Todavía no es un anuncio guardado: aquí puedes enviar un recordatorio específico. La aprobación solo está disponible en la revisión de contenido existente.",
+    "contentPublic": "Público",
+    "contentPrivate": "Privado · no público",
+    "manageContent": "Gestionar",
+    "reviewAndPublish": "Revisar y publicar",
+    "nonPersonalSetupNotice": "La configuración básica está completa. Las cuentas de empresas y ofertas no necesitan un perfil personal. El estado de publicación aparece en cada entrada.",
+    "contentKinds": {
+      "location": "Localización",
+      "prop": "Mercado",
+      "vehicle": "Vehículo",
+      "job": "Empleo",
+      "creator": "Equipo / Talento",
+      "service": "Servicio",
+      "animal": "Portafolio de animales",
+      "other": "Anuncio"
+    }
   },
   "responsiblePerson": {
     "title": "Persona responsable",

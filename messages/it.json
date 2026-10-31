@@ -1337,7 +1337,28 @@
     "accountTarget": "Configurazione dell’account",
     "setupAlreadyComplete": "La configurazione di base è già stata completata. Aggiorna e scegli un modello adatto.",
     "setupTemplateLabel": "Continua il profilo (promemoria facoltativo)",
-    "setupTemplateBody": "Ciao! Il tuo account CineGenius è già stato creato. Se vuoi rendere visibile il tuo profilo o un annuncio, continua qui: '{{Bearbeitungslink}}'. Chi cerca soltanto non ha bisogno di un profilo personale. Per qualsiasi domanda, rispondi direttamente. Il tuo supporto CineGenius"
+    "setupTemplateBody": "Ciao! Il tuo account CineGenius è già stato creato. Se vuoi rendere visibile il tuo profilo o un annuncio, continua qui: '{{Bearbeitungslink}}'. Chi cerca soltanto non ha bisogno di un profilo personale. Per qualsiasi domanda, rispondi direttamente. Il tuo supporto CineGenius",
+    "contentEmpty": "Nessuna azienda, annuncio o bozza di offerta salvata.",
+    "ownedCompanies": "Aziende di proprietà",
+    "createdListings": "Annunci creati con questo account",
+    "creatorNotice": "Il creatore e il fornitore effettivo possono essere diversi. Anteprima e assistenza verificano nuovamente il fornitore.",
+    "privateDrafts": "Bozze private dei moduli",
+    "draftNotice": "Non è ancora un annuncio salvato: qui puoi inviare un promemoria mirato. L’approvazione è disponibile solo nella verifica dei contenuti esistente.",
+    "contentPublic": "Pubblico",
+    "contentPrivate": "Privato · non pubblico",
+    "manageContent": "Gestisci",
+    "reviewAndPublish": "Esamina e pubblica",
+    "nonPersonalSetupNotice": "La configurazione di base è completa. Gli account aziendali e di offerte non richiedono un profilo personale. Lo stato di pubblicazione è indicato per ogni voce.",
+    "contentKinds": {
+      "location": "Location",
+      "prop": "Mercato",
+      "vehicle": "Veicolo",
+      "job": "Lavoro",
+      "creator": "Crew / Talenti",
+      "service": "Servizio",
+      "animal": "Portfolio di animali",
+      "other": "Annuncio"
+    }
   },
   "responsiblePerson": {
     "title": "Persona responsabile",

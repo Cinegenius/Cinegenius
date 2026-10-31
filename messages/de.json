@@ -1337,7 +1337,28 @@
     "accountTarget": "Kontoeinrichtung",
     "setupAlreadyComplete": "Die Grundeinrichtung ist inzwischen abgeschlossen. Bitte aktualisieren und eine passende Vorlage wählen.",
     "setupTemplateLabel": "Profilerstellung fortsetzen (freiwillige Erinnerung)",
-    "setupTemplateBody": "Hallo! Dein CineGenius-Konto ist bereits erstellt. Wenn du dein Profil oder ein Angebot sichtbar machen möchtest, kannst du die Einrichtung hier fortsetzen: '{{Bearbeitungslink}}'. Ein Personenprofil ist für reine Suchende nicht erforderlich. Bei Fragen antworte uns gerne direkt. Dein CineGenius Support"
+    "setupTemplateBody": "Hallo! Dein CineGenius-Konto ist bereits erstellt. Wenn du dein Profil oder ein Angebot sichtbar machen möchtest, kannst du die Einrichtung hier fortsetzen: '{{Bearbeitungslink}}'. Ein Personenprofil ist für reine Suchende nicht erforderlich. Bei Fragen antworte uns gerne direkt. Dein CineGenius Support",
+    "contentEmpty": "Keine gespeicherte Firma, kein Inserat und kein begonnener Angebotsentwurf vorhanden.",
+    "ownedCompanies": "Eigene Firmen",
+    "createdListings": "Mit diesem Konto erstellte Inserate",
+    "creatorNotice": "Ersteller und tatsächlicher Anbieter können unterschiedlich sein. Vorschau und Support prüfen die Anbieterzuordnung erneut.",
+    "privateDrafts": "Private Formularentwürfe",
+    "draftNotice": "Noch kein gespeichertes Inserat: Hier kannst du gezielt erinnern. Eine Freigabe ist erst in der bestehenden Inhaltsprüfung möglich.",
+    "contentPublic": "Öffentlich",
+    "contentPrivate": "Privat · nicht öffentlich",
+    "manageContent": "Verwalten",
+    "reviewAndPublish": "Ansehen und freigeben",
+    "nonPersonalSetupNotice": "Die Grundeinrichtung ist abgeschlossen. Ein Personenprofil ist für Firmen- und Angebotskonten nicht erforderlich. Der Veröffentlichungsstatus steht beim jeweiligen Eintrag.",
+    "contentKinds": {
+      "location": "Location",
+      "prop": "Marktplatz",
+      "vehicle": "Fahrzeug",
+      "job": "Job",
+      "creator": "Crew / Talent",
+      "service": "Dienstleistung",
+      "animal": "Tierportfolio",
+      "other": "Inserat"
+    }
   },
   "responsiblePerson": {
     "title": "Verantwortliche Person",

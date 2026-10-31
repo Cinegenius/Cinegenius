@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { adminAccountRow } from "@/lib/admin-account-status";
+import { loadAccountContent } from "@/lib/admin-account-content";
 
 const PAGE_SIZE = 50;
 export async function GET(request: NextRequest) {
@@ -21,15 +22,19 @@ export async function GET(request: NextRequest) {
       ...(search.startsWith("user_") ? { userId: [search] } : search ? { query: search } : {}),
     });
     const ids = users.map(user => user.id);
-    const [{ data: profiles, error }, { data: settings, error: settingsError }] = ids.length ? await Promise.all([
-      db.from("profiles").select("user_id, display_name, slug, avatar_url, location, positions, role, profile_type, profile_types").in("user_id", ids),
-      db.from("user_settings").select("user_id, profile_visibility").in("user_id", ids),
-    ]) : [{ data: [], error: null }, { data: [], error: null }];
+    const [{ data: profiles, error }, { data: settings, error: settingsError }, content] = await Promise.all([
+      ids.length ?
+      db.from("profiles").select("user_id, display_name, slug, avatar_url, location, positions, role, profile_type, profile_types").in("user_id", ids)
+      : Promise.resolve({ data: [], error: null }),
+      ids.length ? db.from("user_settings").select("user_id, profile_visibility").in("user_id", ids)
+        : Promise.resolve({ data: [], error: null }),
+      loadAccountContent(users),
+    ]);
     if (error || settingsError) return NextResponse.json({ error: t("loadError") }, { status: 503, headers });
     const profileMap = new Map((profiles ?? []).map(profile => [profile.user_id, profile]));
     const visibilityMap = new Map((settings ?? []).map(setting => [setting.user_id, setting.profile_visibility]));
     return NextResponse.json({
-      accounts: users.map(user => adminAccountRow(user, profileMap.get(user.id) ?? null, visibilityMap.get(user.id) ?? null)),
+      accounts: users.map(user => ({ ...adminAccountRow(user, profileMap.get(user.id) ?? null, visibilityMap.get(user.id) ?? null), content: content.get(user.id)! })),
       total: totalCount, page, pageSize: PAGE_SIZE,
     }, { headers });
   } catch {
