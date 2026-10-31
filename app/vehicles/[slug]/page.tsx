@@ -53,8 +53,8 @@ async function getVehicle(slug: string, viewerId?: string | null) {
     id: data.id,
     title: data.title,
     type: marketplaceCategoryLabel(data.category ?? "Fahrzeug",catalog),
-    make: ownerName,
-    model: data.title,
+    make: typeof rawMetadata.make === "string" ? rawMetadata.make.trim() : "",
+    model: typeof rawMetadata.model === "string" ? rawMetadata.model.trim() : listingPriceMetadata(rawMetadata).marketplace?.model ?? "",
     year: typeof rawMetadata.year === "number" ? rawMetadata.year : 0,
     color: typeof rawMetadata.color === "string" ? rawMetadata.color : "",
     era: typeof rawMetadata.era === "string" ? rawMetadata.era : null,
@@ -144,8 +144,13 @@ export default async function VehicleDetailPage({
           <span className="text-text-secondary truncate">{vehicle.title}</span>
         </div>
 
+        <header data-offer-heading className="mb-6 min-w-0 space-y-3">
+          <h1 className="min-w-0 break-words font-display text-3xl font-bold leading-tight text-text-primary sm:text-4xl [overflow-wrap:anywhere]">{vehicle.title}</h1>
+          <span className="inline-block max-w-full break-words rounded-full border border-border bg-bg-elevated px-3 py-1 text-sm text-text-muted">{vehicle.type}</span>
+        </header>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-6">
+          <div className="min-w-0 lg:col-span-2 space-y-6">
             <div className="relative">
               <VehicleImageGallery
                 title={vehicle.title}
@@ -167,12 +172,8 @@ export default async function VehicleDetailPage({
               </div>
             </div>
 
-            <div>
-              <MarketplaceOfferSummary category={vehicle.marketplaceCategory} price={vehicle.dailyRate} metadata={vehicle.pricing} />
-              <div className="flex items-start justify-between gap-4 mb-2">
-                <h1 className="font-display text-3xl font-bold text-text-primary">{vehicle.title}</h1>
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="px-3 py-1 bg-bg-elevated border border-border text-text-muted text-sm rounded-full">{vehicle.type}</span>
+            <div className="min-w-0 space-y-3" data-offer-actions>
+              <div className="flex flex-wrap items-center gap-2 [&_button]:min-h-11 [&_button]:min-w-11">
                   {isOwner && (
                     <Link href="/dashboard?tab=listings"
                       className="flex items-center gap-1.5 px-3 py-1.5 border border-gold/40 text-gold text-xs font-medium rounded-lg hover:bg-gold/10 transition-colors">
@@ -188,9 +189,8 @@ export default async function VehicleDetailPage({
                     listingImage={vehicle.image}
                   />
                   <ReportButton listingId={vehicle.id} />
-                </div>
               </div>
-              <p className="text-text-muted flex items-center gap-1 mb-4">
+              <p className="flex min-w-0 flex-wrap items-center gap-1 break-words text-sm text-text-muted [&_svg]:shrink-0 [overflow-wrap:anywhere]">
                 <MapPin size={14} /> {vehicle.location} · {vehicle.vendor}
               </p>
               <div className="flex flex-wrap gap-2">
@@ -200,38 +200,40 @@ export default async function VehicleDetailPage({
               </div>
             </div>
 
-            {vehicle.make !== "Privatanbieter" && (
-              <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                <h2 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
-                  <Car size={16} className="text-gold" /> Fahrzeugdaten
-                </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  {[
-                    { label: "Marke", value: vehicle.make },
-                    { label: "Modell", value: vehicle.model },
-                    { label: "Baujahr", value: vehicle.year > 0 ? String(vehicle.year) : "—" },
-                    { label: "Farbe", value: vehicle.color || "—" },
-                    { label: "Ära", value: vehicle.era ?? "Modern" },
-                    { label: "Zustand", value: vehicle.condition },
-                  ].map(({ label, value }) => (
-                    <div key={label}>
-                      <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-1">{label}</p>
-                      <p className="text-sm text-text-primary font-medium">{value}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
             <div className="p-5 rounded-xl border border-border bg-bg-secondary">
               <h2 className="font-semibold text-text-primary mb-3">Über dieses Fahrzeug</h2>
-              <p className="text-text-secondary text-sm leading-relaxed">
+              <p className="text-text-secondary text-sm leading-relaxed whitespace-pre-line break-words [overflow-wrap:anywhere]">
                 {"description" in vehicle && vehicle.description
                   ? String(vehicle.description)
                   : `Dieses authentische ${vehicle.make} ${vehicle.model}${vehicle.year > 0 ? ` aus dem Jahr ${vehicle.year}` : ""} ist in ${vehicle.condition.toLowerCase()} Zustand und speziell für Film- und Fernsehproduktionen aufbereitet.${vehicle.delivery ? " Lieferung zum Set ist verfügbar — kontaktiere den Anbieter für Details." : vehicle.location ? ` Selbstabholung am Standort ${vehicle.location}.` : ""}`
                 }
               </p>
             </div>
+
+            <MarketplaceOfferSummary category={vehicle.marketplaceCategory} price={vehicle.dailyRate} metadata={vehicle.pricing} />
+
+            {(vehicle.make || vehicle.model || vehicle.year > 0 || vehicle.color) && (
+              <div className="p-5 rounded-xl border border-border bg-bg-secondary">
+                <h2 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
+                  <Car size={16} className="text-gold" /> Fahrzeugdaten
+                </h2>
+                <div className="grid min-w-0 grid-cols-2 gap-4 sm:grid-cols-3">
+                  {[
+                    { label: "Marke", value: vehicle.make || "—" },
+                    { label: "Modell", value: vehicle.model || "—" },
+                    { label: "Baujahr", value: vehicle.year > 0 ? String(vehicle.year) : "—" },
+                    { label: "Farbe", value: vehicle.color || "—" },
+                    { label: "Ära", value: vehicle.era ?? "Modern" },
+                    { label: "Zustand", value: vehicle.condition },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="min-w-0">
+                      <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-1">{label}</p>
+                      <p className="break-words text-sm font-medium text-text-primary [overflow-wrap:anywhere]">{value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {vehicle.delivery !== undefined && (
               <div className="p-5 rounded-xl border border-border bg-bg-secondary">

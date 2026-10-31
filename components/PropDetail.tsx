@@ -104,14 +104,14 @@ export default function PropDetail({ prop }: { prop: Prop }) {
           <ArrowLeft size={14} /> Zurück zu Requisiten & Verleih
         </ContextBackLink>
 
-        <ListingPhotoGallery images={images} title={prop.title} label="Artikelgalerie" focalPoint={prop.focalPoint} />
-
-        <div className="flex gap-10 flex-col lg:flex-row">
-          {/* LEFT */}
-          <div className="flex-1 min-w-0">
+        <header data-offer-heading className="mb-6 min-w-0">
+            <div className="min-w-0 space-y-3 mb-3">
+              <h1 className="min-w-0 break-words font-display text-3xl font-bold leading-tight text-text-primary sm:text-4xl [overflow-wrap:anywhere]">
+                {prop.title}
+              </h1>
             <div className="flex flex-wrap gap-2 mb-3">
-              <span className="px-2.5 py-1 bg-bg-secondary border border-border text-text-muted text-xs rounded-full">
-                {prop.category}
+              <span className="max-w-full break-words rounded-full border border-border bg-bg-secondary px-2.5 py-1 text-xs text-text-muted [overflow-wrap:anywhere]">
+                {marketplaceCategoryLabel(prop.category,catalog)}
               </span>
               {prop.era && (
                 <span className="px-2.5 py-1 bg-gold-subtle border border-gold/20 text-gold text-xs rounded-full">
@@ -128,11 +128,21 @@ export default function PropDetail({ prop }: { prop: Prop }) {
               )}
             </div>
 
-            <div className="flex items-start justify-between gap-3 mb-2">
-              <h1 className="font-display text-3xl sm:text-4xl font-bold text-text-primary">
-                {prop.title}
-              </h1>
-              <div className="flex items-center gap-1 shrink-0 mt-1">
+
+
+            </div>
+
+
+
+        </header>
+
+        <ListingPhotoGallery images={images} title={prop.title} label="Artikelgalerie" focalPoint={prop.focalPoint} />
+
+        <div className="flex gap-10 flex-col lg:flex-row">
+          {/* LEFT */}
+          <div className="flex-1 min-w-0">
+            <div data-offer-actions className="mb-5 min-w-0 space-y-3">
+              <div className="flex flex-wrap items-center gap-2 [&_button]:min-h-11 [&_button]:min-w-11">
                 {isOwner && (
                   <Link href={`/dashboard?tab=listings`}
                     className="flex items-center gap-1.5 px-3 py-1.5 border border-gold/40 text-gold text-xs font-medium rounded-lg hover:bg-gold/10 transition-colors">
@@ -149,12 +159,20 @@ export default function PropDetail({ prop }: { prop: Prop }) {
                 />
                 <ReportButton listingId={prop.id} />
               </div>
-            </div>
-
-            <div className="flex items-center gap-3 text-sm text-text-muted mb-4">
+            <div className="flex min-w-0 flex-wrap items-center gap-3 break-words text-sm text-text-muted mb-4 [&_svg]:shrink-0 [overflow-wrap:anywhere]">
               <span className="flex items-center gap-1"><Package size={14} className="text-gold" /> {prop.vendor}</span>
               <span>·</span>
               <span className="flex items-center gap-1"><MapPin size={14} className="text-gold" /> {prop.location}</span>
+            </div>
+            </div>
+
+            <div className="mb-8">
+              <h2 className="font-display text-xl font-bold text-text-primary mb-3">Über diesen Artikel</h2>
+              {prop.description ? (
+                <p className="text-text-secondary text-sm leading-relaxed whitespace-pre-line break-words [overflow-wrap:anywhere]">{prop.description}</p>
+              ) : (
+                <p className="text-text-muted italic text-sm">Keine Beschreibung vorhanden.</p>
+              )}
             </div>
 
             {/* Rating */}
@@ -195,14 +213,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
             </div>
 
             <MarketplaceOfferSummary category={prop.category} price={prop.dailyRate} metadata={prop.pricing} />
-            <div className="mb-8">
-              <h2 className="font-display text-xl font-bold text-text-primary mb-3">Über diesen Artikel</h2>
-              {prop.description ? (
-                <p className="text-text-secondary text-sm leading-relaxed whitespace-pre-line">{prop.description}</p>
-              ) : (
-                <p className="text-text-muted italic text-sm">Keine Beschreibung vorhanden.</p>
-              )}
-            </div>
+
 
             <ProductionCreditsDisplay credits={prop.productionCredits ?? []} heading="Bei diesen Produktionen im Einsatz" />
 
