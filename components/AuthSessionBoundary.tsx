@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "@clerk/nextjs";
+import { useClerk, useSession } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Fragment } from "react";
@@ -29,11 +29,14 @@ function SessionTransition() {
  */
 export default function AuthSessionBoundary({ children, initialSessionId = null }: { children: React.ReactNode; initialSessionId?: string | null }) {
   const { session, isLoaded } = useSession();
+  const clerk = useClerk();
   // Clerk clears the client session before its sign-out request/navigation has
   // finished. Do not remount the old server-authenticated page as a guest in
   // that gap: its mount effects and Link prefetches would start again while
   // the document is being replaced. The server refresh supplies the new tree.
-  if (isLoaded && !session && initialSessionId) return <SessionTransition />;
+  // During sign-out Clerk first emits session=undefined (isLoaded=false).
+  // Its loaded instance distinguishes that gap from initial SDK hydration.
+  if ((isLoaded || clerk.loaded) && !session && initialSessionId) return <SessionTransition />;
   // Hydrating the same server-verified session must not remount every private page.
   const sessionId = isLoaded ? session?.id : initialSessionId;
   return <Fragment key={sessionId ?? "signed-out"}>{children}</Fragment>;

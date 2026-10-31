@@ -75,3 +75,65 @@ bewiesen dokumentiert.
 Verwandter, vom WebKit-Team bestätigter Abbruchmechanismus, ausdrücklich keine
 alleinige Diagnose für CineGenius:
 https://github.com/microsoft/playwright/issues/43120
+
+## Nachtest: vorläufiger Clerk-Zustand ebenfalls berücksichtigen
+
+Der Nutzer meldete nach Veröffentlichung von `d04b079` weiterhin rote Meldungen
+bei funktionierender An-/Abmeldung. Damit ist das Konsolen-Erfolgskriterium für
+diese Veröffentlichung nicht bestanden.
+
+Die bisherige lokale Nachstellung bildete nur `session=null, isLoaded=true` ab.
+Der tatsächlich ausgelieferte Clerk-Code setzt beim Beginn von `signOut`
+zunächst `session=undefined` und sendet diesen Ressourcenstand an seine Listener.
+Der installierte `useSessionBase` liest diesen Stand; `useSession` liefert dafür
+`isLoaded=false`, obwohl die bereits initialisierte Clerk-Instanz weiter
+`loaded=true` ist. Die bisherige Bedingung wartete auf `isLoaded=true` und ließ
+die alte Seite in dieser früheren Phase noch stehen. Das ursprüngliche Testmodell
+hatte diesen Unterschied übersehen.
+
+Ein neuer Regressionstest führt die tatsächlichen installierten Module
+`@clerk/shared/dist/react/hooks/base/useSessionBase.js` und
+`@clerk/shared/dist/react/hooks/useSession.js` mit kontrolliertem Ressourcenstore
+aus. Er reproduzierte vor der Ergänzung einen fehlschlagenden Test: die alte
+private Kindkomponente wurde im vorläufigen Abmeldezustand noch ausgeführt.
+Der lokale Kandidat prüft nun zusätzlich das öffentliche `clerk.loaded`. So
+entfernt er die alte Seite bereits in dieser Phase, ohne die initiale
+SDK-Hydrierung vorzuladen oder private Gastinhalte freizugeben.
+
+Nach der Ergänzung: 77 gezielte Tests bestanden, einschließlich beider
+Abmeldezustände in allen sechs Sprachen und unverändertem ersten Serverrender.
+TypeScript, Komponenten-Lint und Sprachprüfung bestanden. Die lokale
+Produktions-Browsernachstellung verglich die tatsächliche vorherige und neue
+Komponente mit `session=undefined, isLoaded=false, clerk.loaded=true`: vorher
+blieben Profil-/Inserat-/Startseitenlinks vorhanden, nachher verschwanden sie
+sofort zugunsten des Status. Die bestätigte neue Serverantwort beendet diesen
+Status ohne Timer.
+
+Ein separater generischer Fetch-während-Dokumentwechsel-Vergleich auf localhost
+reproduzierte die Safari-Konsolenfehler nicht: alle drei Testanfragen erhielten
+200. Er ist kein Nachweis für die Fehlerursache auf CineGenius. Auch die
+oben beschriebene SDK-Lücke allein beweist noch nicht, dass der verbleibende
+Safari-Fehler damit vollständig beseitigt ist. Dafür stehen weiterhin die genaue
+Zuordnung im aktuellen Safari-Fenster und ein echter Nachtest aus.
+
+## Native Safari-Reproduktion vor Veröffentlichung der Ergänzung
+
+Im vom Nutzer freigegebenen Safari-Fenster war zunächst ein älterer Startseitentab
+mit `dpl_7FMaKagdpWATcmBjPWaQC95aLCCu` und der früheren Clerk-CSP-Sperre geöffnet.
+Nur diesen Startseitentab neu geladen: danach eindeutig
+`dpl_FksmXncJuPqtvFYd5R7b5KuYTJVW`, aktive Sitzung, keine roten Meldungen.
+Diese alte Tabversion erklärt ausdrücklich nicht sämtliche früheren Tests.
+
+Dann im so bestätigten aktuellen Tab einmal über das Kontomenü abgemeldet.
+Während des Übergangs waren vier neue RSC-Zugriffsfehlermeldungen für `/search`,
+`/dashboard`, `/ki-transparenz` und `/locations` sowie zwei `TypeError: Load failed`
+sichtbar. Vorübergehend erschien die vorhandene App-Fehleransicht. Anschließend
+schloss die Dokumentnavigation ab und die normale öffentliche Startseite mit
+Anmelden/Registrieren war wieder sichtbar. Das ist eine echte Reproduktion des
+Übergangsfehlers auf der aktuellen vorherigen Version, kein fehlerfreier Test.
+
+Ohne aktiviertes dauerhaftes Netzwerkprotokoll wurden die alten Anfragen bei der
+abschließenden Dokumentnavigation ersetzt. Es wird deshalb kein nicht beobachteter
+HTTP-Status dieser vier Fehlversuche behauptet. Keine Cookies, Tokens, Codes,
+Kennwörter oder privaten Nachrichteninhalte wurden für diesen Test ausgelesen.
+Der Nachtest mit der ergänzten frühen Zustandsprüfung steht noch aus.
