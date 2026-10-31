@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "@/components/MediaImage";
 import Link from "next/link";
 import { Camera, ArrowRight } from "lucide-react";
 import { auth } from "@clerk/nextjs/server";
@@ -26,9 +25,7 @@ export default async function PhotoPage({ searchParams }: { searchParams: Promis
   const selectedWithLikes = profileParam && imageParam
     ? (await getCommunityMedia({ ownerId: profileParam.startsWith("media:") ? undefined : profileParam, imageUrl: imageParam, limit: 1, viewerId: userId })).photos[0] ?? null : null;
   return (
-    <div className="relative min-h-screen">
-      <Image src="/photo-bg.jpg" alt="" fill priority unoptimized className="object-cover object-top" />
-      <div className="absolute inset-0 bg-black/70" />
+    <div className="relative min-h-screen bg-black">
       <div className="relative z-10">
         <section className="site-container pb-8 pt-32 sm:pb-10 sm:pt-36">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-gold/20 bg-gold/5 px-3 py-1.5 text-xs font-semibold text-gold"><Camera size={11} /> CineGenius Galerie</div>

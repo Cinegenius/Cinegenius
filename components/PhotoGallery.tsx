@@ -8,6 +8,7 @@ import { DiscoverPhoto, PhotoDialog } from "@/components/HomePhotoDiscovery";
 import { photoHref } from "@/lib/photo-link";
 import PhotoLikeButton from "@/components/PhotoLikeButton";
 import { communityPreviewUrl } from "@/lib/community-preview";
+import { galleryPreviewAspectRatio } from "@/lib/photo-gallery-layout";
 
 type GalleryItem = DiscoverPhoto;
 
@@ -44,7 +45,8 @@ export function PhotoGallery({
                   href={photoHref(item.profileId, item.imageUrl)}
                   onClick={() => { try { sessionStorage.setItem("cinegenius-photo-return", "1"); } catch {} }}
                   aria-label={`Foto von ${item.author} öffnen${item.caption ? `: ${item.caption}` : ""}`}
-                  className="relative block aspect-[4/3] overflow-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold focus-visible:outline-offset-2"
+                  style={{ aspectRatio: galleryPreviewAspectRatio(item) }}
+                  className="relative block overflow-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold focus-visible:outline-offset-2"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element -- bounded derivative, never the original-resolution fallback */}
                   {failedImages.has(item.imageUrl) ? <div role="img" aria-label="Foto derzeit nicht erreichbar" className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-4 text-center text-xs text-text-muted"><ImageOff size={24} /><span>Foto derzeit nicht erreichbar</span></div> : <img src={communityPreviewUrl(item.imageUrl)} alt={item.caption || `Foto von ${item.author}`} width={640} height={480} loading="lazy" decoding="async" onError={() => setFailedImages(current => new Set(current).add(item.imageUrl))} className={item.fit === "contain" ? "absolute inset-0 h-full w-full object-contain p-4" : "absolute inset-0 h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"} />}
