@@ -168,7 +168,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
   const hasAnyFilter = Boolean(search || selectedCategory || cityFilter || countryFilter || verifiedOnly);
   const hasCatFilter = Boolean(selectedCategory);
   const mobileChips: BrowseChip[] = [
-    ...(selectedCat ? [{ id: "category", label: selectedCat.label, onRemove: () => setSelectedCategory(null) }] : []),
+    ...(selectedCat ? [{ id: "category", label: animalCategoryLabel(selectedCat.id, selectedCat.label, animals), onRemove: () => setSelectedCategory(null) }] : []),
     ...(cityFilter ? [{ id: "city", label: cityFilter, onRemove: () => setCityFilter("") }] : []),
     ...(countryFilter ? [{ id: "country", label: countryFilter, onRemove: () => setCountryFilter("") }] : []),
     ...(verifiedOnly ? [{ id: "verified", label: t("filterVerified"), onRemove: () => setVerifiedOnly(false) }] : []),
@@ -345,7 +345,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                     }`}
                   >
                     <Icon size={14} className={isActive ? "text-gold" : "text-text-muted"} />
-                    <span className="truncate">{animalCategoryLabel(cat.id, cat.label, animals)}</span>
+                    <span className="min-w-0 break-words leading-snug">{animalCategoryLabel(cat.id, cat.label, animals)}</span>
                   </button>
                 );
               })}
@@ -383,7 +383,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
 
             <p className="hidden xl:block text-sm text-text-muted mb-5">
               <span className="font-semibold text-text-primary">{filtered.length}</span> {t("resultsCount", { count: filtered.length })}
-              {selectedCat && <> in <span className={`font-semibold ${selectedCat.color}`}>{selectedCat.label}</span></>}
+              {selectedCat && <> in <span className={`font-semibold ${selectedCat.color}`}>{animalCategoryLabel(selectedCat.id, selectedCat.label, animals)}</span></>}
             </p>
 
             {paginated.length === 0 ? (
@@ -440,34 +440,30 @@ function CompanyCard({ company }: { company: Company }) {
   const cats = company.categories.slice(0, 2).map((id) => COMPANY_CATEGORY_BY_ID[id]).filter(Boolean);
   return (
     <Link href={`/companies/${company.slug}`}
-      className="browse-card card-hover group block p-4">
-      <div className="flex min-w-0 items-start gap-3 mb-3">
+      className="browse-card card-hover group flex h-full min-w-0 flex-col p-4">
+      <div className="mb-3 flex min-h-[4.5rem] min-w-0 items-start gap-3">
         <CompanyLogo src={company.logo_url} name={company.name} className="h-12 w-20 shrink-0" />
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-1">
-            <h3 className="font-semibold text-sm text-text-primary group-hover:text-gold transition-colors break-words leading-snug [overflow-wrap:anywhere]">{company.name}</h3>
+            <h3 className="line-clamp-2 min-h-[2.5rem] font-semibold text-sm text-text-primary group-hover:text-gold transition-colors break-words leading-snug [overflow-wrap:anywhere]">{company.name}</h3>
             {company.verified && <CheckCircle size={13} className="text-gold shrink-0 mt-0.5" />}
           </div>
-          {company.city && (
-            <div className="flex items-center gap-1 text-[11px] text-text-muted mt-0.5">
-              <MapPin size={9} /><span className="truncate">{company.city}</span>
-            </div>
-          )}
+          <div className="mt-0.5 flex min-h-4 items-center gap-1 text-[11px] text-text-muted">
+            {company.city && <><MapPin size={9} className="shrink-0" /><span className="truncate">{company.city}</span></>}
+          </div>
         </div>
       </div>
       {/* Categories */}
-      {cats.length > 0 && (
-        <div className="flex flex-wrap gap-1 mb-2.5">
-          {cats.map((cat) => (
-            <span key={cat.id} className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${cat.bg} ${cat.color}`}>{animalCategoryLabel(cat.id, cat.label, animals)}</span>
-          ))}
-          {company.categories.length > 2 && (
-            <span className="px-2 py-0.5 text-[10px] font-medium rounded-full border border-border text-text-muted">+{company.categories.length - 2}</span>
-          )}
-        </div>
-      )}
+      <div className="mb-2.5 flex min-h-11 flex-wrap content-start gap-1 overflow-hidden">
+        {cats.map((cat) => (
+          <span key={cat.id} title={animalCategoryLabel(cat.id, cat.label, animals)} className={`block max-w-full truncate whitespace-nowrap rounded-full border px-2 py-0.5 text-[10px] font-semibold ${cat.bg} ${cat.color}`}>{animalCategoryLabel(cat.id, cat.label, animals)}</span>
+        ))}
+        {company.categories.length > 2 && (
+          <span className="shrink-0 rounded-full border border-border px-2 py-0.5 text-[10px] font-medium text-text-muted">+{company.categories.length - 2}</span>
+        )}
+      </div>
       {/* Description */}
-      {company.description && <p className="text-[11px] text-text-muted line-clamp-2 leading-relaxed">{company.description}</p>}
+      <p className="mt-auto min-h-[2.25rem] text-[11px] text-text-muted line-clamp-2 leading-relaxed">{company.description || ""}</p>
     </Link>
   );
 }

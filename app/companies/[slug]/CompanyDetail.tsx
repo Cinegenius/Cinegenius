@@ -862,7 +862,7 @@ export default function CompanyDetail({
             )}
 
             {offersCatering && (cateringDetails.serviceTypes.length > 0 || cateringDetails.serviceAreas || cateringDetails.capacity || cateringDetails.dietaryOptions.length > 0 || cateringDetails.mobileEquipment.length > 0) && (
-              <section className="space-y-3 rounded-2xl border border-orange-300/20 bg-orange-300/[0.04] p-4 sm:p-5">
+              <section className="space-y-3 rounded-2xl border border-green-300/20 bg-green-300/[0.04] p-4 sm:p-5">
                 <SectionLabel>Catering / Setverpflegung</SectionLabel>
                 {cateringDetails.serviceTypes.length > 0 && <DetailLine label="Leistungen" value={cateringDetails.serviceTypes.join(", ")} />}
                 {cateringDetails.serviceAreas && <DetailLine label="Einsatzregion" value={cateringDetails.serviceAreas} />}

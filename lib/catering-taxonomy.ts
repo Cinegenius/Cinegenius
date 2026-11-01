@@ -58,8 +58,8 @@ export const CATERING_OCCUPATIONS: readonly CateringOccupation[] = [
 export const CATERING_COMPANY_CATEGORY = {
   id: "catering-setverpflegung",
   label: CATERING_DEPARTMENT_LABEL,
-  color: "text-orange-300",
-  bg: "bg-orange-400/10 border-orange-400/20",
+  color: "text-green-300",
+  bg: "bg-green-400/10 border-green-400/20",
   examples: "Setcatering, Foodtruck, Craft Service, Küchenmobil",
   searchTerms: ["catering", "film catering", "filmcatering", "set catering", "setverpflegung", "setkoch", "foodtruck", "food truck", "craft service", "mobile küche", "kuechenmobil"],
 } as const;
