@@ -2167,5 +2167,20 @@
     "openPublic": "Zobrazit veřejnou nabídku",
     "edit": "Upravit nabídku",
     "saveError": "Odeslání se nepodařilo potvrdit. Tvůj uložený koncept zůstává zachován. Zkontroluj stav nebo to zkus znovu."
+  },
+  "ProviderSetup": {
+    "title": "Tvůj profil poskytovatele",
+    "multiple": "Pod svým profilem poskytovatele můžeš vytvářet a spravovat více lokací a nabídek na tržišti. Profese ve štábu není nutná.",
+    "offerLater": "Tuto nabídku vytvořit později – nejdřív nastavit profil poskytovatele",
+    "photoHelp": "Fotka a představení patří k profilu poskytovatele, ne k jednotlivé nabídce. Obojí je nepovinné.",
+    "publicNotice": "Dokončením se zveřejní profil poskytovatele se jménem, obecnou lokalitou a nepovinnými údaji. Nabídky zůstávají samostatné a nezveřejní se automaticky. E-mail ani telefon se tím nezpřístupní.",
+    "privateNotice": "Tvůj stávající profil zůstane soukromý. Nastavení viditelnosti i samostatná pravidla schvalování nabídek zůstávají zachována.",
+    "publish": "Zveřejnit profil poskytovatele",
+    "savePrivate": "Uložit soukromý profil poskytovatele",
+    "entry": "Představ se jako poskytovatel a shromáždi své lokace či nabídky na tržišti pod jedním profilem. Profese ve štábu není nutná.",
+    "create": "Nastavit profil poskytovatele",
+    "publishWithCompany": "Zveřejnit profil poskytovatele i firmy",
+    "savePrivateWithCompany": "Uložit soukromý profil poskytovatele a zveřejnit firmu",
+    "addOffer": "Přidat nabídku"
   }
 }

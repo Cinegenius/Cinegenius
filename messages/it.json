@@ -2167,5 +2167,20 @@
     "openPublic": "Vedi annuncio pubblico",
     "edit": "Modifica annuncio",
     "saveError": "Impossibile confermare l’invio. La bozza salvata viene conservata. Controlla lo stato o riprova."
+  },
+  "ProviderSetup": {
+    "title": "Il tuo profilo fornitore",
+    "multiple": "Crea e gestisci più location e annunci del marketplace dal tuo profilo fornitore. Non serve una professione della troupe.",
+    "offerLater": "Creare questo annuncio più tardi: configurare prima il profilo fornitore",
+    "photoHelp": "La foto e la presentazione appartengono al profilo fornitore, non a un singolo annuncio. Entrambe sono facoltative.",
+    "publicNotice": "Al termine il profilo fornitore sarà pubblico con nome, località generale e dettagli facoltativi. Gli annunci restano separati e non vengono pubblicati automaticamente. Email e telefono non vengono divulgati.",
+    "privateNotice": "Il profilo esistente resta privato. Le impostazioni di visibilità e le regole di approvazione separate degli annunci rimangono valide.",
+    "publish": "Pubblica profilo fornitore",
+    "savePrivate": "Salva profilo fornitore privato",
+    "entry": "Presentati come fornitore e riunisci le tue location o gli annunci del marketplace in un profilo. Non serve una professione della troupe.",
+    "create": "Configura profilo fornitore",
+    "publishWithCompany": "Pubblica profili fornitore e azienda",
+    "savePrivateWithCompany": "Salva profilo fornitore privato e pubblica azienda",
+    "addOffer": "Aggiungi un annuncio"
   }
 }

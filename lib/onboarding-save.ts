@@ -4,7 +4,7 @@ export function isQuickStartContentSaved(draft: QuickStartDraft) {
   return draft.intents.length > 0 && draft.intents.every(intent =>
     intent === "search" || (intent === "crew" || intent === "talent") && draft.completed.profile
     || intent === "company" && !!draft.completed.company
-    || (intent === "location" || intent === "equipment") && !!draft.completed.listings[intent]);
+    || (intent === "location" || intent === "equipment") && draft.completed.profile && (draft.sections[intent]?.offerLater === true || !!draft.completed.listings[intent]));
 }
 
 /** Serialize writes and skip snapshots already acknowledged by the server. */

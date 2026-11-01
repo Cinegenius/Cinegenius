@@ -20,6 +20,7 @@ export type QuickStartScreen = typeof QUICK_START_SCREENS[number];
 export type QuickStartRoleSelection = { departmentId: string; role: string };
 export type QuickStartIntentData = {
   responsible?: ResponsiblePerson;
+  offerLater?: boolean;
   category: string;
   title: string;
   city: string;
@@ -48,6 +49,7 @@ export type QuickStartDraft = {
   personCountry: string;
   activeIntent: QuickStartIntent | null;
   talentIntro: string;
+  providerImageUrl?: string;
   primaryOccupation?: PrimaryOccupation | null;
   sections: Partial<Record<QuickStartIntent, QuickStartIntentData>>;
   completed: { profile: boolean; listings: Partial<Record<"location" | "equipment", string>>; company?: string };
@@ -128,6 +130,7 @@ function normalizeIntentData(value: unknown): QuickStartIntentData {
     }).filter((item, index, list) => list.findIndex((other) => other.departmentId === item.departmentId && other.role === item.role) === index).slice(0, 100)
     : [];
   return {
+    offerLater: input.offerLater === true,
     responsible: input.responsible ? responsiblePersonDraft(input.responsible) : { ...NEW_RESPONSIBLE_PERSON },
     category: typeof input.category === "string" ? input.category.slice(0, 100) : "",
     title: typeof input.title === "string" ? input.title.slice(0, 200) : "",
@@ -229,6 +232,7 @@ export function normalizeQuickStartDraft(value: unknown): QuickStartDraft {
     personCity: typeof input.personCity === "string" ? input.personCity.slice(0, 100) : "",
     personCountry: typeof input.personCountry === "string" ? input.personCountry.slice(0, 100) : "Deutschland",
     activeIntent,
+    providerImageUrl: typeof input.providerImageUrl === "string" ? input.providerImageUrl.slice(0, 1200) : "",
     talentIntro: typeof input.talentIntro === "string" ? input.talentIntro.slice(0, 1200) : "",
     sections,
     primaryOccupation: occupationReference(primaryOccupationForPositions(input.primaryOccupation, [...(sections.crew?.roles ?? []), ...(sections.talent?.roles ?? [])].map(item=>item.role))),
@@ -253,12 +257,14 @@ export function buildQuickStartScreens(draft: QuickStartDraft): QuickStartScreen
 
 /** A person may choose both crew and talent, but their profile photo and short
  * introduction are shared. Keep one personal-profile panel in step five. */
-export function getQuickStartIntroIntents(intents: readonly QuickStartIntent[]): QuickStartIntent[] {
+export function getQuickStartIntroIntents(intents: readonly QuickStartIntent[], sections?: QuickStartDraft["sections"]): QuickStartIntent[] {
   const selected = new Set(intents);
   const result: QuickStartIntent[] = [];
   if (selected.has("crew")) result.push("crew");
   else if (selected.has("talent")) result.push("talent");
+  const firstProvider = intents.find(intent => intent === "location" || intent === "equipment");
   for (const intent of intents) {
+    if (sections && (intent === "location" || intent === "equipment") && sections[intent]?.offerLater && (result.includes("crew") || result.includes("talent") || intent !== firstProvider)) continue;
     if (intent !== "crew" && intent !== "talent" && intent !== "search" && !result.includes(intent)) result.push(intent);
   }
   return result;
@@ -320,6 +326,7 @@ export function validateQuickStartIntentDetails(draft: QuickStartDraft, intent: 
   }
   if (intent === "talent" && !section?.roles.length) return { field: "talent-roles", message: "Wähle mindestens eine passende Tätigkeit aus." };
   if (intent === "location" || intent === "equipment") {
+    if (section?.offerLater === true) return null;
     const choices = QUICK_START_CATEGORIES[intent];
     if (!choices.some((item) => item.value === section?.category)) {
       return { field: `${intent}-category`, message: intent === "location" ? "Wähle eine passende Art der Location aus." : "Wähle eine passende Angebotskategorie aus." };
@@ -338,7 +345,7 @@ export function validateQuickStartIntentDetails(draft: QuickStartDraft, intent: 
 export function validateQuickStartScreen(draft: QuickStartDraft, screen: QuickStartScreen, activeIntent?: QuickStartIntent | null): QuickStartValidation | null {
   if (screen === "name" && !draft.name.trim()) return { field: "name", message: "Wie dürfen wir dich nennen? Bitte gib deinen Namen ein." };
   if (screen === "goals" && draft.intents.length === 0) return { field: "goals", message: "Wähle mindestens einen Bereich aus, damit wir dich passend weiterführen können." };
-  if (screen === "location" && (draft.intents.includes("crew") || draft.intents.includes("talent"))) {
+  if (screen === "location" && (draft.intents.some(intent => ["crew", "talent", "location", "equipment"].includes(intent)))) {
     if (!draft.personCity.trim()) return { field: "personCity", message: "Bitte gib deine Stadt oder Region an." };
     if (!draft.personCountry.trim()) return { field: "personCountry", message: "Bitte wähle dein Land aus." };
   }
@@ -351,7 +358,7 @@ export function validateQuickStartScreen(draft: QuickStartDraft, screen: QuickSt
   if (screen === "intro") {
     for (const intent of ["location", "equipment"] as const) {
       const section = draft.sections[intent];
-      if (draft.intents.includes(intent) && section && !section.priceOnRequest && !(section.priceNegotiable && !section.price.trim()) && (!section.price.trim() || !Number.isFinite(Number(section.price)) || Number(section.price) < 0)) {
+      if (draft.intents.includes(intent) && section && !section.offerLater && !section.priceOnRequest && !(section.priceNegotiable && !section.price.trim()) && (!section.price.trim() || !Number.isFinite(Number(section.price)) || Number(section.price) < 0)) {
         return { field: `${intent}-price`, message: "Gib einen gültigen Preis in Euro an oder wähle ‚Preis auf Anfrage‘." };
       }
     }

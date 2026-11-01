@@ -1,4 +1,5 @@
 "use client";
+import { needsPublicSetupProfile, setupProfilePayload } from "@/lib/provider-profile-setup";
 import SetupCompletionOffers from "@/components/SetupCompletionOffers";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
@@ -21,8 +22,6 @@ import { marketplaceCategoryLabel } from "@/lib/marketplace-offer";
 import { marketplaceCategory } from "@/lib/marketplaceCategories";
 import { listingPriceLabel } from "@/lib/listing-price";
 import PrimaryOccupationPicker from "@/components/PrimaryOccupationPicker";
-import { selectedCrewOccupations } from "@/lib/crew-occupations";
-import { primaryOccupationForPositions, occupationReference, orderPositionsByPrimary } from "@/lib/primary-occupation";
 import {
   ArrowLeft, ArrowRight, Building2, Camera, CheckCircle2, Film, ImagePlus,
   Loader2, MapPin, Package, Search, Trash2, Lock, UserRound,
@@ -34,7 +33,7 @@ import { hasCompletedNonPersonalSetup, hasProfileBasics, shouldSkipProfileSetup 
 import { createOnboardingSaveQueue, isQuickStartContentSaved } from "@/lib/onboarding-save";
 import {
   buildQuickStartScreens, createQuickStartIntentData, findQuickStartRoles, getQuickStartDepartments, getQuickStartIntroIntents,
-  getQuickStartProfileTypesForRoles, normalizeQuickStartDraft, QUICK_START_CATEGORIES,
+  normalizeQuickStartDraft, QUICK_START_CATEGORIES,
   START_QUICK_START_DRAFT,
   validateQuickStartDraft, validateQuickStartScreen, validateQuickStartIntentDetails,
   type QuickStartDraft, type QuickStartIntent, type QuickStartIntentData,
@@ -95,6 +94,7 @@ function screenForField(field: string): QuickStartScreen {
 
 export default function ProfileSetupWizard() {
   const t = useTranslations("setup");
+  const providerText = useTranslations("ProviderSetup");
   const marketCatalog=useTranslations("MarketplaceCatalog");
   const contact = useTranslations("responsiblePerson");
   const offersText = useTranslations("SetupOffers");
@@ -103,6 +103,7 @@ export default function ProfileSetupWizard() {
   const router = useRouter();
   const params = useSearchParams();
   const { user } = useUser();
+  const providerEntry = params.get("provider") === "location" ? "location" : params.get("provider") === "equipment" ? "equipment" : null;
   const isNewRegistration = params.get("welcome") === "1";
   const resumeIncomplete = params.get("resume") === "1";
   const redirectTo = safeAuthRedirect(params.get("redirect") ?? undefined, "", ["/sign-in", "/sign-up", "/profile-setup", "/guided-profile", "/guided-listing", "/company-setup"]);
@@ -126,7 +127,7 @@ export default function ProfileSetupWizard() {
   const [companyCategorySearch, setCompanyCategorySearch] = useState("");
   const [countryOther, setCountryOther] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const savedCrew = useRef<Record<string, unknown>>({});
+  const savedProfile = useRef<{ profile_type?: string | null; profile_types?: string[] | null; crew?: Record<string, unknown> } | null>(null);
   const saveQueue = useMemo(() => createOnboardingSaveQueue(async (value) => {
     setSaveState("saving");
     try {
@@ -170,14 +171,14 @@ export default function ProfileSetupWizard() {
       if (!active) return;
       setProfileIsPrivate(settings?.settings?.profile_visibility === "private");
       setProfileExists(profile?.exists === true);
-      savedCrew.current = profile?.profile?.crew ?? {};
+      savedProfile.current = profile?.profile ?? null;
       const profileComplete = hasProfileBasics(profile?.profile);
       const hasInProgressDraft = !!saved?.quickStart && saved.setupComplete !== true;
-      if (saved?.setupComplete && (profileComplete || hasCompletedNonPersonalSetup(saved))) {
+      if (!providerEntry && saved?.setupComplete && (profileComplete || hasCompletedNonPersonalSetup(saved))) {
         router.replace(saved.intent === "search" ? (redirectTo || "/search") : (redirectTo || "/dashboard"));
         return;
       }
-      if (shouldSkipProfileSetup({ hasExistingProfile: profileComplete, hasInProgressDraft, isNewRegistration })) {
+      if (!providerEntry && shouldSkipProfileSetup({ hasExistingProfile: profileComplete, hasInProgressDraft, isNewRegistration })) {
         router.replace(redirectTo || "/dashboard");
         return;
       }
@@ -185,6 +186,7 @@ export default function ProfileSetupWizard() {
       let nextDraft = hasInProgressDraft
         ? normalizeQuickStartDraft(saved.quickStart)
         : { ...START_QUICK_START_DRAFT, name: existingName, ...(responsibleAccountName({ firstName: user?.firstName, lastName: user?.lastName }) ? { accountPerson: { ...NEW_RESPONSIBLE_PERSON, ...responsibleAccountName({ firstName: user?.firstName, lastName: user?.lastName })! } } : {}) };
+      if (providerEntry && !hasInProgressDraft) nextDraft = { ...nextDraft, welcomeAcknowledged: true, intents: [providerEntry], activeIntent: providerEntry, sections: { [providerEntry]: { ...createQuickStartIntentData(), offerLater: true } } };
       if (hasInProgressDraft) saveQueue.acknowledge(normalizeQuickStartDraft(saved.quickStart));
       if (!profileComplete && nextDraft.completed.profile) nextDraft = { ...nextDraft, completed: { ...nextDraft.completed, profile: false } };
       if (resumeIncomplete && hasInProgressDraft) {
@@ -200,7 +202,7 @@ export default function ProfileSetupWizard() {
       setReady(true);
     });
     return () => { active = false; };
-  }, [isNewRegistration, resumeIncomplete, loadAttempt, redirectTo, router, user?.fullName, user?.firstName, user?.lastName, saveQueue]);
+  }, [isNewRegistration, resumeIncomplete, loadAttempt, redirectTo, router, user?.fullName, user?.firstName, user?.lastName, saveQueue, providerEntry]);
 
 
 
@@ -220,17 +222,12 @@ export default function ProfileSetupWizard() {
   const currentContent = stepContent[draft.step];
   const saveLabel = saveState === "saving" ? "Speichert …" : saveState === "saved" ? "Gespeichert" : saveState === "error" ? "Speichern fehlgeschlagen" : "";
   const detailIntents = draft.intents.filter((intent): intent is QuickStartProviderIntent => intent !== "search");
-  const introIntents = getQuickStartIntroIntents(draft.intents);
-  const activeIntent = draft.activeIntent && draft.intents.includes(draft.activeIntent)
+  const introIntents = getQuickStartIntroIntents(draft.intents, draft.sections);
+  const activeIntent = draft.step === "intro" && !introIntents.includes(draft.activeIntent ?? "search") ? introIntents[0] ?? "search" : draft.activeIntent && draft.intents.includes(draft.activeIntent)
     ? draft.activeIntent
     : detailIntents[0] ?? "search";
   const activeDetailIndex = activeIntent === "search" ? 0 : Math.max(0, detailIntents.indexOf(activeIntent));
   const activeIntroIndex = Math.max(0, introIntents.indexOf(activeIntent));
-  useEffect(() => {
-    setRoleSearch("");
-    setDepartmentSearch("");
-    setCompanyCategorySearch("");
-  }, [activeIntent]);
   const selectedRoles = useMemo(() => [
     ...(draft.sections.crew?.roles ?? []),
     ...(draft.sections.talent?.roles ?? []),
@@ -238,12 +235,13 @@ export default function ProfileSetupWizard() {
   const filteredDepartments = useMemo(() => {
     const query = departmentSearch.trim().toLocaleLowerCase("de");
     return crewDepartments.filter((department) => !query || getDeptLabel(department, locale, animals).toLocaleLowerCase(locale).includes(query) || department.label.toLocaleLowerCase("de").includes(query) || department.roles.some((role) => getDepartmentRoleSearchTerms(department, role).some((term) => term.toLocaleLowerCase("de").includes(query))));
-  }, [departmentSearch, locale]);
+  }, [departmentSearch, locale, animals]);
   const selectedIntentTitles = draft.intents.map((intent) => t(`${intent}Intent`));
   const hasProfileIntent = draft.intents.includes("crew") || draft.intents.includes("talent");
+  const needsProfile = needsPublicSetupProfile(draft.intents);
   const hasCompanyIntent = draft.intents.includes("company");
   const hasOfferIntent = draft.intents.includes("location") || draft.intents.includes("equipment");
-  const completionActionLabel = hasProfileIntent
+  const completionActionLabel = !hasProfileIntent && hasOfferIntent ? providerText(hasCompanyIntent ? (profileIsPrivate ? "savePrivateWithCompany" : "publishWithCompany") : profileIsPrivate ? "savePrivate" : "publish") : hasProfileIntent
     ? profileIsPrivate ? "Privates Profil speichern und Einrichtung abschließen" : hasCompanyIntent && hasOfferIntent ? "Profil und Firma veröffentlichen, Entwürfe speichern"
       : hasCompanyIntent ? "Profil und Firma veröffentlichen"
         : hasOfferIntent ? "Profil veröffentlichen und Entwürfe speichern"
@@ -253,24 +251,25 @@ export default function ProfileSetupWizard() {
       : hasOfferIntent ? "Private Angebotsentwürfe speichern" : "Los zur Suche";
 
   function update<K extends keyof QuickStartDraft>(key: K, value: QuickStartDraft[K]) {
-    setDraft((current) => ({ ...current, [key]: value }));
+    setDraft((current) => ({ ...current, [key]: value, ...(["name", "personCity", "personCountry", "talentIntro", "providerImageUrl", "primaryOccupation"].includes(key) ? { completed: { ...current.completed, profile: false } } : {}) }));
     setError("");
   }
 
   function updateSection(intent: QuickStartIntent, value: Partial<QuickStartIntentData>) {
-    setDraft((current) => ({ ...current, sections: { ...current.sections, [intent]: { ...createQuickStartIntentData(), ...current.sections[intent], ...value } } }));
+    setDraft((current) => ({ ...current, ...((intent === "crew" || intent === "talent") ? { completed: { ...current.completed, profile: false } } : {}), sections: { ...current.sections, [intent]: { ...createQuickStartIntentData(), ...current.sections[intent], ...value } } }));
     setError("");
   }
 
   function toggleIntent(intent: QuickStartIntent) {
+    setRoleSearch(""); setDepartmentSearch(""); setCompanyCategorySearch("");
     setDraft((current) => {
       const selected = current.intents.includes(intent);
       const intents = selected ? current.intents.filter((item) => item !== intent) : [...current.intents, intent];
       const active = current.activeIntent && intents.includes(current.activeIntent)
         ? current.activeIntent
         : intents.find((item) => item !== "search") ?? "search";
-      return { ...current, intents, activeIntent: active, sections: !selected && !current.sections[intent]
-        ? { ...current.sections, [intent]: createQuickStartIntentData() }
+      return { ...current, intents, completed: { ...current.completed, profile: false }, activeIntent: active, sections: !selected && !current.sections[intent]
+        ? { ...current.sections, [intent]: { ...createQuickStartIntentData(), ...((intent === "location" || intent === "equipment") ? { offerLater: true } : {}) } }
         : current.sections };
     });
     setError("");
@@ -325,6 +324,7 @@ export default function ProfileSetupWizard() {
         if (!response.ok || result.saved !== true) { setError(result.error || contact("accountSaveError")); return; }
       }
       if (await persist(next)) {
+        setRoleSearch(""); setDepartmentSearch(""); setCompanyCategorySearch("");
         setDraft(next);
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
@@ -392,7 +392,7 @@ export default function ProfileSetupWizard() {
     else await transition("review", detailIntents[0] ?? "search");
   }
 
-  async function upload(file: File | undefined, intent: QuickStartIntent) {
+  async function upload(file: File | undefined, intent: QuickStartIntent, forProvider = false) {
     if (!file) return;
     if (!file.type.startsWith("image/")) { setError("Bitte wähle eine Bilddatei aus."); return; }
     setUploading(true);
@@ -404,7 +404,7 @@ export default function ProfileSetupWizard() {
       const response = await fetch("/api/upload", { method: "POST", body: form });
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.url) throw new Error(result.error ?? "Das Foto konnte nicht hochgeladen werden.");
-      const nextDraft = { ...draft, sections: { ...draft.sections, [intent]: { ...createQuickStartIntentData(), ...draft.sections[intent], imageUrl: result.url } } };
+      const nextDraft = forProvider ? { ...draft, providerImageUrl: result.url, completed: { ...draft.completed, profile: false } } : { ...draft, sections: { ...draft.sections, [intent]: { ...createQuickStartIntentData(), ...draft.sections[intent], imageUrl: result.url } } };
       setDraft(nextDraft);
       if (!(await persist(nextDraft))) setError("Das Foto wurde hochgeladen, aber dein Fortschritt konnte nicht gespeichert werden. Bitte bleib auf dieser Seite und versuche es erneut.");
     } catch (cause) {
@@ -458,24 +458,11 @@ export default function ProfileSetupWizard() {
       let progress: QuickStartDraft = { ...draft, step: "review", completed: { ...draft.completed, listings: { ...draft.completed.listings } } };
       if (!isQuickStartContentSaved(progress) && !(await persist(progress))) return;
 
-      if ((progress.intents.includes("crew") || progress.intents.includes("talent")) && !progress.completed.profile) {
-        const primary = primaryOccupationForPositions(progress.primaryOccupation, selectedRoles.map(role=>role.role));
-        const positions = orderPositionsByPrimary(selectedRoles.map(role=>role.role), primary);
-        const profileTypes = getQuickStartProfileTypesForRoles(selectedRoles);
-        const profilePhoto = progress.sections.crew?.imageUrl || progress.sections.talent?.imageUrl || null;
+      if (needsPublicSetupProfile(progress.intents) && !progress.completed.profile) {
+        const profilePayload = setupProfilePayload(progress, profileExists ? savedProfile.current : null, selectedRoles);
         const response = await fetch("/api/profile", {
           method: profileExists ? "PATCH" : "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            display_name: progress.name.trim(),
-            location: [progress.personCity.trim(), progress.personCountry.trim()].filter(Boolean).join(", "),
-            profile_types: profileTypes, profile_type: profileTypes[0] ?? null,
-            positions,
-            crew: { ...savedCrew.current, primaryOccupation: occupationReference(primary), occupations: selectedCrewOccupations(positions, selectedRoles.map(item => ({departmentId: item.departmentId, roleId: `${item.departmentId}/${encodeURIComponent(item.role)}`}))) },
-            ...(!profileExists ? { bio: progress.talentIntro.trim(), avatar_url: profilePhoto, available: true } : {
-              ...(progress.talentIntro.trim() ? { bio: progress.talentIntro.trim() } : {}),
-              ...(profilePhoto ? { avatar_url: profilePhoto } : {}),
-            }),
-          }),
+          body: JSON.stringify(profilePayload),
         });
         const result = await response.json().catch(() => ({}));
         const profileSaved = response.ok && (profileExists ? result.success === true : Boolean(result.profile?.user_id));
@@ -485,6 +472,7 @@ export default function ProfileSetupWizard() {
           if (field) { setDraft({ ...progress, step: screenForField(field), activeIntent: intentForField(field) ?? activeIntent }); focusValidation(field); }
           throw new Error(result.fieldErrors?.[firstField] ?? result.error ?? "Dein Profil konnte nicht erstellt werden.");
         }
+        savedProfile.current = { profile_type: profilePayload.profile_type, profile_types: profilePayload.profile_types, crew: profilePayload.crew ?? savedProfile.current?.crew };
         progress = { ...progress, completed: { ...progress.completed, profile: true } };
         setProfileExists(true);
         setDraft(progress);
@@ -492,7 +480,7 @@ export default function ProfileSetupWizard() {
       }
 
       for (const intent of ["location", "equipment"] as const) {
-        if (!progress.intents.includes(intent) || progress.completed.listings[intent]) continue;
+        if (!progress.intents.includes(intent) || progress.sections[intent]?.offerLater === true || progress.completed.listings[intent]) continue;
         if (!progress.requestKeys[intent]) {
           progress = { ...progress, requestKeys: { ...progress.requestKeys, [intent]: crypto.randomUUID() } };
           setDraft(progress);
@@ -555,11 +543,11 @@ export default function ProfileSetupWizard() {
     void transition(step, intent ?? activeIntent);
   }
 
-  function renderPhotoInput(intent: QuickStartIntent, label: string) {
-    const data = draft.sections[intent] ?? createQuickStartIntentData();
+  function renderPhotoInput(intent: QuickStartIntent, label: string, forProvider = false) {
+    const data = forProvider ? { imageUrl: draft.providerImageUrl ?? "" } : draft.sections[intent] ?? createQuickStartIntentData();
     return <div className="space-y-3">
       <ContentUsageNotice context={intent === "company" ? "company" : intent === "crew" || intent === "talent" ? "profile" : "offer"} visibility="configured" />
-      {data.imageUrl ? <div className="space-y-3"><Image src={data.imageUrl} alt={label} width={960} height={640} sizes="(max-width: 640px) 100vw, 720px" className="max-h-64 w-full rounded-xl border border-border object-contain" /><button type="button" onClick={() => updateSection(intent, { imageUrl: "" })} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm text-text-secondary"><Trash2 size={15} /> {t("copy0")}</button></div> : <label className={`flex min-h-40 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-bg-primary p-5 text-center hover:border-gold/50 ${uploading ? "pointer-events-none opacity-60" : ""}`}><ImagePlus className="text-gold" /><span className="text-sm font-medium text-text-primary">{uploading ? "Foto wird hochgeladen …" : label}</span><span className="text-xs text-text-muted">{t("copy1")}</span><input type="file" accept="image/jpeg,image/png,image/webp,image/heic" className="sr-only" onChange={(event) => { void upload(event.target.files?.[0], intent); event.currentTarget.value = ""; }} /></label>}
+      {data.imageUrl ? <div className="space-y-3"><Image src={data.imageUrl} alt={label} width={960} height={640} sizes="(max-width: 640px) 100vw, 720px" className="max-h-64 w-full rounded-xl border border-border object-contain" /><button type="button" onClick={() => forProvider ? update("providerImageUrl", "") : updateSection(intent, { imageUrl: "" })} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm text-text-secondary"><Trash2 size={15} /> {t("copy0")}</button></div> : <label className={`flex min-h-40 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-bg-primary p-5 text-center hover:border-gold/50 ${uploading ? "pointer-events-none opacity-60" : ""}`}><ImagePlus className="text-gold" /><span className="text-sm font-medium text-text-primary">{uploading ? "Foto wird hochgeladen …" : label}</span><span className="text-xs text-text-muted">{t("copy1")}</span><input type="file" accept="image/jpeg,image/png,image/webp,image/heic" className="sr-only" onChange={(event) => { void upload(event.target.files?.[0], intent, forProvider); event.currentTarget.value = ""; }} /></label>}
       {uploading && <p role="status" className="flex items-center gap-2 text-xs text-text-muted"><Loader2 size={14} className="animate-spin" /> {t("copy2")}</p>}
     </div>;
   }
@@ -615,10 +603,14 @@ export default function ProfileSetupWizard() {
     if (intent === "location" || intent === "equipment") {
       const choices = QUICK_START_CATEGORIES[intent];
       return <div className="space-y-5">
+        <p className="rounded-xl border border-border bg-bg-primary p-4 text-sm leading-6 text-text-secondary">{providerText("multiple")}</p>
+        <label className="flex min-h-12 items-center gap-3 text-sm text-text-primary"><input type="checkbox" checked={data.offerLater === true} onChange={event => updateSection(intent, { offerLater: event.target.checked })} />{providerText("offerLater")}</label>
+        {!data.offerLater && <>
         <ResponsiblePersonFields value={data.responsible ?? NEW_RESPONSIBLE_PERSON} onChange={value => updateSection(intent, { responsible: value })} accountPrefill compactWhenProfile={intent === "equipment"} />
         {intent === "equipment" ? <MarketplaceCategoryPicker value={data.category} onChange={value=>updateSection(intent,{category:value})} /> : <div><p className="mb-2 text-sm font-medium text-text-primary">{t("copy9")}</p><div id={`quick-start-${intent}-category`} tabIndex={-1} className="grid gap-2 sm:grid-cols-2">{choices.map((item) => <button key={item.value} type="button" aria-pressed={data.category === item.value} onClick={() => updateSection(intent, { category: item.value })} className={`min-h-14 min-w-0 rounded-xl border px-4 py-3 text-left ${data.category === item.value ? "border-gold bg-gold/10" : "border-border bg-bg-primary"}`}><span className="block break-words text-sm font-semibold text-text-primary">{item.label}</span><span className="mt-1 block break-words text-xs text-text-muted">{item.example}</span></button>)}</div></div>}
         <div><label htmlFor={`quick-start-${intent}-title`} className="mb-2 block text-sm font-medium text-text-primary">{t("copy10")}<span className="text-gold">*</span></label><input id={`quick-start-${intent}-title`} maxLength={200} value={data.title} onChange={(event) => updateSection(intent, { title: event.target.value })} placeholder={intent === "location" ? "Zum Beispiel Altbauwohnung mit Balkon" : "Zum Beispiel LED-Flächenleuchte"} className={inputClass} /></div>
         <div><label htmlFor={`quick-start-${intent}-city`} className="mb-2 block text-sm font-medium text-text-primary">{t("copy11")}<span className="text-gold">*</span></label><input id={`quick-start-${intent}-city`} autoComplete="address-level2" maxLength={100} value={data.city} onChange={(event) => updateSection(intent, { city: event.target.value })} placeholder={t("copy12")} className={inputClass} /></div>
+        </>}
       </div>;
     }
     const company = draft.sections.company ?? createQuickStartIntentData();
@@ -639,6 +631,16 @@ export default function ProfileSetupWizard() {
   }
 
   function renderOptionalDetails() {
+    const offer = activeIntent === "location" || activeIntent === "equipment";
+    const firstProvider = draft.intents.find(intent => intent === "location" || intent === "equipment");
+    const showProvider = offer && !hasProfileIntent && activeIntent === firstProvider;
+    return <div className="space-y-6">
+      {showProvider && <section className="space-y-4"><h3 className="font-semibold text-text-primary">{providerText("title")}</h3>{renderPhotoInput(activeIntent, t("copy22"), true)}<label className="block text-sm text-text-primary">{t("copy24")} {t("copy23")}<textarea value={draft.talentIntro} onChange={event => update("talentIntro", event.target.value)} rows={3} maxLength={1200} className="mt-2 w-full rounded-xl border border-border bg-bg-primary p-3 text-base text-text-primary" /></label><p className="text-xs text-text-muted">{providerText("photoHelp")}</p></section>}
+      {offer && draft.sections[activeIntent]?.offerLater ? (!showProvider && <p className="text-sm text-text-muted">{providerText("multiple")}</p>) : renderOfferOptionalDetails()}
+    </div>;
+  }
+
+  function renderOfferOptionalDetails() {
     if (activeIntent === "search") return <div className="rounded-xl border border-border bg-bg-primary p-5"><p className="text-sm leading-6 text-text-secondary">{t("copy21")}</p></div>;
     if (activeIntent === "crew" || activeIntent === "talent") {
       const intent = activeIntent;
@@ -672,6 +674,7 @@ export default function ProfileSetupWizard() {
     <p className="mt-4 text-sm leading-6 text-text-secondary">{finished.completed.profile ? profilePublic ? "Andere können dich jetzt finden und dein Profil ansehen." : "Deine bisherigen Sichtbarkeitseinstellungen bleiben erhalten. Ein privates Profil bleibt privat." : finished.completed.company ? "Deine Firma wurde gespeichert. Etwaige Inserate haben einen eigenen Veröffentlichungsstatus." : "Deine Einrichtung ist abgeschlossen. Du kannst jederzeit weitere Bereiche ergänzen."}</p>
     <div className="mt-6 space-y-3">
       {finishedOffers.length > 0 && <SetupCompletionOffers offers={finishedOffers} />}
+      {finished.completed.profile && finished.intents.some(intent => intent === "location" || intent === "equipment") && <Link href="/inserat" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary">{providerText("addOffer")}<ArrowRight size={16} /></Link>}
 
       {finished.completed.profile && user?.id && <a href={`/profile/${encodeURIComponent(user.id)}`} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-border px-5 text-sm font-semibold text-text-primary">{profilePublic ? "Öffentliches Profil ansehen" : "Profil ansehen"}<ArrowRight size={16} /></a>}
       {finished.completed.company && <a href={`/companies/${encodeURIComponent(finished.completed.company)}`} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-gold/30 px-5 text-sm font-semibold text-gold">{t("copy52")}<ArrowRight size={16} /></a>}
@@ -700,7 +703,7 @@ export default function ProfileSetupWizard() {
       <section className="min-w-0 rounded-2xl border border-border bg-bg-secondary p-4 sm:p-7">
         {draft.step === "name" && (draft.name && !draft.accountPerson ? <div><label htmlFor="quick-start-name" className="mb-2 block text-sm font-medium text-text-primary">{t("copy65")}<span className="text-gold">*</span></label><input id="quick-start-name" autoComplete="name" maxLength={120} value={draft.name} onChange={(event) => update("name", event.target.value)} placeholder={t("copy66")} className={inputClass} aria-describedby="quick-start-name-help" /><p id="quick-start-name-help" className="mt-2 text-xs leading-5 text-text-muted">{t("copy67")}</p></div> : <ResponsiblePersonFields identityOnly accountPrefill value={draft.accountPerson ?? NEW_RESPONSIBLE_PERSON} errors={responsibleErrors} onChange={person => { setResponsibleErrors({}); setDraft(current => ({ ...current, accountPerson: person, name: `${person.firstName} ${person.lastName}`.trim() })); }} />)}
 
-        {draft.step === "location" && <div className="space-y-4"><div><label htmlFor="quick-start-person-city" className="mb-2 block text-sm font-medium text-text-primary">{t("copy12")}{hasProfileIntent && <span className="text-gold">*</span>}</label><input id="quick-start-person-city" autoComplete="address-level2" maxLength={100} value={draft.personCity} onChange={(event) => update("personCity", event.target.value)} placeholder={t("copy69")} className={inputClass} /></div><div><label htmlFor="quick-start-person-country" className="mb-2 block text-sm font-medium text-text-primary">{t("copy70")}{hasProfileIntent && <span className="text-gold">*</span>}</label><select id="quick-start-person-country" value={countryOther ? "Andere" : draft.personCountry || t("copy71")} onChange={(event) => { const other = event.target.value === "Andere"; setCountryOther(other); update("personCountry", other ? "" : event.target.value); }} className={inputClass}><option>{t("copy71")}</option><option>{t("copy72")}</option><option>{t("copy73")}</option><option value="Andere">{t("copy74")}</option></select>{countryOther && <input aria-label={t("copy75")} autoComplete="country-name" maxLength={100} value={draft.personCountry} onChange={(event) => update("personCountry", event.target.value)} placeholder={t("copy75")} className={`${inputClass} mt-3`} />}</div>{!hasProfileIntent && <p className="text-xs leading-5 text-text-muted">{t("copy77")}</p>}</div>}
+        {draft.step === "location" && <div className="space-y-4"><div><label htmlFor="quick-start-person-city" className="mb-2 block text-sm font-medium text-text-primary">{t("copy12")}{needsProfile && <span className="text-gold">*</span>}</label><input id="quick-start-person-city" autoComplete="address-level2" maxLength={100} value={draft.personCity} onChange={(event) => update("personCity", event.target.value)} placeholder={t("copy69")} className={inputClass} /></div><div><label htmlFor="quick-start-person-country" className="mb-2 block text-sm font-medium text-text-primary">{t("copy70")}{needsProfile && <span className="text-gold">*</span>}</label><select id="quick-start-person-country" value={countryOther ? "Andere" : draft.personCountry || t("copy71")} onChange={(event) => { const other = event.target.value === "Andere"; setCountryOther(other); update("personCountry", other ? "" : event.target.value); }} className={inputClass}><option value="Deutschland">{t("copy71")}</option><option value="Österreich">{t("copy72")}</option><option value="Schweiz">{t("copy73")}</option><option value="Andere">{t("copy74")}</option></select>{countryOther && <input aria-label={t("copy75")} autoComplete="country-name" maxLength={100} value={draft.personCountry} onChange={(event) => update("personCountry", event.target.value)} placeholder={t("copy75")} className={`${inputClass} mt-3`} />}</div>{!needsProfile && <p className="text-xs leading-5 text-text-muted">{t("copy77")}</p>}</div>}
 
         {draft.step === "goals" && <div id="quick-start-goals" tabIndex={-1} className="grid gap-3 sm:grid-cols-2">{paths.map(({ id, detail, Icon }) => { const selected = draft.intents.includes(id); return <button key={id} type="button" aria-pressed={selected} onClick={() => toggleIntent(id)} className={`flex min-h-24 min-w-0 items-start gap-3 rounded-xl border p-4 text-left transition-colors ${selected ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/50"}`}><span className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${selected ? "bg-gold/15 text-gold" : "bg-bg-elevated text-text-muted"}`}><Icon size={19} /></span><span className="min-w-0 flex-1"><span className="block break-words text-sm font-semibold text-text-primary">{t(`${id}Intent`)}</span><span className="mt-1 block break-words text-xs leading-5 text-text-muted">{localizeSetupMessage(detail, t)}</span></span><span aria-hidden="true" className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-xs ${selected ? "border-gold bg-gold text-bg-primary" : "border-border text-transparent"}`}>✓</span></button>; })}</div>}
 
@@ -718,11 +721,12 @@ export default function ProfileSetupWizard() {
           <ReviewSection title={t("copy66")} onEdit={() => editReview("name")}><ReviewRow label={t("name")} value={draft.name} /></ReviewSection>
           <ReviewSection title={t("copy83")} onEdit={() => editReview("location")}><ReviewRow label={t("place")} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} /></ReviewSection>
           <ReviewSection title={t("copy84")} onEdit={() => editReview("goals")}><p className="break-words text-sm text-text-primary">{selectedIntentTitles.join(" · ") || "—"}</p></ReviewSection>
+          {hasOfferIntent && <ReviewSection title={providerText("title")} onEdit={() => editReview("intro", draft.intents.find(intent => intent === "location" || intent === "equipment"))}><ReviewRow label={t("name")} value={draft.name} /><ReviewRow label={t("place")} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} />{!hasProfileIntent && draft.talentIntro && <ReviewRow label={t("introduction")} value={draft.talentIntro} />}{!hasProfileIntent && draft.providerImageUrl && <Image src={draft.providerImageUrl} alt={t("copy22")} width={160} height={160} className="h-20 w-20 rounded-xl object-cover" />}<p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">{providerText(profileIsPrivate ? "privateNotice" : "publicNotice")}</p></ReviewSection>}
           {(draft.intents.includes("crew") || draft.intents.includes("talent")) && <>
             <ReviewSection title={t("copy85")} onEdit={() => editReview("details", draft.intents.includes("crew") ? "crew" : "talent")}><ReviewRow label={t("occupations")} value={selectedRoles.map((role) => role.role).join(", ")} /><PrimaryOccupationPicker id="quick-start-primary-occupation" positions={selectedRoles.map(role=>role.role)} value={draft.primaryOccupation ?? null} onChange={value=>update("primaryOccupation", value)} /><ReviewRow label={t("place")} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} /><p className="rounded-xl border border-amber-400/25 bg-amber-500/5 p-3 text-xs leading-5 text-text-muted">{t("copy86")}</p></ReviewSection>
             <ReviewSection title={t("copy87")} onEdit={() => editReview("intro", draft.intents.includes("crew") ? "crew" : "talent")}>{draft.sections.crew?.imageUrl && <Image src={draft.sections.crew.imageUrl} alt={t("copy22")} width={240} height={240} className="h-20 w-20 rounded-xl object-cover" />}{draft.sections.talent?.imageUrl && <Image src={draft.sections.talent.imageUrl} alt={t("copy22")} width={240} height={240} className="h-20 w-20 rounded-xl object-cover" />}<ReviewRow label={t("introduction")} value={draft.talentIntro} /></ReviewSection>
           </>}
-          {draft.intents.filter((intent) => intent === "location" || intent === "equipment").map((intent) => { const data = draft.sections[intent] ?? createQuickStartIntentData(); const categoryName = intent === "equipment" ? marketplaceCategoryLabel(data.category,marketCatalog) : QUICK_START_CATEGORIES[intent].find((item) => item.value === data.category)?.label ?? data.category; return <div key={intent} className="space-y-3"><ReviewSection title={t(`${intent}Intent`)} onEdit={() => editReview("details", intent)}><ReviewRow label={t("kind")} value={categoryName} /><ReviewRow label={t("listing")} value={data.title} /><ReviewRow label={t("place")} value={data.city} /></ReviewSection><ReviewSection title={`${t(`${intent}Intent`)}: Ergänzungen`} onEdit={() => editReview("intro", intent)}>{data.description && <ReviewRow label={t("description")} value={data.description} />}<ReviewRow label={t("copy41")} value={listingPriceLabel(Number(data.price), {price_on_request:data.priceOnRequest,price_negotiable:data.priceNegotiable})} />{data.imageUrl && <Image src={data.imageUrl} alt={t("copy90")} width={720} height={480} sizes="(max-width: 640px) 100vw, 640px" className="max-h-40 w-full rounded-lg object-contain" />}<p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">{t("copy91")}</p></ReviewSection></div>; })}
+          {draft.intents.filter((intent): intent is "location" | "equipment" => (intent === "location" || intent === "equipment") && !draft.sections[intent]?.offerLater).map((intent) => { const data = draft.sections[intent] ?? createQuickStartIntentData(); const categoryName = intent === "equipment" ? marketplaceCategoryLabel(data.category,marketCatalog) : QUICK_START_CATEGORIES[intent].find((item) => item.value === data.category)?.label ?? data.category; return <div key={intent} className="space-y-3"><ReviewSection title={t(`${intent}Intent`)} onEdit={() => editReview("details", intent)}><ReviewRow label={t("kind")} value={categoryName} /><ReviewRow label={t("listing")} value={data.title} /><ReviewRow label={t("place")} value={data.city} /></ReviewSection><ReviewSection title={`${t(`${intent}Intent`)}: Ergänzungen`} onEdit={() => editReview("intro", intent)}>{data.description && <ReviewRow label={t("description")} value={data.description} />}<ReviewRow label={t("copy41")} value={listingPriceLabel(Number(data.price), {price_on_request:data.priceOnRequest,price_negotiable:data.priceNegotiable})} />{data.imageUrl && <Image src={data.imageUrl} alt={t("copy90")} width={720} height={480} sizes="(max-width: 640px) 100vw, 640px" className="max-h-40 w-full rounded-lg object-contain" />}<p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">{t("copy91")}</p></ReviewSection></div>; })}
           {draft.intents.includes("company") && (() => { const data = draft.sections.company ?? createQuickStartIntentData(); const categoryLabels = QUICK_START_CATEGORIES.company.filter((category) => data.categoryIds.includes(category.value)).map((category) => animalCategoryLabel(category.value, category.label, animals)); const catering = data.cateringDetails; return <>
             <ReviewSection title={t("copy92")} onEdit={() => editReview("details", "company")}><ReviewRow label={t("name")} value={data.title} /><ReviewRow label={t("place")} value={data.city} /><ReviewRow label={t("industries")} value={categoryLabels.join(", ")} /></ReviewSection>
             <ReviewSection title={t("copy93")} onEdit={() => editReview("intro", "company")}>{data.description && <ReviewRow label={t("description")} value={data.description} />}{data.contactEmail && <ReviewRow label={t("copy35")} value={data.contactEmail} />}{data.contactPhone && <ReviewRow label={t("copy37")} value={data.contactPhone} />}{data.website && <ReviewRow label={t("copy39")} value={data.website} />}{isAnimalCompany(data.categoryIds) && <AnimalCompanySummary value={data.animalDetails} />}{data.categoryIds.includes(CATERING_COMPANY_CATEGORY.id) && catering.serviceTypes.length > 0 && <ReviewRow label={t("copy45")} value={catering.serviceTypes.join(", ")} />}{data.imageUrl && <Image src={data.imageUrl} alt={t("copy94")} width={320} height={160} sizes="320px" className="max-h-32 rounded-lg object-contain" />}</ReviewSection>

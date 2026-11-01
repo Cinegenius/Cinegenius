@@ -2167,5 +2167,20 @@
     "openPublic": "Ver anuncio público",
     "edit": "Editar anuncio",
     "saveError": "No se ha podido confirmar el envío. Se conserva tu borrador guardado. Comprueba el estado o vuelve a intentarlo."
+  },
+  "ProviderSetup": {
+    "title": "Tu perfil de proveedor",
+    "multiple": "Crea y gestiona varias localizaciones y anuncios del mercado desde tu perfil de proveedor. No necesitas una profesión de equipo técnico.",
+    "offerLater": "Crear este anuncio más tarde: configurar primero mi perfil de proveedor",
+    "photoHelp": "La foto y la presentación pertenecen a tu perfil de proveedor, no a un anuncio concreto. Ambas son opcionales.",
+    "publicNotice": "Al finalizar, tu perfil de proveedor será público con tu nombre, ubicación general y datos opcionales. Los anuncios siguen separados y no se publican automáticamente. Esto no revela tu correo ni tu teléfono.",
+    "privateNotice": "Tu perfil existente seguirá siendo privado. Se mantienen sus ajustes de visibilidad y las reglas de aprobación de cada anuncio.",
+    "publish": "Publicar perfil de proveedor",
+    "savePrivate": "Guardar perfil privado de proveedor",
+    "entry": "Preséntate como proveedor y reúne tus localizaciones o anuncios del mercado en un perfil. No necesitas una profesión de equipo técnico.",
+    "create": "Configurar perfil de proveedor",
+    "publishWithCompany": "Publicar perfiles de proveedor y empresa",
+    "savePrivateWithCompany": "Guardar perfil privado de proveedor y publicar empresa",
+    "addOffer": "Añadir un anuncio"
   }
 }

@@ -2167,5 +2167,20 @@
     "openPublic": "View public offer",
     "edit": "Edit offer",
     "saveError": "Submission could not be confirmed. Your saved draft is preserved. Please check the status or try again."
+  },
+  "ProviderSetup": {
+    "title": "Your provider profile",
+    "multiple": "Create and manage multiple locations and marketplace listings under your provider profile. No crew occupation is required.",
+    "offerLater": "Create this listing later – set up my provider profile first",
+    "photoHelp": "The photo and introduction belong to your provider profile, not an individual listing. Both are optional.",
+    "publicNotice": "Finishing makes your provider profile public with your name, general location and optional details. Listings remain separate and are not published automatically. Your email and phone number are not disclosed by this.",
+    "privateNotice": "Your existing profile stays private. Its visibility settings and the separate approval rules for your listings remain in place.",
+    "publish": "Publish provider profile",
+    "savePrivate": "Save private provider profile",
+    "entry": "Introduce yourself as a provider and bring your locations or marketplace listings together under one profile. No crew occupation is required.",
+    "create": "Set up provider profile",
+    "publishWithCompany": "Publish provider and company profiles",
+    "savePrivateWithCompany": "Save private provider profile and publish company",
+    "addOffer": "Add a listing"
   }
 }

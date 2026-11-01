@@ -2167,5 +2167,20 @@
     "openPublic": "Öffentliches Angebot ansehen",
     "edit": "Angebot bearbeiten",
     "saveError": "Die Einreichung konnte nicht bestätigt werden. Dein gespeicherter Entwurf bleibt erhalten. Bitte prüfe den Status oder versuche es erneut."
+  },
+  "ProviderSetup": {
+    "title": "Dein Anbieterprofil",
+    "multiple": "Unter deinem Anbieterprofil kannst du mehrere Locations und Marktplatzangebote anlegen und verwalten. Du brauchst dafür keinen Crewberuf.",
+    "offerLater": "Dieses Angebot später erstellen – zuerst mein Anbieterprofil einrichten",
+    "photoHelp": "Foto und Vorstellung gehören zu deinem Anbieterprofil, nicht zu einem einzelnen Angebot. Beides ist freiwillig.",
+    "publicNotice": "Beim Abschließen wird dein Anbieterprofil mit Name, allgemeinem Standort und freiwilligen Angaben öffentlich. Deine Angebote bleiben separat und werden nicht automatisch veröffentlicht. E-Mail und Telefonnummer werden dadurch nicht freigegeben.",
+    "privateNotice": "Dein vorhandenes Profil bleibt privat. Die gespeicherten Sichtbarkeitsregeln und die getrennten Freigaben deiner Angebote bleiben erhalten.",
+    "publish": "Anbieterprofil veröffentlichen",
+    "savePrivate": "Privates Anbieterprofil speichern",
+    "entry": "Zeige dich als Anbieter und sammle deine Locations oder Marktplatzangebote unter einem Profil. Ein Crewberuf ist nicht erforderlich.",
+    "create": "Anbieterprofil einrichten",
+    "publishWithCompany": "Anbieterprofil und Firma veröffentlichen",
+    "savePrivateWithCompany": "Privates Anbieterprofil speichern und Firma veröffentlichen",
+    "addOffer": "Angebot hinzufügen"
   }
 }

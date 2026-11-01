@@ -2167,5 +2167,20 @@
     "openPublic": "Nyilvános ajánlat megtekintése",
     "edit": "Ajánlat szerkesztése",
     "saveError": "A beküldést nem sikerült megerősíteni. A mentett piszkozatod megmarad. Ellenőrizd az állapotot, vagy próbáld újra."
+  },
+  "ProviderSetup": {
+    "title": "A szolgáltatói profilod",
+    "multiple": "A szolgáltatói profilod alatt több helyszínt és piactéri hirdetést hozhatsz létre és kezelhetsz. Nem kell stábfoglalkozást választanod.",
+    "offerLater": "Ezt a hirdetést később készítem el – először a szolgáltatói profilomat állítom be",
+    "photoHelp": "A fénykép és a bemutatkozás a szolgáltatói profilhoz tartozik, nem egy hirdetéshez. Mindkettő opcionális.",
+    "publicNotice": "A befejezéskor a szolgáltatói profil a neveddel, általános helyszíneddel és opcionális adataiddal nyilvánossá válik. A hirdetések külön maradnak, és nem jelennek meg automatikusan. Ez nem teszi nyilvánossá az e-mail-címedet vagy telefonszámodat.",
+    "privateNotice": "A meglévő profilod privát marad. A láthatósági beállítások és a hirdetések külön jóváhagyási szabályai megmaradnak.",
+    "publish": "Szolgáltatói profil közzététele",
+    "savePrivate": "Privát szolgáltatói profil mentése",
+    "entry": "Mutatkozz be szolgáltatóként, és gyűjtsd össze helyszíneidet vagy piactéri hirdetéseidet egy profil alatt. Nem kell stábfoglalkozást választanod.",
+    "create": "Szolgáltatói profil beállítása",
+    "publishWithCompany": "Szolgáltatói és céges profil közzététele",
+    "savePrivateWithCompany": "Privát szolgáltatói profil mentése és cég közzététele",
+    "addOffer": "Hirdetés hozzáadása"
   }
 }
