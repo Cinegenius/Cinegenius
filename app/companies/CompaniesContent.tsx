@@ -440,21 +440,21 @@ function CompanyCard({ company }: { company: Company }) {
   const cats = company.categories.slice(0, 2).map((id) => COMPANY_CATEGORY_BY_ID[id]).filter(Boolean);
   return (
     <Link href={`/companies/${company.slug}`}
-      className="browse-card card-hover group flex h-full min-w-0 flex-col p-4">
-      <div className="mb-3 flex min-h-[4.5rem] min-w-0 items-start gap-3">
-        <CompanyLogo src={company.logo_url} name={company.name} className="h-12 w-20 shrink-0" />
+      className="browse-card card-hover group flex min-w-0 flex-col p-3 sm:h-full">
+      <div className="mb-2 flex min-w-0 items-start gap-3">
+        <CompanyLogo src={company.logo_url} name={company.name} className="h-16 w-28 shrink-0 sm:h-14 sm:w-24" />
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-1">
-            <h3 className="line-clamp-2 min-h-[2.5rem] font-semibold text-sm text-text-primary group-hover:text-gold transition-colors break-words leading-snug [overflow-wrap:anywhere]">{company.name}</h3>
+            <h3 className="line-clamp-2 font-semibold text-sm text-text-primary group-hover:text-gold transition-colors break-words leading-snug [overflow-wrap:anywhere]">{company.name}</h3>
             {company.verified && <CheckCircle size={13} className="text-gold shrink-0 mt-0.5" />}
           </div>
-          <div className="mt-0.5 flex min-h-4 items-center gap-1 text-[11px] text-text-muted">
+          <div className="mt-0.5 flex items-center gap-1 text-[11px] text-text-muted">
             {company.city && <><MapPin size={9} className="shrink-0" /><span className="truncate">{company.city}</span></>}
           </div>
         </div>
       </div>
       {/* Categories */}
-      <div className="mb-2.5 flex min-h-11 flex-wrap content-start gap-1 overflow-hidden">
+      <div className="mb-2.5 flex flex-wrap content-start gap-1 overflow-hidden">
         {cats.map((cat) => (
           <span key={cat.id} title={animalCategoryLabel(cat.id, cat.label, animals)} className={`block max-w-full truncate whitespace-nowrap rounded-full border px-2 py-0.5 text-[10px] font-semibold ${cat.bg} ${cat.color}`}>{animalCategoryLabel(cat.id, cat.label, animals)}</span>
         ))}
@@ -463,7 +463,7 @@ function CompanyCard({ company }: { company: Company }) {
         )}
       </div>
       {/* Description */}
-      <p className="mt-auto min-h-[2.25rem] text-[11px] text-text-muted line-clamp-2 leading-relaxed">{company.description || ""}</p>
+      <p className="mt-2 empty:mt-0 text-[11px] text-text-muted line-clamp-2 leading-relaxed sm:mt-auto">{company.description || ""}</p>
     </Link>
   );
 }
