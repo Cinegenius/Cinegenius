@@ -215,6 +215,58 @@ export async function sendWelcomeEmail(to: string, displayName: string) {
   );
 }
 
+export type NewsletterTestCopy = {
+  subject: string;
+  greeting: string;
+  community: string;
+  offers: string;
+  feedback: string;
+  visitCta: string;
+  recommend: string;
+  instagramCta: string;
+  closing: string;
+  signature: string;
+  footer: string;
+};
+
+/** One-off newsletter preview test to the authenticated admin's own verified address. */
+export async function sendNewsletterTestEmail(to: string, copy: NewsletterTestCopy) {
+  if (!resend) return { ok: false as const, reason: "not_configured" as const };
+  const safe = Object.fromEntries(Object.entries(copy).map(([key, value]) => [key, escapeHtml(value)])) as NewsletterTestCopy;
+  const siteUrl = escapeHtml(BASE);
+  const instagramUrl = "https://www.instagram.com/cinegenius.co?mdxt=MXZvaG40YWprY2R1bw%3D%3D&utm_source=qr";
+  const html = wrap(`
+    ${h1(safe.subject)}
+    ${p(safe.greeting)}
+    ${p(safe.community)}
+    ${p(safe.offers)}
+    ${p(safe.feedback)}
+    ${btn(safe.visitCta, siteUrl)}
+    ${p(safe.recommend)}
+    <p style="margin:14px 0 0;font-size:14px"><a href="${instagramUrl}" style="color:#d4a843;text-decoration:none">${safe.instagramCta}</a></p>
+    ${p(safe.closing)}
+    <p style="margin:14px 0 0;font-size:14px;color:#f0f0f0;font-weight:600">${safe.signature}</p>
+    <p style="margin:22px 0 0;font-size:11px;color:#666;line-height:1.5">${safe.footer}</p>
+  `);
+  try {
+    const { data, error } = await resend.emails.send({
+      from: FROM,
+      to,
+      replyTo: "support@cinegenius.co",
+      subject: normalizedEmailText(copy.subject),
+      html,
+    });
+    if (error || !data?.id) {
+      console.error("CineGenius: Newsletter-Testmail wurde nicht bestätigt.", { code: error?.name, statusCode: error?.statusCode });
+      return { ok: false as const, reason: "provider_rejected" as const };
+    }
+    return { ok: true as const, id: data.id };
+  } catch {
+    console.error("CineGenius: Newsletter-Testmail konnte nicht gesendet werden.");
+    return { ok: false as const, reason: "provider_error" as const };
+  }
+}
+
 export async function sendNewBookingEmail(to: string, listingTitle: string, guestName: string, locale: AppLocale = DEFAULT_LOCALE) {
   const t = await getTranslations({locale, namespace: "BookingRequest"});
   await send(
