@@ -13,6 +13,10 @@ import { applyReadReceiptTimestamps, incomingUnreadMessageIds } from "@/lib/mess
 import { notifyMessagesRead, subscribeToMessageReads } from "@/lib/message-read-sync";
 import { mergeMessagesById } from "@/lib/conversation-logic";
 import { conversationPeerProfileHref, SUPPORT_AVATAR_URL, SUPPORT_NAME } from "@/lib/support-identity";
+import {
+  ACTIVE_CONVERSATION_FALLBACK_REFRESH_MS,
+  CONVERSATION_LIST_FALLBACK_REFRESH_MS,
+} from "@/lib/message-refresh-policy";
 import { findContactConversation, mergeVisibleMessagePage } from "@/lib/message-actions";
 import { backFromMessageView, navigateMessageView } from "@/lib/message-navigation";
 
@@ -203,7 +207,7 @@ function MessagesContent() {
     const unsubscribe = subscribeToMessageReads(user.id, () => { void loadConversations(); });
     const interval = window.setInterval(() => {
       if (document.visibilityState === "visible") void loadConversations();
-    }, 8_000);
+    }, CONVERSATION_LIST_FALLBACK_REFRESH_MS);
     return () => {
       unsubscribe();
       window.clearInterval(interval);
@@ -361,14 +365,14 @@ function MessagesContent() {
   }, []);
 
   // Message data is delivered only through membership-checked server routes.
-  // Polling every few seconds avoids exposing raw message rows to anonymous
-  // Supabase realtime subscriptions while still updating open group chats.
+  // A modest fallback refresh avoids exposing raw message rows to anonymous
+  // Supabase realtime subscriptions. Focus and user actions refresh immediately.
   useEffect(() => {
     if (!activeId) return;
     void loadMessages(activeId, { scroll: messagesRef.current.length === 0 });
     const interval = window.setInterval(() => {
       if (document.visibilityState === "visible") void loadMessages(activeId);
-    }, 3_000);
+    }, ACTIVE_CONVERSATION_FALLBACK_REFRESH_MS);
     const onFocus = () => { if (document.visibilityState === "visible") void loadMessages(activeId); };
     window.addEventListener("focus", onFocus);
     return () => { window.clearInterval(interval); window.removeEventListener("focus", onFocus); };

@@ -5,6 +5,7 @@ import { useAuth, useSession } from "@clerk/nextjs";
 import { createInboxPolling, type InboxSnapshot } from "@/lib/inbox-polling";
 import { subscribeToMessageReads } from "@/lib/message-read-sync";
 import { publishUnreadCount } from "@/lib/unread-count-store";
+import { INBOX_FALLBACK_REFRESH_MS } from "@/lib/message-refresh-policy";
 
 export function useAuthenticatedInbox() {
   const { isLoaded, isSignedIn, userId, sessionId, getToken } = useAuth();
@@ -33,7 +34,7 @@ export function useAuthenticatedInbox() {
       if (document.visibilityState === "visible" && navigator.onLine !== false) void poll.refresh();
     };
     refresh();
-    const interval = window.setInterval(refresh, 10_000);
+    const interval = window.setInterval(refresh, INBOX_FALLBACK_REFRESH_MS);
     const unsubscribeReads = subscribeToMessageReads(userId, () => {
       if (document.visibilityState === "visible" && navigator.onLine !== false) void poll.refreshAfterMessageRead();
     });

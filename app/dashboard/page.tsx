@@ -39,6 +39,7 @@ import { compressImage, MAX_FUNCTION_UPLOAD_BYTES } from "@/lib/compressImage";
 import ListingImageManager from "@/components/ListingImageManager";
 import { MAX_LOCATION_IMAGES, MAX_LISTING_IMAGES } from "@/lib/listing-image-gallery";
 import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
+import { DASHBOARD_MESSAGES_FALLBACK_REFRESH_MS } from "@/lib/message-refresh-policy";
 
 type RealMessage = {
   id: string;
@@ -788,10 +789,12 @@ export default function DashboardPage() {
   }, [user?.id, loadDashboardConversations]);
 
   useEffect(() => {
-    if (!user?.id || (activeTab !== "overview" && activeTab !== "messages")) return;
+    // The overview is already refreshed on entry and by read events. Only the
+    // open messages tab needs a periodic safety refresh.
+    if (!user?.id || activeTab !== "messages") return;
     const interval = window.setInterval(() => {
       if (document.visibilityState === "visible") void loadDashboardConversations();
-    }, 10_000);
+    }, DASHBOARD_MESSAGES_FALLBACK_REFRESH_MS);
     return () => window.clearInterval(interval);
   }, [user?.id, activeTab, loadDashboardConversations]);
 
