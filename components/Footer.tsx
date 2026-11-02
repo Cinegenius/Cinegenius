@@ -56,6 +56,14 @@ export default function Footer() {
             <p className="text-text-secondary text-sm leading-relaxed max-w-xs">
               {tf("tagline")}
             </p>
+            <a
+              href="https://www.instagram.com/cinegenius.co?mdxt=MXZvaG40YWprY2R1bw%3D%3D&utm_source=qr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex min-h-11 items-center text-sm text-text-secondary hover:text-gold transition-colors"
+            >
+              {tf("links_instagram")}
+            </a>
           </div>
 
           {/* Link-Spalten */}

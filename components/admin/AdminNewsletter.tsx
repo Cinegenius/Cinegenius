@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Check, Instagram, Mail, Send } from "lucide-react";
+import { Check, ExternalLink, Mail, Send } from "lucide-react";
 
 export function AdminNewsletter() {
   const t = useTranslations("AdminNewsletter");
@@ -55,7 +55,7 @@ export function AdminNewsletter() {
             <p className="text-sm leading-6 text-[#aaa]">{t("feedback")}</p>
             <a href="https://www.cinegenius.co/" className="inline-flex min-h-11 items-center rounded-lg bg-[#d4a843] px-5 text-sm font-semibold text-[#0a0a0a]">{t("visitCta")}</a>
             <p className="pt-2 text-sm leading-6 text-[#aaa]">{t("recommend")}</p>
-            <a href="https://www.instagram.com/cinegenius.co?mdxt=MXZvaG40YWprY2R1bw%3D%3D&utm_source=qr" className="inline-flex items-center gap-2 text-sm font-medium text-[#d4a843]"><Instagram size={16} /> {t("instagramCta")}</a>
+            <a href="https://www.instagram.com/cinegenius.co?mdxt=MXZvaG40YWprY2R1bw%3D%3D&utm_source=qr" className="inline-flex items-center gap-2 text-sm font-medium text-[#d4a843]"><ExternalLink size={16} /> {t("instagramCta")}</a>
             <p className="pt-2 text-sm leading-6 text-[#aaa]">{t("closing")}</p>
             <p className="text-sm font-medium text-[#f0f0f0]">{t("signature")}</p>
           </div>
