@@ -115,6 +115,19 @@ function normalizeIntentData(value: unknown): QuickStartIntentData {
   const departmentIds = Array.isArray(input.departmentIds)
     ? [...new Set(input.departmentIds.filter((id): id is string => typeof id === "string" && departmentById.has(id)))].slice(0, departments.length)
     : [];
+  // Talent roles come from the cast department, but older wizard drafts did
+  // not store a department id for them. Preserve valid saved roles and infer
+  // their department so review validation does not lose the selection.
+  if (Array.isArray(input.roles)) {
+    for (const candidate of input.roles) {
+      if (!candidate || typeof candidate !== "object") continue;
+      const selection = candidate as Partial<QuickStartRoleSelection>;
+      const department = typeof selection.departmentId === "string" ? departmentById.get(selection.departmentId) : null;
+      if (department && typeof selection.role === "string" && department.roles.includes(selection.role) && !departmentIds.includes(department.id)) {
+        departmentIds.push(department.id);
+      }
+    }
+  }
   const roles = Array.isArray(input.roles)
     ? input.roles.flatMap((candidate) => {
       if (!candidate || typeof candidate !== "object") return [];

@@ -287,7 +287,7 @@ export default function ProfileSetupWizard() {
   function toggleRole(item: QuickStartRoleSelection, intent: "crew" | "talent") {
     const data = draft.sections[intent] ?? createQuickStartIntentData();
     const alreadySelected = data.roles.some((role) => role.departmentId === item.departmentId && role.role === item.role);
-    const departmentIds = intent === "crew" && !data.departmentIds.includes(item.departmentId)
+    const departmentIds = !data.departmentIds.includes(item.departmentId)
       ? [...data.departmentIds, item.departmentId]
       : data.departmentIds;
     updateSection(intent, {
