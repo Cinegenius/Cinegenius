@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 import {
-  MapPin, Briefcase, ArrowRight, Star, CheckCircle,
+  MapPin, Briefcase, ArrowRight, CheckCircle,
   Zap, Shield, Clock, Package2, Building2, UsersRound, Film,
 } from "lucide-react";
 import HeroSearch from "@/components/HeroSearch";
@@ -33,11 +33,9 @@ import { PageBackdrop } from "@/components/PageHeader";
 import AiDisclosureBadge from "@/components/AiDisclosureBadge";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import { HomePhotoDiscovery, type DiscoverPhoto } from "@/components/HomePhotoDiscovery";
-import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileCategory, type ProfileType } from "@/lib/profile-types";
+import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
 import { getPrivateProfileIds } from "@/lib/trust";
-import { fetchRatingSummaries } from "@/lib/ratings";
 import { getCommunityMedia } from "@/lib/community-media-server";
-import { rankByRatingConfidence } from "@/lib/rating-ranking";
 
 type HomeProfileRow = {
   user_id: string;
@@ -76,7 +74,6 @@ async function getHomeData(viewerId: string | null) {
       liveProps: [],
       companies: [],
       projects: [],
-      topCreators: [],
       newCrew: [],
       ratedPhotos: [],
       newPhotos: [],
@@ -115,14 +112,6 @@ async function getHomeData(viewerId: string | null) {
       .filter(([type]) => PROFILE_CATEGORY_MAP[type] === "crew" || PROFILE_CATEGORY_MAP[type] === "talent" || PROFILE_CATEGORY_MAP[type] === "creative")
       .map(([, label]) => label.toLocaleLowerCase("de")),
   );
-  const peopleTypeLabelsByCategory = new Map<ProfileCategory, Set<string>>(
-    (['crew', 'talent', 'creative'] as const).map((category): [ProfileCategory, Set<string>] => [
-      category,
-      new Set((Object.entries(PROFILE_TYPE_LABELS) as [ProfileType, string][])
-        .filter(([type]) => PROFILE_CATEGORY_MAP[type] === category)
-        .map(([, label]) => label.toLocaleLowerCase("de"))),
-    ]),
-  );
   const peopleProfiles = publicProfiles.filter((profile) => {
     const types = [profile.profile_type, ...(profile.profile_types ?? [])].filter((type): type is string => Boolean(type));
     if (types.some((type) => {
@@ -132,27 +121,11 @@ async function getHomeData(viewerId: string | null) {
     const positions = [...(profile.positions ?? []), profile.role ?? ""].map((position) => position.toLocaleLowerCase("de"));
     return positions.some((position) => [...peopleTypeLabels].some((label) => position === label || position.includes(label)));
   });
-  const [{ photos }, peopleRatingSummaries] = await Promise.all([
-    photosTask,
-    fetchRatingSummaries(peopleProfiles.map(profile => profile.user_id), "user").catch(() => ({} as Awaited<ReturnType<typeof fetchRatingSummaries>>)),
-  ]);
+  const { photos } = await photosTask;
   const newPhotos: DiscoverPhoto[] = photos.slice(0, 24);
   const peopleSummaries = peopleProfiles.map((profile) => {
-    const summary = peopleRatingSummaries[profile.user_id] ?? { rating: 0, reviews: 0, ratingOnly: 0 };
     const types = [profile.profile_type, ...(profile.profile_types ?? [])].filter((type): type is string => Boolean(type));
     const positions = [...new Set([...(profile.positions ?? []), ...(profile.role ? [profile.role] : [])].map((position) => position.trim()).filter(Boolean))];
-    const categories = new Set<ProfileCategory>(types
-      .map((type) => PROFILE_CATEGORY_MAP[type as ProfileType])
-      .filter((category): category is ProfileCategory => category === "crew" || category === "talent" || category === "creative"));
-    if (categories.size === 0) {
-      const normalizedPositions = positions.map((position) => position.toLocaleLowerCase("de"));
-      for (const category of ["crew", "talent", "creative"] as const) {
-        const labels = peopleTypeLabelsByCategory.get(category);
-        if (labels && normalizedPositions.some((position) => [...labels].some((label) => position === label || position.includes(label)))) {
-          categories.add(category);
-        }
-      }
-    }
     if (positions.length === 0) {
       const profileTypes = [profile.profile_type, ...(profile.profile_types ?? [])].filter((type): type is string => Boolean(type));
       positions.push(...profileTypes
@@ -171,41 +144,14 @@ async function getHomeData(viewerId: string | null) {
       city: profile.location?.split(",")[0]?.trim() ?? "",
       verified: profile.verified ?? false,
       positions,
-      categories: [...categories],
-      rating: summary.rating,
-      reviews: summary.reviews,
       createdAt: profile.created_at ?? "",
     };
   });
-  const diversifyPeople = <T extends { categories: ProfileCategory[] }>(people: T[]) => {
-    const featured: T[] = [];
-    const selected = new Set<T>();
-    // Give Cast/Talent and creative profiles a place in this small homepage
-    // selection, then fill remaining cards with the strongest/recent profiles.
-    for (const category of ["talent", "creative", "crew"] as const) {
-      const person = people.find((candidate) => !selected.has(candidate) && candidate.categories.includes(category));
-      if (person) {
-        featured.push(person);
-        selected.add(person);
-      }
-    }
-    for (const person of people) {
-      if (featured.length >= 4) break;
-      if (!selected.has(person)) {
-        featured.push(person);
-        selected.add(person);
-      }
-    }
-    return featured;
-  };
-  const topCreators = diversifyPeople(rankByRatingConfidence(
-    peopleSummaries.filter((profile) => profile.reviews >= 2),
-    (profile) => profile.rating,
-    (profile) => profile.reviews,
-    (profile) => `${profile.name}:${profile.id}`,
-  ));
-  const newCrew = diversifyPeople([...peopleSummaries]
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || a.name.localeCompare(b.name, "de")));
+  // Keep this homepage selection strictly chronological: the latest eligible
+  // public people profiles always occupy the first positions.
+  const newCrew = peopleSummaries
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || a.name.localeCompare(b.name, "de"))
+    .slice(0, 4);
 
   const liveLocations = (recentLocations ?? []).map((l) => ({
     id: l.id as string,
@@ -265,7 +211,6 @@ async function getHomeData(viewerId: string | null) {
     liveProps,
     companies,
     projects,
-    topCreators,
     newCrew,
     ratedPhotos: [],
     newPhotos,
@@ -282,7 +227,7 @@ async function HomeRecommendations({ viewerId }: { viewerId: string | null }) {
     console.error("[homepage] Recommendations unavailable");
     return <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"><p role="status" className="rounded-xl border border-border bg-bg-secondary px-4 py-6 text-sm text-text-muted">{t("recommendationsUnavailable")}</p></section>;
   }
-  const { liveLocations, liveJobs, liveProps, companies, projects, topCreators, newCrew, newPhotos, currentTime } = data;
+  const { liveLocations, liveJobs, liveProps, companies, projects, newCrew, newPhotos, currentTime } = data;
 
   function formatDate(iso: string): string {
     if (!iso) return "";
@@ -352,22 +297,22 @@ async function HomeRecommendations({ viewerId }: { viewerId: string | null }) {
       )}
 
       {/* ══════════════════════════════════════════════
-          TOP RATED CREATORS
+          NEWEST PEOPLE PROFILES
       ══════════════════════════════════════════════ */}
       <section className="py-10 sm:py-14">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-6 flex min-w-0 flex-col items-start gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
               <div className="min-w-0 flex-1">
-                <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{topCreators.length >= 3 ? t("topCreatorsLabel") : t("newCrewLabel")}</p>
-                <h2 className="font-display text-xl sm:text-2xl font-bold text-text-primary">{topCreators.length >= 3 ? t("topCreatorsTitle") : t("newCrewTitle")}</h2>
-                {topCreators.length < 3 && <p className="mt-1 text-xs text-text-muted">{t("newCrewDescription")}</p>}
+                <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("newCrewLabel")}</p>
+                <h2 className="font-display text-xl sm:text-2xl font-bold text-text-primary">{t("newCrewTitle")}</h2>
+                <p className="mt-1 text-xs text-text-muted">{t("newCrewDescription")}</p>
               </div>
               <Link href="/creators?sort=rating" className="inline-flex min-h-11 max-w-full items-center gap-1 text-sm text-gold hover:text-gold-light font-medium sm:max-w-[45%]">
                 <span className="min-w-0 break-words">{t("discoverCrew")}</span> <ArrowRight size={14} className="shrink-0" />
               </Link>
             </div>
-            {(topCreators.length >= 3 || newCrew.length > 0) ? <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {(topCreators.length >= 3 ? topCreators : newCrew).map((c) => (
+            {newCrew.length > 0 ? <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {newCrew.map((c) => (
                 <Link
                   key={c.id}
                   href={`/profile/${c.slug}`}
@@ -406,19 +351,6 @@ async function HomeRecommendations({ viewerId }: { viewerId: string | null }) {
                     {c.tagline && (
                       <p className="text-xs text-text-secondary leading-relaxed line-clamp-2 flex-1 mb-2">{c.tagline}</p>
                     )}
-                    {topCreators.length >= 3 && <div className="flex items-center gap-1.5 mt-auto">
-                      <div className="flex items-center gap-0.5">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <Star
-                            key={i}
-                            size={11}
-                            className={i <= Math.round(c.rating) ? "text-gold fill-gold" : "text-border fill-border"}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-xs font-semibold text-text-primary">{c.rating.toFixed(1)}</span>
-                      <span className="text-[11px] text-text-muted">({c.reviews} {c.reviews === 1 ? "Bewertung" : "Bewertungen"})</span>
-                    </div>}
                   </div>
                 </Link>
               ))}
