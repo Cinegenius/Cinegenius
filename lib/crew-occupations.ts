@@ -1,4 +1,5 @@
 import { occupationChoices, occupationById, occupationReference, readPrimaryOccupation, type PrimaryOccupation } from './primary-occupation';
+import { PROFILE_CATEGORY_MAP, type ProfileType } from './profile-types';
 
 /** Stored selections only: never pass display positions containing inferred type labels. */
 export function selectedCrewOccupations(positions: readonly string[], storedSelections?: unknown, legacyMain?: string | null, primary?: unknown): PrimaryOccupation[] {
@@ -26,16 +27,25 @@ export function crewOccupationIds(profile: {positions?: string[] | null; role?: 
   return selectedCrewOccupations(profile.positions ?? [], profile.crew?.occupations, profile.role, profile.crew?.primaryOccupation).map(option => option.roleId);
 }
 
-export function filterCrewOccupations<T extends {occupationIds?: readonly string[]}>(profiles: readonly T[], departmentId: string | null, roles: readonly string[] = []): T[] {
+export function filterCrewOccupations<T extends {occupationIds?: readonly string[]; profile_type?: string | null; profile_types?: readonly string[] | null}>(profiles: readonly T[], departmentId: string | null, roles: readonly string[] = []): T[] {
   if (!departmentId && !roles.length) return [...profiles];
   const ids = new Set(roles.flatMap(role => {
     const option = occupationById(role);
     return option ? [option.roleId] : occupationChoices([role]).map(choice => choice.roleId);
   }));
-  return profiles.filter(profile => (profile.occupationIds ?? []).some(id => {
-    const option = occupationById(id);
-    return !!option && (!departmentId || option.departmentId === departmentId) && (!roles.length || ids.has(option.roleId));
-  }));
+  return profiles.filter(profile => {
+    // Legacy talent profiles sometimes have a stable talent type but no saved
+    // occupation ID. Keep them in the Cast & Performance department and count
+    // them there; role-specific filters still require an exact saved role.
+    if (departmentId === 'cast' && !roles.length) {
+      const profileTypes = [profile.profile_type, ...(profile.profile_types ?? [])].filter((type): type is string => !!type);
+      if (profileTypes.some(type => PROFILE_CATEGORY_MAP[type as ProfileType] === 'talent')) return true;
+    }
+    return (profile.occupationIds ?? []).some(id => {
+      const option = occupationById(id);
+      return !!option && (!departmentId || option.departmentId === departmentId) && (!roles.length || ids.has(option.roleId));
+    });
+  });
 }
 
 export function crewOccupationsError(crew: unknown, positions: unknown): string | null {
