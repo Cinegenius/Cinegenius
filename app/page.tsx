@@ -33,7 +33,7 @@ import { PageBackdrop } from "@/components/PageHeader";
 import AiDisclosureBadge from "@/components/AiDisclosureBadge";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import { HomePhotoDiscovery, type DiscoverPhoto } from "@/components/HomePhotoDiscovery";
-import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
+import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileCategory, type ProfileType } from "@/lib/profile-types";
 import { getPrivateProfileIds } from "@/lib/trust";
 import { fetchRatingSummaries } from "@/lib/ratings";
 import { getCommunityMedia } from "@/lib/community-media-server";
@@ -110,25 +110,58 @@ async function getHomeData(viewerId: string | null) {
     return { photos: [] };
   });
 
-  const crewTypeLabels = new Set(
+  const peopleTypeLabels = new Set(
     (Object.entries(PROFILE_TYPE_LABELS) as [ProfileType, string][])
-      .filter(([type]) => PROFILE_CATEGORY_MAP[type] === "crew")
+      .filter(([type]) => PROFILE_CATEGORY_MAP[type] === "crew" || PROFILE_CATEGORY_MAP[type] === "talent" || PROFILE_CATEGORY_MAP[type] === "creative")
       .map(([, label]) => label.toLocaleLowerCase("de")),
   );
-  const crewProfiles = publicProfiles.filter((profile) => {
+  const peopleTypeLabelsByCategory = new Map<ProfileCategory, Set<string>>(
+    (['crew', 'talent', 'creative'] as const).map((category): [ProfileCategory, Set<string>] => [
+      category,
+      new Set((Object.entries(PROFILE_TYPE_LABELS) as [ProfileType, string][])
+        .filter(([type]) => PROFILE_CATEGORY_MAP[type] === category)
+        .map(([, label]) => label.toLocaleLowerCase("de"))),
+    ]),
+  );
+  const peopleProfiles = publicProfiles.filter((profile) => {
     const types = [profile.profile_type, ...(profile.profile_types ?? [])].filter((type): type is string => Boolean(type));
-    if (types.some((type) => PROFILE_CATEGORY_MAP[type as ProfileType] === "crew")) return true;
+    if (types.some((type) => {
+      const category = PROFILE_CATEGORY_MAP[type as ProfileType];
+      return category === "crew" || category === "talent" || category === "creative";
+    })) return true;
     const positions = [...(profile.positions ?? []), profile.role ?? ""].map((position) => position.toLocaleLowerCase("de"));
-    return positions.some((position) => [...crewTypeLabels].some((label) => position === label || position.includes(label)));
+    return positions.some((position) => [...peopleTypeLabels].some((label) => position === label || position.includes(label)));
   });
-  const [{ photos }, crewRatingSummaries] = await Promise.all([
+  const [{ photos }, peopleRatingSummaries] = await Promise.all([
     photosTask,
-    fetchRatingSummaries(crewProfiles.map(profile => profile.user_id), "user").catch(() => ({} as Awaited<ReturnType<typeof fetchRatingSummaries>>)),
+    fetchRatingSummaries(peopleProfiles.map(profile => profile.user_id), "user").catch(() => ({} as Awaited<ReturnType<typeof fetchRatingSummaries>>)),
   ]);
   const newPhotos: DiscoverPhoto[] = photos.slice(0, 24);
-  const crewSummaries = crewProfiles.map((profile) => {
-    const summary = crewRatingSummaries[profile.user_id] ?? { rating: 0, reviews: 0, ratingOnly: 0 };
+  const peopleSummaries = peopleProfiles.map((profile) => {
+    const summary = peopleRatingSummaries[profile.user_id] ?? { rating: 0, reviews: 0, ratingOnly: 0 };
+    const types = [profile.profile_type, ...(profile.profile_types ?? [])].filter((type): type is string => Boolean(type));
     const positions = [...new Set([...(profile.positions ?? []), ...(profile.role ? [profile.role] : [])].map((position) => position.trim()).filter(Boolean))];
+    const categories = new Set<ProfileCategory>(types
+      .map((type) => PROFILE_CATEGORY_MAP[type as ProfileType])
+      .filter((category): category is ProfileCategory => category === "crew" || category === "talent" || category === "creative"));
+    if (categories.size === 0) {
+      const normalizedPositions = positions.map((position) => position.toLocaleLowerCase("de"));
+      for (const category of ["crew", "talent", "creative"] as const) {
+        const labels = peopleTypeLabelsByCategory.get(category);
+        if (labels && normalizedPositions.some((position) => [...labels].some((label) => position === label || position.includes(label)))) {
+          categories.add(category);
+        }
+      }
+    }
+    if (positions.length === 0) {
+      const profileTypes = [profile.profile_type, ...(profile.profile_types ?? [])].filter((type): type is string => Boolean(type));
+      positions.push(...profileTypes
+        .filter((type) => {
+          const category = PROFILE_CATEGORY_MAP[type as ProfileType];
+          return category === "crew" || category === "talent" || category === "creative";
+        })
+        .map((type) => PROFILE_TYPE_LABELS[type as ProfileType]));
+    }
     return {
       id: profile.user_id,
       slug: profile.slug || profile.user_id,
@@ -138,20 +171,41 @@ async function getHomeData(viewerId: string | null) {
       city: profile.location?.split(",")[0]?.trim() ?? "",
       verified: profile.verified ?? false,
       positions,
+      categories: [...categories],
       rating: summary.rating,
       reviews: summary.reviews,
       createdAt: profile.created_at ?? "",
     };
   });
-  const topCreators = rankByRatingConfidence(
-    crewSummaries.filter((profile) => profile.reviews >= 2),
+  const diversifyPeople = <T extends { categories: ProfileCategory[] }>(people: T[]) => {
+    const featured: T[] = [];
+    const selected = new Set<T>();
+    // Give Cast/Talent and creative profiles a place in this small homepage
+    // selection, then fill remaining cards with the strongest/recent profiles.
+    for (const category of ["talent", "creative", "crew"] as const) {
+      const person = people.find((candidate) => !selected.has(candidate) && candidate.categories.includes(category));
+      if (person) {
+        featured.push(person);
+        selected.add(person);
+      }
+    }
+    for (const person of people) {
+      if (featured.length >= 4) break;
+      if (!selected.has(person)) {
+        featured.push(person);
+        selected.add(person);
+      }
+    }
+    return featured;
+  };
+  const topCreators = diversifyPeople(rankByRatingConfidence(
+    peopleSummaries.filter((profile) => profile.reviews >= 2),
     (profile) => profile.rating,
     (profile) => profile.reviews,
     (profile) => `${profile.name}:${profile.id}`,
-  ).slice(0, 4);
-  const newCrew = crewSummaries
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || a.name.localeCompare(b.name, "de"))
-    .slice(0, 4);
+  ));
+  const newCrew = diversifyPeople([...peopleSummaries]
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || a.name.localeCompare(b.name, "de")));
 
   const liveLocations = (recentLocations ?? []).map((l) => ({
     id: l.id as string,
