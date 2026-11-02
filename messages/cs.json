@@ -516,6 +516,8 @@
     "filterAllFilters": "Všechny filtry",
     "clearAll": "Smazat vše",
     "results": "{count, plural, one {# profil} few {# profily} other {# profilů}}",
+    "resultsLoading": "Načítají se členové a poskytovatelé …",
+    "resultsLoadFailed": "Další členy a poskytovatele se nepodařilo načíst.",
     "emptyTitle": "Zatím žádné profily",
     "emptyTitleFiltered": "Žádné profily nenalezeny",
     "emptyDesc": "Buďte první! Vytvořte svůj profil v týmu.",

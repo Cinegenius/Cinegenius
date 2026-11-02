@@ -516,6 +516,8 @@
     "filterAllFilters": "Todos los filtros",
     "clearAll": "Borrar todo",
     "results": "{count, plural, one {# perfil} other {# perfiles}}",
+    "resultsLoading": "Cargando miembros y proveedores …",
+    "resultsLoadFailed": "No se pudieron cargar más miembros y proveedores.",
     "emptyTitle": "Aún no hay perfiles",
     "emptyTitleFiltered": "No se encontraron perfiles",
     "emptyDesc": "¡Sé el primero! Crea tu perfil de equipo.",

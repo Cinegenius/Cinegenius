@@ -516,6 +516,8 @@
     "filterAllFilters": "All filters",
     "clearAll": "Clear all",
     "results": "{count, plural, one {# profile} other {# profiles}}",
+    "resultsLoading": "Loading members and providers …",
+    "resultsLoadFailed": "More members and providers could not be loaded.",
     "emptyTitle": "No profiles yet",
     "emptyTitleFiltered": "No profiles found",
     "emptyDesc": "Be the first! Create your crew profile.",

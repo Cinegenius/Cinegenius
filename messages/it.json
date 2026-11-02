@@ -516,6 +516,8 @@
     "filterAllFilters": "Tutti i filtri",
     "clearAll": "Cancella tutto",
     "results": "{count, plural, one {# profilo} other {# profili}}",
+    "resultsLoading": "Caricamento di membri e fornitori …",
+    "resultsLoadFailed": "Impossibile caricare altri membri e fornitori.",
     "emptyTitle": "Ancora nessun profilo",
     "emptyTitleFiltered": "Nessun profilo trovato",
     "emptyDesc": "Sii il primo! Crea il tuo profilo crew.",

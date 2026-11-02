@@ -516,6 +516,8 @@
     "filterAllFilters": "Összes szűrő",
     "clearAll": "Mindent töröl",
     "results": "{count, plural, one {# profil} other {# profil}}",
+    "resultsLoading": "Tagok és szolgáltatók betöltése …",
+    "resultsLoadFailed": "További tagokat és szolgáltatókat nem sikerült betölteni.",
     "emptyTitle": "Még nincsenek profilok",
     "emptyTitleFiltered": "Nem találhatók profilok",
     "emptyDesc": "Legyen az első! Hozd létre a csapatprofilodat.",

@@ -690,7 +690,7 @@ function CreatorsInner({
         ]}
         categoryValue={sidebarDept ?? ""}
         onCategoryChange={(value) => { setSelectedRoles(new Set()); chooseSidebarDept(value || null); }}
-        resultSummary={hasMoreFromApi ? `${t("results", { count: filtered.length })} · ${loadError ? "Laden unvollständig" : "Weitere Profile werden geladen …"}` : t("results", { count: filtered.length })}
+        resultSummary={hasMoreFromApi ? (loadError ? t("resultsLoadFailed") : t("resultsLoading")) : t("results", { count: filtered.length })}
         filterCount={secondaryFilterCount + (sidebarDept ? 1 : 0)}
         chips={mobileChips}
         onReset={resetMobileFilters}
@@ -1384,7 +1384,7 @@ function CreatorsInner({
             {/* Count */}
             <p className="hidden xl:block text-sm text-text-muted mb-5">
               <span className="text-text-primary font-semibold">
-                {t("results", { count: filteredCrew.length })}{hasMoreFromApi ? " · Laden noch nicht abgeschlossen" : ""}
+                {hasMoreFromApi ? (loadError ? t("resultsLoadFailed") : t("resultsLoading")) : t("results", { count: filteredCrew.length })}
               </span>
               {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
             </p>
