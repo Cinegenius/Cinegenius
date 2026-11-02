@@ -363,25 +363,39 @@ async function HomeRecommendations({ viewerId }: { viewerId: string | null }) {
           MARKTPLATZ / PROPS
       ══════════════════════════════════════════════ */}
       {liveProps.length > 0 && (
-        <section className="py-10 sm:py-14">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-end justify-between mb-6">
-              <div>
-                <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Marktplatz</p>
-                <h2 className="font-display text-xl sm:text-2xl font-bold text-text-primary">{t("pillarMarketplaceTitle")} — Equipment & Requisiten</h2>
+        <section className="relative overflow-hidden border-y border-gold/20 bg-bg-secondary/90 py-12 sm:py-16">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_0%,rgba(185,255,36,0.10),transparent_35%)]" aria-hidden="true" />
+          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mb-7 grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+              <div className="min-w-0">
+                <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-gold/25 bg-gold/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest text-gold">
+                  <Package2 size={14} aria-hidden="true" />
+                  {t("pillarMarketplaceTitle")}
+                </div>
+                <h2 className="max-w-3xl font-display text-3xl font-bold leading-tight text-text-primary sm:text-4xl">
+                  {t("pillarMarketplaceTitle")}
+                </h2>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-text-secondary sm:text-base">
+                  {t("pillarMarketplaceDesc")}
+                </p>
               </div>
-              <Link href="/props" className="flex items-center gap-1 text-sm text-gold hover:text-gold-light font-medium shrink-0">
-                {tc("viewAll")} <ArrowRight size={14} />
-              </Link>
+              <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
+                <Link href="/marketplace" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary transition-colors hover:bg-gold-light">
+                  {tc("viewAll")} <ArrowRight size={15} />
+                </Link>
+                <Link href="/guided-listing?type=equipment" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-border bg-bg-primary/70 px-5 text-sm font-semibold text-text-primary transition-colors hover:border-gold/40 hover:text-gold">
+                  {t("pillarMarketplaceCta")} <ArrowRight size={15} />
+                </Link>
+              </div>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {liveProps.map((prop) => (
                 <Link
                   key={prop.id}
                   href={prop.detailHref ?? "/props"}
-                  className="card-hover group rounded-xl border border-border bg-bg-elevated overflow-hidden block"
+                  className="card-hover group block overflow-hidden rounded-2xl border border-border bg-bg-elevated shadow-lg shadow-black/10 transition-colors hover:border-gold/35"
                 >
-                  <div className="relative overflow-hidden aspect-video bg-bg-elevated">
+                  <div className="relative aspect-[4/3] overflow-hidden bg-bg-elevated sm:aspect-video">
                     {prop.image ? <Image
                       src={prop.image}
                       alt={prop.title}
