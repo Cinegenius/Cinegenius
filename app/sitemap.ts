@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { db } from "@/lib/db";
 import { getPrivateProfileIds } from "@/lib/trust";
 
-const BASE = "https://cinegenius.co";
+const BASE = "https://www.cinegenius.co";
 
 const typeToPath: Record<string, string> = {
   location: "locations",

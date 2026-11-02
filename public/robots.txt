@@ -11,4 +11,4 @@ Disallow: /sign-up
 Disallow: /booking/checkout
 Disallow: /invoices
 
-Sitemap: https://cinegenius.co/sitemap.xml
+Sitemap: https://www.cinegenius.co/sitemap.xml
