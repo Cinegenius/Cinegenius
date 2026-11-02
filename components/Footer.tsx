@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Logo } from "./Logo";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { NewsletterSignup } from "@/components/NewsletterSignup";
 
 export default function Footer() {
   const pathname = usePathname();
@@ -64,6 +65,7 @@ export default function Footer() {
             >
               {tf("links_instagram")}
             </a>
+            <NewsletterSignup />
           </div>
 
           {/* Link-Spalten */}

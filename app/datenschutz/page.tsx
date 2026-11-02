@@ -50,7 +50,7 @@ export default async function DatenschutzPage() {
                     ["Vercel", "Hosting & CDN", "USA"],
                     ["Stripe", "Zahlungsabwicklung", "USA"],
                     ["Sentry", t("sentryPurpose"), "USA"],
-                    ["Resend", "Transaktions-E-Mails", "USA"],
+                    ["Resend", "E-Mail-Versand", "USA"],
                     ["Vercel Analytics", "Nutzungsstatistiken (cookielos)", "USA"],
                     ["Vercel Speed Insights", "Performance-Messung (cookielos)", "USA"],
                     ["OpenStreetMap Nominatim", "Geocoding von Städtenamen", "UK / EU"],
@@ -153,7 +153,7 @@ export default async function DatenschutzPage() {
           <section>
             <h2 className="text-base font-semibold text-text-primary mb-3">13. E-Mail-Versand (Resend)</h2>
             <p>
-              Transaktions-E-Mails (z.&nbsp;B. Buchungsbestätigungen, Benachrichtigungen, Systemmeldungen) werden über <strong className="text-text-primary">Resend Inc.</strong> (USA) versendet. Dabei wird deine E-Mail-Adresse sowie dein Name an Resend übermittelt. Wir versenden ausschließlich transaktionale Nachrichten, die zur Vertragserfüllung notwendig sind (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO). Werbe-E-Mails versenden wir nicht ohne ausdrückliche Einwilligung.<br />
+              {t("resendDisclosure")}<br />
               Datenschutz Resend: <a href="https://resend.com/privacy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">resend.com/privacy</a>
             </p>
           </section>

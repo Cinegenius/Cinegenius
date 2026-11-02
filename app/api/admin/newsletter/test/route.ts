@@ -5,8 +5,9 @@ import { requireAdmin } from "@/lib/requireAdmin";
 import { rateLimit } from "@/lib/rateLimit";
 import { finishAdminAudit, startAdminAudit } from "@/lib/admin-audit";
 import { sendNewsletterTestEmail } from "@/lib/email";
+import { validateNewsletterCopy } from "@/lib/newsletter";
 
-export async function POST() {
+export async function POST(request: Request) {
   const admin = await requireAdmin();
   if (admin instanceof NextResponse) return admin;
 
@@ -15,6 +16,10 @@ export async function POST() {
 
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: "AdminNewsletter" });
+  let payload: unknown;
+  try { payload = await request.json(); } catch { return NextResponse.json({ error: t("invalidCopy") }, { status: 400 }); }
+  const copy = validateNewsletterCopy(payload);
+  if (!copy) return NextResponse.json({ error: t("invalidCopy") }, { status: 400 });
   let email: string;
   try {
     const client = await clerkClient();
@@ -39,18 +44,11 @@ export async function POST() {
   if (!audit) return NextResponse.json({ error: t("auditUnavailable") }, { status: 503 });
 
   const result = await sendNewsletterTestEmail(email, {
-    subject: t("subject"),
-    greeting: t("greeting"),
-    community: t("community"),
-    offers: t("offers"),
-    feedback: t("feedback"),
-    visitCta: t("visitCta"),
-    recommend: t("recommend"),
-    instagramCta: t("instagramCta"),
-    closing: t("closing"),
-    signature: t("signature"),
-    footer: t("emailFooter"),
-  });
+    ...copy,
+    testFooter: t("testEmailFooter"),
+    unsubscribeFooter: t("campaignEmailFooter"),
+    unsubscribeLink: t("unsubscribeLink"),
+  }, locale);
   if (!result.ok) {
     await finishAdminAudit(audit, "failed");
     const key = result.reason === "not_configured" ? "emailNotConfigured" : "sendError";

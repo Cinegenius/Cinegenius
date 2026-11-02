@@ -217,44 +217,64 @@ export async function sendWelcomeEmail(to: string, displayName: string) {
 
 export type NewsletterTestCopy = {
   subject: string;
-  greeting: string;
-  community: string;
-  offers: string;
-  feedback: string;
-  visitCta: string;
+  heading: string;
+  body: string;
+  ctaLabel: string;
+  ctaUrl: string;
   recommend: string;
-  instagramCta: string;
-  closing: string;
+  instagramLabel: string;
+  instagramUrl: string;
   signature: string;
-  footer: string;
+  testFooter: string;
+  unsubscribeFooter: string;
+  unsubscribeLink: string;
 };
 
-/** One-off newsletter preview test to the authenticated admin's own verified address. */
-export async function sendNewsletterTestEmail(to: string, copy: NewsletterTestCopy) {
-  if (!resend) return { ok: false as const, reason: "not_configured" as const };
-  const safe = Object.fromEntries(Object.entries(copy).map(([key, value]) => [key, escapeHtml(value)])) as NewsletterTestCopy;
+export type NewsletterConfirmationCopy = {
+  subject: string;
+  heading: string;
+  body: string;
+  button: string;
+  ignore: string;
+};
+
+function newsletterMarkup(copy: NewsletterTestCopy, unsubscribeUrl: string | null, test = false, locale = "de") {
+  const subject = escapeHtml(copy.subject);
+  const heading = escapeHtml(copy.heading);
+  const body = copy.body.split(/\r?\n/).map(line => line.trim()).filter(Boolean)
+    .map(line => `<p style="margin:0 0 16px;font-size:15px;color:#a7afbf;line-height:1.7">${escapeHtml(line)}</p>`).join("");
+  const ctaLabel = escapeHtml(copy.ctaLabel);
+  const ctaUrl = escapeHtml(copy.ctaUrl);
+  const recommend = escapeHtml(copy.recommend);
+  const instagramLabel = escapeHtml(copy.instagramLabel);
+  const instagramUrl = escapeHtml(copy.instagramUrl);
+  const signature = escapeHtml(copy.signature);
   const siteUrl = escapeHtml(BASE);
-  const instagramUrl = "https://www.instagram.com/cinegenius.co?mdxt=MXZvaG40YWprY2R1bw%3D%3D&utm_source=qr";
-  const html = wrap(`
-    ${h1(safe.subject)}
-    ${p(safe.greeting)}
-    ${p(safe.community)}
-    ${p(safe.offers)}
-    ${p(safe.feedback)}
-    ${btn(safe.visitCta, siteUrl)}
-    ${p(safe.recommend)}
-    <p style="margin:14px 0 0;font-size:14px"><a href="${instagramUrl}" style="color:#d4a843;text-decoration:none">${safe.instagramCta}</a></p>
-    ${p(safe.closing)}
-    <p style="margin:14px 0 0;font-size:14px;color:#f0f0f0;font-weight:600">${safe.signature}</p>
-    <p style="margin:22px 0 0;font-size:11px;color:#666;line-height:1.5">${safe.footer}</p>
-  `);
+  const footer = test
+    ? escapeHtml(copy.testFooter)
+    : `${escapeHtml(copy.unsubscribeFooter)} <a href="${escapeHtml(unsubscribeUrl ?? BASE)}" style="color:#c2f135;text-decoration:underline">${escapeHtml(copy.unsubscribeLink)}</a>`;
+  return `<!DOCTYPE html><html lang="${escapeHtml(locale)}"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="color-scheme" content="dark"/><meta name="supported-color-schemes" content="dark"/></head>
+  <body style="margin:0;padding:0;background:#0e1016;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;color:#f4f5f7">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0e1016;padding:28px 12px"><tr><td align="center">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#171b24;border:1px solid #29344a;border-radius:16px;overflow:hidden">
+      <tr><td style="padding:22px 26px;border-bottom:1px solid #29344a"><a href="${siteUrl}" style="color:#f4f5f7;font-size:21px;font-weight:700;text-decoration:none"><span style="color:#c2f135;font-size:25px">›</span> Cine<span style="color:#c2f135">Genius</span></a></td></tr>
+      <tr><td style="padding:30px 26px"><h1 style="margin:0 0 20px;color:#f4f5f7;font-size:25px;line-height:1.3">${heading || subject}</h1>${body}
+        <a href="${ctaUrl}" style="display:inline-block;margin-top:8px;padding:13px 22px;background:#c2f135;color:#10131b;font-size:15px;font-weight:700;border-radius:10px;text-decoration:none">${ctaLabel}</a>
+        <p style="margin:24px 0 12px;font-size:14px;color:#a7afbf;line-height:1.6">${recommend}</p><p style="margin:0 0 20px"><a href="${instagramUrl}" style="color:#c2f135;text-decoration:underline">${instagramLabel}</a></p><p style="margin:0;color:#f4f5f7;font-size:14px;font-weight:600">${signature}</p>
+      </td></tr><tr><td style="padding:17px 26px;border-top:1px solid #29344a"><p style="margin:0;color:#7e899d;font-size:12px;line-height:1.6">${footer}</p></td></tr>
+    </table></td></tr></table></body></html>`;
+}
+
+/** One-off preview test to the authenticated admin's own verified address. */
+export async function sendNewsletterTestEmail(to: string, copy: NewsletterTestCopy, locale = "de") {
+  if (!resend) return { ok: false as const, reason: "not_configured" as const };
   try {
     const { data, error } = await resend.emails.send({
       from: FROM,
       to,
       replyTo: "support@cinegenius.co",
       subject: normalizedEmailText(copy.subject),
-      html,
+      html: newsletterMarkup(copy, null, true, locale),
     });
     if (error || !data?.id) {
       console.error("CineGenius: Newsletter-Testmail wurde nicht bestätigt.", { code: error?.name, statusCode: error?.statusCode });
@@ -263,6 +283,53 @@ export async function sendNewsletterTestEmail(to: string, copy: NewsletterTestCo
     return { ok: true as const, id: data.id };
   } catch {
     console.error("CineGenius: Newsletter-Testmail konnte nicht gesendet werden.");
+    return { ok: false as const, reason: "provider_error" as const };
+  }
+}
+
+export async function sendNewsletterConfirmationEmail(to: string, confirmationUrl: string, copy: NewsletterConfirmationCopy, locale = "de") {
+  if (!resend) return false;
+  try {
+    const { data, error } = await resend.emails.send({
+      from: FROM,
+      to,
+      subject: normalizedEmailText(copy.subject),
+      replyTo: "support@cinegenius.co",
+      html: `<!doctype html><html lang="${escapeHtml(locale)}"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><body style="margin:0;background:#0e1016;color:#f4f5f7;font-family:Arial,sans-serif;padding:28px 12px"><table role="presentation" width="100%" style="max-width:580px;margin:auto;background:#171b24;border:1px solid #29344a;border-radius:14px"><tr><td style="padding:28px"><p style="color:#c2f135;font-weight:700">› CineGenius</p><h1 style="font-size:23px">${escapeHtml(copy.heading)}</h1><p style="color:#a7afbf;line-height:1.6">${escapeHtml(copy.body)}</p><a href="${escapeHtml(confirmationUrl)}" style="display:inline-block;padding:13px 20px;background:#c2f135;color:#10131b;border-radius:9px;font-weight:700;text-decoration:none">${escapeHtml(copy.button)}</a><p style="margin-top:24px;color:#7e899d;font-size:12px">${escapeHtml(copy.ignore)}</p></td></tr></table></body></html>`,
+    });
+    if (error || !data?.id) {
+      console.error("CineGenius: Newsletter-Bestätigung wurde von Resend nicht angenommen.", { code: error?.name, statusCode: error?.statusCode });
+      return false;
+    }
+    return true;
+  } catch {
+    console.error("CineGenius: Newsletter-Bestätigung konnte nicht gesendet werden.");
+    return false;
+  }
+}
+
+/** Send one immutable, manually launched campaign batch with provider idempotency. */
+export async function sendNewsletterCampaignBatch(
+  messages: Array<{ to: string; unsubscribeUrl: string; copy: NewsletterTestCopy }>,
+  idempotencyKey: string,
+  locale = "de",
+) {
+  if (!resend) return { ok: false as const, reason: "not_configured" as const };
+  try {
+    const result = await resend.batch.send(messages.map(({ to, unsubscribeUrl, copy }) => ({
+      from: FROM,
+      to,
+      replyTo: "support@cinegenius.co",
+      subject: normalizedEmailText(copy.subject),
+      html: newsletterMarkup(copy, unsubscribeUrl, false, locale),
+    })), { idempotencyKey }) as unknown as { data?: Array<{ id: string }> | null; error?: { name?: string; statusCode?: number } | null };
+    if (result.error || !result.data || result.data.length !== messages.length) {
+      console.error("CineGenius: Newsletter-Batch wurde nicht vollständig bestätigt.", { code: result.error?.name, statusCode: result.error?.statusCode });
+      return { ok: false as const, reason: "provider_rejected" as const };
+    }
+    return { ok: true as const, ids: result.data.map(item => item.id) };
+  } catch {
+    console.error("CineGenius: Newsletter-Batch konnte nicht bestätigt werden.");
     return { ok: false as const, reason: "provider_error" as const };
   }
 }
