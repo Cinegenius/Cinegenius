@@ -363,39 +363,39 @@ async function HomeRecommendations({ viewerId }: { viewerId: string | null }) {
           MARKTPLATZ / PROPS
       ══════════════════════════════════════════════ */}
       {liveProps.length > 0 && (
-        <section className="relative overflow-hidden border-y border-gold/20 bg-bg-secondary/90 py-12 sm:py-16">
+        <section className="relative overflow-hidden border-y border-gold/20 bg-bg-secondary/90 py-7 sm:py-12">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_0%,rgba(185,255,36,0.10),transparent_35%)]" aria-hidden="true" />
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-7 grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+            <div className="mb-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
               <div className="min-w-0">
-                <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-gold/25 bg-gold/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest text-gold">
+                <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-gold/25 bg-gold/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-gold">
                   <Package2 size={14} aria-hidden="true" />
                   {t("pillarMarketplaceTitle")}
                 </div>
-                <h2 className="max-w-3xl font-display text-3xl font-bold leading-tight text-text-primary sm:text-4xl">
+                <h2 className="max-w-3xl font-display text-2xl font-bold leading-tight text-text-primary sm:text-4xl">
                   {t("pillarMarketplaceTitle")}
                 </h2>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-text-secondary sm:text-base">
+                <p className="mt-1.5 max-w-2xl text-sm leading-5 text-text-secondary sm:mt-2 sm:text-base sm:leading-6">
                   {t("pillarMarketplaceDesc")}
                 </p>
               </div>
-              <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
-                <Link href="/marketplace" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary transition-colors hover:bg-gold-light">
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:justify-end">
+                <Link href="/marketplace" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gold px-3 text-center text-sm font-semibold text-bg-primary transition-colors hover:bg-gold-light sm:min-h-12 sm:px-5">
                   {tc("viewAll")} <ArrowRight size={15} />
                 </Link>
-                <Link href="/guided-listing?type=equipment" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-border bg-bg-primary/70 px-5 text-sm font-semibold text-text-primary transition-colors hover:border-gold/40 hover:text-gold">
+                <Link href="/guided-listing?type=equipment" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-bg-primary/70 px-3 text-center text-sm font-semibold text-text-primary transition-colors hover:border-gold/40 hover:text-gold sm:min-h-12 sm:px-5">
                   {t("pillarMarketplaceCta")} <ArrowRight size={15} />
                 </Link>
               </div>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
               {liveProps.map((prop) => (
                 <Link
                   key={prop.id}
                   href={prop.detailHref ?? "/props"}
                   className="card-hover group block overflow-hidden rounded-2xl border border-border bg-bg-elevated shadow-lg shadow-black/10 transition-colors hover:border-gold/35"
                 >
-                  <div className="relative aspect-[4/3] overflow-hidden bg-bg-elevated sm:aspect-video">
+                  <div className="relative aspect-square overflow-hidden bg-bg-elevated sm:aspect-video">
                     {prop.image ? <Image
                       src={prop.image}
                       alt={prop.title}
@@ -404,7 +404,7 @@ async function HomeRecommendations({ viewerId }: { viewerId: string | null }) {
                       style={{ objectPosition: prop.focalPoint ? `${prop.focalPoint.x}% ${prop.focalPoint.y}%` : "50% 66%" }}
                       sizes="(max-width:1023px) 50vw,25vw"
                     /> : <div className="absolute inset-0 flex items-center justify-center text-text-muted/30"><Package2 size={36} aria-hidden="true" /></div>}
-                    <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/70 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/55 via-bg-primary/10 to-transparent" />
                     <div className="absolute top-2 left-2">
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-bg-primary/80 backdrop-blur-sm border border-border text-[10px] font-semibold text-text-secondary">
                         <Package2 size={9} className="text-gold" />
@@ -412,7 +412,7 @@ async function HomeRecommendations({ viewerId }: { viewerId: string | null }) {
                       </span>
                     </div>
                     <div className="absolute bottom-2 left-2 right-2 sm:left-3 sm:right-3">
-                      <h3 className="font-semibold text-white text-xs sm:text-sm leading-tight line-clamp-2">{prop.title}</h3>
+                      <h3 className="line-clamp-2 text-xs font-semibold leading-tight text-white drop-shadow-md sm:text-sm">{prop.title}</h3>
                       {prop.city && (
                         <p className="text-[10px] sm:text-xs text-white/70 flex items-center gap-1 mt-0.5">
                           <MapPin size={10} /> {prop.city}
