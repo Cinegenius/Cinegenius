@@ -100,37 +100,6 @@ function hasProfileType(c: ServerCreator, ...types: string[]): boolean {
   return types.some((type) => c.profile_type === type || c.profile_types?.includes(type));
 }
 
-function mixAreaResults(creators: ServerCreator[]): ServerCreator[] {
-  const groups: Record<"crew" | "locations" | "marketplace", ServerCreator[]> = {
-    crew: [],
-    locations: [],
-    marketplace: [],
-  };
-
-  for (const creator of creators) {
-    if (hasProfileType(creator, "location", "studio")) groups.locations.push(creator);
-    else if (hasProfileType(creator, "equipment", "vehicle", "props")) groups.marketplace.push(creator);
-    else groups.crew.push(creator);
-  }
-
-  const mixed: ServerCreator[] = [];
-  let crewIndex = 0;
-  let locationsIndex = 0;
-  let marketplaceIndex = 0;
-
-  while (
-    crewIndex < groups.crew.length ||
-    locationsIndex < groups.locations.length ||
-    marketplaceIndex < groups.marketplace.length
-  ) {
-    if (crewIndex < groups.crew.length) mixed.push(groups.crew[crewIndex++]);
-    if (locationsIndex < groups.locations.length) mixed.push(groups.locations[locationsIndex++]);
-    if (marketplaceIndex < groups.marketplace.length) mixed.push(groups.marketplace[marketplaceIndex++]);
-  }
-
-  return mixed;
-}
-
 // ─── Filter Dropdown ────────────────────────────────────────────────────────
 
 function FilterDropdown({
@@ -597,10 +566,6 @@ function CreatorsInner({
     } else {
       result.sort((a, b) => compareCreatorNames(a, b, locale));
     }
-
-    // The default directory order stays alphabetic even while filters are
-    // active. Explicit rating sorts may still mix provider areas as before.
-    if (sortKey !== "featured" && !isTopMode && !sidebarDept && selectedRoles.size === 0) return mixAreaResults(result);
 
     return result;
   }, [query, selectedRoles, sidebarDept, availableOnly, vendorOnly, cityFilter, countryFilter, languageFilter,
