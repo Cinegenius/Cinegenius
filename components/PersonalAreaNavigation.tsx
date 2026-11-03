@@ -18,7 +18,6 @@ import {
   BriefcaseBusiness,
   Settings,
   Users,
-  Wallet,
   X,
   UserRound,
 } from "lucide-react";
@@ -27,7 +26,6 @@ const moreLinks = [
   { href: "/dashboard?tab=favorites", labelKey: "savedItems", icon: Heart },
   { href: "/dashboard?tab=friends", labelKey: "network", icon: Users },
   { href: "/dashboard?tab=bookings", labelKey: "bookings", icon: CalendarDays },
-  { href: "/dashboard?tab=earnings", labelKey: "payments", icon: Wallet },
   { href: "/company-dashboard", labelKey: "manageCompany", icon: Building2 },
   { href: "/notifications", labelKey: "notifications", icon: Bell },
   { href: "/dashboard?tab=settings", labelKey: "accountSettings", icon: Settings },

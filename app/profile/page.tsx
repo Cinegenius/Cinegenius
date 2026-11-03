@@ -11,8 +11,8 @@ import { useUser } from "@clerk/nextjs";
 import { useLocale, useTranslations } from "next-intl";
 import { compressImage, compressAvatar, MAX_FUNCTION_UPLOAD_BYTES, safeObjectURL } from "@/lib/compressImage";
 import {
-  Camera, CheckCircle, User, Lock, Bell, CreditCard, Film,
-  Plus, X, Save, Wallet, Upload, ShieldCheck, Clock, AlertCircle, Loader2,
+  Camera, CheckCircle, User, Lock, Bell, Film,
+  Plus, X, Save, Upload, ShieldCheck, Clock, AlertCircle, Loader2,
   Globe, Plane, Video, Euro, Clapperboard, Link2, AtSign, PlayCircle, ExternalLink,
   Users2, Eye, EyeOff, Pencil, Check, Search, ChevronDown,
 } from "lucide-react";
@@ -284,7 +284,6 @@ const TAB_IDS = [
   { id: "verification",   labelKey: "tabVerification",   icon: CheckCircle },
   { id: "security",       labelKey: "tabSecurity",       icon: Lock        },
   { id: "notifications",  labelKey: "tabNotifications",  icon: Bell        },
-  { id: "billing",        labelKey: "tabBilling",        icon: CreditCard  },
 ];
 
 // ─── Verification Tab ────────────────────────────────────────────────────────
@@ -3024,36 +3023,6 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {/* ── ABRECHNUNG ── */}
-            {activeTab === "billing" && (
-              <div className="space-y-6">
-                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
-                  <div className="flex items-center justify-between mb-2">
-                    <h2 className="font-semibold text-text-primary flex items-center gap-2">
-                      <Wallet size={16} className="text-gold" /> {t("billingTitle")}
-                    </h2>
-                  </div>
-                  <p className="text-xs text-text-muted mb-5 leading-relaxed">
-                    {t("billingDesc")}
-                  </p>
-                  <div className="rounded-lg border border-amber-400/30 bg-amber-400/5 p-4 text-sm text-text-secondary">
-                    Auszahlungsdaten können hier derzeit nicht sicher gespeichert werden. Bitte gib hier keine IBAN oder Bankdaten ein.
-                  </div>
-                </div>
-
-                <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="font-semibold text-text-primary">{t("myAccount")}</h2>
-                    <span className="px-3 py-1 bg-success/10 border border-success/20 text-success text-xs font-semibold rounded-full">
-                      {t("myAccountFree")}
-                    </span>
-                  </div>
-                  <p className="text-sm text-text-muted leading-relaxed">
-                    {t("myAccountDesc")}
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>

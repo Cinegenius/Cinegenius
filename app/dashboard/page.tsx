@@ -26,7 +26,7 @@ import {
   List, Calendar, MessageSquare,
   BarChart2, Plus, Eye,
   Briefcase, CheckCircle, ChevronRight, ExternalLink,
-  User, ArrowDownCircle, Receipt, Send,
+  User, Send,
   Pencil, Save, Loader2, Upload, Heart, MapPin, Car, Package, Trash2,
   Users, UserPlus, Check, X, Globe, Lock, Clock, ShieldCheck,
   Building2, AlertCircle, FileText, ArrowLeft, Search,
@@ -87,7 +87,7 @@ type IncomingBooking = Booking & {
   booker_name: string;
 };
 
-const VALID_TABS = ["overview", "listings", "jobs", "favorites", "messages", "bookings", "earnings", "payouts", "transactions", "friends", "firma", "settings", "analytics"];
+const VALID_TABS = ["overview", "listings", "jobs", "favorites", "messages", "bookings", "friends", "firma", "settings", "analytics"];
 
 
 export default function DashboardPage() {
@@ -686,7 +686,7 @@ export default function DashboardPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (activeTab !== "bookings" && activeTab !== "earnings" && activeTab !== "transactions" && activeTab !== "overview") return;
+    if (activeTab !== "bookings" && activeTab !== "overview") return;
     setBookingsLoading(true);
     fetch("/api/bookings")
       .then(r => r.json())
@@ -882,9 +882,6 @@ export default function DashboardPage() {
       listings: "Meine Angebote",
       jobs: "Meine Angebote",
       bookings: "Buchungen",
-      earnings: "Zahlungen",
-      payouts: "Zahlungen",
-      transactions: "Zahlungen",
       messages: "Nachrichten",
       analytics: "Analysen",
       favorites: "Merkliste",
@@ -918,20 +915,6 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {(activeTab === "earnings" || activeTab === "payouts" || activeTab === "transactions") && (
-          <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3 sm:px-6">
-            {[
-              { id: "earnings", label: "Einnahmen" },
-              { id: "payouts", label: "Auszahlungen" },
-              { id: "transactions", label: "Transaktionen" },
-            ].map(({ id, label }) => (
-              <button key={id} onClick={() => navigateDashboardTab(id)} className={`min-h-10 rounded-lg border px-3 text-sm font-medium transition-colors ${activeTab === id ? "border-gold/40 bg-gold/10 text-gold" : "border-border text-text-secondary hover:text-text-primary"}`}>{label}</button>
-            ))}
-            <Link href="/invoices" className="ml-auto inline-flex min-h-10 items-center gap-2 rounded-lg border border-border px-3 text-sm text-text-secondary transition-colors hover:border-gold/40 hover:text-gold">
-              <Receipt size={15} /> Rechnungsübersicht
-            </Link>
-          </div>
-        )}
 
         <div className="min-w-0 w-full p-4 sm:p-6 pb-24 lg:pb-6">
           {/* ── ÜBERSICHT ── */}
@@ -2311,188 +2294,6 @@ export default function DashboardPage() {
               </div>
             </div>
           )}
-
-          {/* ── EINNAHMEN ── */}
-          {activeTab === "earnings" && (() => {
-            const confirmedBookings = bookings.filter(b => b.status === "confirmed");
-            const totalSpent = confirmedBookings.reduce((s, b) => s + b.total, 0);
-            const avgBooking = confirmedBookings.length > 0 ? Math.round(totalSpent / confirmedBookings.length) : 0;
-            return (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {[
-                    {
-                      label: "Buchungen gesamt",
-                      value: bookingsLoading ? "…" : String(confirmedBookings.length),
-                      sub: confirmedBookings.length === 0 ? "Noch keine Buchungen" : `${confirmedBookings.length} bestätigt`,
-                      color: "text-text-primary",
-                    },
-                    {
-                      label: "Ausgaben gesamt",
-                      value: bookingsLoading ? "…" : totalSpent.toLocaleString() + " €",
-                      sub: "Buchungsbetrag gesamt",
-                      color: confirmedBookings.length > 0 ? "text-gold" : "text-text-muted",
-                    },
-                    {
-                      label: "Ø pro Buchung",
-                      value: bookingsLoading ? "…" : avgBooking > 0 ? avgBooking.toLocaleString() + " €" : "—",
-                      sub: "Durchschnittlicher Buchungswert",
-                      color: "text-text-muted",
-                    },
-                  ].map(({ label, value, sub, color }) => (
-                    <div key={label} className="p-5 rounded-xl border border-border bg-bg-secondary">
-                      <p className="text-xs text-text-muted uppercase tracking-widest mb-2">{label}</p>
-                      <p className={`text-2xl font-bold font-display ${color}`}>{value}</p>
-                      <p className="text-xs text-text-muted mt-1">{sub}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Buchungshistorie */}
-                <div className="rounded-xl border border-border bg-bg-secondary overflow-hidden">
-                  <div className="p-5 border-b border-border">
-                    <h2 className="font-semibold text-text-primary">Letzte Buchungen</h2>
-                  </div>
-                  {bookingsLoading && <div className="p-8 text-center text-xs text-text-muted">Laden...</div>}
-                  {!bookingsLoading && bookings.length === 0 && (
-                    <div className="p-8 text-center text-xs text-text-muted">
-                      Noch keine Buchungen —{" "}
-                      <Link href="/locations" className="text-gold hover:text-gold-light transition-colors">Jetzt entdecken →</Link>
-                    </div>
-                  )}
-                  <div className="divide-y divide-border">
-                    {bookings.slice(0, 10).map((b) => (
-                      <div key={b.id} className="flex items-center gap-4 px-5 py-4">
-                        <div className="w-10 h-10 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0 text-lg">
-                          {b.listing_type === "location" ? "📍" : b.listing_type === "vehicle" ? "🚗" : b.listing_type === "creator" ? "🎬" : b.listing_type === "job" ? "💼" : "📦"}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-text-primary truncate">{b.listing_title}</p>
-                          <p className="text-xs text-text-muted font-mono">{b.ref}</p>
-                        </div>
-                        <div className="text-right shrink-0">
-                          <p className="text-sm font-semibold text-text-primary">{b.total.toLocaleString()} €</p>
-                          <p className="text-xs text-text-muted">{new Date(b.created_at).toLocaleDateString("de-DE")}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="p-5 rounded-xl border border-gold/20 bg-gold-subtle">
-                  <h3 className="font-semibold text-gold mb-2 text-sm">Wie funktioniert der Escrow-Auszahlungsprozess?</h3>
-                  <div className="space-y-2 text-xs text-text-muted">
-                    {[
-                      "Käufer zahlt den Gesamtbetrag bei der Buchung.",
-                      "CineGenius hält das Geld treuhänderisch bis zur Bestätigung.",
-                      "Nach Abschluss wird 90% an den Anbieter ausgezahlt.",
-                      "Auszahlungen erfolgen innerhalb von 3–5 Werktagen auf das Konto.",
-                    ].map((t, i) => (
-                      <p key={i} className="flex items-start gap-2">
-                        <span className="w-4 h-4 rounded-full bg-gold/20 border border-gold/30 text-gold text-[10px] flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
-                        {t}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
-
-          {/* ── AUSZAHLUNGEN ── */}
-          {activeTab === "payouts" && (
-            <div className="space-y-6">
-              <div className="p-6 rounded-xl border border-border bg-bg-secondary">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-1">Ausstehende Auszahlung</p>
-                    <p className="font-display text-3xl font-bold text-text-muted mb-1">0 €</p>
-                    <p className="text-xs text-text-muted">Noch keine abgeschlossenen Buchungen</p>
-                  </div>
-                  <button disabled className="px-4 py-2 bg-border text-text-muted text-sm font-semibold rounded-lg cursor-not-allowed">
-                    Auszahlung anfordern
-                  </button>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-border bg-bg-secondary">
-                <div className="p-5 border-b border-border">
-                  <h2 className="font-semibold text-text-primary">Auszahlungshistorie</h2>
-                </div>
-                <div className="p-8 text-center space-y-2">
-                  <ArrowDownCircle size={28} className="mx-auto text-text-muted opacity-20" />
-                  <p className="text-sm text-text-muted">Noch keine Auszahlungen</p>
-                  <p className="text-xs text-text-muted">Auszahlungen werden nach abgeschlossenen Buchungen freigegeben.</p>
-                </div>
-              </div>
-
-              <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                <h3 className="font-semibold text-text-primary mb-4 text-sm">Auszahlungskonto hinterlegen</h3>
-                <p className="text-xs text-text-muted mb-3">Bankverbindung wird für Auszahlungen benötigt. Aktivierung folgt mit dem Buchungssystem.</p>
-                <button disabled className="px-3 py-2 border border-border text-xs text-text-muted rounded-lg cursor-not-allowed">
-                  + Bankverbindung hinzufügen (demnächst)
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* ── TRANSAKTIONEN ── */}
-          {activeTab === "transactions" && (() => {
-            const confirmed = bookings.filter(b => b.status === "confirmed");
-            const totalPaid = confirmed.reduce((s, b) => s + b.total, 0);
-            return (
-              <div className="space-y-4">
-                <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-2">
-                  {[
-                    { label: "Abgeschlossen", value: bookingsLoading ? "…" : String(confirmed.length), color: confirmed.length > 0 ? "text-success" : "text-text-muted" },
-                    { label: "Ausstehend", value: bookingsLoading ? "…" : "0", color: "text-text-muted" },
-                    { label: "Bezahlt gesamt", value: bookingsLoading ? "…" : totalPaid.toLocaleString() + " €", color: totalPaid > 0 ? "text-gold" : "text-text-muted" },
-                  ].map(({ label, value, color }) => (
-                    <div key={label} className="p-3 rounded-lg border border-border bg-bg-secondary text-center">
-                      <p className={`text-xl font-bold font-display ${color}`}>{value}</p>
-                      <p className="text-xs text-text-muted">{label}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="rounded-xl border border-border bg-bg-secondary overflow-hidden">
-                  <div className="flex items-center justify-between px-5 py-3 border-b border-border">
-                    <span className="text-sm font-semibold text-text-primary">Transaktionshistorie</span>
-                    <Link href="/invoices" className="text-xs text-gold hover:underline flex items-center gap-1">
-                      Alle Rechnungen <ChevronRight size={12} />
-                    </Link>
-                  </div>
-                  {bookingsLoading && <div className="p-8 text-center text-xs text-text-muted">Laden...</div>}
-                  {!bookingsLoading && bookings.length === 0 && (
-                    <div className="p-8 text-center space-y-2">
-                      <Receipt size={28} className="mx-auto text-text-muted opacity-20" />
-                      <p className="text-sm text-text-muted">Noch keine Transaktionen</p>
-                      <p className="text-xs text-text-muted">Transaktionen erscheinen hier sobald Buchungen bestätigt wurden.</p>
-                    </div>
-                  )}
-                  <div className="divide-y divide-border">
-                    {bookings.map((b) => (
-                      <div key={b.id} className="flex items-center gap-4 px-5 py-4">
-                        <div className="w-8 h-8 rounded-lg bg-success/10 border border-success/20 flex items-center justify-center shrink-0">
-                          <Receipt size={14} className="text-success" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-text-primary truncate">{b.listing_title}</p>
-                          <p className="text-xs text-text-muted font-mono">{b.ref} · {new Date(b.created_at).toLocaleDateString("de-DE")}</p>
-                        </div>
-                        <div className="text-right shrink-0">
-                          <p className="text-sm font-semibold text-success">−{b.total.toLocaleString()} €</p>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-full border border-success/30 bg-success/10 text-success font-semibold">
-                            {b.status === "confirmed" ? "Bestätigt" : b.status}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
 
           {/* ── ANALYSEN ── */}
           {activeTab === "analytics" && (() => {
