@@ -27,6 +27,8 @@ import { COMPANY_PUBLIC_TITLE_SUGGESTIONS, normalizeCompanyPublicTitles } from "
 import CompanyLogo from "@/components/CompanyLogo";
 import CateringCompanyFields from "@/components/CateringCompanyFields";
 import { CATERING_COMPANY_CATEGORY, EMPTY_CATERING_COMPANY_DETAILS, normalizeCateringCompanyDetails, type CateringCompanyDetails } from "@/lib/catering-taxonomy";
+import SafetyMedicalServiceFields from "@/components/SafetyMedicalServiceFields";
+import { SAFETY_MEDICAL_COMPANY_CATEGORY_ID, safetyMedicalCompanyCategoryLabel } from "@/lib/safety-medical-taxonomy";
 
 const MAX_PORTFOLIO = MAX_COMPANY_GALLERY_IMAGES;
 
@@ -67,6 +69,8 @@ async function prepareCompanyImage(file: File, dimensions: { maxWidth: number; m
 
 export default function CompanySetupPage() {
   const animals = useTranslations("FilmAnimals");
+  const safetyMedical = useTranslations("SafetyMedical");
+  const categoryLabel = (id: string, fallback: string) => safetyMedicalCompanyCategoryLabel(id, animalCategoryLabel(id, fallback, animals), safetyMedical);
   const optionalMedia = useTranslations("OptionalMedia");
   const { isLoaded, user } = useUser();
   const tDraft = useTranslations("FormDraft");
@@ -510,12 +514,13 @@ export default function CompanySetupPage() {
                       <div className="flex flex-wrap gap-2">
                         {COMPANY_CATEGORIES.map((category) => {
                           const active = selectedCategories.includes(category.id);
-                          return <button key={category.id} type="button" aria-pressed={active} onClick={() => toggleCategory(category.id)} className={`min-h-11 rounded-full border px-3 py-2 text-sm transition-colors ${active ? "border-gold/50 bg-gold/10 text-gold" : "border-border bg-bg-secondary text-text-secondary hover:border-gold/40"}`}>{animalCategoryLabel(category.id, category.label, animals)}</button>;
+                          return <button key={category.id} type="button" aria-pressed={active} onClick={() => toggleCategory(category.id)} className={`min-h-11 rounded-full border px-3 py-2 text-sm transition-colors ${active ? "border-gold/50 bg-gold/10 text-gold" : "border-border bg-bg-secondary text-text-secondary hover:border-gold/40"}`}>{categoryLabel(category.id, category.label)}</button>;
                         })}
                       </div>
                       <p className="text-xs text-text-muted">Weitere Angaben kannst du später im Firmenprofil ergänzen.</p>
                     </fieldset>
                     {isAnimalCompany(selectedCategories) && <AnimalCompanyFields value={animalDetails} onChange={setAnimalDetails} />}
+                    {selectedCategories.includes(SAFETY_MEDICAL_COMPANY_CATEGORY_ID) && <SafetyMedicalServiceFields value={services} onChange={setServices} />}
               {selectedCategories.includes(CATERING_COMPANY_CATEGORY.id) && <>
                       <CateringCompanyFields value={cateringDetails} onChange={setCateringDetails} />
                       <p className="text-xs text-text-muted">Wenn du diese Firmenkategorie abwählst, werden auch ihre Catering-Angaben entfernt.</p>
@@ -543,7 +548,7 @@ export default function CompanySetupPage() {
                     <div><h2 id="company-step-three" className="font-display text-2xl text-text-primary">Prüfen und Firma eintragen</h2><p className="mt-1 text-sm text-text-secondary">Nach dem Speichern wird dein Firmenprofil öffentlich auf CineGenius angezeigt. Du kannst es anschließend jederzeit bearbeiten.</p></div>
                     <div className="space-y-3 rounded-2xl border border-border bg-bg-secondary p-4">
                       <div><p className="text-xs uppercase tracking-wide text-text-muted">Unternehmen</p><p className="mt-1 font-semibold text-text-primary">{name || "Noch kein Firmenname"}</p><p className="text-sm text-text-secondary">{city || "Standort fehlt"}</p></div>
-                      {selectedCategories.length > 0 && <div><p className="text-xs uppercase tracking-wide text-text-muted">Angebot</p><p className="mt-1 text-sm text-text-primary">{selectedCategories.map((id) => COMPANY_CATEGORIES.find((item) => item.id === id)?.label).filter(Boolean).join(", ")}</p></div>}
+                      {selectedCategories.length > 0 && <div><p className="text-xs uppercase tracking-wide text-text-muted">Angebot</p><p className="mt-1 text-sm text-text-primary">{selectedCategories.map((id) => { const item = COMPANY_CATEGORIES.find((candidate) => candidate.id === id); return item ? categoryLabel(item.id, item.label) : null; }).filter(Boolean).join(", ")}</p></div>}
                       {isAnimalCompany(selectedCategories) && <AnimalCompanySummary value={animalDetails} />}
               {selectedCategories.includes(CATERING_COMPANY_CATEGORY.id) && (cateringDetails.serviceTypes.length > 0 || cateringDetails.capacity || cateringDetails.serviceAreas) && <div><p className="text-xs uppercase tracking-wide text-text-muted">Catering</p><p className="mt-1 text-sm text-text-primary">{[...cateringDetails.serviceTypes, cateringDetails.capacity ? `Kapazität: bis ${cateringDetails.capacity} Personen` : "", cateringDetails.serviceAreas].filter(Boolean).join(" · ")}</p></div>}
                       {bioShort.trim() && <div><p className="text-xs uppercase tracking-wide text-text-muted">Kurzvorstellung</p><p className="mt-1 text-sm text-text-secondary">{bioShort}</p></div>}
@@ -658,7 +663,7 @@ export default function CompanySetupPage() {
                     if (!cat) return null;
                     return (
                       <span key={id} className={`flex items-center gap-1 px-2.5 py-1 ${cat.bg} text-xs ${cat.color} rounded-full font-medium border`}>
-                        {animalCategoryLabel(cat.id, cat.label, animals)}
+                        {categoryLabel(cat.id, cat.label)}
                         <button type="button" onClick={() => toggleCategory(id)} className="hover:opacity-70 ml-0.5">
                           <X size={10} />
                         </button>
@@ -693,7 +698,7 @@ export default function CompanySetupPage() {
                         }`}
                       >
                         <div>
-                          <div className="font-semibold">{animalCategoryLabel(cat.id, cat.label, animals)}</div>
+                          <div className="font-semibold">{categoryLabel(cat.id, cat.label)}</div>
                           <div className="text-[10px] opacity-70 mt-0.5">{isAnimalCompany([cat.id]) ? animals("description") : cat.examples}</div>
                         </div>
                         {isSelected && <CheckCircle size={13} className="shrink-0 ml-2" />}
@@ -703,6 +708,7 @@ export default function CompanySetupPage() {
                 </div>
               )}
               {isAnimalCompany(selectedCategories) && <AnimalCompanyFields value={animalDetails} onChange={setAnimalDetails} />}
+              {selectedCategories.includes(SAFETY_MEDICAL_COMPANY_CATEGORY_ID) && <SafetyMedicalServiceFields value={services} onChange={setServices} />}
               {selectedCategories.includes(CATERING_COMPANY_CATEGORY.id) && <>
                 <CateringCompanyFields value={cateringDetails} onChange={setCateringDetails} />
                 <p className="text-xs text-text-muted">Wenn du diese Firmenkategorie abwählst, werden auch ihre Catering-Angaben entfernt.</p>

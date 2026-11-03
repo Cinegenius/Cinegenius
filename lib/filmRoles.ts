@@ -7,6 +7,7 @@
 import { ANIMAL_DEPARTMENT_ID, ANIMAL_DEPARTMENT_LABEL, ANIMAL_OCCUPATIONS, animalSearchTerms } from "@/lib/animal-taxonomy";
 import { GRIP_DEPARTMENT_LABEL, GRIP_OCCUPATIONS } from "@/lib/gripTaxonomy";
 import { CATERING_DEPARTMENT_ID, CATERING_DEPARTMENT_LABEL, CATERING_OCCUPATIONS } from "@/lib/catering-taxonomy";
+import { SAFETY_MEDICAL_DEPARTMENT_ID, SAFETY_MEDICAL_DEPARTMENT_LABEL, SAFETY_MEDICAL_OCCUPATIONS } from "@/lib/safety-medical-taxonomy";
 
 export type Platform = "film" | "social" | "photo";
 
@@ -992,6 +993,14 @@ export const FILM_DEPARTMENTS: FilmDepartment[] = [
       { id: "personal-assistant-set",       label: "Personal Assistant",                         labelEn: "Personal Assistant (On-Set)" },
       { id: "recherche-allg",               label: "Recherche",                                  labelEn: "Researcher (General)" },
     ],
+  },
+  {
+    id: SAFETY_MEDICAL_DEPARTMENT_ID,
+    label: SAFETY_MEDICAL_DEPARTMENT_LABEL,
+    color: "text-red-300",
+    bg: "bg-red-500/10 border-red-500/20",
+    platform: "film",
+    roles: SAFETY_MEDICAL_OCCUPATIONS.map(role => ({ ...role })),
   },
   {
     id: CATERING_DEPARTMENT_ID,

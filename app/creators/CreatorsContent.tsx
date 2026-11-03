@@ -23,6 +23,7 @@ import { rankByRatingConfidence } from "@/lib/rating-ranking";
 import { gripSearchTerms, isGripDepartmentSearch, isGripOccupation, normalizeOccupation } from "@/lib/gripTaxonomy";
 import { occupationCatalogue, occupationById, occupationId, type PrimaryOccupation } from "@/lib/primary-occupation";
 import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
+import { compareCreatorNames } from "@/lib/creator-directory-order";
 
 const DEPT_ICON: Record<string, LucideIcon> = {
   produktion:    Clapperboard,
@@ -589,27 +590,22 @@ function CreatorsInner({
 
     if (sortKey === "rating") {
       const rated = rankByRatingConfidence(result.filter((creator) => creator.reviews > 0), (creator) => creator.rating, (creator) => creator.reviews, (creator) => `${creator.name}:${creator.id}`);
-      const unrated = result.filter((creator) => creator.reviews === 0).sort((a, b) => (b.verified ? 1 : 0) - (a.verified ? 1 : 0) || a.name.localeCompare(b.name, "de"));
+      const unrated = result.filter((creator) => creator.reviews === 0).sort((a, b) => compareCreatorNames(a, b, locale));
       result = [...rated, ...unrated];
-    }
-    if (sortKey === "reviews") result.sort((a, b) => b.reviews - a.reviews);
-
-    // "Alle Bereiche" starts with the highest-rated profiles; keep the full
-    // result available so pagination can reveal every department and provider.
-    if (isTopMode) {
-      const rated = rankByRatingConfidence(result.filter((creator) => creator.reviews > 0), (creator) => creator.rating, (creator) => creator.reviews, (creator) => `${creator.name}:${creator.id}`);
-      const unrated = result.filter((creator) => creator.reviews === 0).sort((a, b) => (b.verified ? 1 : 0) - (a.verified ? 1 : 0) || a.name.localeCompare(b.name, "de"));
-      result = [...rated, ...unrated];
+    } else if (sortKey === "reviews") {
+      result.sort((a, b) => b.reviews - a.reviews || compareCreatorNames(a, b, locale));
+    } else {
+      result.sort((a, b) => compareCreatorNames(a, b, locale));
     }
 
-    // Keep filtered all-area results mixed; the unfiltered default remains
-    // globally sorted by rating so the highest-rated profiles appear first.
-    if (!isTopMode && !sidebarDept && selectedRoles.size === 0) return mixAreaResults(result);
+    // The default directory order stays alphabetic even while filters are
+    // active. Explicit rating sorts may still mix provider areas as before.
+    if (sortKey !== "featured" && !isTopMode && !sidebarDept && selectedRoles.size === 0) return mixAreaResults(result);
 
     return result;
   }, [query, selectedRoles, sidebarDept, availableOnly, vendorOnly, cityFilter, countryFilter, languageFilter,
       profileTypeFilter, hairFilter, eyeFilter, bodyFilter, travelFilter, ageMinFilter, ageMaxFilter,
-      sortKey, allCreators, isTopMode]);
+      sortKey, allCreators, isTopMode, locale]);
 
   const filterKey = JSON.stringify([query, [...selectedRoles].sort(), sidebarDept, availableOnly, vendorOnly,
     cityFilter, countryFilter, languageFilter, profileTypeFilter, hairFilter, eyeFilter, bodyFilter,
@@ -666,7 +662,7 @@ function CreatorsInner({
   };
 
   const SORT_OPTIONS = [
-    { value: "featured", label: t("sortFeatured") },
+    { value: "featured", label: t("sortAlphabetical") },
     { value: "rating",   label: t("sortRating") },
     { value: "reviews",  label: t("sortRatingCount") },
   ];

@@ -511,6 +511,7 @@
     "searchPlaceholder": "Nome, competenza o parola chiave…",
     "sort": "Ordina",
     "sortFeatured": "In evidenza",
+    "sortAlphabetical": "Alfabetico",
     "sortRating": "Migliore valutazione",
     "sortRatingCount": "Più valutazioni",
     "filterAvailable": "Disponibile",
@@ -2273,5 +2274,19 @@
     "unsubscribed": "L’indirizzo è stato disiscritto.",
     "rateLimited": "Attendi un’ora prima di richiedere un’altra email di iscrizione.",
     "privacyLink": "Informativa sulla privacy"
+  },
+  "SafetyMedical": {
+    "department": "Sicurezza e servizio sanitario",
+    "companyCategory": "Servizi sanitari e antincendio",
+    "servicesLabel": "Servizi",
+    "servicesHelp": "Seleziona i servizi offerti.",
+    "qualificationNotice": "Qualifiche e certificati sono dichiarati dal fornitore, salvo quando sono espressamente indicati come verificati.",
+    "services": {
+      "set-medical": "Servizio sanitario sul set",
+      "emergency-medical": "Servizio di emergenza e soccorso",
+      "occupational-medical": "Servizio sanitario aziendale",
+      "fire-watch": "Sorveglianza antincendio",
+      "fire-safety": "Supporto e consulenza antincendio"
+    }
   }
 }

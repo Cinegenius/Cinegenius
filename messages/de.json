@@ -511,6 +511,7 @@
     "searchPlaceholder": "Name, Skill oder Keyword…",
     "sort": "Sortierung",
     "sortFeatured": "Empfohlen",
+    "sortAlphabetical": "Alphabetisch",
     "sortRating": "Beste Bewertung",
     "sortRatingCount": "Meiste Bewertungen",
     "filterAvailable": "Verfügbar",
@@ -2273,5 +2274,19 @@
     "unsubscribed": "Die Adresse wurde vom Newsletter abgemeldet.",
     "rateLimited": "Bitte warte eine Stunde, bevor du eine neue Anmeldung anforderst.",
     "privacyLink": "Datenschutzhinweise"
+  },
+  "SafetyMedical": {
+    "department": "Sicherheit & Sanitätsdienst",
+    "companyCategory": "Sanitätsdienst & Brandwache",
+    "servicesLabel": "Leistungen",
+    "servicesHelp": "Wähle die angebotenen Leistungen aus.",
+    "qualificationNotice": "Qualifikationen und Nachweise sind Angaben des Anbieters, sofern sie nicht ausdrücklich als geprüft gekennzeichnet sind.",
+    "services": {
+      "set-medical": "Set-Sanitätsdienst",
+      "emergency-medical": "Rettungs- und Sanitätsdienst",
+      "occupational-medical": "Betriebssanitätsdienst",
+      "fire-watch": "Brandwache / Brandsicherheitswache",
+      "fire-safety": "Brandschutzunterstützung und -beratung"
+    }
   }
 }

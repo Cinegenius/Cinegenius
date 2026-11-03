@@ -5,6 +5,7 @@ import { ANIMAL_COMPANY_CATEGORIES } from "@/lib/animal-taxonomy";
  */
 
 import { CATERING_COMPANY_CATEGORY } from "@/lib/catering-taxonomy";
+import { SAFETY_MEDICAL_COMPANY_CATEGORY_ID } from "@/lib/safety-medical-taxonomy";
 
 export type CompanyCategory = {
   id: string;
@@ -34,6 +35,7 @@ export const COMPANY_CATEGORIES: CompanyCategory[] = [
   { id: "equipment-hersteller", label: "Hersteller & Händler", color: "text-orange-300",  bg: "bg-orange-400/10 border-orange-400/20", examples: "Kamera, Licht, Ton, Grip" },
   { id: "talent-agentur",    label: "Talent-Agentur",       color: "text-fuchsia-400", bg: "bg-fuchsia-500/10 border-fuchsia-500/20", examples: "Booking, Management, Vermittlung" },
   CATERING_COMPANY_CATEGORY,
+  { id: SAFETY_MEDICAL_COMPANY_CATEGORY_ID, label: "Sanitätsdienst & Brandwache", color: "text-red-300", bg: "bg-red-500/10 border-red-500/20", examples: "Set Medic, Sanitätsdienst, Brandwache" },
   ...ANIMAL_COMPANY_CATEGORIES,
   { id: "drohnen",           label: "Drohnen & Aerial",     color: "text-sky-300",     bg: "bg-sky-400/10 border-sky-400/20",         examples: "UAV, Helikopter, Kran" },
   { id: "musikproduktion",   label: "Musikproduktion",      color: "text-violet-300",  bg: "bg-violet-400/10 border-violet-400/20",   examples: "Score, Soundtrack, Jingle" },

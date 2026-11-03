@@ -71,7 +71,8 @@ const getCreatorDirectoryData = unstable_cache(
         .select("user_id, display_name, location, bio, skills, role, positions, crew, available, avatar_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point, last_seen_at")
         .not("display_name", "is", null)
         .neq("display_name", "")
-        .order("created_at", { ascending: false })
+        .order("display_name", { ascending: true })
+        .order("user_id", { ascending: true })
         .limit(96),
     ]);
 
@@ -87,7 +88,7 @@ const getCreatorDirectoryData = unstable_cache(
 
     return { listings, profiles, listingRatings, profileRatings };
   },
-  ["people-directory-selected-occupations-providers-v7"],
+  ["people-directory-alphabetical-v8"],
   { revalidate: 60, tags: ["creator-directory", "profiles", "listings"] },
 );
 

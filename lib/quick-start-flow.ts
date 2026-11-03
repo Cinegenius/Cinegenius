@@ -35,6 +35,7 @@ export type QuickStartIntentData = {
   contactEmail: string;
   contactPhone: string;
   website: string;
+  services: string[];
   cateringDetails: CateringCompanyDetails;
   animalDetails: AnimalCompanyDetails;
 };
@@ -107,7 +108,7 @@ export function getQuickStartDepartments() {
 }
 
 export function createQuickStartIntentData(): QuickStartIntentData {
-  return { category: "", title: "", city: "", description: "", imageUrl: "", price: "", priceOnRequest: true, departmentIds: [], roles: [], categoryIds: [], contactEmail: "", contactPhone: "", website: "", animalDetails: normalizeAnimalCompanyDetails(null), cateringDetails: { serviceTypes: [], serviceAreas: "", capacity: null, dietaryOptions: [], mobileEquipment: [] } };
+  return { category: "", title: "", city: "", description: "", imageUrl: "", price: "", priceOnRequest: true, departmentIds: [], roles: [], categoryIds: [], contactEmail: "", contactPhone: "", website: "", services: [], animalDetails: normalizeAnimalCompanyDetails(null), cateringDetails: { serviceTypes: [], serviceAreas: "", capacity: null, dietaryOptions: [], mobileEquipment: [] } };
 }
 
 function normalizeIntentData(value: unknown): QuickStartIntentData {
@@ -161,6 +162,11 @@ function normalizeIntentData(value: unknown): QuickStartIntentData {
     contactEmail: typeof input.contactEmail === "string" ? input.contactEmail.slice(0, 200) : "",
     contactPhone: typeof input.contactPhone === "string" ? input.contactPhone.slice(0, 80) : "",
     website: typeof input.website === "string" ? input.website.slice(0, 300) : "",
+    services: Array.isArray(input.services)
+      ? [...new Set(input.services
+          .filter((item): item is string => typeof item === "string" && item.trim().length > 0)
+          .map((item) => item.trim()))].slice(0, 20)
+      : [],
     cateringDetails: normalizeCateringCompanyDetails(input.cateringDetails),
     animalDetails: normalizeAnimalCompanyDetails(input.animalDetails),
   };

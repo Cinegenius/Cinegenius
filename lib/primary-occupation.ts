@@ -1,4 +1,5 @@
 import { ANIMAL_DEPARTMENT_ID, ANIMAL_LEGACY_REFERENCES } from "./animal-taxonomy";
+import { SAFETY_MEDICAL_DEPARTMENT_ID, SAFETY_MEDICAL_LEGACY_REFERENCES } from "./safety-medical-taxonomy";
 import { PROFILE_CATEGORY_MAP, type ProfileType } from './profile-types';
 import { departments, getDepartmentRoleSearchTerms } from './departments';
 
@@ -23,6 +24,13 @@ for (const reference of ANIMAL_LEGACY_REFERENCES) {
   const option = occupationCatalogue.find(item => item.departmentId === ANIMAL_DEPARTMENT_ID && item.label === reference.targetLabel);
   if (option) byId.set(reference.roleId, option);
 }
+const legacySafetyReferences = new Map<string, (typeof SAFETY_MEDICAL_LEGACY_REFERENCES)[number]>(
+  SAFETY_MEDICAL_LEGACY_REFERENCES.map(reference => [reference.roleId, reference]),
+);
+for (const reference of SAFETY_MEDICAL_LEGACY_REFERENCES) {
+  const option = occupationCatalogue.find(item => item.departmentId === SAFETY_MEDICAL_DEPARTMENT_ID && item.label === reference.targetLabel);
+  if (option) byId.set(reference.roleId, option);
+}
 export function occupationId(departmentId: string, label: string): string {
   return `${departmentId}/${encodeURIComponent(label)}`;
 }
@@ -31,7 +39,9 @@ export function readPrimaryOccupation(value: unknown): OccupationOption | null {
   if (!value || typeof value !== 'object') return null;
   const record = value as Partial<PrimaryOccupation>;
   const option = typeof record.roleId === 'string' ? byId.get(record.roleId) : null;
-  return option && (option.departmentId === record.departmentId || (legacyAnimalReferences.get(String(record.roleId))?.departmentId === record.departmentId)) ? option : null;
+  return option && (option.departmentId === record.departmentId
+    || legacyAnimalReferences.get(String(record.roleId))?.departmentId === record.departmentId
+    || legacySafetyReferences.get(String(record.roleId))?.departmentId === record.departmentId) ? option : null;
 }
 export function occupationChoices(positions: readonly string[]): OccupationOption[] {
   const keys = new Set(positions.map(exactKey));

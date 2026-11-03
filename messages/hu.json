@@ -511,6 +511,7 @@
     "searchPlaceholder": "Név, készség vagy kulcsszó…",
     "sort": "Rendezés",
     "sortFeatured": "Ajánlott",
+    "sortAlphabetical": "Betűrendben",
     "sortRating": "Legjobb értékelés",
     "sortRatingCount": "Legtöbb értékelés",
     "filterAvailable": "Elérhető",
@@ -2273,5 +2274,19 @@
     "unsubscribed": "A cím lekerült a hírlevél-listáról.",
     "rateLimited": "Várj egy órát, mielőtt újabb feliratkozási e-mailt kérsz.",
     "privacyLink": "Adatvédelmi tájékoztató"
+  },
+  "SafetyMedical": {
+    "department": "Biztonság és egészségügyi szolgálat",
+    "companyCategory": "Egészségügyi és tűzvédelmi szolgáltatások",
+    "servicesLabel": "Szolgáltatások",
+    "servicesHelp": "Válaszd ki a kínált szolgáltatásokat.",
+    "qualificationNotice": "A képesítéseket és igazolásokat a szolgáltató adja meg, kivéve ha kifejezetten ellenőrzöttként vannak jelölve.",
+    "services": {
+      "set-medical": "Forgatási egészségügyi szolgálat",
+      "emergency-medical": "Mentő- és egészségügyi szolgálat",
+      "occupational-medical": "Üzemi egészségügyi szolgálat",
+      "fire-watch": "Tűzőrség",
+      "fire-safety": "Tűzvédelmi támogatás és tanácsadás"
+    }
   }
 }

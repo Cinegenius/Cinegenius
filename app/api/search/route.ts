@@ -10,6 +10,11 @@ import {
   getCateringProfileSearchValues,
   isCateringSearchQuery,
 } from "@/lib/catering-taxonomy";
+import {
+  SAFETY_MEDICAL_COMPANY_CATEGORY_ID,
+  safetyMedicalProfileValues,
+  safetyMedicalSearchTerms,
+} from "@/lib/safety-medical-taxonomy";
 
 export async function GET(req: NextRequest) {
   const raw  = req.nextUrl.searchParams.get("q")?.trim() ?? "";
@@ -29,8 +34,10 @@ export async function GET(req: NextRequest) {
   const cateringProfileValues = wantProfiles ? getCateringProfileSearchValues(raw) : [];
   const animalValues = wantProfiles ? animalProfileSearchValues(raw) : [];
   const searchCateringCompanies = wantCompanies && isCateringSearchQuery(raw);
+  const safetyMedicalValues = wantProfiles ? safetyMedicalProfileValues(raw) : [];
+  const searchSafetyMedicalCompanies = wantCompanies && safetyMedicalSearchTerms(raw);
 
-  const [listingsRes, profilesRes, companiesRes, cateringProfileResults, cateringCompaniesRes, animalProfilesRes, animalRoleProfilesRes, animalCompaniesRes] = await Promise.all([
+  const [listingsRes, profilesRes, companiesRes, cateringProfileResults, cateringCompaniesRes, animalProfilesRes, animalRoleProfilesRes, animalCompaniesRes, safetyMedicalProfilesRes, safetyMedicalRoleProfilesRes, safetyMedicalCompaniesRes] = await Promise.all([
     wantListings
       ? (() => {
           let q2 = db
@@ -83,6 +90,9 @@ export async function GET(req: NextRequest) {
     animalValues.length ? db.from("profiles").select("user_id, display_name, location, role, positions, avatar_url, available").overlaps("positions", animalValues).limit(24) : Promise.resolve({data: []}),
     animalValues.length ? db.from("profiles").select("user_id, display_name, location, role, positions, avatar_url, available").in("role", animalValues).limit(24) : Promise.resolve({data: []}),
     wantCompanies && animalCompanySearchFilter(raw) ? db.from("companies").select("id, slug, name, city, logo_url, categories").eq("published",true).or(animalCompanySearchFilter(raw)).limit(24) : Promise.resolve({data: []}),
+    safetyMedicalValues.length ? db.from("profiles").select("user_id, display_name, location, role, positions, avatar_url, available").overlaps("positions", safetyMedicalValues).limit(24) : Promise.resolve({data: []}),
+    safetyMedicalValues.length ? db.from("profiles").select("user_id, display_name, location, role, positions, avatar_url, available").in("role", safetyMedicalValues).limit(24) : Promise.resolve({data: []}),
+    searchSafetyMedicalCompanies ? db.from("companies").select("id, slug, name, city, logo_url, categories").eq("published", true).contains("categories", [SAFETY_MEDICAL_COMPANY_CATEGORY_ID]).limit(24) : Promise.resolve({data: []}),
   ]);
 
   const listings = (listingsRes.data ?? []).map((l: Record<string, unknown>) => ({
@@ -98,7 +108,7 @@ export async function GET(req: NextRequest) {
 
   type ProfileSearchRow = { user_id: string; display_name: string | null; location: string | null; role: string | null; positions: string[] | null; avatar_url: string | null; available: boolean | null };
   const profileById = new Map<string, ProfileSearchRow>();
-  for (const profile of [...(profilesRes.data ?? []), ...(animalProfilesRes.data ?? []), ...(animalRoleProfilesRes.data ?? []), ...cateringProfileResults.flatMap((result) => result.data ?? [])] as ProfileSearchRow[]) {
+  for (const profile of [...(profilesRes.data ?? []), ...(animalProfilesRes.data ?? []), ...(animalRoleProfilesRes.data ?? []), ...(safetyMedicalProfilesRes.data ?? []), ...(safetyMedicalRoleProfilesRes.data ?? []), ...cateringProfileResults.flatMap((result) => result.data ?? [])] as ProfileSearchRow[]) {
     if (profile?.user_id) profileById.set(profile.user_id, profile);
   }
   const profileRows = [...profileById.values()];
@@ -117,7 +127,7 @@ export async function GET(req: NextRequest) {
     }));
 
   const companyById = new Map<string, Record<string, unknown>>();
-  for (const company of [...(companiesRes.data ?? []), ...(animalCompaniesRes.data ?? []), ...(cateringCompaniesRes.data ?? [])] as Record<string, unknown>[]) {
+  for (const company of [...(companiesRes.data ?? []), ...(animalCompaniesRes.data ?? []), ...(cateringCompaniesRes.data ?? []), ...(safetyMedicalCompaniesRes.data ?? [])] as Record<string, unknown>[]) {
     const id = String(company.slug ?? company.id ?? "");
     if (id) companyById.set(id, company);
   }

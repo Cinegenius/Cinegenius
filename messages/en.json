@@ -511,6 +511,7 @@
     "searchPlaceholder": "Name, skill or keyword…",
     "sort": "Sort",
     "sortFeatured": "Featured",
+    "sortAlphabetical": "Alphabetical",
     "sortRating": "Best rating",
     "sortRatingCount": "Most reviews",
     "filterAvailable": "Available",
@@ -2273,5 +2274,19 @@
     "unsubscribed": "This address has been unsubscribed.",
     "rateLimited": "Please wait an hour before requesting another signup email.",
     "privacyLink": "Privacy notice"
+  },
+  "SafetyMedical": {
+    "department": "Safety & Medical Services",
+    "companyCategory": "Medical & Fire Safety Services",
+    "servicesLabel": "Services",
+    "servicesHelp": "Select the services offered.",
+    "qualificationNotice": "Qualifications and certificates are self-reported unless explicitly marked as verified.",
+    "services": {
+      "set-medical": "Set medical service",
+      "emergency-medical": "Emergency medical service",
+      "occupational-medical": "Occupational medical service",
+      "fire-watch": "Fire watch / fire safety watch",
+      "fire-safety": "Fire safety support and consulting"
+    }
   }
 }

@@ -511,6 +511,7 @@
     "searchPlaceholder": "Jméno, dovednost nebo klíčové slovo…",
     "sort": "Řazení",
     "sortFeatured": "Doporučeno",
+    "sortAlphabetical": "Abecedně",
     "sortRating": "Nejlépe hodnocené",
     "sortRatingCount": "Nejvíce hodnocení",
     "filterAvailable": "Dostupný",
@@ -2273,5 +2274,19 @@
     "unsubscribed": "Adresa byla odhlášena.",
     "rateLimited": "Před další žádostí o potvrzovací e-mail počkejte jednu hodinu.",
     "privacyLink": "Informace o ochraně soukromí"
+  },
+  "SafetyMedical": {
+    "department": "Bezpečnost a zdravotní služba",
+    "companyCategory": "Zdravotní a požární služby",
+    "servicesLabel": "Služby",
+    "servicesHelp": "Vyberte nabízené služby.",
+    "qualificationNotice": "Kvalifikace a osvědčení uvádí poskytovatel, pokud nejsou výslovně označeny jako ověřené.",
+    "services": {
+      "set-medical": "Zdravotní služba na place",
+      "emergency-medical": "Záchranná a zdravotní služba",
+      "occupational-medical": "Podniková zdravotní služba",
+      "fire-watch": "Požární hlídka",
+      "fire-safety": "Podpora a poradenství v požární ochraně"
+    }
   }
 }

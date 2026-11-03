@@ -19,6 +19,7 @@ import {
 import { COMPANY_CATEGORY_BY_ID } from "@/lib/companyCategories";
 import { AnimalCompanySummary } from "@/components/AnimalCompanyFields";
 import { normalizeAnimalCompanyDetails, isAnimalCompany, animalCategoryLabel } from "@/lib/animal-taxonomy";
+import { safetyMedicalCompanyCategoryLabel } from "@/lib/safety-medical-taxonomy";
 import { CATERING_COMPANY_CATEGORY, normalizeCateringCompanyDetails } from "@/lib/catering-taxonomy";
 import {
   EQUIPMENT_CATEGORY_BY_ID, CONDITION_LABELS, CONDITION_COLORS, SERVICE_TYPE_BY_ID,
@@ -134,6 +135,8 @@ export default function CompanyDetail({
   const market=useTranslations("MarketplaceOffer"),marketLocale=useLocale();
   const messageText = useTranslations("companyMessages");
   const animals = useTranslations("FilmAnimals");
+  const safetyMedical = useTranslations("SafetyMedical");
+  const categoryLabel = (id: string, fallback: string) => safetyMedicalCompanyCategoryLabel(id, animalCategoryLabel(id, fallback, animals), safetyMedical);
   const currentUserId = isLoaded ? user?.id ?? null : initialUserId;
   const searchParams = useSearchParams();
   const isWelcome = searchParams.get("welcome") === "1";
@@ -340,7 +343,7 @@ export default function CompanyDetail({
                 <div className="flex flex-wrap gap-1 mb-1.5">
                   {cats.map((cat) => (
                     <span key={cat.id} className={`px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded-full border ${cat.bg} ${cat.color}`}>
-                      {animalCategoryLabel(cat.id, cat.label, animals)}
+                      {categoryLabel(cat.id, cat.label)}
                     </span>
                   ))}
                 </div>
@@ -718,7 +721,7 @@ export default function CompanyDetail({
                             </span>
                           </div>
                           <div className="flex items-center gap-2 mt-0.5 text-[11px] text-text-muted">
-                            {cat && <span>{animalCategoryLabel(cat.id, cat.label, animals)}</span>}
+                            {cat && <span>{categoryLabel(cat.id, cat.label)}</span>}
                             {item.subcategory && <span>· {item.subcategory}</span>}
                             {item.quantity > 1 && <span>· {item.quantity}×</span>}
                           </div>

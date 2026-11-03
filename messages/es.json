@@ -511,6 +511,7 @@
     "searchPlaceholder": "Nombre, habilidad o palabra clave…",
     "sort": "Ordenar",
     "sortFeatured": "Destacados",
+    "sortAlphabetical": "Alfabético",
     "sortRating": "Mejor valorado",
     "sortRatingCount": "Más valoraciones",
     "filterAvailable": "Disponible",
@@ -2273,5 +2274,19 @@
     "unsubscribed": "La dirección se ha dado de baja.",
     "rateLimited": "Espera una hora antes de solicitar otro correo de confirmación.",
     "privacyLink": "Aviso de privacidad"
+  },
+  "SafetyMedical": {
+    "department": "Seguridad y servicios médicos",
+    "companyCategory": "Servicios médicos y protección contra incendios",
+    "servicesLabel": "Servicios",
+    "servicesHelp": "Selecciona los servicios ofrecidos.",
+    "qualificationNotice": "Las cualificaciones y certificados son datos declarados por el proveedor, salvo que estén marcados expresamente como verificados.",
+    "services": {
+      "set-medical": "Servicio sanitario en rodaje",
+      "emergency-medical": "Servicio de emergencias y asistencia sanitaria",
+      "occupational-medical": "Servicio sanitario de empresa",
+      "fire-watch": "Vigilancia de incendios",
+      "fire-safety": "Apoyo y asesoramiento en protección contra incendios"
+    }
   }
 }

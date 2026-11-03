@@ -20,7 +20,8 @@ export async function GET(req: NextRequest) {
     .select("user_id, display_name, location, bio, skills, role, positions, crew, available, avatar_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point")
     .not("display_name", "is", null)
     .neq("display_name", "")
-    .order("created_at", { ascending: false })
+    .order("display_name", { ascending: true })
+    .order("user_id", { ascending: true })
     .range(from, to);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

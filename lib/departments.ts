@@ -2,6 +2,7 @@ import { ANIMAL_DEPARTMENT_ID, ANIMAL_DEPARTMENT_LABEL, animalRoleLabel, type An
 import { GRIP_DEPARTMENT_LABEL, GRIP_OCCUPATIONS } from "@/lib/gripTaxonomy";
 import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
 import { CATERING_DEPARTMENT_ID, CATERING_DEPARTMENT_LABEL } from "@/lib/catering-taxonomy";
+import { SAFETY_MEDICAL_DEPARTMENT_ID, SAFETY_MEDICAL_DEPARTMENT_LABEL, SAFETY_MEDICAL_DEPARTMENT_LABELS, SAFETY_MEDICAL_OCCUPATIONS, SAFETY_MEDICAL_ROLE_LABELS } from "@/lib/safety-medical-taxonomy";
 import type { ProfileType } from "@/lib/profile-types";
 
 export type Department = {
@@ -356,7 +357,6 @@ export const departments: Department[] = [
       "Base Runner", "Fahrer (PKW / LKW)", "Motivfahrer",
       "Motivaufnahmeleiter", "Assistant Location Manager",
       "Set Security", "Crowd Control",
-      "Medic / Set-Arzt", "Fire Safety Officer",
     ],
   },
   {
@@ -546,6 +546,7 @@ const FILM_TO_PROFILE_DEPARTMENT: Record<string, string> = {
   "public-relation": "public-relations",
   "weitere-crew": "set-logistik",
   [CATERING_DEPARTMENT_ID]: CATERING_DEPARTMENT_ID,
+  [SAFETY_MEDICAL_DEPARTMENT_ID]: SAFETY_MEDICAL_DEPARTMENT_ID,
   [ANIMAL_DEPARTMENT_ID]: ANIMAL_DEPARTMENT_ID,
   "content-creation": "social",
   "social-video": "social",
@@ -563,6 +564,12 @@ const ADDITIONAL_DEPARTMENTS: Department[] = [
     id: "public-relations", label: "Public Relations",
     labels: { de: "Public Relations", en: "Public Relations", es: "Relaciones públicas", it: "Relazioni pubbliche", cs: "Public relations", hu: "Public relations" },
     emoji: "📣", color: "pink", roles: [],
+  },
+  {
+    id: SAFETY_MEDICAL_DEPARTMENT_ID,
+    label: SAFETY_MEDICAL_DEPARTMENT_LABEL,
+    labels: SAFETY_MEDICAL_DEPARTMENT_LABELS,
+    emoji: "🛡️", color: "red", roles: SAFETY_MEDICAL_OCCUPATIONS.map((role) => role.label), roleLabels: SAFETY_MEDICAL_ROLE_LABELS,
   },
   {
     id: CATERING_DEPARTMENT_ID,
@@ -587,7 +594,8 @@ for (const filmDepartment of FILM_DEPARTMENTS) {
 
   for (const filmRole of filmDepartment.roles) {
     const synonyms = [filmRole.labelEn, ...(filmRole.aliases ?? [])].filter((value): value is string => Boolean(value?.trim()));
-    const targetsExisting = target.roles.find((label) => {
+    const directLabelMatch = target.roles.find((label) => roleKey(label) === roleKey(filmRole.label));
+    const targetsExisting = directLabelMatch ?? target.roles.find((label) => {
       const currentSynonyms = target.roleAliases?.[label] ?? [];
       const currentKeys = new Set([label, ...currentSynonyms].map(roleKey));
       return [filmRole.label, ...synonyms].some((value) => currentKeys.has(roleKey(value)));
@@ -596,7 +604,7 @@ for (const filmDepartment of FILM_DEPARTMENTS) {
     if (targetsExisting) {
       if (filmRole.labelEn) {
         target.roleLabels ??= {};
-        target.roleLabels[targetsExisting] = {en: filmRole.labelEn};
+        target.roleLabels[targetsExisting] = { ...target.roleLabels[targetsExisting], en: filmRole.labelEn };
       }
       const current = target.roleAliases[targetsExisting] ?? [];
       const alternateLabels = [filmRole.label, ...synonyms].filter((value) => roleKey(value) !== roleKey(targetsExisting));
@@ -607,7 +615,7 @@ for (const filmDepartment of FILM_DEPARTMENTS) {
     target.roles.push(filmRole.label);
     if (filmRole.labelEn) {
       target.roleLabels ??= {};
-      target.roleLabels[filmRole.label] = {en: filmRole.labelEn};
+      target.roleLabels[filmRole.label] = { ...target.roleLabels[filmRole.label], en: filmRole.labelEn };
     }
     if (synonyms.length) target.roleAliases[filmRole.label] = [...new Set(synonyms)];
   }
@@ -618,6 +626,7 @@ export const DEPARTMENT_TO_PROFILE_TYPES: Record<string, ProfileType[]> = {
   kamera: ["camera"], grip: ["camera"], licht: ["lighting"], ton: ["sound"],
   produktion: ["production"], regie: ["director"], art: ["art_department"],
   [CATERING_DEPARTMENT_ID]: ["production"],
+  [SAFETY_MEDICAL_DEPARTMENT_ID]: ["production"],
   [ANIMAL_DEPARTMENT_ID]: ["production"],
   kostuem: ["costume"], maske: ["makeup"], post: ["postproduction"],
   sfx: ["sfx"], broadcast: ["broadcast"], virtual: ["vfx"],
