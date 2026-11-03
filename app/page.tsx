@@ -33,7 +33,8 @@ import { PageBackdrop } from "@/components/PageHeader";
 import AiDisclosureBadge from "@/components/AiDisclosureBadge";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
 import { HomePhotoDiscovery, type DiscoverPhoto } from "@/components/HomePhotoDiscovery";
-import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
+import { PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
+import { isPeopleDirectoryProfile } from "@/lib/profile-provider-filters";
 import { getPrivateProfileIds } from "@/lib/trust";
 import { getCommunityMedia } from "@/lib/community-media-server";
 
@@ -107,33 +108,20 @@ async function getHomeData(viewerId: string | null) {
     return { photos: [] };
   });
 
-  const peopleTypeLabels = new Set(
-    (Object.entries(PROFILE_TYPE_LABELS) as [ProfileType, string][])
-      .filter(([type]) => PROFILE_CATEGORY_MAP[type] === "crew" || PROFILE_CATEGORY_MAP[type] === "talent" || PROFILE_CATEGORY_MAP[type] === "creative")
-      .map(([, label]) => label.toLocaleLowerCase("de")),
-  );
-  const peopleProfiles = publicProfiles.filter((profile) => {
-    const types = [profile.profile_type, ...(profile.profile_types ?? [])].filter((type): type is string => Boolean(type));
-    if (types.some((type) => {
-      const category = PROFILE_CATEGORY_MAP[type as ProfileType];
-      return category === "crew" || category === "talent" || category === "creative";
-    })) return true;
-    const positions = [...(profile.positions ?? []), profile.role ?? ""].map((position) => position.toLocaleLowerCase("de"));
-    return positions.some((position) => [...peopleTypeLabels].some((label) => position === label || position.includes(label)));
-  });
+  // Use the same eligibility rule as the people directory. Location and
+  // marketplace providers are people too, even when they do not also choose
+  // an invented crew occupation.
+  const peopleProfiles = publicProfiles.filter(isPeopleDirectoryProfile);
   const { photos } = await photosTask;
   const newPhotos: DiscoverPhoto[] = photos.slice(0, 24);
   const peopleSummaries = peopleProfiles.map((profile) => {
     const types = [profile.profile_type, ...(profile.profile_types ?? [])].filter((type): type is string => Boolean(type));
     const positions = [...new Set([...(profile.positions ?? []), ...(profile.role ? [profile.role] : [])].map((position) => position.trim()).filter(Boolean))];
     if (positions.length === 0) {
-      const profileTypes = [profile.profile_type, ...(profile.profile_types ?? [])].filter((type): type is string => Boolean(type));
+      const profileTypes = [...new Set([profile.profile_type, ...(profile.profile_types ?? [])].filter((type): type is string => Boolean(type)))];
       positions.push(...profileTypes
-        .filter((type) => {
-          const category = PROFILE_CATEGORY_MAP[type as ProfileType];
-          return category === "crew" || category === "talent" || category === "creative";
-        })
-        .map((type) => PROFILE_TYPE_LABELS[type as ProfileType]));
+        .filter((type): type is ProfileType => type in PROFILE_TYPE_LABELS)
+        .map((type) => PROFILE_TYPE_LABELS[type]));
     }
     return {
       id: profile.user_id,
