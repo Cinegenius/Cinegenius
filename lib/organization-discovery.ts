@@ -25,9 +25,9 @@ export async function organizationDiscovery(page=1,limit=24) {
 }
 export async function latestOrganizationEntries() {
  const result=await db.from('organization_entries')
- .select('id,slug,title,summary,entry_type,image_url,organization:organizations!inner(slug,name,moderation_status)')
+ .select('id,slug,title,summary,entry_type,image_url,starts_at,ends_at,created_at,organization:organizations!inner(slug,name,moderation_status)')
  .eq('moderation_status','approved').eq('organization.moderation_status','approved')
- .or(`ends_at.is.null,ends_at.gte.${new Date().toISOString()}`)
+ .or(`entry_type.eq.news,ends_at.gte.${new Date().toISOString()},and(ends_at.is.null,starts_at.gte.${new Date().toISOString()})`)
  .order('created_at',{ascending:false}).order('id').limit(3);
  if(result.error) throw new Error('organization_entries_unavailable');
  return result.data??[];

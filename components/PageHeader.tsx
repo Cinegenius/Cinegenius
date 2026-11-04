@@ -47,6 +47,7 @@ type PageHeaderProps = {
   title: string;
   titleHighlight?: string;
   description: string;
+  leading?: ReactNode;
   image?: string;
   imagePosition?: string;
   /** Turn off when a parent page already extends PageBackdrop behind its full content. */
@@ -61,6 +62,7 @@ export default function PageHeader({
   title,
   titleHighlight,
   description,
+  leading,
   image = PROJECTS_BACKDROP_IMAGE,
   imagePosition = "center 42%",
   withBackdrop = true,
@@ -75,6 +77,7 @@ export default function PageHeader({
       <div className="site-container relative z-10 py-4 sm:py-8">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div className="min-w-0">
+            {leading}
             <div className="mb-1.5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 backdrop-blur-sm">
               <span className="text-[11px] font-bold uppercase tracking-widest text-white/80">{badge}</span>
             </div>
