@@ -31,6 +31,7 @@ export default function Footer() {
         { labelKey: "links_postJob", href: "/inserat" },
         { labelKey: "links_projects", href: "/projects/alle" },
         { labelKey: "links_board", href: "/community" },
+        { labelKey: "links_news", href: "/news" },
       ],
     },
     {

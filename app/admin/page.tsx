@@ -17,7 +17,7 @@ import dynamic from "next/dynamic";
 import { ServerAdminContext } from "@/lib/server-admin-context";
 import Image from "@/components/MediaImage";
 import {
-  Activity, BadgeCheck, Building2, Check, ChevronDown, ChevronLeft,
+  Activity, BadgeCheck, Building2, CalendarDays, Check, ChevronDown, ChevronLeft,
   ChevronRight, CircleAlert, ClipboardList, Clapperboard, CreditCard, Eye, FileImage,
   LayoutDashboard, List, MessageSquareText, Search, Shield, ShieldCheck, Users, X,
 } from "lucide-react";
@@ -28,8 +28,9 @@ const AdminReviewQueue = dynamic(() => import("@/components/admin/AdminReviewQue
 const AdminAccounts = dynamic(() => import("@/components/admin/AdminAccounts").then(module => module.AdminAccounts));
 const AdminStartedOffers = dynamic(() => import("@/components/admin/AdminStartedOffers").then(module => module.AdminStartedOffers));
 const AdminNewsletter = dynamic(() => import("@/components/admin/AdminNewsletter").then(module => module.AdminNewsletter));
+const AdminOrganizations = dynamic(() => import("@/components/admin/AdminOrganizations").then(module => module.AdminOrganizations));
 
-type TabId = "reviews" | "overview" | "reports" | "verifications" | "users" | "accounts" | "started-offers" | "companies" | "listings" | "projects" | "bookings" | "media" | "support" | "newsletter" | "audit";
+type TabId = "reviews" | "overview" | "reports" | "verifications" | "users" | "accounts" | "started-offers" | "companies" | "organizations" | "listings" | "projects" | "bookings" | "media" | "support" | "newsletter" | "audit";
 const navItems: { icon: typeof LayoutDashboard; label: string; id: TabId }[] = [
   { icon: LayoutDashboard, label: "Übersicht", id: "overview" },
   { icon: Eye, label: "", id: "reviews" },
@@ -39,6 +40,7 @@ const navItems: { icon: typeof LayoutDashboard; label: string; id: TabId }[] = [
   { icon: Users, label: "", id: "accounts" },
   { icon: List, label: "", id: "started-offers" },
   { icon: Building2, label: "Firmen", id: "companies" },
+  { icon: CalendarDays, label: "", id: "organizations" },
   { icon: List, label: "Inserate", id: "listings" },
   { icon: Clapperboard, label: "Projekte", id: "projects" },
   { icon: CreditCard, label: "Buchungsanfragen", id: "bookings" },
@@ -181,6 +183,7 @@ function AdminContent() {
   const moderation = useTranslations("OfferModeration");
   const accountsText = useTranslations("AdminAccounts");
   const startedText = useTranslations("AdminStartedOffers");
+  const organizationAdminText = useTranslations("AdminOrganizations");
   const [activeTab, setActiveTab] = useViewState<TabId>("admin.activeTab", "overview");
   const [refreshKey, setRefreshKey] = useState(0);
   const [overview, setOverview] = useState<Overview | null>(null);
@@ -523,7 +526,7 @@ function AdminContent() {
   }
 
   const newsletterText = useTranslations("AdminNewsletter");
-  const labels = activeTab === "reviews" ? reviewT("queueTitle") : activeTab === "accounts" ? accountsText("title") : activeTab === "started-offers" ? startedText("title") : activeTab === "newsletter" ? newsletterText("title") : (activeTab === "overview" ? "Übersicht" : navItems.find((item) => item.id === activeTab)?.label) ?? "Admin";
+  const labels = activeTab === "reviews" ? reviewT("queueTitle") : activeTab === "accounts" ? accountsText("title") : activeTab === "started-offers" ? startedText("title") : activeTab === "organizations" ? organizationAdminText("title") : activeTab === "newsletter" ? newsletterText("title") : (activeTab === "overview" ? "Übersicht" : navItems.find((item) => item.id === activeTab)?.label) ?? "Admin";
   const pendingReports = overview?.counts.pendingReports ?? 0;
   const pendingVerifications = overview?.counts.pendingVerifications ?? 0;
   const companyClarificationsCount = overview?.counts.companyClarifications ?? 0;
@@ -534,7 +537,7 @@ function AdminContent() {
         <div className="border-b border-border p-4"><div className="flex items-center gap-2"><div className="flex h-8 w-8 items-center justify-center rounded-lg border border-crimson/30 bg-crimson/20"><Shield size={16} className="text-crimson-light" /></div><div><p className="text-sm font-semibold text-text-primary">Adminbereich</p><p className="text-xs text-text-muted">CineGenius</p></div></div></div>
         <nav className="flex-1 space-y-1 overflow-y-auto p-3">
           {navItems.map(({ icon: Icon, label: originalLabel, id }) => {
-            const label = id === "reviews" ? reviewT("queueTitle") : id === "accounts" ? accountsText("title") : id === "started-offers" ? startedText("title") : id === "newsletter" ? newsletterText("title") : originalLabel;
+            const label = id === "reviews" ? reviewT("queueTitle") : id === "accounts" ? accountsText("title") : id === "started-offers" ? startedText("title") : id === "organizations" ? organizationAdminText("title") : id === "newsletter" ? newsletterText("title") : originalLabel;
             const badge = id === "reports" ? pendingReports : id === "verifications" ? pendingVerifications : id === "companies" ? companyClarificationsCount : 0;
             return <button key={id} onClick={() => setActiveTab(id)} className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${activeTab === id ? "border-l-2 border-crimson bg-crimson/10 pl-2.5 text-crimson-light" : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"}`}><Icon size={15} /><span className="flex-1 text-left">{label}</span>{badge > 0 && <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-bg-primary">{badge}</span>}</button>;
           })}
@@ -545,7 +548,7 @@ function AdminContent() {
       <main className="min-w-0 flex-1 lg:ml-56">
         <header className="sticky top-16 z-30 border-b border-border bg-bg-primary/90 px-4 py-3 backdrop-blur-nav sm:px-6"><h1 className="font-display text-lg font-bold text-text-primary">{labels}</h1></header>
         <nav className="flex gap-2 overflow-x-auto border-b border-border bg-bg-primary px-4 py-2 lg:hidden">
-          {navItems.map(({ label, id }) => <button key={id} onClick={() => setActiveTab(id)} className={`shrink-0 rounded-lg border px-3 py-2 text-xs font-medium ${activeTab === id ? "border-crimson/40 bg-crimson/10 text-crimson-light" : "border-border text-text-secondary"}`}>{id === "reviews" ? reviewT("queueTitle") : id === "accounts" ? accountsText("title") : id === "started-offers" ? startedText("title") : id === "newsletter" ? newsletterText("title") : label}</button>)}
+          {navItems.map(({ label, id }) => <button key={id} onClick={() => setActiveTab(id)} className={`shrink-0 rounded-lg border px-3 py-2 text-xs font-medium ${activeTab === id ? "border-crimson/40 bg-crimson/10 text-crimson-light" : "border-border text-text-secondary"}`}>{id === "reviews" ? reviewT("queueTitle") : id === "accounts" ? accountsText("title") : id === "started-offers" ? startedText("title") : id === "organizations" ? organizationAdminText("title") : id === "newsletter" ? newsletterText("title") : label}</button>)}
         </nav>
         <div className="space-y-5 p-4 sm:p-6">
           {actionMessage && <div role={actionMessage.error ? "alert" : "status"} className={`flex items-start justify-between gap-3 rounded-xl border px-4 py-3 text-sm ${actionMessage.error ? "border-gold/30 bg-gold/10 text-gold" : "border-success/30 bg-success/10 text-success"}`}><span>{actionMessage.text}</span><button aria-label="Meldung schließen" onClick={() => setActionMessage(null)}><X size={15} /></button></div>}
@@ -649,6 +652,7 @@ function AdminContent() {
           </div>}
 
           {activeTab === "support" && <AdminSupportCenter />}
+          {activeTab === "organizations" && <AdminOrganizations />}
           {activeTab === "newsletter" && <AdminNewsletter />}
         </div>
       </main>

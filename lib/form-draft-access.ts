@@ -1,4 +1,5 @@
 import "server-only";
+import { canManageOrganization } from "@/lib/organization-access";
 import { db } from "@/lib/db";
 import { canEditListing } from "@/lib/listing-access";
 import { hasCompanyCapability } from "@/lib/company-access";
@@ -7,6 +8,12 @@ import { hasCompanyCapability } from "@/lib/company-access";
 export async function canUseFormDraft(userId: string, key: string) {
   const [kind, id] = key.split(":");
   if (!/^[0-9a-f-]{36}$/.test(id)) return true;
+  if (kind === "organization") return canManageOrganization(id, userId);
+  if (kind === "organization-entry") {
+    const { data, error } = await db.from("organization_entries").select("organization_id").eq("id", id).maybeSingle();
+    if (error) throw new Error("draft_access_unavailable");
+    return !!data && canManageOrganization(data.organization_id, userId);
+  }
   if (kind === "company") return hasCompanyCapability(id, userId, "edit_company");
   if (kind === "listing") {
     const { data, error } = await db.from("listings").select("user_id, company_id").eq("id", id).maybeSingle();
