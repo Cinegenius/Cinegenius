@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
+import OrganizationAccessPanel from "@/components/organizations/OrganizationAccessPanel";
 import DashboardClient from "./DashboardClient";
 import { normalizeCompanyPermissionRole, type CompanyPermissionRole } from "@/lib/company-roles";
 
@@ -37,5 +38,5 @@ export default async function CompanyDashboardPage({ searchParams }: { searchPar
     logo_url: company.logo_url,
     city: company.city,
   }));
-  return <DashboardClient company={selected.company} permissionRole={selected.permissionRole} companyOptions={companyOptions} />;
+  return <><DashboardClient company={selected.company} permissionRole={selected.permissionRole} companyOptions={companyOptions} />{["owner", "admin"].includes(selected.permissionRole) && <div className="site-container pb-28"><OrganizationAccessPanel key={selected.company.id} companyId={selected.company.id} /></div>}</>;
 }

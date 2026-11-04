@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import Image from "@/components/MediaImage";
@@ -13,6 +14,12 @@ export default async function OrganizationPage({ params }: { params: Promise<{ s
   if (!result) notFound();
   const { organization, entries } = result;
   const t = await getTranslations("Organizations");
+  const accessT = await getTranslations("OrganizationAccess");
+  const linked = await db.from("organization_company_links")
+    .select("company:companies!inner(name,slug,published)").eq("organization_id", organization.id)
+    .eq("status", "accepted").eq("company.published", true).maybeSingle();
+  if (linked.error) throw new Error("organization_company_link_load_failed");
+  const company = linked.data?.company as unknown as {name:string;slug:string}|null;
   return <main className="min-h-screen bg-bg-primary">
     <PageHeader badge={t("organization")} title={organization.name} description={organization.description || t("organizationFallbackDescription")} />
     <section className="site-container py-8 sm:py-12">
@@ -21,6 +28,7 @@ export default async function OrganizationPage({ params }: { params: Promise<{ s
         <div>
           <div className="flex flex-wrap gap-2">{organization.topics.map((topic: string) => <span key={topic} className="rounded-full border border-border px-3 py-2 text-xs text-text-secondary">{t(`topic.${topic}`)}</span>)}</div>
           <p className="mt-5 text-text-secondary">{[organization.city, organization.region].filter(Boolean).join(" · ")}</p>
+          {company && <p className="mt-5 text-sm text-text-secondary">{accessT("companyLinks")}: <Link className="text-gold" href={`/companies/${company.slug}`}>{company.name}</Link></p>}
           <div className="mt-5 flex flex-wrap gap-3">
             {organization.website_url && <a className="inline-flex min-h-11 items-center rounded-xl border border-border px-5 py-3 text-sm text-text-secondary" href={organization.website_url} target="_blank" rel="noopener noreferrer">{t("website")}</a>}
             {organization.public_contact_email && <a className="inline-flex min-h-11 items-center rounded-xl border border-border px-5 py-3 text-sm text-text-secondary" href={`mailto:${organization.public_contact_email}`}>{t("contact")}</a>}

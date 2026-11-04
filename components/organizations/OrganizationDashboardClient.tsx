@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { CalendarDays, ExternalLink, ImagePlus, Loader2, Newspaper, Plus, Save, Trash2 } from "lucide-react";
 import MediaImage from "@/components/MediaImage";
 import ResponsiblePersonFields from "@/components/ResponsiblePersonFields";
+import OrganizationAccessPanel from "./OrganizationAccessPanel";
 import FormDraftStatus from "@/components/FormDraftStatus";
 import { useFormDraft } from "@/lib/use-form-draft";
 import { ORGANIZATION_ENTRY_TYPES, ORGANIZATION_FORMATS, ORGANIZATION_TOPICS } from "@/lib/organization-taxonomy";
@@ -50,6 +51,24 @@ export default function OrganizationDashboardClient({ initialWorkspace, responsi
   const organizationDraft = useFormDraft({ formKey: `organization:${organization.id || "new"}`, value: organization, restore: setOrganization, enabled: mode === "organization", busy: busy || uploading !== null });
   const entryDraft = useFormDraft({ formKey: `organization-entry:${entry.id || "new"}`, value: entry, restore: setEntry, enabled: mode === "entry", busy: busy || uploading !== null });
   const entries = useMemo(() => workspace.entries.filter(item => !entry.organizationId || item.organization_id === entry.organizationId), [workspace.entries, entry.organizationId]);
+
+  const leaveOrganization = (organizationId: string) => {
+    // Access has already been revoked server-side. Remove the stale workspace
+    // immediately, even if a subsequent network refresh would fail.
+    setWorkspace(current => ({
+      organizations: current.organizations.filter(item => item.id !== organizationId),
+      entries: current.entries.filter(item => item.organization_id !== organizationId),
+    }));
+    if (entry.organizationId === organizationId) {
+      void entryDraft.discard();
+      setEntry(emptyEntry());
+    }
+    if (organization.id === organizationId) {
+      void organizationDraft.discard();
+      setOrganization({ id: "", expectedUpdatedAt: "", name: "", description: "", topics: [], city: "", region: "", websiteUrl: "", publicContactEmail: "", logoUrl: "", responsiblePerson: responsiblePersonDraft(responsiblePerson) });
+    }
+    setMode("organization");
+  };
 
   const changeForm = async (change: () => void) => {
     if (operationPending.current || busy || uploading) return;
@@ -208,5 +227,6 @@ export default function OrganizationDashboardClient({ initialWorkspace, responsi
         {!(mode === "organization" ? workspace.organizations : entries).length && <p className="rounded-xl border border-dashed border-border p-5 text-sm text-text-muted">{t("noneYet")}</p>}
       </aside>
     </div>
+    {(mode === "organization" ? organization.id : entry.organizationId) && <OrganizationAccessPanel key={mode === "organization" ? organization.id : entry.organizationId} organizationId={mode === "organization" ? organization.id : entry.organizationId} onLeave={leaveOrganization} />}
   </main>;
 }
