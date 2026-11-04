@@ -1,3 +1,4 @@
+import HomeOrganizations from "@/components/organizations/HomeOrganizations";
 import { listingPriceLabel } from "@/lib/listing-price";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
@@ -446,6 +447,7 @@ async function HomeRecommendations({ viewerId }: { viewerId: string | null }) {
         </section>
       )}
 
+      <Suspense fallback={null}><HomeOrganizations /></Suspense>
       {/* ══════════════════════════════════════════════
           JOBS
       ══════════════════════════════════════════════ */}

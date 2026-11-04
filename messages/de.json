@@ -2466,6 +2466,20 @@
     "declined": "Einladung abgelehnt.",
     "wrongAccount": "Bitte melde dich mit dem eingeladenen Konto an.",
     "openDashboard": "Verwaltung öffnen",
-    "left": "Dein Verwaltungszugriff wurde beendet."
+    "left": "Dein Verwaltungszugriff wurde beendet.",
+    "publicProfile": "Meine bestätigte Verbindung auf meinem öffentlichen Personenprofil anzeigen. Dies ändert keine Verwaltungsrechte."
+  },
+  "OrganizationDiscovery": {
+    "eyebrow": "Aus der Branche",
+    "title": "Organisationen & Neuigkeiten",
+    "allEntries": "Alle Beiträge ansehen",
+    "organizations": "Organisationen",
+    "allOrganizations": "Alle Organisationen ansehen",
+    "profileTitle": "Organisationen",
+    "description": "Entdecke Organisationen und ihre öffentlichen Beiträge.",
+    "empty": "Noch keine öffentlichen Organisationen vorhanden.",
+    "pages": "Seiten",
+    "previous": "Zurück",
+    "next": "Weiter"
   }
 }

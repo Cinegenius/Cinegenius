@@ -465,7 +465,7 @@ function CompanyBadge({ membership }: { membership: CompanyMemberships }) {
 // ACTOR PROFILE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ActorProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMemberships; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
+function ActorProfile({ organizationSection, profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { organizationSection?: React.ReactNode; profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMemberships; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
   const tc = useTranslations("common");
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const { user } = useUser();
@@ -738,6 +738,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
 
               {/* Company badge */}
               <CompanyBadge membership={companyMembership} />
+              {organizationSection}
 
               {/* Social links */}
               {socialLinks.length > 0 && (
@@ -1005,7 +1006,7 @@ function ActorProfile({ profile, isOwner, projectCredits, companyMembership, ext
 // MODEL PROFILE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ModelProfile({ profile, isOwner, projectCredits = [], companyMembership, listings = [], blockStatus = null, collaborations = [] }: { profile: UserProfile; isOwner: boolean; projectCredits?: ProjectCredit[]; companyMembership: CompanyMemberships; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[] }) {
+function ModelProfile({ organizationSection, profile, isOwner, projectCredits = [], companyMembership, listings = [], blockStatus = null, collaborations = [] }: { organizationSection?: React.ReactNode; profile: UserProfile; isOwner: boolean; projectCredits?: ProjectCredit[]; companyMembership: CompanyMemberships; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[] }) {
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const [lightbox, setLightbox] = useState<string | null>(null);
 
@@ -1229,6 +1230,8 @@ function ModelProfile({ profile, isOwner, projectCredits = [], companyMembership
           </>
         )}
 
+        {organizationSection}
+
         {(() => {
           const gp = profile as unknown as { tiktok_url?: string; vimeo_url?: string; phone?: string; contact_email?: string };
           const links = ([
@@ -1284,7 +1287,7 @@ function ModelProfile({ profile, isOwner, projectCredits = [], companyMembership
 // GENERIC PROFILE (Crew, Creative, Vendor etc.)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function GenericProfile({ profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMemberships; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
+function GenericProfile({ organizationSection, profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { organizationSection?: React.ReactNode; profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMemberships; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const { user } = useUser();
   const [lightbox, setLightbox] = useState<string | null>(null);
@@ -1431,6 +1434,7 @@ function GenericProfile({ profile, isOwner, projectCredits, companyMembership, e
             {(companyMembership?.length ?? 0) > 0 && (
               <CompanyBadge membership={companyMembership} />
             )}
+            {organizationSection}
           </div>
 
           {/* Compact info */}
@@ -1970,6 +1974,7 @@ export default function ProfileView({
   collaborations = [],
   imageLikes = {},
   myImageLikes = [],
+  organizationSection,
   similarProfiles = [],
 }: {
   profile: UserProfile;
@@ -1983,6 +1988,7 @@ export default function ProfileView({
   imageLikes?: Record<string, number>;
   myImageLikes?: string[];
   similarProfiles?: SimilarProfile[];
+  organizationSection?: React.ReactNode;
 }) {
   const { user, isLoaded } = useUser();
   const router = useRouter();
@@ -2023,14 +2029,14 @@ export default function ProfileView({
 
   // Model types get editorial layout
   if (isModel) {
-    return <><ModelProfile profile={visibleProfile} isOwner={effectiveOwner} projectCredits={projectCredits} companyMembership={companyMembership} listings={listings} blockStatus={blockStatus} collaborations={collaborations} />{similarSection}</>;
+    return <><ModelProfile organizationSection={organizationSection} profile={visibleProfile} isOwner={effectiveOwner} projectCredits={projectCredits} companyMembership={companyMembership} listings={listings} blockStatus={blockStatus} collaborations={collaborations} />{similarSection}</>;
   }
 
   // Actor/talent types get casting-ready layout
   if (isTalent) {
-    return <><ActorProfile profile={visibleProfile} isOwner={effectiveOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
+    return <><ActorProfile organizationSection={organizationSection} profile={visibleProfile} isOwner={effectiveOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
   }
 
   // Crew, creative, vendor get generic layout
-  return <><GenericProfile profile={visibleProfile} isOwner={effectiveOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
+  return <><GenericProfile organizationSection={organizationSection} profile={visibleProfile} isOwner={effectiveOwner} projectCredits={projectCredits} companyMembership={companyMembership} externalProfiles={externalProfiles} listings={listings} blockStatus={blockStatus} collaborations={collaborations} imageLikes={imageLikes} myImageLikes={myImageLikes} />{similarSection}</>;
 }

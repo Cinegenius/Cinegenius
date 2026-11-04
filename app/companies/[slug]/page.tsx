@@ -1,3 +1,4 @@
+import PublicOrganizationLinks from "@/components/organizations/PublicOrganizationLinks";
 import { publicResponsiblePerson, responsibleForCompany } from "@/lib/responsible-person-server";
 import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
 import { notFound } from "next/navigation";
@@ -170,7 +171,7 @@ export default async function CompanyPage({
   };
 
   return (
-    <CompanyDetail
+    <CompanyDetail organizationSection={<PublicOrganizationLinks companyId={company.id} />}
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       company={normalised as any}
       listings={publicData.listings}

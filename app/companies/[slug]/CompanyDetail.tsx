@@ -119,8 +119,9 @@ const listingTypeLabel: Record<string, string> = {
 
 
 export default function CompanyDetail({
-  company, listings, members, services, equipment, myMembership, myTitleChangeRequest, currentUserId: initialUserId, initialIsOwner,
+  organizationSection, company, listings, members, services, equipment, myMembership, myTitleChangeRequest, currentUserId: initialUserId, initialIsOwner,
 }: {
+  organizationSection?: React.ReactNode;
   company: Company;
   listings: Listing[];
   members: Member[];
@@ -592,6 +593,7 @@ export default function CompanyDetail({
               </section>
             )}
 
+            {organizationSection}
             {/* Team */}
             {(acceptedMembers.length > 0 || isOwner) && (
               <section>
@@ -611,7 +613,8 @@ export default function CompanyDetail({
                     </div>
                   )}
 
-                  {/* Team */}
+                  {organizationSection}
+            {/* Team */}
                   {regularMembers.length > 0 && (
                     <div className="bg-bg-secondary border border-border rounded-2xl overflow-hidden">
                       <div className="px-5 py-2.5 border-b border-border bg-bg-elevated flex items-center gap-2">

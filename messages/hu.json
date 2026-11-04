@@ -2466,6 +2466,20 @@
     "declined": "Meghívás elutasítva.",
     "wrongAccount": "Jelentkezz be a meghívott fiókkal.",
     "openDashboard": "Kezelés megnyitása",
-    "left": "A kezelési hozzáférésed megszűnt."
+    "left": "A kezelési hozzáférésed megszűnt.",
+    "publicProfile": "Megerősített kapcsolatom megjelenítése a nyilvános személyes profilomon. Ez nem módosítja a kezelési jogosultságokat."
+  },
+  "OrganizationDiscovery": {
+    "eyebrow": "Ágazati hírek",
+    "title": "Szervezetek és hírek",
+    "allEntries": "Összes bejegyzés",
+    "organizations": "Szervezetek",
+    "allOrganizations": "Összes szervezet",
+    "profileTitle": "Szervezetek",
+    "description": "Fedezd fel a szervezeteket és nyilvános bejegyzéseiket.",
+    "empty": "Még nincsenek nyilvános szervezetek.",
+    "pages": "Oldalak",
+    "previous": "Előző",
+    "next": "Következő"
   }
 }

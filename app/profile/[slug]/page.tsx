@@ -1,3 +1,4 @@
+import PublicOrganizationLinks from "@/components/organizations/PublicOrganizationLinks";
 import { publicProjectCredits } from "@/lib/project-media-rights";
 import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
 import { notFound } from "next/navigation";
@@ -352,7 +353,7 @@ export default async function ProfilePage(
   return (
     <>
       <JsonLd data={jsonLd} />
-      <ProfileView
+      <ProfileView organizationSection={<PublicOrganizationLinks userId={visibleProfile.user_id} />}
         profile={visibleProfile}
         isOwner={isOwner}
         projectCredits={projectCredits}

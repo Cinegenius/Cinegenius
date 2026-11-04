@@ -24,7 +24,7 @@ export async function GET(request: Request) {
  if (!uuid(orgId) || !await canManageOrganization(orgId,session.userId)) return json({error:'forbidden'},403);
  const [org,members,invites,links] = await Promise.all([
   db.from('organizations').select('owner_user_id').eq('id',orgId).single(),
-  db.from('organization_members').select('user_id,role,status').eq('organization_id',orgId).eq('status','active').limit(100),
+  db.from('organization_members').select('user_id,role,status,public_profile').eq('organization_id',orgId).eq('status','active').limit(100),
   db.from('organization_invitations').select('id,status,created_at,expires_at,recipient_email').eq('organization_id',orgId).eq('status','pending').gt('expires_at',new Date().toISOString()).limit(100),
   db.from('organization_company_links').select('id,company_id,status,company:companies(name)').eq('organization_id',orgId).in('status',['pending','accepted']).limit(1),
  ]);
@@ -45,6 +45,11 @@ export async function POST(request: Request) {
  const body = await request.json().catch(()=>null);
  if (!body || typeof body.action!=='string') return json({error:'invalid'},400);
  let orgId = typeof body.organizationId==='string' ? body.organizationId : '';
+ if(body.action==='public_profile') {
+  if(!uuid(orgId)||typeof body.visible!=='boolean')return json({error:'invalid'},400);
+  const result=await db.rpc('set_organization_profile_visibility',{p_org:orgId,p_actor:session.userId,p_visible:body.visible});
+  return result.error?json({error:result.error.code==='42501'?'forbidden':'load'},result.error.code==='42501'?403:503):json({ok:true});
+ }
  let target = typeof body.target==='string' ? body.target : '';
  let tokenHash='', hashes:string[]=[], token='', recipient='';
  if (['accept_invite','decline_invite'].includes(body.action)) {

@@ -2466,6 +2466,20 @@
     "declined": "Invitation declined.",
     "wrongAccount": "Please sign in with the invited account.",
     "openDashboard": "Open management",
-    "left": "Your management access has ended."
+    "left": "Your management access has ended.",
+    "publicProfile": "Show my confirmed connection on my public personal profile. This does not change management permissions."
+  },
+  "OrganizationDiscovery": {
+    "eyebrow": "Industry updates",
+    "title": "Organizations & news",
+    "allEntries": "View all posts",
+    "organizations": "Organizations",
+    "allOrganizations": "View all organizations",
+    "profileTitle": "Organizations",
+    "description": "Discover organizations and their public posts.",
+    "empty": "No public organizations yet.",
+    "pages": "Pages",
+    "previous": "Previous",
+    "next": "Next"
   }
 }

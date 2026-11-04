@@ -2466,6 +2466,20 @@
     "declined": "Invitación rechazada.",
     "wrongAccount": "Inicia sesión con la cuenta invitada.",
     "openDashboard": "Abrir gestión",
-    "left": "Tu acceso de gestión ha finalizado."
+    "left": "Tu acceso de gestión ha finalizado.",
+    "publicProfile": "Mostrar mi vínculo confirmado en mi perfil personal público. Esto no modifica los permisos de administración."
+  },
+  "OrganizationDiscovery": {
+    "eyebrow": "Actualidad del sector",
+    "title": "Organizaciones y novedades",
+    "allEntries": "Ver todas las publicaciones",
+    "organizations": "Organizaciones",
+    "allOrganizations": "Ver todas las organizaciones",
+    "profileTitle": "Organizaciones",
+    "description": "Descubre organizaciones y sus publicaciones públicas.",
+    "empty": "Todavía no hay organizaciones públicas.",
+    "pages": "Páginas",
+    "previous": "Anterior",
+    "next": "Siguiente"
   }
 }

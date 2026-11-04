@@ -2466,6 +2466,20 @@
     "declined": "Invito rifiutato.",
     "wrongAccount": "Accedi con l’account invitato.",
     "openDashboard": "Apri gestione",
-    "left": "Il tuo accesso di gestione è terminato."
+    "left": "Il tuo accesso di gestione è terminato.",
+    "publicProfile": "Mostra il mio collegamento confermato sul mio profilo personale pubblico. I permessi di amministrazione non cambiano."
+  },
+  "OrganizationDiscovery": {
+    "eyebrow": "Novità del settore",
+    "title": "Organizzazioni e novità",
+    "allEntries": "Tutti i contributi",
+    "organizations": "Organizzazioni",
+    "allOrganizations": "Tutte le organizzazioni",
+    "profileTitle": "Organizzazioni",
+    "description": "Scopri le organizzazioni e i loro contributi pubblici.",
+    "empty": "Nessuna organizzazione pubblica disponibile.",
+    "pages": "Pagine",
+    "previous": "Indietro",
+    "next": "Avanti"
   }
 }

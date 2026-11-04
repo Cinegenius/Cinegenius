@@ -2466,6 +2466,20 @@
     "declined": "Pozvánka odmítnuta.",
     "wrongAccount": "Přihlas se pozvaným účtem.",
     "openDashboard": "Otevřít správu",
-    "left": "Tvůj přístup ke správě byl ukončen."
+    "left": "Tvůj přístup ke správě byl ukončen.",
+    "publicProfile": "Zobrazit mé potvrzené propojení na mém veřejném osobním profilu. Oprávnění ke správě se tím nemění."
+  },
+  "OrganizationDiscovery": {
+    "eyebrow": "Novinky z oboru",
+    "title": "Organizace a novinky",
+    "allEntries": "Zobrazit všechny příspěvky",
+    "organizations": "Organizace",
+    "allOrganizations": "Zobrazit všechny organizace",
+    "profileTitle": "Organizace",
+    "description": "Objevte organizace a jejich veřejné příspěvky.",
+    "empty": "Zatím nejsou žádné veřejné organizace.",
+    "pages": "Stránky",
+    "previous": "Předchozí",
+    "next": "Další"
   }
 }
