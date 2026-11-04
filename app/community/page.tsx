@@ -16,7 +16,7 @@ export default async function CommunityPage() {
   return (
     <main className="min-h-[70vh]">
       <header className="relative isolate overflow-hidden border-b border-border px-4 pb-6 pt-24 sm:px-6 sm:pb-10 sm:pt-28">
-        <div aria-hidden="true" className="absolute inset-0 bg-cover bg-[center_42%]" style={{ backgroundImage: "url('/hero-bg.jpg')" }} />
+        <div aria-hidden="true" className="absolute inset-0 bg-cover bg-[center_42%]" style={{ backgroundImage: "url('/hero-bg-v2.jpg')" }} />
         <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-bg-primary/90 via-bg-primary/78 to-bg-primary/58" />
         <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-bg-primary/40 via-transparent to-bg-primary/90" />
         <div className="relative z-10 mx-auto max-w-5xl">
@@ -29,7 +29,7 @@ export default async function CommunityPage() {
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-text-secondary sm:text-base">
             {t("boardPageDescription")}
           </p>
-          <div className="mt-3 flex justify-end"><AiDisclosureBadge source="/hero-bg.jpg" /></div>
+          <div className="mt-3 flex justify-end"><AiDisclosureBadge source="/hero-bg-v2.jpg" /></div>
         </div>
       </header>
       <CommunityBoard fullPage loggedIn={!!userId} />

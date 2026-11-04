@@ -461,13 +461,13 @@ button[aria-pressed="false"] {
 
 /* Dark mode hero */
 .hero-bg {
-  background-image: url('/hero-bg.jpg');
+  background-image: url('/hero-bg-v2.jpg');
   background-position: center 40%;
   background-size: cover;
 }
 /* Light mode: same image, lighter overlay handles the rest */
 [data-theme="light"] .hero-bg {
-  background-image: url('/hero-bg.jpg');
+  background-image: url('/hero-bg-v2.jpg');
   background-position: center 40%;
   background-size: cover;
 }

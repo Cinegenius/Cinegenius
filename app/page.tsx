@@ -531,7 +531,7 @@ export default async function HomePage() {
     <main className="relative isolate min-h-screen">
       <PageBackdrop
         optimizeImage
-        image="/hero-bg.jpg"
+        image="/hero-bg-v2.jpg"
         imagePosition="center 42%"
         imageOpacity={100}
         overlayClassName="absolute inset-0 bg-bg-primary/72"
@@ -560,7 +560,7 @@ export default async function HomePage() {
             <HeroSearch />
           </div>
         </div>
-        <AiDisclosureBadge source="/hero-bg.jpg" subtle className="absolute bottom-0.5 right-4 z-10 sm:right-6 lg:right-8" />
+        <AiDisclosureBadge source="/hero-bg-v2.jpg" subtle className="absolute bottom-0.5 right-4 z-10 sm:right-6 lg:right-8" />
       </section>
 
       {/* Finden: kompakte, direkte Einstiege in die bestehenden Verzeichnisse */}

@@ -1,5 +1,6 @@
 "use client";
 
+import { normalizeCrewLanguages, crewLanguageLabel, matchesCrewLanguage } from "@/lib/crew-languages";
 import { useViewState } from "@/lib/use-view-state";
 
 import { filterProviderProfiles, isProviderFilter, LOCATION_PROVIDER_FILTER, MARKETPLACE_PROVIDER_FILTER } from "@/lib/profile-provider-filters";
@@ -108,11 +109,13 @@ function FilterDropdown({
   value,
   options,
   onChange,
+  optionLabel = (option: string) => option,
 }: {
   icon: React.ElementType;
   label: string;
   value: string;
   options: string[];
+  optionLabel?: (option: string) => string;
   onChange: (v: string) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -142,7 +145,7 @@ function FilterDropdown({
         }`}
       >
         <Icon size={11} />
-        {active ? value : label}
+        {active ? optionLabel(value) : label}
         {active && (
           <span
             onClick={(e) => { e.stopPropagation(); onChange(""); setOpen(false); }}
@@ -164,7 +167,7 @@ function FilterDropdown({
                 value === opt ? "text-gold font-medium bg-gold/8" : "text-text-secondary"
               }`}
             >
-              {opt}
+              {optionLabel(opt)}
             </button>
           ))}
         </div>
@@ -386,14 +389,14 @@ function CreatorsInner({
       const { city, country } = parseLocation(c.location);
       if (city) cities.add(city);
       if (country) countries.add(country);
-      for (const l of c.languages ?? []) if (l) langs.add(l);
+      for (const l of normalizeCrewLanguages(c.languages)) langs.add(l);
     }
     return {
       availableCities:     [...cities].sort(),
       availableCountries:  [...countries].sort(),
-      availableLanguages:  [...langs].sort(),
+      availableLanguages:  [...langs].sort((a, b) => crewLanguageLabel(a, locale).localeCompare(crewLanguageLabel(b, locale), locale)),
     };
-  }, [allCreators]);
+  }, [allCreators, locale]);
   const [sortKey, setSortKey] = useViewState("crew.sortKey", () => initialFilters.sort === "rating" ? "rating" : "featured");
   const [viewMode, setViewMode] = useViewState<"grid" | "list">("crew.viewMode", "grid");
 
@@ -535,7 +538,7 @@ function CreatorsInner({
       result = result.filter((c) => parseLocation(c.location).country === countryFilter);
     }
     if (languageFilter) {
-      result = result.filter((c) => c.languages?.includes(languageFilter));
+      result = result.filter((c) => matchesCrewLanguage(c.languages, languageFilter));
     }
 
     if (profileTypeFilter) result = result.filter(c => hasProfileType(c, profileTypeFilter));
@@ -610,7 +613,7 @@ function CreatorsInner({
     ...[...selectedRoles].map((role) => ({ id: `role-${role}`, label: occupationById(role)?.label ?? role, onRemove: () => removeRole(role) })),
     ...(cityFilter ? [{ id: "city", label: cityFilter, onRemove: () => setCityFilter("") }] : []),
     ...(countryFilter ? [{ id: "country", label: countryFilter, onRemove: () => setCountryFilter("") }] : []),
-    ...(languageFilter ? [{ id: "language", label: languageFilter, onRemove: () => setLanguageFilter("") }] : []),
+    ...(languageFilter ? [{ id: "language", label: crewLanguageLabel(languageFilter, locale), onRemove: () => setLanguageFilter("") }] : []),
     ...(profileTypeFilter ? [{ id: "profileType", label: `${t("filterProfileType")}: ${PROFILE_TYPE_MAP[profileTypeFilter] ?? profileTypeFilter}`, onRemove: () => setProfileTypeFilter("") }] : []),
     ...(hairFilter ? [{ id: "hair", label: `${t("filterHairColor")}: ${hairFilter}`, onRemove: () => setHairFilter("") }] : []),
     ...(eyeFilter ? [{ id: "eyes", label: `${t("filterEyeColor")}: ${eyeFilter}`, onRemove: () => setEyeFilter("") }] : []),
@@ -671,7 +674,7 @@ function CreatorsInner({
           <MobileFilterSelect value={countryFilter} onChange={setCountryFilter} placeholder="Alle Länder" options={availableCountries.map((value) => ({ value, label: value }))} />
         </MobileFilterField>
         <MobileFilterField label={t("filterLanguage")}>
-          <MobileFilterSelect value={languageFilter} onChange={setLanguageFilter} placeholder={t("filterAll")} options={availableLanguages.map((value) => ({ value, label: value }))} />
+          <MobileFilterSelect value={languageFilter} onChange={setLanguageFilter} placeholder={t("filterAll")} options={availableLanguages.map((value) => ({ value, label: crewLanguageLabel(value, locale) }))} />
         </MobileFilterField>
         <div className="grid grid-cols-2 gap-3">
           <MobileFilterField label={t("filterHairColor")}>
@@ -878,10 +881,10 @@ function CreatorsInner({
                       className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${!languageFilter ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
                       {t("filterAll")}
                     </button>
-                    {availableLanguages.slice(0, 12).map((lang) => (
+                    {availableLanguages.map((lang) => (
                       <button key={lang} onClick={() => setLanguageFilter(languageFilter === lang ? "" : lang)}
                         className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${languageFilter === lang ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
-                        {lang}
+                        {crewLanguageLabel(lang, locale)}
                       </button>
                     ))}
                   </div>
@@ -1048,7 +1051,7 @@ function CreatorsInner({
               <FilterDropdown icon={MapPin} label={t("filterCity")} value={cityFilter} options={availableCities} onChange={setCityFilter} />
             )}
             {availableLanguages.length > 0 && (
-              <FilterDropdown icon={Languages} label={t("filterLanguage")} value={languageFilter} options={availableLanguages} onChange={setLanguageFilter} />
+              <FilterDropdown icon={Languages} label={t("filterLanguage")} value={languageFilter} options={availableLanguages} optionLabel={(value) => crewLanguageLabel(value, locale)} onChange={setLanguageFilter} />
             )}
 
             <button
