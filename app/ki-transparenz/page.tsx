@@ -5,7 +5,7 @@ import PageHeader from "@/components/PageHeader";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("AiTransparency");
-  return { title: `${t("title")} — CineGenius`, description: t("description") };
+  return { alternates: { canonical: "https://www.cinegenius.co/ki-transparenz" }, title: t("title"), description: t("description") };
 }
 
 export default async function AiTransparencyPage() {

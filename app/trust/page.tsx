@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "https://www.cinegenius.co/trust" },
   title: "Vertrauen & Sicherheit",
   description: "Informationen zu Kontakt, Anfragen, Sichtbarkeit und dem Melden problematischer Inhalte auf CineGenius.",
 };

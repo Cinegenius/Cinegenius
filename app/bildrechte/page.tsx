@@ -3,7 +3,7 @@ import PageHeader from "@/components/PageHeader";
 
 export async function generateMetadata() {
   const t = await getTranslations("ProjectMediaRights");
-  return { title: `${t("pageTitle")} — CineGenius`, description: t("pageDescription") };
+  return { alternates: { canonical: "https://www.cinegenius.co/bildrechte" }, title: t("pageTitle"), description: t("pageDescription") };
 }
 export default async function ImageRightsPage() {
   const t = await getTranslations("ProjectMediaRights");

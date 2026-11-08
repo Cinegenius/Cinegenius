@@ -5,7 +5,8 @@ import { auth } from "@clerk/nextjs/server";
 import { PhotoGallery } from "@/components/PhotoGallery";
 
 export const metadata: Metadata = {
-  title: "Fotos & Portfolio — CineGenius",
+  alternates: { canonical: "https://www.cinegenius.co/photo" },
+  title: "Fotos & Portfolio",
   description: "Entdecke öffentliche Profilfotos, Arbeitsproben und Bilder aus Firmenprofilen der CineGenius-Community.",
 };
 

@@ -10,7 +10,8 @@ import { getPrivateProfileIds } from "@/lib/trust";
 import { photoHref } from "@/lib/photo-link";
 
 export const metadata: Metadata = {
-  title: "Behind the Scenes — Backstage & Set-Fotos | CineGenius",
+  alternates: { canonical: "https://www.cinegenius.co/bts" },
+  title: "Behind the Scenes — Backstage & Set-Fotos",
   description: "Echte Behind-the-Scenes-Fotos von Filmsets, Shootings und Produktionen. Entdecke Crews, Locations und Projekte hinter der Kamera.",
 };
 

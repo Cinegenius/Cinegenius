@@ -3,7 +3,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Datenschutzerklärung — CineGenius",
+  alternates: { canonical: "https://www.cinegenius.co/datenschutz" },
+  title: "Datenschutzerklärung",
   description: "Datenschutzerklärung gemäß DSGVO für CineGenius — vollständige Informationen über Datenverarbeitung, eingesetzte Dienste und deine Rechte.",
 };
 

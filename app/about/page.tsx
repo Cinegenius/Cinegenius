@@ -4,7 +4,8 @@ import { Film, Users, Zap, Star, ArrowRight, CheckCircle } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 export const metadata: Metadata = {
-  title: "Über uns — CineGenius",
+  alternates: { canonical: "https://www.cinegenius.co/about" },
+  title: "Über uns",
   description: "CineGenius ist der All-in-One-Marktplatz für Film, Social Media & Fotografie in Deutschland, Österreich und der Schweiz. Locations, Crew, Equipment und Jobs — alles an einem Ort.",
   openGraph: {
     title: "Über CineGenius",

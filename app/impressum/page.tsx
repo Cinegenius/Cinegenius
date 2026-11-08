@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Impressum — CineGenius",
+  alternates: { canonical: "https://www.cinegenius.co/impressum" },
+  title: "Impressum",
   description: "Impressum und Anbieterkennzeichnung gemäß § 5 DDG",
 };
 

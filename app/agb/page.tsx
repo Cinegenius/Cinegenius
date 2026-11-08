@@ -2,7 +2,8 @@ import {getTranslations} from "next-intl/server";
 import Link from "next/link";
 
 export const metadata = {
-  title: "AGB — CineGenius",
+  alternates: { canonical: "https://www.cinegenius.co/agb" },
+  title: "AGB",
   description: "Allgemeine Geschäftsbedingungen von CineGenius",
 };
 

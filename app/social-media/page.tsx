@@ -5,7 +5,8 @@ import Link from "next/link";
 import { Zap, ArrowRight, MapPin, ExternalLink, Link2, Play } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Social Media Creator entdecken — Instagram, TikTok, YouTube | CineGenius",
+  alternates: { canonical: "https://www.cinegenius.co/social-media" },
+  title: "Social Media Creator entdecken — Instagram, TikTok, YouTube",
   description: "Finde Social-Media-Creator, Influencer und Content-Produzent/innen für deine Kampagne. Instagram, TikTok, YouTube — direkt buchbar auf CineGenius.",
 };
 

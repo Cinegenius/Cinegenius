@@ -6,7 +6,8 @@ import {
 import { getTranslations } from "next-intl/server";
 
 export const metadata: Metadata = {
-  title: "Preise — CineGenius",
+  alternates: { canonical: "https://www.cinegenius.co/pricing" },
+  title: "Preise",
   description: "CineGenius ist kostenlos für alle. Keine versteckten Gebühren. Locations, Crew, Equipment und Jobs finden und inserieren.",
   openGraph: {
     title: "Preise & Konditionen — CineGenius",
