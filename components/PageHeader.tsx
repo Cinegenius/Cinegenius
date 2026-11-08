@@ -50,6 +50,8 @@ type PageHeaderProps = {
   leading?: ReactNode;
   image?: string;
   imagePosition?: string;
+  /** Opt in only for public header artwork; protected media remains guarded. */
+  optimizeImage?: boolean;
   /** Turn off when a parent page already extends PageBackdrop behind its full content. */
   withBackdrop?: boolean;
   cta?: { label: string; href: string };
@@ -66,13 +68,14 @@ export default function PageHeader({
   image = PROJECTS_BACKDROP_IMAGE,
   imagePosition = "center 42%",
   withBackdrop = true,
+  optimizeImage = false,
   cta,
   ctaSecondary,
   children,
 }: PageHeaderProps) {
   return (
     <section className="site-page-hero relative isolate overflow-hidden border-b border-border/40 pt-16">
-      {withBackdrop && <PageBackdrop image={image} imagePosition={imagePosition} />}
+      {withBackdrop && <PageBackdrop image={image} imagePosition={imagePosition} optimizeImage={optimizeImage} />}
 
       <div className="site-container relative z-10 py-4 sm:py-8">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">

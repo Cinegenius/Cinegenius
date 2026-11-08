@@ -46,6 +46,7 @@ export default function LocationsLanding({
   return (
     <div className="min-h-screen bg-bg-primary">
       <PageHeader
+        optimizeImage
         badge="Filmlocations Deutschland"
         title="Finde die perfekte"
         titleHighlight="Location"
@@ -130,6 +131,7 @@ export default function LocationsLanding({
                           alt={loc.title}
                           fill
                           sizes="256px"
+                          mediaSize="thumbnail"
                           className="object-cover group-hover:scale-105 transition-transform duration-500"
                           style={
                             loc.focalPoint
