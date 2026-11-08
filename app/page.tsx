@@ -12,6 +12,7 @@ import { Suspense } from "react";
 import { SkeletonBox } from "@/components/Skeleton";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "https://www.cinegenius.co/" },
   title: "CineGenius — Film, Fotografie und Content",
   description: "Finde Drehorte, Crew, Talente, Equipment und Dienstleister für dein nächstes Projekt – oder präsentiere deine Arbeit und dein Angebot.",
   keywords: ["Location mieten", "Crew buchen", "Fotostudio mieten", "Equipment leihen", "Content Production", "Filmproduktion", "Fotoshooting Location", "Creative Hub DACH"],

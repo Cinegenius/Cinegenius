@@ -44,7 +44,7 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://cinegenius.co"),
+  metadataBase: new URL("https://www.cinegenius.co"),
   title: {
     default: "CineGenius — Marktplatz für Film, Social Media & Fotografie",
     template: "%s | CineGenius",
