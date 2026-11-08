@@ -7,6 +7,7 @@ import VehiclesContent from "./VehiclesContent";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "https://www.cinegenius.co/vehicles" },
   title: "Bildfahrzeuge & Stuntautos mieten — Film & Werbung",
   description: "Klassiker, Oldtimer, Stuntautos und Spezialfahrzeuge für Film, Werbung und Fotoproduktionen mieten. Jetzt Fahrzeuge durchsuchen.",
   keywords: ["Bildfahrzeuge mieten", "Oldtimer Film", "Stuntauto mieten", "Filmfahrzeuge", "Fahrzeug für Werbung"],

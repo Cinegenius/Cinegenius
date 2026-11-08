@@ -5,6 +5,7 @@ import PageHeader from "@/components/PageHeader";
 import { getTranslations } from "next-intl/server";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "https://www.cinegenius.co/companies" },
   title: "Firmenverzeichnis — Verleiher, Studios & Agenturen",
   description: "Alle Dienstleister der Filmbranche: Lichtverleih, Kameraverleih, Tonstudios, Postproduktion, Casting-Agenturen, VFX-Studios und mehr im DACH-Raum.",
   keywords: ["Filmdienstleister", "Kameraverleih Deutschland", "Lichtverleih München", "Tonstudio mieten", "Postproduktion Firma", "Casting Agentur Deutschland"],

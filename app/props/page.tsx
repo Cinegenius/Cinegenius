@@ -7,6 +7,7 @@ import { getTranslations } from "next-intl/server";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "https://www.cinegenius.co/props" },
   title: "Requisiten & Equipment mieten — Film, Foto, Social Media",
   description: "Requisiten, Kameras, Licht, Ton-Equipment, Kostüme, Backdrops und Creator-Sets mieten. Alles für Film, Fotografie und Social Media Produktion.",
   keywords: ["Requisiten mieten", "Filmequipment leihen", "Kamera mieten", "Licht mieten Film", "Kostüme mieten", "Fotoequipment mieten"],

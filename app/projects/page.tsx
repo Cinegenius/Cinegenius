@@ -10,6 +10,7 @@ import PageHeader, { PageBackdrop, PROJECTS_BACKDROP_IMAGE } from "@/components/
 export const revalidate = 300;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "https://www.cinegenius.co/projects" },
   title: "Projekte — CineGenius",
   description: "Filmprojekte & Produktionen auf CineGenius — wähle eine Kategorie.",
 };

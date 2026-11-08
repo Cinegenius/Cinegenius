@@ -95,6 +95,7 @@ const getCreatorDirectoryData = unstable_cache(
 export const revalidate = 60;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "https://www.cinegenius.co/creators" },
   title: "Filmcrew & Kreative finden — Kamera, Regie, Content Creator",
   description: "Finde erfahrene Filmcrew, Content Creator und Fotografen: Kameraleute, Regisseure, Cutter, Tontechniker, Influencer und mehr — deutschlandweit buchbar.",
   keywords: ["Filmcrew buchen", "Kameramann buchen", "Content Creator buchen", "Fotograf buchen", "Freelancer Film", "Crew für Filmproduktion"],

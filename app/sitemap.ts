@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
 import { db } from "@/lib/db";
-import { getPrivateProfileIds } from "@/lib/trust";
 
 const BASE = "https://www.cinegenius.co";
 
@@ -24,7 +23,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/props`,                       lastModified: now, changeFrequency: "weekly",  priority: 0.8 },
     { url: `${BASE}/vehicles`,                    lastModified: now, changeFrequency: "weekly",  priority: 0.8 },
     { url: `${BASE}/tiere`,                       lastModified: now, changeFrequency: "weekly",  priority: 0.8 },
-    { url: `${BASE}/marketplace`,                 lastModified: now, changeFrequency: "weekly",  priority: 0.7 },
     { url: `${BASE}/companies`,                   lastModified: now, changeFrequency: "weekly",  priority: 0.8 },
     { url: `${BASE}/projects`,                    lastModified: now, changeFrequency: "daily",   priority: 0.8 },
     { url: `${BASE}/projects/film`,               lastModified: now, changeFrequency: "weekly",  priority: 0.7 },
@@ -50,32 +48,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   let dynamicListings: MetadataRoute.Sitemap = [];
-  let profilePages: MetadataRoute.Sitemap = [];
 
   try {
     const [
       { data: listings },
-      { data: profiles },
       { data: companies },
-      { data: unclaimedProfiles },
       { data: projects },
     ] = await Promise.all([
       db.from("listings")
         .select("id, type, created_at")
         .eq("published", true),
 
-      db.from("profiles")
-        .select("user_id, slug, updated_at")
-        .not("slug", "is", null)
-        .not("positions", "is", null)
-        .neq("positions", "{}"),
-
       db.from("companies")
         .select("slug, updated_at")
         .eq("published", true),
-
-      db.from("unclaimed_profiles")
-        .select("slug, updated_at"),
 
       db.from("projects")
         // `projects` contains public records only. Private working copies live
@@ -92,32 +78,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: l.type === "job" ? 0.7 : 0.8,
       }));
 
-    const privateProfileIds = await getPrivateProfileIds((profiles ?? []).map((profile) => profile.user_id));
-    profilePages = (profiles ?? [])
-      .filter((profile) => !privateProfileIds.has(profile.user_id))
-      .filter((p: { slug: string | null; updated_at: string }) => p.slug)
-      .map((p: { slug: string; updated_at: string }) => ({
-        url: `${BASE}/profile/${p.slug}`,
-        lastModified: p.updated_at ?? now,
-        changeFrequency: "weekly" as const,
-        priority: 0.7,
-      }));
-
+    // Profile pages inherit noindex; unclaimed person pages require sign-in.
+    // Neither belongs in the public search sitemap.
     const companyPages: MetadataRoute.Sitemap = (companies ?? []).map(
       (c: { slug: string; updated_at: string }) => ({
         url: `${BASE}/companies/${c.slug}`,
         lastModified: c.updated_at ?? now,
         changeFrequency: "weekly" as const,
         priority: 0.8,
-      })
-    );
-
-    const unclaimedPages: MetadataRoute.Sitemap = (unclaimedProfiles ?? []).map(
-      (p: { slug: string; updated_at: string }) => ({
-        url: `${BASE}/person/${p.slug}`,
-        lastModified: p.updated_at ?? now,
-        changeFrequency: "monthly" as const,
-        priority: 0.6,
       })
     );
 
@@ -133,14 +101,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return [
       ...staticPages,
       ...dynamicListings,
-      ...profilePages,
       ...companyPages,
-      ...unclaimedPages,
       ...projectPages,
     ];
   } catch {
     // DB not available at build time — return static pages only
   }
 
-  return [...staticPages, ...dynamicListings, ...profilePages];
+  return [...staticPages, ...dynamicListings];
 }

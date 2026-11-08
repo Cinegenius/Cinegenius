@@ -6,7 +6,7 @@ import TiereContent from "./TiereContent";
 
 export const revalidate = 60;
 
-export async function generateMetadata():Promise<Metadata> { const t=await getTranslations("FilmAnimals"); return {title:t("portfolio"),description:t("description")}; }
+export async function generateMetadata():Promise<Metadata> { const t=await getTranslations("FilmAnimals"); return {alternates:{canonical:"https://www.cinegenius.co/tiere"},title:t("portfolio"),description:t("description")}; }
 
 export default async function TierePage() {
   const t = await getTranslations("FilmAnimals");

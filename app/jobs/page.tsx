@@ -6,6 +6,7 @@ import { getTranslations } from "next-intl/server";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "https://www.cinegenius.co/jobs" },
   title: "Film Jobs & Stellenanzeigen — Regie, Kamera, Produktion",
   description: "Aktuelle Jobs in der Filmbranche: Regie, Kamera, Licht, Ton, Produktion, Social Media, Fotografie. Für Freelancer und Festanstellungen im DACH-Raum.",
   keywords: ["Film Jobs Deutschland", "Filmjobs München", "Filmjobs Berlin", "Kameramann gesucht", "Regisseur Job", "Social Media Creator Job"],

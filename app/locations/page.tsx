@@ -7,6 +7,7 @@ import LocationsLanding from "./LocationsLanding";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "https://www.cinegenius.co/locations" },
   title: "Filmlocations mieten — Apartments, Villen, Studios & mehr",
   description: "Finde die perfekte Location für dein Filmprojekt: Apartments, Villen, Industriehallen, Studios, Außengelände und mehr. Jetzt Locations durchsuchen.",
   keywords: ["Location mieten", "Filmlocations Deutschland", "Location für Filmdreh", "Fotostudio mieten", "Außengelände Film"],
