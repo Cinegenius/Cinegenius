@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import ProjectCategoryPage from "@/components/ProjectCategoryPage";
 
 export const metadata: Metadata = {
-  title: "Musikvideo Projekte — CineGenius",
+  alternates: { canonical: "https://www.cinegenius.co/projects/musikvideo" },
+  title: "Musikvideo Projekte",
   description: "Musikvideos, Konzertfilme und Künstler-Visuals — entdecke Musikvideo-Produktionen auf CineGenius.",
 };
 

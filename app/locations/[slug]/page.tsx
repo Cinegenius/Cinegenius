@@ -98,6 +98,7 @@ export async function generateMetadata({
   const location = await getLocation(slug, userId);
   if (!location) return {};
   return {
+    alternates: { canonical: `https://www.cinegenius.co/locations/${encodeURIComponent(slug)}` },
     title: location.title,
     description: `${location.type} in ${location.city} — ${listingPriceLabel(location.price,location.metadata)}.`,
     openGraph: {

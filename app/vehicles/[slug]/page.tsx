@@ -96,6 +96,7 @@ export async function generateMetadata({
     if (!vehicle) return {};
     const title = vehicle.title ?? "Fahrzeug";
     return {
+    alternates: { canonical: `https://www.cinegenius.co/vehicles/${encodeURIComponent(slug)}` },
       title,
       description: `${vehicle.type} — ${listingPriceLabel(vehicle.dailyRate,vehicle.pricing,"/Tag",locale,market)}. Jetzt auf CineGenius für Filmproduktionen mieten.`,
       openGraph: {

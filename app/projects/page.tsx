@@ -11,7 +11,7 @@ export const revalidate = 300;
 
 export const metadata: Metadata = {
   alternates: { canonical: "https://www.cinegenius.co/projects" },
-  title: "Projekte — CineGenius",
+  title: "Projekte",
   description: "Filmprojekte & Produktionen auf CineGenius — wähle eine Kategorie.",
 };
 

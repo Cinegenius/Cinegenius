@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import ProjectCategoryPage from "@/components/ProjectCategoryPage";
 
 export const metadata: Metadata = {
-  title: "Foto & Shooting Projekte — CineGenius",
+  alternates: { canonical: "https://www.cinegenius.co/projects/foto" },
+  title: "Foto & Shooting Projekte",
   description: "Fotoprojekte, Editorial-Shootings und Kampagnen — entdecke Fotografen und ihre Arbeit.",
 };
 

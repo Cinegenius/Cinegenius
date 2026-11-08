@@ -100,6 +100,7 @@ export async function generateMetadata({
     : `${company.name}${company.city ? ` in ${company.city}` : ""}${cats ? ` — ${cats}` : ""} auf CineGenius.`;
 
   return {
+    alternates: { canonical: `https://www.cinegenius.co/companies/${encodeURIComponent(slug)}` },
     title: company.name,
     description,
     openGraph: {

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import ProjectCategoryPage from "@/components/ProjectCategoryPage";
 
 export const metadata: Metadata = {
-  title: "Werbung & Commercial — CineGenius",
+  alternates: { canonical: "https://www.cinegenius.co/projects/werbung" },
+  title: "Werbung & Commercial",
   description: "Werbefilme, TV-Spots und Commercials — entdecke Produktionen auf CineGenius.",
 };
 

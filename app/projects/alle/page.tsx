@@ -7,7 +7,8 @@ import PageHeader from "@/components/PageHeader";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Alle Projekte — CineGenius",
+  alternates: { canonical: "https://www.cinegenius.co/projects/alle" },
+  title: "Alle Projekte",
   description: "Alle Filmprojekte & Produktionen auf CineGenius — mit Suche, Filter und Crew-Übersicht.",
 };
 

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import ProjectCategoryPage from "@/components/ProjectCategoryPage";
 
 export const metadata: Metadata = {
-  title: "Film & Serie Projekte — CineGenius",
+  alternates: { canonical: "https://www.cinegenius.co/projects/film" },
+  title: "Film & Serie Projekte",
   description: "Spielfilme, Kurzfilme und Serien auf CineGenius — entdecke Produktionen und trag dein Projekt ein.",
 };
 

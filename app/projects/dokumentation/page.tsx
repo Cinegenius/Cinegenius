@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import ProjectCategoryPage from "@/components/ProjectCategoryPage";
 
 export const metadata: Metadata = {
-  title: "Dokumentation & Reportage — CineGenius",
+  alternates: { canonical: "https://www.cinegenius.co/projects/dokumentation" },
+  title: "Dokumentation & Reportage",
   description: "Dokumentarfilme, Reportagen und Porträt-Dokumentationen — entdecke Doku-Produktionen auf CineGenius.",
 };
 

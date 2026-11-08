@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import ProjectCategoryPage from "@/components/ProjectCategoryPage";
 
 export const metadata: Metadata = {
-  title: "Corporate & Business Film — CineGenius",
+  alternates: { canonical: "https://www.cinegenius.co/projects/corporate" },
+  title: "Corporate & Business Film",
   description: "Unternehmensfilme, Imagevideos und Erklärfilme — Corporate-Produktionen auf CineGenius.",
 };
 

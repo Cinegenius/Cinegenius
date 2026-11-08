@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import ProjectCategoryPage from "@/components/ProjectCategoryPage";
 
 export const metadata: Metadata = {
-  title: "Event & Live Produktionen — CineGenius",
+  alternates: { canonical: "https://www.cinegenius.co/projects/event" },
+  title: "Event & Live Produktionen",
   description: "Eventfilme, Live-Mitschnitte, Konzertproduktionen — Event-Content auf CineGenius.",
 };
 

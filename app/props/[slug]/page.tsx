@@ -74,6 +74,7 @@ export async function generateMetadata({
   const prop = await getProp(slug);
   if (!prop) return {};
   return {
+    alternates: { canonical: `https://www.cinegenius.co/props/${encodeURIComponent(slug)}` },
     title: prop.title,
     description: `${prop.title} mieten — ${prop.condition}, ${listingPriceLabel(prop.dailyRate,prop.pricing)} bei ${prop.vendor} in ${prop.location}.`,
     openGraph: {

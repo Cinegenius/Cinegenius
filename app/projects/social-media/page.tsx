@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import ProjectCategoryPage from "@/components/ProjectCategoryPage";
 
 export const metadata: Metadata = {
-  title: "Social Media Projekte — CineGenius",
+  alternates: { canonical: "https://www.cinegenius.co/projects/social-media" },
+  title: "Social Media Projekte",
   description: "Instagram Reels, TikTok-Videos, YouTube-Produktionen — Social Media Content Creator auf CineGenius.",
 };
 

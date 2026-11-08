@@ -68,7 +68,8 @@ export async function generateMetadata({
   if (!data) return {};
   const project = toPublicProjectRecord(data.project);
   return {
-    title: `${project.title} (${project.year ?? "—"}) — CineGenius`,
+    alternates: { canonical: `https://www.cinegenius.co/projects/${encodeURIComponent(id)}` },
+    title: project.year ? `${project.title} (${project.year})` : project.title,
     description: project.description ?? `${project.type ?? "Film"} · ${project.year ?? ""}`,
     openGraph: {
       title: project.title,

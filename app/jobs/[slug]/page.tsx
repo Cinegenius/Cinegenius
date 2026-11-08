@@ -72,6 +72,7 @@ export async function generateMetadata({
   const job = await getJob(slug);
   if (!job) return {};
   return {
+    alternates: { canonical: `https://www.cinegenius.co/jobs/${encodeURIComponent(slug)}` },
     title: `${job.title} bei ${job.company}`,
     description: `${job.projectType} · ${job.location} · ${job.rate}. ${job.urgent ? "Dringend gesucht — " : ""}Jetzt auf CineGenius bewerben.`,
     openGraph: {

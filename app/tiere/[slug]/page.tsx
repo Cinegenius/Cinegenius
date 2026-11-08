@@ -26,10 +26,11 @@ async function getAnimal(slug: string, viewerId: string | null = null, preview =
     ownerId:provider.contactUserId ?? undefined,ownerName:provider.name,ownerAvatar:provider.imageUrl,ownerHref:provider.href,canEdit,privatePreview:!data.published };
 }
 export async function generateMetadata({params}:{params:Promise<{slug:string}>}):Promise<Metadata> {
-  const animal = await getAnimal((await params).slug);
+  const { slug } = await params;
+  const animal = await getAnimal(slug);
   if (!animal) return {robots:{index:false,follow:false}};
   const t = await getTranslations("FilmAnimals");
-  return {title:animal.title,description:animal.description?.slice(0,155) || t("description"),openGraph:{title:animal.title,description:t("description")}};
+  return {alternates:{canonical:`https://www.cinegenius.co/tiere/${encodeURIComponent(slug)}`},title:animal.title,description:animal.description?.slice(0,155) || t("description"),openGraph:{title:animal.title,description:t("description")}};
 }
 export default async function AnimalDetailPage({params,searchParams}:{params:Promise<{slug:string}>;searchParams:Promise<{preview?:string}>}) {
   const {userId} = await auth();
