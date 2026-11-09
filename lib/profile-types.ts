@@ -419,7 +419,7 @@ export interface UserProfile {
   contact_requires_sign_in?: boolean;
 
   // Profiltyp
-  profile_type: ProfileType;
+  profile_type: ProfileType | null;
   profile_types?: ProfileType[];    // Mehrfachauswahl möglich
   verified: boolean;
 

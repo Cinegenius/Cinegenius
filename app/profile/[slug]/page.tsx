@@ -17,7 +17,7 @@ import ProfileView from "./ProfileView";
 import { canViewProfile, getBlockStatus, getProfileContactVisibility } from "@/lib/trust";
 import { projectProfileContacts, visibleProfileContactFields } from "@/lib/contact-visibility";
 import type { UserProfile, ProjectCredit } from "@/lib/profile-types";
-import { getPresetForType, type ProfileModule } from "@/lib/profile-types";
+import { getPresetForType, PROFILE_PRESETS, type ProfileModule } from "@/lib/profile-types";
 import { normalizeProfileTypes } from "@/lib/profile-display";
 import type { ExternalProfileRow } from "@/lib/external-platforms";
 
@@ -62,11 +62,11 @@ async function _getProfile(slug: string): Promise<UserProfile | null> {
   const data = { ...base, ...extra } as any;
 
   const profileTypes = normalizeProfileTypes(data.profile_types, data.profile_type);
-  const type = (profileTypes[0] ?? "actor") as UserProfile["profile_type"];
+  const type = profileTypes[0] ?? null;
 
   // Use stored modules, merged with preset so new module types are never missing
-  // preset may be undefined if profile_type is unknown — always fall back to talent preset
-  const preset: ProfileModule[] = getPresetForType(type) ?? getPresetForType("actor");
+  // Legacy profiles without a type use the generic layout, never an invented talent type.
+  const preset: ProfileModule[] = type ? getPresetForType(type) : PROFILE_PRESETS.crew;
   const rawStored: ProfileModule[] = Array.isArray(data.modules) && data.modules.length > 0
     ? data.modules
     : preset;
@@ -89,7 +89,7 @@ async function _getProfile(slug: string): Promise<UserProfile | null> {
 const getProfile = cache(function getProfile(slug: string): Promise<UserProfile | null> {
   return unstable_cache(
     () => _getProfile(slug),
-    ["profile", slug],
+    ["profile-v2", slug],
     { revalidate: 300, tags: ["profiles"] }
   )();
 });
@@ -322,6 +322,7 @@ export default async function ProfilePage(
     })(),
     // Similar profiles: same type, prioritize same city, exclude self
     (async () => {
+      if (!profile.profile_type) return [];
       const city = placeReadFields(profile.location??"",profile,locale).place_city_id;
       const { data } = await db
         .from("profiles")
