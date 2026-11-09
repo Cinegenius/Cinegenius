@@ -22,6 +22,7 @@ type LocationCard = {
 };
 
 type CityGroup = {
+  cityId: string;
   city: string;
   locations: LocationCard[];
 };
@@ -96,8 +97,8 @@ export default function LocationsLanding({
             </Link>
           </div>
         ) : (
-          cityGroups.map(({ city, locations }) => (
-            <section key={city} className="px-4 sm:px-6 lg:px-8">
+          cityGroups.map(({ cityId, city, locations }) => (
+            <section key={cityId} className="px-4 sm:px-6 lg:px-8">
               {/* Section header */}
               <div className="flex items-center justify-between mb-5 max-w-7xl mx-auto">
                 <h2 className="text-xl sm:text-2xl font-bold text-text-primary flex items-center gap-2">
@@ -105,7 +106,7 @@ export default function LocationsLanding({
                   Locations in {city}
                 </h2>
                 <Link
-                  href={`/locations/suche?q=${encodeURIComponent(city)}`}
+                  href={`/locations/suche?city=${encodeURIComponent(cityId)}`}
                   className="text-sm text-text-muted hover:text-gold flex items-center gap-1 transition-colors"
                 >
                   Alle ansehen <ArrowRight size={12} />

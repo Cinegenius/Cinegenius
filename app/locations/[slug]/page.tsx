@@ -1,3 +1,6 @@
+import {getLocale} from "next-intl/server";
+import {placeReadFields} from "@/lib/places/catalog";
+import {placeDisplay} from "@/lib/places/core";
 import { canEditListing } from "@/lib/listing-access";
 import JsonLd from "@/components/JsonLd";
 import { listingPriceLabel } from "@/lib/listing-price";
@@ -27,7 +30,7 @@ async function geocodeCity(city: string): Promise<{ lat: number; lng: number }> 
 async function getLocation(slug: string, viewerId: string | null = null) {
   const { data, error } = await db
     .from("listings")
-    .select("id, user_id, company_id, type, category, title, city, price, created_at, image_url, description, metadata, blocked_dates, floor_plan_url, extra_images, responsible_person, published")
+    .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, user_id, company_id, type, category, title, city, price, created_at, image_url, description, metadata, blocked_dates, floor_plan_url, extra_images, responsible_person, published")
     .eq("id", slug)
     .eq("type", "location")
     .maybeSingle();
@@ -61,6 +64,7 @@ async function getLocation(slug: string, viewerId: string | null = null) {
       title: data.title ?? "Location",
       type: data.category ?? "Speziallocation",
       city: data.city ?? "",
+      ...placeReadFields(data.city ?? "",data),
       price: rawMetadata.price_on_request === true ? 0 : data.price ?? 0,
       priceUnit: "day" as const,
       rating: summary.rating,
@@ -118,6 +122,8 @@ export default async function LocationPage({
   const location = await getLocation(slug);
   if (!location) notFound();
 
+  const locale=await getLocale();
+  const displayLocation={...location,city:placeDisplay(placeReadFields(location.city,location,locale),location.city,locale)};
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Place",
@@ -126,7 +132,7 @@ export default async function LocationPage({
     "address": {
       "@type": "PostalAddress",
       "addressLocality": location.city,
-      "addressCountry": "DE",
+      "addressCountry": placeReadFields(location.city,location,locale).place_country_code || undefined,
     },
     "image": location.image || undefined,
     ...(location.price > 0 && !location.metadata.price_negotiable && !location.metadata.price_on_request ? { "offers": {
@@ -145,7 +151,7 @@ export default async function LocationPage({
   return (
     <>
       <JsonLd data={jsonLd} />
-      <LocationDetail location={location} />
+      <LocationDetail location={displayLocation} />
     </>
   );
 }

@@ -1,5 +1,8 @@
 "use client";
 
+import PlaceField from "@/components/PlaceField";
+import {placeDisplay} from "@/lib/places/core";
+
 import { useFormDraft } from "@/lib/use-form-draft";
 import { useFormNavigation } from "@/contexts/FormDraftContext";
 import FormDraftStatus from "@/components/FormDraftStatus";
@@ -58,7 +61,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
   const [expanded, setExpanded] = useViewState<string | null>("board.expanded", null);
   const [replies, setReplies] = useState<Record<string, Reply[]>>({});
   const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
-  const [form, setForm] = useState({ kind: "question" as Kind, title: "", body: "", city: "" });
+  const [form, setForm] = useState({ kind: "question" as Kind, title: "", body: "", city: "", selected_place_city_id: "" });
   const [busy, setBusy] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -107,7 +110,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || t("boardError"));
       if (!Object.values(replyDrafts).some(text => text.trim())) await boardDraft.complete();
-      setForm({ kind: "question", title: "", body: "", city: "" });
+      setForm({ kind: "question", title: "", body: "", city: "", selected_place_city_id: "" });
       setComposerOpen(false);
       await loadPosts("", "all");
     } catch (cause) {
@@ -163,7 +166,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
     <label className="block text-sm font-medium text-text-secondary">{t("boardTypeLabel")}<select value={form.kind} onChange={event => setForm(current => ({ ...current, kind: event.target.value as Kind }))} className="mt-1.5 h-11 w-full rounded-xl border border-border bg-bg-primary px-3 text-sm text-text-primary outline-none focus:border-gold/60">{KINDS.map(value => <option key={value} value={value}>{t(`boardKind_${value}`)}</option>)}</select></label>
     <label className="block text-sm font-medium text-text-secondary">{t("boardTitleLabel")}<input required minLength={5} maxLength={140} value={form.title} onChange={event => setForm(current => ({ ...current, title: event.target.value }))} placeholder={t("boardTitlePlaceholder")} className="mt-1.5 h-11 w-full rounded-xl border border-border bg-bg-primary px-3 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-gold/60" /></label>
     <label className="block text-sm font-medium text-text-secondary">{t("boardTextLabel")}<textarea required minLength={10} maxLength={3000} rows={5} value={form.body} onChange={event => setForm(current => ({ ...current, body: event.target.value }))} placeholder={t(form.kind === "question" ? "boardQuestionPlaceholder" : "boardBodyPlaceholder")} className="mt-1.5 w-full resize-y rounded-xl border border-border bg-bg-primary px-3 py-2.5 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-gold/60" /></label>
-    <label className="block text-sm font-medium text-text-secondary">{t("boardCityLabel")}<input maxLength={100} value={form.city} onChange={event => setForm(current => ({ ...current, city: event.target.value }))} placeholder={t("boardCityPlaceholder")} className="mt-1.5 h-11 w-full rounded-xl border border-border bg-bg-primary px-3 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-gold/60" /></label>
+    <PlaceField value={form.city} onChange={(value, cityId) => setForm(current => ({ ...current, city: value, selected_place_city_id: cityId || "" }))} />
     <div className="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end"><button type="button" onClick={() => leaveComposer(() => setComposerOpen(false))} className="min-h-11 rounded-xl border border-border px-4 text-sm font-medium text-text-secondary">{t("boardCancel")}</button><button disabled={busy || !boardDraft.loaded} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary disabled:opacity-60"><Pin size={15} />{t("boardSubmit")}</button></div>
   </form> : <div className="rounded-xl border border-border bg-bg-primary/50 p-5 text-center"><p className="text-sm text-text-secondary">{t("boardLoginPrompt")}</p><Link href="/sign-in?redirect_url=%2Fcommunity" className="mt-4 inline-flex min-h-10 items-center rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary">{t("boardLogin")}</Link></div>;
 
@@ -215,7 +218,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
               <div className="flex min-w-0 flex-1 items-center gap-1.5 sm:gap-2">
                 {post.author_avatar ? <Image src={post.author_avatar} alt="" width={24} height={24} unoptimized className="h-6 w-6 rounded-full object-cover ring-1 ring-border" /> : <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gold/10 text-[10px] font-semibold text-gold">{post.author_name.slice(0, 1).toUpperCase()}</span>}
                 <span className="truncate text-text-secondary">{post.author_name}</span>
-                {post.city && <span className="flex min-w-0 items-center gap-1 truncate"><MapPin size={12} className="shrink-0" /><span className="truncate">{post.city}</span></span>}
+                {post.city && <span className="flex min-w-0 items-center gap-1 truncate"><MapPin size={12} className="shrink-0" /><span className="truncate">{placeDisplay(post,post.city,locale)}</span></span>}
               </div>
               {fullPage ? <button type="button" onClick={() => void toggleReplies(post.id)} className="inline-flex min-h-9 shrink-0 items-center gap-1 font-semibold text-gold transition-colors hover:text-gold-light sm:gap-1.5"><MessageCircle size={14} />{t("boardReplies", { count: post.reply_count })}</button> : <Link href={`/community#${post.id}`} className="inline-flex min-h-9 shrink-0 items-center gap-1 font-semibold text-gold transition-colors hover:text-gold-light sm:gap-1.5"><MessageCircle size={14} />{t("boardReplies", { count: post.reply_count })}</Link>}
             </div>

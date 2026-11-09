@@ -1,3 +1,4 @@
+import { cityWriteFields } from "@/lib/places/catalog";
 import { normalizeAnimalCompanyDetails, animalCompanySearchFilter } from "@/lib/animal-taxonomy";
 import { bindResponsiblePerson } from "@/lib/responsible-person";
 import { getTranslations } from "next-intl/server";
@@ -30,14 +31,14 @@ function generateSlug(name: string): string {
 
 // Full company data — needed for the company editor/dashboard.
 const COMPANY_COLS_FULL =
-  "id, slug, owner_user_id, responsible_person, name, logo_url, cover_url, description, city, website, email, phone, " +
+  "place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, owner_user_id, responsible_person, name, logo_url, cover_url, description, city, website, email, phone, " +
   "categories, services, portfolio_images, tagline, bio_short, usp, founded_year, " +
   "legal_form, hq_address, countries, industry_focus, social_links, catering_details, animal_details, published, " +
   "email_public, phone_public, hq_address_public, created_at, updated_at";
 
 // Lighter set for public directory listings.
 const COMPANY_COLS_PUBLIC =
-  "id, slug, name, logo_url, description, city, categories, services, tagline, " +
+  "place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, name, logo_url, description, city, categories, services, tagline, " +
   "founded_year, catering_details, animal_details, published, created_at";
 
 // GET — list published companies (with optional filters)
@@ -92,7 +93,8 @@ export async function GET(req: NextRequest) {
     .range(from, to);
 
   if (category) query = query.contains("categories", [category]);
-  if (city)     query = query.ilike("city", `%${city.trim().slice(0, 80).replace(/[%,()]/g, "")}%`);
+  if (city)     query = query.eq("place_city_id", city.slice(0,100));
+  for(const [param,column] of [["country","place_country_code"],["region","place_region_id"]] as const){const value=req.nextUrl.searchParams.get(param);if(value)query=query.eq(column,value.slice(0,100));}
   if (q) {
     const safeQ = q.trim().slice(0, 80).replace(/[%,()]/g, "");
     if (safeQ) query = query.or(`name.ilike.%${safeQ}%,description.ilike.%${safeQ}%,city.ilike.%${safeQ}%${animalCompanySearchFilter(safeQ) ? `,${animalCompanySearchFilter(safeQ)}` : ""}`);
@@ -109,7 +111,8 @@ export async function GET(req: NextRequest) {
       .contains("categories", [CATERING_COMPANY_CATEGORY.id])
       .order("created_at", { ascending: false })
       .range(0, Math.max(to, limit - 1));
-    if (city) cateringQuery = cateringQuery.ilike("city", `%${city.trim().slice(0, 80).replace(/[%,()]/g, "")}%`);
+    if (city) cateringQuery = cateringQuery.eq("place_city_id", city.slice(0,100));
+  for(const [param,column] of [["country","place_country_code"],["region","place_region_id"]] as const){const value=req.nextUrl.searchParams.get(param);if(value)cateringQuery=cateringQuery.eq(column,value.slice(0,100));}
     const { data: cateringMatches, error: cateringError } = await cateringQuery;
     if (cateringError) return NextResponse.json({ error: cateringError.message }, { status: 500 });
     const rows = new Map<string, Record<string, unknown>>();
@@ -171,7 +174,7 @@ export async function POST(req: NextRequest) {
     onboarding_request_key,
   } = body;
 
-  if (!name?.trim() || !city?.trim()) {
+  if (!name?.trim() || (typeof city !== "string" || !cityWriteFields(city, body.selected_place_city_id).city.trim())) {
     return NextResponse.json({ error: "Firmenname und Standort sind Pflichtfelder" }, { status: 400 });
   }
   if (onboarding_request_key !== undefined && (typeof onboarding_request_key !== "string" || !/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(onboarding_request_key))) {
@@ -195,7 +198,7 @@ export async function POST(req: NextRequest) {
   if (id) {
     const { data: existing } = await db
       .from("companies")
-      .select("id, slug, owner_user_id, responsible_person, logo_url, cover_url, portfolio_images, email_public, phone_public, hq_address_public")
+      .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, owner_user_id, responsible_person, logo_url, cover_url, portfolio_images, email_public, phone_public, hq_address_public")
       .eq("id", id)
       .single();
 
@@ -233,7 +236,7 @@ export async function POST(req: NextRequest) {
         logo_url: nextLogo ?? null,
         cover_url: nextCover ?? null,
         description: description?.trim() ?? "",
-        city: city.trim(),
+        ...cityWriteFields(city.trim(), body.selected_place_city_id),
         website: website?.trim() || null,
         email: email?.trim() || null,
         phone: phone?.trim() || null,
@@ -290,7 +293,7 @@ export async function POST(req: NextRequest) {
     slug = `${baseSlug}-start-${onboarding_request_key.replaceAll("-", "").slice(0, 16)}`;
     const { data: existingRequest, error: lookupError } = await db
       .from("companies")
-      .select("id, slug, owner_user_id")
+      .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, owner_user_id")
       .eq("slug", slug)
       .maybeSingle();
     if (lookupError) return NextResponse.json({ error: "Das gespeicherte Firmenprofil konnte nicht geprüft werden." }, { status: 500 });
@@ -329,7 +332,7 @@ export async function POST(req: NextRequest) {
       logo_url: logo_url ?? null,
       cover_url: cover_url ?? null,
       description: description?.trim() ?? "",
-      city: city.trim(),
+      ...cityWriteFields(city.trim(), body.selected_place_city_id),
       website: website?.trim() || null,
       email: email?.trim() || null,
       phone: phone?.trim() || null,

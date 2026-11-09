@@ -1,4 +1,8 @@
 "use client";
+
+import { placeInputValue } from "@/lib/places/core";
+
+import PlaceField from "@/components/PlaceField";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
 import DashboardDate from "@/components/DashboardDate";
 import { useTranslations, useLocale } from "next-intl";
@@ -254,7 +258,7 @@ export default function DashboardPage() {
   const [editAnimalMeta, setEditAnimalMeta] = useState({ training_level: "", special_skills: "", count: "1", handler_included: true });
   const [editMarketplace,setEditMarketplace]=useState(()=>marketplaceDraft());
   const marketText=useTranslations("MarketplaceOffer"),marketLocale=useLocale();
-  const [editForm, setEditForm] = useState({ title: "", description: "", price: "", city: "", image_url: "" });
+  const [editForm, setEditForm] = useState({ title: "", description: "", price: "", city: "", selected_place_city_id: "", image_url: "" });
   const [editGallery, setEditGallery] = useState<string[]>([]);
   const [editBlockedDates, setEditBlockedDates] = useState<string[]>([]);
   const [newBlockedDate, setNewBlockedDate] = useState("");
@@ -281,7 +285,7 @@ export default function DashboardPage() {
     setEditingId(l.id);
     setEditResponsible(responsiblePersonDraft(l.responsible_person));
     setEditResponsibleErrors({});
-    setEditForm({ title: l.title, description: l.description ?? "", price: String(l.price), city: l.city, image_url: l.image_url ?? "" });
+    setEditForm({ title: l.title, description: l.description ?? "", price: String(l.price), city: placeInputValue(l, l.city), selected_place_city_id: (l as {place_city_id?: string}).place_city_id || "", image_url: l.image_url ?? "" });
     setEditGallery([l.image_url, ...(l.extra_images ?? [])].filter((url): url is string => typeof url === "string" && !!url));
     setEditBlockedDates(Array.isArray(l.blocked_dates) ? l.blocked_dates.filter((date): date is string => typeof date === "string") : []);
     setNewBlockedDate("");
@@ -370,7 +374,7 @@ export default function DashboardPage() {
           title: editForm.title.trim(),
           description: editForm.description,
           price: ["location", "prop", "vehicle"].includes(editingListing?.type ?? "") && editLocationMeta.price_on_request ? 0 : parseFloat(editForm.price) || 0,
-          city: editForm.city.trim(),
+          city: editForm.city.trim(), selected_place_city_id: editForm.selected_place_city_id || undefined,
           responsible_person: editResponsible,
           image_url: usesGallery ? editGallery[0] ?? null : editForm.image_url || null,
           ...(usesGallery ? { extra_images: editGallery.slice(1) } : {}),
@@ -408,7 +412,7 @@ export default function DashboardPage() {
               moderation_reason: savedListing?.moderation_reason ?? null,
               title: editForm.title.trim(),
               description: editForm.description,
-              city: editForm.city.trim(),
+              city: editForm.city.trim(), selected_place_city_id: editForm.selected_place_city_id || undefined,
               price: ["location", "prop", "vehicle"].includes(l.type) && editLocationMeta.price_on_request ? 0 : parseFloat(editForm.price) || 0,
               ...(l.type === "location" ? { metadata: {
                 ...(l.metadata ?? {}),
@@ -1914,13 +1918,7 @@ export default function DashboardPage() {
                       </div>
                       <div>
                         <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">Stadt *</label>
-                        <input
-                          type="text"
-                          value={editForm.city}
-                          onChange={(e) => setEditForm((p) => ({ ...p, city: e.target.value }))}
-                          className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold transition-colors"
-                          placeholder="z. B. Berlin"
-                        />
+                        <PlaceField value={editForm.city} onChange={(value, cityId) => setEditForm(p => ({ ...p, city: value, selected_place_city_id: cityId || "" }))} required />
                       </div>
                     </div>
                     <div>

@@ -1,3 +1,5 @@
+import {placeSearchFilter,placeReadFields} from "@/lib/places/catalog";
+import {placeDisplay} from "@/lib/places/core";
 import { getTranslations, getLocale } from "next-intl/server";
 import { marketplaceSearchCategories } from "@/lib/marketplaceCategories";
 import { animalProfileSearchValues, animalCompanySearchFilter } from "@/lib/animal-taxonomy";
@@ -26,6 +28,7 @@ export async function GET(req: NextRequest) {
   const q    = raw.replace(/[(),]/g, " ").trim();
   const like = `%${q}%`;
   const catalog=await getTranslations("MarketplaceCatalog"),market=await getTranslations("MarketplaceOffer"),locale=await getLocale();
+  const geoFilter=placeSearchFilter(raw);
   const categoryCandidates=marketplaceSearchCategories(q,catalog).map(value=>`"${value.replace(/["\\]/g,'')}"`).join(",");
 
   const wantListings = type === "all" || ["location", "vehicle", "prop", "job", "creator", "animal"].includes(type);
@@ -42,9 +45,9 @@ export async function GET(req: NextRequest) {
       ? (() => {
           let q2 = db
             .from("listings")
-            .select("id, title, city, type, category, price, image_url, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type, marketplace:metadata->marketplace")
+            .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, title, city, type, category, price, image_url, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type, marketplace:metadata->marketplace")
             .eq("published", true)
-            .or(`title.ilike.${like},city.ilike.${like},category.ilike.${like},description.ilike.${like}${categoryCandidates?`,and(type.in.(prop,vehicle),category.in.(${categoryCandidates}))`:""}`)
+            .or(`title.ilike.${like},city.ilike.${like},category.ilike.${like},description.ilike.${like}${categoryCandidates?`,and(type.in.(prop,vehicle),category.in.(${categoryCandidates}))`:""}${geoFilter?`,${geoFilter}`:""}`)
             .order("created_at", { ascending: false });
           if (type !== "all") q2 = q2.eq("type", type);
           return q2.limit(type === "all" ? 12 : 24);
@@ -54,8 +57,8 @@ export async function GET(req: NextRequest) {
     wantProfiles
       ? db
           .from("profiles")
-          .select("user_id, display_name, location, role, positions, avatar_url, available")
-          .or(`display_name.ilike.${like},role.ilike.${like},location.ilike.${like},bio.ilike.${like}`)
+          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available")
+          .or(`display_name.ilike.${like},role.ilike.${like},location.ilike.${like},bio.ilike.${like}${geoFilter?`,${geoFilter}`:""}`)
           .not("display_name", "is", null)
           .neq("display_name", "")
           .limit(type === "all" ? 8 : 24)
@@ -64,16 +67,16 @@ export async function GET(req: NextRequest) {
     wantCompanies
       ? db
           .from("companies")
-          .select("id, slug, name, city, logo_url, categories")
+          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, name, city, logo_url, categories")
           .eq("published", true)
-          .or(`name.ilike.${like},city.ilike.${like},description.ilike.${like}`)
+          .or(`name.ilike.${like},city.ilike.${like},description.ilike.${like}${geoFilter?`,${geoFilter}`:""}`)
           .limit(type === "all" ? 4 : 24)
       : Promise.resolve({ data: [] }),
 
     cateringProfileValues.length
       ? Promise.all(cateringProfileValues.map((position) => db
           .from("profiles")
-          .select("user_id, display_name, location, role, positions, avatar_url, available")
+          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available")
           .contains("positions", [position])
           .not("display_name", "is", null)
           .neq("display_name", "")
@@ -82,23 +85,23 @@ export async function GET(req: NextRequest) {
 
     searchCateringCompanies
       ? db.from("companies")
-          .select("id, slug, name, city, logo_url, categories")
+          .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, name, city, logo_url, categories")
           .eq("published", true)
           .contains("categories", [CATERING_COMPANY_CATEGORY.id])
           .limit(type === "all" ? 8 : 24)
       : Promise.resolve({ data: [] }),
-    animalValues.length ? db.from("profiles").select("user_id, display_name, location, role, positions, avatar_url, available").overlaps("positions", animalValues).limit(24) : Promise.resolve({data: []}),
-    animalValues.length ? db.from("profiles").select("user_id, display_name, location, role, positions, avatar_url, available").in("role", animalValues).limit(24) : Promise.resolve({data: []}),
-    wantCompanies && animalCompanySearchFilter(raw) ? db.from("companies").select("id, slug, name, city, logo_url, categories").eq("published",true).or(animalCompanySearchFilter(raw)).limit(24) : Promise.resolve({data: []}),
-    safetyMedicalValues.length ? db.from("profiles").select("user_id, display_name, location, role, positions, avatar_url, available").overlaps("positions", safetyMedicalValues).limit(24) : Promise.resolve({data: []}),
-    safetyMedicalValues.length ? db.from("profiles").select("user_id, display_name, location, role, positions, avatar_url, available").in("role", safetyMedicalValues).limit(24) : Promise.resolve({data: []}),
-    searchSafetyMedicalCompanies ? db.from("companies").select("id, slug, name, city, logo_url, categories").eq("published", true).contains("categories", [SAFETY_MEDICAL_COMPANY_CATEGORY_ID]).limit(24) : Promise.resolve({data: []}),
+    animalValues.length ? db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available").overlaps("positions", animalValues).limit(24) : Promise.resolve({data: []}),
+    animalValues.length ? db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available").in("role", animalValues).limit(24) : Promise.resolve({data: []}),
+    wantCompanies && animalCompanySearchFilter(raw) ? db.from("companies").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, name, city, logo_url, categories").eq("published",true).or(animalCompanySearchFilter(raw)).limit(24) : Promise.resolve({data: []}),
+    safetyMedicalValues.length ? db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available").overlaps("positions", safetyMedicalValues).limit(24) : Promise.resolve({data: []}),
+    safetyMedicalValues.length ? db.from("profiles").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, role, positions, avatar_url, available").in("role", safetyMedicalValues).limit(24) : Promise.resolve({data: []}),
+    searchSafetyMedicalCompanies ? db.from("companies").select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, name, city, logo_url, categories").eq("published", true).contains("categories", [SAFETY_MEDICAL_COMPANY_CATEGORY_ID]).limit(24) : Promise.resolve({data: []}),
   ]);
 
   const listings = (listingsRes.data ?? []).map((l: Record<string, unknown>) => ({
     id: l.id as string,
     title: l.title as string,
-    subtitle: (l.city as string) ?? "",
+    subtitle: placeDisplay(placeReadFields(String(l.city??""),l,locale),String(l.city??""),locale),
     type: l.type as string,
     price: (l.price as number) ?? 0,
     priceLabel: ["prop","vehicle","location"].includes(String(l.type)) ? listingPriceLabel((l.price as number) ?? 0,l,"/Tag",locale,market) : undefined,
@@ -119,7 +122,7 @@ export async function GET(req: NextRequest) {
     .map((p: Record<string, unknown>) => ({
       id: p.user_id as string,
       title: p.display_name as string,
-      subtitle: [(p.role ?? (p.positions as string[])?.[0]), p.location].filter(Boolean).join(" · "),
+      subtitle: [(p.role ?? (p.positions as string[])?.[0]), placeDisplay(placeReadFields(String(p.location??""),p,locale),String(p.location??""),locale)].filter(Boolean).join(" · "),
       type: "profile",
       price: 0,
       image: p.avatar_url as string | null,
@@ -134,7 +137,7 @@ export async function GET(req: NextRequest) {
   const companies = [...companyById.values()].map((c: Record<string, unknown>) => ({
     id: (c.slug ?? c.id) as string,
     title: c.name as string,
-    subtitle: (c.city as string) ?? "",
+    subtitle: placeDisplay(placeReadFields(String(c.city??""),c,locale),String(c.city??""),locale),
     type: "company",
     price: 0,
     image: c.logo_url as string | null,

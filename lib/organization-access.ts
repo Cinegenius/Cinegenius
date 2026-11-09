@@ -13,7 +13,7 @@ export async function canManageOrganization(organizationId: string, userId: stri
 
 export async function ownOrganizations(userId: string) {
   const { data, error } = await db.from("organizations")
-    .select("id,slug,name,description,logo_url,topics,city,region,website_url,public_contact_email,responsible_person,moderation_status,moderation_reason,created_at,updated_at")
+    .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id,slug,name,description,logo_url,topics,city,region,website_url,public_contact_email,responsible_person,moderation_status,moderation_reason,created_at,updated_at")
     .eq("owner_user_id", userId).order("created_at", { ascending: false });
   return error ? [] : data ?? [];
 }

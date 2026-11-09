@@ -1,3 +1,4 @@
+import { placeReadFields } from "@/lib/places/catalog";
 import { isPeopleDirectoryProfile } from "@/lib/profile-provider-filters";
 import { crewOccupationIds } from "@/lib/crew-occupations";
 import type { Metadata } from "next";
@@ -11,7 +12,7 @@ import { primaryOccupationForPositions, occupationReference } from "@/lib/primar
 import PageHeader from "@/components/PageHeader";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
 import { getProfileDisplayPositions, normalizeProfileTypes } from "@/lib/profile-display";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 
 // Mixed person/offer accounts are retained; offer-only accounts are excluded below.
 const VENDOR_TYPES = new Set(
@@ -61,14 +62,14 @@ const getCreatorDirectoryData = unstable_cache(
     const [listingResult, profileResult] = await Promise.all([
       db
         .from("listings")
-        .select("id, user_id, title, category, city, price, image_url, description")
+        .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, user_id, title, category, city, price, image_url, description")
         .eq("published", true)
         .eq("type", "creator")
         .order("created_at", { ascending: false })
         .limit(300),
       db
         .from("profiles")
-        .select("user_id, display_name, location, bio, skills, role, positions, crew, available, avatar_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point, last_seen_at")
+        .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, skills, role, positions, crew, available, avatar_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point, last_seen_at")
         .not("display_name", "is", null)
         .neq("display_name", "")
         .order("display_name", { ascending: true })
@@ -125,6 +126,7 @@ export default async function CreatorsPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const locale = await getLocale();
   const [t, tCommon, { userId }, directoryData, params] = await Promise.all([
     getTranslations("creators"),
     getTranslations("common"),
@@ -161,6 +163,7 @@ export default async function CreatorsPage({
       primaryOccupation: occupationReference(primaryOccupationForPositions(null, l.category ? [l.category] : [])),
       occupationIds: crewOccupationIds({positions: l.category ? [l.category] : []}),
       location: l.city ?? "",
+        ...placeReadFields(l.city ?? "", l, locale),
       image: l.image_url ?? "",
       avatar: l.image_url ?? "",
       rating: 0,
@@ -203,6 +206,7 @@ export default async function CreatorsPage({
         primaryOccupation: occupationReference(primaryOccupationForPositions(p.crew?.primaryOccupation, p.positions ?? [], p.role)),
         occupationIds: crewOccupationIds(p),
         location: p.location ?? "",
+        ...placeReadFields(p.location ?? "", p, locale),
         // cover: prefer first portfolio image, fall back to avatar
         image: (Array.isArray(p.portfolio_images) && p.portfolio_images.length > 0)
           ? p.portfolio_images[0]

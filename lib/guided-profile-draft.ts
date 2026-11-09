@@ -1,3 +1,4 @@
+import { selectedPlaceId } from "./selected-place-id";
 import { departments, getProfileTypesForDepartment } from "@/lib/departments";
 import { PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
 
@@ -5,6 +6,7 @@ export type GuidedProfileDraft = {
   step: number;
   name: string;
   city: string;
+  selected_place_city_id?: string;
   /** Non-department profile types retained for legacy drafts and casting roles. */
   types: string[];
   departmentIds: string[];
@@ -56,6 +58,7 @@ export function normalizeGuidedProfileDraft(value: Partial<GuidedProfileDraft> &
   return {
     ...START_GUIDED_PROFILE_DRAFT,
     ...currentValues,
+    selected_place_city_id: selectedPlaceId(value.selected_place_city_id),
     step: Math.max(1, Math.min(4, Number(value.step) || 1)),
     types: [...new Set(types)],
     departmentIds: [...departmentIds].filter((id) => departments.some((department) => department.id === id)),

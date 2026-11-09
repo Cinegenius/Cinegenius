@@ -1,5 +1,8 @@
 "use client";
 
+import PlaceFilters, { EMPTY_PLACE_FILTERS } from "@/components/PlaceFilters";
+import { placeSearchMatches, matchesPlace, placeDisplay, placeOptions } from "@/lib/places/core";
+
 import { useViewUrl } from "@/lib/use-view-url";
 import { useViewState } from "@/lib/use-view-state";
 import { listingPriceLabel } from "@/lib/listing-price";
@@ -18,7 +21,7 @@ import {
   Map, Navigation, SlidersHorizontal, X, Share2, Film,
 } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 const LocationMap = dynamicImport(() => import("@/components/LocationMap"), {
   ssr: false,
@@ -77,6 +80,7 @@ function getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number) {
 type ViewMode = "split" | "list" | "map";
 
 function LocationsInner({ serverListings }: { serverListings: Location[] }) {
+  const locale=useLocale();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -161,6 +165,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
     }
   };
 
+  const [placeFilters, setPlaceFilters] = useViewState("locations.placeFilters", () => ({country:searchParams.get("country")??"",region:searchParams.get("region")??"",city:searchParams.get("city")??""}));
   const [query, setQuery] = useViewState("locations.query", () => searchParams.get("q") ?? "");
   const [activeType, setActiveType] = useViewState("locations.activeType", () => searchParams.get("type") ?? "All Types");
   const [instantOnly, setInstantOnly] = useViewState("locations.instantOnly", () => searchParams.get("instant") === "1");
@@ -190,12 +195,14 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
   const filtered = useMemo(() => {
     let result = [...allLocations];
 
+    result = result.filter(row => matchesPlace(row,"country",placeFilters.country) && matchesPlace(row,"region",placeFilters.region) && matchesPlace(row,"city",placeFilters.city));
+
     if (query.trim()) {
       const q = query.toLowerCase();
       result = result.filter(
         (l) =>
           l.title.toLowerCase().includes(q) ||
-          l.city.toLowerCase().includes(q) ||
+          (l.city.toLowerCase().includes(q) || placeSearchMatches(l,q)) ||
           l.type.toLowerCase().includes(q) ||
           l.tags.some((t) => t.toLowerCase().includes(q))
       );
@@ -238,7 +245,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
     if (sortKey === "rating") result.sort((a, b) => b.rating - a.rating);
 
     return result;
-  }, [allLocations, query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, userLocation, radiusKm]);
+  }, [allLocations, placeFilters, query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, userLocation, radiusKm]);
 
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
@@ -270,11 +277,12 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
     el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [activeId]);
 
-  const filterKey = JSON.stringify([query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, userLocation, radiusKm]);
+  const filterKey = JSON.stringify([placeFilters, query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, userLocation, radiusKm]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
   const showMore = () => setPagination({ filterKey, visibleCount: visibleCount + PAGE_SIZE });
 
   const resetFilters = () => {
+    setPlaceFilters(EMPTY_PLACE_FILTERS);
     setQuery(""); setActiveType("All Types");
     setInstantOnly(false); setVerifiedOnly(false);
     setMinPrice(""); setMaxPrice("");
@@ -294,10 +302,12 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
   if (lageFilter !== "Alle") filterParams.set("lage", lageFilter);
   if (powerOnly) filterParams.set("power", "1");
   if (sortKey !== "featured") filterParams.set("sort", sortKey);
+  for (const kind of ['country','region','city'] as const) if(placeFilters[kind])filterParams.set(kind,placeFilters[kind]);
   useViewUrl(filterParams.size ? `${pathname}?${filterParams}` : pathname);
 
-  const hasActiveFilters = query || activeType !== "All Types" || instantOnly || verifiedOnly || minPrice || maxPrice || userLocation || lageFilter !== "Alle" || powerOnly;
+  const hasActiveFilters = Object.values(placeFilters).some(Boolean) || query || activeType !== "All Types" || instantOnly || verifiedOnly || minPrice || maxPrice || userLocation || lageFilter !== "Alle" || powerOnly;
   const mobileChips: BrowseChip[] = [
+    ...(['country','region','city'] as const).flatMap(kind => placeFilters[kind] ? [{id:`place-${kind}`,label:placeOptions(allLocations,kind,locale).find(option=>option.value===placeFilters[kind])?.label??placeFilters[kind],onRemove:()=>setPlaceFilters({...placeFilters,[kind]:''})}] : []),
     ...(activeType !== "All Types" ? [{ id: "type", label: activeType, onRemove: () => setActiveType("All Types") }] : []),
     ...(minPrice ? [{ id: "min", label: `ab ${minPrice} €`, onRemove: () => setMinPrice("") }] : []),
     ...(maxPrice ? [{ id: "max", label: `bis ${maxPrice} €`, onRemove: () => setMaxPrice("") }] : []),
@@ -329,7 +339,8 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
         resetLabel={t("resetFilters")}
         showResultsLabel={t("results", { count: filtered.length })}
       >
-        <div className="grid grid-cols-2 gap-3">
+
+        <PlaceFilters rows={allLocations} value={placeFilters} onChange={setPlaceFilters} scope="locations" />        <div className="grid grid-cols-2 gap-3">
           <MobileFilterField label="Preis ab (€)"><input inputMode="decimal" type="number" min="0" value={minPrice} onChange={(event) => setMinPrice(event.target.value)} placeholder="Beliebig" /></MobileFilterField>
           <MobileFilterField label="Preis bis (€)"><input inputMode="decimal" type="number" min="0" value={maxPrice} onChange={(event) => setMaxPrice(event.target.value)} placeholder="Beliebig" /></MobileFilterField>
         </div>
@@ -352,6 +363,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
           {userLocation && <MobileFilterField label={t("radiusLabel")}><select value={radiusKm} onChange={(event) => setRadiusKm(Number(event.target.value))}>{[10, 25, 50, 100, 200, 500].map((value) => <option key={value} value={value}>{value} km</option>)}</select></MobileFilterField>}
         </div>
       </MobileBrowseControls>
+      <div className="hidden xl:block site-container py-3"><PlaceFilters rows={allLocations} value={placeFilters} onChange={setPlaceFilters} scope="locations" /></div>
       {/* ── TOP BAR ── */}
       <div className="hidden xl:block browse-toolbar shrink-0">
         <div className="site-container space-y-2 py-2">
@@ -598,7 +610,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                         <div className="p-3">
                           <h3 className="font-semibold text-text-primary text-sm leading-snug line-clamp-1 mb-0.5">{loc.title}</h3>
                           <p className="text-xs text-text-muted flex items-center gap-1 mb-1.5">
-                            <MapPin size={10} /> {loc.city} · {loc.type}
+                            <MapPin size={10} /> {placeDisplay(loc, loc.city, locale)} · {loc.type}
                           </p>
                           <div className="flex items-center justify-between mb-1.5">
                             <span className="text-sm font-bold text-gold">
@@ -663,7 +675,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                       </div>
                       <div className="p-4">
                         <h3 className="font-semibold text-text-primary text-sm mb-1">{loc.title}</h3>
-                        <p className="text-xs text-text-muted mb-2 flex items-center gap-1"><MapPin size={11} /> {loc.city}</p>
+                        <p className="text-xs text-text-muted mb-2 flex items-center gap-1"><MapPin size={11} /> {placeDisplay(loc, loc.city, locale)}</p>
                         <div className="flex items-center justify-between pt-2 border-t border-border mb-1.5">
                           <span className="text-xs text-text-muted">{loc.type}</span>
                           <span className="text-sm font-bold text-gold">{listingPriceLabel(loc.price,loc.metadata)}</span>

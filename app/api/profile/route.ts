@@ -1,3 +1,6 @@
+import { placeWriteFields } from "@/lib/places/catalog";
+import { PLACE_COLUMNS } from "@/lib/places/core";
+import { getTranslations } from "next-intl/server";
 import { crewOccupationsError } from "@/lib/crew-occupations";
 import { primaryOccupationError } from "@/lib/primary-occupation";
 import { db } from "@/lib/db";
@@ -15,7 +18,7 @@ import {
 
 // Stable columns that always exist in the profiles table
 const PROFILE_COLS = [
-  "user_id", "display_name", "display_name_alias", "slug", "phone",
+  "place_country_code", "place_region_id", "place_city_id", "place_city_name", "place_region_name", "place_status", "user_id", "display_name", "display_name_alias", "slug", "phone",
   "avatar_url", "cover_image_url", "role", "positions", "location", "bio",
   "tagline", "profile_type", "account_type",
   "verified", "available", "available_from", "day_rate", "languages",
@@ -40,6 +43,24 @@ function privateNoStoreJson(body: unknown, status = 200) {
   const response = NextResponse.json(body, { status });
   response.headers.set("Cache-Control", "private, no-store, max-age=0");
   return response;
+}
+
+// A migration or explicit admin review may have corrected only the canonical
+// fields. An older editor or recovered draft resubmitting the unchanged legacy
+// text must not undo that correction when saving another profile detail.
+async function profilePlaceFields(userId: string, raw: string, selectedCityId?: unknown) {
+  const result = await db.from("profiles")
+    .select(`location,${PLACE_COLUMNS},place_original`)
+    .eq("user_id", userId).maybeSingle();
+  if (result.error) return { fields: null, error: result.error };
+  const current = result.data as Record<string, unknown> | null;
+  if (selectedCityId === undefined && current?.place_status === "verified" && String(current.location ?? "").trim() === raw.trim()) {
+    return {
+      fields: Object.fromEntries([...PLACE_COLUMNS.split(','), 'place_original'].map(key => [key, current[key] ?? null])),
+      error: null,
+    };
+  }
+  return { fields: placeWriteFields(raw.trim(), selectedCityId), error: null };
 }
 
 function isValidProfileType(value: unknown): value is string | null {
@@ -115,9 +136,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ungültige Bildeinstellungen. Bitte prüfe Coverposition und Helligkeit." }, { status: 400 });
   }
 
+  const place = typeof location === "string" ? await profilePlaceFields(userId, location, body.selected_place_city_id) : null;
+  if (place?.error) return privateNoStoreJson({ error: (await getTranslations("Places"))("unavailable") }, 503);
   const fieldErrors: Record<string, string> = {};
   if (typeof display_name !== "string" || !display_name.trim()) fieldErrors.display_name = "Bitte gib deinen Namen ein.";
-  if (typeof location !== "string" || !location.trim()) fieldErrors.location = "Bitte gib deinen Standort ein.";
+  if (typeof location !== "string" || !String(place?.fields?.place_city_name ?? '').trim()) fieldErrors.location = "Bitte gib deinen Standort ein.";
   if (profile_type !== undefined && !isValidProfileType(profile_type)) {
     return NextResponse.json({ error: "Ungültiger Profiltyp." }, { status: 400 });
   }
@@ -154,6 +177,7 @@ export async function POST(req: NextRequest) {
     display_name: display_name.trim(),
     bio: bio?.trim() ?? "",
     location: location?.trim() ?? "",
+    ...place?.fields,
     avatar_url: avatar_url ?? null,
     skills: skills ?? [],
     memberships: memberships ?? [],
@@ -286,11 +310,13 @@ export async function PATCH(req: NextRequest) {
       safe.profile_types = typeof safe.profile_type === "string" ? [safe.profile_type] : [];
     }
 
+    const place = typeof safe.location === "string" ? await profilePlaceFields(userId, safe.location, body.selected_place_city_id) : null;
+    if (place?.error) return privateNoStoreJson({ error: (await getTranslations("Places"))("unavailable") }, 503);
     const fieldErrors: Record<string, string> = {};
     if ("display_name" in safe && (typeof safe.display_name !== "string" || !safe.display_name.trim())) {
       fieldErrors.display_name = "Bitte gib deinen Namen ein.";
     }
-    if ("location" in safe && (typeof safe.location !== "string" || !safe.location.trim())) {
+    if ("location" in safe && (typeof safe.location !== "string" || !String(place?.fields?.place_city_name ?? '').trim())) {
       fieldErrors.location = "Bitte gib deinen Standort ein.";
     }
     if ("positions" in safe || "profile_types" in safe || "profile_type" in safe) {
@@ -303,6 +329,8 @@ export async function PATCH(req: NextRequest) {
     if (Object.keys(fieldErrors).length > 0) {
       return NextResponse.json({ error: "Bitte prüfe die markierten Pflichtfelder.", fieldErrors }, { status: 400 });
     }
+
+    if (place?.fields) Object.assign(safe, place.fields);
 
     // Slug: validate format and check uniqueness to prevent profile hijacking
     if ("slug" in safe) {

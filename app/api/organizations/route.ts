@@ -1,3 +1,4 @@
+import { cityWriteFields } from "@/lib/places/catalog";
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest) {
   const now = new Date().toISOString();
   const { data, error } = await db.from("organizations").insert({
     id, owner_user_id: session.userId, responsible_user_id: session.userId, slug, name,
-    description: text(body?.description, 5000), topics, city: text(body?.city, 120),
+    description: text(body?.description, 5000), topics, ...cityWriteFields(text(body?.city, 320), body?.selected_place_city_id),
     region: text(body?.region, 120), website_url: websiteUrl, public_contact_email: contactEmail, logo_url: logo.url,
     responsible_person: responsible.person, moderation_status: body?.submit === true ? "submitted" : "draft",
     submitted_at: body?.submit === true ? now : null, last_actor_user_id: session.userId, updated_at: now,
@@ -62,7 +63,7 @@ export async function PATCH(request: NextRequest) {
   const body = await request.json().catch(() => null) as Record<string, unknown> | null;
   const id = text(body?.id, 60);
   if (!id || !await canManageOrganization(id, session.userId)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  const { data: existing, error: readError } = await db.from("organizations").select("moderation_status,updated_at,responsible_user_id,responsible_person").eq("id", id).maybeSingle();
+  const { data: existing, error: readError } = await db.from("organizations").select("moderation_status,updated_at,responsible_user_id,responsible_person,region").eq("id", id).maybeSingle();
   if (readError) return NextResponse.json({ error: "load" }, { status: 503 });
   if (!existing) return NextResponse.json({ error: "not_found" }, { status: 404 });
   if (typeof body?.expectedUpdatedAt !== "string" || body.expectedUpdatedAt !== existing.updated_at) return NextResponse.json({ error: "conflict" }, { status: 409 });
@@ -85,8 +86,10 @@ export async function PATCH(request: NextRequest) {
   const now = new Date().toISOString();
   const patch: Record<string, unknown> = {
     name,
-    description: text(body?.description, 5000), topics, city: text(body?.city, 120),
-    region: text(body?.region, 120), website_url: websiteUrl, public_contact_email: contactEmail, logo_url: logo.url, responsible_person: responsible.person,
+    description: text(body?.description, 5000), topics,
+    ...(body && Object.hasOwn(body, "city") ? cityWriteFields(text(body.city, 320), body.selected_place_city_id) : {}),
+    // The legacy region column may describe a service area rather than an admin1 region.
+    ...(body && Object.hasOwn(body, "region") ? { region: body.region === existing.region ? existing.region : text(body.region, 120) } : {}), website_url: websiteUrl, public_contact_email: contactEmail, logo_url: logo.url, responsible_person: responsible.person,
     moderation_status: nextStatus, last_actor_user_id: session.userId, updated_at: now,
   };
   if (nextStatus === "submitted") {

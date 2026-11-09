@@ -1,3 +1,4 @@
+import { cityWriteFields, placeReadFields, placeSearchFilter } from "@/lib/places/catalog";
 import { DEPARTMENTS, deptValues, groupValues, marketplaceCategory, marketplaceSearchCategories } from "@/lib/marketplaceCategories";
 import { validateMarketplaceOffer } from "@/lib/marketplace-offer";
 import { attemptedApproval, OFFER_MODERATION_COLUMNS } from "@/lib/offer-moderation";
@@ -17,7 +18,7 @@ import { editableCompanyIdsForUser } from "@/lib/listing-access";
 // Explicit column list — avoids SELECT * sending unused data over the wire.
 // Update this list if new listing columns are added.
 const LISTING_COLS =
-  "id, user_id, responsible_person, type, category, title, description, price, city, " +
+  "place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, user_id, responsible_person, type, category, title, description, price, city, " +
   "image_url, company_id, published, metadata, blocked_dates, " +
   "floor_plan_url, extra_images, created_at," + OFFER_MODERATION_COLUMNS;
 
@@ -25,7 +26,7 @@ const LISTING_COLS =
 // internal ownership IDs, arbitrary metadata and private availability data on
 // authenticated owner endpoints.
 const LISTING_COLS_PUBLIC =
-  "id, type, category, title, description, price, city, image_url, published, extra_images, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type, marketplace:metadata->marketplace";
+  "place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, type, category, title, description, price, city, image_url, published, extra_images, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type, marketplace:metadata->marketplace";
 
 function privateNoStoreJson(body: unknown, status = 200) {
   const response = NextResponse.json(body, { status });
@@ -81,14 +82,15 @@ export async function GET(req: NextRequest) {
     if(group)query=query.in("category",groupValues(group));else if(selected)query=query.in("category",deptValues(selected));
     const offer=req.nextUrl.searchParams.get("offer");
     if(offer==="miete"||offer==="kauf")query=query.or(`metadata->>rental_type.eq.${offer},metadata->>rental_type.eq.beides${offer==='miete'?',metadata->>rental_type.is.null':''}`);
-    if(text){const catalog=await getTranslations("MarketplaceCatalog");const values=marketplaceSearchCategories(text,catalog);const cats=values.map(v=>`"${v.replace(/["\\]/g,'')}"`).join(',');query=query.or(`title.ilike.%${text}%,description.ilike.%${text}%,city.ilike.%${text}%,category.ilike.%${text}%${cats?`,category.in.(${cats})`:''}`);}
+    if(text){const placeFilter=placeSearchFilter(text);const catalog=await getTranslations("MarketplaceCatalog");const values=marketplaceSearchCategories(text,catalog);const cats=values.map(v=>`"${v.replace(/["\\]/g,'')}"`).join(',');query=query.or(`title.ilike.%${text}%,description.ilike.%${text}%,city.ilike.%${text}%,category.ilike.%${text}%${cats?`,category.in.(${cats})`:''}${placeFilter?`,${placeFilter}`:''}`);}
   }
+  for(const [param,column] of [['country','place_country_code'],['region','place_region_id'],['city','place_city_id']] as const){const value=req.nextUrl.searchParams.get(param);if(value)query=query.eq(column,value.slice(0,100));}
   const sort=req.nextUrl.searchParams.get("sort");
   query=sort==='price-asc'||sort==='price-desc'?query.order("price",{ascending:sort==='price-asc'}).order("id"):query.order("created_at",{ascending:false}).order("id");
   const {data,error,count}=await query.range(from,to);
   if(error){console.error("[listings GET]",error);return NextResponse.json({error:(await getTranslations("OfferModeration"))("saveError")},{status:503});}
   const priceText=await getTranslations("MarketplaceOffer"),locale=await getLocale();
-  return NextResponse.json({data:(data??[]).map((listing:Record<string,unknown>)=>({...listing,priceLabel:listingPriceLabel(Number(listing.price),listing,'/Tag',locale,priceText)})),page,limit,count:count??0},{headers:{"Cache-Control":"private, no-store, max-age=0"}});
+  return NextResponse.json({data:(data??[]).map((listing:Record<string,unknown>)=>({...listing,...placeReadFields(String(listing.city??""),listing,locale),priceLabel:listingPriceLabel(Number(listing.price),listing,'/Tag',locale,priceText)})),page,limit,count:count??0},{headers:{"Cache-Control":"private, no-store, max-age=0"}});
 
 }
 
@@ -110,7 +112,7 @@ export async function POST(req: Request) {
 
   const VALID_LISTING_TYPES = new Set(["job", "location", "prop", "vehicle", "creator", "animal"]);
 
-  if (!type || !title || !city) {
+  if (!type || !title || typeof city !== "string" || !cityWriteFields(city, body.selected_place_city_id).city.trim()) {
     return NextResponse.json({ error: "Pflichtfelder fehlen (type, title, city)" }, { status: 400 });
   }
 
@@ -131,7 +133,7 @@ export async function POST(req: Request) {
 
   // SECURITY: input length limits and price sanitization
   if (title.length > 200) return NextResponse.json({ error: "Titel zu lang (max. 200 Zeichen)" }, { status: 400 });
-  if (city.length > 100) return NextResponse.json({ error: "Stadt zu lang (max. 100 Zeichen)" }, { status: 400 });
+  if (city.length > 320) return NextResponse.json({ error: (await getTranslations("Places"))("invalid") }, { status: 400 });
   if (description && description.length > 5000) return NextResponse.json({ error: "Beschreibung zu lang (max. 5000 Zeichen)" }, { status: 400 });
   const safePrice = Math.max(0, Math.min(Number(price) || 0, 1_000_000));
 
@@ -192,7 +194,7 @@ export async function POST(req: Request) {
       title,
       description: description ?? "",
       price: type === "animal" ? 0 : marketplace && metadata?.marketplace ? (metadata.marketplace.mode === "sale" ? metadata.marketplace.sale_mode === "request" ? 0 : metadata.marketplace.sale_price : metadata.marketplace.rent_mode === "request" ? 0 : metadata.marketplace.rent_price) ?? 0 : safePrice,
-      city,
+      ...cityWriteFields(city, body.selected_place_city_id),
       image_url: storedImageUrl,
       company_id: company_id ?? null,
       // Saving or completing an offer never grants public release.

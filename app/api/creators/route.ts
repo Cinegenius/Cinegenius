@@ -1,3 +1,5 @@
+import { getLocale } from "next-intl/server";
+import { placeReadFields } from "@/lib/places/catalog";
 import { isPeopleDirectoryProfile } from "@/lib/profile-provider-filters";
 import { crewOccupationIds } from "@/lib/crew-occupations";
 import { primaryOccupationForPositions, occupationReference } from "@/lib/primary-occupation";
@@ -11,13 +13,14 @@ const PAGE_SIZE = 48;
 
 // GET /api/creators?page=1  → next page of profiles (page 0 = first 96 served by SSR)
 export async function GET(req: NextRequest) {
+  const locale = await getLocale();
   const page = Math.max(1, Math.min(100000, parseInt(req.nextUrl.searchParams.get("page") ?? "1", 10) || 1));
   const from = 96 + (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
 
   const { data: profiles, error } = await db
     .from("profiles")
-    .select("user_id, display_name, location, bio, skills, role, positions, crew, available, avatar_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point")
+    .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, location, bio, skills, role, positions, crew, available, avatar_url, portfolio_images, languages, profile_types, profile_type, physical, availability_config, day_rate, travel_ready, verified, tagline, focal_point")
     .not("display_name", "is", null)
     .neq("display_name", "")
     .order("display_name", { ascending: true })
@@ -50,6 +53,7 @@ export async function GET(req: NextRequest) {
       primaryOccupation: occupationReference(primaryOccupationForPositions(p.crew?.primaryOccupation, p.positions ?? [], p.role)),
       occupationIds: crewOccupationIds(p),
       location: p.location ?? "",
+        ...placeReadFields(p.location ?? "", p, locale),
       image: (Array.isArray(p.portfolio_images) && p.portfolio_images.length > 0) ? p.portfolio_images[0] : (p.avatar_url ?? ""),
       avatar: p.avatar_url ?? "",
       rating: 0, reviews: 0,

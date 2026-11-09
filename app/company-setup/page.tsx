@@ -1,4 +1,8 @@
 "use client";
+
+import { placeInputValue } from "@/lib/places/core";
+
+import PlaceField from "@/components/PlaceField";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
@@ -82,6 +86,7 @@ export default function CompanySetupPage() {
   // Basic info
   const [name, setName] = useState("");
   const [city, setCity] = useState("");
+  const [selectedPlaceCityId, setSelectedPlaceCityId] = useState("");
   const [description, setDescription] = useState("");
   const [website, setWebsite] = useState("");
   const [email, setEmail] = useState("");
@@ -171,7 +176,7 @@ export default function CompanySetupPage() {
           setResponsibleAccountId(c.responsible_person?.userId || c.owner_user_id);
 
           setName(c.name ?? "");
-          setCity(c.city ?? "");
+          setCity(placeInputValue(c, c.city ?? "")); setSelectedPlaceCityId(c.place_city_id || "");
           setDescription(c.description ?? "");
           setWebsite(c.website ?? "");
           setEmail(c.email ?? "");
@@ -230,7 +235,7 @@ export default function CompanySetupPage() {
       if (!active) return;
       if (draft) {
         setResponsible(responsiblePersonDraft(draft.responsible));
-        setName(draft.name ?? ""); setCity(draft.city ?? ""); setDescription(draft.description ?? "");
+        setName(draft.name ?? ""); setCity(draft.city ?? ""); setSelectedPlaceCityId(draft.selectedPlaceCityId ?? ""); setDescription(draft.description ?? "");
         setWebsite(draft.website ?? ""); setEmail(draft.email ?? ""); setPhone(draft.phone ?? "");
         setEmailPublic(draft.emailPublic === true); setPhonePublic(draft.phonePublic === true); setHqAddressPublic(draft.hqAddressPublic === true);
         setLogoUrl(draft.logoUrl ?? ""); setLogoPreview(draft.logoUrl ?? "");
@@ -253,12 +258,12 @@ export default function CompanySetupPage() {
 
   const companyDraft = useFormDraft({
     formKey: `company:${existingId ?? "new"}`,
-    value: { responsible, name, city, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, animalDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep },
+    value: { responsible, name, city, selectedPlaceCityId, description, website, email, phone, emailPublic, phonePublic, hqAddressPublic, logoUrl, coverUrl, portfolioImages, selectedCategories, services, cateringDetails, animalDetails, tagline, bioShort, usp, foundedYear, legalForm, hqAddress, countries, industryFocus, socialLinks, ownerTitle, step: companyStep },
     ready: !loading && (!guidedSetup || !!existingId || companyDraftLoaded),
     busy: uploadingLogo || uploadingCover || uploadingPortfolio || portfolioUploads.some(entry => entry.status === "failed") || saving,
     restore: (draft) => {
         setResponsible(responsiblePersonDraft(draft.responsible));
-        setName(draft.name ?? ""); setCity(draft.city ?? ""); setDescription(draft.description ?? "");
+        setName(draft.name ?? ""); setCity(draft.city ?? ""); setSelectedPlaceCityId(draft.selectedPlaceCityId ?? ""); setDescription(draft.description ?? "");
         setWebsite(draft.website ?? ""); setEmail(draft.email ?? ""); setPhone(draft.phone ?? "");
         setEmailPublic(draft.emailPublic === true); setPhonePublic(draft.phonePublic === true); setHqAddressPublic(draft.hqAddressPublic === true);
         setLogoUrl(draft.logoUrl ?? ""); setLogoPreview(draft.logoUrl ?? "");
@@ -422,7 +427,7 @@ export default function CompanySetupPage() {
         body: JSON.stringify({
           id: existingId,
           responsible_person: responsible,
-          name, city, description, website, email, phone,
+          name, city, selected_place_city_id: selectedPlaceCityId || undefined, description, website, email, phone,
           email_public: emailPublic, phone_public: phonePublic, hq_address_public: hqAddressPublic,
           logo_url: logoUrl || null,
           categories: selectedCategories,
@@ -507,7 +512,7 @@ export default function CompanySetupPage() {
                       <input autoComplete="organization" value={name} onChange={(e) => setName(e.target.value)} placeholder="Zum Beispiel: Lichtblick Verleih" required className="w-full rounded-xl border border-border bg-bg-secondary px-4 py-3 text-sm focus:border-gold focus:outline-none" />
                     </Field>
                     <Field label="Stadt oder Region" required>
-                      <input autoComplete="address-level2" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Zum Beispiel: Leipzig" required className="w-full rounded-xl border border-border bg-bg-secondary px-4 py-3 text-sm focus:border-gold focus:outline-none" />
+                      <PlaceField value={city} onChange={(value, cityId) => { setCity(value); setSelectedPlaceCityId(cityId || ""); }} required />
                     </Field>
                     <fieldset className="space-y-3">
                       <legend className="text-sm font-medium text-text-primary">Was macht eure Firma? <span className="text-text-muted">(optional)</span></legend>
@@ -638,14 +643,7 @@ export default function CompanySetupPage() {
               <Field label="Standort / Hauptsitz" required>
                 <div className="flex items-center gap-2 bg-bg-secondary border border-border rounded-xl px-3.5 focus-within:border-gold transition-colors">
                   <MapPin size={15} className="text-text-muted shrink-0" />
-                  <input
-                    type="text"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    placeholder="Berlin, München, Hamburg..."
-                    className="bg-transparent border-none py-3 text-sm flex-1 focus:outline-none"
-                    required
-                  />
+                  <PlaceField value={city} onChange={(value, cityId) => { setCity(value); setSelectedPlaceCityId(cityId || ""); }} required />
                   {city && <CheckCircle size={15} className="text-success shrink-0" />}
                 </div>
               </Field>

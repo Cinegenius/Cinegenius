@@ -1,3 +1,5 @@
+import {getLocale} from "next-intl/server";
+import { placeReadFields } from "@/lib/places/catalog";
 import { listingPriceLabel } from "@/lib/listing-price";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
@@ -25,9 +27,10 @@ type LocationCard = {
 };
 
 export default async function LocationsPage() {
+  const locale = await getLocale();
   const { data, error } = await db
     .from("listings")
-    .select("id, title, city, price, image_url, category, metadata, created_at")
+    .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, title, city, price, image_url, category, metadata, created_at")
     .eq("published", true)
     .eq("type", "location")
     .order("created_at", { ascending: false })
@@ -46,12 +49,16 @@ export default async function LocationsPage() {
     image_url: string | null; category: string | null;
     metadata?: Record<string, unknown> | null;
   }[]) {
-    const city = l.city ?? "Sonstige";
-    if (!cityMap.has(city)) cityMap.set(city, []);
-    const arr = cityMap.get(city)!;
+    const place=placeReadFields(l.city??"",l,locale);
+    if(place.place_status!=="verified"||!place.place_city_id)continue;
+    const city=String(place.place_city_name);
+    const cityId=String(place.place_city_id);
+    if (!cityMap.has(cityId)) cityMap.set(cityId, []);
+    const arr = cityMap.get(cityId)!;
     if (arr.length < 6) {
       arr.push({
         id: l.id,
+    ...placeReadFields(l.city ?? "", l, locale),
         title: l.title,
         type: l.category ?? "Speziallocation",
         city,
@@ -70,7 +77,7 @@ export default async function LocationsPage() {
   const cityGroups = [...cityMap.entries()]
     .sort((a, b) => b[1].length - a[1].length)
     .slice(0, 6)
-    .map(([city, locations]) => ({ city, locations }));
+    .map(([cityId, locations]) => ({ cityId, city: locations[0].city, locations }));
 
   return (
     <LocationsLanding cityGroups={cityGroups} totalCount={rows.length} />

@@ -1,3 +1,5 @@
+
+import { hasPlaceCity } from "@/lib/places/core";
 export const PROFILE_EDITOR_STEPS = [
   { id: 1, title: "Was möchtest du anbieten?", description: "Wähle die Bereiche aus, in denen du gefunden werden möchtest." },
   { id: 2, title: "Welche Tätigkeiten passen zu dir?", description: "Suche nach einem Beruf oder wähle zuerst ein Gewerk. Mehrere Tätigkeiten sind möglich." },
@@ -32,7 +34,7 @@ export function profileEditorRequiredMissing(input: {
   return [
     ...(input.profileTypes.length || input.positions.length ? [] : ["activity" as const]),
     ...(input.name.trim() ? [] : ["name" as const]),
-    ...(input.city.trim() ? [] : ["city" as const]),
+    ...(hasPlaceCity(input.city) ? [] : ["city" as const]),
   ];
 }
 

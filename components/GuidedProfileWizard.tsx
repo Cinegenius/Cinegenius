@@ -1,4 +1,8 @@
 "use client";
+
+import { hasPlaceCity } from "@/lib/places/core";
+
+import PlaceField from "@/components/PlaceField";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import { createOnboardingSaveQueue } from "@/lib/onboarding-save";
 import { useExistingDraftProtection } from "@/lib/use-form-draft";
@@ -93,7 +97,7 @@ export default function GuidedProfileWizard() {
   async function move(step: number) {
     if (draft.step === 1 && draft.departmentIds.length === 0) { setError("Wähle mindestens ein Gewerk aus."); return; }
     if (draft.step === 2 && !draft.name.trim()) { setError("Bitte gib deinen Namen an."); return; }
-    if (draft.step === 2 && !draft.city.trim()) { setError("Bitte gib deinen Wohnort oder deine Region an."); return; }
+    if (draft.step === 2 && !hasPlaceCity(draft.city)) { setError("Bitte gib deinen Wohnort oder deine Region an."); return; }
     const next = { ...draft, step };
     if (await persist(next)) setDraft(next);
   }
@@ -131,7 +135,7 @@ export default function GuidedProfileWizard() {
       if (timer.current) clearTimeout(timer.current);
       await saveQueue.settle();
       const response = await fetch("/api/profile", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
-        display_name: draft.name.trim(), location: draft.city.trim(), profile_types: profileTypes,
+        display_name: draft.name.trim(), location: draft.city.trim(), selected_place_city_id: draft.selected_place_city_id || undefined, profile_types: profileTypes,
         profile_type: profileTypes[0] ?? null, positions: draft.positions, bio: draft.bio.trim(), available: true,
       }) });
       const result = await response.json().catch(() => ({}));
@@ -190,7 +194,7 @@ export default function GuidedProfileWizard() {
         {normalizedSearch && visibleDepartments.length === 0 && <p className="rounded-xl border border-dashed border-border px-4 py-6 text-center text-sm text-text-muted">Kein Gewerk oder Beruf gefunden. Prüfe auch englische oder geläufige alternative Bezeichnungen.</p>}
         {draft.departmentIds.length === 0 && !normalizedSearch && <p className="rounded-xl border border-dashed border-border px-4 py-5 text-center text-sm text-text-muted">Wähle mindestens ein Gewerk aus. Alle Bereiche sind oben erreichbar.</p>}
       </div>}
-      {draft.step === 2 && <div className="space-y-5"><p className="text-sm leading-6 text-text-muted">Nutze den Namen, unter dem man dich finden darf. Als Standort genügt Stadt oder Region; deine genaue Adresse wird nicht benötigt.</p><div><label htmlFor="display-name" className="mb-2 block text-sm font-medium text-text-primary">Name <span className="text-gold">*</span></label><input id="display-name" autoComplete="name" value={draft.name} onChange={(event) => update("name", event.target.value)} className="min-h-12 w-full rounded-xl border border-border bg-bg-primary px-4 text-sm text-text-primary outline-none focus:border-gold" /></div><div><label htmlFor="profile-city" className="mb-2 block text-sm font-medium text-text-primary">Wohnort oder Region <span className="text-gold">*</span></label><input id="profile-city" autoComplete="address-level2" value={draft.city} onChange={(event) => update("city", event.target.value)} placeholder="Zum Beispiel Nürnberg" className="min-h-12 w-full rounded-xl border border-border bg-bg-primary px-4 text-sm text-text-primary outline-none focus:border-gold" /></div></div>}
+      {draft.step === 2 && <div className="space-y-5"><p className="text-sm leading-6 text-text-muted">Nutze den Namen, unter dem man dich finden darf. Als Standort genügt Stadt oder Region; deine genaue Adresse wird nicht benötigt.</p><div><label htmlFor="display-name" className="mb-2 block text-sm font-medium text-text-primary">Name <span className="text-gold">*</span></label><input id="display-name" autoComplete="name" value={draft.name} onChange={(event) => update("name", event.target.value)} className="min-h-12 w-full rounded-xl border border-border bg-bg-primary px-4 text-sm text-text-primary outline-none focus:border-gold" /></div><div><label htmlFor="profile-city" className="mb-2 block text-sm font-medium text-text-primary">Wohnort oder Region <span className="text-gold">*</span></label><PlaceField value={draft.city} onChange={(value, cityId) => setDraft(current => ({ ...current, city: value, selected_place_city_id: cityId || "" }))} required /></div></div>}
       {draft.step === 3 && <><p className="mb-4 text-sm leading-6 text-text-muted">Eine kurze Vorstellung ist hilfreich, aber freiwillig. Profilfoto, Showreel und weitere Angaben kannst du nach dem Start ergänzen.</p><label htmlFor="bio" className="mb-2 block text-sm font-medium text-text-primary">Kurz über dich <span className="text-text-muted">(optional)</span></label><textarea id="bio" rows={5} maxLength={1000} value={draft.bio} onChange={(event) => update("bio", event.target.value)} placeholder="Was machst du gern? Welche Art von Projekten interessiert dich?" className="w-full rounded-xl border border-border bg-bg-primary p-4 text-sm text-text-primary outline-none focus:border-gold" /></>}
       {draft.step === 4 && <><p className="mb-5 text-sm leading-6 text-text-muted">Prüfe deine Angaben. Mit „Profil erstellen“ wird dein Profil für andere CineGenius-Mitglieder sichtbar. Weitere Informationen und Bilder kannst du später ergänzen.</p><div className="space-y-3 rounded-xl border border-border bg-bg-primary p-4 text-sm"><div><span className="text-xs text-text-muted">Name</span><p className="text-text-primary">{draft.name}</p></div><div><span className="text-xs text-text-muted">Gewerke</span><p className="text-text-primary">{selectedDepartments.map((department) => department.label).join(" · ")}</p></div>{draft.positions.length > 0 && <div><span className="text-xs text-text-muted">Tätigkeiten</span><p className="text-text-primary">{draft.positions.join(" · ")}</p></div>}<div><span className="text-xs text-text-muted">Standort</span><p className="text-text-primary">{draft.city}</p></div>{draft.bio && <div><span className="text-xs text-text-muted">Vorstellung</span><p className="whitespace-pre-wrap text-text-primary">{draft.bio}</p></div>}</div></>}
     </section>

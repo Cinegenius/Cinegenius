@@ -1,3 +1,6 @@
+import {getLocale} from "next-intl/server";
+import {placeReadFields} from "@/lib/places/catalog";
+import {placeDisplay} from "@/lib/places/core";
 import JsonLd from "@/components/JsonLd";
 import { listingPriceLabel, listingPriceMetadata, listingStructuredOffers } from "@/lib/listing-price";
 import { notFound } from "next/navigation";
@@ -13,7 +16,7 @@ async function getProp(slug: string, viewerId?: string | null) {
   try {
     const { data, error } = await db
       .from("listings")
-      .select("id, user_id, company_id, type, category, title, city, price, created_at, image_url, description, metadata, extra_images, responsible_person, published")
+      .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, user_id, company_id, type, category, title, city, price, created_at, image_url, description, metadata, extra_images, responsible_person, published")
       .eq("id", slug)
       .eq("type", "prop")
       .maybeSingle();
@@ -43,6 +46,7 @@ async function getProp(slug: string, viewerId?: string | null) {
       category: data.category ?? "Requisiten",
       vendor: provider.name,
       location: data.city ?? "",
+      ...placeReadFields(data.city ?? "",data),
       dailyRate: data.price ?? 0,
     pricing: listingPriceMetadata(rawMetadata),
       image: data.image_url ?? "",
@@ -95,6 +99,8 @@ export default async function PropDetailPage({
   const prop = await getProp(slug, userId);
   if (!prop) notFound();
 
+  const locale=await getLocale();
+  const displayProp={...prop,location:placeDisplay(placeReadFields(prop.location,prop,locale),prop.location,locale)};
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -116,7 +122,7 @@ export default async function PropDetailPage({
   return (
     <>
       <JsonLd data={jsonLd} />
-      <PropDetail prop={prop} />
+      <PropDetail prop={displayProp} />
     </>
   );
 }

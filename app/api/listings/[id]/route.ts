@@ -1,3 +1,4 @@
+import { cityWriteFields } from "@/lib/places/catalog";
 import { validateMarketplaceOffer } from "@/lib/marketplace-offer";
 import { attemptedApproval } from "@/lib/offer-moderation";
 import { bindResponsiblePerson } from "@/lib/responsible-person";
@@ -40,7 +41,7 @@ export async function PATCH(
 
   if (title !== undefined && title.length > 200)
     return NextResponse.json({ error: "Titel zu lang (max. 200 Zeichen)" }, { status: 400 });
-  if (city !== undefined && city.length > 100)
+  if (city !== undefined && (typeof city!=="string" || city.length > 320))
     return NextResponse.json({ error: "Stadt zu lang (max. 100 Zeichen)" }, { status: 400 });
   if (description !== undefined && description.length > 5000)
     return NextResponse.json({ error: "Beschreibung zu lang (max. 5000 Zeichen)" }, { status: 400 });
@@ -70,7 +71,7 @@ export async function PATCH(
   if (title !== undefined)       updates.title       = title.trim();
   if (description !== undefined) updates.description = description;
   if (price !== undefined)       updates.price       = Math.max(0, Math.min(Number(price) || 0, 1_000_000));
-  if (city !== undefined)        updates.city        = city.trim();
+  if (city !== undefined) { updates.city = city.trim(); Object.assign(updates, cityWriteFields(city.trim(), body.selected_place_city_id)); }
   if (published === false)       updates.published   = false;
   if (image_url !== undefined || extra_images !== undefined || metadata !== undefined || blocked_dates !== undefined) {
     if (blocked_dates !== undefined) {

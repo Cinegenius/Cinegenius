@@ -1,4 +1,6 @@
 "use client";
+
+import PlaceField from "@/components/PlaceField";
 import { needsPublicSetupProfile, setupProfilePayload } from "@/lib/provider-profile-setup";
 import SetupCompletionOffers from "@/components/SetupCompletionOffers";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
@@ -129,7 +131,7 @@ export default function ProfileSetupWizard() {
   const [roleSearch, setRoleSearch] = useState("");
   const [departmentSearch, setDepartmentSearch] = useState("");
   const [companyCategorySearch, setCompanyCategorySearch] = useState("");
-  const [countryOther, setCountryOther] = useState(false);
+
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const savedProfile = useRef<{ profile_type?: string | null; profile_types?: string[] | null; crew?: Record<string, unknown> } | null>(null);
   const saveQueue = useMemo(() => createOnboardingSaveQueue(async (value) => {
@@ -198,7 +200,7 @@ export default function ProfileSetupWizard() {
         if (missing) nextDraft = { ...nextDraft, step: missing.field === "primaryOccupation" ? "review" : screenForField(missing.field), activeIntent: intentForField(missing.field) ?? nextDraft.activeIntent };
       }
       setDraft(nextDraft);
-      setCountryOther(!countries.includes(nextDraft.personCountry));
+
       setReady(true);
     }).catch((cause) => {
       if (!active) return;
@@ -496,7 +498,7 @@ export default function ProfileSetupWizard() {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             type: vehicle ? "vehicle" : intent === "location" ? "location" : "prop",
-            category: section.category, title: section.title.trim(), city: section.city.trim(),
+            category: section.category, title: section.title.trim(), city: section.city.trim(), selected_place_city_id: section.selected_place_city_id || undefined,
             description: section.description.trim(), price: section.priceOnRequest ? 0 : Number(section.price) || 0,
             image_url: section.imageUrl || null, draft: true,
             metadata: { price_negotiable: section.priceNegotiable === true, price_on_request: section.priceOnRequest, onboarding_setup: true },
@@ -521,7 +523,7 @@ export default function ProfileSetupWizard() {
         const response = await fetch("/api/companies", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            name: section.title.trim(), city: section.city.trim(), description: section.description.trim(),
+            name: section.title.trim(), city: section.city.trim(), selected_place_city_id: section.selected_place_city_id || undefined, description: section.description.trim(),
             logo_url: section.imageUrl || null, categories: section.categoryIds,
             services: section.services,
             catering_details: section.cateringDetails,
@@ -614,7 +616,7 @@ export default function ProfileSetupWizard() {
         <ResponsiblePersonFields value={data.responsible ?? NEW_RESPONSIBLE_PERSON} onChange={value => updateSection(intent, { responsible: value })} accountPrefill compactWhenProfile={intent === "equipment"} />
         {intent === "equipment" ? <MarketplaceCategoryPicker value={data.category} onChange={value=>updateSection(intent,{category:value})} /> : <div><p className="mb-2 text-sm font-medium text-text-primary">{t("copy9")}</p><div id={`quick-start-${intent}-category`} tabIndex={-1} className="grid gap-2 sm:grid-cols-2">{choices.map((item) => <button key={item.value} type="button" aria-pressed={data.category === item.value} onClick={() => updateSection(intent, { category: item.value })} className={`min-h-14 min-w-0 rounded-xl border px-4 py-3 text-left ${data.category === item.value ? "border-gold bg-gold/10" : "border-border bg-bg-primary"}`}><span className="block break-words text-sm font-semibold text-text-primary">{item.label}</span><span className="mt-1 block break-words text-xs text-text-muted">{item.example}</span></button>)}</div></div>}
         <div><label htmlFor={`quick-start-${intent}-title`} className="mb-2 block text-sm font-medium text-text-primary">{t("copy10")}<span className="text-gold">*</span></label><input id={`quick-start-${intent}-title`} maxLength={200} value={data.title} onChange={(event) => updateSection(intent, { title: event.target.value })} placeholder={intent === "location" ? "Zum Beispiel Altbauwohnung mit Balkon" : "Zum Beispiel LED-Flächenleuchte"} className={inputClass} /></div>
-        <div><label htmlFor={`quick-start-${intent}-city`} className="mb-2 block text-sm font-medium text-text-primary">{t("copy11")}<span className="text-gold">*</span></label><input id={`quick-start-${intent}-city`} autoComplete="address-level2" maxLength={100} value={data.city} onChange={(event) => updateSection(intent, { city: event.target.value })} placeholder={t("copy12")} className={inputClass} /></div>
+        <div><label htmlFor={`quick-start-${intent}-city`} className="mb-2 block text-sm font-medium text-text-primary">{t("copy11")}<span className="text-gold">*</span></label><PlaceField id={`quick-start-${intent}-city`} value={data.city} onChange={(value, cityId) => updateSection(intent, { city: value, selected_place_city_id: cityId || "" })} required /></div>
         </>}
       </div>;
     }
@@ -627,7 +629,7 @@ export default function ProfileSetupWizard() {
     return <div className="space-y-4">
       <ResponsiblePersonFields errors={responsibleErrors} company value={company.responsible ?? NEW_RESPONSIBLE_PERSON} onChange={value => updateSection("company", { responsible: value })} accountPrefill />
       <div><label htmlFor="quick-start-company-title" className="mb-2 block text-sm font-medium text-text-primary">{t("copy13")}<span className="text-gold">*</span></label><input id="quick-start-company-title" autoComplete="organization" maxLength={200} value={company.title} onChange={(event) => updateSection("company", { title: event.target.value })} placeholder={t("copy14")} className={inputClass} /></div>
-      <div><label htmlFor="quick-start-company-city" className="mb-2 block text-sm font-medium text-text-primary">{t("copy15")}<span className="text-gold">*</span></label><input id="quick-start-company-city" autoComplete="address-level2" maxLength={100} value={company.city} onChange={(event) => updateSection("company", { city: event.target.value })} placeholder={t("copy12")} className={inputClass} /></div>
+      <div><label htmlFor="quick-start-company-city" className="mb-2 block text-sm font-medium text-text-primary">{t("copy15")}<span className="text-gold">*</span></label><PlaceField id="quick-start-company-city" value={company.city} onChange={(value, cityId) => updateSection("company", { city: value, selected_place_city_id: cityId || "" })} required /></div>
       <div><label htmlFor="quick-start-company-category-search" className="mb-2 block text-sm font-medium text-text-primary">{t("copy17")}<span className="text-gold">*</span></label><div className="relative mb-3"><Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" /><input id="quick-start-company-category-search" autoComplete="off" value={companyCategorySearch} onChange={(event) => setCompanyCategorySearch(event.target.value)} placeholder={t("copy18")} className={`${inputClass} pl-10`} /></div>
         <div id="quick-start-company-categories" tabIndex={-1} className="grid max-h-56 gap-2 overflow-y-auto pr-1 sm:grid-cols-2">{categories.map((category) => { const selected = company.categoryIds.includes(category.value); return <button key={category.value} type="button" aria-pressed={selected} onClick={() => { const categoryIds = selected ? company.categoryIds.filter((id) => id !== category.value) : [...company.categoryIds, category.value]; updateSection("company", { categoryIds, ...(selected && category.value === CATERING_COMPANY_CATEGORY.id ? { cateringDetails: EMPTY_CATERING_COMPANY_DETAILS } : {}), ...(selected && category.value === SAFETY_MEDICAL_COMPANY_CATEGORY_ID ? { services: [] } : {}) }); }} className={`min-h-14 min-w-0 rounded-xl border px-4 py-3 text-left ${selected ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/50"}`}><span className="block break-words text-sm font-semibold text-text-primary">{companyCategoryLabel(category.value, category.label)}</span><span className="mt-1 block break-words text-xs leading-5 text-text-muted">{isAnimalCompany([category.value]) ? animals("description") : category.example}</span></button>; })}{!categories.length && <p className="col-span-full rounded-xl border border-border p-4 text-sm text-text-muted">{t("copy19")}</p>}</div>
         <p className="mt-2 text-xs leading-5 text-text-muted">{t("copy20")}</p>
@@ -709,7 +711,7 @@ export default function ProfileSetupWizard() {
       <section className="min-w-0 rounded-2xl border border-border bg-bg-secondary p-4 sm:p-7">
         {draft.step === "name" && (draft.name && !draft.accountPerson ? <div><label htmlFor="quick-start-name" className="mb-2 block text-sm font-medium text-text-primary">{t("copy65")}<span className="text-gold">*</span></label><input id="quick-start-name" autoComplete="name" maxLength={120} value={draft.name} onChange={(event) => update("name", event.target.value)} placeholder={t("copy66")} className={inputClass} aria-describedby="quick-start-name-help" /><p id="quick-start-name-help" className="mt-2 text-xs leading-5 text-text-muted">{t("copy67")}</p></div> : <ResponsiblePersonFields identityOnly accountPrefill value={draft.accountPerson ?? NEW_RESPONSIBLE_PERSON} errors={responsibleErrors} onChange={person => { setResponsibleErrors({}); setDraft(current => ({ ...current, accountPerson: person, name: `${person.firstName} ${person.lastName}`.trim() })); }} />)}
 
-        {draft.step === "location" && <div className="space-y-4"><div><label htmlFor="quick-start-person-city" className="mb-2 block text-sm font-medium text-text-primary">{t("copy12")}{needsProfile && <span className="text-gold">*</span>}</label><input id="quick-start-person-city" autoComplete="address-level2" maxLength={100} value={draft.personCity} onChange={(event) => update("personCity", event.target.value)} placeholder={t("copy69")} className={inputClass} /></div><div><label htmlFor="quick-start-person-country" className="mb-2 block text-sm font-medium text-text-primary">{t("copy70")}{needsProfile && <span className="text-gold">*</span>}</label><select id="quick-start-person-country" value={countryOther ? "Andere" : draft.personCountry || t("copy71")} onChange={(event) => { const other = event.target.value === "Andere"; setCountryOther(other); update("personCountry", other ? "" : event.target.value); }} className={inputClass}><option value="Deutschland">{t("copy71")}</option><option value="Österreich">{t("copy72")}</option><option value="Schweiz">{t("copy73")}</option><option value="Andere">{t("copy74")}</option></select>{countryOther && <input aria-label={t("copy75")} autoComplete="country-name" maxLength={100} value={draft.personCountry} onChange={(event) => update("personCountry", event.target.value)} placeholder={t("copy75")} className={`${inputClass} mt-3`} />}</div>{!needsProfile && <p className="text-xs leading-5 text-text-muted">{t("copy77")}</p>}</div>}
+        {draft.step === "location" && <PlaceField id="quick-start-person-city" value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} onChange={(value, cityId) => { const parts = value.split(","); setDraft(current => ({ ...current, personCity: parts.slice(0,-1).join(",").trim(), personCountry: parts.at(-1)?.trim() ?? "", personPlaceCityId: cityId || "", completed: { ...current.completed, profile: false } })); }} required={needsProfile} />}
 
         {draft.step === "goals" && <div id="quick-start-goals" tabIndex={-1} className="grid gap-3 sm:grid-cols-2">{paths.map(({ id, detail, Icon }) => { const selected = draft.intents.includes(id); return <button key={id} type="button" aria-pressed={selected} onClick={() => toggleIntent(id)} className={`flex min-h-24 min-w-0 items-start gap-3 rounded-xl border p-4 text-left transition-colors ${selected ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/50"}`}><span className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${selected ? "bg-gold/15 text-gold" : "bg-bg-elevated text-text-muted"}`}><Icon size={19} /></span><span className="min-w-0 flex-1"><span className="block break-words text-sm font-semibold text-text-primary">{t(`${id}Intent`)}</span><span className="mt-1 block break-words text-xs leading-5 text-text-muted">{localizeSetupMessage(detail, t)}</span></span><span aria-hidden="true" className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-xs ${selected ? "border-gold bg-gold text-bg-primary" : "border-border text-transparent"}`}>✓</span></button>; })}</div>}
 

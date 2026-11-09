@@ -1,4 +1,6 @@
-import { getTranslations } from "next-intl/server";
+import {placeReadFields} from "@/lib/places/catalog";
+import {placeDisplay} from "@/lib/places/core";
+import {getLocale, getTranslations} from "next-intl/server";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import PageHeader from "@/components/PageHeader";
@@ -9,10 +11,11 @@ export const revalidate = 60;
 export async function generateMetadata():Promise<Metadata> { const t=await getTranslations("FilmAnimals"); return {alternates:{canonical:"https://www.cinegenius.co/tiere"},title:t("portfolio"),description:t("description")}; }
 
 export default async function TierePage() {
+  const locale=await getLocale();
   const t = await getTranslations("FilmAnimals");
   const { data } = await db
     .from("listings")
-    .select("id, user_id, type, title, category, city, price, image_url, description, metadata")
+    .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, user_id, type, title, category, city, price, image_url, description, metadata")
     .eq("published", true)
     .eq("type", "animal")
     .order("created_at", { ascending: false })
@@ -27,7 +30,8 @@ export default async function TierePage() {
     id: l.id,
     title: l.title,
     category: l.category ?? "Sonstige Tiere",
-    location: l.city ?? "",
+    location: placeDisplay(placeReadFields(l.city??"",l,locale),l.city??"",locale),
+    ...placeReadFields(l.city??"",l,locale),
     dailyRate: l.price,
     image: l.image_url ?? "",
     trainingLevel: (l.metadata?.training_level as string) ?? null,

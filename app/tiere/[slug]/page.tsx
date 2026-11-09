@@ -1,7 +1,9 @@
+import {placeReadFields} from "@/lib/places/catalog";
+import {placeDisplay} from "@/lib/places/core";
 import JsonLd from "@/components/JsonLd";
 import { notFound } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
-import { getTranslations } from "next-intl/server";
+import {getLocale, getTranslations} from "next-intl/server";
 import { db } from "@/lib/db";
 import { canEditListing } from "@/lib/listing-access";
 import { getListingProvider } from "@/lib/listing-provider";
@@ -9,9 +11,10 @@ import type { Metadata } from "next";
 import TiereDetail from "@/components/TiereDetail";
 
 async function getAnimal(slug: string, viewerId: string | null = null, preview = false) {
+  const locale=await getLocale();
   if (!/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(slug)) return null;
   const {data,error} = await db.from("listings")
-    .select("id,user_id,company_id,responsible_person,type,title,category,city,price,image_url,description,metadata,extra_images,published")
+    .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id,user_id,company_id,responsible_person,type,title,category,city,price,image_url,description,metadata,extra_images,published")
     .eq("id",slug).eq("type","animal").maybeSingle();
   if (error) throw new Error("Animal portfolio could not be loaded");
   if (!data) return null;
@@ -19,7 +22,7 @@ async function getAnimal(slug: string, viewerId: string | null = null, preview =
   if (!data.published && !(preview && canEdit)) return null;
   const provider = await getListingProvider(data.user_id,data.company_id,viewerId,data.responsible_person);
   const meta = (data.metadata ?? {}) as Record<string,unknown>;
-  return { id:data.id,title:data.title,category:data.category ?? "",location:data.city ?? "",dailyRate:data.price ?? 0,image:data.image_url ?? "",
+  return { id:data.id,title:data.title,category:data.category ?? "",location:placeDisplay(placeReadFields(data.city??"",data,locale),data.city??"",locale),dailyRate:data.price ?? 0,image:data.image_url ?? "",
     trainingLevel:typeof meta.training_level === "string" ? meta.training_level : null,handlerIncluded:meta.handler_included === true,
     count:String(meta.count ?? "1"),specialSkills:typeof meta.special_skills === "string" ? meta.special_skills : null,delivery:meta.delivery === true,
     focalPoint:meta.focal_point as {x:number;y:number}|null,description:data.description ?? "",extra_images:data.extra_images ?? [],

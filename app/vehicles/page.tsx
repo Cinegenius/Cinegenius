@@ -1,3 +1,6 @@
+import {getLocale} from "next-intl/server";
+import {placeReadFields} from "@/lib/places/catalog";
+import {placeDisplay} from "@/lib/places/core";
 import { marketplaceCategory } from "@/lib/marketplaceCategories";
 import { listingPriceMetadata } from "@/lib/listing-price";
 import type { Metadata } from "next";
@@ -18,9 +21,10 @@ export const metadata: Metadata = {
 };
 
 export default async function VehiclesPage() {
+  const locale=await getLocale();
   const { data } = await db
     .from("listings")
-    .select("id, user_id, title, category, city, price, image_url, description, metadata, created_at")
+    .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, user_id, title, category, city, price, image_url, description, metadata, created_at")
     .eq("published", true)
     .eq("type", "vehicle")
     .order("created_at", { ascending: false })
@@ -48,7 +52,8 @@ export default async function VehiclesPage() {
       color: (meta.color as string) ?? "",
       era: (meta.era as string) ?? null,
       condition: (meta.condition as string) ?? "Gut",
-      location: l.city ?? "",
+      location: placeDisplay(placeReadFields(l.city??"",l,locale),l.city??"",locale),
+    ...placeReadFields(l.city??"",l,locale),
       vendor: "",
       dailyRate: l.price,
       pricing: listingPriceMetadata(l.metadata),

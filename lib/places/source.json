@@ -1,0 +1,16 @@
+{
+  "source": "https://download.geonames.org/export/dump/",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "snapshot": "2026-11-09",
+  "countries": 250,
+  "regions": 3865,
+  "districts": 12896,
+  "cities": 31793,
+  "inputSha256": {
+    "countries.txt": "79f8f59ea01cbb40438bf1856dd6c2ff201f03f8fc72d0530b2646aaf603ef04",
+    "regions.txt": "2e4867f5397acb056ea26377601b57af37cb4c81399770225018e9e439e91ad3",
+    "districts.txt": "5f7d25e16a3343817832f8b865e7e64148a220ef442aab5b244e8ef22634f9c2",
+    "cities.zip": "955ad298b67a60996a15b4c4c84c8ca6923bafed195622227f24fd22a31042f4",
+    "names.zip": "04fe486d194f884b4181540b64b73c097123ed10944ebf283f3b35a7fd630832"
+  }
+}

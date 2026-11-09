@@ -1,4 +1,6 @@
 "use client";
+
+import PlaceField from "@/components/PlaceField";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { useTranslations } from "next-intl";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
@@ -423,7 +425,7 @@ export default function InseratPage() {
     title: "",
     description: "",
     price: "",
-    city: "",
+    city: "", selected_place_city_id: "",
     // vehicle
     make: "",
     model: "",
@@ -507,7 +509,7 @@ export default function InseratPage() {
             setStep(2);
             setForm((current) => ({
               ...current,
-              title: text("title"), description: text("description"), city: text("city"), price: text("price"),
+              title: text("title"), description: text("description"), city: text("city"), selected_place_city_id: text("selected_place_city_id"), price: text("price"),
               sqm: text("sqm"), ceiling_height: text("ceiling_height"), max_crew: text("max_crew"),
               indoor_outdoor: ["innen", "außen", "beides"].includes(String(savedForm.indoor_outdoor)) ? savedForm.indoor_outdoor as "innen" | "außen" | "beides" : "innen",
               power_available: savedForm.power_available === true, power_details: text("power_details"), parking_spots: text("parking_spots"),
@@ -840,6 +842,7 @@ export default function InseratPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...payload,
+          selected_place_city_id: form.selected_place_city_id || undefined,
           responsible_person: responsible,
           image_url: selected?.type === "job" ? null
             : selected?.type === "location" ? locExtraImages[0] ?? null
@@ -1677,12 +1680,7 @@ export default function InseratPage() {
                 <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
                   {isJob ? "Ort *" : "Stadt *"}
                 </label>
-                <input
-                  value={form.city}
-                  onChange={(e) => f("city", e.target.value)}
-                  placeholder={isJob ? "z.B. Berlin oder Remote" : "z.B. Berlin"}
-                  className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors"
-                />
+                <PlaceField value={form.city} onChange={(value, cityId) => setForm(current => ({ ...current, city: value, selected_place_city_id: cityId || "" }))} required />
               </div>
             </div>
 
@@ -1858,7 +1856,7 @@ export default function InseratPage() {
               setPendingImageFile(null);
               setCreatedId(null);
               setCreatedIsDraft(false); setCreatedPublished(false);
-              setForm({ title: "", description: "", price: "", city: "", make: "", model: "", year: "", fuel_type: "", license_class: "", condition: "", vehicle_subtype: "", sqm: "", ceiling_height: "", max_crew: "", indoor_outdoor: "innen", power_available: false, power_details: "", parking_spots: "", natural_light: false, blackout_possible: false, loading_access: false, access_notes: "", shooting_hours: "", availability_notes: "", company: "", projectType: "", shoot_start: "", shoot_end: "", pay_type: "", role_label: "", urgent: false, content_nudity: false, content_violence: false, content_stunts: false, delivery: false, rental_type: "miete", dimensions: "", safety_note: "", skills: "", experience: "", animal_training: "", animal_handler: true, animal_count: "1", animal_skills: "" });
+              setForm({ title: "", description: "", price: "", city: "", selected_place_city_id: "", make: "", model: "", year: "", fuel_type: "", license_class: "", condition: "", vehicle_subtype: "", sqm: "", ceiling_height: "", max_crew: "", indoor_outdoor: "innen", power_available: false, power_details: "", parking_spots: "", natural_light: false, blackout_possible: false, loading_access: false, access_notes: "", shooting_hours: "", availability_notes: "", company: "", projectType: "", shoot_start: "", shoot_end: "", pay_type: "", role_label: "", urgent: false, content_nudity: false, content_violence: false, content_stunts: false, delivery: false, rental_type: "miete", dimensions: "", safety_note: "", skills: "", experience: "", animal_training: "", animal_handler: true, animal_count: "1", animal_skills: "" });
               setLocAmenities([]); setLocBlockedDates([]); setLocExtraImages([]); setLocFloorPlanUrl(null); setLocFloorPlanPreview(null);
               setLocRooms([]); setLocPriceOnRequest(true); setPriceNegotiable(false); setSelectedCompanyId(""); setFocalPoint(null);
               setArticleImages([]); setLocationGalleryState({ uploading: false, failed: 0 }); setArticleGalleryState({ uploading: false, failed: 0 });

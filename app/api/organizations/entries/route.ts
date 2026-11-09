@@ -1,3 +1,4 @@
+import { cityWriteFields } from "@/lib/places/catalog";
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
     id, organization_id: organizationId, author_user_id: session.userId, last_actor_user_id: session.userId,
     slug: await uniqueEntrySlug(organizationId, title), entry_type: body.entryType, title,
     summary: clean(body.summary, 500), description: clean(body.description, 12000), topic: body.topic,
-    format: body.format, city: body.entryType === "news" ? "" : clean(body.city, 120), venue: body.entryType === "news" ? "" : clean(body.venue, 180),
+    format: body.format, ...cityWriteFields(body.entryType === "news" ? "" : clean(body.city, 320), body.selected_place_city_id), venue: body.entryType === "news" ? "" : clean(body.venue, 180),
     starts_at: startsAt, ends_at: endsAt, registration_url: registrationUrl, external_url: externalUrl, image_url: image.url,
     moderation_status: submit ? "submitted" : "draft", submitted_at: submit ? now : null, updated_at: now,
   }).select("id,slug,moderation_status,updated_at").single();
@@ -73,7 +74,7 @@ export async function PATCH(request: NextRequest) {
   const nextStatus = submit || ["approved", "ended"].includes(existing.moderation_status) ? "submitted" : existing.moderation_status;
   const patch: Record<string, unknown> = {
     entry_type: body.entryType, title, summary: clean(body.summary, 500), description: clean(body.description, 12000),
-    topic: body.topic, format: body.format, city: body.entryType === "news" ? "" : clean(body.city, 120), venue: body.entryType === "news" ? "" : clean(body.venue, 180),
+    topic: body.topic, format: body.format, ...cityWriteFields(body.entryType === "news" ? "" : clean(body.city, 320), body.selected_place_city_id), venue: body.entryType === "news" ? "" : clean(body.venue, 180),
     starts_at: startsAt, ends_at: endsAt, registration_url: registrationUrl, external_url: externalUrl, image_url: image.url,
     moderation_status: nextStatus, last_actor_user_id: session.userId, updated_at: now,
   };

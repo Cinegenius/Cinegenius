@@ -1,4 +1,7 @@
 "use client";
+
+import PlaceField from "@/components/PlaceField";
+import { placeInputValue } from "@/lib/places/core";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 
@@ -504,7 +507,6 @@ export default function ProfilePage() {
   const draftSequenceRef = useRef(0);
   const draftQueueRef = useRef<Promise<unknown>>(Promise.resolve());
   const nameInputRef = useRef<HTMLInputElement>(null);
-  const cityInputRef = useRef<HTMLInputElement>(null);
   const activityPickerRef = useRef<HTMLDivElement>(null);
   const [saving, setSaving] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
@@ -534,6 +536,7 @@ export default function ProfilePage() {
     name: "",
     city: "",
     country: "",
+    selected_place_city_id: "",
     website: "",
     bio: "",
     available: true,
@@ -600,7 +603,7 @@ export default function ProfilePage() {
   const [editingCollaborator, setEditingCollaborator] = useState("");
   const [savingCollaborator, setSavingCollaborator] = useState(false);
   const [showNewProject, setShowNewProject] = useState(false);
-  const [newProject, setNewProject] = useState({ title: "", year: "", type: "", description: "", director: "", myRole: "", collaborator: "", poster_url: "", genre: "", productionCompany: "", location: "", equipment: "", link: "", alsoOnCrewUnited: false });
+  const [newProject, setNewProject] = useState({ title: "", year: "", type: "", description: "", director: "", myRole: "", collaborator: "", poster_url: "", genre: "", productionCompany: "", location: "", selected_place_city_id: "", equipment: "", link: "", alsoOnCrewUnited: false });
   const [creatingProject, setCreatingProject] = useState(false);
   const [uploadingPoster, setUploadingPoster] = useState(false);
 
@@ -733,8 +736,9 @@ export default function ProfilePage() {
           } | null;
           setForm({
             name:          profile.display_name        ?? "",
-            city:          (profile.location ?? "").split(",")[0]?.trim() ?? "",
-            country:       (profile.location ?? "").split(",")[1]?.trim() ?? "",
+            city:          placeInputValue(profile, profile.location ?? ""),
+            country:       "",
+            selected_place_city_id: typeof profile.place_city_id === "string" ? profile.place_city_id : "",
             website:       profile.website_url         ?? profile.portfolio_url ?? "",
             bio:           profile.bio                 ?? "",
             available:     profile.available           ?? true,
@@ -1014,13 +1018,13 @@ export default function ProfilePage() {
       const r = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...newProject, myRole: roleWithCollaborator(newProject.myRole, newProject.collaborator) }),
+        body: JSON.stringify({ ...newProject, selected_place_city_id: newProject.selected_place_city_id || undefined, myRole: roleWithCollaborator(newProject.myRole, newProject.collaborator) }),
       });
       const d = await r.json();
       if (!r.ok) { addToast(d.error, "error"); return; }
       if (!d.draft?.id) throw new Error("Der private Entwurf konnte nicht bestätigt werden.");
       setShowNewProject(false);
-      setNewProject({ title: "", year: "", type: "", description: "", director: "", myRole: "", collaborator: "", poster_url: "", genre: "", productionCompany: "", location: "", equipment: "", link: "", alsoOnCrewUnited: false });
+      setNewProject({ title: "", year: "", type: "", description: "", director: "", myRole: "", collaborator: "", poster_url: "", genre: "", productionCompany: "", location: "", selected_place_city_id: "", equipment: "", link: "", alsoOnCrewUnited: false });
       addToast("Privater Entwurf gespeichert", "success");
       router.push(`/dashboard/projects/drafts/${d.draft.id}`);
     } catch (error) {
@@ -1097,6 +1101,7 @@ export default function ProfilePage() {
         display_name:   form.name,
         avatar_url:     avatarUrl || null,
         location,
+        selected_place_city_id: form.selected_place_city_id || undefined,
         bio:            form.bio,
         available:      form.available,
         skills,
@@ -1346,7 +1351,7 @@ export default function ProfilePage() {
   });
 
   const restoreEditorDraft = useCallback((saved: ReturnType<typeof buildEditorDraft>) => {
-          if (saved.form && typeof saved.form === "object") setForm((current) => ({ ...current, ...(saved.form as Partial<typeof current>) }));
+          if (saved.form && typeof saved.form === "object") setForm((current) => ({ ...current, ...(saved.form as Partial<typeof current>), selected_place_city_id: typeof (saved.form as Partial<typeof current>).selected_place_city_id === "string" ? (saved.form as typeof current).selected_place_city_id : "" }));
           if (Array.isArray(saved.skills)) setSkills(saved.skills.filter((item: unknown): item is string => typeof item === "string"));
           if (Array.isArray(saved.memberships)) setMemberships(saved.memberships.filter((item: unknown): item is string => typeof item === "string"));
           if (Array.isArray(saved.positions)) setPositions(saved.positions.filter((item: unknown): item is string => typeof item === "string"));
@@ -1427,7 +1432,7 @@ export default function ProfilePage() {
 
   function focusEditorField(field: "activity" | "name" | "city") {
     window.setTimeout(() => {
-      const target = field === "activity" ? activityPickerRef.current : field === "name" ? nameInputRef.current : cityInputRef.current;
+      const target = field === "activity" ? activityPickerRef.current : field === "name" ? nameInputRef.current : document.getElementById("profile-city");
       target?.scrollIntoView({ behavior: "smooth", block: "center" });
       target?.focus();
     }, 80);
@@ -1901,29 +1906,8 @@ export default function ProfilePage() {
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
                       <p className="text-xs text-text-muted mt-1">Öffentliche Kontakt-E-Mail (optional, kann von deiner Login-E-Mail abweichen)</p>
                     </div>
-                    <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
-                        {t("fieldCity")} <span className="text-crimson-light">*</span>
-                      </label>
-                      <input ref={cityInputRef} id="profile-city" type="text" value={form.city}
-                        aria-invalid={!!fieldErrors.city}
-                        aria-describedby={fieldErrors.city ? "profile-city-error" : undefined}
-                        onChange={(e) => {
-                          setForm((p) => ({ ...p, city: e.target.value }));
-                          if (e.target.value.trim()) setFieldErrors((previous) => ({ ...previous, city: undefined }));
-                        }}
-                        placeholder={t("fieldCityPlaceholder")}
-                        className={`w-full bg-bg-elevated border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors ${fieldErrors.city ? "border-error" : "border-border"}`} />
-                      {fieldErrors.city && <p id="profile-city-error" role="alert" className="mt-1.5 text-sm text-error">{fieldErrors.city}</p>}
-                    </div>
-                    <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
-                        {t("fieldCountry")}
-                      </label>
-                      <input type="text" value={form.country} onChange={(e) => setForm((p) => ({ ...p, country: e.target.value }))}
-                        placeholder={t("fieldCountryPlaceholder")}
-                        className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
-                    </div>
+                    <PlaceField id="profile-city" value={[form.city, form.country].filter(Boolean).join(", ")} onChange={(value,cityId) => { setForm(p => ({ ...p, city: value, country: "", selected_place_city_id: cityId ?? "" })); setFieldErrors(p => ({ ...p, city: undefined })); }} required />
+                    {fieldErrors.city && <p id="profile-city-error" role="alert" className="text-sm text-error">{fieldErrors.city}</p>}
                     {/* Profil-URL / Slug */}
                     <div>
                       <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
@@ -2351,10 +2335,7 @@ export default function ProfilePage() {
                         </div>
                         <div>
                           <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelLocation")}</label>
-                          <input type="text" value={newProject.location}
-                            onChange={(e) => setNewProject((p) => ({ ...p, location: e.target.value }))}
-                            placeholder="München, Bayern"
-                            className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
+                          <PlaceField value={newProject.location} onChange={(value,cityId) => setNewProject(p => ({...p,location:value,selected_place_city_id:cityId??""}))} />
                         </div>
                         <div>
                           <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelLink")}</label>

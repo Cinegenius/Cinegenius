@@ -1,3 +1,6 @@
+
+import { selectedPlaceId } from "./selected-place-id";
+import { hasPlaceCity } from "@/lib/places/core";
 import { DEPARTMENTS, deptValues } from "@/lib/marketplaceCategories";
 import { ANIMAL_DEPARTMENT_ID, ANIMAL_LEGACY_REFERENCES, normalizeAnimalCompanyDetails, type AnimalCompanyDetails } from "@/lib/animal-taxonomy";
 import { responsiblePersonDraft, NEW_RESPONSIBLE_PERSON, type ResponsiblePerson } from "./responsible-person";
@@ -24,6 +27,7 @@ export type QuickStartIntentData = {
   category: string;
   title: string;
   city: string;
+  selected_place_city_id?: string;
   description: string;
   imageUrl: string;
   price: string;
@@ -47,6 +51,7 @@ export type QuickStartDraft = {
   name: string;
   accountPerson?: ResponsiblePerson;
   personCity: string;
+  personPlaceCityId?: string;
   personCountry: string;
   activeIntent: QuickStartIntent | null;
   talentIntro: string;
@@ -148,7 +153,8 @@ function normalizeIntentData(value: unknown): QuickStartIntentData {
     responsible: input.responsible ? responsiblePersonDraft(input.responsible) : { ...NEW_RESPONSIBLE_PERSON },
     category: typeof input.category === "string" ? input.category.slice(0, 100) : "",
     title: typeof input.title === "string" ? input.title.slice(0, 200) : "",
-    city: typeof input.city === "string" ? input.city.slice(0, 100) : "",
+    city: typeof input.city === "string" ? input.city.slice(0, 320) : "",
+    selected_place_city_id: selectedPlaceId(input.selected_place_city_id),
     description: typeof input.description === "string" ? input.description.slice(0, 3000) : "",
     imageUrl: typeof input.imageUrl === "string" ? input.imageUrl.slice(0, 1200) : "",
     price: typeof input.price === "string" ? input.price.slice(0, 20) : "",
@@ -248,7 +254,8 @@ export function normalizeQuickStartDraft(value: unknown): QuickStartDraft {
     step: migratedStep,
     intents,
     name: typeof input.name === "string" ? input.name.slice(0, 120) : "",
-    personCity: typeof input.personCity === "string" ? input.personCity.slice(0, 100) : "",
+    personCity: typeof input.personCity === "string" ? input.personCity.slice(0, 320) : "",
+    personPlaceCityId: selectedPlaceId(input.personPlaceCityId),
     personCountry: typeof input.personCountry === "string" ? input.personCountry.slice(0, 100) : "Deutschland",
     activeIntent,
     providerImageUrl: typeof input.providerImageUrl === "string" ? input.providerImageUrl.slice(0, 1200) : "",
@@ -351,11 +358,11 @@ export function validateQuickStartIntentDetails(draft: QuickStartDraft, intent: 
       return { field: `${intent}-category`, message: intent === "location" ? "Wähle eine passende Art der Location aus." : "Wähle eine passende Angebotskategorie aus." };
     }
     if (!section?.title.trim()) return { field: `${intent}-title`, message: "Bitte gib deinem Angebot einen kurzen Namen." };
-    if (!section.city.trim()) return { field: `${intent}-city`, message: "Bitte gib den Standort des Angebots an." };
+    if (!hasPlaceCity(section.city)) return { field: `${intent}-city`, message: "Bitte gib den Standort des Angebots an." };
   }
   if (intent === "company") {
     if (!section?.title.trim()) return { field: "company-title", message: "Bitte gib den Namen deiner Firma ein." };
-    if (!section.city.trim()) return { field: "company-city", message: "Bitte gib den Firmenstandort an." };
+    if (!hasPlaceCity(section.city)) return { field: "company-city", message: "Bitte gib den Firmenstandort an." };
     if (!section.categoryIds.length) return { field: "company-categories", message: "Wähle mindestens eine passende Firmenkategorie aus." };
   }
   return null;
@@ -365,7 +372,7 @@ export function validateQuickStartScreen(draft: QuickStartDraft, screen: QuickSt
   if (screen === "name" && !draft.name.trim()) return { field: "name", message: "Wie dürfen wir dich nennen? Bitte gib deinen Namen ein." };
   if (screen === "goals" && draft.intents.length === 0) return { field: "goals", message: "Wähle mindestens einen Bereich aus, damit wir dich passend weiterführen können." };
   if (screen === "location" && (draft.intents.some(intent => ["crew", "talent", "location", "equipment"].includes(intent)))) {
-    if (!draft.personCity.trim()) return { field: "personCity", message: "Bitte gib deine Stadt oder Region an." };
+    if (!hasPlaceCity(draft.personCity)) return { field: "personCity", message: "Bitte gib deine Stadt oder Region an." };
     if (!draft.personCountry.trim()) return { field: "personCountry", message: "Bitte wähle dein Land aus." };
   }
   if (screen === "details") {

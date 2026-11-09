@@ -1,9 +1,10 @@
+import { placeReadFields } from "@/lib/places/catalog";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
 import LocationsContent from "../LocationsContent";
 import PageHeader from "@/components/PageHeader";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 
 export const revalidate = 60;
 
@@ -30,13 +31,17 @@ async function geocodeCities(cities: string[]): Promise<Record<string, { lat: nu
   return result;
 }
 
-export default async function LocationsSuchePage() {
+export default async function LocationsSuchePage({searchParams}:{searchParams:Promise<Record<string,string|string[]|undefined>>}) {
+  const params=await searchParams;
+  const locale = await getLocale();
   const t = await getTranslations("locations");
-  const { data, error } = await db
+  let locationQuery = db
     .from("listings")
-    .select("id, user_id, title, city, price, image_url, category, description, metadata, created_at")
+    .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, user_id, title, city, price, image_url, category, description, metadata, created_at")
     .eq("published", true)
-    .eq("type", "location")
+    .eq("type", "location");
+  for(const [param,column] of [["country","place_country_code"],["region","place_region_id"],["city","place_city_id"]] as const){const value=params[param];if(typeof value==="string")locationQuery=locationQuery.eq(column,value.slice(0,100));}
+  const {data,error}=await locationQuery
     .order("created_at", { ascending: false })
     .limit(300);
 
@@ -57,7 +62,8 @@ export default async function LocationsSuchePage() {
   }) => {
     const { lat, lng } = coords[l.city] ?? FALLBACK;
     return {
-      id: l.id, ownerId: l.user_id, title: l.title, type: l.category ?? "Speziallocation",
+      id: l.id,
+    ...placeReadFields(l.city ?? "", l, locale), ownerId: l.user_id, title: l.title, type: l.category ?? "Speziallocation",
       city: l.city ?? "", price: l.price, priceUnit: "day" as const,
       rating: ratingsMap[l.id]?.rating ?? 0, reviews: ratingsMap[l.id]?.reviews ?? 0,
       image: l.image_url ?? "",

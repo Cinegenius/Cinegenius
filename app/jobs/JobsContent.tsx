@@ -1,5 +1,9 @@
 "use client";
 
+import PlaceFilters from "@/components/PlaceFilters";
+
+import { placeSearchMatches, placeOptions, matchesPlace, placeDisplay, canonicalFilterValue } from "@/lib/places/core";
+
 import { useViewUrl } from "@/lib/use-view-url";
 import { useViewState } from "@/lib/use-view-state";
 
@@ -17,7 +21,7 @@ import EmptyState from "@/components/EmptyState";
 import { ANIMAL_DEPARTMENT_ID, animalRoleLabel, animalOccupation } from "@/lib/animal-taxonomy";
 import { FILM_DEPARTMENTS, DEPT_KEYWORDS, ALL_ROLES } from "@/lib/filmRoles";
 import { matchesGripOccupation, normalizeGripDepartmentId, normalizeGripRoleId } from "@/lib/gripTaxonomy";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import PageHeader from "@/components/PageHeader";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 
@@ -114,10 +118,10 @@ function SortDropdown({ value, options, onChange }: {
 
 // ─── FilterDropdown ───────────────────────────────────────────────
 function FilterDropdown({
-  icon: Icon, label, value, options, onChange,
+  icon: Icon, label, value, options, onChange, optionLabel = (value: string) => value,
 }: {
   icon: React.ElementType; label: string; value: string;
-  options: string[]; onChange: (v: string) => void;
+  options: string[]; onChange: (v: string) => void; optionLabel?: (value: string) => string;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -135,7 +139,7 @@ function FilterDropdown({
           active ? "bg-gold/12 border-gold/30 text-gold" : open ? "bg-bg-elevated border-border text-text-secondary" : "border-border text-text-muted hover:border-gold/40 hover:text-gold"
         }`}>
         <Icon size={11} />
-        {active ? value : label}
+        {active ? optionLabel(value) : label}
         {active
           ? <span onClick={(e) => { e.stopPropagation(); onChange(""); setOpen(false); }} className="hover:text-red-400 transition-colors ml-0.5"><X size={10} /></span>
           : <ChevronDown size={11} className={`transition-transform ${open ? "rotate-180" : ""}`} />}
@@ -145,7 +149,7 @@ function FilterDropdown({
           {options.map((opt) => (
             <button key={opt} onClick={() => { onChange(opt); setOpen(false); }}
               className={`w-full text-left px-3 py-2 text-xs transition-colors hover:bg-white/[0.04] ${value === opt ? "text-gold font-medium" : "text-text-secondary"}`}>
-              {opt}
+              {optionLabel(opt)}
             </button>
           ))}
         </div>
@@ -286,6 +290,7 @@ function JobDeptPanel({
 
 // ─── Main ─────────────────────────────────────────────────────────
 function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
+  const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("jobs");
@@ -304,6 +309,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   const [jobTypeFilter, setJobTypeFilter] = useViewState<"alle" | "freelance" | "festanstellung" | "praktikum">("jobs.jobTypeFilter", "alle");
   const [cityFilter, setCityFilter] = useViewState("jobs.cityFilter", () => searchParams.get("city") ?? "");
   const [countryFilter, setCountryFilter] = useViewState("jobs.countryFilter", () => searchParams.get("country") ?? "");
+  const [regionFilter, setRegionFilter] = useViewState("jobs.regionFilter", () => searchParams.get("region") ?? "");
   const [sortKey, setSortKey] = useViewState("jobs.sortKey", () => searchParams.get("sort") ?? "newest");
   const [pagination, setPagination] = useViewState("jobs.pagination", { filterKey: "", visibleCount: PAGE_SIZE });
   const panelRef = useRef<HTMLDivElement>(null);
@@ -327,10 +333,18 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   if (sortKey !== "newest") filterParams.set("sort", sortKey);
   useViewUrl(filterParams.size ? `/jobs?${filterParams}` : "/jobs");
 
-  const availableCities = useMemo(() => {
-    const cities = allJobs.map((j) => j.location?.split(",")[0]?.trim()).filter(Boolean) as string[];
-    return [...new Set(cities)].sort();
-  }, [allJobs]);
+  useEffect(() => {
+    const country=canonicalFilterValue(countryFilter,allJobs,"country"),city=canonicalFilterValue(cityFilter,allJobs,"city");
+    if(country!==countryFilter||city!==cityFilter)queueMicrotask(()=>{setCountryFilter(country);setCityFilter(city);});
+  },[countryFilter,cityFilter,allJobs,setCountryFilter,setCityFilter]);
+  const cityOptions = useMemo(() => placeOptions(allJobs, "city", locale, countryFilter), [allJobs,locale,countryFilter]);
+  const countryOptions = useMemo(() => placeOptions(allJobs, "country", locale), [allJobs,locale]);
+  const regionOptions = useMemo(() => placeOptions(allJobs, "region", locale), [allJobs,locale]);
+  const availableCities = cityOptions.map(o => o.value);
+  const availableCountries = countryOptions.map(o => o.value);
+  const cityLabel = (value: string) => cityOptions.find(o => o.value === value)?.label ?? value;
+  const countryLabel = (value: string) => countryOptions.find(o => o.value === value)?.label ?? value;
+  const regionLabel = (value: string) => regionOptions.find(option => option.value === value)?.label ?? value;
 
   const filtered = useMemo(() => {
     let result = [...allJobs];
@@ -374,7 +388,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
       result = result.filter((j) =>
         j.title.toLowerCase().includes(q) ||
         (j.company ?? "").toLowerCase().includes(q) ||
-        j.location.toLowerCase().includes(q) ||
+        (j.location.toLowerCase().includes(q) || placeSearchMatches(j,q)) ||
         j.tags.some((t) => t.toLowerCase().includes(q)) ||
         (j.description ?? "").toLowerCase().includes(q)
       );
@@ -389,20 +403,15 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
       });
     }
     if (jobTypeFilter !== "alle") result = result.filter((j) => (j.jobType ?? "freelance") === jobTypeFilter);
-    if (cityFilter) result = result.filter((j) => j.location?.toLowerCase().includes(cityFilter.toLowerCase()));
-    if (countryFilter) {
-      if (countryFilter === "Remote") {
-        result = result.filter((j) => j.location?.toLowerCase().includes("remote"));
-      } else {
-        result = result.filter((j) => j.location?.toLowerCase().includes(countryFilter.toLowerCase()));
-      }
-    }
+    if (cityFilter) result = result.filter(j => matchesPlace(j, "city", cityFilter));
+    if (regionFilter) result = result.filter(row => matchesPlace(row, "region", regionFilter));
+    if (countryFilter) result = result.filter(j => matchesPlace(j, "country", countryFilter));
     if (sortKey === "rate-desc") result = [...result].sort((a, b) => parseInt(b.rate) - parseInt(a.rate));
     if (sortKey === "urgent") result = [...result].sort((a, b) => (b.urgent ? 1 : 0) - (a.urgent ? 1 : 0));
     return result;
-  }, [allJobs, query, selectedDeptId, selectedRoleId, activeType, urgentOnly, payTypeFilter, jobTypeFilter, cityFilter, countryFilter, sortKey]);
+  }, [allJobs, query, selectedDeptId, selectedRoleId, activeType, urgentOnly, payTypeFilter, jobTypeFilter, cityFilter, countryFilter, regionFilter, sortKey]);
 
-  const filterKey = JSON.stringify([query, selectedDeptId, selectedRoleId, activeType, urgentOnly, payTypeFilter, jobTypeFilter, cityFilter, countryFilter, sortKey]);
+  const filterKey = JSON.stringify([query, selectedDeptId, selectedRoleId, activeType, urgentOnly, payTypeFilter, jobTypeFilter, cityFilter, countryFilter, regionFilter, sortKey]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
   const showMore = () => setPagination({ filterKey, visibleCount: visibleCount + PAGE_SIZE });
 
@@ -420,11 +429,11 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
     setSelectedDeptId(null); setSelectedRoleId(null);
     setQuery(""); setActiveType(""); setUrgentOnly(false);
     setPayTypeFilter(""); setJobTypeFilter("alle");
-    setCityFilter(""); setCountryFilter(""); setSortKey("newest");
+    setCityFilter(""); setCountryFilter(""); setRegionFilter(""); setSortKey("newest");
     router.replace("/jobs", { scroll: false });
   };
 
-  const hasAnyFilter = Boolean(selectedDeptId || selectedRoleId || query || activeType || urgentOnly || payTypeFilter || jobTypeFilter !== "alle" || cityFilter || countryFilter);
+  const hasAnyFilter = Boolean(regionFilter || selectedDeptId || selectedRoleId || query || activeType || urgentOnly || payTypeFilter || jobTypeFilter !== "alle" || cityFilter || countryFilter);
   const hasDeptFilter = Boolean(selectedDeptId || selectedRoleId);
 
   const activeDeptData = selectedDeptId ? FILM_DEPARTMENTS.find((d) => d.id === selectedDeptId) : null;
@@ -433,8 +442,9 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
     ...(activeDeptData ? [{ id: "dept", label: activeRoleData ? `${activeDeptData.label} · ${activeRoleData.label}` : activeDeptData.label, onRemove: () => { setSelectedDeptId(null); setSelectedRoleId(null); } }] : []),
     ...(activeType ? [{ id: "project", label: activeType, onRemove: () => setActiveType("") }] : []),
     ...(payTypeFilter ? [{ id: "pay", label: payTypeFilter, onRemove: () => setPayTypeFilter("") }] : []),
-    ...(cityFilter ? [{ id: "city", label: cityFilter, onRemove: () => setCityFilter("") }] : []),
-    ...(countryFilter ? [{ id: "country", label: countryFilter, onRemove: () => setCountryFilter("") }] : []),
+    ...(cityFilter ? [{ id: "city", label: cityLabel(cityFilter), onRemove: () => setCityFilter("") }] : []),
+    ...(countryFilter ? [{ id: "country", label: countryLabel(countryFilter), onRemove: () => setCountryFilter("") }] : []),
+    ...(regionFilter ? [{ id: "region", label: regionLabel(regionFilter), onRemove: () => setRegionFilter("") }] : []),
     ...(urgentOnly ? [{ id: "urgent", label: t("filterUrgentLabel"), onRemove: () => setUrgentOnly(false) }] : []),
     ...(jobTypeFilter !== "alle" ? [{ id: "jobtype", label: jobTypeFilter, onRemove: () => setJobTypeFilter("alle") }] : []),
   ];
@@ -491,12 +501,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
         <MobileFilterField label={t("filterPay")}>
           <MobileFilterSelect value={payTypeFilter} onChange={setPayTypeFilter} placeholder="Alle Vergütungsarten" options={PAY_TYPES.map((value) => ({ value, label: value }))} />
         </MobileFilterField>
-        <MobileFilterField label={t("filterCity")}>
-          <MobileFilterSelect value={cityFilter} onChange={setCityFilter} placeholder="Alle Städte" options={availableCities.map((value) => ({ value, label: value }))} />
-        </MobileFilterField>
-        <MobileFilterField label={t("filterCountry")}>
-          <MobileFilterSelect value={countryFilter} onChange={setCountryFilter} placeholder="Alle Länder" options={["Deutschland", "Österreich", "Schweiz", "Remote"].map((value) => ({ value, label: value }))} />
-        </MobileFilterField>
+        <PlaceFilters rows={allJobs} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />
         <MobileFilterField label="Anstellungsart">
           <MobileFilterSelect value={jobTypeFilter === "alle" ? "" : jobTypeFilter} onChange={(value) => setJobTypeFilter((value || "alle") as typeof jobTypeFilter)} placeholder="Alle" options={[{ value: "freelance", label: t("filterFreelance") }, { value: "festanstellung", label: t("filterFulltime") }, { value: "praktikum", label: t("filterInternship") }]} />
         </MobileFilterField>
@@ -538,12 +543,12 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
             <FilterDropdown icon={Briefcase} label={t("filterPay")} value={payTypeFilter} options={PAY_TYPES} onChange={setPayTypeFilter} />
 
             {/* Stadt */}
-            {availableCities.length > 0 && (
-              <FilterDropdown icon={MapPin} label={t("filterCity")} value={cityFilter} options={availableCities} onChange={setCityFilter} />
+            {(availableCities.length > 0 || availableCountries.length > 0) && (
+              <PlaceFilters rows={allJobs} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />
             )}
 
             {/* Land */}
-            <FilterDropdown icon={Globe} label={t("filterCountry")} value={countryFilter} options={["Deutschland", "Österreich", "Schweiz", "Remote"]} onChange={setCountryFilter} />
+
 
             {/* Dringend toggle */}
             <label className="flex items-center gap-1.5 text-xs text-text-muted cursor-pointer hover:text-text-secondary transition-colors select-none shrink-0">
@@ -591,7 +596,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
           )}
 
           {/* Row 4: Active chips */}
-          {(hasDeptFilter || activeType || urgentOnly || payTypeFilter || jobTypeFilter !== "alle" || cityFilter || countryFilter) && (
+          {(hasDeptFilter || activeType || urgentOnly || payTypeFilter || jobTypeFilter !== "alle" || cityFilter || countryFilter || regionFilter) && (
             <div className="flex flex-wrap gap-1.5 items-center">
               {activeDeptData && (
                 <span className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium ${activeDeptData.bg} ${activeDeptData.color}`}>
@@ -625,16 +630,17 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
               )}
               {cityFilter && (
                 <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary">
-                  <MapPin size={9} /> {cityFilter}
+                  <MapPin size={9} /> {cityLabel(cityFilter)}
                   <button onClick={() => setCityFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               )}
               {countryFilter && (
                 <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary">
-                  <Globe size={9} /> {countryFilter}
+                  <Globe size={9} /> {countryLabel(countryFilter)}
                   <button onClick={() => setCountryFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               )}
+              {regionFilter && <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary"><MapPin size={9} />{regionLabel(regionFilter)}<button type="button" aria-label={`${t("clearFilter")}: ${regionLabel(regionFilter)}`} onClick={() => setRegionFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button></span>}
               <button onClick={clearAll} className="text-[11px] text-text-muted hover:text-red-400 transition-colors underline underline-offset-2 ml-1">
                 {t("clearAll")}
               </button>
@@ -800,7 +806,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
 
                   {/* Row 4: meta */}
                   <div className="flex flex-wrap items-center gap-3 text-[11px] text-text-muted">
-                    {job.location && <span className="flex items-center gap-1"><MapPin size={10} />{job.location}</span>}
+                    {job.location && <span className="flex items-center gap-1"><MapPin size={10} />{placeDisplay(job, job.location, locale)}</span>}
                     {shootDates && <span className="flex items-center gap-1"><Clock size={10} />{shootDates}</span>}
                     <span className="ml-auto">{job.posted}</span>
                   </div>

@@ -1,5 +1,9 @@
 "use client";
 
+import { placeInputValue } from "@/lib/places/core";
+
+import PlaceField from "@/components/PlaceField";
+
 import { FormEvent, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -23,8 +27,8 @@ type Entry = {
   registration_url: string | null; external_url: string | null; image_url: string | null; moderation_status: string; moderation_reason: string;
 };
 type Workspace = { organizations: Organization[]; entries: Entry[] };
-type OrganizationForm = { id: string; expectedUpdatedAt: string; name: string; description: string; topics: string[]; city: string; region: string; websiteUrl: string; publicContactEmail: string; logoUrl: string; responsiblePerson: ResponsiblePerson };
-type EntryForm = { id: string; expectedUpdatedAt: string; organizationId: string; entryType: string; title: string; summary: string; description: string; topic: string; format: string; city: string; venue: string; startsAt: string; endsAt: string; registrationUrl: string; externalUrl: string; imageUrl: string };
+type OrganizationForm = { selected_place_city_id?: string; id: string; expectedUpdatedAt: string; name: string; description: string; topics: string[]; city: string; region: string; websiteUrl: string; publicContactEmail: string; logoUrl: string; responsiblePerson: ResponsiblePerson };
+type EntryForm = { selected_place_city_id?: string; id: string; expectedUpdatedAt: string; organizationId: string; entryType: string; title: string; summary: string; description: string; topic: string; format: string; city: string; venue: string; startsAt: string; endsAt: string; registrationUrl: string; externalUrl: string; imageUrl: string };
 
 const input = "min-h-11 w-full rounded-xl border border-border bg-bg-primary px-3 py-2 text-text-primary outline-none focus:border-gold";
 const emptyEntry = (organizationId = ""): EntryForm => ({ id: "", expectedUpdatedAt: "", organizationId, entryType: "news", title: "", summary: "", description: "", topic: "industry", format: "onsite", city: "", venue: "", startsAt: "", endsAt: "", registrationUrl: "", externalUrl: "", imageUrl: "" });
@@ -39,6 +43,7 @@ function localDate(value: string | null) {
 
 export default function OrganizationDashboardClient({ initialWorkspace, responsiblePerson }: { initialWorkspace: Workspace; responsiblePerson: ResponsiblePerson }) {
   const t = useTranslations("Organizations");
+  const places = useTranslations("Places");
   const [workspace, setWorkspace] = useState(initialWorkspace);
   const [mode, setMode] = useState<"organization" | "entry">(initialWorkspace.organizations.length ? "entry" : "organization");
   const [organization, setOrganization] = useState<OrganizationForm>({ id: "", expectedUpdatedAt: "", name: "", description: "", topics: [], city: "", region: "", websiteUrl: "", publicContactEmail: "", logoUrl: "", responsiblePerson: responsiblePersonDraft(responsiblePerson) });
@@ -131,12 +136,12 @@ export default function OrganizationDashboardClient({ initialWorkspace, responsi
 
   const editOrganization = (item: Organization) => {
     if (mode === "organization" && organization.id === item.id) return;
-    setOrganization({ id: item.id, expectedUpdatedAt: item.updated_at, name: item.name, description: item.description || "", topics: item.topics || [], city: item.city || "", region: item.region || "", websiteUrl: item.website_url || "", publicContactEmail: item.public_contact_email || "", logoUrl: item.logo_url || "", responsiblePerson: responsiblePersonDraft(item.responsible_person) });
+    setOrganization({ id: item.id, expectedUpdatedAt: item.updated_at, name: item.name, description: item.description || "", topics: item.topics || [], city: placeInputValue(item,item.city || ""), selected_place_city_id: (item as {place_city_id?: string}).place_city_id || "", region: item.region || "", websiteUrl: item.website_url || "", publicContactEmail: item.public_contact_email || "", logoUrl: item.logo_url || "", responsiblePerson: responsiblePersonDraft(item.responsible_person) });
     setMode("organization"); setMessage(null);
   };
   const editEntry = (item: Entry) => {
     if (mode === "entry" && entry.id === item.id) return;
-    setEntry({ id: item.id, expectedUpdatedAt: item.updated_at, organizationId: item.organization_id, entryType: item.entry_type, title: item.title, summary: item.summary || "", description: item.description || "", topic: item.topic, format: item.format, city: item.city || "", venue: item.venue || "", startsAt: localDate(item.starts_at), endsAt: localDate(item.ends_at), registrationUrl: item.registration_url || "", externalUrl: item.external_url || "", imageUrl: item.image_url || "" });
+    setEntry({ id: item.id, expectedUpdatedAt: item.updated_at, organizationId: item.organization_id, entryType: item.entry_type, title: item.title, summary: item.summary || "", description: item.description || "", topic: item.topic, format: item.format, city: placeInputValue(item,item.city || ""), selected_place_city_id: (item as {place_city_id?: string}).place_city_id || "", venue: item.venue || "", startsAt: localDate(item.starts_at), endsAt: localDate(item.ends_at), registrationUrl: item.registration_url || "", externalUrl: item.external_url || "", imageUrl: item.image_url || "" });
     setMode("entry"); setMessage(null);
   };
 
@@ -170,7 +175,7 @@ export default function OrganizationDashboardClient({ initialWorkspace, responsi
         </fieldset>
         <label className="block text-sm text-text-primary">{t("description")}<textarea className={`${input} mt-1 min-h-36`} maxLength={5000} value={organization.description} onChange={event => setOrganization({ ...organization, description: event.target.value })} /></label>
         <fieldset><legend className="mb-2 text-sm text-text-primary">{t("topics")}</legend><div className="flex flex-wrap gap-2">{ORGANIZATION_TOPICS.map(topic => <label key={topic} className={`cursor-pointer rounded-full border px-3 py-2 text-sm ${organization.topics.includes(topic) ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}><input type="checkbox" className="sr-only" checked={organization.topics.includes(topic)} onChange={() => setOrganization({ ...organization, topics: organization.topics.includes(topic) ? organization.topics.filter(value => value !== topic) : [...organization.topics, topic] })} />{t(`topic.${topic}`)}</label>)}</div></fieldset>
-        <div className="grid gap-4 sm:grid-cols-2"><label className="text-sm text-text-primary">{t("city")}<input className={`${input} mt-1`} value={organization.city} onChange={event => setOrganization({ ...organization, city: event.target.value })} /></label><label className="text-sm text-text-primary">{t("region")}<input className={`${input} mt-1`} value={organization.region} onChange={event => setOrganization({ ...organization, region: event.target.value })} /></label></div>
+        <div className="grid gap-4 sm:grid-cols-2"><PlaceField value={organization.city} onChange={(value, cityId) => setOrganization({ ...organization, city: value, selected_place_city_id: cityId || "" })} /><label className="block text-sm text-text-primary">{places("legacyArea")}<input className={`${input} mt-1`} value={organization.region} onChange={event => setOrganization({ ...organization, region: event.target.value })} /></label></div>
         <label className="block text-sm text-text-primary">{t("website")}<input type="url" className={`${input} mt-1`} value={organization.websiteUrl} onChange={event => setOrganization({ ...organization, websiteUrl: event.target.value })} /></label>
         <label className="block text-sm text-text-primary">{t("publicEmail")}<input type="email" className={`${input} mt-1`} value={organization.publicContactEmail} onChange={event => setOrganization({ ...organization, publicContactEmail: event.target.value })} /></label>
         <ResponsiblePersonFields value={organization.responsiblePerson} onChange={value => setOrganization({ ...organization, responsiblePerson: value })} company accountPrefill />
@@ -205,7 +210,7 @@ export default function OrganizationDashboardClient({ initialWorkspace, responsi
         <label className="block text-sm text-text-primary">{t("summary")}<textarea maxLength={500} className={`${input} mt-1 min-h-24`} value={entry.summary} onChange={event => setEntry({ ...entry, summary: event.target.value })} /></label>
         <label className="block text-sm text-text-primary">{t("description")}<textarea maxLength={12000} className={`${input} mt-1 min-h-40`} value={entry.description} onChange={event => setEntry({ ...entry, description: event.target.value })} /></label>
         {entry.entryType !== "news" && <>
-        <div className="grid gap-4 sm:grid-cols-2"><label className="text-sm text-text-primary">{t("formatLabel")}<select className={`${input} mt-1`} value={entry.format} onChange={event => setEntry({ ...entry, format: event.target.value })}>{ORGANIZATION_FORMATS.map(value => <option key={value} value={value}>{t(`format.${value}`)}</option>)}</select></label><label className="text-sm text-text-primary">{t("city")}<input className={`${input} mt-1`} value={entry.city} onChange={event => setEntry({ ...entry, city: event.target.value })} /></label></div>
+        <div className="grid gap-4 sm:grid-cols-2"><label className="text-sm text-text-primary">{t("formatLabel")}<select className={`${input} mt-1`} value={entry.format} onChange={event => setEntry({ ...entry, format: event.target.value })}>{ORGANIZATION_FORMATS.map(value => <option key={value} value={value}>{t(`format.${value}`)}</option>)}</select></label><PlaceField value={entry.city} onChange={(value, cityId) => setEntry({ ...entry, city: value, selected_place_city_id: cityId || "" })} /></div>
         <label className="block text-sm text-text-primary">{t("venue")}<input className={`${input} mt-1`} value={entry.venue} onChange={event => setEntry({ ...entry, venue: event.target.value })} /></label>
         <div className="grid gap-4 sm:grid-cols-2"><label className="text-sm text-text-primary">{t("startsAt")}<input type="datetime-local" className={`${input} mt-1`} value={entry.startsAt} onChange={event => setEntry({ ...entry, startsAt: event.target.value })} /></label><label className="text-sm text-text-primary">{t("endsAt")}<input type="datetime-local" className={`${input} mt-1`} value={entry.endsAt} onChange={event => setEntry({ ...entry, endsAt: event.target.value })} /></label></div>
         <label className="block text-sm text-text-primary">{t("registrationUrl")}<input type="url" className={`${input} mt-1`} value={entry.registrationUrl} onChange={event => setEntry({ ...entry, registrationUrl: event.target.value })} /></label>

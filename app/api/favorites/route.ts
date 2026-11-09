@@ -1,4 +1,6 @@
 import { listingPriceLabel } from "@/lib/listing-price";
+import { placeReadFields } from "@/lib/places/catalog";
+import { PLACE_COLUMNS, placeDisplay } from "@/lib/places/core";
 import { getTranslations, getLocale } from "next-intl/server";
 // Required Supabase table:
 // CREATE TABLE IF NOT EXISTS favorites (
@@ -59,13 +61,13 @@ export async function GET(req: NextRequest) {
     .limit(200);
 
   const idsToResolve = (data ?? []).map(row => row.listing_id);
-  const current = idsToResolve.length ? await db.from("listings").select("id,type,title,city,price,image_url,price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace").in("id", idsToResolve).eq("published", true) : { data: [], error: null };
+  const current = idsToResolve.length ? await db.from("listings").select(`id,type,title,city,price,image_url,price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace,${PLACE_COLUMNS}`).in("id", idsToResolve).eq("published", true) : { data: [], error: null };
   if (current.error) return NextResponse.json({ error: (await getTranslations("OfferModeration"))("saveError") }, { status: 503 });
   const market=await getTranslations("MarketplaceOffer"),locale=await getLocale();
   const visible = new Map((current.data ?? []).map(row => [row.id, row]));
   return NextResponse.json({ favorites: (data ?? []).flatMap(row => {
     const offer = visible.get(row.listing_id);
-    return offer ? [{ ...row, listing_type: offer.type, listing_title: offer.title, listing_city: offer.city, listing_price: offer.price, priceLabel:listingPriceLabel(offer.price,offer,"/Tag",locale,market), listing_image: offer.image_url }] : [];
+    return offer ? [{ ...row, listing_type: offer.type, listing_title: offer.title, listing_city: placeDisplay(placeReadFields(offer.city??"",offer,locale),offer.city??"",locale), listing_price: offer.price, priceLabel:listingPriceLabel(offer.price,offer,"/Tag",locale,market), listing_image: offer.image_url }] : [];
   }) }, { headers: { "Cache-Control": "private, no-store" } });
 }
 

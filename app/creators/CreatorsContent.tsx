@@ -1,5 +1,9 @@
 "use client";
 
+import PlaceFilters from "@/components/PlaceFilters";
+
+import { placeSearchMatches, placeOptions, matchesPlace, placeDisplay, canonicalFilterValue } from "@/lib/places/core";
+
 import { normalizeCrewLanguages, crewLanguageLabel, matchesCrewLanguage } from "@/lib/crew-languages";
 import { useViewState } from "@/lib/use-view-state";
 
@@ -87,10 +91,6 @@ export type ServerCreator = {
   last_seen_at?: string | null;
 };
 
-function parseLocation(loc: string): { city: string; country: string } {
-  const parts = loc.split(",").map((s) => s.trim()).filter(Boolean);
-  return { city: parts[0] ?? "", country: parts[1] ?? "" };
-}
 
 function getPositions(c: ServerCreator): string[] {
   if (Array.isArray(c.positions) && c.positions.length > 0) return c.positions;
@@ -329,6 +329,7 @@ function CreatorsInner({
   const [query, setQuery] = useViewState("crew.query", () => initialFilters.query);
   const [cityFilter, setCityFilter] = useViewState("crew.cityFilter", () => initialFilters.city);
   const [countryFilter, setCountryFilter] = useViewState("crew.countryFilter", "");
+  const [regionFilter, setRegionFilter] = useViewState("creators.regionFilter", "");
   const [languageFilter, setLanguageFilter] = useViewState("crew.languageFilter", "");
   const [availableOnly, setAvailableOnly] = useViewState("crew.availableOnly", false);
 
@@ -381,22 +382,19 @@ function CreatorsInner({
   }, [hasMoreFromApi, loadingMore, loadError, loadMoreFromApi]);
 
   // Derive available filter options from real data only
-  const { availableCities, availableCountries, availableLanguages } = useMemo(() => {
-    const cities = new Set<string>();
-    const countries = new Set<string>();
-    const langs = new Set<string>();
-    for (const c of allCreators) {
-      const { city, country } = parseLocation(c.location);
-      if (city) cities.add(city);
-      if (country) countries.add(country);
-      for (const l of normalizeCrewLanguages(c.languages)) langs.add(l);
-    }
-    return {
-      availableCities:     [...cities].sort(),
-      availableCountries:  [...countries].sort(),
-      availableLanguages:  [...langs].sort((a, b) => crewLanguageLabel(a, locale).localeCompare(crewLanguageLabel(b, locale), locale)),
-    };
-  }, [allCreators, locale]);
+  useEffect(() => {
+    const country=canonicalFilterValue(countryFilter,allCreators,"country"),city=canonicalFilterValue(cityFilter,allCreators,"city");
+    if(country!==countryFilter||city!==cityFilter)queueMicrotask(()=>{setCountryFilter(country);setCityFilter(city);});
+  },[countryFilter,cityFilter,allCreators,setCountryFilter,setCityFilter]);
+  const cityOptions = useMemo(() => placeOptions(allCreators, "city", locale, countryFilter), [allCreators, locale, countryFilter]);
+  const countryOptions = useMemo(() => placeOptions(allCreators, "country", locale), [allCreators, locale]);
+  const regionOptions = useMemo(() => placeOptions(allCreators, "region", locale), [allCreators, locale]);
+  const availableCities = cityOptions.map(o => o.value);
+  const availableCountries = countryOptions.map(o => o.value);
+  const availableLanguages = useMemo(() => [...new Set(allCreators.flatMap(c => normalizeCrewLanguages(c.languages)))].sort((a,b) => crewLanguageLabel(a,locale).localeCompare(crewLanguageLabel(b,locale),locale)), [allCreators,locale]);
+  const cityLabel = (value: string) => cityOptions.find(o => o.value === value)?.label ?? value;
+  const countryLabel = (value: string) => countryOptions.find(o => o.value === value)?.label ?? value;
+  const regionLabel = (value: string) => regionOptions.find(option => option.value === value)?.label ?? value;
   const [sortKey, setSortKey] = useViewState("crew.sortKey", () => initialFilters.sort === "rating" ? "rating" : "featured");
   const [viewMode, setViewMode] = useViewState<"grid" | "list">("crew.viewMode", "grid");
 
@@ -496,7 +494,7 @@ function CreatorsInner({
 
   // Filtered results
   const isTopMode = !query.trim() && selectedRoles.size === 0 && !sidebarDept
-    && !availableOnly && !vendorOnly && !cityFilter && !countryFilter && !languageFilter
+    && !availableOnly && !vendorOnly && !cityFilter && !countryFilter && !regionFilter && !languageFilter
     && !profileTypeFilter && !hairFilter && !eyeFilter && !bodyFilter && !travelFilter
     && !ageMinFilter && !ageMaxFilter;
 
@@ -513,7 +511,7 @@ function CreatorsInner({
           || gripSearchTerms(p).some((term) => normalizeOccupation(term).includes(normalizedQuery))) ||
         (isGripDepartmentSearch(query) && getPositions(c).some(isGripOccupation)) ||
         c.role.toLowerCase().includes(q) ||
-        c.location.toLowerCase().includes(q) ||
+        (c.location.toLowerCase().includes(q) || placeSearchMatches(c,q)) ||
         c.skills.some((s) => s.toLowerCase().includes(q))
       );
     }
@@ -532,10 +530,11 @@ function CreatorsInner({
     if (availableOnly) result = result.filter((c) => c.available);
 
     if (cityFilter) {
-      result = result.filter((c) => parseLocation(c.location).city === cityFilter);
+      result = result.filter((c) => matchesPlace(c, "city", cityFilter));
     }
+    if (regionFilter) result = result.filter(row => matchesPlace(row, "region", regionFilter));
     if (countryFilter) {
-      result = result.filter((c) => parseLocation(c.location).country === countryFilter);
+      result = result.filter((c) => matchesPlace(c, "country", countryFilter));
     }
     if (languageFilter) {
       result = result.filter((c) => matchesCrewLanguage(c.languages, languageFilter));
@@ -571,12 +570,12 @@ function CreatorsInner({
     }
 
     return result;
-  }, [query, selectedRoles, sidebarDept, availableOnly, vendorOnly, cityFilter, countryFilter, languageFilter,
+  }, [query, selectedRoles, sidebarDept, availableOnly, vendorOnly, cityFilter, countryFilter, regionFilter, languageFilter,
       profileTypeFilter, hairFilter, eyeFilter, bodyFilter, travelFilter, ageMinFilter, ageMaxFilter,
       sortKey, allCreators, isTopMode, locale]);
 
   const filterKey = JSON.stringify([query, [...selectedRoles].sort(), sidebarDept, availableOnly, vendorOnly,
-    cityFilter, countryFilter, languageFilter, profileTypeFilter, hairFilter, eyeFilter, bodyFilter,
+    cityFilter, countryFilter, regionFilter, languageFilter, profileTypeFilter, hairFilter, eyeFilter, bodyFilter,
     travelFilter, ageMinFilter, ageMaxFilter, sortKey]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
   const setVisibleCount = (next: number | ((value: number) => number)) =>
@@ -599,6 +598,7 @@ function CreatorsInner({
     availableOnly,
     !!cityFilter,
     !!countryFilter,
+    !!regionFilter,
     !!languageFilter,
     !!profileTypeFilter,
     !!hairFilter,
@@ -611,8 +611,9 @@ function CreatorsInner({
   const mobileChips: BrowseChip[] = [
     ...(sidebarDept ? [{ id: "area", label: sidebarDept === "__locations" ? "Locations" : sidebarDept === "__marktplatz" ? "Marktplatz" : getDeptLabel(departments.find((department) => department.id === sidebarDept) ?? departments[0], locale, animals), onRemove: () => chooseSidebarDept(null) }] : []),
     ...[...selectedRoles].map((role) => ({ id: `role-${role}`, label: occupationById(role)?.label ?? role, onRemove: () => removeRole(role) })),
-    ...(cityFilter ? [{ id: "city", label: cityFilter, onRemove: () => setCityFilter("") }] : []),
-    ...(countryFilter ? [{ id: "country", label: countryFilter, onRemove: () => setCountryFilter("") }] : []),
+    ...(cityFilter ? [{ id: "city", label: cityLabel(cityFilter), onRemove: () => setCityFilter("") }] : []),
+    ...(countryFilter ? [{ id: "country", label: countryLabel(countryFilter), onRemove: () => setCountryFilter("") }] : []),
+    ...(regionFilter ? [{ id: "region", label: regionLabel(regionFilter), onRemove: () => setRegionFilter("") }] : []),
     ...(languageFilter ? [{ id: "language", label: crewLanguageLabel(languageFilter, locale), onRemove: () => setLanguageFilter("") }] : []),
     ...(profileTypeFilter ? [{ id: "profileType", label: `${t("filterProfileType")}: ${PROFILE_TYPE_MAP[profileTypeFilter] ?? profileTypeFilter}`, onRemove: () => setProfileTypeFilter("") }] : []),
     ...(hairFilter ? [{ id: "hair", label: `${t("filterHairColor")}: ${hairFilter}`, onRemove: () => setHairFilter("") }] : []),
@@ -624,7 +625,7 @@ function CreatorsInner({
     ...(vendorOnly ? [{ id: "vendor", label: "Anbieter", onRemove: () => setVendorOnly(false) }] : []),
   ];
   const resetMobileFilters = () => {
-    setSelectedRoles(new Set()); setSidebarDept(null); setQuery(""); setCityFilter(""); setCountryFilter(""); setLanguageFilter("");
+    setSelectedRoles(new Set()); setSidebarDept(null); setQuery(""); setCityFilter(""); setCountryFilter(""); setRegionFilter(""); setLanguageFilter("");
     setAvailableOnly(false); setVendorOnly(false); setProfileTypeFilter(""); setHairFilter(""); setEyeFilter(""); setBodyFilter("");
     setAgeMinFilter(""); setAgeMaxFilter(""); setTravelFilter(""); setSortKey("featured");
   };
@@ -667,12 +668,7 @@ function CreatorsInner({
         {!isProviderFilter(sidebarDept) && <MobileFilterField label="Rolle">
           <MobileFilterSelect value={[...selectedRoles][0] ?? ""} onChange={(value) => setSelectedRoles(value ? new Set([value]) : new Set())} placeholder="Alle Rollen" options={occupationCatalogue.filter(option => !sidebarDept || option.departmentId === sidebarDept).map(option => ({ value: option.roleId, label: `${getDeptLabel(departments.find(department=>department.id === option.departmentId)!, locale, animals)} → ${getDepartmentRoleLabel(option.departmentId, option.label, locale, animals)}` }))} />
         </MobileFilterField>}
-        <MobileFilterField label={t("filterCity")}>
-          <MobileFilterSelect value={cityFilter} onChange={setCityFilter} placeholder="Alle Städte" options={availableCities.map((value) => ({ value, label: value }))} />
-        </MobileFilterField>
-        <MobileFilterField label={t("filterCountry")}>
-          <MobileFilterSelect value={countryFilter} onChange={setCountryFilter} placeholder="Alle Länder" options={availableCountries.map((value) => ({ value, label: value }))} />
-        </MobileFilterField>
+        <PlaceFilters rows={allCreators} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />
         <MobileFilterField label={t("filterLanguage")}>
           <MobileFilterSelect value={languageFilter} onChange={setLanguageFilter} placeholder={t("filterAll")} options={availableLanguages.map((value) => ({ value, label: crewLanguageLabel(value, locale) }))} />
         </MobileFilterField>
@@ -778,7 +774,7 @@ function CreatorsInner({
               );
             })}
             <button
-              onClick={() => { clearAll(); setCityFilter(""); setCountryFilter(""); setLanguageFilter(""); setAvailableOnly(false); setVendorOnly(false); }}
+              onClick={() => { clearAll(); setCityFilter(""); setCountryFilter(""); setRegionFilter(""); setLanguageFilter(""); setAvailableOnly(false); setVendorOnly(false); }}
               className="text-[11px] text-text-muted hover:text-red-400 transition-colors underline underline-offset-2"
             >
               {t("clearAll")}
@@ -854,7 +850,7 @@ function CreatorsInner({
               })}
 
               {/* Stadt */}
-              {availableCities.length > 0 && (
+              {(availableCities.length > 0 || availableCountries.length > 0) && (
                 <div>
                   <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2.5">{t("filterCity")}</p>
                   <div className="flex flex-wrap gap-2">
@@ -865,7 +861,7 @@ function CreatorsInner({
                     {availableCities.map((city) => (
                       <button key={city} onClick={() => setCityFilter(cityFilter === city ? "" : city)}
                         className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${cityFilter === city ? "bg-gold text-bg-primary border-gold" : "border-border text-text-muted bg-bg-secondary"}`}>
-                        {city}
+                        {cityLabel(city)}
                       </button>
                     ))}
                   </div>
@@ -971,7 +967,7 @@ function CreatorsInner({
               <button
                 onClick={() => {
                   clearAll();
-                  setCityFilter(""); setCountryFilter(""); setLanguageFilter("");
+                  setCityFilter(""); setCountryFilter(""); setRegionFilter(""); setLanguageFilter("");
                   setAvailableOnly(false); setVendorOnly(false);
                   setProfileTypeFilter(""); setHairFilter(""); setEyeFilter("");
                   setBodyFilter(""); setTravelFilter(""); setAgeMinFilter(""); setAgeMaxFilter("");
@@ -1047,8 +1043,8 @@ function CreatorsInner({
             </label>
 
 
-            {availableCities.length > 0 && (
-              <FilterDropdown icon={MapPin} label={t("filterCity")} value={cityFilter} options={availableCities} onChange={setCityFilter} />
+            {(availableCities.length > 0 || availableCountries.length > 0) && (
+              <PlaceFilters rows={allCreators} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />
             )}
             {availableLanguages.length > 0 && (
               <FilterDropdown icon={Languages} label={t("filterLanguage")} value={languageFilter} options={availableLanguages} optionLabel={(value) => crewLanguageLabel(value, locale)} onChange={setLanguageFilter} />
@@ -1072,12 +1068,13 @@ function CreatorsInner({
               <ChevronDown size={11} className={`transition-transform ${moreFiltersOpen ? "rotate-180" : ""}`} />
             </button>
 
-            {(cityFilter || countryFilter || languageFilter || selectedRoles.size > 0 ||
+            {regionFilter && <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary"><MapPin size={9} />{regionLabel(regionFilter)}<button type="button" aria-label={`${tc("clearFilter")}: ${regionLabel(regionFilter)}`} onClick={() => setRegionFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button></span>}
+            {(cityFilter || countryFilter || regionFilter || languageFilter || selectedRoles.size > 0 ||
               profileTypeFilter || hairFilter || eyeFilter || bodyFilter || travelFilter || ageMinFilter || ageMaxFilter) && (
               <button
                 onClick={() => {
                   clearAll();
-                  setCityFilter(""); setCountryFilter(""); setLanguageFilter("");
+                  setCityFilter(""); setCountryFilter(""); setRegionFilter(""); setLanguageFilter("");
                   setProfileTypeFilter(""); setHairFilter(""); setEyeFilter("");
                   setBodyFilter(""); setTravelFilter(""); setAgeMinFilter(""); setAgeMaxFilter("");
                 }}
@@ -1091,9 +1088,7 @@ function CreatorsInner({
           {/* Mehr Filter (ausgeklappt) */}
           {moreFiltersOpen && (
             <div className="flex items-center gap-2 flex-wrap pt-1">
-              {availableCountries.length > 0 && (
-                <FilterDropdown icon={Globe} label={t("filterCountry")} value={countryFilter} options={availableCountries} onChange={setCountryFilter} />
-              )}
+
               {availableProfileTypes.length > 0 && (
                 <FilterDropdown
                   icon={Users}
@@ -1361,7 +1356,7 @@ function CreatorsInner({
                 description={allCreators.length === 0 ? t("emptyDesc") : t("emptyDescFiltered")}
                 action={allCreators.length === 0
                   ? { label: t("emptyActionCreate"), onClick: () => window.location.href = "/profile" }
-                  : { label: t("emptyActionReset"), onClick: () => { setQuery(""); clearAll(); setAvailableOnly(false); setCityFilter(""); setCountryFilter(""); setLanguageFilter(""); } }
+                  : { label: t("emptyActionReset"), onClick: () => { setQuery(""); clearAll(); setAvailableOnly(false); setCityFilter(""); setCountryFilter(""); setRegionFilter(""); setLanguageFilter(""); } }
                 }
               />
             )}

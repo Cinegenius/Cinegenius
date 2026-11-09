@@ -1,3 +1,6 @@
+import {getLocale} from "next-intl/server";
+import {placeReadFields} from "@/lib/places/catalog";
+import {placeDisplay} from "@/lib/places/core";
 import PublicOrganizationLinks from "@/components/organizations/PublicOrganizationLinks";
 import { publicResponsiblePerson, responsibleForCompany } from "@/lib/responsible-person-server";
 import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
@@ -10,7 +13,7 @@ import { isPublicCompanyMembership } from "@/lib/company-membership-requests";
 
 async function getCompany(slug: string) {
   const { data } = await db.from("companies")
-    .select("id, slug, owner_user_id, responsible_person, name, logo_url, cover_url, description, city, website, email_public, phone_public, categories, services, portfolio_images, tagline, bio_short, usp, founded_year, legal_form, hq_address_public, countries, industry_focus, social_links, catering_details, animal_details, published, verified, created_at")
+    .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, owner_user_id, responsible_person, name, logo_url, cover_url, description, city, website, email_public, phone_public, categories, services, portfolio_images, tagline, bio_short, usp, founded_year, legal_form, hq_address_public, countries, industry_focus, social_links, catering_details, animal_details, published, verified, created_at")
     .eq("slug", slug).maybeSingle();
   if (!data) return null;
 
@@ -31,7 +34,7 @@ async function getCompany(slug: string) {
 async function getCompanyPublicData(companyId: string, ownerUserId: string, viewerId: string | null = null) {
     const [listingsRes, rawMembersRes, servicesRes, equipmentRes] = await Promise.all([
       db.from("listings")
-        .select("id, title, type, category, price, city, image_url, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type, marketplace:metadata->marketplace")
+        .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, title, type, category, price, city, image_url, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type, marketplace:metadata->marketplace")
         .eq("company_id", companyId)
         .eq("published", true)
         .order("created_at", { ascending: false }),
@@ -123,6 +126,8 @@ export default async function CompanyPage({
 
   if (!company || (company.published !== true && userId !== company.owner_user_id)) notFound();
 
+  const locale=await getLocale();
+  company.city=placeDisplay(placeReadFields(company.city??"",company,locale),company.city??"",locale);
   const isOwner = userId === company.owner_user_id;
 
   // Public data is accepted-only. Pending requests are private and only shown
@@ -175,7 +180,7 @@ export default async function CompanyPage({
     <CompanyDetail organizationSection={<PublicOrganizationLinks companyId={company.id} />}
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       company={normalised as any}
-      listings={publicData.listings}
+      listings={publicData.listings.map(l=>({...l,city:placeDisplay(placeReadFields(l.city??"",l,locale),l.city??"",locale)}))}
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       members={publicData.members as any[]}
       services={publicData.services}

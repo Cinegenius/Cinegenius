@@ -1,3 +1,5 @@
+import {getLocale} from "next-intl/server";
+import {cityWriteFields,placeReadFields,placeSearchFilter} from "@/lib/places/catalog";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { rateLimit } from "@/lib/rateLimit";
@@ -8,6 +10,7 @@ const POST_KINDS = ["question", "recommendation", "request", "offer"] as const;
 type PostKind = (typeof POST_KINDS)[number];
 
 export async function GET(request: NextRequest) {
+  const locale=await getLocale();
   const params = request.nextUrl.searchParams;
   const rawLimit = Number.parseInt(params.get("limit") ?? "3", 10);
   const limit = Number.isFinite(rawLimit) ? Math.min(Math.max(rawLimit, 1), 50) : 3;
@@ -19,7 +22,7 @@ export async function GET(request: NextRequest) {
 
   let query = db
     .from("community_posts")
-    .select("id,author_id,kind,title,body,city,created_at,expires_at")
+    .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id,author_id,kind,title,body,city,created_at,expires_at")
     .gt("expires_at", now)
     .order("created_at", { ascending: false })
     .limit(limit);
@@ -27,7 +30,7 @@ export async function GET(request: NextRequest) {
   if (rawKind && POST_KINDS.includes(rawKind as PostKind)) query = query.eq("kind", rawKind);
   if (queryText) {
     const safeQuery = queryText.replace(/[^\p{L}\p{N}\s-]/gu, " ").replace(/\s+/g, " ").trim();
-    if (safeQuery) query = query.or(`title.ilike.%${safeQuery}%,body.ilike.%${safeQuery}%,city.ilike.%${safeQuery}%`);
+    if (safeQuery) query = query.or(`title.ilike.%${safeQuery}%,body.ilike.%${safeQuery}%,city.ilike.%${safeQuery}%${placeSearchFilter(safeQuery)?`,${placeSearchFilter(safeQuery)}`:""}`);
   }
 
   const { data, error } = await query;
@@ -53,6 +56,7 @@ export async function GET(request: NextRequest) {
         title: post.title,
         body: post.body,
         city: post.city,
+        ...placeReadFields(post.city??"",post,locale),
         created_at: post.created_at,
         expires_at: post.expires_at,
         author_name: profile?.display_name ?? "Mitglied",
@@ -89,14 +93,14 @@ export async function POST(request: NextRequest) {
   if (typeof kind !== "string" || !POST_KINDS.includes(kind as PostKind)) {
     return NextResponse.json({ error: "Bitte wähle eine gültige Art des Aushangs." }, { status: 400 });
   }
-  if (title.length < 5 || title.length > 140 || body.length < 10 || body.length > 3000 || city.length > 100) {
+  if (title.length < 5 || title.length > 140 || body.length < 10 || body.length > 3000 || city.length > 320) {
     return NextResponse.json({ error: "Bitte prüfe Titel, Text und Ort. Titel: 5–140 Zeichen, Text: 10–3000 Zeichen." }, { status: 400 });
   }
 
   const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
   const { data, error } = await db
     .from("community_posts")
-    .insert({ author_id: userId, kind, title, body, city: city || null, expires_at: expiresAt })
+    .insert({ author_id: userId, kind, title, body, ...cityWriteFields(city, input.selected_place_city_id), expires_at: expiresAt })
     .select("id,kind,title,body,city,created_at,expires_at")
     .single();
   if (error || !data) return NextResponse.json({ error: "Aushang konnte nicht gespeichert werden." }, { status: 500 });

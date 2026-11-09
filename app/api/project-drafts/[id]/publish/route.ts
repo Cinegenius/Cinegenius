@@ -1,3 +1,4 @@
+import { placeWriteFields } from "@/lib/places/catalog";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { projectDraftMetadata } from "@/lib/project-drafts";
@@ -69,6 +70,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   let projectId: string | null = null;
   const parsedYear = data.year == null || data.year === "" ? null : Number.parseInt(String(data.year), 10);
   const baseProjectFields = {
+    ...placeWriteFields(typeof data.location==="string"&&data.location.trim()?data.location:typeof data.country==="string"?data.country:"",data.selected_place_city_id),
     title,
     year: parsedYear !== null && Number.isFinite(parsedYear) ? parsedYear : null,
     type: typeof data.type === "string" && data.type.trim() ? data.type.trim() : null,

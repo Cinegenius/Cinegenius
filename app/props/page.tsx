@@ -1,8 +1,9 @@
+import { placeReadFields } from "@/lib/places/catalog";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import PropsContent from "./PropsContent";
 import PageHeader from "@/components/PageHeader";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 
 export const revalidate = 60;
 
@@ -18,10 +19,11 @@ export const metadata: Metadata = {
 };
 
 export default async function PropsPage() {
+  const locale = await getLocale();
   const t = await getTranslations("props");
   const { data } = await db
     .from("listings")
-    .select("id, user_id, type, title, category, city, price, image_url, description, metadata")
+    .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, user_id, type, title, category, city, price, image_url, description, metadata")
     .eq("published", true)
     .in("type", ["prop", "vehicle"])
     .order("created_at", { ascending: false })
@@ -33,6 +35,7 @@ export default async function PropsPage() {
     metadata?: Record<string, unknown> | null;
   }) => ({
     id: l.id,
+    ...placeReadFields(l.city ?? "", l, locale),
     title: l.title,
     type: l.type,
     category: l.type === "vehicle" ? (l.category ?? "Bild-Fahrzeug") : (l.category ?? "Requisiten"),

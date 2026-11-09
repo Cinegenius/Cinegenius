@@ -1,4 +1,9 @@
 "use client";
+
+import { selectedPlaceId } from "@/lib/selected-place-id";
+import { hasPlaceCity } from "@/lib/places/core";
+
+import PlaceField from "@/components/PlaceField";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { MarketplaceCategoryPicker } from "@/components/MarketplaceOfferFields";
 import { marketplaceCategoryLabel } from "@/lib/marketplace-offer";
@@ -22,7 +27,7 @@ import { MAX_LOCATION_IMAGES, MAX_LISTING_IMAGES } from "@/lib/listing-image-gal
 type Kind = "location" | "equipment";
 type Draft = {
   responsible?: ResponsiblePerson;
-  type: Kind; step: number; category: string; city: string; title: string; description: string;
+  type: Kind; step: number; category: string; city: string; selected_place_city_id?: string; title: string; description: string;
   price: string; priceOnRequest: boolean; priceNegotiable?: boolean; imageUrls: string[];
   sqm: string; ceilingHeight: string; maxCrew: string; parkingSpots: string;
   indoorOutdoor: "innen" | "außen" | "beides"; powerAvailable: boolean; naturalLight: boolean;
@@ -65,7 +70,8 @@ function normalizeDraft(value: unknown, kind: Kind): Draft {
     responsible: input.responsible ? responsiblePersonDraft(input.responsible) : { ...NEW_RESPONSIBLE_PERSON },
     type: kind, step: Math.max(1, Math.min(6, Number(input.step) || 1)),
     category: typeof input.category === "string" ? input.category.slice(0, 100) : "",
-    city: typeof input.city === "string" ? input.city.slice(0, 100) : "",
+    city: typeof input.city === "string" ? input.city.slice(0, 320) : "",
+    selected_place_city_id: selectedPlaceId(input.selected_place_city_id),
     title: typeof input.title === "string" ? input.title.slice(0, 200) : "",
     description: typeof input.description === "string" ? input.description.slice(0, 3000) : "",
     price: typeof input.price === "string" ? input.price.slice(0, 20) : "",
@@ -164,12 +170,12 @@ export default function GuidedListingWizard() {
       return;
     }
     if (form.step === 1 && !form.category) { setError("Bitte wähle eine passende Kategorie."); return; }
-    if (form.step === 2 && !form.city.trim()) { setError("Bitte gib eine Stadt oder einen Ort an."); return; }
+    if (form.step === 2 && !hasPlaceCity(form.city)) { setError("Bitte gib eine Stadt oder einen Ort an."); return; }
     if (form.step === 4 && !form.title.trim()) { setError("Bitte gib deinem Angebot einen kurzen Titel."); return; }
     await go(Math.min(6, form.step + 1));
   }
   async function saveListing() {
-    if (!form.category || !form.city.trim() || !form.title.trim()) { setError("Bitte prüfe Kategorie, Ort und Titel."); return; }
+    if (!form.category || !hasPlaceCity(form.city) || !form.title.trim()) { setError("Bitte prüfe Kategorie, Ort und Titel."); return; }
     if (galleryState.uploading || galleryState.failed > 0) { setError(galleryState.uploading ? "Bitte warte, bis die Fotos hochgeladen sind." : "Bitte lade fehlgeschlagene Fotos erneut hoch oder entferne sie."); return; }
     setSavingListing(true); setError("");
     try {
@@ -178,7 +184,7 @@ export default function GuidedListingWizard() {
       const vehicle = kind === "equipment" && marketplaceCategory(form.category)?.department === "fahrzeuge";
       const response = await fetch("/api/listings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         type: vehicle ? "vehicle" : kind === "location" ? "location" : "prop", category: form.category,
-        title: form.title.trim(), city: form.city.trim(), description: form.description.trim(),
+        title: form.title.trim(), city: form.city.trim(), selected_place_city_id: form.selected_place_city_id || undefined, description: form.description.trim(),
         price: form.priceOnRequest ? 0 : Number(form.price) || 0, image_url: form.imageUrls[0] || null,
         extra_images: form.imageUrls.slice(1),
         draft: true,
@@ -237,7 +243,7 @@ export default function GuidedListingWizard() {
     <section className="rounded-2xl border border-border bg-bg-secondary p-5 sm:p-7">
       {form.step === 1 && kind === "equipment" && <MarketplaceCategoryPicker value={form.category} onChange={value=>update("category",value)} />}
       {form.step === 1 && kind === "location" && <><p className="mb-5 text-sm text-text-muted">{kind === "location" ? "Wähle die Beschreibung, die am besten passt." : "Wähle die passende Art. Du kannst später weitere Angebote ergänzen."}</p><div className="grid gap-2 sm:grid-cols-2">{options[kind].map((item) => <button key={item.category} onClick={() => update("category", item.category)} className={`min-h-16 rounded-xl border p-4 text-left transition ${form.category === item.category ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/40"}`}><strong className="block text-sm text-text-primary">{item.label}</strong><span className="mt-1 block text-xs text-text-muted">{item.help}</span></button>)}</div></>}
-      {form.step === 2 && <><p className="mb-4 text-sm leading-6 text-text-muted">Gib bitte nur Stadt oder Ort an. Eine genaue Privatadresse wird hier nicht benötigt oder veröffentlicht.</p><label htmlFor="city" className="mb-2 block text-sm font-medium text-text-primary">Stadt oder Ort <span className="text-gold">*</span></label><input id="city" autoComplete="address-level2" value={form.city} onChange={(event) => update("city", event.target.value)} placeholder="Zum Beispiel Augsburg" className="min-h-12 w-full rounded-xl border border-border bg-bg-primary px-4 text-sm text-text-primary outline-none focus:border-gold" />{kind === "location" && <p className="mt-3 text-xs text-text-muted">Die Stadt wird im Angebot angezeigt. Eine genaue Adresse kannst du später direkt mit Interessenten teilen.</p>}</>}
+      {form.step === 2 && <><p className="mb-4 text-sm leading-6 text-text-muted">Gib bitte nur Stadt oder Ort an. Eine genaue Privatadresse wird hier nicht benötigt oder veröffentlicht.</p><label htmlFor="city" className="mb-2 block text-sm font-medium text-text-primary">Stadt oder Ort <span className="text-gold">*</span></label><PlaceField value={form.city} onChange={(value, cityId) => setForm(current => ({ ...current, city: value, selected_place_city_id: cityId || "" }))} required />{kind === "location" && <p className="mt-3 text-xs text-text-muted">Die Stadt wird im Angebot angezeigt. Eine genaue Adresse kannst du später direkt mit Interessenten teilen.</p>}</>}
       {form.step === 3 && <><p className="mb-4 text-sm leading-6 text-text-muted">{optionalMedia("galleryHelp", { count: kind === "location" ? MAX_LOCATION_IMAGES : MAX_LISTING_IMAGES })}</p><ListingImageManager value={form.imageUrls} maxImages={kind === "location" ? MAX_LOCATION_IMAGES : MAX_LISTING_IMAGES} label={kind === "location" ? "Locationfotos" : "Angebotsfotos"} onChange={(imageUrls) => update("imageUrls", imageUrls)} onStatusChange={setGalleryState} /><ContentUsageNotice context="offer" visibility="configured" /></>}
       {form.step === 4 && <div className="space-y-5"><p className="text-sm leading-6 text-text-muted">Ein kurzer, klarer Titel reicht. Die zusätzlichen Locationangaben sind freiwillig und helfen Produktionen bei der Planung.</p><div><label htmlFor="title" className="mb-2 block text-sm font-medium text-text-primary">Titel <span className="text-gold">*</span></label><input id="title" maxLength={200} value={form.title} onChange={(event) => update("title", event.target.value)} placeholder={kind === "location" ? "Zum Beispiel Helle Altbauwohnung mit Balkon" : "Zum Beispiel LED-Flächenleuchte"} className="min-h-12 w-full rounded-xl border border-border bg-bg-primary px-4 text-sm text-text-primary outline-none focus:border-gold" /></div><div><label htmlFor="description" className="mb-2 block text-sm font-medium text-text-primary">Kurze Beschreibung <span className="text-text-muted">(optional)</span></label><textarea id="description" rows={5} maxLength={3000} value={form.description} onChange={(event) => update("description", event.target.value)} placeholder={kind === "location" ? "Was sollte man über den Ort wissen?" : "Was ist enthalten und in welchem Zustand ist es?"} className="w-full rounded-xl border border-border bg-bg-primary p-4 text-sm text-text-primary outline-none focus:border-gold" /></div>{kind === "location" && <div className="space-y-4 rounded-xl border border-border bg-bg-primary p-4"><h2 className="text-sm font-semibold text-text-primary">Ausstattung und Drehbedingungen <span className="font-normal text-text-muted">(optional)</span></h2><div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{([["sqm", "Fläche (m²)"], ["ceilingHeight", "Deckenhöhe (m)"], ["maxCrew", "Crewgröße"], ["parkingSpots", "Parkplätze"]] as const).map(([key, label]) => <label key={key} className="text-xs text-text-muted">{label}<input type="number" min="0" step={key === "ceilingHeight" ? "0.1" : "1"} value={form[key]} onChange={(event) => update(key, event.target.value)} className="mt-1 min-h-10 w-full rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary" /></label>)}</div><label className="block text-xs text-text-muted">Innen- und Außenbereich<select value={form.indoorOutdoor} onChange={(event) => update("indoorOutdoor", event.target.value as Draft["indoorOutdoor"])} className="mt-1 min-h-10 w-full rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary"><option value="innen">Innen</option><option value="außen">Außen</option><option value="beides">Innen & Außen</option></select></label><div className="flex flex-wrap gap-2">{([["powerAvailable", "Strom"], ["naturalLight", "Tageslicht"], ["blackoutPossible", "Verdunkelbar"], ["loadingAccess", "Be-/Entladung"]] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={form[key]} onClick={() => update(key, !form[key])} className={`min-h-10 rounded-lg border px-3 text-xs ${form[key] ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{form[key] ? "✓ " : ""}{label}</button>)}</div><input maxLength={160} value={form.shootingHours} onChange={(event) => update("shootingHours", event.target.value)} placeholder="Mögliche Drehzeiten" className="min-h-10 w-full rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary" /><input maxLength={240} value={form.accessNotes} onChange={(event) => update("accessNotes", event.target.value)} placeholder="Anfahrt und Zugang, keine Privatadresse" className="min-h-10 w-full rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary" /><textarea maxLength={500} rows={2} value={form.availabilityNotes} onChange={(event) => update("availabilityNotes", event.target.value)} placeholder="Verfügbarkeit und Einschränkungen" className="w-full rounded-lg border border-border bg-bg-secondary p-3 text-sm text-text-primary" /></div>}</div>}
       {form.step === 5 && <><p className="mb-5 text-sm leading-6 text-text-muted">Du kannst einen Tagespreis nennen oder zuerst Anfragen sammeln.</p><div className="space-y-3"><ListingPriceOptions onRequest={form.priceOnRequest} negotiable={form.priceNegotiable === true} onChange={value => setForm(previous => ({...previous, ...value}))} />{!form.priceOnRequest && <div><label htmlFor="price" className="mb-2 block text-sm font-medium text-text-primary">Preis pro Tag in Euro</label><input id="price" type="number" min="0" step="1" value={form.price} onChange={(event) => update("price", event.target.value)} placeholder="Zum Beispiel 150" className="min-h-12 w-full rounded-xl border border-border bg-bg-primary px-4 text-sm text-text-primary outline-none focus:border-gold" /></div>}</div></>}

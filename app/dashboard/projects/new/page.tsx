@@ -1,4 +1,6 @@
 "use client";
+
+import PlaceField from "@/components/PlaceField";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 
 import { useFormDraft } from "@/lib/use-form-draft";
@@ -210,7 +212,7 @@ export default function NewProjectPage() {
 
   const [form, setForm] = useState({
     title: "", type: "", year: "", director: "", myRole: "",
-    genre: "", productionCompany: "", location: "", description: "",
+    genre: "", productionCompany: "", location: "", selected_place_city_id: "", description: "",
     poster_url: "", link: "",
   });
 
@@ -307,6 +309,7 @@ export default function NewProjectPage() {
           genre: form.genre || null,
           productionCompany: form.productionCompany || null,
           location: form.location || null,
+          selected_place_city_id: form.selected_place_city_id || undefined,
           description: form.description || null,
           poster_url: form.poster_url || null,
           link: form.link || null,
@@ -419,7 +422,7 @@ export default function NewProjectPage() {
           {/* Drehort */}
           <div>
             <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">{cfg.locationLabel}</label>
-            <input type="text" placeholder={cfg.locationPlaceholder} value={form.location} onChange={(e) => set("location", e.target.value)} className={inputCls} />
+            <PlaceField value={form.location} onChange={(value, cityId) => setForm(current => ({ ...current, location: value, selected_place_city_id: cityId || "" }))} />
           </div>
 
           {/* Beschreibung */}

@@ -1,5 +1,8 @@
 "use client";
 
+import PlaceFilters, { EMPTY_PLACE_FILTERS } from "@/components/PlaceFilters";
+import { placeSearchMatches, matchesPlace, placeDisplay, placeOptions } from "@/lib/places/core";
+
 import { useViewUrl } from "@/lib/use-view-url";
 import { useViewState } from "@/lib/use-view-state";
 import { marketplaceCategoryLabel } from "@/lib/marketplace-offer";
@@ -209,6 +212,7 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
 // ─── Main ─────────────────────────────────────────────────────────
 
 function PropsInner({ serverListings }: { serverListings: Prop[] }) {
+  const locale=useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("props");
@@ -217,6 +221,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const { user } = useUser();
   const { isSignedIn } = useAuth();
 
+  const [placeFilters, setPlaceFilters] = useViewState("props.placeFilters", () => ({country:searchParams.get("country")??"",region:searchParams.get("region")??"",city:searchParams.get("city")??""}));
   const [query, setQuery] = useViewState("marketplace.query", () => searchParams.get("q") ?? "");
   const [selectedDept, setSelectedDept] = useViewState<string | null>("marketplace.selectedDept", () => marketplaceCategory(searchParams.get("dept"))?.department ?? searchParams.get("dept") ?? null);
   const [selectedSub,setSelectedSub]=useViewState("marketplace.subcategory",()=>searchParams.get("sub")??"");
@@ -305,12 +310,15 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   if (selectedDept) filterParams.set("dept", selectedDept);
   if(selectedSub)filterParams.set("sub",selectedSub);
   if (sortKey !== "featured") filterParams.set("sort", sortKey);
+  for (const kind of ['country','region','city'] as const) if(placeFilters[kind])filterParams.set(kind,placeFilters[kind]);
   useViewUrl(filterParams.size ? `/props?${filterParams}` : "/props");
 
   const filtered = useMemo(() => {
     let r = [...serverListings];
 
     if(selectedDept||selectedSub)r=r.filter(p=>marketplaceMatches(p.category,selectedDept,selectedSub||null,p.type));
+
+    r = r.filter(row => matchesPlace(row,"country",placeFilters.country) && matchesPlace(row,"region",placeFilters.region) && matchesPlace(row,"city",placeFilters.city));
 
     if (rentalTypeFilter !== "alle") {
       r = r.filter((p) => ((p.rentalType ?? "miete") === rentalTypeFilter || p.rentalType === "beides"));
@@ -324,7 +332,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
         const title = p.title.toLowerCase();
         const cat = marketplaceSearchTerms(p.category).toLowerCase();
         const loc = p.location?.toLowerCase() ?? "";
-        if (title.includes(q) || cat.includes(q) || loc.includes(q)) return true;
+        if (title.includes(q) || cat.includes(q) || loc.includes(q) || placeSearchMatches(p,q)) return true;
         if (synonymCats.length > 0 && synonymCats.some((sc) => marketplaceCategory(sc)?.subcategory === marketplaceCategory(p.category)?.subcategory)) return true;
         return false;
       });
@@ -333,9 +341,9 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
     if (sortKey === "price-asc") r.sort((a, b) => a.dailyRate - b.dailyRate);
     if (sortKey === "price-desc") r.sort((a, b) => b.dailyRate - a.dailyRate);
     return r;
-  }, [serverListings, selectedDept, selectedSub, query, rentalTypeFilter, sortKey]);
+  }, [serverListings, placeFilters, selectedDept, selectedSub, query, rentalTypeFilter, sortKey]);
 
-  const filterKey = JSON.stringify([selectedDept, selectedSub, query, rentalTypeFilter, sortKey]);
+  const filterKey = JSON.stringify([placeFilters, selectedDept, selectedSub, query, rentalTypeFilter, sortKey]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
   const showMore = () => setPagination({ filterKey, visibleCount: visibleCount + PAGE_SIZE });
 
@@ -346,28 +354,31 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   useEffect(()=>{
     const controller=new AbortController();
     const parameters=new URLSearchParams({marketplace:'1',page:String(visibleCount/PAGE_SIZE),limit:String(PAGE_SIZE),sort:sortKey});
+    for (const kind of ['country','region','city'] as const) if(placeFilters[kind])parameters.set(kind,placeFilters[kind]);
     if(selectedDept)parameters.set('dept',selectedDept);if(selectedSub)parameters.set('sub',selectedSub);if(query)parameters.set('q',query);if(rentalTypeFilter!=='alle')parameters.set('offer',rentalTypeFilter);
     const pages=remoteRef.current?.key===filterKey&&remoteRef.current.rows.length>=visibleCount-PAGE_SIZE?[visibleCount/PAGE_SIZE]:Array.from({length:visibleCount/PAGE_SIZE},(_,index)=>index+1);
     Promise.all(pages.map(page=>{const params=new URLSearchParams(parameters);params.set('page',String(page));return fetch(`/api/listings?${params}`,{signal:controller.signal}).then(async response=>{if(!response.ok)throw new Error();return response.json();});})).then(results=>{
       const result={data:results.flatMap(result=>result.data??[]),count:results[0]?.count??0};
-      const rows:Prop[]=(result.data??[]).map((row:Record<string,unknown>)=>({id:String(row.id),title:String(row.title),type:String(row.type),category:String(row.category??''),location:String(row.city??''),dailyRate:Number(row.price),image:String(row.image_url??''),vendor:t('vendorPrivate'),condition:'',era:null,delivery:false,isReal:true,meta:row,rentalType:String(row.rental_type??'miete') as Prop['rentalType']}));
+      const rows:Prop[]=(result.data??[]).map((row:Record<string,unknown>)=>({...row,id:String(row.id),title:String(row.title),type:String(row.type),category:String(row.category??''),location:String(row.city??''),dailyRate:Number(row.price),image:String(row.image_url??''),vendor:t('vendorPrivate'),condition:'',era:null,delivery:false,isReal:true,meta:row,rentalType:String(row.rental_type??'miete') as Prop['rentalType']}));
       setRemote(previous=>({key:filterKey,rows:visibleCount>PAGE_SIZE&&previous?.key===filterKey?[...new Map([...previous.rows,...rows].map(row=>[row.id,row])).values()]:rows,count:result.count??0}));setBrowseError(null);
     }).catch(()=>{if(!controller.signal.aborted){setBrowseError(filterKey);}});
     return ()=>controller.abort();
-  },[filterKey,visibleCount,selectedDept,selectedSub,query,rentalTypeFilter,sortKey,t]);
+  },[filterKey,placeFilters,visibleCount,selectedDept,selectedSub,query,rentalTypeFilter,sortKey,t]);
   const browseLoading=browseError!==filterKey && (remote?.key!==filterKey || (remote.rows.length<visibleCount && remote.count>remote.rows.length));
   const resultRows=remote?.key===filterKey?remote.rows:filtered;
   const resultCount=remote?.key===filterKey?remote.count:filtered.length;
   const clearAll = () => {
+    setPlaceFilters(EMPTY_PLACE_FILTERS);
     setSelectedDept(null); setSelectedSub(""); setQuery(""); setSortKey("featured"); setRentalTypeFilter("alle");
     router.replace("/props", { scroll: false });
   };
 
-  const hasAnyFilter = Boolean(selectedDept || selectedSub || query || rentalTypeFilter !== "alle");
+  const hasAnyFilter = Boolean(Object.values(placeFilters).some(Boolean) || selectedDept || selectedSub || query || rentalTypeFilter !== "alle");
 
   const activeDeptData = selectedDept ? DEPARTMENTS.find((d) => d.id === selectedDept) : null;
   const chipColors = activeDeptData ? deptColors(activeDeptData.color) : null;
   const mobileChips: BrowseChip[] = [
+    ...(['country','region','city'] as const).flatMap(kind => placeFilters[kind] ? [{id:`place-${kind}`,label:placeOptions(serverListings,kind,locale).find(option=>option.value===placeFilters[kind])?.label??placeFilters[kind],onRemove:()=>setPlaceFilters({...placeFilters,[kind]:''})}] : []),
     ...(activeDeptData ? [{ id: "category", label: activeDeptData.label, onRemove: () => setSelectedDept(null) }] : []),
     ...(rentalTypeFilter !== "alle" ? [{ id: "offer", label: rentalTypeFilter === "miete" ? t("offerRent") : t("offerBuy"), onRemove: () => setRentalTypeFilter("alle") }] : []),
   ];
@@ -394,7 +405,8 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
         resetLabel={t("clearAllFilters")}
         showResultsLabel={t("results", { count: resultCount })}
       >
-        <MobileFilterField label={market("subcategory")}><MobileFilterSelect value={selectedSub} onChange={setSelectedSub} placeholder={market("allSubcategories")} options={(activeDeptData?.groups??[]).map(g=>({value:g.id,label:g.label}))} /></MobileFilterField>
+
+        <PlaceFilters rows={serverListings} value={placeFilters} onChange={setPlaceFilters} scope="marketplace" />        <MobileFilterField label={market("subcategory")}><MobileFilterSelect value={selectedSub} onChange={setSelectedSub} placeholder={market("allSubcategories")} options={(activeDeptData?.groups??[]).map(g=>({value:g.id,label:g.label}))} /></MobileFilterField>
         <MobileFilterField label={t("offerTypeLabel")}>
           <MobileFilterSelect value={rentalTypeFilter === "alle" ? "" : rentalTypeFilter} onChange={(value) => setRentalTypeFilter((value || "alle") as typeof rentalTypeFilter)} placeholder={t("offerAll")} options={[{ value: "miete", label: t("offerRent") }, { value: "kauf", label: t("offerBuy") }]} />
         </MobileFilterField>
@@ -409,6 +421,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
           </div>
         </div>
       </MobileBrowseControls>
+      <div className="hidden xl:block site-container py-3"><PlaceFilters rows={serverListings} value={placeFilters} onChange={setPlaceFilters} scope="marketplace" /></div>
 
       {/* ── Filter Bar ───────────────────────────────────────────── */}
       <div className="hidden xl:block browse-toolbar">

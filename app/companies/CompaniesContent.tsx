@@ -1,4 +1,8 @@
 "use client";
+
+import PlaceFilters from "@/components/PlaceFilters";
+
+import { placeSearchMatches, placeOptions, matchesPlace, placeDisplay, canonicalFilterValue } from "@/lib/places/core";
 import { animalCategoryLabel, animalCompanySearchText, isAnimalCompany } from "@/lib/animal-taxonomy";
 
 import { useViewState } from "@/lib/use-view-state";
@@ -6,7 +10,7 @@ import { useViewState } from "@/lib/use-view-state";
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import CompanyLogo from "@/components/CompanyLogo";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import type { LucideIcon } from "lucide-react";
 import {
   Building2, MapPin, Search, CheckCircle, LayoutGrid, LayoutList,
@@ -67,10 +71,10 @@ function cateringSearchText(company: Company): string {
 
 // ─── FilterDropdown ───────────────────────────────────────────────
 function FilterDropdown({
-  icon: Icon, label, value, options, onChange,
+  icon: Icon, label, value, options, onChange, optionLabel = (value: string) => value,
 }: {
   icon: React.ElementType; label: string; value: string;
-  options: string[]; onChange: (v: string) => void;
+  options: string[]; onChange: (v: string) => void; optionLabel?: (value: string) => string;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -88,7 +92,7 @@ function FilterDropdown({
           active ? "bg-gold/10 border-gold/30 text-gold" : open ? "bg-bg-elevated border-border text-text-secondary" : "border-border text-text-muted hover:text-text-secondary"
         }`}>
         <Icon size={11} />
-        {active ? value : label}
+        {active ? optionLabel(value) : label}
         {active
           ? <span onClick={(e) => { e.stopPropagation(); onChange(""); setOpen(false); }} className="hover:text-red-400 transition-colors ml-0.5"><X size={10} /></span>
           : <ChevronDown size={11} className={`transition-transform ${open ? "rotate-180" : ""}`} />}
@@ -98,7 +102,7 @@ function FilterDropdown({
           {options.map((opt) => (
             <button key={opt} onClick={() => { onChange(opt); setOpen(false); }}
               className={`w-full text-left px-3 py-2 text-xs transition-colors hover:bg-white/[0.04] ${value === opt ? "text-gold font-medium" : "text-text-secondary"}`}>
-              {opt}
+              {optionLabel(opt)}
             </button>
           ))}
         </div>
@@ -109,6 +113,7 @@ function FilterDropdown({
 
 // ─── Main ─────────────────────────────────────────────────────────
 export default function CompaniesContent({ initialCompanies }: { initialCompanies: Company[] }) {
+  const locale = useLocale();
   const t = useTranslations("companies");
   const animals = useTranslations("FilmAnimals");
   const safetyMedical = useTranslations("SafetyMedical");
@@ -118,15 +123,24 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
   const [selectedCategory, setSelectedCategory] = useViewState<string | null>("companies.selectedCategory", null);
   const [cityFilter, setCityFilter] = useViewState("companies.cityFilter", "");
   const [countryFilter, setCountryFilter] = useViewState("companies.countryFilter", "");
+  const [regionFilter, setRegionFilter] = useViewState("companies.regionFilter", "");
   const [verifiedOnly, setVerifiedOnly] = useViewState("companies.verifiedOnly", false);
   const [sortKey, setSortKey] = useViewState("companies.sortKey", "newest");
   const [viewMode, setViewMode] = useViewState<"grid" | "list">("companies.viewMode", "grid");
   const [pageState, setPageState] = useViewState("companies.pageState", { filterKey: "", page: 1 });
 
-  const availableCities = useMemo(() => {
-    const cities = initialCompanies.map((c) => c.city?.split(",")[0]?.trim()).filter(Boolean) as string[];
-    return [...new Set(cities)].sort();
-  }, [initialCompanies]);
+  useEffect(() => {
+    const country=canonicalFilterValue(countryFilter,initialCompanies,"country"),city=canonicalFilterValue(cityFilter,initialCompanies,"city");
+    if(country!==countryFilter||city!==cityFilter)queueMicrotask(()=>{setCountryFilter(country);setCityFilter(city);});
+  },[countryFilter,cityFilter,initialCompanies,setCountryFilter,setCityFilter]);
+  const cityOptions = useMemo(() => placeOptions(initialCompanies, "city", locale, countryFilter), [initialCompanies,locale,countryFilter]);
+  const countryOptions = useMemo(() => placeOptions(initialCompanies, "country", locale), [initialCompanies,locale]);
+  const regionOptions = useMemo(() => placeOptions(initialCompanies, "region", locale), [initialCompanies,locale]);
+  const availableCities = cityOptions.map(o => o.value);
+  const availableCountries = countryOptions.map(o => o.value);
+  const cityLabel = (value: string) => cityOptions.find(o => o.value === value)?.label ?? value;
+  const countryLabel = (value: string) => countryOptions.find(o => o.value === value)?.label ?? value;
+  const regionLabel = (value: string) => regionOptions.find(option => option.value === value)?.label ?? value;
 
   const filtered = useMemo(() => {
     let result = initialCompanies;
@@ -135,25 +149,23 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
       result = result.filter((c) =>
         c.name.toLowerCase().includes(q) ||
         c.description.toLowerCase().includes(q) ||
-        c.city.toLowerCase().includes(q) ||
+        (c.city.toLowerCase().includes(q) || placeSearchMatches(c,q)) ||
         c.services.some((s) => s.toLowerCase().includes(q)) ||
         c.categories.some((id) => (COMPANY_CATEGORY_BY_ID[id]?.label ?? id).toLowerCase().includes(q)) ||
         cateringSearchText(c).includes(q) || (isAnimalCompany(c.categories) && animalCompanySearchText(c.animal_details, c.categories).toLowerCase().includes(q))
       );
     }
     if (selectedCategory) result = result.filter((c) => c.categories.includes(selectedCategory));
-    if (cityFilter) result = result.filter((c) => c.city?.toLowerCase().includes(cityFilter.toLowerCase()));
-    if (countryFilter) {
-      if (countryFilter === "Remote") result = result.filter((c) => c.city?.toLowerCase().includes("remote"));
-      else result = result.filter((c) => c.city?.toLowerCase().includes(countryFilter.toLowerCase()));
-    }
+    if (cityFilter) result = result.filter((c) => matchesPlace(c, "city", cityFilter));
+    if (regionFilter) result = result.filter(row => matchesPlace(row, "region", regionFilter));
+    if (countryFilter) result = result.filter(c => matchesPlace(c, "country", countryFilter));
     if (verifiedOnly) result = result.filter((c) => c.verified);
     if (sortKey === "newest") result = [...result].sort((a, b) => b.created_at.localeCompare(a.created_at));
     if (sortKey === "name") result = [...result].sort((a, b) => a.name.localeCompare(b.name, "de"));
     return result;
-  }, [initialCompanies, search, selectedCategory, cityFilter, countryFilter, verifiedOnly, sortKey]);
+  }, [initialCompanies, search, selectedCategory, cityFilter, countryFilter, regionFilter, verifiedOnly, sortKey]);
 
-  const filterKey = JSON.stringify([search, selectedCategory, cityFilter, countryFilter, verifiedOnly, sortKey]);
+  const filterKey = JSON.stringify([search, selectedCategory, cityFilter, countryFilter, regionFilter, verifiedOnly, sortKey]);
   const page = pageState.filterKey === filterKey ? pageState.page : 1;
   const resetPage = () => setPageState({ filterKey, page: 1 });
   const changePage = (next: number | ((current: number) => number)) =>
@@ -164,16 +176,17 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
 
   const clearAll = () => {
     setSearch(""); setSelectedCategory(null); setCityFilter("");
-    setCountryFilter(""); setVerifiedOnly(false); setSortKey("newest"); resetPage();
+    setCountryFilter(""); setRegionFilter(""); setVerifiedOnly(false); setSortKey("newest"); resetPage();
   };
 
   const selectedCat = selectedCategory ? COMPANY_CATEGORY_BY_ID[selectedCategory] : null;
-  const hasAnyFilter = Boolean(search || selectedCategory || cityFilter || countryFilter || verifiedOnly);
+  const hasAnyFilter = Boolean(regionFilter || search || selectedCategory || cityFilter || countryFilter || verifiedOnly);
   const hasCatFilter = Boolean(selectedCategory);
   const mobileChips: BrowseChip[] = [
     ...(selectedCat ? [{ id: "category", label: companyCategoryLabel(selectedCat.id, selectedCat.label), onRemove: () => setSelectedCategory(null) }] : []),
-    ...(cityFilter ? [{ id: "city", label: cityFilter, onRemove: () => setCityFilter("") }] : []),
-    ...(countryFilter ? [{ id: "country", label: countryFilter, onRemove: () => setCountryFilter("") }] : []),
+    ...(cityFilter ? [{ id: "city", label: cityLabel(cityFilter), onRemove: () => setCityFilter("") }] : []),
+    ...(countryFilter ? [{ id: "country", label: countryLabel(countryFilter), onRemove: () => setCountryFilter("") }] : []),
+    ...(regionFilter ? [{ id: "region", label: regionLabel(regionFilter), onRemove: () => setRegionFilter("") }] : []),
     ...(verifiedOnly ? [{ id: "verified", label: t("filterVerified"), onRemove: () => setVerifiedOnly(false) }] : []),
   ];
 
@@ -199,12 +212,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
         resetLabel={t("resetFilters")}
         showResultsLabel={`${filtered.length} Unternehmen anzeigen`}
       >
-        <MobileFilterField label={t("filterCity")}>
-          <MobileFilterSelect value={cityFilter} onChange={setCityFilter} placeholder="Alle Städte" options={availableCities.map((value) => ({ value, label: value }))} />
-        </MobileFilterField>
-        <MobileFilterField label={t("filterCountry")}>
-          <MobileFilterSelect value={countryFilter} onChange={setCountryFilter} placeholder="Alle Länder" options={[t("countryDE"), t("countryAT"), t("countryCH")].map((value) => ({ value, label: value }))} />
-        </MobileFilterField>
+        <PlaceFilters rows={initialCompanies} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />
         <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={verifiedOnly} onChange={(event) => setVerifiedOnly(event.target.checked)} />{t("filterVerified")}</label>
         <div className="mobile-filter-field">
           <span>Ansicht</span>
@@ -260,12 +268,12 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
             <div className="w-px h-6 bg-border shrink-0" />
 
             {/* Stadt */}
-            {availableCities.length > 0 && (
-              <FilterDropdown icon={MapPin} label={t("filterCity")} value={cityFilter} options={availableCities} onChange={setCityFilter} />
+            {(availableCities.length > 0 || availableCountries.length > 0) && (
+              <PlaceFilters rows={initialCompanies} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />
             )}
 
             {/* Land */}
-            <FilterDropdown icon={Globe} label={t("filterCountry")} value={countryFilter} options={[t("countryDE"), t("countryAT"), t("countryCH")]} onChange={setCountryFilter} />
+
 
             {hasAnyFilter && (
               <>
@@ -279,7 +287,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
           </div>
 
           {/* Active chips */}
-          {(hasCatFilter || cityFilter || countryFilter || verifiedOnly) && (
+          {(hasCatFilter || cityFilter || countryFilter || regionFilter || verifiedOnly) && (
             <div className="flex flex-wrap gap-1.5 items-center">
               {selectedCat && (
                 <span className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium ${selectedCat.bg} ${selectedCat.color}`}>
@@ -289,16 +297,17 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
               )}
               {cityFilter && (
                 <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary">
-                  <MapPin size={9} /> {cityFilter}
+                  <MapPin size={9} /> {cityLabel(cityFilter)}
                   <button onClick={() => setCityFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               )}
               {countryFilter && (
                 <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary">
-                  <Globe size={9} /> {countryFilter}
+                  <Globe size={9} /> {countryLabel(countryFilter)}
                   <button onClick={() => setCountryFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               )}
+              {regionFilter && <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary"><MapPin size={9} />{regionLabel(regionFilter)}<button type="button" aria-label={`${t("clearFilter")}: ${regionLabel(regionFilter)}`} onClick={() => setRegionFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button></span>}
               {verifiedOnly && (
                 <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-gold/10 border-gold/30 text-gold">
                   <CheckCircle size={9} /> {t("filterVerified")}
@@ -439,6 +448,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
 
 // ─── Grid card ────────────────────────────────────────────────────
 function CompanyCard({ company }: { company: Company }) {
+  const locale = useLocale();
   const animals = useTranslations("FilmAnimals");
   const safetyMedical = useTranslations("SafetyMedical");
   const categoryLabel = (id: string, fallback: string) => safetyMedicalCompanyCategoryLabel(id, animalCategoryLabel(id, fallback, animals), safetyMedical);
@@ -454,7 +464,7 @@ function CompanyCard({ company }: { company: Company }) {
             {company.verified && <CheckCircle size={13} className="text-gold shrink-0 mt-0.5" />}
           </div>
           <div className="mt-0.5 flex items-center gap-1 text-[11px] text-text-muted">
-            {company.city && <><MapPin size={9} className="shrink-0" /><span className="truncate">{company.city}</span></>}
+            {company.city && <><MapPin size={9} className="shrink-0" /><span className="truncate">{placeDisplay(company, company.city, locale)}</span></>}
           </div>
         </div>
       </div>
@@ -475,6 +485,7 @@ function CompanyCard({ company }: { company: Company }) {
 
 // ─── List row ─────────────────────────────────────────────────────
 function CompanyListRow({ company }: { company: Company }) {
+  const locale = useLocale();
   const animals = useTranslations("FilmAnimals");
   const safetyMedical = useTranslations("SafetyMedical");
   const categoryLabel = (id: string, fallback: string) => safetyMedicalCompanyCategoryLabel(id, animalCategoryLabel(id, fallback, animals), safetyMedical);
@@ -488,7 +499,7 @@ function CompanyListRow({ company }: { company: Company }) {
           <span className="font-semibold text-sm text-text-primary group-hover:text-gold transition-colors break-words [overflow-wrap:anywhere]">{company.name}</span>
           {company.verified && <CheckCircle size={12} className="text-gold shrink-0" />}
         </div>
-        <div className="flex items-center gap-1 text-xs text-text-muted"><MapPin size={10} /><span>{company.city}</span></div>
+        <div className="flex items-center gap-1 text-xs text-text-muted"><MapPin size={10} /><span>{placeDisplay(company, company.city, locale)}</span></div>
       </div>
       <div className="hidden sm:flex items-center gap-1.5 flex-wrap justify-end">
         {cats.map((cat) => (

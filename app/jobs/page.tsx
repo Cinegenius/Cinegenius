@@ -1,7 +1,8 @@
+import { placeReadFields } from "@/lib/places/catalog";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import JobsContent from "./JobsContent";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 
 export const revalidate = 60;
 
@@ -17,11 +18,12 @@ export const metadata: Metadata = {
 };
 
 export default async function JobsPage() {
+  const locale = await getLocale();
   const tc = await getTranslations("common");
 
   const { data } = await db
     .from("listings")
-    .select("id, title, city, price, description, created_at")
+    .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, title, city, price, description, created_at")
     .eq("published", true)
     .eq("type", "job")
     .order("created_at", { ascending: false })
@@ -37,6 +39,7 @@ export default async function JobsPage() {
     company: "",
     projectType: "Film",
     location: l.city ?? "",
+    ...placeReadFields(l.city ?? "", l, locale),
     rate: l.price > 0 ? `${l.price} €${tc("perDay")}` : tc("onRequest"),
     union: "Non-Union",
     shootDates: tc("onRequest"),

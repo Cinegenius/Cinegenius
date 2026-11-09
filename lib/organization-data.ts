@@ -1,8 +1,8 @@
 import "server-only";
 import { db } from "@/lib/db";
 
-export const ORGANIZATION_SELECT = "id,slug,name,description,logo_url,topics,city,region,website_url,public_contact_email,moderation_status,created_at,updated_at";
-export const ORGANIZATION_ENTRY_SELECT = "id,organization_id,slug,entry_type,title,summary,description,topic,format,city,venue,starts_at,ends_at,registration_url,external_url,image_url,moderation_status,created_at,updated_at";
+export const ORGANIZATION_SELECT = "place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id,slug,name,description,logo_url,topics,city,region,website_url,public_contact_email,moderation_status,created_at,updated_at";
+export const ORGANIZATION_ENTRY_SELECT = "place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id,organization_id,slug,entry_type,title,summary,description,topic,format,city,venue,starts_at,ends_at,registration_url,external_url,image_url,moderation_status,created_at,updated_at";
 
 export async function approvedOrganizations() {
   const { data, error } = await db.from("organizations").select(ORGANIZATION_SELECT)

@@ -1,3 +1,6 @@
+import {getLocale} from "next-intl/server";
+import {placeReadFields} from "@/lib/places/catalog";
+import {placeDisplay} from "@/lib/places/core";
 import PublicOrganizationLinks from "@/components/organizations/PublicOrganizationLinks";
 import { publicProjectCredits } from "@/lib/project-media-rights";
 import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
@@ -22,7 +25,7 @@ import type { ExternalProfileRow } from "@/lib/external-platforms";
 export const dynamicParams = true;
 
 // Stable base columns that always exist
-const BASE_FIELDS = "user_id, display_name, avatar_url, cover_image_url, focal_point, role, positions, location, bio, tagline, slug, profile_type, profile_types, verified, available, available_from, day_rate, languages, travel_ready, skills, filmography, profile_images, showreel_url, reel_url, awards, availability_config, modules, instagram_url, tiktok_url, youtube_url, vimeo_url, linkedin_url, website_url, video_links";
+const BASE_FIELDS = "place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, avatar_url, cover_image_url, focal_point, role, positions, location, bio, tagline, slug, profile_type, profile_types, verified, available, available_from, day_rate, languages, travel_ready, skills, filmography, profile_images, showreel_url, reel_url, awards, availability_config, modules, instagram_url, tiktok_url, youtube_url, vimeo_url, linkedin_url, website_url, video_links";
 // Newer columns — fetched separately so a missing column doesn't break the whole query
 const EXTRA_FIELDS = "physical, performance, model_measurements, casting, crew, creative, vendor, agency";
 
@@ -145,7 +148,7 @@ function getPublicListings(userId: string): Promise<Array<{ pricing?: import("@/
     async () => {
       const { data } = await db
         .from("listings")
-        .select("id, type, title, category, price, city, image_url, metadata")
+        .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, type, title, category, price, city, image_url, metadata")
         .eq("user_id", userId)
         .is("company_id", null)
         .eq("published", true)
@@ -158,6 +161,7 @@ function getPublicListings(userId: string): Promise<Array<{ pricing?: import("@/
         price: l.price,
         pricing:listingPriceMetadata(l.metadata),
         city: l.city,
+        ...placeReadFields(l.city,l),
         image_url: l.image_url,
         focal_point: (l.metadata?.focal_point as { x: number; y: number } | null) ?? null,
       }));
@@ -284,8 +288,10 @@ export default async function ProfilePage(
     }
   }
   const contactFields = projectProfileContacts(contactData, contactVisibility, userId, isOwner);
+  const locale=await getLocale();
   const visibleProfile: UserProfile = {
     ...profile,
+    location: placeDisplay(placeReadFields(profile.location??"",profile,locale),profile.location??"",locale),
     profile_images: isOwner ? profile.profile_images : (profile.profile_images ?? []).filter((image) => {
       const visibility = image as typeof image & { visibility?: string; public?: boolean };
       return visibility.visibility !== "private" && visibility.public !== false;
@@ -316,10 +322,10 @@ export default async function ProfilePage(
     })(),
     // Similar profiles: same type, prioritize same city, exclude self
     (async () => {
-      const city = typeof profile.location === "string" ? profile.location.split(",")[0]?.trim() : null;
+      const city = placeReadFields(profile.location??"",profile,locale).place_city_id;
       const { data } = await db
         .from("profiles")
-        .select("user_id, display_name, avatar_url, slug, role, profile_type, location, tagline, verified, day_rate")
+        .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,user_id, display_name, avatar_url, slug, role, profile_type, location, tagline, verified, day_rate")
         .eq("profile_type", profile.profile_type)
         .neq("user_id", profile.user_id)
         .not("display_name", "is", null)
@@ -330,8 +336,8 @@ export default async function ProfilePage(
       const visibleIds = await visibleLinkedProfileIds(rows.map((row) => row.user_id), userId);
       const visibleRows = rows.filter((row) => visibleIds.has(row.user_id));
       // Prioritize same city, then fill with others, cap at 6
-      const sameCity = city ? visibleRows.filter(r => r.location?.includes(city)) : [];
-      const others = visibleRows.filter(r => !city || !r.location?.includes(city));
+      const sameCity = city ? visibleRows.filter(r => placeReadFields(r.location??"",r,locale).place_city_id===city) : [];
+      const others = visibleRows.filter(r => !city || placeReadFields(r.location??"",r,locale).place_city_id!==city);
       return [...sameCity, ...others].slice(0, 6);
     })(),
   ]);
@@ -359,12 +365,12 @@ export default async function ProfilePage(
         projectCredits={projectCredits}
         companyMembership={companyMembership}
         externalProfiles={externalProfiles}
-        listings={listings}
+        listings={listings.map(l=>({...l,city:placeDisplay(placeReadFields(l.city,l,locale),l.city,locale)}))}
         blockStatus={blockStatus}
         collaborations={collaborations}
         imageLikes={imageLikesData.likes}
         myImageLikes={imageLikesData.myLikes}
-        similarProfiles={similarProfiles}
+        similarProfiles={similarProfiles.map(p=>({...p,location:placeDisplay(placeReadFields(p.location??"",p,locale),p.location??"",locale)}))}
       />
     </>
   );
