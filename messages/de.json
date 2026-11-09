@@ -2481,5 +2481,10 @@
     "pages": "Seiten",
     "previous": "Zurück",
     "next": "Weiter"
+  },
+  "profileRoles": {
+    "additional": "Weitere Tätigkeiten",
+    "showMore": "{count} weitere anzeigen",
+    "showLess": "Weniger Tätigkeiten anzeigen"
   }
 }

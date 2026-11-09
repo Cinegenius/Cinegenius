@@ -23,6 +23,7 @@ import PhotoLikeButton from "@/components/PhotoLikeButton";
 import { markPhotoNavigation, photoHref } from "@/lib/photo-link";
 import CompanyLogo from "@/components/CompanyLogo";
 import ProfileRoles from "./ProfileRoles";
+import ProfileCardPhoto from "@/components/ProfileCardPhoto";
 import ResilientPublicImage from "@/components/ResilientPublicImage";
 import { profileCoverStyle } from "@/lib/profile-cover";
 import FloatingPanel from "@/components/FloatingPanel";
@@ -1367,19 +1368,28 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
         )}
 
         <div className={`relative z-10 mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 pb-5 sm:pb-6 ${bgImage ? "pt-12 sm:pt-16" : "pt-6 sm:pt-8"}`}>
-          <div className={`flex w-fit min-w-0 max-w-[min(100%,48rem)] flex-col items-start gap-3 ${isOwner ? "sm:flex-row" : ""}`}>
+          <div className="flex w-fit min-w-0 max-w-[min(100%,36rem)] items-center gap-3 rounded-2xl bg-bg-primary/95 p-3 sm:gap-4 sm:p-4">
+            <ProfileCardPhoto src={profile.avatar_url ?? ""} name={profile.display_name ?? ""} focalPoint={profile.focal_point} className="h-20 w-20 rounded-xl sm:h-24 sm:w-24" sizes="(max-width: 640px) 80px, 96px" />
             <div className="flex-1 min-w-0 w-full max-w-full [overflow-wrap:anywhere]">
-              <h1 className="min-w-0 max-w-full break-words font-display text-3xl sm:text-4xl font-bold tracking-tight text-white leading-tight [overflow-wrap:anywhere]" style={{ textShadow: "0 2px 4px #000, 0 0 22px rgba(0,0,0,0.7)" }}>
+              <h1 className="min-w-0 max-w-full break-words font-display text-2xl sm:text-3xl font-bold tracking-tight text-white leading-tight [overflow-wrap:anywhere]" style={{ textShadow: "0 2px 4px #000, 0 0 22px rgba(0,0,0,0.7)" }}>
                 {profile.display_name ?? "Unbekannt"}
                 <span className="block h-0.5 w-12 bg-gold mt-2 rounded-full" />
               </h1>
-              <ProfileRoles positions={roleLabels} tone="hero" />
+              {roleLabels[0] && <p className="mt-2 text-sm sm:text-base font-semibold text-gold break-words">{roleLabels[0]}</p>}
               {profile.location && (
                 <p className="min-w-0 max-w-full break-words text-white text-sm mt-3 flex items-center gap-1 drop-shadow-md [overflow-wrap:anywhere]" style={{ textShadow: "0 1px 2px #000, 0 0 5px #000" }}>
                   <MapPin size={13} className="shrink-0" />{profile.location}
                 </p>
               )}
             </div>
+
+          </div>
+        </div>
+      </section>
+
+
+      <div className="mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 py-4 space-y-3">
+        <ProfileRoles positions={roleLabels.slice(1)} secondaryOnly />
             <div className={`flex min-w-0 max-w-full items-center gap-2 flex-wrap ${isOwner ? "sm:shrink-0" : ""}`}>
               {!isOwner ? (
                 <>
@@ -1407,9 +1417,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
                 </Link>
               )}
             </div>
-          </div>
-        </div>
-      </section>
+      </div>
 
       <div className="mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-16">
 

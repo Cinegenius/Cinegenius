@@ -2481,5 +2481,10 @@
     "pages": "Pagine",
     "previous": "Indietro",
     "next": "Avanti"
+  },
+  "profileRoles": {
+    "additional": "Altre attività",
+    "showMore": "Mostra altre {count}",
+    "showLess": "Mostra meno attività"
   }
 }

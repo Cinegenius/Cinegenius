@@ -2481,5 +2481,10 @@
     "pages": "Stránky",
     "previous": "Předchozí",
     "next": "Další"
+  },
+  "profileRoles": {
+    "additional": "Další činnosti",
+    "showMore": "Zobrazit další ({count})",
+    "showLess": "Zobrazit méně činností"
   }
 }
