@@ -2486,5 +2486,12 @@
     "additional": "Weitere Tätigkeiten",
     "showMore": "{count} weitere anzeigen",
     "showLess": "Weniger Tätigkeiten anzeigen"
+  },
+  "profileHeader": {
+    "openPhoto": "Profilfoto vergrößern",
+    "closeImage": "Bildansicht schließen",
+    "imageView": "Vergrößertes Bild",
+    "available": "Verfügbar",
+    "unavailable": "Nicht verfügbar"
   }
 }

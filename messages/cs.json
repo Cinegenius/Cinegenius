@@ -2486,5 +2486,12 @@
     "additional": "Další činnosti",
     "showMore": "Zobrazit další ({count})",
     "showLess": "Zobrazit méně činností"
+  },
+  "profileHeader": {
+    "openPhoto": "Zvětšit profilovou fotografii",
+    "closeImage": "Zavřít obrázek",
+    "imageView": "Zvětšený obrázek",
+    "available": "K dispozici",
+    "unavailable": "Není k dispozici"
   }
 }

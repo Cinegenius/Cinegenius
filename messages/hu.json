@@ -2486,5 +2486,12 @@
     "additional": "További tevékenységek",
     "showMore": "További {count} megjelenítése",
     "showLess": "Kevesebb tevékenység megjelenítése"
+  },
+  "profileHeader": {
+    "openPhoto": "Profilkép nagyítása",
+    "closeImage": "Képnézet bezárása",
+    "imageView": "Nagyított kép",
+    "available": "Elérhető",
+    "unavailable": "Nem elérhető"
   }
 }

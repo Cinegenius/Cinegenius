@@ -2486,5 +2486,12 @@
     "additional": "Otras funciones",
     "showMore": "Mostrar {count} más",
     "showLess": "Mostrar menos funciones"
+  },
+  "profileHeader": {
+    "openPhoto": "Ampliar foto de perfil",
+    "closeImage": "Cerrar imagen",
+    "imageView": "Imagen ampliada",
+    "available": "Disponible",
+    "unavailable": "No disponible"
   }
 }

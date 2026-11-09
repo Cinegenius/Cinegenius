@@ -2486,5 +2486,12 @@
     "additional": "Additional roles",
     "showMore": "Show {count} more",
     "showLess": "Show fewer roles"
+  },
+  "profileHeader": {
+    "openPhoto": "Enlarge profile photo",
+    "closeImage": "Close image view",
+    "imageView": "Enlarged image",
+    "available": "Available",
+    "unavailable": "Unavailable"
   }
 }

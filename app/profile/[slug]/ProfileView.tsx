@@ -360,22 +360,35 @@ function ListingsSection({ listings }: { listings: PublicListing[] }) {
 // ─── Lightbox ─────────────────────────────────────────────────────────────────
 
 function Lightbox({ src, onClose }: { src: string; onClose: () => void }) {
+  const t = useTranslations("profileHeader");
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    const previousOverflow = document.body.style.overflow;
+    dialog?.showModal();
+    document.body.style.overflow = "hidden";
+    return () => {
+      dialog?.close();
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
+
   return (
-    <div
-      className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
-      onClick={onClose}
-    >
-      <button className="absolute top-4 right-4 text-white/60 hover:text-white">
-        <X size={24} />
-      </button>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={src}
-        alt=""
-        className="max-h-[90vh] max-w-[90vw] object-contain rounded-lg"
-        onClick={(e) => e.stopPropagation()}
-      />
-    </div>
+    <dialog ref={dialogRef} aria-label={t("imageView")} onCancel={onClose}
+      className="fixed inset-0 m-0 h-[100dvh] max-h-none w-full max-w-none border-0 bg-black/95 p-4 text-white backdrop:bg-black/80"
+      onClick={onClose}>
+      <div className="flex h-full w-full items-center justify-center">
+        <button type="button" aria-label={t("closeImage")} onClick={onClose}
+          className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-black/80 text-white hover:bg-bg-elevated focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold">
+          <X size={24} />
+        </button>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} alt={t("imageView")}
+          className="max-h-[calc(100dvh-5rem)] max-w-full rounded-lg object-contain"
+          onClick={(e) => e.stopPropagation()} />
+      </div>
+    </dialog>
   );
 }
 
@@ -1289,6 +1302,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function GenericProfile({ organizationSection, profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { organizationSection?: React.ReactNode; profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMemberships; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
+  const tHeader = useTranslations("profileHeader");
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const { user } = useUser();
   const [lightbox, setLightbox] = useState<string | null>(null);
@@ -1357,7 +1371,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
       {lightbox && <Lightbox src={lightbox} onClose={() => setLightbox(null)} />}
 
       {/* Hero */}
-      <section className={`relative isolate flex items-end ${bgImage ? "min-h-56 sm:min-h-64" : ""}`}>
+      <section className={`relative isolate flex items-end ${bgImage ? "min-h-[300px] sm:min-h-[340px]" : ""}`}>
         {bgImage ? (
           <>
             <ResilientPublicImage src={bgImage} alt="" className="absolute inset-0" imageClassName="h-full w-full object-cover" imageStyle={profileCoverStyle(profile.focal_point)} loading="eager" />
@@ -1367,20 +1381,23 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
           <div className="absolute inset-0 bg-gradient-to-b from-bg-elevated to-bg-primary" />
         )}
 
-        <div className={`relative z-10 mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 pb-5 sm:pb-6 ${bgImage ? "pt-12 sm:pt-16" : "pt-6 sm:pt-8"}`}>
+        <div className={`relative z-10 mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 pb-5 sm:pb-6 ${bgImage ? "pt-40 sm:pt-44" : "pt-6 sm:pt-8"}`}>
           <div className="flex w-fit min-w-0 max-w-[min(100%,36rem)] items-center gap-3 rounded-2xl bg-bg-primary/95 p-3 sm:gap-4 sm:p-4">
-            <ProfileCardPhoto src={profile.avatar_url ?? ""} name={profile.display_name ?? ""} focalPoint={profile.focal_point} className="h-20 w-20 rounded-xl sm:h-24 sm:w-24" sizes="(max-width: 640px) 80px, 96px" />
+            {profile.avatar_url ? (
+              <button type="button" onClick={() => setLightbox(profile.avatar_url!)} aria-label={tHeader("openPhoto")}
+                className="shrink-0 rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold">
+                <ProfileCardPhoto src={profile.avatar_url ?? ""} name={profile.display_name ?? ""} focalPoint={profile.focal_point} className="h-16 w-16 rounded-xl sm:h-20 sm:w-20" sizes="(max-width: 640px) 64px, 80px" />
+              </button>
+            ) : (
+              <ProfileCardPhoto src={profile.avatar_url ?? ""} name={profile.display_name ?? ""} focalPoint={profile.focal_point} className="h-16 w-16 rounded-xl sm:h-20 sm:w-20" sizes="(max-width: 640px) 64px, 80px" />
+            )}
             <div className="flex-1 min-w-0 w-full max-w-full [overflow-wrap:anywhere]">
-              <h1 className="min-w-0 max-w-full break-words font-display text-2xl sm:text-3xl font-bold tracking-tight text-white leading-tight [overflow-wrap:anywhere]" style={{ textShadow: "0 2px 4px #000, 0 0 22px rgba(0,0,0,0.7)" }}>
+              <h1 className="min-w-0 max-w-full break-words font-display text-xl sm:text-3xl font-bold tracking-tight text-white leading-tight [overflow-wrap:anywhere]" style={{ textShadow: "0 2px 4px #000, 0 0 22px rgba(0,0,0,0.7)" }}>
                 {profile.display_name ?? "Unbekannt"}
                 <span className="block h-0.5 w-12 bg-gold mt-2 rounded-full" />
               </h1>
               {roleLabels[0] && <p className="mt-2 text-sm sm:text-base font-semibold text-gold break-words">{roleLabels[0]}</p>}
-              {profile.location && (
-                <p className="min-w-0 max-w-full break-words text-white text-sm mt-3 flex items-center gap-1 drop-shadow-md [overflow-wrap:anywhere]" style={{ textShadow: "0 1px 2px #000, 0 0 5px #000" }}>
-                  <MapPin size={13} className="shrink-0" />{profile.location}
-                </p>
-              )}
+
             </div>
 
           </div>
@@ -1389,6 +1406,13 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
 
 
       <div className="mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 py-4 space-y-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2 text-sm text-text-secondary">
+          {profile.location && <p className="flex min-w-0 items-start gap-1.5 break-words"><MapPin size={14} className="mt-0.5 shrink-0" />{profile.location}</p>}
+          <span className="inline-flex items-center gap-1.5 text-xs">
+            <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${profile.available ? "bg-gold" : "bg-red-400"}`} />
+            {tHeader(profile.available ? "available" : "unavailable")}
+          </span>
+        </div>
         <ProfileRoles positions={roleLabels.slice(1)} secondaryOnly />
             <div className={`flex min-w-0 max-w-full items-center gap-2 flex-wrap ${isOwner ? "sm:shrink-0" : ""}`}>
               {!isOwner ? (
@@ -1421,29 +1445,14 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
 
       <div className="mx-auto w-full min-w-0 max-w-5xl px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-16">
 
-        {/* Two-column: avatar + compact info */}
-        <div className="grid min-w-0 max-w-full grid-cols-1 md:grid-cols-[200px_minmax(0,1fr)] lg:grid-cols-[220px_minmax(0,1fr)] gap-6 md:gap-8 lg:gap-10 mb-6 sm:mb-10">
-          {/* Avatar + company badge */}
-          <div className="min-w-0 max-w-full space-y-6 sm:space-y-8">
-            {profile.avatar_url ? (
-              <div className="relative mx-auto w-full max-w-xs md:max-w-none aspect-square rounded-2xl overflow-hidden bg-bg-secondary ring-1 ring-white/8 shadow-2xl">
-                <ResilientPublicImage src={profile.avatar_url} alt="" className="absolute inset-0 scale-110 blur-2xl opacity-55" imageClassName="h-full w-full object-cover" />
-                <ResilientPublicImage src={profile.avatar_url} alt={profile.display_name ?? ""} className="relative z-10 h-full w-full" imageClassName="h-full w-full object-cover" loading="eager" />
-                <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10">
-                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${profile.available ? "bg-gold" : "bg-red-400"}`} />
-                  <span className={`text-[10px] font-medium ${profile.available ? "text-gold/90" : "text-white/60"}`}>{profile.available ? "Verfügbar" : "Nicht verfügbar"}</span>
-                </div>
-              </div>
-            ) : (
-              <div className="mx-auto w-full max-w-xs md:max-w-none aspect-square rounded-2xl bg-bg-elevated border border-border flex items-center justify-center text-4xl font-bold text-text-muted">
-                {(profile.display_name ?? "?")[0]}
-              </div>
-            )}
+        {/* Only affiliations occupy the sidebar; the portrait appears once in the header. */}
+        <div className="grid min-w-0 max-w-full grid-cols-1 md:has-[>aside:not(:empty)]:grid-cols-[200px_minmax(0,1fr)] lg:has-[>aside:not(:empty)]:grid-cols-[220px_minmax(0,1fr)] gap-6 md:gap-8 lg:gap-10 mb-6 sm:mb-10">
+          <aside className="min-w-0 max-w-full space-y-6 sm:space-y-8 empty:hidden">
             {(companyMembership?.length ?? 0) > 0 && (
               <CompanyBadge membership={companyMembership} />
             )}
             {organizationSection}
-          </div>
+          </aside>
 
           {/* Compact info */}
           <div className="min-w-0 max-w-full [overflow-wrap:anywhere]">

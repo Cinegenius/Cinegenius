@@ -2486,5 +2486,12 @@
     "additional": "Altre attività",
     "showMore": "Mostra altre {count}",
     "showLess": "Mostra meno attività"
+  },
+  "profileHeader": {
+    "openPhoto": "Ingrandisci foto del profilo",
+    "closeImage": "Chiudi immagine",
+    "imageView": "Immagine ingrandita",
+    "available": "Disponibile",
+    "unavailable": "Non disponibile"
   }
 }
