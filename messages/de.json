@@ -874,6 +874,11 @@
     "fieldAvailableFromHint": "Leer lassen wenn sofort verfügbar",
     "fieldTravelReady": "Reisebereit",
     "fieldTravelReadyDesc": "Bereit für Drehs außerhalb deines Standorts",
+    "travelNone": "Nicht reisebereit",
+    "travelRegional": "Regional",
+    "travelNational": "Landesweit",
+    "travelEuropean": "Europaweit",
+    "travelWorldwide": "Weltweit",
     "sectionFilmography": "Filmografie",
     "sectionFilmographyDesc": "Suche nach bestehenden Projekten oder erstelle ein neues — andere Crew-Mitglieder können sich ebenfalls eintragen.",
     "manualEntries": "Manuell eingetragen",
@@ -2541,6 +2546,13 @@
     "projectCountryLegacy": "Zusätzlich gespeichertes Produktionsland",
     "projectLocationLegacy": "Zusätzlich gespeicherter Standort",
     "projectShootLocations": "Drehorte",
-    "projectShootLocationsLegacy": "Zusätzlich gespeicherte Drehorte"
+    "projectShootLocationsLegacy": "Zusätzlich gespeicherte Drehorte",
+    "cityPlaceholder": "Stadt oder Gemeinde suchen",
+    "citySearchHelp": "Tippe mindestens zwei Buchstaben und wähle einen Vorschlag. Fehlt dein Ort, kannst du ihn manuell eingeben.",
+    "selectedCity": "Ausgewählter Ort: {place}",
+    "regionInCity": "{region} ist eine Region. Bitte gib hier eine Stadt oder Gemeinde ein.",
+    "useRegion": "Als Region übernehmen",
+    "noSuggestions": "Keine passenden Vorschläge. Du kannst deinen Ort manuell eingeben.",
+    "suggestionCount": "Passende Orte: {count}. Mit den Pfeiltasten auswählen und mit Enter übernehmen."
   }
 }

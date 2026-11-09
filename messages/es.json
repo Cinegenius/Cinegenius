@@ -874,6 +874,11 @@
     "fieldAvailableFromHint": "Dejar vacío si estás disponible inmediatamente",
     "fieldTravelReady": "Dispuesto a viajar",
     "fieldTravelReadyDesc": "Listo para rodajes fuera de tu ubicación",
+    "travelNone": "Sin disponibilidad para viajar",
+    "travelRegional": "Regional",
+    "travelNational": "En todo el país",
+    "travelEuropean": "En toda Europa",
+    "travelWorldwide": "En todo el mundo",
     "sectionFilmography": "Filmografía",
     "sectionFilmographyDesc": "Busca proyectos existentes o crea uno nuevo — otros miembros del equipo también pueden agregarse.",
     "manualEntries": "Añadido manualmente",
@@ -2541,6 +2546,13 @@
     "projectCountryLegacy": "País de producción guardado adicionalmente",
     "projectLocationLegacy": "Ubicación guardada adicionalmente",
     "projectShootLocations": "Lugares de rodaje",
-    "projectShootLocationsLegacy": "Lugares de rodaje guardados adicionalmente"
+    "projectShootLocationsLegacy": "Lugares de rodaje guardados adicionalmente",
+    "cityPlaceholder": "Buscar ciudad o municipio",
+    "citySearchHelp": "Escribe al menos dos letras y elige una sugerencia. Si no aparece tu localidad, puedes introducirla manualmente.",
+    "selectedCity": "Localidad seleccionada: {place}",
+    "regionInCity": "{region} es una región. Introduce aquí una ciudad o un municipio.",
+    "useRegion": "Usar como región",
+    "noSuggestions": "No hay sugerencias coincidentes. Puedes introducir tu localidad manualmente.",
+    "suggestionCount": "Localidades disponibles: {count}. Usa las flechas para elegir y pulsa Intro para seleccionar."
   }
 }

@@ -5,6 +5,7 @@ import PlaceFilters from "@/components/PlaceFilters";
 import { placeSearchMatches, placeOptions, matchesPlace, placeDisplay, canonicalFilterValue } from "@/lib/places/core";
 
 import { normalizeCrewLanguages, crewLanguageLabel, matchesCrewLanguage } from "@/lib/crew-languages";
+import { PROFILE_TRAIT_MESSAGE_KEYS, profileTraitLabel, profileTraitOptions } from "@/lib/profile-trait-labels";
 import { useViewState } from "@/lib/use-view-state";
 
 import { filterProviderProfiles, isProviderFilter, LOCATION_PROVIDER_FILTER, MARKETPLACE_PROVIDER_FILTER } from "@/lib/profile-provider-filters";
@@ -323,6 +324,7 @@ function CreatorsInner({
 }) {
   const tc = useTranslations("common");
   const t = useTranslations("creators");
+  const profileText = useTranslations("profile");
   const animals = useTranslations("FilmAnimals");
   const locale = useLocale();
 
@@ -422,11 +424,14 @@ function CreatorsInner({
     }
     return {
       availableProfileTypes: [...types].sort(),
-      availableHairColors:   [...hair].sort(),
-      availableEyeColors:    [...eye].sort(),
-      availableBodyTypes:    [...body].sort(),
+      availableHairColors:   profileTraitOptions("hair", [...hair], profileText, locale).map(option => option.value),
+      availableEyeColors:    profileTraitOptions("eyes", [...eye], profileText, locale).map(option => option.value),
+      availableBodyTypes:    profileTraitOptions("body", [...body], profileText, locale).map(option => option.value),
     };
-  }, [allCreators]);
+  }, [allCreators, locale, profileText]);
+  const hairLabel = (value: string) => profileTraitLabel("hair", value, profileText);
+  const eyeLabel = (value: string) => profileTraitLabel("eyes", value, profileText);
+  const bodyLabel = (value: string) => profileTraitLabel("body", value, profileText);
 
   const PROFILE_TYPE_LABELS: Record<string, Record<string, string>> = {
     de: { actor:"Schauspieler/in", model:"Model", extra:"Komparse/in", host:"Moderator/in", dancer:"Tänzer/in", stunt:"Stunt Performer", voiceover:"Synchronsprecher/in", creator:"Creator", camera:"Kamera", lighting:"Licht", sound:"Ton", director_of_photography:"DoP", director:"Regie", production:"Produktion", makeup:"Maske", costume:"Kostüm", postproduction:"Postproduktion", vfx:"VFX", sfx:"SFX", art_department:"Szenenbild", broadcast:"Broadcast", filmmaker:"Regisseur/in", writer:"Autor/in", photographer:"Fotograf/in", editor:"Editor/in", motion_designer:"Motion Designer", art_director:"Art Director", location:"Location", equipment:"Equipment", vehicle:"Fahrzeuge", studio:"Studio", props:"Requisiten" },
@@ -438,15 +443,10 @@ function CreatorsInner({
   };
   const PROFILE_TYPE_MAP = PROFILE_TYPE_LABELS[locale] ?? PROFILE_TYPE_LABELS.de;
 
-  const TRAVEL_LABELS: Record<string, Record<string, string>> = {
-    de: { regional:"Regional", national:"Deutschlandweit", european:"Europaweit", worldwide:"Weltweit" },
-    en: { regional:"Regional", national:"Nationwide", european:"Europe-wide", worldwide:"Worldwide" },
-    es: { regional:"Regional", national:"Nacional", european:"Europa", worldwide:"Mundial" },
-    it: { regional:"Regionale", national:"Nazionale", european:"Europa", worldwide:"Mondiale" },
-    cs: { regional:"Regionálně", national:"Celostátně", european:"Evropsky", worldwide:"Celosvětově" },
-    hu: { regional:"Regionális", national:"Országosan", european:"Európai", worldwide:"Világszerte" },
-  };
-  const TRAVEL_MAP = TRAVEL_LABELS[locale] ?? TRAVEL_LABELS.de;
+  const travelValues = [...new Set([...Object.keys(PROFILE_TRAIT_MESSAGE_KEYS.travel),
+    ...allCreators.flatMap(creator => typeof creator.travel === "string" && creator.travel ? [creator.travel] : []),
+  ])];
+  const TRAVEL_MAP = Object.fromEntries(travelValues.map(value => [value, profileTraitLabel("travel", value, profileText)]));
   const [pagination, setPagination] = useViewState("crew.pagination", { filterKey: "", visibleCount: PAGE_SIZE });
 
   const [vendorOnly, setVendorOnly] = useViewState("crew.vendorOnly", false);
@@ -616,9 +616,9 @@ function CreatorsInner({
     ...(regionFilter ? [{ id: "region", label: regionLabel(regionFilter), onRemove: () => setRegionFilter("") }] : []),
     ...(languageFilter ? [{ id: "language", label: crewLanguageLabel(languageFilter, locale), onRemove: () => setLanguageFilter("") }] : []),
     ...(profileTypeFilter ? [{ id: "profileType", label: `${t("filterProfileType")}: ${PROFILE_TYPE_MAP[profileTypeFilter] ?? profileTypeFilter}`, onRemove: () => setProfileTypeFilter("") }] : []),
-    ...(hairFilter ? [{ id: "hair", label: `${t("filterHairColor")}: ${hairFilter}`, onRemove: () => setHairFilter("") }] : []),
-    ...(eyeFilter ? [{ id: "eyes", label: `${t("filterEyeColor")}: ${eyeFilter}`, onRemove: () => setEyeFilter("") }] : []),
-    ...(bodyFilter ? [{ id: "body", label: `Körperbau: ${bodyFilter}`, onRemove: () => setBodyFilter("") }] : []),
+    ...(hairFilter ? [{ id: "hair", label: `${t("filterHairColor")}: ${hairLabel(hairFilter)}`, onRemove: () => setHairFilter("") }] : []),
+    ...(eyeFilter ? [{ id: "eyes", label: `${t("filterEyeColor")}: ${eyeLabel(eyeFilter)}`, onRemove: () => setEyeFilter("") }] : []),
+    ...(bodyFilter ? [{ id: "body", label: `${profileText("castingBody")}: ${bodyLabel(bodyFilter)}`, onRemove: () => setBodyFilter("") }] : []),
     ...(ageMinFilter || ageMaxFilter ? [{ id: "age", label: `${t("filterAge")}: ${ageMinFilter || "1"}–${ageMaxFilter || "99"}`, onRemove: () => { setAgeMinFilter(""); setAgeMaxFilter(""); } }] : []),
     ...(travelFilter ? [{ id: "travel", label: `${t("filterTravel")}: ${TRAVEL_MAP[travelFilter] ?? travelFilter}`, onRemove: () => setTravelFilter("") }] : []),
     ...(availableOnly ? [{ id: "available", label: tc("available"), onRemove: () => setAvailableOnly(false) }] : []),
@@ -674,14 +674,14 @@ function CreatorsInner({
         </MobileFilterField>
         <div className="grid grid-cols-2 gap-3">
           <MobileFilterField label={t("filterHairColor")}>
-            <MobileFilterSelect value={hairFilter} onChange={setHairFilter} placeholder={t("filterAll")} options={availableHairColors.map((value) => ({ value, label: value }))} />
+            <MobileFilterSelect value={hairFilter} onChange={setHairFilter} placeholder={t("filterAll")} options={availableHairColors.map((value) => ({ value, label: hairLabel(value) }))} />
           </MobileFilterField>
           <MobileFilterField label={t("filterEyeColor")}>
-            <MobileFilterSelect value={eyeFilter} onChange={setEyeFilter} placeholder={t("filterAll")} options={availableEyeColors.map((value) => ({ value, label: value }))} />
+            <MobileFilterSelect value={eyeFilter} onChange={setEyeFilter} placeholder={t("filterAll")} options={availableEyeColors.map((value) => ({ value, label: eyeLabel(value) }))} />
           </MobileFilterField>
         </div>
-        <MobileFilterField label="Körperbau">
-          <MobileFilterSelect value={bodyFilter} onChange={setBodyFilter} placeholder={t("filterAll")} options={availableBodyTypes.map((value) => ({ value, label: value }))} />
+        <MobileFilterField label={profileText("castingBody")}>
+          <MobileFilterSelect value={bodyFilter} onChange={setBodyFilter} placeholder={t("filterAll")} options={availableBodyTypes.map((value) => ({ value, label: bodyLabel(value) }))} />
         </MobileFilterField>
         <div className="grid grid-cols-2 gap-3">
           <MobileFilterField label="Alter ab"><input inputMode="numeric" type="number" min="1" max="99" value={ageMinFilter} onChange={(event) => setAgeMinFilter(event.target.value)} placeholder="Beliebig" /></MobileFilterField>
@@ -914,8 +914,8 @@ function CreatorsInner({
                       <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2">{t("filterHairColor")}</p>
                       <select value={hairFilter} onChange={(e) => setHairFilter(e.target.value)}
                         className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-xs text-text-secondary focus:outline-none focus:border-gold transition-colors">
-                        <option value="">Alle</option>
-                        {availableHairColors.map((h) => <option key={h} value={h}>{h}</option>)}
+                        <option value="">{t("filterAll")}</option>
+                        {availableHairColors.map((h) => <option key={h} value={h}>{hairLabel(h)}</option>)}
                       </select>
                     </div>
                   )}
@@ -924,8 +924,8 @@ function CreatorsInner({
                       <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2">{t("filterEyeColor")}</p>
                       <select value={eyeFilter} onChange={(e) => setEyeFilter(e.target.value)}
                         className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-xs text-text-secondary focus:outline-none focus:border-gold transition-colors">
-                        <option value="">Alle</option>
-                        {availableEyeColors.map((e) => <option key={e} value={e}>{e}</option>)}
+                        <option value="">{t("filterAll")}</option>
+                        {availableEyeColors.map((e) => <option key={e} value={e}>{eyeLabel(e)}</option>)}
                       </select>
                     </div>
                   )}
@@ -1102,10 +1102,10 @@ function CreatorsInner({
                 />
               )}
               {availableHairColors.length > 0 && (
-                <FilterDropdown icon={SlidersHorizontal} label={t("filterHairColor")} value={hairFilter} options={availableHairColors} onChange={setHairFilter} />
+                <FilterDropdown icon={SlidersHorizontal} label={t("filterHairColor")} value={hairFilter} options={availableHairColors} optionLabel={hairLabel} onChange={setHairFilter} />
               )}
               {availableEyeColors.length > 0 && (
-                <FilterDropdown icon={SlidersHorizontal} label={t("filterEyeColor")} value={eyeFilter} options={availableEyeColors} onChange={setEyeFilter} />
+                <FilterDropdown icon={SlidersHorizontal} label={t("filterEyeColor")} value={eyeFilter} options={availableEyeColors} optionLabel={eyeLabel} onChange={setEyeFilter} />
               )}
               <div className="flex items-center gap-1 shrink-0">
                 <span className="text-xs text-text-muted whitespace-nowrap">{t("filterAge")}</span>
@@ -1118,12 +1118,10 @@ function CreatorsInner({
               <FilterDropdown
                 icon={Globe}
                 label={t("filterTravel")}
-                value={travelFilter ? (TRAVEL_MAP[travelFilter] ?? travelFilter) : ""}
-                options={Object.values(TRAVEL_MAP)}
-                onChange={v => {
-                  const found = Object.entries(TRAVEL_MAP).find(([, label]) => label === v)?.[0] ?? "";
-                  setTravelFilter(found);
-                }}
+                value={travelFilter}
+                options={Object.keys(TRAVEL_MAP)}
+                optionLabel={value => TRAVEL_MAP[value] ?? value}
+                onChange={setTravelFilter}
               />
             </div>
           )}

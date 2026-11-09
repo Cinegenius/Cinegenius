@@ -12,6 +12,31 @@ export const PROFILE_EDITOR_STEPS = [
 export type ProfileEditorStep = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 export type ProfileEditorErrorField = "activity" | "name" | "city";
 
+export function profileEditorAvailabilityConfig(previous: Record<string, unknown>, input: {
+  originalTravelReady: boolean;
+  travelReady: boolean;
+  weekends: boolean;
+  nightShoots: boolean;
+  shortNotice: boolean;
+  workRadius: string;
+}) {
+  const preserved = { ...previous };
+  // Preserve an existing scope on unrelated edits. An explicit change of the
+  // editor's travel switch must also update the scope used by public filters.
+  if (input.travelReady !== input.originalTravelReady) {
+    preserved.travel = input.travelReady
+      ? typeof previous.travel === "string" && previous.travel && previous.travel !== "none" ? previous.travel : "national"
+      : "none";
+  }
+  return {
+    ...preserved,
+    weekends: input.weekends,
+    night_shoots: input.nightShoots,
+    short_notice: input.shortNotice,
+    work_radius_km: input.workRadius ? parseInt(input.workRadius) : null,
+  };
+}
+
 export function profileEditorStepForErrors(fields: readonly ProfileEditorErrorField[]): ProfileEditorStep {
   if (fields.includes("activity")) return 1;
   if (fields.includes("name") || fields.includes("city")) return 3;

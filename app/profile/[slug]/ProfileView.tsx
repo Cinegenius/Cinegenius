@@ -1,5 +1,6 @@
 "use client";
 
+import { profileTraitLabel, profileTravelValue } from "@/lib/profile-trait-labels";
 import { listingPriceLabel } from "@/lib/listing-price";
 import { marketplaceCategoryLabel } from "@/lib/marketplace-offer";
 import Image from "@/components/MediaImage";
@@ -481,6 +482,9 @@ function CompanyBadge({ membership }: { membership: CompanyMemberships }) {
 
 function ActorProfile({ organizationSection, profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { organizationSection?: React.ReactNode; profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMemberships; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
   const tc = useTranslations("common");
+  const profileText = useTranslations("profile");
+  const creatorText = useTranslations("creators");
+  const travel = profileTravelValue(profile);
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const { user } = useUser();
   const [lightbox, setLightbox] = useState<string | null>(null);
@@ -714,20 +718,20 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
               </div>
 
               {/* Stats grid — only non-null values */}
-              {(playingAge || p.height_cm || p.clothing_size || p.shoe_size || p.hair_color || p.eye_color || languages.length > 0 || dialects.length > 0 || drivingLicenses.length > 0 || p.body_type || profile.day_rate) && (
+              {(playingAge || p.height_cm || p.clothing_size || p.shoe_size || p.hair_color || p.eye_color || languages.length > 0 || dialects.length > 0 || drivingLicenses.length > 0 || p.body_type || profile.day_rate || travel) && (
                 <div className="grid grid-cols-3 gap-x-4 gap-y-4 py-5 border-y border-border">
                   {playingAge        && <StatPill label="Spielalter" value={playingAge} />}
                   {p.height_cm       && <StatPill label="Größe"      value={`${p.height_cm} cm`} />}
                   {p.clothing_size   && <StatPill label="Konfektion" value={p.clothing_size} />}
                   {p.shoe_size       && <StatPill label="Schuhgröße" value={p.shoe_size} />}
-                  {p.hair_color      && <StatPill label="Haarfarbe"  value={p.hair_color} />}
-                  {p.eye_color       && <StatPill label="Augenfarbe" value={p.eye_color} />}
-                  {p.body_type       && <StatPill label="Körperbau"  value={p.body_type} />}
+                  {p.hair_color      && <StatPill label={profileText("castingHair")} value={profileTraitLabel("hair", p.hair_color, profileText)} />}
+                  {p.eye_color       && <StatPill label={profileText("castingEyes")} value={profileTraitLabel("eyes", p.eye_color, profileText)} />}
+                  {p.body_type       && <StatPill label={profileText("castingBody")} value={profileTraitLabel("body", p.body_type, profileText)} />}
                   {languages.length > 0 && <StatPill label="Sprachen" value={languages.join(", ")} />}
                   {dialects.length > 0 && <StatPill label="Dialekte" value={dialects.join(", ")} />}
                   {drivingLicenses.length > 0 && <StatPill label="Führerschein" value={drivingLicenses.join(", ")} />}
                   {profile.day_rate  && <StatPill label="Tagesgage"  value={`${profile.day_rate} €`} />}
-                  {profile.travel_ready && <StatPill label="Reisen" value="Reisebereit" />}
+                  {travel && <StatPill label={creatorText("filterTravel")} value={profileTraitLabel("travel", travel, profileText)} />}
                 </div>
               )}
 
@@ -1021,6 +1025,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function ModelProfile({ organizationSection, profile, isOwner, projectCredits = [], companyMembership, listings = [], blockStatus = null, collaborations = [] }: { organizationSection?: React.ReactNode; profile: UserProfile; isOwner: boolean; projectCredits?: ProjectCredit[]; companyMembership: CompanyMemberships; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[] }) {
+  const profileText = useTranslations("profile");
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const [lightbox, setLightbox] = useState<string | null>(null);
 
@@ -1057,8 +1062,8 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
     ["Größe", p.height_cm ? `${p.height_cm} cm` : null],
     ["Konfektion", p.clothing_size],
     ["Schuhgröße", p.shoe_size],
-    ["Haare", p.hair_color],
-    ["Augen", p.eye_color],
+    [profileText("castingHair"), p.hair_color ? profileTraitLabel("hair", p.hair_color, profileText) : null],
+    [profileText("castingEyes"), p.eye_color ? profileTraitLabel("eyes", p.eye_color, profileText) : null],
     ["Sprachen", languages.length ? languages.join(", ") : null],
     ["Dialekte", performance.dialects?.length ? performance.dialects.join(", ") : null],
     ["Führerschein", performance.driving_licenses?.length ? performance.driving_licenses.join(", ") : null],
@@ -1302,6 +1307,9 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function GenericProfile({ organizationSection, profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { organizationSection?: React.ReactNode; profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMemberships; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
+  const profileText = useTranslations("profile");
+  const creatorText = useTranslations("creators");
+  const travel = profileTravelValue(profile);
   const tHeader = useTranslations("profileHeader");
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const { user } = useUser();
@@ -1468,11 +1476,11 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
               </div>
             )}
 
-            {(languages.length > 0 || profile.day_rate || profile.travel_ready || profile.crew?.experience_years) && (
+            {(languages.length > 0 || profile.day_rate || travel || profile.crew?.experience_years) && (
               <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-x-6 gap-y-5">
                 {languages.length > 0 && <StatPill label="Sprachen" value={languages.join(", ")} />}
                 {profile.day_rate && <StatPill label="Tagesgage" value={`${profile.day_rate} €`} />}
-                {profile.travel_ready && <StatPill label="Reisen" value="Reisebereit" />}
+                {travel && <StatPill label={creatorText("filterTravel")} value={profileTraitLabel("travel", travel, profileText)} />}
                 {profile.crew?.experience_years && <StatPill label="Erfahrung" value={`${profile.crew.experience_years} Jahre`} />}
               </div>
             )}

@@ -121,6 +121,7 @@ export default function CreatorDetail({
   currentUserId?: string | null;
 }) {
   const tc = useTranslations("common");
+  const profileText = useTranslations("profile");
   const bookingCopy = useTranslations("BookingRequest");
   const tcr = useTranslations("creators");
   const [activeSection, setActiveSection] = useState<"inquiry" | "message">("inquiry");
@@ -351,7 +352,7 @@ export default function CreatorDetail({
                 </span>
               )}
               {creator.travel_ready && (
-                <span className="flex items-center gap-1"><Plane size={13} /> Reisebereit</span>
+                <span className="flex items-center gap-1"><Plane size={13} /> {profileText("fieldTravelReady")}</span>
               )}
               {creator.last_seen_at && (
                 <span className="flex items-center gap-1.5">

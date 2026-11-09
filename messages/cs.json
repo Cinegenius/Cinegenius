@@ -874,6 +874,11 @@
     "fieldAvailableFromHint": "Nechat prázdné pokud jste ihned dostupní",
     "fieldTravelReady": "Ochoten cestovat",
     "fieldTravelReadyDesc": "Připraven na natáčení mimo vaši lokalitu",
+    "travelNone": "Bez možnosti cestovat",
+    "travelRegional": "V regionu",
+    "travelNational": "Celostátně",
+    "travelEuropean": "Po celé Evropě",
+    "travelWorldwide": "Celosvětově",
     "sectionFilmography": "Filmografie",
     "sectionFilmographyDesc": "Hledejte existující projekty nebo vytvořte nový — ostatní členové týmu se mohou také přidat.",
     "manualEntries": "Ručně přidáno",
@@ -2541,6 +2546,13 @@
     "projectCountryLegacy": "Země produkce uložená v doplňujících údajích",
     "projectLocationLegacy": "Místo uložené v doplňujících údajích",
     "projectShootLocations": "Místa natáčení",
-    "projectShootLocationsLegacy": "Místa natáčení uložená v doplňujících údajích"
+    "projectShootLocationsLegacy": "Místa natáčení uložená v doplňujících údajích",
+    "cityPlaceholder": "Hledat město nebo obec",
+    "citySearchHelp": "Zadejte alespoň dvě písmena a vyberte návrh. Pokud místo chybí, můžete ho zadat ručně.",
+    "selectedCity": "Vybrané místo: {place}",
+    "regionInCity": "{region} je region. Zadejte zde město nebo obec.",
+    "useRegion": "Použít jako region",
+    "noSuggestions": "Žádné odpovídající návrhy. Místo můžete zadat ručně.",
+    "suggestionCount": "Odpovídající místa: {count}. Vyberte pomocí šipek a potvrďte klávesou Enter."
   }
 }
