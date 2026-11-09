@@ -495,7 +495,20 @@
     "vendorSection": "Location Anbieter",
     "newBadge": "NEU",
     "geolocationError": "Standort konnte nicht ermittelt werden. Bitte Zugriff erlauben.",
-    "geolocationUnsupported": "Standortermittlung wird von deinem Browser nicht unterstützt."
+    "geolocationUnsupported": "Standortermittlung wird von deinem Browser nicht unterstützt.",
+    "categoryLabel": "Location-Typ",
+    "allLocations": "Alle Locations",
+    "viewLabel": "Ansicht",
+    "addFavorite": "Als Favorit merken",
+    "removeFavorite": "Aus Favoriten entfernen",
+    "landingBadge": "Filmlocations",
+    "landingAll": "Alle Locations ansehen",
+    "landingSearch": "Suchen",
+    "landingClear": "Suche löschen",
+    "landingDiscover": "Locations entdecken",
+    "landingMore": "Weitere Locations ansehen",
+    "landingNoReviews": "Noch keine Bewertung",
+    "showResults": "{count, plural, one {# Location anzeigen} other {# Locations anzeigen}}"
   },
   "creators": {
     "heroTitle": "Filmschaffende, Creator",

@@ -495,7 +495,20 @@
     "vendorSection": "Location Providers",
     "newBadge": "NEW",
     "geolocationError": "Could not determine your location. Please allow access.",
-    "geolocationUnsupported": "Geolocation is not supported by your browser."
+    "geolocationUnsupported": "Geolocation is not supported by your browser.",
+    "categoryLabel": "Location type",
+    "allLocations": "All locations",
+    "viewLabel": "View",
+    "addFavorite": "Save to favorites",
+    "removeFavorite": "Remove from favorites",
+    "landingBadge": "Filming locations",
+    "landingAll": "View all locations",
+    "landingSearch": "Search",
+    "landingClear": "Clear search",
+    "landingDiscover": "Discover locations",
+    "landingMore": "View more locations",
+    "landingNoReviews": "No reviews yet",
+    "showResults": "{count, plural, one {Show # location} other {Show # locations}}"
   },
   "creators": {
     "heroTitle": "Filmmakers, Creators",

@@ -18,7 +18,9 @@ type MobileBrowseControlsProps = {
   categories: BrowseOption[];
   categoryValue: string;
   onCategoryChange: (value: string) => void;
+  categoryPlacement?: "toolbar" | "filters";
   resultSummary: ReactNode;
+  viewControls?: ReactNode;
   filterCount: number;
   chips?: BrowseChip[];
   onReset: () => void;
@@ -30,8 +32,8 @@ type MobileBrowseControlsProps = {
 /** Shared compact search, sorting, category and filter panel for directory pages. */
 export default function MobileBrowseControls({
   query, onQueryChange, searchPlaceholder, sortValue, sortOptions, onSortChange,
-  categoryLabel, allCategoryLabel, categories, categoryValue, onCategoryChange,
-  resultSummary, filterCount, chips = [], onReset, resetLabel, showResultsLabel, children,
+  categoryLabel, allCategoryLabel, categories, categoryValue, onCategoryChange, categoryPlacement = "toolbar",
+  resultSummary, viewControls, filterCount, chips = [], onReset, resetLabel, showResultsLabel, children,
 }: MobileBrowseControlsProps) {
   const [open, setOpen] = useState(false);
 
@@ -74,16 +76,16 @@ export default function MobileBrowseControls({
           </label>
         </div>
 
-        <label className="mobile-browse-category">
+        {categoryPlacement === "toolbar" && <label className="mobile-browse-category">
           <span>{categoryLabel}</span>
           <select value={categoryValue} onChange={(event) => onCategoryChange(event.target.value)}>
             <option value="">{allCategoryLabel}</option>
             {categories.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
           </select>
-        </label>
+        </label>}
 
         <div className="mobile-browse-summary">
-          <p>{resultSummary}</p>
+          {viewControls ? <div className="flex min-w-0 flex-wrap items-center justify-between gap-2"><p>{resultSummary}</p>{viewControls}</div> : <p>{resultSummary}</p>}
           {chips.length > 0 && (
             <div className="mobile-browse-chips" aria-label="Aktive Filter">
               {chips.slice(0, 3).map((chip) => (

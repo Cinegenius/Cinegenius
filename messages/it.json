@@ -495,7 +495,20 @@
     "vendorSection": "Fornitori di location",
     "newBadge": "NUOVO",
     "geolocationError": "Non è stato possibile determinare la tua posizione. Consenti l'accesso.",
-    "geolocationUnsupported": "La geolocalizzazione non è supportata dal tuo browser."
+    "geolocationUnsupported": "La geolocalizzazione non è supportata dal tuo browser.",
+    "categoryLabel": "Tipo di location",
+    "allLocations": "Tutte le location",
+    "viewLabel": "Vista",
+    "addFavorite": "Salva nei preferiti",
+    "removeFavorite": "Rimuovi dai preferiti",
+    "landingBadge": "Location per riprese",
+    "landingAll": "Vedi tutte le location",
+    "landingSearch": "Cerca",
+    "landingClear": "Cancella ricerca",
+    "landingDiscover": "Scopri le location",
+    "landingMore": "Vedi altre location",
+    "landingNoReviews": "Nessuna recensione",
+    "showResults": "{count, plural, one {Mostra # location} other {Mostra # location}}"
   },
   "creators": {
     "heroTitle": "Cineasti, Creator",

@@ -495,7 +495,20 @@
     "vendorSection": "Helyszín szolgáltatók",
     "newBadge": "ÚJ",
     "geolocationError": "Nem sikerült meghatározni a helyzetedet. Engedélyezd a hozzáférést.",
-    "geolocationUnsupported": "A geolokáció nem támogatott a böngésződben."
+    "geolocationUnsupported": "A geolokáció nem támogatott a böngésződben.",
+    "categoryLabel": "Helyszín típusa",
+    "allLocations": "Minden helyszín",
+    "viewLabel": "Nézet",
+    "addFavorite": "Mentés a kedvencek közé",
+    "removeFavorite": "Eltávolítás a kedvencek közül",
+    "landingBadge": "Forgatási helyszínek",
+    "landingAll": "Összes helyszín megtekintése",
+    "landingSearch": "Keresés",
+    "landingClear": "Keresés törlése",
+    "landingDiscover": "Helyszínek felfedezése",
+    "landingMore": "További helyszínek megtekintése",
+    "landingNoReviews": "Még nincs értékelés",
+    "showResults": "{count, plural, one {# helyszín megjelenítése} other {# helyszín megjelenítése}}"
   },
   "creators": {
     "heroTitle": "Filmesek, Alkotók",

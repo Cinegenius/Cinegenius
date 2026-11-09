@@ -495,7 +495,20 @@
     "vendorSection": "Proveedores de locaciones",
     "newBadge": "NUEVO",
     "geolocationError": "No se pudo determinar tu ubicación. Permite el acceso.",
-    "geolocationUnsupported": "La geolocalización no es compatible con tu navegador."
+    "geolocationUnsupported": "La geolocalización no es compatible con tu navegador.",
+    "categoryLabel": "Tipo de localización",
+    "allLocations": "Todas las localizaciones",
+    "viewLabel": "Vista",
+    "addFavorite": "Guardar en favoritos",
+    "removeFavorite": "Eliminar de favoritos",
+    "landingBadge": "Localizaciones de rodaje",
+    "landingAll": "Ver todas las localizaciones",
+    "landingSearch": "Buscar",
+    "landingClear": "Borrar búsqueda",
+    "landingDiscover": "Descubrir localizaciones",
+    "landingMore": "Ver más localizaciones",
+    "landingNoReviews": "Sin valoraciones aún",
+    "showResults": "{count, plural, one {Mostrar # localización} other {Mostrar # localizaciones}}"
   },
   "creators": {
     "heroTitle": "Cineastas, Creadores",

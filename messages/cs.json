@@ -495,7 +495,20 @@
     "vendorSection": "Poskytovatelé lokací",
     "newBadge": "NOVÉ",
     "geolocationError": "Nepodařilo se zjistit polohu. Povolte přístup.",
-    "geolocationUnsupported": "Geolokace není vaším prohlížečem podporována."
+    "geolocationUnsupported": "Geolokace není vaším prohlížečem podporována.",
+    "categoryLabel": "Typ lokace",
+    "allLocations": "Všechny lokace",
+    "viewLabel": "Zobrazení",
+    "addFavorite": "Uložit do oblíbených",
+    "removeFavorite": "Odebrat z oblíbených",
+    "landingBadge": "Filmové lokace",
+    "landingAll": "Zobrazit všechny lokace",
+    "landingSearch": "Hledat",
+    "landingClear": "Vymazat hledání",
+    "landingDiscover": "Objevte lokace",
+    "landingMore": "Zobrazit další lokace",
+    "landingNoReviews": "Zatím bez hodnocení",
+    "showResults": "{count, plural, one {Zobrazit # lokaci} few {Zobrazit # lokace} other {Zobrazit # lokací}}"
   },
   "creators": {
     "heroTitle": "Filmaři, Tvůrci",
