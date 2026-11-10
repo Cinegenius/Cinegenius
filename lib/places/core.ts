@@ -1,20 +1,21 @@
+import { SUPPORTED_LOCALES } from "../i18n/locales";
 import { COUNTRY_CODES } from './countries';
 export type Place = { countryCode: string; regionId: string | null; cityId: string | null; city: string; region: string; status: 'verified' | 'pending' | 'empty' };
 export const PLACE_COLUMNS = 'place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status';
 export function placeKey(value: string) { return value.normalize('NFKD').replace(/\p{M}/gu,'').toLowerCase().replace(/ß/g,'ss').replace(/[^\p{L}\p{N}]/gu,''); }
 export function countryName(code: string, locale = 'de') { return new Intl.DisplayNames([locale], {type:'region'}).of(code) ?? code; }
 const countryAliases = new Map<string,string>();
-for (const code of COUNTRY_CODES) { countryAliases.set(placeKey(code),code); for (const locale of ['de','en','es','it','cs','hu']) countryAliases.set(placeKey(countryName(code,locale)),code); }
+for (const code of COUNTRY_CODES) { countryAliases.set(placeKey(code),code); for (const locale of SUPPORTED_LOCALES) countryAliases.set(placeKey(countryName(code,locale)),code); }
 export function countryCode(value: string) { return countryAliases.get(placeKey(value)) ?? ''; }
 const names: Record<string,Record<string,string>> = {
- 'geonames:2886242': {de:'Köln',en:'Cologne',es:'Colonia',it:'Colonia',cs:'Kolín nad Rýnem',hu:'Köln'},
- 'geonames:2925533': {de:'Frankfurt am Main',en:'Frankfurt am Main',es:'Fráncfort del Meno',it:'Francoforte sul Meno',cs:'Frankfurt nad Mohanem',hu:'Frankfurt am Main'},
- 'geonames:2867714': {de:'München',en:'Munich',es:'Múnich',it:'Monaco di Baviera',cs:'Mnichov',hu:'München'},
- 'geonames:2761369': {de:'Wien',en:'Vienna',es:'Viena',it:'Vienna',cs:'Vídeň',hu:'Bécs'},
- 'geonames:3067696': {de:'Prag',en:'Prague',es:'Praga',it:'Praga',cs:'Praha',hu:'Prága'},
- 'geonames:2657896': {de:'Zürich',en:'Zurich',es:'Zúrich',it:'Zurigo',cs:'Curych',hu:'Zürich'},
+ 'geonames:2886242': {de:'Köln',en:'Cologne',es:'Colonia',it:'Colonia',cs:'Kolín nad Rýnem',hu:'Köln',nl:'Keulen','nl-BE':'Keulen',sv:'Köln'},
+ 'geonames:2925533': {de:'Frankfurt am Main',en:'Frankfurt am Main',es:'Fráncfort del Meno',it:'Francoforte sul Meno',cs:'Frankfurt nad Mohanem',hu:'Frankfurt am Main',nl:'Frankfurt am Main','nl-BE':'Frankfurt am Main',sv:'Frankfurt am Main'},
+ 'geonames:2867714': {de:'München',en:'Munich',es:'Múnich',it:'Monaco di Baviera',cs:'Mnichov',hu:'München',nl:'München','nl-BE':'München',sv:'München'},
+ 'geonames:2761369': {de:'Wien',en:'Vienna',es:'Viena',it:'Vienna',cs:'Vídeň',hu:'Bécs',nl:'Wenen','nl-BE':'Wenen',sv:'Wien'},
+ 'geonames:3067696': {de:'Prag',en:'Prague',es:'Praga',it:'Praga',cs:'Praha',hu:'Prága',nl:'Praag','nl-BE':'Praag',sv:'Prag'},
+ 'geonames:2657896': {de:'Zürich',en:'Zurich',es:'Zúrich',it:'Zurigo',cs:'Curych',hu:'Zürich',nl:'Zürich','nl-BE':'Zürich',sv:'Zürich'},
 };
-export function cityName(id: string | null, fallback: string, locale = 'de') { return (id && names[id]?.[locale]) || fallback; }
+export function cityName(id: string | null, fallback: string, locale = 'de') { return (id && (names[id]?.[locale] ?? names[id]?.[locale.split('-')[0]])) || fallback; }
 export function placeFromRecord(input: object): Place {
  const row=input as Record<string,unknown>;
  return {countryCode:String(row.place_country_code??''),regionId:row.place_region_id as string|null??null,cityId:row.place_city_id as string|null??null,city:String(row.place_city_name??''),region:String(row.place_region_name??''),status:(row.place_status as Place['status'])??'pending'};

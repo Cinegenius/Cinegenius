@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { getPrivateProfileIds } from "@/lib/trust";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 export async function GET(request: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const admin = await requireAdmin();
   if (admin instanceof NextResponse) return admin;
   const query = (request.nextUrl.searchParams.get("q") ?? "").trim().slice(0, 80).replace(/[%,()]/g, " ").trim();
@@ -19,7 +21,7 @@ export async function GET(request: NextRequest) {
       .not("display_name", "is", null)
       .order("display_name", { ascending: true })
       .limit(30);
-    if (error) return NextResponse.json({ error: "Profile konnten nicht gesucht werden." }, { status: 500 });
+    if (error) return NextResponse.json({ error: tResponse('System.m_e7c9fb4edb4f') }, { status: 500 });
     const rows = data ?? [];
     const privateIds = await getPrivateProfileIds(rows.map((profile) => profile.user_id));
     return NextResponse.json({ results: rows.filter((profile) => !privateIds.has(profile.user_id)).map((profile) => ({
@@ -37,7 +39,7 @@ export async function GET(request: NextRequest) {
     .ilike("name", `%${query}%`)
     .order("name", { ascending: true })
     .limit(30);
-  if (error) return NextResponse.json({ error: "Firmen konnten nicht gesucht werden." }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.m_6992880d6f41') }, { status: 500 });
   const ownerIds = [...new Set((companies ?? []).map((company) => company.owner_user_id).filter(Boolean))];
   const { data: owners } = ownerIds.length
     ? await db.from("profiles").select("user_id").in("user_id", ownerIds)

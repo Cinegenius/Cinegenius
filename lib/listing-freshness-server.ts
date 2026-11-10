@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import { clerkClient } from "@clerk/nextjs/server";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { db } from "@/lib/db";
-import { isAppLocale, type AppLocale } from "@/lib/i18n/locales";
+import { appLocale, DEFAULT_LOCALE, isAppLocale, type AppLocale } from "@/lib/i18n/locales";
 import { listingDetailPath } from "@/lib/listing-routes";
 import { listingFreshnessSchedulerEnabled } from "@/lib/listing-freshness-cron-auth";
 import { buildListingReminderEmail, getListingReminderDeliveryStatus, isFrozenListingReminderEmail, sendListingReminderEmail } from "@/lib/listing-freshness-email";
@@ -156,11 +156,12 @@ export async function runListingFreshnessWorker(options: { limit?: number } = {}
       const member = await (await clerkClient()).users.getUser(providerId);
       const primary = member.emailAddresses.find(address => address.id === member.primaryEmailAddressId);
       if (!primary || primary.verification?.status !== "verified") { await finish(claim, "skipped", "verified_email_missing"); continue; }
-      const locale = isAppLocale(claim.provider_locale) ? claim.provider_locale
-        : isAppLocale(member.privateMetadata.cinegeniusLocale) ? member.privateMetadata.cinegeniusLocale : "de";
       const payload = claim.frozen_payload === null ? await buildListingReminderEmail({
         to: primary.emailAddress, firstName: member.firstName, listingId: claim.listing_id,
-        title: claim.title, stage: claim.stage, graceDays: claim.grace_days, locale,
+        title: claim.title, stage: claim.stage, graceDays: claim.grace_days,
+        locale: isAppLocale(claim.provider_locale) ? claim.provider_locale
+          : appLocale(member.locale) ?? appLocale(member.privateMetadata?.cinegeniusLocale)
+            ?? appLocale(member.unsafeMetadata?.cinegeniusLocale) ?? DEFAULT_LOCALE,
       }) : claim.frozen_payload;
       if (!isFrozenListingReminderEmail(payload) || payload.to !== primary.emailAddress) {
         await finish(claim, claim.first_attempt_at ? "unknown" : "skipped", "recipient_or_payload_changed"); continue;

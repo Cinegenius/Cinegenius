@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { sendNewMessageEmail } from "@/lib/email";
 import { rateLimit } from "@/lib/rateLimit";
 import { applyParticipantReadReceipts } from "@/lib/message-read-state";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 const PAGE_SIZE = 200;
 
@@ -14,6 +15,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -24,8 +26,8 @@ export async function GET(
     .select("id, kind, group_name, listing_id, listing_title, listing_type, sender_id, receiver_id, created_by")
     .eq("id", id)
     .maybeSingle();
-  if (conversationError) return NextResponse.json({ error: "Unterhaltung konnte nicht geladen werden." }, { status: 500 });
-  if (!conversation || (conversation.kind === "support" && conversation.receiver_id !== userId)) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 });
+  if (conversationError) return NextResponse.json({ error: tResponse('System.m_1fa117ab833b') }, { status: 500 });
+  if (!conversation || (conversation.kind === "support" && conversation.receiver_id !== userId)) return NextResponse.json({ error: tResponse('System.m_621ca4c037d3') }, { status: 404 });
 
   const { data: membership, error: membershipError } = await db
     .from("conversation_members")
@@ -34,25 +36,25 @@ export async function GET(
     .eq("user_id", userId)
     .is("left_at", null)
     .maybeSingle();
-  if (membershipError) return NextResponse.json({ error: "Mitgliedschaft konnte nicht geprüft werden." }, { status: 500 });
-  if (!membership) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 });
+  if (membershipError) return NextResponse.json({ error: tResponse('System.m_599c867e2758') }, { status: 500 });
+  if (!membership) return NextResponse.json({ error: tResponse('System.m_621ca4c037d3') }, { status: 404 });
 
   const { data: activeMembers, error: membersError } = await db
     .from("conversation_members")
     .select("user_id, role, joined_at")
     .eq("conversation_id", id)
     .is("left_at", null);
-  if (membersError) return NextResponse.json({ error: "Teilnehmer konnten nicht geladen werden." }, { status: 500 });
+  if (membersError) return NextResponse.json({ error: tResponse('System.m_f0806571830a') }, { status: 500 });
   const memberRows = activeMembers ?? [];
   if (conversation.kind !== "group" && !memberRows.some((member) => member.user_id !== userId)) {
-    return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 });
+    return NextResponse.json({ error: tResponse('System.m_621ca4c037d3') }, { status: 404 });
   }
 
   const before = request.nextUrl.searchParams.get("before");
   const beforeId = request.nextUrl.searchParams.get("before_id");
   if (before || beforeId) {
     if (!before || !beforeId || Number.isNaN(Date.parse(before)) || beforeId.length > 80) {
-      return NextResponse.json({ error: "Ungültiger Nachrichtenzeiger." }, { status: 400 });
+      return NextResponse.json({ error: tResponse('System.m_b9644bfee79d') }, { status: 400 });
     }
   }
 
@@ -68,7 +70,7 @@ export async function GET(
     .order("created_at", { ascending: false })
     .order("id", { ascending: false })
     .limit(PAGE_SIZE + 1);
-  if (messagesError) return NextResponse.json({ error: "Nachrichten konnten nicht geladen werden." }, { status: 500 });
+  if (messagesError) return NextResponse.json({ error: tResponse('System.m_ece7dc87613b') }, { status: 500 });
   const descendingPage = rawMessages ?? [];
   const hasOlder = descendingPage.length > PAGE_SIZE;
   const page = descendingPage.slice(0, PAGE_SIZE).reverse();
@@ -82,7 +84,7 @@ export async function GET(
       : Promise.resolve({ data: [], error: null }),
   ]);
   if (profilesResult.error || receiptsResult.error) {
-    return NextResponse.json({ error: "Profil- oder Lesestatusdaten konnten nicht geladen werden." }, { status: 500 });
+    return NextResponse.json({ error: tResponse('System.m_a5e7c6ff901e') }, { status: 500 });
   }
 
   const profiles = new Map((profilesResult.data ?? []).map((profile) => [profile.user_id, profile]));
@@ -138,16 +140,17 @@ export async function GET(
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const tResponse = await getResponseTranslations();
   const caller = await requireAuth();
   if (caller instanceof NextResponse) return caller;
   const { id } = await params;
   const messageId = request.nextUrl.searchParams.get("message_id") ?? "";
   const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  if (!uuid.test(id) || !uuid.test(messageId)) return NextResponse.json({ error: "Ungültige Nachricht." }, { status: 400 });
+  if (!uuid.test(id) || !uuid.test(messageId)) return NextResponse.json({ error: tResponse('System.m_ff964adb286c') }, { status: 400 });
   const { allowed } = await rateLimit(`hide-message:${caller.userId}`, 60, 60);
-  if (!allowed) return NextResponse.json({ error: "Bitte warte kurz und versuche es erneut." }, { status: 429 });
+  if (!allowed) return NextResponse.json({ error: tResponse('System.m_b1c34ba77e66') }, { status: 429 });
   const { data, error } = await db.rpc("hide_own_conversation_message", { p_actor: caller.userId, p_conversation: id, p_message: messageId });
-  if (error || data !== messageId) return NextResponse.json({ error: error?.code === "42501" ? "Diese Nachricht ist nicht verfügbar oder stammt nicht von dir." : "Die Nachricht konnte nicht für dich gelöscht werden." }, { status: error?.code === "42501" ? 404 : 500 });
+  if (error || data !== messageId) return NextResponse.json({ error: error?.code === "42501" ? tResponse("System.messageNotOwnOrUnavailable") : tResponse("Ui.text_ce810a95feef7e") }, { status: error?.code === "42501" ? 404 : 500 });
   return NextResponse.json({ hiddenMessageId: data }, { headers: { "Cache-Control": "private, no-store" } });
 }
 
@@ -155,25 +158,26 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
   const { allowed } = await rateLimit(`msg:${userId}`, 30, 60);
-  if (!allowed) return NextResponse.json({ error: "Zu viele Nachrichten. Bitte kurz warten." }, { status: 429 });
+  if (!allowed) return NextResponse.json({ error: tResponse('System.m_fed9db832019') }, { status: 429 });
 
   const { id } = await params;
   const body = await request.json().catch(() => null);
   const content = typeof body?.content === "string" ? body.content.trim() : "";
-  if (!content) return NextResponse.json({ error: "Nachricht leer" }, { status: 400 });
-  if (content.length > 5000) return NextResponse.json({ error: "Nachricht zu lang (max. 5000 Zeichen)" }, { status: 400 });
+  if (!content) return NextResponse.json({ error: tResponse('System.m_34f087ae9fdf') }, { status: 400 });
+  if (content.length > 5000) return NextResponse.json({ error: tResponse('System.m_f65be0fc77aa') }, { status: 400 });
 
   const { data: conversation, error: conversationError } = await db
     .from("conversations")
     .select("id, kind, group_name, sender_id, receiver_id")
     .eq("id", id)
     .maybeSingle();
-  if (conversationError) return NextResponse.json({ error: "Unterhaltung konnte nicht geprüft werden." }, { status: 500 });
-  if (!conversation) return NextResponse.json({ error: "Kein Zugriff" }, { status: 404 });
+  if (conversationError) return NextResponse.json({ error: tResponse('System.m_c453f2efc15a') }, { status: 500 });
+  if (!conversation) return NextResponse.json({ error: tResponse('System.m_cd2f7b0a21cd') }, { status: 404 });
 
   const { data: membership, error: membershipError } = await db
     .from("conversation_members")
@@ -182,10 +186,10 @@ export async function POST(
     .eq("user_id", userId)
     .is("left_at", null)
     .maybeSingle();
-  if (membershipError) return NextResponse.json({ error: "Mitgliedschaft konnte nicht geprüft werden." }, { status: 500 });
-  if (!membership) return NextResponse.json({ error: "Kein Zugriff" }, { status: 404 });
+  if (membershipError) return NextResponse.json({ error: tResponse('System.m_599c867e2758') }, { status: 500 });
+  if (!membership) return NextResponse.json({ error: tResponse('System.m_cd2f7b0a21cd') }, { status: 404 });
   if (conversation.kind === "support" && conversation.receiver_id !== userId) {
-    return NextResponse.json({ error: "Kein Zugriff" }, { status: 404 });
+    return NextResponse.json({ error: tResponse('System.m_cd2f7b0a21cd') }, { status: 404 });
   }
 
   const { data: activeMembers, error: membersError } = await db
@@ -193,22 +197,22 @@ export async function POST(
     .select("user_id")
     .eq("conversation_id", id)
     .is("left_at", null);
-  if (membersError) return NextResponse.json({ error: "Teilnehmer konnten nicht geprüft werden." }, { status: 500 });
+  if (membersError) return NextResponse.json({ error: tResponse('System.m_378d2a42e006') }, { status: 500 });
   const recipientIds = (activeMembers ?? []).map((member) => member.user_id).filter((memberId) => memberId !== userId);
 
   if (conversation.kind !== "group" && conversation.kind !== "support") {
     const receiverId = recipientIds[0];
-    if (!receiverId) return NextResponse.json({ error: "Empfänger ist nicht mehr verfügbar." }, { status: 404 });
+    if (!receiverId) return NextResponse.json({ error: tResponse('System.m_9f73491d8f79') }, { status: 404 });
     const { data: receiverSettings, error: settingsError } = await db
       .from("user_settings")
       .select("message_permission")
       .eq("user_id", receiverId)
       .maybeSingle();
-    if (settingsError) return NextResponse.json({ error: "Nachrichteneinstellungen konnten nicht geprüft werden." }, { status: 500 });
+    if (settingsError) return NextResponse.json({ error: tResponse('System.m_44480805a269') }, { status: 500 });
     if (receiverSettings?.message_permission === "friends_only" && !(await areAcceptedFriends(userId, receiverId))) {
-      return NextResponse.json({ error: "Diese Person nimmt Nachrichten nur von Freunden an." }, { status: 403 });
+      return NextResponse.json({ error: tResponse('System.m_3d26f80efc50') }, { status: 403 });
     }
-    if (await anyBlockExists(userId, receiverId)) return NextResponse.json({ error: "Nachrichten an diesen Nutzer sind nicht möglich" }, { status: 403 });
+    if (await anyBlockExists(userId, receiverId)) return NextResponse.json({ error: tResponse('System.m_0fc7245a4195') }, { status: 403 });
   }
 
   // The database function locks the conversation while checking active
@@ -219,13 +223,14 @@ export async function POST(
     p_content: content,
   });
   if (sendError) {
-    const isMembershipError = sendError.message?.includes("aktives Mitglied");
-    return NextResponse.json({ error: isMembershipError ? "Du bist kein aktives Mitglied dieser Unterhaltung." : "Nachricht konnte nicht gesendet werden." }, {
+    const isMembershipError = sendError.code === "42501" || sendError.code === "P0002"
+      || ((sendError.code === "P0001" || sendError.code === undefined) && sendError.message === "Du bist kein aktives Mitglied dieser Unterhaltung.");
+    return NextResponse.json({ error: isMembershipError ? tResponse("System.conversationMemberInactive") : tResponse("System.m_0949dcf4a579") }, {
       status: isMembershipError ? 404 : 500,
     });
   }
   const message = Array.isArray(inserted) ? inserted[0] : inserted;
-  if (!message) return NextResponse.json({ error: "Nachricht konnte nicht bestätigt werden." }, { status: 500 });
+  if (!message) return NextResponse.json({ error: tResponse('System.m_41c85b9f5d2c') }, { status: 500 });
 
   if (conversation.kind === "support") {
     return NextResponse.json({ message: { ...message, senderName: "Du", senderAvatar: null, read_by: [] } });

@@ -14,6 +14,7 @@ import Image from "@/components/MediaImage";
 import { useLocale, useTranslations } from "next-intl";
 import { MapPin, MessageCircle, Pin, Plus, Search, Send, Trash2, X } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
+import { uiErrorMessage } from "@/lib/ui-error-message";
 
 type Kind = "question" | "recommendation" | "request" | "offer";
 type Reply = { id: string; body: string; created_at: string; author_name: string; author_avatar: string | null; is_mine?: boolean };
@@ -114,7 +115,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
       setComposerOpen(false);
       await loadPosts("", "all");
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : t("boardError"));
+      setError(uiErrorMessage(cause, t("boardError")));
     } finally { setBusy(false); }
   }
 
@@ -143,7 +144,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
       setReplies(current => ({ ...current, [postId]: [...(current[postId] ?? []), payload.reply] }));
       setPosts(current => current.map(post => post.id === postId ? { ...post, reply_count: post.reply_count + 1 } : post));
       setReplyDrafts(current => ({ ...current, [postId]: "" }));
-    } catch (cause) { setError(cause instanceof Error ? cause.message : t("boardError")); }
+    } catch (cause) { setError(uiErrorMessage(cause, t("boardError"))); }
     finally { setBusy(false); }
   }
 
@@ -157,7 +158,7 @@ export default function CommunityBoard({ loggedIn = false, fullPage = false }: {
       setPosts(current => current.filter(post => post.id !== postId));
       setExpanded(current => current === postId ? null : current);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : t("boardError"));
+      setError(uiErrorMessage(cause, t("boardError")));
     } finally { setDeleting(null); }
   }
 

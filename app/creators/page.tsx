@@ -13,6 +13,7 @@ import PageHeader from "@/components/PageHeader";
 import { PROFILE_CATEGORY_MAP, PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
 import { getProfileDisplayPositions, normalizeProfileTypes } from "@/lib/profile-display";
 import { getTranslations, getLocale } from "next-intl/server";
+import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 // Mixed person/offer accounts are retained; offer-only accounts are excluded below.
 const VENDOR_TYPES = new Set(
@@ -95,16 +96,21 @@ const getCreatorDirectoryData = unstable_cache(
 
 export const revalidate = 60;
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const tMetadata = await getMetadataTranslations("Metadata");
+  return {
   alternates: { canonical: "https://www.cinegenius.co/creators" },
-  title: "Filmcrew & Kreative finden — Kamera, Regie, Content Creator",
-  description: "Finde erfahrene Filmcrew, Content Creator und Fotografen: Kameraleute, Regisseure, Cutter, Tontechniker, Influencer und mehr — deutschlandweit buchbar.",
-  keywords: ["Filmcrew buchen", "Kameramann buchen", "Content Creator buchen", "Fotograf buchen", "Freelancer Film", "Crew für Filmproduktion"],
+  title: tMetadata('m_177de5567cb4'),
+  description: tMetadata('m_65995207208d'),
+  keywords: [tMetadata('m_e54dabc25ec8'), tMetadata('m_82e523280085'), tMetadata('m_ac88802c1689'), tMetadata('m_0cc63a71479c'), tMetadata('m_e57913375963'), tMetadata('m_b7a6dbd670b8')],
   openGraph: {
-    title: "Filmcrew & Kreative finden — CineGenius",
-    description: "Kamera, Regie, Licht, Ton, Social Media, Fotografie — alle Gewerke auf einer Plattform.",
+    title: tMetadata('m_a9f10b644ea2'),
+    description: tMetadata('m_80d5794fa4d8'),
   },
 };
+}
+
+function getLocalizedProfileTypeLabels(translate: (key: string) => string): typeof PROFILE_TYPE_LABELS { return { actor: translate("menu.crewActors"), model: translate("MarketplaceOffer.fields.model"), extra: translate("Ui.text_359b6b495d37ee"), host: translate("Ui.text_0a95f0e5c8dfe9"), dancer: translate("Ui.text_edbf4c8ebb46d7"), stunt: translate("Ui.text_b84275027d70dc"), voiceover: translate("Ui.text_ecd65813175a41"), creator: translate("Ui.text_d952b2e69292db"), camera: translate("menu.crewCamera"), lighting: translate("Ui.text_df58636dc4a76c"), sound: translate("menu.crewSound"), director_of_photography: translate("Ui.text_e0e64895eb6431"), director: translate("menu.crewDirection"), production: translate("menu.crewProduction"), makeup: translate("Ui.text_93c744e1d17b9a"), costume: translate("Ui.text_a21ae87ef519df"), postproduction: translate("Ui.text_212f3b80ce86c2"), vfx: translate("Ui.text_23d20474305ac3"), sfx: translate("menu.marketSfx"), art_department: translate("Ui.text_a92fc587a90c16"), broadcast: translate("Ui.text_17bc9178343601"), filmmaker: translate("Ui.text_93ecd734fdc054"), writer: translate("Ui.text_fec099ea8a39bd"), photographer: translate("menu.crewPhotographer"), editor: translate("Ui.text_0e4eb4156e02e7"), motion_designer: translate("Ui.text_8213a51cdbc986"), art_director: translate("Ui.text_2d3b48143ed2b9"), location: translate("locations.vendorSection"), equipment: translate("props.vendorSection"), vehicle: translate("Ui.text_758a6eefc6f22f"), studio: translate("Ui.text_3e35f07c14a89e"), props: translate("Ui.text_54d1cc854cc30d") }; }
 
 function parseCreatorDescription(raw: string): { skills: string[]; credits: string[] } {
   const skillsMatch = raw.match(/^Skills: (.+)$/m);
@@ -126,6 +132,10 @@ export default async function CreatorsPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const uiText = await getTranslations();
+  const PROFILE_TYPE_LABELS = getLocalizedProfileTypeLabels(uiText);
+
+
   const locale = await getLocale();
   const [t, tCommon, { userId }, directoryData, params] = await Promise.all([
     getTranslations("creators"),
@@ -168,7 +178,7 @@ export default async function CreatorsPage({
       avatar: l.image_url ?? "",
       rating: 0,
       reviews: 0,
-      dayRate: (l.price ?? 0) > 0 ? `${l.price} €/Tag` : tCommon("byArrangement"),
+      dayRate: (l.price ?? 0) > 0 ? uiText("Ui.text_4519fabedb2cbd", { value1: Number(l.price).toLocaleString(locale) }) : tCommon("byArrangement"), dayRateOnRequest: !((l.price ?? 0) > 0),
       available: true,
       credits,
       skills,
@@ -200,7 +210,7 @@ export default async function CreatorsPage({
       });
       return {
         id: p.user_id,
-        name: p.display_name ?? "Unbekannt",
+        name: p.display_name ?? uiText("Ui.text_276ffa1fb4f970"),
         role: p.role ?? displayPositions[0] ?? typeLabel ?? "Filmschaffende/r",
         positions: displayPositions,
         primaryOccupation: occupationReference(primaryOccupationForPositions(p.crew?.primaryOccupation, p.positions ?? [], p.role)),
@@ -214,7 +224,7 @@ export default async function CreatorsPage({
         avatar: p.avatar_url ?? "",
         rating: 0,
         reviews: 0,
-        dayRate: p.day_rate ? `${p.day_rate} €/Tag` : tCommon("byArrangement"),
+        dayRate: p.day_rate ? uiText("Ui.text_4519fabedb2cbd", { value1: Number(p.day_rate).toLocaleString(locale) }) : tCommon("byArrangement"), dayRateOnRequest: !(p.day_rate),
         available: p.available ?? true,
         credits: [],
         skills: p.skills ?? [],
@@ -253,7 +263,7 @@ export default async function CreatorsPage({
   return (
     <div className="min-h-screen bg-bg-primary">
       <PageHeader
-        badge="Crew"
+        badge={uiText("nav.crew")}
         title={t("heroTitle")}
         titleHighlight={t("heroTitleHighlight")}
         description={t("heroDesc")}

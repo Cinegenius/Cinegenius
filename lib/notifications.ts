@@ -23,15 +23,15 @@ export interface Notification {
 }
 
 
-export function timeAgo(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "Gerade eben";
-  if (mins < 60) return `vor ${mins} Min.`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `vor ${hours} Std.`;
-  const days = Math.floor(hours / 24);
-  return `vor ${days} Tag${days > 1 ? "en" : ""}`;
+export function timeAgo(iso: string, locale = "de"): string {
+  const diff = new Date(iso).getTime() - Date.now();
+  if (!Number.isFinite(diff)) return "";
+  const formatter = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+  const minutes = Math.trunc(diff / 60_000);
+  if (Math.abs(minutes) < 1) return formatter.format(0, "second");
+  if (Math.abs(minutes) < 60) return formatter.format(minutes, "minute");
+  const hours = Math.trunc(minutes / 60);
+  return Math.abs(hours) < 24 ? formatter.format(hours, "hour") : formatter.format(Math.trunc(hours / 24), "day");
 }
 
 export const notificationMeta: Record<NotificationType, { color: string; dot: string }> = {

@@ -10,10 +10,12 @@ import { getTranslations } from "next-intl/server";
 import { SETUP_TEMPLATE_KEY, setupSupportTemplate } from "@/lib/support-setup-template";
 import { adminSupportParticipants } from "@/lib/admin-support-participants";
 import { STARTED_OFFER_TEMPLATE_KEY, startedOfferTemplate } from "@/lib/support-started-offer-template";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 const PAGE_SIZE = 30;
 
 export async function GET(request: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const admin = await requireAdmin();
   if (admin instanceof NextResponse) return admin;
   const page = Math.max(1, Number.parseInt(request.nextUrl.searchParams.get("page") ?? "1", 10) || 1);
@@ -23,7 +25,7 @@ export async function GET(request: NextRequest) {
     .order("created_at", { ascending: false, referencedTable: "messages" })
     .limit(1, { referencedTable: "messages" })
     .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
-  if (error) return NextResponse.json({ error: "Supportpostfach konnte nicht geladen werden. Bitte Migration prüfen." }, { status: 503 });
+  if (error) return NextResponse.json({ error: tResponse('System.m_5cd067189f0d') }, { status: 503 });
   const rows = data ?? [];
   const userIds = [...new Set(rows.map((row) => row.support_user_id).filter((id): id is string => Boolean(id)))];
   const [{ data: profiles, error: profileError }, { data: unread, error: unreadError }] = await Promise.all([
@@ -32,10 +34,10 @@ export async function GET(request: NextRequest) {
       : Promise.resolve({ data: [], error: null }),
     db.rpc("unread_message_counts", { p_user_id: SUPPORT_ACTOR_ID }),
   ]);
-  if (profileError || unreadError) return NextResponse.json({ error: "Supportstatus konnte nicht geladen werden." }, { status: 500 });
+  if (profileError || unreadError) return NextResponse.json({ error: tResponse('System.m_3fad376bd8ef') }, { status: 500 });
   let profileMap;
   try { profileMap = await adminSupportParticipants(userIds, profiles ?? []); }
-  catch { return NextResponse.json({ error: "Supportstatus konnte nicht geladen werden." }, { status: 503 }); }
+  catch { return NextResponse.json({ error: tResponse('System.m_3fad376bd8ef') }, { status: 503 }); }
   const profileIds = new Set((profiles ?? []).map(profile => profile.user_id));
   const unreadMap = new Map((unread ?? []).map((row: { conversation_id: string; unread_count: number }) => [row.conversation_id, Number(row.unread_count)]));
   return NextResponse.json({
@@ -61,10 +63,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const admin = await requireAdmin();
   if (admin instanceof NextResponse) return admin;
   const { allowed } = await rateLimit("admin-support-send:" + admin.userId, 30, 60);
-  if (!allowed) return NextResponse.json({ error: "Zu viele Supportnachrichten. Bitte kurz warten." }, { status: 429 });
+  if (!allowed) return NextResponse.json({ error: tResponse('System.m_cd1c186115c3') }, { status: 429 });
   const body = await request.json().catch(() => null);
   const type = body?.targetType;
   const id = typeof body?.targetId === "string" ? body.targetId : "";
@@ -72,21 +75,21 @@ export async function POST(request: NextRequest) {
   const content = typeof body?.content === "string" ? body.content.trim() : "";
   const idempotencyKey = typeof body?.idempotencyKey === "string" ? body.idempotencyKey : "";
   if (!["profile", "company", "listing", "started_offer"].includes(type) || !id || id.length > 160 || !content || content.length > 5000 || !/^[0-9a-f-]{36}$/i.test(idempotencyKey)) {
-    return NextResponse.json({ error: "Empfänger, Nachricht und sichere Versandkennung sind erforderlich." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_d18b2c288ec2') }, { status: 400 });
   }
   const { data: savedTemplate, error: templateError } = await db.from("support_message_templates")
     .select("template_key, body, enabled").eq("template_key", templateKey).maybeSingle();
-  if (templateError) return NextResponse.json({ error: "Supportvorlage konnte nicht geprüft werden." }, { status: 503 });
+  if (templateError) return NextResponse.json({ error: tResponse('System.m_6a6d03717659') }, { status: 503 });
   const template = savedTemplate ?? (templateKey === SETUP_TEMPLATE_KEY ? setupSupportTemplate(await getTranslations("AdminAccounts"))
     : templateKey === STARTED_OFFER_TEMPLATE_KEY ? startedOfferTemplate(await getTranslations("AdminStartedOffers")) : null);
-  if (!template?.enabled) return NextResponse.json({ error: "Diese Supportvorlage ist nicht verfügbar." }, { status: 400 });
-  if (/\{\{[^}]+\}\}/.test(content)) return NextResponse.json({ error: "Die Nachricht enthält noch nicht ersetzte Platzhalter." }, { status: 400 });
+  if (!template?.enabled) return NextResponse.json({ error: tResponse('System.m_6ca43ca7ff72') }, { status: 400 });
+  if (/\{\{[^}]+\}\}/.test(content)) return NextResponse.json({ error: tResponse('System.m_7a1d20a89ba5') }, { status: 400 });
 
   let target;
   try {
     target = await resolveAdminSupportTarget(type as AdminSupportTargetType, id, admin.userId);
   } catch (error) {
-    return NextResponse.json({ error: error instanceof SupportTargetError ? error.message : "Empfänger konnte nicht sicher ermittelt werden." }, { status: error instanceof SupportTargetError ? error.status : 500 });
+    return NextResponse.json({ error: error instanceof SupportTargetError ? error.message : tResponse("ServerCopy.s_b85590688b34") }, { status: error instanceof SupportTargetError ? error.status : 500 });
   }
   if (templateKey === STARTED_OFFER_TEMPLATE_KEY && !target.startedOffer) {
     return NextResponse.json({ error: (await getTranslations("AdminStartedOffers"))("unavailable") }, { status: 409 });
@@ -96,11 +99,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: t("setupAlreadyComplete") }, { status: 409 });
   }
   if (template.body.includes("{{fehlendeAngaben}}") && !target.missingFields.length) {
-    return NextResponse.json({ error: "Für diese Vorlage wurden keine fehlenden Pflichtangaben gefunden. Freiwillige Ergänzungen werden nicht als Pflicht dargestellt." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_8347e71a0f57') }, { status: 400 });
   }
   const expectedEditUrl = new URL(target.editUrl, request.nextUrl.origin).toString();
   if (template.body.includes("{{Bearbeitungslink}}") && !content.includes(expectedEditUrl)) {
-    return NextResponse.json({ error: "Der direkte Bearbeitungslink fehlt oder wurde verändert. Bitte Vorlage neu laden." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_d9171818a396') }, { status: 400 });
   }
 
   const { data, error } = await db.rpc("create_support_conversation", {
@@ -110,11 +113,11 @@ export async function POST(request: NextRequest) {
   });
   if (error) {
     console.error("[admin support] conversation persistence failed");
-    return NextResponse.json({ error: "Supportnachricht konnte nicht dauerhaft gespeichert werden." }, { status: 503 });
+    return NextResponse.json({ error: tResponse('System.m_ef269828a1cc') }, { status: 503 });
   }
   const result = Array.isArray(data) ? data[0] : data;
   if (!result?.conversation_id || !result?.message_id) {
-    return NextResponse.json({ error: "Speicherung der Supportnachricht konnte nicht bestätigt werden." }, { status: 503 });
+    return NextResponse.json({ error: tResponse('System.m_95c7c83e2bbe') }, { status: 503 });
   }
   if (result.created) {
     try {

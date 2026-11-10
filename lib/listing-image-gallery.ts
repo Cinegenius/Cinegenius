@@ -13,7 +13,7 @@ export type ListingImageGallery = {
 
 export type GalleryValidation =
   | { ok: true; gallery: ListingImageGallery }
-  | { ok: false; error: string };
+  | { ok: false; error: "mainImageInvalid" | "galleryInvalid" | "galleryEntryInvalid" | "tooManyImages" | "imageLinkTooLong" };
 
 export type ListingGalleryPreview = {
   activeImage: string | null;
@@ -50,15 +50,15 @@ export function normalizeListingImageGallery(
   maxImages = MAX_LISTING_IMAGES,
 ): GalleryValidation {
   if (imageUrl !== undefined && imageUrl !== null && typeof imageUrl !== "string") {
-    return { ok: false, error: "Das Hauptbild ist ungültig." };
+    return { ok: false, error: "mainImageInvalid" };
   }
   if (extraImages !== undefined && extraImages !== null && !Array.isArray(extraImages)) {
-    return { ok: false, error: "Die Bildergalerie ist ungültig." };
+    return { ok: false, error: "galleryInvalid" };
   }
 
   const extras = (Array.isArray(extraImages) ? extraImages : []) as unknown[];
   if (extras.some((url) => typeof url !== "string")) {
-    return { ok: false, error: "Die Bildergalerie enthält einen ungültigen Eintrag." };
+    return { ok: false, error: "galleryEntryInvalid" };
   }
 
   const raw = [imageUrl, ...extras]
@@ -68,10 +68,10 @@ export function normalizeListingImageGallery(
   const urls = [...new Set(raw)];
 
   if (urls.length > maxImages) {
-    return { ok: false, error: `Pro Angebot sind höchstens ${maxImages} Bilder erlaubt.` };
+    return { ok: false, error: "tooManyImages" };
   }
   if (urls.some((url) => url.length > 2048)) {
-    return { ok: false, error: "Ein Bildlink ist zu lang." };
+    return { ok: false, error: "imageLinkTooLong" };
   }
 
   return {

@@ -5,6 +5,7 @@ import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight, Loader2, RefreshCw, Search } from "lucide-react";
 import { SupportMessageAction } from "./SupportMessageAction";
 import type { StartedOffer } from "@/lib/admin-started-offers";
+import { uiErrorMessage } from "@/lib/ui-error-message";
 
 type Result = { offers: (StartedOffer & { accountName: string })[]; nextOffset: number | null; scanned: number };
 export function AdminStartedOffers() {
@@ -30,7 +31,7 @@ export function AdminStartedOffers() {
         if (!response.ok) throw new Error(data.error || t("loadError"));
         if (!controller.signal.aborted) { setResult(data); setError(""); }
       } catch (cause) {
-        if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : t("loadError"));
+        if (!controller.signal.aborted) setError(uiErrorMessage(cause, t("loadError")));
       } finally { if (!controller.signal.aborted) setFinished(requestKey); }
     }, search ? 250 : 0);
     return () => { clearTimeout(timer); controller.abort(); };

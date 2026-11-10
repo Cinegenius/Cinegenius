@@ -8,26 +8,28 @@ import { NextRequest, NextResponse } from "next/server";
 import { sendNewMessageEmail } from "@/lib/email";
 import { applyParticipantReadReceipts } from "@/lib/message-read-state";
 import { getUnreadMessageCounts } from "@/lib/unread-message-counts";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 
 // The membership table is the access-control source for both direct and group
 // conversations. It lets a user participate in many-member conversations
 // without exposing other conversations through the service-role DB client.
 export async function GET(request: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
   const contactId = request.nextUrl.searchParams.get("with_user");
   if (contactId) {
-    if (!/^[a-zA-Z0-9_-]{1,128}$/.test(contactId) || contactId === userId) return NextResponse.json({ error: "Ungültiger Kontakt." }, { status: 400 });
+    if (!/^[a-zA-Z0-9_-]{1,128}$/.test(contactId) || contactId === userId) return NextResponse.json({ error: tResponse('System.m_ccdfe6406c75') }, { status: 400 });
     const { data, error } = await db.from("conversations")
       .select("id,conversation_members!inner(user_id,left_at)")
       .eq("kind", "direct")
       .or(`and(sender_id.eq.${userId},receiver_id.eq.${contactId}),and(sender_id.eq.${contactId},receiver_id.eq.${userId})`)
       .eq("conversation_members.user_id", userId).is("conversation_members.left_at", null)
       .order("listing_id", { nullsFirst: true }).order("updated_at", { ascending: false }).limit(1).maybeSingle();
-    if (error) return NextResponse.json({ error: "Unterhaltung konnte nicht gesucht werden." }, { status: 500 });
+    if (error) return NextResponse.json({ error: tResponse('System.m_2fd1f0952739') }, { status: 500 });
     return NextResponse.json({ conversationId: data?.id ?? null }, { headers: { "Cache-Control": "private, no-store" } });
   }
 
@@ -35,7 +37,7 @@ export async function GET(request: NextRequest) {
   try {
     unreadCounts = await getUnreadMessageCounts(userId);
   } catch {
-    return NextResponse.json({ error: "Ungelesene Nachrichten konnten nicht geladen werden." }, { status: 500 });
+    return NextResponse.json({ error: tResponse('System.m_38658963a719') }, { status: 500 });
   }
 
   // Filter active membership and sort activity before limiting the inbox.
@@ -55,12 +57,12 @@ export async function GET(request: NextRequest) {
     .order("created_at", { ascending: false, referencedTable: "messages" })
     .limit(1, { referencedTable: "messages" })
     .limit(50);
-  if (error) return NextResponse.json({ error: "Unterhaltungen konnten nicht geladen werden." }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.m_907ee849b3ff') }, { status: 500 });
   if ((conversations ?? []).some((conversation) =>
     !Array.isArray(conversation.conversation_members)
       || !conversation.conversation_members.some((member) => member?.user_id === userId && member.left_at === null),
   )) {
-    return NextResponse.json({ error: "Unterhaltungen konnten nicht geladen werden." }, { status: 500 });
+    return NextResponse.json({ error: tResponse('System.m_907ee849b3ff') }, { status: 500 });
   }
 
   const groupIds = (conversations ?? []).filter((conversation) => conversation.kind === "group").map((conversation) => conversation.id);
@@ -71,7 +73,7 @@ export async function GET(request: NextRequest) {
       .select("conversation_id, user_id, role, joined_at")
       .in("conversation_id", groupIds)
       .is("left_at", null);
-    if (groupMembersError) return NextResponse.json({ error: "Gruppenmitglieder konnten nicht geladen werden." }, { status: 500 });
+    if (groupMembersError) return NextResponse.json({ error: tResponse('System.m_96c50531e092') }, { status: 500 });
     groupMembers = data ?? [];
   }
 
@@ -97,7 +99,7 @@ export async function GET(request: NextRequest) {
       .select("message_id, user_id, read_at")
       .in("message_id", messageIds)
       .in("user_id", [...new Set([userId, SUPPORT_ACTOR_ID, ...profileIds])]);
-    if (readsError) return NextResponse.json({ error: "Lesestatus konnte nicht geladen werden." }, { status: 500 });
+    if (readsError) return NextResponse.json({ error: tResponse('System.m_9ca5cc3fc595') }, { status: 500 });
     receipts = data ?? [];
   }
 
@@ -171,32 +173,33 @@ export async function GET(request: NextRequest) {
 
 // Start or reuse a one-to-one conversation and send a message.
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
   const { allowed } = await rateLimit(`conv:${userId}`, 20, 60);
-  if (!allowed) return NextResponse.json({ error: "Zu viele Anfragen. Bitte kurz warten." }, { status: 429 });
+  if (!allowed) return NextResponse.json({ error: tResponse('System.m_35bd89251439') }, { status: 429 });
 
   const body = await req.json().catch(() => null);
   const { listing_id, listing_title, listing_type, receiver_id, content } = body ?? {};
   if (typeof receiver_id !== "string" || !receiver_id || typeof content !== "string" || !content.trim()) {
-    return NextResponse.json({ error: "Empfänger und Nachricht erforderlich" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_4e9578946ba1') }, { status: 400 });
   }
-  if (content.length > 5000) return NextResponse.json({ error: "Nachricht zu lang (max. 5000 Zeichen)" }, { status: 400 });
-  if (userId === receiver_id) return NextResponse.json({ error: "Du kannst dir selbst keine Nachricht senden" }, { status: 400 });
-  if (receiver_id === SUPPORT_ACTOR_ID) return NextResponse.json({ error: "CineGenius Support kann nur aus dem geschützten Supportpostfach schreiben." }, { status: 403 });
+  if (content.length > 5000) return NextResponse.json({ error: tResponse('System.m_f65be0fc77aa') }, { status: 400 });
+  if (userId === receiver_id) return NextResponse.json({ error: tResponse('System.m_bc535cf61b1f') }, { status: 400 });
+  if (receiver_id === SUPPORT_ACTOR_ID) return NextResponse.json({ error: tResponse('System.m_e1e12ad810ee') }, { status: 403 });
 
   const { data: receiverSettings, error: settingsError } = await db
     .from("user_settings")
     .select("message_permission")
     .eq("user_id", receiver_id)
     .maybeSingle();
-  if (settingsError) return NextResponse.json({ error: "Nachrichteneinstellungen konnten nicht geprüft werden." }, { status: 500 });
+  if (settingsError) return NextResponse.json({ error: tResponse('System.m_44480805a269') }, { status: 500 });
   if (receiverSettings?.message_permission === "friends_only" && !(await areAcceptedFriends(userId, receiver_id))) {
-    return NextResponse.json({ error: "Diese Person nimmt Nachrichten nur von Freunden an." }, { status: 403 });
+    return NextResponse.json({ error: tResponse('System.m_3d26f80efc50') }, { status: 403 });
   }
-  if (await anyBlockExists(userId, receiver_id)) return NextResponse.json({ error: "Nachrichten an diesen Nutzer sind nicht möglich" }, { status: 403 });
+  if (await anyBlockExists(userId, receiver_id)) return NextResponse.json({ error: tResponse('System.m_0fc7245a4195') }, { status: 403 });
 
   const directPair = listing_id
     ? `and(sender_id.eq.${userId},receiver_id.eq.${receiver_id},listing_id.eq.${listing_id}),and(sender_id.eq.${receiver_id},receiver_id.eq.${userId},listing_id.eq.${listing_id})`
@@ -204,7 +207,7 @@ export async function POST(req: NextRequest) {
   let existingQuery = db.from("conversations").select("id").eq("kind", "direct").or(directPair);
   if (!listing_id) existingQuery = existingQuery.is("listing_id", null);
   const { data: existing, error: existingError } = await existingQuery.maybeSingle();
-  if (existingError) return NextResponse.json({ error: "Unterhaltung konnte nicht geprüft werden." }, { status: 500 });
+  if (existingError) return NextResponse.json({ error: tResponse('System.m_c453f2efc15a') }, { status: 500 });
 
   let conversationId = existing?.id;
   if (!conversationId) {
@@ -213,7 +216,7 @@ export async function POST(req: NextRequest) {
       .insert({ listing_id, listing_title, listing_type, sender_id: userId, receiver_id, kind: "direct", created_by: userId })
       .select("id")
       .single();
-    if (conversationError) return NextResponse.json({ error: "Unterhaltung konnte nicht erstellt werden." }, { status: 500 });
+    if (conversationError) return NextResponse.json({ error: tResponse('System.m_e4a5f92c24fe') }, { status: 500 });
     conversationId = conversation.id;
     const { error: membersError } = await db.from("conversation_members").insert([
       { conversation_id: conversationId, user_id: userId, role: "member" },
@@ -221,7 +224,7 @@ export async function POST(req: NextRequest) {
     ]);
     if (membersError) {
       await db.from("conversations").delete().eq("id", conversationId);
-      return NextResponse.json({ error: "Teilnehmer konnten nicht zur Unterhaltung hinzugefügt werden." }, { status: 500 });
+      return NextResponse.json({ error: tResponse('System.m_19e5ad79b203') }, { status: 500 });
     }
   }
 
@@ -230,7 +233,7 @@ export async function POST(req: NextRequest) {
     p_sender_id: userId,
     p_content: content.trim(),
   });
-  if (messageError) return NextResponse.json({ error: "Nachricht konnte nicht gesendet werden." }, { status: 500 });
+  if (messageError) return NextResponse.json({ error: tResponse('System.m_0949dcf4a579') }, { status: 500 });
 
   try {
     const [{ data: senderProfile }, { data: emailSettings }] = await Promise.all([

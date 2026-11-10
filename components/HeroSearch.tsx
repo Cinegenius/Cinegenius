@@ -3,15 +3,26 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, MapPin } from "lucide-react";
+import { useTranslations } from "next-intl";
 
-const tabs = [
-  { id: "locations", label: "Locations", placeholder: "Location suchen…",    href: "/locations" },
-  { id: "crew",      label: "Crew",      placeholder: "Fotograf, Kameramann…", href: "/creators" },
-  { id: "equipment", label: "Equipment", placeholder: "Kamera, Licht, Ton…",   href: "/props" },
-  { id: "jobs",      label: "Jobs",      placeholder: "Job oder Auftrag…",      href: "/jobs" },
-];
+
+
+
+
+function getLocalizedTabs(translate: (key: string) => string) {
+  return ([
+  { id: "locations", label: translate("nav.locations"), placeholder: translate("Ui.text_64869d31081bb8"),    href: "/locations" },
+  { id: "crew",      label: translate("nav.crew"),      placeholder: translate("Ui.text_323d7dd4417e20"), href: "/creators" },
+  { id: "equipment", label: translate("companies.groupAusstattung"), placeholder: translate("Ui.text_debf8074d5b54f"),   href: "/props" },
+  { id: "jobs",      label: translate("nav.jobs"),      placeholder: translate("Ui.text_73c2890fe0d243"),      href: "/jobs" },
+]);
+}
 
 export default function HeroSearch() {
+  const uiText = useTranslations();
+  const tabs = getLocalizedTabs(uiText);
+
+
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("locations");
   const [query, setQuery] = useState("");
@@ -71,7 +82,7 @@ export default function HeroSearch() {
             type="text"
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            placeholder="Stadt"
+            placeholder={uiText("creators.filterCity")}
             className="w-full py-4 text-sm bg-transparent focus:outline-none placeholder:text-text-muted text-text-primary"
           />
         </div>
@@ -80,10 +91,7 @@ export default function HeroSearch() {
         <button
           type="submit"
           className="m-1.5 px-3.5 sm:px-4 py-2.5 bg-[#C2F135] hover:bg-[#D6F96A] text-[#0A0A0A] font-bold text-sm rounded-full sm:rounded-lg transition-colors shrink-0 flex items-center gap-1.5"
-        >
-          <Search size={15} className="sm:w-3.5 sm:h-3.5" />
-          <span className="hidden sm:inline">Suchen</span>
-        </button>
+        >{uiText.rich("Ui.text_43abcbcce10e6d", { part1: () => (<Search size={15} className="sm:w-3.5 sm:h-3.5" />), part2: chunks => (<span className="hidden sm:inline">{chunks}</span>) })}</button>
       </form>
     </div>
   );

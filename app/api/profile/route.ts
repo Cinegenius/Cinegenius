@@ -15,6 +15,7 @@ import {
   retryWithoutMissingOptionalProfileColumns,
   selectOptionalProfileColumns,
 } from "@/lib/profile-db-compat";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // Stable columns that always exist in the profiles table
 const PROFILE_COLS = [
@@ -71,6 +72,7 @@ function isValidProfileTypes(value: unknown): value is string[] {
 }
 
 export async function GET() {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -81,7 +83,7 @@ export async function GET() {
     .eq("user_id", userId)
     .maybeSingle();
 
-  if (dbError) return privateNoStoreJson({ error: dbError.message }, 500);
+  if (dbError) return privateNoStoreJson({ error: tResponse('System.requestFailed') }, 500);
 
   let data = base;
   let unavailableFields: string[] = [];
@@ -94,8 +96,8 @@ export async function GET() {
       },
     );
     if (optionalResult.error) {
-      console.error("[profile GET] optional profile fields could not be read:", optionalResult.error);
-      return privateNoStoreJson({ error: optionalResult.error.message ?? "Optionale Profilfelder konnten nicht geladen werden.", code: optionalResult.error.code }, 500);
+      console.error("[profile GET] optional profile fields could not be read");
+      return privateNoStoreJson({ error: tResponse("System.requestFailed"), code: optionalResult.error.code }, 500);
     }
     data = Object.assign({}, base, optionalResult.data ?? {}) as typeof base;
     unavailableFields = optionalResult.unavailableFields;
@@ -118,12 +120,13 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
   const body = await req.json().catch(() => null);
-  if (!body) return NextResponse.json({ error: "Ungültiger Request-Body" }, { status: 400 });
+  if (!body) return NextResponse.json({ error: tResponse('System.m_9c5ea1715bd5') }, { status: 400 });
   const {
     display_name, bio, location, avatar_url, skills, memberships, portfolio_url, positions,
     portfolio_images, profile_images, experience, profile_types, profile_type, slug, phone, contact_email,
@@ -133,7 +136,7 @@ export async function POST(req: NextRequest) {
   } = body;
 
   if (focal_point !== undefined && !validProfileFocalPoint(focal_point)) {
-    return NextResponse.json({ error: "Ungültige Bildeinstellungen. Bitte prüfe Coverposition und Helligkeit." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_a9e61c5f5c7e') }, { status: 400 });
   }
 
   const place = typeof location === "string" ? await profilePlaceFields(userId, location, body.selected_place_city_id) : null;
@@ -142,10 +145,10 @@ export async function POST(req: NextRequest) {
   if (typeof display_name !== "string" || !display_name.trim()) fieldErrors.display_name = "Bitte gib deinen Namen ein.";
   if (typeof location !== "string" || !String(place?.fields?.place_city_name ?? '').trim()) fieldErrors.location = "Bitte gib deinen Standort ein.";
   if (profile_type !== undefined && !isValidProfileType(profile_type)) {
-    return NextResponse.json({ error: "Ungültiger Profiltyp." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_39a06a4868c7') }, { status: 400 });
   }
   if (profile_types !== undefined && !isValidProfileTypes(profile_types)) {
-    return NextResponse.json({ error: "Ungültige Profiltypen." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_61d340f2b8c0') }, { status: 400 });
   }
   const normalizedProfileTypes = normalizeProfileTypes(profile_types ?? [], profile_type ?? null);
   const primaryError = primaryOccupationError(crew, positions) ?? crewOccupationsError(crew, positions);
@@ -153,7 +156,7 @@ export async function POST(req: NextRequest) {
   const hasPositions = Array.isArray(positions) && positions.some((position: unknown) => typeof position === "string" && position.trim());
   if (!hasPositions && normalizedProfileTypes.length === 0) fieldErrors.activity = "Bitte wähle mindestens eine Tätigkeit aus.";
   if (Object.keys(fieldErrors).length > 0) {
-    return NextResponse.json({ error: "Bitte prüfe die markierten Pflichtfelder.", fieldErrors }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_09c9f4d72a9a'), fieldErrors }, { status: 400 });
   }
   const requestedPrimary = normalizedProfileTypes[0] ?? null;
 
@@ -161,7 +164,7 @@ export async function POST(req: NextRequest) {
   if (slug && String(slug).trim()) {
     normalizedSlug = String(slug).trim().toLowerCase();
     if (!/^[a-z0-9_-]{3,64}$/.test(normalizedSlug)) {
-      return NextResponse.json({ error: "Profil-URL ungültig (3–64 Zeichen, nur a-z, 0-9, _ und -)" }, { status: 400 });
+      return NextResponse.json({ error: tResponse('System.m_d241d7b26773') }, { status: 400 });
     }
     const { data: conflict } = await db
       .from("profiles")
@@ -169,7 +172,7 @@ export async function POST(req: NextRequest) {
       .eq("slug", normalizedSlug)
       .neq("user_id", userId)
       .maybeSingle();
-    if (conflict) return NextResponse.json({ error: "Profil-URL ist bereits vergeben" }, { status: 409 });
+    if (conflict) return NextResponse.json({ error: tResponse('System.m_edf88737f30c') }, { status: 409 });
   }
 
   const payload: Record<string, unknown> = {
@@ -226,14 +229,14 @@ export async function POST(req: NextRequest) {
     },
   );
   if (saveResult.error) {
-    console.error("[profile POST]", saveResult.error);
-    return NextResponse.json({ error: saveResult.error.message ?? "Profil konnte nicht gespeichert werden.", code: saveResult.error.code }, { status: 500 });
+    console.error("[profile POST] database save failed");
+    return NextResponse.json({ error: tResponse("System.requestFailed"), code: saveResult.error.code }, { status: 500 });
   }
   const data = saveResult.data;
   const unavailableFields = saveResult.unavailableFields;
 
   if (!data) {
-    return NextResponse.json({ error: "Profil konnte nicht gespeichert werden." }, { status: 500 });
+    return NextResponse.json({ error: tResponse('System.m_9ab61ef20592') }, { status: 500 });
   }
 
   // Mark profile as complete in Clerk metadata (best-effort — JWT refresh takes ~60s)
@@ -242,8 +245,8 @@ export async function POST(req: NextRequest) {
     await clerk.users.updateUserMetadata(userId, {
       publicMetadata: { profileComplete: true },
     });
-  } catch (e) {
-    console.error("[profile POST] failed to set Clerk metadata:", e);
+  } catch {
+    console.error("[profile POST] failed to set Clerk metadata");
   }
   // Welcome email is sent by the Clerk webhook (user.created) — no duplicate here
 
@@ -278,29 +281,30 @@ const ALLOWED_PATCH_KEYS = new Set([
 ]);
 
 export async function PATCH(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   try {
     const authResult = await requireAuth();
     if (authResult instanceof NextResponse) return authResult;
     const { userId } = authResult;
 
     const body = await req.json().catch(() => null);
-    if (!body) return NextResponse.json({ error: "Ungültiger Request-Body" }, { status: 400 });
+    if (!body) return NextResponse.json({ error: tResponse('System.m_9c5ea1715bd5') }, { status: 400 });
 
     // Only pass known columns to Supabase to avoid "column does not exist" errors
     const safe = Object.fromEntries(
       Object.entries(body).filter(([k]) => ALLOWED_PATCH_KEYS.has(k))
     );
     if (Object.keys(safe).length === 0) {
-      return NextResponse.json({ error: "Keine unterstützten Profiländerungen erhalten." }, { status: 400 });
+      return NextResponse.json({ error: tResponse('System.m_f1389f5a0bd3') }, { status: 400 });
     }
     if ("focal_point" in safe && !validProfileFocalPoint(safe.focal_point)) {
-      return NextResponse.json({ error: "Ungültige Bildeinstellungen. Bitte prüfe Coverposition und Helligkeit." }, { status: 400 });
+      return NextResponse.json({ error: tResponse('System.m_a9e61c5f5c7e') }, { status: 400 });
     }
     if ("profile_type" in safe && !isValidProfileType(safe.profile_type)) {
-      return NextResponse.json({ error: "Ungültiger Profiltyp." }, { status: 400 });
+      return NextResponse.json({ error: tResponse('System.m_39a06a4868c7') }, { status: 400 });
     }
     if ("profile_types" in safe && !isValidProfileTypes(safe.profile_types)) {
-      return NextResponse.json({ error: "Ungültige Profiltypen." }, { status: 400 });
+      return NextResponse.json({ error: tResponse('System.m_61d340f2b8c0') }, { status: 400 });
     }
     if ("profile_types" in safe) {
       const normalizedTypes = normalizeProfileTypes(safe.profile_types as string[], safe.profile_type as string | null | undefined);
@@ -323,7 +327,7 @@ export async function PATCH(req: NextRequest) {
       // PATCH leaves omitted fields unchanged. Validate the resulting activity
       // selection rather than treating those saved fields as empty.
       const current = await db.from("profiles").select("positions, profile_type").eq("user_id", userId).maybeSingle();
-      if (current.error) return privateNoStoreJson({ error: current.error.message, code: current.error.code }, 500);
+      if (current.error) return privateNoStoreJson({ error: tResponse("System.requestFailed"), code: current.error.code }, 500);
       const optional = await selectOptionalProfileColumns<Record<string, unknown>>(
         ["profile_types"],
         async (projection) => {
@@ -331,7 +335,7 @@ export async function PATCH(req: NextRequest) {
           return { data: result.data as Record<string, unknown> | null, error: result.error };
         },
       );
-      if (optional.error) return privateNoStoreJson({ error: optional.error.message, code: optional.error.code }, 500);
+      if (optional.error) return privateNoStoreJson({ error: tResponse("System.requestFailed"), code: optional.error.code }, 500);
       const activity: Record<string, unknown> = { ...current.data, ...optional.data, ...safe };
       const hasPositions = Array.isArray(activity.positions) && activity.positions.some((position) => typeof position === "string" && position.trim());
       const types = normalizeProfileTypes(
@@ -343,7 +347,7 @@ export async function PATCH(req: NextRequest) {
     const primaryError = primaryOccupationError(safe.crew, safe.positions) ?? crewOccupationsError(safe.crew, safe.positions);
     if (primaryError) fieldErrors.activity = primaryError;
     if (Object.keys(fieldErrors).length > 0) {
-      return NextResponse.json({ error: "Bitte prüfe die markierten Pflichtfelder.", fieldErrors }, { status: 400 });
+      return NextResponse.json({ error: tResponse('System.m_09c9f4d72a9a'), fieldErrors }, { status: 400 });
     }
 
     if (place?.fields) Object.assign(safe, place.fields);
@@ -358,7 +362,7 @@ export async function PATCH(req: NextRequest) {
       } else {
         const slug = String(rawSlug).trim().toLowerCase();
         if (!/^[a-z0-9_-]{3,64}$/.test(slug)) {
-          return NextResponse.json({ error: "Slug ungültig (3–64 Zeichen, nur a-z, 0-9, _ und -)" }, { status: 400 });
+          return NextResponse.json({ error: tResponse('System.m_c17fa5e7a5fb') }, { status: 400 });
         }
         const { data: conflict } = await db
           .from("profiles")
@@ -367,7 +371,7 @@ export async function PATCH(req: NextRequest) {
           .neq("user_id", userId)
           .maybeSingle();
         if (conflict) {
-          return NextResponse.json({ error: "Slug ist bereits vergeben" }, { status: 409 });
+          return NextResponse.json({ error: tResponse('System.m_cfcff78f63f5') }, { status: 409 });
         }
         safe.slug = slug;
       }
@@ -385,18 +389,18 @@ export async function PATCH(req: NextRequest) {
     );
 
     if (saveResult.error) {
-      console.error("[profile PATCH] error:", JSON.stringify(saveResult.error));
-      return NextResponse.json({ error: saveResult.error.message ?? "Profil konnte nicht gespeichert werden.", code: saveResult.error.code }, { status: 500 });
+      console.error("[profile PATCH] database save failed");
+      return NextResponse.json({ error: tResponse("System.requestFailed"), code: saveResult.error.code }, { status: 500 });
     }
-    if (!saveResult.data) return NextResponse.json({ error: "Profil nicht gefunden. Bitte zuerst das Profil anlegen." }, { status: 404 });
+    if (!saveResult.data) return NextResponse.json({ error: tResponse('System.m_80b5e901d33c') }, { status: 404 });
 
     revalidateTag("profiles", { expire: 0 });
     if (saveResult.unavailableFields.length > 0) {
       return NextResponse.json({ success: true, unavailableFields: saveResult.unavailableFields });
     }
     return NextResponse.json({ success: true, unavailableFields: [] });
-  } catch (err) {
-    console.error("[profile PATCH] uncaught:", err);
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+  } catch {
+    console.error("[profile PATCH] unexpected failure");
+    return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   }
 }

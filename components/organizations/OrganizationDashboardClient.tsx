@@ -42,6 +42,8 @@ function localDate(value: string | null) {
 }
 
 export default function OrganizationDashboardClient({ initialWorkspace, responsiblePerson }: { initialWorkspace: Workspace; responsiblePerson: ResponsiblePerson }) {
+  const uiText = useTranslations();
+
   const t = useTranslations("Organizations");
   const places = useTranslations("Places");
   const [workspace, setWorkspace] = useState(initialWorkspace);

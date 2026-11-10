@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useLocale , useTranslations } from "next-intl";
+
 
 type Location = {
   id: string; title: string; type: string; city: string;
@@ -69,6 +71,10 @@ function buildClusters(locations: Location[], map: L.Map, pixelRadius = 60): Clu
 export default function LocationMap({
   locations, activeId, onHover, userLocation, radiusKm,
 }: Props) {
+  const uiText = useTranslations();
+
+  const uiLocale = useLocale();
+
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const layerGroupRef = useRef<L.LayerGroup | null>(null);
@@ -137,7 +143,7 @@ export default function LocationMap({
                 <div style="font-size:11px;color:#9e9e9e;margin-bottom:8px">${loc.city} · ${loc.type}</div>
                 <div style="display:flex;align-items:center;justify-content:space-between">
                   <span style="font-size:11px;color:#9e9e9e">★ ${loc.rating} (${loc.reviews})</span>
-                  <span style="font-size:13px;font-weight:700;color:#C2F135">${loc.price.toLocaleString("de-DE")} €/Tag</span>
+                  <span style="font-size:13px;font-weight:700;color:#C2F135">${loc.price.toLocaleString(uiLocale)} €/Tag</span>
                 </div>
                 <a href="/locations/${loc.id}" style="
                   display:block;
@@ -304,7 +310,7 @@ export default function LocationMap({
       });
       userMarkerRef.current = L.marker(userLocation, { icon: userIcon })
         .addTo(map)
-        .bindPopup("<span style='color:#f0ede8;font-size:12px;font-family:Inter'>Dein Standort</span>");
+        .bindPopup(Object.assign(document.createElement("span"), { textContent: uiText("Ui.text_950aed2ce22f69"), style: "color:#f0ede8;font-size:12px;font-family:Inter" }));
 
       circleRef.current = L.circle(userLocation, {
         radius: radiusKm * 1000,

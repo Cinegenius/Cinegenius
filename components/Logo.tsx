@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
+
 
 // CineGenius signature chevron: a softened forward mark, kept simple for small headers.
 // A clear forward mark that stays legible in compact headers.
@@ -27,6 +29,8 @@ function ChevronMark({ size = 28 }: { size?: number }) {
 }
 
 export function Logo({ href = "/", onClick }: { href?: string; onClick?: () => void }) {
+  const uiText = useTranslations();
+
   const pathname = usePathname();
 
   function handleClick() {
@@ -41,14 +45,8 @@ export function Logo({ href = "/", onClick }: { href?: string; onClick?: () => v
       href={href}
       onClick={handleClick}
       className="flex items-center gap-2.5 max-[420px]:gap-1 shrink-0 group"
-      aria-label="CineGenius"
-    >
-      <ChevronMark size={28} />
-      <span className="font-sans text-[16px] max-[420px]:text-[14px] max-[360px]:text-[13px] leading-none select-none tracking-[-0.035em]">
-        <span className="font-medium text-text-primary">Cine</span>
-        <span className="font-bold" style={{ color: "var(--color-gold)" }}>Genius</span>
-      </span>
-    </Link>
+      aria-label={uiText("AdminNewsletter.brandName")}
+    >{uiText.rich("Ui.text_44b6b8362d2bfa", { part1: () => (<ChevronMark size={28} />), part3: chunks => (<span className="font-medium text-text-primary">{chunks}</span>), part4: chunks => (<span className="font-bold" style={{ color: "var(--color-gold)" }}>{chunks}</span>), part2: chunks => (<span className="font-sans text-[16px] max-[420px]:text-[14px] max-[360px]:text-[13px] leading-none select-none tracking-[-0.035em]">{chunks}</span>) })}</Link>
   );
 }
 

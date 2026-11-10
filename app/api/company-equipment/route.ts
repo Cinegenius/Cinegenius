@@ -6,15 +6,17 @@ import { getCurrentUser, requireAuth } from "@/lib/auth";
 import { hasCompanyCapability } from "@/lib/company-access";
 import { canPersistCompanyImages } from "@/lib/company-media";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 const admin = db;
 
 export async function GET(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const companyId = req.nextUrl.searchParams.get("company_id");
   const category  = req.nextUrl.searchParams.get("category");
-  if (!companyId) return NextResponse.json({ error: "company_id fehlt" }, { status: 400 });
+  if (!companyId) return NextResponse.json({ error: tResponse('System.m_71d566d71666') }, { status: 400 });
   const caller = await getCurrentUser();
-  if (!caller || !(await hasCompanyCapability(companyId, caller.userId, "read"))) return NextResponse.json({ error: "Keine Berechtigung" }, { status: 403, headers: { "Cache-Control": "private, no-store" } });
+  if (!caller || !(await hasCompanyCapability(companyId, caller.userId, "read"))) return NextResponse.json({ error: tResponse('System.m_df847a54c928') }, { status: 403, headers: { "Cache-Control": "private, no-store" } });
 
   let query = admin
     .from("company_equipment")
@@ -25,11 +27,12 @@ export async function GET(req: NextRequest) {
   if (category && category !== "alle") query = query.eq("category", category);
 
   const { data, error } = await query;
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   return NextResponse.json({ data: data ?? [] }, { headers: { "Cache-Control": "private, no-store" } });
 }
 
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -39,14 +42,14 @@ export async function POST(req: NextRequest) {
   const { company_id, category, name } = body;
 
   if (!company_id || !category || !name?.trim())
-    return NextResponse.json({ error: "company_id, category und name sind Pflicht" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_6f654a69f9b6') }, { status: 400 });
 
   const storageUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
   const initialImages = body.images ?? [];
-  if (!canPersistCompanyImages(initialImages, [], userId, storageUrl)) return NextResponse.json({ error: "Die Bilder müssen aus eigenen CineGenius-Uploads stammen (maximal 12 Fotos)." }, { status: 400 });
+  if (!canPersistCompanyImages(initialImages, [], userId, storageUrl)) return NextResponse.json({ error: tResponse('System.m_328eb718bb3a') }, { status: 400 });
 
   if (!(await hasCompanyCapability(company_id, userId, "edit_offers")))
-    return NextResponse.json({ error: "Keine Berechtigung" }, { status: 403 });
+    return NextResponse.json({ error: tResponse('System.m_df847a54c928') }, { status: 403 });
 
   const { data, error } = await admin
     .from("company_equipment")
@@ -80,12 +83,13 @@ export async function POST(req: NextRequest) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   revalidatePath("/", "layout");
   return NextResponse.json({ data }, { headers: { "Cache-Control": "private, no-store" } });
 }
 
 export async function PATCH(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -93,11 +97,11 @@ export async function PATCH(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   if (attemptedApproval(body)) return NextResponse.json({ error: (await getTranslations("OfferModeration"))("adminOnly") }, { status: 403 });
   const { id } = body;
-  if (!id) return NextResponse.json({ error: "id fehlt" }, { status: 400 });
+  if (!id) return NextResponse.json({ error: tResponse('System.m_4b8591045313') }, { status: 400 });
 
   const { data: eq } = await admin.from("company_equipment").select("company_id, images").eq("id", id).single();
   if (!eq || !(await hasCompanyCapability(eq.company_id, userId, "edit_offers")))
-    return NextResponse.json({ error: "Keine Berechtigung" }, { status: 403 });
+    return NextResponse.json({ error: tResponse('System.m_df847a54c928') }, { status: 403 });
 
   const fields: Record<string, unknown> = {};
   const stringFields = ["category", "subcategory", "name", "brand", "model", "description", "condition", "currency"] as const;
@@ -111,31 +115,32 @@ export async function PATCH(req: NextRequest) {
     if (body[key] === null || (typeof body[key] === "number" && Number.isFinite(body[key]))) fields[key] = body[key];
   }
   if (Array.isArray(body.images) && body.images.every((image: unknown) => typeof image === "string")) fields.images = body.images;
-  if (!Object.keys(fields).length) return NextResponse.json({ error: "Keine gültigen Änderungen angegeben" }, { status: 400 });
-  if ("name" in fields && !(fields.name as string)) return NextResponse.json({ error: "Der Name darf nicht leer sein." }, { status: 400 });
+  if (!Object.keys(fields).length) return NextResponse.json({ error: tResponse('System.m_72aca14f3d9b') }, { status: 400 });
+  if ("name" in fields && !(fields.name as string)) return NextResponse.json({ error: tResponse('System.m_ed2d830d4848') }, { status: 400 });
   if ("images" in fields && !canPersistCompanyImages(fields.images, eq.images, userId, process.env.NEXT_PUBLIC_SUPABASE_URL ?? "")) {
-    return NextResponse.json({ error: "Die Bilder müssen bereits gespeichert oder eigene CineGenius-Uploads sein (maximal 12 Fotos)." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_0794013c24e7') }, { status: 400 });
   }
 
   const { data, error } = await admin.from("company_equipment").update({ ...fields, last_editor_id: userId }).eq("id", id).select().single();
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   revalidatePath("/", "layout");
   return NextResponse.json({ data }, { headers: { "Cache-Control": "private, no-store" } });
 }
 
 export async function DELETE(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
   const id = req.nextUrl.searchParams.get("id");
-  if (!id) return NextResponse.json({ error: "id fehlt" }, { status: 400 });
+  if (!id) return NextResponse.json({ error: tResponse('System.m_4b8591045313') }, { status: 400 });
 
   const { data: eq } = await admin.from("company_equipment").select("company_id").eq("id", id).single();
   if (!eq || !(await hasCompanyCapability(eq.company_id, userId, "edit_offers")))
-    return NextResponse.json({ error: "Keine Berechtigung" }, { status: 403 });
+    return NextResponse.json({ error: tResponse('System.m_df847a54c928') }, { status: 403 });
 
   const { error } = await admin.from("company_equipment").delete().eq("id", id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   return NextResponse.json({ success: true });
 }

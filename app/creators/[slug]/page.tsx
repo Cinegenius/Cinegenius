@@ -1,3 +1,5 @@
+import { taxonomyLabel } from "@/lib/departments";
+import { getTranslations as getPageTranslations } from "next-intl/server";
 import { canViewProfile } from "@/lib/trust";
 import JsonLd from "@/components/JsonLd";
 import { notFound, redirect } from "next/navigation";
@@ -9,6 +11,8 @@ import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { Lock, ArrowLeft } from "lucide-react";
 import CreatorDetail from "@/components/CreatorDetail";
+import { getTranslations } from "next-intl/server";
+
 
 // Dynamic because of auth()
 
@@ -46,8 +50,8 @@ async function _getCreator(slug: string) {
       }
       return {
         id: listing.id,
-        name: listing.title ?? "Creator",
-        role: listing.category ?? "Filmschaffende/r",
+        name: listing.title ?? "",
+        role: listing.category ?? "",
         location: listing.city ?? "",
         image: listing.image_url ?? "",
         avatar: listing.image_url ?? "",
@@ -79,19 +83,26 @@ async function _getCreator(slug: string) {
   }
 }
 
-const getCreator = unstable_cache(_getCreator, ["creator"], { revalidate: 300, tags: ["listings", "profiles"] });
+const getCreatorData = unstable_cache(_getCreator, ["creator"], { revalidate: 300, tags: ["listings", "profiles"] });
+async function getCreator(slug: string) {
+  const creator = await getCreatorData(slug);
+  if (!creator) return null;
+  const translate = await getTranslations();
+  return { ...creator, name: creator.name || translate("Ui.text_88447b83090cde"), role: creator.role ? taxonomyLabel(creator.role, translate) : translate("creators.defaultRole") };
+}
 
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
+  const pageCopy = await getPageTranslations("PageCopy");
   const { slug } = await params;
   const creator = await getCreator(slug);
   if (!creator || !await canViewProfile(creator.ownerId, null)) return {};
   return {
     title: `${creator.name} — ${creator.role}`,
-    description: `${creator.name} ist ${creator.role} aus ${creator.location}. Jetzt auf CineGenius anfragen.`,
+    description: pageCopy("p_c2b9b41e4402", { value0: String(creator.name), value1: String(creator.role), value2: String(creator.location) }),
     openGraph: {
       title: `${creator.name} | CineGenius`,
       description: `${creator.role} · ${creator.location}`,
@@ -105,6 +116,9 @@ export default async function CreatorProfilePage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  const pageCopy = await getPageTranslations("PageCopy");
+  const uiText = await getTranslations();
+
   const { slug } = await params;
   const creator = await getCreator(slug);
   if (!creator) notFound();
@@ -150,19 +164,13 @@ export default async function CreatorProfilePage({
             <Lock size={24} className="text-text-muted" />
           </div>
           <div>
-            <h1 className="font-display text-2xl font-bold text-text-primary mb-2">
-              Dieses Profil ist privat
-            </h1>
-            <p className="text-sm text-text-muted">
-              Nur Freunde von {creator.name} können dieses Profil sehen.
-            </p>
+            <h1 className="font-display text-2xl font-bold text-text-primary mb-2">{uiText("Ui.text_07dc97aeb97819")}</h1>
+            <p className="text-sm text-text-muted">{uiText.rich("Ui.text_c70c2a9f1232e3", { value1: () => (creator.name) })}</p>
           </div>
           <Link
             href="/creators"
             className="inline-flex items-center gap-2 text-gold hover:text-gold-light text-sm font-medium transition-colors"
-          >
-            <ArrowLeft size={14} /> Zurück zu Filmschaffenden
-          </Link>
+          >{uiText.rich("Ui.text_290a371c03a78e", { part1: () => (<ArrowLeft size={14} />) })}</Link>
         </div>
       </div>
     );
@@ -190,13 +198,13 @@ export default async function CreatorProfilePage({
     "@type": "Person",
     "name": creator.name,
     "jobTitle": positions[0],
-    "description": ("bio" in creator && creator.bio) ? String(creator.bio) : `${creator.role} aus ${creator.location}`,
+    "description": ("bio" in creator && creator.bio) ? String(creator.bio) : pageCopy("p_4a0b30e98e18", { value0: String(creator.role), value1: String(creator.location) }),
     "image": creator.image,
     "addressLocality": creator.location,
     "knowsAbout": "skills" in creator ? creator.skills : [],
     "offers": {
       "@type": "Offer",
-      "description": `${positions.join(", ")} für Film- und Medienproduktionen`,
+      "description": pageCopy("p_cb39ea605950", { value0: String(positions.join(", ")) }),
     },
   };
 

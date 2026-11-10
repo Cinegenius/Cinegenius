@@ -5,13 +5,17 @@ import { fetchRatings } from "@/lib/ratings";
 import LocationsContent from "../LocationsContent";
 import PageHeader from "@/components/PageHeader";
 import { getTranslations, getLocale } from "next-intl/server";
+import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  title: "Locations suchen — Filmlocations in Deutschland",
-  description: "Finde die perfekte Location für dein Filmprojekt: Apartments, Villen, Industriehallen, Studios, Außengeländen und mehr.",
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const tMetadata = await getMetadataTranslations("Metadata");
+  return {
+  title: tMetadata('m_b33aecdb6128'),
+  description: tMetadata('m_457f6cc0d6a8'),
 };
+}
 
 async function geocodeCities(cities: string[]): Promise<Record<string, { lat: number; lng: number }>> {
   const unique = [...new Set(cities.filter(Boolean))];
@@ -32,6 +36,8 @@ async function geocodeCities(cities: string[]): Promise<Record<string, { lat: nu
 }
 
 export default async function LocationsSuchePage({searchParams}:{searchParams:Promise<Record<string,string|string[]|undefined>>}) {
+  const uiText = await getTranslations();
+
   const params=await searchParams;
   const locale = await getLocale();
   const t = await getTranslations("locations");
@@ -45,7 +51,7 @@ export default async function LocationsSuchePage({searchParams}:{searchParams:Pr
     .order("created_at", { ascending: false })
     .limit(300);
 
-  if (error) throw new Error("Locationsuche: Inserate konnten nicht geladen werden.");
+  if (error) throw new Error(uiText("Ui.text_08c1ec68ea0a40"));
 
   const rows = data ?? [];
   const [ratingsMap, coords] = await Promise.all([
@@ -77,11 +83,11 @@ export default async function LocationsSuchePage({searchParams}:{searchParams:Pr
   return (
     <div className="min-h-screen bg-bg-primary">
       <PageHeader
-        badge="Filmlocations Deutschland"
+        badge={uiText("Ui.text_6cd5097a3ae37a")}
         title={t("heroTitle")}
         titleHighlight={t("heroTitleHighlight")}
         description={t("heroDesc")}
-        ctaSecondary={{ label: "Zurück zur Übersicht", href: "/locations" }}
+        ctaSecondary={{ label: uiText("Ui.text_4f89a48cdb4470"), href: "/locations" }}
       />
       <div className="site-content-width">
         <LocationsContent serverListings={serverListings} />

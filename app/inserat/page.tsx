@@ -1,8 +1,11 @@
 "use client";
 
 import PlaceField from "@/components/PlaceField";
+import { LOCATION_ROOMS } from "@/lib/location-rooms";
+import { taxonomyLabel } from "@/lib/departments";
+import { projectTypeLabel, roleOptionMatchesSearch } from "@/lib/project-type-labels";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
-import { useTranslations } from "next-intl";
+import { useTranslations , useLocale } from "next-intl";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 import ResponsiblePersonFields, { focusResponsiblePerson } from "@/components/ResponsiblePersonFields";
 import { NEW_RESPONSIBLE_PERSON, responsiblePersonDraft, responsiblePersonErrors, marketplaceResponsibleErrors, type ResponsiblePerson } from "@/lib/responsible-person";
@@ -38,8 +41,95 @@ import ListingImageManager from "@/components/ListingImageManager";
 import { MAX_LOCATION_IMAGES } from "@/lib/listing-image-gallery";
 import { ProductionCreditsEditor } from "@/components/ProductionCredits";
 import { serializeProductionCredits, type ProductionCreditDraft } from "@/lib/production-credits";
+import { uiErrorMessage } from "@/lib/ui-error-message";
 
 // ─── FormSelect ──────────────────────────────────────────────────────────────
+
+
+function getLocalizedGroups(translate: (key: string) => string): Group[] {
+  return ([
+  {
+    id: "jobs",
+    label: translate("nav.jobs"),
+    desc: translate("Ui.text_ddb5c8f8db58cc"),
+    color: "text-emerald-400",
+    border: "border-emerald-500/30",
+    items: [
+      ...FILM_DEPARTMENTS.map((d) => ({
+        id: `job_${d.id}`,
+        label: d.label,
+        icon: deptMeta[d.id]?.icon ?? Users,
+        type: "job" as const,
+        category: d.label,
+        color: deptMeta[d.id]?.color ?? "text-text-secondary",
+        bg: deptMeta[d.id]?.bg ?? "bg-bg-elevated border-border",
+      })),
+      { id: "job_praktikum",      label: translate("Ui.text_fccd60340eba02"),    icon: GraduationCap, type: "job" as const, category: "Praktikum",        color: "text-gold",        bg: "bg-gold/10 border-gold/20" },
+      { id: "job_projekt",        label: translate("Ui.text_f4cb34fbdffe06"),  icon: Film,          type: "job" as const, category: "Projekt",          color: "text-indigo-400",  bg: "bg-indigo-500/10 border-indigo-500/20" },
+    ],
+  },
+  {
+    id: "marktplatz",
+    label: translate("nav.marketplace"),
+    desc: translate("Ui.text_7cca36ae82d017"),
+    color: "text-violet-400",
+    border: "border-violet-500/30",
+    items: [
+      // Film Equipment
+      { id: "mk_fahrzeuge",           label: translate("Ui.text_3013f219634d4b"),        sub: translate("Ui.text_bd3383ef531ec9"),       icon: Car,         type: "vehicle", category: "Bild-Fahrzeug",          color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/20" },
+      { id: "mk_produktionsfahrzeug", label: translate("Ui.text_b1ea23191f1202"), sub: translate("Ui.text_08478634222825"),     icon: Truck,       type: "vehicle", category: "Produktionsfahrzeug",     color: "text-cyan-400",    bg: "bg-cyan-500/10 border-cyan-500/20" },
+      { id: "mk_kostuem",        label: translate("Ui.text_6ee06a9e4b3d9f"),     sub: translate("Ui.text_d76fdd5d5a61ec"),     icon: Shirt,       type: "prop",    category: "Kostüme",              color: "text-rose-400",    bg: "bg-rose-500/10 border-rose-500/20" },
+      { id: "mk_requisiten",     label: translate("Ui.text_4087dad4203804"),   sub: translate("Ui.text_570e97d79bd9cb"),    icon: Package,     type: "prop",    category: "Requisiten",           color: "text-violet-400",  bg: "bg-violet-500/10 border-violet-500/20" },
+      { id: "mk_moebel",         label: translate("Ui.text_eeb6822165e195"),    sub: translate("Ui.text_4666aa6dbb971c"),         icon: Layers,      type: "prop",    category: "Möbel / Szenenbild",   color: "text-indigo-400",  bg: "bg-indigo-500/10 border-indigo-500/20" },
+      { id: "mk_kamera",         label: translate("Ui.text_cc36de65a905b5"),       sub: translate("Ui.text_68b9df4b39c6a1"),     icon: Camera,      type: "prop",    category: "Kameraequipment",      color: "text-sky-400",     bg: "bg-sky-500/10 border-sky-500/20" },
+      { id: "mk_licht",          label: translate("Ui.text_bf27165988c5fd"),    sub: translate("Ui.text_fced44838fd67c"),     icon: Lightbulb,   type: "prop",    category: "Lichttechnik",         color: "text-amber-400",   bg: "bg-amber-500/10 border-amber-500/20" },
+      { id: "mk_ton",            label: translate("MarketplaceCatalog.categories.ton"),            sub: translate("Ui.text_c29720372a4d49"),        icon: Mic,         type: "prop",    category: "Ton & Audio",          color: "text-teal-400",    bg: "bg-teal-500/10 border-teal-500/20" },
+      { id: "mk_grip",           label: translate("Ui.text_ec55afb53067c0"),       sub: translate("Ui.text_17eef19102abe5"),        icon: Wrench,      type: "prop",    category: "Grip & Rigging",       color: "text-slate-400",   bg: "bg-slate-500/10 border-slate-500/20" },
+      { id: "mk_produktion",     label: translate("Ui.text_776c43d3a86a19"),     sub: translate("Ui.text_aefe8847983c06"),           icon: Box,         type: "prop",    category: "Produktionsausstattung",color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
+      // Foto Equipment
+      { id: "mk_fotoequipment",  label: translate("Ui.text_ba598ff19dfdbe"),         sub: translate("Ui.text_c1c76fec1aabaf"),  icon: Aperture,    type: "prop",    category: "Fotoequipment",        color: "text-cyan-400",    bg: "bg-cyan-500/10 border-cyan-500/20" },
+      { id: "mk_backdrops",      label: translate("Ui.text_d845b16dde904e"),  sub: translate("Ui.text_08781a09a486ec"),         icon: ImageIcon,   type: "prop",    category: "Backdrops",            color: "text-lime-400",    bg: "bg-lime-500/10 border-lime-500/20" },
+      // Creator / Social
+      { id: "mk_contentsets",    label: translate("Ui.text_30a8358057c4c7"),   sub: translate("Ui.text_19b6bf4712a00a"),icon: Smartphone,  type: "prop",    category: "Content Sets",         color: "text-purple-400",  bg: "bg-purple-500/10 border-purple-500/20" },
+    ],
+  },
+  {
+    id: "tiere",
+    label: translate("menu.marketAnimals"),
+    desc: translate("Ui.text_d8237265372606"),
+    color: "text-amber-400",
+    border: "border-amber-500/30",
+    items: [
+      { id: "tier_hunde",    label: translate("FilmAnimals.species.dogs"),          sub: translate("Ui.text_7fb2aa8e26457b"),   icon: PawPrint, type: "animal" as const, category: "Hunde",          color: "text-amber-400",   bg: "bg-amber-500/10 border-amber-500/20" },
+      { id: "tier_pferde",   label: translate("FilmAnimals.species.horses"), sub: translate("Ui.text_bf0f2753f5663d"),         icon: PawPrint, type: "animal" as const, category: "Pferde",         color: "text-stone-400",   bg: "bg-stone-500/10 border-stone-500/20" },
+      { id: "tier_katzen",   label: translate("FilmAnimals.species.cats"),         sub: translate("Ui.text_920a58e9d28f85"),    icon: PawPrint, type: "animal" as const, category: "Katzen",         color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/20" },
+      { id: "tier_voegel",   label: translate("FilmAnimals.species.birds"),          sub: translate("Ui.text_56bff4fc63866e"),         icon: PawPrint, type: "animal" as const, category: "Vögel",          color: "text-sky-400",     bg: "bg-sky-500/10 border-sky-500/20" },
+      { id: "tier_reptilien",label: translate("FilmAnimals.species.reptiles"),      sub: translate("Ui.text_c432c94f617b26"),       icon: PawPrint, type: "animal" as const, category: "Reptilien",      color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
+      { id: "tier_nutztiere",label: translate("FilmAnimals.species.livestock"),      sub: translate("Ui.text_4b99d427345753"),        icon: PawPrint, type: "animal" as const, category: "Nutztiere",      color: "text-lime-400",    bg: "bg-lime-500/10 border-lime-500/20" },
+      { id: "tier_exoten",   label: translate("FilmAnimals.species.exotics"),         sub: translate("Ui.text_e0480f9c9d0d4d"),  icon: PawPrint, type: "animal" as const, category: "Exoten",         color: "text-violet-400",  bg: "bg-violet-500/10 border-violet-500/20" },
+      { id: "tier_sonstige", label: translate("Ui.text_ff34416878ea00"), sub: translate("Ui.text_6b6e18761383b9"),                icon: PawPrint, type: "animal" as const, category: "Sonstige Tiere", color: "text-zinc-400",    bg: "bg-zinc-500/10 border-zinc-500/20" },
+    ],
+  },
+  {
+    id: "drehorte",
+    label: translate("nav.locations"),
+    desc: translate("Ui.text_26234c24ab5565"),
+    color: "text-sky-400",
+    border: "border-sky-500/30",
+    items: [
+      { id: "loc_wohnen",        label: translate("Ui.text_886c0ca6e99eef"),        icon: Home,         type: "location", category: "Wohnen",        color: "text-sky-400",     bg: "bg-sky-500/10 border-sky-500/20" },
+      { id: "loc_villa",         label: translate("Ui.text_f38dd33e1b45ad"),   icon: Home,         type: "location", category: "Villa",         color: "text-gold",        bg: "bg-gold/10 border-gold/20" },
+      { id: "loc_gewerbe",       label: translate("Ui.text_b9cda346572417"),        icon: Building2,    type: "location", category: "Büro",          color: "text-slate-400",   bg: "bg-slate-500/10 border-slate-500/20" },
+      { id: "loc_industrie",     label: translate("Ui.text_f5459f77bf3a02"),     icon: Truck,        type: "location", category: "Industrie",     color: "text-zinc-400",    bg: "bg-zinc-500/10 border-zinc-500/20" },
+      { id: "loc_natur",         label: translate("Ui.text_b633a2c4879a8a"),       icon: TreePine,     type: "location", category: "Natur",         color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
+      { id: "loc_gastro",        label: translate("Ui.text_4dd54056e2ab61"),icon: Coffee,      type: "location", category: "Gastronomie",   color: "text-amber-400",   bg: "bg-amber-500/10 border-amber-500/20" },
+      { id: "loc_studio",        label: translate("menu.locFilmStudio"),            icon: Clapperboard, type: "location", category: "Studio",        color: "text-violet-400",  bg: "bg-violet-500/10 border-violet-500/20" },
+      { id: "loc_fotostudio",    label: translate("menu.locPhotoStudio"),            icon: Aperture,     type: "location", category: "Fotostudio",    color: "text-cyan-400",    bg: "bg-cyan-500/10 border-cyan-500/20" },
+      { id: "loc_special",       label: translate("menu.locSpecial"),       icon: MapPin,       type: "location", category: "Speziallocation",color: "text-fuchsia-400", bg: "bg-fuchsia-500/10 border-fuchsia-500/20" },
+    ],
+  },
+]);
+}
 
 function FormSelect({ value, onChange, options, placeholder, className = "" }: {
   value: string;
@@ -48,6 +138,8 @@ function FormSelect({ value, onChange, options, placeholder, className = "" }: {
   placeholder?: string;
   className?: string;
 }) {
+  const uiText = useTranslations();
+
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -61,7 +153,7 @@ function FormSelect({ value, onChange, options, placeholder, className = "" }: {
     <div ref={ref} className={`relative ${className}`}>
       <button type="button" onClick={() => setOpen(v => !v)}
         className={`w-full flex items-center justify-between gap-2 px-4 py-3 bg-bg-elevated border rounded-xl text-sm transition-colors text-left ${open ? "border-gold" : "border-border hover:border-gold/40"} ${selected ? "text-text-primary" : "text-text-muted"}`}>
-        <span className="truncate">{selected?.label ?? placeholder ?? "Bitte wählen…"}</span>
+        <span className="truncate">{selected?.label ?? placeholder ?? uiText("Ui.text_5a65d3a10117a6")}</span>
         <ChevronDown size={14} className={`shrink-0 text-text-muted transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
@@ -109,13 +201,17 @@ function RoleDropdown({
   value,
   onChange,
   options,
-  placeholder = "Rolle auswählen…",
+  placeholder,
 }: {
   value: string;
   onChange: (val: string) => void;
   options: RoleOption[];
   placeholder?: string;
 }) {
+  const uiText = useTranslations();
+  if (placeholder === undefined) placeholder = uiText("Ui.text_660f108f302665");
+
+
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const ref = useRef<HTMLDivElement>(null);
@@ -129,9 +225,9 @@ function RoleDropdown({
   }, []);
 
   const selected = options.find((o) => o.label === value);
-  const normalizedQuery = query.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("de");
-  const filteredOptions = options.filter((option) =>
-    !normalizedQuery || `${option.label} ${option.labelEn ?? ""} ${(option.aliases ?? []).join(" ")}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("de").includes(normalizedQuery),
+  const locale = useLocale();
+  const filteredOptions = options.filter(option =>
+    roleOptionMatchesSearch(option, query, value => taxonomyLabel(value, uiText), locale),
   );
 
   return (
@@ -145,7 +241,7 @@ function RoleDropdown({
           open ? "border-gold" : "border-border hover:border-border-hover"
         } ${selected ? "text-text-primary" : "text-text-muted"}`}
       >
-        <span className="truncate">{selected ? selected.label : placeholder}</span>
+        <span className="truncate">{selected ? taxonomyLabel(selected.label, uiText) : value || placeholder}</span>
         <ChevronDown
           size={15}
           className={`shrink-0 text-text-muted transition-transform duration-200 ml-2 ${open ? "rotate-180" : ""}`}
@@ -160,14 +256,14 @@ function RoleDropdown({
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Gewerk oder Rolle suchen …"
-              aria-label="Gewerk oder Rolle suchen"
+              placeholder={uiText("Ui.text_cf1be3c121724a")}
+              aria-label={uiText("Ui.text_83c7721f81c99b")}
               className="w-full bg-transparent text-sm text-text-primary placeholder:text-text-muted focus:outline-none"
             />
           </label>
           <div role="listbox" className="max-h-60 overflow-y-auto">
             {filteredOptions.length === 0 ? (
-              <p className="px-4 py-5 text-center text-sm text-text-muted">Keine passende Rolle gefunden.</p>
+              <p className="px-4 py-5 text-center text-sm text-text-muted">{uiText("Ui.text_895aad52de12ec")}</p>
             ) : filteredOptions.map((opt) => (
               <button
                 key={opt.id}
@@ -179,7 +275,7 @@ function RoleDropdown({
                   opt.label === value ? "text-gold bg-gold/5" : "text-text-secondary hover:text-text-primary"
                 }`}
               >
-                <span className="min-w-0">{opt.label}{opt.description && <span className="mt-0.5 block whitespace-normal text-[10px] leading-4 text-text-muted">{opt.description}</span>}</span>
+                <span className="min-w-0">{taxonomyLabel(opt.label, uiText)}{opt.description && <span className="mt-0.5 block whitespace-normal text-[10px] leading-4 text-text-muted">{taxonomyLabel(opt.description, uiText)}</span>}</span>
                 <span className="flex items-center gap-2 shrink-0 ml-2">
                   {opt.labelEn && (
                     <span className="text-[11px] text-text-muted hidden sm:block">{opt.labelEn}</span>
@@ -220,88 +316,7 @@ const deptMeta: Record<string, { icon: LucideIcon; color: string; bg: string }> 
 
 // ─── Category structure ───────────────────────────────────────────────────────
 
-const groups: Group[] = [
-  {
-    id: "jobs",
-    label: "Jobs",
-    desc: "Stelle ausschreiben — für jedes Gewerk einzeln",
-    color: "text-emerald-400",
-    border: "border-emerald-500/30",
-    items: [
-      ...FILM_DEPARTMENTS.map((d) => ({
-        id: `job_${d.id}`,
-        label: d.label,
-        icon: deptMeta[d.id]?.icon ?? Users,
-        type: "job" as const,
-        category: d.label,
-        color: deptMeta[d.id]?.color ?? "text-text-secondary",
-        bg: deptMeta[d.id]?.bg ?? "bg-bg-elevated border-border",
-      })),
-      { id: "job_praktikum",      label: "Praktikum / Volontariat",    icon: GraduationCap, type: "job" as const, category: "Praktikum",        color: "text-gold",        bg: "bg-gold/10 border-gold/20" },
-      { id: "job_projekt",        label: "Projektbasiert / Kurzfilm",  icon: Film,          type: "job" as const, category: "Projekt",          color: "text-indigo-400",  bg: "bg-indigo-500/10 border-indigo-500/20" },
-    ],
-  },
-  {
-    id: "marktplatz",
-    label: "Marktplatz",
-    desc: "Equipment, Requisiten, Kostüme & Fahrzeuge vermieten",
-    color: "text-violet-400",
-    border: "border-violet-500/30",
-    items: [
-      // Film Equipment
-      { id: "mk_fahrzeuge",           label: "Bildfahrzeug vermieten",        sub: "Auto, Boot, Flugzeug, Heli, Motorrad…",       icon: Car,         type: "vehicle", category: "Bild-Fahrzeug",          color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/20" },
-      { id: "mk_produktionsfahrzeug", label: "Produktionsfahrzeug vermieten", sub: "Kostümbus, Equipmenttransporter, Maske…",     icon: Truck,       type: "vehicle", category: "Produktionsfahrzeug",     color: "text-cyan-400",    bg: "bg-cyan-500/10 border-cyan-500/20" },
-      { id: "mk_kostuem",        label: "Kostüme & Kleidung",     sub: "Verkleidungen, Uniformen, Zeitgeist…",     icon: Shirt,       type: "prop",    category: "Kostüme",              color: "text-rose-400",    bg: "bg-rose-500/10 border-rose-500/20" },
-      { id: "mk_requisiten",     label: "Objekte & Dekoration",   sub: "Alltagsgegenstände, Kunstwerke, Deko…",    icon: Package,     type: "prop",    category: "Requisiten",           color: "text-violet-400",  bg: "bg-violet-500/10 border-violet-500/20" },
-      { id: "mk_moebel",         label: "Möbel & Einrichtung",    sub: "Sofas, Lampen, Tische, Wanddeko…",         icon: Layers,      type: "prop",    category: "Möbel / Szenenbild",   color: "text-indigo-400",  bg: "bg-indigo-500/10 border-indigo-500/20" },
-      { id: "mk_kamera",         label: "Kamera & Zubehör",       sub: "Kameras, Objektive, Gimbal, Monitor…",     icon: Camera,      type: "prop",    category: "Kameraequipment",      color: "text-sky-400",     bg: "bg-sky-500/10 border-sky-500/20" },
-      { id: "mk_licht",          label: "Licht & Beleuchtung",    sub: "LED-Panels, Scheinwerfer, Softboxen…",     icon: Lightbulb,   type: "prop",    category: "Lichttechnik",         color: "text-amber-400",   bg: "bg-amber-500/10 border-amber-500/20" },
-      { id: "mk_ton",            label: "Ton & Audio",            sub: "Mikrofone, Recorder, Funksysteme…",        icon: Mic,         type: "prop",    category: "Ton & Audio",          color: "text-teal-400",    bg: "bg-teal-500/10 border-teal-500/20" },
-      { id: "mk_grip",           label: "Stative & Träger",       sub: "Stative, Dolly, Schienen, Slider…",        icon: Wrench,      type: "prop",    category: "Grip & Rigging",       color: "text-slate-400",   bg: "bg-slate-500/10 border-slate-500/20" },
-      { id: "mk_produktion",     label: "Diverses & Zubehör",     sub: "Cases, Monitore, Akkus, Kabel…",           icon: Box,         type: "prop",    category: "Produktionsausstattung",color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
-      // Foto Equipment
-      { id: "mk_fotoequipment",  label: "Foto-Equipment",         sub: "Kameras, Blitze, Objektive, Studiosets…",  icon: Aperture,    type: "prop",    category: "Fotoequipment",        color: "text-cyan-400",    bg: "bg-cyan-500/10 border-cyan-500/20" },
-      { id: "mk_backdrops",      label: "Hintergründe & Stoffe",  sub: "Backdrops, Chroma Key, Vorhänge…",         icon: ImageIcon,   type: "prop",    category: "Backdrops",            color: "text-lime-400",    bg: "bg-lime-500/10 border-lime-500/20" },
-      // Creator / Social
-      { id: "mk_contentsets",    label: "Content-Studio / Set",   sub: "Ring Light, Greenscreen, Creator-Zubehör…",icon: Smartphone,  type: "prop",    category: "Content Sets",         color: "text-purple-400",  bg: "bg-purple-500/10 border-purple-500/20" },
-    ],
-  },
-  {
-    id: "tiere",
-    label: "Film-Tiere",
-    desc: "Ausgebildete Tiere für Film, Foto & Werbung anbieten",
-    color: "text-amber-400",
-    border: "border-amber-500/30",
-    items: [
-      { id: "tier_hunde",    label: "Hunde",          sub: "Ausgebildete Filmhunde aller Rassen…",   icon: PawPrint, type: "animal" as const, category: "Hunde",          color: "text-amber-400",   bg: "bg-amber-500/10 border-amber-500/20" },
-      { id: "tier_pferde",   label: "Pferde & Ponys", sub: "Reit- und Kutschpferde, Ponys…",         icon: PawPrint, type: "animal" as const, category: "Pferde",         color: "text-stone-400",   bg: "bg-stone-500/10 border-stone-500/20" },
-      { id: "tier_katzen",   label: "Katzen",         sub: "Rassekatzen, dressierte Hauskatzen…",    icon: PawPrint, type: "animal" as const, category: "Katzen",         color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/20" },
-      { id: "tier_voegel",   label: "Vögel",          sub: "Papageien, Greifvögel, Hühner…",         icon: PawPrint, type: "animal" as const, category: "Vögel",          color: "text-sky-400",     bg: "bg-sky-500/10 border-sky-500/20" },
-      { id: "tier_reptilien",label: "Reptilien",      sub: "Schlangen, Echsen, Schildkröten…",       icon: PawPrint, type: "animal" as const, category: "Reptilien",      color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
-      { id: "tier_nutztiere",label: "Nutztiere",      sub: "Kühe, Schafe, Ziegen, Schweine…",        icon: PawPrint, type: "animal" as const, category: "Nutztiere",      color: "text-lime-400",    bg: "bg-lime-500/10 border-lime-500/20" },
-      { id: "tier_exoten",   label: "Exoten",         sub: "Lamas, Alpakas, Minischweine, Füchse…",  icon: PawPrint, type: "animal" as const, category: "Exoten",         color: "text-violet-400",  bg: "bg-violet-500/10 border-violet-500/20" },
-      { id: "tier_sonstige", label: "Sonstige Tiere", sub: "Alle anderen Tierarten…",                icon: PawPrint, type: "animal" as const, category: "Sonstige Tiere", color: "text-zinc-400",    bg: "bg-zinc-500/10 border-zinc-500/20" },
-    ],
-  },
-  {
-    id: "drehorte",
-    label: "Locations",
-    desc: "Location für Film, Foto oder Werbung anbieten",
-    color: "text-sky-400",
-    border: "border-sky-500/30",
-    items: [
-      { id: "loc_wohnen",        label: "Wohnung / Haus",        icon: Home,         type: "location", category: "Wohnen",        color: "text-sky-400",     bg: "bg-sky-500/10 border-sky-500/20" },
-      { id: "loc_villa",         label: "Villa / Luxusobjekt",   icon: Home,         type: "location", category: "Villa",         color: "text-gold",        bg: "bg-gold/10 border-gold/20" },
-      { id: "loc_gewerbe",       label: "Büro / Gewerbe",        icon: Building2,    type: "location", category: "Büro",          color: "text-slate-400",   bg: "bg-slate-500/10 border-slate-500/20" },
-      { id: "loc_industrie",     label: "Industrie / Halle",     icon: Truck,        type: "location", category: "Industrie",     color: "text-zinc-400",    bg: "bg-zinc-500/10 border-zinc-500/20" },
-      { id: "loc_natur",         label: "Natur / Outdoor",       icon: TreePine,     type: "location", category: "Natur",         color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
-      { id: "loc_gastro",        label: "Restaurant / Bar / Café",icon: Coffee,      type: "location", category: "Gastronomie",   color: "text-amber-400",   bg: "bg-amber-500/10 border-amber-500/20" },
-      { id: "loc_studio",        label: "Filmstudio",            icon: Clapperboard, type: "location", category: "Studio",        color: "text-violet-400",  bg: "bg-violet-500/10 border-violet-500/20" },
-      { id: "loc_fotostudio",    label: "Fotostudio",            icon: Aperture,     type: "location", category: "Fotostudio",    color: "text-cyan-400",    bg: "bg-cyan-500/10 border-cyan-500/20" },
-      { id: "loc_special",       label: "Speziallocation",       icon: MapPin,       type: "location", category: "Speziallocation",color: "text-fuchsia-400", bg: "bg-fuchsia-500/10 border-fuchsia-500/20" },
-    ],
-  },
-];
+
 
 const projectTypes = [
   // Film
@@ -316,6 +331,106 @@ const projectTypes = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function InseratPage() {
+  const uiText = useTranslations();
+  const uiOptionLabels: Record<string, string> = {
+    "Tageslicht vorhanden": uiText("Ui.text_513bddf9c03462"),
+    "Verdunkelbar": uiText("Ui.text_947f519f43195e"),
+    "Gute Be-/Entladung": uiText("Ui.text_e645fceb0eeea4"),
+    "Wohnzimmer": uiText("Ui.text_08f7b944a44e64"),
+    "Schlafzimmer": uiText("Ui.text_d169602d01f7a9"),
+    "Esszimmer": uiText("Ui.text_7ab86957a50a86"),
+    "Küche": uiText("Ui.text_a9ec872e661915"),
+    "Badezimmer": uiText("Ui.text_5d662eade635b5"),
+    "Arbeitszimmer": uiText("Ui.text_2396c83101c3bf"),
+    "Garten": uiText("Ui.text_d81f9bcfd66015"),
+    "Garage": uiText("Ui.text_b15f6253519634"),
+    "Keller": uiText("Ui.text_32dfe2cbdfb72c"),
+    "Dachboden": uiText("Ui.text_9b38abc0d84263"),
+    "Balkon / Terrasse": uiText("Ui.text_b7a3a7c78bba32"),
+    "Pool": uiText("Ui.text_f13024272c385f"),
+    "Pool / Swimmingpool": uiText("Ui.text_986686737acb7c"),
+    "Sauna / Spa": uiText("Ui.text_26dab981d365b2"),
+    "Heimkino": uiText("Ui.text_c167cde5813dec"),
+    "Weinkeller": uiText("Ui.text_9bfe47142475ad"),
+    "Bibliothek": uiText("Ui.text_70862cdee3da4d"),
+    "Rooftop": uiText("Ui.text_66d5c95f408bbb"),
+    "Open Space": uiText("Ui.text_17ddc308ad55f4"),
+    "Konferenzraum": uiText("Ui.text_247e05dd4552dd"),
+    "Besprechungsraum": uiText("Ui.text_bad397419c051c"),
+    "Empfang / Lobby": uiText("Ui.text_0ed474d04f3403"),
+    "Teeküche": uiText("Ui.text_89498b946a009b"),
+    "Coworking-Bereich": uiText("Ui.text_5fc749bfaf4e22"),
+    "Serverraum": uiText("Ui.text_89cec591faf24c"),
+    "Archiv": uiText("Ui.text_27207439933298"),
+    "Dachterrasse": uiText("Ui.text_c02bfb35fb0a0d"),
+    "Lagerhalle": uiText("Ui.text_546956663b0bce"),
+    "Produktion / Werkstatt": uiText("Ui.text_82568a934bc9a6"),
+    "Bürobereich": uiText("Ui.text_fe1c0c444ae4e5"),
+    "Umkleide": uiText("Ui.text_6bb28e219f8023"),
+    "Verladebereich": uiText("Ui.text_9b24667ff52422"),
+    "Kühlraum": uiText("Ui.text_4818a9abc64032"),
+    "Dach / Außenbereich": uiText("Ui.text_c00b0a3fab0248"),
+    "Showroom": uiText("Ui.text_74cc1d00fe9ede"),
+    "Wald": uiText("Ui.text_cad1dafa8fe5e2"),
+    "Wiese / Feld": uiText("Ui.text_56102faf95b015"),
+    "See / Gewässer": uiText("Ui.text_ce72d09f088113"),
+    "Strand": uiText("Ui.text_770baae20e7bb5"),
+    "Berg / Hügel": uiText("Ui.text_c9619c6579b5a6"),
+    "Park / Gartenanlage": uiText("Ui.text_908019d609bb0e"),
+    "Bauernhof / Hof": uiText("Ui.text_e9c1fdfdd87e81"),
+    "Ruine / Lost Place": uiText("Ui.text_642dcff01846fd"),
+    "Restaurantbereich": uiText("Ui.text_874f1fb3504a11"),
+    "Bar / Theke": uiText("Ui.text_efa4ec5f1ebcb4"),
+    "Terrasse / Außenbereich": uiText("Ui.text_642e5dcb308419"),
+    "Privatraum / VIP": uiText("Ui.text_70c374423575e2"),
+    "Profiküche": uiText("Ui.text_d6b03d178f4e05"),
+    "Lager": uiText("Ui.text_3781688d9e695d"),
+    "Hauptstage": uiText("Ui.text_b3f926d138e222"),
+    "Green Room": uiText("Ui.text_cd4db9724f65a4"),
+    "Maske / Make-up": uiText("Ui.text_ff1f6c7ca6813a"),
+    "Regieraum": uiText("Ui.text_cd64412276d0ad"),
+    "Requisitenlager": uiText("Ui.text_cd2bae3271ee26"),
+    "Außenset": uiText("Ui.text_1e53ee82c369c3"),
+    "Shootingfläche": uiText("Ui.text_85611f9368aa7a"),
+    "Cyclorama / Hohlkehle": uiText("Ui.text_be6529edfffb7c"),
+    "Lounge / Wartebereich": uiText("Ui.text_e1af31f4a151e1"),
+    "Fundus / Lager": uiText("Ui.text_b6275262d19bde"),
+    "Hauptbereich": uiText("Ui.text_f655e29e87927f"),
+    "Garten / Außenbereich": uiText("Ui.text_0364dc8c38b028"),
+    "Keller / UG": uiText("Ui.text_508832fca3eb30"),
+    "Dach / Rooftop": uiText("Ui.text_ac3f3b292f3bec"),
+    "Terrasse": uiText("Ui.text_cbff339342911e"),
+    "Nebenraum": uiText("Ui.text_ee373efc76fdbd"),
+    "Wi-Fi": uiText("Ui.text_337253f2e8d4d1"),
+    "WC / Sanitär": uiText("Ui.text_800e5612baf938"),
+    "Laderampe": uiText("Ui.text_7c8dc1fd90b6af"),
+    "Generator": uiText("Ui.text_1ade60abe93f5c"),
+    "Schallisoliert": uiText("Ui.text_e60eee0f0e49fe"),
+    "Klimaanlage": uiText("Ui.text_ea0e1904f1726c"),
+    "Heizung": uiText("Ui.text_744b4873e74c5c"),
+    "Aufzug": uiText("Ui.text_02861aeff786cd"),
+    "Barrierefreiheit": uiText("Ui.text_4e0b1087084fdb"),
+    "Mo": uiText("Ui.text_d23e867e38e89e"),
+    "Di": uiText("Ui.text_16ab7287480992"),
+    "Mi": uiText("Ui.text_d8f33a13ae6e93"),
+    "Do": uiText("Ui.text_30094e0bec0046"),
+    "Fr": uiText("Ui.text_eed8f901692d08"),
+    "Sa": uiText("Ui.text_a951efc79deb7f"),
+    "So": uiText("Ui.text_fb1df1a24e3f6a"),
+    "Bezahlt": uiText("Ui.text_057b27bdbc5519"),
+    "Deferred Pay": uiText("Ui.text_6bd179a0682616"),
+    "Spesen & Reise": uiText("Ui.text_ab1fbdf891ea96"),
+    "Ehrenamtlich / Übung": uiText("Ui.text_7c904bff597cd2"),
+  };
+
+
+
+
+
+  const groups = getLocalizedGroups(uiText);
+
+  const uiLocale = useLocale();
+
   const moderation = useTranslations("OfferModeration");
   const marketplaceText = useTranslations("MarketplacePublishing");
   const animals = useTranslations("FilmAnimals");
@@ -325,56 +440,6 @@ export default function InseratPage() {
   const [responsible, setResponsible] = useState<ResponsiblePerson>(NEW_RESPONSIBLE_PERSON);
   const [responsibleErrors, setResponsibleErrors] = useState<Record<string, string>>({});
 
-  const LOCATION_ROOMS: Record<string, [string, string][]> = {
-    "Wohnen": [
-      ["living_room", "Wohnzimmer"], ["bedroom", "Schlafzimmer"], ["dining_room", "Esszimmer"],
-      ["kitchen_room", "Küche"], ["bathroom", "Badezimmer"], ["home_office", "Arbeitszimmer"],
-      ["garden", "Garten"], ["garage", "Garage"], ["basement", "Keller"],
-      ["attic", "Dachboden"], ["balcony", "Balkon / Terrasse"], ["pool", "Pool"],
-    ],
-    "Villa": [
-      ["living_room", "Wohnzimmer"], ["bedroom", "Schlafzimmer"], ["dining_room", "Esszimmer"],
-      ["kitchen_room", "Küche"], ["bathroom", "Badezimmer"], ["garden", "Garten"],
-      ["garage", "Garage"], ["pool", "Pool / Swimmingpool"], ["spa", "Sauna / Spa"],
-      ["home_cinema", "Heimkino"], ["wine_cellar", "Weinkeller"], ["library", "Bibliothek"],
-      ["balcony", "Balkon / Terrasse"], ["rooftop", "Rooftop"],
-    ],
-    "Büro": [
-      ["open_space", "Open Space"], ["conference_room", "Konferenzraum"], ["meeting_room", "Besprechungsraum"],
-      ["reception", "Empfang / Lobby"], ["kitchen_room", "Teeküche"], ["coworking", "Coworking-Bereich"],
-      ["server_room", "Serverraum"], ["archive", "Archiv"], ["terrace", "Dachterrasse"],
-    ],
-    "Industrie": [
-      ["warehouse", "Lagerhalle"], ["production", "Produktion / Werkstatt"], ["office_area", "Bürobereich"],
-      ["changing_room_area", "Umkleide"], ["loading_area", "Verladebereich"], ["cold_storage", "Kühlraum"],
-      ["rooftop", "Dach / Außenbereich"], ["showroom", "Showroom"],
-    ],
-    "Natur": [
-      ["forest", "Wald"], ["meadow", "Wiese / Feld"], ["lake", "See / Gewässer"],
-      ["beach", "Strand"], ["mountain", "Berg / Hügel"], ["park", "Park / Gartenanlage"],
-      ["farm", "Bauernhof / Hof"], ["ruins", "Ruine / Lost Place"],
-    ],
-    "Gastronomie": [
-      ["restaurant_area", "Restaurantbereich"], ["bar_area", "Bar / Theke"], ["terrace", "Terrasse / Außenbereich"],
-      ["private_room", "Privatraum / VIP"], ["kitchen_room", "Profiküche"], ["storage", "Lager"],
-      ["rooftop", "Rooftop"],
-    ],
-    "Studio": [
-      ["main_stage", "Hauptstage"], ["green_room_area", "Green Room"], ["makeup_room", "Maske / Make-up"],
-      ["control_room", "Regieraum"], ["prop_storage", "Requisitenlager"], ["changing_room_area", "Umkleide"],
-      ["office_area", "Bürobereich"], ["outdoor_set", "Außenset"],
-    ],
-    "Fotostudio": [
-      ["shooting_area", "Shootingfläche"], ["cyclorama", "Cyclorama / Hohlkehle"], ["makeup_room", "Maske / Make-up"],
-      ["changing_room_area", "Umkleide"], ["lounge", "Lounge / Wartebereich"], ["storage", "Fundus / Lager"],
-      ["office_area", "Bürobereich"],
-    ],
-    "Speziallocation": [
-      ["main_area", "Hauptbereich"], ["garden", "Garten / Außenbereich"], ["basement", "Keller / UG"],
-      ["rooftop", "Dach / Rooftop"], ["terrace", "Terrasse"], ["private_room", "Nebenraum"],
-      ["storage", "Lager"],
-    ],
-  };
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [createdId, setCreatedId] = useState<string | null>(null);
@@ -491,7 +556,7 @@ export default function InseratPage() {
     fetch("/api/onboarding", { cache: "no-store" })
       .then(async (response) => {
         const data = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(data.error ?? "Der gespeicherte Locationentwurf konnte nicht geladen werden.");
+        if (!response.ok) throw new Error(data.error ?? uiText("Ui.text_2e68c52246cd14"));
         return data.draft?.locationFormDraft as Record<string, unknown> | undefined;
       })
       .then((saved) => {
@@ -579,7 +644,7 @@ export default function InseratPage() {
 
   function handleSelect(item: CategoryItem) {
     if (item.type === "location" && !locationDraftReady) {
-      setError("Einen gespeicherten Locationentwurf prüfen wir gerade. Bitte versuche es gleich noch einmal.");
+      setError(uiText("Ui.text_ea5af243a24b60"));
       return;
     }
     setMarketReview(false);
@@ -677,8 +742,8 @@ export default function InseratPage() {
     if (type === "job") {
       const dateRange = form.shoot_start
         ? form.shoot_end
-          ? `${new Date(form.shoot_start).toLocaleDateString("de-DE", { day: "numeric", month: "long" })} – ${new Date(form.shoot_end).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}`
-          : `Ab ${new Date(form.shoot_start).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}`
+          ? `${new Date(form.shoot_start).toLocaleDateString(uiLocale, { day: "numeric", month: "long" })} – ${new Date(form.shoot_end).toLocaleDateString(uiLocale, { day: "numeric", month: "long", year: "numeric" })}`
+          : `Ab ${new Date(form.shoot_start).toLocaleDateString(uiLocale, { day: "numeric", month: "long", year: "numeric" })}`
         : "";
       const contentWarnings = [
         form.content_nudity && "⚠ Nacktheit",
@@ -698,7 +763,7 @@ export default function InseratPage() {
         type,
         category,
         title: form.title,
-        description: meta ? `${meta}\n\n${form.description}` : form.description,
+        description: meta ? uiText("Ui.text_c53dfd5c59507b", { value1: String(meta), value2: String(form.description) }) : form.description,
         price: parseFloat(form.price) || 0,
         city: form.city,
       };
@@ -733,7 +798,7 @@ export default function InseratPage() {
         description: [
           form.skills && `Skills: ${form.skills}`,
           form.experience && `Erfahrung: ${form.experience}`,
-        ].filter(Boolean).join("\n") + (form.description ? `\n\n${form.description}` : ""),
+        ].filter(Boolean).join("\n") + (form.description ? uiText("Ui.text_8c3b5a4eb4be78", { value1: String(form.description) }) : ""),
         price: parseFloat(form.price) || 0,
         city: form.city,
       };
@@ -776,22 +841,22 @@ export default function InseratPage() {
     setUploading(true);
     setError("");
     try {
-      const compressed = await compressImage(file, { maxWidth: 1920, quality: 0.85, maxBytes: MAX_FUNCTION_UPLOAD_BYTES });
+      const compressed = await compressImage(file, { maxWidth: 1920, quality: 0.85, maxBytes: MAX_FUNCTION_UPLOAD_BYTES , translate: uiText });
       const fd = new FormData();
       fd.append("file", compressed);
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       const json = await res.json().catch(() => ({}));
       if (!res.ok || !json.url) {
         throw new Error(res.status === 413
-          ? "Das Foto war für den Upload zu groß. Bitte wähle ein kleineres Bild."
-          : json.error ?? "Das Foto konnte nicht hochgeladen werden.");
+          ? uiText("Ui.text_b75cda6588d917")
+          : json.error ?? uiText("Ui.text_c3b9328b1f25e4"));
       }
       setImageUrl(json.url);
       setImagePreview(json.url);
     } catch (cause) {
       setImageUrl(null);
       setImagePreview(null);
-      setError(cause instanceof Error ? cause.message : "Das Foto konnte nicht hochgeladen werden. Bitte versuche es erneut.");
+      setError(uiErrorMessage(cause, uiText("Ui.text_6dfc9fec3e873f")));
     } finally {
       setUploading(false);
       input.value = "";
@@ -817,11 +882,11 @@ export default function InseratPage() {
     const usesGallery = selected?.type === "prop" || selected?.type === "vehicle" || selected?.type === "animal" || selected?.type === "location";
     const galleryState = selected?.type === "location" ? locationGalleryState : articleGalleryState;
     if (usesGallery && galleryState.uploading) {
-      setError("Bitte warte, bis alle Bilder fertig hochgeladen sind.");
+      setError(uiText("Ui.text_818a40c8fab3e9"));
       return;
     }
     if (usesGallery && galleryState.failed > 0) {
-      setError("Bitte lade fehlgeschlagene Bilder erneut hoch oder entferne sie.");
+      setError(uiText("Ui.text_e0466ed245c931"));
       return;
     }
     if(selected?.type === "prop" || selected?.type === "vehicle") {
@@ -856,12 +921,12 @@ export default function InseratPage() {
       });
       json = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(json.error ?? "Fehler beim Speichern");
+        setError(json.error ?? uiText("profile.savingError"));
         setLoading(false);
         return;
       }
     } catch {
-      setError("Speichern fehlgeschlagen. Deine Eingaben sind weiterhin als privater Entwurf gesichert. Bitte versuche es erneut.");
+      setError(uiText("Ui.text_d4df37ff68fddf"));
       setLoading(false);
       return;
     }
@@ -873,7 +938,7 @@ export default function InseratPage() {
     if (json.publicationError) setError(json.publicationError);
     if (selected?.type === "location") {
       const cleared = await fetch("/api/onboarding?type=location-form", { method: "DELETE" }).catch(() => null);
-      if (!cleared?.ok) setError("Die Location ist sicher als Entwurf gespeichert. Der private Formularstand konnte noch nicht bereinigt werden.");
+      if (!cleared?.ok) setError(uiText("Ui.text_5e80d82f007207"));
     }
     setStep(3);
   }
@@ -889,7 +954,7 @@ export default function InseratPage() {
       if (!responsibleSave.ok) { const failure = await responsibleSave.json(); throw new Error(failure.error); }
       let response: Response;
       if (pendingImageFile) {
-        const compressed = await compressImage(pendingImageFile, { maxWidth: 1920, quality: 0.85, maxBytes: MAX_FUNCTION_UPLOAD_BYTES });
+        const compressed = await compressImage(pendingImageFile, { maxWidth: 1920, quality: 0.85, maxBytes: MAX_FUNCTION_UPLOAD_BYTES , translate: uiText });
         const formData = new FormData();
         formData.append("file", compressed);
         response = await fetch(`/api/listings/${createdId}/publish`, { method: "POST", body: formData });
@@ -902,7 +967,7 @@ export default function InseratPage() {
       setCreatedPublished(result.published === true);
       setPendingImageFile(null);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : moderation("saveError"));
+      setError(uiErrorMessage(cause, moderation("saveError")));
     } finally {
       setPublishingDraft(false);
     }
@@ -945,8 +1010,8 @@ export default function InseratPage() {
   const mainTiles = [
     {
       id: "jobs",
-      label: "Job ausschreiben",
-      sub: "Film · Social Media · Fotografie",
+      label: uiText("footer.links_postJob"),
+      sub: uiText("Ui.text_8971f390b9cb71"),
       icon: Briefcase,
       color: "text-emerald-400",
       border: "border-emerald-500/30 hover:border-emerald-400",
@@ -955,8 +1020,8 @@ export default function InseratPage() {
     },
     {
       id: "drehorte",
-      label: "Location inserieren",
-      sub: "Locations · Fotostudios · Studios",
+      label: uiText("home.usecase1Cta"),
+      sub: uiText("Ui.text_123056670f1212"),
       icon: MapPin,
       color: "text-sky-400",
       border: "border-sky-500/30 hover:border-sky-400",
@@ -965,8 +1030,8 @@ export default function InseratPage() {
     },
     {
       id: "marktplatz",
-      label: "Marktplatz",
-      sub: "Equipment · Fotoequipment · Creator Sets",
+      label: uiText("nav.marketplace"),
+      sub: uiText("Ui.text_d0fb2e1f78654e"),
       icon: Package,
       color: "text-violet-400",
       border: "border-violet-500/30 hover:border-violet-400",
@@ -975,8 +1040,8 @@ export default function InseratPage() {
     },
     {
       id: "tiere",
-      label: "Film-Tiere inserieren",
-      sub: "Hunde · Pferde · Katzen · Exoten",
+      label: uiText("Ui.text_707fa8090d84a7"),
+      sub: uiText("Ui.text_74736db78e725a"),
       icon: PawPrint,
       color: "text-amber-400",
       border: "border-amber-500/30 hover:border-amber-400",
@@ -985,8 +1050,8 @@ export default function InseratPage() {
     },
     {
       id: "firma",
-      label: "Firma eintragen",
-      sub: "Produktionsfirma · Agentur · Studio",
+      label: uiText("home.pillarCompaniesCta"),
+      sub: uiText("Ui.text_553e466cdafcc0"),
       icon: Building2,
       color: "text-gold",
       border: "border-gold/20 hover:border-gold/60",
@@ -1008,19 +1073,17 @@ export default function InseratPage() {
               <button
                 onClick={() => setActiveGroup(null)}
                 className="flex items-center gap-1.5 text-text-muted hover:text-text-primary text-sm mb-5 transition-colors"
-              >
-                <ChevronLeft size={16} /> Zurück
-              </button>
+              >{uiText.rich("Ui.text_3c9cbf8b79d036", { part1: () => (<ChevronLeft size={16} />) })}</button>
             )}
-            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">Inserat erstellen</p>
+            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-2">{uiText("nav.createListing")}</p>
             <h1 className="font-display text-2xl font-bold text-text-primary mb-1">
-              {activeGroup === "tiere" ? animals("portfolio") : activeGroup ? currentGroup?.label : "Was möchtest du inserieren?"}
+              {activeGroup === "tiere" ? animals("portfolio") : activeGroup ? currentGroup?.label : uiText("Ui.text_3c8e178e2a3b45")}
             </h1>
             <p className="text-text-muted text-sm">
-              {activeGroup ? "Wähle eine Kategorie aus." : "Wähle einen Bereich — der Rest passt sich an."}
+              {activeGroup ? uiText("Ui.text_db7f01f8d176a5") : uiText("Ui.text_a60218a2892285")}
             </p>
             {activeGroup === "drehorte" && locationDraftStatus === "loading" && (
-              <p role="status" className="mt-3 text-xs text-text-muted">Gespeicherten Locationfortschritt prüfen …</p>
+              <p role="status" className="mt-3 text-xs text-text-muted">{uiText("Ui.text_26276743581fe5")}</p>
             )}
           </div>
 
@@ -1098,16 +1161,14 @@ export default function InseratPage() {
         <div className="max-w-2xl mx-auto px-4 py-10">
 
           {/* Header */}
-          <button disabled={articleGalleryState.uploading} onClick={() => { setStep(1); if(selected?.type!=="prop"&&selected?.type!=="vehicle"){setImageUrl(null);setImagePreview(null);} setSelected(null); }} className="flex items-center gap-1.5 text-text-muted hover:text-text-primary text-sm mb-6 transition-colors disabled:cursor-not-allowed disabled:opacity-50">
-            <ChevronLeft size={16} /> Zurück zur Auswahl
-          </button>
+          <button disabled={articleGalleryState.uploading} onClick={() => { setStep(1); if(selected?.type!=="prop"&&selected?.type!=="vehicle"){setImageUrl(null);setImagePreview(null);} setSelected(null); }} className="flex items-center gap-1.5 text-text-muted hover:text-text-primary text-sm mb-6 transition-colors disabled:cursor-not-allowed disabled:opacity-50">{uiText.rich("Ui.text_60dbbca363cc93", { part1: () => (<ChevronLeft size={16} />) })}</button>
 
           <div className="flex items-center gap-3 mb-8">
             <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${bg}`}>
               <Icon size={18} className={color} />
             </div>
             <div>
-              <p className="text-xs uppercase tracking-widest text-gold font-semibold">Inserat erstellen</p>
+              <p className="text-xs uppercase tracking-widest text-gold font-semibold">{uiText("nav.createListing")}</p>
               <FormDraftStatus draft={listingDraft} />
               <h1 className="font-display text-2xl font-bold text-text-primary">{isAnimal ? animals("portfolio") : dept?.id === ANIMAL_DEPARTMENT_ID ? animals("department") : label}</h1>
             </div>
@@ -1120,12 +1181,12 @@ export default function InseratPage() {
             {/* ── FIRMA VERKNÜPFEN ── */}
             {myCompanies.length > 0 && (
               <div>
-                <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Zu Firma verknüpfen (optional)</label>
+                <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("Ui.text_98adb5e20049e3")}</label>
                 <FormSelect value={selectedCompanyId} onChange={setSelectedCompanyId}
-                  placeholder="Kein Firmenprofil"
+                  placeholder={uiText("Ui.text_3b20455a1a02b3")}
                   options={myCompanies.map((c) => ({ value: c.id, label: c.name }))} />
                 {selectedCompanyId && (
-                  <p className="text-xs text-text-muted mt-1.5">Dieses Inserat erscheint auf deinem Firmenprofil.</p>
+                  <p className="text-xs text-text-muted mt-1.5">{uiText("Ui.text_51b377742d420e")}</p>
                 )}
               </div>
             )}
@@ -1135,25 +1196,25 @@ export default function InseratPage() {
               <div className="space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Marke *</label>
-                    <input value={form.make} onChange={(e) => f("make", e.target.value)} placeholder="Ford"
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("Ui.text_3be9f49ce7f662")}</label>
+                    <input value={form.make} onChange={(e) => f("make", e.target.value)} placeholder={uiText("Ui.text_1aa4f3d6ea5b4c")}
                       className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Modell *</label>
-                    <input value={form.model} onChange={(e) => f("model", e.target.value)} placeholder="Mustang"
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("Ui.text_e185cae4470827")}</label>
+                    <input value={form.model} onChange={(e) => f("model", e.target.value)} placeholder={uiText("Ui.text_777cce275513f0")}
                       className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Baujahr</label>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("Ui.text_1145a55035d8d6")}</label>
                     <input type="number" value={form.year} onChange={(e) => f("year", e.target.value)} placeholder="1969"
                       className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Fahrzeugtyp *</label>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("Ui.text_a3f100833c6d2c")}</label>
                   <FormSelect value={form.vehicle_subtype} onChange={(v) => f("vehicle_subtype", v)}
-                    placeholder="Bitte wählen…"
+                    placeholder={uiText("Ui.text_5a65d3a10117a6")}
                     options={((selected.category === "Produktionsfahrzeug" || (marketplaceCategory(selected.category)?.department === "fahrzeuge" && marketplaceCategory(selected.category)?.subcategory !== "fahrzeuge-bild"))
                       ? ["Kostümbus", "Maske & Hair", "Equipment-Transporter", "Kamera-Van", "Generator-Fahrzeug", "Catering / Crafty", "Produktions-Van", "Regisseur-Trailer", "Darsteller-Trailer", "Motorboot / Tender", "Produktionsschiff", "Helikopter (Transport)", "Kleinflugzeug (Transport)", "Sonstiges"]
                       : ["PKW / Limousine", "Sportwagen / Cabrio", "SUV / Geländewagen", "Oldtimer / Classic Car", "Motorrad", "Roller / Scooter", "LKW / Truck", "Bus / Reisebus", "Wohnmobil / Camper", "Militärfahrzeug", "Kutsche / Pferdewagen", "Motorboot", "Segelboot / Yacht", "Jet-Ski", "Schiff / Fähre", "U-Boot (Requisite)", "Flugzeug (Prop / Stunt)", "Helikopter / Gyrocopter", "Heißluftballon", "Sonstiges"]
@@ -1161,15 +1222,15 @@ export default function InseratPage() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Antrieb / Kraftstoff</label>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("Ui.text_2b2caebdd105c9")}</label>
                     <FormSelect value={form.fuel_type} onChange={(v) => f("fuel_type", v)}
-                      placeholder="Bitte wählen…"
+                      placeholder={uiText("Ui.text_5a65d3a10117a6")}
                       options={["Benzin", "Diesel", "Elektro", "Hybrid", "LPG", "Marine-Diesel", "Kerosin / Avgas", "Wind (Segel)", "Muskelkraft / Ruder", "Sonstiges"].map(o => ({ value: o, label: o }))} />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Lizenz / Führerschein</label>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("Ui.text_a2eecce50f7bf1")}</label>
                     <FormSelect value={form.license_class} onChange={(v) => f("license_class", v)}
-                      placeholder="Bitte wählen…"
+                      placeholder={uiText("Ui.text_5a65d3a10117a6")}
                       options={["B", "BE", "C", "CE", "D", "A", "Bootsführerschein (SBF Binnen)", "Bootsführerschein (SBF See / SKS)", "Sportküstenschifferschein (SKS)", "Privatpilotenlizenz (PPL)", "Berufspilotenlizenz (CPL)", "Keine / Nicht erforderlich"].map(o => ({ value: o, label: o }))} />
                   </div>
                 </div>
@@ -1179,8 +1240,8 @@ export default function InseratPage() {
                     <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${form.delivery ? "left-5" : "left-1"}`} />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-text-primary">Lieferung zum Set möglich</p>
-                    <p className="text-xs text-text-muted">Das Fahrzeug kann zur Location geliefert werden</p>
+                    <p className="text-sm font-medium text-text-primary">{uiText("Ui.text_39a95f2f70d7aa")}</p>
+                    <p className="text-xs text-text-muted">{uiText("Ui.text_c02c2d64dc8ca2")}</p>
                   </div>
                 </label>
               </div>
@@ -1209,22 +1270,22 @@ export default function InseratPage() {
                 {/* Grunddaten */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Fläche (m²)</label>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("AdminReview.fields.sqm")}</label>
                     <input type="number" value={form.sqm} onChange={(e) => f("sqm", e.target.value)} placeholder="120"
                       className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Deckenhöhe (m)</label>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("AdminReview.fields.ceiling_height_m")}</label>
                     <input type="number" step="0.1" value={form.ceiling_height} onChange={(e) => f("ceiling_height", e.target.value)} placeholder="3.5"
                       className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Max. Crew</label>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("Ui.text_8c95b59cdc03d1")}</label>
                     <input type="number" value={form.max_crew} onChange={(e) => f("max_crew", e.target.value)} placeholder="20"
                       className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Parkplätze</label>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("AdminReview.fields.parking_spots")}</label>
                     <input type="number" value={form.parking_spots} onChange={(e) => f("parking_spots", e.target.value)} placeholder="5"
                       className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
@@ -1232,7 +1293,7 @@ export default function InseratPage() {
 
                 {/* Lage */}
                 <div>
-                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Lage *</label>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("Ui.text_231e4484a85608")}</label>
                   <div className="flex rounded-xl border border-border overflow-hidden">
                     {(["innen", "außen", "beides"] as const).map((opt) => (
                       <button key={opt} type="button" onClick={() => f("indoor_outdoor", opt)}
@@ -1250,17 +1311,17 @@ export default function InseratPage() {
                       className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 cursor-pointer shrink-0 ${form.power_available ? "bg-gold" : "bg-bg-elevated border border-border"}`}>
                       <div className={`w-4 h-4 rounded-full bg-white transition-transform ${form.power_available ? "translate-x-4" : ""}`} />
                     </div>
-                    <p className="text-sm font-medium text-text-primary">Stromanschluss vorhanden</p>
+                    <p className="text-sm font-medium text-text-primary">{uiText("Ui.text_ef4eb59f4ec025")}</p>
                   </label>
                   {form.power_available && (
                     <input type="text" value={form.power_details} onChange={(e) => f("power_details", e.target.value)}
-                      placeholder="z.B. 2× 32A CEE, 1× 63A CEE 3-phasig, 230V Steckdosen"
+                      placeholder={uiText("Ui.text_cd74c29e1a9030")}
                       className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">Licht und Anlieferung</label>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">{uiText("Ui.text_ad6bf90ca6a4d6")}</label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     {([
                       ["natural_light", "Tageslicht vorhanden"],
@@ -1269,7 +1330,7 @@ export default function InseratPage() {
                     ] as const).map(([key, label]) => (
                       <button key={key} type="button" aria-pressed={form[key]} onClick={() => f(key, !form[key])}
                         className={`min-h-11 rounded-xl border px-3 py-2 text-left text-xs transition-colors ${form[key] ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-elevated text-text-secondary hover:border-gold/40"}`}>
-                        {form[key] ? "✓ " : ""}{label}
+                        {form[key] ? "✓ " : ""}{(uiOptionLabels[label] ?? label)}
                       </button>
                     ))}
                   </div>
@@ -1277,29 +1338,29 @@ export default function InseratPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Mögliche Drehzeiten</label>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("AdminReview.fields.shooting_hours")}</label>
                     <input value={form.shooting_hours} onChange={(e) => f("shooting_hours", e.target.value)} maxLength={160}
-                      placeholder="z. B. werktags ab 9 Uhr, nach Absprache"
+                      placeholder={uiText("Ui.text_2a938597917f1d")}
                       className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Anfahrt und Zugang</label>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("Ui.text_9c68248af7b8fc")}</label>
                     <input value={form.access_notes} onChange={(e) => f("access_notes", e.target.value)} maxLength={240}
-                      placeholder="z. B. Zufahrt über den Innenhof"
+                      placeholder={uiText("Ui.text_0a66e68b873324")}
                       className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Verfügbarkeit oder Einschränkungen</label>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("Ui.text_93312a18a28bf5")}</label>
                   <textarea value={form.availability_notes} onChange={(e) => f("availability_notes", e.target.value)} maxLength={500} rows={2}
-                    placeholder="z. B. nicht an Sonn- und Feiertagen, Belegung bitte anfragen"
+                    placeholder={uiText("Ui.text_dba9679fb55c1b")}
                     className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm resize-y" />
                 </div>
 
                 {/* Räume — kategoriespezifisch */}
                 {selected?.category && LOCATION_ROOMS[selected.category] && (
                   <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">Räume & Bereiche</label>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">{uiText("Ui.text_78ff90932bddd6")}</label>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       {LOCATION_ROOMS[selected.category].map(([id, label]) => {
                         const active = locRooms.includes(id);
@@ -1307,7 +1368,7 @@ export default function InseratPage() {
                           <button key={id} type="button"
                             onClick={() => setLocRooms(prev => active ? prev.filter(r => r !== id) : [...prev, id])}
                             className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left text-xs font-medium transition-all ${active ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-elevated text-text-secondary hover:border-border-light"}`}>
-                            {active && <span className="text-gold">✓</span>} {label}
+                            {active && <span className="text-gold">✓</span>} {(uiOptionLabels[label] ?? label)}
                           </button>
                         );
                       })}
@@ -1317,7 +1378,7 @@ export default function InseratPage() {
 
                 {/* Ausstattung */}
                 <div>
-                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">Ausstattung</label>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">{uiText("companies.groupAusstattung")}</label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {[
                       ["wifi", "Wi-Fi"], ["restrooms", "WC / Sanitär"], ["green_room", "Green Room"],
@@ -1330,7 +1391,7 @@ export default function InseratPage() {
                         <button key={id} type="button"
                           onClick={() => setLocAmenities(prev => active ? prev.filter(a => a !== id) : [...prev, id])}
                           className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left text-xs font-medium transition-all ${active ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-elevated text-text-secondary hover:border-border-light"}`}>
-                          {active && <span className="text-gold">✓</span>} {label}
+                          {active && <span className="text-gold">✓</span>} {(uiOptionLabels[label] ?? label)}
                         </button>
                       );
                     })}
@@ -1339,18 +1400,16 @@ export default function InseratPage() {
 
                 {/* Grundriss */}
                 <div>
-                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Grundriss (optional)</label>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("Ui.text_fae6a912257423")}</label>
                   {locFloorPlanPreview ? (
                     <div className="relative w-full max-w-sm">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={locFloorPlanPreview} alt="Grundriss" className="w-full rounded-xl border border-border object-contain max-h-48" />
+                      <img src={locFloorPlanPreview} alt={uiText("Ui.text_514d54b3eb66dc")} className="w-full rounded-xl border border-border object-contain max-h-48" />
                       <button type="button" onClick={() => { setLocFloorPlanUrl(null); setLocFloorPlanPreview(null); }}
                         className="absolute top-2 right-2 w-6 h-6 bg-bg-primary/80 rounded-full flex items-center justify-center text-text-muted hover:text-crimson-light text-xs">✕</button>
                     </div>
                   ) : (
-                    <label className={`flex items-center gap-2 px-4 py-3 bg-bg-elevated border border-dashed border-border rounded-xl cursor-pointer hover:border-gold transition-colors text-sm text-text-muted w-fit ${locFloorUploading ? "opacity-60 pointer-events-none" : ""}`}>
-                      {locFloorUploading ? <span className="animate-spin text-gold">⟳</span> : <span>+</span>} Grundriss hochladen
-                      <input type="file" accept="image/*,.pdf" className="hidden" onChange={async (e) => {
+                    <label className={`flex items-center gap-2 px-4 py-3 bg-bg-elevated border border-dashed border-border rounded-xl cursor-pointer hover:border-gold transition-colors text-sm text-text-muted w-fit ${locFloorUploading ? "opacity-60 pointer-events-none" : ""}`}>{uiText.rich("Ui.text_071ec9fe302b36", { value1: () => (locFloorUploading ? <span className="animate-spin text-gold">⟳</span> : <span>+</span>), part2: () => (<input type="file" accept="image/*,.pdf" className="hidden" onChange={async (e) => {
                         const file = e.target.files?.[0]; if (!file) return;
                         const _fp = safeObjectURL(file); if (_fp) setLocFloorPlanPreview(_fp);
                         setLocFloorUploading(true);
@@ -1359,15 +1418,14 @@ export default function InseratPage() {
                         const json = await res.json();
                         setLocFloorUploading(false);
                         if (json.url) setLocFloorPlanUrl(json.url);
-                      }} />
-                    </label>
+                      }} />) })}</label>
                   )}
                 </div>
 
                 {/* Verfügbarkeit / Gesperrte Tage */}
                 <div>
-                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-1">Gesperrte Tage</label>
-                  <p className="text-xs text-text-muted mb-3">Klicke auf Tage die nicht buchbar sind (rot = gesperrt)</p>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-1">{uiText("Ui.text_d8fc4dc6e34388")}</label>
+                  <p className="text-xs text-text-muted mb-3">{uiText("Ui.text_44361d660df2f4")}</p>
                   {(() => {
                     const today = new Date(); today.setHours(0,0,0,0);
                     const monthNames = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
@@ -1391,7 +1449,7 @@ export default function InseratPage() {
                             className="w-7 h-7 flex items-center justify-center text-text-muted hover:text-gold rounded-lg hover:bg-bg-secondary transition-all">›</button>
                         </div>
                         <div className="grid grid-cols-7 gap-1 mb-1">
-                          {["Mo","Di","Mi","Do","Fr","Sa","So"].map(d => <div key={d} className="text-center text-[10px] text-text-muted font-semibold py-1">{d}</div>)}
+                          {["Mo","Di","Mi","Do","Fr","Sa","So"].map(d => <div key={d} className="text-center text-[10px] text-text-muted font-semibold py-1">{(uiOptionLabels[d] ?? d)}</div>)}
                         </div>
                         <div className="grid grid-cols-7 gap-1">
                           {cells.map((day, i) => {
@@ -1413,7 +1471,7 @@ export default function InseratPage() {
                           })}
                         </div>
                         {locBlockedDates.length > 0 && (
-                          <p className="text-xs text-text-muted mt-3">{locBlockedDates.length} Tag{locBlockedDates.length !== 1 ? "e" : ""} gesperrt</p>
+                          <p className="text-xs text-text-muted mt-3">{uiText.rich("Ui.text_d805d7eea1748c", { value1: () => (locBlockedDates.length), count2: locBlockedDates.length })}</p>
                         )}
                       </div>
                     );
@@ -1427,39 +1485,37 @@ export default function InseratPage() {
             {isJob && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
-                    Gesuchte Rolle *
-                  </label>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("Ui.text_e37e7b1fbbd952")}</label>
                   <RoleDropdown
                     value={form.role_label}
-                    onChange={(val) => { f("role_label", val); if (!form.title) f("title", val); }}
+                    onChange={(val) => { f("role_label", val); if (!form.title) f("title", taxonomyLabel(val, uiText)); }}
                     options={dept ? dept.roles : FILM_DEPARTMENTS.flatMap((d) => d.roles)}
                   />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Produktion / Unternehmen</label>
-                    <input value={form.company} onChange={(e) => f("company", e.target.value)} placeholder="Parallax Films"
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("Ui.text_d5c91f555547df")}</label>
+                    <input value={form.company} onChange={(e) => f("company", e.target.value)} placeholder={uiText("Ui.text_326e376ce7e5f5")}
                       className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Projekttyp</label>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("jobs.filterProjectType")}</label>
                     <FormSelect value={form.projectType} onChange={(v) => f("projectType", v)}
-                      placeholder="Bitte wählen…"
-                      options={projectTypes.map(t => ({ value: t, label: t }))} />
+                      placeholder={uiText("Ui.text_5a65d3a10117a6")}
+                      options={projectTypes.map(value => ({ value, label: projectTypeLabel(value, uiText) }))} />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
-                      {dept?.id === "post" ? "Projektstart *" : "Drehstart *"}
+                      {dept?.id === "post" ? uiText("Ui.text_9b64b293d31d93") : uiText("Ui.text_00d0f4ae17cf0c")}
                     </label>
                     <input type="date" value={form.shoot_start} onChange={(e) => f("shoot_start", e.target.value)}
                       className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors text-sm" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
-                      {dept?.id === "post" ? "Abgabe / Deadline" : "Drehende"}
+                      {dept?.id === "post" ? uiText("Ui.text_c66d1275ea60ff") : uiText("Ui.text_999c5a7a759bc3")}
                     </label>
                     <input type="date" value={form.shoot_end} onChange={(e) => f("shoot_end", e.target.value)}
                       min={form.shoot_start || undefined}
@@ -1467,16 +1523,16 @@ export default function InseratPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Vergütung *</label>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("Ui.text_6c93b335dcaf18")}</label>
                   <div className="flex flex-wrap gap-2">
                     {["Bezahlt", "Deferred Pay", "Spesen & Reise", "Ehrenamtlich / Übung"].map((opt) => (
                       <button key={opt} onClick={() => f("pay_type", opt)}
                         className={`px-3 py-1.5 rounded-lg text-sm border transition-all ${form.pay_type === opt ? "bg-gold text-bg-primary border-gold" : "border-border text-text-secondary hover:border-gold/40"}`}>
-                        {opt}
+                        {(uiOptionLabels[opt] ?? opt)}
                       </button>
                     ))}
                   </div>
-                  {!form.pay_type && <p className="text-xs text-amber-400 mt-1">Vergütung angeben erhöht die Bewerbungsrate deutlich</p>}
+                  {!form.pay_type && <p className="text-xs text-amber-400 mt-1">{uiText("Ui.text_ab8f8423902442")}</p>}
                 </div>
                 {(() => {
                   // Department-specific content warnings
@@ -1484,58 +1540,58 @@ export default function InseratPage() {
                   // Nacktheit / Intimszenen → NUR Vor der Kamera
                   const deptWarnings: Record<string, { key: string; label: string; hint?: string }[]> = {
                     "vor-der-kamera": [
-                      { key: "content_nudity",  label: "Nacktheit / Intimszenen",      hint: "Nacktaufnahmen, Körperbetonung" },
-                      { key: "content_violence", label: "Gewalt / Blut / Waffen",       hint: "Kampfszenen, Verletzungen" },
-                      { key: "content_stunts",  label: "Stunts / körperliches Risiko", hint: "Akrobatik, Actionszenen" },
+                      { key: "content_nudity",  label: uiText("Ui.text_bdfae534ef1a13"),      hint: uiText("Ui.text_792e2e765482af") },
+                      { key: "content_violence", label: uiText("Ui.text_3a07a0e0148f1c"),       hint: uiText("Ui.text_854e31d80b9696") },
+                      { key: "content_stunts",  label: uiText("Ui.text_e289b5eb7624d5"), hint: uiText("Ui.text_a94d676b462df7") },
                     ],
                     regie: [
-                      { key: "content_violence", label: "Gewalt / Blut / Waffen" },
-                      { key: "content_stunts",  label: "Stunts / Action-Koordination" },
+                      { key: "content_violence", label: uiText("Ui.text_3a07a0e0148f1c") },
+                      { key: "content_stunts",  label: uiText("Ui.text_959c9f4dbc51dc") },
                     ],
                     kamera: [
-                      { key: "content_violence", label: "Gewalt / Blut / Waffen" },
-                      { key: "content_stunts",  label: "Stunts / Action-Setups" },
+                      { key: "content_violence", label: uiText("Ui.text_3a07a0e0148f1c") },
+                      { key: "content_stunts",  label: uiText("Ui.text_8341466a8ffc2f") },
                     ],
                     licht: [
-                      { key: "content_violence", label: "Gewalt / Blut / Waffen" },
-                      { key: "content_stunts",  label: "Stunts / körperliches Risiko" },
+                      { key: "content_violence", label: uiText("Ui.text_3a07a0e0148f1c") },
+                      { key: "content_stunts",  label: uiText("Ui.text_e289b5eb7624d5") },
                     ],
                     grip: [
-                      { key: "content_stunts",  label: "Stunts / Rigging-Risiko", hint: "Aufbauten mit erhöhtem Sicherheitsaufwand" },
+                      { key: "content_stunts",  label: uiText("Ui.text_205fd31adb4c06"), hint: uiText("Ui.text_00b1e486fe3833") },
                     ],
                     ton: [
-                      { key: "content_violence", label: "Gewalt / Blut / Waffen" },
-                      { key: "content_stunts",  label: "Stunts / Action-Setups" },
+                      { key: "content_violence", label: uiText("Ui.text_3a07a0e0148f1c") },
+                      { key: "content_stunts",  label: uiText("Ui.text_8341466a8ffc2f") },
                     ],
                     maske: [
-                      { key: "content_violence", label: "SFX-Wunden / Blut / Prothesen", hint: "Verletzungs-Make-up, Latexarbeiten" },
+                      { key: "content_violence", label: uiText("Ui.text_d0f528e124c775"), hint: uiText("Ui.text_c1e278b0b59f91") },
                     ],
                     kostuem:    [],
                     szenenbild: [
-                      { key: "content_violence", label: "Gewalt-Requisiten / Waffen / Blut", hint: "Set-Dekoration für Kampf- oder Tatortszenen" },
-                      { key: "content_stunts",  label: "Stunt-Set / erhöhter Sicherheitsaufwand" },
+                      { key: "content_violence", label: uiText("Ui.text_d535a2f1e3da7b"), hint: uiText("Ui.text_be7636bdb84b1b") },
+                      { key: "content_stunts",  label: uiText("Ui.text_b5f2ae305f424d") },
                     ],
                     produktion: [
-                      { key: "content_violence", label: "Gewalt / Blut / Waffen" },
-                      { key: "content_stunts",  label: "Stunts / körperliches Risiko" },
+                      { key: "content_violence", label: uiText("Ui.text_3a07a0e0148f1c") },
+                      { key: "content_stunts",  label: uiText("Ui.text_e289b5eb7624d5") },
                     ],
                     post: [
-                      { key: "content_violence", label: "Explizites Material in Post", hint: "Rohschnitt enthält Gewalt oder explizite Szenen" },
+                      { key: "content_violence", label: uiText("Ui.text_b9916047b27fa0"), hint: uiText("Ui.text_6261b3d099a8ad") },
                     ],
                   };
 
                   const warnings = dept ? (deptWarnings[dept.id] ?? []) : [
-                    { key: "content_nudity",  label: "Nacktheit / Intimszenen" },
-                    { key: "content_violence", label: "Gewalt / Blut / Waffen" },
-                    { key: "content_stunts",  label: "Stunts / körperliches Risiko" },
+                    { key: "content_nudity",  label: uiText("Ui.text_bdfae534ef1a13") },
+                    { key: "content_violence", label: uiText("Ui.text_3a07a0e0148f1c") },
+                    { key: "content_stunts",  label: uiText("Ui.text_e289b5eb7624d5") },
                   ];
 
                   if (warnings.length === 0) return null;
 
                   return (
                     <div>
-                      <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Inhaltliche Hinweise</label>
-                      <p className="text-xs text-text-muted mb-2">Transparenz schützt alle Beteiligten — bitte ankreuzen wenn zutreffend.</p>
+                      <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("Ui.text_caf2a0c3d0d540")}</label>
+                      <p className="text-xs text-text-muted mb-2">{uiText("Ui.text_b390533dcef67c")}</p>
                       <div className="space-y-2">
                         {warnings.map(({ key, label, hint }) => (
                           <label key={key} className="flex items-start gap-3 cursor-pointer">
@@ -1559,8 +1615,8 @@ export default function InseratPage() {
                     <div className={`w-4 h-4 rounded-full bg-white transition-transform ${form.urgent ? "translate-x-4" : ""}`} />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-text-primary">Dringend gesucht</p>
-                    <p className="text-xs text-text-muted">Wird mit „Urgent“-Badge hervorgehoben</p>
+                    <p className="text-sm font-medium text-text-primary">{uiText("Ui.text_6a138a227e9a95")}</p>
+                    <p className="text-xs text-text-muted">{uiText("Ui.text_9f5e8eea6224de")}</p>
                   </div>
                 </label>
               </div>
@@ -1570,9 +1626,7 @@ export default function InseratPage() {
             {isCreator && dept && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
-                    Deine Rolle im Bereich {dept.label}
-                  </label>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText.rich("Ui.text_5d6b40cb111b18", { value1: () => (taxonomyLabel(dept.label, uiText)) })}</label>
                   <RoleDropdown
                     value={form.skills}
                     onChange={(val) => f("skills", val)}
@@ -1580,9 +1634,9 @@ export default function InseratPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Erfahrung</label>
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("Ui.text_dfe794929179b3")}</label>
                   <input value={form.experience} onChange={(e) => f("experience", e.target.value)}
-                    placeholder="z.B. 5 Jahre, Kinofilm-Credits, Werbung"
+                    placeholder={uiText("Ui.text_c8e451170c82a7")}
                     className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                 </div>
               </div>
@@ -1590,13 +1644,13 @@ export default function InseratPage() {
             {isCreator && !dept && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Skills / Kenntnisse</label>
-                  <input value={form.skills} onChange={(e) => f("skills", e.target.value)} placeholder="z.B. ARRI, Anamorphic, Low Light"
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("Ui.text_e548d20f4d4d00")}</label>
+                  <input value={form.skills} onChange={(e) => f("skills", e.target.value)} placeholder={uiText("Ui.text_972a37a19c25c2")}
                     className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">Erfahrung</label>
-                  <input value={form.experience} onChange={(e) => f("experience", e.target.value)} placeholder="z.B. 5 Jahre, Kinofilm-Credits"
+                  <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">{uiText("Ui.text_dfe794929179b3")}</label>
+                  <input value={form.experience} onChange={(e) => f("experience", e.target.value)} placeholder={uiText("Ui.text_5307689070e03e")}
                     className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors text-sm" />
                 </div>
               </div>
@@ -1605,17 +1659,17 @@ export default function InseratPage() {
             {/* ── TITLE ── */}
             <div>
               <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
-                {isAnimal ? animals("animalName") : isVehicle ? "Titel (optional)" : isJob ? "Anzeigentitel *" : isCreator ? "Dein Name *" : "Titel *"}
+                {isAnimal ? animals("animalName") : isVehicle ? uiText("Ui.text_28551e22d8758b") : isJob ? uiText("Ui.text_8a22dfbfe40c6c") : isCreator ? uiText("Ui.text_0fcc640591717c") : uiText("Ui.text_fe0fc68dab2d5b")}
               </label>
               <input
                 value={form.title}
                 onChange={(e) => f("title", e.target.value)}
                 placeholder={
-                  isAnimal ? animals("animalName") : isVehicle ? "z.B. 1969 Ford Mustang Fastback" :
-                  isLocation ? "z.B. Loft-Wohnung mit Industriecharme, Berlin Mitte" :
-                  isJob ? (form.role_label ? `z.B. ${form.role_label} für Kurzfilm gesucht` : `z.B. ${dept?.label ?? ""}-Stelle für Kurzfilm`) :
-                  isCreator ? "z.B. Max Müller" :
-                  "z.B. ARRI Alexa 35 Komplettpaket"
+                  isAnimal ? animals("animalName") : isVehicle ? uiText("Ui.text_f2a0cdfd7dfb05") :
+                  isLocation ? uiText("Ui.text_4ce21923234e4f") :
+                  isJob ? (form.role_label ? uiText("Ui.text_0bf28613cd9a23", { value1: taxonomyLabel(form.role_label, uiText) }) : uiText("Ui.text_59df9e25511a77", { value1: taxonomyLabel(dept?.label ?? "", uiText) })) :
+                  isCreator ? uiText("Ui.text_e3bd2b3c872c21") :
+                  uiText("Ui.text_861f0f16def9e6")
                 }
                 className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors"
               />
@@ -1624,17 +1678,17 @@ export default function InseratPage() {
             {/* ── DESCRIPTION ── */}
             <div>
               <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
-                {isJob ? "Beschreibung & Anforderungen" : isCreator ? "Kurzbiografie / Über mich" : "Beschreibung"}
+                {isJob ? uiText("Ui.text_481735ef20dce4") : isCreator ? uiText("Ui.text_f842c9b0ecc954") : uiText("setup.description")}
               </label>
               <textarea
                 value={form.description}
                 onChange={(e) => f("description", e.target.value)}
                 rows={4}
                 placeholder={
-                  isJob ? "Was wird erwartet? Anforderungen, Ausstattung, besondere Bedingungen…" :
-                  isCreator ? "Erfahrungen, Credits, Arbeitsstil, Verfügbarkeit…" :
-                  isLocation ? "Besonderheiten, Ausstattung, Parkplätze, Strom, Verfügbarkeit…" :
-                  "Zustand, Besonderheiten, Verfügbarkeit, Lieferung möglich…"
+                  isJob ? uiText("Ui.text_bf5fcc9a48cd94") :
+                  isCreator ? uiText("Ui.text_82ba53454c5fd1") :
+                  isLocation ? uiText("Ui.text_f25b0e4a548621") :
+                  uiText("Ui.text_be6cfdfa49d7b0")
                 }
                 className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors resize-none"
               />
@@ -1647,10 +1701,10 @@ export default function InseratPage() {
               <ProductionCreditsEditor
                 value={productionCredits}
                 onChange={setProductionCredits}
-                heading={isLocation ? "Drehhistorie dieser Location" : "In Produktionen eingesetzt"}
+                heading={isLocation ? uiText("Ui.text_f493609d5b1202") : uiText("Ui.text_bd4c9864e6fdce")}
                 description={isLocation
-                  ? "Zeige, welche Filme, Serien, Werbungen oder Shootings bereits hier gedreht wurden."
-                  : "Zeige, in welchen Filmen, Werbungen oder Shootings dieser Artikel bereits eingesetzt wurde – mit Fotos vom Set."}
+                  ? uiText("Ui.text_9fc3838a324a6f")
+                  : uiText("Ui.text_84ee49453bc4b0")}
               />
             )}
 
@@ -1660,25 +1714,23 @@ export default function InseratPage() {
               <div>
                 {type === "prop" || type === "vehicle" ? null : isAnimal ? <p className="text-sm text-text-secondary">{animals("conditions")}</p> : isLocation ? (
                   <div className="space-y-2">
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest">Preis</label>
+                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest">{uiText("setup.copy41")}</label>
                     <ListingPriceOptions onRequest={locPriceOnRequest} negotiable={priceNegotiable} onChange={value=>{setLocPriceOnRequest(value.priceOnRequest);setPriceNegotiable(value.priceNegotiable);}} />
-                    {!locPriceOnRequest && <label className="block text-xs text-text-muted">Preis pro Drehtag (€)
-                      <input type="number" min="0" value={form.price} onChange={(e) => f("price", e.target.value)} placeholder="z. B. 500" className="mt-1 w-full rounded-xl border border-border bg-bg-elevated px-4 py-3 text-sm text-text-primary placeholder:text-text-muted transition-colors focus:border-gold focus:outline-none" />
-                    </label>}
+                    {!locPriceOnRequest && <label className="block text-xs text-text-muted">{uiText.rich("Ui.text_6c05ba4c8c98d3", { part1: () => (<input type="number" min="0" value={form.price} onChange={(e) => f("price", e.target.value)} placeholder="500" className="mt-1 w-full rounded-xl border border-border bg-bg-elevated px-4 py-3 text-sm text-text-primary placeholder:text-text-muted transition-colors focus:border-gold focus:outline-none" />) })}</label>}
                   </div>
                 ) : (
                   <>
                     <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
-                      {isJob ? "Gage / Tag (€) — 0 = Auf Anfrage" : isCreator ? "Tagesrate (€)" : form.rental_type === "kauf" ? "Kaufpreis (€) *" : "Preis / Tag (€) *"}
+                      {isJob ? uiText("Ui.text_2341277cc84ef9") : isCreator ? uiText("Ui.text_8e8ac54e84a7f9") : form.rental_type === "kauf" ? uiText("Ui.text_59aa29065dfccb") : uiText("Ui.text_118c05ad45086b")}
                     </label>
-                    {!isJob && !isCreator && <label className="mb-2 flex min-h-11 items-center gap-2 text-sm text-text-secondary"><input type="checkbox" checked={priceNegotiable} onChange={event=>{setPriceNegotiable(event.target.checked);if(event.target.checked)setLocPriceOnRequest(false);}} />VB – Verhandlungsbasis (Betrag optional)</label>}
-                    <input type="number" min="0" value={form.price} onChange={(e) => f("price", e.target.value)} placeholder={isJob || isCreator ? "z. B. 500" : form.rental_type === "kauf" ? "z. B. 1200" : "z. B. 800"} className="w-full rounded-xl border border-border bg-bg-elevated px-4 py-3 text-sm text-text-primary placeholder:text-text-muted transition-colors focus:border-gold focus:outline-none" />
+                    {!isJob && !isCreator && <label className="mb-2 flex min-h-11 items-center gap-2 text-sm text-text-secondary">{uiText.rich("Ui.text_403589b75437c6", { part1: () => (<input type="checkbox" checked={priceNegotiable} onChange={event=>{setPriceNegotiable(event.target.checked);if(event.target.checked)setLocPriceOnRequest(false);}} />) })}</label>}
+                    <input type="number" min="0" value={form.price} onChange={(e) => f("price", e.target.value)} placeholder={isJob || isCreator ? "500" : form.rental_type === "kauf" ? "1200" : "800"} className="w-full rounded-xl border border-border bg-bg-elevated px-4 py-3 text-sm text-text-primary placeholder:text-text-muted transition-colors focus:border-gold focus:outline-none" />
                   </>
                 )}
               </div>
               <div>
                 <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
-                  {isJob ? "Ort *" : "Stadt *"}
+                  {isJob ? uiText("Ui.text_85c04c4052dde9") : uiText("Ui.text_a7f3095e67f2ba")}
                 </label>
                 <PlaceField value={form.city} onChange={(value, cityId) => setForm(current => ({ ...current, city: value, selected_place_city_id: cityId || "" }))} required />
               </div>
@@ -1695,7 +1747,7 @@ export default function InseratPage() {
                       setArticleImages(urls);
                     }}
                     onStatusChange={setArticleGalleryState}
-                    label={isAnimal ? animals("gallery") : "Artikelbilder"}
+                    label={isAnimal ? animals("gallery") : uiText("Ui.text_62e0c060c11ffc")}
                   />
                   {articleImages[0] && (
                     <button
@@ -1704,7 +1756,7 @@ export default function InseratPage() {
                       className="flex min-h-10 items-center gap-2 rounded-lg border border-gold/30 px-3 py-2 text-xs text-gold transition-colors hover:border-gold"
                     >
                       <ImageIcon size={12} />
-                      {focalPoint ? "Fokuspunkt des Hauptbilds ändern" : "Fokuspunkt für das Hauptbild setzen"}
+                      {focalPoint ? uiText("Ui.text_ae9f6747714aa1") : uiText("Ui.text_fd80575799f17a")}
                     </button>
                   )}
                 </div>
@@ -1718,9 +1770,9 @@ export default function InseratPage() {
                       setLocExtraImages(urls);
                     }}
                     onStatusChange={setLocationGalleryState}
-                    label="Locationfotos"
+                    label={uiText("Ui.text_fdff84960c7129")}
                   />
-                  {locExtraImages[0] && <button type="button" onClick={() => setShowFocalPicker(true)} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-gold/30 px-3 py-2 text-xs text-gold transition-colors hover:border-gold"><ImageIcon size={12} />{focalPoint ? "Fokuspunkt des Hauptbilds ändern" : "Fokuspunkt des Hauptbilds setzen"}</button>}
+                  {locExtraImages[0] && <button type="button" onClick={() => setShowFocalPicker(true)} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-gold/30 px-3 py-2 text-xs text-gold transition-colors hover:border-gold"><ImageIcon size={12} />{focalPoint ? uiText("Ui.text_ae9f6747714aa1") : uiText("Ui.text_861446dbf1197f")}</button>}
                 </div>
               ) : (
                 <>
@@ -1733,7 +1785,7 @@ export default function InseratPage() {
                   <div className="relative rounded-xl overflow-hidden border border-border aspect-video w-full">
                     <UnoptimizedImage
                       src={imagePreview}
-                      alt="Vorschau"
+                      alt={uiText("Ui.text_69337f6de91475")}
                       className="w-full h-full object-cover"
                       style={{ objectPosition: focalPoint ? `${focalPoint.x}% ${focalPoint.y}%` : "50% 50%" }}
                     />
@@ -1751,9 +1803,7 @@ export default function InseratPage() {
                       </button>
                     )}
                     {imageUrl && (
-                      <div className="absolute bottom-2 left-2 flex items-center gap-1.5 bg-success/20 border border-success/30 text-success text-xs px-2 py-1 rounded-full">
-                        <CheckCircle size={11} /> Hochgeladen
-                      </div>
+                      <div className="absolute bottom-2 left-2 flex items-center gap-1.5 bg-success/20 border border-success/30 text-success text-xs px-2 py-1 rounded-full">{uiText.rich("Ui.text_d95eea9f99f8f2", { part1: () => (<CheckCircle size={11} />) })}</div>
                     )}
                   </div>
                   {imageUrl && (
@@ -1761,10 +1811,7 @@ export default function InseratPage() {
                       type="button"
                       onClick={() => setShowFocalPicker(true)}
                       className="flex items-center gap-2 text-xs text-gold hover:text-gold-light border border-gold/30 hover:border-gold px-3 py-1.5 rounded-lg transition-colors w-fit"
-                    >
-                      <ImageIcon size={12} />
-                      {focalPoint ? "Fokuspunkt ändern" : "Fokuspunkt setzen"} — wo soll das Hauptmotiv sichtbar sein?
-                    </button>
+                    >{uiText.rich("Ui.text_e199bde5fdd61f", { part1: () => (<ImageIcon size={12} />), value2: () => (focalPoint ? uiText("Ui.text_dd2931602e678d") : uiText("Ui.text_8994604b2b50b2")) })}</button>
                   )}
                 </div>
               ) : (
@@ -1773,8 +1820,8 @@ export default function InseratPage() {
                     <ImageIcon size={20} className="text-text-muted group-hover:text-gold transition-colors" />
                   </div>
                   <div className="text-center">
-                    <p className="text-sm font-medium text-text-primary">Bild auswählen</p>
-                    <p className="text-xs text-text-muted mt-0.5">JPG, PNG, WEBP oder HEIC · wird automatisch verkleinert</p>
+                    <p className="text-sm font-medium text-text-primary">{uiText("Ui.text_a37b4f36443414")}</p>
+                    <p className="text-xs text-text-muted mt-0.5">{uiText("Ui.text_0850e09a4688f3")}</p>
                   </div>
                   <input
                     type="file"
@@ -1791,8 +1838,8 @@ export default function InseratPage() {
 
             {/* ── HINT ── */}
             <div className="p-4 bg-bg-secondary border border-border rounded-xl text-sm text-text-muted">
-              <p className="font-semibold text-text-secondary mb-1">Kostenlos inserieren</p>
-              <p>CineGenius ist vollständig kostenlos — keine Provision, keine Gebühren.</p>
+              <p className="font-semibold text-text-secondary mb-1">{uiText("Ui.text_9fc0d9d22d3114")}</p>
+              <p>{uiText("Ui.text_2498f369f8a525")}</p>
             </div>
 
             </div>
@@ -1810,9 +1857,9 @@ export default function InseratPage() {
               className="w-full py-4 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
             >
               {loading ? (
-                <><Loader2 size={18} className="animate-spin" /> {savingPrivate ? marketText("savingDraft") : selected?.type === "job" || selected?.type === "location" ? "Entwurf wird gespeichert…" : (selected?.type === "prop" || selected?.type === "vehicle") && responsible.profileName ? marketplaceText("publishing") : moderation("submitting")}</>
+                <><Loader2 size={18} className="animate-spin" /> {savingPrivate ? marketText("savingDraft") : selected?.type === "job" || selected?.type === "location" ? uiText("Ui.text_22153207f54bea") : (selected?.type === "prop" || selected?.type === "vehicle") && responsible.profileName ? marketplaceText("publishing") : moderation("submitting")}</>
               ) : (
-                <>{(type === "prop" || type === "vehicle") && !marketReview ? marketText("review") : selected?.type === "job" ? "Als Entwurf speichern" : selected?.type === "location" ? "Entwurf speichern und prüfen" : (selected?.type === "prop" || selected?.type === "vehicle") && responsible.profileName ? marketplaceText("publish") : moderation("submit")} <ArrowRight size={18} /></>
+                <>{(type === "prop" || type === "vehicle") && !marketReview ? marketText("review") : selected?.type === "job" ? uiText("Ui.text_3f392fd0af41b6") : selected?.type === "location" ? uiText("Ui.text_99207e26a1676c") : (selected?.type === "prop" || selected?.type === "vehicle") && responsible.profileName ? marketplaceText("publish") : moderation("submit")} <ArrowRight size={18} /></>
               )}
             </button>
             {(type === "prop" || type === "vehicle") && <button type="button" disabled={loading || uploading || articleGalleryState.uploading || articleGalleryState.failed>0} className="min-h-11 w-full rounded-xl border border-border px-4 py-3 text-sm" onClick={()=>handleSubmit(true)}>{marketText("saveDraft")}</button>}
@@ -1868,9 +1915,9 @@ export default function InseratPage() {
           {createdIsDraft ? (
             <>
               {selected?.type === "location" ? (
-                <a href="/dashboard?tab=listings" className="px-6 py-3 border border-border text-text-secondary rounded-xl hover:border-gold hover:text-gold transition-all text-sm font-medium">Später im Dashboard bearbeiten</a>
+                <a href="/dashboard?tab=listings" className="px-6 py-3 border border-border text-text-secondary rounded-xl hover:border-gold hover:text-gold transition-all text-sm font-medium">{uiText("Ui.text_0d3df70a017261")}</a>
               ) : (
-                <a href={`${successHref(createdId)}?preview=1`} target="_blank" rel="noreferrer" className="px-6 py-3 border border-border text-text-secondary rounded-xl hover:border-gold hover:text-gold transition-all text-sm font-medium">Vorschau ansehen</a>
+                <a href={`${successHref(createdId)}?preview=1`} target="_blank" rel="noreferrer" className="px-6 py-3 border border-border text-text-secondary rounded-xl hover:border-gold hover:text-gold transition-all text-sm font-medium">{uiText("Ui.text_491c0db19af4db")}</a>
               )}
               <button type="button" onClick={handlePublishDraft} disabled={publishingDraft} className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm disabled:opacity-50">
                 {!publishingDraft && (selected?.type === "prop" || selected?.type === "vehicle") && responsible.profileName ? marketplaceText("publish") : moderation(publishingDraft ? "submitting" : "submit")}

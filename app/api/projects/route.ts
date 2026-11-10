@@ -3,6 +3,7 @@ import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { saveProjectDraft } from "@/lib/project-drafts-server";
 import { publicProjectMedia } from "@/lib/project-media-rights";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 function privateNoStoreJson(body: unknown, status = 200) {
   const response = NextResponse.json(body, { status });
@@ -12,6 +13,7 @@ function privateNoStoreJson(body: unknown, status = 200) {
 
 // GET /api/projects?q=titel&limit=10&mine=true
 export async function GET(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q") ?? "";
   const rawLimit = Number.parseInt(searchParams.get("limit") ?? "20", 10);
@@ -28,7 +30,7 @@ export async function GET(req: NextRequest) {
       .select("id, title, year, type, director, poster_url")
       .eq("created_by", userId)
       .order("created_at", { ascending: false });
-    if (error) return privateNoStoreJson({ error: error.message }, 500);
+    if (error) return privateNoStoreJson({ error: tResponse('System.requestFailed') }, 500);
     return privateNoStoreJson({ projects: data ?? [] });
   }
 
@@ -43,18 +45,19 @@ export async function GET(req: NextRequest) {
   }
 
   const { data, error } = await query;
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   return NextResponse.json({ projects: (data ?? []).map(project => publicProjectMedia(project)) }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 }
 
 // POST /api/projects — create a private draft; publication is a separate action.
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
   const body = await req.json().catch(() => null);
   if (!body || typeof body !== "object" || Array.isArray(body)) {
-    return NextResponse.json({ error: "Ungültige Anfrage" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_0e4698bf4051') }, { status: 400 });
   }
   const result = await saveProjectDraft(userId, { draftData: body });
   if (result.error) return privateNoStoreJson({ error: result.error }, result.status);

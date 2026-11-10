@@ -6,6 +6,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { projectMediaGrant, projectMediaUrls } from "@/lib/project-media-rights";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 function slugifyName(name: string) {
   return name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -43,6 +44,7 @@ async function findOrCreateUnclaimedProfile(name: string, role: string, userId: 
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -51,8 +53,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const { data: draft, error: draftError } = await db.from("project_drafts")
     .select("id, user_id, source_project_id, published_project_id, draft_data")
     .eq("id", id).eq("user_id", userId).maybeSingle();
-  if (draftError) return NextResponse.json({ error: "Entwurf konnte nicht geladen werden" }, { status: 500 });
-  if (!draft) return NextResponse.json({ error: "Entwurf nicht gefunden oder keine Berechtigung" }, { status: 404 });
+  if (draftError) return NextResponse.json({ error: tResponse('System.m_4bb7a67aea1b') }, { status: 500 });
+  if (!draft) return NextResponse.json({ error: tResponse('System.m_36ae6da39735') }, { status: 404 });
   if (draft.published_project_id) return NextResponse.json({ projectId: draft.published_project_id, alreadyPublished: true });
 
   const data = (draft.draft_data ?? {}) as Record<string, unknown>;
@@ -63,9 +65,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   }
   const publicationMetadata = { ...projectDraftMetadata(data, id), media_rights: rights };
   const title = typeof data.title === "string" ? data.title.trim() : "";
-  if (!title) return NextResponse.json({ error: "Titel ist Pflichtfeld" }, { status: 400 });
+  if (!title) return NextResponse.json({ error: tResponse('System.m_c2018abde6e3') }, { status: 400 });
   if (typeof data.type !== "string" || !data.type.trim()) {
-    return NextResponse.json({ error: "Bitte wähle eine Produktionsart aus" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_af547b8a0b13') }, { status: 400 });
   }
   let projectId: string | null = null;
   const parsedYear = data.year == null || data.year === "" ? null : Number.parseInt(String(data.year), 10);
@@ -87,8 +89,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const { data: project, error } = await db.from("projects").update(updates)
       .eq("id", draft.source_project_id).eq("created_by", userId)
       .select("id").maybeSingle();
-    if (error) return NextResponse.json({ error: "Änderungen konnten nicht veröffentlicht werden" }, { status: 500 });
-    if (!project) return NextResponse.json({ error: "Projekt nicht gefunden oder keine Berechtigung" }, { status: 404 });
+    if (error) return NextResponse.json({ error: tResponse('System.m_3eff693c5cd9') }, { status: 500 });
+    if (!project) return NextResponse.json({ error: tResponse('System.m_248ba736f0b3') }, { status: 404 });
     projectId = project.id;
   } else {
     const { data: existing } = await db.from("projects").select("id")
@@ -108,11 +110,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           .eq("created_by", userId).contains("metadata", { draft_id: id }).maybeSingle();
         if (retryExisting) projectId = retryExisting.id;
       } else if (error) {
-        return NextResponse.json({ error: "Projekt konnte nicht veröffentlicht werden" }, { status: 500 });
+        return NextResponse.json({ error: tResponse('System.m_f29e5bd28fab') }, { status: 500 });
       }
     }
 
-    if (!projectId) return NextResponse.json({ error: "Projektveröffentlichung konnte nicht bestätigt werden" }, { status: 500 });
+    if (!projectId) return NextResponse.json({ error: tResponse('System.m_4e39778ae531') }, { status: 500 });
   }
 
   if (typeof data.myRole === "string" && data.myRole.trim()) {
@@ -120,7 +122,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       { project_id: projectId, user_id: userId, role: data.myRole.trim() },
       { onConflict: "project_id,user_id" },
     );
-    if (creditError) return NextResponse.json({ error: "Projekt gespeichert, Crew-Rolle konnte aber nicht übernommen werden" }, { status: 500 });
+    if (creditError) return NextResponse.json({ error: tResponse('System.m_4e309c756a39') }, { status: 500 });
   }
 
   const crewEntries = Array.isArray(data.crew_entries)
@@ -134,12 +136,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (!name || !role) continue;
     const profile = await findOrCreateUnclaimedProfile(name, role, userId);
     if (profile.error || !profile.id) {
-      return NextResponse.json({ error: "Projekt ist veröffentlicht, aber ein Mitwirkenden-Eintrag konnte nicht gespeichert werden. Bitte erneut veröffentlichen." }, { status: 500 });
+      return NextResponse.json({ error: tResponse('System.m_eb8f17c231f9') }, { status: 500 });
     }
     const existingCredit = await db.from("project_credits").select("id")
       .eq("project_id", projectId).eq("unclaimed_profile_id", profile.id).maybeSingle();
     if (existingCredit.error) {
-      return NextResponse.json({ error: "Projekt ist veröffentlicht, aber Mitwirkende konnten nicht vollständig geladen werden." }, { status: 500 });
+      return NextResponse.json({ error: tResponse('System.m_5cc323e1e295') }, { status: 500 });
     }
     if (!existingCredit.data) {
       const credit = await db.from("project_credits").insert({
@@ -148,7 +150,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         role,
       });
       if (credit.error && credit.error.code !== "23505") {
-        return NextResponse.json({ error: "Projekt ist veröffentlicht, aber ein Mitwirkenden-Eintrag konnte nicht gespeichert werden. Bitte erneut veröffentlichen." }, { status: 500 });
+        return NextResponse.json({ error: tResponse('System.m_eb8f17c231f9') }, { status: 500 });
       }
     }
   }
@@ -157,7 +159,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     published_project_id: projectId,
     updated_at: new Date().toISOString(),
   }).eq("id", id).eq("user_id", userId).is("published_project_id", null);
-  if (markError) return NextResponse.json({ error: "Veröffentlichung gespeichert, aber Entwurfsstatus konnte nicht aktualisiert werden" }, { status: 500 });
+  if (markError) return NextResponse.json({ error: tResponse('System.m_4adae6f6b02b') }, { status: 500 });
 
   revalidatePath("/projects");
   revalidatePath(`/projects/${projectId}`);

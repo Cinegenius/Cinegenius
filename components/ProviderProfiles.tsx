@@ -4,6 +4,8 @@ import { useState } from "react";
 import Image from "@/components/MediaImage";
 import Link from "next/link";
 import { MapPin, UserCircle2, ChevronDown } from "lucide-react";
+import { useTranslations } from "next-intl";
+
 
 export type ProviderProfile = {
   id: string;
@@ -21,6 +23,8 @@ export default function ProviderProfiles({
   profiles: ProviderProfile[];
   heading: string;
 }) {
+  const uiText = useTranslations();
+
   const [open, setOpen] = useState(false);
 
   if (profiles.length === 0) return null;
@@ -85,7 +89,7 @@ export default function ProviderProfiles({
                     {p.bio}
                   </p>
                 )}
-                <span className="text-[10px] text-gold mt-auto">Profil ansehen →</span>
+                <span className="text-[10px] text-gold mt-auto">{uiText("Ui.text_f8e82ad0fdb4ed")}</span>
               </Link>
             ))}
           </div>

@@ -13,6 +13,6 @@ export function mergeMessages(fallback: Messages, selected: Messages): Messages 
 export async function loadMessages(locale: AppLocale) {
   const fallback = (await import('../../messages/de.json')).default;
   if (locale === 'de') return fallback;
-  const selected = await ({en:()=>import('../../messages/en.json'),es:()=>import('../../messages/es.json'),it:()=>import('../../messages/it.json'),cs:()=>import('../../messages/cs.json'),hu:()=>import('../../messages/hu.json')}[locale])();
+  const selected = await ({en:()=>import('../../messages/en.json'),es:()=>import('../../messages/es.json'),it:()=>import('../../messages/it.json'),cs:()=>import('../../messages/cs.json'),hu:()=>import('../../messages/hu.json'),nl:()=>import('../../messages/nl.json'),'nl-BE':()=>import('../../messages/nl-BE.json'),sv:()=>import('../../messages/sv.json')}[locale])();
   return mergeMessages(fallback, selected.default);
 }

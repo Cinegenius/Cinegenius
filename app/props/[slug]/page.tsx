@@ -1,4 +1,5 @@
-import {getLocale} from "next-intl/server";
+import { getTranslations as getPageTranslations } from "next-intl/server";
+import {getLocale, getTranslations } from "next-intl/server";
 import {placeReadFields} from "@/lib/places/catalog";
 import {placeDisplay} from "@/lib/places/core";
 import JsonLd from "@/components/JsonLd";
@@ -13,6 +14,7 @@ import { getListingProvider } from "@/lib/listing-provider";
 import { getCompanyAccess } from "@/lib/company-access";
 
 async function getProp(slug: string, viewerId?: string | null) {
+  const modelText = await getTranslations();
   try {
     const { data, error } = await db
       .from("listings")
@@ -42,7 +44,7 @@ async function getProp(slug: string, viewerId?: string | null) {
 
     return {
       id: data.id,
-      title: data.title ?? "Requisite",
+      title: data.title ?? modelText("Ui.text_27c673e10176f0"),
       category: data.category ?? "Requisiten",
       vendor: provider.name,
       location: data.city ?? "",
@@ -74,15 +76,16 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
+  const pageCopy = await getPageTranslations("PageCopy");
   const { slug } = await params;
   const prop = await getProp(slug);
   if (!prop) return {};
   return {
     alternates: { canonical: `https://www.cinegenius.co/props/${encodeURIComponent(slug)}` },
     title: prop.title,
-    description: `${prop.title} mieten — ${prop.condition}, ${listingPriceLabel(prop.dailyRate,prop.pricing)} bei ${prop.vendor} in ${prop.location}.`,
+    description: pageCopy("p_0e988ef3da6a", { value0: String(prop.title), value1: String(prop.condition), value2: String(listingPriceLabel(prop.dailyRate,prop.pricing)), value3: String(prop.vendor), value4: String(prop.location) }),
     openGraph: {
-      title: `${prop.title} | CineGenius Verleih`,
+      title: pageCopy("p_0da9ff7e8d85", { value0: String(prop.title) }),
       description: `${prop.category} · ${prop.condition} · ${listingPriceLabel(prop.dailyRate,prop.pricing)}`,
       ...(prop.image ? { images: [{ url: prop.image, width: 800, height: 600, alt: prop.title }] } : {}),
     },
@@ -94,6 +97,9 @@ export default async function PropDetailPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  const pageCopy = await getPageTranslations("PageCopy");
+  const uiText = await getTranslations();
+
   const { slug } = await params;
   const { userId } = await auth();
   const prop = await getProp(slug, userId);
@@ -105,9 +111,7 @@ export default async function PropDetailPage({
     "@context": "https://schema.org",
     "@type": "Product",
     "name": prop.title,
-    "description": ("description" in prop && prop.description)
-      ? String(prop.description)
-      : `${prop.category} zum Verleih — ${prop.condition} — ${prop.location}`,
+    "description": ("description" in prop && prop.description) ? String(prop.description) : pageCopy("p_64b2907066bb", { value0: String(prop.category), value1: String(prop.condition), value2: String(prop.location) }),
     "image": prop.image || undefined,
     "brand": {
       "@type": "Brand",

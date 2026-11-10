@@ -1,28 +1,19 @@
+import { parseJobDescription } from "@/lib/job-metadata";
+import { projectTypeLabel } from "@/lib/project-type-labels";
+import { getTranslations as getPageTranslations } from "next-intl/server";
 import JsonLd from "@/components/JsonLd";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import type { Metadata } from "next";
 import JobDetail from "@/components/JobDetail";
 import { auth } from "@clerk/nextjs/server";
+import { getTranslations , getLocale } from "next-intl/server";
 
-function parseJobDescription(raw: string) {
-  const lines = raw.split("\n\n");
-  if (lines.length < 2) return { company: undefined, projectType: undefined, shootDates: undefined, urgent: false, payType: undefined, contentWarnings: [] as string[], description: raw };
-  const metaLine = lines[0];
-  const description = lines.slice(1).join("\n\n");
-  const inhalt = metaLine.match(/Inhalt: ([^·\n]+)/)?.[1]?.trim();
-  return {
-    company: metaLine.match(/Produktion: ([^·\n]+)/)?.[1]?.trim(),
-    projectType: metaLine.match(/Typ: ([^·\n]+)/)?.[1]?.trim() ?? metaLine.match(/Projekttyp: ([^·\n]+)/)?.[1]?.trim(),
-    shootDates: metaLine.match(/Drehtage: ([^·\n]+)/)?.[1]?.trim(),
-    urgent: metaLine.includes("⚡ Dringend"),
-    payType: metaLine.match(/Vergütung: ([^·\n]+)/)?.[1]?.trim(),
-    contentWarnings: inhalt ? inhalt.split(",").map((s) => s.trim()).filter(Boolean) : [] as string[],
-    description,
-  };
-}
 
 async function getJob(slug: string, previewOwnerId?: string) {
+  const uiDataText = await getTranslations();
+  const uiDataLocale = await getLocale();
+
   let query = db
     .from("listings")
     .select("id, user_id, type, title, city, price, description, created_at, published")
@@ -39,21 +30,21 @@ async function getJob(slug: string, previewOwnerId?: string) {
 
   return {
       id: data.id,
-      title: data.title ?? "Job",
-      company: parsed.company ?? "Privatanbieter",
+      title: data.title ?? uiDataText("AdminAccounts.contentKinds.job"),
+      company: parsed.company ?? uiDataText("props.vendorPrivate"),
       projectType: parsed.projectType ?? "Film",
       location: data.city ?? "",
-      rate: (data.price ?? 0) > 0 ? `${data.price} €/Tag` : "Nach Vereinbarung",
-      union: "Non-Union",
-      shootDates: parsed.shootDates ?? "Auf Anfrage",
-      urgent: parsed.urgent,
+      rate: (data.price ?? 0) > 0 ? uiDataText("Ui.text_8a272aeab9d3a5", { amount: Number(data.price).toLocaleString(uiDataLocale) }) : uiDataText("common.byArrangement"),
+      union: uiDataText("Ui.text_35c3daa1b53c44"),
+      shootDates: parsed.shootDates ?? uiDataText("common.onRequest"),
+      urgent: parsed.urgent ?? false,
       payType: parsed.payType,
       contentWarnings: parsed.contentWarnings,
-      tags: data.created_at && (Date.now() - new Date(data.created_at as string).getTime() < 3 * 24 * 60 * 60 * 1000) ? ["Neu"] : [],
-      posted: "Aktuell",
+      tags: data.created_at && (Date.now() - new Date(data.created_at as string).getTime() < 3 * 24 * 60 * 60 * 1000) ? [uiDataText("common.newBadge")] : [],
+      posted: uiDataText("Ui.text_f4d865ae1b7722"),
       description: parsed.description,
       ownerId: data.user_id ?? "",
-      ownerName: parsed.company ?? "Anbieter",
+      ownerName: parsed.company ?? uiDataText("profile.catAnbieterLabel"),
       isReal: true,
   };
 }
@@ -65,6 +56,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ preview?: string }>;
 }): Promise<Metadata> {
+  const pageCopy = await getPageTranslations("PageCopy");
+  const typeText = await getTranslations();
   if ((await searchParams).preview === "1") {
     return { robots: { index: false, follow: false } };
   }
@@ -73,11 +66,11 @@ export async function generateMetadata({
   if (!job) return {};
   return {
     alternates: { canonical: `https://www.cinegenius.co/jobs/${encodeURIComponent(slug)}` },
-    title: `${job.title} bei ${job.company}`,
-    description: `${job.projectType} · ${job.location} · ${job.rate}. ${job.urgent ? "Dringend gesucht — " : ""}Jetzt auf CineGenius bewerben.`,
+    title: pageCopy("p_08d42bd8e216", { value0: String(job.title), value1: String(job.company) }),
+    description: pageCopy("p_29fb1f1278c6", { value0: String(projectTypeLabel(job.projectType, typeText)), value1: String(job.location), value2: String(job.rate), value3: String(job.urgent ? pageCopy("p_802ec227650b") : "") }),
     openGraph: {
       title: `${job.title} | CineGenius Jobs`,
-      description: `${job.company} sucht ${job.title} für ${job.projectType} in ${job.location}.`,
+      description: pageCopy("p_84ba2ee0b343", { value0: String(job.company), value1: String(job.title), value2: String(projectTypeLabel(job.projectType, typeText)), value3: String(job.location) }),
     },
   };
 }
@@ -89,6 +82,10 @@ export default async function JobDetailPage({
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ preview?: string }>;
 }) {
+  const pageCopy = await getPageTranslations("PageCopy");
+  const typeText = await getTranslations();
+  const uiText = await getTranslations();
+
   const { slug } = await params;
   const preview = (await searchParams).preview === "1";
   let previewOwnerId: string | undefined;
@@ -104,9 +101,7 @@ export default async function JobDetailPage({
     "@context": "https://schema.org",
     "@type": "JobPosting",
     "title": job.title,
-    "description": ("description" in job && job.description)
-      ? String(job.description)
-      : `${job.company} sucht ${job.title} für ${job.projectType} in ${job.location}.`,
+    "description": ("description" in job && job.description) ? String(job.description) : pageCopy("p_84ba2ee0b343", { value0: String(job.company), value1: String(job.title), value2: String(projectTypeLabel(job.projectType, typeText)), value3: String(job.location) }),
     "hiringOrganization": {
       "@type": "Organization",
       "name": job.company,

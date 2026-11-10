@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // GET /api/profile-image-comments?profile_id=xxx&image_url=xxx
 export async function GET(req: NextRequest) {
@@ -33,12 +34,13 @@ export async function GET(req: NextRequest) {
 
 // POST /api/profile-image-comments  { profile_id, image_url, text }
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  if (!userId) return NextResponse.json({ error: tResponse('System.m_352f63d9d1d9') }, { status: 401 });
 
   const { profile_id, image_url, text } = await req.json().catch(() => ({}));
   if (!profile_id || !image_url || !text?.trim())
-    return NextResponse.json({ error: "Fehlende Felder" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_07b82fec11ca') }, { status: 400 });
 
   const { data: inserted, error } = await db
     .from("profile_image_comments")
@@ -46,7 +48,7 @@ export async function POST(req: NextRequest) {
     .select("id, author_id, text, created_at")
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
   const { data: profile } = await db.from("profiles").select("display_name, avatar_url").eq("user_id", userId).maybeSingle();
 

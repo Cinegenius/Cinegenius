@@ -16,6 +16,8 @@ export type LocationCard = {
 };
 
 export default function LocationsLanding({ allLocations, totalCount }: { allLocations: LocationCard[]; totalCount: number }) {
+  const uiText = useTranslations();
+
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations("locations");
@@ -37,7 +39,7 @@ export default function LocationsLanding({ allLocations, totalCount }: { allLoca
         badge={t("landingBadge")}
         title={t("heroTitle")}
         titleHighlight={t("heroTitleHighlight")}
-        description={totalCount > 0 ? `${t("results", { count: totalCount })} · ${t("heroDesc")}` : t("heroDesc")}
+        description={totalCount > 0 ? uiText("Ui.text_7c639bc99b8569", { value1: String(t("results", { count: totalCount })), value2: String(t("heroDesc")) }) : t("heroDesc")}
         ctaSecondary={{ label: t("landingAll"), href: "/locations/suche" }}
         cta={{ label: t("heroCta"), href: "/inserat?group=drehorte" }}
       >

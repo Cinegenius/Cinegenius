@@ -84,6 +84,8 @@ function responsibleName(value: Record<string, unknown> | null) {
 }
 
 export function AdminOrganizations() {
+  const uiText = useTranslations();
+
   const t = useTranslations("AdminOrganizations");
   const locale = useLocale();
   const pendingLoad = useRef<AbortController | null>(null);
@@ -216,11 +218,11 @@ export function AdminOrganizations() {
               </div>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2"><h3 className="font-semibold text-text-primary">{entry.title}</h3><span className={`rounded-full border px-2 py-1 text-[11px] ${statusTone(entry.moderation_status)}`}>{ot(`status.${entry.moderation_status}`)}</span></div>
-                <p className="mt-1 text-xs text-text-muted">{ot(`entryType.${entry.entry_type}`)} · {entry.organization?.name ?? t("missingOrganization")}{entry.topic ? ` · ${ot(`topic.${entry.topic}`)}` : ""} · {ot(`format.${entry.format}`)}</p>
+                <p className="mt-1 text-xs text-text-muted">{ot(`entryType.${entry.entry_type}`)} · {entry.organization?.name ?? t("missingOrganization")}{entry.topic ? uiText("Ui.text_f6b53f9c8ab3ef", { value1: String(ot(`topic.${entry.topic}`)) }) : ""} · {ot(`format.${entry.format}`)}</p>
                 {(entry.summary || entry.description) && <div className="mt-3"><p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">{t("descriptionLabel")}</p><p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-text-secondary">{entry.summary || entry.description}</p>{entry.summary && entry.description && <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-text-secondary">{entry.description}</p>}</div>}
                 <dl className="mt-3 grid gap-x-5 gap-y-2 text-xs text-text-secondary sm:grid-cols-2">
                   <div><dt className="font-semibold text-text-muted">{t("venueLabel")}</dt><dd className="mt-0.5">{[entry.venue, entry.city].filter(Boolean).join(" · ") || t("noLocation")}</dd></div>
-                  {entry.starts_at && <div><dt className="font-semibold text-text-muted">{ot("startsAt")}</dt><dd className="mt-0.5">{new Date(entry.starts_at).toLocaleString(locale)}{entry.ends_at ? ` – ${new Date(entry.ends_at).toLocaleString(locale)}` : ""}</dd></div>}
+                  {entry.starts_at && <div><dt className="font-semibold text-text-muted">{ot("startsAt")}</dt><dd className="mt-0.5">{new Date(entry.starts_at).toLocaleString(locale)}{entry.ends_at ? uiText("Ui.text_d3e67227c95466", { value1: String(new Date(entry.ends_at).toLocaleString(locale)) }) : ""}</dd></div>}
                   {entry.registration_url && <div><dt className="font-semibold text-text-muted">{t("registration")}</dt><dd className="mt-0.5"><a href={entry.registration_url} target="_blank" rel="noreferrer" className="break-all text-gold">{entry.registration_url}</a></dd></div>}
                   {entry.external_url && <div><dt className="font-semibold text-text-muted">{t("externalDetails")}</dt><dd className="mt-0.5"><a href={entry.external_url} target="_blank" rel="noreferrer" className="break-all text-gold">{entry.external_url}</a></dd></div>}
                 </dl>

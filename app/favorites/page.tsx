@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Heart, ArrowLeft, MapPin, Car, Package, Briefcase, Users, Trash2 } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
+
 
 type Favorite = {
   id: string;
@@ -15,20 +17,30 @@ type Favorite = {
   created_at: string;
 };
 
-const typeConfig: Record<string, {
+
+
+
+function getLocalizedTypeConfig(translate: (key: string) => string): Record<string, {
   label: string;
   icon: React.ComponentType<{ size?: number; className?: string }>;
   href: (id: string) => string;
   color: string;
-}> = {
-  location: { label: "Location",    icon: MapPin,    href: (id) => `/locations/${id}`, color: "text-sky-400" },
-  vehicle:  { label: "Fahrzeug",   icon: Car,       href: (id) => `/vehicles/${id}`,  color: "text-orange-400" },
-  prop:     { label: "Requisite",  icon: Package,   href: (id) => `/props/${id}`,     color: "text-violet-400" },
-  job:      { label: "Job",        icon: Briefcase, href: (id) => `/jobs/${id}`,      color: "text-emerald-400" },
-  creator:  { label: "Filmschaffende/r", icon: Users, href: (id) => `/profile/${id}`, color: "text-gold" },
-};
+}> {
+  return ({
+  location: { label: translate("profile.labelLocation"),    icon: MapPin,    href: (id) => `/locations/${id}`, color: "text-sky-400" },
+  vehicle:  { label: translate("AdminAccounts.contentKinds.vehicle"),   icon: Car,       href: (id) => `/vehicles/${id}`,  color: "text-orange-400" },
+  prop:     { label: translate("Ui.text_27c673e10176f0"),  icon: Package,   href: (id) => `/props/${id}`,     color: "text-violet-400" },
+  job:      { label: translate("AdminAccounts.contentKinds.job"),        icon: Briefcase, href: (id) => `/jobs/${id}`,      color: "text-emerald-400" },
+  creator:  { label: translate("creators.defaultRole"), icon: Users, href: (id) => `/profile/${id}`, color: "text-gold" },
+});
+}
 
 export default function FavoritesPage() {
+  const uiText = useTranslations();
+  const typeConfig = getLocalizedTypeConfig(uiText);
+
+  const uiLocale = useLocale();
+
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [loading, setLoading] = useState(true);
   const [removing, setRemoving] = useState<string | null>(null);
@@ -70,15 +82,12 @@ export default function FavoritesPage() {
             <ArrowLeft size={16} />
           </Link>
           <div>
-            <h1 className="font-display text-2xl font-bold text-text-primary flex items-center gap-2">
-              <Heart size={20} className="text-crimson-light fill-current" />
-              Merkliste
-            </h1>
-            <p className="text-sm text-text-muted mt-0.5">Gespeicherte Inserate</p>
+            <h1 className="font-display text-2xl font-bold text-text-primary flex items-center gap-2">{uiText.rich("Ui.text_3e8fe8de1e730d", { part1: () => (<Heart size={20} className="text-crimson-light fill-current" />) })}</h1>
+            <p className="text-sm text-text-muted mt-0.5">{uiText("Ui.text_a8c4b8615f9944")}</p>
           </div>
           {!loading && favorites.length > 0 && (
             <span className="ml-auto px-3 py-1 bg-bg-secondary border border-border text-text-muted text-xs rounded-full">
-              {favorites.length} {favorites.length === 1 ? "Eintrag" : "Einträge"}
+              {favorites.length} {favorites.length === 1 ? uiText("Ui.text_99b9259f15b10b") : uiText("Ui.text_b46a6b65c674c7")}
             </span>
           )}
         </div>
@@ -97,22 +106,10 @@ export default function FavoritesPage() {
               <Heart size={24} className="text-text-muted opacity-40" />
             </div>
             <div>
-              <h2 className="font-semibold text-text-primary mb-1">Noch nichts gespeichert</h2>
-              <p className="text-sm text-text-muted max-w-sm mx-auto">
-                Klicke das Herz-Symbol auf einer Detailseite, um Locations, Crew, Jobs und mehr zu speichern.
-              </p>
+              <h2 className="font-semibold text-text-primary mb-1">{uiText("Ui.text_bf33b5684b2765")}</h2>
+              <p className="text-sm text-text-muted max-w-sm mx-auto">{uiText("Ui.text_a07c293eb84aad")}</p>
             </div>
-            <div className="flex flex-wrap justify-center gap-3">
-              <Link href="/locations" className="px-4 py-2 border border-border text-text-secondary text-sm rounded-lg hover:border-gold hover:text-gold transition-all">
-                Locations entdecken
-              </Link>
-              <Link href="/creators" className="px-4 py-2 border border-border text-text-secondary text-sm rounded-lg hover:border-gold hover:text-gold transition-all">
-                Filmschaffende finden
-              </Link>
-              <Link href="/jobs" className="px-4 py-2 border border-border text-text-secondary text-sm rounded-lg hover:border-gold hover:text-gold transition-all">
-                Jobs durchsuchen
-              </Link>
-            </div>
+            <div className="flex flex-wrap justify-center gap-3">{uiText.rich("Ui.text_85bb7e24d07f91", { part1: chunks => (<Link href="/locations" className="px-4 py-2 border border-border text-text-secondary text-sm rounded-lg hover:border-gold hover:text-gold transition-all">{chunks}</Link>), part2: chunks => (<Link href="/creators" className="px-4 py-2 border border-border text-text-secondary text-sm rounded-lg hover:border-gold hover:text-gold transition-all">{chunks}</Link>), part3: chunks => (<Link href="/jobs" className="px-4 py-2 border border-border text-text-secondary text-sm rounded-lg hover:border-gold hover:text-gold transition-all">{chunks}</Link>) })}</div>
           </div>
         )}
 
@@ -149,26 +146,18 @@ export default function FavoritesPage() {
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <Link href={config.href(fav.listing_id)} className="hover:text-gold transition-colors">
-                    <p className="font-semibold text-text-primary truncate">{fav.listing_title ?? "Inserat"}</p>
+                    <p className="font-semibold text-text-primary truncate">{fav.listing_title ?? uiText("AdminAccounts.contentKinds.other")}</p>
                   </Link>
-                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                    <span className={`flex items-center gap-1 text-xs ${config.color}`}>
-                      <Icon size={10} /> {config.label}
-                    </span>
-                    {fav.listing_city && (
+                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">{uiText.rich("Ui.text_a5b6bd1e07b790", { part2: () => (<Icon size={10} />), value3: () => (config.label), part1: chunks => (<span className={`flex items-center gap-1 text-xs ${config.color}`}>{chunks}</span>), value4: () => (fav.listing_city && (
                       <span className="text-xs text-text-muted">{fav.listing_city}</span>
-                    )}
-                    <span className="text-xs text-text-muted">
-                      · Gespeichert {new Date(fav.created_at).toLocaleDateString("de-DE", { day: "numeric", month: "short", year: "numeric" })}
-                    </span>
-                  </div>
+                    )), value6: () => (new Date(fav.created_at).toLocaleDateString(uiLocale, { day: "numeric", month: "short", year: "numeric" })), part5: chunks => (<span className="text-xs text-text-muted">{chunks}</span>) })}</div>
                 </div>
 
                 {/* Price */}
                 {fav.listing_price != null && fav.listing_price > 0 && (
                   <div className="text-right shrink-0">
-                    <p className="text-sm font-semibold text-gold font-mono">{fav.listing_price.toLocaleString()} €</p>
-                    <p className="text-xs text-text-muted">/ Tag</p>
+                    <p className="text-sm font-semibold text-gold font-mono">{fav.listing_price.toLocaleString(uiLocale)} €</p>
+                    <p className="text-xs text-text-muted">{uiText("Ui.text_2bf4c50be2aec3")}</p>
                   </div>
                 )}
 
@@ -177,14 +166,12 @@ export default function FavoritesPage() {
                   <Link
                     href={config.href(fav.listing_id)}
                     className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all"
-                  >
-                    Ansehen
-                  </Link>
+                  >{uiText("Ui.text_8e31363947a6c7")}</Link>
                   <button
                     onClick={() => remove(fav)}
                     disabled={isRemoving}
                     className="w-8 h-8 flex items-center justify-center text-text-muted hover:text-crimson-light transition-colors disabled:opacity-40"
-                    title="Entfernen"
+                    title={uiText("profile.removePhoto")}
                   >
                     <Trash2 size={14} />
                   </button>

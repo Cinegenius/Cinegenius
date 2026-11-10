@@ -10,11 +10,13 @@ import { getListingProvider } from "@/lib/listing-provider";
 import { listingDetailPath } from "@/lib/listing-routes";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { getPrivateProfileIds } from "@/lib/trust";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 const LISTING_TYPES = new Set(["all", "location", "prop", "vehicle", "job", "creator", "service", "animal"]);
 
 // GET /api/admin/listings — complete, paginated admin list, including drafts.
 export async function GET(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const guard = await requireAdmin();
   if (guard instanceof NextResponse) return guard;
 
@@ -25,7 +27,7 @@ export async function GET(req: NextRequest) {
   const rawType = params.get("type") ?? "all";
   const rawStatus = params.get("status") ?? "all";
   if (!LISTING_TYPES.has(rawType) || (!["all", "published"].includes(rawStatus) && !isOfferStatus(rawStatus))) {
-    return NextResponse.json({ error: "Ungültiger Filter." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_17c320022ae6') }, { status: 400 });
   }
 
   let query = db.from("listings")
@@ -44,7 +46,7 @@ export async function GET(req: NextRequest) {
   else if (isOfferStatus(rawStatus)) query = query.eq("moderation_status", rawStatus);
   if (search) query = query.ilike("title", `%${search}%`);
   const { data, error, count } = await query;
-  if (error) return NextResponse.json({ error: "Inserate konnten nicht geladen werden." }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.m_089420ed0ea3') }, { status: 500 });
   const companyIds = [...new Set((data ?? []).flatMap((listing) => listing.company_id ? [listing.company_id] : []))];
   const userIds = [...new Set((data ?? []).flatMap((listing) => !listing.company_id && listing.user_id ? [listing.user_id] : []))];
   const { data: companies } = companyIds.length
@@ -86,6 +88,7 @@ export async function GET(req: NextRequest) {
 
 // PATCH /api/admin/listings — publish or hide a listing with an audit reason.
 export async function PATCH(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const guard = await requireAdmin();
   if (guard instanceof NextResponse) return guard;
 
@@ -97,36 +100,36 @@ export async function PATCH(req: NextRequest) {
     const providerId = body.providerId;
     const reason = validateAdminReason(body?.reason);
     if (typeof listingId !== "string" || !listingId || typeof providerId !== "string" || !providerId || !reason) {
-      return NextResponse.json({ error: "Angebot, Anbieter und eine Begründung sind erforderlich." }, { status: 400 });
+      return NextResponse.json({ error: tResponse('System.m_49a875806bdc') }, { status: 400 });
     }
 
     const { data: listing, error: listingError } = await db.from("listings")
       .select("id, type, user_id, company_id, responsible_person")
       .eq("id", listingId)
       .maybeSingle();
-    if (listingError) return NextResponse.json({ error: "Angebot konnte nicht geladen werden." }, { status: 500 });
-    if (!listing) return NextResponse.json({ error: "Angebot nicht gefunden." }, { status: 404 });
+    if (listingError) return NextResponse.json({ error: tResponse('System.m_33d111b49253') }, { status: 500 });
+    if (!listing) return NextResponse.json({ error: tResponse('System.m_8f7a319d27b8') }, { status: 404 });
 
     let update: Record<string, unknown>;
     if (providerType === "person") {
       const { data: profile } = await db.from("profiles").select("user_id, display_name").eq("user_id", providerId).maybeSingle();
-      if (!profile?.display_name?.trim()) return NextResponse.json({ error: "Das ausgewählte Personenprofil ist nicht verfügbar." }, { status: 400 });
-      if ((await getPrivateProfileIds([providerId])).has(providerId)) return NextResponse.json({ error: "Private Profile können nicht als öffentlicher Anbieter zugeordnet werden." }, { status: 400 });
+      if (!profile?.display_name?.trim()) return NextResponse.json({ error: tResponse('System.m_91bc6af90fb6') }, { status: 400 });
+      if ((await getPrivateProfileIds([providerId])).has(providerId)) return NextResponse.json({ error: tResponse('System.m_de5534d44f16') }, { status: 400 });
       update = { user_id: providerId, company_id: null };
     } else {
       const { data: company } = await db.from("companies").select("id, published, owner_user_id, slug").eq("id", providerId).maybeSingle();
-      if (!company || company.published !== true || !company.slug) return NextResponse.json({ error: "Die ausgewählte Firma ist nicht öffentlich erreichbar." }, { status: 400 });
+      if (!company || company.published !== true || !company.slug) return NextResponse.json({ error: tResponse('System.m_0fe8d99d1634') }, { status: 400 });
       const { data: ownerProfile } = await db.from("profiles").select("user_id").eq("user_id", company.owner_user_id).maybeSingle();
-      if (!ownerProfile) return NextResponse.json({ error: "Bei dieser Firma fehlt ein erreichbares Inhaberprofil. Anbieterzuordnung wurde nicht geändert." }, { status: 400 });
+      if (!ownerProfile) return NextResponse.json({ error: tResponse('System.m_eb933432a583') }, { status: 400 });
       // Keep user_id as the technical submitting account; company_id identifies the actual provider.
       update = { company_id: providerId };
     }
 
     const previousProvider = await getListingProvider(listing.user_id, listing.company_id, guard.userId, listing.responsible_person);
     const audit = await startAdminAudit({ actorUserId: guard.userId, action: "listing_provider_assign", entityType: "listing", entityId: listingId, reason, metadata: { providerType, providerId, previousUserId: listing.user_id, previousCompanyId: listing.company_id } });
-    if (!audit) return NextResponse.json({ error: "Änderung gestoppt: Das Adminprotokoll ist nicht verfügbar." }, { status: 503 });
+    if (!audit) return NextResponse.json({ error: tResponse('System.m_6a08a22878cc') }, { status: 503 });
     const { error: updateError } = await db.from("listings").update({ ...update, responsible_person: null, last_editor_id: guard.userId }).eq("id", listingId);
-    if (updateError) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Anbieterzuordnung konnte nicht gespeichert werden." }, { status: 500 }); }
+    if (updateError) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.m_83039c14f128') }, { status: 500 }); }
     const auditLogged = await finishAdminAudit(audit, "succeeded");
     const assignedCompany = providerType === "company"
       ? await db.from("companies").select("slug").eq("id", providerId).maybeSingle()
@@ -152,6 +155,7 @@ export async function PATCH(req: NextRequest) {
 
 // DELETE /api/admin/listings — remove a listing
 export async function DELETE(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const guard = await requireAdmin();
   if (guard instanceof NextResponse) return guard;
 
@@ -159,11 +163,11 @@ export async function DELETE(req: NextRequest) {
   const listingId = body?.listingId;
   const reason = validateAdminReason(body?.reason);
   if (typeof listingId !== "string" || !listingId || !reason || body?.confirm !== true) {
-    return NextResponse.json({ error: "ID, Begründung und ausdrückliche Bestätigung erforderlich." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_d4c7e54689f9') }, { status: 400 });
   }
 
   const audit = await startAdminAudit({ actorUserId: guard.userId, action: "listing_delete", entityType: "listing", entityId: listingId, reason });
-  if (!audit) return NextResponse.json({ error: "Aktion aus Sicherheitsgründen gestoppt: Das Adminprotokoll ist nicht verfügbar." }, { status: 503 });
+  if (!audit) return NextResponse.json({ error: tResponse('System.m_8f517d75e467') }, { status: 503 });
   const { data, error } = await db
     .from("listings")
     .delete()
@@ -171,8 +175,8 @@ export async function DELETE(req: NextRequest) {
     .select("id")
     .maybeSingle();
 
-  if (error) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: error.message }, { status: 500 }); }
-  if (!data) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Inserat nicht gefunden." }, { status: 404 }); }
+  if (error) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 }); }
+  if (!data) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.m_f9f93622f35e') }, { status: 404 }); }
 
   const auditLogged = await finishAdminAudit(audit, "succeeded");
   return NextResponse.json({ success: true, auditLogged });

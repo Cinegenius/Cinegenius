@@ -4,16 +4,20 @@ import {
   CheckCircle, Zap, Shield, Users, MapPin, Car, Package, Briefcase, Sparkles, ArrowRight,
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const tMetadata = await getMetadataTranslations("Metadata");
+  return {
   alternates: { canonical: "https://www.cinegenius.co/pricing" },
-  title: "Preise",
-  description: "CineGenius ist kostenlos für alle. Keine versteckten Gebühren. Locations, Crew, Equipment und Jobs finden und inserieren.",
+  title: tMetadata('m_56e09549c5d6'),
+  description: tMetadata('m_4caf8207a7d6'),
   openGraph: {
-    title: "Preise & Konditionen — CineGenius",
-    description: "Kostenlos mitmachen — keine versteckten Gebühren.",
+    title: tMetadata('m_25c9d8601aa8'),
+    description: tMetadata('m_8a6a55ed5040'),
   },
 };
+}
 
 export default async function PricingPage() {
   const t = await getTranslations("pricing");

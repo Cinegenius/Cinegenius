@@ -3,6 +3,8 @@
 import { useState } from "react";
 import type { CSSProperties } from "react";
 import { ImageOff } from "lucide-react";
+import { useTranslations } from "next-intl";
+
 
 type ResilientPublicImageProps = {
   src: string;
@@ -24,6 +26,8 @@ export default function ResilientPublicImage({
   style,
   imageStyle,
 }: ResilientPublicImageProps) {
+  const uiText = useTranslations();
+
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
 
   return (
@@ -31,12 +35,9 @@ export default function ResilientPublicImage({
       {failedSrc === src ? (
         <div
           role="img"
-          aria-label={alt ? `${alt}: Foto derzeit nicht erreichbar` : "Foto derzeit nicht erreichbar"}
+          aria-label={alt ? uiText("Ui.text_7d605ca2709052", { value1: String(alt) }) : uiText("MediaGallery.unavailable")}
           className="flex h-full min-h-16 w-full flex-col items-center justify-center gap-2 bg-bg-elevated px-3 text-center text-xs text-text-muted"
-        >
-          <ImageOff size={20} aria-hidden="true" />
-          <span>Foto derzeit nicht erreichbar</span>
-        </div>
+        >{uiText.rich("Ui.text_d98b12e8bfcae8", { part1: () => (<ImageOff size={20} aria-hidden="true" />), part2: chunks => (<span>{chunks}</span>) })}</div>
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={src} alt={alt} loading={loading} className={imageClassName} style={imageStyle} onError={() => setFailedSrc(src)} />

@@ -2,16 +2,20 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Film, Users, Zap, Star, ArrowRight, CheckCircle } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const tMetadata = await getMetadataTranslations("Metadata");
+  return {
   alternates: { canonical: "https://www.cinegenius.co/about" },
-  title: "Über uns",
-  description: "CineGenius ist der All-in-One-Marktplatz für Film, Social Media & Fotografie in Deutschland, Österreich und der Schweiz. Locations, Crew, Equipment und Jobs — alles an einem Ort.",
+  title: tMetadata('m_b7defbf9cff0'),
+  description: tMetadata('m_5df5561d6f2f'),
   openGraph: {
-    title: "Über CineGenius",
-    description: "Der Marktplatz für Film, Social Media & Fotografie im DACH-Raum.",
+    title: tMetadata('m_d2408f28b29b'),
+    description: tMetadata('m_6e2c107adcc8'),
   },
 };
+}
 
 export default async function AboutPage() {
   const t = await getTranslations("about");

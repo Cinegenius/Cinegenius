@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { listingDetailPath } from "@/lib/listing-routes";
 import { setupOfferState, submitSetupOffer, type SetupOfferState } from "@/lib/setup-offer-submission";
+import { uiErrorMessage } from "@/lib/ui-error-message";
 
 type Offer = { id: string; kind: "location" | "equipment"; title: string };
 type CurrentOffer = { id: string; type: string; published: boolean; moderation_status?: string };
@@ -42,7 +43,7 @@ export default function SetupCompletionOffers({ offers }: { offers: Offer[] }) {
       const state = await submitSetupOffer(offer.id, t("saveError"));
       setCurrent(value => ({ ...value, [offer.id]: { ...value[offer.id], state } }));
     } catch (error) {
-      setErrors(value => ({ ...value, [offer.id]: error instanceof Error ? error.message : t("saveError") }));
+      setErrors(value => ({ ...value, [offer.id]: uiErrorMessage(error, t("saveError")) }));
     } finally {
       inFlight.current.delete(offer.id);
       setBusy(value => ({ ...value, [offer.id]: false }));

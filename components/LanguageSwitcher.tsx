@@ -4,15 +4,9 @@ import { useState, useRef, useEffect, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Globe, Check } from "lucide-react";
+import { LANGUAGE_OPTIONS } from "@/lib/i18n/locales";
 
-const LANGUAGES = [
-  { code: "de", label: "Deutsch",  flag: "🇩🇪" },
-  { code: "en", label: "English",  flag: "🇬🇧" },
-  { code: "es", label: "Español",  flag: "🇪🇸" },
-  { code: "it", label: "Italiano", flag: "🇮🇹" },
-  { code: "cs", label: "Čeština",  flag: "🇨🇿" },
-  { code: "hu", label: "Magyar",   flag: "🇭🇺" },
-];
+const LANGUAGES = LANGUAGE_OPTIONS;
 
 function persistLocaleCookie(code: string) {
   document.cookie = `cg_locale=${code}; path=/; max-age=31536000; samesite=lax`;
@@ -25,6 +19,7 @@ export default function LanguageSwitcher() {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const ref = useRef<HTMLDivElement>(null);
+  const languageUpdates = useRef<Promise<unknown>>(Promise.resolve());
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -43,11 +38,11 @@ export default function LanguageSwitcher() {
 
     // Cookie is already available to the refresh. Do not delay the switch on a second request.
     startTransition(() => router.refresh());
-    void fetch("/api/locale", {
+    languageUpdates.current = languageUpdates.current.catch(() => undefined).then(() => fetch("/api/locale", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({locale: code}),
-    }).catch(() => { /* The directly stored cookie remains authoritative. */ });
+      body: JSON.stringify({locale: code, persistOnly: true}),
+    })).catch(() => { /* The directly stored cookie remains authoritative. */ });
   };
 
   const currentLang = LANGUAGES.find((l) => l.code === current);
@@ -67,12 +62,14 @@ export default function LanguageSwitcher() {
       </button>
 
       {open && (
-        <div className="absolute top-full right-0 mt-1.5 w-44 bg-bg-elevated border border-border rounded-lg shadow-xl overflow-hidden z-50 animate-fade-in">
+        <div className="absolute top-full right-0 mt-1.5 w-56 max-w-[calc(100vw-2rem)] max-h-[70dvh] overflow-y-auto bg-bg-elevated border border-border rounded-lg shadow-xl z-50 animate-fade-in">
           {LANGUAGES.map((lang) => (
             <button
               key={lang.code}
+              type="button"
               onClick={() => select(lang.code)}
-              className={`w-full flex items-center gap-2 px-3 py-1.5 text-xs transition-colors hover:bg-bg-hover ${
+              aria-current={current === lang.code ? "true" : undefined}
+              className={`w-full min-h-11 flex items-center gap-2 px-3 py-2 text-xs transition-colors hover:bg-bg-hover ${
                 current === lang.code ? "text-gold" : "text-text-secondary"
               }`}
             >

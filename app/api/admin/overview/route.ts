@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 type CountFilter = { op: "eq" | "in" | "gt"; column: string; value: string | boolean | string[] };
 
@@ -30,6 +31,7 @@ async function attentionCounts(includeOffers = false) {
 }
 
 export async function GET(request: Request) {
+  const tResponse = await getResponseTranslations();
   const startedAt = performance.now();
   const admin = await requireAdmin();
   if (admin instanceof NextResponse) return admin;
@@ -82,6 +84,6 @@ export async function GET(request: Request) {
     }, { headers: { "Cache-Control": "private, no-store", "Server-Timing": `auth;dur=${(authorizedAt - startedAt).toFixed(1)}, database;dur=${(performance.now() - authorizedAt).toFixed(1)}` } });
   } catch (error) {
     console.error("[admin] overview failed", error);
-    return NextResponse.json({ error: "Die Adminübersicht konnte nicht vollständig geladen werden. Bitte Datenquelle und Admin-Migration prüfen." }, { status: 503 });
+    return NextResponse.json({ error: tResponse('System.m_10b8cf9a5b3f') }, { status: 503 });
   }
 }

@@ -9,6 +9,7 @@ import ListingPhotoGallery from "@/components/ListingPhotoGallery";
 import { SupportMessageAction } from "@/components/admin/SupportMessageAction";
 import OfferModerationStatus from "@/components/OfferModerationStatus";
 import { adminReviewReason, type AdminReview } from "@/lib/admin-review";
+import { uiErrorMessage } from "@/lib/ui-error-message";
 
 export default function AdminReviewDetail({ review }: { review: AdminReview }) {
   const t = useTranslations("AdminReview");
@@ -46,7 +47,7 @@ export default function AdminReviewDetail({ review }: { review: AdminReview }) {
       const warnings = Array.isArray(result.warnings) ? result.warnings.filter((issue: unknown): issue is string => typeof issue === "string" && t.has("issues." + issue)) : [];
       setSuccess(m("decisionSaved") + (warnings.length ? " " + t("approvedWithWarnings", { details: warnings.map((issue: string) => t("issues." + issue)).join("; ") }) : "") + (result.cacheRefreshed === false ? " " + t("cacheWarning") : ""));
       setAcknowledged(false); setReason(""); router.refresh();
-    } catch (cause) { setError(cause instanceof Error ? cause.message : t("saveError")); }
+    } catch (cause) { setError(uiErrorMessage(cause, t("saveError"))); }
     finally { lock.current = false; setSaving(false); }
   }
   const back = () => {

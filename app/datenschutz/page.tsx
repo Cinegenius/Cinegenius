@@ -1,47 +1,83 @@
 import {getTranslations} from "next-intl/server";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const tMetadata = await getMetadataTranslations("Metadata");
+  return {
   alternates: { canonical: "https://www.cinegenius.co/datenschutz" },
-  title: "Datenschutzerklärung",
-  description: "Datenschutzerklärung gemäß DSGVO für CineGenius — vollständige Informationen über Datenverarbeitung, eingesetzte Dienste und deine Rechte.",
+  title: tMetadata('m_a1235efbc18d'),
+  description: tMetadata('m_e31d1ae1dff3'),
 };
+}
 
 export default async function DatenschutzPage() {
+  const uiText = await getTranslations();
+  const uiOptionLabels: Record<string, string> = {
+    "Clerk": uiText("Ui.text_dd192288ced6e9"),
+    "Supabase": uiText("Ui.text_fe7ceb7816ed0e"),
+    "Vercel": uiText("Ui.text_68edc75c015e2e"),
+    "Stripe": uiText("Ui.text_961a6062ba1ba2"),
+    "Sentry": uiText("Ui.text_5ece526b2e72c2"),
+    "Resend": uiText("Ui.text_1f94843777aed8"),
+    "Vercel Analytics": uiText("Ui.text_3f1ff89269fcea"),
+    "Vercel Speed Insights": uiText("Ui.text_52862c368ba698"),
+    "OpenStreetMap Nominatim": uiText("Ui.text_8cef47f31aa306"),
+    "Authentifizierung / Login": uiText("Ui.text_a5373ffc8409d2"),
+    "Datenbank & Dateispeicher": uiText("Ui.text_1cbf6f1bafcd28"),
+    "Hosting & CDN": uiText("Ui.text_da77aba39cd821"),
+    "Zahlungsabwicklung": uiText("Ui.text_6f48fbdba30ab1"),
+    "E-Mail-Versand": uiText("Ui.text_aede0443695428"),
+    "Nutzungsstatistiken (cookielos)": uiText("Ui.text_7872cd1b8aa7c3"),
+    "Performance-Messung (cookielos)": uiText("Ui.text_888d385c2be74b"),
+    "Geocoding von Städtenamen": uiText("Ui.text_9e98ad5683d751"),
+    "USA": uiText("Ui.text_aa5ab35a9174c2"),
+    "EU (Frankfurt)": uiText("Ui.text_fc3782bd2fd753"),
+    "UK / EU": uiText("Ui.text_bbe3aca285ed92"),
+    "Profildaten, Inserate und Entwürfe": uiText("Ui.text_6d1e40c0f7a667"),
+    "Nachrichten und Supportvorgänge": uiText("Ui.text_2e19e231bca837"),
+    "Profilaufrufe, Foto-Likes und Präsenzdaten": uiText("Ui.text_b7b179c958ba80"),
+    "Hosting-, Fehler- und E-Mail-Protokolle": uiText("Ui.text_e86a5d6f175ed5"),
+    "Vertrags- und Abrechnungsunterlagen": uiText("Ui.text_54643357de0295"),
+    "Für die Bereitstellung des Kontos und der gespeicherten Inhalte; Löschanfragen können über die Kontoeinstellungen oder den Support gestellt werden": uiText("Ui.text_b72f03e8ce9080"),
+    "Für die Kommunikation und erforderliche Bearbeitung; lokales Ausblenden einer Nachricht löscht nicht automatisch die Empfängerkopie": uiText("Ui.text_f44a4b40ae3a40"),
+    "Nur soweit für die jeweiligen Funktionen und erforderlichen Nachweise benötigt": uiText("Ui.text_7301cd37c3fd00"),
+    "Nach der tatsächlichen Dienstkonfiguration und dem erforderlichen Betriebszweck": uiText("Ui.text_2235d05ee2c319"),
+    "Soweit vorhanden und gesetzlich vorgeschrieben, für die jeweils anwendbare Aufbewahrungsfrist": uiText("Ui.text_d160bfb031e885"),
+  };
+
+
+
+
   const t = await getTranslations("LegalAuditOriginal");
   return (
     <div className="pt-16 min-h-screen min-w-0 bg-bg-primary [overflow-wrap:anywhere]">
       <div className="max-w-2xl mx-auto px-4 py-16">
 
         <div className="mb-10">
-          <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-3">Rechtliches</p>
-          <h1 className="font-display text-3xl font-bold text-text-primary mb-2">Datenschutzerklärung</h1>
+          <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-3">{uiText("Ui.text_0da5374b4c42ae")}</p>
+          <h1 className="font-display text-3xl font-bold text-text-primary mb-2">{uiText("cookie.link")}</h1>
           <p className="text-text-muted text-sm">{t("privacyDate")}</p>
         </div>
 
         <div className="space-y-10 text-text-secondary text-sm leading-relaxed">
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">1. Verantwortlicher</h2>
-            <p>
-              Markus Müller<br />
-              Plinganserstrasse 19, 81369 München<br />
-              E-Mail: <a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">cinegenius.co@gmail.com</a><br />
-              Tel: <a href="tel:+491713866624" className="text-gold hover:underline">+49 171 3866624</a>
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_ebb2bcce0d2b33")}</h2>
+            <p>{uiText.rich("Ui.text_6c75d83671505b", { part1: () => (<br />), part2: () => (<br />), part3: chunks => (<a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">{chunks}</a>), part4: () => (<br />), part5: chunks => (<a href="tel:+491713866624" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">2. Überblick der eingesetzten Dienste</h2>
-            <p className="mb-3">Auf CineGenius kommen folgende externe Dienste zum Einsatz, die personenbezogene Daten verarbeiten können:</p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_5a32db135f8479")}</h2>
+            <p className="mb-3">{uiText("Ui.text_f6618e1359baa7")}</p>
             <div className="overflow-x-auto">
               <table className="w-full text-xs border-collapse">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left py-2 pr-4 text-text-primary font-semibold">Dienst</th>
-                    <th className="text-left py-2 pr-4 text-text-primary font-semibold">Zweck</th>
-                    <th className="text-left py-2 text-text-primary font-semibold">Sitz</th>
+                    <th className="text-left py-2 pr-4 text-text-primary font-semibold">{uiText("Ui.text_ecc4f77cf21313")}</th>
+                    <th className="text-left py-2 pr-4 text-text-primary font-semibold">{uiText("Ui.text_5c123d4febae37")}</th>
+                    <th className="text-left py-2 text-text-primary font-semibold">{uiText("Ui.text_48652c16f7639c")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -57,155 +93,110 @@ export default async function DatenschutzPage() {
                     ["OpenStreetMap Nominatim", "Geocoding von Städtenamen", "UK / EU"],
                   ].map(([d, z, s]) => (
                     <tr key={d}>
-                      <td className="py-2 pr-4 font-medium text-text-primary">{d}</td>
-                      <td className="py-2 pr-4">{z}</td>
-                      <td className="py-2">{s}</td>
+                      <td className="py-2 pr-4 font-medium text-text-primary">{(uiOptionLabels[d] ?? d)}</td>
+                      <td className="py-2 pr-4">{(uiOptionLabels[z] ?? z)}</td>
+                      <td className="py-2">{(uiOptionLabels[s] ?? s)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <p className="mt-3 text-text-muted text-xs">Informationen zu Drittlandübertragungen findest du in Abschnitt 17. Die konkreten Dienstverträge und Speicherkonfigurationen sind vom Betreiber zu prüfen.</p>
+            <p className="mt-3 text-text-muted text-xs">{uiText("Ui.text_f0d2ffad706599")}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">3. Registrierung & Nutzerkonto</h2>
-            <p>
-              Für die Erstellung eines Kontos verarbeiten wir über <strong className="text-text-primary">Clerk Inc.</strong> deinen Namen und deine E-Mail-Adresse. Optional kannst du ein Profilbild hochladen. Die Daten werden zur Vertragserfüllung benötigt (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO). Passwörter werden von uns nicht gespeichert — die Authentifizierung läuft vollständig über Clerk.
-            </p>
-            <p className="mt-2">
-              Clerk verarbeitet Anmeldedaten auf Servern in den USA auf Basis von Standardvertragsklauseln.<br />
-              Datenschutz Clerk: <a href="https://clerk.com/privacy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">clerk.com/privacy</a>
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_fa04380c470bab")}</h2>
+            <p>{uiText.rich("Ui.text_0ecf904775ac39", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</p>
+            <p className="mt-2">{uiText.rich("Ui.text_d495c49dd5837a", { part1: () => (<br />), part2: chunks => (<a href="https://clerk.com/privacy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">4. Profildaten & Inserate</h2>
-            <p>
-              Alle von dir eingestellten Inhalte — Profildaten, Inserate, Beschreibungen, Bilder — werden in unserer Datenbank (<strong className="text-text-primary">Supabase</strong>, Server in Frankfurt/EU) gespeichert. Rechtsgrundlage ist die Vertragserfüllung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO). Veröffentlichte Inhalte sind entsprechend ihrer Sichtbarkeit öffentlich einsehbar. Private Entwürfe und persönliche Kontaktdaten unterliegen gesonderten Sichtbarkeits- und Zugriffsregeln. Persönliche Kontaktdaten werden nicht automatisch zu öffentlichen Firmenkontakten.
-            </p>
-            <p className="mt-2">
-              Datenschutz Supabase: <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">supabase.com/privacy</a>
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_611ed3fea6bc0b")}</h2>
+            <p>{uiText.rich("Ui.text_0977c086c9faae", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</p>
+            <p className="mt-2">{uiText.rich("Ui.text_3fb2cb0d3f1da2", { part1: chunks => (<a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">5. Nachrichten & Kommunikation</h2>
-            <p>
-              Nachrichten zwischen Nutzern werden zur Ermöglichung der Plattformfunktion in der Datenbank gespeichert (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO). Private Gespräche sind nicht als allgemeiner Admininhalt frei durchsuchbar. Für rechtmäßig erforderliche Prüfungen oder gemeldete Inhalte ist der Zugriff auf das notwendige Maß zu beschränken. Nachrichten an „CineGenius Support“ werden von berechtigten Supportadministratoren bearbeitet. Die Funktion „für mich löschen“ blendet eine eigene Nachricht nur für den Absender aus; beim Empfänger kann sie weiterhin sichtbar sein. Bewerbungen auf Job-Inserate werden dem ausschreibenden Unternehmen weitergegeben.
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_7e7d30e65a87d8")}</h2>
+            <p>{uiText("Ui.text_c6f3386a6e0579")}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">6. Profilaufrufe</h2>
-            <p>
-              Wenn ein eingeloggter Nutzer ein Profil besucht, speichern wir intern, dass dieses Profil aufgerufen wurde (Zeitstempel und pseudonymisierter Bezug zum Betrachter). So können Profilinhaber sehen, wie oft ihr Profil aufgerufen wurde. Rechtsgrundlage ist das berechtigte Interesse beider Seiten an Transparenz (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO). Nicht eingeloggte Besucher werden über diese Profilaufruffunktion nicht erfasst. Es gilt die unter „Speicherdauer & Löschung“ beschriebene Begrenzung.
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_4b64aeaa56a72b")}</h2>
+            <p>{uiText("Ui.text_9ab536f2317d7e")}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">7. Online-Präsenzstatus</h2>
-            <p>
-              Wenn du eingeloggt bist, sendet die Plattform bei sichtbarem Browser-Tab ungefähr alle zwei Minuten einen authentifizierten Ping an unsere Server, der deinen Online-Status aktualisiert. Dabei wird ausschließlich deine pseudonymisierte Nutzer-ID sowie ein Zeitstempel gespeichert — keine Inhalte oder Standortdaten. Dieser Status wird anderen Nutzern als „Online“-Indikator angezeigt. Rechtsgrundlage ist das berechtigte Interesse an einer funktionalen Kommunikationsplattform (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO). Die Anzeige richtet sich nach dem zuletzt gespeicherten Aktivitätszeitpunkt. Dieser Zeitpunkt wird nicht bei jeder Abmeldung automatisch gelöscht.
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_2c8eaa209e9a87")}</h2>
+            <p>{uiText("Ui.text_a6b7d5bcf43c72")}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">8. Foto-Likes</h2>
-            <p>
-              Nutzer können Profilbilder anderer Nutzer mit einem Like versehen. Dabei speichern wir, welcher Nutzer (pseudonymisierte ID) welches Bild (URL) geliked hat, sowie den Zeitstempel der Aktion. Diese Information ist für den Profilinhaber einsehbar (Anzahl der Likes). Die individuelle Zuordnung (wer hat geliked) ist nicht öffentlich sichtbar. Rechtsgrundlage ist die Vertragserfüllung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO). Likes können jederzeit durch erneutes Klicken entfernt werden.
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_13e13e4c86a9ac")}</h2>
+            <p>{uiText("Ui.text_f36dfccc3e4bc6")}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">9. Öffentliche Fotos, Firmenzugehörigkeit und Entwürfe</h2>
-            <p>Öffentlich sichtbare Profilfotos, Coverbilder und direkt zugeordnete persönliche Portfoliofotos sowie Firmenlogos, Firmen-Cover und Firmengalerien können auch in „Frische Einblicke“ erscheinen. Dafür ist keine gesonderte Kennzeichnung notwendig. Bilder eigenständiger Projekte, Locations, Marktplatzangebote und Beiträge im Schwarzen Brett sowie private Bilder, Entwürfe und Nachrichtenanhänge sind von dieser Sammlung ausgeschlossen. Die Zuordnung zum öffentlichen Profil oder Unternehmen bleibt erhalten.</p>
-            <p className="mt-2">Zugehörigkeitsanfragen und Firmeneinladungen enthalten Profilbezug, gewünschte Funktionen und gegebenenfalls eine Nachricht. Sie werden zur Entscheidung durch die jeweils berechtigte Gegenseite verarbeitet. Die Zugehörigkeit erscheint erst nach Bestätigung öffentlich. Eine öffentliche Firmenfunktion ist von technischen Verwaltungsrechten getrennt.</p>
-            <p className="mt-2">Die geführte Einrichtung und die Profilbearbeitung speichern begonnene Angaben als privaten Entwurf im bestehenden Kontosystem. Rechtsgrundlage für diese Funktionen ist die Bereitstellung der angeforderten Plattformleistung (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO).</p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_2d81e07ce7f7f9")}</h2>
+            <p>{uiText("Ui.text_ac80679995e973")}</p>
+            <p className="mt-2">{uiText("Ui.text_ead49c8e2ee161")}</p>
+            <p className="mt-2">{uiText("Ui.text_c0370dcbb5d3e0")}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">10. Zahlungsabwicklung (Stripe)</h2>
-            <p>
-              Eine Anfrage auf CineGenius löst keine automatische Zahlung aus. In der Plattform ist eine Schnittstelle zu <strong className="text-text-primary">Stripe</strong> vorbereitet; eine allgemeine Treuhandabwicklung wird nicht angeboten. Falls eine gesonderte Zahlungsfunktion bereitgestellt und ausdrücklich genutzt wird, sind deren konkrete Datenverarbeitung und Bedingungen vorab anzugeben.<br />
-              Datenschutz Stripe: <a href="https://stripe.com/de/privacy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">stripe.com/de/privacy</a>
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_f9a9bed03c18b2")}</h2>
+            <p>{uiText.rich("Ui.text_3d21c2d6becf05", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>), part2: () => (<br />), part3: chunks => (<a href="https://stripe.com/de/privacy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">11. Hosting & Infrastruktur (Vercel)</h2>
-            <p>
-              Die Plattform wird bei <strong className="text-text-primary">Vercel Inc.</strong> (USA) gehostet. Vercel verarbeitet Zugriffsdaten (IP-Adresse, Browsertyp, aufgerufene Seite, Datum und Uhrzeit) in Server-Logs. Rechtsgrundlage ist das berechtigte Interesse an einem sicheren und fehlerfreien Betrieb (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO). Die konkrete Aufbewahrung richtet sich nach der eingesetzten Hosting-Konfiguration und den notwendigen Betriebs- und Sicherheitszwecken.<br />
-              Datenschutz Vercel: <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">vercel.com/legal/privacy-policy</a>
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_e8909434900434")}</h2>
+            <p>{uiText.rich("Ui.text_e671b124557fc3", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>), part2: () => (<br />), part3: chunks => (<a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">12. Fehler-Tracking (Sentry)</h2>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_65de63aa494e84")}</h2>
             <p>
               {t("sentryPrepared")}
             </p>
-            <p className="mt-2">
-              {t("replayDisabled")}<br />
-              Datenschutz Sentry: <a href="https://sentry.io/privacy/" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">sentry.io/privacy</a>
-            </p>
+            <p className="mt-2">{uiText.rich("Ui.text_9ea859209bd02b", { value1: () => (t("replayDisabled")), part2: () => (<br />), part3: chunks => (<a href="https://sentry.io/privacy/" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">13. E-Mail-Versand (Resend)</h2>
-            <p>
-              {t("resendDisclosure")}<br />
-              Datenschutz Resend: <a href="https://resend.com/privacy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">resend.com/privacy</a>
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_e966e1c8944555")}</h2>
+            <p>{uiText.rich("Ui.text_2f87ba40e8a08c", { value1: () => (t("resendDisclosure")), part2: () => (<br />), part3: chunks => (<a href="https://resend.com/privacy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">14. Nutzungsstatistiken (Vercel Analytics & Speed Insights)</h2>
-            <p>
-              Wir nutzen <strong className="text-text-primary">Vercel Analytics</strong> und <strong className="text-text-primary">Vercel Speed Insights</strong> zur Auswertung von Seitenaufrufen und Ladezeiten. Diese Dienste arbeiten <strong className="text-text-primary">ohne Cookies und ohne persönliche Identifikatoren</strong>. IP-Adressen werden nicht gespeichert; die Daten sind vollständig aggregiert und anonymisiert. Eine Rückverfolgung auf einzelne Personen ist technisch ausgeschlossen. Rechtsgrundlage ist das berechtigte Interesse an der Verbesserung der Plattform (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO).<br />
-              Datenschutz Vercel Analytics: <a href="https://vercel.com/docs/analytics/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">vercel.com/docs/analytics/privacy-policy</a>
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_3cd4554dd7ab2f")}</h2>
+            <p>{uiText.rich("Ui.text_fb3764d3dac6f5", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>), part2: chunks => (<strong className="text-text-primary">{chunks}</strong>), part3: chunks => (<strong className="text-text-primary">{chunks}</strong>), part4: () => (<br />), part5: chunks => (<a href="https://vercel.com/docs/analytics/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">15. Geocoding (OpenStreetMap Nominatim)</h2>
-            <p>
-              Für die Kartenansicht bei Locations ermitteln wir geografische Koordinaten über die öffentliche <strong className="text-text-primary">Nominatim-API</strong> der OpenStreetMap Foundation (UK). Beim serverseitigen Geocoding werden Städtenamen übertragen. Kartenkacheln werden bei angezeigten Karten vom OpenStreetMap-Kartendienst geladen; dabei erhält dieser unter anderem die IP-Adresse und technische Zugriffsdaten des Browsers. Ergebnisse werden serverseitig 24 Stunden gecacht, sodass jede Stadt nur einmal angefragt wird. Rechtsgrundlage ist das berechtigte Interesse (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO).<br />
-              Datenschutz OpenStreetMap: <a href="https://osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">osmfoundation.org/wiki/Privacy_Policy</a>
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_37ef196041cca2")}</h2>
+            <p>{uiText.rich("Ui.text_83bd02c2e09311", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>), part2: () => (<br />), part3: chunks => (<a href="https://osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">16. Cookies, localStorage & lokale Speicherung</h2>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_3f9cc56cdb997b")}</h2>
             <div className="space-y-3">
-              <p>
-                <strong className="text-text-primary">Technisch notwendige Cookies (Clerk):</strong> Clerk setzt Session-Cookies, die für die Authentifizierung zwingend erforderlich sind. Ohne diese Cookies ist eine Anmeldung nicht möglich. Rechtsgrundlage: Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b DSGVO, § 25 Abs.&nbsp;2 Nr.&nbsp;2 TDDDG.
-              </p>
-              <p>
-                <strong className="text-text-primary">Präferenz-Cookie:</strong> <code className="bg-bg-elevated px-1 rounded text-xs">cg_locale</code> speichert deine Sprachauswahl. Enthält keine personenbezogenen Daten. Rechtsgrundlage: § 25 Abs.&nbsp;2 Nr.&nbsp;2 TDDDG (technisch notwendig für korrekte Sprachanzeige).
-              </p>
-              <p>
-                <strong className="text-text-primary">Lokaler Browser-Speicher (localStorage):</strong> Im Browser werden lokal gespeichert:
-              </p>
+              <p>{uiText.rich("Ui.text_0401d93941cd17", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</p>
+              <p>{uiText.rich("Ui.text_e2888ae24dc5fb", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>), part2: chunks => (<code className="bg-bg-elevated px-1 rounded text-xs">{chunks}</code>) })}</p>
+              <p>{uiText.rich("Ui.text_041e3e28efd4a6", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</p>
               <ul className="list-disc list-inside space-y-1 pl-2">
-                <li><code className="bg-bg-elevated px-1 rounded text-xs">cg_recent_searches</code> — deine zuletzt eingegebenen Suchbegriffe. Verbleiben ausschließlich in deinem Browser, werden nie an unsere Server übertragen.</li>
-                <li><code className="bg-bg-elevated px-1 rounded text-xs">cg_cookies_ok</code> — deine Bestätigung des Cookie-Hinweises. Sie ist keine pauschale Einwilligung in optionale Aufzeichnungen.</li>
+                <li>{uiText.rich("Ui.text_02353b549012bf", { part1: chunks => (<code className="bg-bg-elevated px-1 rounded text-xs">{chunks}</code>) })}</li>
+                <li>{uiText.rich("Ui.text_4bdd5c52423155", { part1: chunks => (<code className="bg-bg-elevated px-1 rounded text-xs">{chunks}</code>) })}</li>
               </ul>
-              <p>
-                <strong className="text-text-primary">Keine Werbe- oder Tracking-Cookies:</strong> Wir setzen keinerlei Cookies zu Werbe-, Tracking- oder Profilierungszwecken ein.
-              </p>
+              <p>{uiText.rich("Ui.text_a5da57f09fb33f", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</p>
             </div>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">17. Drittlandübertragungen (USA)</h2>
-            <p>
-              Mehrere eingesetzte Dienste (Clerk, Vercel, Stripe, Sentry, Resend) haben ihren Sitz in den USA. Für eine Übertragung ist eine anwendbare Grundlage nach Art.&nbsp;44 ff. DSGVO erforderlich, etwa ein anwendbarer Angemessenheitsbeschluss oder geeignete Garantien wie Standardvertragsklauseln. Maßgeblich sind der konkrete Anbieter und die tatsächlich vereinbarten Bedingungen. Die SCC-Dokumente der jeweiligen Anbieter können über deren Datenschutzseiten abgerufen werden.
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_cc51bf12053029")}</h2>
+            <p>{uiText("Ui.text_04763d66b1ef33")}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">18. Speicherdauer & Löschung</h2>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_be3bc2432bedee")}</h2>
             <div className="space-y-2 mt-1">
               {[
                 ["Profildaten, Inserate und Entwürfe", "Für die Bereitstellung des Kontos und der gespeicherten Inhalte; Löschanfragen können über die Kontoeinstellungen oder den Support gestellt werden"],
@@ -215,73 +206,52 @@ export default async function DatenschutzPage() {
                 ["Vertrags- und Abrechnungsunterlagen", "Soweit vorhanden und gesetzlich vorgeschrieben, für die jeweils anwendbare Aufbewahrungsfrist"],
               ].map(([what, when]) => (
                 <div key={what} className="flex flex-col sm:flex-row gap-1 sm:gap-3 py-1.5 border-b border-border/50 last:border-0">
-                  <span className="text-text-primary font-medium sm:w-52 shrink-0">{what}</span>
-                  <span className="text-text-muted">{when}</span>
+                  <span className="text-text-primary font-medium sm:w-52 shrink-0">{(uiOptionLabels[what] ?? what)}</span>
+                  <span className="text-text-muted">{(uiOptionLabels[when] ?? when)}</span>
                 </div>
               ))}
             </div>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">19. Datensicherheit</h2>
-            <p>
-              Alle Datenübertragungen sind mit HTTPS/TLS verschlüsselt. Der Zugriff auf Datenbankdaten ist durch Row Level Security (RLS) strikt auf autorisierte Nutzer beschränkt — jeder Nutzer kann ausschließlich auf die ihm erlaubten Datensätze zugreifen. Passwörter werden von uns nicht gespeichert. Administrative Zugriffe auf die Plattform sind protokolliert und auf wenige Personen beschränkt.
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_188abb11361064")}</h2>
+            <p>{uiText("Ui.text_5e6d173d294b4f")}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">20. Deine Rechte (Art. 15–21 DSGVO)</h2>
-            <p className="mb-3">Du hast folgende Rechte gegenüber uns als Verantwortlichem:</p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_421e74a6d64849")}</h2>
+            <p className="mb-3">{uiText("Ui.text_c7bccc84802cbf")}</p>
             <ul className="space-y-2 list-disc list-inside marker:text-gold">
-              <li><strong className="text-text-primary">Auskunft</strong> — Welche Daten wir über dich verarbeiten (Art. 15 DSGVO)</li>
-              <li><strong className="text-text-primary">Berichtigung</strong> — Korrektur unrichtiger Daten (Art. 16 DSGVO)</li>
-              <li><strong className="text-text-primary">Löschung</strong> — Deiner Daten, sofern keine Aufbewahrungspflichten entgegenstehen (Art. 17 DSGVO)</li>
-              <li><strong className="text-text-primary">Einschränkung</strong> — Der Verarbeitung in bestimmten Fällen (Art. 18 DSGVO)</li>
-              <li><strong className="text-text-primary">Datenübertragbarkeit</strong> — Export deiner Daten in einem gängigen Format (Art. 20 DSGVO)</li>
-              <li><strong className="text-text-primary">Widerspruch</strong> — Gegen Verarbeitungen auf Basis berechtigten Interesses (Art. 21 DSGVO)</li>
-              <li><strong className="text-text-primary">Widerruf</strong> — Einer Einwilligung jederzeit mit Wirkung für die Zukunft</li>
+              <li>{uiText.rich("Ui.text_471d3044e1c802", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</li>
+              <li>{uiText.rich("Ui.text_36d9ab8e2fbb50", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</li>
+              <li>{uiText.rich("Ui.text_94d0d1954f6b1e", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</li>
+              <li>{uiText.rich("Ui.text_df657ce9889ac0", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</li>
+              <li>{uiText.rich("Ui.text_e42f35ebd97f2a", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</li>
+              <li>{uiText.rich("Ui.text_fc5b657f756222", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</li>
+              <li>{uiText.rich("Ui.text_351e16f55e9108", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</li>
             </ul>
-            <p className="mt-3">
-              Konto und alle Daten löschen: <strong className="text-text-primary">Dashboard → Einstellungen → Konto löschen.</strong><br />
-              Alle anderen Anfragen an: <a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">cinegenius.co@gmail.com</a>
-            </p>
-            <p className="mt-3">
-              Du hast das Recht, dich bei einer Datenschutzaufsichtsbehörde zu beschweren. Zuständig für Bayern:<br />
-              <strong className="text-text-primary">Bayerisches Landesamt für Datenschutzaufsicht (BayLDA)</strong><br />
-              Promenade 27, 91522 Ansbach —{" "}
-              <a href="https://www.lda.bayern.de" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">lda.bayern.de</a>
-            </p>
+            <p className="mt-3">{uiText.rich("Ui.text_11ecf3b1603bc3", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>), part2: () => (<br />), part3: chunks => (<a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">{chunks}</a>) })}</p>
+            <p className="mt-3">{uiText.rich("Ui.text_dec738ce27179f", { part1: () => (<br />), part2: chunks => (<strong className="text-text-primary">{chunks}</strong>), part3: () => (<br />), part4: chunks => (<a href="https://www.lda.bayern.de" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">21. Minderjährige</h2>
-            <p>
-              CineGenius richtet sich ausschließlich an Personen ab 18 Jahren. Wir erheben wissentlich keine Daten von Minderjährigen. Solltest du Kenntnis davon haben, dass ein Minderjähriger ein Konto erstellt hat, melde dies bitte unter <a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">cinegenius.co@gmail.com</a>.
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_3e62bfdd32525c")}</h2>
+            <p>{uiText.rich("Ui.text_7fb3434c1d331e", { part1: chunks => (<a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">22. Änderungen dieser Datenschutzerklärung</h2>
-            <p>
-              Wir behalten uns vor, diese Erklärung bei Änderungen an der Plattform oder neuen gesetzlichen Anforderungen zu aktualisieren. Die jeweils aktuelle Version ist unter <strong className="text-text-primary">cinegenius.co/datenschutz</strong> abrufbar. Bei wesentlichen Änderungen informieren wir registrierte Nutzer per E-Mail.
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_dc614761f1d7f7")}</h2>
+            <p>{uiText.rich("Ui.text_e8c7a399f8d706", { part1: chunks => (<strong className="text-text-primary">{chunks}</strong>) })}</p>
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-text-primary mb-3">23. Kontakt bei Datenschutzfragen</h2>
-            <p>
-              Markus Müller<br />
-              Plinganserstrasse 19, 81369 München<br />
-              <a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">cinegenius.co@gmail.com</a>
-            </p>
+            <h2 className="text-base font-semibold text-text-primary mb-3">{uiText("Ui.text_da1aa5f0d7763e")}</h2>
+            <p>{uiText.rich("Ui.text_d47b701f28bc95", { part1: () => (<br />), part2: () => (<br />), part3: chunks => (<a href="mailto:cinegenius.co@gmail.com" className="text-gold hover:underline">{chunks}</a>) })}</p>
           </section>
 
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border flex flex-wrap gap-6">
-          <Link href="/impressum" className="text-sm text-gold hover:underline">Impressum →</Link>
-          <Link href="/agb" className="text-sm text-gold hover:underline">AGB →</Link>
-        </div>
+        <div className="mt-12 pt-8 border-t border-border flex flex-wrap gap-6">{uiText.rich("Ui.text_a42d052c401e22", { part1: chunks => (<Link href="/impressum" className="text-sm text-gold hover:underline">{chunks}</Link>), part2: chunks => (<Link href="/agb" className="text-sm text-gold hover:underline">{chunks}</Link>) })}</div>
 
       </div>
     </div>

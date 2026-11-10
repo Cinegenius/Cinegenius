@@ -1,3 +1,4 @@
+import { localizedNotification } from "@/lib/i18n/notification-copy";
 import "server-only";
 import { getTranslations } from "next-intl/server";
 import { NextResponse } from "next/server";
@@ -38,7 +39,7 @@ export async function releaseReviewedListing(id: string, body: Record<string, un
     const result = await db.rpc("offer_review_transition", {
       p_kind: kind, p_id: id, p_expected: listing, p_provider_company: review.providerCompany, p_provider_profile: review.providerProfile,
       p_action: action, p_actor: review.admin.userId, p_reason: reason,
-      p_notification: { title: m("notificationTitle"), body: m("notificationBody", { title: review.dto.title, status: m("statuses." + ({ approve: "approved", hide: "hidden", changes_requested: "changes_requested", reject: "rejected" }[String(action)])) }), href: kind === "listing" ? "/dashboard?tab=listings" : "/company-dashboard" },
+      p_notification: { ...localizedNotification({ title: { key: "offerTitle" }, body: { key: "offerBody_" + ({ approve: "approved", hide: "hidden", changes_requested: "changes_requested", reject: "rejected" }[String(action)]), values: { title: review.dto.title } } }),  href: kind === "listing" ? "/dashboard?tab=listings" : "/company-dashboard" },
     });
     if (result.error) return fail("saveError", 503);
     if (result.data === "stale") return fail("stale", 409);

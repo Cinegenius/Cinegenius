@@ -10,6 +10,8 @@ import { ORGANIZATION_ENTRY_TYPES, ORGANIZATION_TOPICS, isOrganizationEntryType,
 export const dynamic = "force-dynamic";
 
 export default async function NewsPage({ searchParams }: { searchParams: Promise<{ type?: string; topic?: string; q?: string; page?: string }> }) {
+  const uiText = await getTranslations();
+
   const t = await getTranslations("Organizations");
   const discoveryT = await getTranslations("OrganizationDiscovery");
   const locale = await getLocale();
@@ -63,7 +65,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
             {entry.entry_type !== "news" && entry.starts_at && <p className="mt-2 text-sm text-text-secondary"><time dateTime={entry.starts_at}>{dates.format(new Date(entry.starts_at))}</time></p>}
             {(entry.moderation_status === "ended" || (entry.ends_at && new Date(entry.ends_at).getTime() < Date.now())) && <p className="mt-2 text-sm text-gold">{t("status.ended")}</p>}
             {entry.summary && <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-text-secondary">{entry.summary}</p>}
-            <p className="mt-4 text-sm text-text-muted">{(Array.isArray(entry.organization) ? entry.organization[0] : entry.organization).name}{entry.city ? ` · ${entry.city}` : ""}</p>
+            <p className="mt-4 text-sm text-text-muted">{(Array.isArray(entry.organization) ? entry.organization[0] : entry.organization).name}{entry.city ? uiText("Ui.text_f6b53f9c8ab3ef", { value1: String(entry.city) }) : ""}</p>
             <Link className="mt-5 inline-flex min-h-11 items-center font-semibold text-gold" href={`/news/${(Array.isArray(entry.organization) ? entry.organization[0] : entry.organization).slug}/${entry.slug}`}>{t("openEntry")} →</Link>
           </div>
         </article>)}

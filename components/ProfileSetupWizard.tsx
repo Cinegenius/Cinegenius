@@ -29,7 +29,7 @@ import {
   Loader2, MapPin, Package, Search, Trash2, Lock, UserRound,
 } from "lucide-react";
 import { compressImage, MAX_FUNCTION_UPLOAD_BYTES } from "@/lib/compressImage";
-import { departments, getDeptLabel, getDepartmentRoleLabel, getDepartmentRoleSearchTerms } from "@/lib/departments";
+import { departments, getDeptLabel, getDepartmentRoleLabel, getDepartmentRoleSearchTerms , taxonomyLabel } from "@/lib/departments";
 import { safeAuthRedirect } from "@/lib/auth-redirect";
 import { hasCompletedNonPersonalSetup, hasProfileBasics, shouldSkipProfileSetup } from "@/lib/profile-setup-flow";
 import { createOnboardingSaveQueue, isQuickStartContentSaved } from "@/lib/onboarding-save";
@@ -48,29 +48,40 @@ import CateringCompanyFields from "@/components/CateringCompanyFields";
 import { CATERING_COMPANY_CATEGORY, EMPTY_CATERING_COMPANY_DETAILS, getCateringCompanySearchTerms } from "@/lib/catering-taxonomy";
 import SafetyMedicalServiceFields from "@/components/SafetyMedicalServiceFields";
 import { SAFETY_MEDICAL_COMPANY_CATEGORY_ID, safetyMedicalCompanyCategoryLabel } from "@/lib/safety-medical-taxonomy";
+import { uiErrorMessage } from "@/lib/ui-error-message";
 
-const paths: { id: QuickStartIntent; detail: string; Icon: typeof MapPin }[] = [
-  { id: "crew", detail: "Für Kamera, Licht, Ton, Regie und viele weitere Gewerke", Icon: Film },
-  { id: "talent", detail: "Schauspiel, Model oder Komparserie", Icon: Camera },
-  { id: "location", detail: "Zum Beispiel Wohnung, Haus, Café oder Studio", Icon: MapPin },
-  { id: "equipment", detail: "Technik, Fahrzeuge oder Requisiten", Icon: Package },
-  { id: "company", detail: "Zum Beispiel Catering, Verleih oder Studio", Icon: Building2 },
-  { id: "search", detail: "Menschen, Orte oder Dinge für ein Projekt entdecken", Icon: Search },
-];
+
 const crewDepartments = getQuickStartDepartments();
 const castDepartment = departments.find((department) => department.id === "cast");
 const inputClass = "min-h-12 w-full rounded-xl border border-border bg-bg-primary px-4 text-base text-text-primary outline-none focus:border-gold focus:ring-2 focus:ring-gold/20";
-const stepContent: Record<QuickStartScreen, { title: string; description: string }> = {
-  name: { title: "Wie heißt du?", description: "Dein Name wird für dein CineGenius-Profil verwendet." },
-  location: { title: "Wo bist du zu Hause?", description: "Stadt und Land helfen dabei, dich und deine Angebote in deiner Region zu finden. Für ein Angebot kannst du später einen anderen Ort angeben." },
-  goals: { title: "Was möchtest du auf CineGenius machen?", description: "Du kannst später jederzeit weitere Bereiche ergänzen." },
-  details: { title: "Was passt zu deiner Auswahl?", description: "Wir zeigen nur die Angaben für den Bereich, den du gerade einrichtest." },
-  intro: { title: "Foto und kurze Vorstellung", description: "Diese Ergänzungen sind freiwillig. Du kannst sie jederzeit später hinzufügen." },
-  review: { title: "Prüfen und abschließen", description: "Sieh dir an, was angelegt wird. Über „Ändern“ springst du direkt zum passenden Abschnitt." },
-};
-const countries = ["Deutschland", "Österreich", "Schweiz"];
+
+
 
 type SaveState = "idle" | "saving" | "saved" | "error";
+
+
+function getLocalizedPaths(translate: (key: string) => string): { id: QuickStartIntent; detail: string; Icon: typeof MapPin }[] {
+  return ([
+  { id: "crew", detail: translate("setup.crewDetail"), Icon: Film },
+  { id: "talent", detail: translate("setup.talentDetail"), Icon: Camera },
+  { id: "location", detail: translate("setup.locationDetail"), Icon: MapPin },
+  { id: "equipment", detail: translate("setup.equipmentDetail"), Icon: Package },
+  { id: "company", detail: translate("setup.companyDetail"), Icon: Building2 },
+  { id: "search", detail: translate("setup.searchDetail"), Icon: Search },
+]);
+}
+
+
+function getLocalizedStepContent(translate: (key: string) => string): Record<QuickStartScreen, { title: string; description: string }> {
+  return ({
+  name: { title: translate("setup.nameTitle"), description: translate("setup.nameDescription") },
+  location: { title: translate("setup.locationTitle"), description: translate("setup.locationDescription") },
+  goals: { title: translate("setup.goalsTitle"), description: translate("setup.goalsDescription") },
+  details: { title: translate("setup.detailsTitle"), description: translate("setup.detailsDescription") },
+  intro: { title: translate("setup.introTitle"), description: translate("setup.introDescription") },
+  review: { title: translate("setup.reviewTitle"), description: translate("setup.reviewDescription") },
+});
+}
 
 function primaryIntent(draft: QuickStartDraft): QuickStartIntent {
   return draft.intents.find((intent) => intent !== "search") ?? "search";
@@ -97,6 +108,15 @@ function screenForField(field: string): QuickStartScreen {
 }
 
 export default function ProfileSetupWizard() {
+  const uiPriceText = useTranslations("MarketplaceOffer");
+
+  const taxonomyText = useTranslations("Taxonomy");
+
+  const uiText = useTranslations();
+  const paths = getLocalizedPaths(uiText);
+  const stepContent = getLocalizedStepContent(uiText);
+
+
   const t = useTranslations("setup");
   const providerText = useTranslations("ProviderSetup");
   const marketCatalog=useTranslations("MarketplaceCatalog");
@@ -143,12 +163,12 @@ export default function ProfileSetupWizard() {
       });
       const result = await response.json().catch(() => ({}));
       if (response.status === 429) setRetrySeconds(Number(response.headers.get("Retry-After")) || result.retryAfter || 10);
-      if (!response.ok) throw new Error(result.error ?? "Dein Fortschritt konnte nicht gespeichert werden.");
+      if (!response.ok) throw new Error(result.error ?? uiText("Ui.text_1a732f2b583c89"));
       setSaveState("saved");
       return true;
     } catch (cause) {
       setSaveState("error");
-      setError(cause instanceof Error ? cause.message : "Dein Fortschritt konnte nicht gespeichert werden.");
+      setError(uiErrorMessage(cause, uiText("Ui.text_1a732f2b583c89")));
       return false;
     }
   }), []);
@@ -164,12 +184,12 @@ export default function ProfileSetupWizard() {
     Promise.all([
       fetch("/api/onboarding", { cache: "no-store" }).then(async (response) => {
         const result = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(result.error ?? "Der gespeicherte Fortschritt konnte nicht geladen werden.");
+        if (!response.ok) throw new Error(result.error ?? uiText("Ui.text_1476ffcfaae23e"));
         return result.draft;
       }),
       fetch("/api/profile", { cache: "no-store" }).then(async (response) => {
         const result = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(result.error ?? "Dein Profilstatus konnte nicht geprüft werden.");
+        if (!response.ok) throw new Error(result.error ?? uiText("Ui.text_2518c7ecf5f492"));
         return result;
       }),
       fetch("/api/user-settings", { cache: "no-store" }).then(response => response.ok ? response.json() : null).catch(() => null),
@@ -204,7 +224,7 @@ export default function ProfileSetupWizard() {
       setReady(true);
     }).catch((cause) => {
       if (!active) return;
-      setLoadError(cause instanceof Error ? cause.message : "Dein Start konnte nicht geladen werden.");
+      setLoadError(uiErrorMessage(cause, uiText("Ui.text_8e80795bfc8ecd")));
       setReady(true);
     });
     return () => { active = false; };
@@ -226,7 +246,7 @@ export default function ProfileSetupWizard() {
   const screens = useMemo(() => buildQuickStartScreens(draft), [draft]);
   const currentIndex = Math.max(0, screens.findIndex((screen) => screen.id === draft.step));
   const currentContent = stepContent[draft.step];
-  const saveLabel = saveState === "saving" ? "Speichert …" : saveState === "saved" ? "Gespeichert" : saveState === "error" ? "Speichern fehlgeschlagen" : "";
+  const saveLabel = saveState === "saving" ? uiText("setup.copy101") : saveState === "saved" ? uiText("profile.collabSaved") : saveState === "error" ? uiText("setup.saveFailed") : "";
   const detailIntents = draft.intents.filter((intent): intent is QuickStartProviderIntent => intent !== "search");
   const introIntents = getQuickStartIntroIntents(draft.intents, draft.sections);
   const activeIntent = draft.step === "intro" && !introIntents.includes(draft.activeIntent ?? "search") ? introIntents[0] ?? "search" : draft.activeIntent && draft.intents.includes(draft.activeIntent)
@@ -240,21 +260,21 @@ export default function ProfileSetupWizard() {
   ].filter((role, index, list) => list.findIndex((other) => other.departmentId === role.departmentId && other.role === role.role) === index), [draft.sections.crew?.roles, draft.sections.talent?.roles]);
   const filteredDepartments = useMemo(() => {
     const query = departmentSearch.trim().toLocaleLowerCase("de");
-    return crewDepartments.filter((department) => !query || getDeptLabel(department, locale, animals).toLocaleLowerCase(locale).includes(query) || department.label.toLocaleLowerCase("de").includes(query) || department.roles.some((role) => getDepartmentRoleSearchTerms(department, role).some((term) => term.toLocaleLowerCase("de").includes(query))));
-  }, [departmentSearch, locale, animals]);
+    return crewDepartments.filter((department) => !query || getDeptLabel(department, locale, animals, taxonomyText).toLocaleLowerCase(locale).includes(query) || [department.label, ...Object.values(department.labels)].some((label) => label.toLocaleLowerCase("de").includes(query)) || department.roles.some((role) => getDepartmentRoleSearchTerms(department, role, getDepartmentRoleLabel(department.id, role, locale, animals, taxonomyText)).some((term) => term.toLocaleLowerCase("de").includes(query))));
+  }, [departmentSearch, locale, animals, taxonomyText]);
   const selectedIntentTitles = draft.intents.map((intent) => t(`${intent}Intent`));
   const hasProfileIntent = draft.intents.includes("crew") || draft.intents.includes("talent");
   const needsProfile = needsPublicSetupProfile(draft.intents);
   const hasCompanyIntent = draft.intents.includes("company");
   const hasOfferIntent = draft.intents.includes("location") || draft.intents.includes("equipment");
   const completionActionLabel = !hasProfileIntent && hasOfferIntent ? providerText(hasCompanyIntent ? (profileIsPrivate ? "savePrivateWithCompany" : "publishWithCompany") : profileIsPrivate ? "savePrivate" : "publish") : hasProfileIntent
-    ? profileIsPrivate ? "Privates Profil speichern und Einrichtung abschließen" : hasCompanyIntent && hasOfferIntent ? "Profil und Firma veröffentlichen, Entwürfe speichern"
-      : hasCompanyIntent ? "Profil und Firma veröffentlichen"
-        : hasOfferIntent ? "Profil veröffentlichen und Entwürfe speichern"
-          : "Profil veröffentlichen"
+    ? profileIsPrivate ? uiText("setup.privateFinish") : hasCompanyIntent && hasOfferIntent ? uiText("setup.publishAll")
+      : hasCompanyIntent ? uiText("setup.publishBoth")
+        : hasOfferIntent ? uiText("setup.publishWithDrafts")
+          : uiText("setup.publishProfile")
     : hasCompanyIntent
-      ? hasOfferIntent ? "Firma eintragen und Angebote speichern" : "Firma eintragen"
-      : hasOfferIntent ? "Private Angebotsentwürfe speichern" : "Los zur Suche";
+      ? hasOfferIntent ? uiText("setup.companyAndDrafts") : uiText("home.pillarCompaniesCta")
+      : hasOfferIntent ? uiText("setup.draftsFinish") : uiText("setup.searchFinish");
 
   function update<K extends keyof QuickStartDraft>(key: K, value: QuickStartDraft[K]) {
     setDraft((current) => ({ ...current, [key]: value, ...(["name", "personCity", "personCountry", "talentIntro", "providerImageUrl", "primaryOccupation"].includes(key) ? { completed: { ...current.completed, profile: false } } : {}) }));
@@ -346,8 +366,8 @@ export default function ProfileSetupWizard() {
       setResponsibleErrors(errors); if (Object.keys(errors).length) { focusResponsiblePerson(); return; }
     }
     const validation = draft.step === "details"
-      ? validateQuickStartIntentDetails(draft, activeIntent)
-      : validateQuickStartScreen(draft, draft.step, activeIntent);
+      ? validateQuickStartIntentDetails(draft, activeIntent, uiText)
+      : validateQuickStartScreen(draft, draft.step, activeIntent, uiText);
     if (validation) {
       setError(validation.message);
       const matchingIntent = intentForField(validation.field) ?? activeIntent;
@@ -400,21 +420,21 @@ export default function ProfileSetupWizard() {
 
   async function upload(file: File | undefined, intent: QuickStartIntent, forProvider = false) {
     if (!file) return;
-    if (!file.type.startsWith("image/")) { setError("Bitte wähle eine Bilddatei aus."); return; }
+    if (!file.type.startsWith("image/")) { setError(uiText("Ui.text_573d9a56a2eedf")); return; }
     setUploading(true);
     setError("");
     try {
-      const compressed = await compressImage(file, { maxWidth: 1920, quality: 0.82, maxBytes: MAX_FUNCTION_UPLOAD_BYTES });
+      const compressed = await compressImage(file, { maxWidth: 1920, quality: 0.82, maxBytes: MAX_FUNCTION_UPLOAD_BYTES , translate: uiText });
       const form = new FormData();
       form.append("file", compressed);
       const response = await fetch("/api/upload", { method: "POST", body: form });
       const result = await response.json().catch(() => ({}));
-      if (!response.ok || !result.url) throw new Error(result.error ?? "Das Foto konnte nicht hochgeladen werden.");
+      if (!response.ok || !result.url) throw new Error(result.error ?? uiText("Ui.text_c3b9328b1f25e4"));
       const nextDraft = forProvider ? { ...draft, providerImageUrl: result.url, completed: { ...draft.completed, profile: false } } : { ...draft, sections: { ...draft.sections, [intent]: { ...createQuickStartIntentData(), ...draft.sections[intent], imageUrl: result.url } } };
       setDraft(nextDraft);
-      if (!(await persist(nextDraft))) setError("Das Foto wurde hochgeladen, aber dein Fortschritt konnte nicht gespeichert werden. Bitte bleib auf dieser Seite und versuche es erneut.");
+      if (!(await persist(nextDraft))) setError(uiText("Ui.text_cf35517ee63d3e"));
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Das Foto konnte nicht hochgeladen werden.");
+      setError(uiErrorMessage(cause, uiText("Ui.text_c3b9328b1f25e4")));
     } finally { setUploading(false); }
   }
 
@@ -422,11 +442,11 @@ export default function ProfileSetupWizard() {
     setCompletionPending(true);
     await saveQueue.settle();
     const response = await fetch("/api/onboarding?type=quick-start", { method: "DELETE" }).catch(() => {
-      throw new Error("Deine Angaben sind bereits gespeichert. Die Verbindung wurde unterbrochen. Bitte versuche nur den Abschluss erneut.");
+      throw new Error(uiText("Ui.text_f01354be8698c6"));
     });
     const body = await response.json().catch(() => ({}));
     if (response.status === 429) setRetrySeconds(Number(response.headers.get("Retry-After")) || body.retryAfter || 10);
-    if (!response.ok || body.completed !== true) throw new Error(`Deine Angaben sind bereits gespeichert. ${body.error ?? "Die Einrichtung konnte noch nicht abgeschlossen werden. Bitte versuche den Abschluss erneut."}`);
+    if (!response.ok || body.completed !== true) throw new Error(uiText("Ui.text_24c7cf656ceb5c", { value1: String(body.error ?? uiText("Ui.text_6e4f4a5d9cceb9")) }));
     if (completedDraft.completed.profile) {
       try {
         const settingsResponse = await fetch("/api/user-settings", { cache: "no-store" });
@@ -476,13 +496,13 @@ export default function ProfileSetupWizard() {
           const firstField = Object.keys(result.fieldErrors ?? {})[0];
           const field = firstField === "display_name" ? "name" : firstField === "location" ? "personCity" : firstField === "activity" ? "crew-roles" : null;
           if (field) { setDraft({ ...progress, step: screenForField(field), activeIntent: intentForField(field) ?? activeIntent }); focusValidation(field); }
-          throw new Error(result.fieldErrors?.[firstField] ?? result.error ?? "Dein Profil konnte nicht erstellt werden.");
+          throw new Error(result.fieldErrors?.[firstField] ?? result.error ?? uiText("Ui.text_92added47b1ce3"));
         }
         savedProfile.current = { profile_type: profilePayload.profile_type, profile_types: profilePayload.profile_types, crew: profilePayload.crew ?? savedProfile.current?.crew };
         progress = { ...progress, completed: { ...progress.completed, profile: true } };
         setProfileExists(true);
         setDraft(progress);
-        if (!isQuickStartContentSaved(progress) && !(await persist(progress))) throw new Error("Das Profil wurde erstellt, aber dein Einrichtungsstand konnte nicht aktualisiert werden. Bitte versuche es erneut.");
+        if (!isQuickStartContentSaved(progress) && !(await persist(progress))) throw new Error(uiText("Ui.text_376a0ec562face"));
       }
 
       for (const intent of ["location", "equipment"] as const) {
@@ -490,7 +510,7 @@ export default function ProfileSetupWizard() {
         if (!progress.requestKeys[intent]) {
           progress = { ...progress, requestKeys: { ...progress.requestKeys, [intent]: crypto.randomUUID() } };
           setDraft(progress);
-          if (!(await persist(progress))) throw new Error("Dein Fortschritt konnte vor dem Speichern des Angebots nicht gesichert werden.");
+          if (!(await persist(progress))) throw new Error(uiText("Ui.text_d6d6cee7f1b649"));
         }
         const section = progress.sections[intent] ?? createQuickStartIntentData();
         const vehicle = intent === "equipment" && marketplaceCategory(section.category)?.department === "fahrzeuge";
@@ -507,17 +527,17 @@ export default function ProfileSetupWizard() {
           }),
         });
         const result = await response.json().catch(() => ({}));
-        if (!response.ok || !result.data?.id) throw new Error(result.error ?? "Der private Angebotsentwurf konnte nicht gespeichert werden.");
+        if (!response.ok || !result.data?.id) throw new Error(result.error ?? uiText("Ui.text_d9298fb67de3a4"));
         progress = { ...progress, completed: { ...progress.completed, listings: { ...progress.completed.listings, [intent]: String(result.data.id) } } };
         setDraft(progress);
-        if (!isQuickStartContentSaved(progress) && !(await persist(progress))) throw new Error("Der Angebotsentwurf wurde gespeichert, aber dein Einrichtungsstand konnte nicht aktualisiert werden. Bitte versuche es erneut.");
+        if (!isQuickStartContentSaved(progress) && !(await persist(progress))) throw new Error(uiText("Ui.text_dd2d94c0e7d5c2"));
       }
 
       if (progress.intents.includes("company") && !progress.completed.company) {
         if (!progress.requestKeys.company) {
           progress = { ...progress, requestKeys: { ...progress.requestKeys, company: crypto.randomUUID() } };
           setDraft(progress);
-          if (!(await persist(progress))) throw new Error("Dein Fortschritt konnte vor dem Speichern des Firmenprofils nicht gesichert werden.");
+          if (!(await persist(progress))) throw new Error(uiText("Ui.text_280402be2b89e5"));
         }
         const section = progress.sections.company ?? createQuickStartIntentData();
         const response = await fetch("/api/companies", {
@@ -535,14 +555,14 @@ export default function ProfileSetupWizard() {
           }),
         });
         const result = await response.json().catch(() => ({}));
-        if (!response.ok || !result.data?.id) throw new Error(result.error ?? "Das Firmenprofil konnte nicht gespeichert werden.");
+        if (!response.ok || !result.data?.id) throw new Error(result.error ?? uiText("Ui.text_18bcc117d9aba1"));
         progress = { ...progress, completed: { ...progress.completed, company: String(result.data.id) } };
         setDraft(progress);
-        if (!isQuickStartContentSaved(progress) && !(await persist(progress))) throw new Error("Das Firmenprofil wurde gespeichert, aber dein Einrichtungsstand konnte nicht aktualisiert werden. Bitte versuche es erneut.");
+        if (!isQuickStartContentSaved(progress) && !(await persist(progress))) throw new Error(uiText("Ui.text_ccc2418f8b9a6f"));
       }
       await clearAndContinue(progress);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Deine Angaben konnten nicht vollständig gespeichert werden.");
+      setError(uiErrorMessage(cause, uiText("setup.requestError")));
     } finally { setSaving(false); }
   }
 
@@ -554,7 +574,7 @@ export default function ProfileSetupWizard() {
     const data = forProvider ? { imageUrl: draft.providerImageUrl ?? "" } : draft.sections[intent] ?? createQuickStartIntentData();
     return <div className="space-y-3">
       <ContentUsageNotice context={intent === "company" ? "company" : intent === "crew" || intent === "talent" ? "profile" : "offer"} visibility="configured" />
-      {data.imageUrl ? <div className="space-y-3"><Image src={data.imageUrl} alt={label} width={960} height={640} sizes="(max-width: 640px) 100vw, 720px" className="max-h-64 w-full rounded-xl border border-border object-contain" /><button type="button" onClick={() => forProvider ? update("providerImageUrl", "") : updateSection(intent, { imageUrl: "" })} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm text-text-secondary"><Trash2 size={15} /> {t("copy0")}</button></div> : <label className={`flex min-h-40 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-bg-primary p-5 text-center hover:border-gold/50 ${uploading ? "pointer-events-none opacity-60" : ""}`}><ImagePlus className="text-gold" /><span className="text-sm font-medium text-text-primary">{uploading ? "Foto wird hochgeladen …" : label}</span><span className="text-xs text-text-muted">{t("copy1")}</span><input type="file" accept="image/jpeg,image/png,image/webp,image/heic" className="sr-only" onChange={(event) => { void upload(event.target.files?.[0], intent, forProvider); event.currentTarget.value = ""; }} /></label>}
+      {data.imageUrl ? <div className="space-y-3"><Image src={data.imageUrl} alt={label} width={960} height={640} sizes="(max-width: 640px) 100vw, 720px" className="max-h-64 w-full rounded-xl border border-border object-contain" /><button type="button" onClick={() => forProvider ? update("providerImageUrl", "") : updateSection(intent, { imageUrl: "" })} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-4 text-sm text-text-secondary"><Trash2 size={15} /> {t("copy0")}</button></div> : <label className={`flex min-h-40 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-bg-primary p-5 text-center hover:border-gold/50 ${uploading ? "pointer-events-none opacity-60" : ""}`}><ImagePlus className="text-gold" /><span className="text-sm font-medium text-text-primary">{uploading ? uiText("Ui.text_5fd6ef633a74ed") : label}</span><span className="text-xs text-text-muted">{t("copy1")}</span><input type="file" accept="image/jpeg,image/png,image/webp,image/heic" className="sr-only" onChange={(event) => { void upload(event.target.files?.[0], intent, forProvider); event.currentTarget.value = ""; }} /></label>}
       {uploading && <p role="status" className="flex items-center gap-2 text-xs text-text-muted"><Loader2 size={14} className="animate-spin" /> {t("copy2")}</p>}
     </div>;
   }
@@ -563,7 +583,7 @@ export default function ProfileSetupWizard() {
     const data = draft.sections[intent] ?? createQuickStartIntentData();
     const activeDepartments = intent === "crew" ? data.departmentIds : (castDepartment ? [castDepartment.id] : []);
     const roleFilter = intent === "crew" && activeDepartments.length ? activeDepartments : intent === "talent" ? activeDepartments : undefined;
-    const matches = findQuickStartRoles(roleSearch, 50, roleFilter);
+    const matches = findQuickStartRoles(roleSearch, 50, roleFilter, (departmentId, role) => getDepartmentRoleLabel(departmentId, role, locale, animals, taxonomyText));
     return <div className="space-y-4">
       {intent === "crew" && <>
         <label htmlFor="quick-start-department-search" className="block text-sm font-medium text-text-primary">{t("copy3")}</label>
@@ -571,32 +591,32 @@ export default function ProfileSetupWizard() {
         <div id="quick-start-crew-departments" tabIndex={-1} className="grid max-h-56 gap-2 overflow-y-auto pr-1 sm:grid-cols-2">
           {filteredDepartments.map((department) => {
             const selected = data.departmentIds.includes(department.id);
-            return <button key={department.id} type="button" aria-pressed={selected} onClick={() => toggleDepartment(department.id)} className={`flex min-h-12 min-w-0 items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left ${selected ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/50"}`}><span className="min-w-0 break-words text-sm text-text-primary">{department.emoji} {getDeptLabel(department, locale, animals)}</span><span className="shrink-0 text-xs text-text-muted">{department.roles.length}</span></button>;
+            return <button key={department.id} type="button" aria-pressed={selected} onClick={() => toggleDepartment(department.id)} className={`flex min-h-12 min-w-0 items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left ${selected ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/50"}`}><span className="min-w-0 break-words text-sm text-text-primary">{department.emoji} {getDeptLabel(department, locale, animals, taxonomyText)}</span><span className="shrink-0 text-xs text-text-muted">{department.roles.length}</span></button>;
           })}
           {!filteredDepartments.length && <p className="col-span-full rounded-xl border border-border p-3 text-sm text-text-muted">{t("copy5")}</p>}
         </div>
       </>}
       <div>
-        <label htmlFor={`quick-start-${intent}-role-search`} className="mb-2 block text-sm font-medium text-text-primary">{intent === "crew" ? "2. Tätigkeit auswählen" : "Tätigkeit auswählen"}</label>
-        <div className="relative"><Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" /><input id={`quick-start-${intent}-role-search`} autoComplete="off" value={roleSearch} onChange={(event) => setRoleSearch(event.target.value)} placeholder={intent === "crew" ? "Zum Beispiel Key Grip oder Schnitt" : "Zum Beispiel Schauspiel, Model oder Komparserie"} className={`${inputClass} pl-10`} /></div>
+        <label htmlFor={`quick-start-${intent}-role-search`} className="mb-2 block text-sm font-medium text-text-primary">{intent === "crew" ? uiText("Ui.text_be345f7f1086d2") : uiText("Ui.text_98ec27e21b84e9")}</label>
+        <div className="relative"><Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" /><input id={`quick-start-${intent}-role-search`} autoComplete="off" value={roleSearch} onChange={(event) => setRoleSearch(event.target.value)} placeholder={intent === "crew" ? uiText("Ui.text_3a16b34f55e110") : uiText("Ui.text_9d08ff6f542a8c")} className={`${inputClass} pl-10`} /></div>
         {roleSearch.trim() ? <div className="mt-3 max-h-56 space-y-1 overflow-y-auto rounded-xl border border-border bg-bg-primary p-2">
           {matches.map((item) => {
             const selected = data.roles.some((role) => role.departmentId === item.departmentId && role.role === item.role);
-            return <button key={`${item.departmentId}:${item.role}`} type="button" aria-pressed={selected} onClick={() => toggleRole(item, intent)} className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left ${selected ? "bg-gold/10 text-gold" : "text-text-primary hover:bg-bg-elevated"}`}><span className="min-w-0"><span className="block break-words text-sm font-medium">{getDepartmentRoleLabel(item.departmentId, item.role, locale, animals)}</span><span className="block text-xs text-text-muted">{getDeptLabel(departments.find(department=>department.id===item.departmentId)!, locale, animals)}</span></span><span className="shrink-0">{selected ? "✓" : "+"}</span></button>;
+            return <button key={`${item.departmentId}:${item.role}`} type="button" aria-pressed={selected} onClick={() => toggleRole(item, intent)} className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left ${selected ? "bg-gold/10 text-gold" : "text-text-primary hover:bg-bg-elevated"}`}><span className="min-w-0"><span className="block break-words text-sm font-medium">{getDepartmentRoleLabel(item.departmentId, item.role, locale, animals, taxonomyText)}</span><span className="block text-xs text-text-muted">{getDeptLabel(departments.find(department=>department.id===item.departmentId)!, locale, animals, taxonomyText)}</span></span><span className="shrink-0">{selected ? "✓" : "+"}</span></button>;
           })}
           {!matches.length && <p className="px-3 py-4 text-sm text-text-muted">{t("copy6")}</p>}
         </div> : intent === "talent" ? <div className="mt-3 grid gap-2 sm:grid-cols-2">
-          {(castDepartment?.roles ?? []).map((role) => { const selected = data.roles.some((item) => item.role === role); return <button key={role} type="button" aria-pressed={selected} onClick={() => toggleRole({ departmentId: "cast", role }, intent)} className={`flex min-h-11 items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left text-sm ${selected ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-primary text-text-primary"}`}><span className="break-words">{getDepartmentRoleLabel("cast", role, locale, animals)}</span><span className="shrink-0">{selected ? "✓" : "+"}</span></button>; })}
+          {(castDepartment?.roles ?? []).map((role) => { const selected = data.roles.some((item) => item.role === role); return <button key={role} type="button" aria-pressed={selected} onClick={() => toggleRole({ departmentId: "cast", role }, intent)} className={`flex min-h-11 items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left text-sm ${selected ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-primary text-text-primary"}`}><span className="break-words">{getDepartmentRoleLabel("cast", role, locale, animals, taxonomyText)}</span><span className="shrink-0">{selected ? "✓" : "+"}</span></button>; })}
         </div> : <div className="mt-3 space-y-2">
           {data.departmentIds.map((id, index) => {
             const department = departments.find((item) => item.id === id);
             if (!department) return null;
             const selectedCount = data.roles.filter((role) => role.departmentId === id).length;
-            return <details key={id} className="rounded-xl border border-border bg-bg-primary" open={index === 0}><summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-text-primary"><span className="break-words">{department.emoji} {getDeptLabel(department, locale, animals)}</span><span className="shrink-0 text-xs font-normal text-text-muted">{selectedCount ? `${selectedCount} gewählt` : `${department.roles.length} Tätigkeiten`}</span></summary><div className="max-h-48 space-y-1 overflow-y-auto border-t border-border p-2">{[...new Set(department.roles)].map((role) => { const selected = data.roles.some((item) => item.departmentId === id && item.role === role); return <button key={role} type="button" aria-pressed={selected} onClick={() => toggleRole({ departmentId: id, role }, intent)} className={`flex min-h-10 w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm ${selected ? "bg-gold/10 text-gold" : "text-text-secondary hover:bg-bg-elevated"}`}><span className="break-words">{getDepartmentRoleLabel(id, role, locale, animals)}</span><span className="shrink-0">{selected ? "✓" : "+"}</span></button>; })}</div></details>;
+            return <details key={id} className="rounded-xl border border-border bg-bg-primary" open={index === 0}><summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-text-primary"><span className="break-words">{department.emoji} {getDeptLabel(department, locale, animals, taxonomyText)}</span><span className="shrink-0 text-xs font-normal text-text-muted">{selectedCount ? uiText("Ui.text_fd3252760fa813", { value1: String(selectedCount) }) : uiText("Ui.text_15ffa5773e8f7a", { value1: String(department.roles.length) })}</span></summary><div className="max-h-48 space-y-1 overflow-y-auto border-t border-border p-2">{[...new Set(department.roles)].map((role) => { const selected = data.roles.some((item) => item.departmentId === id && item.role === role); return <button key={role} type="button" aria-pressed={selected} onClick={() => toggleRole({ departmentId: id, role }, intent)} className={`flex min-h-10 w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm ${selected ? "bg-gold/10 text-gold" : "text-text-secondary hover:bg-bg-elevated"}`}><span className="break-words">{getDepartmentRoleLabel(id, role, locale, animals, taxonomyText)}</span><span className="shrink-0">{selected ? "✓" : "+"}</span></button>; })}</div></details>;
           })}
           {!data.departmentIds.length && <p className="rounded-xl border border-border bg-bg-primary p-3 text-sm text-text-muted">{t("copy7")}</p>}
         </div>}
-        <div className="mt-3 flex flex-wrap gap-2">{data.roles.map((item) => <span key={`${item.departmentId}:${item.role}`} className="inline-flex max-w-full items-center gap-2 rounded-full border border-gold/35 bg-gold/10 px-3 py-2 text-xs text-gold"><span className="break-words">{item.role}</span><button type="button" aria-label={`${item.role} entfernen`} onClick={() => toggleRole(item, intent)} className="min-h-6 min-w-6 rounded-full hover:bg-bg-elevated">×</button></span>)}</div>
+        <div className="mt-3 flex flex-wrap gap-2">{data.roles.map((item) => <span key={`${item.departmentId}:${item.role}`} className="inline-flex max-w-full items-center gap-2 rounded-full border border-gold/35 bg-gold/10 px-3 py-2 text-xs text-gold"><span className="break-words">{getDepartmentRoleLabel(item.departmentId, item.role, locale, animals, taxonomyText)}</span><button type="button" aria-label={uiText("Ui.text_f10fe7a27ce274", { value1: String(getDepartmentRoleLabel(item.departmentId, item.role, locale, animals, taxonomyText)) })} onClick={() => toggleRole(item, intent)} className="min-h-6 min-w-6 rounded-full hover:bg-bg-elevated">×</button></span>)}</div>
       </div>
     </div>;
   }
@@ -614,8 +634,8 @@ export default function ProfileSetupWizard() {
         <label className="flex min-h-12 items-center gap-3 text-sm text-text-primary"><input type="checkbox" checked={data.offerLater === true} onChange={event => updateSection(intent, { offerLater: event.target.checked })} />{providerText("offerLater")}</label>
         {!data.offerLater && <>
         <ResponsiblePersonFields value={data.responsible ?? NEW_RESPONSIBLE_PERSON} onChange={value => updateSection(intent, { responsible: value })} accountPrefill compactWhenProfile={intent === "equipment"} />
-        {intent === "equipment" ? <MarketplaceCategoryPicker value={data.category} onChange={value=>updateSection(intent,{category:value})} /> : <div><p className="mb-2 text-sm font-medium text-text-primary">{t("copy9")}</p><div id={`quick-start-${intent}-category`} tabIndex={-1} className="grid gap-2 sm:grid-cols-2">{choices.map((item) => <button key={item.value} type="button" aria-pressed={data.category === item.value} onClick={() => updateSection(intent, { category: item.value })} className={`min-h-14 min-w-0 rounded-xl border px-4 py-3 text-left ${data.category === item.value ? "border-gold bg-gold/10" : "border-border bg-bg-primary"}`}><span className="block break-words text-sm font-semibold text-text-primary">{item.label}</span><span className="mt-1 block break-words text-xs text-text-muted">{item.example}</span></button>)}</div></div>}
-        <div><label htmlFor={`quick-start-${intent}-title`} className="mb-2 block text-sm font-medium text-text-primary">{t("copy10")}<span className="text-gold">*</span></label><input id={`quick-start-${intent}-title`} maxLength={200} value={data.title} onChange={(event) => updateSection(intent, { title: event.target.value })} placeholder={intent === "location" ? "Zum Beispiel Altbauwohnung mit Balkon" : "Zum Beispiel LED-Flächenleuchte"} className={inputClass} /></div>
+        {intent === "equipment" ? <MarketplaceCategoryPicker value={data.category} onChange={value=>updateSection(intent,{category:value})} /> : <div><p className="mb-2 text-sm font-medium text-text-primary">{t("copy9")}</p><div id={`quick-start-${intent}-category`} tabIndex={-1} className="grid gap-2 sm:grid-cols-2">{choices.map((item) => <button key={item.value} type="button" aria-pressed={data.category === item.value} onClick={() => updateSection(intent, { category: item.value })} className={`min-h-14 min-w-0 rounded-xl border px-4 py-3 text-left ${data.category === item.value ? "border-gold bg-gold/10" : "border-border bg-bg-primary"}`}><span className="block break-words text-sm font-semibold text-text-primary">{taxonomyLabel(item.label, uiText)}</span><span className="mt-1 block break-words text-xs text-text-muted">{taxonomyLabel(item.example, uiText)}</span></button>)}</div></div>}
+        <div><label htmlFor={`quick-start-${intent}-title`} className="mb-2 block text-sm font-medium text-text-primary">{t("copy10")}<span className="text-gold">*</span></label><input id={`quick-start-${intent}-title`} maxLength={200} value={data.title} onChange={(event) => updateSection(intent, { title: event.target.value })} placeholder={intent === "location" ? uiText("Ui.text_0db8a8c4620ad1") : uiText("Ui.text_d55cb9291e7b66")} className={inputClass} /></div>
         <div><label htmlFor={`quick-start-${intent}-city`} className="mb-2 block text-sm font-medium text-text-primary">{t("copy11")}<span className="text-gold">*</span></label><PlaceField id={`quick-start-${intent}-city`} value={data.city} onChange={(value, cityId) => updateSection(intent, { city: value, selected_place_city_id: cityId || "" })} required /></div>
         </>}
       </div>;
@@ -631,7 +651,7 @@ export default function ProfileSetupWizard() {
       <div><label htmlFor="quick-start-company-title" className="mb-2 block text-sm font-medium text-text-primary">{t("copy13")}<span className="text-gold">*</span></label><input id="quick-start-company-title" autoComplete="organization" maxLength={200} value={company.title} onChange={(event) => updateSection("company", { title: event.target.value })} placeholder={t("copy14")} className={inputClass} /></div>
       <div><label htmlFor="quick-start-company-city" className="mb-2 block text-sm font-medium text-text-primary">{t("copy15")}<span className="text-gold">*</span></label><PlaceField id="quick-start-company-city" value={company.city} onChange={(value, cityId) => updateSection("company", { city: value, selected_place_city_id: cityId || "" })} required /></div>
       <div><label htmlFor="quick-start-company-category-search" className="mb-2 block text-sm font-medium text-text-primary">{t("copy17")}<span className="text-gold">*</span></label><div className="relative mb-3"><Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" /><input id="quick-start-company-category-search" autoComplete="off" value={companyCategorySearch} onChange={(event) => setCompanyCategorySearch(event.target.value)} placeholder={t("copy18")} className={`${inputClass} pl-10`} /></div>
-        <div id="quick-start-company-categories" tabIndex={-1} className="grid max-h-56 gap-2 overflow-y-auto pr-1 sm:grid-cols-2">{categories.map((category) => { const selected = company.categoryIds.includes(category.value); return <button key={category.value} type="button" aria-pressed={selected} onClick={() => { const categoryIds = selected ? company.categoryIds.filter((id) => id !== category.value) : [...company.categoryIds, category.value]; updateSection("company", { categoryIds, ...(selected && category.value === CATERING_COMPANY_CATEGORY.id ? { cateringDetails: EMPTY_CATERING_COMPANY_DETAILS } : {}), ...(selected && category.value === SAFETY_MEDICAL_COMPANY_CATEGORY_ID ? { services: [] } : {}) }); }} className={`min-h-14 min-w-0 rounded-xl border px-4 py-3 text-left ${selected ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/50"}`}><span className="block break-words text-sm font-semibold text-text-primary">{companyCategoryLabel(category.value, category.label)}</span><span className="mt-1 block break-words text-xs leading-5 text-text-muted">{isAnimalCompany([category.value]) ? animals("description") : category.example}</span></button>; })}{!categories.length && <p className="col-span-full rounded-xl border border-border p-4 text-sm text-text-muted">{t("copy19")}</p>}</div>
+        <div id="quick-start-company-categories" tabIndex={-1} className="grid max-h-56 gap-2 overflow-y-auto pr-1 sm:grid-cols-2">{categories.map((category) => { const selected = company.categoryIds.includes(category.value); return <button key={category.value} type="button" aria-pressed={selected} onClick={() => { const categoryIds = selected ? company.categoryIds.filter((id) => id !== category.value) : [...company.categoryIds, category.value]; updateSection("company", { categoryIds, ...(selected && category.value === CATERING_COMPANY_CATEGORY.id ? { cateringDetails: EMPTY_CATERING_COMPANY_DETAILS } : {}), ...(selected && category.value === SAFETY_MEDICAL_COMPANY_CATEGORY_ID ? { services: [] } : {}) }); }} className={`min-h-14 min-w-0 rounded-xl border px-4 py-3 text-left ${selected ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/50"}`}><span className="block break-words text-sm font-semibold text-text-primary">{taxonomyLabel(companyCategoryLabel(category.value, category.label), uiText)}</span><span className="mt-1 block break-words text-xs leading-5 text-text-muted">{isAnimalCompany([category.value]) ? animals("description") : taxonomyLabel(category.example, uiText)}</span></button>; })}{!categories.length && <p className="col-span-full rounded-xl border border-border p-4 text-sm text-text-muted">{t("copy19")}</p>}</div>
         <p className="mt-2 text-xs leading-5 text-text-muted">{t("copy20")}</p>
       </div>
     </div>;
@@ -652,14 +672,14 @@ export default function ProfileSetupWizard() {
     if (activeIntent === "crew" || activeIntent === "talent") {
       const intent = activeIntent;
       const data = draft.sections[intent] ?? createQuickStartIntentData();
-      return <div className="space-y-5"><div><p className="mb-3 text-sm font-medium text-text-primary">{t("copy22")}<span className="text-text-muted">{t("copy23")}</span></p>{renderPhotoInput(intent, "Profilfoto auswählen")}</div><div><label htmlFor="quick-start-talent-intro" className="mb-2 block text-sm font-medium text-text-primary">{t("copy24")}<span className="text-text-muted">{t("copy23")}</span></label><textarea id="quick-start-talent-intro" rows={4} maxLength={1200} value={draft.talentIntro} onChange={(event) => update("talentIntro", event.target.value)} placeholder={t("copy26")} className="w-full rounded-xl border border-border bg-bg-primary p-4 text-base text-text-primary outline-none focus:border-gold" /><p className="mt-1 text-xs text-text-muted">{t("copy27")}</p></div>{data.imageUrl && <p className="text-xs text-text-muted">{t("copy28")}</p>}</div>;
+      return <div className="space-y-5"><div><p className="mb-3 text-sm font-medium text-text-primary">{t("copy22")}<span className="text-text-muted">{t("copy23")}</span></p>{renderPhotoInput(intent, uiText("Ui.text_d4186e3b183651"))}</div><div><label htmlFor="quick-start-talent-intro" className="mb-2 block text-sm font-medium text-text-primary">{t("copy24")}<span className="text-text-muted">{t("copy23")}</span></label><textarea id="quick-start-talent-intro" rows={4} maxLength={1200} value={draft.talentIntro} onChange={(event) => update("talentIntro", event.target.value)} placeholder={t("copy26")} className="w-full rounded-xl border border-border bg-bg-primary p-4 text-base text-text-primary outline-none focus:border-gold" /><p className="mt-1 text-xs text-text-muted">{t("copy27")}</p></div>{data.imageUrl && <p className="text-xs text-text-muted">{t("copy28")}</p>}</div>;
     }
     const intent = activeIntent;
     const data = draft.sections[intent] ?? createQuickStartIntentData();
     const isCompany = intent === "company";
     return <div className="space-y-5">
-      <div><label htmlFor={`quick-start-${intent}-description`} className="mb-2 block text-sm font-medium text-text-primary">{t("copy29")}<span className="text-text-muted">{t("copy23")}</span></label><textarea id={`quick-start-${intent}-description`} rows={4} maxLength={3000} value={data.description} onChange={(event) => updateSection(intent, { description: event.target.value })} placeholder={isCompany ? "Was bietet deine Firma an?" : intent === "location" ? "Was ist an diesem Ort besonders?" : "Was ist enthalten und in welchem Zustand ist es?"} className="w-full rounded-xl border border-border bg-bg-primary p-4 text-base text-text-primary outline-none focus:border-gold" /><p className="mt-1 text-xs text-text-muted">{t("copy31")}{isCompany ? "deinem Firmenprofil" : "diesem Angebotsentwurf"}.</p></div>
-      <div><p className="mb-3 text-sm font-medium text-text-primary">{isCompany ? t("copy94") : "Foto für dein Angebot"} <span className="text-text-muted">{t("copy23")}</span></p>{renderPhotoInput(intent, isCompany ? "Firmenlogo auswählen" : "Angebotsfoto auswählen")}</div>
+      <div><label htmlFor={`quick-start-${intent}-description`} className="mb-2 block text-sm font-medium text-text-primary">{t("copy29")}<span className="text-text-muted">{t("copy23")}</span></label><textarea id={`quick-start-${intent}-description`} rows={4} maxLength={3000} value={data.description} onChange={(event) => updateSection(intent, { description: event.target.value })} placeholder={isCompany ? uiText("Ui.text_fada6ff49d041c") : intent === "location" ? uiText("Ui.text_f41060be8f2953") : uiText("Ui.text_b6e68f42fd1cd5")} className="w-full rounded-xl border border-border bg-bg-primary p-4 text-base text-text-primary outline-none focus:border-gold" /><p className="mt-1 text-xs text-text-muted">{t("copy31")}{isCompany ? uiText("Ui.text_e65e76a883a279") : uiText("Ui.text_4dd9b42733982a")}.</p></div>
+      <div><p className="mb-3 text-sm font-medium text-text-primary">{isCompany ? t("copy94") : uiText("Ui.text_d6b55d5c6bb64d")} <span className="text-text-muted">{t("copy23")}</span></p>{renderPhotoInput(intent, isCompany ? uiText("Ui.text_e072332fb9f69e") : uiText("Ui.text_9b3b7d07ded069"))}</div>
       {isCompany ? <div className="space-y-4 rounded-xl border border-border bg-bg-primary p-4"><p className="text-sm font-medium text-text-primary">{t("copy33")}<span className="text-text-muted">{t("copy23")}</span></p><div><label htmlFor="quick-start-company-email" className="mb-2 block text-sm text-text-primary">{t("copy35")}</label><input id="quick-start-company-email" type="email" autoComplete="email" maxLength={200} value={data.contactEmail} onChange={(event) => updateSection("company", { contactEmail: event.target.value })} placeholder={t("copy36")} className={inputClass} /></div><div><label htmlFor="quick-start-company-phone" className="mb-2 block text-sm text-text-primary">{t("copy37")}</label><input id="quick-start-company-phone" type="tel" autoComplete="tel" maxLength={80} value={data.contactPhone} onChange={(event) => updateSection("company", { contactPhone: event.target.value })} placeholder={t("copy38")} className={inputClass} /></div><div><label htmlFor="quick-start-company-website" className="mb-2 block text-sm text-text-primary">{t("copy39")}</label><input id="quick-start-company-website" type="url" autoComplete="url" maxLength={300} value={data.website} onChange={(event) => updateSection("company", { website: event.target.value })} placeholder={t("copy40")} className={inputClass} /></div></div> : <div className="rounded-xl border border-border bg-bg-primary p-4"><p className="mb-3 text-sm text-text-primary">{t("copy41")}<span className="text-text-muted">{t("copy23")}</span></p><div className="space-y-2"><ListingPriceOptions onRequest={data.priceOnRequest} negotiable={data.priceNegotiable === true} onChange={value => updateSection(intent, value)} />{!data.priceOnRequest && <div><label htmlFor={`quick-start-${intent}-price`} className="mb-2 mt-3 block text-sm text-text-primary">{t("copy43")}</label><input id={`quick-start-${intent}-price`} type="number" min="0" step="1" value={data.price} onChange={(event) => updateSection(intent, { price: event.target.value })} placeholder={t("copy44")} className={inputClass} /></div>}</div></div>}
       {isCompany && isAnimalCompany(data.categoryIds) && <AnimalCompanyFields value={data.animalDetails} onChange={animalDetails => updateSection("company", { animalDetails })} />}
       {isCompany && data.categoryIds.includes(CATERING_COMPANY_CATEGORY.id) && <div className="rounded-xl border border-border bg-bg-primary p-4"><p className="mb-3 text-sm font-medium text-text-primary">{t("copy45")}<span className="text-text-muted">{t("copy23")}</span></p><CateringCompanyFields value={data.cateringDetails} onChange={(cateringDetails) => updateSection("company", { cateringDetails })} /></div>}
@@ -678,13 +698,13 @@ export default function ProfileSetupWizard() {
   if (finished) return <div className="min-h-screen bg-bg-primary px-4 py-8 sm:py-12"><section className="mx-auto max-w-xl rounded-2xl border border-border bg-bg-secondary p-5 sm:p-7">
     <CheckCircle2 size={36} className="mb-5 text-gold" />
     <p className="mb-2 text-xs font-semibold text-gold">{t("copy50")}</p>
-    <h1 className="font-display text-2xl font-bold sm:text-3xl">{finishedOffers.length && !finished.completed.profile && !finished.completed.company ? offersText("accountReady") : finished.completed.profile ? profilePublic ? "Dein Profil ist jetzt öffentlich sichtbar." : "Dein Profil ist erstellt." : finished.completed.company ? "Dein Firmenprofil ist erstellt." : finished.intents.every(intent => intent === "search") ? "Du kannst jetzt entdecken." : "Deine Angebotsentwürfe sind gespeichert."}</h1>
-    <p className="mt-4 text-sm leading-6 text-text-secondary">{finished.completed.profile ? profilePublic ? "Andere können dich jetzt finden und dein Profil ansehen." : "Deine bisherigen Sichtbarkeitseinstellungen bleiben erhalten. Ein privates Profil bleibt privat." : finished.completed.company ? "Deine Firma wurde gespeichert. Etwaige Inserate haben einen eigenen Veröffentlichungsstatus." : "Deine Einrichtung ist abgeschlossen. Du kannst jederzeit weitere Bereiche ergänzen."}</p>
+    <h1 className="font-display text-2xl font-bold sm:text-3xl">{finishedOffers.length && !finished.completed.profile && !finished.completed.company ? offersText("accountReady") : finished.completed.profile ? profilePublic ? uiText("Ui.text_90dcfa548fa27f") : uiText("Ui.text_7dbb1c94689383") : finished.completed.company ? uiText("Ui.text_b9fb2d98e35cc0") : finished.intents.every(intent => intent === "search") ? uiText("Ui.text_14e36d94e6b4ed") : uiText("Ui.text_34a8feea167284")}</h1>
+    <p className="mt-4 text-sm leading-6 text-text-secondary">{finished.completed.profile ? profilePublic ? uiText("Ui.text_6486ba90a4a392") : uiText("Ui.text_38e0f62f3d81d2") : finished.completed.company ? uiText("Ui.text_b99e031b3668e1") : uiText("Ui.text_175d0b1d21a866")}</p>
     <div className="mt-6 space-y-3">
       {finishedOffers.length > 0 && <SetupCompletionOffers offers={finishedOffers} />}
       {finished.completed.profile && finished.intents.some(intent => intent === "location" || intent === "equipment") && <Link href="/inserat" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary">{providerText("addOffer")}<ArrowRight size={16} /></Link>}
 
-      {finished.completed.profile && user?.id && <a href={`/profile/${encodeURIComponent(user.id)}`} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-border px-5 text-sm font-semibold text-text-primary">{profilePublic ? "Öffentliches Profil ansehen" : "Profil ansehen"}<ArrowRight size={16} /></a>}
+      {finished.completed.profile && user?.id && <a href={`/profile/${encodeURIComponent(user.id)}`} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-border px-5 text-sm font-semibold text-text-primary">{profilePublic ? uiText("nav.publicProfile") : uiText("profile.viewProfile")}<ArrowRight size={16} /></a>}
       {finished.completed.company && <a href={`/companies/${encodeURIComponent(finished.completed.company)}`} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-gold/30 px-5 text-sm font-semibold text-gold">{t("copy52")}<ArrowRight size={16} /></a>}
       <Link href="/" className={`flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 text-sm font-semibold ${finishedOffers.length ? "border border-border text-text-secondary" : "bg-gold text-bg-primary"}`}>{t("copy51")}<ArrowRight size={16} /></Link>
       {redirectTo && redirectTo !== "/dashboard" && <button type="button" onClick={() => router.replace(redirectTo)} className="flex min-h-12 w-full items-center justify-center rounded-xl border border-border px-4 text-sm text-text-primary">{t("copy54")}</button>}
@@ -731,10 +751,10 @@ export default function ProfileSetupWizard() {
           <ReviewSection title={t("copy84")} onEdit={() => editReview("goals")}><p className="break-words text-sm text-text-primary">{selectedIntentTitles.join(" · ") || "—"}</p></ReviewSection>
           {hasOfferIntent && <ReviewSection title={providerText("title")} onEdit={() => editReview("intro", draft.intents.find(intent => intent === "location" || intent === "equipment"))}><ReviewRow label={t("name")} value={draft.name} /><ReviewRow label={t("place")} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} />{!hasProfileIntent && draft.talentIntro && <ReviewRow label={t("introduction")} value={draft.talentIntro} />}{!hasProfileIntent && draft.providerImageUrl && <Image src={draft.providerImageUrl} alt={t("copy22")} width={160} height={160} className="h-20 w-20 rounded-xl object-cover" />}<p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">{providerText(profileIsPrivate ? "privateNotice" : "publicNotice")}</p></ReviewSection>}
           {(draft.intents.includes("crew") || draft.intents.includes("talent")) && <>
-            <ReviewSection title={t("copy85")} onEdit={() => editReview("details", draft.intents.includes("crew") ? "crew" : "talent")}><ReviewRow label={t("occupations")} value={selectedRoles.map((role) => role.role).join(", ")} /><PrimaryOccupationPicker id="quick-start-primary-occupation" positions={selectedRoles.map(role=>role.role)} value={draft.primaryOccupation ?? null} onChange={value=>update("primaryOccupation", value)} /><ReviewRow label={t("place")} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} /><p className="rounded-xl border border-amber-400/25 bg-amber-500/5 p-3 text-xs leading-5 text-text-muted">{t("copy86")}</p></ReviewSection>
+            <ReviewSection title={t("copy85")} onEdit={() => editReview("details", draft.intents.includes("crew") ? "crew" : "talent")}><ReviewRow label={t("occupations")} value={selectedRoles.map((role) => getDepartmentRoleLabel(role.departmentId, role.role, locale, animals, taxonomyText)).join(", ")} /><PrimaryOccupationPicker id="quick-start-primary-occupation" positions={selectedRoles.map(role=>role.role)} value={draft.primaryOccupation ?? null} onChange={value=>update("primaryOccupation", value)} /><ReviewRow label={t("place")} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} /><p className="rounded-xl border border-amber-400/25 bg-amber-500/5 p-3 text-xs leading-5 text-text-muted">{t("copy86")}</p></ReviewSection>
             <ReviewSection title={t("copy87")} onEdit={() => editReview("intro", draft.intents.includes("crew") ? "crew" : "talent")}>{draft.sections.crew?.imageUrl && <Image src={draft.sections.crew.imageUrl} alt={t("copy22")} width={240} height={240} className="h-20 w-20 rounded-xl object-cover" />}{draft.sections.talent?.imageUrl && <Image src={draft.sections.talent.imageUrl} alt={t("copy22")} width={240} height={240} className="h-20 w-20 rounded-xl object-cover" />}<ReviewRow label={t("introduction")} value={draft.talentIntro} /></ReviewSection>
           </>}
-          {draft.intents.filter((intent): intent is "location" | "equipment" => (intent === "location" || intent === "equipment") && !draft.sections[intent]?.offerLater).map((intent) => { const data = draft.sections[intent] ?? createQuickStartIntentData(); const categoryName = intent === "equipment" ? marketplaceCategoryLabel(data.category,marketCatalog) : QUICK_START_CATEGORIES[intent].find((item) => item.value === data.category)?.label ?? data.category; return <div key={intent} className="space-y-3"><ReviewSection title={t(`${intent}Intent`)} onEdit={() => editReview("details", intent)}><ReviewRow label={t("kind")} value={categoryName} /><ReviewRow label={t("listing")} value={data.title} /><ReviewRow label={t("place")} value={data.city} /></ReviewSection><ReviewSection title={`${t(`${intent}Intent`)}: Ergänzungen`} onEdit={() => editReview("intro", intent)}>{data.description && <ReviewRow label={t("description")} value={data.description} />}<ReviewRow label={t("copy41")} value={listingPriceLabel(Number(data.price), {price_on_request:data.priceOnRequest,price_negotiable:data.priceNegotiable})} />{data.imageUrl && <Image src={data.imageUrl} alt={t("copy90")} width={720} height={480} sizes="(max-width: 640px) 100vw, 640px" className="max-h-40 w-full rounded-lg object-contain" />}<p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">{t("copy91")}</p></ReviewSection></div>; })}
+          {draft.intents.filter((intent): intent is "location" | "equipment" => (intent === "location" || intent === "equipment") && !draft.sections[intent]?.offerLater).map((intent) => { const data = draft.sections[intent] ?? createQuickStartIntentData(); const categoryName = intent === "equipment" ? marketplaceCategoryLabel(data.category,marketCatalog) : QUICK_START_CATEGORIES[intent].find((item) => item.value === data.category)?.label ?? data.category; return <div key={intent} className="space-y-3"><ReviewSection title={t(`${intent}Intent`)} onEdit={() => editReview("details", intent)}><ReviewRow label={t("kind")} value={taxonomyLabel(categoryName, uiText)} /><ReviewRow label={t("listing")} value={data.title} /><ReviewRow label={t("place")} value={data.city} /></ReviewSection><ReviewSection title={uiText("Ui.text_de70e79498ecb6", { value1: String(t(`${intent}Intent`)) })} onEdit={() => editReview("intro", intent)}>{data.description && <ReviewRow label={t("description")} value={data.description} />}<ReviewRow label={t("copy41")} value={listingPriceLabel(Number(data.price), {price_on_request:data.priceOnRequest,price_negotiable:data.priceNegotiable}, undefined, locale, uiPriceText)} />{data.imageUrl && <Image src={data.imageUrl} alt={t("copy90")} width={720} height={480} sizes="(max-width: 640px) 100vw, 640px" className="max-h-40 w-full rounded-lg object-contain" />}<p className="rounded-xl border border-border bg-bg-primary p-3 text-xs leading-5 text-text-muted">{t("copy91")}</p></ReviewSection></div>; })}
           {draft.intents.includes("company") && (() => { const data = draft.sections.company ?? createQuickStartIntentData(); const categoryLabels = QUICK_START_CATEGORIES.company.filter((category) => data.categoryIds.includes(category.value)).map((category) => companyCategoryLabel(category.value, category.label)); const catering = data.cateringDetails; return <>
             <ReviewSection title={t("copy92")} onEdit={() => editReview("details", "company")}><ReviewRow label={t("name")} value={data.title} /><ReviewRow label={t("place")} value={data.city} /><ReviewRow label={t("industries")} value={categoryLabels.join(", ")} /></ReviewSection>
             <ReviewSection title={t("copy93")} onEdit={() => editReview("intro", "company")}>{data.description && <ReviewRow label={t("description")} value={data.description} />}{data.contactEmail && <ReviewRow label={t("copy35")} value={data.contactEmail} />}{data.contactPhone && <ReviewRow label={t("copy37")} value={data.contactPhone} />}{data.website && <ReviewRow label={t("copy39")} value={data.website} />}{isAnimalCompany(data.categoryIds) && <AnimalCompanySummary value={data.animalDetails} />}{data.categoryIds.includes(CATERING_COMPANY_CATEGORY.id) && catering.serviceTypes.length > 0 && <ReviewRow label={t("copy45")} value={catering.serviceTypes.join(", ")} />}{data.categoryIds.includes(SAFETY_MEDICAL_COMPANY_CATEGORY_ID) && data.services.length > 0 && <ReviewRow label={safetyMedical("servicesLabel")} value={data.services.join(", ")} />}{data.imageUrl && <Image src={data.imageUrl} alt={t("copy94")} width={320} height={160} sizes="320px" className="max-h-32 rounded-lg object-contain" />}</ReviewSection>

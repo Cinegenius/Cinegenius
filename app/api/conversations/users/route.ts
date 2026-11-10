@@ -2,8 +2,10 @@ import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { getPrivateProfileIds } from "@/lib/trust";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 export async function GET(request: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -20,7 +22,7 @@ export async function GET(request: NextRequest) {
     .ilike("display_name", `%${query}%`)
     .order("display_name", { ascending: true })
     .limit(25);
-  if (error) return NextResponse.json({ error: "Nutzersuche ist gerade nicht verfügbar." }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.m_6ecb1fd4404f') }, { status: 500 });
 
   const profiles = data ?? [];
   const privateIds = await getPrivateProfileIds(profiles.map((profile) => profile.user_id));

@@ -1,10 +1,14 @@
+import { getLocale, getTranslations } from "next-intl/server";
 import type { MetadataRoute } from "next";
 
-export default function manifest(): MetadataRoute.Manifest {
+export const dynamic = "force-dynamic";
+
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const [locale, t] = await Promise.all([getLocale(), getTranslations("Metadata")]);
   return {
     name: "CineGenius",
     short_name: "CineGenius",
-    description: "Marktplatz für Film, Social Media & Fotografie",
+    description: t("manifestDescription"),
     start_url: "/",
     display: "standalone",
     background_color: "#0A0A0A",
@@ -24,6 +28,6 @@ export default function manifest(): MetadataRoute.Manifest {
       },
     ],
     categories: ["business", "entertainment"],
-    lang: "de",
+    lang: locale,
   };
 }

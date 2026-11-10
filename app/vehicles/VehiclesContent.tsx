@@ -22,6 +22,26 @@ type Vehicle = {
 };
 
 export default function VehiclesContent({ serverVehicles }: { serverVehicles: Vehicle[] }) {
+  const uiText = useTranslations();
+  const uiOptionLabels: Record<string, string> = {
+    "Alle": uiText("common.all"),
+    "Bild-Fahrzeug": uiText("Ui.text_6168252d27dfb6"),
+    "Produktionsfahrzeug": uiText("Ui.text_756dd641ae64d3"),
+    "Classic Car": uiText("Ui.text_f524d651a584c8"),
+    "Vintage Van": uiText("Ui.text_6d9e05c971e104"),
+    "Military Vehicle": uiText("Ui.text_c280d157280976"),
+    "Vintage Limousine": uiText("Ui.text_2dbad18dc7a119"),
+    "Stunt Vehicle": uiText("Ui.text_599602fdbc32a1"),
+    "Luxury Classic": uiText("Ui.text_4063473fe1da67"),
+    "Modern": uiText("Ui.text_eef6c7f6ddd406"),
+  };
+
+
+
+
+
+  const uiLocale = useLocale();
+
   const market=useTranslations("MarketplaceOffer"),locale=useLocale();
   const allVehicles = useMemo(() => serverVehicles, [serverVehicles]);
 
@@ -65,20 +85,17 @@ export default function VehiclesContent({ serverVehicles }: { serverVehicles: Ve
             <div className="w-8 h-8 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center">
               <Car size={16} className="text-gold" />
             </div>
-            <p className="text-xs uppercase tracking-widest text-gold font-semibold">Fahrzeuge</p>
+            <p className="text-xs uppercase tracking-widest text-gold font-semibold">{uiText("footer.links_vehicles")}</p>
           </div>
-          <h1 className="font-display text-4xl sm:text-5xl font-bold text-text-primary mb-3">Film-Fahrzeuge mieten</h1>
-          <p className="text-text-secondary max-w-2xl leading-relaxed mb-6">
-            Classic Cars, Military Vehicles, Vintage Vans, Stunt Cars — authentische Fahrzeuge für jede Produktion.
-            Direkt buchen, sicher bezahlen.
-          </p>
+          <h1 className="font-display text-4xl sm:text-5xl font-bold text-text-primary mb-3">{uiText("Ui.text_8d34e23c6df853")}</h1>
+          <p className="text-text-secondary max-w-2xl leading-relaxed mb-6">{uiText("Ui.text_96a28460521be5")}</p>
           <div className="relative max-w-xl">
             <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Marke, Modell oder Ort suchen..."
+              placeholder={uiText("Ui.text_4902fd14536998")}
               className="w-full pl-10 pr-4 py-3 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors"
             />
           </div>
@@ -90,42 +107,38 @@ export default function VehiclesContent({ serverVehicles }: { serverVehicles: Ve
           <aside className={`lg:w-60 shrink-0 ${showFilters ? "block" : "hidden lg:block"}`}>
             <div className="sticky top-24 space-y-6">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-text-primary text-sm">Filter</h3>
+                <h3 className="font-semibold text-text-primary text-sm">{uiText("locations.filterBtn")}</h3>
                 {activeFilterCount > 0 && (
-                  <button onClick={clearFilters} className="text-xs text-gold hover:text-gold-light flex items-center gap-1">
-                    <X size={12} /> Zurücksetzen
-                  </button>
+                  <button onClick={clearFilters} className="text-xs text-gold hover:text-gold-light flex items-center gap-1">{uiText.rich("Ui.text_344dac4a73583a", { part1: () => (<X size={12} />) })}</button>
                 )}
               </div>
 
               <div>
-                <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-2">Fahrzeugtyp</p>
+                <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-2">{uiText("Ui.text_be81512fc07317")}</p>
                 <div className="space-y-1">
                   {vehicleTypes.map((t) => (
                     <button key={t} onClick={() => setSelectedType(t)}
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all ${selectedType === t ? "bg-gold-subtle text-gold font-medium" : "text-text-secondary hover:text-text-primary hover:bg-bg-elevated"}`}>
-                      {t}
+                      {(uiOptionLabels[t] ?? t)}
                     </button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-2">Ära / Epoche</p>
+                <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-2">{uiText("Ui.text_19a32c53930780")}</p>
                 <div className="space-y-1">
                   {eras.map((e) => (
                     <button key={e} onClick={() => setSelectedEra(e)}
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all ${selectedEra === e ? "bg-gold-subtle text-gold font-medium" : "text-text-secondary hover:text-text-primary hover:bg-bg-elevated"}`}>
-                      {e}
+                      {(uiOptionLabels[e] ?? e)}
                     </button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-2">
-                  Max. Preis: <span className="text-gold">{maxPrice.toLocaleString()} €/Tag</span>
-                </p>
+                <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-2">{uiText.rich("Ui.text_433ea1d9771641", { value2: () => (maxPrice.toLocaleString(uiLocale)), part1: chunks => (<span className="text-gold">{chunks}</span>) })}</p>
                 <input type="range" min={200} max={10000} step={100} value={maxPrice}
                   onChange={(e) => setMaxPrice(Number(e.target.value))} className="w-full accent-gold" />
                 <div className="flex justify-between text-xs text-text-muted mt-1">
@@ -134,39 +147,28 @@ export default function VehiclesContent({ serverVehicles }: { serverVehicles: Ve
               </div>
 
               <div>
-                <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-2">Optionen</p>
-                <label className="flex items-center gap-2 cursor-pointer mb-2">
-                  <input type="checkbox" className="accent-gold" checked={deliveryOnly} onChange={(e) => setDeliveryOnly(e.target.checked)} />
-                  <span className="text-sm text-text-secondary">Lieferung verfügbar</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="accent-gold" checked={verifiedOnly} onChange={(e) => setVerifiedOnly(e.target.checked)} />
-                  <span className="text-sm text-text-secondary">Nur Verifizierte</span>
-                </label>
+                <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-2">{uiText("Ui.text_f1daae3521feda")}</p>
+                <label className="flex items-center gap-2 cursor-pointer mb-2">{uiText.rich("Ui.text_5ad6608b2d78b6", { part1: () => (<input type="checkbox" className="accent-gold" checked={deliveryOnly} onChange={(e) => setDeliveryOnly(e.target.checked)} />), part2: chunks => (<span className="text-sm text-text-secondary">{chunks}</span>) })}</label>
+                <label className="flex items-center gap-2 cursor-pointer">{uiText.rich("Ui.text_cdab718df01cce", { part1: () => (<input type="checkbox" className="accent-gold" checked={verifiedOnly} onChange={(e) => setVerifiedOnly(e.target.checked)} />), part2: chunks => (<span className="text-sm text-text-secondary">{chunks}</span>) })}</label>
               </div>
             </div>
           </aside>
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-6 gap-4">
-              <p className="text-sm text-text-muted">
-                <span className="text-text-primary font-semibold">{filtered.length}</span> Fahrzeuge gefunden
-              </p>
+              <p className="text-sm text-text-muted">{uiText.rich("Ui.text_cba47b1910b782", { value2: () => (filtered.length), part1: chunks => (<span className="text-text-primary font-semibold">{chunks}</span>) })}</p>
               <button onClick={() => setShowFilters((v) => !v)}
-                className="lg:hidden flex items-center gap-2 px-3 py-2 border border-border rounded-lg text-sm text-text-secondary hover:border-gold hover:text-gold transition-all">
-                <Filter size={14} /> Filter
-                {activeFilterCount > 0 && (
+                className="lg:hidden flex items-center gap-2 px-3 py-2 border border-border rounded-lg text-sm text-text-secondary hover:border-gold hover:text-gold transition-all">{uiText.rich("Ui.text_cba0a3d98c77ea", { part1: () => (<Filter size={14} />), value2: () => (activeFilterCount > 0 && (
                   <span className="w-5 h-5 bg-gold text-bg-primary text-xs rounded-full flex items-center justify-center">{activeFilterCount}</span>
-                )}
-              </button>
+                )) })}</button>
             </div>
 
             {filtered.length === 0 ? (
               <EmptyState
                 icon={Car}
-                title={allVehicles.length === 0 ? "Noch keine Fahrzeuge eingetragen" : "Keine Fahrzeuge gefunden"}
-                description={allVehicles.length === 0 ? "Sei der Erste! Biete dein Auto, Motorrad oder Fahrzeug für Produktionen an." : "Passe die Filter an oder setze sie zurück."}
-                action={allVehicles.length === 0 ? { label: "Fahrzeug eintragen", onClick: () => window.location.href = "/inserat?group=marktplatz" } : { label: "Filter zurücksetzen", onClick: clearFilters }}
+                title={allVehicles.length === 0 ? uiText("Ui.text_3a9e5d3eb28df5") : uiText("Ui.text_a1de7e3fc04c07")}
+                description={allVehicles.length === 0 ? uiText("Ui.text_70adc0cab587dc") : uiText("Ui.text_bfa9e3a8d5d697")}
+                action={allVehicles.length === 0 ? { label: uiText("Ui.text_2a4689f6e8ac60"), onClick: () => window.location.href = "/inserat?group=marktplatz" } : { label: uiText("common.resetFilters"), onClick: clearFilters }}
               />
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
@@ -179,9 +181,9 @@ export default function VehiclesContent({ serverVehicles }: { serverVehicles: Ve
                       }
                       <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/60 to-transparent" />
                       <div className="absolute top-3 left-3 flex gap-2 flex-wrap">
-                        {v.isReal && <span className="px-2 py-0.5 bg-success text-white text-xs font-bold rounded">NEU</span>}
-                        {v.instantBook && <span className="px-2 py-0.5 bg-gold text-bg-primary text-xs font-semibold rounded flex items-center gap-1"><Zap size={10} /> Sofortbuchung</span>}
-                        {v.verified && <span className="px-2 py-0.5 bg-bg-primary/80 border border-border text-text-secondary text-xs rounded flex items-center gap-1"><CheckCircle size={10} className="text-success" /> Verifiziert</span>}
+                        {v.isReal && <span className="px-2 py-0.5 bg-success text-white text-xs font-bold rounded">{uiText("locations.newBadge")}</span>}
+                        {v.instantBook && <span className="px-2 py-0.5 bg-gold text-bg-primary text-xs font-semibold rounded flex items-center gap-1">{uiText.rich("Ui.text_d64964f565b304", { part1: () => (<Zap size={10} />) })}</span>}
+                        {v.verified && <span className="px-2 py-0.5 bg-bg-primary/80 border border-border text-text-secondary text-xs rounded flex items-center gap-1">{uiText.rich("Ui.text_712de43869af36", { part1: () => (<CheckCircle size={10} className="text-success" />) })}</span>}
                       </div>
                       <div className="absolute bottom-3 left-3 right-3">
                         <div className="flex flex-wrap gap-1">
@@ -201,7 +203,7 @@ export default function VehiclesContent({ serverVehicles }: { serverVehicles: Ve
                       <div className="flex items-center justify-between pt-3 border-t border-border">
                         <div className="flex items-center gap-2 text-xs text-text-muted">
                           <span className="px-1.5 py-0.5 bg-bg-elevated rounded">{v.type}</span>
-                          {v.delivery && <span className="flex items-center gap-0.5 text-success"><Truck size={10} /> Lieferung</span>}
+                          {v.delivery && <span className="flex items-center gap-0.5 text-success">{uiText.rich("Ui.text_b1074837744a9d", { part1: () => (<Truck size={10} />) })}</span>}
                         </div>
                         <span className="text-sm font-semibold text-gold">{listingPriceLabel(v.dailyRate,v.pricing,"/Tag",locale,market)}</span>
                       </div>

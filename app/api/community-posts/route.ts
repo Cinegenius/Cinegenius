@@ -5,11 +5,13 @@ import { requireAuth } from "@/lib/auth";
 import { rateLimit } from "@/lib/rateLimit";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 const POST_KINDS = ["question", "recommendation", "request", "offer"] as const;
 type PostKind = (typeof POST_KINDS)[number];
 
 export async function GET(request: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const locale=await getLocale();
   const params = request.nextUrl.searchParams;
   const rawLimit = Number.parseInt(params.get("limit") ?? "3", 10);
@@ -34,7 +36,7 @@ export async function GET(request: NextRequest) {
   }
 
   const { data, error } = await query;
-  if (error) return NextResponse.json({ error: "Aushänge konnten nicht geladen werden." }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.m_2863c53106dd') }, { status: 500 });
   if (!data?.length) return NextResponse.json({ posts: [] });
 
   const authorIds = [...new Set(data.map((post) => post.author_id))];
@@ -71,19 +73,20 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
   const { allowed } = await rateLimit(`community-post:${userId}`, 5, 3600);
-  if (!allowed) return NextResponse.json({ error: "Zu viele Aushänge. Bitte versuche es später erneut." }, { status: 429 });
+  if (!allowed) return NextResponse.json({ error: tResponse('System.m_5498b53c3dff') }, { status: 429 });
 
   let payload: unknown;
   try {
     payload = await request.json();
   } catch {
-    return NextResponse.json({ error: "Ungültige Anfrage." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_aab1a65082f7') }, { status: 400 });
   }
-  if (!payload || typeof payload !== "object") return NextResponse.json({ error: "Ungültige Anfrage." }, { status: 400 });
+  if (!payload || typeof payload !== "object") return NextResponse.json({ error: tResponse('System.m_aab1a65082f7') }, { status: 400 });
 
   const input = payload as Record<string, unknown>;
   const kind = input.kind;
@@ -91,10 +94,10 @@ export async function POST(request: NextRequest) {
   const body = typeof input.body === "string" ? input.body.trim() : "";
   const city = typeof input.city === "string" ? input.city.trim() : "";
   if (typeof kind !== "string" || !POST_KINDS.includes(kind as PostKind)) {
-    return NextResponse.json({ error: "Bitte wähle eine gültige Art des Aushangs." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_e0e1cc5e9d7d') }, { status: 400 });
   }
   if (title.length < 5 || title.length > 140 || body.length < 10 || body.length > 3000 || city.length > 320) {
-    return NextResponse.json({ error: "Bitte prüfe Titel, Text und Ort. Titel: 5–140 Zeichen, Text: 10–3000 Zeichen." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_a6e56b3cd739') }, { status: 400 });
   }
 
   const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
@@ -103,7 +106,7 @@ export async function POST(request: NextRequest) {
     .insert({ author_id: userId, kind, title, body, ...cityWriteFields(city, input.selected_place_city_id), expires_at: expiresAt })
     .select("id,kind,title,body,city,created_at,expires_at")
     .single();
-  if (error || !data) return NextResponse.json({ error: "Aushang konnte nicht gespeichert werden." }, { status: 500 });
+  if (error || !data) return NextResponse.json({ error: tResponse('System.m_9143eabe05ad') }, { status: 500 });
 
   const { data: profile } = await db.from("profiles").select("display_name,avatar_url").eq("user_id", userId).maybeSingle();
   return NextResponse.json({

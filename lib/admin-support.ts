@@ -25,6 +25,7 @@ export class SupportTargetError extends Error {
 export async function resolveAdminSupportTarget(
   type: AdminSupportTargetType, id: string, adminUserId: string,
 ): Promise<AdminSupportTarget> {
+  const responseText = await getTranslations();
   if (type === "started_offer") {
     const t = await getTranslations("AdminStartedOffers");
     const parsed = parseStartedOfferId(id);
@@ -41,7 +42,7 @@ export async function resolveAdminSupportTarget(
       targetId: id, targetLabel: `${label} · ${t("kinds." + offer.kind)}`, editUrl: offer.editUrl,
       recipientUserId: member.id, profileName: name || t("unnamedAccount"), profileSlug: null, avatarUrl: null,
       companyName: offer.kind === "company" ? label : null, listingTitle: label, missingFields: [], isDraft: true,
-    }, adminUserId);
+    }, adminUserId, responseText);
     return { ...target, recipientProfileUrl: null, firstName: member.firstName || name.split(/\s+/)[0] || null, startedOffer: true };
   }
   let recipientUserId = "";
@@ -58,7 +59,7 @@ export async function resolveAdminSupportTarget(
     const { data: profile, error } = await db.from("profiles")
       .select("user_id, display_name, slug, avatar_url, location, positions, role, profile_types, profile_type")
       .eq("user_id", id).maybeSingle();
-    if (error) throw new SupportTargetError("Profil konnte nicht geprüft werden.", 500);
+    if (error) throw new SupportTargetError((await getTranslations())("ServerCopy.s_8dfbfdb29b9c"), 500);
     if (!hasProfileBasics(profile)) {
       const t = await getTranslations("AdminAccounts");
       let member;
@@ -75,12 +76,12 @@ export async function resolveAdminSupportTarget(
           editUrl: destination ?? "/dashboard", recipientUserId: member.id,
           profileName: name || t("unnamed"), profileSlug: null, avatarUrl: profile?.avatar_url ?? null,
           missingFields: [], isDraft: destination !== null,
-        }, adminUserId),
+        }, adminUserId, responseText),
         recipientProfileUrl: null, firstName: member.firstName || null,
         setupIncomplete: destination !== null,
       };
     }
-    if (!profile) throw new SupportTargetError("Profil nicht gefunden.");
+    if (!profile) throw new SupportTargetError((await getTranslations())("ServerCopy.s_21480dc3761d"));
     recipientUserId = profile.user_id;
     targetLabel = profile.display_name?.trim() || "Profil";
     missingFields = [
@@ -93,15 +94,15 @@ export async function resolveAdminSupportTarget(
     return finishTarget({
       targetType, targetId, targetLabel, editUrl, recipientUserId, profileName: profile.display_name,
       profileSlug: profile.slug, avatarUrl: profile.avatar_url, missingFields, isDraft: false,
-    }, adminUserId);
+    }, adminUserId, responseText);
   }
 
   if (type === "company") {
     const { data: company, error } = await db.from("companies")
       .select("id, slug, owner_user_id, name, logo_url, categories, published")
       .eq("id", id).maybeSingle();
-    if (error) throw new SupportTargetError("Firmenprofil konnte nicht geprüft werden.", 500);
-    if (!company) throw new SupportTargetError("Firma nicht gefunden.");
+    if (error) throw new SupportTargetError((await getTranslations())("ServerCopy.s_aa81ee47d092"), 500);
+    if (!company) throw new SupportTargetError((await getTranslations())("ServerCopy.s_baaeeedeb779"));
     recipientUserId = company.owner_user_id;
     targetType = "company";
     targetLabel = company.name;
@@ -112,21 +113,21 @@ export async function resolveAdminSupportTarget(
     const { data: owner, error: ownerError } = await db.from("profiles")
       .select("user_id, display_name, slug, avatar_url")
       .eq("user_id", recipientUserId).maybeSingle();
-    if (ownerError) throw new SupportTargetError("Firmenverantwortliche konnten nicht geprüft werden.", 500);
+    if (ownerError) throw new SupportTargetError((await getTranslations())("ServerCopy.s_3cc509c3a069"), 500);
     if (!owner) return finishAccountOnlyTarget({
       targetType, targetId, targetLabel, editUrl, recipientUserId, avatarUrl: null, companyName, missingFields, isDraft,
     }, adminUserId);
     return finishTarget({
       targetType, targetId, targetLabel, editUrl, recipientUserId, profileName: owner.display_name,
       profileSlug: owner.slug, avatarUrl: owner.avatar_url, companyName, missingFields, isDraft,
-    }, adminUserId);
+    }, adminUserId, responseText);
   }
 
   const { data: listing, error: listingError } = await db.from("listings")
     .select("id, user_id, company_id, type, title, city, published")
     .eq("id", id).maybeSingle();
-  if (listingError) throw new SupportTargetError("Angebot konnte nicht geprüft werden.", 500);
-  if (!listing) throw new SupportTargetError("Angebot nicht gefunden.");
+  if (listingError) throw new SupportTargetError((await getTranslations())("ServerCopy.s_84971c3f00af"), 500);
+  if (!listing) throw new SupportTargetError((await getTranslations())("ServerCopy.s_8f7a319d27b8"));
   targetType = listing.type === "location" ? "location" : "marketplace";
   targetId = listing.id;
   listingTitle = listing.title?.trim() || "Angebot";
@@ -140,14 +141,14 @@ export async function resolveAdminSupportTarget(
     const { data: company, error } = await db.from("companies")
       .select("id, owner_user_id, name, logo_url")
       .eq("id", listing.company_id).maybeSingle();
-    if (error) throw new SupportTargetError("Anbieterfirma konnte nicht geprüft werden.", 500);
-    if (!company?.owner_user_id) throw new SupportTargetError("Für dieses Angebot ist keine verantwortliche Firmenperson hinterlegt.", 409);
+    if (error) throw new SupportTargetError((await getTranslations())("ServerCopy.s_e027a0ac7402"), 500);
+    if (!company?.owner_user_id) throw new SupportTargetError((await getTranslations())("ServerCopy.s_9cb4f1cdc621"), 409);
     recipientUserId = company.owner_user_id;
     companyName = company.name;
     const { data: owner, error: ownerError } = await db.from("profiles")
       .select("user_id, display_name, slug, avatar_url")
       .eq("user_id", recipientUserId).maybeSingle();
-    if (ownerError) throw new SupportTargetError("Anbieterprofil konnte nicht geprüft werden.", 500);
+    if (ownerError) throw new SupportTargetError((await getTranslations())("ServerCopy.s_480a83921427"), 500);
     if (!owner) return finishAccountOnlyTarget({
       targetType, targetId, targetLabel, editUrl, recipientUserId, avatarUrl: null, companyName, listingTitle, missingFields, isDraft,
     }, adminUserId);
@@ -155,28 +156,29 @@ export async function resolveAdminSupportTarget(
       targetType, targetId, targetLabel, editUrl, recipientUserId, profileName: owner.display_name,
       profileSlug: owner.slug, avatarUrl: company.logo_url ?? owner.avatar_url, companyName, listingTitle,
       missingFields, isDraft,
-    }, adminUserId);
+    }, adminUserId, responseText);
   }
 
   recipientUserId = listing.user_id ?? "";
-  if (!recipientUserId) throw new SupportTargetError("Für dieses Angebot ist kein Anbieter zugeordnet.", 409);
+  if (!recipientUserId) throw new SupportTargetError((await getTranslations())("ServerCopy.s_da838c3f4df0"), 409);
   const { data: owner, error: ownerError } = await db.from("profiles")
     .select("user_id, display_name, slug, avatar_url")
     .eq("user_id", recipientUserId).maybeSingle();
-  if (ownerError) throw new SupportTargetError("Anbieterprofil konnte nicht geprüft werden.", 500);
+  if (ownerError) throw new SupportTargetError((await getTranslations())("ServerCopy.s_480a83921427"), 500);
   if (!owner) return finishAccountOnlyTarget({
     targetType, targetId, targetLabel, editUrl, recipientUserId, avatarUrl: null, listingTitle, missingFields, isDraft,
   }, adminUserId);
   return finishTarget({
     targetType, targetId, targetLabel, editUrl, recipientUserId, profileName: owner.display_name,
     profileSlug: owner.slug, avatarUrl: owner.avatar_url, listingTitle, missingFields, isDraft,
-  }, adminUserId);
+  }, adminUserId, responseText);
 }
 
 /** A real responsible account is sufficient for support; a public person profile is optional. */
 async function finishAccountOnlyTarget(
   input: Omit<Parameters<typeof finishTarget>[0], "profileName" | "profileSlug">, adminUserId: string,
 ): Promise<AdminSupportTarget> {
+  const responseText = await getTranslations();
   const t = await getTranslations("AdminAccounts");
   let member;
   try { member = await (await clerkClient()).users.getUser(input.recipientUserId); }
@@ -185,7 +187,7 @@ async function finishAccountOnlyTarget(
   }
   const name = [member.firstName, member.lastName].filter(Boolean).join(" ").trim();
   return {
-    ...finishTarget({ ...input, profileName: name || t("unnamed"), profileSlug: null }, adminUserId),
+    ...finishTarget({ ...input, profileName: name || t("unnamed"), profileSlug: null }, adminUserId, responseText),
     recipientProfileUrl: null, firstName: member.firstName || null,
   };
 }
@@ -195,12 +197,12 @@ function finishTarget(
     targetType: AdminSupportTarget["targetType"]; targetId: string; targetLabel: string; editUrl: string;
     recipientUserId: string; profileName: string | null; profileSlug: string | null; avatarUrl: string | null;
     companyName?: string | null; listingTitle?: string | null; missingFields: string[]; isDraft: boolean;
-  }, adminUserId: string,
+  }, adminUserId: string, translate: (key: string) => string,
 ): AdminSupportTarget {
   if (input.recipientUserId === adminUserId) {
-    throw new SupportTargetError("Das Zielprofil gehört zu deinem Admin-Konto. Versand an dich selbst wurde verhindert.", 409);
+    throw new SupportTargetError(translate("ServerCopy.s_dc8fca324cdb"), 409);
   }
-  const recipientName = input.profileName?.trim() || "Mitglied ohne Profilnamen";
+  const recipientName = input.profileName?.trim() || translate("AdminAccounts.unnamed");
   const firstName = input.profileName?.trim().split(/\s+/)[0] || null;
   return {
     targetType: input.targetType, targetId: input.targetId, targetLabel: input.targetLabel,

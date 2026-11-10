@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { Star, CheckCircle, X, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { uiErrorMessage } from "@/lib/ui-error-message";
+
 
 interface Props {
   targetId: string;
@@ -12,7 +15,7 @@ interface Props {
   onSubmit?: (rating: number, text: string, reviewId?: string) => void;
 }
 
-const labels = ["", "Enttäuschend", "Verbesserungswürdig", "Gut", "Sehr gut", "Ausgezeichnet"];
+
 
 const aspects: Record<Props["targetType"], string[]> = {
   location:  ["Genauigkeit der Beschreibung", "Kommunikation", "Sauberkeit", "Lage", "Wert"],
@@ -23,7 +26,36 @@ const aspects: Record<Props["targetType"], string[]> = {
   animal:    ["Dressur-Level", "Verhalten am Set", "Handler-Kommunikation", "Pünktlichkeit", "Wert"],
 };
 
+
+function getLocalizedLabels(translate: (key: string) => string) { return (["", translate("Ui.text_7c92511643bb6b"), translate("Ui.text_7d9539e9bb870e"), translate("Ui.text_7a26d266bf0c4e"), translate("Ui.text_9f24cc311ede00"), translate("Ui.text_29fde84fd1671b")]); }
+
 export default function ReviewForm({ targetId, targetName, targetType, initialReview, onClose, onSubmit }: Props) {
+  const uiText = useTranslations();
+  const labels = getLocalizedLabels(uiText);
+
+  const uiOptionLabels: Record<string, string> = {
+    "Genauigkeit der Beschreibung": uiText("Ui.text_28d52a066a6f13"),
+    "Kommunikation": uiText("Ui.text_4f1228bcb1ac56"),
+    "Sauberkeit": uiText("Ui.text_2f45bf9ff4674a"),
+    "Lage": uiText("Ui.text_295029201d603e"),
+    "Wert": uiText("Ui.text_7e347daa5ec7fb"),
+    "Professionalität": uiText("Ui.text_89d961ab78f513"),
+    "Pünktlichkeit": uiText("Ui.text_4ed3fa77a09c93"),
+    "Qualität der Arbeit": uiText("Ui.text_47e7f60f4800a2"),
+    "Zustand": uiText("props.conditionLabel"),
+    "Lieferung": uiText("props.deliveryLabel"),
+    "Übergabe": uiText("MarketplaceOffer.fulfilment"),
+    "Zuverlässigkeit": uiText("Ui.text_3943f61ac03a6e"),
+    "Dressur-Level": uiText("Ui.text_f842743bda8808"),
+    "Verhalten am Set": uiText("Ui.text_03bfab4d141373"),
+    "Handler-Kommunikation": uiText("Ui.text_713f6b2bca8f52"),
+  };
+
+
+
+
+
+
   const [overall, setOverall] = useState(initialReview?.rating ?? 0);
   const [hovered, setHovered] = useState(0);
   const [aspectRatings, setAspectRatings] = useState<Record<string, number>>({});
@@ -54,12 +86,12 @@ export default function ReviewForm({ targetId, targetName, targetType, initialRe
       });
 
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Fehler beim Speichern");
+      if (!res.ok) throw new Error(json.error ?? uiText("profile.savingError"));
 
       setSubmitted(true);
       onSubmit?.(overall, text, initialReview?.id);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Fehler beim Speichern");
+      setError(uiErrorMessage(err, uiText("profile.savingError")));
     } finally {
       setSubmitting(false);
     }
@@ -72,16 +104,12 @@ export default function ReviewForm({ targetId, targetName, targetType, initialRe
           <div className="w-16 h-16 bg-success/10 border border-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle size={32} className="text-success" />
           </div>
-          <h3 className="font-display text-xl font-bold text-text-primary mb-2">{initialReview ? "Bewertung aktualisiert" : "Bewertung gesendet!"}</h3>
-          <p className="text-text-muted text-sm mb-6 leading-relaxed">
-            Danke für dein Feedback. Deine Bewertung hilft der Community, bessere Entscheidungen zu treffen.
-          </p>
+          <h3 className="font-display text-xl font-bold text-text-primary mb-2">{initialReview ? uiText("Ui.text_e191ceffa6fd07") : uiText("Ui.text_440dad53bbb5c5")}</h3>
+          <p className="text-text-muted text-sm mb-6 leading-relaxed">{uiText("Ui.text_3f610af8e068b7")}</p>
           <button
             onClick={onClose}
             className="w-full py-2.5 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors"
-          >
-            Schließen
-          </button>
+          >{uiText("ProfilePhotoCrop.close")}</button>
         </div>
       </div>
     );
@@ -93,7 +121,7 @@ export default function ReviewForm({ targetId, targetName, targetType, initialRe
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border sticky top-0 bg-bg-elevated">
           <div>
-            <h2 className="font-display text-lg font-bold text-text-primary">{initialReview ? "Bewertung ändern" : "Bewertung schreiben"}</h2>
+            <h2 className="font-display text-lg font-bold text-text-primary">{initialReview ? uiText("Ui.text_68b790ccd7ac43") : uiText("Ui.text_11ab7b359040ad")}</h2>
             <p className="text-xs text-text-muted">{targetName}</p>
           </div>
           <button onClick={onClose} className="text-text-muted hover:text-gold transition-colors">
@@ -104,9 +132,7 @@ export default function ReviewForm({ targetId, targetName, targetType, initialRe
         <div className="px-6 py-5 space-y-6">
           {/* Overall rating */}
           <div>
-            <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-3">
-              Gesamtbewertung <span className="text-crimson-light">*</span>
-            </label>
+            <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-3">{uiText.rich("Ui.text_1924bcf35aa077", { part1: chunks => (<span className="text-crimson-light">{chunks}</span>) })}</label>
             <div className="flex items-center gap-3">
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((s) => (
@@ -136,13 +162,11 @@ export default function ReviewForm({ targetId, targetName, targetType, initialRe
 
           {/* Aspect ratings */}
           <div>
-            <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-3">
-              Detailbewertung
-            </label>
+            <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-3">{uiText("Ui.text_19e28ddcde45a7")}</label>
             <div className="space-y-3">
               {aspectList.map((aspect) => (
                 <div key={aspect} className="flex items-center justify-between gap-4">
-                  <span className="text-sm text-text-secondary flex-1">{aspect}</span>
+                  <span className="text-sm text-text-secondary flex-1">{(uiOptionLabels[aspect] ?? aspect)}</span>
                   <div className="flex gap-0.5">
                     {[1, 2, 3, 4, 5].map((s) => (
                       <button
@@ -167,30 +191,23 @@ export default function ReviewForm({ targetId, targetName, targetType, initialRe
 
           {/* Text */}
           <div>
-            <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">
-              Deine Erfahrung <span className="text-crimson-light">*</span>
-            </label>
+            <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">{uiText.rich("Ui.text_e7c22633a7e39d", { part1: chunks => (<span className="text-crimson-light">{chunks}</span>) })}</label>
             <textarea
               rows={4}
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="Beschreibe deine Erfahrung — was hat gut funktioniert? Was könnte besser sein?"
+              placeholder={uiText("Ui.text_46c6224ca36266")}
               className="w-full bg-bg-secondary border border-border rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors resize-none"
             />
             <div className="flex justify-between mt-1">
-              <p className="text-[11px] text-text-muted">Mindestens 20 Zeichen</p>
-              <p className={`text-[11px] ${text.length >= 20 ? "text-success" : "text-text-muted"}`}>
-                {text.length} Zeichen
-              </p>
+              <p className="text-[11px] text-text-muted">{uiText("Ui.text_dfd52e19fe2167")}</p>
+              <p className={`text-[11px] ${text.length >= 20 ? "text-success" : "text-text-muted"}`}>{uiText.rich("Ui.text_a1569b4ba52198", { value1: () => (text.length) })}</p>
             </div>
           </div>
 
           {/* Anonymous note */}
           <div className="p-3 bg-bg-secondary border border-border rounded-lg">
-            <p className="text-xs text-text-muted leading-relaxed">
-              <span className="font-semibold text-text-secondary">Verifizierte Bewertung:</span>{" "}
-              Diese Bewertung wird nur nach abgeschlossener Buchung veröffentlicht und ist dauerhaft mit deiner Buchungs-ID verknüpft.
-            </p>
+            <p className="text-xs text-text-muted leading-relaxed">{uiText.rich("Ui.text_0dfbaa3b1f52c8", { part1: chunks => (<span className="font-semibold text-text-secondary">{chunks}</span>) })}</p>
           </div>
 
           {error && (
@@ -208,7 +225,7 @@ export default function ReviewForm({ targetId, targetName, targetType, initialRe
             }`}
           >
             {submitting ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
-            {submitting ? "Wird gespeichert..." : "Bewertung einreichen"}
+            {submitting ? uiText("profile.saving") : uiText("Ui.text_e8d99308675793")}
           </button>
         </div>
       </div>

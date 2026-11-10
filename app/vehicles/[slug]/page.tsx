@@ -1,3 +1,4 @@
+import { getTranslations as getPageTranslations } from "next-intl/server";
 import {placeReadFields} from "@/lib/places/catalog";
 import {placeDisplay} from "@/lib/places/core";
 import { marketplaceCategoryLabel } from "@/lib/marketplace-offer";
@@ -92,6 +93,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
+  const pageCopy = await getPageTranslations("PageCopy");
   try {
     const { slug } = await params;
     const vehicle = await getVehicle(slug);
@@ -101,10 +103,10 @@ export async function generateMetadata({
     return {
     alternates: { canonical: `https://www.cinegenius.co/vehicles/${encodeURIComponent(slug)}` },
       title,
-      description: `${vehicle.type} — ${listingPriceLabel(vehicle.dailyRate,vehicle.pricing,"/Tag",locale,market)}. Jetzt auf CineGenius für Filmproduktionen mieten.`,
+      description: pageCopy("p_b310d30e5a6b", { value0: String(vehicle.type), value1: String(listingPriceLabel(vehicle.dailyRate,vehicle.pricing,"/Tag",locale,market)) }),
       openGraph: {
         title: `${title} | CineGenius`,
-        description: `${vehicle.type} mieten für Film & Foto.`,
+        description: pageCopy("p_fc8a627c6c07", { value0: String(vehicle.type) }),
         ...(vehicle.image ? { images: [{ url: vehicle.image, width: 800, height: 600, alt: title }] } : {}),
       },
     };
@@ -119,6 +121,9 @@ export default async function VehicleDetailPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  const pageCopy = await getPageTranslations("PageCopy");
+  const uiText = await getTranslations();
+
   const { slug } = await params;
   const { userId } = await auth();
   const vehicle = await getVehicle(slug, userId);
@@ -130,7 +135,7 @@ export default async function VehicleDetailPage({
     "@context": "https://schema.org",
     "@type": "Product",
     "name": vehicle.title,
-    "description": vehicle.description || `${vehicle.type} für Filmproduktionen mieten`,
+    "description": vehicle.description || pageCopy("p_29049e735211", { value0: String(vehicle.type) }),
     "image": vehicle.image,
     "category": vehicle.type,
     offers:listingStructuredOffers(vehicle.dailyRate,vehicle.pricing),
@@ -141,9 +146,9 @@ export default async function VehicleDetailPage({
       <JsonLd data={jsonLd} />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center gap-2 text-xs text-text-muted mb-6">
-          <Link href="/" className="hover:text-gold transition-colors">Home</Link>
+          <Link href="/" className="hover:text-gold transition-colors">{uiText("Ui.text_3a78695388b38b")}</Link>
           <span>/</span>
-          <Link href="/vehicles" className="hover:text-gold transition-colors">Fahrzeuge</Link>
+          <Link href="/vehicles" className="hover:text-gold transition-colors">{uiText("footer.links_vehicles")}</Link>
           <span>/</span>
           <span className="text-text-secondary truncate">{vehicle.title}</span>
         </div>
@@ -164,14 +169,10 @@ export default async function VehicleDetailPage({
               />
               <div className="absolute top-4 left-4 flex gap-2">
                 {vehicle.instantBook && (
-                  <span className="px-3 py-1 bg-gold text-bg-primary text-xs font-semibold rounded-full flex items-center gap-1">
-                    <Zap size={11} /> Sofortbuchung
-                  </span>
+                  <span className="px-3 py-1 bg-gold text-bg-primary text-xs font-semibold rounded-full flex items-center gap-1">{uiText.rich("Ui.text_d64964f565b304", { part1: () => (<Zap size={11} />) })}</span>
                 )}
                 {vehicle.verified && (
-                  <span className="px-3 py-1 bg-bg-primary/80 border border-border text-text-secondary text-xs rounded-full flex items-center gap-1">
-                    <CheckCircle size={11} className="text-success" /> Verifiziert
-                  </span>
+                  <span className="px-3 py-1 bg-bg-primary/80 border border-border text-text-secondary text-xs rounded-full flex items-center gap-1">{uiText.rich("Ui.text_712de43869af36", { part1: () => (<CheckCircle size={11} className="text-success" />) })}</span>
                 )}
               </div>
             </div>
@@ -180,9 +181,7 @@ export default async function VehicleDetailPage({
               <div className="flex flex-wrap items-center gap-2 [&_button]:min-h-11 [&_button]:min-w-11">
                   {isOwner && (
                     <Link href="/dashboard?tab=listings"
-                      className="flex items-center gap-1.5 px-3 py-1.5 border border-gold/40 text-gold text-xs font-medium rounded-lg hover:bg-gold/10 transition-colors">
-                      <Pencil size={12} /> Bearbeiten
-                    </Link>
+                      className="flex items-center gap-1.5 px-3 py-1.5 border border-gold/40 text-gold text-xs font-medium rounded-lg hover:bg-gold/10 transition-colors">{uiText.rich("Ui.text_603ead2ae843f0", { part1: () => (<Pencil size={12} />) })}</Link>
                   )}
                   <FavoriteButton
                     listingId={vehicle.id}
@@ -205,11 +204,11 @@ export default async function VehicleDetailPage({
             </div>
 
             <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-              <h2 className="font-semibold text-text-primary mb-3">Über dieses Fahrzeug</h2>
+              <h2 className="font-semibold text-text-primary mb-3">{uiText("Ui.text_b74f22ce5ac411")}</h2>
               <p className="text-text-secondary text-sm leading-relaxed whitespace-pre-line break-words [overflow-wrap:anywhere]">
                 {"description" in vehicle && vehicle.description
                   ? String(vehicle.description)
-                  : `Dieses authentische ${vehicle.make} ${vehicle.model}${vehicle.year > 0 ? ` aus dem Jahr ${vehicle.year}` : ""} ist in ${vehicle.condition.toLowerCase()} Zustand und speziell für Film- und Fernsehproduktionen aufbereitet.${vehicle.delivery ? " Lieferung zum Set ist verfügbar — kontaktiere den Anbieter für Details." : vehicle.location ? ` Selbstabholung am Standort ${vehicle.location}.` : ""}`
+                  : uiText("Ui.text_4d02e3a23026f2", { value1: String(vehicle.make), value2: String(vehicle.model), value3: String(vehicle.year > 0 ? uiText("Ui.text_5a645beba35392", { value1: String(vehicle.year) }) : ""), value4: String(vehicle.condition.toLowerCase()), value5: String(vehicle.delivery ? uiText("Ui.text_00765e09a9664c") : vehicle.location ? uiText("Ui.text_2b67c088c59a94", { value1: String(vehicle.location) }) : "") })
                 }
               </p>
             </div>
@@ -218,17 +217,15 @@ export default async function VehicleDetailPage({
 
             {(vehicle.make || vehicle.model || vehicle.year > 0 || vehicle.color) && (
               <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                <h2 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
-                  <Car size={16} className="text-gold" /> Fahrzeugdaten
-                </h2>
+                <h2 className="font-semibold text-text-primary mb-4 flex items-center gap-2">{uiText.rich("Ui.text_9efaf7df880fdb", { part1: () => (<Car size={16} className="text-gold" />) })}</h2>
                 <div className="grid min-w-0 grid-cols-2 gap-4 sm:grid-cols-3">
                   {[
-                    { label: "Marke", value: vehicle.make || "—" },
-                    { label: "Modell", value: vehicle.model || "—" },
-                    { label: "Baujahr", value: vehicle.year > 0 ? String(vehicle.year) : "—" },
-                    { label: "Farbe", value: vehicle.color || "—" },
-                    { label: "Ära", value: vehicle.era ?? "Modern" },
-                    { label: "Zustand", value: vehicle.condition },
+                    { label: uiText("Ui.text_9badc274ec9504"), value: vehicle.make || "—" },
+                    { label: uiText("MarketplaceOffer.fields.model"), value: vehicle.model || "—" },
+                    { label: uiText("Ui.text_1145a55035d8d6"), value: vehicle.year > 0 ? String(vehicle.year) : "—" },
+                    { label: uiText("Ui.text_a952c8f76f58ad"), value: vehicle.color || "—" },
+                    { label: uiText("Ui.text_c01f139341c7ba"), value: vehicle.era ?? uiText("Ui.text_eef6c7f6ddd406") },
+                    { label: uiText("props.conditionLabel"), value: vehicle.condition },
                   ].map(({ label, value }) => (
                     <div key={label} className="min-w-0">
                       <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-1">{label}</p>
@@ -241,16 +238,9 @@ export default async function VehicleDetailPage({
 
             {vehicle.delivery !== undefined && (
               <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                <h2 className="font-semibold text-text-primary mb-3 flex items-center gap-2">
-                  <Calendar size={16} className="text-gold" /> Konditionen
-                </h2>
+                <h2 className="font-semibold text-text-primary mb-3 flex items-center gap-2">{uiText.rich("Ui.text_caabca627ea8db", { part1: () => (<Calendar size={16} className="text-gold" />) })}</h2>
                 <div className="space-y-3 text-sm text-text-secondary">
-                  <div className="flex justify-between py-2">
-                    <span>Lieferung</span>
-                    <span className={vehicle.delivery ? "text-success font-medium" : "text-text-muted"}>
-                      {vehicle.delivery ? "Verfügbar" : "Selbstabholung"}
-                    </span>
-                  </div>
+                  <div className="flex justify-between py-2">{uiText.rich("Ui.text_32322ffdc13f16", { part1: chunks => (<span>{chunks}</span>), value3: () => (vehicle.delivery ? uiText("common.available") : uiText("Ui.text_f58e79dff3c014")), part2: chunks => (<span className={vehicle.delivery ? "text-success font-medium" : "text-text-muted"}>{chunks}</span>) })}</div>
                 </div>
               </div>
             )}
@@ -261,15 +251,13 @@ export default async function VehicleDetailPage({
               <div className="p-6 rounded-2xl border border-border bg-bg-secondary">
                 <div className="mb-5">
                   <span className="font-display text-3xl font-bold text-gold">{listingPriceLabel(vehicle.dailyRate,vehicle.pricing,"/Tag",locale,market)}</span>
-                  <span className="text-text-muted text-sm"> / Tag</span>
+                  <span className="text-text-muted text-sm">{uiText("Ui.text_2bf4c50be2aec3")}</span>
                 </div>
 
                 {vehicle.ownerId ? <Link
                   href={`/booking/checkout?type=vehicle&id=${vehicle.id}&title=${encodeURIComponent(vehicle.title)}&price=${vehicle.dailyRate}`}
                   className="block w-full py-3.5 bg-gold text-bg-primary font-semibold text-center rounded-xl hover:bg-gold-light transition-colors flex items-center justify-center gap-2 mb-3"
-                >
-                  <Calendar size={16} /> Jetzt buchen
-                </Link> : <p className="mb-3 rounded-lg border border-gold/30 bg-gold/10 p-3 text-xs leading-5 text-text-secondary">Buchungs- und Kontaktanfragen sind vorübergehend nicht möglich, weil der Anbieter noch nicht zugeordnet ist.</p>}
+                >{uiText.rich("Ui.text_84219c9af6466b", { part1: () => (<Calendar size={16} />) })}</Link> : <p className="mb-3 rounded-lg border border-gold/30 bg-gold/10 p-3 text-xs leading-5 text-text-secondary">{uiText("Ui.text_f43ef22d799759")}</p>}
 
                 {"ownerId" in vehicle && vehicle.ownerId ? (
                   <InquiryForm
@@ -282,15 +270,13 @@ export default async function VehicleDetailPage({
                 ) : (
                   <div className="mt-4 flex items-start gap-2 p-3 bg-gold-subtle rounded-lg border border-gold/20">
                     <Shield size={14} className="text-gold shrink-0 mt-0.5" />
-                    <p className="text-xs text-text-muted leading-relaxed">
-                      Sichere Zahlung über CineGenius. Geld wird erst nach Abschluss freigegeben.
-                    </p>
+                    <p className="text-xs text-text-muted leading-relaxed">{uiText("Ui.text_97454add1d86a2")}</p>
                   </div>
                 )}
               </div>
 
               <div className="space-y-3">
-                <h3 className="font-semibold text-text-primary text-sm">Anbieter</h3>
+                <h3 className="font-semibold text-text-primary text-sm">{uiText("profile.catAnbieterLabel")}</h3>
                 <ListingProviderCard provider={vehicle.provider} />
               </div>
             </div>
@@ -307,10 +293,8 @@ export default async function VehicleDetailPage({
 
         <div className="mt-0 pt-8 border-t border-border">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-display text-2xl font-bold text-text-primary">Ähnliche Fahrzeuge</h2>
-            <Link href="/vehicles" className="text-sm text-gold hover:text-gold-light flex items-center gap-1">
-              Alle anzeigen <ArrowRight size={14} />
-            </Link>
+            <h2 className="font-display text-2xl font-bold text-text-primary">{uiText("Ui.text_e254416128fcec")}</h2>
+            <Link href="/vehicles" className="text-sm text-gold hover:text-gold-light flex items-center gap-1">{uiText.rich("Ui.text_85c18f09370e39", { part1: () => (<ArrowRight size={14} />) })}</Link>
           </div>
         </div>
       </div>

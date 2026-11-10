@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations , useLocale } from "next-intl";
 import { useGallerySelection } from "@/lib/use-gallery-selection";
 import Link from "next/link";
 import ContextBackLink from "@/components/ContextBackLink";
@@ -18,6 +18,7 @@ import InquiryForm from "@/components/InquiryForm";
 import ReviewsSection from "@/components/ReviewsSection";
 import FavoriteButton from "@/components/FavoriteButton";
 import Lightbox from "@/components/Lightbox";
+import { uiErrorMessage } from "@/lib/ui-error-message";
 
 type FilmographyEntry = {
   year: number;
@@ -62,17 +63,17 @@ type Creator = {
   ownerId?: string;
 };
 
-function formatLastSeen(isoDate: string): string {
+function formatLastSeen(translate: (key: string, values?: Record<string, string | number>) => string, isoDate: string): string {
   const diff = Date.now() - new Date(isoDate).getTime();
-  const mins  = Math.floor(diff / 60000);
+  const mins = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
-  const days  = Math.floor(diff / 86400000);
-  if (mins < 5)   return "Gerade eben aktiv";
-  if (mins < 60)  return `Vor ${mins} Minuten aktiv`;
-  if (hours < 24) return `Vor ${hours} Stunde${hours !== 1 ? "n" : ""} aktiv`;
-  if (days < 7)   return `Vor ${days} Tag${days !== 1 ? "en" : ""} aktiv`;
-  if (days < 30)  return `Vor ${Math.floor(days / 7)} Woche${Math.floor(days / 7) !== 1 ? "n" : ""} aktiv`;
-  return "Vor mehr als einem Monat aktiv";
+  const days = Math.floor(diff / 86400000);
+  if (mins < 5) return translate("Ui.text_41dd5825403591");
+  if (mins < 60) return translate("Ui.text_40f6da5e688a71", { count: mins });
+  if (hours < 24) return translate("Ui.text_a0e76b0367d9d0", { count: hours });
+  if (days < 7) return translate("Ui.text_7d876c5f235da3", { count: days });
+  if (days < 30) return translate("Ui.text_f82ed0be81f8a3", { count: Math.floor(days / 7) });
+  return translate("Ui.text_439b74405c4d4a");
 }
 
 function getEmbedUrl(url: string): string | null {
@@ -120,6 +121,9 @@ export default function CreatorDetail({
   isOwnProfile?: boolean;
   currentUserId?: string | null;
 }) {
+  const uiText = useTranslations();
+  const uiLocale = useLocale();
+
   const tc = useTranslations("common");
   const profileText = useTranslations("profile");
   const bookingCopy = useTranslations("BookingRequest");
@@ -168,9 +172,9 @@ export default function CreatorDetail({
         body: JSON.stringify({ listing_id: creator.id, listing_title: creator.name, listing_type: "creator", receiver_id: creator.ownerId, content: message.trim() }),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Fehler beim Senden");
+      if (!res.ok) throw new Error(json.error ?? uiText("Ui.text_3d5d6608b0a99d"));
       setMsgSent(true); setMessage("");
-    } catch (err) { setMsgError(err instanceof Error ? err.message : "Fehler"); }
+    } catch (err) { setMsgError(uiErrorMessage(err, uiText("Ui.text_f6cc01cb7edbf0"))); }
     finally { setMsgSending(false); }
   };
 
@@ -190,11 +194,11 @@ export default function CreatorDetail({
         body: JSON.stringify({ recipient_id: creator.id, content: recForm.content, author_role: recForm.author_role, project: recForm.project || null }),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Fehler");
+      if (!res.ok) throw new Error(json.error ?? uiText("Ui.text_f6cc01cb7edbf0"));
       setRecSent(true); setShowRecForm(false);
       const updated = await fetch(`/api/recommendations?userId=${creator.id}`).then((r) => r.json());
       setRecommendations(updated.recommendations ?? []);
-    } catch (err) { setRecError(err instanceof Error ? err.message : "Fehler"); }
+    } catch (err) { setRecError(uiErrorMessage(err, uiText("Ui.text_f6cc01cb7edbf0"))); }
     finally { setRecSending(false); }
   };
 
@@ -211,9 +215,9 @@ export default function CreatorDetail({
     try {
       const res = await fetch("/api/friendships", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ receiver_id: creator.ownerId }) });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Fehler");
+      if (!res.ok) throw new Error(json.error ?? uiText("Ui.text_f6cc01cb7edbf0"));
       setCurrentFriendshipId(json.friendship.id); setCurrentFriendStatus("pending_sent");
-    } catch (err) { setFriendError(err instanceof Error ? err.message : "Fehler"); }
+    } catch (err) { setFriendError(uiErrorMessage(err, uiText("Ui.text_f6cc01cb7edbf0"))); }
     finally { setFriendLoading(false); }
   };
 
@@ -223,9 +227,9 @@ export default function CreatorDetail({
     try {
       const res = await fetch(`/api/friendships/${currentFriendshipId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Fehler");
+      if (!res.ok) throw new Error(json.error ?? uiText("Ui.text_f6cc01cb7edbf0"));
       setCurrentFriendStatus(status);
-    } catch (err) { setFriendError(err instanceof Error ? err.message : "Fehler"); }
+    } catch (err) { setFriendError(uiErrorMessage(err, uiText("Ui.text_f6cc01cb7edbf0"))); }
     finally { setFriendLoading(false); }
   };
 
@@ -234,53 +238,45 @@ export default function CreatorDetail({
     setFriendLoading(true); setFriendError("");
     try {
       const res = await fetch(`/api/friendships/${currentFriendshipId}`, { method: "DELETE" });
-      if (!res.ok) { const j = await res.json(); throw new Error(j.error ?? "Fehler"); }
+      if (!res.ok) { const j = await res.json(); throw new Error(j.error ?? uiText("Ui.text_f6cc01cb7edbf0")); }
       setCurrentFriendStatus("none"); setCurrentFriendshipId(null);
-    } catch (err) { setFriendError(err instanceof Error ? err.message : "Fehler"); }
+    } catch (err) { setFriendError(uiErrorMessage(err, uiText("Ui.text_f6cc01cb7edbf0"))); }
     finally { setFriendLoading(false); }
   };
 
   const positions = (creator.positions?.length ? creator.positions : [creator.role]);
   const allVideos = [creator.reel_url, ...(creator.video_links ?? [])].filter(Boolean) as string[];
   const socialLinks = [
-    { url: creator.instagram_url, icon: AtSign,        label: "Instagram",  color: "text-pink-400" },
-    { url: creator.tiktok_url,    icon: PlayCircle,    label: "TikTok",     color: "text-text-secondary" },
-    { url: creator.youtube_url,   icon: Video,         label: "YouTube",    color: "text-red-400" },
-    { url: creator.linkedin_url,  icon: Globe,         label: "LinkedIn",   color: "text-blue-400" },
-    { url: creator.imdb_url,      icon: Award,         label: "IMDb",       color: "text-amber-400" },
-    { url: creator.website_url,   icon: Globe,         label: "Website",    color: "text-text-secondary" },
+    { url: creator.instagram_url, icon: AtSign,        label: uiText("Ui.text_bad57ef7837c8e"),  color: "text-pink-400" },
+    { url: creator.tiktok_url,    icon: PlayCircle,    label: uiText("Ui.text_1bb6fcfbf1368a"),     color: "text-text-secondary" },
+    { url: creator.youtube_url,   icon: Video,         label: uiText("Ui.text_fb7accfff8c6f8"),    color: "text-red-400" },
+    { url: creator.linkedin_url,  icon: Globe,         label: uiText("Ui.text_dd84425b72da12"),   color: "text-blue-400" },
+    { url: creator.imdb_url,      icon: Award,         label: uiText("Ui.text_061f3a4e4a30d7"),       color: "text-amber-400" },
+    { url: creator.website_url,   icon: Globe,         label: uiText("AdminReview.fields.website"),    color: "text-text-secondary" },
   ].filter((s) => s.url);
 
   const FriendButton = () => {
+  const uiText = useTranslations();
+
     if (isOwnProfile || !currentUserId) return null;
     if (currentFriendStatus === "none" || currentFriendStatus === "rejected") return (
       <button onClick={sendFriendRequest} disabled={friendLoading}
-        className="flex items-center gap-1.5 px-3 py-1.5 bg-gold/10 border border-gold/20 text-gold text-xs font-medium rounded-full hover:bg-gold/20 transition-colors disabled:opacity-50">
-        {friendLoading ? <Loader2 size={12} className="animate-spin" /> : <UserPlus size={12} />} Freund hinzufügen
-      </button>
+        className="flex items-center gap-1.5 px-3 py-1.5 bg-gold/10 border border-gold/20 text-gold text-xs font-medium rounded-full hover:bg-gold/20 transition-colors disabled:opacity-50">{uiText.rich("Ui.text_7ace85e5f8b307", { value1: () => (friendLoading ? <Loader2 size={12} className="animate-spin" /> : <UserPlus size={12} />) })}</button>
     );
     if (currentFriendStatus === "pending_sent") return (
-      <span className="flex items-center gap-1.5 px-3 py-1.5 bg-bg-secondary border border-border text-text-muted text-xs rounded-full">
-        <Clock size={12} /> Anfrage gesendet
-      </span>
+      <span className="flex items-center gap-1.5 px-3 py-1.5 bg-bg-secondary border border-border text-text-muted text-xs rounded-full">{uiText.rich("Ui.text_6ef3d8e9ec1014", { part1: () => (<Clock size={12} />) })}</span>
     );
     if (currentFriendStatus === "pending_received") return (
       <div className="flex items-center gap-2">
         <button onClick={() => respondToRequest("accepted")} disabled={friendLoading}
-          className="flex items-center gap-1 px-3 py-1.5 bg-success/10 border border-success/20 text-success text-xs font-medium rounded-full hover:bg-success/20 transition-colors disabled:opacity-50">
-          {friendLoading ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Annehmen
-        </button>
+          className="flex items-center gap-1 px-3 py-1.5 bg-success/10 border border-success/20 text-success text-xs font-medium rounded-full hover:bg-success/20 transition-colors disabled:opacity-50">{uiText.rich("Ui.text_f595baa92ebad7", { value1: () => (friendLoading ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />) })}</button>
         <button onClick={() => respondToRequest("rejected")} disabled={friendLoading}
-          className="flex items-center gap-1 px-3 py-1.5 bg-bg-secondary border border-border text-text-muted text-xs rounded-full hover:border-red-400 hover:text-red-400 transition-colors disabled:opacity-50">
-          <X size={12} /> Ablehnen
-        </button>
+          className="flex items-center gap-1 px-3 py-1.5 bg-bg-secondary border border-border text-text-muted text-xs rounded-full hover:border-red-400 hover:text-red-400 transition-colors disabled:opacity-50">{uiText.rich("Ui.text_2424239b7d6d6c", { part1: () => (<X size={12} />) })}</button>
       </div>
     );
     if (currentFriendStatus === "accepted") return (
       <button onClick={removeFriend} disabled={friendLoading}
-        className="flex items-center gap-1.5 px-3 py-1.5 bg-success/10 border border-success/20 text-success text-xs font-medium rounded-full hover:bg-red-500/10 hover:border-red-400/20 hover:text-red-400 transition-colors disabled:opacity-50">
-        {friendLoading ? <Loader2 size={12} className="animate-spin" /> : <UserCheck size={12} />} Befreundet
-      </button>
+        className="flex items-center gap-1.5 px-3 py-1.5 bg-success/10 border border-success/20 text-success text-xs font-medium rounded-full hover:bg-red-500/10 hover:border-red-400/20 hover:text-red-400 transition-colors disabled:opacity-50">{uiText.rich("Ui.text_1185eeb2a56108", { value1: () => (friendLoading ? <Loader2 size={12} className="animate-spin" /> : <UserCheck size={12} />) })}</button>
     );
     return null;
   };
@@ -302,17 +298,11 @@ export default function CreatorDetail({
 
         {/* Back link */}
         <div className="absolute top-4 left-4">
-          <ContextBackLink href="/creators" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/40 backdrop-blur-sm rounded-full text-white/80 hover:text-white text-xs font-medium transition-colors">
-            <ArrowLeft size={13} /> Filmschaffende
-          </ContextBackLink>
+          <ContextBackLink href="/creators" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/40 backdrop-blur-sm rounded-full text-white/80 hover:text-white text-xs font-medium transition-colors">{uiText.rich("Ui.text_71de535944f89f", { part1: () => (<ArrowLeft size={13} />) })}</ContextBackLink>
         </div>
 
         {isOwnProfile && (
-          <div className="absolute top-4 right-4">
-            <Link href="/profile" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/40 backdrop-blur-sm rounded-full text-white/80 hover:text-gold text-xs font-medium transition-colors">
-              <Pencil size={13} /> Bearbeiten
-            </Link>
-          </div>
+          <div className="absolute top-4 right-4">{uiText.rich("Ui.text_d27b2c548b981f", { part2: () => (<Pencil size={13} />), part1: chunks => (<Link href="/profile" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/40 backdrop-blur-sm rounded-full text-white/80 hover:text-gold text-xs font-medium transition-colors">{chunks}</Link>) })}</div>
         )}
       </div>
 
@@ -348,7 +338,7 @@ export default function CreatorDetail({
               <span className="flex items-center gap-1"><MapPin size={13} />{creator.location}</span>
               {creator.day_rate && (
                 <span className="flex items-center gap-1 text-text-secondary font-medium">
-                  <DollarSign size={13} className="text-gold" />{creator.day_rate.toLocaleString("de-DE")} €{tc("perDay")}
+                  <DollarSign size={13} className="text-gold" />{creator.day_rate.toLocaleString(uiLocale)} €{tc("perDay")}
                 </span>
               )}
               {creator.travel_ready && (
@@ -357,7 +347,7 @@ export default function CreatorDetail({
               {creator.last_seen_at && (
                 <span className="flex items-center gap-1.5">
                   <span className={`w-2 h-2 rounded-full ${Date.now() - new Date(creator.last_seen_at).getTime() < 5 * 60000 ? "bg-success" : "bg-text-muted"}`} />
-                  {formatLastSeen(creator.last_seen_at)}
+                  {formatLastSeen(uiText, creator.last_seen_at)}
                 </span>
               )}
             </div>
@@ -385,11 +375,11 @@ export default function CreatorDetail({
           <div className="ml-auto flex items-center gap-4">
             <div className="text-center">
               <div className="text-base font-bold text-text-primary">{projectCredits.length}</div>
-              <div className="text-[10px] text-text-muted uppercase tracking-widest">Credits</div>
+              <div className="text-[10px] text-text-muted uppercase tracking-widest">{uiText("Ui.text_2a6b24ad287220")}</div>
             </div>
             <div className="text-center">
               <div className="text-base font-bold text-text-primary">{creator.reviews}</div>
-              <div className="text-[10px] text-text-muted uppercase tracking-widest">Projekte</div>
+              <div className="text-[10px] text-text-muted uppercase tracking-widest">{uiText("nav.projects")}</div>
             </div>
             <div className="flex flex-col items-center">
               <div className="flex">
@@ -397,7 +387,7 @@ export default function CreatorDetail({
                   <Star key={i} size={12} className={i < Math.floor(creator.rating) ? "text-gold fill-gold" : "text-border"} />
                 ))}
               </div>
-              <div className="text-[10px] text-text-muted uppercase tracking-widest">{creator.reviews} Bew.</div>
+              <div className="text-[10px] text-text-muted uppercase tracking-widest">{uiText.rich("Ui.text_10d8a5e26bd73e", { value1: () => (creator.reviews) })}</div>
             </div>
           </div>
         </div>
@@ -409,7 +399,7 @@ export default function CreatorDetail({
             {/* Über mich */}
             {creator.bio && (
               <section>
-                <SectionTitle icon={Users}>Über mich</SectionTitle>
+                <SectionTitle icon={Users}>{uiText("Ui.text_3f8ab8360131de")}</SectionTitle>
                 <p className="text-text-secondary leading-relaxed">{creator.bio}</p>
               </section>
             )}
@@ -417,13 +407,13 @@ export default function CreatorDetail({
             {/* Showreel / Videos */}
             {allVideos.length > 0 && (
               <section>
-                <SectionTitle icon={Play}>Videos & Showreel</SectionTitle>
+                <SectionTitle icon={Play}>{uiText("profile.sectionVideos")}</SectionTitle>
                 <div className="space-y-4">
                   {allVideos.map((url, i) => {
                     const embedUrl = getEmbedUrl(url);
                     return embedUrl ? (
                       <div key={i} className="relative aspect-video rounded-2xl overflow-hidden border border-border shadow-lg">
-                        <iframe src={embedUrl} title={`Video ${i + 1}`}
+                        <iframe src={embedUrl} title={uiText("Ui.text_7c5f4551b266c9", { value1: String(i + 1) })}
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                           allowFullScreen className="absolute inset-0 w-full h-full" />
                       </div>
@@ -443,7 +433,7 @@ export default function CreatorDetail({
             {/* Portfolio Galerie */}
             {(creator.portfolio_images?.length ?? 0) > 0 && (
               <section>
-                <SectionTitle icon={Camera}>Portfolio</SectionTitle>
+                <SectionTitle icon={Camera}>{uiText("Ui.text_1853eb2e9e5ed2")}</SectionTitle>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {(creator.portfolio_images ?? []).map((url, i) => (
                     <button key={url} onClick={() => setLightboxIdx(i)}
@@ -451,7 +441,7 @@ export default function CreatorDetail({
                         i === 0 ? "col-span-2 aspect-video" : "aspect-square"
                       }`}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={url} alt={`Portfolio ${i + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                      <img src={url} alt={uiText("Ui.text_3a1e6b953a8984", { value1: String(i + 1) })} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
                     </button>
                   ))}
                 </div>
@@ -470,7 +460,7 @@ export default function CreatorDetail({
             {/* Filmografie — verknüpfte Projekte */}
             {projectCredits.length > 0 && (
               <section>
-                <SectionTitle icon={Clapperboard}>Filmografie</SectionTitle>
+                <SectionTitle icon={Clapperboard}>{uiText("profile.sectionFilmography")}</SectionTitle>
                 <div className="space-y-2">
                   {[...projectCredits]
                     .sort((a, b) => (b.projects?.year ?? 0) - (a.projects?.year ?? 0))
@@ -499,8 +489,8 @@ export default function CreatorDetail({
                             </div>
                             <div className="text-xs text-text-muted mt-0.5 flex items-center gap-2">
                               <span>{roleLabel}</span>
-                              {collaborator && <><span>·</span><span>Mit: {collaborator}</span></>}
-                              {credit.projects?.director && <><span>·</span><span>Regie: {credit.projects.director}</span></>}
+                              {collaborator && <>{uiText.rich("Ui.text_819bd4bbf6cc4a", { part1: chunks => (<span>{chunks}</span>), value3: () => (collaborator), part2: chunks => (<span>{chunks}</span>) })}</>}
+                              {credit.projects?.director && <>{uiText.rich("Ui.text_38432540914b27", { part1: chunks => (<span>{chunks}</span>), value3: () => (credit.projects.director), part2: chunks => (<span>{chunks}</span>) })}</>}
                             </div>
                           </div>
                           <Calendar size={14} className="text-text-muted shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -514,7 +504,7 @@ export default function CreatorDetail({
             {/* Erfahrung */}
             {creator.experience && (
               <section>
-                <SectionTitle icon={Award}>Erfahrung & Referenzen</SectionTitle>
+                <SectionTitle icon={Award}>{uiText("Ui.text_9620ef01dde01d")}</SectionTitle>
                 <p className="text-text-secondary leading-relaxed whitespace-pre-line">{creator.experience}</p>
               </section>
             )}
@@ -522,7 +512,7 @@ export default function CreatorDetail({
             {/* Fähigkeiten */}
             {(creator.skills ?? []).length > 0 && (
               <section>
-                <SectionTitle icon={CheckCircle}>Fähigkeiten & Equipment</SectionTitle>
+                <SectionTitle icon={CheckCircle}>{uiText("Ui.text_0f0478732ed1ba")}</SectionTitle>
                 <div className="flex flex-wrap gap-2">
                   {(creator.skills ?? []).map((s) => (
                     <span key={s} className="px-3 py-1.5 bg-bg-secondary border border-border text-text-secondary text-sm rounded-lg hover:border-gold/30 transition-colors">
@@ -536,7 +526,7 @@ export default function CreatorDetail({
             {/* Sprachen */}
             {(creator.languages?.length ?? 0) > 0 && (
               <section>
-                <SectionTitle icon={Globe}>Sprachen</SectionTitle>
+                <SectionTitle icon={Globe}>{uiText("profile.sectionLanguages")}</SectionTitle>
                 <div className="flex flex-wrap gap-2">
                   {(creator.languages ?? []).map((l) => (
                     <span key={l} className="px-3 py-1.5 bg-bg-secondary border border-border text-text-secondary text-sm rounded-lg">{l}</span>
@@ -548,46 +538,42 @@ export default function CreatorDetail({
             {/* Empfehlungen */}
             <section>
               <div className="flex items-center justify-between mb-4">
-                <SectionTitle icon={Quote} noMargin>
-                  Empfehlungen{recommendations.length > 0 && <span className="text-sm font-normal text-text-muted ml-1">({recommendations.length})</span>}
-                </SectionTitle>
+                <SectionTitle icon={Quote} noMargin>{uiText.rich("Ui.text_16c95667074b37", { value1: () => (recommendations.length > 0 && <span className="text-sm font-normal text-text-muted ml-1">({recommendations.length})</span>) })}</SectionTitle>
                 {!isOwnProfile && currentUserId && !alreadyWroteRec && !recSent && (
                   <button onClick={() => setShowRecForm((v) => !v)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors">
-                    <Pencil size={12} /> Empfehlung schreiben
-                  </button>
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors">{uiText.rich("Ui.text_2e3fa7cd433318", { part1: () => (<Pencil size={12} />) })}</button>
                 )}
-                {recSent && <span className="flex items-center gap-1 text-xs text-success"><CheckCircle size={12} /> Gespeichert</span>}
+                {recSent && <span className="flex items-center gap-1 text-xs text-success">{uiText.rich("Ui.text_2f50464d68aaef", { part1: () => (<CheckCircle size={12} />) })}</span>}
               </div>
 
               {showRecForm && (
                 <div className="mb-6 p-5 bg-bg-secondary border border-gold/20 rounded-xl space-y-4">
                   <div className="grid sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">Deine Rolle *</label>
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{uiText("Ui.text_46852aaa262254")}</label>
                       <input type="text" value={recForm.author_role} onChange={(e) => setRecForm((p) => ({ ...p, author_role: e.target.value }))}
-                        placeholder="z.B. Regisseur, Produzentin…"
+                        placeholder={uiText("Ui.text_feb8233f0fcae9")}
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
                     </div>
                     <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">Projekt (optional)</label>
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{uiText("Ui.text_4408814c2404e8")}</label>
                       <input type="text" value={recForm.project} onChange={(e) => setRecForm((p) => ({ ...p, project: e.target.value }))}
-                        placeholder={`z.B. "Das letzte Bild" (2024)`}
+                        placeholder={uiText("Ui.text_8581cd83e84d96")}
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
                     </div>
                   </div>
                   <textarea rows={4} value={recForm.content} onChange={(e) => setRecForm((p) => ({ ...p, content: e.target.value }))} maxLength={600}
-                    placeholder={`Beschreibe deine Zusammenarbeit mit ${creator.name.split(" ")[0]}…`}
+                    placeholder={uiText("Ui.text_a790d1b8c43a23", { value1: String(creator.name.split(" ")[0]) })}
                     className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors resize-none" />
                   <p className="text-xs text-text-muted text-right">{recForm.content.length} / 600</p>
                   {recError && <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{recError}</p>}
                   <div className="flex gap-2 justify-end">
                     <button onClick={() => { setShowRecForm(false); setRecError(""); }}
-                      className="px-4 py-2 text-sm text-text-muted border border-border rounded-lg hover:border-gold hover:text-gold transition-colors">Abbrechen</button>
+                      className="px-4 py-2 text-sm text-text-muted border border-border rounded-lg hover:border-gold hover:text-gold transition-colors">{uiText("home.boardCancel")}</button>
                     <button onClick={submitRecommendation} disabled={recSending || !recForm.author_role.trim() || !recForm.content.trim()}
                       className="px-4 py-2 text-sm font-semibold bg-gold text-bg-primary rounded-lg hover:bg-gold-light transition-colors disabled:opacity-40 flex items-center gap-2">
                       {recSending ? <Loader2 size={13} className="animate-spin" /> : <CheckCircle size={13} />}
-                      {recSending ? "Wird gespeichert…" : "Veröffentlichen"}
+                      {recSending ? uiText("AdminReview.saving") : uiText("MarketplacePublishing.publish")}
                     </button>
                   </div>
                 </div>
@@ -598,7 +584,7 @@ export default function CreatorDetail({
               ) : recommendations.length === 0 ? (
                 <div className="py-8 text-center border border-dashed border-border rounded-xl">
                   <Quote size={24} className="text-text-muted mx-auto mb-2 opacity-40" />
-                  <p className="text-sm text-text-muted">Noch keine Empfehlungen</p>
+                  <p className="text-sm text-text-muted">{uiText("Ui.text_a435e0d550b4d1")}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -617,7 +603,7 @@ export default function CreatorDetail({
                         )}
                         <div className="min-w-0">
                           <p className="text-sm font-semibold text-text-primary leading-tight">{rec.author_name}</p>
-                          <p className="text-xs text-text-muted truncate">{rec.author_role}{rec.project ? ` · ${rec.project}` : ""}</p>
+                          <p className="text-xs text-text-muted truncate">{rec.author_role}{rec.project ? uiText("Ui.text_f6b53f9c8ab3ef", { value1: String(rec.project) }) : ""}</p>
                         </div>
                         {rec.author_id === currentUserId && (
                           <button onClick={() => deleteRecommendation(rec.id)}
@@ -646,7 +632,7 @@ export default function CreatorDetail({
                 <span className={`w-2 h-2 rounded-full shrink-0 ${creator.available ? "bg-success" : "bg-text-muted"}`} />
                 {creator.available
                   ? creator.available_from
-                    ? `${tcr("availableFrom")} ${new Date(creator.available_from).toLocaleDateString(undefined, { day: "numeric", month: "long" })}`
+                    ? uiText("Ui.text_4040b7c06c4e87", { value1: String(tcr("availableFrom")), value2: String(new Date(creator.available_from).toLocaleDateString(undefined, { day: "numeric", month: "long" })) })
                     : tcr("availableImmediately")
                   : tcr("currentlyBooked")}
               </div>
@@ -678,31 +664,29 @@ export default function CreatorDetail({
                   {!canMessage ? (
                     <div className="text-center space-y-3 py-2">
                       <div className="w-12 h-12 bg-bg-elevated border border-border rounded-full flex items-center justify-center mx-auto"><Lock size={18} className="text-text-muted" /></div>
-                      <p className="font-semibold text-text-primary text-sm">Nachrichten eingeschränkt</p>
-                      <p className="text-xs text-text-muted leading-relaxed">Nur Freunde können eine Nachricht senden.</p>
+                      <p className="font-semibold text-text-primary text-sm">{uiText("Ui.text_29c8ec8b49aa6f")}</p>
+                      <p className="text-xs text-text-muted leading-relaxed">{uiText("Ui.text_00dfadf6983ae3")}</p>
                     </div>
                   ) : msgSent ? (
                     <div className="text-center space-y-3 py-2">
                       <div className="w-12 h-12 bg-success/10 border border-success/20 rounded-full flex items-center justify-center mx-auto"><CheckCircle size={22} className="text-success" /></div>
-                      <p className="font-semibold text-text-primary">Nachricht gesendet!</p>
-                      <button onClick={() => { setMsgSent(false); setMessage(""); }} className="text-xs text-gold hover:text-gold-light transition-colors">Weitere Nachricht senden</button>
+                      <p className="font-semibold text-text-primary">{uiText("Ui.text_95aa00aa984848")}</p>
+                      <button onClick={() => { setMsgSent(false); setMessage(""); }} className="text-xs text-gold hover:text-gold-light transition-colors">{uiText("Ui.text_5928a284cf930d")}</button>
                     </div>
                   ) : (
                     <>
-                      <h3 className="font-semibold text-text-primary mb-1">Nachricht senden</h3>
-                      <p className="text-text-muted text-xs mb-4">Antwortet üblicherweise innerhalb von 24h.</p>
+                      <h3 className="font-semibold text-text-primary mb-1">{uiText("companyMessages.send")}</h3>
+                      <p className="text-text-muted text-xs mb-4">{uiText("Ui.text_d03a03c81f97e6")}</p>
                       <textarea rows={4} value={message} onChange={(e) => setMessage(e.target.value)}
-                        placeholder={`Hallo ${creator.name.split(" ")[0]}, ich würde gerne über ein Projekt sprechen...`}
+                        placeholder={uiText("Ui.text_744506c61723c7", { value1: String(creator.name.split(" ")[0]) })}
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors resize-none mb-3" />
                       {msgError && <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 mb-3">{msgError}</p>}
                       <button onClick={sendMessage} disabled={!message.trim() || msgSending || !creator.ownerId}
                         className="w-full py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
                         {msgSending ? <Loader2 size={14} className="animate-spin" /> : <MessageSquare size={14} />}
-                        {msgSending ? "Wird gesendet..." : "Nachricht senden"}
+                        {msgSending ? uiText("Ui.text_e37bd862386549") : uiText("companyMessages.send")}
                       </button>
-                      <p className="text-center text-xs text-text-muted mt-2 flex items-center justify-center gap-1">
-                        <Shield size={11} /> Privat · nur du und {creator.name.split(" ")[0]}
-                      </p>
+                      <p className="text-center text-xs text-text-muted mt-2 flex items-center justify-center gap-1">{uiText.rich("Ui.text_9cbc04b6b9d3b9", { part1: () => (<Shield size={11} />), value2: () => (creator.name.split(" ")[0]) })}</p>
                     </>
                   )}
                 </div>

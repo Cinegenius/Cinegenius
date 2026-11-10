@@ -6,19 +6,23 @@ import { listingPriceMetadata } from "@/lib/listing-price";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import VehiclesContent from "./VehiclesContent";
+import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 export const revalidate = 60;
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const tMetadata = await getMetadataTranslations("Metadata");
+  return {
   alternates: { canonical: "https://www.cinegenius.co/vehicles" },
-  title: "Bildfahrzeuge & Stuntautos mieten — Film & Werbung",
-  description: "Klassiker, Oldtimer, Stuntautos und Spezialfahrzeuge für Film, Werbung und Fotoproduktionen mieten. Jetzt Fahrzeuge durchsuchen.",
-  keywords: ["Bildfahrzeuge mieten", "Oldtimer Film", "Stuntauto mieten", "Filmfahrzeuge", "Fahrzeug für Werbung"],
+  title: tMetadata('m_fa2435096125'),
+  description: tMetadata('m_47fa659ef18c'),
+  keywords: [tMetadata('m_b529927fe8e7'), tMetadata('m_3a53fe2a687a'), tMetadata('m_e8394cb4ca66'), tMetadata('m_756f8a76f3f9'), tMetadata('m_92a6c6a6ae60')],
   openGraph: {
-    title: "Bildfahrzeuge & Stuntautos — CineGenius",
-    description: "Klassiker, Stuntautos und Spezialfahrzeuge für deine Produktion.",
+    title: tMetadata('m_28b9791b7533'),
+    description: tMetadata('m_541269017187'),
   },
 };
+}
 
 export default async function VehiclesPage() {
   const locale=await getLocale();

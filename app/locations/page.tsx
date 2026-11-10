@@ -6,21 +6,27 @@ import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
 import LocationsLanding, { type LocationCard } from "./LocationsLanding";
+import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 export const revalidate = 60;
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const tMetadata = await getMetadataTranslations("Metadata");
+  return {
   alternates: { canonical: "https://www.cinegenius.co/locations" },
-  title: "Filmlocations mieten — Apartments, Villen, Studios & mehr",
-  description: "Finde die perfekte Location für dein Filmprojekt: Apartments, Villen, Industriehallen, Studios, Außengelände und mehr. Jetzt Locations durchsuchen.",
-  keywords: ["Location mieten", "Filmlocations Deutschland", "Location für Filmdreh", "Fotostudio mieten", "Außengelände Film"],
+  title: tMetadata('m_34258bd0b349'),
+  description: tMetadata('m_d4138f9d1e78'),
+  keywords: [tMetadata('m_74826d9e051a'), tMetadata('m_6cd5097a3ae3'), tMetadata('m_9787d23bd01a'), tMetadata('m_d9753ec6bbbb'), tMetadata('m_5a64824ccd38')],
   openGraph: {
-    title: "Filmlocations — CineGenius",
-    description: "Die perfekte Location für dein nächstes Projekt — Innen, Außen & Speziallocation.",
+    title: tMetadata('m_36511716ffc5'),
+    description: tMetadata('m_9de8e0ccf7aa'),
   },
 };
+}
 
 export default async function LocationsPage() {
+  const uiText = await getTranslations();
+
   const locale = await getLocale();
   const priceText = await getTranslations("MarketplaceOffer");
   const { data, error } = await db
@@ -31,7 +37,7 @@ export default async function LocationsPage() {
     .order("created_at", { ascending: false })
     .limit(200);
 
-  if (error) throw new Error(`Locations konnten nicht geladen werden: ${error.message}`);
+  if (error) throw new Error(uiText("Ui.text_2a7079785185c8", { value1: String(error.message) }));
 
   const rows = data ?? [];
 

@@ -13,6 +13,8 @@ import { useTranslations } from "next-intl";
  * - Profile exists → renders children
  */
 export default function ProfileGuard({ children }: { children: React.ReactNode }) {
+  const uiText = useTranslations();
+
   const { user, isLoaded } = useUser();
   const router = useRouter();
   const [ready, setReady] = useState(false);
@@ -29,7 +31,7 @@ export default function ProfileGuard({ children }: { children: React.ReactNode }
 
     fetch("/api/profile")
       .then((r) => {
-        if (!r.ok) throw new Error("profile check failed");
+        if (!r.ok) throw new Error(uiText("Ui.text_45eb7ed015c77e"));
         return r.json();
       })
       .then(({ exists }) => {

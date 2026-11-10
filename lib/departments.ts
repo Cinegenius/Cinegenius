@@ -1,3 +1,6 @@
+import taxonomyLabelIndex from "./i18n/taxonomy-label-index.json" with { type: "json" };
+import taxonomyIndex from "./i18n/taxonomy-index.json" with { type: "json" };
+const TAXONOMY_INDEX = taxonomyIndex as Record<string, {label: string; roles: Record<string, string>}>;
 import { ANIMAL_DEPARTMENT_ID, ANIMAL_DEPARTMENT_LABEL, animalRoleLabel, type AnimalTranslator } from "@/lib/animal-taxonomy";
 import { GRIP_DEPARTMENT_LABEL, GRIP_OCCUPATIONS } from "@/lib/gripTaxonomy";
 import { FILM_DEPARTMENTS } from "@/lib/filmRoles";
@@ -17,8 +20,8 @@ export type Department = {
   roleLabels?: Record<string, Record<string, string>>;
 };
 
-export function getDeptLabel(dept: Department, locale: string, animals?: AnimalTranslator): string {
-  return dept.id === ANIMAL_DEPARTMENT_ID && animals ? animals("department") : dept.labels[locale] ?? dept.label;
+export function getDeptLabel(dept: Department, locale: string, animals?: AnimalTranslator, taxonomy?: (key: string) => string): string {
+  return dept.id === ANIMAL_DEPARTMENT_ID && animals ? animals("department") : taxonomy && Object.hasOwn(TAXONOMY_INDEX, dept.id) ? taxonomy(TAXONOMY_INDEX[dept.id].label) : dept.labels[locale] ?? dept.labels[locale.split("-")[0]] ?? dept.label;
 }
 
 export const departments: Department[] = [
@@ -658,8 +661,9 @@ export function getProfileTypesForDepartment(departmentId: string, selectedRoles
   return DEPARTMENT_TO_PROFILE_TYPES[departmentId] ?? ["filmmaker"];
 }
 
-export function getDepartmentRoleSearchTerms(department: Department, role: string): string[] {
-  return [...new Set([role, ...(department.roleAliases?.[role] ?? [])])];
+/** Add reader-specific display text only for this search; never alter catalogue aliases or stored IDs. */
+export function getDepartmentRoleSearchTerms(department: Department, role: string, displayLabel?: string): string[] {
+  return [...new Set([role, ...(department.roleAliases?.[role] ?? []), ...(displayLabel ? [displayLabel] : [])])];
 }
 
 const occupationSearchIndex = new Map<string, string[]>();
@@ -717,7 +721,16 @@ export function deptColors(color: string) {
 }
 
 /** Display only; stored occupation titles and stable role IDs never change. */
-export function getDepartmentRoleLabel(departmentId: string, role: string, locale: string, animals?: AnimalTranslator): string {
+export function getDepartmentRoleLabel(departmentId: string, role: string, locale: string, animals?: AnimalTranslator, taxonomy?: (key: string) => string): string {
   if (departmentId === ANIMAL_DEPARTMENT_ID && animals) return animalRoleLabel(role, animals);
+  const index = Object.hasOwn(TAXONOMY_INDEX, departmentId) ? TAXONOMY_INDEX[departmentId] : null;
+  const key = index && Object.hasOwn(index.roles, role) ? index.roles[role] : undefined;
+  if (taxonomy && key) return taxonomy(key);
   return departments.find(department=>department.id===departmentId)?.roleLabels?.[role]?.[locale] ?? role;
+}
+
+/** Display only curated catalogue labels; unknown member-written values stay unchanged. */
+export function taxonomyLabel(value: string, translate: (key: string) => string): string {
+  const index = taxonomyLabelIndex as Record<string, string>;
+  return Object.hasOwn(index, value) ? translate(index[value]) : value;
 }

@@ -1,3 +1,5 @@
+import { projectTypeLabel } from "@/lib/project-type-labels";
+import { getTranslations } from "next-intl/server";
 import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
@@ -63,6 +65,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
+  const uiText = await getTranslations();
   const { id } = await params;
   const data = await getProject(id);
   if (!data) return {};
@@ -70,7 +73,7 @@ export async function generateMetadata({
   return {
     alternates: { canonical: `https://www.cinegenius.co/projects/${encodeURIComponent(id)}` },
     title: project.year ? `${project.title} (${project.year})` : project.title,
-    description: project.description ?? `${project.type ?? "Film"} · ${project.year ?? ""}`,
+    description: project.description ?? `${projectTypeLabel(project.type ?? "Film", uiText)} · ${project.year ?? ""}`,
     openGraph: {
       title: project.title,
       description: project.description ?? "",

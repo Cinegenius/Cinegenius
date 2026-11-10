@@ -1,3 +1,4 @@
+import { SUPPORTED_LOCALES } from "../i18n/locales";
 import rawData from './catalog.json' with { type: 'json' };
 import { countryCode, countryName, placeKey, type Place } from './core';
 type LocalNames=Record<string,string>;
@@ -13,7 +14,7 @@ export function cityDistrictName(city:CityEntry,locale:string) {
 }
 export function localizedPlaceFields(fields:Record<string,unknown>,locale:string): Record<string,unknown> {
  const city=cityById.get(String(fields.place_city_id??'')),region=regionById.get(String(fields.place_region_id??''));
- return {...fields,place_search_terms:[...new Set([city?.name??"",...Object.values(city?.names??{}),...(aliasOverrides[city?.id??""]??[]),region?.name??"",...Object.values(region?.names??{}),...(["de","en","es","it","cs","hu"].map(language=>fields.place_country_code?countryName(String(fields.place_country_code),language):""))])],place_city_name:city?.names[locale]??fields.place_city_name,place_region_name:region?.names[locale]??fields.place_region_name};
+ return {...fields,place_search_terms:[...new Set([city?.name??"",...Object.values(city?.names??{}),...(aliasOverrides[city?.id??""]??[]),region?.name??"",...Object.values(region?.names??{}),...(SUPPORTED_LOCALES.map(language=>fields.place_country_code?countryName(String(fields.place_country_code),language):""))])],place_city_name:city?.names[locale]??fields.place_city_name,place_region_name:region?.names[locale]??fields.place_region_name};
 }
 const aliasOverrides: Record<string,string[]> = {'geonames:2925533':['Frankfurt a.M.','Frankfurt a. M.','Frankfurt/Main','Frankfurt am Main'],'geonames:2886242':['Köln','Cologne','Koeln']};
 export function aliases(city:typeof data.cities[number]) {return [city.name,...city.aliases,...(aliasOverrides[city.id]??[])];}
@@ -70,10 +71,32 @@ export function placeSearchFilter(query:string) {
 }
 /** Explicit reviewer selection disambiguates homonyms without accepting a forged path. */
 export function placeFieldsForId(cityId:string,raw:string) {
- const city=cityById.get(cityId),parts=raw.split(',').map(part=>part.trim());
- if(!city||countryCode(parts.at(-1)??'')!==city.country||!aliases(city).some(alias=>placeKey(alias)===placeKey(parts[0]??'')))return null;
+ const city=cityById.get(cityId);
+ if(!city)return null;
+ const parts=raw.split(',').map(part=>part.trim());
+ if(parts.length<2||!parts[0]||!parts.at(-1))return null;
+ if(parts.some(part=>part&&!placeKey(part)))return null;
  const region=regionById.get(city.region);
- const regionText=parts.slice(1,-1).filter(Boolean).join(', ');
- if(regionText&&(!region||![region.id,region.name,...region.aliases].some(alias=>placeKey(alias)===placeKey(regionText))))return null;
+ const regionKeys=new Set(region?[region.id,region.name,...region.aliases,...Object.values(region.names)].map(placeKey):[]);
+ const matchesCity=(value:string)=>{
+  const key=placeKey(value);
+  return (exactIndex.get(city.country+':'+key)??[]).some(candidate=>candidate.id===city.id)
+   ||Object.values(city.names).some(name=>placeKey(name)===key);
+ };
+ let matched=false;
+ // Commas can belong to a catalogued name. Test field boundaries against this
+ // explicit city's aliases, parent region and country, never against guessed IDs.
+ for(let countryStart=parts.length-1;countryStart>0;countryStart--){
+  if(countryCode(parts.slice(countryStart).join(', '))!==city.country)continue;
+  const path=parts.slice(0,countryStart);
+  if(matchesCity(path.join(', '))){matched=true;break;}
+  for(let regionStart=1;regionStart<path.length;regionStart++){
+   const regionText=path.slice(regionStart).filter(Boolean).join(', ');
+   if(regionText&&!regionKeys.has(placeKey(regionText)))continue;
+   if(matchesCity(path.slice(0,regionStart).join(', '))){matched=true;break;}
+  }
+  if(matched)break;
+ }
+ if(!matched)return null;
  return {place_country_code:city.country,place_region_id:region?.id??null,place_city_id:city.id,place_city_name:city.name,place_region_name:region?.name??'',place_status:'verified',place_original:raw};
 }

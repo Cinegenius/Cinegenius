@@ -1,5 +1,5 @@
 "use client";
-import { useTranslations } from "next-intl";
+import { useTranslations , useLocale } from "next-intl";
 import OfferModerationStatus from "@/components/OfferModerationStatus";
 
 import { useState, useEffect, useCallback } from "react";
@@ -18,6 +18,7 @@ import {
 } from "@/lib/equipment-categories";
 import { CompanyMemberInvitations } from "@/components/CompanyMemberInvitations";
 import { canCompanyRoleManageTarget, normalizeCompanyPublicTitles, COMPANY_PUBLIC_TITLE_SUGGESTIONS } from "@/lib/company-roles";
+import { uiErrorMessage } from "@/lib/ui-error-message";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -67,6 +68,8 @@ export default function DashboardClient({ company, permissionRole, companyOption
   permissionRole: "owner" | "admin" | "editor" | "member";
   companyOptions?: Array<Pick<Company, "id" | "name" | "slug" | "logo_url" | "city">>;
 }) {
+  const uiText = useTranslations();
+
   const searchParams = useSearchParams();
   const [tab, setTab] = useState<Tab>(() => searchParams.get("tab") === "team" ? "team" : "overview");
   const isOwner = permissionRole === "owner";
@@ -74,10 +77,10 @@ export default function DashboardClient({ company, permissionRole, companyOption
   const canEditCompany = permissionRole !== "member";
 
   const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
-    { id: "overview",  label: "Übersicht",  icon: LayoutDashboard },
-    { id: "services",  label: "Services",   icon: Briefcase },
-    { id: "equipment", label: "Equipment",  icon: Package },
-    { id: "team",      label: "Team",       icon: Users },
+    { id: "overview",  label: uiText("nav.accountOverview"),  icon: LayoutDashboard },
+    { id: "services",  label: uiText("AdminReview.fields.services"),   icon: Briefcase },
+    { id: "equipment", label: uiText("companies.groupAusstattung"),  icon: Package },
+    { id: "team",      label: uiText("Ui.text_5985039f106df0"),       icon: Users },
   ];
 
   return (
@@ -118,16 +121,9 @@ export default function DashboardClient({ company, permissionRole, companyOption
         </nav>
 
         {/* Footer links */}
-        <div className="p-2 border-t border-border space-y-0.5">
-          {canEditCompany && <Link href={`/company-setup?company_id=${company.id}`}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-text-muted hover:text-text-primary hover:bg-bg-elevated transition-colors">
-            <Settings size={14} /> Einstellungen
-          </Link>}
-          <Link href={`/companies/${company.slug}`}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-text-muted hover:text-text-primary hover:bg-bg-elevated transition-colors">
-            <ExternalLink size={14} /> Profil ansehen
-          </Link>
-        </div>
+        <div className="p-2 border-t border-border space-y-0.5">{uiText.rich("Ui.text_a09e8086ff3703", { value1: () => (canEditCompany && <Link href={`/company-setup?company_id=${company.id}`}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-text-muted hover:text-text-primary hover:bg-bg-elevated transition-colors">{uiText.rich("Ui.text_ca55b1b30a19f2", { part1: () => (<Settings size={14} />) })}</Link>), part3: () => (<ExternalLink size={14} />), part2: chunks => (<Link href={`/companies/${company.slug}`}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-text-muted hover:text-text-primary hover:bg-bg-elevated transition-colors">{chunks}</Link>) })}</div>
       </aside>
 
       {/* ── MAIN ──────────────────────────────────────────────────────────── */}
@@ -135,9 +131,9 @@ export default function DashboardClient({ company, permissionRole, companyOption
         {companyOptions.length > 1 && (
           <div className="border-b border-border bg-bg-primary px-4 py-3 sm:px-6 lg:px-8">
             <label className="flex min-h-11 max-w-xl items-center gap-3 text-xs text-text-muted">
-              <span className="shrink-0">Firma wechseln</span>
+              <span className="shrink-0">{uiText("Ui.text_8caed0d961965e")}</span>
               <select value={company.id} onChange={(event) => window.location.assign(`/company-dashboard?company_id=${encodeURIComponent(event.target.value)}`)} className="min-h-11 min-w-0 flex-1 rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary">
-                {companyOptions.map((option) => <option key={option.id} value={option.id}>{option.name}{option.city ? ` · ${option.city}` : ""}</option>)}
+                {companyOptions.map((option) => <option key={option.id} value={option.id}>{option.name}{option.city ? uiText("Ui.text_f6b53f9c8ab3ef", { value1: String(option.city) }) : ""}</option>)}
               </select>
             </label>
           </div>
@@ -171,6 +167,8 @@ export default function DashboardClient({ company, permissionRole, companyOption
 // ─── Overview Tab ──────────────────────────────────────────────────────────────
 
 function OverviewTab({ company, setTab, canDelete }: { company: Company; setTab: (t: Tab) => void; canDelete: boolean }) {
+  const uiText = useTranslations();
+
   const [stats, setStats] = useState({ services: 0, equipment: 0, members: 0 });
   const [deleteModal, setDeleteModal] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");
@@ -193,29 +191,29 @@ function OverviewTab({ company, setTab, canDelete }: { company: Company; setTab:
 
   const hasSocialLinks = !!(company.social_links && Object.values(company.social_links).some(v => v?.trim()));
   const checks = [
-    { label: "Logo hochgeladen",          done: !!company.logo_url },
-    { label: "Tagline / Beschreibung",    done: !!(company.tagline?.trim() || company.description?.trim()) },
-    { label: "Mindestens 1 Service",      done: stats.services > 0 },
-    { label: "Equipment eingetragen",     done: stats.equipment > 0 },
-    { label: "Teammitglied hinzugefügt",  done: stats.members > 0 },
-    { label: "Social-Media-Link gesetzt", done: hasSocialLinks },
-    { label: "Profil veröffentlicht",     done: company.published },
+    { label: uiText("Ui.text_d7188d45e384f6"),          done: !!company.logo_url },
+    { label: uiText("Ui.text_ca253d14c2ae91"),    done: !!(company.tagline?.trim() || company.description?.trim()) },
+    { label: uiText("Ui.text_c28cc9d984c456"),      done: stats.services > 0 },
+    { label: uiText("Ui.text_d9e247141cfb9a"),     done: stats.equipment > 0 },
+    { label: uiText("Ui.text_981c8626ff01b9"),  done: stats.members > 0 },
+    { label: uiText("Ui.text_6b212ae5c20cc4"), done: hasSocialLinks },
+    { label: uiText("Ui.text_0642ef8281f506"),     done: company.published },
   ];
   const score = Math.round((checks.filter(c => c.done).length / checks.length) * 100);
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-2xl font-bold text-text-primary mb-1">Übersicht</h1>
-        <p className="text-sm text-text-muted">Verwalte dein Firmenprofil auf CineGenius.</p>
+        <h1 className="font-display text-2xl font-bold text-text-primary mb-1">{uiText("nav.accountOverview")}</h1>
+        <p className="text-sm text-text-muted">{uiText("Ui.text_c9639d579cfb61")}</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: "Services",    value: stats.services,  tab: "services"  as Tab, icon: Briefcase },
-          { label: "Equipment",   value: stats.equipment, tab: "equipment" as Tab, icon: Package },
-          { label: "Teammitglieder", value: stats.members, tab: "team"     as Tab, icon: Users },
+          { label: uiText("AdminReview.fields.services"),    value: stats.services,  tab: "services"  as Tab, icon: Briefcase },
+          { label: uiText("companies.groupAusstattung"),   value: stats.equipment, tab: "equipment" as Tab, icon: Package },
+          { label: uiText("Ui.text_9faed076e31cad"), value: stats.members, tab: "team"     as Tab, icon: Users },
         ].map(({ label, value, tab, icon: Icon }) => (
           <button key={label} onClick={() => setTab(tab)}
             className="p-4 bg-bg-secondary border border-border rounded-xl text-left hover:border-gold/40 transition-colors group">
@@ -229,7 +227,7 @@ function OverviewTab({ company, setTab, canDelete }: { company: Company; setTab:
       {/* Completeness */}
       <div className="bg-bg-secondary border border-border rounded-xl p-5">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-semibold text-text-primary">Profil-Vollständigkeit</p>
+          <p className="text-sm font-semibold text-text-primary">{uiText("profile.completionTitle")}</p>
           <span className={`text-sm font-bold ${score === 100 ? "text-emerald-400" : "text-gold"}`}>{score}%</span>
         </div>
         <div className="w-full h-1.5 bg-bg-elevated rounded-full mb-4">
@@ -244,9 +242,7 @@ function OverviewTab({ company, setTab, canDelete }: { company: Company; setTab:
               }
               <span className={done ? "text-text-secondary" : "text-text-muted"}>{label}</span>
               {!done && (
-                <Link href="/company-setup" className="ml-auto text-xs text-gold hover:underline">
-                  Hinzufügen
-                </Link>
+                <Link href="/company-setup" className="ml-auto text-xs text-gold hover:underline">{uiText("profile.addPhoto")}</Link>
               )}
             </div>
           ))}
@@ -256,35 +252,23 @@ function OverviewTab({ company, setTab, canDelete }: { company: Company; setTab:
       {/* Quick actions */}
       <div className="grid grid-cols-2 gap-3">
         <button onClick={() => setTab("services")}
-          className="flex items-center gap-2 p-3 bg-bg-secondary border border-border rounded-xl text-sm text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
-          <Plus size={14} /> Service hinzufügen
-        </button>
+          className="flex items-center gap-2 p-3 bg-bg-secondary border border-border rounded-xl text-sm text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">{uiText.rich("Ui.text_4bde6f698a95a9", { part1: () => (<Plus size={14} />) })}</button>
         <button onClick={() => setTab("equipment")}
-          className="flex items-center gap-2 p-3 bg-bg-secondary border border-border rounded-xl text-sm text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
-          <Plus size={14} /> Equipment hinzufügen
-        </button>
+          className="flex items-center gap-2 p-3 bg-bg-secondary border border-border rounded-xl text-sm text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">{uiText.rich("Ui.text_d7e793e349865b", { part1: () => (<Plus size={14} />) })}</button>
         <Link href="/company-setup"
-          className="flex items-center gap-2 p-3 bg-bg-secondary border border-border rounded-xl text-sm text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
-          <Settings size={14} /> Firmendaten bearbeiten
-        </Link>
+          className="flex items-center gap-2 p-3 bg-bg-secondary border border-border rounded-xl text-sm text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">{uiText.rich("Ui.text_7bd40503e9c1f8", { part1: () => (<Settings size={14} />) })}</Link>
         <Link href={`/companies/${company.slug}`}
-          className="flex items-center gap-2 p-3 bg-bg-secondary border border-border rounded-xl text-sm text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">
-          <ExternalLink size={14} /> Öffentliches Profil
-        </Link>
+          className="flex items-center gap-2 p-3 bg-bg-secondary border border-border rounded-xl text-sm text-text-secondary hover:border-gold/40 hover:text-gold transition-colors">{uiText.rich("Ui.text_59119c264e61b8", { part1: () => (<ExternalLink size={14} />) })}</Link>
       </div>
 
       {/* Danger zone */}
       {canDelete && <div className="border border-red-500/20 rounded-xl p-4 bg-red-500/5">
-        <p className="text-sm font-semibold text-red-400 mb-1">Gefahrenzone</p>
-        <p className="text-xs text-text-muted mb-3">
-          Firma dauerhaft löschen — alle Services, Equipment und Teammitglieder werden entfernt. Diese Aktion kann nicht rückgängig gemacht werden.
-        </p>
+        <p className="text-sm font-semibold text-red-400 mb-1">{uiText("Ui.text_dae662e1cf5b2b")}</p>
+        <p className="text-xs text-text-muted mb-3">{uiText("Ui.text_99625cac4d6f79")}</p>
         <button
           onClick={() => { setDeleteModal(true); setDeleteConfirm(""); setDeleteError(""); }}
           className="flex items-center gap-2 px-3 py-2 border border-red-500/30 text-red-400 rounded-lg text-xs font-semibold hover:bg-red-500/10 transition-colors"
-        >
-          <Trash2 size={13} /> Firma löschen
-        </button>
+        >{uiText.rich("Ui.text_8498f9df246fd7", { part1: () => (<Trash2 size={13} />) })}</button>
       </div>}
 
       {/* Delete confirmation modal */}
@@ -296,13 +280,11 @@ function OverviewTab({ company, setTab, canDelete }: { company: Company; setTab:
                 <Trash2 size={18} className="text-red-400" />
               </div>
               <div>
-                <h3 className="font-bold text-text-primary">Firma löschen?</h3>
-                <p className="text-xs text-text-muted">Nicht rückgängig zu machen</p>
+                <h3 className="font-bold text-text-primary">{uiText("Ui.text_8f4467df06e29b")}</h3>
+                <p className="text-xs text-text-muted">{uiText("Ui.text_659ab9a6fab051")}</p>
               </div>
             </div>
-            <p className="text-sm text-text-muted mb-4">
-              Tippe <span className="font-bold text-text-primary">{company.name}</span> ein um zu bestätigen:
-            </p>
+            <p className="text-sm text-text-muted mb-4">{uiText.rich("Ui.text_f15cd6a08d1adf", { value2: () => (company.name), part1: chunks => (<span className="font-bold text-text-primary">{chunks}</span>) })}</p>
             <input
               type="text"
               value={deleteConfirm}
@@ -317,9 +299,7 @@ function OverviewTab({ company, setTab, canDelete }: { company: Company; setTab:
               <button
                 onClick={() => setDeleteModal(false)}
                 className="flex-1 px-3 py-2.5 border border-border text-text-secondary rounded-xl text-sm hover:border-border-hover transition-colors"
-              >
-                Abbrechen
-              </button>
+              >{uiText("home.boardCancel")}</button>
               <button
                 disabled={deleteConfirm !== company.name || deleting}
                 onClick={async () => {
@@ -332,17 +312,17 @@ function OverviewTab({ company, setTab, canDelete }: { company: Company; setTab:
                       body: JSON.stringify({ id: company.id }),
                     });
                     const json = await res.json();
-                    if (!res.ok) throw new Error(json.error ?? "Fehler beim Löschen");
+                    if (!res.ok) throw new Error(json.error ?? uiText("Ui.text_0a51bff0e89d0f"));
                     window.location.href = "/dashboard";
                   } catch (err: unknown) {
-                    setDeleteError(err instanceof Error ? err.message : "Unbekannter Fehler");
+                    setDeleteError(uiErrorMessage(err, uiText("profile.unknownError")));
                     setDeleting(false);
                   }
                 }}
                 className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
-                {deleting ? "Löschen …" : "Endgültig löschen"}
+                {deleting ? uiText("Ui.text_161929fed42a9a") : uiText("Ui.text_6c1fd39216fe7e")}
               </button>
             </div>
           </div>
@@ -357,6 +337,8 @@ function OverviewTab({ company, setTab, canDelete }: { company: Company; setTab:
 const BLANK_SERVICE = { type: "equipment_rental", title: "", description: "", use_cases: [] as string[], price_on_request: true, price_note: "" };
 
 function ServicesTab({ companyId, canEdit }: { companyId: string; canEdit: boolean }) {
+  const uiText = useTranslations();
+
   const [items, setItems] = useState<ServiceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<"list" | "form">("list");
@@ -392,7 +374,7 @@ function ServicesTab({ companyId, canEdit }: { companyId: string; canEdit: boole
   }
 
   async function handleSave() {
-    if (!form.title.trim()) { setError("Titel ist Pflicht."); return; }
+    if (!form.title.trim()) { setError(uiText("Ui.text_c8ec0566a6a8f2")); return; }
     setSaving(true); setError("");
     try {
       const body = editing
@@ -408,7 +390,7 @@ function ServicesTab({ companyId, canEdit }: { companyId: string; canEdit: boole
       load();
       setView("list");
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Fehler");
+      setError(uiErrorMessage(e, uiText("Ui.text_f6cc01cb7edbf0")));
     } finally {
       setSaving(false);
     }
@@ -426,31 +408,31 @@ function ServicesTab({ companyId, canEdit }: { companyId: string; canEdit: boole
           <X size={18} />
         </button>
         <h2 className="font-display text-xl font-bold text-text-primary">
-          {editing ? "Service bearbeiten" : "Service hinzufügen"}
+          {editing ? uiText("Ui.text_4ff98601faab62") : uiText("Ui.text_0388525dd5748d")}
         </h2>
       </div>
 
       <div className="space-y-4">
-        <FormField label="Typ">
+        <FormField label={uiText("projects.colType")}>
           <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))}
             className="w-full bg-bg-secondary border border-border rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-gold transition-colors">
             {SERVICE_TYPES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
           </select>
         </FormField>
 
-        <FormField label="Titel" required>
+        <FormField label={uiText("projects.colTitle")} required>
           <input value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
-            placeholder="z.B. Komplettes Lichtpaket ab 2 Tagen"
+            placeholder={uiText("Ui.text_71ad0e13bb9d02")}
             className="w-full bg-bg-secondary border border-border rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-gold transition-colors" />
         </FormField>
 
-        <FormField label="Beschreibung">
+        <FormField label={uiText("setup.description")}>
           <textarea rows={3} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
-            placeholder="Was ist enthalten? Für welche Produktionsgrößen geeignet?"
+            placeholder={uiText("Ui.text_796715636c6201")}
             className="w-full bg-bg-secondary border border-border rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-gold transition-colors resize-none" />
         </FormField>
 
-        <FormField label="Einsatzgebiete (optional)">
+        <FormField label={uiText("Ui.text_87c4c4d40d9627")}>
           <div className="space-y-2">
             {form.use_cases.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
@@ -467,7 +449,7 @@ function ServicesTab({ companyId, canEdit }: { companyId: string; canEdit: boole
             <div className="flex gap-2">
               <input value={usecaseInput} onChange={e => setUsecaseInput(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter" && usecaseInput.trim()) { e.preventDefault(); setForm(p => ({ ...p, use_cases: [...p.use_cases, usecaseInput.trim()] })); setUsecaseInput(""); }}}
-                placeholder="z.B. Spielfilm, Werbung... (Enter)"
+                placeholder={uiText("Ui.text_b83f6de6db7413")}
                 className="flex-1 bg-bg-secondary border border-border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
             </div>
           </div>
@@ -478,13 +460,13 @@ function ServicesTab({ companyId, canEdit }: { companyId: string; canEdit: boole
             className="text-text-muted hover:text-gold transition-colors">
             {form.price_on_request ? <ToggleRight size={22} className="text-gold" /> : <ToggleLeft size={22} />}
           </button>
-          <span className="text-sm text-text-secondary">Preis auf Anfrage</span>
+          <span className="text-sm text-text-secondary">{uiText("AdminReview.fields.price_on_request")}</span>
         </div>
 
         {!form.price_on_request && (
-          <FormField label="Preishinweis">
+          <FormField label={uiText("Ui.text_e281f58bb15f40")}>
             <input value={form.price_note} onChange={e => setForm(p => ({ ...p, price_note: e.target.value }))}
-              placeholder="z.B. ab 500 €/Tag, Pauschalpreise möglich"
+              placeholder={uiText("Ui.text_c2715e6201544c")}
               className="w-full bg-bg-secondary border border-border rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-gold transition-colors" />
           </FormField>
         )}
@@ -496,11 +478,9 @@ function ServicesTab({ companyId, canEdit }: { companyId: string; canEdit: boole
         <button onClick={handleSave} disabled={saving}
           className="flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary rounded-xl text-sm font-semibold hover:bg-gold-light transition-colors disabled:opacity-50">
           {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-          {editing ? "Speichern" : "Hinzufügen"}
+          {editing ? uiText("profile.save") : uiText("profile.addPhoto")}
         </button>
-        <button onClick={() => setView("list")} className="px-4 py-2.5 text-sm text-text-muted hover:text-text-primary transition-colors">
-          Abbrechen
-        </button>
+        <button onClick={() => setView("list")} className="px-4 py-2.5 text-sm text-text-muted hover:text-text-primary transition-colors">{uiText("home.boardCancel")}</button>
       </div>
     </div>
   );
@@ -509,13 +489,11 @@ function ServicesTab({ companyId, canEdit }: { companyId: string; canEdit: boole
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="font-display text-xl font-bold text-text-primary">Services</h2>
-          <p className="text-sm text-text-muted mt-0.5">Was bietet deine Firma an?</p>
+          <h2 className="font-display text-xl font-bold text-text-primary">{uiText("AdminReview.fields.services")}</h2>
+          <p className="text-sm text-text-muted mt-0.5">{uiText("Ui.text_fada6ff49d041c")}</p>
         </div>
         {canEdit && <button onClick={openNew}
-          className="flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary rounded-xl text-sm font-semibold hover:bg-gold-light transition-colors">
-          <Plus size={14} /> Hinzufügen
-        </button>}
+          className="flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary rounded-xl text-sm font-semibold hover:bg-gold-light transition-colors">{uiText.rich("Ui.text_3eba69d280403f", { part1: () => (<Plus size={14} />) })}</button>}
       </div>
 
       {loading ? (
@@ -523,9 +501,9 @@ function ServicesTab({ companyId, canEdit }: { companyId: string; canEdit: boole
       ) : items.length === 0 ? (
         <EmptyState
           icon={Briefcase}
-          title="Noch keine Services"
-          description="Zeige der Filmbranche, was du anbietest."
-          action={canEdit ? "Service hinzufügen" : undefined}
+          title={uiText("Ui.text_8bae7dee2b1784")}
+          description={uiText("Ui.text_c5d9f7094c143a")}
+          action={canEdit ? uiText("Ui.text_0388525dd5748d") : undefined}
           onAction={canEdit ? openNew : undefined}
         />
       ) : (
@@ -579,6 +557,8 @@ const BLANK_EQUIPMENT = {
 };
 
 function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: boolean }) {
+  const uiText = useTranslations();
+
   const moderation = useTranslations("OfferModeration");
   const [items, setItems] = useState<EquipmentItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -623,7 +603,7 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
   }
 
   async function handleSave() {
-    if (!form.name.trim()) { setError("Name ist Pflicht."); return; }
+    if (!form.name.trim()) { setError(uiText("Ui.text_59f13e83da765f")); return; }
     setSaving(true); setError("");
     try {
       const payload = {
@@ -657,7 +637,7 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
       if (err) throw new Error(err);
       load(); setView("list");
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Fehler");
+      setError(uiErrorMessage(e, uiText("Ui.text_f6cc01cb7edbf0")));
     } finally {
       setSaving(false);
     }
@@ -675,7 +655,7 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || moderation("saveError"));
       load();
-    } catch (cause) { setError(cause instanceof Error ? cause.message : moderation("saveError")); }
+    } catch (cause) { setError(uiErrorMessage(cause, moderation("saveError"))); }
     finally { setSaving(false); }
   }
   async function toggleAvailable(item: EquipmentItem) {
@@ -692,76 +672,76 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <button onClick={() => setView("list")} className="text-text-muted hover:text-text-primary transition-colors"><X size={18} /></button>
-        <h2 className="font-display text-xl font-bold text-text-primary">{editing ? "Equipment bearbeiten" : "Equipment hinzufügen"}</h2>
+        <h2 className="font-display text-xl font-bold text-text-primary">{editing ? uiText("Ui.text_5d659265888d38") : uiText("Ui.text_1401c28a160095")}</h2>
       </div>
 
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <FormField label="Kategorie" required>
+          <FormField label={uiText("props.categoryBtn")} required>
             <select value={form.category} onChange={e => set("category", e.target.value)}
               className="w-full bg-bg-secondary border border-border rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-gold transition-colors">
               {EQUIPMENT_CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.emoji} {c.label}</option>)}
             </select>
           </FormField>
-          <FormField label="Unterkategorie">
+          <FormField label={uiText("MarketplaceOffer.subcategory")}>
             <input value={form.subcategory} onChange={e => set("subcategory", e.target.value)}
-              placeholder="z.B. Zoom Lens, LED Panel"
+              placeholder={uiText("Ui.text_5d249ce72db4a6")}
               className="w-full bg-bg-secondary border border-border rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-gold transition-colors" />
           </FormField>
         </div>
 
-        <FormField label="Name / Bezeichnung" required>
+        <FormField label={uiText("Ui.text_9ef6768f0b5213")} required>
           <input value={form.name} onChange={e => set("name", e.target.value)}
-            placeholder="z.B. ARRI Alexa Mini LF"
+            placeholder={uiText("Ui.text_07b7c6d1f98835")}
             className="w-full bg-bg-secondary border border-border rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-gold transition-colors" />
         </FormField>
 
         <div className="grid grid-cols-2 gap-4">
-          <FormField label="Marke">
-            <input value={form.brand} onChange={e => set("brand", e.target.value)} placeholder="z.B. ARRI"
+          <FormField label={uiText("Ui.text_9badc274ec9504")}>
+            <input value={form.brand} onChange={e => set("brand", e.target.value)} placeholder={uiText("Ui.text_a7aa3dbf68cd2e")}
               className="w-full bg-bg-secondary border border-border rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-gold transition-colors" />
           </FormField>
-          <FormField label="Modell">
-            <input value={form.model} onChange={e => set("model", e.target.value)} placeholder="z.B. Alexa Mini LF"
+          <FormField label={uiText("MarketplaceOffer.fields.model")}>
+            <input value={form.model} onChange={e => set("model", e.target.value)} placeholder={uiText("Ui.text_b29a7bcd2bf50f")}
               className="w-full bg-bg-secondary border border-border rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-gold transition-colors" />
           </FormField>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <FormField label="Zustand">
+          <FormField label={uiText("props.conditionLabel")}>
             <select value={form.condition} onChange={e => set("condition", e.target.value)}
               className="w-full bg-bg-secondary border border-border rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-gold transition-colors">
               {Object.entries(CONDITION_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
           </FormField>
-          <FormField label="Anzahl">
+          <FormField label={uiText("Ui.text_7174de22bac650")}>
             <input type="number" min="1" value={form.quantity} onChange={e => set("quantity", e.target.value)}
               className="w-full bg-bg-secondary border border-border rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-gold transition-colors" />
           </FormField>
         </div>
 
-        <FormField label="Beschreibung">
+        <FormField label={uiText("setup.description")}>
           <textarea rows={2} value={form.description} onChange={e => set("description", e.target.value)}
-            placeholder="Besonderheiten, Zubehör, Spezifikationen..."
+            placeholder={uiText("Ui.text_cc61d729495805")}
             className="w-full bg-bg-secondary border border-border rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-gold transition-colors resize-none" />
         </FormField>
 
         {/* Preise */}
         <div className="pt-2 border-t border-border">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-text-muted font-semibold mb-3">Preise</p>
+          <p className="text-[10px] uppercase tracking-[0.14em] text-text-muted font-semibold mb-3">{uiText("footer.links_pricing")}</p>
           <div className="flex items-center gap-3 mb-3">
             <button onClick={() => set("price_on_request", !form.price_on_request)} className="text-text-muted hover:text-gold transition-colors">
               {form.price_on_request ? <ToggleRight size={22} className="text-gold" /> : <ToggleLeft size={22} />}
             </button>
-            <span className="text-sm text-text-secondary">Preis auf Anfrage</span>
+            <span className="text-sm text-text-secondary">{uiText("AdminReview.fields.price_on_request")}</span>
           </div>
           {!form.price_on_request && (
             <div className="grid grid-cols-2 gap-4">
-              <FormField label="Tagespreis (€)">
+              <FormField label={uiText("Ui.text_4c6fd2ca5500b1")}>
                 <input type="number" value={form.price_day} onChange={e => set("price_day", e.target.value)} placeholder="0"
                   className="w-full bg-bg-secondary border border-border rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-gold transition-colors" />
               </FormField>
-              <FormField label="Wochenpreis (€)">
+              <FormField label={uiText("Ui.text_05a1e34e209a42")}>
                 <input type="number" value={form.price_week} onChange={e => set("price_week", e.target.value)} placeholder="0"
                   className="w-full bg-bg-secondary border border-border rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-gold transition-colors" />
               </FormField>
@@ -771,12 +751,12 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
 
         {/* Logistik */}
         <div className="pt-2 border-t border-border">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-text-muted font-semibold mb-3">Logistik</p>
+          <p className="text-[10px] uppercase tracking-[0.14em] text-text-muted font-semibold mb-3">{uiText("Ui.text_520d980657c707")}</p>
           <div className="space-y-2">
             {[
-              { key: "pickup_available", label: "Abholung möglich" },
-              { key: "delivery_available", label: "Lieferung möglich" },
-              { key: "shipping_available", label: "Versand möglich" },
+              { key: "pickup_available", label: uiText("Ui.text_c7ef070c31ca76") },
+              { key: "delivery_available", label: uiText("Ui.text_fbdfe95ce4cc83") },
+              { key: "shipping_available", label: uiText("Ui.text_6c3f53e5c0fb0b") },
             ].map(({ key, label }) => (
               <div key={key} className="flex items-center gap-3">
                 <button onClick={() => set(key, !form[key])} className="text-text-muted hover:text-gold transition-colors">
@@ -786,7 +766,7 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
               </div>
             ))}
             {form.delivery_available && (
-              <FormField label="Lieferradius (km)">
+              <FormField label={uiText("Ui.text_fb766d9d823e26")}>
                 <input type="number" value={form.delivery_radius_km} onChange={e => set("delivery_radius_km", e.target.value)} placeholder="50"
                   className="w-full bg-bg-secondary border border-border rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-gold transition-colors" />
               </FormField>
@@ -796,11 +776,11 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
 
         {/* Versicherung */}
         <div className="pt-2 border-t border-border">
-          <p className="text-[10px] uppercase tracking-[0.14em] text-text-muted font-semibold mb-3">Versicherung & Kaution</p>
+          <p className="text-[10px] uppercase tracking-[0.14em] text-text-muted font-semibold mb-3">{uiText("Ui.text_253decab349a98")}</p>
           <div className="space-y-2">
             {[
-              { key: "insured", label: "Versichert" },
-              { key: "deposit_required", label: "Kaution erforderlich" },
+              { key: "insured", label: uiText("Ui.text_f89731ee0a1468") },
+              { key: "deposit_required", label: uiText("Ui.text_e13ead5dc094ca") },
             ].map(({ key, label }) => (
               <div key={key} className="flex items-center gap-3">
                 <button onClick={() => set(key, !form[key])} className="text-text-muted hover:text-gold transition-colors">
@@ -810,7 +790,7 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
               </div>
             ))}
             {form.deposit_required && (
-              <FormField label="Kautionsbetrag (€)">
+              <FormField label={uiText("Ui.text_f9544c043b107b")}>
                 <input type="number" value={form.deposit_amount} onChange={e => set("deposit_amount", e.target.value)} placeholder="0"
                   className="w-full bg-bg-secondary border border-border rounded-xl px-3.5 py-3 text-sm focus:outline-none focus:border-gold transition-colors" />
               </FormField>
@@ -825,11 +805,9 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
         <button onClick={handleSave} disabled={saving}
           className="flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary rounded-xl text-sm font-semibold hover:bg-gold-light transition-colors disabled:opacity-50">
           {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-          {editing ? "Speichern" : "Hinzufügen"}
+          {editing ? uiText("profile.save") : uiText("profile.addPhoto")}
         </button>
-        <button onClick={() => setView("list")} className="px-4 py-2.5 text-sm text-text-muted hover:text-text-primary transition-colors">
-          Abbrechen
-        </button>
+        <button onClick={() => setView("list")} className="px-4 py-2.5 text-sm text-text-muted hover:text-text-primary transition-colors">{uiText("home.boardCancel")}</button>
       </div>
     </div>
   );
@@ -838,13 +816,11 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="font-display text-xl font-bold text-text-primary">Equipment</h2>
-          <p className="text-sm text-text-muted mt-0.5">{items.length} {items.length === 1 ? "Eintrag" : "Einträge"}</p>
+          <h2 className="font-display text-xl font-bold text-text-primary">{uiText("companies.groupAusstattung")}</h2>
+          <p className="text-sm text-text-muted mt-0.5">{items.length} {items.length === 1 ? uiText("Ui.text_99b9259f15b10b") : uiText("Ui.text_b46a6b65c674c7")}</p>
         </div>
         {canEdit && <button onClick={openNew}
-          className="flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary rounded-xl text-sm font-semibold hover:bg-gold-light transition-colors">
-          <Plus size={14} /> Hinzufügen
-        </button>}
+          className="flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary rounded-xl text-sm font-semibold hover:bg-gold-light transition-colors">{uiText.rich("Ui.text_3eba69d280403f", { part1: () => (<Plus size={14} />) })}</button>}
       </div>
 
       <p className="text-sm leading-6 text-text-muted">{moderation("publicNotice")}</p>{error && <p role="alert" className="text-sm text-crimson-light">{error}</p>}
@@ -860,7 +836,7 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
                     ? "bg-gold/10 border-gold/30 text-gold"
                     : "bg-bg-secondary border-border text-text-muted hover:text-text-primary hover:border-border-hover"
                 }`}>
-                {info ? `${info.emoji} ${info.label}` : "Alle"}
+                {info ? uiText("Ui.text_4040b7c06c4e87", { value1: String(info.emoji), value2: String(info.label) }) : uiText("common.all")}
               </button>
             );
           })}
@@ -872,9 +848,9 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
       ) : filtered.length === 0 ? (
         <EmptyState
           icon={Package}
-          title={catFilter === "alle" ? "Noch kein Equipment" : "Nichts in dieser Kategorie"}
-          description="Trage Equipment und Inventar ein, das du vermietest oder einsetzt."
-          action={canEdit ? "Equipment hinzufügen" : undefined}
+          title={catFilter === "alle" ? uiText("Ui.text_d6d6aacfe8530a") : uiText("Ui.text_13a15ea9efa92f")}
+          description={uiText("Ui.text_f4c60c62000133")}
+          action={canEdit ? uiText("Ui.text_1401c28a160095") : undefined}
           onAction={canEdit ? openNew : undefined}
         />
       ) : (
@@ -897,16 +873,16 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
                   <div className="flex items-center gap-3 mt-0.5 text-[11px] text-text-muted">
                     {cat && <span>{cat.label}</span>}
                     {item.subcategory && <span>· {item.subcategory}</span>}
-                    {!item.price_on_request && item.price_day && <span className="text-gold">· {item.price_day} €/Tag</span>}
-                    {item.delivery_available && <span className="flex items-center gap-0.5"><Truck size={9} /> Lieferung</span>}
-                    {item.insured && <span className="flex items-center gap-0.5"><Shield size={9} /> Versichert</span>}
+                    {!item.price_on_request && item.price_day && <span className="text-gold">{uiText.rich("Ui.text_af6cf9f70e0433", { value1: () => (item.price_day) })}</span>}
+                    {item.delivery_available && <span className="flex items-center gap-0.5">{uiText.rich("Ui.text_b1074837744a9d", { part1: () => (<Truck size={9} />) })}</span>}
+                    {item.insured && <span className="flex items-center gap-0.5">{uiText.rich("Ui.text_f321771ee0c0bb", { part1: () => (<Shield size={9} />) })}</span>}
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   {canEdit && !item.published && item.moderation_status !== "pending" && <button disabled={saving} onClick={() => void submitEquipment(item)} className="min-h-11 rounded-lg border border-gold/30 px-3 text-xs text-gold">{moderation("submit")}</button>}
-                  {canEdit && <button onClick={() => toggleAvailable(item)} title={item.available ? "Verfügbar" : "Nicht verfügbar"}
+                  {canEdit && <button onClick={() => toggleAvailable(item)} title={item.available ? uiText("common.available") : uiText("common.unavailable")}
                     className={`text-xs px-2 py-1 rounded-full border font-medium transition-colors ${item.available ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" : "text-text-muted bg-bg-elevated border-border"}`}>
-                    {item.available ? "Verfügbar" : "Nicht verfügbar"}
+                    {item.available ? uiText("common.available") : uiText("common.unavailable")}
                   </button>}
                   {canEdit && <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button onClick={() => openEdit(item)} className="p-1.5 rounded-lg hover:bg-bg-elevated text-text-muted hover:text-gold transition-colors">
@@ -929,6 +905,8 @@ function EquipmentTab({ companyId, canEdit }: { companyId: string; canEdit: bool
 // ─── Team Tab ──────────────────────────────────────────────────────────────────
 
 function TeamTab({ companyId, permissionRole, canManageTeam }: { companyId: string; permissionRole: "owner" | "admin" | "editor" | "member"; canManageTeam: boolean }) {
+  const uiText = useTranslations();
+
   const [members, setMembers] = useState<Member[]>([]);
   const [titleChangeRequests, setTitleChangeRequests] = useState<TitleChangeRequest[]>([]);
   const [teamView, setTeamView] = useState<"members" | "requests" | "invitations" | "add">(canManageTeam ? "requests" : "members");
@@ -951,11 +929,11 @@ function TeamTab({ companyId, permissionRole, canManageTeam }: { companyId: stri
         membersResponse.json().catch(() => ({})),
         titleRequestsResponse?.json().catch(() => ({})) ?? Promise.resolve({}),
       ]);
-      if (!membersResponse.ok) throw new Error(memberResult.error ?? "Teamdaten konnten nicht geladen werden.");
+      if (!membersResponse.ok) throw new Error(memberResult.error ?? uiText("Ui.text_f1f44520495173"));
       setMembers(memberResult.data ?? []);
       if (titleRequestsResponse?.ok) setTitleChangeRequests(titleRequestResult.data ?? []);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Teamdaten konnten nicht geladen werden.");
+      setError(uiErrorMessage(cause, uiText("Ui.text_f1f44520495173")));
     } finally { setLoading(false); }
   }, [canManageTeam, companyId]);
 
@@ -967,51 +945,51 @@ function TeamTab({ companyId, permissionRole, canManageTeam }: { companyId: stri
 
   async function handleAccept(id: string, rawTitles: string) {
     const public_titles = normalizeCompanyPublicTitles(rawTitles);
-    if (!public_titles.length) { setError("Bitte lege mindestens eine öffentliche Funktion fest."); return; }
+    if (!public_titles.length) { setError(uiText("Ui.text_f742904f959bec")); return; }
     const response = await fetch("/api/company-members", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, status: "accepted", public_titles }) });
-    if (!response.ok) { const result = await response.json().catch(() => ({})); setError(result.error ?? "Anfrage konnte nicht bestätigt werden."); return; }
+    if (!response.ok) { const result = await response.json().catch(() => ({})); setError(result.error ?? uiText("Ui.text_596f99d63a4be8")); return; }
     const result = await response.json().catch(() => ({}));
     setMembers((current) => current.map((member) => member.id === id ? { ...member, status: "accepted", public_titles, title: public_titles[0] } : member));
-    setNotice(result.data?.public_titles?.join(" · ") ? `Beitritt bestätigt. Freigegebene Funktion: ${result.data.public_titles.join(" · ")}.` : "Beitritt bestätigt.");
+    setNotice(result.data?.public_titles?.join(" · ") ? uiText("Ui.text_5bca52e736814b", { value1: String(result.data.public_titles.join(" · ")) }) : uiText("Ui.text_465d50a140ad02"));
   }
 
   async function handleRemove(id: string) {
     const pendingRequest = members.some((member) => member.id === id && member.status === "pending");
     const response = await fetch(`/api/company-members?id=${id}`, { method: "DELETE" });
-    if (!response.ok) { const result = await response.json().catch(() => ({})); setError(result.error ?? "Mitglied konnte nicht entfernt werden."); return; }
+    if (!response.ok) { const result = await response.json().catch(() => ({})); setError(result.error ?? uiText("Ui.text_cbff4222b4971f")); return; }
     setMembers((current) => current.filter((member) => member.id !== id));
-    setNotice(pendingRequest ? "Beitrittsanfrage abgelehnt. Die Person wurde informiert." : "Mitglied wurde aus dem Team entfernt.");
+    setNotice(pendingRequest ? uiText("Ui.text_fd57abaeed7bc5") : uiText("Ui.text_426414b7545464"));
   }
 
   async function handleRoleChange(id: string, role: string) {
     const response = await fetch("/api/company-members", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, role }) });
-    if (!response.ok) { const result = await response.json().catch(() => ({})); setError(result.error ?? "Berechtigung konnte nicht geändert werden."); return; }
+    if (!response.ok) { const result = await response.json().catch(() => ({})); setError(result.error ?? uiText("Ui.text_39c2098bbf518d")); return; }
     setMembers((current) => current.map((member) => member.id === id ? { ...member, role } : member));
   }
 
   async function handleTitlesChange(id: string, rawTitles: string) {
     const public_titles = normalizeCompanyPublicTitles(rawTitles);
     const response = await fetch("/api/company-members", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, public_titles }) });
-    if (!response.ok) { const result = await response.json().catch(() => ({})); setError(result.error ?? "Öffentliche Funktion konnte nicht gespeichert werden."); return; }
+    if (!response.ok) { const result = await response.json().catch(() => ({})); setError(result.error ?? uiText("Ui.text_976c08e817fd8f")); return; }
     setMembers((current) => current.map((member) => member.id === id ? { ...member, public_titles, title: public_titles[0] ?? null } : member));
   }
 
   async function handleTitleRequestDecision(id: string, status: "accepted" | "rejected", rawTitles = "") {
     const public_titles = status === "accepted" ? normalizeCompanyPublicTitles(rawTitles) : undefined;
-    if (status === "accepted" && !public_titles?.length) { setError("Lege mindestens eine öffentliche Funktion fest."); return; }
+    if (status === "accepted" && !public_titles?.length) { setError(uiText("Ui.text_97c60b2fb99b23")); return; }
     const response = await fetch("/api/company-member-title-change-requests", {
       method: "PATCH", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, status, ...(public_titles ? { public_titles } : {}) }),
     });
     const result = await response.json().catch(() => ({}));
-    if (!response.ok) { setError(result.error ?? "Funktionsanfrage konnte nicht bearbeitet werden."); return; }
+    if (!response.ok) { setError(result.error ?? uiText("Ui.text_850ca047766faa")); return; }
     setTitleChangeRequests((current) => current.filter((request) => request.id !== id));
     if (status === "accepted" && result.data?.company_member_id) {
       setMembers((current) => current.map((member) => member.id === result.data.company_member_id
         ? { ...member, public_titles: public_titles ?? [], title: public_titles?.[0] ?? null }
         : member));
     }
-    setNotice(status === "accepted" ? "Funktionsänderung bestätigt. Die betroffene Person wurde informiert." : "Funktionsanfrage abgelehnt. Die bisherige Funktion bleibt bestehen.");
+    setNotice(status === "accepted" ? uiText("Ui.text_bee3112b20b3b4") : uiText("Ui.text_bc98a943ab28d5"));
   }
 
   async function createInvite() {
@@ -1019,16 +997,16 @@ function TeamTab({ companyId, permissionRole, canManageTeam }: { companyId: stri
     try {
       const response = await fetch("/api/company-invitations", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ company_id: companyId, permission_role: inviteRole, public_titles: normalizeCompanyPublicTitles(inviteTitles) }) });
       const result = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(result.error ?? "Einladung konnte nicht erstellt werden.");
+      if (!response.ok) throw new Error(result.error ?? uiText("Ui.text_57e37222f852c5"));
       setInviteUrl(result.invite_url);
-      setNotice("Einladungslink erstellt. Er läuft in 14 Tagen ab und wird erst nach deiner Bestätigung als Teammitglied sichtbar.");
-    } catch (cause) { setError(cause instanceof Error ? cause.message : "Einladung konnte nicht erstellt werden."); }
+      setNotice(uiText("Ui.text_116f736fb56adf"));
+    } catch (cause) { setError(uiErrorMessage(cause, uiText("Ui.text_57e37222f852c5"))); }
     finally { setInviteBusy(false); }
   }
 
   async function copyInvite() {
-    try { await navigator.clipboard.writeText(inviteUrl); setNotice("Einladungslink kopiert."); }
-    catch { setError("Der Link konnte nicht kopiert werden. Du kannst ihn markieren und kopieren."); }
+    try { await navigator.clipboard.writeText(inviteUrl); setNotice(uiText("Ui.text_2b76ccd5264ae5")); }
+    catch { setError(uiText("Ui.text_fa12951d166104")); }
   }
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 size={20} className="animate-spin text-gold" /></div>;
@@ -1036,24 +1014,20 @@ function TeamTab({ companyId, permissionRole, canManageTeam }: { companyId: stri
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="font-display text-xl font-bold text-text-primary">Team</h2>
-        <p className="text-sm text-text-muted mt-0.5">Öffentliche Funktion und Verwaltungsrechte werden getrennt verwaltet.</p>
+        <h2 className="font-display text-xl font-bold text-text-primary">{uiText("Ui.text_5985039f106df0")}</h2>
+        <p className="text-sm text-text-muted mt-0.5">{uiText("Ui.text_12d05108d7c5de")}</p>
       </div>
       {error && <p role="alert" className="rounded-xl border border-crimson/20 bg-crimson/10 p-3 text-sm text-crimson-light">{error}</p>}
 
-      <div className="flex flex-wrap gap-2 border-b border-border pb-3" role="tablist" aria-label="Teamverwaltung">
+      <div className="flex flex-wrap gap-2 border-b border-border pb-3" role="tablist" aria-label={uiText("Ui.text_14ec021d69c3de")}>
         <button type="button" role="tab" aria-selected={teamView === "members"} onClick={() => setTeamView("members")}
-          className={`min-h-11 rounded-lg px-4 text-sm font-medium ${teamView === "members" ? "bg-bg-elevated text-gold" : "text-text-muted hover:bg-bg-secondary hover:text-text-primary"}`}>
-          Teammitglieder ({accepted.length})
-        </button>
+          className={`min-h-11 rounded-lg px-4 text-sm font-medium ${teamView === "members" ? "bg-bg-elevated text-gold" : "text-text-muted hover:bg-bg-secondary hover:text-text-primary"}`}>{uiText.rich("Ui.text_cf4cbb4b086f84", { value1: () => (accepted.length) })}</button>
         {canManageTeam && <button type="button" role="tab" aria-selected={teamView === "requests"} onClick={() => setTeamView("requests")}
-          className={`min-h-11 rounded-lg px-4 text-sm font-medium ${teamView === "requests" ? "bg-bg-elevated text-gold" : "text-text-muted hover:bg-bg-secondary hover:text-text-primary"}`}>
-          Anfragen ({requestCount})
-        </button>}
+          className={`min-h-11 rounded-lg px-4 text-sm font-medium ${teamView === "requests" ? "bg-bg-elevated text-gold" : "text-text-muted hover:bg-bg-secondary hover:text-text-primary"}`}>{uiText.rich("Ui.text_9aa9571e7fb080", { value1: () => (requestCount) })}</button>}
       </div>
       {canManageTeam && <div className="flex flex-wrap gap-2">
-        <button type="button" onClick={() => setTeamView("add")} className="min-h-11 rounded-lg border border-gold/30 px-4 text-sm text-gold">Mitglied hinzufügen</button>
-        <button type="button" onClick={() => setTeamView("invitations")} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary">Ausstehende Einladungen</button>
+        <button type="button" onClick={() => setTeamView("add")} className="min-h-11 rounded-lg border border-gold/30 px-4 text-sm text-gold">{uiText("Ui.text_33b98a70d653c4")}</button>
+        <button type="button" onClick={() => setTeamView("invitations")} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary">{uiText("OrganizationAccess.pendingInvites")}</button>
       </div>}
       {canManageTeam && (teamView === "add" || teamView === "invitations") && <CompanyMemberInvitations companyId={companyId} mode={teamView === "add" ? "add" : "list"} />}
       {canManageTeam && <datalist id="company-public-title-options">{COMPANY_PUBLIC_TITLE_SUGGESTIONS.map((title) => <option key={title} value={title} />)}</datalist>}
@@ -1062,10 +1036,8 @@ function TeamTab({ companyId, permissionRole, canManageTeam }: { companyId: stri
 
       {teamView === "requests" && canManageTeam && (
         <div>
-          <p className="text-[10px] uppercase tracking-[0.14em] text-amber-400 font-semibold mb-3 flex items-center gap-1.5">
-            <Clock size={10} /> Ausstehende Firmenanfragen ({requestCount})
-          </p>
-          {requestCount === 0 ? <p className="rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-muted">Zurzeit gibt es keine offenen Anfragen.</p> : <div className="space-y-3">
+          <p className="text-[10px] uppercase tracking-[0.14em] text-amber-400 font-semibold mb-3 flex items-center gap-1.5">{uiText.rich("Ui.text_b4ef2dcba589be", { part1: () => (<Clock size={10} />), value2: () => (requestCount) })}</p>
+          {requestCount === 0 ? <p className="rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-muted">{uiText("Ui.text_2362604b52ea7e")}</p> : <div className="space-y-3">
             {pending.map((member) => <JoinRequestCard key={member.id} member={member}
               onAccept={(titles) => void handleAccept(member.id, titles)} onReject={() => void handleRemove(member.id)} />)}
             {titleChangeRequests.map((request) => <TitleChangeRequestCard key={request.id} request={request}
@@ -1076,21 +1048,19 @@ function TeamTab({ companyId, permissionRole, canManageTeam }: { companyId: stri
       )}
 
       {teamView === "add" && canManageTeam && <details className="space-y-3 rounded-xl border border-border bg-bg-secondary p-4">
-        <summary className="min-h-11 cursor-pointer text-sm font-semibold text-text-primary">Person ohne Konto per privatem Link einladen</summary>
-        <p className="text-xs leading-5 text-text-muted">Erstelle einen privaten, einmal verwendbaren Link. Die eingeladene Person kann sich anmelden oder neu registrieren; du bestätigst danach den Beitritt. Der Link wird nicht automatisch per E-Mail versendet.</p>
-        <label className="block text-xs text-text-secondary">CineGenius-Funktion (optional, mehrere mit Komma trennen)<input list="company-public-title-options" value={inviteTitles} onChange={(event) => setInviteTitles(event.target.value)} maxLength={400} placeholder="z.B. Catering-Leitung, Setkoch" className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary" /></label>
-        <label className="block text-xs text-text-secondary">Verwaltungsrecht<select value={inviteRole} onChange={(event) => setInviteRole(event.target.value as "admin" | "editor" | "member")} className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary"><option value="member">Teammitglied – ansehen</option><option value="editor">Bearbeiter/in – Firmendaten und Angebote bearbeiten</option>{permissionRole === "owner" && <option value="admin">Administrator/in – Team verwalten</option>}</select></label>
-        <button onClick={() => void createInvite()} disabled={inviteBusy} className="min-h-11 rounded-lg bg-gold px-4 text-sm font-bold text-bg-primary disabled:opacity-50">{inviteBusy ? "Wird erstellt …" : "Einladungslink erstellen"}</button>
-        {inviteUrl && <div className="space-y-2"><input readOnly value={inviteUrl} aria-label="Einladungslink" className="min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-xs text-text-primary" /><button onClick={() => void copyInvite()} className="min-h-10 rounded-lg border border-border px-3 text-xs text-gold">Link kopieren</button></div>}
+        <summary className="min-h-11 cursor-pointer text-sm font-semibold text-text-primary">{uiText("Ui.text_2efeff59c21eb1")}</summary>
+        <p className="text-xs leading-5 text-text-muted">{uiText("Ui.text_cdb6944ad486c2")}</p>
+        <label className="block text-xs text-text-secondary">{uiText.rich("Ui.text_16715b453b2529", { part1: () => (<input list="company-public-title-options" value={inviteTitles} onChange={(event) => setInviteTitles(event.target.value)} maxLength={400} placeholder={uiText("Ui.text_bcddc99e370c1f")} className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary" />) })}</label>
+        <label className="block text-xs text-text-secondary">{uiText("Ui.text_cebeb83543ef7f")}<select value={inviteRole} onChange={(event) => setInviteRole(event.target.value as "admin" | "editor" | "member")} className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary"><option value="member">{uiText("Ui.text_d8cd4be8c37da5")}</option><option value="editor">{uiText("Ui.text_501cf5ed46c1c0")}</option>{permissionRole === "owner" && <option value="admin">{uiText("Ui.text_6fac86f9bf3e9f")}</option>}</select></label>
+        <button onClick={() => void createInvite()} disabled={inviteBusy} className="min-h-11 rounded-lg bg-gold px-4 text-sm font-bold text-bg-primary disabled:opacity-50">{inviteBusy ? uiText("Ui.text_07f24078a691fa") : uiText("OrganizationAccess.createInvite")}</button>
+        {inviteUrl && <div className="space-y-2"><input readOnly value={inviteUrl} aria-label={uiText("Ui.text_7ec1900cd4f63e")} className="min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-xs text-text-primary" /><button onClick={() => void copyInvite()} className="min-h-10 rounded-lg border border-border px-3 text-xs text-gold">{uiText("Ui.text_6a752b442eff4e")}</button></div>}
         {notice && <p role="status" className="text-xs text-success">{notice}</p>}
       </details>}
       {teamView === "members" && <div className="space-y-6">
         <div>
-        <p className="text-[10px] uppercase tracking-[0.14em] text-text-muted font-semibold mb-3">
-          Aktive Mitglieder ({accepted.length})
-        </p>
+        <p className="text-[10px] uppercase tracking-[0.14em] text-text-muted font-semibold mb-3">{uiText.rich("Ui.text_69b5b687a95edf", { value1: () => (accepted.length) })}</p>
         {accepted.length === 0 ? (
-          <p className="text-sm text-text-muted">Noch keine Mitglieder. Mitglieder können auf dem öffentlichen Firmenprofil beitreten.</p>
+          <p className="text-sm text-text-muted">{uiText("Ui.text_440fa28a77e92f")}</p>
         ) : (
           <div className="space-y-2">
             {accepted.map(m => (
@@ -1100,27 +1070,27 @@ function TeamTab({ companyId, permissionRole, canManageTeam }: { companyId: stri
                   <div className="flex items-center gap-2">
                     <Link href={`/profile/${m.profile?.slug ?? m.user_id}`}
                       className="text-sm font-semibold text-text-primary hover:text-gold transition-colors truncate flex items-center gap-1">
-                      {m.profile?.display_name ?? "Unbekannt"}
+                      {m.profile?.display_name ?? uiText("Ui.text_276ffa1fb4f970")}
                       <ArrowUpRight size={11} className="opacity-0 group-hover:opacity-60 transition-opacity" />
                     </Link>
                     {m.role === "owner" && <Crown size={11} className="text-gold shrink-0" />}
                   </div>
-                  <p className="text-xs text-text-muted truncate">Öffentliche Funktion: {(m.public_titles?.length ? m.public_titles : m.title ? [m.title] : []).join(" · ") || "noch nicht angegeben"}</p>
+                  <p className="text-xs text-text-muted truncate">{uiText.rich("Ui.text_ea815298a33154", { value1: () => ((m.public_titles?.length ? m.public_titles : m.title ? [m.title] : []).join(" · ") || uiText("Ui.text_69130d18f7b19e")) })}</p>
                   {canManageTeam && <PublicTitlesEditor member={m} onSave={(value) => void handleTitlesChange(m.id, value)} />}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                 {permissionRole === "owner" && m.role !== "owner" && (
                   <div className="flex items-center gap-2 shrink-0">
                     <select value={m.role} onChange={e => handleRoleChange(m.id, e.target.value)}
-                      aria-label={`Verwaltungsrechte für ${m.profile?.display_name ?? "Mitglied"}`}
+                      aria-label={uiText("Ui.text_1db86f9402e8c6", { value1: String(m.profile?.display_name ?? uiText("Ui.text_4d338cce824968")) })}
                       className="text-xs bg-bg-elevated border border-border rounded-lg px-2 py-2 focus:outline-none focus:border-gold transition-colors">
-                      <option value="admin">Administrator</option>
-                      <option value="editor">Bearbeiter/in</option>
-                      <option value="member">Teammitglied</option>
+                      <option value="admin">{uiText("OrganizationAccess.admin")}</option>
+                      <option value="editor">{uiText("Ui.text_7adcec3de6f791")}</option>
+                      <option value="member">{uiText("Ui.text_46a19d00aadaa0")}</option>
                     </select>
                   </div>
                 )}
-                {m.role !== "owner" && canCompanyRoleManageTarget(permissionRole, m.role) && <button onClick={() => void handleRemove(m.id)} aria-label={`${m.profile?.display_name ?? "Mitglied"} entfernen`} className="flex h-10 w-10 items-center justify-center rounded-lg text-text-muted hover:bg-crimson/10 hover:text-crimson-light"><UserMinus size={14} /></button>}
+                {m.role !== "owner" && canCompanyRoleManageTarget(permissionRole, m.role) && <button onClick={() => void handleRemove(m.id)} aria-label={uiText("Ui.text_f10fe7a27ce274", { value1: String(m.profile?.display_name ?? uiText("Ui.text_4d338cce824968")) })} className="flex h-10 w-10 items-center justify-center rounded-lg text-text-muted hover:bg-crimson/10 hover:text-crimson-light"><UserMinus size={14} /></button>}
                 </div>
               </div>
             ))}
@@ -1135,6 +1105,10 @@ function TeamTab({ companyId, permissionRole, canManageTeam }: { companyId: stri
 }
 
 function JoinRequestCard({ member, onAccept, onReject }: { member: Member; onAccept: (titles: string) => void; onReject: () => void }) {
+  const uiFormattingLocale = useLocale();
+
+  const uiText = useTranslations();
+
   const [titles, setTitles] = useState((member.public_titles?.length ? member.public_titles : member.title ? [member.title] : []).join(", "));
   const name = member.profile?.display_name ?? "Unbekannt";
   const profileHref = `/profile/${member.profile?.slug ?? member.user_id}`;
@@ -1143,28 +1117,26 @@ function JoinRequestCard({ member, onAccept, onReject }: { member: Member; onAcc
       <div className="flex items-start gap-3">
         <MemberAvatar member={member} size={40} />
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <Link href={profileHref} className="text-sm font-semibold text-text-primary hover:text-gold">{name}</Link>
-            <span className="text-[11px] text-amber-400">Ausstehend{member.created_at ? ` · ${formatRequestDate(member.created_at)}` : ""}</span>
-          </div>
+          <div className="flex flex-wrap items-center justify-between gap-2">{uiText.rich("Ui.text_7880cc54432071", { value2: () => (name), part1: chunks => (<Link href={profileHref} className="text-sm font-semibold text-text-primary hover:text-gold">{chunks}</Link>), value4: () => (member.created_at ? uiText("Ui.text_f6b53f9c8ab3ef", { value1: String(formatRequestDate(uiFormattingLocale, uiText, member.created_at)) }) : ""), part3: chunks => (<span className="text-[11px] text-amber-400">{chunks}</span>) })}</div>
           {member.profile?.role && <p className="text-xs text-text-muted">{member.profile.role}</p>}
         </div>
       </div>
       {member.request_message && <p className="rounded-lg border border-border bg-bg-primary/60 p-3 text-sm leading-relaxed text-text-secondary">„{member.request_message}“</p>}
-      <label className="block text-xs text-text-secondary">
-        Funktion(en) für die Freigabe überprüfen oder anpassen
-        <input list="company-public-title-options" value={titles} onChange={(event) => setTitles(event.target.value)} maxLength={400}
-          className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary" />
-      </label>
+      <label className="block text-xs text-text-secondary">{uiText.rich("Ui.text_ca915adabebf55", { part1: () => (<input list="company-public-title-options" value={titles} onChange={(event) => setTitles(event.target.value)} maxLength={400}
+          className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary" />) })}</label>
       <div className="flex flex-wrap justify-end gap-2">
-        <button type="button" onClick={onReject} className="min-h-11 rounded-lg px-3 text-sm text-text-muted hover:bg-crimson/10 hover:text-crimson-light">Ablehnen</button>
-        <button type="button" onClick={() => onAccept(titles)} className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-success/10 px-3 text-sm font-semibold text-success hover:bg-success/20"><Check size={14} /> Annehmen</button>
+        <button type="button" onClick={onReject} className="min-h-11 rounded-lg px-3 text-sm text-text-muted hover:bg-crimson/10 hover:text-crimson-light">{uiText("OfferModeration.reject")}</button>
+        <button type="button" onClick={() => onAccept(titles)} className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-success/10 px-3 text-sm font-semibold text-success hover:bg-success/20">{uiText.rich("Ui.text_048edf533fa6f4", { part1: () => (<Check size={14} />) })}</button>
       </div>
     </article>
   );
 }
 
 function TitleChangeRequestCard({ request, onAccept, onReject }: { request: TitleChangeRequest; onAccept: (titles: string) => void; onReject: () => void }) {
+  const uiFormattingLocale = useLocale();
+
+  const uiText = useTranslations();
+
   const [titles, setTitles] = useState(request.requested_public_titles.join(", "));
   const name = request.profile?.display_name ?? "Unbekannt";
   return (
@@ -1172,35 +1144,31 @@ function TitleChangeRequestCard({ request, onAccept, onReject }: { request: Titl
       <div className="flex items-start gap-3">
         <MemberAvatar member={{ ...request, title: null, public_titles: request.requested_public_titles, status: request.status }} size={40} />
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <Link href={`/profile/${request.profile?.slug ?? request.user_id}`} className="text-sm font-semibold text-text-primary hover:text-gold">{name}</Link>
-            <span className="text-[11px] text-amber-400">Ausstehend · {formatRequestDate(request.created_at)}</span>
-          </div>
-          <p className="mt-1 text-xs text-text-muted">Bisher bestätigt: {request.current_public_titles.join(" · ") || "keine Funktion hinterlegt"}</p>
+          <div className="flex flex-wrap items-center justify-between gap-2">{uiText.rich("Ui.text_721bc869551ccb", { value2: () => (name), part1: chunks => (<Link href={`/profile/${request.profile?.slug ?? request.user_id}`} className="text-sm font-semibold text-text-primary hover:text-gold">{chunks}</Link>), value4: () => (formatRequestDate(uiFormattingLocale, uiText, request.created_at)), part3: chunks => (<span className="text-[11px] text-amber-400">{chunks}</span>) })}</div>
+          <p className="mt-1 text-xs text-text-muted">{uiText.rich("Ui.text_d190a2564e3e50", { value1: () => (request.current_public_titles.join(" · ") || uiText("Ui.text_bfdc08cfd677d0")) })}</p>
         </div>
       </div>
       {request.message && <p className="rounded-lg border border-border bg-bg-primary/60 p-3 text-sm leading-relaxed text-text-secondary">„{request.message}“</p>}
-      <label className="block text-xs text-text-secondary">
-        Neue Funktion(en) prüfen oder anpassen
-        <input list="company-public-title-options" value={titles} onChange={(event) => setTitles(event.target.value)} maxLength={400}
-          className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary" />
-      </label>
+      <label className="block text-xs text-text-secondary">{uiText.rich("Ui.text_ad102247f94b2b", { part1: () => (<input list="company-public-title-options" value={titles} onChange={(event) => setTitles(event.target.value)} maxLength={400}
+          className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary" />) })}</label>
       <div className="flex flex-wrap justify-end gap-2">
-        <button type="button" onClick={onReject} className="min-h-11 rounded-lg px-3 text-sm text-text-muted hover:bg-crimson/10 hover:text-crimson-light">Ablehnen</button>
-        <button type="button" onClick={() => onAccept(titles)} className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-success/10 px-3 text-sm font-semibold text-success hover:bg-success/20"><Check size={14} /> Annehmen</button>
+        <button type="button" onClick={onReject} className="min-h-11 rounded-lg px-3 text-sm text-text-muted hover:bg-crimson/10 hover:text-crimson-light">{uiText("OfferModeration.reject")}</button>
+        <button type="button" onClick={() => onAccept(titles)} className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-success/10 px-3 text-sm font-semibold text-success hover:bg-success/20">{uiText.rich("Ui.text_048edf533fa6f4", { part1: () => (<Check size={14} />) })}</button>
       </div>
     </article>
   );
 }
 
-function formatRequestDate(value: string) {
+function formatRequestDate(locale: string, translate: (key: string) => string, value: string) {
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? "Datum unbekannt" : new Intl.DateTimeFormat("de-DE", { dateStyle: "medium" }).format(date);
+  return Number.isNaN(date.getTime()) ? translate("Ui.text_c641e8c9b87351") : new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(date);
 }
 
 function PublicTitlesEditor({ member, onSave }: { member: Member; onSave: (value: string) => void }) {
+  const uiText = useTranslations();
+
   const [value, setValue] = useState((member.public_titles?.length ? member.public_titles : member.title ? [member.title] : []).join(", "));
-  return <label className="mt-2 block text-[11px] text-text-muted">Funktion(en), öffentlich sichtbar<input list="company-public-title-options" value={value} onChange={(event) => setValue(event.target.value)} onBlur={() => onSave(value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); onSave(value); } }} maxLength={400} placeholder="z.B. Technische Leitung, Oberbeleuchter" className="mt-1 min-h-10 w-full rounded-lg border border-border bg-bg-primary px-3 text-xs text-text-primary" /></label>;
+  return <label className="mt-2 block text-[11px] text-text-muted">{uiText.rich("Ui.text_6b9a27efa8e57d", { part1: () => (<input list="company-public-title-options" value={value} onChange={(event) => setValue(event.target.value)} onBlur={() => onSave(value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); onSave(value); } }} maxLength={400} placeholder={uiText("Ui.text_354d5eb293b0a9")} className="mt-1 min-h-10 w-full rounded-lg border border-border bg-bg-primary px-3 text-xs text-text-primary" />) })}</label>;
 }
 
 // ─── Shared helpers ────────────────────────────────────────────────────────────

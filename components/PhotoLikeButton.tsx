@@ -5,6 +5,9 @@ import { Heart } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { photoHref } from "@/lib/photo-link";
 import { optimisticPhotoLikeCount } from "@/lib/photo-like-state";
+import { useTranslations } from "next-intl";
+import { uiErrorMessage } from "@/lib/ui-error-message";
+
 
 type LikeEvent = { imageUrl: string; profileId: string; liked: boolean; count: number };
 const EVENT_NAME = "cinegenius:photo-like";
@@ -39,6 +42,8 @@ export default function PhotoLikeButton({
   tabIndex?: number;
   blurBackground?: boolean;
 }) {
+  const uiText = useTranslations();
+
   const { isLoaded, isSignedIn, user } = useUser();
   const [count, setCount] = useState(initialCount);
   const [liked, setLiked] = useState(initialLiked);
@@ -84,7 +89,7 @@ export default function PhotoLikeButton({
         body: JSON.stringify({ profile_id: profileId, image_url: imageUrl, liked: nextLiked }),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error ?? "Dein Like konnte nicht gespeichert werden.");
+      if (!response.ok) throw new Error(data.error ?? uiText("Ui.text_0299577cefd9a3"));
       setLiked(data.liked);
       const finalCount = Number.isInteger(data.count) ? data.count : optimisticPhotoLikeCount(count, previousLiked, data.liked);
       setCount(finalCount);
@@ -92,7 +97,7 @@ export default function PhotoLikeButton({
     } catch (cause) {
       setLiked(previousLiked);
       setCount(previousCount);
-      setError(cause instanceof Error ? cause.message : "Dein Like konnte nicht gespeichert werden.");
+      setError(uiErrorMessage(cause, uiText("Ui.text_0299577cefd9a3")));
     } finally {
       setSaving(false);
     }
@@ -125,9 +130,9 @@ export default function PhotoLikeButton({
         onClick={(event) => { event.preventDefault(); event.stopPropagation(); void toggleLike(); }}
         disabled={!isLoaded || saving || disabled || isOwner}
         tabIndex={tabIndex}
-        aria-label={liked ? `Like entfernen, ${count} Likes` : `Foto liken, ${count} Likes`}
+        aria-label={liked ? uiText("Ui.text_f5d39d37511e48", { value1: String(count) }) : uiText("Ui.text_c3654c20755b49", { value1: String(count) })}
         aria-pressed={liked}
-        title={isOwner ? "Eigene Fotos kannst du nicht liken" : undefined}
+        title={isOwner ? uiText("Ui.text_e7a6faf4ca2816") : undefined}
         className={`flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-full border border-white/20 bg-black/70 px-2.5 text-white shadow-md ${blurBackground ? "backdrop-blur" : ""} transition-colors hover:border-red-300 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-70 ${liked ? "text-red-400" : ""}`}
       >
         <Heart size={18} className={liked ? "fill-current text-red-400" : ""} />

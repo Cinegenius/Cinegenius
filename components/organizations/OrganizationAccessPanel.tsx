@@ -6,20 +6,22 @@ type Access={owner?:boolean;userId?:string;members?:{user_id:string;role:string;
 const button='min-h-11 rounded-xl border border-border px-4 py-2 text-sm disabled:opacity-50';
 const input='min-h-11 w-full rounded-xl border border-border bg-bg-primary px-3 py-2';
 export default function OrganizationAccessPanel({organizationId,companyId,onLeave}:{organizationId?:string;companyId?:string;onLeave?:(organizationId:string)=>void}) {
+  const uiText = useTranslations();
+
  const t=useTranslations('OrganizationAccess');const format=useFormatter();const [data,setData]=useState<Access|null>(null);const [message,setMessage]=useState('');const [busy,setBusy]=useState(false);const pending=useRef(false);
  const [email,setEmail]=useState('');const [companySlug,setCompanySlug]=useState('');const [invitePath,setInvitePath]=useState('');
  const endpoint=`/api/organizations/access?${companyId?`companyId=${companyId}`:`organizationId=${organizationId}`}`;
- const refresh=useCallback(async(signal?:AbortSignal)=>{const response=await fetch(endpoint,{cache:'no-store',signal});if(!response.ok)throw new Error('load');setData(await response.json());},[endpoint]);
- useEffect(()=>{const controller=new AbortController();setData(null);setInvitePath('');setMessage('');void refresh(controller.signal).catch(()=>{if(!controller.signal.aborted)setMessage('error');});return()=>controller.abort();},[refresh]);
+ const refresh=useCallback(async(signal?:AbortSignal)=>{const response=await fetch(endpoint,{cache:'no-store',signal});if(!response.ok)throw new Error("load");setData(await response.json());},[endpoint]);
+ useEffect(()=>{const controller=new AbortController();setData(null);setInvitePath('');setMessage('');void refresh(controller.signal).catch(()=>{if(!controller.signal.aborted)setMessage("error");});return()=>controller.abort();},[refresh]);
  async function change(action:string,target='',org=organizationId,visible?:boolean) {
   if(pending.current)return;pending.current=true;setBusy(true);setMessage('');
   try {
    const response=await fetch('/api/organizations/access',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,target,organizationId:org,email,companySlug,visible})});const result=await response.json();
-   if(!response.ok){setMessage(result.error==='unavailable'?'unavailable':result.error==='forbidden'?'forbidden':'error');return;}
-   setInvitePath(result.invitationPath?`${window.location.origin}${result.invitationPath}`:'');setMessage('saved');setEmail('');setCompanySlug('');
-   if(action==='leave'){setData(null);setMessage('left');if(org)onLeave?.(org);return;}
+   if(!response.ok){setMessage(result.error==='unavailable'?"unavailable":result.error==='forbidden'?"forbidden":'error');return;}
+   setInvitePath(result.invitationPath?`${window.location.origin}${result.invitationPath}`:'');setMessage("saved");setEmail('');setCompanySlug('');
+   if(action==='leave'){setData(null);setMessage("left");if(org)onLeave?.(org);return;}
    await refresh();
-  }catch{setMessage('error');}finally{pending.current=false;setBusy(false);}
+  }catch{setMessage("error");}finally{pending.current=false;setBusy(false);}
  }
  return <section className="mt-8 space-y-4 rounded-2xl border border-border bg-bg-secondary p-5 sm:p-6"><h2 className="font-serif text-2xl">{t(companyId?'companyLinks':'title')}</h2><p className="text-sm text-text-secondary">{t(companyId?'linkNotice':'rightsNotice')}</p>
  {message&&<p role="status" className="break-words text-sm text-gold">{t(message)}</p>}{!data&&!message&&<p role="status">{t('loading')}</p>}

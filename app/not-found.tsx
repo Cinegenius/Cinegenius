@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { Film, Home, Search } from "lucide-react";
+import { useTranslations } from "next-intl";
+
 
 export default function NotFound() {
+  const uiText = useTranslations();
+
   return (
     <div className="pt-16 min-h-screen flex items-center justify-center px-4">
       <div className="text-center max-w-lg">
@@ -20,40 +24,27 @@ export default function NotFound() {
           </div>
         </div>
 
-        <h1 className="font-display text-3xl font-bold text-text-primary mb-3">
-          Szene nicht gefunden
-        </h1>
-        <p className="text-text-muted text-lg mb-2">
-          Diese Seite wurde wohl im Schneideraum vergessen.
-        </p>
-        <p className="text-text-muted text-sm mb-10">
-          Die URL stimmt möglicherweise nicht, die Seite wurde verschoben oder existiert nicht.
-        </p>
+        <h1 className="font-display text-3xl font-bold text-text-primary mb-3">{uiText("Ui.text_4d25c24500cc60")}</h1>
+        <p className="text-text-muted text-lg mb-2">{uiText("Ui.text_26936b4cb9131a")}</p>
+        <p className="text-text-muted text-sm mb-10">{uiText("Ui.text_eba20ce9a35216")}</p>
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">{uiText.rich("Ui.text_e1d9a30afcdd04", { part2: () => (<Home size={16} />), part1: chunks => (<Link
             href="/"
             className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors flex items-center justify-center gap-2"
-          >
-            <Home size={16} /> Zur Startseite
-          </Link>
-          <Link
+          >{chunks}</Link>), part4: () => (<Search size={16} />), part3: chunks => (<Link
             href="/locations"
             className="px-6 py-3 border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-colors flex items-center justify-center gap-2"
-          >
-            <Search size={16} /> Locations entdecken
-          </Link>
-        </div>
+          >{chunks}</Link>) })}</div>
 
         <div className="mt-12 pt-8 border-t border-border">
-          <p className="text-text-muted text-xs mb-4">Oder direkt zu:</p>
+          <p className="text-text-muted text-xs mb-4">{uiText("Ui.text_f68e7a98be6197")}</p>
           <div className="flex flex-wrap gap-2 justify-center">
             {[
-              { label: "Requisiten & Verleih", href: "/props" },
-              { label: "Film Jobs", href: "/jobs" },
-              { label: "Filmschaffende", href: "/creators" },
-              { label: "Marktplatz", href: "/marketplace" },
-              { label: "Hilfe", href: "/help" },
+              { label: uiText("Ui.text_e512dbd2b58a8b"), href: "/props" },
+              { label: uiText("footer.links_filmJobs"), href: "/jobs" },
+              { label: uiText("search.typeCreators"), href: "/creators" },
+              { label: uiText("nav.marketplace"), href: "/marketplace" },
+              { label: uiText("Ui.text_95472f650a2b64"), href: "/help" },
             ].map(({ label, href }) => (
               <Link
                 key={href}

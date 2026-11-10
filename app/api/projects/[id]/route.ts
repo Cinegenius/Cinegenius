@@ -7,23 +7,25 @@ import { revalidateTag } from "next/cache";
 import { saveProjectDraft } from "@/lib/project-drafts-server";
 import { getProjectRecord } from "@/lib/project-records-server";
 import { toPublicProjectRecord } from "@/lib/project-record";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // GET /api/projects/[id] — public project detail (no auth required)
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const tResponse = await getResponseTranslations();
   const { id } = await params;
   const projectResult = await getProjectRecord(id);
-  if (projectResult.kind === "not_found") return NextResponse.json({ error: "Projekt nicht gefunden" }, { status: 404 });
-  if (projectResult.kind === "error") return NextResponse.json({ error: "Projekt konnte nicht geladen werden." }, { status: 500 });
+  if (projectResult.kind === "not_found") return NextResponse.json({ error: tResponse('System.m_67d6f019a7f1') }, { status: 404 });
+  if (projectResult.kind === "error") return NextResponse.json({ error: tResponse('System.m_f688eb6d8477') }, { status: 500 });
 
   const { data: credits, error: creditsError } = await db
     .from("project_credits")
     .select("id, user_id, role, created_at")
     .eq("project_id", id)
     .order("created_at", { ascending: true });
-  if (creditsError) return NextResponse.json({ error: "Projektmitwirkende konnten nicht geladen werden." }, { status: 500 });
+  if (creditsError) return NextResponse.json({ error: tResponse('System.m_2bc8b4d8fb3b') }, { status: 500 });
 
   const { userId: viewerId } = await auth();
   const visibleIds = await visibleLinkedProfileIds((credits ?? []).map((c) => c.user_id), viewerId);
@@ -35,7 +37,7 @@ export async function GET(
       .from("profiles")
       .select("user_id, display_name, avatar_url, role")
       .in("user_id", userIds);
-    if (profilesError) return NextResponse.json({ error: "Mitwirkendenprofile konnten nicht geladen werden." }, { status: 500 });
+    if (profilesError) return NextResponse.json({ error: tResponse('System.m_bcb2dabf3798') }, { status: 500 });
 
     profiles = Object.fromEntries(
       (profileData ?? []).map((p) => [p.user_id, p])
@@ -58,16 +60,17 @@ export async function GET(
 
 // PATCH /api/projects/[id] — save an owner-only working copy; public data changes on publish.
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
   const { id } = await params;
   const body = await req.json().catch(() => null);
   if (!body || typeof body !== "object" || Array.isArray(body) || Object.keys(body).length === 0) {
-    return NextResponse.json({ error: "Keine gültigen Felder" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_aadbd52861ab') }, { status: 400 });
   }
   const result = await saveProjectDraft(userId, { sourceProjectId: id, draftData: body });
-  if (result.error) return NextResponse.json({ error: result.error }, { status: result.status });
+  if ("error" in result) return NextResponse.json({ error: result.error }, { status: result.status });
   return NextResponse.json({ success: true, draftId: result.draft.id });
 }
 
@@ -76,6 +79,7 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -89,7 +93,7 @@ export async function DELETE(
     .eq("id", id)
     .maybeSingle();
 
-  const ownershipError = assertOwner(project?.created_by, userId);
+  const ownershipError = assertOwner(project?.created_by, userId, tResponse);
   if (ownershipError) return ownershipError;
 
   // Delete credits first (referential integrity)
@@ -101,7 +105,7 @@ export async function DELETE(
     .delete()
     .eq("id", id);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   revalidateTag("profiles", "max");
   revalidateTag("projects", "max");
   return NextResponse.json({ success: true });

@@ -17,6 +17,7 @@ import { db } from "@/lib/db";
 import { getInboxNotifications } from "@/lib/inbox-data";
 import { getCurrentUser, requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // GET /api/notifications — list notifications for current user
 export async function GET() {
@@ -50,13 +51,14 @@ export async function PATCH() {
 
 // POST /api/notifications — mark single as read
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
   const body = await req.json().catch(() => null);
   const id = body?.id;
-  if (typeof id !== "string" || !id) return NextResponse.json({ error: "id fehlt" }, { status: 400 });
+  if (typeof id !== "string" || !id) return NextResponse.json({ error: tResponse('System.m_4b8591045313') }, { status: 400 });
 
   const { data: notification, error: lookupError } = await db
     .from("notifications")
@@ -64,15 +66,15 @@ export async function POST(req: NextRequest) {
     .eq("id", id)
     .eq("user_id", userId)
     .maybeSingle();
-  if (lookupError) return NextResponse.json({ error: "Benachrichtigung konnte nicht geladen werden." }, { status: 500 });
-  if (!notification) return NextResponse.json({ error: "Benachrichtigung nicht gefunden" }, { status: 404 });
+  if (lookupError) return NextResponse.json({ error: tResponse('System.m_115ec98e9910') }, { status: 500 });
+  if (!notification) return NextResponse.json({ error: tResponse('System.m_59236d5bcaae') }, { status: 404 });
 
   const { error: updateError } = await db
     .from("notifications")
     .update({ read: true })
     .eq("id", id)
     .eq("user_id", userId);
-  if (updateError) return NextResponse.json({ error: "Benachrichtigung konnte nicht markiert werden." }, { status: 500 });
+  if (updateError) return NextResponse.json({ error: tResponse('System.m_f5b90602591d') }, { status: 500 });
 
   return NextResponse.json({ success: true });
 }

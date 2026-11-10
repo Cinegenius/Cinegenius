@@ -11,6 +11,7 @@
 import { MAX_UPLOAD_BYTES } from "./upload-limits";
 
 interface CompressOptions {
+  translate?: (key: string) => string;
   maxWidth?: number;
   maxHeight?: number;
   quality?: number; // 0–1
@@ -153,15 +154,15 @@ export async function compressImage(
     }
     if (file instanceof File && file.size <= maxBytes && PASSTHROUGH_MIME_TYPES.has(file.type)) return file;
     if (cause instanceof Error && cause.message === "Bild überschreitet Uploadgröße") {
-      throw new Error("Das Foto ist zu groß für den Upload. Bitte wähle ein kleineres Bild oder exportiere es als JPG, PNG oder WEBP.");
+      throw new Error(options.translate ? options.translate("mediaSecurity.tooLarge") : "Das Foto ist zu groß für den Upload. Bitte wähle ein kleineres Bild oder exportiere es als JPG, PNG oder WEBP.");
     }
-    throw new Error("Das Foto konnte im Browser nicht verkleinert werden. Bitte wähle ein kleineres JPG-, PNG- oder WEBP-Bild.");
+    throw new Error(options.translate ? options.translate("mediaSecurity.invalid") : "Das Foto konnte im Browser nicht verkleinert werden. Bitte wähle ein kleineres JPG-, PNG- oder WEBP-Bild.");
   }
 }
 
 /** Convenience wrapper for avatar uploads — smaller max size. */
-export function compressAvatar(file: File | Blob): Promise<File> {
-  return compressImage(file, { maxWidth: 500, maxHeight: 500, quality: 0.88, maxBytes: MAX_FUNCTION_UPLOAD_BYTES, forceCompression: true });
+export function compressAvatar(file: File | Blob, translate?: (key: string) => string): Promise<File> {
+  return compressImage(file, { maxWidth: 500, maxHeight: 500, quality: 0.88, maxBytes: MAX_FUNCTION_UPLOAD_BYTES, forceCompression: true, translate });
 }
 
 /**

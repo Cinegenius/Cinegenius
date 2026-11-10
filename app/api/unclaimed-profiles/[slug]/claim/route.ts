@@ -1,11 +1,13 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 export async function POST(
   _req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -18,8 +20,8 @@ export async function POST(
     .eq("slug", slug)
     .maybeSingle();
 
-  if (!profile) return NextResponse.json({ error: "Profil nicht gefunden" }, { status: 404 });
-  if (profile.claimed_by) return NextResponse.json({ error: "Profil bereits übernommen" }, { status: 409 });
+  if (!profile) return NextResponse.json({ error: tResponse('System.m_4b7786bc0e50') }, { status: 404 });
+  if (profile.claimed_by) return NextResponse.json({ error: tResponse('System.m_30366543c183') }, { status: 409 });
 
   // Find projects where the user already has a credit (to avoid duplicates)
   const { data: existingCredits } = await db

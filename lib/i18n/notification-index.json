@@ -1,0 +1,563 @@
+{
+  "n_ea6126cc7e26": {
+    "field": "title",
+    "types": [
+      "accepted",
+      "new_application",
+      "application_sent"
+    ],
+    "legacy": "Bewerbung angenommen!",
+    "template": "Bewerbung angenommen!"
+  },
+  "n_83d937785d2c": {
+    "field": "title",
+    "types": [
+      "accepted",
+      "new_application",
+      "application_sent"
+    ],
+    "legacy": "Bewerbung abgelehnt",
+    "template": "Bewerbung abgelehnt"
+  },
+  "n_28d8576e6594": {
+    "field": "body",
+    "types": [
+      "accepted",
+      "new_application",
+      "application_sent"
+    ],
+    "legacy": "Deine Bewerbung für „{value0}\" wurde angenommen. Melde dich beim Auftraggeber.",
+    "template": "Deine Bewerbung für „{value0}\" wurde angenommen. Melde dich beim Auftraggeber."
+  },
+  "n_84ebc88da291": {
+    "field": "body",
+    "types": [
+      "accepted",
+      "new_application",
+      "application_sent"
+    ],
+    "legacy": "Deine Bewerbung für „{value0}\" wurde leider nicht berücksichtigt.",
+    "template": "Deine Bewerbung für „{value0}\" wurde leider nicht berücksichtigt."
+  },
+  "n_52ebfd46b352": {
+    "field": "title",
+    "types": [
+      "new_application"
+    ],
+    "legacy": "Neue Bewerbung",
+    "template": "Neue Bewerbung"
+  },
+  "n_f5ec0ac58f2d": {
+    "field": "body",
+    "types": [
+      "new_application"
+    ],
+    "legacy": "Jemand hat sich auf „{value0}\" beworben.",
+    "template": "Jemand hat sich auf „{value0}\" beworben."
+  },
+  "n_245257c21df5": {
+    "field": "title",
+    "types": [
+      "application_sent"
+    ],
+    "legacy": "Bewerbung abgesendet",
+    "template": "Bewerbung abgesendet"
+  },
+  "n_0639be2a8253": {
+    "field": "body",
+    "types": [
+      "application_sent"
+    ],
+    "legacy": "Deine Bewerbung für „{value0}\" wurde übermittelt.",
+    "template": "Deine Bewerbung für „{value0}\" wurde übermittelt."
+  },
+  "n_4be82f33ed39": {
+    "field": "title",
+    "types": [
+      "confirmed",
+      "booking_confirmed",
+      "booking_rejected"
+    ],
+    "legacy": "Buchung bestätigt",
+    "template": "Buchung bestätigt"
+  },
+  "n_576b0b2c6729": {
+    "field": "title",
+    "types": [
+      "confirmed",
+      "booking_confirmed",
+      "booking_rejected"
+    ],
+    "legacy": "Buchung abgelehnt",
+    "template": "Buchung abgelehnt"
+  },
+  "n_fde7ef167b37": {
+    "field": "body",
+    "types": [
+      "confirmed",
+      "booking_confirmed",
+      "booking_rejected"
+    ],
+    "legacy": "Deine Buchungsanfrage für „{value0}\" wurde bestätigt. Referenz: {value1}",
+    "template": "Deine Buchungsanfrage für „{value0}\" wurde bestätigt. Referenz: {value1}"
+  },
+  "n_f0aac5bd59a0": {
+    "field": "body",
+    "types": [
+      "confirmed",
+      "booking_confirmed",
+      "booking_rejected"
+    ],
+    "legacy": "Deine Buchungsanfrage für „{value0}\" wurde leider abgelehnt.",
+    "template": "Deine Buchungsanfrage für „{value0}\" wurde leider abgelehnt."
+  },
+  "n_00721588db8b": {
+    "field": "title",
+    "types": [
+      "company_join_request"
+    ],
+    "legacy": "Neue Teameinladung angenommen",
+    "template": "Neue Teameinladung angenommen"
+  },
+  "n_aacf4c964341": {
+    "field": "body",
+    "types": [
+      "company_join_request"
+    ],
+    "legacy": "Eine eingeladene Person möchte dem Team von {value0} beitreten.",
+    "template": "Eine eingeladene Person möchte dem Team von {value0} beitreten."
+  },
+  "n_fbaa8a9dbe43": {
+    "field": "title",
+    "types": [
+      "company_title_change_request"
+    ],
+    "legacy": "Neue Funktionsanfrage",
+    "template": "Neue Funktionsanfrage"
+  },
+  "n_b15e8fef3e8e": {
+    "field": "body",
+    "types": [
+      "company_title_change_request"
+    ],
+    "legacy": "Ein Teammitglied von {value0} bittet um eine Änderung der öffentlichen Funktion: {value1}.",
+    "template": "Ein Teammitglied von {value0} bittet um eine Änderung der öffentlichen Funktion: {value1}."
+  },
+  "n_bce4cfa042e8": {
+    "field": "title",
+    "types": [
+      "accepted",
+      "company_title_change_accepted",
+      "company_title_change_rejected"
+    ],
+    "legacy": "Funktionsänderung bestätigt",
+    "template": "Funktionsänderung bestätigt"
+  },
+  "n_26af4d7e3d94": {
+    "field": "title",
+    "types": [
+      "accepted",
+      "company_title_change_accepted",
+      "company_title_change_rejected"
+    ],
+    "legacy": "Funktionsänderung abgelehnt",
+    "template": "Funktionsänderung abgelehnt"
+  },
+  "n_927b5fa88562": {
+    "field": "body",
+    "types": [
+      "accepted",
+      "company_title_change_accepted",
+      "company_title_change_rejected"
+    ],
+    "legacy": "Die Firma hat deine Funktionsänderung angepasst und {value0} freigegeben.",
+    "template": "Die Firma hat deine Funktionsänderung angepasst und {value0} freigegeben."
+  },
+  "n_f5199140fafc": {
+    "field": "body",
+    "types": [
+      "accepted",
+      "company_title_change_accepted",
+      "company_title_change_rejected"
+    ],
+    "legacy": "Die Firma hat deine neue öffentliche Funktion freigegeben: {value0}.",
+    "template": "Die Firma hat deine neue öffentliche Funktion freigegeben: {value0}."
+  },
+  "n_db27acf9e567": {
+    "field": "body",
+    "types": [
+      "accepted",
+      "company_title_change_accepted",
+      "company_title_change_rejected"
+    ],
+    "legacy": "Die Firma hat deine Anfrage zur Funktionsänderung abgelehnt. Deine bisherige Funktion bleibt bestehen.",
+    "template": "Die Firma hat deine Anfrage zur Funktionsänderung abgelehnt. Deine bisherige Funktion bleibt bestehen."
+  },
+  "n_6f120a657c89": {
+    "field": "title",
+    "types": [
+      "company_join_request"
+    ],
+    "legacy": "Neue Beitrittsanfrage",
+    "template": "Neue Beitrittsanfrage"
+  },
+  "n_4226c25553e7": {
+    "field": "body",
+    "types": [
+      "company_join_request"
+    ],
+    "legacy": "{value0} möchte {value1} als {value2} beitreten.",
+    "template": "{value0} möchte {value1} als {value2} beitreten."
+  },
+  "n_413a99014613": {
+    "field": "title",
+    "types": [
+      "company_public_title_changed"
+    ],
+    "legacy": "Öffentliche Firmenfunktion geändert",
+    "template": "Öffentliche Firmenfunktion geändert"
+  },
+  "n_9faff5e62e37": {
+    "field": "body",
+    "types": [
+      "company_public_title_changed"
+    ],
+    "legacy": "Die Firma hat deine öffentliche Funktion aktualisiert: {value0}.",
+    "template": "Die Firma hat deine öffentliche Funktion aktualisiert: {value0}."
+  },
+  "n_e8c5800ebc76": {
+    "field": "title",
+    "types": [
+      "company_join_accepted"
+    ],
+    "legacy": "Beitritt bestätigt",
+    "template": "Beitritt bestätigt"
+  },
+  "n_00689bb641b6": {
+    "field": "body",
+    "types": [
+      "company_join_accepted"
+    ],
+    "legacy": "Dein Beitritt zu {value0} wurde bestätigt. Die Firma hat folgende Funktion freigegeben: {value1}.",
+    "template": "Dein Beitritt zu {value0} wurde bestätigt. Die Firma hat folgende Funktion freigegeben: {value1}."
+  },
+  "n_88e04a64baa6": {
+    "field": "body",
+    "types": [
+      "company_join_accepted"
+    ],
+    "legacy": "Du bist jetzt Mitglied von {value0} als {value1}.",
+    "template": "Du bist jetzt Mitglied von {value0} als {value1}."
+  },
+  "n_54596ecd198e": {
+    "field": "title",
+    "types": [
+      "company_join_rejected"
+    ],
+    "legacy": "Anfrage abgelehnt",
+    "template": "Anfrage abgelehnt"
+  },
+  "n_58d793c6edc0": {
+    "field": "body",
+    "types": [
+      "company_join_rejected"
+    ],
+    "legacy": "Deine Anfrage, dem Team von {value0} beizutreten, wurde abgelehnt.",
+    "template": "Deine Anfrage, dem Team von {value0} beizutreten, wurde abgelehnt."
+  },
+  "n_e3ef2e08afb3": {
+    "field": "title",
+    "types": [
+      "friend_accepted"
+    ],
+    "legacy": "Freundschaftsanfrage angenommen",
+    "template": "Freundschaftsanfrage angenommen"
+  },
+  "n_8a8b90197586": {
+    "field": "body",
+    "types": [
+      "friend_accepted"
+    ],
+    "legacy": "{value0} hat deine Anfrage angenommen.",
+    "template": "{value0} hat deine Anfrage angenommen."
+  },
+  "n_cbf93b99dd39": {
+    "field": "title",
+    "types": [
+      "friend_request"
+    ],
+    "legacy": "Neue Freundschaftsanfrage",
+    "template": "Neue Freundschaftsanfrage"
+  },
+  "n_aa80d88f1a90": {
+    "field": "body",
+    "types": [
+      "friend_request"
+    ],
+    "legacy": "{value0} möchte sich mit dir vernetzen.",
+    "template": "{value0} möchte sich mit dir vernetzen."
+  },
+  "n_6fc234ff6dc6": {
+    "field": "title",
+    "types": [
+      "review"
+    ],
+    "legacy": "Inserat bewertet",
+    "template": "Inserat bewertet"
+  },
+  "n_794be4485c9a": {
+    "field": "body",
+    "types": [
+      "review"
+    ],
+    "legacy": "{value0} hat dein Inserat „{value1}\" mit {value2} Stern{legacySuffix} bewertet.",
+    "template": "{value0} hat dein Inserat „{value1}\" mit {value2, plural, one {# Stern} other {# Sternen}} bewertet."
+  },
+  "n_b3a8a25c59f6": {
+    "field": "title",
+    "types": [
+      "review_request"
+    ],
+    "legacy": "Foto geliked",
+    "template": "Foto geliked"
+  },
+  "n_9d35a14e222c": {
+    "field": "body",
+    "types": [
+      "review_request"
+    ],
+    "legacy": "{value0} hat eines deiner Fotos mit einem Herz versehen.",
+    "template": "{value0} hat eines deiner Fotos mit einem Herz versehen."
+  },
+  "n_c8f507042075": {
+    "field": "title",
+    "types": [
+      "friend_accepted"
+    ],
+    "legacy": "Neue Empfehlung",
+    "template": "Neue Empfehlung"
+  },
+  "n_b98e55b809f9": {
+    "field": "body",
+    "types": [
+      "friend_accepted"
+    ],
+    "legacy": "{value0} hat dir eine Empfehlung geschrieben.",
+    "template": "{value0} hat dir eine Empfehlung geschrieben."
+  },
+  "n_97c4676220a7": {
+    "field": "title",
+    "types": [
+      "review_request"
+    ],
+    "legacy": "Neue Bewertung von {value0}",
+    "template": "Neue Bewertung von {value0}"
+  },
+  "n_6b646322a8ed": {
+    "field": "title",
+    "types": [
+      "booking_confirmed"
+    ],
+    "legacy": "Buchung bestätigt: {value0}",
+    "template": "Buchung bestätigt: {value0}"
+  },
+  "n_7f78c535de22": {
+    "field": "body",
+    "types": [
+      "booking_confirmed"
+    ],
+    "legacy": "Deine Zahlung wurde erfolgreich verarbeitet. Buchungsreferenz: {value0}",
+    "template": "Deine Zahlung wurde erfolgreich verarbeitet. Buchungsreferenz: {value0}"
+  },
+  "n_21cfb1603af9": {
+    "field": "title",
+    "types": [
+      "booking_request"
+    ],
+    "legacy": "Neue Buchung: {value0}",
+    "template": "Neue Buchung: {value0}"
+  },
+  "n_35bffb78df4b": {
+    "field": "body",
+    "types": [
+      "booking_request"
+    ],
+    "legacy": "{value0} hat dein Inserat für {value1} Tag(e) gebucht.",
+    "template": "{value0} hat dein Inserat für {value1, plural, one {# Tag} other {# Tage}} gebucht."
+  },
+  "bookingSentTitle": {
+    "field": "title",
+    "types": [
+      "booking_request"
+    ],
+    "legacy": "Buchungsanfrage gesendet",
+    "legacyVariants": [
+      "Booking request sent",
+      "Solicitud de reserva enviada",
+      "Richiesta di prenotazione inviata",
+      "Poptávka rezervace odeslána",
+      "Foglalási érdeklődés elküldve"
+    ],
+    "template": "Buchungsanfrage gesendet"
+  },
+  "bookingSentBody": {
+    "field": "body",
+    "types": [
+      "booking_request"
+    ],
+    "legacy": "Deine Anfrage für „{title}“ wurde gesendet. Referenz: {ref}",
+    "legacyVariants": [
+      "Your request for “{title}” was sent. Reference: {ref}",
+      "Se ha enviado tu solicitud para «{title}». Referencia: {ref}",
+      "La tua richiesta per «{title}» è stata inviata. Riferimento: {ref}",
+      "Tvá poptávka pro „{title}“ byla odeslána. Reference: {ref}",
+      "A(z) „{title}” iránti érdeklődésed elküldve. Hivatkozás: {ref}"
+    ],
+    "template": "Deine Anfrage für „{title}“ wurde gesendet. Referenz: {ref}"
+  },
+  "bookingIncomingTitle": {
+    "field": "title",
+    "types": [
+      "booking_request"
+    ],
+    "legacy": "Neue Buchungsanfrage",
+    "legacyVariants": [
+      "New booking request",
+      "Nueva solicitud de reserva",
+      "Nuova richiesta di prenotazione",
+      "Nová poptávka rezervace",
+      "Új foglalási érdeklődés"
+    ],
+    "template": "Neue Buchungsanfrage"
+  },
+  "bookingIncomingBody": {
+    "field": "body",
+    "types": [
+      "booking_request"
+    ],
+    "legacy": "{name} hat eine Anfrage für „{title}“ gesendet. Eine Buchung ist noch nicht bestätigt.",
+    "legacyVariants": [
+      "{name} sent a request for “{title}”. No booking has been confirmed yet.",
+      "{name} ha enviado una solicitud para «{title}». Aún no se ha confirmado ninguna reserva.",
+      "{name} ha inviato una richiesta per «{title}». Nessuna prenotazione è ancora confermata.",
+      "{name} poslal(a) poptávku pro „{title}“. Rezervace zatím není potvrzena.",
+      "{name} érdeklődést küldött a(z) „{title}” hirdetésre. A foglalás még nincs megerősítve."
+    ],
+    "template": "{name} hat eine Anfrage für „{title}“ gesendet. Eine Buchung ist noch nicht bestätigt."
+  },
+  "companyInvitationTitle": {
+    "field": "title",
+    "types": [
+      "company_invitation"
+    ],
+    "legacy": "Einladung ins Firmenteam",
+    "template": "Einladung ins Firmenteam"
+  },
+  "companyInvitationBody": {
+    "field": "body",
+    "types": [
+      "company_invitation"
+    ],
+    "legacy": "{company} lädt dich ein: {roles}. Die Zuordnung wird erst nach deiner Annahme öffentlich.",
+    "template": "{company} lädt dich ein: {roles}. Die Zuordnung wird erst nach deiner Annahme öffentlich."
+  },
+  "companyInvitationAccepted": {
+    "field": "title",
+    "types": [
+      "company_invitation_response"
+    ],
+    "legacy": "Teameinladung angenommen",
+    "template": "Teameinladung angenommen"
+  },
+  "companyInvitationDeclined": {
+    "field": "title",
+    "types": [
+      "company_invitation_response"
+    ],
+    "legacy": "Teameinladung abgelehnt",
+    "template": "Teameinladung abgelehnt"
+  },
+  "companyInvitationRevoked": {
+    "field": "title",
+    "types": [
+      "company_invitation_response"
+    ],
+    "legacy": "Teameinladung zurückgezogen",
+    "template": "Teameinladung zurückgezogen"
+  },
+  "offerTitle": {
+    "field": "title",
+    "types": [
+      "offer_review"
+    ],
+    "legacy": "Prüfstatus deines Inserats",
+    "legacyVariants": [
+      "Review status of your offer",
+      "Estado de revisión de tu anuncio",
+      "Stato di verifica del tuo annuncio",
+      "Stav kontroly tvého inzerátu",
+      "Hirdetésed ellenőrzési állapota"
+    ],
+    "template": "Prüfstatus deines Inserats"
+  },
+  "offerBody_approved": {
+    "field": "body",
+    "types": [
+      "offer_review"
+    ],
+    "legacy": "„{title}“: Freigegeben. Details findest du bei deinen Angeboten.",
+    "legacyVariants": [
+      "“{title}”: Approved. See your offers for details.",
+      "«{title}»: Aprobado. Consulta tus anuncios para más detalles.",
+      "«{title}»: Approvato. Consulta i tuoi annunci per i dettagli.",
+      "„{title}“: Schváleno. Podrobnosti najdeš ve svých nabídkách.",
+      "„{title}”: Jóváhagyva. A részleteket az ajánlataidnál találod."
+    ],
+    "template": "„{title}“: Freigegeben. Details findest du bei deinen Angeboten."
+  },
+  "offerBody_hidden": {
+    "field": "body",
+    "types": [
+      "offer_review"
+    ],
+    "legacy": "„{title}“: Ausgeblendet. Details findest du bei deinen Angeboten.",
+    "legacyVariants": [
+      "“{title}”: Hidden. See your offers for details.",
+      "«{title}»: Oculto. Consulta tus anuncios para más detalles.",
+      "«{title}»: Nascosto. Consulta i tuoi annunci per i dettagli.",
+      "„{title}“: Skryto. Podrobnosti najdeš ve svých nabídkách.",
+      "„{title}”: Elrejtve. A részleteket az ajánlataidnál találod."
+    ],
+    "template": "„{title}“: Ausgeblendet. Details findest du bei deinen Angeboten."
+  },
+  "offerBody_changes_requested": {
+    "field": "body",
+    "types": [
+      "offer_review"
+    ],
+    "legacy": "„{title}“: Nachbesserung erforderlich. Details findest du bei deinen Angeboten.",
+    "legacyVariants": [
+      "“{title}”: Changes required. See your offers for details.",
+      "«{title}»: Se requieren cambios. Consulta tus anuncios para más detalles.",
+      "«{title}»: Modifiche necessarie. Consulta i tuoi annunci per i dettagli.",
+      "„{title}“: Nutné úpravy. Podrobnosti najdeš ve svých nabídkách.",
+      "„{title}”: Javítás szükséges. A részleteket az ajánlataidnál találod."
+    ],
+    "template": "„{title}“: Nachbesserung erforderlich. Details findest du bei deinen Angeboten."
+  },
+  "offerBody_rejected": {
+    "field": "body",
+    "types": [
+      "offer_review"
+    ],
+    "legacy": "„{title}“: Abgelehnt. Details findest du bei deinen Angeboten.",
+    "legacyVariants": [
+      "“{title}”: Rejected. See your offers for details.",
+      "«{title}»: Rechazado. Consulta tus anuncios para más detalles.",
+      "«{title}»: Rifiutato. Consulta i tuoi annunci per i dettagli.",
+      "„{title}“: Zamítnuto. Podrobnosti najdeš ve svých nabídkách.",
+      "„{title}”: Elutasítva. A részleteket az ajánlataidnál találod."
+    ],
+    "template": "„{title}“: Abgelehnt. Details findest du bei deinen Angeboten."
+  }
+}

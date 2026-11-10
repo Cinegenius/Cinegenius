@@ -1,62 +1,76 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
-export const metadata: Metadata = {
+
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const tMetadata = await getMetadataTranslations("Metadata");
+  return {
   alternates: { canonical: "https://www.cinegenius.co/trust" },
-  title: "Vertrauen & Sicherheit",
-  description: "Informationen zu Kontakt, Anfragen, Sichtbarkeit und dem Melden problematischer Inhalte auf CineGenius.",
+  title: tMetadata('m_40caf7cbe2d5'),
+  description: tMetadata('m_cbe3f97a2369'),
 };
+}
 import {
   Shield, CheckCircle, AlertCircle, RotateCcw, MessageSquare,
   ArrowRight, Lock, Eye, Flag,
 } from "lucide-react";
+import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
-const sections = [
-  { icon: Lock, title: "Anfragen & Vereinbarungen", id: "payment", content: [
-    { heading: "Wie kommt ein Kontakt zustande?", body: "Öffentliche Angebote kannst du ohne Konto entdecken. Für Nachrichten und Anfragen meldest du dich an. Eine Anfrage ist noch keine Zusage des Anbieters." },
-    { heading: "Wie wird bezahlt?", body: "Preis, Verfügbarkeit, Zahlung und Übergabe vereinbaren die Beteiligten miteinander. Eine Anfrage löst keine automatische Zahlung aus. CineGenius verspricht keine Treuhandverwahrung oder Auszahlung zu festen Fristen." },
-    { heading: "Worauf sollte ich achten?", body: "Prüfe Angebot und Anbieter, kläre den Leistungsumfang und halte Vereinbarungen schriftlich fest. Überweise kein Geld allein aufgrund eines vermeintlichen Plattform-Gütesiegels." },
-  ] },
-  { icon: RotateCcw, title: "Stornierung & Änderungen", id: "cancellation", content: [
-    { heading: "Welche Bedingungen gelten?", body: "Kläre Stornierung, Terminänderungen, Kaution und mögliche Kosten vor einer Zusage direkt mit dem Anbieter. Maßgeblich sind eure Vereinbarung und die gesetzlichen Rechte." },
-    { heading: "Erstattet CineGenius automatisch?", body: "Es gibt keine allgemeine automatische Rückerstattung durch CineGenius. Wende dich bei Fragen zur vereinbarten Leistung oder Zahlung zunächst an deinen Vertragspartner." },
-  ] },
-  { icon: AlertCircle, title: "Probleme & Meldungen", id: "disputes", content: [
-    { heading: "Wie melde ich ein Problem?", body: "Nutze die vorhandene Melden-Funktion am Profil oder Angebot oder sende den betroffenen Link mit einer Beschreibung an cinegenius.co@gmail.com. Teile nur die für die Prüfung notwendigen Informationen." },
-    { heading: "Was passiert anschließend?", body: "Berechtigte Verantwortliche prüfen die Meldung. Eine feste Bearbeitungszeit oder eine Erstattung kann nicht pauschal zugesichert werden. Supportunterhaltungen können von berechtigten Supportadministratoren bearbeitet werden." },
-    { heading: "Wer ist für Schäden verantwortlich?", body: "Kläre Haftung, Versicherungen und eventuelle Kautionen vor dem Einsatz mit deinem Vertragspartner. Eine Plattformanfrage enthält keinen automatischen Versicherungsschutz." },
-  ] },
-  { icon: Eye, title: "Profile, Bewertungen & Sichtbarkeit", id: "verification", content: [
-    { heading: "Was bedeutet eine Kennzeichnung?", body: "Beachte die jeweils angezeigte Kennzeichnung und ihren konkreten Bezug. Ein Profil ist keine pauschale Garantie für Identität, Qualifikation, Eigentum oder die Qualität jeder angebotenen Leistung." },
-    { heading: "Wer kann bewerten?", body: "Für Bewertungen prüft die Plattform die jeweils erforderliche Berechtigung anhand zugehöriger Vorgänge. Inhalte können gemeldet und geprüft werden; ein automatischer Schutz vor jeder falschen Bewertung wird nicht zugesichert." },
-    { heading: "Wer sieht meine Daten?", body: "Öffentliche Inhalte bleiben auffindbar. Persönliche Kontaktdaten richten sich nach den Sichtbarkeitseinstellungen und Zugriffsrechten. Eine öffentliche Firmenfunktion vergibt keine Verwaltungsrechte." },
-  ] },
-];
 
-const quickFacts = [
-  { icon: MessageSquare, stat: "Kontakt", label: "Direkt miteinander sprechen" },
-  { icon: Flag, stat: "Melden", label: "Problematische Inhalte melden" },
-  { icon: Shield, stat: "Sichtbarkeit", label: "Eigene Angaben verwalten" },
-  { icon: CheckCircle, stat: "Anfragen", label: "Konditionen vorab klären" },
-];
+
+
+
+
+function getLocalizedSections(translate: (key: string) => string) {
+  return ([
+  { icon: Lock, title: translate("Ui.text_b4c6e32be3effa"), id: "payment", content: [
+    { heading: translate("Ui.text_3318a42e196547"), body: translate("Ui.text_240a0e90696973") },
+    { heading: translate("Ui.text_deda6dfefccec7"), body: translate("Ui.text_ece2cd18994fed") },
+    { heading: translate("Ui.text_92732943717035"), body: translate("Ui.text_0e024c5b72d5e2") },
+  ] },
+  { icon: RotateCcw, title: translate("Ui.text_06a219981769b1"), id: "cancellation", content: [
+    { heading: translate("Ui.text_456b6149b52b2d"), body: translate("Ui.text_78970f62dbacb2") },
+    { heading: translate("Ui.text_289fcfa7e3bce1"), body: translate("Ui.text_9304f320d20c7a") },
+  ] },
+  { icon: AlertCircle, title: translate("Ui.text_05db057884a227"), id: "disputes", content: [
+    { heading: translate("Ui.text_14495a684f86ed"), body: translate("Ui.text_3550cab39bd557") },
+    { heading: translate("Ui.text_598e3cb27810c9"), body: translate("Ui.text_a2170631ea5282") },
+    { heading: translate("Ui.text_671024bb1d0a80"), body: translate("Ui.text_085da4a0443384") },
+  ] },
+  { icon: Eye, title: translate("Ui.text_b58e5dca3cf46a"), id: "verification", content: [
+    { heading: translate("Ui.text_0dfdc58c21ba99"), body: translate("Ui.text_ebd7ef4c997d0f") },
+    { heading: translate("Ui.text_530a7742f32181"), body: translate("Ui.text_05e9303570bd86") },
+    { heading: translate("Ui.text_7420be84b1ad58"), body: translate("Ui.text_ce4dbaa5286d81") },
+  ] },
+]);
+}
+
+
+function getLocalizedQuickFacts(translate: (key: string) => string) {
+  return ([
+  { icon: MessageSquare, stat: translate("Organizations.contact"), label: translate("Ui.text_3b164ef8a00642") },
+  { icon: Flag, stat: translate("Ui.text_a11f461624489e"), label: translate("Ui.text_d9905dccc98ae7") },
+  { icon: Shield, stat: translate("Ui.text_661f7149b21eaa"), label: translate("Ui.text_606f909a615e60") },
+  { icon: CheckCircle, stat: translate("Ui.text_5dfb5bcd667e78"), label: translate("Ui.text_4a473bb6be5bf4") },
+]);
+}
 
 export default function TrustSafetyPage() {
+  const uiText = useTranslations();
+  const sections = getLocalizedSections(uiText);
+  const quickFacts = getLocalizedQuickFacts(uiText);
+
+
   return (
     <div className="pt-16 min-h-screen">
       {/* Hero */}
       <div className="relative py-16 bg-bg-secondary border-b border-border overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-success/5 via-transparent to-transparent" />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-success/10 border border-success/20 rounded-full text-success text-xs font-medium mb-5">
-            <Shield size={12} /> Trust & Safety
-          </div>
-          <h1 className="font-display text-4xl sm:text-5xl font-bold text-text-primary mb-4 leading-tight">
-            Deine Sicherheit hat Priorität.
-          </h1>
-          <p className="text-text-secondary text-lg max-w-2xl mx-auto leading-relaxed">
-            Informiere dich über Anbieter, kläre Vereinbarungen direkt und nutze die
-            Meldefunktionen, wenn dir problematische Inhalte auffallen.
-          </p>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-success/10 border border-success/20 rounded-full text-success text-xs font-medium mb-5">{uiText.rich("Ui.text_1833889cc1db39", { part1: () => (<Shield size={12} />) })}</div>
+          <h1 className="font-display text-4xl sm:text-5xl font-bold text-text-primary mb-4 leading-tight">{uiText("Ui.text_b77761df40bc7f")}</h1>
+          <p className="text-text-secondary text-lg max-w-2xl mx-auto leading-relaxed">{uiText("Ui.text_74d2dceff1cd99")}</p>
         </div>
       </div>
 
@@ -82,7 +96,7 @@ export default function TrustSafetyPage() {
           {/* Sidebar nav */}
           <aside className="lg:w-56 shrink-0">
             <div className="sticky top-24 space-y-1">
-              <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold px-3 mb-3">Themen</p>
+              <p className="text-[10px] uppercase tracking-widest text-text-muted font-semibold px-3 mb-3">{uiText("Organizations.topics")}</p>
               {sections.map(({ icon: Icon, title, id }) => (
                 <a
                   key={id}
@@ -93,14 +107,10 @@ export default function TrustSafetyPage() {
                   {title}
                 </a>
               ))}
-              <div className="pt-4 mt-4 border-t border-border">
-                <Link
+              <div className="pt-4 mt-4 border-t border-border">{uiText.rich("Ui.text_8158912a830550", { part2: () => (<MessageSquare size={12} />), part3: () => (<ArrowRight size={11} />), part1: chunks => (<Link
                   href="/help"
                   className="flex items-center gap-2 px-3 py-2 text-xs text-gold hover:text-gold-light transition-colors"
-                >
-                  <MessageSquare size={12} /> Hilfe-Center <ArrowRight size={11} />
-                </Link>
-              </div>
+                >{chunks}</Link>) })}</div>
             </div>
           </aside>
 
@@ -131,16 +141,12 @@ export default function TrustSafetyPage() {
                 <Flag size={16} className="text-crimson-light" />
               </div>
               <div>
-                <h3 className="font-semibold text-text-primary mb-1">Etwas melden</h3>
-                <p className="text-sm text-text-muted leading-relaxed mb-3">
-                  Verdächtiges Inserat, Betrugsversuch oder unsicheres Verhalten? Melde uns den betroffenen Inhalt mit einer kurzen Beschreibung.
-                </p>
+                <h3 className="font-semibold text-text-primary mb-1">{uiText("Ui.text_2ff6abcb72740c")}</h3>
+                <p className="text-sm text-text-muted leading-relaxed mb-3">{uiText("Ui.text_afca3743010620")}</p>
                 <Link
                   href="/help"
                   className="inline-flex items-center gap-1.5 text-sm text-gold hover:text-gold-light transition-colors font-medium"
-                >
-                  Support kontaktieren <ArrowRight size={13} />
-                </Link>
+                >{uiText.rich("Ui.text_829d4ef8158c41", { part1: () => (<ArrowRight size={13} />) })}</Link>
               </div>
             </div>
           </div>

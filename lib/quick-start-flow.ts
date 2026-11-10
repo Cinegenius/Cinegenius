@@ -300,13 +300,13 @@ export function getFirstScreenForIntent(draft: QuickStartDraft, intent: QuickSta
   return draft.intents.includes(intent) ? "details" : "goals";
 }
 
-function termsFor(item: QuickStartRole): string[] {
+function termsFor(item: QuickStartRole, displayLabel?: (departmentId: string, role: string) => string): string[] {
   const department = departmentById.get(item.departmentId);
-  const terms = department ? getDepartmentRoleSearchTerms(department, item.role) : [item.role];
+  const terms = department ? getDepartmentRoleSearchTerms(department, item.role, displayLabel?.(item.departmentId, item.role)) : [item.role];
   return item.departmentId === "grip" ? [...new Set([...terms, ...gripSearchTerms(item.role)])] : terms;
 }
 
-export function findQuickStartRoles(query: string, limit = 18, departmentIds?: readonly string[]): QuickStartRole[] {
+export function findQuickStartRoles(query: string, limit = 18, departmentIds?: readonly string[], displayLabel?: (departmentId: string, role: string) => string): QuickStartRole[] {
   const needle = normalizeOccupation(query.trim());
   if (!needle) return [];
   const cateringDepartmentSearch = ["catering", "setverpflegung"].includes(needle);
@@ -314,7 +314,7 @@ export function findQuickStartRoles(query: string, limit = 18, departmentIds?: r
   return roleRecords
     .filter((item) => !allowed || allowed.has(item.departmentId))
     .map((item) => {
-      const terms = termsFor(item).map(normalizeOccupation);
+      const terms = termsFor(item, displayLabel).map(normalizeOccupation);
       const exact = terms.some((term) => term === needle);
       const starts = terms.some((term) => term.startsWith(needle));
       const matches = (cateringDepartmentSearch && item.departmentId === CATERING_COMPANY_CATEGORY.id)
@@ -342,70 +342,71 @@ export function getQuickStartProfileTypesForRoles(roles: readonly QuickStartRole
 }
 
 export type QuickStartValidation = { field: string; message: string };
+export type ValidationTranslator = (key: string, values?: Record<string, string | number>) => string;
 
-export function validateQuickStartIntentDetails(draft: QuickStartDraft, intent: QuickStartIntent): QuickStartValidation | null {
+export function validateQuickStartIntentDetails(draft: QuickStartDraft, intent: QuickStartIntent, translate?: ValidationTranslator): QuickStartValidation | null {
   if (intent === "search") return null;
   const section = draft.sections[intent];
   if (intent === "crew") {
-    if (!section?.departmentIds.length) return { field: "crew-departments", message: "Wähle mindestens ein Gewerk aus." };
-    if (!section.roles.length) return { field: "crew-roles", message: "Wähle mindestens eine passende Tätigkeit aus." };
+    if (!section?.departmentIds.length) return { field: "crew-departments", message: (translate ? translate("setup.departmentRequired") : "Wähle mindestens ein Gewerk aus.") };
+    if (!section.roles.length) return { field: "crew-roles", message: (translate ? translate("setup.roleRequired") : "Wähle mindestens eine passende Tätigkeit aus.") };
   }
-  if (intent === "talent" && !section?.roles.length) return { field: "talent-roles", message: "Wähle mindestens eine passende Tätigkeit aus." };
+  if (intent === "talent" && !section?.roles.length) return { field: "talent-roles", message: (translate ? translate("setup.roleRequired") : "Wähle mindestens eine passende Tätigkeit aus.") };
   if (intent === "location" || intent === "equipment") {
     if (section?.offerLater === true) return null;
     const choices = QUICK_START_CATEGORIES[intent];
     if (!choices.some((item) => item.value === section?.category)) {
-      return { field: `${intent}-category`, message: intent === "location" ? "Wähle eine passende Art der Location aus." : "Wähle eine passende Angebotskategorie aus." };
+      return { field: `${intent}-category`, message: intent === "location" ? (translate ? translate("setup.locationKindRequired") : "Wähle eine passende Art der Location aus.") : (translate ? translate("setup.listingKindRequired") : "Wähle eine passende Angebotskategorie aus.") };
     }
-    if (!section?.title.trim()) return { field: `${intent}-title`, message: "Bitte gib deinem Angebot einen kurzen Namen." };
-    if (!hasPlaceCity(section.city)) return { field: `${intent}-city`, message: "Bitte gib den Standort des Angebots an." };
+    if (!section?.title.trim()) return { field: `${intent}-title`, message: (translate ? translate("setup.listingNameRequired") : "Bitte gib deinem Angebot einen kurzen Namen.") };
+    if (!hasPlaceCity(section.city)) return { field: `${intent}-city`, message: (translate ? translate("setup.listingPlaceRequired") : "Bitte gib den Standort des Angebots an.") };
   }
   if (intent === "company") {
-    if (!section?.title.trim()) return { field: "company-title", message: "Bitte gib den Namen deiner Firma ein." };
-    if (!hasPlaceCity(section.city)) return { field: "company-city", message: "Bitte gib den Firmenstandort an." };
-    if (!section.categoryIds.length) return { field: "company-categories", message: "Wähle mindestens eine passende Firmenkategorie aus." };
+    if (!section?.title.trim()) return { field: "company-title", message: (translate ? translate("setup.companyNameRequired") : "Bitte gib den Namen deiner Firma ein.") };
+    if (!hasPlaceCity(section.city)) return { field: "company-city", message: (translate ? translate("setup.companyPlaceRequired") : "Bitte gib den Firmenstandort an.") };
+    if (!section.categoryIds.length) return { field: "company-categories", message: (translate ? translate("setup.companyCategoryRequired") : "Wähle mindestens eine passende Firmenkategorie aus.") };
   }
   return null;
 }
 
-export function validateQuickStartScreen(draft: QuickStartDraft, screen: QuickStartScreen, activeIntent?: QuickStartIntent | null): QuickStartValidation | null {
-  if (screen === "name" && !draft.name.trim()) return { field: "name", message: "Wie dürfen wir dich nennen? Bitte gib deinen Namen ein." };
-  if (screen === "goals" && draft.intents.length === 0) return { field: "goals", message: "Wähle mindestens einen Bereich aus, damit wir dich passend weiterführen können." };
+export function validateQuickStartScreen(draft: QuickStartDraft, screen: QuickStartScreen, activeIntent?: QuickStartIntent | null, translate?: ValidationTranslator): QuickStartValidation | null {
+  if (screen === "name" && !draft.name.trim()) return { field: "name", message: (translate ? translate("setup.nameRequired") : "Wie dürfen wir dich nennen? Bitte gib deinen Namen ein.") };
+  if (screen === "goals" && draft.intents.length === 0) return { field: "goals", message: (translate ? translate("setup.goalRequired") : "Wähle mindestens einen Bereich aus, damit wir dich passend weiterführen können.") };
   if (screen === "location" && (draft.intents.some(intent => ["crew", "talent", "location", "equipment"].includes(intent)))) {
-    if (!hasPlaceCity(draft.personCity)) return { field: "personCity", message: "Bitte gib deine Stadt oder Region an." };
-    if (!draft.personCountry.trim()) return { field: "personCountry", message: "Bitte wähle dein Land aus." };
+    if (!hasPlaceCity(draft.personCity)) return { field: "personCity", message: (translate ? translate("setup.cityRequired") : "Bitte gib deine Stadt oder Region an.") };
+    if (!draft.personCountry.trim()) return { field: "personCountry", message: (translate ? translate("setup.countryRequired") : "Bitte wähle dein Land aus.") };
   }
   if (screen === "details") {
     const intent = activeIntent && draft.intents.includes(activeIntent)
       ? activeIntent
       : draft.intents.find((item) => item !== "search");
-    if (intent) return validateQuickStartIntentDetails(draft, intent);
+    if (intent) return validateQuickStartIntentDetails(draft, intent, translate);
   }
   if (screen === "intro") {
     for (const intent of ["location", "equipment"] as const) {
       const section = draft.sections[intent];
       if (draft.intents.includes(intent) && section && !section.offerLater && !section.priceOnRequest && !(section.priceNegotiable && !section.price.trim()) && (!section.price.trim() || !Number.isFinite(Number(section.price)) || Number(section.price) < 0)) {
-        return { field: `${intent}-price`, message: "Gib einen gültigen Preis in Euro an oder wähle ‚Preis auf Anfrage‘." };
+        return { field: `${intent}-price`, message: (translate ? translate("setup.priceRequired") : "Gib einen gültigen Preis in Euro an oder wähle ‚Preis auf Anfrage‘.") };
       }
     }
   }
   return null;
 }
 
-export function validateQuickStartDraft(draft: QuickStartDraft, { requirePrimary = true } = {}): QuickStartValidation | null {
-  const name = validateQuickStartScreen(draft, "name");
+export function validateQuickStartDraft(draft: QuickStartDraft, { requirePrimary = true, translate }: { requirePrimary?: boolean; translate?: ValidationTranslator } = {}): QuickStartValidation | null {
+  const name = validateQuickStartScreen(draft, "name", undefined, translate);
   if (name) return name;
-  const goals = validateQuickStartScreen(draft, "goals");
+  const goals = validateQuickStartScreen(draft, "goals", undefined, translate);
   if (goals) return goals;
-  const location = validateQuickStartScreen(draft, "location");
+  const location = validateQuickStartScreen(draft, "location", undefined, translate);
   if (location) return location;
   for (const intent of draft.intents) {
-    const details = validateQuickStartIntentDetails(draft, intent);
+    const details = validateQuickStartIntentDetails(draft, intent, translate);
     if (details) return details;
   }
   const personalRoles = [...(draft.sections.crew?.roles ?? []), ...(draft.sections.talent?.roles ?? [])];
-  if (requirePrimary && personalRoles.length && !primaryOccupationForPositions(draft.primaryOccupation, personalRoles.map(item=>item.role))) return {field: "primaryOccupation", message: "Bitte wähle deine Haupttätigkeit aus."};
-  const intro = validateQuickStartScreen(draft, "intro");
+  if (requirePrimary && personalRoles.length && !primaryOccupationForPositions(draft.primaryOccupation, personalRoles.map(item=>item.role))) return {field: "primaryOccupation", message: (translate ? translate("setup.mainRequired") : "Bitte wähle deine Haupttätigkeit aus.")};
+  const intro = validateQuickStartScreen(draft, "intro", undefined, translate);
   if (intro) return intro;
   return null;
 }

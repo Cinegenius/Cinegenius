@@ -3,6 +3,8 @@
 import Image from "@/components/MediaImage";
 import { useState } from "react";
 import { Building2 } from "lucide-react";
+import { useTranslations } from "next-intl";
+
 
 /** Full logo canvas: preserve wordmarks and portrait logos without cropping. */
 export default function CompanyLogo({ src, name, className = "" }: {
@@ -10,6 +12,8 @@ export default function CompanyLogo({ src, name, className = "" }: {
   name: string;
   className?: string;
 }) {
+  const uiText = useTranslations();
+
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   return (
     <div className={`flex min-w-0 max-w-full items-center justify-center ${className}`}>
@@ -19,7 +23,7 @@ export default function CompanyLogo({ src, name, className = "" }: {
           className="h-full w-full min-w-0 object-contain p-0.5"
           onError={() => setFailedSrc(src)} />
       ) : (
-        <span role="img" aria-label={`${name} – kein Logo`} className="flex h-full w-full items-center justify-center text-text-muted">
+        <span role="img" aria-label={uiText("Ui.text_07646f280d60c1", { value1: String(name) })} className="flex h-full w-full items-center justify-center text-text-muted">
           <Building2 size={36} strokeWidth={1.5} />
         </span>
       )}

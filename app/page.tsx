@@ -11,16 +11,19 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { Suspense } from "react";
 import { SkeletonBox } from "@/components/Skeleton";
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const tMetadata = await getMetadataTranslations("Metadata");
+  return {
   alternates: { canonical: "https://www.cinegenius.co/" },
-  title: "CineGenius — Film, Fotografie und Content",
-  description: "Finde Drehorte, Crew, Talente, Equipment und Dienstleister für dein nächstes Projekt – oder präsentiere deine Arbeit und dein Angebot.",
-  keywords: ["Location mieten", "Crew buchen", "Fotostudio mieten", "Equipment leihen", "Content Production", "Filmproduktion", "Fotoshooting Location", "Creative Hub DACH"],
+  title: tMetadata('m_010d820e3a26'),
+  description: tMetadata('m_7055aabe2bd3'),
+  keywords: [tMetadata('m_74826d9e051a'), tMetadata('m_63f1bb517ac1'), tMetadata('m_d9753ec6bbbb'), tMetadata('m_9a871cebc0d9'), tMetadata('m_60e020d36246'), tMetadata('m_7a9a84b10b4d'), tMetadata('m_89a6dff9be40'), tMetadata('m_9b949f719483')],
   openGraph: {
-    title: "CineGenius — Der Marktplatz für Kreative",
-    description: "Locations, Crew, Equipment und Jobs — für Film, Foto, Content und Werbung.",
+    title: tMetadata('m_87ce3bba89a8'),
+    description: tMetadata('m_d31d8b89cb0e'),
   },
 };
+}
 
 export const revalidate = 60;
 
@@ -39,6 +42,7 @@ import { PROFILE_TYPE_LABELS, type ProfileType } from "@/lib/profile-types";
 import { isPeopleDirectoryProfile } from "@/lib/profile-provider-filters";
 import { getPrivateProfileIds } from "@/lib/trust";
 import { getCommunityMedia } from "@/lib/community-media-server";
+import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 type HomeProfileRow = {
   user_id: string;
@@ -55,7 +59,12 @@ type HomeProfileRow = {
   created_at?: string | null;
 };
 
+function getLocalizedProfileTypeLabels(translate: (key: string) => string): typeof PROFILE_TYPE_LABELS { return { actor: translate("menu.crewActors"), model: translate("MarketplaceOffer.fields.model"), extra: translate("Ui.text_359b6b495d37ee"), host: translate("Ui.text_0a95f0e5c8dfe9"), dancer: translate("Ui.text_edbf4c8ebb46d7"), stunt: translate("Ui.text_b84275027d70dc"), voiceover: translate("Ui.text_ecd65813175a41"), creator: translate("Ui.text_d952b2e69292db"), camera: translate("menu.crewCamera"), lighting: translate("Ui.text_df58636dc4a76c"), sound: translate("menu.crewSound"), director_of_photography: translate("Ui.text_e0e64895eb6431"), director: translate("menu.crewDirection"), production: translate("menu.crewProduction"), makeup: translate("Ui.text_93c744e1d17b9a"), costume: translate("Ui.text_a21ae87ef519df"), postproduction: translate("Ui.text_212f3b80ce86c2"), vfx: translate("Ui.text_23d20474305ac3"), sfx: translate("menu.marketSfx"), art_department: translate("Ui.text_a92fc587a90c16"), broadcast: translate("Ui.text_17bc9178343601"), filmmaker: translate("Ui.text_93ecd734fdc054"), writer: translate("Ui.text_fec099ea8a39bd"), photographer: translate("menu.crewPhotographer"), editor: translate("Ui.text_0e4eb4156e02e7"), motion_designer: translate("Ui.text_8213a51cdbc986"), art_director: translate("Ui.text_2d3b48143ed2b9"), location: translate("locations.vendorSection"), equipment: translate("props.vendorSection"), vehicle: translate("Ui.text_758a6eefc6f22f"), studio: translate("Ui.text_3e35f07c14a89e"), props: translate("Ui.text_54d1cc854cc30d") }; }
+
 async function getHomeData(viewerId: string | null) {
+  const uiProfileText = await getTranslations();
+  const PROFILE_TYPE_LABELS = getLocalizedProfileTypeLabels(uiProfileText);
+
   const market=await getTranslations("MarketplaceOffer"),marketLocale=await getLocale();
   const currentTime = Date.now();
   const hasSupabaseCredentials = Boolean(
@@ -128,7 +137,7 @@ async function getHomeData(viewerId: string | null) {
     return {
       id: profile.user_id,
       slug: profile.slug || profile.user_id,
-      name: profile.display_name ?? "CineGenius Mitglied",
+      name: profile.display_name ?? uiProfileText("Ui.text_51fb8dfa65e81e"),
       tagline: profile.tagline ?? undefined,
       avatar: profile.avatar_url?.trim() || undefined,
       city: profile.location?.split(",")[0]?.trim() ?? "",
@@ -140,7 +149,7 @@ async function getHomeData(viewerId: string | null) {
   // Keep this homepage selection strictly chronological: the latest eligible
   // public people profiles always occupy the first positions.
   const newCrew = peopleSummaries
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || a.name.localeCompare(b.name, "de"))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || a.name.localeCompare(b.name, marketLocale))
     .slice(0, 4);
 
   const liveLocations = (recentLocations ?? []).map((l) => ({
@@ -173,7 +182,7 @@ async function getHomeData(viewerId: string | null) {
     image: (p.image_url ?? "") as string,
     focalPoint: (((p.metadata ?? {}) as Record<string, unknown>).focal_point as { x: number; y: number } | null) ?? null,
     type: (p.type ?? "prop") as string,
-    providerName: propProviders[index]?.name ?? "Anbieter wird geprüft",
+    providerName: propProviders[index]?.name ?? uiProfileText("Ui.text_fb0adca8892ab2"),
     detailHref: listingDetailPath(p.type ?? "prop", p.id),
     created_at: (p.created_at ?? "") as string,
   }));
@@ -209,6 +218,9 @@ async function getHomeData(viewerId: string | null) {
 }
 
 async function HomeRecommendations({ viewerId }: { viewerId: string | null }) {
+  const uiText = await getTranslations();
+  const uiLocale = await getLocale();
+
   const [t, tc] = await Promise.all([getTranslations("home"), getTranslations("common")]);
   let data: Awaited<ReturnType<typeof getHomeData>>;
   try {
@@ -398,7 +410,7 @@ async function HomeRecommendations({ viewerId }: { viewerId: string | null }) {
                     <div className="absolute top-2 left-2">
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-bg-primary/80 backdrop-blur-sm border border-border text-[10px] font-semibold text-text-secondary">
                         <Package2 size={9} className="text-gold" />
-                        {prop.type === "vehicle" ? "Fahrzeug" : "Equipment"}
+                        {prop.type === "vehicle" ? uiText("AdminAccounts.contentKinds.vehicle") : uiText("companies.groupAusstattung")}
                       </span>
                     </div>
                     <div className="absolute bottom-2 left-2 right-2 sm:left-3 sm:right-3">
@@ -408,7 +420,7 @@ async function HomeRecommendations({ viewerId }: { viewerId: string | null }) {
                           <MapPin size={10} /> {prop.city}
                         </p>
                       )}
-                      <p className="mt-1 truncate text-[10px] text-white/75">Anbieter: {prop.providerName}</p>
+                      <p className="mt-1 truncate text-[10px] text-white/75">{uiText.rich("Ui.text_c84554a48878b8", { value1: () => (prop.providerName) })}</p>
                     </div>
                   </div>
                   <div className="px-2.5 py-2 sm:px-4 sm:py-3 flex items-center justify-between gap-1">
@@ -479,7 +491,7 @@ async function HomeRecommendations({ viewerId }: { viewerId: string | null }) {
                   </div>
                   <div className="text-right shrink-0">
                     <p className="text-sm font-semibold text-gold">
-                      {job.rawPrice ? `${job.rawPrice.toLocaleString()} €${tc("perDay")}` : tc("onRequest")}
+                      {job.rawPrice ? uiText("Ui.text_8ae8849cdb3aaa", { value1: String(job.rawPrice.toLocaleString(uiLocale)), value2: String(tc("perDay")) }) : tc("onRequest")}
                     </p>
                     <p className="text-[11px] text-text-muted flex items-center gap-1 mt-0.5 justify-end">
                       <Clock size={9} /> {formatDate(job.created_at)}

@@ -1,8 +1,11 @@
+import { projectTypeLabel } from "@/lib/project-type-labels";
 import { publicProjectMedia } from "@/lib/project-media-rights";
 import { db } from "@/lib/db";
 import Image from "@/components/MediaImage";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Clapperboard } from "lucide-react";
+import { getTranslations } from "next-intl/server";
+
 
 export interface CategoryConfig {
   slug: string;
@@ -35,6 +38,8 @@ function typeColor(type: string): string {
 }
 
 export default async function ProjectCategoryPage({ config }: { config: CategoryConfig }) {
+  const uiText = await getTranslations();
+
   const { data: allProjects } = await db
     .from("projects")
     .select("id, title, year, type, director, poster_url, metadata, created_by")
@@ -75,9 +80,7 @@ export default async function ProjectCategoryPage({ config }: { config: Category
           <Link
             href="/projects"
             className="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-xs mb-6 transition-colors"
-          >
-            <ArrowLeft size={12} /> Alle Projekte
-          </Link>
+          >{uiText.rich("Ui.text_6537e36e485dda", { part1: () => (<ArrowLeft size={12} />) })}</Link>
 
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
@@ -92,17 +95,10 @@ export default async function ProjectCategoryPage({ config }: { config: Category
               </p>
             </div>
 
-            <div className="flex items-center gap-3 shrink-0">
-              <span className="text-sm text-white/40">
-                <span className="font-semibold text-white/70">{projects.length}</span> Projekt{projects.length !== 1 ? "e" : ""}
-              </span>
-              <Link
+            <div className="flex items-center gap-3 shrink-0">{uiText.rich("Ui.text_dc6bd1687db934", { value3: () => (projects.length), part2: chunks => (<span className="font-semibold text-white/70">{chunks}</span>), count4: projects.length, part1: chunks => (<span className="text-sm text-white/40">{chunks}</span>), part5: chunks => (<Link
                 href="/projects/neu"
                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-xs whitespace-nowrap"
-              >
-                + Projekt eintragen
-              </Link>
-            </div>
+              >{chunks}</Link>) })}</div>
           </div>
         </div>
 
@@ -139,7 +135,7 @@ export default async function ProjectCategoryPage({ config }: { config: Category
                   {p.type && (
                     <div className="px-2 py-1.5">
                       <span className={`inline-block text-[10px] font-medium px-1.5 py-0.5 rounded border ${typeColor(p.type)}`}>
-                        {p.type}
+                        {projectTypeLabel(p.type, uiText)}
                       </span>
                     </div>
                   )}
@@ -151,26 +147,15 @@ export default async function ProjectCategoryPage({ config }: { config: Category
               <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 flex items-center justify-center mx-auto mb-5">
                 <Clapperboard size={24} className="text-white/60" />
               </div>
-              <h2 className="font-display text-2xl font-bold text-white mb-3">
-                Noch keine {config.label}-Projekte
-              </h2>
-              <p className="text-white/50 mb-7 max-w-md mx-auto">
-                Sei der Erste — trag dein Projekt ein und zeig der Community deine Arbeit.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Link
+              <h2 className="font-display text-2xl font-bold text-white mb-3">{uiText.rich("Ui.text_1f502a70f7ce2f", { value1: () => (config.label) })}</h2>
+              <p className="text-white/50 mb-7 max-w-md mx-auto">{uiText("Ui.text_f2ffc93ee4cd77")}</p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">{uiText.rich("Ui.text_d9ee49dbf180cb", { part2: () => (<ArrowRight size={14} />), part1: chunks => (<Link
                   href="/projects/neu"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm"
-                >
-                  Projekt eintragen <ArrowRight size={14} />
-                </Link>
-                <Link
+                >{chunks}</Link>), part3: chunks => (<Link
                   href="/projects"
                   className="inline-flex items-center gap-2 px-6 py-3 border border-white/20 text-white/70 rounded-xl hover:border-white/40 hover:text-white transition-all text-sm"
-                >
-                  Alle Projekte ansehen
-                </Link>
-              </div>
+                >{chunks}</Link>) })}</div>
             </div>
           )}
         </div>

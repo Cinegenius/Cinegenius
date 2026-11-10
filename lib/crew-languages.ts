@@ -1,6 +1,7 @@
+import { SUPPORTED_LOCALES } from "./i18n/locales";
 /** Normalize directory facets only; never rewrite a member's original language entries. */
 const codes = 'de en es fr it cs hu pt nl pl ru uk tr ar zh ja ko el ro bg hr sr bs sl sk da sv no fi is et lv lt he fa hi ur bn ta th vi id ms tl ceb ca eu gl sq mk sw af be hy ka la'.split(' ');
-const locales = ['de', 'en', 'es', 'it', 'cs', 'hu'];
+const locales = SUPPORTED_LOCALES;
 const key = (value: string) => value.normalize('NFKC').trim().toLocaleLowerCase('en').replace(/\s+/g, ' ');
 const aliases = new Map<string, string>();
 for (const locale of locales) {

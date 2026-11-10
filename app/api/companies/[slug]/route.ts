@@ -2,6 +2,7 @@ import { publicResponsiblePerson, responsibleForCompany } from "@/lib/responsibl
 import { db } from "@/lib/db";
 import { requireAuth, assertOwner } from "@/lib/guards";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // GET /api/companies/[slug] — fetch company + its published listings
 // ?preview=true allows the owner to view their unpublished company
@@ -9,6 +10,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const tResponse = await getResponseTranslations();
   const { slug } = await params;
   const preview = req.nextUrl.searchParams.get("preview") === "true";
 
@@ -29,12 +31,12 @@ export async function GET(
 
   const { data: company, error } = await query.single();
   if (error || !company) {
-    return NextResponse.json({ error: "Firma nicht gefunden" }, { status: 404 });
+    return NextResponse.json({ error: tResponse('System.m_c59ef4b12e52') }, { status: 404 });
   }
 
   // Preview mode requires ownership before any private columns are selected.
   if (preview) {
-    const ownershipError = assertOwner(company.owner_user_id, previewUserId!);
+    const ownershipError = assertOwner(company.owner_user_id, previewUserId!, tResponse);
     if (ownershipError) return ownershipError;
   }
 
@@ -49,7 +51,7 @@ export async function GET(
       .select("email, phone, hq_address")
       .eq("id", company.id)
       .single();
-    if (privateError || !privateCompany) return NextResponse.json({ error: "Firmendaten konnten nicht geladen werden" }, { status: 500 });
+    if (privateError || !privateCompany) return NextResponse.json({ error: tResponse('System.m_a3fdf8502b56') }, { status: 500 });
     visibleCompany = { ...safeCompany, ...privateCompany };
   } else {
     const publicContactColumns = [
@@ -92,6 +94,7 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -105,7 +108,7 @@ export async function DELETE(
     .eq("slug", slug)
     .maybeSingle();
 
-  const ownershipError = assertOwner(company?.owner_user_id, userId);
+  const ownershipError = assertOwner(company?.owner_user_id, userId, tResponse);
   if (ownershipError) return ownershipError;
 
   const { error } = await db
@@ -113,6 +116,6 @@ export async function DELETE(
     .delete()
     .eq("id", company!.id);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   return NextResponse.json({ success: true });
 }

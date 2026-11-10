@@ -1,12 +1,14 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // GET /api/project-festivals?project_id=xxx
 export async function GET(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const { searchParams } = new URL(req.url);
   const project_id = searchParams.get("project_id");
-  if (!project_id) return NextResponse.json({ error: "project_id fehlt" }, { status: 400 });
+  if (!project_id) return NextResponse.json({ error: tResponse('System.m_87e6682e9396') }, { status: 400 });
 
   const { data, error } = await db
     .from("project_festivals")
@@ -14,12 +16,13 @@ export async function GET(req: NextRequest) {
     .eq("project_id", project_id)
     .order("year", { ascending: false });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   return NextResponse.json({ festivals: data ?? [] });
 }
 
 // POST /api/project-festivals
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -28,7 +31,7 @@ export async function POST(req: NextRequest) {
   const { project_id, festival_name, year, section, status, award_name, notes } = body;
 
   if (!project_id || !festival_name?.trim() || !year || !status) {
-    return NextResponse.json({ error: "Pflichtfelder fehlen" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_931da94b6c23') }, { status: 400 });
   }
 
   // Verify the user owns this project
@@ -39,7 +42,7 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (!project || project.created_by !== userId) {
-    return NextResponse.json({ error: "Keine Berechtigung" }, { status: 403 });
+    return NextResponse.json({ error: tResponse('System.m_df847a54c928') }, { status: 403 });
   }
 
   const { data, error } = await db
@@ -56,6 +59,6 @@ export async function POST(req: NextRequest) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   return NextResponse.json({ festival: data });
 }

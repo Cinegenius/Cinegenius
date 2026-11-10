@@ -1,14 +1,17 @@
+import { localizedNotification } from "@/lib/i18n/notification-copy";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { clerkClient } from "@clerk/nextjs/server";
 import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { sendFriendAcceptedEmail } from "@/lib/email";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // PATCH /api/friendships/[id]
 // action: "accepted" | "rejected"  → receiver only, changes status
 // action: "collab"                  → either party, sets their own collab_label + collab_public
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -24,10 +27,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       .eq("id", id)
       .single();
 
-    if (!friendship) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 });
-    if (friendship.status !== "accepted") return NextResponse.json({ error: "Keine aktive Verbindung" }, { status: 400 });
+    if (!friendship) return NextResponse.json({ error: tResponse('System.m_621ca4c037d3') }, { status: 404 });
+    if (friendship.status !== "accepted") return NextResponse.json({ error: tResponse('System.m_d7dab3b028ce') }, { status: 400 });
     if (friendship.sender_id !== userId && friendship.receiver_id !== userId) {
-      return NextResponse.json({ error: "Keine Berechtigung" }, { status: 403 });
+      return NextResponse.json({ error: tResponse('System.m_df847a54c928') }, { status: 403 });
     }
 
     const isSender = friendship.sender_id === userId;
@@ -36,7 +39,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       : { receiver_collab_label: body.label ?? null, receiver_collab_public: !!body.is_public };
 
     const { error } = await db.from("friendships").update(update).eq("id", id);
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
     revalidateTag("profiles", { expire: 0 });
     return NextResponse.json({ success: true });
   }
@@ -45,7 +48,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { status } = body;
 
   if (!["accepted", "rejected"].includes(status)) {
-    return NextResponse.json({ error: "Ungültiger Status" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_e1d05fa3a095') }, { status: 400 });
   }
 
   const { data: friendship } = await db
@@ -54,9 +57,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     .eq("id", id)
     .single();
 
-  if (!friendship) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 });
+  if (!friendship) return NextResponse.json({ error: tResponse('System.m_621ca4c037d3') }, { status: 404 });
   if (friendship.receiver_id !== userId) {
-    return NextResponse.json({ error: "Keine Berechtigung" }, { status: 403 });
+    return NextResponse.json({ error: tResponse('System.m_df847a54c928') }, { status: 403 });
   }
 
   const { error } = await db
@@ -64,7 +67,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     .update({ status, updated_at: new Date().toISOString() })
     .eq("id", id);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   if (status === "accepted") revalidateTag("profiles", { expire: 0 });
 
   // Notify the original sender when accepted (in-app + email)
@@ -79,8 +82,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     await db.from("notifications").insert({
       user_id: friendship.sender_id,
       type: "friend_accepted",
-      title: "Freundschaftsanfrage angenommen",
-      body: `${accepterName} hat deine Anfrage angenommen.`,
+      ...localizedNotification({ title: { key: "n_e3ef2e08afb3" }, body: { key: "n_8a8b90197586", values: { value0: String(accepterName) } } }),
+
       href: "/dashboard?tab=friends",
     });
 
@@ -97,6 +100,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 // DELETE /api/friendships/[id]  → remove friendship (sender or receiver)
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -109,13 +113,13 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     .eq("id", id)
     .single();
 
-  if (!friendship) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 });
+  if (!friendship) return NextResponse.json({ error: tResponse('System.m_621ca4c037d3') }, { status: 404 });
   if (friendship.sender_id !== userId && friendship.receiver_id !== userId) {
-    return NextResponse.json({ error: "Keine Berechtigung" }, { status: 403 });
+    return NextResponse.json({ error: tResponse('System.m_df847a54c928') }, { status: 403 });
   }
 
   const { error } = await db.from("friendships").delete().eq("id", id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   revalidateTag("profiles", { expire: 0 });
   return NextResponse.json({ success: true });
 }

@@ -11,12 +11,14 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { maxImagesForListingType, normalizeListingImageGallery } from "@/lib/listing-image-gallery";
 import { canEditListing } from "@/lib/listing-access";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // PATCH /api/listings/[id] — edit own listing
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -25,28 +27,28 @@ export async function PATCH(
   const { data: current, error: currentError } = await db.from("listings")
     .select("id, user_id, company_id, type, category, image_url, extra_images, metadata, blocked_dates, responsible_person, published")
     .eq("id", id).maybeSingle();
-  if (currentError) return NextResponse.json({ error: "Inserat konnte nicht geprüft werden." }, { status: 500 });
-  if (!current) return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
+  if (currentError) return NextResponse.json({ error: tResponse('System.m_f219f6f443ff') }, { status: 500 });
+  if (!current) return NextResponse.json({ error: tResponse('System.m_6031a8e7b450') }, { status: 404 });
   try {
-    if (!(await canEditListing(userId, current))) return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
+    if (!(await canEditListing(userId, current))) return NextResponse.json({ error: tResponse('System.m_6031a8e7b450') }, { status: 404 });
   } catch {
-    return NextResponse.json({ error: "Berechtigung zur Firmenverwaltung konnte nicht geprüft werden." }, { status: 500 });
+    return NextResponse.json({ error: tResponse('System.m_1178621fba1b') }, { status: 500 });
   }
   const body = await req.json().catch(() => null);
-  if (!body) return NextResponse.json({ error: "Ungültige Anfrage" }, { status: 400 });
+  if (!body) return NextResponse.json({ error: tResponse('System.m_0e4698bf4051') }, { status: 400 });
 
   const { title, description, price, city, published, image_url, extra_images, metadata, blocked_dates } = body;
 
   if (attemptedApproval(body)) return NextResponse.json({ error: (await getTranslations("OfferModeration"))("adminOnly") }, { status: 403 });
 
   if (title !== undefined && title.length > 200)
-    return NextResponse.json({ error: "Titel zu lang (max. 200 Zeichen)" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_bee8a7bccee9') }, { status: 400 });
   if (city !== undefined && (typeof city!=="string" || city.length > 320))
-    return NextResponse.json({ error: "Stadt zu lang (max. 100 Zeichen)" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_c23c8d9dd2e5') }, { status: 400 });
   if (description !== undefined && description.length > 5000)
-    return NextResponse.json({ error: "Beschreibung zu lang (max. 5000 Zeichen)" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_0749b2d405e8') }, { status: 400 });
   if (image_url !== undefined && image_url !== null && (typeof image_url !== "string" || image_url.length > 2048))
-    return NextResponse.json({ error: "Das Bild ist ungültig." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_2a8b75a16d3f') }, { status: 400 });
 
   const companyOwner = current.company_id && !current.responsible_person
     ? await db.from("companies").select("owner_user_id").eq("id", current.company_id).maybeSingle()
@@ -81,7 +83,7 @@ export async function PATCH(
         return Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== date;
       });
       if (current.type !== "location" || !Array.isArray(blocked_dates) || blocked_dates.length > 500 || hasInvalidBlockedDate) {
-        return NextResponse.json({ error: "Die gesperrten Drehtage sind ungültig." }, { status: 400 });
+        return NextResponse.json({ error: tResponse('System.m_41ba8d61fde5') }, { status: 400 });
       }
       updates.blocked_dates = [...new Set(blocked_dates)];
     }
@@ -92,12 +94,12 @@ export async function PATCH(
         extra_images !== undefined ? extra_images : current.extra_images,
         maxImagesForListingType(current.type),
       );
-      if (!gallery.ok) return NextResponse.json({ error: gallery.error }, { status: 400 });
+      if (!gallery.ok) return NextResponse.json({ error: tResponse(`Gallery.${gallery.error}`, { count: maxImagesForListingType(current.type) }) }, { status: 400 });
       updates.image_url = gallery.gallery.imageUrl;
       updates.extra_images = gallery.gallery.extraImages;
     } else if (image_url !== undefined || extra_images !== undefined) {
       if (extra_images !== undefined) {
-        return NextResponse.json({ error: "Eine Bildergalerie kann nur bei Locations und Marktplatzartikeln geändert werden." }, { status: 400 });
+        return NextResponse.json({ error: tResponse('System.m_79ff7faada49') }, { status: 400 });
       }
       if (image_url !== undefined) updates.image_url = image_url || null;
     }
@@ -109,42 +111,42 @@ export async function PATCH(
       if (!animalData) return NextResponse.json({error:(await getTranslations("FilmAnimals"))("portfolioHelp")},{status:400});
       updates.metadata = {...(current.metadata as Record<string,unknown> ?? {}), ...animalData};
     } else if (metadata !== undefined) {
-      if (!["location", "prop", "vehicle"].includes(current.type)) return NextResponse.json({ error: "Preisangaben können nur bei Locations und Marktplatzangeboten geändert werden." }, { status: 400 });
-      const pricingError = listingPriceMetadataError(metadata);
+      if (!["location", "prop", "vehicle"].includes(current.type)) return NextResponse.json({ error: tResponse('System.m_16aada756674') }, { status: 400 });
+      const pricingError = listingPriceMetadataError(metadata,tResponse);
       if (pricingError) return NextResponse.json({ error: pricingError }, { status: 400 });
-      if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return NextResponse.json({ error: "Die Locationangaben sind ungültig." }, { status: 400 });
+      if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return NextResponse.json({ error: tResponse('System.m_a005785b227a') }, { status: 400 });
       const incoming = metadata as Record<string, unknown>;
       const merged = current.metadata && typeof current.metadata === "object" && !Array.isArray(current.metadata)
         ? { ...(current.metadata as Record<string, unknown>) }
         : {};
-      if (current.type !== "location" && Object.keys(incoming).some(key => !["price_negotiable", "price_on_request", "marketplace", "rental_type"].includes(key))) return NextResponse.json({ error: "Es können nur die Preisangaben geändert werden." }, { status: 400 });
+      if (current.type !== "location" && Object.keys(incoming).some(key => !["price_negotiable", "price_on_request", "marketplace", "rental_type"].includes(key))) return NextResponse.json({ error: tResponse('System.m_edc5de5cf373') }, { status: 400 });
       const numericFields: Record<string, number> = { sqm: 1000000, ceiling_height_m: 1000, max_crew: 100000, parking_spots: 100000 };
       for (const [key, maximum] of Object.entries(numericFields)) {
         if (!(key in incoming)) continue;
         const value = incoming[key];
         if (value === null || value === "") { merged[key] = null; continue; }
         const number = Number(value);
-        if (!Number.isFinite(number) || number < 0 || number > maximum) return NextResponse.json({ error: `Die Angabe „${key}“ ist ungültig.` }, { status: 400 });
+        if (!Number.isFinite(number) || number < 0 || number > maximum) return NextResponse.json({ error: tResponse('System.m_7cb61d66eae3', { value0: String(key) }) }, { status: 400 });
         merged[key] = number;
       }
       if ("indoor_outdoor" in incoming) {
-        if (!["innen", "außen", "beides"].includes(String(incoming.indoor_outdoor))) return NextResponse.json({ error: "Bitte wähle Innen, Außen oder Innen & Außen." }, { status: 400 });
+        if (!["innen", "außen", "beides"].includes(String(incoming.indoor_outdoor))) return NextResponse.json({ error: tResponse('System.m_be63838a0b91') }, { status: 400 });
         merged.indoor_outdoor = incoming.indoor_outdoor;
       }
       for (const key of ["power_available", "natural_light", "blackout_possible", "loading_access", "price_on_request", "price_negotiable"]) {
         if (!(key in incoming)) continue;
-        if (typeof incoming[key] !== "boolean") return NextResponse.json({ error: "Eine Ausstattungsangabe ist ungültig." }, { status: 400 });
+        if (typeof incoming[key] !== "boolean") return NextResponse.json({ error: tResponse('System.m_4f4adda56822') }, { status: 400 });
         merged[key] = incoming[key];
       }
       for (const [key, maximum] of [["power_details", 160], ["access_notes", 240], ["shooting_hours", 160], ["availability_notes", 500]] as const) {
         if (!(key in incoming)) continue;
-        if (typeof incoming[key] !== "string" || incoming[key].length > maximum) return NextResponse.json({ error: `Die Angabe „${key}“ ist zu lang oder ungültig.` }, { status: 400 });
+        if (typeof incoming[key] !== "string" || incoming[key].length > maximum) return NextResponse.json({ error: tResponse('System.m_04b4aa546e77', { value0: String(key) }) }, { status: 400 });
         merged[key] = incoming[key].trim();
       }
       for (const key of ["rooms", "amenities"] as const) {
         if (!(key in incoming)) continue;
         const value = incoming[key];
-        if (!Array.isArray(value) || value.length > 80 || value.some((item) => typeof item !== "string" || item.length > 100)) return NextResponse.json({ error: "Die ausgewählten Räume oder Ausstattungen sind ungültig." }, { status: 400 });
+        if (!Array.isArray(value) || value.length > 80 || value.some((item) => typeof item !== "string" || item.length > 100)) return NextResponse.json({ error: tResponse('System.m_195c2c1caf4b') }, { status: 400 });
         merged[key] = [...new Set(value.map((item) => (item as string).trim()).filter(Boolean))];
       }
       if (incoming.price_negotiable === true) merged.price_on_request = false;
@@ -162,7 +164,7 @@ export async function PATCH(
   }
 
   if (Object.keys(updates).length === 0)
-    return NextResponse.json({ error: "Keine Änderungen" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_e6c5344cca41') }, { status: 400 });
 
   const { data, error } = await db
     .from("listings")
@@ -173,9 +175,9 @@ export async function PATCH(
 
   if (error) {
     console.error("[listings PATCH]", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   }
-  if (!data) return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
+  if (!data) return NextResponse.json({ error: tResponse('System.m_6031a8e7b450') }, { status: 404 });
 
   let result = data;
   let publicationError: string | undefined;
@@ -199,6 +201,7 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -210,11 +213,11 @@ export async function DELETE(
     .select("id, type, user_id, company_id")
     .eq("id", id).maybeSingle();
 
-  if (!listing) return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
+  if (!listing) return NextResponse.json({ error: tResponse('System.m_6031a8e7b450') }, { status: 404 });
   try {
-    if (!(await canEditListing(userId, listing))) return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
+    if (!(await canEditListing(userId, listing))) return NextResponse.json({ error: tResponse('System.m_6031a8e7b450') }, { status: 404 });
   } catch {
-    return NextResponse.json({ error: "Berechtigung zur Firmenverwaltung konnte nicht geprüft werden." }, { status: 500 });
+    return NextResponse.json({ error: tResponse('System.m_1178621fba1b') }, { status: 500 });
   }
 
   const { error } = await db
@@ -224,7 +227,7 @@ export async function DELETE(
 
   if (error) {
     console.error("[listings DELETE]", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   }
 
   const pathMap: Record<string, string> = {

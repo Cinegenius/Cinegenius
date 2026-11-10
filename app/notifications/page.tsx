@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
 import {
@@ -9,6 +9,8 @@ import {
   ArrowLeft, Inbox, ExternalLink, Circle, Check, X, Loader2,
 } from "lucide-react";
 import { timeAgo, notificationMeta, type NotificationType } from "@/lib/notifications";
+import { useTranslations , useLocale } from "next-intl";
+
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -40,17 +42,19 @@ const typeIcons: Record<NotificationType, React.ComponentType<{ size?: number; c
   friend_accepted:       Users,
 };
 
-const FILTER_TABS = [
-  { id: "all",      label: "Alle" },
-  { id: "booking",  label: "Buchungen" },
-  { id: "message",  label: "Nachrichten" },
-  { id: "job",      label: "Jobs" },
-  { id: "money",    label: "Zahlungen" },
-  { id: "social",   label: "Netzwerk" },
-  { id: "system",   label: "System" },
-] as const;
+type FilterId = "all" | "booking" | "message" | "job" | "money" | "social" | "system";
 
-type FilterId = typeof FILTER_TABS[number]["id"];
+function getLocalizedFILTER_TABS(translate: (key: string) => string) {
+  return ([
+  { id: "all",      label: translate("common.all") },
+  { id: "booking",  label: translate("nav.bookings") },
+  { id: "message",  label: translate("nav.messages") },
+  { id: "job",      label: translate("nav.jobs") },
+  { id: "money",    label: translate("nav.payments") },
+  { id: "social",   label: translate("nav.network") },
+  { id: "system",   label: translate("Ui.text_6725e7bbcd28f3") },
+] as const);
+}
 
 function matchesFilter(type: NotificationType, filter: FilterId): boolean {
   if (filter === "all") return true;
@@ -80,6 +84,10 @@ function NotifRow({
   onReject?: (id: string) => void;
   isProcessing?: boolean;
 }) {
+  const uiPriceLocale = useLocale();
+
+  const uiText = useTranslations();
+
   const Icon = typeIcons[notif.type] ?? Bell;
   const meta = notificationMeta[notif.type];
 
@@ -110,7 +118,7 @@ function NotifRow({
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <span className="text-[11px] text-text-muted whitespace-nowrap">
-              {timeAgo(notif.created_at)}
+              {timeAgo(notif.created_at, uiPriceLocale)}
             </span>
           </div>
         </div>
@@ -125,15 +133,11 @@ function NotifRow({
                 <button
                   onClick={() => { onAccept(friendRequest.friendship_id); if (!notif.read) onRead(notif.id); }}
                   className="flex items-center gap-1 px-3 py-1 bg-success/10 border border-success/20 text-success text-xs font-medium rounded-lg hover:bg-success/20 transition-colors"
-                >
-                  <Check size={11} /> Annehmen
-                </button>
+                >{uiText.rich("Ui.text_048edf533fa6f4", { part1: () => (<Check size={11} />) })}</button>
                 <button
                   onClick={() => { onReject(friendRequest.friendship_id); if (!notif.read) onRead(notif.id); }}
                   className="flex items-center gap-1 px-3 py-1 border border-border text-text-muted text-xs rounded-lg hover:border-red-400 hover:text-red-400 transition-colors"
-                >
-                  <X size={11} /> Ablehnen
-                </button>
+                >{uiText.rich("Ui.text_2424239b7d6d6c", { part1: () => (<X size={11} />) })}</button>
               </>
             )
           ) : (
@@ -143,9 +147,7 @@ function NotifRow({
                   href={notif.href}
                   onClick={() => { if (!notif.read) onRead(notif.id); }}
                   className="flex items-center gap-1 text-xs text-gold hover:text-gold-light font-medium transition-colors"
-                >
-                  Ansehen <ExternalLink size={10} />
-                </Link>
+                >{uiText.rich("Ui.text_1ee06198abe18c", { part1: () => (<ExternalLink size={10} />) })}</Link>
               )}
             </>
           )}
@@ -153,9 +155,7 @@ function NotifRow({
             <button
               onClick={() => onRead(notif.id)}
               className="flex items-center gap-1 text-xs text-text-muted hover:text-text-secondary transition-colors"
-            >
-              <Circle size={10} /> Als gelesen markieren
-            </button>
+            >{uiText.rich("Ui.text_ccd4999556ee96", { part1: () => (<Circle size={10} />) })}</button>
           )}
         </div>
       </div>
@@ -168,33 +168,57 @@ function NotifRow({
 type FriendRequest = { friendship_id: string; user_id: string; display_name: string };
 
 export default function NotificationsPage() {
-  const { isSignedIn, isLoaded } = useAuth();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
+  const uiText = useTranslations();
+  const FILTER_TABS = getLocalizedFILTER_TABS(uiText);
+
+
+  const locale = useLocale();
+  const { isSignedIn, isLoaded, userId, sessionId } = useAuth();
+  const requestScope = JSON.stringify([userId, sessionId, locale]);
+  const currentScope = useRef(requestScope);
+  currentScope.current = requestScope;
+  const requestGeneration = useRef(0);
+  const activeRequest = useRef<AbortController | null>(null);
+  const [storedNotifications, setNotifications] = useState<Notification[]>([]);
+  const [notificationsScope, setNotificationsScope] = useState(requestScope);
+  const [loadingState, setLoading] = useState(true);
+  const notifications = notificationsScope === requestScope ? storedNotifications : [];
+  const loading = notificationsScope !== requestScope || loadingState;
   const [activeFilter, setActiveFilter] = useState<FilterId>("all");
   const [markingAll, setMarkingAll] = useState(false);
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
 
   const fetchNotifications = useCallback(async () => {
+    const generation = ++requestGeneration.current;
+    activeRequest.current?.abort();
+    const controller = new AbortController();
+    activeRequest.current = controller;
+    const isCurrent = () => !controller.signal.aborted
+      && generation === requestGeneration.current && currentScope.current === requestScope;
+    setLoading(true);
+    setNotifications([]);
+    setNotificationsScope(requestScope);
     try {
       const [notificationResponse, conversationsResponse] = await Promise.all([
-        fetch("/api/notifications", { cache: "no-store" }),
-        fetch("/api/conversations", { cache: "no-store" }),
+        fetch("/api/notifications", { cache: "no-store", signal: controller.signal }),
+        fetch("/api/conversations", { cache: "no-store", signal: controller.signal }),
       ]);
-      if (notificationResponse.status === 401) { setLoading(false); return; }
+      if (!isCurrent()) return;
+      if (notificationResponse.status === 401) return;
       if (!notificationResponse.ok || !conversationsResponse.ok) return;
       const [{ notifications: notificationData }, { data: conversations }] = await Promise.all([
         notificationResponse.json(),
         conversationsResponse.json(),
       ]);
+      if (!isCurrent()) return;
       const unreadChats: Notification[] = (conversations ?? [])
         .filter((conversation: { unread_count?: number }) => Number(conversation.unread_count) > 0)
         .map((conversation: { id: string; kind?: string; group_name?: string | null; otherName?: string; unread_count: number; updated_at: string }) => ({
           id: `chat-unread:${conversation.id}`,
           type: "new_message",
-          title: conversation.kind === "group" ? (conversation.group_name ?? "Gruppenchat") : (conversation.otherName ?? "Neue Nachricht"),
-          body: `${conversation.unread_count} ungelesene ${conversation.unread_count === 1 ? "Nachricht" : "Nachrichten"}`,
+          title: conversation.kind === "group" ? (conversation.group_name ?? uiText("Ui.text_d96e55720c85b8")) : (conversation.otherName ?? uiText("Ui.text_e8a28a55f6fbf9")),
+          body: uiText("Ui.text_f6d5879b399536", { value1: String(conversation.unread_count), value2: String(conversation.unread_count === 1 ? uiText("creators.sendMessage") : uiText("nav.messages")) }),
           href: `/messages?conv=${conversation.id}`,
           read: false,
           created_at: conversation.updated_at,
@@ -203,18 +227,31 @@ export default function NotificationsPage() {
       setNotifications([...(notificationData ?? []), ...unreadChats].sort(
         (a: Notification, b: Notification) => b.created_at.localeCompare(a.created_at),
       ));
+    } catch {
+      // Cancelled or failed loads keep the existing empty-list fallback.
     } finally {
-      setLoading(false);
+      if (isCurrent()) {
+        activeRequest.current = null;
+        setLoading(false);
+      }
     }
-  }, []);
+  }, [requestScope, uiText]);
 
   useEffect(() => {
-    fetchNotifications();
+    void fetchNotifications();
+    return () => {
+      requestGeneration.current += 1;
+      activeRequest.current?.abort();
+      activeRequest.current = null;
+    };
+  }, [fetchNotifications]);
+
+  useEffect(() => {
     fetch("/api/friendships")
       .then(r => r.json())
       .then(({ incoming }) => setFriendRequests(incoming ?? []))
       .catch(() => {});
-  }, [fetchNotifications]);
+  }, []);
 
   const handleFriendRequest = async (friendshipId: string, action: "accepted" | "rejected") => {
     setProcessingIds(prev => new Set(prev).add(friendshipId));
@@ -258,11 +295,9 @@ export default function NotificationsPage() {
         <div className="w-16 h-16 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center">
           <Bell size={28} className="text-text-muted" />
         </div>
-        <h2 className="font-display text-2xl font-bold text-text-primary">Anmeldung erforderlich</h2>
-        <p className="text-text-muted text-sm max-w-xs">Melde dich an, um deine Benachrichtigungen zu sehen.</p>
-        <Link href="/sign-in" className="px-6 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl text-sm hover:bg-gold-light transition-colors">
-          Anmelden
-        </Link>
+        <h2 className="font-display text-2xl font-bold text-text-primary">{uiText("Ui.text_6638bb26a46e61")}</h2>
+        <p className="text-text-muted text-sm max-w-xs">{uiText("Ui.text_3ccacf6d64e54f")}</p>
+        <Link href="/sign-in" className="px-6 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl text-sm hover:bg-gold-light transition-colors">{uiText("nav.signIn")}</Link>
       </div>
     );
   }
@@ -282,14 +317,12 @@ export default function NotificationsPage() {
             </Link>
             <div>
               <div className="flex items-center gap-2.5">
-                <h1 className="font-display text-2xl font-bold text-text-primary">Benachrichtigungen</h1>
+                <h1 className="font-display text-2xl font-bold text-text-primary">{uiText("nav.notifications")}</h1>
                 {unreadCount > 0 && (
-                  <span className="px-2 py-0.5 bg-gold/15 border border-gold/30 text-gold text-xs font-bold rounded-full">
-                    {unreadCount} neu
-                  </span>
+                  <span className="px-2 py-0.5 bg-gold/15 border border-gold/30 text-gold text-xs font-bold rounded-full">{uiText.rich("Ui.text_488b93937e6625", { value1: () => (unreadCount) })}</span>
                 )}
               </div>
-              <p className="text-xs text-text-muted mt-0.5">Alle Aktivitäten auf deinem Konto</p>
+              <p className="text-xs text-text-muted mt-0.5">{uiText("Ui.text_40d091dae1995d")}</p>
             </div>
           </div>
 
@@ -298,10 +331,7 @@ export default function NotificationsPage() {
               onClick={markAllRead}
               disabled={markingAll}
               className="flex items-center gap-1.5 text-xs text-text-muted hover:text-gold transition-colors px-3 py-2 rounded-lg border border-border hover:border-gold/30 shrink-0"
-            >
-              <CheckCheck size={13} />
-              Alle gelesen
-            </button>
+            >{uiText.rich("Ui.text_110bf3daa72f97", { part1: () => (<CheckCheck size={13} />) })}</button>
           )}
         </div>
 
@@ -339,7 +369,7 @@ export default function NotificationsPage() {
             <div className="py-16 flex items-center justify-center">
               <div className="flex flex-col items-center gap-3">
                 <div className="w-8 h-8 border-2 border-gold/20 border-t-gold rounded-full animate-spin" />
-                <p className="text-xs text-text-muted">Lade Benachrichtigungen…</p>
+                <p className="text-xs text-text-muted">{uiText("Ui.text_ba8a3775a261b9")}</p>
               </div>
             </div>
           ) : filtered.length === 0 ? (
@@ -348,12 +378,12 @@ export default function NotificationsPage() {
                 <Inbox size={22} className="text-text-muted" />
               </div>
               <h3 className="font-semibold text-text-secondary">
-                {activeFilter === "all" ? "Keine Benachrichtigungen" : "Nichts in dieser Kategorie"}
+                {activeFilter === "all" ? uiText("notifications.empty") : uiText("Ui.text_13a15ea9efa92f")}
               </h3>
               <p className="text-xs text-text-muted max-w-xs leading-relaxed">
                 {activeFilter === "all"
-                  ? "Sobald es Aktivität auf deinem Konto gibt, erscheint sie hier."
-                  : "Wechsle in eine andere Kategorie oder warte auf neue Aktivität."}
+                  ? uiText("Ui.text_748c6fdacaffbb")
+                  : uiText("Ui.text_14954d0afe0557")}
               </p>
             </div>
           ) : (
@@ -362,9 +392,7 @@ export default function NotificationsPage() {
               {unreadFiltered > 0 && (
                 <>
                   <div className="px-5 pt-4 pb-2">
-                    <p className="text-[10px] uppercase tracking-widest font-semibold text-gold">
-                      Neu · {unreadFiltered}
-                    </p>
+                    <p className="text-[10px] uppercase tracking-widest font-semibold text-gold">{uiText.rich("Ui.text_98887e202b0505", { value1: () => (unreadFiltered) })}</p>
                   </div>
                   {filtered.filter((n) => !n.read).map((n) => {
                     const fr = n.type === "friend_request"
@@ -389,9 +417,7 @@ export default function NotificationsPage() {
               {filtered.filter((n) => n.read).length > 0 && (
                 <>
                   <div className={`px-5 pb-2 ${unreadFiltered > 0 ? "pt-4 border-t border-border" : "pt-4"}`}>
-                    <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">
-                      Frühere
-                    </p>
+                    <p className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">{uiText("Ui.text_cf5073c7dcf96d")}</p>
                   </div>
                   {filtered.filter((n) => n.read).map((n) => {
                     const fr = n.type === "friend_request"
@@ -417,9 +443,7 @@ export default function NotificationsPage() {
 
         {/* Footer hint */}
         {!loading && notifications.length >= 30 && (
-          <p className="text-center text-xs text-text-muted mt-4">
-            Es werden maximal die letzten 30 Benachrichtigungen angezeigt.
-          </p>
+          <p className="text-center text-xs text-text-muted mt-4">{uiText("Ui.text_563c43496d39ff")}</p>
         )}
       </div>
     </div>

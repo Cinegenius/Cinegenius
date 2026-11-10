@@ -8,6 +8,7 @@ import { PROFILE_MEDIA_MAX_BYTES, PROFILE_MEDIA_MIME_TYPES } from "@/lib/profile
 import { persistAvatarAssociation } from "@/lib/profile-avatar-persistence";
 import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 function json(body: unknown, status = 200) {
   const response = NextResponse.json(body, { status });
@@ -17,26 +18,27 @@ function json(body: unknown, status = 200) {
 
 /** Upload and associate an avatar in one authenticated operation. */
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
   const t = await getTranslations("mediaSecurity");
 
   const limit = await rateLimit(`profile-avatar:${userId}`, 10, 60);
-  if (!limit.allowed) return json({ error: "Zu viele Profilfoto-Uploads. Bitte kurz warten." }, 429);
+  if (!limit.allowed) return json({ error: tResponse('System.m_8eaad2004c03') }, 429);
 
   let formData: FormData;
   try {
     formData = await req.formData();
   } catch {
-    return json({ error: "Die Upload-Anfrage konnte nicht gelesen werden. Bitte versuche es erneut." }, 400);
+    return json({ error: tResponse('System.m_36debab01788') }, 400);
   }
 
   const file = formData.get("file");
-  if (!(file instanceof File)) return json({ error: "Bitte wähle zuerst ein Profilfoto aus." }, 400);
+  if (!(file instanceof File)) return json({ error: tResponse('System.m_b7286937066b') }, 400);
   const uploadId = formData.get("uploadId");
   if (typeof uploadId !== "string" || !/^[a-f0-9]{32}$/i.test(uploadId)) {
-    return json({ error: "Der Upload konnte nicht eindeutig zugeordnet werden. Bitte versuche es erneut." }, 400);
+    return json({ error: tResponse('System.m_bc65f0a5efd3') }, 400);
   }
 
   const validation = await validateUpload(file, {
@@ -55,9 +57,9 @@ export async function POST(req: NextRequest) {
     .maybeSingle();
   if (currentError) {
     console.error("[profile avatar] current profile lookup failed:", currentError.message);
-    return json({ error: "Dein Profil konnte nicht geprüft werden. Das bisherige Foto bleibt erhalten." }, 500);
+    return json({ error: tResponse('System.m_a290798a8156') }, 500);
   }
-  if (!current) return json({ error: "Speichere zuerst die Grunddaten deines Profils. Danach wird das Foto sofort übernommen." }, 409);
+  if (!current) return json({ error: tResponse('System.m_fd423dc75d17') }, 409);
 
   const path = buildStoragePath(userId, validation.ext, "profile-media/avatars", uploadId);
   let savedUrl: string;
@@ -65,7 +67,7 @@ export async function POST(req: NextRequest) {
     savedUrl = await storeProtectedMedia(userId, path, validation.buffer, validation.mime);
   } catch {
     console.error("[profile avatar] private upload failed");
-    return json({ error: "Das Profilfoto konnte nicht hochgeladen werden. Dein bisheriges Foto bleibt erhalten." }, 500);
+    return json({ error: tResponse('System.m_4b512cdc5e47') }, 500);
   }
 
   const outcome = await persistAvatarAssociation({
@@ -87,9 +89,9 @@ export async function POST(req: NextRequest) {
 
   if (outcome.status !== "saved") {
     if (outcome.status === "conflict") {
-      return json({ error: "Dein Profilfoto wurde in einem anderen Fenster geändert. Lade die Seite neu und versuche es erneut." }, 409);
+      return json({ error: tResponse('System.m_2056266e238e') }, 409);
     }
-    return json({ error: "Das Foto wurde hochgeladen, aber die Profilzuordnung konnte nicht bestätigt werden. Dein bisheriges Foto bleibt erhalten." }, 500);
+    return json({ error: tResponse('System.m_54b10feec1d3') }, 500);
   }
 
   revalidateTag("profiles", { expire: 0 });

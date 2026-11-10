@@ -1,8 +1,19 @@
+import { createTranslator } from "next-intl";
+import { loadMessages } from "@/lib/i18n/messages";
+import { resolveLocale } from "@/lib/i18n/locales";
 import { trustedMutationOrigin } from "@/lib/request-origin";
 import { mediaOptimizerBlockStatus } from "@/lib/media-optimizer-guard";
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { isProtectedCreatePath, isPublicProfilePath } from "@/lib/public-access";
+
+async function localizedProxyError(request: NextRequest, key: string, init: ResponseInit): Promise<NextResponse> {
+  const locale = resolveLocale(request.cookies.get("cg_locale")?.value, request.headers.get("accept-language") ?? "");
+  const messages = await loadMessages(locale);
+  const system = messages.System as Record<string, string>;
+  const copy = createTranslator({locale, messages: {System: system}, namespace: "System"});
+  return NextResponse.json({error: copy(key)}, init);
+}
 
 function generateNonce(): string {
   const bytes = new Uint8Array(16);
@@ -45,7 +56,7 @@ const RATE_LIMITS: Record<string, { limit: number; windowMs: number }> = {
   "/api/favorites":      { limit: 30, windowMs: 60_000 },
 };
 
-function ipRateLimit(req: NextRequest): NextResponse | null {
+async function ipRateLimit(req: NextRequest): Promise<NextResponse | null> {
   const path = req.nextUrl.pathname;
   const rule = Object.entries(RATE_LIMITS).find(([prefix]) => path.startsWith(prefix))?.[1];
   if (!rule) return null;
@@ -69,8 +80,8 @@ function ipRateLimit(req: NextRequest): NextResponse | null {
 
   entry.count++;
   if (entry.count > rule.limit) {
-    return NextResponse.json(
-      { error: "Zu viele Anfragen. Bitte kurz warten." },
+    return localizedProxyError(
+      req, "m_35bd89251439",
       {
         status: 429,
         headers: {
@@ -87,7 +98,7 @@ function ipRateLimit(req: NextRequest): NextResponse | null {
 
 // ── CSRF: Origin/Referer check for mutating API requests ─────────────────────
 
-function csrfCheck(request: NextRequest): NextResponse | null {
+async function csrfCheck(request: NextRequest): Promise<NextResponse | null> {
   if (!["POST", "PUT", "PATCH", "DELETE"].includes(request.method)) return null;
   if (!request.nextUrl.pathname.startsWith("/api/")) return null;
   if (request.nextUrl.pathname.startsWith("/api/webhooks/")) return null;
@@ -99,7 +110,7 @@ function csrfCheck(request: NextRequest): NextResponse | null {
     development: process.env.NODE_ENV !== "production",
     deploymentHost: process.env.VERCEL_URL,
   })) {
-    return NextResponse.json({ error: "CSRF check failed" }, { status: 403 });
+    return localizedProxyError(request, "m_cd2f7b0a21cd", {status: 403});
   }
   return null;
 }
@@ -182,11 +193,11 @@ export default clerkMiddleware(async (auth, request) => {
   }
 
   // 1. IP-based rate limiting — runs before auth to reject floods cheaply
-  const rateLimitRes = ipRateLimit(request);
+  const rateLimitRes = await ipRateLimit(request);
   if (rateLimitRes) return rateLimitRes;
 
   // 1b. CSRF check — reject mutating API requests from unknown origins
-  const csrfRes = csrfCheck(request);
+  const csrfRes = await csrfCheck(request);
   if (csrfRes) return csrfRes;
 
   const isApi = request.nextUrl.pathname.startsWith("/api/");
@@ -200,14 +211,14 @@ export default clerkMiddleware(async (auth, request) => {
     if (!userId) {
       // Not authenticated
       return isApi
-        ? NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 })
+        ? localizedProxyError(request, "m_352f63d9d1d9", {status: 401})
         : NextResponse.redirect(new URL(`/sign-in?redirect_url=${encodeURIComponent(request.nextUrl.pathname + request.nextUrl.search)}`, request.url));
     }
 
     if (!getAdminIds().has(userId)) {
       // Authenticated but not an admin
       return isApi
-        ? NextResponse.json({ error: "Kein Zugriff" }, { status: 403 })
+        ? localizedProxyError(request, "m_cd2f7b0a21cd", {status: 403})
         : NextResponse.redirect(new URL("/", request.url));
     }
 

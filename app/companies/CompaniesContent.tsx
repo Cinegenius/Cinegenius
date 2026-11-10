@@ -22,6 +22,8 @@ import { COMPANY_CATEGORIES, COMPANY_CATEGORY_BY_ID } from "@/lib/companyCategor
 import { CATERING_COMPANY_CATEGORY, getCateringCompanySearchTerms, normalizeCateringCompanyDetails } from "@/lib/catering-taxonomy";
 import { safetyMedicalCompanyCategoryLabel } from "@/lib/safety-medical-taxonomy";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
+import { taxonomyLabel } from "@/lib/departments";
+
 
 const PAGE_SIZE = 24;
 
@@ -113,6 +115,8 @@ function FilterDropdown({
 
 // ─── Main ─────────────────────────────────────────────────────────
 export default function CompaniesContent({ initialCompanies }: { initialCompanies: Company[] }) {
+  const uiText = useTranslations();
+
   const locale = useLocale();
   const t = useTranslations("companies");
   const animals = useTranslations("FilmAnimals");
@@ -161,7 +165,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
     if (countryFilter) result = result.filter(c => matchesPlace(c, "country", countryFilter));
     if (verifiedOnly) result = result.filter((c) => c.verified);
     if (sortKey === "newest") result = [...result].sort((a, b) => b.created_at.localeCompare(a.created_at));
-    if (sortKey === "name") result = [...result].sort((a, b) => a.name.localeCompare(b.name, "de"));
+    if (sortKey === "name") result = [...result].sort((a, b) => a.name.localeCompare(b.name, locale));
     return result;
   }, [initialCompanies, search, selectedCategory, cityFilter, countryFilter, regionFilter, verifiedOnly, sortKey]);
 
@@ -183,7 +187,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
   const hasAnyFilter = Boolean(regionFilter || search || selectedCategory || cityFilter || countryFilter || verifiedOnly);
   const hasCatFilter = Boolean(selectedCategory);
   const mobileChips: BrowseChip[] = [
-    ...(selectedCat ? [{ id: "category", label: companyCategoryLabel(selectedCat.id, selectedCat.label), onRemove: () => setSelectedCategory(null) }] : []),
+    ...(selectedCat ? [{ id: "category", label: taxonomyLabel(companyCategoryLabel(selectedCat.id, selectedCat.label), uiText), onRemove: () => setSelectedCategory(null) }] : []),
     ...(cityFilter ? [{ id: "city", label: cityLabel(cityFilter), onRemove: () => setCityFilter("") }] : []),
     ...(countryFilter ? [{ id: "country", label: countryLabel(countryFilter), onRemove: () => setCountryFilter("") }] : []),
     ...(regionFilter ? [{ id: "region", label: regionLabel(regionFilter), onRemove: () => setRegionFilter("") }] : []),
@@ -198,11 +202,11 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
         onQueryChange={setSearch}
         searchPlaceholder={t("searchPlaceholder")}
         sortValue={sortKey}
-        sortOptions={[{ value: "newest", label: "Neueste zuerst" }, { value: "name", label: "Name A–Z" }]}
+        sortOptions={[{ value: "newest", label: uiText("jobs.sortNewest") }, { value: "name", label: uiText("Ui.text_7ed96629073e83") }]}
         onSortChange={setSortKey}
         categoryLabel={t("filterCategory")}
-        allCategoryLabel="Alle Firmen"
-        categories={COMPANY_CATEGORIES.map((category) => ({ value: category.id, label: companyCategoryLabel(category.id, category.label) }))}
+        allCategoryLabel={uiText("Ui.text_aecf68fa0908cc")}
+        categories={COMPANY_CATEGORIES.map((category) => ({ value: category.id, label: taxonomyLabel(companyCategoryLabel(category.id, category.label), uiText) }))}
         categoryValue={selectedCategory ?? ""}
         onCategoryChange={(value) => setSelectedCategory(value || null)}
         resultSummary={`${filtered.length} ${t("resultsCount")}`}
@@ -210,15 +214,15 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
         chips={mobileChips}
         onReset={clearAll}
         resetLabel={t("resetFilters")}
-        showResultsLabel={`${filtered.length} Unternehmen anzeigen`}
+        showResultsLabel={uiText("Ui.text_4d89b095821660", { value1: String(filtered.length) })}
       >
         <PlaceFilters rows={initialCompanies} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />
         <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={verifiedOnly} onChange={(event) => setVerifiedOnly(event.target.checked)} />{t("filterVerified")}</label>
         <div className="mobile-filter-field">
-          <span>Ansicht</span>
+          <span>{uiText("locations.viewLabel")}</span>
           <div className="grid grid-cols-2 gap-2">
-            <button type="button" onClick={() => setViewMode("grid")} className={`min-h-11 rounded-lg border text-sm ${viewMode === "grid" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>Raster</button>
-            <button type="button" onClick={() => setViewMode("list")} className={`min-h-11 rounded-lg border text-sm ${viewMode === "list" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>Liste</button>
+            <button type="button" onClick={() => setViewMode("grid")} className={`min-h-11 rounded-lg border text-sm ${viewMode === "grid" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{uiText("Ui.text_2cc48b15f4ffeb")}</button>
+            <button type="button" onClick={() => setViewMode("list")} className={`min-h-11 rounded-lg border text-sm ${viewMode === "list" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{uiText("locations.viewList")}</button>
           </div>
         </div>
       </MobileBrowseControls>
@@ -291,7 +295,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
             <div className="flex flex-wrap gap-1.5 items-center">
               {selectedCat && (
                 <span className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium ${selectedCat.bg} ${selectedCat.color}`}>
-                  {selectedCat.label}
+                  {taxonomyLabel(selectedCat.label, uiText)}
                   <button onClick={() => setSelectedCategory(null)} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               )}
@@ -307,7 +311,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                   <button onClick={() => setCountryFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               )}
-              {regionFilter && <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary"><MapPin size={9} />{regionLabel(regionFilter)}<button type="button" aria-label={`${t("clearFilter")}: ${regionLabel(regionFilter)}`} onClick={() => setRegionFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button></span>}
+              {regionFilter && <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary"><MapPin size={9} />{regionLabel(regionFilter)}<button type="button" aria-label={uiText("Ui.text_efae3eb968ceb3", { value1: String(t("clearFilter")), value2: String(regionLabel(regionFilter)) })} onClick={() => setRegionFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button></span>}
               {verifiedOnly && (
                 <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-gold/10 border-gold/30 text-gold">
                   <CheckCircle size={9} /> {t("filterVerified")}
@@ -328,9 +332,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
 
           {/* Sidebar */}
           <aside className="cat-sidebar w-44 shrink-0 sticky top-20">
-            <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3 px-2">
-              Kategorie
-            </p>
+            <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3 px-2">{uiText("props.categoryBtn")}</p>
             <nav className="space-y-0.5">
               <button
                 onClick={() => { setSelectedCategory(null); resetPage(); }}
@@ -339,11 +341,8 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                     ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
                     : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
                 }`}
-              >
-                <Building2 size={14} className={!selectedCategory ? "text-gold" : "text-text-muted"} />
-                Alle Firmen
-              </button>
-              {[...COMPANY_CATEGORIES].sort((a, b) => a.label.localeCompare(b.label, "de")).map((cat) => {
+              >{uiText.rich("Ui.text_532c17f15dfbaf", { part1: () => (<Building2 size={14} className={!selectedCategory ? "text-gold" : "text-text-muted"} />) })}</button>
+              {[...COMPANY_CATEGORIES].sort((a, b) => a.label.localeCompare(b.label, locale)).map((cat) => {
                 const Icon = CATEGORY_ICONS[cat.id] ?? Building2;
                 const isActive = selectedCategory === cat.id;
                 return (
@@ -357,7 +356,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                     }`}
                   >
                     <Icon size={14} className={isActive ? "text-gold" : "text-text-muted"} />
-                    <span className="min-w-0 break-words leading-snug">{companyCategoryLabel(cat.id, cat.label)}</span>
+                    <span className="min-w-0 break-words leading-snug">{taxonomyLabel(companyCategoryLabel(cat.id, cat.label), uiText)}</span>
                   </button>
                 );
               })}
@@ -374,10 +373,8 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                 className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
                   !selectedCategory ? "bg-gold/10 text-gold border-gold/40" : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
                 }`}
-              >
-                Alle
-              </button>
-              {[...COMPANY_CATEGORIES].sort((a, b) => a.label.localeCompare(b.label, "de")).map((cat) => {
+              >{uiText("common.all")}</button>
+              {[...COMPANY_CATEGORIES].sort((a, b) => a.label.localeCompare(b.label, locale)).map((cat) => {
                 const isActive = selectedCategory === cat.id;
                 return (
                   <button
@@ -387,7 +384,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
                       isActive ? "bg-gold/10 text-gold border-gold/40" : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
                     }`}
                   >
-                    {companyCategoryLabel(cat.id, cat.label)}
+                    {taxonomyLabel(companyCategoryLabel(cat.id, cat.label), uiText)}
                   </button>
                 );
               })}
@@ -395,7 +392,7 @@ export default function CompaniesContent({ initialCompanies }: { initialCompanie
 
             <p className="hidden xl:block text-sm text-text-muted mb-5">
               <span className="font-semibold text-text-primary">{filtered.length}</span> {t("resultsCount", { count: filtered.length })}
-              {selectedCat && <> in <span className={`font-semibold ${selectedCat.color}`}>{companyCategoryLabel(selectedCat.id, selectedCat.label)}</span></>}
+              {selectedCat && <>{uiText.rich("Ui.text_3aa0bce7c8c5d4", { value2: () => (taxonomyLabel(companyCategoryLabel(selectedCat.id, selectedCat.label), uiText)), part1: chunks => (<span className={`font-semibold ${selectedCat.color}`}>{chunks}</span>) })}</>}
             </p>
 
             {paginated.length === 0 ? (

@@ -2,9 +2,13 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { loadAdminReview, ReviewError } from "@/lib/admin-review-server";
 import AdminReviewDetail from "@/components/admin/AdminReviewDetail";
+import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
-export const metadata = { robots: { index: false, follow: false, noarchive: true }, title: "Admin · CineGenius" };
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const tMetadata = await getMetadataTranslations("Metadata");
+  return { robots: { index: false, follow: false, noarchive: true }, title: tMetadata('m_7c5b63b6a113') };
+}
 export default async function ReviewPage({ params }: { params: Promise<{ kind: string; id: string }> }) {
   const { kind, id } = await params;
   let review;

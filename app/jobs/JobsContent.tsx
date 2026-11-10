@@ -1,6 +1,8 @@
 "use client";
 
 import PlaceFilters from "@/components/PlaceFilters";
+import { projectTypeLabel, normalizedCatalogueSearch } from "@/lib/project-type-labels";
+import { parseJobDescription, canonicalJobPayType, jobPayLabel, JOB_PAY_FILTER_VALUES } from "@/lib/job-metadata";
 
 import { placeSearchMatches, placeOptions, matchesPlace, placeDisplay, canonicalFilterValue } from "@/lib/places/core";
 
@@ -24,6 +26,8 @@ import { matchesGripOccupation, normalizeGripDepartmentId, normalizeGripRoleId }
 import { useTranslations, useLocale } from "next-intl";
 import PageHeader from "@/components/PageHeader";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
+import { taxonomyLabel } from "@/lib/departments";
+
 
 // ── Department icon map ───────────────────────────────────────────
 const DEPT_ICON_MAP: Record<string, LucideIcon> = {
@@ -44,19 +48,15 @@ const DEPT_ICON_MAP: Record<string, LucideIcon> = {
   "foto-post":       Scissors,
 };
 
-const PLATFORM_META: { id: string; label: string; Icon: LucideIcon }[] = [
-  { id: "film",   label: "Film & TV",      Icon: Film },
-  { id: "social", label: "Social Media",   Icon: Smartphone },
-  { id: "photo",  label: "Fotografie",     Icon: Aperture },
-];
+
 
 const PROJECT_TYPES = [
   "Spielfilm", "Kurzfilm", "Werbung", "Musikvideo", "TV / Serie", "Dokumentarfilm", "Corporate",
   "Instagram / Reels", "TikTok", "YouTube", "UGC Content", "Brand Content",
-  "Fashion Shooting", "Produkt-Shooting", "Event-Fotografie", "Portrait-Shooting", "Werbe-Fotografie",
+  "Fashion Shooting", "Produkt-Shooting", "Event-Fotografie", "Hochzeits-Fotografie", "Portrait-Shooting", "Werbe-Fotografie", "Sonstiges",
 ];
 
-const PAY_TYPES = ["Paid", "Deferred", "Ehrenamtlich", "Expenses Only"];
+const PAY_TYPES = [...JOB_PAY_FILTER_VALUES];
 
 const PAGE_SIZE = 24;
 
@@ -67,24 +67,21 @@ type Job = {
   description?: string; isReal?: boolean; jobType?: "freelance" | "festanstellung" | "praktikum";
 };
 
-function parseJobDescription(raw: string): { roleLabel?: string; company?: string; projectType?: string; shootDates?: string; urgent?: boolean; payType?: string; description: string } {
-  const lines = raw.split("\n\n");
-  if (lines.length < 2) return { description: raw };
-  const metaLine = lines[0];
-  const description = lines.slice(1).join("\n\n");
-  const roleLabel = metaLine.match(/Rolle: ([^·\n]+)/)?.[1]?.trim();
-  const company = metaLine.match(/Produktion: ([^·]+)/)?.[1]?.trim();
-  const projectType = metaLine.match(/Typ: ([^·]+)/)?.[1]?.trim() ?? metaLine.match(/Projekttyp: ([^·]+)/)?.[1]?.trim();
-  const shootDates = metaLine.match(/Drehtage: ([^·]+)/)?.[1]?.trim();
-  const urgent = metaLine.includes("⚡ Dringend");
-  const payType = metaLine.match(/Vergütung: ([^·]+)/)?.[1]?.trim();
-  return { roleLabel, company, projectType, shootDates, urgent, payType, description };
+
+function getLocalizedPLATFORM_META(translate: (key: string) => string): { id: string; label: string; Icon: LucideIcon }[] {
+  return ([
+  { id: "film",   label: translate("Ui.text_021d311367f182"),      Icon: Film },
+  { id: "social", label: translate("home.showcaseSocial"),   Icon: Smartphone },
+  { id: "photo",  label: translate("menu.jobPhotography"),     Icon: Aperture },
+]);
 }
 
 // ─── SortDropdown ────────────────────────────────────────────────
 function SortDropdown({ value, options, onChange }: {
   value: string; options: { value: string; label: string }[]; onChange: (v: string) => void;
 }) {
+  const uiText = useTranslations();
+
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -93,7 +90,7 @@ function SortDropdown({ value, options, onChange }: {
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
   }, [open]);
-  const label = options.find((o) => o.value === value)?.label ?? "Sortierung";
+  const label = options.find((o) => o.value === value)?.label ?? uiText("creators.sort");
   return (
     <div ref={ref} className="relative shrink-0">
       <button onClick={() => setOpen((v) => !v)}
@@ -107,7 +104,7 @@ function SortDropdown({ value, options, onChange }: {
           {options.map((o) => (
             <button key={o.value} onClick={() => { onChange(o.value); setOpen(false); }}
               className={`w-full text-left px-3 py-2 text-xs transition-colors hover:bg-white/[0.04] ${value === o.value ? "text-gold font-medium" : "text-text-secondary"}`}>
-              {o.label}
+              {taxonomyLabel(o.label, uiText)}
             </button>
           ))}
         </div>
@@ -172,6 +169,9 @@ function JobDeptPanel({
   onClose: () => void;
   clearLabel: string; clearSelectionLabel: string;
 }) {
+  const uiConfigText = useTranslations();
+  const PLATFORM_META = getLocalizedPLATFORM_META(uiConfigText);
+
   const animals = useTranslations("FilmAnimals");
   const activeDept = FILM_DEPARTMENTS.find((d) => d.id === activeDeptId) ?? FILM_DEPARTMENTS[0];
 
@@ -191,7 +191,7 @@ function JobDeptPanel({
                   isActive ? `${dept.bg} ${dept.color} border-transparent` : "border-border text-text-muted"
                 }`}>
                 <Icon size={11} className={isActive ? dept.color : "text-text-muted"} />
-                {dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : dept.label}
+                {dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : taxonomyLabel(dept.label, uiConfigText)}
                 {isSelected && <span className="w-3.5 h-3.5 rounded-full bg-gold text-bg-primary text-[8px] font-bold flex items-center justify-center">✓</span>}
               </button>
             );
@@ -199,7 +199,7 @@ function JobDeptPanel({
         </div>
         <div className="p-3">
           <div className="flex items-center justify-between mb-1.5">
-            <h3 className={`text-sm font-semibold ${activeDept.color}`}>{activeDept.label}</h3>
+            <h3 className={`text-sm font-semibold ${activeDept.color}`}>{taxonomyLabel(activeDept.label, uiConfigText)}</h3>
             {selectedDeptId === activeDeptId && (
               <button onClick={() => onSelectRole(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">{clearLabel}</button>
             )}
@@ -213,7 +213,7 @@ function JobDeptPanel({
                   className={`text-left px-3 py-2.5 rounded-lg text-xs border transition-all ${
                     isSelected ? `${activeDept.bg} ${activeDept.color} font-semibold` : "border-border/60 text-text-muted"
                   }`}>
-                  <div className="font-medium leading-tight">{animalRoleLabel(role.id, animals) === role.id ? role.label : animalRoleLabel(role.id, animals)}</div>
+                  <div className="font-medium leading-tight">{animalRoleLabel(role.id, animals) === role.id ? taxonomyLabel(role.label, uiConfigText) : animalRoleLabel(role.id, animals)}</div>
                   {role.labelEn && <div className="mt-0.5 text-[10px] opacity-50">{role.labelEn}</div>}
                   {role.description && <div className="mt-1 text-[10px] leading-4 opacity-70">{role.description}</div>}
                 </button>
@@ -249,7 +249,7 @@ function JobDeptPanel({
                         <span className={`w-5 h-5 rounded flex items-center justify-center shrink-0 border ${isActive ? dept.bg : "bg-bg-elevated border-border"}`}>
                           <Icon size={10} className={isActive ? dept.color : "text-text-muted"} />
                         </span>
-                        <span className={`truncate ${isActive ? dept.color : ""}`}>{dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : dept.label}</span>
+                        <span className={`truncate ${isActive ? dept.color : ""}`}>{dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : taxonomyLabel(dept.label, uiConfigText)}</span>
                       </div>
                       {isSelected && <span className="w-3.5 h-3.5 rounded-full bg-gold text-bg-primary text-[8px] font-bold flex items-center justify-center shrink-0">✓</span>}
                     </button>
@@ -261,7 +261,7 @@ function JobDeptPanel({
         </div>
         <div className="flex-1 p-4 overflow-y-auto">
           <div className="flex items-center justify-between mb-1.5">
-            <h3 className={`text-sm font-semibold ${activeDept.color}`}>{activeDept.label}</h3>
+            <h3 className={`text-sm font-semibold ${activeDept.color}`}>{taxonomyLabel(activeDept.label, uiConfigText)}</h3>
             {selectedDeptId === activeDeptId && (
               <button onClick={() => onSelectRole(activeDeptId, null)} className="text-[10px] text-text-muted hover:text-red-400 transition-colors">{clearSelectionLabel}</button>
             )}
@@ -275,7 +275,7 @@ function JobDeptPanel({
                   className={`text-left px-3 py-2 rounded-lg text-xs border transition-all ${
                     isSelected ? `${activeDept.bg} ${activeDept.color} font-semibold` : "border-border/60 text-text-muted hover:text-text-secondary hover:border-border hover:bg-white/[0.02]"
                   }`}>
-                  <div className="font-medium leading-tight">{animalRoleLabel(role.id, animals) === role.id ? role.label : animalRoleLabel(role.id, animals)}</div>
+                  <div className="font-medium leading-tight">{animalRoleLabel(role.id, animals) === role.id ? taxonomyLabel(role.label, uiConfigText) : animalRoleLabel(role.id, animals)}</div>
                   {role.labelEn && <div className="text-[10px] opacity-50 mt-0.5">{role.labelEn}</div>}
                   {role.description && <div className="mt-1 text-[10px] leading-4 opacity-70">{role.description}</div>}
                 </button>
@@ -290,13 +290,22 @@ function JobDeptPanel({
 
 // ─── Main ─────────────────────────────────────────────────────────
 function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
+  const uiText = useTranslations();
+
   const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("jobs");
   const animals = useTranslations("FilmAnimals");
 
-  const allJobs = useMemo(() => serverJobs, [serverJobs]);
+  const allJobs = useMemo(() => serverJobs.map(job => {
+    if (!job.isReal) return job;
+    const metadata = parseJobDescription(job.description ?? "");
+    return { ...job, projectType: metadata.projectType ?? job.projectType, urgent: metadata.urgent ?? job.urgent };
+  }), [serverJobs]);
+  const availableProjectTypes = useMemo(() => [...new Set([...PROJECT_TYPES, ...allJobs.map(job => job.projectType ?? "").filter(Boolean)])], [allJobs]);
+  const availablePayTypes = useMemo(() => [...new Set<string>([...PAY_TYPES, ...allJobs
+    .filter(job => job.isReal).map(job => canonicalJobPayType(parseJobDescription(job.description ?? "").payType ?? "")).filter(Boolean)])], [allJobs]);
 
   const [query, setQuery] = useViewState("jobs.query", () => searchParams.get("q") ?? "");
   const [selectedDeptId, setSelectedDeptId] = useViewState<string | null>("jobs.selectedDeptId", () => normalizeGripDepartmentId(searchParams.get("dept")));
@@ -305,7 +314,8 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   const [panelOpen, setPanelOpen] = useState(false);
   const [activeType, setActiveType] = useViewState("jobs.activeType", () => searchParams.get("type") ?? "");
   const [urgentOnly, setUrgentOnly] = useViewState("jobs.urgentOnly", () => searchParams.get("urgent") === "1");
-  const [payTypeFilter, setPayTypeFilter] = useViewState("jobs.payTypeFilter", () => searchParams.get("pay") ?? "");
+  const [storedPayTypeFilter, setPayTypeFilter] = useViewState("jobs.payTypeFilter", () => searchParams.get("pay") ?? "");
+  const payTypeFilter = canonicalJobPayType(storedPayTypeFilter);
   const [jobTypeFilter, setJobTypeFilter] = useViewState<"alle" | "freelance" | "festanstellung" | "praktikum">("jobs.jobTypeFilter", "alle");
   const [cityFilter, setCityFilter] = useViewState("jobs.cityFilter", () => searchParams.get("city") ?? "");
   const [countryFilter, setCountryFilter] = useViewState("jobs.countryFilter", () => searchParams.get("country") ?? "");
@@ -384,14 +394,13 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
     }
 
     if (query.trim()) {
-      const q = query.toLowerCase();
-      result = result.filter((j) =>
-        j.title.toLowerCase().includes(q) ||
-        (j.company ?? "").toLowerCase().includes(q) ||
-        (j.location.toLowerCase().includes(q) || placeSearchMatches(j,q)) ||
-        j.tags.some((t) => t.toLowerCase().includes(q)) ||
-        (j.description ?? "").toLowerCase().includes(q)
-      );
+      const q = normalizedCatalogueSearch(query, locale);
+      result = result.filter((j) => {
+        const metadata = j.isReal ? parseJobDescription(j.description ?? "") : null;
+        const terms = [j.title, j.company ?? "", j.location, ...j.tags, j.description ?? "",
+          projectTypeLabel(j.projectType ?? "", uiText), taxonomyLabel(metadata?.roleLabel ?? "", uiText)];
+        return terms.some(value => normalizedCatalogueSearch(value, locale).includes(q)) || placeSearchMatches(j, q);
+      });
     }
     if (activeType) result = result.filter((j) => j.projectType === activeType || (j.projectType ?? "").includes(activeType));
     if (urgentOnly) result = result.filter((j) => j.urgent);
@@ -399,7 +408,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
       result = result.filter((j) => {
         if (!j.isReal) return true;
         const parsed = parseJobDescription(j.description ?? "");
-        return parsed.payType === payTypeFilter;
+        return canonicalJobPayType(parsed.payType ?? "") === canonicalJobPayType(payTypeFilter);
       });
     }
     if (jobTypeFilter !== "alle") result = result.filter((j) => (j.jobType ?? "freelance") === jobTypeFilter);
@@ -409,7 +418,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
     if (sortKey === "rate-desc") result = [...result].sort((a, b) => parseInt(b.rate) - parseInt(a.rate));
     if (sortKey === "urgent") result = [...result].sort((a, b) => (b.urgent ? 1 : 0) - (a.urgent ? 1 : 0));
     return result;
-  }, [allJobs, query, selectedDeptId, selectedRoleId, activeType, urgentOnly, payTypeFilter, jobTypeFilter, cityFilter, countryFilter, regionFilter, sortKey]);
+  }, [allJobs, query, selectedDeptId, selectedRoleId, activeType, urgentOnly, payTypeFilter, jobTypeFilter, cityFilter, countryFilter, regionFilter, sortKey, locale, uiText]);
 
   const filterKey = JSON.stringify([query, selectedDeptId, selectedRoleId, activeType, urgentOnly, payTypeFilter, jobTypeFilter, cityFilter, countryFilter, regionFilter, sortKey]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
@@ -439,9 +448,9 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   const activeDeptData = selectedDeptId ? FILM_DEPARTMENTS.find((d) => d.id === selectedDeptId) : null;
   const activeRoleData = selectedRoleId ? ALL_ROLES.find((r) => r.id === selectedRoleId) : null;
   const mobileChips: BrowseChip[] = [
-    ...(activeDeptData ? [{ id: "dept", label: activeRoleData ? `${activeDeptData.label} · ${activeRoleData.label}` : activeDeptData.label, onRemove: () => { setSelectedDeptId(null); setSelectedRoleId(null); } }] : []),
-    ...(activeType ? [{ id: "project", label: activeType, onRemove: () => setActiveType("") }] : []),
-    ...(payTypeFilter ? [{ id: "pay", label: payTypeFilter, onRemove: () => setPayTypeFilter("") }] : []),
+    ...(activeDeptData ? [{ id: "dept", label: activeRoleData ? uiText("Ui.text_7c639bc99b8569", { value1: String(taxonomyLabel(activeDeptData.label, uiText)), value2: String(taxonomyLabel(activeRoleData.label, uiText)) }) : taxonomyLabel(activeDeptData.label, uiText), onRemove: () => { setSelectedDeptId(null); setSelectedRoleId(null); } }] : []),
+    ...(activeType ? [{ id: "project", label: projectTypeLabel(activeType, uiText), onRemove: () => setActiveType("") }] : []),
+    ...(payTypeFilter ? [{ id: "pay", label: jobPayLabel(payTypeFilter, uiText), onRemove: () => setPayTypeFilter("") }] : []),
     ...(cityFilter ? [{ id: "city", label: cityLabel(cityFilter), onRemove: () => setCityFilter("") }] : []),
     ...(countryFilter ? [{ id: "country", label: countryLabel(countryFilter), onRemove: () => setCountryFilter("") }] : []),
     ...(regionFilter ? [{ id: "region", label: regionLabel(regionFilter), onRemove: () => setRegionFilter("") }] : []),
@@ -471,8 +480,8 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
         ]}
         onSortChange={setSortKey}
         categoryLabel={t("filterDeptRole")}
-        allCategoryLabel={t("filterAll") + " Bereiche"}
-        categories={FILM_DEPARTMENTS.map((dept) => ({ value: dept.id, label: dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : dept.label }))}
+        allCategoryLabel={t("filterAll") + uiText("Ui.text_7b3886f5485e90")}
+        categories={FILM_DEPARTMENTS.map((dept) => ({ value: dept.id, label: dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : taxonomyLabel(dept.label, uiText) }))}
         categoryValue={selectedDeptId ?? ""}
         onCategoryChange={(value) => { setSelectedDeptId(value || null); setSelectedRoleId(null); }}
         resultSummary={t("results", { count: filtered.length })}
@@ -491,19 +500,19 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
               setSelectedDeptId(deptId);
               setSelectedRoleId(roleId);
             }}
-            placeholder="Alle Rollen"
-            options={FILM_DEPARTMENTS.flatMap((dept) => dept.roles.map((role) => ({ value: `${dept.id}:${role.id}`, label: `${dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : dept.label} · ${animalRoleLabel(role.id, animals) === role.id ? role.label : animalRoleLabel(role.id, animals)}` })))}
+            placeholder={uiText("Ui.text_903f372337ed95")}
+            options={FILM_DEPARTMENTS.flatMap((dept) => dept.roles.map((role) => ({ value: `${dept.id}:${role.id}`, label: uiText("Ui.text_7c639bc99b8569", { value1: String(dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : taxonomyLabel(dept.label, uiText)), value2: String(animalRoleLabel(role.id, animals) === role.id ? taxonomyLabel(role.label, uiText) : animalRoleLabel(role.id, animals)) }) })))}
           />
         </MobileFilterField>
         <MobileFilterField label={t("filterProjectType")}>
-          <MobileFilterSelect value={activeType} onChange={setActiveType} placeholder="Alle Projekttypen" options={PROJECT_TYPES.map((value) => ({ value, label: value }))} />
+          <MobileFilterSelect value={activeType} onChange={setActiveType} placeholder={uiText("Ui.text_afba0b3e7b5f22")} options={availableProjectTypes.map((value) => ({ value, label: projectTypeLabel(value, uiText) }))} />
         </MobileFilterField>
         <MobileFilterField label={t("filterPay")}>
-          <MobileFilterSelect value={payTypeFilter} onChange={setPayTypeFilter} placeholder="Alle Vergütungsarten" options={PAY_TYPES.map((value) => ({ value, label: value }))} />
+          <MobileFilterSelect value={payTypeFilter} onChange={setPayTypeFilter} placeholder={uiText("Ui.text_8f7f9d1fdbe006")} options={availablePayTypes.map((value) => ({ value, label: jobPayLabel(value, uiText) }))} />
         </MobileFilterField>
         <PlaceFilters rows={allJobs} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />
-        <MobileFilterField label="Anstellungsart">
-          <MobileFilterSelect value={jobTypeFilter === "alle" ? "" : jobTypeFilter} onChange={(value) => setJobTypeFilter((value || "alle") as typeof jobTypeFilter)} placeholder="Alle" options={[{ value: "freelance", label: t("filterFreelance") }, { value: "festanstellung", label: t("filterFulltime") }, { value: "praktikum", label: t("filterInternship") }]} />
+        <MobileFilterField label={uiText("Ui.text_ee0789bf07d3b9")}>
+          <MobileFilterSelect value={jobTypeFilter === "alle" ? "" : jobTypeFilter} onChange={(value) => setJobTypeFilter((value || "alle") as typeof jobTypeFilter)} placeholder={uiText("common.all")} options={[{ value: "freelance", label: t("filterFreelance") }, { value: "festanstellung", label: t("filterFulltime") }, { value: "praktikum", label: t("filterInternship") }]} />
         </MobileFilterField>
         <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={urgentOnly} onChange={(event) => setUrgentOnly(event.target.checked)} />{t("filterUrgentLabel")}</label>
       </MobileBrowseControls>
@@ -537,10 +546,10 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
             <div className="w-px h-6 bg-border shrink-0" />
 
             {/* Projekttyp */}
-            <FilterDropdown icon={Film} label={t("filterProjectType")} value={activeType} options={PROJECT_TYPES} onChange={setActiveType} />
+            <FilterDropdown icon={Film} label={t("filterProjectType")} value={activeType} options={availableProjectTypes} onChange={setActiveType} optionLabel={value => projectTypeLabel(value, uiText)} />
 
             {/* Vergütung */}
-            <FilterDropdown icon={Briefcase} label={t("filterPay")} value={payTypeFilter} options={PAY_TYPES} onChange={setPayTypeFilter} />
+            <FilterDropdown icon={Briefcase} label={t("filterPay")} value={payTypeFilter} options={availablePayTypes} onChange={setPayTypeFilter} optionLabel={value => jobPayLabel(value, uiText)} />
 
             {/* Stadt */}
             {(availableCities.length > 0 || availableCountries.length > 0) && (
@@ -600,19 +609,19 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
             <div className="flex flex-wrap gap-1.5 items-center">
               {activeDeptData && (
                 <span className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium ${activeDeptData.bg} ${activeDeptData.color}`}>
-                  {activeRoleData ? `${activeDeptData.label} › ${activeRoleData.label}` : activeDeptData.label}
+                  {activeRoleData ? uiText("Ui.text_b5767757f96fbd", { value1: String(taxonomyLabel(activeDeptData.label, uiText)), value2: String(taxonomyLabel(activeRoleData.label, uiText)) }) : taxonomyLabel(activeDeptData.label, uiText)}
                   <button onClick={() => { setSelectedDeptId(null); setSelectedRoleId(null); }} className="hover:opacity-70 transition-opacity ml-0.5"><X size={9} /></button>
                 </span>
               )}
               {activeType && (
                 <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary">
-                  {activeType}
+                  {projectTypeLabel(activeType, uiText)}
                   <button onClick={() => setActiveType("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               )}
               {payTypeFilter && (
                 <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary">
-                  {payTypeFilter}
+                  {jobPayLabel(payTypeFilter, uiText)}
                   <button onClick={() => setPayTypeFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               )}
@@ -640,7 +649,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
                   <button onClick={() => setCountryFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               )}
-              {regionFilter && <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary"><MapPin size={9} />{regionLabel(regionFilter)}<button type="button" aria-label={`${t("clearFilter")}: ${regionLabel(regionFilter)}`} onClick={() => setRegionFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button></span>}
+              {regionFilter && <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary"><MapPin size={9} />{regionLabel(regionFilter)}<button type="button" aria-label={uiText("Ui.text_efae3eb968ceb3", { value1: String(t("clearFilter")), value2: String(regionLabel(regionFilter)) })} onClick={() => setRegionFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button></span>}
               <button onClick={clearAll} className="text-[11px] text-text-muted hover:text-red-400 transition-colors underline underline-offset-2 ml-1">
                 {t("clearAll")}
               </button>
@@ -655,9 +664,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
 
           {/* Left sidebar */}
           <aside className="cat-sidebar w-44 shrink-0 sticky top-20">
-            <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3 px-2">
-              Bereiche
-            </p>
+            <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3 px-2">{uiText("Ui.text_7b40d8db4ebc62")}</p>
             <nav className="space-y-0.5">
               <button
                 onClick={() => { setSelectedDeptId(null); setSelectedRoleId(null); }}
@@ -666,10 +673,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
                     ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
                     : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
                 }`}
-              >
-                <Briefcase size={14} className={!selectedDeptId ? "text-gold" : "text-text-muted"} />
-                Alle Bereiche
-              </button>
+              >{uiText.rich("Ui.text_059ad29af9ea26", { part1: () => (<Briefcase size={14} className={!selectedDeptId ? "text-gold" : "text-text-muted"} />) })}</button>
               {FILM_DEPARTMENTS.map((dept) => {
                 const Icon = DEPT_ICON_MAP[dept.id] ?? Briefcase;
                 const isActive = selectedDeptId === dept.id;
@@ -684,7 +688,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
                     }`}
                   >
                     <Icon size={14} className={isActive ? "text-gold" : "text-text-muted"} />
-                    {dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : dept.label}
+                    {dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : taxonomyLabel(dept.label, uiText)}
                   </button>
                 );
               })}
@@ -703,10 +707,8 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
                     ? "bg-gold/10 text-gold border-gold/40"
                     : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
                 }`}
-              >
-                Alle Bereiche
-              </button>
-              {[...FILM_DEPARTMENTS].sort((a, b) => a.label.localeCompare(b.label, "de")).map((dept) => {
+              >{uiText("Ui.text_bc0b501bb3186b")}</button>
+              {[...FILM_DEPARTMENTS].sort((a, b) => a.label.localeCompare(b.label, locale)).map((dept) => {
                 const isActive = selectedDeptId === dept.id;
                 return (
                   <button
@@ -718,7 +720,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
                         : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
                     }`}
                   >
-                    {dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : dept.label}
+                    {dept.id === ANIMAL_DEPARTMENT_ID ? animals("department") : taxonomyLabel(dept.label, uiText)}
                   </button>
                 );
               })}
@@ -728,7 +730,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
             <div className="hidden xl:flex items-center justify-between mb-4">
               <p className="text-sm text-text-muted">
                 <span className="text-text-primary font-semibold">{t("results", { count: filtered.length })}</span>
-                {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
+                {query && <span className="text-gold">{uiText.rich("Ui.text_58e2efda5da487", { value1: () => (query) })}</span>}
               </p>
             </div>
 
@@ -786,13 +788,13 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
                   {/* Row 2: badges */}
                   <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
                     <span className={`px-2 py-0.5 text-[10px] font-semibold rounded border ${jobTypeBadge.cls}`}>
-                      {jobTypeBadge.label}
+                      {taxonomyLabel(jobTypeBadge.label, uiText)}
                     </span>
                     {roleLabel && (
-                      <span className="px-2 py-0.5 bg-bg-elevated border border-border text-text-muted text-[10px] rounded font-medium">{roleLabel}</span>
+                      <span className="px-2 py-0.5 bg-bg-elevated border border-border text-text-muted text-[10px] rounded font-medium">{taxonomyLabel(roleLabel, uiText)}</span>
                     )}
                     {projectType && (
-                      <span className="px-2 py-0.5 bg-bg-elevated border border-border text-text-muted text-[10px] rounded">{projectType}</span>
+                      <span className="px-2 py-0.5 bg-bg-elevated border border-border text-text-muted text-[10px] rounded">{projectTypeLabel(projectType, uiText)}</span>
                     )}
                     {company && (
                       <span className="text-[11px] text-text-muted">{company}</span>

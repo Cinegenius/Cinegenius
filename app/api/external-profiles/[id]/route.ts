@@ -1,12 +1,14 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // PATCH /api/external-profiles/[id] — update (owner only)
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -35,8 +37,8 @@ export async function PATCH(
     .select("id, platform_type, platform_name, url, custom_label, sort_order, is_public")
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  if (!data) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
+  if (!data) return NextResponse.json({ error: tResponse('System.m_621ca4c037d3') }, { status: 404 });
   return NextResponse.json({ profile: data });
 }
 
@@ -45,6 +47,7 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -57,6 +60,6 @@ export async function DELETE(
     .eq("id", id)
     .eq("user_id", userId); // ownership check
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   return NextResponse.json({ success: true });
 }

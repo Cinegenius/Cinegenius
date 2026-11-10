@@ -11,6 +11,7 @@ import { CATERING_COMPANY_CATEGORY, isCateringSearchQuery, normalizeCateringComp
 import { getCompanyAccess } from "@/lib/company-access";
 import { canCompanyRole, normalizeCompanyPublicTitles } from "@/lib/company-roles";
 import { canPersistCompanyImages, isCompanyImageUrlOwnedByUser } from "@/lib/company-media";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 function revalidateCompanyViews(slug: string) {
   revalidateTag("companies", { expire: 0 });
@@ -43,6 +44,7 @@ const COMPANY_COLS_PUBLIC =
 
 // GET — list published companies (with optional filters)
 export async function GET(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const mine     = req.nextUrl.searchParams.get("mine") === "true";
   const companyId = req.nextUrl.searchParams.get("company_id");
   const category = req.nextUrl.searchParams.get("category");
@@ -57,9 +59,9 @@ export async function GET(req: NextRequest) {
     const authResult = await requireAuth();
     if (authResult instanceof NextResponse) return authResult;
     const access = await getCompanyAccess(companyId, authResult.userId);
-    if (!access || !canCompanyRole(access.role, "edit_company")) return NextResponse.json({ error: "Keine Berechtigung, diese Firmendaten zu bearbeiten." }, { status: 403 });
+    if (!access || !canCompanyRole(access.role, "edit_company")) return NextResponse.json({ error: tResponse('System.m_d12094e3c848') }, { status: 403 });
     const { data, error } = await db.from("companies").select(COMPANY_COLS_FULL).eq("id", companyId).single();
-    if (error || !data) return NextResponse.json({ error: "Firma nicht gefunden" }, { status: 404 });
+    if (error || !data) return NextResponse.json({ error: tResponse('System.m_c59ef4b12e52') }, { status: 404 });
     const editable = data as unknown as Record<string, unknown>;
     const activeContact = await responsibleForCompany(editable.responsible_person, companyId, String(editable.owner_user_id));
     editable.responsible_person = activeContact || (editable.owner_user_id === authResult.userId ? bindResponsiblePerson(await accountResponsiblePerson(authResult.userId), authResult.userId) : null);
@@ -78,7 +80,7 @@ export async function GET(req: NextRequest) {
       .order("created_at", { ascending: false })
       .limit(50);           // a user realistically owns < 50 companies
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500, headers: { "Cache-Control": "private, no-store" } });
+    if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500, headers: { "Cache-Control": "private, no-store" } });
     const rows = data as unknown as Array<Record<string, unknown> & { id: string; owner_user_id: string; responsible_person?: { userId?: string } }> ?? [];
     const fallback = rows.some(row => !row.responsible_person || row.responsible_person.userId !== row.owner_user_id) ? await accountResponsiblePerson(userId) : null;
     const editableRows = await Promise.all(rows.map(async row => ({ ...row, responsible_person: await responsibleForCompany(row.responsible_person, row.id, row.owner_user_id) || bindResponsiblePerson(fallback, userId) })));
@@ -101,7 +103,7 @@ export async function GET(req: NextRequest) {
   }
 
   const { data, error } = await query;
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
   if (q && !category && isCateringSearchQuery(q)) {
     let cateringQuery = db
@@ -114,7 +116,7 @@ export async function GET(req: NextRequest) {
     if (city) cateringQuery = cateringQuery.eq("place_city_id", city.slice(0,100));
   for(const [param,column] of [["country","place_country_code"],["region","place_region_id"]] as const){const value=req.nextUrl.searchParams.get(param);if(value)cateringQuery=cateringQuery.eq(column,value.slice(0,100));}
     const { data: cateringMatches, error: cateringError } = await cateringQuery;
-    if (cateringError) return NextResponse.json({ error: cateringError.message }, { status: 500 });
+    if (cateringError) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
     const rows = new Map<string, Record<string, unknown>>();
     for (const company of [...(data ?? []), ...(cateringMatches ?? [])] as unknown as Record<string, unknown>[]) {
       const id = String(company.id ?? "");
@@ -129,12 +131,13 @@ export async function GET(req: NextRequest) {
 
 // DELETE — delete own company
 export async function DELETE(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
   const { id } = await req.json();
-  if (!id) return NextResponse.json({ error: "id fehlt" }, { status: 400 });
+  if (!id) return NextResponse.json({ error: tResponse('System.m_4b8591045313') }, { status: 400 });
 
   // Verify ownership
   const { data: company } = await db
@@ -144,7 +147,7 @@ export async function DELETE(req: NextRequest) {
     .eq("owner_user_id", userId)
     .single();
 
-  if (!company) return NextResponse.json({ error: "Firma nicht gefunden oder keine Berechtigung" }, { status: 403 });
+  if (!company) return NextResponse.json({ error: tResponse('System.m_cc7aadd6c31b') }, { status: 403 });
 
   // Delete related data first
   await db.from("company_members").delete().eq("company_id", id);
@@ -152,13 +155,14 @@ export async function DELETE(req: NextRequest) {
   await db.from("company_services").delete().eq("company_id", id);
 
   const { error } = await db.from("companies").delete().eq("id", id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
   return NextResponse.json({ success: true });
 }
 
 // POST — create or update company
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -175,14 +179,14 @@ export async function POST(req: NextRequest) {
   } = body;
 
   if (!name?.trim() || (typeof city !== "string" || !cityWriteFields(city, body.selected_place_city_id).city.trim())) {
-    return NextResponse.json({ error: "Firmenname und Standort sind Pflichtfelder" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_ad57e76d7073') }, { status: 400 });
   }
   if (onboarding_request_key !== undefined && (typeof onboarding_request_key !== "string" || !/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(onboarding_request_key))) {
-    return NextResponse.json({ error: "Ungültiger Einrichtungsauftrag" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_e4eb55646155') }, { status: 400 });
   }
   for (const [field, value] of [["email_public", email_public], ["phone_public", phone_public], ["hq_address_public", hq_address_public]] as const) {
     if (value !== undefined && typeof value !== "boolean") {
-      return NextResponse.json({ error: `Ungültige Veröffentlichungseinstellung: ${field}` }, { status: 400 });
+      return NextResponse.json({ error: tResponse('System.m_e675b8de5085', { value0: String(field) }) }, { status: 400 });
     }
   }
 
@@ -190,7 +194,7 @@ export async function POST(req: NextRequest) {
     const storageUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
     const allowedSingleImage = (candidate: unknown) => candidate == null || candidate === "" || (typeof candidate === "string" && candidate.length <= 2048 && isCompanyImageUrlOwnedByUser(candidate, userId, storageUrl));
     if (!allowedSingleImage(logo_url) || !allowedSingleImage(cover_url) || !canPersistCompanyImages(portfolio_images ?? [], [], userId, storageUrl)) {
-      return NextResponse.json({ error: "Bitte verwende für Logo, Titelbild und Galerie ausschließlich eigene CineGenius-Uploads (maximal 12 Galeriefotos)." }, { status: 400 });
+      return NextResponse.json({ error: tResponse('System.m_10cf186e7bfb') }, { status: 400 });
     }
   }
 
@@ -202,9 +206,9 @@ export async function POST(req: NextRequest) {
       .eq("id", id)
       .single();
 
-    if (!existing) return NextResponse.json({ error: "Firma nicht gefunden oder keine Berechtigung" }, { status: 403 });
+    if (!existing) return NextResponse.json({ error: tResponse('System.m_cc7aadd6c31b') }, { status: 403 });
     const access = await getCompanyAccess(id, userId);
-    if (!access || !canCompanyRole(access.role, "edit_company")) return NextResponse.json({ error: "Keine Berechtigung, dieses Firmenprofil zu bearbeiten." }, { status: 403 });
+    if (!access || !canCompanyRole(access.role, "edit_company")) return NextResponse.json({ error: tResponse('System.m_b994e1257717') }, { status: 403 });
     const activeResponsible = await responsibleForCompany(existing.responsible_person, id, existing.owner_user_id);
     const responsibleAccountId = activeResponsible?.userId || existing.owner_user_id;
     const responsible = await validateResponsiblePerson(body.responsible_person ?? activeResponsible ?? undefined, responsibleAccountId, true);
@@ -222,10 +226,10 @@ export async function POST(req: NextRequest) {
     const nextPortfolio = portfolio_images === undefined ? existing.portfolio_images : portfolio_images;
     const allowedSingleImage = (candidate: unknown, previous: string | null) => candidate == null || candidate === "" || (typeof candidate === "string" && candidate.length <= 2048 && (candidate === previous || isCompanyImageUrlOwnedByUser(candidate, userId, storageUrl)));
     if (!allowedSingleImage(nextLogo, existing.logo_url) || !allowedSingleImage(nextCover, existing.cover_url)) {
-      return NextResponse.json({ error: "Logo und Titelbild müssen aus einem eigenen CineGenius-Upload stammen." }, { status: 400 });
+      return NextResponse.json({ error: tResponse('System.m_9b2dc3e66d2a') }, { status: 400 });
     }
     if (!canPersistCompanyImages(nextPortfolio, existing.portfolio_images, userId, storageUrl)) {
-      return NextResponse.json({ error: "Die Galerie enthält ungültige Bilder oder überschreitet das Limit von 12 Fotos." }, { status: 400 });
+      return NextResponse.json({ error: tResponse('System.m_2c127998a651') }, { status: 400 });
     }
 
     const { data, error } = await db
@@ -266,7 +270,7 @@ export async function POST(req: NextRequest) {
       .select()
       .single();
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
     // Only the actual account owner can update the owner's public job title.
     if (existing.owner_user_id === userId) {
@@ -296,7 +300,7 @@ export async function POST(req: NextRequest) {
       .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, slug, owner_user_id")
       .eq("slug", slug)
       .maybeSingle();
-    if (lookupError) return NextResponse.json({ error: "Das gespeicherte Firmenprofil konnte nicht geprüft werden." }, { status: 500 });
+    if (lookupError) return NextResponse.json({ error: tResponse('System.m_373a87c38471') }, { status: 500 });
     if (existingRequest && existingRequest.owner_user_id === userId) {
       const { data: company, error: companyError } = await db
         .from("companies")
@@ -305,11 +309,11 @@ export async function POST(req: NextRequest) {
         .eq("owner_user_id", userId)
         .select(COMPANY_COLS_FULL)
         .single();
-      if (companyError) return NextResponse.json({ error: "Das gespeicherte Firmenprofil konnte nicht geladen werden." }, { status: 500 });
+      if (companyError) return NextResponse.json({ error: tResponse('System.m_a6b8746906cf') }, { status: 500 });
       revalidateCompanyViews(existingRequest.slug);
       return NextResponse.json({ data: company });
     }
-    if (existingRequest) return NextResponse.json({ error: "Das Firmenprofil konnte wegen eines Slug-Konflikts nicht gespeichert werden." }, { status: 409 });
+    if (existingRequest) return NextResponse.json({ error: tResponse('System.m_998905482869') }, { status: 409 });
   } else {
     const { data: existing } = await db
       .from("companies")
@@ -358,7 +362,7 @@ export async function POST(req: NextRequest) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
   // Auto-add owner to company_members as owner/accepted
   await db

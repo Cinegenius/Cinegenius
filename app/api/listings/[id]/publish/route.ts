@@ -11,12 +11,14 @@ import { getListingProvider } from "@/lib/listing-provider";
 import { listingDetailPath } from "@/lib/listing-routes";
 import { validateListingPublication } from "@/lib/listing-publication";
 import { canEditListing } from "@/lib/listing-access";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 const PATHS: Record<string, string> = {
   job: "/jobs", location: "/locations", prop: "/props", vehicle: "/vehicles", creator: "/creators", animal: "/tiere",
 };
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -29,12 +31,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     .select("*")
     .eq("id", id)
     .maybeSingle();
-  if (listingError) return NextResponse.json({ error: "Inserat konnte nicht geladen werden" }, { status: 500 });
-  if (!listing) return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
+  if (listingError) return NextResponse.json({ error: tResponse('System.m_8fb24c30da36') }, { status: 500 });
+  if (!listing) return NextResponse.json({ error: tResponse('System.m_6031a8e7b450') }, { status: 404 });
   try {
-    if (!(await canEditListing(userId, listing))) return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
+    if (!(await canEditListing(userId, listing))) return NextResponse.json({ error: tResponse('System.m_6031a8e7b450') }, { status: 404 });
   } catch {
-    return NextResponse.json({ error: "Berechtigung zur Firmenverwaltung konnte nicht geprüft werden." }, { status: 500 });
+    return NextResponse.json({ error: tResponse('System.m_1178621fba1b') }, { status: 500 });
   }
   if (listing.type === "prop" || listing.type === "vehicle") {
     const publication = await (await import("@/lib/marketplace-publication-server")).publishMarketplaceOffer(listing, userId);
@@ -56,22 +58,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (listing.type === "job") {
     const description = listing.description ?? "";
     if (!listing.title?.trim() || !listing.city?.trim() || !/Rolle:\s*[^·\n]+/.test(description) || !/Drehtage:\s*[^·\n]+/.test(description)) {
-      return NextResponse.json({ error: "Bitte ergänze Titel, Rolle, Ort und Drehtag, bevor du den Job veröffentlichst." }, { status: 400 });
+      return NextResponse.json({ error: tResponse('System.m_d80502dc18b4') }, { status: 400 });
     }
   }
 
   const companyResult = listing.company_id
     ? await db.from("companies").select("slug").eq("id", listing.company_id).maybeSingle()
     : { data: null };
-  if (listing.company_id && !companyResult.data) return NextResponse.json({ error: "Die zugeordnete Firma konnte nicht geprüft werden." }, { status: 500 });
+  if (listing.company_id && !companyResult.data) return NextResponse.json({ error: tResponse('System.m_7982767be5d3') }, { status: 500 });
 
   const isMultipart = req.headers.get("content-type")?.includes("multipart/form-data") ?? false;
   const formData = isMultipart ? await req.formData() : null;
   const file = formData?.get("file") ?? null;
-  if (file && !(file instanceof File)) return NextResponse.json({ error: "Ungültige Bilddatei" }, { status: 400 });
+  if (file && !(file instanceof File)) return NextResponse.json({ error: tResponse('System.m_61e8118a64d2') }, { status: 400 });
   if (file instanceof File) {
     const { allowed } = await rateLimit(`upload:${userId}`, 10, 60);
-    if (!allowed) return NextResponse.json({ error: "Zu viele Uploads. Bitte kurz warten." }, { status: 429 });
+    if (!allowed) return NextResponse.json({ error: tResponse('System.m_4ca6fcf5bc59') }, { status: 429 });
   }
   const upload = file instanceof File ? await validateUpload(file, { emptyMessage: t("empty"), tooLargeMessage: t("tooLarge"), unsupportedTypeMessage: t("invalid") }) : null;
   if (upload && "error" in upload) return NextResponse.json({ error: upload.error }, { status: upload.status });
@@ -87,7 +89,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     companySlug: companyResult.data?.slug,
     providerAssigned: provider.kind !== "unassigned",
     providerContactable: Boolean(provider.contactUserId),
-  });
+  }, tResponse);
   if (validationError) return NextResponse.json({ error: validationError }, { status: 400 });
 
   let uploadedPath: string | null = null;
@@ -97,7 +99,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       try {
         imageUrl = await storeProtectedMedia(userId, uploadedPath, upload.buffer, upload.mime);
       } catch {
-        return NextResponse.json({ error: "Bild konnte nicht hochgeladen werden" }, { status: 500 });
+        return NextResponse.json({ error: tResponse('System.m_d9b566d19b13') }, { status: 500 });
       }
   }
 

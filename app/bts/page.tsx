@@ -8,12 +8,18 @@ import BTSMosaicGrid, { type BTSGridItem } from "./BTSMosaicGrid";
 import PhotoNavigationLink from "./PhotoNavigationLink";
 import { getPrivateProfileIds } from "@/lib/trust";
 import { photoHref } from "@/lib/photo-link";
+import { getTranslations } from "next-intl/server";
+import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
+
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const tMetadata = await getMetadataTranslations("Metadata");
+  return {
   alternates: { canonical: "https://www.cinegenius.co/bts" },
-  title: "Behind the Scenes — Backstage & Set-Fotos",
-  description: "Echte Behind-the-Scenes-Fotos von Filmsets, Shootings und Produktionen. Entdecke Crews, Locations und Projekte hinter der Kamera.",
+  title: tMetadata('m_0b2f9cc928bd'),
+  description: tMetadata('m_7d38bb918306'),
 };
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type RawProfile = Record<string, any>;
@@ -23,6 +29,8 @@ const CREW_TYPES = new Set(["camera", "lighting", "sound", "director_of_photogra
   "production", "makeup", "costume", "filmmaker", "photographer", "editor"]);
 
 export default async function BTSPage() {
+  const uiText = await getTranslations();
+
   const { userId } = await auth();
 
   const { data: profiles } = await db
@@ -116,24 +124,16 @@ export default async function BTSPage() {
 
       {/* Hero */}
       <section className="pt-28 pb-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold/20 bg-gold/5 text-gold text-xs font-semibold mb-6">
-          <Aperture size={11} /> Behind the Scenes
-        </div>
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold/20 bg-gold/5 text-gold text-xs font-semibold mb-6">{uiText.rich("Ui.text_641be6965c93ce", { part1: () => (<Aperture size={11} />) })}</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
           <div>
-            <h1 className="font-display text-4xl sm:text-5xl font-bold text-text-primary mb-3">
-              Behind the Scenes
-            </h1>
-            <p className="text-text-muted max-w-xl leading-relaxed">
-              Echte Set-Fotos, Backstage-Momente und Einblicke hinter die Kamera — von Crews, Fotografen und Filmemachern.
-            </p>
+            <h1 className="font-display text-4xl sm:text-5xl font-bold text-text-primary mb-3">{uiText("home.showcaseBts")}</h1>
+            <p className="text-text-muted max-w-xl leading-relaxed">{uiText("Ui.text_9de86819febf23")}</p>
           </div>
           <Link
             href="/creators"
             className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm"
-          >
-            Crews entdecken <ArrowRight size={14} />
-          </Link>
+          >{uiText.rich("Ui.text_b9dfc00a520d2e", { part1: () => (<ArrowRight size={14} />) })}</Link>
         </div>
       </section>
 
@@ -142,7 +142,7 @@ export default async function BTSPage() {
         <section className="pb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-4">
             <Heart size={14} className="text-red-400 fill-red-400" />
-            <h2 className="text-sm font-bold uppercase tracking-widest text-red-400">Meistgeliked</h2>
+            <h2 className="text-sm font-bold uppercase tracking-widest text-red-400">{uiText("Ui.text_6d8dc4b2b5cb02")}</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {topRated.map((item, i) => (
@@ -178,16 +178,12 @@ export default async function BTSPage() {
           <div className="w-16 h-16 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center mx-auto mb-5">
             <Aperture size={24} className="text-gold" />
           </div>
-          <h2 className="font-display text-2xl font-bold text-text-primary mb-3">Noch keine BTS-Fotos</h2>
-          <p className="text-text-muted mb-6 max-w-md mx-auto">
-            Lade deine Behind-the-Scenes-Bilder in dein Profil hoch — sie erscheinen automatisch hier.
-          </p>
+          <h2 className="font-display text-2xl font-bold text-text-primary mb-3">{uiText("Ui.text_82ecdd3ad5bd97")}</h2>
+          <p className="text-text-muted mb-6 max-w-md mx-auto">{uiText("Ui.text_30626b152dfc17")}</p>
           <Link
             href="/sign-up"
             className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm"
-          >
-            Profil erstellen <ArrowRight size={14} />
-          </Link>
+          >{uiText.rich("Ui.text_5d63896787f560", { part1: () => (<ArrowRight size={14} />) })}</Link>
         </section>
       )}
       </div>
