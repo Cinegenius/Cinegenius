@@ -2,6 +2,12 @@
   "regions": [
     "fra1"
   ],
+  "crons": [
+    {
+      "path": "/api/cron/listing-freshness",
+      "schedule": "0 8 * * *"
+    }
+  ],
   "git": {
     "deploymentEnabled": {
       "main": false

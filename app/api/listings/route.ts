@@ -44,7 +44,10 @@ export async function GET(req: NextRequest) {
 
   if (mine) {
     const authResult = await requireAuth();
-    if (authResult instanceof NextResponse) return authResult;
+    if (authResult instanceof NextResponse) {
+      authResult.headers.set("Cache-Control", "private, no-store, max-age=0");
+      return authResult;
+    }
     const { userId } = authResult;
 
     try {
@@ -61,8 +64,17 @@ export async function GET(req: NextRequest) {
       const rows = [...(ownResult.data ?? []), ...(companyResult.data ?? [])] as unknown as Array<Record<string, unknown> & { id: string; created_at: string }>;
       const byId = new Map(rows.filter((listing) => !listing.company_id || companyIds.includes(String(listing.company_id))).map((listing) => [listing.id, listing]));
       const data = [...byId.values()].sort((left, right) => Date.parse(right.created_at) - Date.parse(left.created_at)).slice(0, 200);
+      const freshnessResult = data.length
+        ? await db.from("listing_freshness_state")
+          .select("listing_id,status,due_at,response_deadline_at,confirmed_at")
+          .in("listing_id", data.map(row => row.id))
+        : { data: [], error: null };
+      if (freshnessResult.error && !["42P01", "PGRST205"].includes(freshnessResult.error.code)) {
+        throw new Error("Listing freshness unavailable");
+      }
+      const freshnessById = new Map((freshnessResult.data ?? []).map(row => [row.listing_id, row]));
       const account = data.some(row => !row.responsible_person && !row.company_id && row.user_id === userId) ? await accountResponsiblePerson(userId) : null;
-      return privateNoStoreJson({ data: data.map(row => ({ ...row, responsible_person: row.responsible_person || (!row.company_id && row.user_id === userId ? bindResponsiblePerson(account, userId) : null) })) });
+      return privateNoStoreJson({ data: data.map(row => ({ ...row, freshness: freshnessById.get(row.id) ?? null, responsible_person: row.responsible_person || (!row.company_id && row.user_id === userId ? bindResponsiblePerson(account, userId) : null) })) });
     } catch (error) {
       console.error("[listings GET mine]", error);
       return privateNoStoreJson({ error: error instanceof Error ? error.message : "Inserate konnten nicht geladen werden." }, 500);

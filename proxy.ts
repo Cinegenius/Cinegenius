@@ -214,6 +214,9 @@ export default clerkMiddleware(async (auth, request) => {
     // Verified admin — fall through to security headers
   } else if (isWebhookRoute(request)) {
     // 3a. Webhook routes — skip Clerk auth entirely; signature verified per-handler
+  } else if (request.method === "GET" && request.nextUrl.pathname === "/api/cron/listing-freshness") {
+    // This exact scheduler route checks CRON_SECRET itself before any work.
+    // Other cron paths and methods retain the normal session protection.
   } else if (isApi && !isPublicApiGet(request)) {
     // Private fetch endpoints must not follow Clerk's hosted sign-in redirect
     // after logout/session expiry. Keep the existing authenticated-session

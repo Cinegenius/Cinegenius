@@ -527,6 +527,7 @@ function AdminContent() {
 
   const newsletterText = useTranslations("AdminNewsletter");
   const placeText = useTranslations("Places");
+  const freshnessText = useTranslations("AdminListingFreshness");
   const labels = activeTab === "reviews" ? reviewT("queueTitle") : activeTab === "accounts" ? accountsText("title") : activeTab === "started-offers" ? startedText("title") : activeTab === "organizations" ? organizationAdminText("title") : activeTab === "newsletter" ? newsletterText("title") : (activeTab === "overview" ? "Übersicht" : navItems.find((item) => item.id === activeTab)?.label) ?? "Admin";
   const pendingReports = overview?.counts.pendingReports ?? 0;
   const pendingVerifications = overview?.counts.pendingVerifications ?? 0;
@@ -538,6 +539,7 @@ function AdminContent() {
         <div className="border-b border-border p-4"><div className="flex items-center gap-2"><div className="flex h-8 w-8 items-center justify-center rounded-lg border border-crimson/30 bg-crimson/20"><Shield size={16} className="text-crimson-light" /></div><div><p className="text-sm font-semibold text-text-primary">Adminbereich</p><p className="text-xs text-text-muted">CineGenius</p></div></div></div>
         <nav className="flex-1 space-y-1 overflow-y-auto p-3">
           <a href="/admin/places" className="flex min-h-11 items-center rounded-lg px-3 py-2.5 text-sm text-text-secondary hover:bg-bg-elevated">{placeText("reviewTitle")}</a>
+          <a href="/admin/listing-freshness" className="flex min-h-11 items-center rounded-lg px-3 py-2.5 text-sm text-text-secondary hover:bg-bg-elevated">{freshnessText("title")}</a>
           {navItems.map(({ icon: Icon, label: originalLabel, id }) => {
             const label = id === "reviews" ? reviewT("queueTitle") : id === "accounts" ? accountsText("title") : id === "started-offers" ? startedText("title") : id === "organizations" ? organizationAdminText("title") : id === "newsletter" ? newsletterText("title") : originalLabel;
             const badge = id === "reports" ? pendingReports : id === "verifications" ? pendingVerifications : id === "companies" ? companyClarificationsCount : 0;
@@ -551,6 +553,7 @@ function AdminContent() {
         <header className="sticky top-16 z-30 border-b border-border bg-bg-primary/90 px-4 py-3 backdrop-blur-nav sm:px-6"><h1 className="font-display text-lg font-bold text-text-primary">{labels}</h1></header>
         <nav className="flex gap-2 overflow-x-auto border-b border-border bg-bg-primary px-4 py-2 lg:hidden">
           <a href="/admin/places" className="shrink-0 rounded-lg border border-border px-3 py-2 text-xs">{placeText("reviewTitle")}</a>
+          <a href="/admin/listing-freshness" className="flex min-h-11 shrink-0 items-center rounded-lg border border-border px-3 py-2 text-xs">{freshnessText("title")}</a>
           {navItems.map(({ label, id }) => <button key={id} onClick={() => setActiveTab(id)} className={`shrink-0 rounded-lg border px-3 py-2 text-xs font-medium ${activeTab === id ? "border-crimson/40 bg-crimson/10 text-crimson-light" : "border-border text-text-secondary"}`}>{id === "reviews" ? reviewT("queueTitle") : id === "accounts" ? accountsText("title") : id === "started-offers" ? startedText("title") : id === "organizations" ? organizationAdminText("title") : id === "newsletter" ? newsletterText("title") : label}</button>)}
         </nav>
         <div className="space-y-5 p-4 sm:p-6">

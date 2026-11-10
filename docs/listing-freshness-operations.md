@@ -1,0 +1,34 @@
+# Listing reminders: release and operation
+
+The reminder system is separate from publication approval. Renewal cannot publish an offer or override moderation restrictions. Ending or automatically pausing an offer preserves its stored content.
+
+## Release order
+
+1. Apply and verify `supabase/migrations/20261110120000_listing_freshness.sql` before releasing the dependent application. Check RLS, denied direct `anon`/`authenticated` access, service-only RPC grants, ownership checks, stale-version rejection and unchanged existing listings. The migration itself must not send messages, enroll old offers or change their publication status.
+2. Release through the repository's guarded production procedure. Keep `LISTING_FRESHNESS_ENABLED` unset or `false` during initial verification. The new settings start disabled for every listing type.
+3. Verify the private owner page and admin settings with owned test fixtures. Test the cron authorization while the global gate is disabled. Never invoke the enabled production worker as a test: it processes real eligible offers and can send real mail.
+4. Before activation, configure a strong production `CRON_SECRET`, the existing `RESEND_API_KEY`, the intended per-type timing settings and the global production flag. The Resend key must also permit retrieving sent messages; a send-only key cannot confirm delivery and therefore cannot trigger automatic pausing. Enable only the reviewed listing types through the authenticated admin settings page. Existing offers receive a new freshness baseline through bounded enrollment; their old creation dates do not cause an immediate backlog of reminders or pauses.
+
+The worker runs only when `VERCEL_ENV=production` and `LISTING_FRESHNESS_ENABLED=true`. Missing email configuration also prevents all worker mutations. The Vercel schedule is daily at **08:00 UTC**. Its only unauthenticated session exception is `GET /api/cron/listing-freshness`, which independently requires the exact `Authorization: Bearer <CRON_SECRET>` header. HEAD cannot execute the worker. Responses are not cached and contain counters or stable error codes, never recipient details.
+
+## Delivery and failure handling
+
+Each listing, cycle and reminder stage has a separate outbox entry and stable idempotency key. Company offers use the company's current owner, never a fallback to the technical creator. Personal offers use the current listing owner. Only that account's verified primary Clerk email is eligible. The current provider, publication and content revision are checked again before binding the delivery.
+
+The first delivery attempt freezes the complete recipient, subject and rendered message. Retries use that stored payload and the same Resend idempotency key, even if translations or the account's locale change. A changed recipient stops the old delivery. Provider lookup errors and failed or ambiguous sends never count as confirmed reminders.
+
+The promised interval is stored with the outbox entry as well. Later admin setting changes cannot shorten a period already promised in an email. Withdrawing a listing immediately suspends its old freshness cycle; an explicit later publication receives a new initial period even when a marketplace listing's content is unchanged.
+
+An accepted send with a returned Resend message ID is not proof of delivery. The accepted initial reminder starts only the follow-up interval. An accepted follow-up has no automatic-pause deadline until a separate Resend message lookup reports `delivered`, `opened` or `clicked` for the exact stored message and recipient. That first positive confirmation starts the entire promised response period; it is never backdated to the sending attempt. Delivery means acceptance by the recipient's mail server, not a guarantee that the person has read the message.
+
+After the response period expires, a fresh positive delivery lookup and an atomic check of the current listing, provider, settings and cycle are required before pausing. A bounce, failure, suppression, complaint, cancellation, changed recipient or loss of primary-address verification blocks automatic pausing. Pending delivery clears the deadline; unavailable status checks do not establish delivery and never pause an offer. Status checks are bounded to 10 per run and have an eight-second timeout. No webhook registration is required. A read-permission failure or unavailable Resend/Clerk service leaves the offer live for a later successful check. With the daily schedule, checks and pauses may occur later than the minimum interval, never earlier because of the daily schedule.
+
+[Resend retains idempotency keys for 24 hours](https://resend.com/changelog/idempotency-keys). This worker stops retrying after 23 hours. Because the normal schedule is daily, an ambiguous attempt may become `unknown` on the next run instead of being sent again. Inspect the provider's message records and private outbox before deciding how to resolve such an entry. Do not generate a new key, reset the first-attempt time or infer acceptance from a timeout. Unknown delivery does not start an automatic pause deadline.
+
+Each run claims at most 10 reminders and stops starting new items after 45 seconds. Email requests have a 10-second timeout; unused claims recover after their lease. Simultaneous runs and interrupted requests rely on the database lease plus the stable provider key. Cron counters distinguish confirmed `sent`, `retry`, `skipped`, `unknown` and recording errors.
+
+## Local verification
+
+`lib/listing-freshness-mail.test.mjs` renders the real six-language catalogs with ICU formatting and intercepts every mail call and status lookup. `lib/listing-freshness-server.test.mjs` uses isolated fake database, identity and delivery dependencies. `lib/listing-freshness-delivery-db.test.mjs` exercises the actual migration and moderation triggers in an isolated PGlite database, including stale leases, frozen payloads and promised intervals, accepted-but-undelivered follow-ups, bounces, recipient changes, stale delivery observations and guarded automatic pauses. The cron exception is covered in `lib/private-api-auth.test.mjs`. These tests require no live service credentials and send no real mail.
+
+Run those tests, the database regression suite, TypeScript, `npm run check:i18n`, `npm run check:design`, and the production build before release. Local fixtures are not evidence that a production migration, activation or delivery has occurred.

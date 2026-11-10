@@ -5,6 +5,7 @@ import { placeInputValue } from "@/lib/places/core";
 import PlaceField from "@/components/PlaceField";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
 import DashboardDate from "@/components/DashboardDate";
+import ListingFreshnessSummary, { type ListingFreshnessPreview } from "@/components/ListingFreshnessSummary";
 import { useTranslations, useLocale } from "next-intl";
 import OfferModerationStatus from "@/components/OfferModerationStatus";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
@@ -106,7 +107,7 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState(VALID_TABS.includes(tabParam) ? tabParam : "overview");
 
   // Real listings from Supabase
-  const [myListings, setMyListings] = useState<{ id: string; type: string; category?: string; title: string; city: string; price: number; published: boolean; moderation_status?: string; moderation_reason?: string | null; responsible_person?: ResponsiblePerson & { userId: string }; created_at: string; image_url: string | null; extra_images?: string[] | null; blocked_dates?: string[] | null; description: string; metadata?: Record<string, unknown> | null }[]>([]);
+  const [myListings, setMyListings] = useState<{ id: string; type: string; category?: string; title: string; city: string; price: number; published: boolean; moderation_status?: string; moderation_reason?: string | null; freshness?: ListingFreshnessPreview | null; responsible_person?: ResponsiblePerson & { userId: string }; created_at: string; image_url: string | null; extra_images?: string[] | null; blocked_dates?: string[] | null; description: string; metadata?: Record<string, unknown> | null }[]>([]);
   const [listingsLoading, setListingsLoading] = useState(false);
   const [listingsError, setListingsError] = useState("");
 
@@ -1160,6 +1161,7 @@ export default function DashboardPage() {
                             <OfferModerationStatus item={l} />
                           </div>
                           <p className="text-xs text-text-muted">{typeLabel[l.type] ?? l.type} · {l.city}</p>
+                          <ListingFreshnessSummary listingId={l.id} state={l.freshness} showLink={false} />
                         </div>
                         {/* Preis */}
                         <div className="text-right shrink-0">
@@ -1776,6 +1778,7 @@ export default function DashboardPage() {
                       {listingPriceLabel(l.price,l.metadata,"/Tag",marketLocale,marketText)} ·{" "}
                       erstellt {new Date(l.created_at).toLocaleDateString("de-DE")}
                     </p>
+                    <ListingFreshnessSummary listingId={l.id} state={l.freshness} onNavigate={() => router.push(`/listing-status/${encodeURIComponent(l.id)}`)} />
                   </div>
                   <div className="flex flex-col gap-2 shrink-0">
                     <Link
