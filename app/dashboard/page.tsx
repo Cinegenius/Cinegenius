@@ -38,6 +38,7 @@ import {
 import { useUser } from "@clerk/nextjs";
 import { calculateProfileCompletion } from "@/lib/profile-completion";
 import { applyReadReceiptTimestamps, incomingUnreadMessageIds } from "@/lib/message-read-state";
+import { mergeMessagesById } from "@/lib/conversation-logic";
 import { notifyMessagesRead, subscribeToMessageReads } from "@/lib/message-read-sync";
 import { compressImage, MAX_FUNCTION_UPLOAD_BYTES } from "@/lib/compressImage";
 import ListingImageManager from "@/components/ListingImageManager";
@@ -98,6 +99,7 @@ export default function DashboardPage() {
   const moderation = useTranslations("OfferModeration");
   const marketplaceText = useTranslations("MarketplacePublishing");
   const animals = useTranslations("FilmAnimals");
+  const dashboardMessageText = useTranslations("messagesNavigation");
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -687,7 +689,20 @@ export default function DashboardPage() {
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [sending, setSending] = useState(false);
+  const [replyError, setReplyError] = useState("");
+  const [messageLoadError, setMessageLoadError] = useState("");
+  const [messageReloadVersion, setMessageReloadVersion] = useState(0);
+  const messageViewRef = useRef<{ userId: string; conversationId: string } | null>(null);
+  const messageSendPendingRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const view = user?.id && selectedConversation
+      ? { userId: user.id, conversationId: selectedConversation }
+      : null;
+    messageViewRef.current = view;
+    return () => { if (messageViewRef.current === view) messageViewRef.current = null; };
+  }, [selectedConversation, user?.id]);
 
   useEffect(() => {
     if (activeTab !== "bookings" && activeTab !== "overview") return;
@@ -803,61 +818,93 @@ export default function DashboardPage() {
   }, [user?.id, activeTab, loadDashboardConversations]);
 
   useEffect(() => {
-    if (!selectedConversation) return;
+    const view = messageViewRef.current;
+    let cancelled = false;
+    const controller = new AbortController();
+    const isCurrent = () => !cancelled && messageViewRef.current === view;
+    setActiveMessages([]);
+    setMessageLoadError("");
+    setReplyError("");
+    if (!view || !selectedConversation || !user?.id) {
+      setMessagesLoading(false);
+      return;
+    }
+    const { userId: owner, conversationId } = view;
     setMessagesLoading(true);
-    fetch(`/api/conversations/${selectedConversation}`, { cache: "no-store" })
-      .then(r => {
-        if (!r.ok) throw new Error("conversation fetch failed");
-        return r.json();
-      })
-      .then(async ({ messages }) => {
-        const loadedMessages = Array.isArray(messages) ? messages as RealMessage[] : [];
-        setActiveMessages(loadedMessages);
-        const messageIds = incomingUnreadMessageIds(loadedMessages, user?.id ?? "");
+    async function load() {
+      try {
+        const response = await fetch(`/api/conversations/${conversationId}`, { cache: "no-store", signal: controller.signal });
+        if (!response.ok) throw new Error("conversation fetch failed");
+        const { messages } = await response.json();
+        if (!isCurrent()) return;
+        if (!Array.isArray(messages)) throw new Error();
+        const loadedMessages = messages as RealMessage[];
+        setActiveMessages(current => mergeMessagesById(loadedMessages, current));
+        const messageIds = incomingUnreadMessageIds(loadedMessages, owner);
         if (messageIds.length > 0) {
-          const readResponse = await fetch(`/api/conversations/${selectedConversation}/read`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            cache: "no-store",
-            body: JSON.stringify({ message_ids: messageIds }),
-          });
-          if (readResponse.ok) {
-            const readState = await readResponse.json();
-            const readMessages = Array.isArray(readState.readMessages) ? readState.readMessages : [];
-            setActiveMessages((current) => applyReadReceiptTimestamps(current, readMessages));
-            setConversations((current) => current.map((conversation) => conversation.id !== selectedConversation ? conversation : {
-              ...conversation,
-              unread_count: readState.byConversation?.[selectedConversation] ?? conversation.unread_count,
-              messages: applyReadReceiptTimestamps(conversation.messages, readMessages),
-            }));
-            setUnreadMessagesTotal(Number(readState.count) || 0);
-            setConversationsReady(true);
-            if (user?.id) notifyMessagesRead(user.id);
-          }
+          try {
+            const readResponse = await fetch(`/api/conversations/${conversationId}/read`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              cache: "no-store",
+              signal: controller.signal,
+              body: JSON.stringify({ message_ids: messageIds }),
+            });
+            if (readResponse.ok) {
+              const readState = await readResponse.json();
+              if (!isCurrent()) return;
+              const readMessages = Array.isArray(readState.readMessages) ? readState.readMessages : [];
+              setActiveMessages((current) => applyReadReceiptTimestamps(current, readMessages));
+              setConversations((current) => current.map((conversation) => conversation.id !== conversationId ? conversation : {
+                ...conversation,
+                unread_count: readState.byConversation?.[conversationId] ?? conversation.unread_count,
+                messages: applyReadReceiptTimestamps(conversation.messages, readMessages),
+              }));
+              setUnreadMessagesTotal(Number(readState.count) || 0);
+              setConversationsReady(true);
+              notifyMessagesRead(owner);
+            }
+          } catch { /* read receipts are best effort; keep the loaded messages visible */ }
         }
-        setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
-      })
-      .catch(() => {})
-      .finally(() => setMessagesLoading(false));
-  }, [selectedConversation, user?.id]);
+        setTimeout(() => { if (isCurrent()) messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, 50);
+      } catch {
+        if (isCurrent()) setMessageLoadError(dashboardMessageText("messageLoadError"));
+      } finally {
+        if (isCurrent()) setMessagesLoading(false);
+      }
+    }
+    void load();
+    return () => { cancelled = true; controller.abort(); };
+  }, [selectedConversation, user?.id, messageReloadVersion, dashboardMessageText]);
 
   const sendReply = async () => {
-    if (!replyText.trim() || !selectedConversation || sending) return;
+    const view = messageViewRef.current;
+    if (!replyText.trim() || !selectedConversation || !view || view.conversationId !== selectedConversation || view.userId !== user?.id || sending || messageSendPendingRef.current) return;
+    const isCurrent = () => messageViewRef.current === view;
+    const draftAtSend = replyText;
+    messageSendPendingRef.current = true;
     setSending(true);
-    const text = replyText.trim();
-    setReplyText("");
+    setReplyError("");
     try {
-      await fetch(`/api/conversations/${selectedConversation}`, {
+      const response = await fetch(`/api/conversations/${view.conversationId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: text }),
+        body: JSON.stringify({ content: draftAtSend.trim() }),
       });
-      const { messages } = await fetch(`/api/conversations/${selectedConversation}`).then(r => r.json());
-      setActiveMessages(messages ?? []);
-      setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
-      // refresh conv list to update updated_at
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || payload.error || !payload.message?.id) {
+        if (isCurrent()) setReplyError(typeof payload.error === "string" && payload.error ? payload.error : dashboardMessageText("sendError"));
+        return;
+      }
+      if (!isCurrent()) { void loadDashboardConversations(); return; }
+      setReplyText(current => current === draftAtSend ? "" : current);
+      setActiveMessages(current => mergeMessagesById(current, [payload.message as RealMessage]));
+      setTimeout(() => { if (isCurrent()) messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, 50);
       void loadDashboardConversations();
+    } catch {
+      if (isCurrent()) setReplyError(dashboardMessageText("sendError"));
     } finally {
+      messageSendPendingRef.current = false;
       setSending(false);
     }
   };
@@ -2069,7 +2116,11 @@ export default function DashboardPage() {
                       {messagesLoading && (
                         <div className="text-center text-xs text-text-muted py-4">Nachrichten laden...</div>
                       )}
-                      {!messagesLoading && activeMessages.length === 0 && (
+                      {messageLoadError && <div role="alert" className="py-3 text-xs text-red-400">
+                        <p>{messageLoadError}</p>
+                        <button type="button" onClick={() => setMessageReloadVersion(value => value + 1)} className="min-h-11 text-gold">{dashboardMessageText("retry")}</button>
+                      </div>}
+                      {!messagesLoading && !messageLoadError && activeMessages.length === 0 && (
                         <div className="text-center text-xs text-text-muted py-4">Noch keine Nachrichten</div>
                       )}
                       {activeMessages.map((msg) => {
@@ -2093,7 +2144,9 @@ export default function DashboardPage() {
                     </div>
 
                     {/* Reply input */}
-                    <div className="p-3 border-t border-border flex items-end gap-2">
+                    <div className="p-3 border-t border-border">
+                      {replyError && <p role="alert" className="mb-2 text-xs text-red-400">{replyError}</p>}
+                      <div className="flex items-end gap-2">
                       <textarea
                         rows={2}
                         value={replyText}
@@ -2109,6 +2162,7 @@ export default function DashboardPage() {
                       >
                         <Send size={15} className="text-bg-primary" />
                       </button>
+                      </div>
                     </div>
                   </div>
                 );

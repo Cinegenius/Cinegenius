@@ -1978,7 +1978,12 @@
     "back": "Indietro",
     "contacts": "Contatti",
     "contactsLoading": "Contatti …",
-    "contactsCount": "Contatti ({count})"
+    "contactsCount": "Contatti ({count})",
+    "loadError": "Non è stato possibile caricare le tue conversazioni. Riprova.",
+    "messageLoadError": "Non è stato possibile caricare i messaggi. Riprova.",
+    "retry": "Riprova",
+    "sendError": "Non è stato possibile inviare il messaggio. Il testo è stato conservato.",
+    "loading": "Caricamento dei messaggi…"
   },
   "homeCompanyLogos": {
     "touchHint": "Scorri per ruotare · Tocca per aprire",

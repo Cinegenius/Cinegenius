@@ -1978,7 +1978,12 @@
     "back": "Volver",
     "contacts": "Contactos",
     "contactsLoading": "Contactos …",
-    "contactsCount": "Contactos ({count})"
+    "contactsCount": "Contactos ({count})",
+    "loadError": "No se han podido cargar tus conversaciones. Inténtalo de nuevo.",
+    "messageLoadError": "No se han podido cargar los mensajes. Inténtalo de nuevo.",
+    "retry": "Volver a intentar",
+    "sendError": "No se ha podido enviar el mensaje. El texto se ha conservado.",
+    "loading": "Cargando mensajes…"
   },
   "homeCompanyLogos": {
     "touchHint": "Desliza para girar · Toca para abrir",

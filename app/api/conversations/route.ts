@@ -31,16 +31,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ conversationId: data?.id ?? null }, { headers: { "Cache-Control": "private, no-store" } });
   }
 
-  const { data: memberships, error: membershipError } = await db
-    .from("conversation_members")
-    .select("conversation_id, role, joined_at")
-    .eq("user_id", userId)
-    .is("left_at", null)
-    .order("joined_at", { ascending: false })
-    .limit(50);
-  if (membershipError) return NextResponse.json({ error: "Unterhaltungen konnten nicht geladen werden." }, { status: 500 });
-
-  const conversationIds = (memberships ?? []).map((membership) => membership.conversation_id);
   let unreadCounts: Awaited<ReturnType<typeof getUnreadMessageCounts>>;
   try {
     unreadCounts = await getUnreadMessageCounts(userId);
@@ -48,26 +38,30 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Ungelesene Nachrichten konnten nicht geladen werden." }, { status: 500 });
   }
 
-  if (conversationIds.length === 0) {
-    return NextResponse.json({ data: [], unreadCount: unreadCounts.count }, {
-      headers: { "Cache-Control": "no-store, max-age=0" },
-    });
-  }
-
+  // Filter active membership and sort activity before limiting the inbox.
+  // A recently active old chat must not be excluded by its join date.
   const { data: conversations, error } = await db
     .from("conversations")
     .select(`
       id, kind, group_name, listing_id, listing_title, listing_type,
       sender_id, receiver_id, created_at, updated_at,
+      conversation_members!inner(user_id, joined_at, left_at),
       messages(id, sender_id, content, read_at, created_at)
     `)
-    .in("id", conversationIds)
+    .eq("conversation_members.user_id", userId)
+    .is("conversation_members.left_at", null)
     .or(`sender_id.neq.${userId},hidden_for_sender_at.is.null`, { referencedTable: "messages" })
     .order("updated_at", { ascending: false })
     .order("created_at", { ascending: false, referencedTable: "messages" })
     .limit(1, { referencedTable: "messages" })
     .limit(50);
   if (error) return NextResponse.json({ error: "Unterhaltungen konnten nicht geladen werden." }, { status: 500 });
+  if ((conversations ?? []).some((conversation) =>
+    !Array.isArray(conversation.conversation_members)
+      || !conversation.conversation_members.some((member) => member?.user_id === userId && member.left_at === null),
+  )) {
+    return NextResponse.json({ error: "Unterhaltungen konnten nicht geladen werden." }, { status: 500 });
+  }
 
   const groupIds = (conversations ?? []).filter((conversation) => conversation.kind === "group").map((conversation) => conversation.id);
   let groupMembers: Array<{ conversation_id: string; user_id: string; role: "admin" | "member"; joined_at: string }> = [];
@@ -107,8 +101,8 @@ export async function GET(request: NextRequest) {
     receipts = data ?? [];
   }
 
-  const enriched = (conversations ?? []).map((conversation) => {
-    const membership = (memberships ?? []).find((candidate) => candidate.conversation_id === conversation.id);
+  const enriched = (conversations ?? []).map(({ conversation_members: memberships, ...conversation }) => {
+    const membership = memberships.find((candidate) => candidate?.user_id === userId && candidate.left_at === null);
     const messages = (conversation.messages ?? []).filter((message) =>
       !membership || new Date(message.created_at).getTime() >= new Date(membership.joined_at).getTime(),
     );
