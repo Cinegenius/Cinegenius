@@ -73,6 +73,8 @@ const TRAINING_COLORS: Record<string, string> = {
 };
 
 export default function TiereContent({ serverListings }: { serverListings: Animal[] }) {
+  const uiText = useTranslations();
+
   const { isSignedIn } = useAuth();
   const animals = useTranslations("FilmAnimals");
   const [search, setSearch] = useState("");
@@ -179,7 +181,7 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Tier suchen…"
+            placeholder={uiText("Ui.text_daec3cc1690074")}
             className="w-full pl-9 pr-4 py-2.5 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors"
           />
         </div>
@@ -190,9 +192,7 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
         <button onClick={() => setDeliveryOnly((v) => !v)}
           className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm border transition-colors ${
             deliveryOnly ? "bg-gold/10 border-gold/30 text-gold" : "bg-bg-elevated border-border text-text-muted hover:text-text-secondary"
-          }`}>
-          <Truck size={14} /> Lieferung
-        </button>
+          }`}>{uiText.rich("Ui.text_b1074837744a9d", { part1: () => (<Truck size={14} />) })}</button>
       </div>
 
       {/* Active filters */}
@@ -209,14 +209,12 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
             </span>
           ))}
           <button onClick={() => { setSpecies("Alle"); setTraining("Alle"); setDeliveryOnly(false); setSearch(""); }}
-            className="text-xs text-text-muted hover:text-gold transition-colors px-2">
-            Alle zurücksetzen
-          </button>
+            className="text-xs text-text-muted hover:text-gold transition-colors px-2">{uiText("Ui.text_0b6db8b5a95799")}</button>
         </div>
       )}
 
       {/* Count */}
-      <p className="text-xs text-text-muted mb-6">{filtered.length} {filtered.length === 1 ? "Tier" : "Tiere"} gefunden</p>
+      <p className="text-xs text-text-muted mb-6">{uiText.rich("Ui.text_7d362f03fc64a9", { value1: () => (filtered.length), value2: () => (filtered.length === 1 ? uiText("Ui.text_cb9e8664edea8c") : uiText("Ui.text_d9609c949e931a")) })}</p>
 
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
@@ -250,9 +248,7 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
                 )}
                 <div className="absolute top-2 right-2 flex items-center gap-1">
                   {animal.delivery && (
-                    <span className="px-2 py-0.5 bg-success/90 text-white text-[10px] font-semibold rounded-full flex items-center gap-1">
-                      <Truck size={9} /> Lieferung
-                    </span>
+                    <span className="px-2 py-0.5 bg-success/90 text-white text-[10px] font-semibold rounded-full flex items-center gap-1">{uiText.rich("Ui.text_b1074837744a9d", { part1: () => (<Truck size={9} />) })}</span>
                   )}
                   {isSignedIn && (
                     <button type="button" onClick={(e) => handleFavorite(e, animal.id)}
@@ -278,7 +274,7 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
                 </h3>
 
                 <div className="flex items-center gap-1 text-xs text-text-muted mb-3">
-                  <MapPin size={11} /> {animal.location || "Standort auf Anfrage"}
+                  <MapPin size={11} /> {animal.location || uiText("FilmAnimals.locationRequest")}
                 </div>
 
                 {animal.handlerIncluded && (
@@ -305,7 +301,7 @@ export default function TiereContent({ serverListings }: { serverListings: Anima
                         <span className="text-[9px] text-text-muted">({liveRatings[animal.id].count})</span>
                       </>
                     ) : (
-                      <span className="text-[9px] text-text-muted/60">Noch keine Bewertung</span>
+                      <span className="text-[9px] text-text-muted/60">{uiText("locations.landingNoReviews")}</span>
                     )}
                   </div>
                   {eligible.has(animal.id) && (

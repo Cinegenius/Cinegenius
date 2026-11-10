@@ -2,18 +2,22 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth, useSession } from "@clerk/nextjs";
+import { useLocale } from "next-intl";
 import { createInboxPolling, type InboxSnapshot } from "@/lib/inbox-polling";
 import { subscribeToMessageReads } from "@/lib/message-read-sync";
 import { publishUnreadCount } from "@/lib/unread-count-store";
 import { INBOX_FALLBACK_REFRESH_MS } from "@/lib/message-refresh-policy";
 
 export function useAuthenticatedInbox() {
+  const locale = useLocale();
+  const localeRef = useRef(locale);
+  localeRef.current = locale;
   const { isLoaded, isSignedIn, userId, sessionId, getToken } = useAuth();
   const { session, isLoaded: sessionLoaded } = useSession();
   const active = isLoaded && sessionLoaded && isSignedIn && !!userId && !!sessionId
     && session?.status === "active" && session.id === sessionId && session.user.id === userId;
   const key = active ? `${userId}:${sessionId}` : null;
-  const [data, setData] = useState<{ key: string; snapshot: InboxSnapshot } | null>(null);
+  const [data, setData] = useState<{ key: string; locale: string; snapshot: InboxSnapshot } | null>(null);
   const current = useRef<{ key: string; poll: ReturnType<typeof createInboxPolling> } | null>(null);
 
   useEffect(() => {
@@ -21,11 +25,11 @@ export function useAuthenticatedInbox() {
       publishUnreadCount(null, 0);
       return;
     }
-    const poll = createInboxPolling({ userId, sessionId }, getToken);
+    const poll = createInboxPolling({ userId, sessionId }, getToken, { locale: localeRef.current });
     current.current = { key, poll };
     const unsubscribe = poll.subscribe(() => {
       const snapshot = poll.getSnapshot();
-      setData({ key, snapshot });
+      setData({ key, locale: poll.getLocale() ?? localeRef.current, snapshot });
       // Unknown/error is not published as a successful zero-count response.
       if (snapshot.status === "ready" && snapshot.count !== null) publishUnreadCount(userId, snapshot.count);
       else if (snapshot.status === "expired") publishUnreadCount(null, 0);
@@ -52,11 +56,15 @@ export function useAuthenticatedInbox() {
     };
   }, [getToken, key, sessionId, userId]);
 
+  useEffect(() => {
+    if (current.current?.key === key) void current.current.poll.setLocale(locale);
+  }, [key, locale]);
+
   const refresh = useCallback((retry = false) => current.current?.key === key
     ? current.current.poll.refresh(retry) : Promise.resolve(), [key]);
   const markRead = useCallback((id?: string) => current.current?.key === key
     ? current.current.poll.markRead(id) : Promise.resolve(false), [key]);
-  const snapshot: InboxSnapshot = key && data?.key === key ? data.snapshot : {
+  const snapshot: InboxSnapshot = key && data?.key === key && data.locale === locale ? data.snapshot : {
     status: !isLoaded || !sessionLoaded || active ? "loading" : isSignedIn ? "expired" : "idle",
     count: null, notifications: [],
   };

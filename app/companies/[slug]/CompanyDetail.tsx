@@ -30,6 +30,7 @@ import CompanyLogo from "@/components/CompanyLogo";
 import Lightbox from "@/components/Lightbox";
 import { listingPriceLabel } from "@/lib/listing-price";
 import { listingDetailPath } from "@/lib/listing-routes";
+import { uiErrorMessage } from "@/lib/ui-error-message";
 
 type Listing = {
   id: string;
@@ -132,6 +133,8 @@ export default function CompanyDetail({
   currentUserId: string | null;
   initialIsOwner: boolean;
 }) {
+  const uiText = useTranslations();
+
   const { user, isLoaded } = useUser();
   const market=useTranslations("MarketplaceOffer"),marketLocale=useLocale();
   const messageText = useTranslations("companyMessages");
@@ -208,7 +211,7 @@ export default function CompanyDetail({
 
   function toggleJoinTitle(title: string) {
     if (!joinTitles.includes(title) && joinTitles.length + normalizeCompanyPublicTitles(joinCustomTitle.split(",")).length >= 5) {
-      setJoinError("Du kannst bis zu fünf Funktionen angeben.");
+      setJoinError(uiText("Ui.text_03ade5d8fb8160"));
       return;
     }
     setJoinError("");
@@ -220,7 +223,7 @@ export default function CompanyDetail({
   async function handleSubmitMembershipAction() {
     const public_titles = selectedJoinTitles();
     if (!public_titles.length) {
-      setJoinError("Wähle mindestens eine Funktion aus oder gib eine eigene Bezeichnung ein.");
+      setJoinError(uiText("Ui.text_9b5e4eb1b172ee"));
       return;
     }
     if (joinDialogMode === "title_change" && !localMembership) return;
@@ -238,15 +241,15 @@ export default function CompanyDetail({
             body: JSON.stringify({ company_id: company.id, public_titles, message: joinMessage }),
           });
       const result = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(result.error ?? "Deine Anfrage konnte nicht gesendet werden.");
+      if (!response.ok) throw new Error(result.error ?? uiText("Ui.text_684a18c0b543ed"));
       if (joinDialogMode === "title_change") setTitleChangeRequest(result.data);
       else setLocalMembership({ id: result.data.id, status: result.data.status });
       setJoinDialogMode(null);
       setMembershipSuccess(joinDialogMode === "title_change"
-        ? "Funktionsänderung angefragt – die Bestätigung durch die Firma steht aus."
-        : "Anfrage gesendet – Bestätigung durch die Firma ausstehend.");
+        ? uiText("Ui.text_e3a1b433c756be")
+        : uiText("Ui.text_9ad1fd84fa41f8"));
     } catch (cause: unknown) {
-      setJoinError(cause instanceof Error ? cause.message : "Deine Anfrage konnte nicht gesendet werden.");
+      setJoinError(uiErrorMessage(cause, uiText("Ui.text_684a18c0b543ed")));
     } finally {
       setJoining(false);
     }
@@ -258,11 +261,11 @@ export default function CompanyDetail({
     try {
       const response = await fetch(`/api/company-member-title-change-requests?id=${encodeURIComponent(titleChangeRequest.id)}`, { method: "DELETE" });
       const result = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(result.error ?? "Die Anfrage konnte nicht zurückgezogen werden.");
+      if (!response.ok) throw new Error(result.error ?? uiText("Ui.text_74c3215cde86d9"));
       setTitleChangeRequest(null);
-      setMembershipSuccess("Deine Funktionsänderungsanfrage wurde zurückgezogen.");
+      setMembershipSuccess(uiText("Ui.text_f10f05b971bae5"));
     } catch (cause) {
-      setMembershipError(cause instanceof Error ? cause.message : "Die Anfrage konnte nicht zurückgezogen werden.");
+      setMembershipError(uiErrorMessage(cause, uiText("Ui.text_74c3215cde86d9")));
     } finally { setWithdrawing(false); }
   }
 
@@ -274,15 +277,15 @@ export default function CompanyDetail({
     try {
       const res = await fetch(`/api/company-members?id=${encodeURIComponent(localMembership.id)}`, { method: "DELETE" });
       const result = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(result.error ?? "Die Anfrage konnte nicht zurückgezogen werden. Bitte lade die Seite neu und versuche es erneut.");
+      if (!res.ok) throw new Error(result.error ?? uiText("Ui.text_b91f2a7514ba04"));
       setLocalMembership(null);
       setLocalMembers((current) => current.filter((member) => member.id !== localMembership.id));
       setJoinDialogMode(null);
       setMembershipSuccess(localMembership.status === "pending"
-        ? "Deine Beitrittsanfrage wurde zurückgezogen."
-        : "Du hast die Firma verlassen.");
+        ? uiText("Ui.text_d7ebc224d92c28")
+        : uiText("Ui.text_50f91ed1dc932e"));
     } catch (cause) {
-      setMembershipError(cause instanceof Error ? cause.message : "Die Anfrage konnte nicht zurückgezogen werden.");
+      setMembershipError(uiErrorMessage(cause, uiText("Ui.text_74c3215cde86d9")));
     } finally {
       setWithdrawing(false);
     }
@@ -294,10 +297,10 @@ export default function CompanyDetail({
     try {
       const response = await fetch(`/api/companies/${company.slug}/publish`, { method: "POST" });
       const result = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(result.error ?? "Veröffentlichung fehlgeschlagen.");
+      if (!response.ok) throw new Error(result.error ?? uiText("Ui.text_b8a82d14926aed"));
       setCompanyPublished(true);
     } catch (cause) {
-      setPublishError(cause instanceof Error ? cause.message : "Veröffentlichung fehlgeschlagen.");
+      setPublishError(uiErrorMessage(cause, uiText("Ui.text_b8a82d14926aed")));
     } finally {
       setPublishingCompany(false);
     }
@@ -309,7 +312,7 @@ export default function CompanyDetail({
       {isWelcome && !welcomeDismissed && (
         <div className="bg-gold/10 border-b border-gold/20">
           <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-            <span className="text-sm text-gold flex items-center gap-2"><CheckCircle size={14} /> Firmenprofil erstellt!</span>
+            <span className="text-sm text-gold flex items-center gap-2">{uiText.rich("Ui.text_d8312e10ffbd58", { part1: () => (<CheckCircle size={14} />) })}</span>
             <button onClick={() => setWelcomeDismissed(true)}><X size={14} className="text-gold/50 hover:text-gold" /></button>
           </div>
         </div>
@@ -318,8 +321,8 @@ export default function CompanyDetail({
       {isOwner && !companyPublished && (
         <div className="border-b border-gold/20 bg-gold/10">
           <div className="mx-auto flex max-w-4xl flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <div><p className="text-sm font-semibold text-gold">Bisher privater Firmenentwurf</p><p className="mt-1 text-xs text-text-muted">Dieses ältere Profil ist noch privat. Wenn du es im Formular speicherst, wird es automatisch öffentlich. Du kannst es auch direkt hier veröffentlichen.</p>{publishError && <p role="alert" className="mt-2 text-xs text-red-300">{publishError}</p>}</div>
-            <button onClick={() => void publishCompany()} disabled={publishingCompany} className="min-h-11 rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary disabled:opacity-60">{publishingCompany ? "Wird veröffentlicht …" : "Jetzt öffentlich anzeigen"}</button>
+            <div><p className="text-sm font-semibold text-gold">{uiText("Ui.text_6bb8196892d764")}</p><p className="mt-1 text-xs text-text-muted">{uiText("Ui.text_e53bb993c14906")}</p>{publishError && <p role="alert" className="mt-2 text-xs text-red-300">{publishError}</p>}</div>
+            <button onClick={() => void publishCompany()} disabled={publishingCompany} className="min-h-11 rounded-xl bg-gold px-4 text-sm font-semibold text-bg-primary disabled:opacity-60">{publishingCompany ? uiText("MarketplacePublishing.publishing") : uiText("Ui.text_ad4bfd9349d119")}</button>
           </div>
         </div>
       )}
@@ -367,9 +370,7 @@ export default function CompanyDetail({
 
           {canEditCompany && (
             <Link href={`/company-setup?company_id=${company.id}`}
-              className="mb-5 inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-bg-primary/60 px-3 py-2 text-xs text-text-secondary hover:border-gold/40 hover:text-gold">
-              <Pencil size={13} /> Bearbeiten
-            </Link>
+              className="mb-5 inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-bg-primary/60 px-3 py-2 text-xs text-text-secondary hover:border-gold/40 hover:text-gold">{uiText.rich("Ui.text_603ead2ae843f0", { part1: () => (<Pencil size={13} />) })}</Link>
           )}
 
           {/* Industry focus */}
@@ -384,13 +385,11 @@ export default function CompanyDetail({
             <span className="flex items-center gap-1.5"><MapPin size={11} />{company.city}</span>
             {acceptedMembers.length > 0 && (
               <span className="flex items-center gap-1.5">
-                <Users size={11} /> {acceptedMembers.length} {acceptedMembers.length === 1 ? "Person" : "Personen"}
+                <Users size={11} /> {acceptedMembers.length} {acceptedMembers.length === 1 ? uiText("Ui.text_6007db63e18e53") : uiText("Ui.text_cf996a8dbe3635")}
               </span>
             )}
             {company.founded_year && (
-              <span className="flex items-center gap-1.5">
-                <Calendar size={11} /> Seit {company.founded_year}
-              </span>
+              <span className="flex items-center gap-1.5">{uiText.rich("Ui.text_600a9479a54f20", { part1: () => (<Calendar size={11} />), value2: () => (company.founded_year) })}</span>
             )}
           </div>
 
@@ -398,9 +397,7 @@ export default function CompanyDetail({
           <div className="flex min-w-0 max-w-full flex-wrap gap-2">
             {company.email && (
               <a href={`mailto:${company.email}`}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors text-xs">
-                <Mail size={13} /> E-Mail schreiben
-              </a>
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors text-xs">{uiText.rich("Ui.text_a745e79a497b9e", { part1: () => (<Mail size={13} />) })}</a>
             )}
             {!isOwner && <Link href={`/companies/${encodeURIComponent(company.slug)}/message`}
               className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-border bg-bg-elevated px-4 py-2 text-xs text-text-secondary transition-colors hover:border-gold/40 hover:text-gold">
@@ -420,54 +417,44 @@ export default function CompanyDetail({
             )}
             {company.contact_requires_sign_in && !currentUserId && (
               <Link href={`/sign-in?redirect_url=${encodeURIComponent(`/companies/${company.slug}`)}`}
-                className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-border bg-bg-elevated px-4 py-2 text-xs text-text-secondary hover:border-gold/40 hover:text-gold">
-                <Mail size={13} /> Anmelden, um Kontakt aufzunehmen
-              </Link>
+                className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-border bg-bg-elevated px-4 py-2 text-xs text-text-secondary hover:border-gold/40 hover:text-gold">{uiText.rich("Ui.text_d58af908bdd601", { part1: () => (<Mail size={13} />) })}</Link>
             )}
             {!isOwner && (
               <div className="relative">
                 <button ref={actionMenuTriggerRef} type="button" aria-expanded={actionMenuOpen} aria-controls="company-membership-actions-menu"
                   onClick={() => setActionMenuOpen((open) => !open)}
-                  className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-bg-elevated px-3 py-2 text-xs text-text-secondary transition-colors hover:border-gold/40 hover:text-gold">
-                  <MoreHorizontal size={14} /> Weitere Aktionen
-                </button>
+                  className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-bg-elevated px-3 py-2 text-xs text-text-secondary transition-colors hover:border-gold/40 hover:text-gold">{uiText.rich("Ui.text_884bc9a6617e37", { part1: () => (<MoreHorizontal size={14} />) })}</button>
                 {actionMenuOpen && (
-                  <FloatingPanel anchorRef={actionMenuTriggerRef} onClose={() => setActionMenuOpen(false)} width={288} id="company-membership-actions-menu" label="Weitere Firmenaktionen" className="rounded-xl border border-border bg-bg-secondary p-2 shadow-2xl">
+                  <FloatingPanel anchorRef={actionMenuTriggerRef} onClose={() => setActionMenuOpen(false)} width={288} id="company-membership-actions-menu" label={uiText("Ui.text_4218d84acb0e7c")} className="rounded-xl border border-border bg-bg-secondary p-2 shadow-2xl">
                     {!currentUserId ? (
                       <Link href={`/sign-in?redirect_url=${encodeURIComponent(`/companies/${company.slug}`)}`}
-                        className="flex min-h-11 items-center rounded-lg px-3 py-2.5 text-left text-sm text-text-primary hover:bg-bg-elevated">
-                        Anmelden, um Firmenzugehörigkeit anzufragen
-                      </Link>
+                        className="flex min-h-11 items-center rounded-lg px-3 py-2.5 text-left text-sm text-text-primary hover:bg-bg-elevated">{uiText("Ui.text_2063bdc17825d5")}</Link>
                     ) : !localMembership ? (
                       <button type="button" onClick={() => openJoinForm("join")}
-                        className="flex min-h-11 w-full items-center rounded-lg px-3 py-2.5 text-left text-sm text-text-primary hover:bg-bg-elevated">
-                        Firmenzugehörigkeit anfragen
-                      </button>
+                        className="flex min-h-11 w-full items-center rounded-lg px-3 py-2.5 text-left text-sm text-text-primary hover:bg-bg-elevated">{uiText("Ui.text_b5afc393a9c48a")}</button>
                     ) : localMembership.status === "pending" ? (
                       <div className="space-y-1">
-                        <p className="px-3 py-2 text-xs leading-relaxed text-text-muted">Anfrage gesendet – Bestätigung durch die Firma ausstehend.</p>
+                        <p className="px-3 py-2 text-xs leading-relaxed text-text-muted">{uiText("Ui.text_9ad1fd84fa41f8")}</p>
                         <button type="button" onClick={() => void handleLeave()} disabled={withdrawing}
                           className="flex min-h-11 w-full items-center rounded-lg px-3 py-2.5 text-left text-sm text-text-secondary hover:bg-bg-elevated disabled:opacity-50">
-                          {withdrawing ? "Wird zurückgezogen …" : "Anfrage zurückziehen"}
+                          {withdrawing ? uiText("Ui.text_03b83846d1d0fd") : uiText("Ui.text_ee241cef795ce5")}
                         </button>
                       </div>
                     ) : titleChangeRequest?.status === "pending" ? (
                       <div className="space-y-1">
-                        <p className="px-3 py-2 text-xs leading-relaxed text-text-muted">Funktionsänderung ausstehend. Deine bestätigte Funktion bleibt bis zur Freigabe bestehen.</p>
+                        <p className="px-3 py-2 text-xs leading-relaxed text-text-muted">{uiText("Ui.text_31bce102266fc9")}</p>
                         <button type="button" onClick={() => void withdrawTitleChangeRequest()} disabled={withdrawing}
                           className="flex min-h-11 w-full items-center rounded-lg px-3 py-2.5 text-left text-sm text-text-secondary hover:bg-bg-elevated disabled:opacity-50">
-                          {withdrawing ? "Wird zurückgezogen …" : "Anfrage zurückziehen"}
+                          {withdrawing ? uiText("Ui.text_03b83846d1d0fd") : uiText("Ui.text_ee241cef795ce5")}
                         </button>
                       </div>
                     ) : (
                       <>
                         <button type="button" onClick={() => openJoinForm("title_change")}
-                          className="flex min-h-11 w-full items-center rounded-lg px-3 py-2.5 text-left text-sm text-text-primary hover:bg-bg-elevated">
-                          Funktion ändern anfragen
-                        </button>
+                          className="flex min-h-11 w-full items-center rounded-lg px-3 py-2.5 text-left text-sm text-text-primary hover:bg-bg-elevated">{uiText("Ui.text_59d2fef9a29700")}</button>
                         <button type="button" onClick={() => void handleLeave()} disabled={withdrawing}
                           className="flex min-h-11 w-full items-center rounded-lg px-3 py-2.5 text-left text-sm text-text-secondary hover:bg-bg-elevated disabled:opacity-50">
-                          {withdrawing ? "Wird beendet …" : "Firma verlassen"}
+                          {withdrawing ? uiText("Ui.text_c8b041480a7563") : uiText("Ui.text_eb9b558151c7ce")}
                         </button>
                       </>
                     )}
@@ -476,14 +463,12 @@ export default function CompanyDetail({
               </div>
             )}
             {currentUserId && !isOwner && localMembership?.status === "pending" && (
-              <p role="status" className="w-full text-xs text-amber-400"><Clock size={11} className="mr-1 inline" />Anfrage gesendet – Bestätigung durch die Firma ausstehend.</p>
+              <p role="status" className="w-full text-xs text-amber-400">{uiText.rich("Ui.text_b4abd16a2b78d1", { part1: () => (<Clock size={11} className="mr-1 inline" />) })}</p>
             )}
             {membershipError && <p role="alert" className="w-full text-xs text-crimson-light">{membershipError}</p>}
             {membershipSuccess && <p role="status" className="w-full text-xs text-success">{membershipSuccess}</p>}
             {currentUserId && !isOwner && localMembership?.status === "accepted" && (
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-success flex items-center gap-1.5"><CheckCircle size={11} /> Du bist Teammitglied</span>
-              </div>
+              <div className="flex items-center gap-3">{uiText.rich("Ui.text_059132e4cae141", { part2: () => (<CheckCircle size={11} />), part1: chunks => (<span className="text-xs text-success flex items-center gap-1.5">{chunks}</span>) })}</div>
             )}
           </div>
 
@@ -505,22 +490,20 @@ export default function CompanyDetail({
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h2 id="company-membership-dialog-title" className="font-display text-xl font-bold text-text-primary">
-                      {joinDialogMode === "join" ? "Firmenzugehörigkeit anfragen" : "Funktion ändern anfragen"}
+                      {joinDialogMode === "join" ? uiText("Ui.text_b5afc393a9c48a") : uiText("Ui.text_59d2fef9a29700")}
                     </h2>
                     <p className="mt-2 text-sm leading-relaxed text-text-muted">
                       {joinDialogMode === "join"
-                        ? "Du arbeitest bereits für diese Firma? Frage hier die Verknüpfung mit deinem Profil an. Das ist keine Bewerbung auf einen Job."
-                        : "Bitte die Firma darum, deine öffentliche Funktion im Teamprofil zu ändern. Bis zur Bestätigung bleibt deine bisherige Funktion sichtbar."}
+                        ? uiText("Ui.text_10144f3c7595a8")
+                        : uiText("Ui.text_b0183f5eb90b49")}
                     </p>
                   </div>
-                  <button type="button" aria-label="Dialog schließen" onClick={() => !joining && setJoinDialogMode(null)} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-text-muted hover:bg-bg-elevated hover:text-text-primary"><X size={16} /></button>
+                  <button type="button" aria-label={uiText("Ui.text_192abd55f1bb32")} onClick={() => !joining && setJoinDialogMode(null)} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-text-muted hover:bg-bg-elevated hover:text-text-primary"><X size={16} /></button>
                 </div>
-                <p className="mt-3 rounded-lg border border-border bg-bg-primary/60 p-3 text-xs leading-relaxed text-text-muted">
-                  Die Angaben erscheinen erst nach der Bestätigung durch die Firma öffentlich. Öffentliche Funktionen vergeben keine Verwaltungsrechte. Ohne zuständige Firmenverwaltung wird nichts automatisch freigegeben; zur Klärung erreichst du uns unter <a className="text-gold underline underline-offset-2" href="mailto:cinegenius.co@gmail.com">cinegenius.co@gmail.com</a>.
-                </p>
+                <p className="mt-3 rounded-lg border border-border bg-bg-primary/60 p-3 text-xs leading-relaxed text-text-muted">{uiText.rich("Ui.text_eb12dcd1639dde", { part1: chunks => (<a className="text-gold underline underline-offset-2" href="mailto:cinegenius.co@gmail.com">{chunks}</a>) })}</p>
                 <div className="mt-5 space-y-4">
                   <div>
-                    <p className="mb-2 text-xs font-medium text-text-secondary">Welche Funktion(en) hast du? Wähle bis zu fünf.</p>
+                    <p className="mb-2 text-xs font-medium text-text-secondary">{uiText("Ui.text_c147da3a826532")}</p>
                     <div className="flex flex-wrap gap-2">
                       {COMPANY_PUBLIC_TITLE_SUGGESTIONS.map((title) => {
                         const selected = joinTitles.includes(title);
@@ -531,25 +514,18 @@ export default function CompanyDetail({
                       })}
                     </div>
                   </div>
-                  <label className="block space-y-1.5">
-                    <span className="text-xs font-medium text-text-secondary">Weitere Berufsbezeichnung(en) (optional, mehrere mit Komma trennen)</span>
-                    <input value={joinCustomTitle} onChange={(event) => { setJoinCustomTitle(event.target.value); setJoinError(""); }} maxLength={400} disabled={joinTitles.length >= 5}
-                      placeholder="z. B. Catering-Leitung oder Oberbeleuchter/in"
-                      className="min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary placeholder:text-text-muted focus:border-gold/50 focus:outline-none disabled:opacity-50" />
-                  </label>
-                  <label className="block space-y-1.5">
-                    <span className="text-xs font-medium text-text-secondary">Nachricht an die Firma (optional)</span>
-                    <textarea value={joinMessage} onChange={(event) => setJoinMessage(event.target.value)} maxLength={500} rows={3}
-                      placeholder="Zum Beispiel: Seit wann du für die Firma arbeitest."
-                      className="w-full resize-y rounded-lg border border-border bg-bg-primary px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-gold/50 focus:outline-none" />
-                    <span className="block text-right text-[11px] text-text-muted">{joinMessage.length}/500</span>
-                  </label>
+                  <label className="block space-y-1.5">{uiText.rich("Ui.text_17a98e89649ce4", { part1: chunks => (<span className="text-xs font-medium text-text-secondary">{chunks}</span>), part2: () => (<input value={joinCustomTitle} onChange={(event) => { setJoinCustomTitle(event.target.value); setJoinError(""); }} maxLength={400} disabled={joinTitles.length >= 5}
+                      placeholder={uiText("Ui.text_0cae44c75ca0b4")}
+                      className="min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary placeholder:text-text-muted focus:border-gold/50 focus:outline-none disabled:opacity-50" />) })}</label>
+                  <label className="block space-y-1.5">{uiText.rich("Ui.text_b42ab91e4f00a9", { part1: chunks => (<span className="text-xs font-medium text-text-secondary">{chunks}</span>), part2: () => (<textarea value={joinMessage} onChange={(event) => setJoinMessage(event.target.value)} maxLength={500} rows={3}
+                      placeholder={uiText("Ui.text_da8ee865aa5fd0")}
+                      className="w-full resize-y rounded-lg border border-border bg-bg-primary px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-gold/50 focus:outline-none" />), value4: () => (joinMessage.length), part3: chunks => (<span className="block text-right text-[11px] text-text-muted">{chunks}</span>) })}</label>
                   {joinError && <p role="alert" className="text-xs text-crimson-light">{joinError}</p>}
                   <div className="flex flex-wrap justify-end gap-2 border-t border-border pt-4">
-                    <button type="button" onClick={() => setJoinDialogMode(null)} disabled={joining} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary hover:bg-bg-elevated disabled:opacity-50">Abbrechen</button>
+                    <button type="button" onClick={() => setJoinDialogMode(null)} disabled={joining} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary hover:bg-bg-elevated disabled:opacity-50">{uiText("home.boardCancel")}</button>
                     <button type="button" onClick={() => void handleSubmitMembershipAction()} disabled={joining}
                       className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-gold px-4 text-sm font-semibold text-bg-primary transition-colors hover:bg-gold-light disabled:opacity-50">
-                      <UserPlus size={14} /> {joining ? "Wird gesendet …" : "Anfrage senden"}
+                      <UserPlus size={14} /> {joining ? uiText("AdminNewsletter.sending") : uiText("BookingRequest.send")}
                     </button>
                   </div>
                 </div>
@@ -571,7 +547,7 @@ export default function CompanyDetail({
             <ResponsiblePersonCard person={company.responsible} />
             {(company.bio_short || company.description || company.usp) && (
               <section>
-                <SectionLabel>Über das Unternehmen</SectionLabel>
+                <SectionLabel>{uiText("Ui.text_8750b74ea54ced")}</SectionLabel>
                 <div className="space-y-4">
                   {company.bio_short && (
                     <p className="text-sm text-text-primary leading-relaxed font-medium">
@@ -597,16 +573,13 @@ export default function CompanyDetail({
             {/* Team */}
             {(acceptedMembers.length > 0 || isOwner) && (
               <section>
-                <SectionLabel>Team ({acceptedMembers.length})</SectionLabel>
+                <SectionLabel>{uiText.rich("Ui.text_01556da576529d", { value1: () => (acceptedMembers.length) })}</SectionLabel>
                 <div className="space-y-4">
 
                   {/* Management */}
                   {managementMembers.length > 0 && (
                     <div className="bg-bg-secondary border border-border rounded-2xl overflow-hidden">
-                      <div className="px-5 py-2.5 border-b border-border bg-bg-elevated flex items-center gap-2">
-                        <Crown size={10} className="text-gold" />
-                        <span className="text-[10px] uppercase tracking-widest font-semibold text-gold">Inhaberschaft</span>
-                      </div>
+                      <div className="px-5 py-2.5 border-b border-border bg-bg-elevated flex items-center gap-2">{uiText.rich("Ui.text_f74f3d2a9788d2", { part1: () => (<Crown size={10} className="text-gold" />), part2: chunks => (<span className="text-[10px] uppercase tracking-widest font-semibold text-gold">{chunks}</span>) })}</div>
                       <div className="grid min-w-0 divide-y divide-border">
                         {managementMembers.map((member) => <CompanyPersonCard key={member.id} member={member} />)}
                       </div>
@@ -617,10 +590,7 @@ export default function CompanyDetail({
             {/* Team */}
                   {regularMembers.length > 0 && (
                     <div className="bg-bg-secondary border border-border rounded-2xl overflow-hidden">
-                      <div className="px-5 py-2.5 border-b border-border bg-bg-elevated flex items-center gap-2">
-                        <Users size={10} className="text-text-muted" />
-                        <span className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">Team</span>
-                      </div>
+                      <div className="px-5 py-2.5 border-b border-border bg-bg-elevated flex items-center gap-2">{uiText.rich("Ui.text_7d08fc9f0374ee", { part1: () => (<Users size={10} className="text-text-muted" />), part2: chunks => (<span className="text-[10px] uppercase tracking-widest font-semibold text-text-muted">{chunks}</span>) })}</div>
                       <div className="grid min-w-0 divide-y divide-border">
                         {(showAllTeam ? regularMembers : regularMembers.slice(0, 10)).map((member) => <CompanyPersonCard key={member.id} member={member} />)}
                       </div>
@@ -630,7 +600,7 @@ export default function CompanyDetail({
                           className="w-full px-5 py-3 border-t border-border bg-bg-secondary hover:bg-bg-elevated text-xs text-text-muted hover:text-gold transition-colors flex items-center justify-center gap-1.5"
                         >
                           <Users size={11} />
-                          {showAllTeam ? "Weniger anzeigen" : `Alle ${regularMembers.length} Teammitglieder anzeigen`}
+                          {showAllTeam ? uiText("Ui.text_2f11e0e6d3c3c5") : uiText("Ui.text_2fe783fb10a1d1", { value1: String(regularMembers.length) })}
                         </button>
                       )}
                     </div>
@@ -643,7 +613,7 @@ export default function CompanyDetail({
             {/* Portfolio */}
             {company.portfolio_images.length > 0 && (
               <section>
-                <SectionLabel>Portfolio</SectionLabel>
+                <SectionLabel>{uiText("Ui.text_1853eb2e9e5ed2")}</SectionLabel>
                 <div className="grid grid-cols-3 gap-2">
                   {company.portfolio_images.slice(0, 9).map((url, i) => (
                     <button key={url} onClick={() => setLightboxIdx(i)}
@@ -673,7 +643,7 @@ export default function CompanyDetail({
             {/* Services */}
             {services.length > 0 && (
               <section>
-                <SectionLabel>Services ({services.length})</SectionLabel>
+                <SectionLabel>{uiText.rich("Ui.text_c683ea3287f5cf", { value1: () => (services.length) })}</SectionLabel>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {services.map((svc) => (
                     <div key={svc.id} className="p-4 bg-bg-secondary border border-border rounded-xl">
@@ -685,7 +655,7 @@ export default function CompanyDetail({
                           <span className="text-[10px] text-gold">{svc.price_note}</span>
                         )}
                         {svc.price_on_request && (
-                          <span className="text-[10px] text-text-muted">Preis auf Anfrage</span>
+                          <span className="text-[10px] text-text-muted">{uiText("AdminReview.fields.price_on_request")}</span>
                         )}
                       </div>
                       <p className="text-sm font-semibold text-text-primary mb-1">{svc.title}</p>
@@ -708,7 +678,7 @@ export default function CompanyDetail({
             {/* Equipment */}
             {equipment.length > 0 && (
               <section>
-                <SectionLabel>Equipment ({equipment.length})</SectionLabel>
+                <SectionLabel>{uiText.rich("Ui.text_f6e57176396281", { value1: () => (equipment.length) })}</SectionLabel>
                 <div className="space-y-2">
                   {equipment.slice(0, 12).map((item) => {
                     const cat = EQUIPMENT_CATEGORY_BY_ID[item.category];
@@ -718,7 +688,7 @@ export default function CompanyDetail({
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <p className="text-sm font-medium text-text-primary truncate">{item.name}</p>
-                            {item.brand && <span className="text-xs text-text-muted">{item.brand}{item.model ? ` ${item.model}` : ""}</span>}
+                            {item.brand && <span className="text-xs text-text-muted">{item.brand}{item.model ? uiText("Ui.text_50843318c9cf54", { value1: String(item.model) }) : ""}</span>}
                             <span className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${CONDITION_COLORS[item.condition]}`}>
                               {CONDITION_LABELS[item.condition]}
                             </span>
@@ -731,19 +701,19 @@ export default function CompanyDetail({
                         </div>
                         <div className="shrink-0 text-right">
                           {!item.price_on_request && item.price_day ? (
-                            <p className="text-sm font-semibold text-gold">{item.price_day} €<span className="text-text-muted font-normal text-xs">/Tag</span></p>
+                            <p className="text-sm font-semibold text-gold">{item.price_day} €<span className="text-text-muted font-normal text-xs">{uiText("common.perDay")}</span></p>
                           ) : (
-                            <p className="text-xs text-text-muted">Auf Anfrage</p>
+                            <p className="text-xs text-text-muted">{uiText("common.onRequest")}</p>
                           )}
                           <p className={`text-[10px] mt-0.5 ${item.available ? "text-emerald-400" : "text-text-muted"}`}>
-                            {item.available ? "Verfügbar" : "Nicht verfügbar"}
+                            {item.available ? uiText("common.available") : uiText("common.unavailable")}
                           </p>
                         </div>
                       </div>
                     );
                   })}
                   {equipment.length > 12 && (
-                    <p className="text-xs text-text-muted pt-1">+ {equipment.length - 12} weitere — für vollständige Liste anfragen</p>
+                    <p className="text-xs text-text-muted pt-1">{uiText.rich("Ui.text_c0d4ba989eebe2", { value1: () => (equipment.length - 12) })}</p>
                   )}
                 </div>
               </section>
@@ -752,7 +722,7 @@ export default function CompanyDetail({
             {/* Listings */}
             {listings.length > 0 && (
               <section>
-                <SectionLabel>Inserate ({listings.length})</SectionLabel>
+                <SectionLabel>{uiText.rich("Ui.text_60baa95c9670ba", { value1: () => (listings.length) })}</SectionLabel>
                 <div className="divide-y divide-border">
                   {listings.map((listing) => {
                     const Icon = listingTypeIcons[listing.type] ?? Package;
@@ -790,16 +760,16 @@ export default function CompanyDetail({
             {/* Social links */}
             {company.social_links && Object.values(company.social_links).some(Boolean) && (
               <section>
-                <SectionLabel>Social Media</SectionLabel>
+                <SectionLabel>{uiText("home.showcaseSocial")}</SectionLabel>
                 <div className="space-y-1.5">
                   {(
                     [
-                      { key: "instagram", label: "Instagram" },
-                      { key: "linkedin",  label: "LinkedIn" },
-                      { key: "youtube",   label: "YouTube" },
-                      { key: "vimeo",     label: "Vimeo" },
-                      { key: "tiktok",    label: "TikTok" },
-                      { key: "facebook",  label: "Facebook" },
+                      { key: "instagram", label: uiText("Ui.text_bad57ef7837c8e") },
+                      { key: "linkedin",  label: uiText("Ui.text_dd84425b72da12") },
+                      { key: "youtube",   label: uiText("Ui.text_fb7accfff8c6f8") },
+                      { key: "vimeo",     label: uiText("Ui.text_a7a93fd1930a61") },
+                      { key: "tiktok",    label: uiText("Ui.text_1bb6fcfbf1368a") },
+                      { key: "facebook",  label: uiText("Ui.text_d41f5b4977ee05") },
                     ] as const
                   )
                     .filter(({ key }) => company.social_links?.[key]?.trim())
@@ -822,13 +792,10 @@ export default function CompanyDetail({
             {/* Firmendaten */}
             {(company.founded_year || company.legal_form || company.hq_address || company.countries?.length > 0) && (
               <section>
-                <SectionLabel>Firmendaten</SectionLabel>
+                <SectionLabel>{uiText("Ui.text_caa2319d25ade1")}</SectionLabel>
                 <div className="space-y-2 text-xs text-text-secondary">
                   {company.founded_year && (
-                    <div className="flex items-center gap-2">
-                      <Calendar size={12} className="text-text-muted shrink-0" />
-                      <span>Gegründet {company.founded_year}</span>
-                    </div>
+                    <div className="flex items-center gap-2">{uiText.rich("Ui.text_ab50fa35e8d1d9", { part1: () => (<Calendar size={12} className="text-text-muted shrink-0" />), value3: () => (company.founded_year), part2: chunks => (<span>{chunks}</span>) })}</div>
                   )}
                   {company.legal_form && (
                     <div className="flex items-center gap-2">
@@ -856,7 +823,7 @@ export default function CompanyDetail({
             {isAnimalCompany(company.categories) && <section className="space-y-4"><AnimalCompanySummary value={normalizeAnimalCompanyDetails(company.animal_details)} />{isOwner && <Link href={`/inserat?animal=1&company_id=${company.id}`} className="inline-flex min-h-11 items-center rounded-xl border border-border px-4 text-sm text-gold">{animals("addPortfolio")}</Link>}<p className="text-xs leading-5 text-text-muted">{animals("portfolioHelp")}</p></section>}
             {company.services.length > 0 && (
               <section>
-                <SectionLabel>Leistungen</SectionLabel>
+                <SectionLabel>{uiText("AdminReview.fields.services")}</SectionLabel>
                 <div className="flex flex-wrap gap-1.5">
                   {company.services.map((s) => (
                     <span key={s} className="px-2.5 py-1 bg-bg-secondary border border-border text-xs text-text-secondary rounded-full">
@@ -869,12 +836,12 @@ export default function CompanyDetail({
 
             {offersCatering && (cateringDetails.serviceTypes.length > 0 || cateringDetails.serviceAreas || cateringDetails.capacity || cateringDetails.dietaryOptions.length > 0 || cateringDetails.mobileEquipment.length > 0) && (
               <section className="space-y-3 rounded-2xl border border-green-300/20 bg-green-300/[0.04] p-4 sm:p-5">
-                <SectionLabel>Catering / Setverpflegung</SectionLabel>
-                {cateringDetails.serviceTypes.length > 0 && <DetailLine label="Leistungen" value={cateringDetails.serviceTypes.join(", ")} />}
-                {cateringDetails.serviceAreas && <DetailLine label="Einsatzregion" value={cateringDetails.serviceAreas} />}
-                {cateringDetails.capacity && <DetailLine label="Kapazität" value={`Bis zu ${cateringDetails.capacity} Personen`} />}
-                {cateringDetails.dietaryOptions.length > 0 && <DetailLine label="Ernährungsangebote" value={cateringDetails.dietaryOptions.join(", ")} />}
-                {cateringDetails.mobileEquipment.length > 0 && <DetailLine label="Mobile Ausstattung" value={cateringDetails.mobileEquipment.join(", ")} />}
+                <SectionLabel>{uiText("Ui.text_3bb69740c531c0")}</SectionLabel>
+                {cateringDetails.serviceTypes.length > 0 && <DetailLine label={uiText("AdminReview.fields.services")} value={cateringDetails.serviceTypes.join(", ")} />}
+                {cateringDetails.serviceAreas && <DetailLine label={uiText("Ui.text_e7c28b1fd0f674")} value={cateringDetails.serviceAreas} />}
+                {cateringDetails.capacity && <DetailLine label={uiText("MarketplaceOffer.fields.capacity")} value={`Bis zu ${cateringDetails.capacity} Personen`} />}
+                {cateringDetails.dietaryOptions.length > 0 && <DetailLine label={uiText("Ui.text_4028f79e2d232e")} value={cateringDetails.dietaryOptions.join(", ")} />}
+                {cateringDetails.mobileEquipment.length > 0 && <DetailLine label={uiText("Ui.text_6e6ed79b3d62e3")} value={cateringDetails.mobileEquipment.join(", ")} />}
               </section>
             )}
 

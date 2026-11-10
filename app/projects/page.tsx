@@ -6,14 +6,18 @@ import {
   Film, Tv, Camera, Zap, Music, FileVideo, Building2, Radio, ArrowRight,
 } from "lucide-react";
 import PageHeader, { PageBackdrop, PROJECTS_BACKDROP_IMAGE } from "@/components/PageHeader";
+import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 export const revalidate = 300;
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const tMetadata = await getMetadataTranslations("Metadata");
+  return {
   alternates: { canonical: "https://www.cinegenius.co/projects" },
-  title: "Projekte",
-  description: "Filmprojekte & Produktionen auf CineGenius — wähle eine Kategorie.",
+  title: tMetadata('m_df87bfa7519b'),
+  description: tMetadata('m_766022476504'),
 };
+}
 
 const CATEGORIES_META = [
   { labelKey: "catFilmSerie" as const,   descKey: "catFilmSerieDesc" as const,   href: "/projects/film",       icon: Film,      image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=80", accent: "#c8f135" },
@@ -33,15 +37,13 @@ export default async function ProjectsPage() {
     label: t(c.labelKey),
     desc: t(c.descKey),
   }));
-  const [titleLead = "", titleTail = ""] = t("title").split("&");
-
   return (
     <div className="relative isolate min-h-screen overflow-hidden bg-bg-primary">
       <PageBackdrop image={PROJECTS_BACKDROP_IMAGE} className="absolute inset-0 z-0" />
       <PageHeader
         badge={t("badge")}
-        title={`${titleLead.trim()} &`}
-        titleHighlight={titleTail.trim()}
+        title={t("titleLead")}
+        titleHighlight={t("titleHighlight")}
         description={t("subtitle")}
         withBackdrop={false}
         ctaSecondary={{ label: t("allBrowse"), href: "/projects/alle" }}

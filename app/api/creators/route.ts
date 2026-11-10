@@ -1,3 +1,4 @@
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 import { getLocale } from "next-intl/server";
 import { placeReadFields } from "@/lib/places/catalog";
 import { isPeopleDirectoryProfile } from "@/lib/profile-provider-filters";
@@ -13,6 +14,7 @@ const PAGE_SIZE = 48;
 
 // GET /api/creators?page=1  → next page of profiles (page 0 = first 96 served by SSR)
 export async function GET(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const locale = await getLocale();
   const page = Math.max(1, Math.min(100000, parseInt(req.nextUrl.searchParams.get("page") ?? "1", 10) || 1));
   const from = 96 + (page - 1) * PAGE_SIZE;
@@ -27,7 +29,7 @@ export async function GET(req: NextRequest) {
     .order("user_id", { ascending: true })
     .range(from, to);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
   const privateProfileIds = await getPrivateProfileIds((profiles ?? []).map((profile) => profile.user_id));
 

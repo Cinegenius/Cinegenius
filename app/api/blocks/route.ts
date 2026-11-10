@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { requireAuth, getCurrentUser } from "@/lib/auth";
 import { rateLimit } from "@/lib/rateLimit";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // GET /api/blocks — list the IDs I have blocked
 export async function GET() {
@@ -23,20 +24,21 @@ export async function GET() {
 // Returns { blocked: true }  after blocking
 // Returns { blocked: false } after unblocking
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
   // Per-user rate limit: 20 block toggles per minute
   const { allowed } = await rateLimit(`block:${userId}`, 20, 60);
-  if (!allowed) return NextResponse.json({ error: "Zu viele Anfragen. Bitte kurz warten." }, { status: 429 });
+  if (!allowed) return NextResponse.json({ error: tResponse('System.m_35bd89251439') }, { status: 429 });
 
   const { blocked_id } = await req.json();
   if (!blocked_id || typeof blocked_id !== "string") {
-    return NextResponse.json({ error: "blocked_id fehlt" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_f2e69ad52fd4') }, { status: 400 });
   }
   if (blocked_id === userId) {
-    return NextResponse.json({ error: "Du kannst dich nicht selbst blockieren" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_01847317fe62') }, { status: 400 });
   }
 
   // Check if already blocked
@@ -55,7 +57,7 @@ export async function POST(req: NextRequest) {
 
   // Block
   const { error } = await db.from("blocks").insert({ blocker_id: userId, blocked_id });
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
   return NextResponse.json({ blocked: true });
 }

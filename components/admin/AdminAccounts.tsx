@@ -10,10 +10,13 @@ import type { adminAccountRow } from "@/lib/admin-account-status";
 import type { AccountContent } from "@/lib/admin-account-content";
 import { reviewPath } from "@/lib/admin-review";
 import Link from "next/link";
+import { uiErrorMessage } from "@/lib/ui-error-message";
 
 type Account = ReturnType<typeof adminAccountRow> & { content: AccountContent };
 
 function AccountContents({ content }: { content: AccountContent }) {
+  const uiText = useTranslations();
+
   const t = useTranslations("AdminAccounts");
   const moderation = useTranslations("OfferModeration");
   const drafts = useTranslations("AdminStartedOffers");
@@ -22,7 +25,7 @@ function AccountContents({ content }: { content: AccountContent }) {
   if (!content.companies.length && !content.listings.length && !content.drafts.length) return <p className="text-xs text-text-muted">{t("contentEmpty")}</p>;
   return <div className="min-w-0 space-y-4">
     {content.companies.length > 0 && <section aria-label={t("ownedCompanies")}><h3 className="text-xs font-semibold text-text-secondary">{t("ownedCompanies")} ({content.companies.length})</h3><ul className="mt-2 space-y-2">{content.companies.map(company => <li key={company.id} className="flex min-w-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-border p-3"><div className="min-w-0 flex-1 basis-40 break-words [overflow-wrap:anywhere]"><p className="text-sm text-text-primary">{company.title || drafts("untitled")}</p><p className={`mt-1 text-xs ${company.published ? "text-success" : "text-text-muted"}`}>{t(company.published ? "contentPublic" : "contentPrivate")}</p></div><div className="flex flex-wrap gap-2"><Link href={reviewPath("company", company.id)} prefetch={false} className={actionClass}>{t(company.published ? "manageContent" : "reviewAndPublish")}</Link><SupportMessageAction targetType="company" targetId={company.id} /></div></li>)}</ul></section>}
-    {content.listings.length > 0 && <section aria-label={t("createdListings")}><h3 className="text-xs font-semibold text-text-secondary">{t("createdListings")} ({content.listings.length})</h3><p className="mt-1 text-xs text-text-muted">{t("creatorNotice")}</p><ul className="mt-2 space-y-2">{content.listings.map(listing => <li key={listing.id} className="flex min-w-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-border p-3"><div className="min-w-0 flex-1 basis-40 break-words [overflow-wrap:anywhere]"><p className="text-sm text-text-primary">{listing.title || drafts("untitled")}</p><p className="mt-1 text-xs text-text-muted">{t("contentKinds." + (kinds.has(listing.type) ? listing.type : "other"))} · {listing.status === "draft" && !listing.published ? t("notSubmitted") : `${t(listing.published ? "contentPublic" : "contentPrivate")} · ${moderation("statuses." + listing.status)}`}</p></div><div className="flex flex-wrap gap-2"><Link href={reviewPath("listing", listing.id)} prefetch={false} className={actionClass}>{t(listing.published ? "manageContent" : "reviewAndPublish")}</Link><SupportMessageAction targetType="listing" targetId={listing.id} label={listing.status === "draft" && !listing.published ? t("remindSubmission") : undefined} preferredTemplate={listing.status === "draft" && !listing.published ? "resume_draft" : undefined} /></div></li>)}</ul></section>}
+    {content.listings.length > 0 && <section aria-label={t("createdListings")}><h3 className="text-xs font-semibold text-text-secondary">{t("createdListings")} ({content.listings.length})</h3><p className="mt-1 text-xs text-text-muted">{t("creatorNotice")}</p><ul className="mt-2 space-y-2">{content.listings.map(listing => <li key={listing.id} className="flex min-w-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-border p-3"><div className="min-w-0 flex-1 basis-40 break-words [overflow-wrap:anywhere]"><p className="text-sm text-text-primary">{listing.title || drafts("untitled")}</p><p className="mt-1 text-xs text-text-muted">{t("contentKinds." + (kinds.has(listing.type) ? listing.type : "other"))} · {listing.status === "draft" && !listing.published ? t("notSubmitted") : uiText("Ui.text_7c639bc99b8569", { value1: String(t(listing.published ? "contentPublic" : "contentPrivate")), value2: String(moderation("statuses." + listing.status)) })}</p></div><div className="flex flex-wrap gap-2"><Link href={reviewPath("listing", listing.id)} prefetch={false} className={actionClass}>{t(listing.published ? "manageContent" : "reviewAndPublish")}</Link><SupportMessageAction targetType="listing" targetId={listing.id} label={listing.status === "draft" && !listing.published ? t("remindSubmission") : undefined} preferredTemplate={listing.status === "draft" && !listing.published ? "resume_draft" : undefined} /></div></li>)}</ul></section>}
     {content.drafts.length > 0 && <section aria-label={t("privateDrafts")}><h3 className="text-xs font-semibold text-text-secondary">{t("privateDrafts")} ({content.drafts.length})</h3><p className="mt-1 text-xs text-text-muted">{t("draftNotice")}</p><ul className="mt-2 space-y-2">{content.drafts.map(draft => <li key={draft.id} className="flex min-w-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-border p-3"><div className="min-w-0 flex-1 basis-40 break-words [overflow-wrap:anywhere]"><p className="text-sm text-text-primary">{draft.title || drafts("untitled")}</p><p className="mt-1 text-xs text-text-muted">{drafts("kinds." + draft.kind)} · {drafts("status")}</p></div><SupportMessageAction targetType="started_offer" targetId={draft.id} label={drafts("remind")} /></li>)}</ul></section>}
   </div>;
 }
@@ -47,7 +50,7 @@ export function AdminAccounts() {
         if (!response.ok) throw new Error(data.error || t("loadError"));
         if (!controller.signal.aborted) { setResult(data); setError(""); }
       } catch (cause) {
-        if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : t("loadError"));
+        if (!controller.signal.aborted) setError(uiErrorMessage(cause, t("loadError")));
       } finally { if (!controller.signal.aborted) setFinishedRequest(requestKey); }
     }, search ? 250 : 0);
     return () => { clearTimeout(timer); controller.abort(); };

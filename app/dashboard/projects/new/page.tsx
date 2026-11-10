@@ -13,6 +13,9 @@ import {
   Search, Building2, MapPin, Users, ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { uiErrorMessage } from "@/lib/ui-error-message";
+
 
 const PROJECT_TYPES = [
   "Spielfilm", "Kurzfilm", "Serie", "Dokumentation", "Musikvideo",
@@ -27,28 +30,33 @@ type TypeConfig = {
   linkPlaceholder: string; descPlaceholder: string; titlePlaceholder: string;
 };
 
-const TYPE_CONFIG: Record<string, TypeConfig> = {
-  "Spielfilm": { rolePlaceholder: "z. B. Regisseur/in, Kamerafrau/-mann, Produzent/in", directorLabel: "Regie", directorPlaceholder: "Name Regisseur/in", genreLabel: "Genre", genrePlaceholder: "Drama, Thriller, Komödie …", locationLabel: "Drehort / Region", locationPlaceholder: "z. B. Berlin, Hamburg, Wien", companyLabel: "Produktionsfirma", companyPlaceholder: "z. B. X Filme, UFA", linkPlaceholder: "IMDb, Vimeo, YouTube …", descPlaceholder: "Worum geht es in diesem Film?", titlePlaceholder: "z. B. Der letzte Sommer" },
-  "Kurzfilm": { rolePlaceholder: "z. B. Regisseur/in, Kamerafrau/-mann, Cutter/in", directorLabel: "Regie", directorPlaceholder: "Name Regisseur/in", genreLabel: "Genre", genrePlaceholder: "Drama, Komödie, Horror …", locationLabel: "Drehort / Region", locationPlaceholder: "z. B. München, Leipzig", companyLabel: "Hochschule / Produktionsfirma", companyPlaceholder: "z. B. HFF München, unabhängig", linkPlaceholder: "Vimeo, YouTube, Kurzfilmtage …", descPlaceholder: "Worum geht es in diesem Kurzfilm?", titlePlaceholder: "z. B. Stille Wasser" },
-  "Serie": { rolePlaceholder: "z. B. Regisseur/in, Showrunner, DOP", directorLabel: "Regie / Showrunner", directorPlaceholder: "Name Showrunner/in oder Regisseur/in", genreLabel: "Genre", genrePlaceholder: "Drama, Krimi, Comedy …", locationLabel: "Drehort / Region", locationPlaceholder: "z. B. Köln, Berlin, Wien", companyLabel: "Produktionsfirma / Sender", companyPlaceholder: "z. B. Wiedemann & Berg, ARD", linkPlaceholder: "IMDb, Streaming-Link …", descPlaceholder: "Worum geht es in dieser Serie?", titlePlaceholder: "z. B. Dark Horizons" },
-  "Dokumentation": { rolePlaceholder: "z. B. Regisseur/in, Kamerafrau/-mann, Cutter/in", directorLabel: "Regie", directorPlaceholder: "Name Regisseur/in", genreLabel: "Thema", genrePlaceholder: "Gesellschaft, Natur, Geschichte, Sport …", locationLabel: "Drehort / Region", locationPlaceholder: "z. B. weltweit, DACH, Berlin", companyLabel: "Produktionsfirma / Sender", companyPlaceholder: "z. B. NDR, ZDF, unabhängig", linkPlaceholder: "Mediathek, Vimeo, YouTube …", descPlaceholder: "Was ist das Thema dieser Dokumentation?", titlePlaceholder: "z. B. Am Rande der Welt" },
-  "Musikvideo": { rolePlaceholder: "z. B. Regisseur/in, Kamerafrau/-mann, Colorist/in", directorLabel: "Regie", directorPlaceholder: "Name Regisseur/in", genreLabel: "Musikgenre", genrePlaceholder: "Pop, Hip-Hop, Rock, Electronic …", locationLabel: "Drehort / Region", locationPlaceholder: "z. B. Berlin, Studio, On Location", companyLabel: "Label / Künstler/in", companyPlaceholder: "z. B. Universal, Sony, Indie", linkPlaceholder: "YouTube, Vimeo, Spotify …", descPlaceholder: "Für welche/n Künstler/in und Song wurde das Video gedreht?", titlePlaceholder: "z. B. Midnight Run – Max Mustermann" },
-  "Werbefilm / Commercial": { rolePlaceholder: "z. B. Regisseur/in, Kamerafrau/-mann, Art Director/in", directorLabel: "Regie", directorPlaceholder: "Name Regisseur/in", genreLabel: "Format", genrePlaceholder: "TV-Spot, Online-Ad, Imagefilm, Product …", locationLabel: "Drehort / Region", locationPlaceholder: "z. B. Studio Berlin, München", companyLabel: "Agentur / Auftraggeber", companyPlaceholder: "z. B. BBDO, Jung von Matt, Markenname", linkPlaceholder: "YouTube, Vimeo, Agentur-Link …", descPlaceholder: "Für welches Produkt oder welche Marke wurde der Spot gedreht?", titlePlaceholder: "z. B. BMW Frühjahrs-Kampagne 2024" },
-  "Corporate Film": { rolePlaceholder: "z. B. Kamerafrau/-mann, Produzent/in, Cutter/in", directorLabel: "Projektleitung", directorPlaceholder: "Verantwortliche Person oder Agentur", genreLabel: "Art des Films", genrePlaceholder: "Imagefilm, Employer Branding, Erklärfilm …", locationLabel: "Drehort / Unternehmen", locationPlaceholder: "z. B. Frankfurt, Hamburg, On Location", companyLabel: "Auftraggeber / Unternehmen", companyPlaceholder: "z. B. Siemens AG, Startup GmbH", linkPlaceholder: "Unternehmenswebsite, Vimeo, YouTube …", descPlaceholder: "Welches Unternehmen wurde porträtiert und was war das Ziel?", titlePlaceholder: "z. B. Imagefilm Muster GmbH" },
-  "Event / Live": { rolePlaceholder: "z. B. Hochzeitsfilmer/in, Fotograf/in, Stylist/in, Kamerafrau/-mann, Tontechniker/in", directorLabel: "Veranstaltungsort / Location", directorPlaceholder: "z. B. Schloss Elmau, Olympiastadion, Messe Hamburg", genreLabel: "Art des Events", genrePlaceholder: "Hochzeit, Konzert, Festival, Konferenz, Standesamt, Feier …", locationLabel: "Stadt / Region", locationPlaceholder: "z. B. Berlin, München, Wien", companyLabel: "Veranstalter / Auftraggeber", companyPlaceholder: "z. B. Brautpaar, Live Nation, Eventfirma", linkPlaceholder: "YouTube, Instagram, Event-Website …", descPlaceholder: "Welches Event wurde gefilmt? Bei einer Hochzeit: Wo, wann, was war besonders?", titlePlaceholder: "z. B. Hochzeit Müller – Schloss Elmau 2024" },
-  "Foto / Shooting": { rolePlaceholder: "z. B. Fotograf/in, Art Director/in, Stylist/in", directorLabel: "Art Direction", directorPlaceholder: "Name Art Director/in oder Stylist/in", genreLabel: "Art des Shootings", genrePlaceholder: "Fashion, Portrait, Editorial, Werbung, Beauty …", locationLabel: "Location / Studio", locationPlaceholder: "z. B. Studio Berlin, On Location, Paris", companyLabel: "Agentur / Auftraggeber", companyPlaceholder: "z. B. Magazin, Marke, Modelagentur", linkPlaceholder: "Portfolio, Instagram, Behance …", descPlaceholder: "Worum ging es bei diesem Shooting? Wer war involviert?", titlePlaceholder: "z. B. Editorial Vogue DE Herbst 2024" },
-  "Social Media Content": { rolePlaceholder: "z. B. Creator/in, Videograf/in, Editor/in", directorLabel: "Plattform / Kanal", directorPlaceholder: "z. B. @username auf TikTok, YouTube-Kanal", genreLabel: "Content-Art", genrePlaceholder: "TikTok, Reels, YouTube, Podcast, Story …", locationLabel: "Drehort / Setting", locationPlaceholder: "z. B. Homeoffice, On Location, Studio", companyLabel: "Brand Deal / Auftraggeber", companyPlaceholder: "z. B. Nike, eigener Kanal", linkPlaceholder: "TikTok, YouTube, Instagram …", descPlaceholder: "Was ist das Thema dieses Projekts? Für welche Plattform?", titlePlaceholder: "z. B. Travel-Serie Südostasien" },
-  "Imagefilm": { rolePlaceholder: "z. B. Regisseur/in, Kamerafrau/-mann, Produzent/in", directorLabel: "Regie / Projektleitung", directorPlaceholder: "Verantwortliche Person", genreLabel: "Zielgruppe / Format", genrePlaceholder: "B2B, Employer Branding, Produktvideo …", locationLabel: "Drehort / Region", locationPlaceholder: "z. B. Köln, Hamburg, Zürich", companyLabel: "Auftraggeber", companyPlaceholder: "z. B. Unternehmensname, Agentur", linkPlaceholder: "Vimeo, Unternehmenswebsite …", descPlaceholder: "Welches Unternehmen oder Produkt wurde präsentiert?", titlePlaceholder: "z. B. Imagevideo Musterfirma AG" },
-  "Sonstiges": { rolePlaceholder: "z. B. Regisseur/in, Kamerafrau/-mann, Produzent/in", directorLabel: "Regie / Verantwortlich", directorPlaceholder: "Name der verantwortlichen Person", genreLabel: "Kategorie / Thema", genrePlaceholder: "Beliebige Kategorie", locationLabel: "Drehort / Region", locationPlaceholder: "z. B. Berlin, Wien, Zürich", companyLabel: "Auftraggeber / Firma", companyPlaceholder: "Auftraggeber oder Produktionsfirma", linkPlaceholder: "Website, YouTube, Vimeo …", descPlaceholder: "Beschreib dein Projekt.", titlePlaceholder: "Projekttitel eingeben" },
-};
 
-const DEFAULT_CONFIG: TypeConfig = TYPE_CONFIG["Spielfilm"];
+
+
 
 // ── Linked item types ─────────────────────────────────────────────
 type LinkedItem = { id?: string; name: string; subtitle?: string };
 type CrewEntry  = { name: string; role: string };
 
 // ── Generic searchable linker ─────────────────────────────────────
+
+function getLocalizedTYPE_CONFIG(translate: (key: string) => string): Record<string, TypeConfig> {
+  return ({
+  "Spielfilm": { rolePlaceholder: translate("Ui.text_79b93c18f1f03e"), directorLabel: translate("menu.crewDirection"), directorPlaceholder: translate("Ui.text_18c9793dd4b4f7"), genreLabel: translate("profile.labelGenre"), genrePlaceholder: translate("Ui.text_3c4c96ca1af314"), locationLabel: translate("Ui.text_83382f209fd896"), locationPlaceholder: translate("Ui.text_efef29b8168ae8"), companyLabel: translate("profile.labelProductionCompany"), companyPlaceholder: translate("Ui.text_8b19f4fc396fd9"), linkPlaceholder: translate("Ui.text_e5da2a0e196592"), descPlaceholder: translate("Ui.text_5b6920b441558e"), titlePlaceholder: translate("Ui.text_68a961de48589a") },
+  "Kurzfilm": { rolePlaceholder: translate("Ui.text_f8ee1f620f639c"), directorLabel: translate("menu.crewDirection"), directorPlaceholder: translate("Ui.text_18c9793dd4b4f7"), genreLabel: translate("profile.labelGenre"), genrePlaceholder: translate("Ui.text_7d2775ed364e82"), locationLabel: translate("Ui.text_83382f209fd896"), locationPlaceholder: translate("Ui.text_79e959cf80e219"), companyLabel: translate("Ui.text_d615314ed947e8"), companyPlaceholder: translate("Ui.text_b313170244b178"), linkPlaceholder: translate("Ui.text_6ffa187fe55132"), descPlaceholder: translate("Ui.text_b0b6f491df610d"), titlePlaceholder: translate("Ui.text_dee17ece7e18f3") },
+  "Serie": { rolePlaceholder: translate("Ui.text_e7c0f4b6ac9f6f"), directorLabel: translate("Ui.text_ffcf59349dbdfb"), directorPlaceholder: translate("Ui.text_93d47b797e59bc"), genreLabel: translate("profile.labelGenre"), genrePlaceholder: translate("Ui.text_22edf3c8d16667"), locationLabel: translate("Ui.text_83382f209fd896"), locationPlaceholder: translate("Ui.text_2e92c5d3283d72"), companyLabel: translate("Ui.text_e548f68d6c218e"), companyPlaceholder: translate("Ui.text_d3a4b3ea456006"), linkPlaceholder: translate("Ui.text_a1c81d79bdce4a"), descPlaceholder: translate("Ui.text_575c04151ec916"), titlePlaceholder: translate("Ui.text_ed2deecbe94454") },
+  "Dokumentation": { rolePlaceholder: translate("Ui.text_f8ee1f620f639c"), directorLabel: translate("menu.crewDirection"), directorPlaceholder: translate("Ui.text_18c9793dd4b4f7"), genreLabel: translate("Organizations.topicLabel"), genrePlaceholder: translate("Ui.text_d993791425308f"), locationLabel: translate("Ui.text_83382f209fd896"), locationPlaceholder: translate("Ui.text_0fffcb2801d46a"), companyLabel: translate("Ui.text_e548f68d6c218e"), companyPlaceholder: translate("Ui.text_99a70557b9cd32"), linkPlaceholder: translate("Ui.text_f3d770129fe5d2"), descPlaceholder: translate("Ui.text_c51792178969a5"), titlePlaceholder: translate("Ui.text_6c73b4f3bb9639") },
+  "Musikvideo": { rolePlaceholder: translate("Ui.text_b3fc7f01d98c67"), directorLabel: translate("menu.crewDirection"), directorPlaceholder: translate("Ui.text_18c9793dd4b4f7"), genreLabel: translate("Ui.text_cc80d978a4a545"), genrePlaceholder: translate("Ui.text_70dfcb39207db6"), locationLabel: translate("Ui.text_83382f209fd896"), locationPlaceholder: translate("Ui.text_692df5dccf7096"), companyLabel: translate("Ui.text_b072c0c3e761ee"), companyPlaceholder: translate("Ui.text_dba77ceb02ccbc"), linkPlaceholder: translate("Ui.text_9178abf2d42194"), descPlaceholder: translate("Ui.text_0cc21da0e5404e"), titlePlaceholder: translate("Ui.text_74337d2174ae02") },
+  "Werbefilm / Commercial": { rolePlaceholder: translate("Ui.text_9a24f34725576f"), directorLabel: translate("menu.crewDirection"), directorPlaceholder: translate("Ui.text_18c9793dd4b4f7"), genreLabel: translate("Organizations.formatLabel"), genrePlaceholder: translate("Ui.text_32296c76201cba"), locationLabel: translate("Ui.text_83382f209fd896"), locationPlaceholder: translate("Ui.text_ddc165fec8d11e"), companyLabel: translate("Ui.text_bc95e0dcca2946"), companyPlaceholder: translate("Ui.text_cc967febdeb81e"), linkPlaceholder: translate("Ui.text_d91040eb26af25"), descPlaceholder: translate("Ui.text_4449ede14bfb83"), titlePlaceholder: translate("Ui.text_3377ad2a602321") },
+  "Corporate Film": { rolePlaceholder: translate("Ui.text_dbcc58ad3043fd"), directorLabel: translate("Ui.text_918982bce2096c"), directorPlaceholder: translate("Ui.text_238b33f85d75bd"), genreLabel: translate("Ui.text_3384cefe050932"), genrePlaceholder: translate("Ui.text_2361d15464cef8"), locationLabel: translate("Ui.text_f7eef21acafa37"), locationPlaceholder: translate("Ui.text_1aa8a64d2246d4"), companyLabel: translate("Ui.text_e286dd1b0712e4"), companyPlaceholder: translate("Ui.text_60ef1c58e0d0d7"), linkPlaceholder: translate("Ui.text_4010cef6f778bd"), descPlaceholder: translate("Ui.text_fa3c58c0a9d9fc"), titlePlaceholder: translate("Ui.text_a81ef97c3e0451") },
+  "Event / Live": { rolePlaceholder: translate("Ui.text_3273c05f2fdbc4"), directorLabel: translate("Ui.text_623758b79eced4"), directorPlaceholder: translate("Ui.text_fa6aa869a7c449"), genreLabel: translate("Ui.text_ce2d22bccbe484"), genrePlaceholder: translate("Ui.text_6dd3f0288b55f7"), locationLabel: translate("Ui.text_9483f083ea5f25"), locationPlaceholder: translate("Ui.text_8611245c9e8d24"), companyLabel: translate("Ui.text_df756fb1891334"), companyPlaceholder: translate("Ui.text_1164cac4daaba0"), linkPlaceholder: translate("Ui.text_98fcb9c795f65b"), descPlaceholder: translate("Ui.text_f3f518ec6fb09b"), titlePlaceholder: translate("Ui.text_51d474a2b3638d") },
+  "Foto / Shooting": { rolePlaceholder: translate("Ui.text_da8840a18236de"), directorLabel: translate("Ui.text_af725e1fe29a42"), directorPlaceholder: translate("Ui.text_bfcff28fc5039b"), genreLabel: translate("Ui.text_b34c8863f08d03"), genrePlaceholder: translate("Ui.text_4c9717a5343247"), locationLabel: translate("Ui.text_85d9e096db6b5d"), locationPlaceholder: translate("Ui.text_26bd5498eb0e9d"), companyLabel: translate("Ui.text_bc95e0dcca2946"), companyPlaceholder: translate("Ui.text_8a4febefb0dc7e"), linkPlaceholder: translate("Ui.text_44b2ebe2ac2f5d"), descPlaceholder: translate("Ui.text_e2a73095090136"), titlePlaceholder: translate("Ui.text_209dd7a1388739") },
+  "Social Media Content": { rolePlaceholder: translate("Ui.text_527b0bc7d37df3"), directorLabel: translate("Ui.text_00bab39785045f"), directorPlaceholder: translate("Ui.text_73e57bb3486326"), genreLabel: translate("Ui.text_020658a74305df"), genrePlaceholder: translate("Ui.text_c043f4c3937f10"), locationLabel: translate("Ui.text_eedbc2857b292e"), locationPlaceholder: translate("Ui.text_c0352ffb8887e7"), companyLabel: translate("Ui.text_1186d6aab646eb"), companyPlaceholder: translate("Ui.text_0222f3e76c6007"), linkPlaceholder: translate("Ui.text_b82f1b03f2ed3d"), descPlaceholder: translate("Ui.text_d4da6ca6528a1b"), titlePlaceholder: translate("Ui.text_cbfc13af8cc95e") },
+  "Imagefilm": { rolePlaceholder: translate("Ui.text_79b93c18f1f03e"), directorLabel: translate("Ui.text_b715c315ba6ed4"), directorPlaceholder: translate("responsiblePerson.title"), genreLabel: translate("Ui.text_b19fddb2cc6631"), genrePlaceholder: translate("Ui.text_42bbc731b126ec"), locationLabel: translate("Ui.text_83382f209fd896"), locationPlaceholder: translate("Ui.text_d4a509e7b8603d"), companyLabel: translate("Ui.text_f997e048f3be2a"), companyPlaceholder: translate("Ui.text_24747a148ca846"), linkPlaceholder: translate("Ui.text_15bcddfe375ad4"), descPlaceholder: translate("Ui.text_6b2affdf06bda7"), titlePlaceholder: translate("Ui.text_0435f274dc6fc6") },
+  "Sonstiges": { rolePlaceholder: translate("Ui.text_79b93c18f1f03e"), directorLabel: translate("Ui.text_50c64e09823d24"), directorPlaceholder: translate("Ui.text_416e9c72f63910"), genreLabel: translate("Ui.text_10403284b9a7d2"), genrePlaceholder: translate("Ui.text_4eb337271a5f37"), locationLabel: translate("Ui.text_83382f209fd896"), locationPlaceholder: translate("Ui.text_db0877d65e1ba7"), companyLabel: translate("Ui.text_2dfade1934e72e"), companyPlaceholder: translate("Ui.text_9d3d20a56332f9"), linkPlaceholder: translate("Ui.text_5cc1ee3c157164"), descPlaceholder: translate("Ui.text_064295b0e12c23"), titlePlaceholder: translate("Ui.text_381a7d6816c07b") },
+});
+}
+
 function LinkedSearch({
   label, icon: Icon, placeholder, items, onAdd, onRemove, onSearch, searchResults, searching,
 }: {
@@ -62,6 +70,8 @@ function LinkedSearch({
   searchResults: LinkedItem[];
   searching: boolean;
 }) {
+  const uiText = useTranslations();
+
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -121,9 +131,7 @@ function LinkedSearch({
           {searching && <Loader2 size={12} className="text-text-muted animate-spin shrink-0" />}
           {q && (
             <button type="button" onClick={addManual}
-              className="shrink-0 text-[11px] text-gold hover:text-gold-light font-semibold whitespace-nowrap">
-              + Hinzufügen
-            </button>
+              className="shrink-0 text-[11px] text-gold hover:text-gold-light font-semibold whitespace-nowrap">{uiText("Ui.text_993b7b55f75046")}</button>
           )}
         </div>
 
@@ -137,7 +145,7 @@ function LinkedSearch({
                   <p className="text-sm text-text-primary truncate">{r.name}</p>
                   {r.subtitle && <p className="text-xs text-text-muted truncate">{r.subtitle}</p>}
                 </div>
-                {r.id && <span className="text-[10px] text-gold/60 shrink-0">Verknüpfen</span>}
+                {r.id && <span className="text-[10px] text-gold/60 shrink-0">{uiText("Ui.text_8ca3f93cc45e94")}</span>}
               </button>
             ))}
           </div>
@@ -149,6 +157,8 @@ function LinkedSearch({
 
 // ── Crew manual adder ─────────────────────────────────────────────
 function CrewAdder({ crew, onChange }: { crew: CrewEntry[]; onChange: (c: CrewEntry[]) => void }) {
+  const uiText = useTranslations();
+
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
 
@@ -160,9 +170,7 @@ function CrewAdder({ crew, onChange }: { crew: CrewEntry[]; onChange: (c: CrewEn
 
   return (
     <div>
-      <label className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">
-        <Users size={11} /> Crew eintragen
-      </label>
+      <label className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">{uiText.rich("Ui.text_71aec30e2a5e57", { part1: () => (<Users size={11} />) })}</label>
 
       {crew.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-2">
@@ -181,7 +189,7 @@ function CrewAdder({ crew, onChange }: { crew: CrewEntry[]; onChange: (c: CrewEn
       <div className="flex gap-2">
         <input
           type="text"
-          placeholder="Name"
+          placeholder={uiText("profile.fieldName")}
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), add())}
@@ -189,7 +197,7 @@ function CrewAdder({ crew, onChange }: { crew: CrewEntry[]; onChange: (c: CrewEn
         />
         <input
           type="text"
-          placeholder="Rolle"
+          placeholder={uiText("Ui.text_0038a9cf86613c")}
           value={role}
           onChange={(e) => setRole(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), add())}
@@ -200,13 +208,36 @@ function CrewAdder({ crew, onChange }: { crew: CrewEntry[]; onChange: (c: CrewEn
           <Plus size={15} />
         </button>
       </div>
-      <p className="text-[11px] text-text-muted mt-1.5">Enter drücken oder + klicken zum Hinzufügen</p>
+      <p className="text-[11px] text-text-muted mt-1.5">{uiText("Ui.text_6d681d926674c0")}</p>
     </div>
   );
 }
 
 // ── Main Page ─────────────────────────────────────────────────────
 export default function NewProjectPage() {
+  const uiText = useTranslations();
+  const uiOptionLabels: Record<string, string> = {
+    "Spielfilm": uiText("Ui.text_031b1c1fc4b241"),
+    "Kurzfilm": uiText("Ui.text_75b346d26e4973"),
+    "Serie": uiText("Ui.text_ab7743a4ad9a44"),
+    "Dokumentation": uiText("projects.catDokumentation"),
+    "Musikvideo": uiText("projects.catMusikvideo"),
+    "Werbefilm / Commercial": uiText("Ui.text_9bf2221daf841f"),
+    "Corporate Film": uiText("Ui.text_3a7f36cb4e7257"),
+    "Event / Live": uiText("Ui.text_eab270724977e8"),
+    "Foto / Shooting": uiText("Ui.text_f1ff7fc6fb8449"),
+    "Social Media Content": uiText("Ui.text_130e3fc256922c"),
+    "Imagefilm": uiText("Ui.text_411e73c2f310f4"),
+    "Sonstiges": uiText("profile.typeOther"),
+  };
+
+
+
+
+
+  const TYPE_CONFIG = getLocalizedTYPE_CONFIG(uiText);
+
+
   const router = useRouter();
   const { isSignedIn } = useAuth();
 
@@ -282,18 +313,18 @@ export default function NewProjectPage() {
   if (!isSignedIn) {
     return (
       <div className="pt-16 min-h-screen bg-bg-primary flex items-center justify-center">
-        <p className="text-text-muted">Bitte einloggen.</p>
+        <p className="text-text-muted">{uiText("Ui.text_603df3632ba85f")}</p>
       </div>
     );
   }
 
-  const cfg: TypeConfig = form.type ? (TYPE_CONFIG[form.type] ?? DEFAULT_CONFIG) : DEFAULT_CONFIG;
+  const cfg: TypeConfig = form.type ? (TYPE_CONFIG[form.type] ?? TYPE_CONFIG["Spielfilm"]) : TYPE_CONFIG["Spielfilm"];
   function set(key: string, val: string) { setForm((f) => ({ ...f, [key]: val })); }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!projectDraft.loaded) return;
-    if (!form.title.trim()) { setError("Titel ist Pflichtfeld"); return; }
+    if (!form.title.trim()) { setError(uiText("Ui.text_c2018abde6e3d8")); return; }
     setSaving(true);
     setError(null);
     try {
@@ -321,11 +352,11 @@ export default function NewProjectPage() {
         }),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Fehler beim Speichern");
+      if (!res.ok) throw new Error(json.error ?? uiText("profile.savingError"));
       await projectDraft.complete();
       router.push(`/dashboard/projects/drafts/${json.draft.id}`);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Unbekannter Fehler");
+      setError(uiErrorMessage(err, uiText("profile.unknownError")));
       setSaving(false);
     }
   }
@@ -345,8 +376,8 @@ export default function NewProjectPage() {
             <Clapperboard size={18} className="text-gold" />
           </div>
           <div>
-            <h1 className="font-display text-xl font-bold text-text-primary leading-tight">Projekt eintragen</h1>
-            <p className="text-xs text-text-muted">Zeig der Community deine Arbeit</p>
+            <h1 className="font-display text-xl font-bold text-text-primary leading-tight">{uiText("projects.addProject")}</h1>
+            <p className="text-xs text-text-muted">{uiText("Ui.text_cc3cb81a556f84")}</p>
           </div>
         </div>
 
@@ -354,7 +385,7 @@ export default function NewProjectPage() {
 
           {/* Produktionsart */}
           <div>
-            <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">Produktionsart</label>
+            <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">{uiText("Ui.text_0557707e2982c0")}</label>
             <div ref={typeRef} className="relative">
               <button
                 type="button"
@@ -362,7 +393,7 @@ export default function NewProjectPage() {
                 className={inputCls + " flex items-center justify-between text-left"}
               >
                 <span className={form.type ? "text-text-primary" : "text-text-muted"}>
-                  {form.type || "Bitte wählen"}
+                  {form.type || uiText("Ui.text_4112179c8995fc")}
                 </span>
                 <ChevronDown size={15} className={`text-text-muted transition-transform duration-200 ${typeOpen ? "rotate-180" : ""}`} />
               </button>
@@ -375,7 +406,7 @@ export default function NewProjectPage() {
                       onClick={() => { set("type", t); setTypeOpen(false); }}
                       className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-bg-hover ${form.type === t ? "text-gold bg-gold/8" : "text-text-primary"}`}
                     >
-                      {t}
+                      {(uiOptionLabels[t] ?? t)}
                     </button>
                   ))}
                 </div>
@@ -386,11 +417,11 @@ export default function NewProjectPage() {
           {/* Titel + Jahr */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">Projekttitel <span className="text-gold">*</span></label>
+              <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">{uiText.rich("Ui.text_021a7d57480275", { part1: chunks => (<span className="text-gold">{chunks}</span>) })}</label>
               <input type="text" placeholder={cfg.titlePlaceholder} value={form.title} onChange={(e) => set("title", e.target.value)} className={inputCls} required />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">Jahr</label>
+              <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">{uiText("projects.filterYear")}</label>
               <input type="number" placeholder="2024" min="1900" max="2030" value={form.year} onChange={(e) => set("year", e.target.value)} className={inputCls} />
             </div>
           </div>
@@ -398,7 +429,7 @@ export default function NewProjectPage() {
           {/* Meine Rolle + Regie */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">Meine Rolle</label>
+              <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">{uiText("profile.labelMyRole")}</label>
               <input type="text" placeholder={cfg.rolePlaceholder} value={form.myRole} onChange={(e) => set("myRole", e.target.value)} className={inputCls} />
             </div>
             <div>
@@ -427,18 +458,18 @@ export default function NewProjectPage() {
 
           {/* Beschreibung */}
           <div>
-            <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">Beschreibung</label>
+            <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">{uiText("setup.description")}</label>
             <textarea rows={4} placeholder={cfg.descPlaceholder} value={form.description} onChange={(e) => set("description", e.target.value)} className={inputCls + " resize-none"} />
           </div>
 
           {/* Poster + Link */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">Poster URL</label>
-              <input type="url" placeholder="https://..." value={form.poster_url} onChange={(e) => set("poster_url", e.target.value)} className={inputCls} />
+              <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">{uiText("Ui.text_af9f2155477cda")}</label>
+              <input type="url" placeholder={uiText("Ui.text_e98a62ef23bb46")} value={form.poster_url} onChange={(e) => set("poster_url", e.target.value)} className={inputCls} />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">Link</label>
+              <label className="block text-xs font-semibold text-text-secondary mb-1.5 uppercase tracking-wide">{uiText("Ui.text_a6a32dbc5618ea")}</label>
               <input type="url" placeholder={cfg.linkPlaceholder} value={form.link} onChange={(e) => set("link", e.target.value)} className={inputCls} />
             </div>
           </div>
@@ -448,9 +479,9 @@ export default function NewProjectPage() {
 
           {/* Beteiligte Firmen */}
           <LinkedSearch
-            label="Beteiligte Firmen"
+            label={uiText("Ui.text_2b5c201d2afdd5")}
             icon={Building2}
-            placeholder="Firma suchen oder Namen eingeben …"
+            placeholder={uiText("Ui.text_11f9aa786253be")}
             items={linkedCompanies}
             onAdd={(item) => {
               if (!linkedCompanies.find((c) => c.name === item.name))
@@ -464,9 +495,9 @@ export default function NewProjectPage() {
 
           {/* Genutzte Locations */}
           <LinkedSearch
-            label="Genutzte Locations"
+            label={uiText("Ui.text_6aeb8a772267d5")}
             icon={MapPin}
-            placeholder="Location suchen oder Namen eingeben …"
+            placeholder={uiText("Ui.text_7954d6c03a8736")}
             items={linkedLocations}
             onAdd={(item) => {
               if (!linkedLocations.find((l) => l.name === item.name))
@@ -492,13 +523,11 @@ export default function NewProjectPage() {
 
           <div className="flex gap-3 pt-2">
             <Link href="/projects"
-              className="flex-1 px-4 py-3 border border-border text-text-secondary rounded-xl hover:border-border-hover hover:text-text-primary transition-all text-sm font-medium text-center">
-              Abbrechen
-            </Link>
+              className="flex-1 px-4 py-3 border border-border text-text-secondary rounded-xl hover:border-border-hover hover:text-text-primary transition-all text-sm font-medium text-center">{uiText("home.boardCancel")}</Link>
             <button type="submit" disabled={saving || !projectDraft.loaded}
               className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm disabled:opacity-60">
               {saving ? <Loader2 size={15} className="animate-spin" /> : <CheckCircle size={15} />}
-              {saving ? "Entwurf wird gespeichert …" : "Als Entwurf speichern"}
+              {saving ? uiText("Ui.text_52cc3bf250a92e") : uiText("Ui.text_3f392fd0af41b6")}
             </button>
           </div>
         </form>

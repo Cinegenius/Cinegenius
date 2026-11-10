@@ -9,21 +9,21 @@ export function listingPriceMetadata(value: unknown): ListingPriceMetadata {
 export function listingPriceLabel(price:number|null|undefined, metadata:unknown=null, unit='/Tag',locale='de-DE',translate?:(key:string)=>string):string {
   const flags=listingPriceMetadata(metadata);
   const market=flags.marketplace;
-  const words=(key:string)=>translate?.(key)??({request:'Preis auf Anfrage',rent:'Miete',sale:'Kauf',hour:'Std.',day:'Tag',week:'Woche',month:'Monat',project:'Projekt'} as Record<string,string>)[key]??key;
+  const words=(key:string)=>translate?.(key)??({request:'Preis auf Anfrage',rent:'Miete',sale:'Kauf',hour:'Std.',day:'Tag',week:'Woche',month:'Monat',project:'Projekt',negotiableShort:'VB'} as Record<string,string>)[key]??key;
   if(market){
-    const format=(kind:'rent'|'sale')=>{const mode=market[`${kind}_mode`],value=market[`${kind}_price`];const amount=typeof value==='number'&&value>0?`${value.toLocaleString(locale,{maximumFractionDigits:2})} €${kind==='rent'?`/${words(market.unit)}`:''}`:'';return mode==='request'?words('request'):mode==='negotiable'?amount?`${amount} VB`:'VB':amount||words('request');};
+    const format=(kind:'rent'|'sale')=>{const mode=market[`${kind}_mode`],value=market[`${kind}_price`];const amount=typeof value==='number'&&value>0?`${value.toLocaleString(locale,{maximumFractionDigits:2})} €${kind==='rent'?`/${words(market.unit)}`:''}`:'';return mode==='request'?words('request'):mode==='negotiable'?amount?`${amount} ${words('negotiableShort')}`:words('negotiableShort'):amount||words('request');};
     return market.mode==='both'?`${words('rent')}: ${format('rent')} · ${words('sale')}: ${format('sale')}`:format(market.mode==='sale'?'sale':'rent');
   }
   const amount=typeof price==='number'&&Number.isFinite(price)&&price>0 ? `${price.toLocaleString(locale,{maximumFractionDigits:2})} €${flags.rental_type==='kauf'?'':unit==='/Tag'&&translate?`/${words('day')}`:unit}` : '';
-  if(flags.price_negotiable)return amount ? `${amount} VB` : 'VB';
+  if(flags.price_negotiable)return amount ? `${amount} ${words('negotiableShort')}` : words('negotiableShort');
   if(flags.price_on_request||!amount)return words('request');
   return amount;
 }
-export function listingPriceMetadataError(value:unknown):string|null {
-  if(!value||typeof value!=='object'||Array.isArray(value))return 'Die Preisangaben sind ungültig.';
+export function listingPriceMetadataError(value:unknown,translate?:(key:string)=>string):string|null {
+  if(!value||typeof value!=='object'||Array.isArray(value))return translate?translate('System.priceMetadataInvalid'):'Die Preisangaben sind ungültig.';
   const record=value as Record<string,unknown>;
-  for(const key of ['price_negotiable','price_on_request'])if(key in record&&typeof record[key]!=='boolean')return 'Bitte wähle eine gültige Preisart aus.';
-  if(record.price_negotiable===true&&record.price_on_request===true)return 'Bitte wähle entweder Verhandlungsbasis oder Preis auf Anfrage.';
+  for(const key of ['price_negotiable','price_on_request'])if(key in record&&typeof record[key]!=='boolean')return translate?translate('System.priceModeInvalid'):'Bitte wähle eine gültige Preisart aus.';
+  if(record.price_negotiable===true&&record.price_on_request===true)return translate?translate('System.priceModeConflict'):'Bitte wähle entweder Verhandlungsbasis oder Preis auf Anfrage.';
   return null;
 }
 

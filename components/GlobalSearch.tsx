@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations , useLocale } from "next-intl";
 import {
   Search, X, MapPin, Car, Package, Briefcase, Users,
   Loader2, Clock, ArrowRight, User, Building2, PawPrint,
@@ -37,6 +37,9 @@ function clearRecentSearches() {
 }
 
 export default function GlobalSearch() {
+  const uiText = useTranslations();
+  const uiLocale = useLocale();
+
   const t = useTranslations("search");
   const animals = useTranslations("FilmAnimals");
   const [open, setOpen] = useState(false);
@@ -191,14 +194,11 @@ export default function GlobalSearch() {
             placeholder={t("inputPlaceholder")}
             className="min-w-0 flex-1 bg-transparent text-text-primary placeholder:text-text-muted text-base focus:outline-none"
           />
-          <div className="flex items-center gap-2 shrink-0">
-            {query && (
+          <div className="flex items-center gap-2 shrink-0">{uiText.rich("Ui.text_0633df8995bbb3", { value1: () => (query && (
               <button type="button" aria-label={t("clearSearch")} onClick={() => {setQuery(""); inputRef.current?.focus();}} className="min-h-11 min-w-11 flex items-center justify-center text-text-muted hover:text-gold transition-colors">
                 <X size={16} />
               </button>
-            )}
-            <kbd className="text-[10px] px-1.5 py-0.5 bg-bg-secondary border border-border rounded text-text-muted">Esc</kbd>
-          </div>
+            )), part2: chunks => (<kbd className="text-[10px] px-1.5 py-0.5 bg-bg-secondary border border-border rounded text-text-muted">{chunks}</kbd>) })}</div>
         </div>
 
         {/* Results */}
@@ -292,7 +292,7 @@ export default function GlobalSearch() {
                           <span className={`w-2 h-2 rounded-full ${r.available ? "bg-success" : "bg-text-muted"}`} />
                         )}
                         {!isProfile && r.type !== "animal" && (r.priceLabel || r.price > 0) && (
-                          <span className="text-xs font-mono text-gold">{r.priceLabel ?? `${r.price.toLocaleString()} €`}</span>
+                          <span className="text-xs font-mono text-gold">{r.priceLabel ?? uiText("Ui.text_4a44946c8fc283", { value1: String(r.price.toLocaleString(uiLocale)) })}</span>
                         )}
                       </div>
                     </button>

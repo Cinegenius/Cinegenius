@@ -14,26 +14,26 @@ export type ListingPublicationInput = {
 };
 
 /** Completeness checks for provider submission/publication. Admin quality decisions are separate. */
-export function validateListingPublication(input: ListingPublicationInput): string | null {
+export function validateListingPublication(input: ListingPublicationInput, translate?: (key: string) => string): string | null {
   if (!input.title?.trim() || !input.city?.trim()) {
-    return "Vor der Veröffentlichung müssen Titel und Ort eingetragen sein.";
+    return translate ? translate("ServerCopy.s_29ff957be269") : "Vor der Veröffentlichung müssen Titel und Ort eingetragen sein.";
   }
   const visualListing = ["location", "prop", "vehicle", "animal"].includes(input.type);
   if (visualListing && !input.category?.trim()) {
-    return "Vor der Veröffentlichung muss eine passende Kategorie ausgewählt sein.";
+    return translate ? translate("ServerCopy.s_b2986f18f24f") : "Vor der Veröffentlichung muss eine passende Kategorie ausgewählt sein.";
   }
   if (input.imageUrl && !protectedMediaKey(input.imageUrl)) {
     try {
       if (new URL(input.imageUrl).protocol !== "https:") throw new Error("invalid image protocol");
     } catch {
-      return "Das Hauptbild hat keine gültige öffentliche HTTPS-Adresse.";
+      return translate ? translate("ServerCopy.s_a91db39ecd6c") : "Das Hauptbild hat keine gültige öffentliche HTTPS-Adresse.";
     }
   }
   if (!isListingDetailRouteSupported(input.type, input.companySlug)) {
-    return "Für diesen Angebotstyp gibt es keine gültige öffentliche Detailseite.";
+    return translate ? translate("ServerCopy.s_6312926c554a") : "Für diesen Angebotstyp gibt es keine gültige öffentliche Detailseite.";
   }
   if (!input.providerAssigned || !input.providerContactable) {
-    return "Vor der Veröffentlichung muss ein erreichbarer Anbieter mit Kontaktprofil zugeordnet sein.";
+    return translate ? translate("ServerCopy.s_4754b7cb2095") : "Vor der Veröffentlichung muss ein erreichbarer Anbieter mit Kontaktprofil zugeordnet sein.";
   }
   return null;
 }

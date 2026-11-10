@@ -24,16 +24,18 @@ import {
 import EmptyState from "@/components/EmptyState";
 import { useTranslations, useLocale } from "next-intl";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
-const LocationMap = dynamicImport(() => import("@/components/LocationMap"), {
-  ssr: false,
-  loading: () => (
+function LocationMapLoading() { const uiText = useTranslations(); return ((
     <div className="w-full h-full bg-bg-secondary flex items-center justify-center rounded-xl border border-border">
       <div className="text-center">
         <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-text-muted text-sm">Karte wird geladen…</p>
+        <p className="text-text-muted text-sm">{uiText("Ui.text_8cd626fb7674ab")}</p>
       </div>
     </div>
-  ),
+  )); }
+
+const LocationMap = dynamicImport(() => import("@/components/LocationMap"), {
+  ssr: false,
+  loading: LocationMapLoading,
 });
 
 const locationTypes = [
@@ -84,6 +86,12 @@ function readWideLayout() { return window.matchMedia(wideLayoutQuery).matches; }
 function serverWideLayout() { return false; }
 
 function LocationsInner({ serverListings }: { serverListings: Location[] }) {
+  const uiText = useTranslations();
+
+
+
+
+
   const locale=useLocale();
   const router = useRouter();
   const pathname = usePathname();
@@ -318,8 +326,8 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
   const mobileChips: BrowseChip[] = [
     ...(['country','region','city'] as const).flatMap(kind => placeFilters[kind] ? [{id:`place-${kind}`,label:placeOptions(allLocations,kind,locale).find(option=>option.value===placeFilters[kind])?.label??placeFilters[kind],onRemove:()=>setPlaceFilters({...placeFilters,[kind]:''})}] : []),
     ...(activeType !== "All Types" ? [{ id: "type", label: categoryLabel(activeType), onRemove: () => setActiveType("All Types") }] : []),
-    ...(minPrice ? [{ id: "min", label: `ab ${minPrice} €`, onRemove: () => setMinPrice("") }] : []),
-    ...(maxPrice ? [{ id: "max", label: `bis ${maxPrice} €`, onRemove: () => setMaxPrice("") }] : []),
+    ...(minPrice ? [{ id: "min", label: uiText("Ui.text_c6e3466f40cb9d", { value1: String(minPrice) }), onRemove: () => setMinPrice("") }] : []),
+    ...(maxPrice ? [{ id: "max", label: uiText("Ui.text_f47e415aff7a38", { value1: String(maxPrice) }), onRemove: () => setMaxPrice("") }] : []),
     ...(lageFilter !== "Alle" ? [{ id: "lage", label: lageFilter, onRemove: () => setLageFilter("Alle") }] : []),
     ...(instantOnly ? [{ id: "instant", label: t("filterInstant"), onRemove: () => setInstantOnly(false) }] : []),
     ...(verifiedOnly ? [{ id: "verified", label: t("filterVerified"), onRemove: () => setVerifiedOnly(false) }] : []),
@@ -354,11 +362,11 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
       >
 
         <PlaceFilters rows={allLocations} value={placeFilters} onChange={setPlaceFilters} scope="locations" />        <div className="grid grid-cols-2 gap-3">
-          <MobileFilterField label="Preis ab (€)"><input inputMode="decimal" type="number" min="0" value={minPrice} onChange={(event) => setMinPrice(event.target.value)} placeholder="Beliebig" /></MobileFilterField>
-          <MobileFilterField label="Preis bis (€)"><input inputMode="decimal" type="number" min="0" value={maxPrice} onChange={(event) => setMaxPrice(event.target.value)} placeholder="Beliebig" /></MobileFilterField>
+          <MobileFilterField label={uiText("Ui.text_84381d6fa4d29d")}><input inputMode="decimal" type="number" min="0" value={minPrice} onChange={(event) => setMinPrice(event.target.value)} placeholder={uiText("Ui.text_d0c50fd56cbce3")} /></MobileFilterField>
+          <MobileFilterField label={uiText("Ui.text_f7abc502297a74")}><input inputMode="decimal" type="number" min="0" value={maxPrice} onChange={(event) => setMaxPrice(event.target.value)} placeholder={uiText("Ui.text_d0c50fd56cbce3")} /></MobileFilterField>
         </div>
-        <MobileFilterField label="Lage">
-          <MobileFilterSelect value={lageFilter === "Alle" ? "" : lageFilter} onChange={(value) => setLageFilter(value || "Alle")} placeholder="Innen und außen" options={[{ value: "Innen", label: t("filterInnen") }, { value: "Außen", label: t("filterAussen") }, { value: "Innen & Außen", label: t("filterInnenAussen") }]} />
+        <MobileFilterField label={uiText("Ui.text_295029201d603e")}>
+          <MobileFilterSelect value={lageFilter === "Alle" ? "" : lageFilter} onChange={(value) => setLageFilter(value || "Alle")} placeholder={uiText("Ui.text_43341e4d2ec3d0")} options={[{ value: "Innen", label: t("filterInnen") }, { value: "Außen", label: t("filterAussen") }, { value: "Innen & Außen", label: t("filterInnenAussen") }]} />
         </MobileFilterField>
         <div className="grid gap-1">
           {[
@@ -373,7 +381,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
         </div>
         <div className="grid grid-cols-2 gap-2">
           <button type="button" onClick={userLocation ? clearLocation : handleLocateMe} className="min-h-11 rounded-lg border border-border px-2 text-sm text-text-secondary">{userLocation ? t("locateActive") : t("locateMe")}</button>
-          {userLocation && <MobileFilterField label={t("radiusLabel")}><select value={radiusKm} onChange={(event) => setRadiusKm(Number(event.target.value))}>{[10, 25, 50, 100, 200, 500].map((value) => <option key={value} value={value}>{value} km</option>)}</select></MobileFilterField>}
+          {userLocation && <MobileFilterField label={t("radiusLabel")}><select value={radiusKm} onChange={(event) => setRadiusKm(Number(event.target.value))}>{[10, 25, 50, 100, 200, 500].map((value) => <option key={value} value={value}>{uiText.rich("Ui.text_6b06beb2a825c0", { value1: () => (value) })}</option>)}</select></MobileFilterField>}
         </div>
       </MobileBrowseControls>
       <div className="hidden xl:block site-container py-3"><PlaceFilters rows={allLocations} value={placeFilters} onChange={setPlaceFilters} scope="locations" /></div>
@@ -450,7 +458,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                   className="bg-transparent border-none text-xs text-gold font-semibold focus:outline-none"
                 >
                   {[10, 25, 50, 100, 200, 500].map((r) => (
-                    <option key={r} value={r}>{r} km</option>
+                    <option key={r} value={r}>{uiText.rich("Ui.text_6b06beb2a825c0", { value1: () => (r) })}</option>
                   ))}
                 </select>
               </div>
@@ -475,7 +483,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
             {/* Share */}
             <button
               onClick={handleCopyLink}
-              title="Copy shareable link"
+              title={uiText("Ui.text_2716448da0c02a")}
               className="flex items-center gap-1.5 h-9 px-3 rounded-lg text-xs font-medium border border-border text-text-secondary hover:border-gold hover:text-gold transition-all shrink-0"
             >
               <Share2 size={13} /> {copied ? t("copied") : t("shareBtn")}
@@ -505,9 +513,9 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
               <div className="flex items-center gap-3 flex-wrap">
                 <div className="flex items-center gap-1.5">
                   <span className="text-xs text-text-muted">€</span>
-                  <input type="number" placeholder="Min" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} className="text-xs py-1.5 px-2 w-20 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none" />
+                  <input type="number" placeholder={uiText("Ui.text_dea79332147ffe")} value={minPrice} onChange={(e) => setMinPrice(e.target.value)} className="text-xs py-1.5 px-2 w-20 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none" />
                   <span className="text-xs text-text-muted">–</span>
-                  <input type="number" placeholder="Max" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} className="text-xs py-1.5 px-2 w-20 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none" />
+                  <input type="number" placeholder={uiText("Ui.text_a1a5936d3b0f8a")} value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} className="text-xs py-1.5 px-2 w-20 bg-bg-elevated border border-border rounded-lg text-text-secondary focus:outline-none" />
                 </div>
 
                 <div className="flex items-center gap-1">
@@ -573,7 +581,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
               <p className="text-xs text-text-muted">
                 <span className="text-text-primary font-semibold">{t("results", { count: filtered.length })}</span>
                 {userLocation && <span className="text-gold"> {t("inRadius", { radius: radiusKm })}</span>}
-                {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
+                {query && <span className="text-gold">{uiText.rich("Ui.text_58e2efda5da487", { value1: () => (query) })}</span>}
               </p>
             </div>
 

@@ -1,4 +1,5 @@
 "use client";
+import { projectTypeLabel } from "@/lib/project-type-labels";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 
 import { useFormDraft } from "@/lib/use-form-draft";
@@ -13,6 +14,8 @@ import {
 import ProfileGuard from "@/components/ProfileGuard";
 import RoleDropdown from "@/components/RoleDropdown";
 import { departments } from "@/lib/departments";
+import { useTranslations } from "next-intl";
+
 
 const ALL_ROLES = departments.flatMap((d) => d.roles);
 
@@ -36,6 +39,27 @@ type ExistingProject = {
 };
 
 export default function NeuesProjektPage() {
+  const uiText = useTranslations();
+  const uiOptionLabels: Record<string, string> = {
+    "Spielfilm": uiText("Ui.text_031b1c1fc4b241"),
+    "Kurzfilm": uiText("Ui.text_75b346d26e4973"),
+    "Serie": uiText("Ui.text_ab7743a4ad9a44"),
+    "Dokumentation": uiText("projects.catDokumentation"),
+    "Werbefilm": uiText("Ui.text_5c634ccc3ba66d"),
+    "Imagefilm": uiText("Ui.text_411e73c2f310f4"),
+    "Musikvideo": uiText("projects.catMusikvideo"),
+    "Corporate": uiText("projects.catCorporate"),
+    "Social Media": uiText("home.showcaseSocial"),
+    "Foto / Shooting": uiText("Ui.text_f1ff7fc6fb8449"),
+    "Event": uiText("Organizations.entryType.event"),
+    "Sonstiges": uiText("profile.typeOther"),
+  };
+
+
+
+
+
+
   const router = useRouter();
 
   // ── Step 1: search ───────────────────────────────────────────────────────────
@@ -69,7 +93,7 @@ export default function NeuesProjektPage() {
   const [joinError, setJoinError] = useState("");
 
   async function handleJoin() {
-    if (!joinTarget || !joinRole.trim()) { setJoinError("Bitte Rolle eingeben"); return; }
+    if (!joinTarget || !joinRole.trim()) { setJoinError(uiText("Ui.text_82470efaf4a588")); return; }
     setJoinSaving(true); setJoinError("");
     try {
       const res = await fetch("/api/project-credits", {
@@ -77,7 +101,7 @@ export default function NeuesProjektPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ project_id: joinTarget.id, role: joinRole.trim() }),
       });
-      if (!res.ok) { const j = await res.json(); setJoinError(j.error ?? "Fehler"); return; }
+      if (!res.ok) { const j = await res.json(); setJoinError(j.error ?? uiText("Ui.text_f6cc01cb7edbf0")); return; }
       router.push(`/projects/${joinTarget.id}`);
     } finally {
       setJoinSaving(false);
@@ -130,7 +154,7 @@ export default function NeuesProjektPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!projectDraft.loaded) return;
-    if (!form.title.trim()) { setCreateError("Titel ist Pflichtfeld"); return; }
+    if (!form.title.trim()) { setCreateError(uiText("Ui.text_c2018abde6e3d8")); return; }
     setSaving(true); setCreateError("");
     try {
       const res = await fetch("/api/projects", {
@@ -151,12 +175,12 @@ export default function NeuesProjektPage() {
         }),
       });
       const json = await res.json();
-      if (!res.ok) { setCreateError(json.error ?? "Fehler"); return; }
-      if (!json.draft?.id) throw new Error("Der Entwurf konnte nicht bestätigt werden.");
+      if (!res.ok) { setCreateError(json.error ?? uiText("Ui.text_f6cc01cb7edbf0")); return; }
+      if (!json.draft?.id) throw new Error(uiText("Ui.text_0d36134dd2e27a"));
       await projectDraft.complete();
       router.push(`/dashboard/projects/drafts/${json.draft.id}`);
     } catch {
-      setCreateError("Netzwerkfehler — bitte erneut versuchen");
+      setCreateError(uiText("Ui.text_294a4d573e5e5f"));
     } finally {
       setSaving(false);
     }
@@ -167,18 +191,14 @@ export default function NeuesProjektPage() {
       <div className="pt-16 min-h-screen bg-bg-primary">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
 
-          <Link href="/projects" className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-gold transition-colors mb-8">
-            <ArrowLeft size={14} /> Zurück zu Projekten
-          </Link>
+          <Link href="/projects" className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-gold transition-colors mb-8">{uiText.rich("Ui.text_3613d87ef6ba76", { part1: () => (<ArrowLeft size={14} />) })}</Link>
 
           <div className="mb-8">
             <div className="w-12 h-12 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center mb-4">
               <Clapperboard size={22} className="text-gold" />
             </div>
-            <h1 className="font-display text-2xl font-bold text-text-primary">Projekt hinzufügen</h1>
-            <p className="text-sm text-text-muted mt-1">
-              Suche zuerst ob das Projekt bereits existiert — so verhindern wir Duplikate.
-            </p>
+            <h1 className="font-display text-2xl font-bold text-text-primary">{uiText("Ui.text_4fa2d0afa57f46")}</h1>
+            <p className="text-sm text-text-muted mt-1">{uiText("Ui.text_50c0a8ba7046f3")}</p>
           </div>
 
           {/* ── SUCHE ─────────────────────────────────────────────────────── */}
@@ -189,7 +209,7 @@ export default function NeuesProjektPage() {
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder='Projektitel suchen, z. B. "Bibi Blocksberg"'
+                  placeholder={uiText("Ui.text_2df366bc58aa2c")}
                   className="w-full pl-10 pr-4 py-3.5 bg-bg-secondary border border-border rounded-xl text-text-primary placeholder-text-muted focus:outline-none focus:border-gold transition-colors"
                   autoFocus
                 />
@@ -201,9 +221,7 @@ export default function NeuesProjektPage() {
               {/* Results */}
               {searched && results.length > 0 && !joining && (
                 <div className="border border-border rounded-xl overflow-hidden bg-bg-secondary mb-6">
-                  <p className="px-4 py-2.5 text-[10px] uppercase tracking-widest text-text-muted font-semibold border-b border-border">
-                    Bestehende Projekte — zum Beitreten auswählen
-                  </p>
+                  <p className="px-4 py-2.5 text-[10px] uppercase tracking-widest text-text-muted font-semibold border-b border-border">{uiText("Ui.text_8296bde358a2ac")}</p>
                   {results.map((p) => (
                     <button
                       key={p.id}
@@ -223,11 +241,11 @@ export default function NeuesProjektPage() {
                             {p.title}
                           </span>
                           {p.verified && (
-                            <ShieldCheck size={12} className="text-emerald-400 shrink-0" aria-label="Verifiziert" />
+                            <ShieldCheck size={12} className="text-emerald-400 shrink-0" aria-label={uiText("common.verified")} />
                           )}
                         </div>
                         <span className="text-xs text-text-muted">
-                          {[p.type, p.year, p.director].filter(Boolean).join(" · ")}
+                          {[p.type ? projectTypeLabel(p.type, uiText) : p.type, p.year, p.director].filter(Boolean).join(" · ")}
                         </span>
                       </div>
                       <ChevronRight size={14} className="text-text-muted group-hover:text-gold transition-colors shrink-0" />
@@ -239,19 +257,17 @@ export default function NeuesProjektPage() {
               {/* Join form */}
               {joining && joinTarget && (
                 <div className="border border-gold/30 rounded-xl p-5 bg-gold/5 mb-6">
-                  <p className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-1">Beitreten</p>
+                  <p className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-1">{uiText("Ui.text_82a93e81d1397c")}</p>
                   <p className="text-sm font-bold text-text-primary mb-4">
-                    {joinTarget.title} {joinTarget.year ? `(${joinTarget.year})` : ""}
+                    {joinTarget.title} {joinTarget.year ? uiText("Ui.text_1a37d34e227808", { value1: String(joinTarget.year) }) : ""}
                   </p>
                   <div className="mb-4">
-                    <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">
-                      Deine Rolle <span className="text-gold">*</span>
-                    </label>
+                    <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">{uiText.rich("Ui.text_14df02841f6a38", { part1: chunks => (<span className="text-gold">{chunks}</span>) })}</label>
                     <RoleDropdown
                       value={joinRole}
                       onChange={setJoinRole}
                       options={ALL_ROLES}
-                      placeholder="Rolle eingeben oder wählen…"
+                      placeholder={uiText("Ui.text_050e4c4db66fb2")}
                     />
                   </div>
                   {joinError && (
@@ -266,14 +282,12 @@ export default function NeuesProjektPage() {
                       className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors disabled:opacity-50 text-sm"
                     >
                       {joinSaving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-                      {joinSaving ? "Wird hinzugefügt…" : "Zum Projekt hinzufügen"}
+                      {joinSaving ? uiText("Ui.text_24c82e62f86e8a") : uiText("Ui.text_3f8a40824fc2e4")}
                     </button>
                     <button
                       onClick={() => { setJoining(null); setJoinTarget(null); setJoinError(""); }}
                       className="px-4 py-2.5 border border-border text-text-secondary text-sm rounded-xl hover:border-gold hover:text-gold transition-colors"
-                    >
-                      Zurück
-                    </button>
+                    >{uiText("setup.copy99")}</button>
                   </div>
                 </div>
               )}
@@ -285,33 +299,25 @@ export default function NeuesProjektPage() {
                     <div className="flex items-start gap-3">
                       <AlertCircle size={16} className="text-gold shrink-0 mt-0.5" />
                       <div>
-                        <p className="text-sm font-semibold text-text-primary mb-1">
-                          Kein passendes Projekt gefunden
-                        </p>
-                        <p className="text-xs text-text-muted mb-4">
-                          Du kannst es neu anlegen. Es wird als ungeprüft markiert und kann später verifiziert werden.
-                        </p>
+                        <p className="text-sm font-semibold text-text-primary mb-1">{uiText("Ui.text_0dc05b94ba2d4c")}</p>
+                        <p className="text-xs text-text-muted mb-4">{uiText("Ui.text_ab401a4bdbf122")}</p>
                         <button
                           onClick={openCreate}
                           className="inline-flex items-center gap-2 px-4 py-2 bg-gold text-bg-primary font-semibold rounded-lg text-sm hover:bg-gold-light transition-colors"
-                        >
-                          <Plus size={14} /> Neues Projekt anlegen
-                        </button>
+                        >{uiText.rich("Ui.text_bfc831b36e6f61", { part1: () => (<Plus size={14} />) })}</button>
                       </div>
                     </div>
                   ) : (
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-text-primary">Projekt nicht dabei?</p>
-                        <p className="text-xs text-text-muted mt-0.5">Erst suchen, dann neu anlegen</p>
+                        <p className="text-sm font-medium text-text-primary">{uiText("Ui.text_dbd4e52434c787")}</p>
+                        <p className="text-xs text-text-muted mt-0.5">{uiText("Ui.text_1b35653109e48d")}</p>
                       </div>
                       <button
                         onClick={openCreate}
                         disabled={!searched}
                         className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-sm rounded-lg hover:border-gold hover:text-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                        <Plus size={14} /> Neu anlegen
-                      </button>
+                      >{uiText.rich("Ui.text_3d70e5d8e24436", { part1: () => (<Plus size={14} />) })}</button>
                     </div>
                   )}
                 </div>
@@ -325,104 +331,94 @@ export default function NeuesProjektPage() {
               <button
                 onClick={() => setShowCreate(false)}
                 className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-gold transition-colors mb-6"
-              >
-                <ArrowLeft size={12} /> Zurück zur Suche
-              </button>
+              >{uiText.rich("Ui.text_463eb948b49aea", { part1: () => (<ArrowLeft size={12} />) })}</button>
 
               <div className="flex items-center gap-2 px-4 py-2.5 bg-amber-500/10 border border-amber-500/20 rounded-xl mb-6">
                 <AlertCircle size={14} className="text-amber-400 shrink-0" />
-                <p className="text-xs text-amber-300">
-                  Neues Projekt wird als <strong>ungeprüft</strong> angelegt. Bitte nur echte Produktionen eintragen.
-                </p>
+                <p className="text-xs text-amber-300">{uiText.rich("Ui.text_cb835b6411725a", { part1: chunks => (<strong>{chunks}</strong>) })}</p>
               </div>
 
               <FormDraftStatus draft={projectDraft} /><form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">
-                    Projekttitel <span className="text-gold">*</span>
-                  </label>
+                  <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">{uiText.rich("Ui.text_021a7d57480275", { part1: chunks => (<span className="text-gold">{chunks}</span>) })}</label>
                   <input
                     value={form.title}
                     onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-                    placeholder='z. B. "Der letzte Schnitt"'
+                    placeholder={uiText("Ui.text_0803d108114dda")}
                     className="w-full px-4 py-3 bg-bg-secondary border border-border rounded-xl text-text-primary placeholder-text-muted focus:outline-none focus:border-gold transition-colors"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">Typ</label>
+                    <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">{uiText("projects.colType")}</label>
                     <select
                       value={form.type}
                       onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))}
                       className="w-full px-4 py-3 bg-bg-secondary border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors appearance-none"
                     >
-                      <option value="">Typ wählen</option>
-                      {PROJECT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                      <option value="">{uiText("Ui.text_fe64193742c376")}</option>
+                      {PROJECT_TYPES.map((t) => <option key={t} value={t}>{(uiOptionLabels[t] ?? t)}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">Jahr</label>
+                    <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">{uiText("projects.filterYear")}</label>
                     <select
                       value={form.year}
                       onChange={(e) => setForm((f) => ({ ...f, year: e.target.value }))}
                       className="w-full px-4 py-3 bg-bg-secondary border border-border rounded-xl text-text-primary focus:outline-none focus:border-gold transition-colors appearance-none"
                     >
-                      <option value="">Jahr wählen</option>
+                      <option value="">{uiText("Ui.text_4420e2c948470e")}</option>
                       {YEARS.map((y) => <option key={y} value={String(y)}>{y}</option>)}
                     </select>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">
-                    Meine Rolle <span className="text-gold">*</span>
-                  </label>
+                  <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">{uiText.rich("Ui.text_baf8a1a1d96fc5", { part1: chunks => (<span className="text-gold">{chunks}</span>) })}</label>
                   <RoleDropdown
                     value={form.myRole}
                     onChange={(v) => setForm((f) => ({ ...f, myRole: v }))}
                     options={ALL_ROLES}
-                    placeholder="Rolle eingeben oder wählen…"
+                    placeholder={uiText("Ui.text_050e4c4db66fb2")}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">Regie</label>
+                    <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">{uiText("menu.crewDirection")}</label>
                     <input
                       value={form.director}
                       onChange={(e) => setForm((f) => ({ ...f, director: e.target.value }))}
-                      placeholder="Name des Regisseurs"
+                      placeholder={uiText("Ui.text_98a89ad69959cc")}
                       className="w-full px-4 py-3 bg-bg-secondary border border-border rounded-xl text-text-primary placeholder-text-muted focus:outline-none focus:border-gold transition-colors"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">Produktionsfirma</label>
+                    <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">{uiText("profile.labelProductionCompany")}</label>
                     <input
                       value={form.productionCompany}
                       onChange={(e) => setForm((f) => ({ ...f, productionCompany: e.target.value }))}
-                      placeholder="Optional"
+                      placeholder={uiText("setup.copy38")}
                       className="w-full px-4 py-3 bg-bg-secondary border border-border rounded-xl text-text-primary placeholder-text-muted focus:outline-none focus:border-gold transition-colors"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">Beschreibung</label>
+                  <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">{uiText("setup.description")}</label>
                   <textarea
                     value={form.description}
                     onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                     rows={3}
-                    placeholder="Kurzbeschreibung, Festivalteilnahmen …"
+                    placeholder={uiText("Ui.text_2096a7deadd6f7")}
                     className="w-full px-4 py-3 bg-bg-secondary border border-border rounded-xl text-text-primary placeholder-text-muted focus:outline-none focus:border-gold transition-colors resize-none"
                   />
                 </div>
 
                 {/* Team members (ghost profiles) */}
                 <div>
-                  <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">
-                    Teammitglieder <span className="text-text-muted font-normal normal-case">(optional — auch nicht registrierte Personen)</span>
-                  </label>
+                  <label className="block text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2">{uiText.rich("Ui.text_6970c8fe537d71", { part1: chunks => (<span className="text-text-muted font-normal normal-case">{chunks}</span>) })}</label>
 
                   {teamMembers.length > 0 && (
                     <div className="mb-3 space-y-2">
@@ -449,7 +445,7 @@ export default function NeuesProjektPage() {
                       type="text"
                       value={memberName}
                       onChange={(e) => setMemberName(e.target.value)}
-                      placeholder="Name der Person"
+                      placeholder={uiText("Ui.text_a4f19fdc93c825")}
                       className="flex-1 min-w-0 px-3 py-2.5 bg-bg-secondary border border-border rounded-xl text-sm text-text-primary placeholder-text-muted focus:outline-none focus:border-gold transition-colors"
                       onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addMember(); } }}
                     />
@@ -458,7 +454,7 @@ export default function NeuesProjektPage() {
                         value={memberRole}
                         onChange={setMemberRole}
                         options={ALL_ROLES}
-                        placeholder="Rolle…"
+                        placeholder={uiText("Ui.text_21e932322d0ac7")}
                       />
                     </div>
                     <button
@@ -470,9 +466,7 @@ export default function NeuesProjektPage() {
                       <Plus size={14} />
                     </button>
                   </div>
-                  <p className="text-[11px] text-text-muted mt-1.5">
-                    Sobald sie sich bei CineGenius anmelden, können sie das Profil übernehmen.
-                  </p>
+                  <p className="text-[11px] text-text-muted mt-1.5">{uiText("Ui.text_2ac390d94b6af5")}</p>
                 </div>
 
                 {createError && (
@@ -488,15 +482,13 @@ export default function NeuesProjektPage() {
                     className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {saving ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
-                    {saving ? "Wird gespeichert…" : "Projekt anlegen"}
+                    {saving ? uiText("AdminReview.saving") : uiText("Ui.text_bdbe2a07aebfbc")}
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowCreate(false)}
                     className="px-4 py-3 border border-border text-text-secondary text-sm rounded-xl hover:border-gold hover:text-gold transition-colors"
-                  >
-                    Abbrechen
-                  </button>
+                  >{uiText("home.boardCancel")}</button>
                 </div>
               </form>
             </>

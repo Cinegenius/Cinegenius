@@ -1,9 +1,11 @@
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // GET /api/profile-views — Aufrufe des eigenen Profils
 export async function GET() {
+  const tResponse = await getResponseTranslations();
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ views7: 0, views14: 0, trend: 0, daily: [] });
 
@@ -26,7 +28,7 @@ export async function GET() {
   ]);
 
   if (legacyResult.error || (dailyResult.error && !["42P01", "PGRST205"].includes(dailyResult.error.code ?? ""))) {
-    return NextResponse.json({ error: "Profilaufrufe konnten nicht geladen werden" }, { status: 500 });
+    return NextResponse.json({ error: tResponse('System.m_f37b2de8d190') }, { status: 500 });
   }
 
   const rows = [

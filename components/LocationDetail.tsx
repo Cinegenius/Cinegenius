@@ -1,10 +1,11 @@
 "use client";
 import { listingPriceLabel } from "@/lib/listing-price";
+import { locationRoomLabel } from "@/lib/location-rooms";
 
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useTranslations , useLocale } from "next-intl";
 import { bookingDateKey } from "@/lib/booking-request";
 import ContextBackLink from "@/components/ContextBackLink";
 import {
@@ -62,12 +63,7 @@ type Location = {
   sqft?: number; capacity?: number;
 };
 
-const AMENITY_LABELS: Record<string, string> = {
-  wifi: "Wi-Fi", restrooms: "WC / Sanitär", green_room: "Green Room",
-  loading_bay: "Laderampe", kitchen: "Küche", changing_room: "Umkleide",
-  generator: "Generator", sound_insulated: "Schallisoliert", ac: "Klimaanlage",
-  heating: "Heizung", elevator: "Aufzug", disabled_access: "Barrierefreiheit",
-};
+
 
 const AMENITY_ICONS: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
   wifi: Wifi, restrooms: DoorOpen, green_room: Users, loading_bay: Truck,
@@ -75,7 +71,21 @@ const AMENITY_ICONS: Record<string, React.ComponentType<{ size?: number; classNa
   ac: Wind, heating: Thermometer, elevator: ArrowUpDown, disabled_access: Accessibility,
 };
 
+function getLocalizedAMENITY_LABELS(translate: (key: string) => string): Record<string, string> { return ({
+  wifi: translate("Ui.text_337253f2e8d4d1"), restrooms: translate("Ui.text_800e5612baf938"), green_room: translate("Ui.text_cd4db9724f65a4"),
+  loading_bay: translate("Ui.text_7c8dc1fd90b6af"), kitchen: translate("Ui.text_a9ec872e661915"), changing_room: translate("Ui.text_6bb28e219f8023"),
+  generator: translate("Ui.text_1ade60abe93f5c"), sound_insulated: translate("Ui.text_e60eee0f0e49fe"), ac: translate("Ui.text_ea0e1904f1726c"),
+  heating: translate("Ui.text_744b4873e74c5c"), elevator: translate("Ui.text_02861aeff786cd"), disabled_access: translate("Ui.text_4e0b1087084fdb"),
+}); }
+
 export default function LocationDetail({ location }: { location: Location }) {
+  const uiPriceLocale = useLocale();
+  const uiPriceText = useTranslations("MarketplaceOffer");
+
+  const uiText = useTranslations();
+  const AMENITY_LABELS = getLocalizedAMENITY_LABELS(uiText);
+
+
   const bookingCopy = useTranslations("BookingRequest");
   const { user } = useUser();
   const isOwner = !!user && user.id === location.ownerId;
@@ -117,7 +127,7 @@ export default function LocationDetail({ location }: { location: Location }) {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ listing_id: location.id, owner_id: location.ownerId, rating: star }),
       });
-      if (!response.ok) throw new Error("Bewertung konnte nicht gespeichert werden");
+      if (!response.ok) throw new Error(uiText("Ui.text_1463df4649db2c"));
     } catch {
       setMyRating(prev);
       setLiveRating(prevSummary);
@@ -150,26 +160,24 @@ export default function LocationDetail({ location }: { location: Location }) {
     );
   };
 
-  const lageLabel = meta.indoor_outdoor === "beides" ? "Innen & Außen"
-    : meta.indoor_outdoor === "außen" ? "Außen"
-    : meta.indoor_outdoor === "innen" ? "Innen"
+  const lageLabel = meta.indoor_outdoor === "beides" ? uiText("locations.filterInnenAussen")
+    : meta.indoor_outdoor === "außen" ? uiText("locations.filterAussen")
+    : meta.indoor_outdoor === "innen" ? uiText("locations.filterInnen")
     : null;
 
   return (
     <div className="pt-16 min-h-screen">
       {/* Back */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <ContextBackLink href="/locations" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors mb-4">
-          <ArrowLeft size={14} /> Zurück zu Locations
-        </ContextBackLink>
+        <ContextBackLink href="/locations" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors mb-4">{uiText.rich("Ui.text_bbd0c5ecf20e22", { part1: () => (<ArrowLeft size={14} />) })}</ContextBackLink>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
         <ListingPhotoGallery
           images={allImages}
           title={location.title}
-          label="Locationgalerie"
-          alt={`Fotos von ${location.title}`}
+          label={uiText("Ui.text_e6ba89e6f89b71")}
+          alt={uiText("Ui.text_46e748668f5e7a", { value1: String(location.title) })}
           focalPoint={location.focalPoint}
           fallback={<MapPin size={42} aria-hidden="true" />}
         />
@@ -188,22 +196,16 @@ export default function LocationDetail({ location }: { location: Location }) {
                     <span key={t} className="px-2 py-0.5 bg-bg-secondary border border-border text-text-muted text-xs rounded">{t}</span>
                   ))}
                   {location.verified && (
-                    <span className="flex items-center gap-1 px-2 py-0.5 bg-success/10 border border-success/20 text-success text-xs rounded">
-                      <CheckCircle size={11} /> Verifiziert
-                    </span>
+                    <span className="flex items-center gap-1 px-2 py-0.5 bg-success/10 border border-success/20 text-success text-xs rounded">{uiText.rich("Ui.text_712de43869af36", { part1: () => (<CheckCircle size={11} />) })}</span>
                   )}
                 </div>
                 <h1 className="font-display text-3xl sm:text-4xl font-bold text-text-primary mb-1">{location.title}</h1>
-                <p className="text-text-secondary flex items-center gap-1.5">
-                  <MapPin size={14} className="text-gold" /> {location.city} &middot; {location.type}
-                </p>
+                <p className="text-text-secondary flex items-center gap-1.5">{uiText.rich("Ui.text_97a14078c43165", { part1: () => (<MapPin size={14} className="text-gold" />), value2: () => (location.city), value3: () => (location.type) })}</p>
               </div>
               <div className="flex items-center gap-1">
                 {isOwner && (
                   <Link href={`/dashboard?tab=listings`}
-                    className="flex items-center gap-1.5 px-3 py-1.5 border border-gold/40 text-gold text-xs font-medium rounded-lg hover:bg-gold/10 transition-colors">
-                    <Pencil size={12} /> Bearbeiten
-                  </Link>
+                    className="flex items-center gap-1.5 px-3 py-1.5 border border-gold/40 text-gold text-xs font-medium rounded-lg hover:bg-gold/10 transition-colors">{uiText.rich("Ui.text_603ead2ae843f0", { part1: () => (<Pencil size={12} />) })}</Link>
                 )}
                 <FavoriteButton listingId={location.id} listingType="location" listingTitle={location.title}
                   listingCity={location.city} listingPrice={location.price} listingImage={location.image} />
@@ -219,18 +221,15 @@ export default function LocationDetail({ location }: { location: Location }) {
                     onClick={() => handleRate(s)}
                     disabled={!canRate}
                     className={`transition-transform ${canRate ? "hover:scale-110 active:scale-125" : "cursor-default"}`}
-                    title={!user ? "Einloggen zum Bewerten" : isOwner ? "Eigene Location" : !eligible ? "Erst anfragen, dann bewerten" : `${s} Stern${s !== 1 ? "e" : ""}`}>
+                    title={!user ? uiText("Ui.text_0e87ce8126b5d8") : isOwner ? uiText("Ui.text_f05767e24ef119") : !eligible ? uiText("Ui.text_c05dd8c953b77c") : uiText("Ui.text_8dc8762909a7e9", { value1: String(s), value2: String(s !== 1 ? "e" : "") })}>
                     <Star size={18} className={`transition-colors ${s <= (myRating || Math.round(ratingSummary.avg)) ? "text-gold fill-gold" : "text-border fill-border"}`} />
                   </button>
                 ))}
               </div>
               {ratingSummary.count > 0 ? (
-                <>
-                  <span className="font-semibold text-text-primary">{ratingSummary.avg.toFixed(1)}</span>
-                  <span className="text-text-muted text-sm">({ratingSummary.count} Bewertung{ratingSummary.count !== 1 ? "en" : ""})</span>
-                </>
+                <>{uiText.rich("Ui.text_eda0715004d2ec", { value2: () => (ratingSummary.avg.toFixed(1)), part1: chunks => (<span className="font-semibold text-text-primary">{chunks}</span>), value4: () => (ratingSummary.count), count5: ratingSummary.count, part3: chunks => (<span className="text-text-muted text-sm">{chunks}</span>) })}</>
               ) : (
-                <span className="text-text-muted text-sm">{canRate ? "Jetzt als Erste/r bewerten" : user && !isOwner ? "Erst anfragen, dann bewerten" : "Noch keine Bewertungen"}</span>
+                <span className="text-text-muted text-sm">{canRate ? uiText("Ui.text_a375a02f805fef") : user && !isOwner ? uiText("Ui.text_c05dd8c953b77c") : uiText("home.reviewsEmpty")}</span>
               )}
             </div>
 
@@ -238,23 +237,23 @@ export default function LocationDetail({ location }: { location: Location }) {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
               {(() => {
                 const specIcons: Record<string, React.ReactNode> = {
-                  "Fläche": <Maximize2 size={14} className="text-gold" />,
-                  "Deckenhöhe": <ArrowUpDown size={14} className="text-gold" />,
-                  "Max. Crew": <Users size={14} className="text-gold" />,
-                  "Parkplätze": <Car size={14} className="text-gold" />,
-                  "Lage": <MapPin size={14} className="text-gold" />,
-                  "Preis": <Zap size={14} className="text-gold" />,
+                  [uiText("Ui.text_858a56aaf92c35")]: <Maximize2 size={14} className="text-gold" />,
+                  [uiText("Ui.text_2097c8965823f2")]: <ArrowUpDown size={14} className="text-gold" />,
+                  [uiText("Ui.text_8c95b59cdc03d1")]: <Users size={14} className="text-gold" />,
+                  [uiText("AdminReview.fields.parking_spots")]: <Car size={14} className="text-gold" />,
+                  [uiText("Ui.text_295029201d603e")]: <MapPin size={14} className="text-gold" />,
+                  [uiText("setup.copy41")]: <Zap size={14} className="text-gold" />,
                 };
                 return [
-                  meta.sqm && { label: "Fläche", value: `${meta.sqm} m²` },
-                  meta.ceiling_height_m && { label: "Deckenhöhe", value: `${meta.ceiling_height_m} m` },
-                  meta.max_crew && { label: "Max. Crew", value: `${meta.max_crew} Personen` },
-                  meta.parking_spots != null && { label: "Parkplätze", value: String(meta.parking_spots) },
-                  lageLabel && { label: "Lage", value: lageLabel },
-                  meta.natural_light && { label: "Tageslicht", value: "Vorhanden" },
-                  meta.blackout_possible && { label: "Verdunkelung", value: "Möglich" },
-                  meta.loading_access && { label: "Be-/Entladung", value: "Gut möglich" },
-                  location.price > 0 && { label: "Preis", value: listingPriceLabel(location.price,location.metadata) },
+                  meta.sqm && { label: uiText("Ui.text_858a56aaf92c35"), value: `${meta.sqm} m²` },
+                  meta.ceiling_height_m && { label: uiText("Ui.text_2097c8965823f2"), value: `${meta.ceiling_height_m} m` },
+                  meta.max_crew && { label: uiText("Ui.text_8c95b59cdc03d1"), value: uiText("Ui.text_c245b9e060f31e", { value1: String(meta.max_crew) }) },
+                  meta.parking_spots != null && { label: uiText("AdminReview.fields.parking_spots"), value: String(meta.parking_spots) },
+                  lageLabel && { label: uiText("Ui.text_295029201d603e"), value: lageLabel },
+                  meta.natural_light && { label: uiText("AdminReview.fields.natural_light"), value: uiText("Ui.text_35d918eac1e8e2") },
+                  meta.blackout_possible && { label: uiText("Ui.text_71f7048b9c1392"), value: uiText("Ui.text_00cc54c4d91fa1") },
+                  meta.loading_access && { label: uiText("Ui.text_78f3462ff79135"), value: uiText("Ui.text_6f775dde6e8764") },
+                  location.price > 0 && { label: uiText("setup.copy41"), value: listingPriceLabel(location.price,location.metadata, undefined, uiPriceLocale, uiPriceText) },
                 ].filter((x): x is { label: string; value: string } => !!x).map(({ label, value }) => (
                   <div key={label} className="p-3 bg-bg-secondary border border-border rounded-xl flex flex-col items-center gap-1.5 text-center">
                     {specIcons[label] ?? null}
@@ -268,19 +267,19 @@ export default function LocationDetail({ location }: { location: Location }) {
             {/* Description */}
             {location.description && (
               <div className="mb-8">
-                <h2 className="font-display text-xl font-bold text-text-primary mb-3">Über diese Location</h2>
+                <h2 className="font-display text-xl font-bold text-text-primary mb-3">{uiText("Ui.text_802131a6b63644")}</h2>
                 <p className="text-text-secondary leading-relaxed whitespace-pre-line">{location.description}</p>
               </div>
             )}
 
-            <ProductionCreditsDisplay credits={productionCredits} heading="Hier wurde bereits gedreht" />
+            <ProductionCreditsDisplay credits={productionCredits} heading={uiText("Ui.text_308ba00501fe58")} />
 
             {/* Strom */}
             {meta.power_available && (
               <div className="mb-6 flex items-start gap-3 p-4 bg-bg-secondary border border-border rounded-xl">
                 <Power size={16} className="text-gold mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-sm font-semibold text-text-primary">Stromanschluss vorhanden</p>
+                  <p className="text-sm font-semibold text-text-primary">{uiText("Ui.text_ef4eb59f4ec025")}</p>
                   {meta.power_details && <p className="text-xs text-text-muted mt-0.5">{meta.power_details}</p>}
                 </div>
               </div>
@@ -289,7 +288,7 @@ export default function LocationDetail({ location }: { location: Location }) {
             {/* Ausstattung */}
             {amenities.length > 0 && (
               <div className="mb-8">
-                <h2 className="font-display text-xl font-bold text-text-primary mb-4">Ausstattung</h2>
+                <h2 className="font-display text-xl font-bold text-text-primary mb-4">{uiText("companies.groupAusstattung")}</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {amenities.map((a) => {
                     const Icon = AMENITY_ICONS[a] || CheckCircle;
@@ -306,11 +305,11 @@ export default function LocationDetail({ location }: { location: Location }) {
 
             {Array.isArray(meta.rooms) && meta.rooms.length > 0 && (
               <div className="mb-8">
-                <h2 className="font-display text-xl font-bold text-text-primary mb-4">Räume & Bereiche</h2>
+                <h2 className="font-display text-xl font-bold text-text-primary mb-4">{uiText("Ui.text_78ff90932bddd6")}</h2>
                 <div className="flex flex-wrap gap-2">
                   {meta.rooms.map((room) => (
                     <span key={room} className="rounded-full border border-border bg-bg-secondary px-3 py-1.5 text-xs text-text-secondary">
-                      {room.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toLocaleUpperCase("de-DE"))}
+                      {locationRoomLabel(room, location.type, uiText)}
                     </span>
                   ))}
                 </div>
@@ -319,11 +318,11 @@ export default function LocationDetail({ location }: { location: Location }) {
 
             {(meta.shooting_hours || meta.access_notes || meta.availability_notes) && (
               <div className="mb-8 rounded-xl border border-border bg-bg-secondary p-4 sm:p-5">
-                <h2 className="font-display text-xl font-bold text-text-primary mb-3">Drehbedingungen</h2>
+                <h2 className="font-display text-xl font-bold text-text-primary mb-3">{uiText("Ui.text_c34fa41b7de219")}</h2>
                 <dl className="space-y-3 text-sm">
-                  {meta.shooting_hours && <div><dt className="text-xs text-text-muted">Mögliche Drehzeiten</dt><dd className="mt-0.5 text-text-secondary">{meta.shooting_hours}</dd></div>}
-                  {meta.access_notes && <div><dt className="text-xs text-text-muted">Anfahrt und Zugang</dt><dd className="mt-0.5 text-text-secondary">{meta.access_notes}</dd></div>}
-                  {meta.availability_notes && <div><dt className="text-xs text-text-muted">Verfügbarkeit und Einschränkungen</dt><dd className="mt-0.5 whitespace-pre-line text-text-secondary">{meta.availability_notes}</dd></div>}
+                  {meta.shooting_hours && <div><dt className="text-xs text-text-muted">{uiText("AdminReview.fields.shooting_hours")}</dt><dd className="mt-0.5 text-text-secondary">{meta.shooting_hours}</dd></div>}
+                  {meta.access_notes && <div><dt className="text-xs text-text-muted">{uiText("Ui.text_9c68248af7b8fc")}</dt><dd className="mt-0.5 text-text-secondary">{meta.access_notes}</dd></div>}
+                  {meta.availability_notes && <div><dt className="text-xs text-text-muted">{uiText("Ui.text_e6c48894da484b")}</dt><dd className="mt-0.5 whitespace-pre-line text-text-secondary">{meta.availability_notes}</dd></div>}
                 </dl>
               </div>
             )}
@@ -331,12 +330,10 @@ export default function LocationDetail({ location }: { location: Location }) {
             {/* Grundriss */}
             {location.floor_plan_url && (
               <div className="mb-8">
-                <h2 className="font-display text-xl font-bold text-text-primary mb-4">
-                  <FlipHorizontal size={18} className="inline mr-2 text-gold" />Grundriss
-                </h2>
-                <a href={location.floor_plan_url} target="_blank" rel="noreferrer" className="block w-full max-w-lg overflow-hidden rounded-xl border border-border hover:opacity-90 transition-opacity" aria-label="Grundriss in voller Größe öffnen">
+                <h2 className="font-display text-xl font-bold text-text-primary mb-4">{uiText.rich("Ui.text_17f586ed48be9a", { part1: () => (<FlipHorizontal size={18} className="inline mr-2 text-gold" />) })}</h2>
+                <a href={location.floor_plan_url} target="_blank" rel="noreferrer" className="block w-full max-w-lg overflow-hidden rounded-xl border border-border hover:opacity-90 transition-opacity" aria-label={uiText("Ui.text_4a0d5497ac0eb2")}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={location.floor_plan_url} alt="Grundriss in voller Größe öffnen" className="max-h-96 w-full object-contain" />
+                  <img src={location.floor_plan_url} alt={uiText("Ui.text_4a0d5497ac0eb2")} className="max-h-96 w-full object-contain" />
                 </a>
               </div>
             )}
@@ -351,18 +348,14 @@ export default function LocationDetail({ location }: { location: Location }) {
               <div className="bg-bg-secondary border border-border rounded-xl p-5">
                 <div className="flex items-end gap-1 mb-1">
                   <span className="text-3xl font-bold font-display text-text-primary">
-                    {listingPriceLabel(location.price,location.metadata)}
+                    {listingPriceLabel(location.price,location.metadata, undefined, uiPriceLocale, uiPriceText)}
                   </span>
 
                 </div>
                 <div className="flex items-center gap-1.5 mb-5">
                   {ratingSummary.count > 0 ? (
-                    <>
-                      <Star size={13} className="text-gold fill-gold" />
-                      <span className="text-sm font-semibold text-text-primary">{ratingSummary.avg.toFixed(1)}</span>
-                      <span className="text-text-muted text-sm">· {ratingSummary.count} Bewertung{ratingSummary.count !== 1 ? "en" : ""}</span>
-                    </>
-                  ) : <span className="text-text-muted text-sm">Noch keine Bewertungen</span>}
+                    <>{uiText.rich("Ui.text_5e2e88ffc13e83", { part1: () => (<Star size={13} className="text-gold fill-gold" />), value3: () => (ratingSummary.avg.toFixed(1)), part2: chunks => (<span className="text-sm font-semibold text-text-primary">{chunks}</span>), value5: () => (ratingSummary.count), count6: ratingSummary.count, part4: chunks => (<span className="text-text-muted text-sm">{chunks}</span>) })}</>
+                  ) : <span className="text-text-muted text-sm">{uiText("home.reviewsEmpty")}</span>}
                 </div>
 
                 <AvailabilityCalendar
@@ -385,7 +378,7 @@ export default function LocationDetail({ location }: { location: Location }) {
 
               <ListingProviderCard provider={location.provider} />
               {location.ownerId ? <InquiryForm listingId={location.id} listingTitle={location.title} listingType="location"
-                ownerId={location.ownerId} ownerName={location.ownerName ?? "Anbieter"} /> : <p className="rounded-xl border border-gold/30 bg-gold/10 p-4 text-xs leading-5 text-text-secondary">Kontaktanfragen sind vorübergehend nicht verfügbar, weil der Anbieter noch nicht zugeordnet ist.</p>}
+                ownerId={location.ownerId} ownerName={location.ownerName ?? "Anbieter"} /> : <p className="rounded-xl border border-gold/30 bg-gold/10 p-4 text-xs leading-5 text-text-secondary">{uiText("Ui.text_5a8432095e77f2")}</p>}
             </div>
           </div>
         </div>
@@ -395,16 +388,13 @@ export default function LocationDetail({ location }: { location: Location }) {
       <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-bg-primary/95 backdrop-blur-sm border-t border-border px-4 py-3 flex items-center gap-3">
         <div className="flex-1">
           <div className="text-lg font-bold font-display text-text-primary">
-            {listingPriceLabel(location.price,location.metadata)}
+            {listingPriceLabel(location.price,location.metadata, undefined, uiPriceLocale, uiPriceText)}
 
           </div>
           <div className="flex items-center gap-1">
             {ratingSummary.count > 0 ? (
-              <>
-                <Star size={11} className="text-gold fill-gold" />
-                <span className="text-xs text-text-secondary">{ratingSummary.avg.toFixed(1)} · {ratingSummary.count} Bewertung{ratingSummary.count !== 1 ? "en" : ""}</span>
-              </>
-            ) : <span className="text-xs text-text-secondary">Noch keine Bewertungen</span>}
+              <>{uiText.rich("Ui.text_27e8dc5cef9291", { part1: () => (<Star size={11} className="text-gold fill-gold" />), value3: () => (ratingSummary.avg.toFixed(1)), value4: () => (ratingSummary.count), count5: ratingSummary.count, part2: chunks => (<span className="text-xs text-text-secondary">{chunks}</span>) })}</>
+            ) : <span className="text-xs text-text-secondary">{uiText("home.reviewsEmpty")}</span>}
           </div>
         </div>
         <button
@@ -414,7 +404,7 @@ export default function LocationDetail({ location }: { location: Location }) {
           }}
           className="bg-gold text-bg-primary font-semibold px-5 py-2.5 rounded-xl text-sm hover:bg-gold-light transition-colors shrink-0"
         >
-          {location.instantBook ? "Sofort buchen" : "Anfragen"}
+          {location.instantBook ? uiText("Ui.text_4a1f597b972d57") : uiText("Ui.text_5dfb5bcd667e78")}
         </button>
       </div>
     </div>

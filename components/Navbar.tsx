@@ -29,6 +29,8 @@ const desktopNavHrefs = [
 ] as const;
 
 export default function Navbar({ initialIsSignedIn = false, initialAdminUserId = null }: { initialIsSignedIn?: boolean; initialAdminUserId?: string | null }) {
+  const uiText = useTranslations();
+
   const t = useTranslations("nav");
   const { leave } = useFormNavigation();
   const [open, setOpen] = useState(false);
@@ -197,12 +199,8 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                 <button
                   onClick={() => document.dispatchEvent(new Event("cg:opensearch"))}
                   className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border text-text-muted hover:border-gold/40 hover:text-gold transition-all text-sm"
-                  aria-label="CineGenius durchsuchen"
-                >
-                  <Search size={14} />
-                  <span className="hidden xl:inline">Suchen…</span>
-                  <kbd className="hidden xl:inline text-[10px] px-1.5 py-0.5 rounded bg-bg-hover border border-border font-mono">⌘K</kbd>
-                </button>
+                  aria-label={uiText("Ui.text_9f6d74e0a12b67")}
+                >{uiText.rich("Ui.text_0f04b8dca49119", { part1: () => (<Search size={14} />), part2: chunks => (<span className="hidden xl:inline">{chunks}</span>), part3: chunks => (<kbd className="hidden xl:inline text-[10px] px-1.5 py-0.5 rounded bg-bg-hover border border-border font-mono">{chunks}</kbd>) })}</button>
               )}
               <LanguageSwitcher />
               <NotificationCenter inbox={inbox} />
@@ -316,21 +314,13 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
                 <button
                   onClick={() => document.dispatchEvent(new Event("cg:opensearch"))}
                   className="w-9 h-9 flex items-center justify-center text-text-secondary hover:text-gold transition-colors"
-                  aria-label="CineGenius durchsuchen"
+                  aria-label={uiText("Ui.text_9f6d74e0a12b67")}
                 >
                   <Search size={20} />
                 </button>
               )}
               {!hasSignedInSession && (
-                <div className="flex items-center gap-1">
-                  <Link href="/sign-in" prefetch className="min-h-11 inline-flex items-center justify-center whitespace-nowrap rounded-lg border border-border px-2.5 max-[360px]:px-1.5 text-[11px] max-[360px]:text-[10px] font-semibold text-text-primary hover:border-gold hover:text-gold">
-                    {t("signIn")}
-                  </Link>
-                  <Link href="/sign-up" prefetch className="min-h-11 inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-gold px-2.5 max-[360px]:px-1.5 text-[11px] max-[360px]:text-[10px] font-bold text-bg-primary hover:bg-gold-light">
-                    <span className="max-[420px]:hidden">{t("signUp")}</span>
-                    <span className="min-[421px]:hidden">Registrieren</span>
-                  </Link>
-                </div>
+                <div className="flex items-center gap-1">{uiText.rich("Ui.text_49b372e77a7a76", { value2: () => (t("signIn")), part1: chunks => (<Link href="/sign-in" prefetch className="min-h-11 inline-flex items-center justify-center whitespace-nowrap rounded-lg border border-border px-2.5 max-[360px]:px-1.5 text-[11px] max-[360px]:text-[10px] font-semibold text-text-primary hover:border-gold hover:text-gold">{chunks}</Link>), value5: () => (t("signUp")), part4: chunks => (<span className="max-[420px]:hidden">{chunks}</span>), part6: chunks => (<span className="min-[421px]:hidden">{chunks}</span>), part3: chunks => (<Link href="/sign-up" prefetch className="min-h-11 inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-gold px-2.5 max-[360px]:px-1.5 text-[11px] max-[360px]:text-[10px] font-bold text-bg-primary hover:bg-gold-light">{chunks}</Link>) })}</div>
               )}
               {hasSignedInSession && (() => {
                 return (
@@ -374,12 +364,19 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
       >
         <div className="flex items-center justify-between px-5 h-16 border-b border-border">
           <Logo onClick={() => setOpen(false)} />
-          <button onClick={() => setOpen(false)} className="text-text-muted hover:text-gold transition-colors">
+          <button type="button" onClick={() => setOpen(false)} aria-label={t("closeMenu")} className="-m-3 inline-flex min-h-11 min-w-11 items-center justify-center text-text-muted hover:text-gold transition-colors">
             <X size={20} />
           </button>
         </div>
 
         <nav className="px-4 py-5 overflow-y-auto h-[calc(100%-4rem)] flex flex-col gap-4">
+
+          {!hasSignedInSession && (
+            <div className="flex items-center justify-between gap-3 px-4 py-3.5 text-sm text-text-secondary">
+              <span>{uiText("language.choose")}</span>
+              <LanguageSwitcher />
+            </div>
+          )}
 
           {hasSignedInSession ? (
             <>

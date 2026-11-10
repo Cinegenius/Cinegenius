@@ -3,155 +3,166 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Search, ChevronDown, ChevronUp, MessageSquare, Mail, BookOpen, MapPin, Package, Briefcase, Shield, Car, PawPrint } from "lucide-react";
+import { useTranslations } from "next-intl";
 
-const categories = [
+
+
+
+
+function getLocalizedCategories(translate: (key: string) => string) {
+  return ([
   {
     icon: BookOpen,
-    label: "Erste Schritte",
+    label: translate("Ui.text_232c9caabcc362"),
     items: [
       {
-        q: "Was ist CineGenius?",
-        a: "CineGenius ist der kostenlose Marktplatz für die Film- und Medienbranche im DACH-Raum. Du findest hier Locations, Crew & Talente, Requisiten, Equipment, Fahrzeuge, Tiere für Produktionen und offene Jobs — alles an einem Ort, direkt ohne Vermittlungsagentur.",
+        q: translate("Ui.text_c0397b86b6acfd"),
+        a: translate("Ui.text_f02d146f3e098d"),
       },
       {
-        q: "Brauche ich ein Konto zum Stöbern?",
-        a: "Nein — du kannst alle Locations, Requisiten, Jobs und Filmschaffenden ohne Registrierung durchsuchen. Ein Konto brauchst du nur, um Kontakt aufzunehmen, dich auf Jobs zu bewerben oder eigene Angebote einzustellen.",
+        q: translate("Ui.text_7237cd1f700480"),
+        a: translate("Ui.text_5d7322b563f933"),
       },
       {
-        q: "Ist CineGenius kostenlos?",
-        a: "Registrierung, Profile, Suche und Inserate sind derzeit kostenlos. Preise für gemietete Gegenstände, Locations oder Dienstleistungen vereinbarst du mit dem jeweiligen Anbieter.",
+        q: translate("Ui.text_2fd5173f2cbb9c"),
+        a: translate("Ui.text_0e149f944a9c36"),
       },
       {
-        q: "Wie nehme ich Kontakt mit einem Anbieter auf?",
-        a: "Jedes Inserat hat einen Kontakt-Button. Damit öffnest du direkt die interne Nachrichtenfunktion. Alle weiteren Absprachen — Preise, Verfügbarkeit, Konditionen — klärt ihr direkt miteinander.",
+        q: translate("Ui.text_35080d686eadb3"),
+        a: translate("Ui.text_b1bedfc7113d76"),
       },
     ],
   },
   {
     icon: MapPin,
-    label: "Locations",
+    label: translate("nav.locations"),
     items: [
       {
-        q: "Wie stelle ich meine Location ein?",
-        a: "Melde dich an, öffne „Inserat erstellen“ und wähle „Location“. Ergänze Grunddaten, Drehbedingungen, bis zu 20 Fotos sowie Preis und Verfügbarkeit. Du kannst einen Entwurf speichern und veröffentlichst erst über die entsprechende Aktion.",
+        q: translate("Ui.text_14262cd693898d"),
+        a: translate("Ui.text_b06c28a3d12af0"),
       },
       {
-        q: "Kann ich eine Location vor der Anmietung besichtigen?",
-        a: "Frage den Anbieter, ob eine Besichtigung vor Ort oder per Video möglich ist. Eine Besichtigung ist nicht automatisch Bestandteil eines Angebots.",
+        q: translate("Ui.text_44e28c14fa9ae7"),
+        a: translate("Ui.text_2f3e72f1bf18d0"),
       },
       {
-        q: "Wie werden Preise und Konditionen vereinbart?",
-        a: "Preise und Konditionen werden direkt zwischen Anbieter und Produktion ausgehandelt. CineGenius stellt nur die Kontaktmöglichkeit bereit — keine Buchungsgebühren, keine Provision.",
+        q: translate("Ui.text_0cb536e243bf67"),
+        a: translate("Ui.text_284a3a0e13f1c7"),
       },
     ],
   },
   {
     icon: Package,
-    label: "Requisiten & Verleih",
+    label: translate("Ui.text_e512dbd2b58a8b"),
     items: [
       {
-        q: "Wie funktioniert der Requisiten-Verleih auf CineGenius?",
-        a: "Du findest den gewünschten Artikel, siehst Fotos und Beschreibung, und nimmst dann direkt Kontakt mit dem Anbieter auf. Verfügbarkeit, Mietdauer und Abholung klärt ihr persönlich — CineGenius ist das Verzeichnis, der Rest läuft direkt zwischen euch.",
+        q: translate("Ui.text_6b1f909fc968ae"),
+        a: translate("Ui.text_8dd5663d275cda"),
       },
       {
-        q: "Kann ich Requisiten ans Set liefern lassen?",
-        a: "Das entscheidet jeder Anbieter selbst. Frag einfach per Nachricht an, ob Lieferung möglich ist und was sie kostet.",
+        q: translate("Ui.text_5f048e755d7f6c"),
+        a: translate("Ui.text_b0007f0e5db38e"),
       },
       {
-        q: "Was mache ich, wenn ein Anbieter nicht antwortet?",
-        a: "Wenn du innerhalb von 2–3 Tagen keine Antwort erhältst, kannst du es nochmals versuchen oder einen anderen Anbieter kontaktieren. Du kannst uns auch unter cinegenius.co@gmail.com melden, wenn ein Inserat veraltet oder inaktiv wirkt.",
+        q: translate("Ui.text_dcff3d216808c3"),
+        a: translate("Ui.text_5401229f93f5f8"),
       },
     ],
   },
   {
     icon: Car,
-    label: "Fahrzeuge",
+    label: translate("footer.links_vehicles"),
     items: [
       {
-        q: "Welche Fahrzeuge finde ich auf CineGenius?",
-        a: "Auf CineGenius findest du Bild-Fahrzeuge (z. B. klassische Autos, Motorräder), Produktionsfahrzeuge (Kostümbus, Maske & Hair, Equipment-Transporter, Generator-Fahrzeuge, Darsteller-Trailer u. v. m.) sowie Oldtimer und Spezialfahrzeuge für Filmproduktionen.",
+        q: translate("Ui.text_0a4347d5f1b6c9"),
+        a: translate("Ui.text_452b8ae2aeaf1e"),
       },
       {
-        q: "Wie stelle ich mein Fahrzeug ein?",
-        a: "Klicke auf 'Inserat erstellen' und wähle die Kategorie 'Fahrzeug'. Für Produktionsfahrzeuge kannst du zusätzlich den genauen Fahrzeugtyp angeben (z. B. Kostümbus oder Generator-Fahrzeug). Speichere dein Angebot zunächst als Entwurf oder veröffentliche es mit der dafür vorgesehenen Aktion.",
+        q: translate("Ui.text_5e264fc254f41a"),
+        a: translate("Ui.text_2fc537a7d3fd9d"),
       },
       {
-        q: "Wie wird die Miete / der Einsatz vereinbart?",
-        a: "Preise, Verfügbarkeit und Konditionen klärt ihr direkt mit dem Anbieter per Nachricht. CineGenius stellt nur die Kontaktmöglichkeit bereit — keine Provision, keine Buchungsgebühren.",
+        q: translate("Ui.text_0a67cbacc429c2"),
+        a: translate("Ui.text_8576edc4aadf97"),
       },
     ],
   },
   {
     icon: PawPrint,
-    label: "Tiere",
+    label: translate("Ui.text_d9609c949e931a"),
     items: [
       {
-        q: "Kann ich Tiere für meine Produktion über CineGenius buchen?",
-        a: "Ja — im Bereich 'Tiere' findest du ausgebildete Filmtiere und erfahrene Tiertrainer/-innen für Foto- und Filmproduktionen. Von Hunden und Pferden bis zu Exoten — die Anbieter listen ihre Tiere mit Fotos, Ausbildungsstand und Einsatzbereichen.",
+        q: translate("Ui.text_8a8693ff819d35"),
+        a: translate("Ui.text_8baf134a3204b2"),
       },
       {
-        q: "Wie stelle ich mein Tier / meine Tieragentur ein?",
-        a: "Klicke auf 'Inserat erstellen' und wähle die Kategorie 'Tiere'. Beschreibe das Tier, seinen Ausbildungsstand und bisherige Produktionen, und lade aussagekräftige Fotos hoch.",
+        q: translate("Ui.text_c28963b689a760"),
+        a: translate("Ui.text_89fc1207c645ad"),
       },
       {
-        q: "Welche Voraussetzungen gelten für Tiere am Set?",
-        a: "Das ist Sache der jeweiligen Produktion und des Tierhalters. CineGenius empfiehlt, Tierschutzanforderungen, Versicherung und Betreuung vor Drehbeginn schriftlich zu klären. Halter und Produktion sind eigenverantwortlich für das Wohl der Tiere am Set.",
+        q: translate("Ui.text_81914e6a8d6538"),
+        a: translate("Ui.text_53ee328cf84607"),
       },
     ],
   },
   {
     icon: Briefcase,
-    label: "Jobs & Crew",
+    label: translate("Ui.text_bdfa14e1b38649"),
     items: [
       {
-        q: "Wie bewerbe ich mich auf einen Job?",
-        a: "Gehe zum Job-Inserat und nutze den Kontakt-Button oder das Bewerbungsformular. Du kannst eine Kurzbewerbung schreiben und dein Portfolio verlinken. Die weitere Kommunikation läuft direkt mit der Produktion.",
+        q: translate("Ui.text_9d21b13a0a1934"),
+        a: translate("Ui.text_0fde0e5360432e"),
       },
       {
-        q: "Werden meine Daten bei einer Bewerbung weitergegeben?",
-        a: "Der Empfänger sieht deine Bewerbung und die dazu vorgesehenen Profilangaben. Öffentlich freigegebene Profilinhalte sind für Besucher sichtbar; persönliche Kontaktdaten richten sich nach deinen Sichtbarkeitseinstellungen.",
+        q: translate("Ui.text_47fc5853a3022d"),
+        a: translate("Ui.text_6f1b2038b1488b"),
       },
       {
-        q: "Können Produktionen Jobs kostenlos ausschreiben?",
-        a: "Jobs einstellen, Crew suchen und Bewerbungen über die vorhandenen Funktionen versenden ist derzeit kostenlos.",
+        q: translate("Ui.text_a09e33d4d9d83f"),
+        a: translate("Ui.text_fedc2ddbecd3a3"),
       },
       {
-        q: "Wie erstelle ich ein Crew-Profil?",
-        a: "Nach der E-Mail-Bestätigung führt dich die Einrichtung durch Name, Ort, gewünschte Bereiche und passende Tätigkeiten. Mehrere Gewerke und Tätigkeiten sind möglich. Später bearbeitest du dein Profil in „Mein Bereich“. Ob es öffentlich erscheint, hängt von der vorgesehenen Sichtbarkeit ab.",
+        q: translate("Ui.text_9ecf3a88360bb2"),
+        a: translate("Ui.text_d78932ee50b0dd"),
       },
     ],
   },
   {
     icon: BookOpen,
-    label: "Firmen & Fotos",
+    label: translate("Ui.text_854275885a9851"),
     items: [
-      { q: "Wie präsentiere ich meine Firma oder mein Catering?", a: "Wähle bei der Einrichtung eine Firma oder Dienstleistung und ergänze Branche und Leistungen. Mehrere passende Bereiche einschließlich Catering sind möglich. Ein neues Firmenprofil wird beim Speichern öffentlich; Entwürfe anderer Angebotsarten bleiben bis zur Veröffentlichung privat." },
-      { q: "Wie verknüpfe ich mein Profil mit einer Firma?", a: "Auf dem Firmenprofil findest du unter „Weitere Aktionen“ die Firmenzugehörigkeitsanfrage. Wähle Funktionen und ergänze bei Bedarf eine Nachricht. Erst nach Bestätigung erscheint die Zugehörigkeit öffentlich. Firmenverantwortliche können bereits registrierte Mitglieder einladen; auch diese Einladung muss angenommen werden." },
-      { q: "Wie viele Fotos kann ich hochladen?", a: "Im Marktplatz sind bis zu 10 Fotos pro Artikel und bei Locations bis zu 20 Fotos möglich. Die jeweiligen Formulare zeigen unterstützte Formate und Größenlimits. Persönliche Profile und Firmen haben eigene Foto- und Galerieeingaben." },
-      { q: "Welche Bilder erscheinen in „Frische Einblicke“?", a: "Öffentlich sichtbare Profilfotos, Cover und direkt hochgeladene persönliche Portfoliofotos sowie Firmenlogos, Firmen-Cover und Firmengalerien können automatisch erscheinen. Projekt-, Marktplatz-, Location- und Schwarzes-Brett-Bilder sowie private Inhalte und Nachrichtenanhänge gehören nicht dazu." },
+      { q: translate("Ui.text_f466f86a12a014"), a: translate("Ui.text_ddea6729a28713") },
+      { q: translate("Ui.text_1ade5581502ca9"), a: translate("Ui.text_b169cf44e42adb") },
+      { q: translate("Ui.text_4a610b516161ec"), a: translate("Ui.text_e1893e6dffad16") },
+      { q: translate("Ui.text_6799588f07af0d"), a: translate("Ui.text_620b510d55014a") },
     ],
   },
   {
     icon: Shield,
-    label: "Sicherheit & Vertrauen",
+    label: translate("Ui.text_42cae79597c266"),
     items: [
       {
-        q: "Ist CineGenius seriös?",
-        a: "CineGenius verbindet Menschen und Angebote für Film, Fotografie und Content. Angaben stammen von den jeweiligen Mitgliedern. Prüfe wichtige Details direkt mit dem Anbieter; auffällige Inhalte kannst du melden.",
+        q: translate("Ui.text_2e5ba026b3573b"),
+        a: translate("Ui.text_ecefd7ab0c5e0f"),
       },
       {
-        q: "Wie melde ich ein verdächtiges Inserat?",
-        a: "Schreib uns einfach an cinegenius.co@gmail.com mit dem Link zum Inserat und einer kurzen Beschreibung. Wir prüfen Meldungen; eine feste Bearbeitungszeit wird nicht zugesichert.",
+        q: translate("Ui.text_768fcf92332f19"),
+        a: translate("Ui.text_08ec7448a5e8e5"),
       },
       {
-        q: "Was passiert mit meinen Daten?",
-        a: "Deine Daten werden ausschließlich zur Bereitstellung der Plattform verwendet und nicht an Dritte verkauft. Details findest du in unserer Datenschutzerklärung.",
+        q: translate("Ui.text_35352e055b2273"),
+        a: translate("Ui.text_98b2f10d612454"),
       },
     ],
   },
-];
+]);
+}
 
 export default function HelpPage() {
+  const uiText = useTranslations();
+  const categories = getLocalizedCategories(uiText);
+
+
   const [query, setQuery] = useState("");
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -179,17 +190,13 @@ export default function HelpPage() {
       {/* Header */}
       <div className="bg-bg-secondary border-b border-border py-16 px-4">
         <div className="max-w-2xl mx-auto text-center">
-          <h1 className="font-display text-4xl font-bold text-text-primary mb-3">
-            Hilfe-Center
-          </h1>
-          <p className="text-text-muted mb-8">
-            Alles, was du über die Nutzung von CineGenius wissen musst.
-          </p>
+          <h1 className="font-display text-4xl font-bold text-text-primary mb-3">{uiText("Ui.text_0c014891cbffd5")}</h1>
+          <p className="text-text-muted mb-8">{uiText("Ui.text_6c4fc6a65a4166")}</p>
           <div className="flex items-center gap-2 bg-bg-elevated border border-border rounded-xl px-4 focus-within:border-gold transition-colors">
             <Search size={16} className="text-text-muted" />
             <input
               type="text"
-              placeholder="Antworten suchen..."
+              placeholder={uiText("Ui.text_1b86a7229ab830")}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="bg-transparent border-none py-3.5 text-sm w-full focus:outline-none"
@@ -209,9 +216,7 @@ export default function HelpPage() {
                   ? "bg-gold text-bg-primary border-gold"
                   : "border-border text-text-secondary hover:border-gold hover:text-gold"
               }`}
-            >
-              Alle Themen
-            </button>
+            >{uiText("Ui.text_f5c129c2aab569")}</button>
             {categories.map(({ label, icon: Icon }) => (
               <button
                 key={label}
@@ -231,13 +236,11 @@ export default function HelpPage() {
         {/* FAQ Sections */}
         {filtered.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-text-muted mb-2">Keine Ergebnisse für &ldquo;{query}&rdquo;</p>
+            <p className="text-text-muted mb-2">{uiText.rich("Ui.text_ca4ec38ac19663", { value1: () => (query) })}</p>
             <button
               onClick={() => setQuery("")}
               className="text-gold text-sm hover:text-gold-light transition-colors"
-            >
-              Suche zurücksetzen
-            </button>
+            >{uiText("Ui.text_b75f4841525e7a")}</button>
           </div>
         ) : (
           <div className="space-y-10">
@@ -280,26 +283,15 @@ export default function HelpPage() {
 
         {/* Contact */}
         <div className="mt-16 p-8 bg-bg-secondary border border-border rounded-2xl text-center">
-          <h2 className="font-display text-2xl font-bold text-text-primary mb-2">
-            Noch Fragen?
-          </h2>
-          <p className="text-text-muted mb-6 text-sm">
-            Schreibe uns an cinegenius.co@gmail.com. Nenne den betroffenen Bereich und füge bei Fehlern möglichst den Seitenlink hinzu.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a
+          <h2 className="font-display text-2xl font-bold text-text-primary mb-2">{uiText("Ui.text_28881025f27160")}</h2>
+          <p className="text-text-muted mb-6 text-sm">{uiText("Ui.text_eb2f0ea66d2081")}</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">{uiText.rich("Ui.text_4f778e3c677bc4", { part2: () => (<Mail size={15} />), part1: chunks => (<a
               href="mailto:cinegenius.co@gmail.com"
               className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors flex items-center justify-center gap-2"
-            >
-              <Mail size={15} /> E-Mail Support
-            </a>
-            <Link
+            >{chunks}</a>), part4: () => (<MessageSquare size={15} />), part3: chunks => (<Link
               href="/dashboard"
               className="px-6 py-3 border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-colors flex items-center justify-center gap-2"
-            >
-              <MessageSquare size={15} /> Mein Bereich
-            </Link>
-          </div>
+            >{chunks}</Link>) })}</div>
         </div>
       </div>
     </div>

@@ -23,6 +23,8 @@ export default function Lightbox({
   onNext,
   alt = "",
 }: LightboxProps) {
+  const uiText = useTranslations();
+
   const t = useTranslations("MediaGallery");
   const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
   const touchStartX = useRef<number | null>(null);
@@ -129,7 +131,7 @@ export default function Lightbox({
         onClick={(e) => e.stopPropagation()}
       >
         {failedImages.has(currentImage) ? (
-          <div role="img" aria-label={alt ? `${alt}: ${t("unavailable")}` : t("unavailable")} className="flex h-64 max-h-[85vh] w-[min(80vw,48rem)] flex-col items-center justify-center gap-3 rounded-xl border border-white/10 bg-bg-elevated px-6 text-center text-sm text-text-secondary">
+          <div role="img" aria-label={alt ? uiText("Ui.text_efae3eb968ceb3", { value1: String(alt), value2: String(t("unavailable")) }) : t("unavailable")} className="flex h-64 max-h-[85vh] w-[min(80vw,48rem)] flex-col items-center justify-center gap-3 rounded-xl border border-white/10 bg-bg-elevated px-6 text-center text-sm text-text-secondary">
             <ImageOff size={28} className="text-text-muted" aria-hidden="true" />
             <span>{t("unavailable")}</span>
           </div>

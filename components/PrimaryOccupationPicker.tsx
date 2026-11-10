@@ -4,6 +4,8 @@ import { departments, getDeptLabel, getDepartmentRoleLabel } from "@/lib/departm
 import { occupationChoices, primaryOccupationForPositions, occupationReference, type PrimaryOccupation } from '@/lib/primary-occupation';
 
 export default function PrimaryOccupationPicker({positions,value,onChange,id='primary-occupation'}:{positions:readonly string[];value:PrimaryOccupation|null;onChange:(value:PrimaryOccupation|null)=>void;id?:string}) {
+  const taxonomyText = useTranslations("Taxonomy");
+
   const t = useTranslations("occupation");
   const locale = useLocale();
   const animals = useTranslations("FilmAnimals");
@@ -14,7 +16,7 @@ export default function PrimaryOccupationPicker({positions,value,onChange,id='pr
     <label htmlFor={id} className="block text-sm font-semibold text-text-primary">{t("main")}</label>
     <select id={id} value={selected?.roleId ?? ''} onChange={event=>onChange(occupationReference(options.find(option=>option.roleId===event.target.value)??null))} className="min-h-11 w-full min-w-0 rounded-xl border border-border bg-bg-primary px-3 py-3 text-base text-text-primary">
       <option value="">{t("choose")}</option>
-      {options.map(option=><option key={option.roleId} value={option.roleId}>{getDeptLabel(departments.find(department=>department.id===option.departmentId)!, locale, animals)} → {getDepartmentRoleLabel(option.departmentId, option.label, locale, animals)}</option>)}
+      {options.map(option=><option key={option.roleId} value={option.roleId}>{getDeptLabel(departments.find(department=>department.id===option.departmentId)!, locale, animals, taxonomyText)} → {getDepartmentRoleLabel(option.departmentId, option.label, locale, animals, taxonomyText)}</option>)}
     </select>
     <p className="text-xs leading-5 text-text-muted">{t("hint")}</p>
     {!selected && options.length > 1 && <p className="text-xs leading-5 text-text-muted">{t("legacy")}</p>}

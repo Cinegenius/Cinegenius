@@ -1,3 +1,4 @@
+import { localizedNotification } from "@/lib/i18n/notification-copy";
 // Required Supabase table:
 // CREATE TABLE IF NOT EXISTS bookings (
 //   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -27,6 +28,7 @@ import { requireAuth, getCurrentUser } from "@/lib/auth";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { sendNewBookingEmail } from "@/lib/email";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 function generateRef(): string {
   return "CG-" + Math.random().toString(36).slice(2, 8).toUpperCase();
@@ -34,16 +36,16 @@ function generateRef(): string {
 
 // POST /api/bookings — create a booking
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
-  const t = await getTranslations("BookingRequest");
 
   const body = await req.json();
   const { listingId, startDate, endDate, notes } = body;
 
   if (!listingId || !startDate || !endDate) {
-    return NextResponse.json({ error: "Fehlende Pflichtfelder" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_3b85b95ef017') }, { status: 400 });
   }
 
   // SECURITY: read price and title server-side from DB — never trust client
@@ -54,14 +56,14 @@ export async function POST(req: NextRequest) {
     .eq("published", true)
     .maybeSingle();
 
-  if (!listing) return NextResponse.json({ error: "Inserat nicht gefunden" }, { status: 404 });
-  if (listing.user_id === userId) return NextResponse.json({ error: "Eigenes Inserat kann nicht gebucht werden" }, { status: 400 });
+  if (!listing) return NextResponse.json({ error: tResponse('System.m_853de52d816c') }, { status: 404 });
+  if (listing.user_id === userId) return NextResponse.json({ error: tResponse('System.m_434858c76794') }, { status: 400 });
 
   // Compute days server-side
   const start = new Date(startDate);
   const end   = new Date(endDate);
   if (isNaN(start.getTime()) || isNaN(end.getTime()) || end < start) {
-    return NextResponse.json({ error: "Ungültige Datumsangaben" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_30af6a8382bf') }, { status: 400 });
   }
   const days         = bookingDays(startDate, endDate);
   const listingTitle = listing.title;
@@ -94,15 +96,15 @@ export async function POST(req: NextRequest) {
 
   if (error) {
     console.error("Booking insert failed", {code: error.code ?? "UNKNOWN"});
-    return NextResponse.json({ error: "Buchung konnte nicht gespeichert werden" }, { status: 500 });
+    return NextResponse.json({ error: tResponse('System.m_12b6f4e80f14') }, { status: 500 });
   }
 
   // In-app notification for the buyer
   await db.from("notifications").insert({
     user_id: userId,
     type: "booking_request",
-    title: t("sentTitle"),
-    body: t("sentBody", {title: listingTitle, ref}),
+    ...localizedNotification({ title: { key: "bookingSentTitle" }, body: { key: "bookingSentBody", values: {title: listingTitle, ref} } }),
+
     href: `/dashboard?tab=bookings`,
   });
 
@@ -127,13 +129,12 @@ export async function POST(req: NextRequest) {
         try {
           ownerUser = await (await clerkClient()).users.getUser(listingData.user_id);
         } catch { /* In-app delivery must not depend on the email account lookup. */ }
-        const ownerLocale = resolveLocale(ownerUser?.unsafeMetadata?.locale ?? ownerUser?.publicMetadata?.locale);
-        const ownerCopy = await getTranslations({locale: ownerLocale, namespace: "BookingRequest"});
+        const ownerLocale = resolveLocale(ownerUser?.locale ?? ownerUser?.privateMetadata?.cinegeniusLocale ?? ownerUser?.unsafeMetadata?.locale ?? ownerUser?.publicMetadata?.locale);
         await db.from("notifications").insert({
           user_id: listingData.user_id,
           type: "booking_request",
-          title: ownerCopy("incomingTitle"),
-          body: ownerCopy("incomingBody", {name: guestName, title: listingTitle}),
+          ...localizedNotification({ title: { key: "bookingIncomingTitle" }, body: { key: "bookingIncomingBody", values: {name: guestName, title: listingTitle} } }),
+
           href: "/dashboard?tab=bookings",
         });
 
@@ -149,6 +150,7 @@ export async function POST(req: NextRequest) {
 // GET /api/bookings — list bookings for current user, or single by ?ref=CG-XXXXX
 // ?incoming=true → requests for listings owned by the current user
 export async function GET(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ bookings: [] });
   const { userId } = user;
@@ -164,7 +166,7 @@ export async function GET(req: NextRequest) {
       .eq("user_id", userId)
       .eq("ref", ref)
       .maybeSingle();
-    if (!data) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (!data) return NextResponse.json({ error: tResponse('System.m_e3ebaa16dd9d') }, { status: 404 });
     return NextResponse.json({ booking: data });
   }
 

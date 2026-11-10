@@ -3,6 +3,7 @@ import { requireAuth, requireAdmin } from "@/lib/auth";
 import { rateLimit } from "@/lib/rateLimit";
 import { finishAdminAudit, startAdminAudit, validateAdminReason } from "@/lib/admin-audit";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 const VALID_TARGET_TYPES = new Set(["user", "listing", "review"]);
 const VALID_REASONS = new Set([
@@ -17,31 +18,32 @@ const VALID_REASONS = new Set([
 
 // POST /api/reports — submit a report
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
   // Per-user rate limit: 5 reports per minute
   const { allowed } = await rateLimit(`report:${userId}`, 5, 60);
-  if (!allowed) return NextResponse.json({ error: "Zu viele Meldungen. Bitte kurz warten." }, { status: 429 });
+  if (!allowed) return NextResponse.json({ error: tResponse('System.m_ce6cd40bfd1e') }, { status: 429 });
 
   const body = await req.json();
   const { target_type, target_id, reason, details } = body;
 
   if (!VALID_TARGET_TYPES.has(target_type)) {
-    return NextResponse.json({ error: "Ungültiger target_type" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_a53f7b2f8fa7') }, { status: 400 });
   }
   if (!target_id || typeof target_id !== "string") {
-    return NextResponse.json({ error: "target_id fehlt" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_340c72435425') }, { status: 400 });
   }
   if (!VALID_REASONS.has(reason)) {
-    return NextResponse.json({ error: "Ungültiger Grund" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_3e5020e4f944') }, { status: 400 });
   }
   if (details && String(details).length > 1000) {
-    return NextResponse.json({ error: "Details zu lang (max. 1000 Zeichen)" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_8ed95575a149') }, { status: 400 });
   }
   if (target_type === "user" && target_id === userId) {
-    return NextResponse.json({ error: "Du kannst dich nicht selbst melden" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_af199c7ee49e') }, { status: 400 });
   }
 
   // Prevent duplicate reports
@@ -54,7 +56,7 @@ export async function POST(req: NextRequest) {
     .maybeSingle();
 
   if (existing) {
-    return NextResponse.json({ error: "Du hast diesen Inhalt bereits gemeldet" }, { status: 409 });
+    return NextResponse.json({ error: tResponse('System.m_8fe4904cde5a') }, { status: 409 });
   }
 
   const { data, error } = await db
@@ -69,19 +71,20 @@ export async function POST(req: NextRequest) {
     .select("id")
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
   return NextResponse.json({ id: data.id }, { status: 201 });
 }
 
 // GET /api/reports — admin only: list pending reports
 export async function GET(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAdmin();
   if (authResult instanceof NextResponse) return authResult;
 
   const status = req.nextUrl.searchParams.get("status") ?? "pending";
   const validStatuses = new Set(["pending", "reviewed", "resolved", "dismissed"]);
-  if (!validStatuses.has(status)) return NextResponse.json({ error: "Ungültiger Meldungsstatus." }, { status: 400 });
+  if (!validStatuses.has(status)) return NextResponse.json({ error: tResponse('System.m_936ecef9ffde') }, { status: 400 });
   const page   = Math.max(1, parseInt(req.nextUrl.searchParams.get("page") ?? "1", 10) || 1);
   const limit  = 50;
   const from   = (page - 1) * limit;
@@ -94,7 +97,7 @@ export async function GET(req: NextRequest) {
     .order("created_at", { ascending: false })
     .range(from, to);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
   const rows = data ?? [];
   const reporterIds = [...new Set(rows.map((row) => row.reporter_id))];
@@ -144,6 +147,7 @@ export async function GET(req: NextRequest) {
 
 // PATCH /api/reports — admin only: update report status
 export async function PATCH(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAdmin();
   if (authResult instanceof NextResponse) return authResult;
 
@@ -151,11 +155,11 @@ export async function PATCH(req: NextRequest) {
   const { id, status } = body ?? {};
   const reason = validateAdminReason(body?.reason);
   if (typeof id !== "string" || !id || !["reviewed", "resolved", "dismissed"].includes(status) || !reason) {
-    return NextResponse.json({ error: "ID, gültiger Status und eine Begründung (5–500 Zeichen) sind erforderlich." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_71060d64df79') }, { status: 400 });
   }
 
   const audit = await startAdminAudit({ actorUserId: authResult.userId, action: `report_${status}`, entityType: "report", entityId: id, reason });
-  if (!audit) return NextResponse.json({ error: "Aktion aus Sicherheitsgründen gestoppt: Das Adminprotokoll ist nicht verfügbar." }, { status: 503 });
+  if (!audit) return NextResponse.json({ error: tResponse('System.m_8f517d75e467') }, { status: 503 });
 
   const { data, error } = await db
     .from("reports")
@@ -164,8 +168,8 @@ export async function PATCH(req: NextRequest) {
     .select("id")
     .maybeSingle();
 
-  if (error) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: error.message }, { status: 500 }); }
-  if (!data) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Meldung nicht gefunden." }, { status: 404 }); }
+  if (error) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 }); }
+  if (!data) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.m_b448020cf40c') }, { status: 404 }); }
   const auditLogged = await finishAdminAudit(audit, "succeeded");
   return NextResponse.json({ success: true, auditLogged });
 }

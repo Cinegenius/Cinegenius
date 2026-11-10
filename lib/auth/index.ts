@@ -25,6 +25,9 @@
  *   if (ownershipError) return ownershipError;
  */
 
+import { getTranslations } from "next-intl/server";
+import sourceMessages from "../../messages/de.json" with { type: "json" };
+
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { isConfiguredAdmin } from "@/lib/admin-policy";
@@ -45,7 +48,7 @@ export async function getCurrentUser(): Promise<{ userId: string } | null> {
 export async function requireAuth(): Promise<{ userId: string } | NextResponse> {
   const { userId } = await auth();
   if (!userId) {
-    return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+    return NextResponse.json({ error: (await getTranslations())("System.m_352f63d9d1d9") }, { status: 401 });
   }
   return { userId };
 }
@@ -57,10 +60,10 @@ export async function requireAuth(): Promise<{ userId: string } | NextResponse> 
 export async function requireAdmin(): Promise<{ userId: string } | NextResponse> {
   const { userId } = await auth();
   if (!userId) {
-    return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+    return NextResponse.json({ error: (await getTranslations())("System.m_352f63d9d1d9") }, { status: 401 });
   }
   if (!isConfiguredAdmin(userId, process.env.ADMIN_USER_IDS)) {
-    return NextResponse.json({ error: "Kein Zugriff" }, { status: 403 });
+    return NextResponse.json({ error: (await getTranslations())("System.m_cd2f7b0a21cd") }, { status: 403 });
   }
   return { userId };
 }
@@ -87,13 +90,14 @@ export async function isAdminSession(): Promise<boolean> {
  */
 export function assertOwner(
   resourceOwnerId: string | null | undefined,
-  userId: string
+  userId: string,
+  translate: (key: string) => string = key => (sourceMessages.System as Record<string, string>)[key.slice("System.".length)] ?? key
 ): NextResponse | null {
   if (resourceOwnerId == null) {
-    return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 });
+    return NextResponse.json({ error: translate("System.m_621ca4c037d3") }, { status: 404 });
   }
   if (resourceOwnerId !== userId) {
-    return NextResponse.json({ error: "Kein Zugriff" }, { status: 403 });
+    return NextResponse.json({ error: translate("System.m_cd2f7b0a21cd") }, { status: 403 });
   }
   return null;
 }

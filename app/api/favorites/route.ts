@@ -22,6 +22,7 @@ import { db } from "@/lib/db";
 import { getCurrentUser, requireAuth } from "@/lib/auth";
 import { rateLimit } from "@/lib/rateLimit";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // GET /api/favorites — list all favorites for current user
 // GET /api/favorites?id=xxx — check if specific listing is favorited
@@ -74,18 +75,19 @@ export async function GET(req: NextRequest) {
 // POST /api/favorites — toggle favorite
 // Body: { listing_id }
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
   const { allowed } = await rateLimit(`fav:${userId}`, 60, 60);
-  if (!allowed) return NextResponse.json({ error: "Zu viele Anfragen. Bitte kurz warten." }, { status: 429 });
+  if (!allowed) return NextResponse.json({ error: tResponse('System.m_35bd89251439') }, { status: 429 });
 
   const body = await req.json();
   const { listing_id } = body;
 
   if (!listing_id) {
-    return NextResponse.json({ error: "listing_id ist erforderlich" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_6f1dc120d2ab') }, { status: 400 });
   }
 
   // Check if already favorited
@@ -111,7 +113,7 @@ export async function POST(req: NextRequest) {
     .maybeSingle();
 
   if (!listing) {
-    return NextResponse.json({ error: "Inserat nicht gefunden" }, { status: 404 });
+    return NextResponse.json({ error: tResponse('System.m_853de52d816c') }, { status: 404 });
   }
 
   await db.from("favorites").insert({

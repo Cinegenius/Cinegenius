@@ -1,8 +1,10 @@
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   try {
     const authResult = await requireAuth();
     if (authResult instanceof NextResponse) return authResult;
@@ -18,13 +20,13 @@ export async function PATCH(req: NextRequest) {
     });
 
     if (error) {
-      console.error("[modules PATCH] supabase error:", error.code, error.message);
-      return NextResponse.json({ error: error.message, code: error.code }, { status: 500 });
+      console.error("[modules PATCH] database update failed");
+      return NextResponse.json({ error: tResponse('System.requestFailed'), code: error.code }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
-  } catch (err) {
-    console.error("[modules PATCH] uncaught exception:", err);
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+  } catch {
+    console.error("[modules PATCH] unexpected failure");
+    return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   }
 }

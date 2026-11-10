@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { compressProfileEditorDraft, expandProfileEditorDraft } from "@/lib/profile-editor-private-draft";
 import { normalizeQuickStartDraft, QUICK_START_INTENTS, validateQuickStartDraft } from "@/lib/quick-start-flow";
 import { clerkRateLimitSeconds } from "@/lib/onboarding-save";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 export const runtime = "nodejs";
 
@@ -11,9 +12,9 @@ const KEY = "cinegeniusOnboarding";
 const INTENTS = new Set(["crew", "location", "equipment", "talent", "search", "company"]);
 const MAX_BYTES = 7000;
 
-function rateLimitResponse(error: unknown) {
+function rateLimitResponse(error: unknown, translate: Awaited<ReturnType<typeof getResponseTranslations>>) {
   const retryAfter = clerkRateLimitSeconds(error);
-  return retryAfter === null ? null : NextResponse.json({ error: `Zu viele Speicheranfragen. Bitte versuche es in ${retryAfter} Sekunden erneut.`, retryAfter }, {
+  return retryAfter === null ? null : NextResponse.json({ error: translate('System.m_4d9a076bead8', { value0: String(retryAfter) }), retryAfter }, {
     status: 429, headers: { "Cache-Control": "private, no-store", "Retry-After": String(retryAfter) },
   });
 }
@@ -26,6 +27,7 @@ function json(body: unknown, status = 200) {
 }
 
 export async function GET() {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   try {
@@ -39,20 +41,21 @@ export async function GET() {
         const decoded = expandProfileEditorDraft(draft.profileEditorDraftEncoded);
         draft.profileEditorDraft = decoded;
       } catch {
-        return json({ error: "Der private Profilentwurf konnte nicht gelesen werden." }, 503);
+        return json({ error: tResponse('System.m_ab62f818b876') }, 503);
       }
       delete draft.profileEditorDraftEncoded;
     }
     return json({ draft });
   } catch (error) {
-    const limited = rateLimitResponse(error);
+    const limited = rateLimitResponse(error, tResponse);
     if (limited) return limited;
     console.error("[onboarding GET] private progress could not be loaded", error);
-    return json({ error: "Dein gespeicherter Fortschritt konnte nicht geladen werden." }, 503);
+    return json({ error: tResponse('System.m_4e3178839fad') }, 503);
   }
 }
 
 export async function PUT(request: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const payload = await request.json().catch(() => null);
@@ -60,20 +63,20 @@ export async function PUT(request: NextRequest) {
   const isProfileEditorDraft = Boolean(record && Object.hasOwn(record, "profileEditorDraft"));
   const isLocationFormDraft = Boolean(record && Object.hasOwn(record, "locationFormDraft"));
   if (!record || (!isProfileEditorDraft && !isLocationFormDraft && !INTENTS.has(String(record.intent)))) {
-    return json({ error: "Bitte wähle einen gültigen Einrichtungsweg aus." }, 400);
+    return json({ error: tResponse('System.m_e502c4224771') }, 400);
   }
   if (Object.hasOwn(record, "quickStart") && record.quickStart !== null) {
     const raw = record.quickStart;
     if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
-      return json({ error: "Dein Einrichtungsentwurf ist ungültig." }, 400);
+      return json({ error: tResponse('System.m_245b995b0b84') }, 400);
     }
     const input = raw as Record<string, unknown>;
     const normalized = normalizeQuickStartDraft(input);
     if ((normalized.intents.length > 0 && !normalized.intents.includes(record.intent as typeof QUICK_START_INTENTS[number]))
       || ((input.version === 2 || input.version === 3) && typeof input.step !== "string")) {
-      return json({ error: "Dein Einrichtungsentwurf passt nicht zur gewählten Aufgabe." }, 400);
+      return json({ error: tResponse('System.m_0b2ced4eb519') }, 400);
     }
-    const validation = normalized.step === "review" ? validateQuickStartDraft(normalized, { requirePrimary: false }) : null;
+    const validation = normalized.step === "review" ? validateQuickStartDraft(normalized, { requirePrimary: false, translate: tResponse }) : null;
     if (validation) {
       return json({ error: validation.message }, 400);
     }
@@ -81,19 +84,19 @@ export async function PUT(request: NextRequest) {
   }
   if (isLocationFormDraft) {
     const raw = record.locationFormDraft;
-    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return json({ error: "Der Locationentwurf ist ungültig." }, 400);
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return json({ error: tResponse('System.m_9f7bad0b1d5d') }, 400);
     const draft = raw as Record<string, unknown>;
     const imageUrls = draft.imageUrls;
     if (draft.version !== 1 || typeof draft.categoryId !== "string" || draft.categoryId.length > 80
       || !Array.isArray(imageUrls) || imageUrls.length > 20
       || imageUrls.some((url) => typeof url !== "string" || url.length > 2048)) {
-      return json({ error: "Der Locationentwurf enthält ungültige Angaben oder zu viele Fotos." }, 400);
+      return json({ error: tResponse('System.m_d244ca5078f6') }, 400);
     }
   }
   const encoded = JSON.stringify(record);
   const maxIncomingBytes = isProfileEditorDraft ? 100_000 : MAX_BYTES;
   if (new TextEncoder().encode(encoded).byteLength > maxIncomingBytes) {
-    return json({ error: "Der Entwurf ist zu umfangreich. Entferne einige optionale Angaben oder Bilder." }, 413);
+    return json({ error: tResponse('System.m_699cf9afdb02') }, 413);
   }
   try {
     const clerk = await clerkClient();
@@ -106,7 +109,7 @@ export async function PUT(request: NextRequest) {
     if (isProfileEditorDraft) {
       const editorDraft = record.profileEditorDraft;
       if (!editorDraft || typeof editorDraft !== "object" || Array.isArray(editorDraft)) {
-        return json({ error: "Der Profilentwurf ist ungültig." }, 400);
+        return json({ error: tResponse('System.m_6acb6efcd029') }, 400);
       }
       next.profileEditorDraftEncoded = compressProfileEditorDraft(editorDraft as Record<string, unknown>);
       next.profileEditorDraftUpdatedAt = new Date().toISOString();
@@ -136,21 +139,22 @@ export async function PUT(request: NextRequest) {
     }
     const serialized = JSON.stringify(next);
     if (new TextEncoder().encode(serialized).byteLength > MAX_BYTES) {
-      return json({ error: "Der gespeicherte Fortschritt ist zu umfangreich. Entferne optionale Angaben aus einem Entwurf." }, 413);
+      return json({ error: tResponse('System.m_865553e9cb9e') }, 413);
     }
     await clerk.users.updateUserMetadata(authResult.userId, {
       privateMetadata: { [KEY]: next },
     });
     return json({ saved: true });
   } catch (error) {
-    const limited = rateLimitResponse(error);
+    const limited = rateLimitResponse(error, tResponse);
     if (limited) return limited;
     console.error("[onboarding PUT] private progress could not be saved", error);
-    return json({ error: "Dein Fortschritt konnte nicht gespeichert werden. Bitte versuche es erneut." }, 503);
+    return json({ error: tResponse('System.m_8a3ed5b44d39') }, 503);
   }
 }
 
 export async function DELETE(request: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   try {
@@ -220,9 +224,9 @@ export async function DELETE(request: NextRequest) {
     await clerk.users.updateUserMetadata(authResult.userId, { privateMetadata });
     return json({ deleted: true });
   } catch (error) {
-    const limited = rateLimitResponse(error);
+    const limited = rateLimitResponse(error, tResponse);
     if (limited) return limited;
     console.error("[onboarding DELETE] private progress could not be cleared", error);
-    return json({ error: "Der gespeicherte Einrichtungsfortschritt konnte nicht entfernt werden." }, 503);
+    return json({ error: tResponse('System.m_699eac87dce6') }, 503);
   }
 }

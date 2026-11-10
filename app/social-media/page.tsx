@@ -3,12 +3,18 @@ import { db } from "@/lib/db";
 import Image from "@/components/MediaImage";
 import Link from "next/link";
 import { Zap, ArrowRight, MapPin, ExternalLink, Link2, Play } from "lucide-react";
+import { getTranslations, getLocale } from "next-intl/server";
+import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
+
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const tMetadata = await getMetadataTranslations("Metadata");
+  return {
   alternates: { canonical: "https://www.cinegenius.co/social-media" },
-  title: "Social Media Creator entdecken — Instagram, TikTok, YouTube",
-  description: "Finde Social-Media-Creator, Influencer und Content-Produzent/innen für deine Kampagne. Instagram, TikTok, YouTube — direkt buchbar auf CineGenius.",
+  title: tMetadata('m_22610e880484'),
+  description: tMetadata('m_f1e4c34158e2'),
 };
+}
 
 export const revalidate = 300;
 
@@ -30,6 +36,24 @@ interface CreatorCard {
 }
 
 export default async function SocialMediaPage() {
+  const uiText = await getTranslations();
+  const uiOptionLabels: Record<string, string> = {
+    "Instagram": uiText("Ui.text_bad57ef7837c8e"),
+    "TikTok": uiText("Ui.text_1bb6fcfbf1368a"),
+    "YouTube": uiText("Ui.text_fb7accfff8c6f8"),
+    "Podcast": uiText("Ui.text_27a723d62938b4"),
+    "Blog": uiText("Ui.text_8c6bc099534a02"),
+    "Lifestyle": uiText("Ui.text_2e6c28eb66f463"),
+    "Fashion": uiText("Ui.text_00d20d0632f5e1"),
+    "Tech": uiText("Ui.text_d0da7ab8bc9279"),
+    "Food": uiText("Ui.text_e4eb18069d65aa"),
+    "Travel": uiText("Ui.text_d2b98fb53714f2"),
+  };
+
+
+
+  const uiLocale = await getLocale();
+
   const { data: profiles } = await db
     .from("profiles")
     .select("user_id, display_name, tagline, location, avatar_url, profile_type, profile_types, instagram_url, youtube_url, tiktok_url, website_url, day_rate, available, verified")
@@ -72,31 +96,23 @@ export default async function SocialMediaPage() {
 
       {/* Hero */}
       <section className="pt-28 pb-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold/20 bg-gold/5 text-gold text-xs font-semibold mb-6">
-          <Zap size={11} /> Social Media
-        </div>
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold/20 bg-gold/5 text-gold text-xs font-semibold mb-6">{uiText.rich("Ui.text_6c59dbb9b58ab6", { part1: () => (<Zap size={11} />) })}</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
           <div>
-            <h1 className="font-display text-4xl sm:text-5xl font-bold text-text-primary mb-3">
-              Social Media Creator
-            </h1>
-            <p className="text-text-muted max-w-xl leading-relaxed">
-              Instagram, TikTok, YouTube — finde Creator und Influencer für deine Kampagne, dein Produkt oder dein Projekt. Direkt buchbar, ohne Agentur.
-            </p>
+            <h1 className="font-display text-4xl sm:text-5xl font-bold text-text-primary mb-3">{uiText("Ui.text_ebe5a8365418e9")}</h1>
+            <p className="text-text-muted max-w-xl leading-relaxed">{uiText("Ui.text_1fd521cf4cb3f7")}</p>
           </div>
           <Link
             href="/creators"
             className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm"
-          >
-            Alle Creator <ArrowRight size={14} />
-          </Link>
+          >{uiText.rich("Ui.text_b9eee2d09141f8", { part1: () => (<ArrowRight size={14} />) })}</Link>
         </div>
 
         {/* Platform pills */}
         <div className="flex flex-wrap gap-2 mt-8">
           {["Instagram", "TikTok", "YouTube", "Podcast", "Blog", "Lifestyle", "Fashion", "Tech", "Food", "Travel"].map((tag) => (
             <span key={tag} className="px-3 py-1 rounded-full border border-border bg-bg-secondary text-text-muted text-xs">
-              {tag}
+              {(uiOptionLabels[tag] ?? tag)}
             </span>
           ))}
         </div>
@@ -131,10 +147,7 @@ export default async function SocialMediaPage() {
                   )}
                   {/* Available badge */}
                   {c.available && (
-                    <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-sm border border-white/10">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      <span className="text-[10px] text-white font-medium">Verfügbar</span>
-                    </div>
+                    <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-sm border border-white/10">{uiText.rich("Ui.text_ef2387c45d7395", { part1: () => (<span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />), part2: chunks => (<span className="text-[10px] text-white font-medium">{chunks}</span>) })}</div>
                   )}
                   {/* Social links overlay */}
                   <div className="absolute bottom-0 left-0 right-0 p-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -173,9 +186,7 @@ export default async function SocialMediaPage() {
                     <p className="text-xs text-text-secondary leading-relaxed line-clamp-2 flex-1">{c.tagline}</p>
                   )}
                   {c.dayRate && (
-                    <p className="text-xs font-semibold text-gold mt-3">
-                      ab {c.dayRate.toLocaleString()} €<span className="text-text-muted font-normal">/Tag</span>
-                    </p>
+                    <p className="text-xs font-semibold text-gold mt-3">{uiText.rich("Ui.text_af296a89acf4b8", { value1: () => (c.dayRate?.toLocaleString(uiLocale) ?? ""), part2: chunks => (<span className="text-text-muted font-normal">{chunks}</span>) })}</p>
                   )}
                 </div>
               </Link>
@@ -187,16 +198,12 @@ export default async function SocialMediaPage() {
           <div className="w-16 h-16 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center mx-auto mb-5">
             <Zap size={24} className="text-gold" />
           </div>
-          <h2 className="font-display text-2xl font-bold text-text-primary mb-3">Noch keine Creator</h2>
-          <p className="text-text-muted mb-6 max-w-md mx-auto">
-            Erstelle dein Creator-Profil und werde von Marken und Produktionen gefunden.
-          </p>
+          <h2 className="font-display text-2xl font-bold text-text-primary mb-3">{uiText("Ui.text_f0fe32c6d1d2a4")}</h2>
+          <p className="text-text-muted mb-6 max-w-md mx-auto">{uiText("Ui.text_e9ea152088cd4b")}</p>
           <Link
             href="/sign-up"
             className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors text-sm"
-          >
-            Profil erstellen <ArrowRight size={14} />
-          </Link>
+          >{uiText.rich("Ui.text_5d63896787f560", { part1: () => (<ArrowRight size={14} />) })}</Link>
         </section>
       )}
       </div>

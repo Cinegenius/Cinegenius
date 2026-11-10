@@ -3,31 +3,46 @@
 import { useState } from "react";
 import { Search, MapPin, ShoppingBag, Briefcase, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
-const categories = [
-  { label: "Alles",      href: "/locations",   icon: Search },
-  { label: "Locations",   href: "/locations",   icon: MapPin },
-  { label: "Marktplatz", href: "/marketplace", icon: ShoppingBag },
-  { label: "Jobs",       href: "/jobs",        icon: Briefcase },
-  { label: "Crew",       href: "/creators",    icon: Users },
-];
 
-const placeholders: Record<string, string> = {
-  "Alles":      "Locations, Requisiten, Jobs oder Crew suchen...",
-  "Locations":   "Lagerhallen, Anwesen, Studios in Berlin...",
-  "Marktplatz": "Kamera, Kostüm, Fahrzeug, Requisite...",
-  "Jobs":       "Kameramann, Gaffer, Cutter, Tonmeister...",
-  "Crew":       "Regisseur, DP, Make-up-Artist, Editor...",
-};
+
+
+
+
+
+function getLocalizedPlaceholders(translate: (key: string) => string): Record<string, string> { return ({
+  "Alles":      translate("Ui.text_257383a2e99f13"),
+  "Locations":   translate("Ui.text_9222e2bfdbb30c"),
+  "Marktplatz": translate("Ui.text_949a42ae0eb9fc"),
+  "Jobs":       translate("Ui.text_39e8fd5c32c3cf"),
+  "Crew":       translate("Ui.text_bbf44a24d3dedb"),
+}); }
+
+function getLocalizedCategories(translate: (key: string) => string) {
+  return ([
+  { id: "Alles", label: translate("home.boardAll"),      href: "/locations",   icon: Search },
+  { id: "Locations", label: translate("nav.locations"),   href: "/locations",   icon: MapPin },
+  { id: "Marktplatz", label: translate("nav.marketplace"), href: "/marketplace", icon: ShoppingBag },
+  { id: "Jobs", label: translate("nav.jobs"),       href: "/jobs",        icon: Briefcase },
+  { id: "Crew", label: translate("nav.crew"),       href: "/creators",    icon: Users },
+]);
+}
 
 export default function SearchBar() {
+  const uiText = useTranslations();
+  const placeholders = getLocalizedPlaceholders(uiText);
+
+  const categories = getLocalizedCategories(uiText);
+
+
   const [active, setActive] = useState("Alles");
   const [query, setQuery] = useState("");
   const router = useRouter();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    const target = categories.find(c => c.label === active)!;
+    const target = categories.find(c => c.id === active) ?? categories[0];
     router.push(query.trim() ? `${target.href}?q=${encodeURIComponent(query)}` : target.href);
   };
 
@@ -49,19 +64,17 @@ export default function SearchBar() {
         <button
           type="submit"
           className="m-1.5 px-5 py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-xl hover:bg-gold-light transition-colors shrink-0"
-        >
-          Suchen
-        </button>
+        >{uiText("locations.landingSearch")}</button>
       </form>
 
       {/* Category pills */}
       <div className="flex items-center gap-2 mt-3 flex-wrap justify-center">
-        {categories.map(({ label, icon: Icon }) => (
+        {categories.map(({ id, label, icon: Icon }) => (
           <button
-            key={label}
-            onClick={() => setActive(label)}
+            key={id}
+            onClick={() => setActive(id)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all border ${
-              active === label
+              active === id
                 ? "bg-gold text-bg-primary border-gold"
                 : "border-white/30 text-white/80 hover:border-gold hover:text-gold bg-white/10"
             }`}

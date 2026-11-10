@@ -7,7 +7,7 @@ import {
   Bell, Check, BookOpen, MessageSquare, Star,
   Wallet, ShieldCheck, FileCheck, Briefcase, UserPlus, Users,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslations , useLocale } from "next-intl";
 import { timeAgo, notificationMeta, type NotificationType } from "@/lib/notifications";
 import type { AuthenticatedInbox } from "@/lib/use-authenticated-inbox";
 
@@ -27,6 +27,8 @@ const typeIcons: Record<NotificationType, React.ComponentType<{ size?: number; c
 };
 
 export default function NotificationCenter({ inbox }: { inbox: AuthenticatedInbox }) {
+  const uiPriceLocale = useLocale();
+
   const router = useRouter();
   const tn = useTranslations("notifications");
   const [open, setOpen] = useState(false);
@@ -196,7 +198,7 @@ export default function NotificationCenter({ inbox }: { inbox: AuthenticatedInbo
                     <p className="text-xs text-text-muted leading-relaxed mt-0.5 line-clamp-2">
                       {n.body}
                     </p>
-                    <p className="text-[10px] text-text-muted mt-1">{timeAgo(n.created_at)}</p>
+                    <p className="text-[10px] text-text-muted mt-1">{timeAgo(n.created_at, uiPriceLocale)}</p>
                   </div>
                 </Link>
               );

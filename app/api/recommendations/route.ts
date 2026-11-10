@@ -1,12 +1,15 @@
+import { localizedNotification } from "@/lib/i18n/notification-copy";
 import { auth } from "@clerk/nextjs/server";
 import { canViewProfile } from "@/lib/trust";
 import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // GET /api/recommendations?userId=xxx — alle Empfehlungen für einen Nutzer
 export async function GET(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const recipientId = req.nextUrl.searchParams.get("userId");
   if (!recipientId) return NextResponse.json({ recommendations: [] });
 
@@ -20,7 +23,7 @@ export async function GET(req: NextRequest) {
     .order("created_at", { ascending: false })
     .limit(50);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
   if (!data?.length) return NextResponse.json({ recommendations: [] });
 
@@ -51,6 +54,7 @@ export async function GET(req: NextRequest) {
 
 // POST /api/recommendations — Empfehlung schreiben
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -59,11 +63,11 @@ export async function POST(req: NextRequest) {
   const { recipient_id, content, author_role, project } = body;
 
   if (!recipient_id || !content?.trim() || !author_role?.trim()) {
-    return NextResponse.json({ error: "Empfänger, Inhalt und deine Rolle sind Pflichtfelder" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_676b5ecf1a65') }, { status: 400 });
   }
 
   if (userId === recipient_id) {
-    return NextResponse.json({ error: "Du kannst dir nicht selbst eine Empfehlung schreiben" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_02e92bebdad6') }, { status: 400 });
   }
 
   // Nur eine Empfehlung pro Person erlaubt
@@ -75,7 +79,7 @@ export async function POST(req: NextRequest) {
     .maybeSingle();
 
   if (existing) {
-    return NextResponse.json({ error: "Du hast bereits eine Empfehlung für diese Person geschrieben" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_8ea7b528b157') }, { status: 400 });
   }
 
   const { data, error } = await db
@@ -90,7 +94,7 @@ export async function POST(req: NextRequest) {
     .select("id")
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
   // In-App-Benachrichtigung für den Empfänger
   try {
@@ -104,8 +108,8 @@ export async function POST(req: NextRequest) {
     await db.from("notifications").insert({
       user_id: recipient_id,
       type: "friend_accepted", // nutzt success-Farbe
-      title: "Neue Empfehlung",
-      body: `${authorName} hat dir eine Empfehlung geschrieben.`,
+      ...localizedNotification({ title: { key: "n_c8f507042075" }, body: { key: "n_b98e55b809f9", values: { value0: String(authorName) } } }),
+
       href: `/creators/${recipient_id}`,
     });
   } catch { /* fire-and-forget */ }
@@ -115,12 +119,13 @@ export async function POST(req: NextRequest) {
 
 // DELETE /api/recommendations?id=xxx — eigene Empfehlung löschen
 export async function DELETE(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
   const id = req.nextUrl.searchParams.get("id");
-  if (!id) return NextResponse.json({ error: "ID fehlt" }, { status: 400 });
+  if (!id) return NextResponse.json({ error: tResponse('System.m_bf75e9a69ba7') }, { status: 400 });
 
   const { error } = await db
     .from("recommendations")
@@ -128,7 +133,7 @@ export async function DELETE(req: NextRequest) {
     .eq("id", id)
     .eq("author_id", userId); // nur eigene
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
   return NextResponse.json({ success: true });
 }

@@ -3,16 +3,24 @@ import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import ProjectsContent from "@/app/projects/ProjectsContent";
 import PageHeader from "@/components/PageHeader";
+import { getTranslations } from "next-intl/server";
+import { getTranslations as getMetadataTranslations } from "next-intl/server";
+
 
 export const revalidate = 300;
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const tMetadata = await getMetadataTranslations("Metadata");
+  return {
   alternates: { canonical: "https://www.cinegenius.co/projects/alle" },
-  title: "Alle Projekte",
-  description: "Alle Filmprojekte & Produktionen auf CineGenius — mit Suche, Filter und Crew-Übersicht.",
+  title: tMetadata('m_1e8f7f76eb11'),
+  description: tMetadata('m_59b147ab3a40'),
 };
+}
 
 export default async function AlleProjectsPage() {
+  const uiText = await getTranslations();
+
   const { data: projects } = await db
     .from("projects")
     .select("id, title, year, type, director, poster_url, metadata, created_by")
@@ -45,12 +53,12 @@ export default async function AlleProjectsPage() {
   return (
     <div className="min-h-screen bg-bg-primary">
       <PageHeader
-        badge="Alle Projekte"
-        title="Filmprojekte"
+        badge={uiText("common.allProjects")}
+        title={uiText("Ui.text_1a37db69ee45a0")}
         titleHighlight="& Produktionen"
-        description="Alle Kategorien — durchsuche und filtere nach Typ, Jahr und Regie."
-        ctaSecondary={{ label: "Zur Projektübersicht", href: "/projects" }}
-        cta={{ label: "Projekt erstellen", href: "/projects/neu" }}
+        description={uiText("Ui.text_e88d83ff804e78")}
+        ctaSecondary={{ label: uiText("Ui.text_db09b1e12e0d66"), href: "/projects" }}
+        cta={{ label: uiText("home.pillarProjectsCta"), href: "/projects/neu" }}
       />
       <div className="site-container py-4 sm:py-8">
         <ProjectsContent projects={projectsWithCount} />

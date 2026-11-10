@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { Star, ShieldCheck } from "lucide-react";
 import ReviewForm from "@/components/ReviewForm";
 import { useUser } from "@clerk/nextjs";
+import { useTranslations, useLocale } from "next-intl";
+
 
 type Review = {
   id: string;
@@ -28,6 +30,9 @@ interface Props {
 }
 
 export default function ReviewsSection({ targetId, targetType, targetName }: Props) {
+  const uiText = useTranslations();
+  const uiLocale = useLocale();
+
   const { user } = useUser();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,12 +85,9 @@ export default function ReviewsSection({ targetId, targetType, targetName }: Pro
     <div>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-display text-xl font-bold text-text-primary flex items-center gap-2">
-          Bewertungen
-          {!loading && totalRatings > 0 && (
+        <h2 className="font-display text-xl font-bold text-text-primary flex items-center gap-2">{uiText.rich("Ui.text_9ee26124e4b8dc", { value1: () => (!loading && totalRatings > 0 && (
             <span className="text-base font-normal text-text-muted">({totalRatings})</span>
-          )}
-        </h2>
+          )) })}</h2>
         {avgRating !== null && (
           <div className="flex items-center gap-1.5">
             <Star size={14} className="text-gold fill-gold" />
@@ -107,14 +109,10 @@ export default function ReviewsSection({ targetId, targetType, targetName }: Pro
       {!loading && (
         <div className="space-y-4">
           {reviews.length === 0 && !ratingSummary?.ratingOnlyCount && (
-            <p className="text-sm text-text-muted italic">
-              Noch keine Bewertungen — sei der/die Erste!
-            </p>
+            <p className="text-sm text-text-muted italic">{uiText("Ui.text_274d2070143dbe")}</p>
           )}
           {ratingSummary && ratingSummary.ratingOnlyCount > 0 && (
-            <p className="text-sm text-text-muted italic">
-              {ratingSummary.ratingOnlyCount} Sternebewertung{ratingSummary.ratingOnlyCount === 1 ? "" : "en"} ohne Kommentar.
-            </p>
+            <p className="text-sm text-text-muted italic">{uiText.rich("Ui.text_7cd4eca028801b", { value1: () => (ratingSummary.ratingOnlyCount), count2: ratingSummary.ratingOnlyCount })}</p>
           )}
           {reviews.map((r) => (
             <div key={r.id} className="p-5 bg-bg-secondary border border-border rounded-xl">
@@ -128,7 +126,7 @@ export default function ReviewsSection({ targetId, targetType, targetName }: Pro
                     <Star key={i} size={12} className="text-border" />
                   ))}
                   <span className="text-xs text-text-muted ml-1">
-                    {new Date(r.created_at).toLocaleDateString("de-DE", { month: "short", year: "numeric" })}
+                    {new Date(r.created_at).toLocaleDateString(uiLocale, { month: "short", year: "numeric" })}
                   </span>
                 </div>
               </div>
@@ -144,13 +142,11 @@ export default function ReviewsSection({ targetId, targetType, targetName }: Pro
           onClick={() => setFormOpen(true)}
           className="mt-5 flex items-center gap-2 px-4 py-2.5 border border-gold/30 text-gold text-sm rounded-lg hover:border-gold hover:bg-gold/5 transition-all"
         >
-          <ShieldCheck size={14} /> {alreadyReviewed ? "Eigene Bewertung ändern" : "Verifizierte Bewertung schreiben"}
+          <ShieldCheck size={14} /> {alreadyReviewed ? uiText("Ui.text_a899db81e81996") : uiText("Ui.text_9415b513a90612")}
         </button>
       )}
       {user && alreadyReviewed && !canReview && (
-        <p className="mt-5 text-xs text-text-muted flex items-center gap-1.5">
-          <ShieldCheck size={13} className="text-success" /> Du hast bereits eine Bewertung abgegeben.
-        </p>
+        <p className="mt-5 text-xs text-text-muted flex items-center gap-1.5">{uiText.rich("Ui.text_2b2e4268203d7a", { part1: () => (<ShieldCheck size={13} className="text-success" />) })}</p>
       )}
 
       {/* Review modal */}

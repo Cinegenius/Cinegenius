@@ -1,3 +1,14 @@
+import {getTranslations} from "next-intl/server";
+import {recipientEmailLocale} from "@/lib/i18n/email-locale";
+import {appLocale, type AppLocale} from "@/lib/i18n/locales";
+type EmailTranslator = Awaited<ReturnType<typeof getTranslations>>;
+function escapeHtml(text: string) { return text.replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]!)); }
+function normalizedEmailHeader(value: string) {
+  return value.replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim();
+}
+function validOtp(value: unknown): string | null {
+  return typeof value === "string" && /^\d{6}$/.test(value) ? value : null;
+}
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { Resend } from "resend";
@@ -39,6 +50,8 @@ export async function POST(req: Request) {
   if (event.type === "email.created") {
     const e = event.data as {
       to_email_address?: string;
+      user_id?: string | null;
+      locale?: string | null;
       subject?: string;
       body?: string;
       from_email_name?: string;
@@ -52,17 +65,23 @@ export async function POST(req: Request) {
       }
 
       let html = e.body ?? "";
+      let subject = e.subject;
+      const dataUser = e.data?.user && typeof e.data.user === "object" ? e.data.user as Record<string, unknown> : null;
+      const hint = appLocale(e.locale) ?? appLocale(e.data?.locale) ?? appLocale(dataUser?.locale);
+      const locale = await recipientEmailLocale(e.to_email_address, e.user_id, hint);
+      const copy = await getTranslations({locale, namespace: "TransactionalEmail"});
 
       if (e.slug === "verification_code" || e.slug === "reset_password_code") {
         const otp =
-          (e.data?.otp_code as string) ??
-          (e.data?.code as string) ??
+          validOtp(e.data?.otp_code) ??
+          validOtp(e.data?.code) ??
           extractOtp(e.body ?? "");
         if (otp) {
+          subject = copy(e.slug === "reset_password_code" ? "otpPasswordHeading" : "otpVerificationLabel");
           html =
             e.slug === "reset_password_code"
-              ? buildOtpEmail(otp, "password")
-              : buildOtpEmail(otp, "verification");
+              ? buildOtpEmail(otp, "password", locale, copy)
+              : buildOtpEmail(otp, "verification", locale, copy);
         }
       }
 
@@ -70,7 +89,7 @@ export async function POST(req: Request) {
         const result = await resend.emails.send({
           from: "CineGenius <noreply@cinegenius.co>",
           to: e.to_email_address,
-          subject: e.subject,
+          subject,
           html,
         });
         if (result.error) {
@@ -88,6 +107,8 @@ export async function POST(req: Request) {
       email_addresses?: { email_address: string; id: string }[];
       primary_email_address_id?: string;
       first_name?: string;
+      id?: string;
+      locale?: string | null;
     };
 
     const primaryEmail = user.email_addresses?.find(
@@ -95,13 +116,16 @@ export async function POST(req: Request) {
     )?.email_address ?? user.email_addresses?.[0]?.email_address;
 
     const firstName = user.first_name ?? "";
+    const subjectName = normalizedEmailHeader(firstName);
 
     if (primaryEmail && resend) {
+      const locale = await recipientEmailLocale(primaryEmail, user.id, user.locale);
+      const copy = await getTranslations({locale, namespace: "TransactionalEmail"});
       await resend.emails.send({
         from: "CineGenius <willkommen@cinegenius.co>",
         to: primaryEmail,
-        subject: firstName ? `${firstName}, dein CineGenius-Account ist bereit` : "Dein CineGenius-Account ist bereit",
-        html: buildWelcomeEmail(firstName),
+        subject: subjectName ? copy("welcomeAccountNamedSubject", {name: subjectName}) : copy("welcomeAccountSubject"),
+        html: buildWelcomeEmail(firstName, locale, copy),
         headers: {
           "X-Entity-Ref-ID": `welcome-${Date.now()}`,
           "Precedence": "bulk",
@@ -118,20 +142,18 @@ function extractOtp(body: string): string | null {
   return match?.[1] ?? null;
 }
 
-function buildOtpEmail(otp: string, type: "verification" | "password"): string {
+function buildOtpEmail(otp: string, type: "verification" | "password", locale: AppLocale, t: EmailTranslator): string {
   const isPassword = type === "password";
 
-  const welcome = isPassword
-    ? "Kein Problem — das passiert."
-    : "Willkommen bei CineGenius!";
-  const headline = isPassword ? "Passwort zurücksetzen" : "Fast geschafft!";
+  const welcome = escapeHtml(t(isPassword ? "otpPasswordWelcome" : "otpVerificationWelcome"));
+  const headline = escapeHtml(t(isPassword ? "otpPasswordHeading" : "otpVerificationHeading"));
   const subline = isPassword
-    ? "Gib diesen Code ein, um ein neues Passwort zu vergeben. Er ist <strong style=\"color:#EFEFEF;\">10 Minuten</strong> gültig."
-    : "Nur noch ein Schritt. Gib diesen Code ein und dein Account ist sofort bereit — Locations, Crew &amp; Jobs warten auf dich.";
-  const label = isPassword ? "Passwort" : "Bestätigung";
+    ? t.markup("otpPasswordBody", {duration: chunks => `<strong style="color:#EFEFEF;">${chunks}</strong>`})
+    : escapeHtml(t("otpVerificationBody"));
+  const label = escapeHtml(t(isPassword ? "otpPasswordLabel" : "otpVerificationLabel"));
 
   return `<!DOCTYPE html>
-<html lang="de">
+<html lang="${escapeHtml(locale)}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -195,7 +217,7 @@ function buildOtpEmail(otp: string, type: "verification" | "password"): string {
                     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:32px;">
                       <tr>
                         <td style="background:#0D0D0D;border:1.5px solid #C2F135;border-radius:14px;padding:30px 20px;text-align:center;">
-                          <span style="font-size:48px;font-weight:800;color:#C2F135;letter-spacing:14px;font-family:'Courier New',Courier,monospace;display:inline-block;padding-left:14px;">${otp}</span>
+                          <span style="font-size:48px;font-weight:800;color:#C2F135;letter-spacing:14px;font-family:'Courier New',Courier,monospace;display:inline-block;padding-left:14px;">${escapeHtml(otp)}</span>
                         </td>
                       </tr>
                     </table>
@@ -207,7 +229,7 @@ function buildOtpEmail(otp: string, type: "verification" | "password"): string {
 
                     <!-- Security note -->
                     <p style="margin:0;font-size:13px;color:#444444;line-height:1.65;">
-                      Falls du diese Anfrage nicht gestellt hast, kannst du diese E-Mail ignorieren. Dein Konto ist sicher.
+                      ${escapeHtml(t("otpIgnore"))}
                     </p>
 
                   </td>
@@ -220,7 +242,7 @@ function buildOtpEmail(otp: string, type: "verification" | "password"): string {
           <tr>
             <td style="padding-top:32px;text-align:center;">
               <p style="margin:0;font-size:12px;color:#333333;line-height:1.7;">
-                CineGenius &middot; Marktplatz für Film &amp; Medien<br/>
+                ${escapeHtml(t("brandFooter"))}<br/>
                 <a href="https://cinegenius.co" style="color:#444444;text-decoration:none;">cinegenius.co</a>
               </p>
             </td>
@@ -234,14 +256,14 @@ function buildOtpEmail(otp: string, type: "verification" | "password"): string {
 </html>`;
 }
 
-function buildWelcomeEmail(firstName: string): string {
-  const name = (firstName || "Hey").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]!));
+function buildWelcomeEmail(firstName: string, locale: AppLocale, t: EmailTranslator): string {
+  const name = firstName || t("anonymousGreeting");
   return `<!DOCTYPE html>
-<html lang="de">
+<html lang="${escapeHtml(locale)}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Willkommen bei CineGenius</title>
+  <title>${escapeHtml(t("welcomeTitle"))}</title>
 </head>
 <body style="margin:0;padding:0;background-color:#0D0D0D;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0D0D0D;padding:48px 16px;">
@@ -282,16 +304,16 @@ function buildWelcomeEmail(firstName: string): string {
                   <td style="padding:44px 44px 0;">
 
                     <!-- Label -->
-                    <p style="margin:0 0 20px;font-size:11px;font-weight:700;color:#C2F135;text-transform:uppercase;letter-spacing:3px;">Willkommen</p>
+                    <p style="margin:0 0 20px;font-size:11px;font-weight:700;color:#C2F135;text-transform:uppercase;letter-spacing:3px;">${escapeHtml(t("welcomeLabel"))}</p>
 
                     <!-- Headline -->
                     <h1 style="margin:0 0 16px;font-size:36px;font-weight:800;color:#FFFFFF;line-height:1.15;letter-spacing:-0.8px;">
-                      ${name},<br/>schön dass du dabei bist.
+                      ${escapeHtml(t("welcomeGreetingShort", {name}))}
                     </h1>
 
                     <!-- Subline -->
                     <p style="margin:0 0 40px;font-size:16px;color:#888888;line-height:1.65;">
-                      Der Marktplatz für Film, Social Media und Fotografie im DACH-Raum. Locations, Crew, Equipment, Jobs — alles an einem Ort.
+                      ${escapeHtml(t("welcomeDachIntro"))}
                     </p>
 
                     <!-- Divider -->
@@ -309,8 +331,8 @@ function buildWelcomeEmail(firstName: string): string {
                                 <span style="display:inline-block;width:20px;height:20px;background:#C2F135;border-radius:50%;text-align:center;line-height:20px;font-size:11px;font-weight:800;color:#0D0D0D;">1</span>
                               </td>
                               <td style="padding-left:12px;">
-                                <p style="margin:0;font-size:15px;font-weight:600;color:#FFFFFF;">Profil vervollständigen</p>
-                                <p style="margin:3px 0 0;font-size:13px;color:#555555;line-height:1.5;">Lade dein Portfolio hoch und werde von Produktionen gefunden.</p>
+                                <p style="margin:0;font-size:15px;font-weight:600;color:#FFFFFF;">${escapeHtml(t("profileStep"))}</p>
+                                <p style="margin:3px 0 0;font-size:13px;color:#555555;line-height:1.5;">${escapeHtml(t("portfolioStepDescription"))}</p>
                               </td>
                             </tr>
                           </table>
@@ -324,8 +346,8 @@ function buildWelcomeEmail(firstName: string): string {
                                 <span style="display:inline-block;width:20px;height:20px;background:#C2F135;border-radius:50%;text-align:center;line-height:20px;font-size:11px;font-weight:800;color:#0D0D0D;">2</span>
                               </td>
                               <td style="padding-left:12px;">
-                                <p style="margin:0;font-size:15px;font-weight:600;color:#FFFFFF;">Erstes Inserat erstellen</p>
-                                <p style="margin:3px 0 0;font-size:13px;color:#555555;line-height:1.5;">Location, Equipment, Job oder Requisite — kostenlos inserieren.</p>
+                                <p style="margin:0;font-size:15px;font-weight:600;color:#FFFFFF;">${escapeHtml(t("firstListing"))}</p>
+                                <p style="margin:3px 0 0;font-size:13px;color:#555555;line-height:1.5;">${escapeHtml(t("firstListingDescription"))}</p>
                               </td>
                             </tr>
                           </table>
@@ -339,8 +361,8 @@ function buildWelcomeEmail(firstName: string): string {
                                 <span style="display:inline-block;width:20px;height:20px;background:#C2F135;border-radius:50%;text-align:center;line-height:20px;font-size:11px;font-weight:800;color:#0D0D0D;">3</span>
                               </td>
                               <td style="padding-left:12px;">
-                                <p style="margin:0;font-size:15px;font-weight:600;color:#FFFFFF;">Crew &amp; Locations entdecken</p>
-                                <p style="margin:3px 0 0;font-size:13px;color:#555555;line-height:1.5;">Durchsuche Profile, Locations und Equipment für dein nächstes Projekt.</p>
+                                <p style="margin:0;font-size:15px;font-weight:600;color:#FFFFFF;">${escapeHtml(t("discoverStep"))}</p>
+                                <p style="margin:3px 0 0;font-size:13px;color:#555555;line-height:1.5;">${escapeHtml(t("discoverStepDescription"))}</p>
                               </td>
                             </tr>
                           </table>
@@ -358,7 +380,7 @@ function buildWelcomeEmail(firstName: string): string {
                       <tr>
                         <td style="background:#C2F135;border-radius:10px;">
                           <a href="https://cinegenius.co/dashboard" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:700;color:#0D0D0D;text-decoration:none;letter-spacing:-0.2px;">
-                            Zum Dashboard &rarr;
+                            ${escapeHtml(t("dashboard"))} &rarr;
                           </a>
                         </td>
                       </tr>
@@ -374,7 +396,7 @@ function buildWelcomeEmail(firstName: string): string {
           <tr>
             <td style="padding-top:32px;text-align:center;">
               <p style="margin:0;font-size:12px;color:#333333;line-height:1.7;">
-                CineGenius &middot; Marktplatz für Film &amp; Medien<br/>
+                ${escapeHtml(t("brandFooter"))}<br/>
                 <a href="https://cinegenius.co" style="color:#444444;text-decoration:none;">cinegenius.co</a>
               </p>
             </td>

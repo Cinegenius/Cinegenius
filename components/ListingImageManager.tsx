@@ -6,6 +6,7 @@ import { ArrowDown, ArrowUp, Check, Loader2, RefreshCw, Star, Trash2, Upload } f
 import UnoptimizedImage from "@/components/UnoptimizedImage";
 import { compressImage, MAX_FUNCTION_UPLOAD_BYTES, safeObjectURL } from "@/lib/compressImage";
 import { galleryUrlsFromEntries, MAX_LISTING_IMAGES, moveGalleryImage } from "@/lib/listing-image-gallery";
+import { uiErrorMessage } from "@/lib/ui-error-message";
 
 type Entry = {
   id: string;
@@ -41,7 +42,7 @@ function uniqueUrls(urls: string[]) {
   return [...new Set(urls.filter((url) => typeof url === "string" && url.trim()).map((url) => url.trim()))];
 }
 
-function uploadFile(file: File, onProgress: (progress: number) => void, uploadId: string): Promise<string> {
+function uploadFile(translate: (key: string, values?: Record<string, string | number>) => string, file: File, onProgress: (progress: number) => void, uploadId: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const request = new XMLHttpRequest();
     const data = new FormData();
@@ -52,8 +53,8 @@ function uploadFile(file: File, onProgress: (progress: number) => void, uploadId
     request.upload.onprogress = (event) => {
       if (event.lengthComputable) onProgress(Math.round((event.loaded / event.total) * 100));
     };
-    request.onerror = () => reject(new Error("Verbindung unterbrochen. Bitte dieses Bild erneut hochladen."));
-    request.ontimeout = () => reject(new Error("Der Upload dauert zu lange. Bitte dieses Bild erneut hochladen."));
+    request.onerror = () => reject(new Error(translate("Ui.text_0767ea2944c880")));
+    request.ontimeout = () => reject(new Error(translate("Ui.text_3cb58821eef83e")));
     request.onload = () => {
       let response: { url?: string; error?: string } = {};
       try { response = JSON.parse(request.responseText) as typeof response; } catch { /* handled below */ }
@@ -62,14 +63,18 @@ function uploadFile(file: File, onProgress: (progress: number) => void, uploadId
         return;
       }
       reject(new Error(request.status === 413
-        ? "Das Bild ist zu groß. Es wird vor dem Upload verkleinert; wähle bitte ein anderes Foto."
-        : response.error ?? "Das Bild konnte nicht hochgeladen werden."));
+        ? translate("Ui.text_3e1d92ce421042")
+        : response.error ?? translate("Ui.text_70f8fac9177f96")));
     };
     request.send(data);
   });
 }
 
-export default function ListingImageManager({ value, onChange, onStatusChange, label = "Artikelbilder", maxImages = MAX_LISTING_IMAGES }: Props) {
+export default function ListingImageManager({ value, onChange, onStatusChange, label, maxImages = MAX_LISTING_IMAGES }: Props) {
+  const uiText = useTranslations();
+  if (label === undefined) label = uiText("Ui.text_62e0c060c11ffc");
+
+
   const optionalMedia = useTranslations("OptionalMedia");
   const initial = uniqueUrls(value).map((url) => ({
     id: `saved:${url}`,
@@ -181,10 +186,10 @@ export default function ListingImageManager({ value, onChange, onStatusChange, l
         maxHeight: 1920,
         quality: 0.82,
         maxBytes: MAX_FUNCTION_UPLOAD_BYTES,
-      });
+       translate: uiText });
       if (!mountedRef.current) return;
       patchEntry(id, { stage: "uploading", progress: 0 }, false);
-      const url = await uploadFile(compressed, (progress) => patchEntry(id, { progress }, false), uploadId);
+      const url = await uploadFile(uiText, compressed, (progress) => patchEntry(id, { progress }, false), uploadId);
       if (!mountedRef.current) return;
       const current = entriesRef.current.find((entry) => entry.id === id);
       if (!current) return;
@@ -201,7 +206,7 @@ export default function ListingImageManager({ value, onChange, onStatusChange, l
       const next = entriesRef.current.map((entry) => entry.id === id ? ready : entry);
       writeEntries(next, true);
     } catch (cause) {
-      const message = cause instanceof Error ? cause.message : "Das Bild konnte nicht hochgeladen werden.";
+      const message = uiErrorMessage(cause, uiText("Ui.text_70f8fac9177f96"));
       const current = entriesRef.current.find((entry) => entry.id === id);
       if (current && mountedRef.current) {
         const replacementPreview = current.replacementPreview ?? safeObjectURL(file) ?? undefined;
@@ -228,12 +233,12 @@ export default function ListingImageManager({ value, onChange, onStatusChange, l
     if (!files?.length || busyRef.current) return;
     const remaining = Math.max(0, maxImages - entriesRef.current.length);
     if (!remaining) {
-      setNotice(`Du kannst höchstens ${maxImages} Bilder hinzufügen.`);
+      setNotice(uiText("Ui.text_43362bfd2f769d", { value1: String(maxImages) }));
       return;
     }
     const selected = Array.from(files);
     const accepted = selected.slice(0, remaining);
-    setNotice(selected.length > remaining ? `Es wurden nur ${remaining} weitere Bilder ausgewählt. Insgesamt sind maximal ${maxImages} erlaubt.` : "");
+    setNotice(selected.length > remaining ? uiText("Ui.text_006df035bece06", { value1: String(remaining), value2: String(maxImages) }) : "");
     const additions = accepted.map((file) => {
       const previewUrl = safeObjectURL(file);
       return {
@@ -299,9 +304,9 @@ export default function ListingImageManager({ value, onChange, onStatusChange, l
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
           <label className="block text-xs font-semibold text-text-muted uppercase tracking-widest">{label} <span className="font-normal normal-case">({optionalMedia("optional")})</span></label>
-          <p className="mt-1 text-xs text-text-muted">JPG, PNG, WebP oder HEIC/HEIF · große Fotos werden automatisch verkleinert (max. 4 MB pro Foto nach der Verkleinerung).</p>
+          <p className="mt-1 text-xs text-text-muted">{uiText("Ui.text_3a6eba6a1465f6")}</p>
         </div>
-        <span className="text-xs text-text-muted">{entries.length} / {maxImages} Bilder</span>
+        <span className="text-xs text-text-muted">{entries.length} / {maxImages}{uiText("Ui.text_1eded4052c6d46")}</span>
       </div>
 
       {entries.length === 0 && <p className="text-xs leading-5 text-text-muted">{optionalMedia("hint")}</p>}
@@ -313,31 +318,29 @@ export default function ListingImageManager({ value, onChange, onStatusChange, l
               <article key={entry.id} className={`relative overflow-hidden rounded-xl border bg-bg-secondary ${index === 0 ? "border-gold/60" : "border-border"}`}>
                 <div className="relative aspect-[4/3] bg-bg-elevated">
                   {entry.previewUrl ? (
-                    <UnoptimizedImage src={entry.previewUrl} alt={`Artikelbild ${index + 1}`} className="h-full w-full object-contain" />
+                    <UnoptimizedImage src={entry.previewUrl} alt={uiText("Ui.text_b84cfbd427c093", { value1: String(index + 1) })} className="h-full w-full object-contain" />
                   ) : (
-                    <div className="flex h-full items-center justify-center text-sm text-text-muted">Vorschau nicht verfügbar</div>
+                    <div className="flex h-full items-center justify-center text-sm text-text-muted">{uiText("Ui.text_667fc4b9cc6f49")}</div>
                   )}
                   {entry.status === "uploading" && (
                     <div className="absolute inset-x-0 bottom-0 bg-bg-primary/90 px-3 py-2">
                       <div className="mb-1 flex items-center gap-1.5 text-[11px] text-text-secondary">
                         <Loader2 size={12} className="animate-spin text-gold" />
-                        {entry.stage === "compressing" ? "Wird verkleinert…" : `Upload ${entry.progress}%`}
+                        {entry.stage === "compressing" ? uiText("Ui.text_92cbd019e6f0a3") : uiText("Ui.text_6587ea86566bb7", { value1: String(entry.progress) })}
                       </div>
-                      <div role="progressbar" aria-label={`Uploadfortschritt Bild ${index + 1}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={entry.stage === "uploading" ? entry.progress : undefined} className="h-1.5 overflow-hidden rounded-full bg-bg-elevated">
+                      <div role="progressbar" aria-label={uiText("Ui.text_a55932f4b9bb67", { value1: String(index + 1) })} aria-valuemin={0} aria-valuemax={100} aria-valuenow={entry.stage === "uploading" ? entry.progress : undefined} className="h-1.5 overflow-hidden rounded-full bg-bg-elevated">
                         <div className={`h-full rounded-full bg-gold transition-[width] duration-150 ${entry.stage === "compressing" ? "w-1/4 animate-pulse" : ""}`} style={entry.stage === "uploading" ? { width: `${entry.progress}%` } : undefined} />
                       </div>
                     </div>
                   )}
                   {entry.status === "failed" && (
-                    <div className="absolute inset-x-0 bottom-0 bg-red-950/90 px-3 py-2 text-[11px] text-red-100">Upload fehlgeschlagen</div>
+                    <div className="absolute inset-x-0 bottom-0 bg-red-950/90 px-3 py-2 text-[11px] text-red-100">{uiText("profile.uploadFailed")}</div>
                   )}
                   {entry.id === mainEntryId && (
-                    <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full border border-gold/30 bg-bg-primary/90 px-2 py-1 text-[10px] font-semibold text-gold">
-                      <Star size={10} fill="currentColor" /> Hauptbild
-                    </span>
+                    <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full border border-gold/30 bg-bg-primary/90 px-2 py-1 text-[10px] font-semibold text-gold">{uiText.rich("Ui.text_4ccf4035b65b61", { part1: () => (<Star size={10} fill="currentColor" />) })}</span>
                   )}
                   {showingReplacement && (
-                    <span className="absolute inset-x-2 top-10 rounded bg-bg-primary/90 px-2 py-1 text-center text-[10px] text-red-300">Ersatz fehlgeschlagen · altes Bild bleibt gespeichert</span>
+                    <span className="absolute inset-x-2 top-10 rounded bg-bg-primary/90 px-2 py-1 text-center text-[10px] text-red-300">{uiText("Ui.text_cf27208a7750fb")}</span>
                   )}
                 </div>
 
@@ -347,33 +350,22 @@ export default function ListingImageManager({ value, onChange, onStatusChange, l
 
                 <div className="flex flex-wrap items-center gap-1 p-2">
                   {index > 0 && (
-                    <button type="button" disabled={isBusy} onClick={() => moveImage(index, index - 1)} aria-label={`Bild ${index + 1} nach oben verschieben`} className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-border px-2 text-[11px] text-text-secondary hover:border-gold hover:text-gold disabled:opacity-50">
-                      <ArrowUp size={12} /> Nach oben
-                    </button>
+                    <button type="button" disabled={isBusy} onClick={() => moveImage(index, index - 1)} aria-label={uiText("Ui.text_4354f507132db7", { value1: String(index + 1) })} className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-border px-2 text-[11px] text-text-secondary hover:border-gold hover:text-gold disabled:opacity-50">{uiText.rich("Ui.text_ee65cad7d10738", { part1: () => (<ArrowUp size={12} />) })}</button>
                   )}
                   {index < entries.length - 1 && (
-                    <button type="button" disabled={isBusy} onClick={() => moveImage(index, index + 1)} aria-label={`Bild ${index + 1} nach unten verschieben`} className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-border px-2 text-[11px] text-text-secondary hover:border-gold hover:text-gold disabled:opacity-50">
-                      <ArrowDown size={12} /> Nach unten
-                    </button>
+                    <button type="button" disabled={isBusy} onClick={() => moveImage(index, index + 1)} aria-label={uiText("Ui.text_293daf6fb7a669", { value1: String(index + 1) })} className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-border px-2 text-[11px] text-text-secondary hover:border-gold hover:text-gold disabled:opacity-50">{uiText.rich("Ui.text_93d89ab59adc01", { part1: () => (<ArrowDown size={12} />) })}</button>
                   )}
-                  <label className={`inline-flex min-h-11 cursor-pointer items-center gap-1 rounded-lg border border-border px-2 text-[11px] text-text-secondary hover:border-gold hover:text-gold ${isBusy ? "pointer-events-none opacity-50" : ""}`}>
-                    <RefreshCw size={11} /> Ersetzen
-                    <input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" className="sr-only" disabled={isBusy} onChange={(event) => {
+                  <label className={`inline-flex min-h-11 cursor-pointer items-center gap-1 rounded-lg border border-border px-2 text-[11px] text-text-secondary hover:border-gold hover:text-gold ${isBusy ? "pointer-events-none opacity-50" : ""}`}>{uiText.rich("Ui.text_5c1e79c7cf8b94", { part1: () => (<RefreshCw size={11} />), part2: () => (<input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" className="sr-only" disabled={isBusy} onChange={(event) => {
                       const file = event.currentTarget.files?.[0];
                       if (file) void handleReplacement(entry, file);
                       event.currentTarget.value = "";
-                    }} />
-                  </label>
+                    }} />) })}</label>
                   {entry.status === "failed" || entry.error ? (
-                    <button type="button" disabled={isBusy} onClick={() => void retryImage(entry)} className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-gold/40 px-2 text-[11px] text-gold hover:bg-gold/10 disabled:opacity-50">
-                      <RefreshCw size={11} /> Erneut hochladen
-                    </button>
+                    <button type="button" disabled={isBusy} onClick={() => void retryImage(entry)} className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-gold/40 px-2 text-[11px] text-gold hover:bg-gold/10 disabled:opacity-50">{uiText.rich("Ui.text_317ac8e468c94a", { part1: () => (<RefreshCw size={11} />) })}</button>
                   ) : entry.status === "ready" ? (
-                    <span className="inline-flex min-h-11 items-center gap-1 px-1 text-[11px] text-success"><Check size={12} /> Hochgeladen</span>
+                    <span className="inline-flex min-h-11 items-center gap-1 px-1 text-[11px] text-success">{uiText.rich("Ui.text_d95eea9f99f8f2", { part1: () => (<Check size={12} />) })}</span>
                   ) : null}
-                  <button type="button" disabled={isBusy} onClick={() => removeImage(entry)} aria-label={`Bild ${index + 1} entfernen`} className="ml-auto inline-flex min-h-11 items-center gap-1 rounded-lg border border-red-500/20 px-2 text-[11px] text-red-300 hover:bg-red-500/10 disabled:opacity-50">
-                    <Trash2 size={11} /> Entfernen
-                  </button>
+                  <button type="button" disabled={isBusy} onClick={() => removeImage(entry)} aria-label={uiText("Ui.text_06bfac22b0fd2e", { value1: String(index + 1) })} className="ml-auto inline-flex min-h-11 items-center gap-1 rounded-lg border border-red-500/20 px-2 text-[11px] text-red-300 hover:bg-red-500/10 disabled:opacity-50">{uiText.rich("Ui.text_958330d18739f1", { part1: () => (<Trash2 size={11} />) })}</button>
                 </div>
               </article>
             );
@@ -384,17 +376,17 @@ export default function ListingImageManager({ value, onChange, onStatusChange, l
       <div className="flex flex-wrap items-center gap-3">
         <button type="button" disabled={isBusy || entries.length >= maxImages} onClick={() => fileInputRef.current?.click()} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm text-text-secondary transition-colors hover:border-gold hover:text-gold disabled:cursor-not-allowed disabled:opacity-50">
           {isBusy ? <Loader2 size={15} className="animate-spin" /> : <Upload size={15} />}
-          {isBusy ? "Upload läuft…" : "Bilder hinzufügen"}
+          {isBusy ? uiText("Ui.text_cd4d95699e7e8f") : uiText("Ui.text_a7731f9fd0df61")}
         </button>
         <input ref={fileInputRef} type="file" multiple accept="image/jpeg,image/png,image/webp,image/heic,image/heif" className="sr-only" disabled={isBusy || entries.length >= maxImages} onChange={(event) => {
           void handleAddFiles(event.currentTarget.files);
           event.currentTarget.value = "";
         }} />
-        <span className="text-xs text-text-muted">Das erste Bild ist das Hauptbild. Über „Nach oben“ kannst du die Reihenfolge auch ohne Ziehen ändern.</span>
+        <span className="text-xs text-text-muted">{uiText("Ui.text_159102c349da5c")}</span>
       </div>
 
       {notice && <p role="status" className="text-xs text-gold">{notice}</p>}
-      {failedCount > 0 && <p role="alert" className="text-xs text-red-300">{failedCount} Bild{failedCount === 1 ? "" : "er"} nicht erfolgreich hochgeladen. Erneut hochladen oder entfernen, bevor du speicherst.</p>}
+      {failedCount > 0 && <p role="alert" className="text-xs text-red-300">{uiText.rich("Ui.text_a9f7da73a35d90", { value1: () => (failedCount), count2: failedCount })}</p>}
     </section>
   );
 }

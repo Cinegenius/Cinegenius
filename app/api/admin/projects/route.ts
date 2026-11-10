@@ -3,9 +3,11 @@ import { requireAdmin } from "@/lib/guards";
 import { NextRequest, NextResponse } from "next/server";
 import { finishAdminAudit, startAdminAudit, validateAdminReason } from "@/lib/admin-audit";
 import { projectRecordWithDetails } from "@/lib/project-record";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // GET /api/admin/projects?search=&page=1
 export async function GET(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const adminResult = await requireAdmin();
   if (adminResult instanceof NextResponse) return adminResult;
 
@@ -24,7 +26,7 @@ export async function GET(req: NextRequest) {
   if (search) query = query.ilike("title", `%${search.slice(0, 80).replace(/[%,()]/g, " ")}%`);
 
   const { data: projects, count, error } = await query;
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
   // Fetch crew counts
   const ids = (projects ?? []).map((p: { id: string }) => p.id);
@@ -59,25 +61,26 @@ export async function GET(req: NextRequest) {
 
 // PATCH /api/admin/projects — toggle verified
 export async function PATCH(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const adminResult = await requireAdmin();
   if (adminResult instanceof NextResponse) return adminResult;
 
   const body = await req.json().catch(() => null);
   const reason = validateAdminReason(body?.reason);
   if (typeof body?.projectId !== "string" || typeof body?.verified !== "boolean" || !reason) {
-    return NextResponse.json({ error: "Projekt, Status und eine Begründung (5–500 Zeichen) sind erforderlich." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_55aca4e2b3ab') }, { status: 400 });
   }
 
   const audit = await startAdminAudit({ actorUserId: adminResult.userId, action: body.verified ? "project_verify" : "project_unverify", entityType: "project", entityId: body.projectId, reason });
-  if (!audit) return NextResponse.json({ error: "Aktion aus Sicherheitsgründen gestoppt: Das Adminprotokoll ist nicht verfügbar." }, { status: 503 });
+  if (!audit) return NextResponse.json({ error: tResponse('System.m_8f517d75e467') }, { status: 503 });
   const { data: current, error: currentError } = await db
     .from("projects")
     .select("id, metadata")
     .eq("id", body.projectId)
     .maybeSingle();
 
-  if (currentError) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: currentError.message }, { status: 500 }); }
-  if (!current) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Projekt nicht gefunden." }, { status: 404 }); }
+  if (currentError) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 }); }
+  if (!current) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.m_bfbc36f441fc') }, { status: 404 }); }
 
   const currentMetadata = current.metadata && typeof current.metadata === "object" && !Array.isArray(current.metadata)
     ? current.metadata as Record<string, unknown>
@@ -91,8 +94,8 @@ export async function PATCH(req: NextRequest) {
     .eq("id", body.projectId)
     .select("id")
     .maybeSingle();
-  if (error) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: error.message }, { status: 500 }); }
-  if (!data) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Projekt wurde nicht aktualisiert." }, { status: 404 }); }
+  if (error) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 }); }
+  if (!data) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.m_9df36bfde46c') }, { status: 404 }); }
   const auditLogged = await finishAdminAudit(audit, "succeeded");
   return NextResponse.json({ success: true, auditLogged });
 }

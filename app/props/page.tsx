@@ -4,19 +4,23 @@ import { db } from "@/lib/db";
 import PropsContent from "./PropsContent";
 import PageHeader from "@/components/PageHeader";
 import { getTranslations, getLocale } from "next-intl/server";
+import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 export const revalidate = 60;
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const tMetadata = await getMetadataTranslations("Metadata");
+  return {
   alternates: { canonical: "https://www.cinegenius.co/props" },
-  title: "Requisiten & Equipment mieten — Film, Foto, Social Media",
-  description: "Requisiten, Kameras, Licht, Ton-Equipment, Kostüme, Backdrops und Creator-Sets mieten. Alles für Film, Fotografie und Social Media Produktion.",
-  keywords: ["Requisiten mieten", "Filmequipment leihen", "Kamera mieten", "Licht mieten Film", "Kostüme mieten", "Fotoequipment mieten"],
+  title: tMetadata('m_afa315365274'),
+  description: tMetadata('m_22a04084bf9d'),
+  keywords: [tMetadata('m_cb9a7dde6c1c'), tMetadata('m_44e1c8b7ba50'), tMetadata('m_d34a5b74859b'), tMetadata('m_30574e214957'), tMetadata('m_4bb65bc9ff2c'), tMetadata('m_cd14c6eba3f1')],
   openGraph: {
-    title: "Requisiten & Equipment mieten — CineGenius",
-    description: "Equipment für Film, Foto und Social Media — von Privatpersonen und Verleihfirmen.",
+    title: tMetadata('m_71e2b180d033'),
+    description: tMetadata('m_7d4038ca4329'),
   },
 };
+}
 
 export default async function PropsPage() {
   const locale = await getLocale();

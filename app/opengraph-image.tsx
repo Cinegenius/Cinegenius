@@ -1,10 +1,13 @@
+import { getTranslations } from "next-intl/server";
 import { ImageResponse } from "next/og";
 
-export const alt = "CineGenius — Marktplatz für Film, Social Media & Fotografie";
+export const alt = "CineGenius";
+export const dynamic = "force-dynamic";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function Image() {
+export default async function Image() {
+  const t = await getTranslations();
   return new ImageResponse(
     (
       <div
@@ -110,7 +113,7 @@ export default function Image() {
                 letterSpacing: "-2px",
               }}
             >
-              Locations, Crew
+              {t("PageCopy.ogLine1")}
             </span>
             <div style={{ display: "flex" }}>
               <span
@@ -122,24 +125,24 @@ export default function Image() {
                   letterSpacing: "-2px",
                 }}
               >
-                &amp; Equipment
+                {t("PageCopy.ogLine2")}
               </span>
             </div>
           </div>
 
           {/* Subtitle */}
           <span style={{ fontSize: 26, color: "rgba(255,255,255,0.7)", fontWeight: 400 }}>
-            Der Marktplatz für Film, Social Media &amp; Fotografie im DACH-Raum.
+            {t("Metadata.m_6e2c107adcc8")}
           </span>
 
           {/* Category pills */}
           <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
             {[
-              { label: "Locations", color: "#C2F135" },
-              { label: "Filmcrew", color: "#00DCFF" },
-              { label: "Equipment", color: "#FF8C00" },
-              { label: "Jobs", color: "#DC32B4" },
-              { label: "Tiere", color: "#C2F135" },
+              { label: t("nav.locations"), color: "#C2F135" },
+              { label: t("nav.crew"), color: "#00DCFF" },
+              { label: t("companies.groupAusstattung"), color: "#FF8C00" },
+              { label: t("nav.jobs"), color: "#DC32B4" },
+              { label: t("Ui.text_d9609c949e931a"), color: "#C2F135" },
             ].map(({ label, color }) => (
               <div
                 key={label}

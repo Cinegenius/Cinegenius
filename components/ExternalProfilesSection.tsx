@@ -10,6 +10,8 @@ import {
   validatePlatformUrl,
   type ExternalProfileRow,
 } from "@/lib/external-platforms";
+import { useTranslations } from "next-intl";
+
 
 type FormState = {
   platform_type: string;
@@ -28,6 +30,8 @@ const EMPTY_FORM: FormState = {
 };
 
 export default function ExternalProfilesSection() {
+  const uiText = useTranslations();
+
   const { user } = useUser();
   const { addToast } = useToast();
 
@@ -77,7 +81,7 @@ export default function ExternalProfilesSection() {
 
   function handleUrlChange(url: string) {
     setForm((p) => ({ ...p, url }));
-    const warning = validatePlatformUrl(form.platform_type, url);
+    const warning = validatePlatformUrl(form.platform_type, url, uiText);
     setUrlWarning(warning && url.length > 5 ? warning : null);
   }
 
@@ -87,8 +91,8 @@ export default function ExternalProfilesSection() {
   }
 
   async function handleSubmit() {
-    if (!form.url.trim()) { setUrlWarning("URL ist Pflichtfeld"); return; }
-    const warning = validatePlatformUrl(form.platform_type, form.url);
+    if (!form.url.trim()) { setUrlWarning(uiText("Ui.text_0641f4c027ade1")); return; }
+    const warning = validatePlatformUrl(form.platform_type, form.url, uiText);
     if (warning) { setUrlWarning(warning); }
 
     setSaving(true);
@@ -100,9 +104,9 @@ export default function ExternalProfilesSection() {
           body: JSON.stringify(form),
         });
         const d = await res.json();
-        if (!res.ok) { addToast(d.error ?? "Fehler beim Aktualisieren", "error"); return; }
+        if (!res.ok) { addToast(d.error ?? uiText("Ui.text_75f37645bf5113"), "error"); return; }
         setEntries((prev) => prev.map((e) => (e.id === editingId ? { ...e, ...d.profile } : e)));
-        addToast("Profil aktualisiert", "success");
+        addToast(uiText("Ui.text_5d775bf5a863ad"), "success");
       } else {
         const res = await fetch("/api/external-profiles", {
           method: "POST",
@@ -110,9 +114,9 @@ export default function ExternalProfilesSection() {
           body: JSON.stringify({ ...form, sort_order: entries.length }),
         });
         const d = await res.json();
-        if (!res.ok) { addToast(d.error ?? "Fehler beim Speichern", "error"); return; }
+        if (!res.ok) { addToast(d.error ?? uiText("profile.savingError"), "error"); return; }
         setEntries((prev) => [...prev, d.profile]);
-        addToast("Profil hinzugefügt", "success");
+        addToast(uiText("Ui.text_ec0894f7529930"), "success");
       }
       cancelForm();
     } finally {
@@ -124,9 +128,9 @@ export default function ExternalProfilesSection() {
     setDeletingId(id);
     try {
       const res = await fetch(`/api/external-profiles/${id}`, { method: "DELETE" });
-      if (!res.ok) { addToast("Löschen fehlgeschlagen", "error"); return; }
+      if (!res.ok) { addToast(uiText("Ui.text_8ef5d06188f11f"), "error"); return; }
       setEntries((prev) => prev.filter((e) => e.id !== id));
-      addToast("Entfernt", "success");
+      addToast(uiText("Ui.text_d0124fb1d921d7"), "success");
     } finally {
       setDeletingId(null);
     }
@@ -155,9 +159,7 @@ export default function ExternalProfilesSection() {
 
   if (loading) {
     return (
-      <div className="p-6 bg-bg-secondary border border-border rounded-xl flex items-center gap-2 text-text-muted text-sm">
-        <Loader2 size={14} className="animate-spin" /> Lade externe Profile…
-      </div>
+      <div className="p-6 bg-bg-secondary border border-border rounded-xl flex items-center gap-2 text-text-muted text-sm">{uiText.rich("Ui.text_51a5f71565649f", { part1: () => (<Loader2 size={14} className="animate-spin" />) })}</div>
     );
   }
 
@@ -167,19 +169,15 @@ export default function ExternalProfilesSection() {
     <div className="p-6 bg-bg-secondary border border-border rounded-xl">
       <div className="flex items-start justify-between gap-4 mb-5">
         <div>
-          <h2 className="font-semibold text-text-primary mb-0.5">Externe Profile</h2>
-          <p className="text-xs text-text-muted">
-            Verlinke deine Profile auf anderen Plattformen. CineGenius speichert nur den Link — kein Import, kein Sync.
-          </p>
+          <h2 className="font-semibold text-text-primary mb-0.5">{uiText("Ui.text_08a9689d0d6b13")}</h2>
+          <p className="text-xs text-text-muted">{uiText("Ui.text_99b989a955aee6")}</p>
         </div>
         {!showForm && (
           <button
             type="button"
             onClick={openAdd}
             className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-gold/10 border border-gold/20 text-gold text-xs font-semibold rounded-lg hover:bg-gold/20 transition-colors"
-          >
-            <Plus size={13} /> Profil hinzufügen
-          </button>
+          >{uiText.rich("Ui.text_5be3eac5541b13", { part1: () => (<Plus size={13} />) })}</button>
         )}
       </div>
 
@@ -213,9 +211,7 @@ export default function ExternalProfilesSection() {
 
                 {/* Visibility badge */}
                 {!entry.is_public && (
-                  <span className="text-[9px] px-1.5 py-0.5 bg-bg-secondary border border-border text-text-muted rounded font-medium shrink-0">
-                    Privat
-                  </span>
+                  <span className="text-[9px] px-1.5 py-0.5 bg-bg-secondary border border-border text-text-muted rounded font-medium shrink-0">{uiText("Ui.text_ca2bb5f431f0ff")}</span>
                 )}
 
                 {/* Reorder */}
@@ -267,8 +263,8 @@ export default function ExternalProfilesSection() {
       {entries.length === 0 && !showForm && (
         <div className="py-8 text-center border border-dashed border-border rounded-xl mb-4">
           <ExternalLink size={20} className="text-text-muted mx-auto mb-2" />
-          <p className="text-sm text-text-muted">Noch keine externen Profile hinterlegt.</p>
-          <p className="text-xs text-text-muted mt-1">Klicke oben auf „Profil hinzufügen“.</p>
+          <p className="text-sm text-text-muted">{uiText("Ui.text_7db6e8794cc9da")}</p>
+          <p className="text-xs text-text-muted mt-1">{uiText("Ui.text_c7493a6e0e88c7")}</p>
         </div>
       )}
 
@@ -277,7 +273,7 @@ export default function ExternalProfilesSection() {
         <div className="p-4 bg-bg-elevated border border-gold/20 rounded-xl space-y-3">
           <div className="flex items-center justify-between mb-1">
             <p className="text-xs font-semibold text-gold uppercase tracking-widest">
-              {editingId ? "Profil bearbeiten" : "Neues externes Profil"}
+              {editingId ? uiText("Ui.text_4f2308fdddb262") : uiText("Ui.text_c5555a237e111b")}
             </p>
             <button type="button" onClick={cancelForm} className="text-text-muted hover:text-red-400 transition-colors">
               <X size={14} />
@@ -286,7 +282,7 @@ export default function ExternalProfilesSection() {
 
           {/* Platform select */}
           <div>
-            <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Plattform</label>
+            <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{uiText("Ui.text_cdf648878bc013")}</label>
             <select
               value={form.platform_type}
               onChange={(e) => handlePlatformChange(e.target.value)}
@@ -301,14 +297,12 @@ export default function ExternalProfilesSection() {
           {/* Custom name for "other" */}
           {form.platform_type === "other" && (
             <div>
-              <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">
-                Plattformname <span className="text-red-400">*</span>
-              </label>
+              <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{uiText.rich("Ui.text_9865f02c3a2e0e", { part1: chunks => (<span className="text-red-400">{chunks}</span>) })}</label>
               <input
                 type="text"
                 value={form.platform_name}
                 onChange={(e) => setForm((p) => ({ ...p, platform_name: e.target.value }))}
-                placeholder="z. B. Casting Network"
+                placeholder={uiText("Ui.text_1bafb29988bdab")}
                 className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold transition-colors"
               />
             </div>
@@ -316,9 +310,7 @@ export default function ExternalProfilesSection() {
 
           {/* URL */}
           <div>
-            <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">
-              URL <span className="text-red-400">*</span>
-            </label>
+            <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{uiText.rich("Ui.text_77a5b810ea42e8", { part1: chunks => (<span className="text-red-400">{chunks}</span>) })}</label>
             <input
               type="url"
               value={form.url}
@@ -342,14 +334,12 @@ export default function ExternalProfilesSection() {
 
           {/* Optional: custom label */}
           <div>
-            <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">
-              Kurzbezeichnung <span className="text-text-muted normal-case font-normal">(optional)</span>
-            </label>
+            <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{uiText.rich("Ui.text_899fe8dd951e8c", { part1: chunks => (<span className="text-text-muted normal-case font-normal">{chunks}</span>) })}</label>
             <input
               type="text"
               value={form.custom_label}
               onChange={(e) => setForm((p) => ({ ...p, custom_label: e.target.value }))}
-              placeholder="z. B. Regie-Profil, Demo Reel…"
+              placeholder={uiText("Ui.text_c2ee6167225bfd")}
               className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold transition-colors"
             />
           </div>
@@ -365,7 +355,7 @@ export default function ExternalProfilesSection() {
                 style={{ left: form.is_public ? "calc(100% - 18px)" : "2px" }}
               />
             </div>
-            <span className="text-xs text-text-secondary">Öffentlich sichtbar</span>
+            <span className="text-xs text-text-secondary">{uiText("Ui.text_619da8b57abb8c")}</span>
           </label>
 
           {/* Submit */}
@@ -376,8 +366,8 @@ export default function ExternalProfilesSection() {
             className="w-full py-2.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {saving
-              ? <><Loader2 size={13} className="animate-spin" /> Speichern…</>
-              : editingId ? "Änderungen speichern" : "Profil hinzufügen"}
+              ? <>{uiText.rich("Ui.text_ee62764341b743", { part1: () => (<Loader2 size={13} className="animate-spin" />) })}</>
+              : editingId ? uiText("profile.saveChanges") : uiText("Ui.text_dbdc8d1addd1d9")}
           </button>
         </div>
       )}
@@ -388,9 +378,7 @@ export default function ExternalProfilesSection() {
           type="button"
           onClick={openAdd}
           className="w-full mt-1 py-2 border border-dashed border-border rounded-lg text-xs text-text-muted hover:border-gold/40 hover:text-gold transition-colors flex items-center justify-center gap-1.5"
-        >
-          <Plus size={12} /> Weiteres Profil hinzufügen
-        </button>
+        >{uiText.rich("Ui.text_3c05dc2c897027", { part1: () => (<Plus size={12} />) })}</button>
       )}
     </div>
   );

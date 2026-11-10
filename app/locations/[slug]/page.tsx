@@ -1,4 +1,5 @@
-import {getLocale} from "next-intl/server";
+import { getTranslations as getPageTranslations } from "next-intl/server";
+import {getLocale, getTranslations } from "next-intl/server";
 import {placeReadFields} from "@/lib/places/catalog";
 import {placeDisplay} from "@/lib/places/core";
 import { canEditListing } from "@/lib/listing-access";
@@ -28,6 +29,7 @@ async function geocodeCity(city: string): Promise<{ lat: number; lng: number }> 
 }
 
 async function getLocation(slug: string, viewerId: string | null = null) {
+  const modelText = await getTranslations();
   const { data, error } = await db
     .from("listings")
     .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, user_id, company_id, type, category, title, city, price, created_at, image_url, description, metadata, blocked_dates, floor_plan_url, extra_images, responsible_person, published")
@@ -61,7 +63,7 @@ async function getLocation(slug: string, viewerId: string | null = null) {
 
   return {
       id: data.id,
-      title: data.title ?? "Location",
+      title: data.title ?? modelText("profile.labelLocation"),
       type: data.category ?? "Speziallocation",
       city: data.city ?? "",
       ...placeReadFields(data.city ?? "",data),
@@ -97,6 +99,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
+  const pageCopy = await getPageTranslations("PageCopy");
   const { slug } = await params;
   const { userId } = await auth();
   const location = await getLocation(slug, userId);
@@ -104,10 +107,10 @@ export async function generateMetadata({
   return {
     alternates: { canonical: `https://www.cinegenius.co/locations/${encodeURIComponent(slug)}` },
     title: location.title,
-    description: `${location.type} in ${location.city} — ${listingPriceLabel(location.price,location.metadata)}.`,
+    description: pageCopy("p_83ce29d3bb77", { value0: String(location.type), value1: String(location.city), value2: String(listingPriceLabel(location.price,location.metadata)) }),
     openGraph: {
       title: `${location.title} | CineGenius`,
-      description: `${location.type} in ${location.city} — jetzt für Film & Foto buchen.`,
+      description: pageCopy("p_43df4d09a584", { value0: String(location.type), value1: String(location.city) }),
       ...(location.image ? { images: [{ url: location.image, width: 800, height: 600, alt: location.title }] } : {}),
     },
   };
@@ -118,6 +121,9 @@ export default async function LocationPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  const pageCopy = await getPageTranslations("PageCopy");
+  const uiText = await getTranslations();
+
   const { slug } = await params;
   const location = await getLocation(slug);
   if (!location) notFound();
@@ -128,7 +134,7 @@ export default async function LocationPage({
     "@context": "https://schema.org",
     "@type": "Place",
     "name": location.title,
-    "description": ("description" in location && location.description) ? String(location.description) : `${location.type} in ${location.city}`,
+    "description": ("description" in location && location.description) ? String(location.description) : pageCopy("p_8e5a60352562", { value0: String(location.type), value1: String(location.city) }),
     "address": {
       "@type": "PostalAddress",
       "addressLocality": location.city,

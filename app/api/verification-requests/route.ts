@@ -2,9 +2,11 @@ import { db } from "@/lib/db";
 import { requireAuth, isAdminSession } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { finishAdminAudit, startAdminAudit, validateAdminReason } from "@/lib/admin-audit";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // GET /api/verification-requests — user: own status | admin: all requests
 export async function GET(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -20,7 +22,7 @@ export async function GET(req: NextRequest) {
       .select("id, user_id, display_name, status, notes, submitted_at, reviewed_at", { count: "exact" })
       .order("submitted_at", { ascending: false })
       .range((page - 1) * pageSize, page * pageSize - 1);
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
     return NextResponse.json({ data: (data ?? []).slice(0, pageSize), total: count ?? 0, page });
   }
 
@@ -37,6 +39,7 @@ export async function GET(req: NextRequest) {
 
 // POST /api/verification-requests — user submits verification request
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -51,7 +54,7 @@ export async function POST(req: NextRequest) {
 
   if (existing) {
     return NextResponse.json(
-      { error: existing.status === "approved" ? "Bereits verifiziert" : "Bereits eine Anfrage gestellt" },
+      { error: existing.status === "approved" ? tResponse("System.verificationAlreadyVerified") : tResponse("System.verificationAlreadyRequested") },
       { status: 400 }
     );
   }
@@ -79,29 +82,30 @@ export async function POST(req: NextRequest) {
     .select("id")
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   return NextResponse.json({ id: data.id });
 }
 
 // PATCH /api/verification-requests — admin approves or rejects
 export async function PATCH(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
   const isAdmin = await isAdminSession();
-  if (!isAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!isAdmin) return NextResponse.json({ error: tResponse('System.m_78342a0905a7') }, { status: 403 });
 
   const body = await req.json().catch(() => null);
   const { requestId, action } = body ?? {};
   const reason = validateAdminReason(body?.reason);
   if (typeof requestId !== "string" || !requestId || !["approve", "reject"].includes(action) || !reason) {
-    return NextResponse.json({ error: "Anfrage, Aktion und eine Begründung (5–500 Zeichen) sind erforderlich." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_ed34158bbb16') }, { status: 400 });
   }
 
   const status = action === "approve" ? "approved" : "rejected";
   const audit = await startAdminAudit({ actorUserId: userId, action: `verification_${status}`, entityType: "verification_request", entityId: requestId, reason });
-  if (!audit) return NextResponse.json({ error: "Aktion aus Sicherheitsgründen gestoppt: Das Adminprotokoll ist nicht verfügbar." }, { status: 503 });
+  if (!audit) return NextResponse.json({ error: tResponse('System.m_8f517d75e467') }, { status: 503 });
 
   const { data: request, error: requestError } = await db
     .from("verification_requests")
@@ -110,8 +114,8 @@ export async function PATCH(req: NextRequest) {
     .select("user_id")
     .single();
 
-  if (requestError) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Die Anfrage konnte nicht aktualisiert werden." }, { status: 500 }); }
-  if (!request) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Anfrage nicht gefunden." }, { status: 404 }); }
+  if (requestError) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.m_a0e4100091ef') }, { status: 500 }); }
+  if (!request) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.m_ba71c66d1bd2') }, { status: 404 }); }
 
   // If approved, set verified on profile
   if (action === "approve") {
@@ -119,7 +123,7 @@ export async function PATCH(req: NextRequest) {
       .from("profiles")
       .update({ verified: true })
       .eq("user_id", request.user_id);
-    if (profileError) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Anfrage wurde aktualisiert, aber das Profil konnte nicht verifiziert werden. Bitte Status prüfen." }, { status: 500 }); }
+    if (profileError) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.m_b2cc66b881e5') }, { status: 500 }); }
   }
 
   const auditLogged = await finishAdminAudit(audit, "succeeded");

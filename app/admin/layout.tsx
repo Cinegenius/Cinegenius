@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { isAdminSession } from "@/lib/requireAdmin";
+import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Admin",
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const tMetadata = await getMetadataTranslations("Metadata");
+  return {
+  title: tMetadata('m_c1c224b03cd9'),
   robots: { index: false, follow: false },
 };
+}
 
 /**
  * Server-side layout guard for all /admin pages.

@@ -2,15 +2,17 @@ import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/guards";
 import { NextRequest, NextResponse } from "next/server";
 import { finishAdminAudit, startAdminAudit, validateAdminReason } from "@/lib/admin-audit";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // GET /api/admin/project-credits?project_id=xxx
 export async function GET(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const adminResult = await requireAdmin();
   if (adminResult instanceof NextResponse) return adminResult;
 
   const { searchParams } = new URL(req.url);
   const project_id = searchParams.get("project_id");
-  if (!project_id) return NextResponse.json({ error: "project_id fehlt" }, { status: 400 });
+  if (!project_id) return NextResponse.json({ error: tResponse('System.m_87e6682e9396') }, { status: 400 });
   const page = Math.max(1, Number.parseInt(searchParams.get("page") ?? "1", 10) || 1);
   const pageSize = 50;
 
@@ -21,7 +23,7 @@ export async function GET(req: NextRequest) {
     .order("created_at", { ascending: true })
     .range((page - 1) * pageSize, page * pageSize - 1);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
   const rawCredits = credits ?? [];
   const userIds = rawCredits.filter((c: { user_id: string | null }) => c.user_id).map((c: { user_id: string }) => c.user_id);
@@ -51,17 +53,18 @@ export async function GET(req: NextRequest) {
 
 // PATCH /api/admin/project-credits — update role
 export async function PATCH(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const adminResult = await requireAdmin();
   if (adminResult instanceof NextResponse) return adminResult;
 
   const body = await req.json().catch(() => null);
   const reason = validateAdminReason(body?.reason);
   if (typeof body?.id !== "string" || !body.id || typeof body?.role !== "string" || !body.role.trim() || !reason) {
-    return NextResponse.json({ error: "ID, Funktion und eine Begründung (5–500 Zeichen) sind erforderlich." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_873c676e08b2') }, { status: 400 });
   }
 
   const audit = await startAdminAudit({ actorUserId: adminResult.userId, action: "project_credit_role_change", entityType: "project_credit", entityId: body.id, reason });
-  if (!audit) return NextResponse.json({ error: "Aktion aus Sicherheitsgründen gestoppt: Das Adminprotokoll ist nicht verfügbar." }, { status: 503 });
+  if (!audit) return NextResponse.json({ error: tResponse('System.m_8f517d75e467') }, { status: 503 });
   const { data, error } = await db
     .from("project_credits")
     .update({ role: body.role.trim() })
@@ -69,27 +72,28 @@ export async function PATCH(req: NextRequest) {
     .select("id, project_id")
     .maybeSingle();
 
-  if (error) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: error.message }, { status: 500 }); }
-  if (!data) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Crewzuordnung nicht gefunden." }, { status: 404 }); }
+  if (error) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 }); }
+  if (!data) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.m_354c9ab622c4') }, { status: 404 }); }
   const auditLogged = await finishAdminAudit(audit, "succeeded");
   return NextResponse.json({ success: true, auditLogged });
 }
 
 // DELETE /api/admin/project-credits?id=xxx
 export async function DELETE(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const adminResult = await requireAdmin();
   if (adminResult instanceof NextResponse) return adminResult;
 
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
   const reason = validateAdminReason(searchParams.get("reason"));
-  if (!id || !reason || searchParams.get("confirm") !== "true") return NextResponse.json({ error: "ID, Begründung und ausdrückliche Bestätigung erforderlich." }, { status: 400 });
+  if (!id || !reason || searchParams.get("confirm") !== "true") return NextResponse.json({ error: tResponse('System.m_d4c7e54689f9') }, { status: 400 });
 
   const audit = await startAdminAudit({ actorUserId: adminResult.userId, action: "project_credit_delete", entityType: "project_credit", entityId: id, reason });
-  if (!audit) return NextResponse.json({ error: "Aktion aus Sicherheitsgründen gestoppt: Das Adminprotokoll ist nicht verfügbar." }, { status: 503 });
+  if (!audit) return NextResponse.json({ error: tResponse('System.m_8f517d75e467') }, { status: 503 });
   const { data, error } = await db.from("project_credits").delete().eq("id", id).select("id").maybeSingle();
-  if (error) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: error.message }, { status: 500 }); }
-  if (!data) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: "Crewzuordnung nicht gefunden." }, { status: 404 }); }
+  if (error) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 }); }
+  if (!data) { await finishAdminAudit(audit, "failed"); return NextResponse.json({ error: tResponse('System.m_354c9ab622c4') }, { status: 404 }); }
   const auditLogged = await finishAdminAudit(audit, "succeeded");
   return NextResponse.json({ success: true, auditLogged });
 }

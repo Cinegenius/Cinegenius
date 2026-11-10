@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 const TYPES = new Set(["profiles", "companies", "listings", "projects"]);
 const toUrls = (value: unknown): string[] => {
@@ -17,11 +18,12 @@ const toUrls = (value: unknown): string[] => {
 };
 
 export async function GET(request: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const admin = await requireAdmin();
   if (admin instanceof NextResponse) return admin;
   const params = request.nextUrl.searchParams;
   const type = params.get("type") ?? "profiles";
-  if (!TYPES.has(type)) return NextResponse.json({ error: "Ungültige Medienquelle." }, { status: 400 });
+  if (!TYPES.has(type)) return NextResponse.json({ error: tResponse('System.m_80da9c2651b6') }, { status: 400 });
   const page = Math.max(1, Number.parseInt(params.get("page") ?? "1", 10) || 1);
   const pageSize = 25;
   const range = [(page - 1) * pageSize, page * pageSize - 1] as const;
@@ -33,7 +35,7 @@ export async function GET(request: NextRequest) {
   else query = db.from("projects").select("id, title, poster_url, images, updated_at", { count: "exact" }).order("updated_at", { ascending: false }).range(...range);
 
   const { data, error, count } = await query;
-  if (error) return NextResponse.json({ error: "Medienverweise konnten nicht geladen werden." }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.m_7ed1e3febb9c') }, { status: 500 });
   const entities = (data ?? []).map((record: Record<string, unknown>) => {
     const id = String(record.id ?? record.user_id ?? "");
     const title = String(record.display_name ?? record.name ?? record.title ?? "Ohne Bezeichnung");

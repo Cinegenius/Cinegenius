@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import {
   Clapperboard, UserRound, Loader2, Check, ArrowLeft, ShieldAlert, Film,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
+
 
 const PROJECT_TYPE_NORMALIZE: Record<string, string> = {
   "Werbefilm / Commercial": "Werbefilm",
@@ -52,6 +54,8 @@ export default function PersonView({
   credits: Credit[];
   isSignedIn: boolean;
 }) {
+  const uiText = useTranslations();
+
   const router = useRouter();
   const [claiming, setClaiming] = useState(false);
   const [claimError, setClaimError] = useState("");
@@ -63,7 +67,7 @@ export default function PersonView({
     try {
       const res = await fetch(`/api/unclaimed-profiles/${profile.slug}/claim`, { method: "POST" });
       const json = await res.json();
-      if (!res.ok) { setClaimError(json.error ?? "Fehler beim Übernehmen"); return; }
+      if (!res.ok) { setClaimError(json.error ?? uiText("Ui.text_f84c843b1893d2")); return; }
       setClaimed(true);
       setTimeout(() => router.push("/dashboard"), 1500);
     } finally {
@@ -75,18 +79,14 @@ export default function PersonView({
     <div className="pt-16 min-h-screen bg-bg-primary">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
 
-        <Link href="/projects" className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-gold transition-colors mb-8">
-          <ArrowLeft size={14} /> Projekte
-        </Link>
+        <Link href="/projects" className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-gold transition-colors mb-8">{uiText.rich("Ui.text_45f48c2ceb22a9", { part1: () => (<ArrowLeft size={14} />) })}</Link>
 
         {/* Claim banner */}
         {isSignedIn && !claimed && (
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center gap-4 p-5 rounded-2xl border border-gold/30 bg-gold/5">
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-text-primary mb-0.5">Das bist du?</p>
-              <p className="text-sm text-text-muted">
-                Wenn du {profile.name} bist, kannst du dieses Profil übernehmen. Alle eingetragenen Projekte werden dann mit deinem Konto verknüpft.
-              </p>
+              <p className="font-semibold text-text-primary mb-0.5">{uiText("Ui.text_d6f21a5bbf2ba7")}</p>
+              <p className="text-sm text-text-muted">{uiText.rich("Ui.text_fe7a112045b017", { value1: () => (profile.name) })}</p>
               {claimError && <p className="text-xs text-red-400 mt-2">{claimError}</p>}
             </div>
             <button
@@ -95,7 +95,7 @@ export default function PersonView({
               className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary font-semibold rounded-xl hover:bg-gold-light transition-colors disabled:opacity-50 text-sm"
             >
               {claiming ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-              {claiming ? "Wird übernommen…" : "Profil übernehmen"}
+              {claiming ? uiText("Ui.text_b76aa89b84f5a4") : uiText("Ui.text_43be13e6fd9ab2")}
             </button>
           </div>
         )}
@@ -104,8 +104,8 @@ export default function PersonView({
           <div className="mb-8 flex items-center gap-3 p-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/5">
             <Check size={18} className="text-emerald-400 shrink-0" />
             <div>
-              <p className="font-semibold text-text-primary">Profil übernommen!</p>
-              <p className="text-sm text-text-muted">Du wirst zu deinem Dashboard weitergeleitet…</p>
+              <p className="font-semibold text-text-primary">{uiText("Ui.text_3851b00993a6db")}</p>
+              <p className="text-sm text-text-muted">{uiText("Ui.text_f976c85a155a01")}</p>
             </div>
           </div>
         )}
@@ -113,9 +113,7 @@ export default function PersonView({
         {!isSignedIn && (
           <div className="mb-8 flex items-center gap-3 p-4 rounded-2xl border border-border bg-bg-secondary">
             <ShieldAlert size={16} className="text-text-muted shrink-0" />
-            <p className="text-sm text-text-muted">
-              <Link href="/sign-in" className="text-gold hover:underline">Melde dich an</Link>, um dieses Profil zu übernehmen, falls du {profile.name} bist.
-            </p>
+            <p className="text-sm text-text-muted">{uiText.rich("Ui.text_f9c788da5540e2", { part1: chunks => (<Link href="/sign-in" className="text-gold hover:underline">{chunks}</Link>), value2: () => (profile.name) })}</p>
           </div>
         )}
 
@@ -131,9 +129,7 @@ export default function PersonView({
           <div className="flex-1 min-w-0 pt-1">
             <div className="flex items-center gap-2 flex-wrap mb-1">
               <h1 className="font-display text-2xl font-bold text-text-primary">{profile.name}</h1>
-              <span className="text-[10px] uppercase tracking-widest font-semibold px-2 py-0.5 rounded-full border border-border text-text-muted bg-bg-secondary">
-                nicht registriert
-              </span>
+              <span className="text-[10px] uppercase tracking-widest font-semibold px-2 py-0.5 rounded-full border border-border text-text-muted bg-bg-secondary">{uiText("Ui.text_dfb13797d10629")}</span>
             </div>
             {profile.primary_role && (
               <p className="text-sm text-text-muted mb-2">{profile.primary_role}</p>
@@ -146,12 +142,10 @@ export default function PersonView({
 
         {/* Projects */}
         <div>
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-4 flex items-center gap-2">
-            <Film size={12} /> Filmografie ({credits.length})
-          </h2>
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-4 flex items-center gap-2">{uiText.rich("Ui.text_7969fd570aa19d", { part1: () => (<Film size={12} />), value2: () => (credits.length) })}</h2>
 
           {credits.length === 0 ? (
-            <p className="text-sm text-text-muted">Noch keine Projekte eingetragen.</p>
+            <p className="text-sm text-text-muted">{uiText("Ui.text_c413cecb91c128")}</p>
           ) : (
             <div className="space-y-3">
               {credits.map((credit) => {

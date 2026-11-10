@@ -1,3 +1,4 @@
+import { localizedNotification } from "@/lib/i18n/notification-copy";
 // Required Supabase columns (add via migration before activating Stripe):
 //
 // ALTER TABLE bookings
@@ -15,27 +16,29 @@ import { sendNewBookingEmail, sendBookingConfirmedEmail } from "@/lib/email";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // Stripe sends the raw body — do NOT use req.json() here.
 // Next.js would re-encode it and the signature check would fail.
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const body = await req.text();
   const sig  = req.headers.get("stripe-signature");
 
   if (!sig) {
-    return NextResponse.json({ error: "Missing stripe-signature header" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_c27b71519783') }, { status: 400 });
   }
 
   if (!process.env.STRIPE_WEBHOOK_SECRET) {
     console.error("STRIPE_WEBHOOK_SECRET is not set");
-    return NextResponse.json({ error: "Webhook not configured" }, { status: 500 });
+    return NextResponse.json({ error: tResponse('System.m_f84dead010d0') }, { status: 500 });
   }
 
   let event: Stripe.Event;
   try {
     event = getStripe().webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch {
-    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_97b096319f1c') }, { status: 400 });
   }
 
   // Idempotency: skip events already processed
@@ -96,8 +99,8 @@ export async function POST(req: NextRequest) {
               await db.from("notifications").insert({
                 user_id: booking.user_id,
                 type: "booking_confirmed",
-                title: `Buchung bestätigt: ${listingTitle}`,
-                body: `Deine Zahlung wurde erfolgreich verarbeitet. Buchungsreferenz: ${bookingRef}`,
+                ...localizedNotification({ title: { key: "n_6b646322a8ed", values: { value0: String(listingTitle) } }, body: { key: "n_7f78c535de22", values: { value0: String(bookingRef) } } }),
+
                 href: `/dashboard?tab=bookings`,
               });
 
@@ -106,8 +109,8 @@ export async function POST(req: NextRequest) {
                 await db.from("notifications").insert({
                   user_id: hostUserId,
                   type: "booking_request",
-                  title: `Neue Buchung: ${listingTitle}`,
-                  body: `${guestName} hat dein Inserat für ${booking.days ?? 1} Tag(e) gebucht.`,
+                  ...localizedNotification({ title: { key: "n_21cfb1603af9", values: { value0: String(listingTitle) } }, body: { key: "n_35bffb78df4b", values: { value0: String(guestName), value1: Number(booking.days ?? 1) } } }),
+
                   href: `/dashboard?tab=bookings`,
                 });
               }

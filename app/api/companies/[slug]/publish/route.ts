@@ -3,8 +3,10 @@ import { db } from "@/lib/db";
 import { assertOwner, requireAuth } from "@/lib/guards";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 export async function POST(_request: Request, context: { params: Promise<{ slug: string }> }) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { slug } = await context.params;
@@ -12,9 +14,9 @@ export async function POST(_request: Request, context: { params: Promise<{ slug:
     .select("id, owner_user_id, published, responsible_person")
     .eq("slug", slug)
     .maybeSingle();
-  if (lookupError) return NextResponse.json({ error: "Das Firmenprofil konnte nicht geladen werden." }, { status: 500 });
-  if (!company) return NextResponse.json({ error: "Firmenprofil nicht gefunden." }, { status: 404 });
-  const ownershipError = assertOwner(company.owner_user_id, authResult.userId);
+  if (lookupError) return NextResponse.json({ error: tResponse('System.m_20679d4c9cd8') }, { status: 500 });
+  if (!company) return NextResponse.json({ error: tResponse('System.m_7e6b04921076') }, { status: 404 });
+  const ownershipError = assertOwner(company.owner_user_id, authResult.userId, tResponse);
   if (ownershipError) return ownershipError;
   if (company.published) return NextResponse.json({ published: true, alreadyPublished: true });
 
@@ -22,7 +24,7 @@ export async function POST(_request: Request, context: { params: Promise<{ slug:
   if (responsible.response) return responsible.response;
   const { error } = await db.from("companies").update({ responsible_person: responsible.person, published: true, updated_at: new Date().toISOString() })
     .eq("id", company.id).eq("owner_user_id", authResult.userId).eq("published", false);
-  if (error) return NextResponse.json({ error: "Das Firmenprofil konnte nicht veröffentlicht werden." }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.m_1302ae17c108') }, { status: 500 });
   revalidateTag("companies", { expire: 0 });
   revalidateTag("profiles", { expire: 0 });
   revalidatePath("/");

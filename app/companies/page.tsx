@@ -4,17 +4,21 @@ import { db } from "@/lib/db";
 import CompaniesContent from "./CompaniesContent";
 import PageHeader from "@/components/PageHeader";
 import { getTranslations, getLocale } from "next-intl/server";
+import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const tMetadata = await getMetadataTranslations("Metadata");
+  return {
   alternates: { canonical: "https://www.cinegenius.co/companies" },
-  title: "Firmenverzeichnis — Verleiher, Studios & Agenturen",
-  description: "Alle Dienstleister der Filmbranche: Lichtverleih, Kameraverleih, Tonstudios, Postproduktion, Casting-Agenturen, VFX-Studios und mehr im DACH-Raum.",
-  keywords: ["Filmdienstleister", "Kameraverleih Deutschland", "Lichtverleih München", "Tonstudio mieten", "Postproduktion Firma", "Casting Agentur Deutschland"],
+  title: tMetadata('m_cc80fbf924d3'),
+  description: tMetadata('m_1b2ce26676e9'),
+  keywords: [tMetadata('m_35e0b9cc4343'), tMetadata('m_3f3c21f3b5ce'), tMetadata('m_361f572abb14'), tMetadata('m_ffe45f73aa12'), tMetadata('m_1b5f6ec47e09'), tMetadata('m_c9e8ac833195')],
   openGraph: {
-    title: "Firmenverzeichnis — Dienstleister für Film & Medien",
-    description: "Verleiher, Studios, Agenturen — alle Filmdienstleister auf einen Blick.",
+    title: tMetadata('m_5ae3e68f520c'),
+    description: tMetadata('m_e27ac870c83e'),
   },
 };
+}
 
 export const revalidate = 60;
 

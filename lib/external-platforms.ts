@@ -110,20 +110,20 @@ export function getPlatform(type: string): ExternalPlatform {
  * Returns a warning string if the URL doesn't match the expected platform domain.
  * Returns null if OK.
  */
-export function validatePlatformUrl(platformType: string, url: string): string | null {
-  if (!url.trim()) return "URL ist Pflichtfeld";
+export function validatePlatformUrl(platformType: string, url: string, translate?: (key: string, values?: Record<string, string>) => string): string | null {
+  if (!url.trim()) return translate ? translate("Ui.text_0641f4c027ade1") : "URL ist Pflichtfeld";
   let parsed: URL;
   try {
     parsed = new URL(url.trim().startsWith("http") ? url.trim() : `https://${url.trim()}`);
   } catch {
-    return "Keine gültige URL (z. B. https://...)";
+    return translate ? translate("System.urlInvalid") : "Keine gültige URL (z. B. https://...)";
   }
   const platform = getPlatform(platformType);
   if (!platform.urlHints.length) return null;
   const host = parsed.hostname.replace(/^www\./, "");
   const matches = platform.urlHints.some((hint) => host.endsWith(hint) || host === hint);
   if (!matches) {
-    return `Diese URL sieht nicht nach ${platform.name} aus (erwartet: ${platform.urlHints[0]})`;
+    return translate ? translate("System.urlPlatformMismatch", { platform: platform.name, domain: platform.urlHints[0] }) : `Diese URL sieht nicht nach ${platform.name} aus (erwartet: ${platform.urlHints[0]})`;
   }
   return null;
 }

@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
-import { departments, deptColors, getDeptLabel, getOccupationSearchTerms, getDepartmentRoleSearchTerms, getDepartmentRoleLabel, type Department } from "@/lib/departments";
+import { departments, deptColors, getDeptLabel, getOccupationSearchTerms, getDepartmentRoleSearchTerms, getDepartmentRoleLabel, type Department , taxonomyLabel } from "@/lib/departments";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 import { rankByRatingConfidence } from "@/lib/rating-ranking";
 import { gripSearchTerms, isGripDepartmentSearch, isGripOccupation, normalizeOccupation } from "@/lib/gripTaxonomy";
@@ -70,6 +70,7 @@ export type ServerCreator = {
   rating: number;
   reviews: number;
   dayRate: string;
+  dayRateOnRequest?: boolean;
   available: boolean;
   credits: string[];
   skills: string[];
@@ -178,6 +179,8 @@ function FilterDropdown({
 }
 
 function SortDropdown({ value, options, onChange }: { value: string; options: { value: string; label: string }[]; onChange: (v: string) => void }) {
+  const uiText = useTranslations();
+
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -186,7 +189,7 @@ function SortDropdown({ value, options, onChange }: { value: string; options: { 
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
-  const label = options.find((o) => o.value === value)?.label ?? "Sortierung";
+  const label = options.find((o) => o.value === value)?.label ?? uiText("creators.sort");
   return (
     <div ref={ref} className="relative shrink-0">
       <button onClick={() => setOpen((v) => !v)} className="flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border border-border text-text-muted hover:text-text-secondary transition-all bg-bg-elevated">
@@ -223,6 +226,10 @@ function RolePanel({
   onClose: () => void;
   locale: string;
 }) {
+  const taxonomyText = useTranslations("Taxonomy");
+
+  const uiText = useTranslations();
+
   const t = useTranslations("creators");
   const animals = useTranslations("FilmAnimals");
   const [search, setSearch] = useState("");
@@ -238,8 +245,8 @@ function RolePanel({
   const visible = useMemo(() => {
     if (!search.trim()) return deptRoles;
     const q = search.toLowerCase();
-    return deptRoles.filter((r) => getDepartmentRoleSearchTerms(dept, r).some(term => term.toLowerCase().includes(q)));
-  }, [deptRoles, search, dept]);
+    return deptRoles.filter((r) => getDepartmentRoleSearchTerms(dept, r).some(term => term.toLowerCase().includes(q)) || getDepartmentRoleLabel(dept.id, r, locale, animals, taxonomyText).toLowerCase().includes(q));
+  }, [deptRoles, search, dept, locale, animals, taxonomyText]);
 
   const selectedCount = deptRoles.filter((r) => selectedRoles.has(occupationId(dept.id, r))).length;
 
@@ -248,7 +255,7 @@ function RolePanel({
       {/* Header */}
       <div className={`flex items-center justify-between pb-2 mb-2 border-b border-border/60`}>
         <div className="flex items-center gap-2">
-          <span className={`text-xs font-semibold ${colors.text}`}>{getDeptLabel(dept, locale, animals)}</span>
+          <span className={`text-xs font-semibold ${colors.text}`}>{getDeptLabel(dept, locale, animals, taxonomyText)}</span>
           <span className="text-[11px] text-text-muted">{t("deptRoles", { count: deptRoles.length })}</span>
           {selectedCount > 0 && (
             <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${colors.bg} ${colors.border} border ${colors.text}`}>
@@ -256,7 +263,7 @@ function RolePanel({
             </span>
           )}
         </div>
-        <button aria-label="Berufsauswahl schließen" onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors p-0.5 rounded hover:bg-white/5">
+        <button aria-label={uiText("Ui.text_0245e5d1d7c111")} onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors p-0.5 rounded hover:bg-white/5">
           <X size={13} />
         </button>
       </div>
@@ -300,7 +307,7 @@ function RolePanel({
                     {active && <div className="w-1.5 h-1.5 rounded-sm bg-current" />}
                   </div>
                   <input type="checkbox" checked={active} onChange={() => onToggle(occupationId(dept.id, role))} className="sr-only" />
-                  <span className="text-[11px] leading-snug">{getDepartmentRoleLabel(dept.id, role, locale, animals)}</span>
+                  <span className="text-[11px] leading-snug">{getDepartmentRoleLabel(dept.id, role, locale, animals, taxonomyText)}</span>
                 </label>
               );
             })}
@@ -322,6 +329,10 @@ function CreatorsInner({
   hasMoreProfiles?: boolean;
   initialFilters: { query: string; city: string; sort: string };
 }) {
+  const taxonomyText = useTranslations("Taxonomy");
+
+  const uiText = useTranslations();
+
   const tc = useTranslations("common");
   const t = useTranslations("creators");
   const profileText = useTranslations("profile");
@@ -366,7 +377,7 @@ function CreatorsInner({
     setLoadingMore(true);
     try {
       const res = await fetch(`/api/creators?page=${apiPage}`);
-      if (!res.ok) throw new Error("Profile konnten nicht geladen werden.");
+      if (!res.ok) throw new Error(uiText("Ui.text_3246f5de17bad7"));
       const { creators, hasMore } = await res.json();
       if (creators?.length) {
         setAllCreators(prev => [...new Map([...prev.filter(creator => !creator.id.startsWith("listing_") || !creators.some((profile: ServerCreator) => profile.id === creator.ownerId)), ...creators].map(creator => [creator.id, creator])).values()]);
@@ -433,15 +444,8 @@ function CreatorsInner({
   const eyeLabel = (value: string) => profileTraitLabel("eyes", value, profileText);
   const bodyLabel = (value: string) => profileTraitLabel("body", value, profileText);
 
-  const PROFILE_TYPE_LABELS: Record<string, Record<string, string>> = {
-    de: { actor:"Schauspieler/in", model:"Model", extra:"Komparse/in", host:"Moderator/in", dancer:"Tänzer/in", stunt:"Stunt Performer", voiceover:"Synchronsprecher/in", creator:"Creator", camera:"Kamera", lighting:"Licht", sound:"Ton", director_of_photography:"DoP", director:"Regie", production:"Produktion", makeup:"Maske", costume:"Kostüm", postproduction:"Postproduktion", vfx:"VFX", sfx:"SFX", art_department:"Szenenbild", broadcast:"Broadcast", filmmaker:"Regisseur/in", writer:"Autor/in", photographer:"Fotograf/in", editor:"Editor/in", motion_designer:"Motion Designer", art_director:"Art Director", location:"Location", equipment:"Equipment", vehicle:"Fahrzeuge", studio:"Studio", props:"Requisiten" },
-    en: { actor:"Actor/Actress", model:"Model", extra:"Extra", host:"Host", dancer:"Dancer", stunt:"Stunt Performer", voiceover:"Voice Over", creator:"Creator", camera:"Camera", lighting:"Lighting", sound:"Sound", director_of_photography:"DoP", director:"Director", production:"Production", makeup:"Make-up", costume:"Costume", postproduction:"Post-Production", vfx:"VFX", sfx:"SFX", art_department:"Art Department", broadcast:"Broadcast", filmmaker:"Filmmaker", writer:"Writer", photographer:"Photographer", editor:"Editor", motion_designer:"Motion Designer", art_director:"Art Director", location:"Location", equipment:"Equipment", vehicle:"Vehicles", studio:"Studio", props:"Props" },
-    es: { actor:"Actor/Actriz", model:"Modelo", extra:"Extra", host:"Presentador/a", dancer:"Bailarín/a", stunt:"Especialista", voiceover:"Actor/a de doblaje", creator:"Creador/a", camera:"Cámara", lighting:"Iluminación", sound:"Sonido", director_of_photography:"DoP", director:"Director/a", production:"Producción", makeup:"Maquillaje", costume:"Vestuario", postproduction:"Postproducción", vfx:"VFX", sfx:"SFX", art_department:"Arte", broadcast:"Broadcast", filmmaker:"Cineasta", writer:"Guionista", photographer:"Fotógrafo/a", editor:"Editor/a", motion_designer:"Motion Designer", art_director:"Dir. de Arte", location:"Locación", equipment:"Equipamiento", vehicle:"Vehículos", studio:"Estudio", props:"Atrezzo" },
-    it: { actor:"Attore/Attrice", model:"Modello/a", extra:"Comparsa", host:"Presentatore/trice", dancer:"Ballerino/a", stunt:"Stuntman/woman", voiceover:"Doppiatore/trice", creator:"Creator", camera:"Camera", lighting:"Illuminazione", sound:"Suono", director_of_photography:"DoP", director:"Regista", production:"Produzione", makeup:"Trucco", costume:"Costume", postproduction:"Post-Produzione", vfx:"VFX", sfx:"SFX", art_department:"Arte", broadcast:"Broadcast", filmmaker:"Cineasta", writer:"Sceneggiatore/trice", photographer:"Fotografo/a", editor:"Editor", motion_designer:"Motion Designer", art_director:"Art Director", location:"Location", equipment:"Attrezzatura", vehicle:"Veicoli", studio:"Studio", props:"Oggetti di scena" },
-    cs: { actor:"Herec/Herečka", model:"Model", extra:"Komparz", host:"Moderátor/ka", dancer:"Tanečník/ce", stunt:"Kaskadér/ka", voiceover:"Dabér/ka", creator:"Creator", camera:"Kamera", lighting:"Osvětlení", sound:"Zvuk", director_of_photography:"DoP", director:"Režisér/ka", production:"Produkce", makeup:"Masky", costume:"Kostýmy", postproduction:"Postprodukce", vfx:"VFX", sfx:"SFX", art_department:"Art oddělení", broadcast:"Broadcast", filmmaker:"Filmař/ka", writer:"Scenárista/ka", photographer:"Fotograf/ka", editor:"Editor/ka", motion_designer:"Motion Designer", art_director:"Art Director", location:"Lokace", equipment:"Vybavení", vehicle:"Vozidla", studio:"Studio", props:"Rekvizity" },
-    hu: { actor:"Színész/Színésznő", model:"Modell", extra:"Statiszta", host:"Műsorvezető", dancer:"Táncos/Táncosnő", stunt:"Kaszkadőr", voiceover:"Szinkronszínész/nő", creator:"Creator", camera:"Kamera", lighting:"Világítás", sound:"Hang", director_of_photography:"DoP", director:"Rendező", production:"Produkció", makeup:"Smink", costume:"Jelmez", postproduction:"Utómunka", vfx:"VFX", sfx:"SFX", art_department:"Díszlet", broadcast:"Broadcast", filmmaker:"Filmkészítő", writer:"Forgatókönyvíró", photographer:"Fotós", editor:"Vágó", motion_designer:"Motion Designer", art_director:"Art Director", location:"Helyszín", equipment:"Felszerelés", vehicle:"Járművek", studio:"Stúdió", props:"Kellékek" },
-  };
-  const PROFILE_TYPE_MAP = PROFILE_TYPE_LABELS[locale] ?? PROFILE_TYPE_LABELS.de;
+
+  const PROFILE_TYPE_MAP: Record<string, string> = { actor: uiText("menu.crewActors"), model: uiText("MarketplaceOffer.fields.model"), extra: uiText("Ui.text_7fb159238f13fa"), host: uiText("Ui.text_0a95f0e5c8dfe9"), dancer: uiText("Ui.text_edbf4c8ebb46d7"), stunt: uiText("Ui.text_b84275027d70dc"), voiceover: uiText("Ui.text_ecd65813175a41"), creator: uiText("Ui.text_88447b83090cde"), camera: uiText("menu.crewCamera"), lighting: uiText("menu.crewLight"), sound: uiText("menu.crewSound"), director_of_photography: uiText("Ui.text_09119154bd2ac6"), director: uiText("menu.crewDirection"), production: uiText("menu.crewProduction"), makeup: uiText("Ui.text_93c744e1d17b9a"), costume: uiText("Ui.text_a21ae87ef519df"), postproduction: uiText("Ui.text_212f3b80ce86c2"), vfx: uiText("Ui.text_23d20474305ac3"), sfx: uiText("menu.marketSfx"), art_department: uiText("Ui.text_03552f45d48cae"), broadcast: uiText("Ui.text_17bc9178343601"), filmmaker: uiText("Ui.text_93ecd734fdc054"), writer: uiText("Ui.text_c01d8914754e43"), photographer: uiText("menu.crewPhotographer"), editor: uiText("Ui.text_23891caedf928e"), motion_designer: uiText("Ui.text_8213a51cdbc986"), art_director: uiText("Ui.text_2d3b48143ed2b9"), location: uiText("profile.labelLocation"), equipment: uiText("companies.groupAusstattung"), vehicle: uiText("footer.links_vehicles"), studio: uiText("Ui.text_0aa91af2ec4c1f"), props: uiText("search.typeProps") };
 
   const travelValues = [...new Set([...Object.keys(PROFILE_TRAIT_MESSAGE_KEYS.travel),
     ...allCreators.flatMap(creator => typeof creator.travel === "string" && creator.travel ? [creator.travel] : []),
@@ -507,6 +511,7 @@ function CreatorsInner({
       result = result.filter((c) =>
         c.name.toLowerCase().includes(q) ||
         getPositions(c).some((p) => p.toLowerCase().includes(q)
+          || taxonomyLabel(p, uiText).toLowerCase().includes(q)
           || getOccupationSearchTerms(p).some((term) => normalizeOccupation(term).includes(normalizedQuery))
           || gripSearchTerms(p).some((term) => normalizeOccupation(term).includes(normalizedQuery))) ||
         (isGripDepartmentSearch(query) && getPositions(c).some(isGripOccupation)) ||
@@ -572,7 +577,7 @@ function CreatorsInner({
     return result;
   }, [query, selectedRoles, sidebarDept, availableOnly, vendorOnly, cityFilter, countryFilter, regionFilter, languageFilter,
       profileTypeFilter, hairFilter, eyeFilter, bodyFilter, travelFilter, ageMinFilter, ageMaxFilter,
-      sortKey, allCreators, isTopMode, locale]);
+      sortKey, allCreators, isTopMode, locale, uiText]);
 
   const filterKey = JSON.stringify([query, [...selectedRoles].sort(), sidebarDept, availableOnly, vendorOnly,
     cityFilter, countryFilter, regionFilter, languageFilter, profileTypeFilter, hairFilter, eyeFilter, bodyFilter,
@@ -586,9 +591,9 @@ function CreatorsInner({
     [...selectedRoles].map((role) => {
       const option = occupationById(role);
       const dept = departments.find((d) => d.id === option?.departmentId);
-      return { role, label: option?.label ?? role, dept };
+      return { role, label: taxonomyLabel(option?.label ?? role, uiText), dept };
     }),
-    [selectedRoles]
+    [selectedRoles, uiText]
   );
 
   // ── Mobile promoted role shortcuts ────────────────────────────────────
@@ -609,20 +614,20 @@ function CreatorsInner({
   ].filter(Boolean).length + selectedRoles.size;
 
   const mobileChips: BrowseChip[] = [
-    ...(sidebarDept ? [{ id: "area", label: sidebarDept === "__locations" ? "Locations" : sidebarDept === "__marktplatz" ? "Marktplatz" : getDeptLabel(departments.find((department) => department.id === sidebarDept) ?? departments[0], locale, animals), onRemove: () => chooseSidebarDept(null) }] : []),
-    ...[...selectedRoles].map((role) => ({ id: `role-${role}`, label: occupationById(role)?.label ?? role, onRemove: () => removeRole(role) })),
+    ...(sidebarDept ? [{ id: "area", label: sidebarDept === "__locations" ? uiText("nav.locations") : sidebarDept === "__marktplatz" ? uiText("nav.marketplace") : getDeptLabel(departments.find((department) => department.id === sidebarDept) ?? departments[0], locale, animals, taxonomyText), onRemove: () => chooseSidebarDept(null) }] : []),
+    ...[...selectedRoles].map((role) => ({ id: `role-${role}`, label: taxonomyLabel(occupationById(role)?.label ?? role, uiText), onRemove: () => removeRole(role) })),
     ...(cityFilter ? [{ id: "city", label: cityLabel(cityFilter), onRemove: () => setCityFilter("") }] : []),
     ...(countryFilter ? [{ id: "country", label: countryLabel(countryFilter), onRemove: () => setCountryFilter("") }] : []),
     ...(regionFilter ? [{ id: "region", label: regionLabel(regionFilter), onRemove: () => setRegionFilter("") }] : []),
     ...(languageFilter ? [{ id: "language", label: crewLanguageLabel(languageFilter, locale), onRemove: () => setLanguageFilter("") }] : []),
-    ...(profileTypeFilter ? [{ id: "profileType", label: `${t("filterProfileType")}: ${PROFILE_TYPE_MAP[profileTypeFilter] ?? profileTypeFilter}`, onRemove: () => setProfileTypeFilter("") }] : []),
-    ...(hairFilter ? [{ id: "hair", label: `${t("filterHairColor")}: ${hairLabel(hairFilter)}`, onRemove: () => setHairFilter("") }] : []),
-    ...(eyeFilter ? [{ id: "eyes", label: `${t("filterEyeColor")}: ${eyeLabel(eyeFilter)}`, onRemove: () => setEyeFilter("") }] : []),
-    ...(bodyFilter ? [{ id: "body", label: `${profileText("castingBody")}: ${bodyLabel(bodyFilter)}`, onRemove: () => setBodyFilter("") }] : []),
-    ...(ageMinFilter || ageMaxFilter ? [{ id: "age", label: `${t("filterAge")}: ${ageMinFilter || "1"}–${ageMaxFilter || "99"}`, onRemove: () => { setAgeMinFilter(""); setAgeMaxFilter(""); } }] : []),
-    ...(travelFilter ? [{ id: "travel", label: `${t("filterTravel")}: ${TRAVEL_MAP[travelFilter] ?? travelFilter}`, onRemove: () => setTravelFilter("") }] : []),
+    ...(profileTypeFilter ? [{ id: "profileType", label: uiText("Ui.text_efae3eb968ceb3", { value1: String(t("filterProfileType")), value2: String(PROFILE_TYPE_MAP[profileTypeFilter] ?? profileTypeFilter) }), onRemove: () => setProfileTypeFilter("") }] : []),
+    ...(hairFilter ? [{ id: "hair", label: uiText("Ui.text_efae3eb968ceb3", { value1: String(t("filterHairColor")), value2: String(hairLabel(hairFilter)) }), onRemove: () => setHairFilter("") }] : []),
+    ...(eyeFilter ? [{ id: "eyes", label: uiText("Ui.text_efae3eb968ceb3", { value1: String(t("filterEyeColor")), value2: String(eyeLabel(eyeFilter)) }), onRemove: () => setEyeFilter("") }] : []),
+    ...(bodyFilter ? [{ id: "body", label: uiText("Ui.text_efae3eb968ceb3", { value1: String(profileText("castingBody")), value2: String(bodyLabel(bodyFilter)) }), onRemove: () => setBodyFilter("") }] : []),
+    ...(ageMinFilter || ageMaxFilter ? [{ id: "age", label: uiText("Ui.text_907dc400de24ac", { value1: String(t("filterAge")), value2: String(ageMinFilter || "1"), value3: String(ageMaxFilter || "99") }), onRemove: () => { setAgeMinFilter(""); setAgeMaxFilter(""); } }] : []),
+    ...(travelFilter ? [{ id: "travel", label: uiText("Ui.text_efae3eb968ceb3", { value1: String(t("filterTravel")), value2: String(TRAVEL_MAP[travelFilter] ?? travelFilter) }), onRemove: () => setTravelFilter("") }] : []),
     ...(availableOnly ? [{ id: "available", label: tc("available"), onRemove: () => setAvailableOnly(false) }] : []),
-    ...(vendorOnly ? [{ id: "vendor", label: "Anbieter", onRemove: () => setVendorOnly(false) }] : []),
+    ...(vendorOnly ? [{ id: "vendor", label: uiText("profile.catAnbieterLabel"), onRemove: () => setVendorOnly(false) }] : []),
   ];
   const resetMobileFilters = () => {
     setSelectedRoles(new Set()); setSidebarDept(null); setQuery(""); setCityFilter(""); setCountryFilter(""); setRegionFilter(""); setLanguageFilter("");
@@ -647,11 +652,11 @@ function CreatorsInner({
         sortOptions={SORT_OPTIONS}
         onSortChange={setSortKey}
         categoryLabel={t("deptFilter")}
-        allCategoryLabel="Alle Bereiche"
+        allCategoryLabel={uiText("Ui.text_bc0b501bb3186b")}
         categories={[
-          ...departments.map((department) => ({ value: department.id, label: getDeptLabel(department, locale, animals) })),
-          { value: LOCATION_PROVIDER_FILTER, label: "Locations – Anbieter" },
-          { value: MARKETPLACE_PROVIDER_FILTER, label: "Marktplatz – Anbieter" },
+          ...departments.map((department) => ({ value: department.id, label: getDeptLabel(department, locale, animals, taxonomyText) })),
+          { value: LOCATION_PROVIDER_FILTER, label: uiText("Ui.text_e05308bad64468") },
+          { value: MARKETPLACE_PROVIDER_FILTER, label: uiText("Ui.text_47ce00e52d872a") },
         ]}
         categoryValue={sidebarDept ?? ""}
         onCategoryChange={(value) => { setSelectedRoles(new Set()); chooseSidebarDept(value || null); }}
@@ -665,8 +670,8 @@ function CreatorsInner({
         <MobileFilterField label={t("filterProfileType")}>
           <MobileFilterSelect value={profileTypeFilter} onChange={setProfileTypeFilter} placeholder={t("filterAll")} options={availableProfileTypes.map((value) => ({ value, label: PROFILE_TYPE_MAP[value] ?? value }))} />
         </MobileFilterField>
-        {!isProviderFilter(sidebarDept) && <MobileFilterField label="Rolle">
-          <MobileFilterSelect value={[...selectedRoles][0] ?? ""} onChange={(value) => setSelectedRoles(value ? new Set([value]) : new Set())} placeholder="Alle Rollen" options={occupationCatalogue.filter(option => !sidebarDept || option.departmentId === sidebarDept).map(option => ({ value: option.roleId, label: `${getDeptLabel(departments.find(department=>department.id === option.departmentId)!, locale, animals)} → ${getDepartmentRoleLabel(option.departmentId, option.label, locale, animals)}` }))} />
+        {!isProviderFilter(sidebarDept) && <MobileFilterField label={uiText("Ui.text_0038a9cf86613c")}>
+          <MobileFilterSelect value={[...selectedRoles][0] ?? ""} onChange={(value) => setSelectedRoles(value ? new Set([value]) : new Set())} placeholder={uiText("Ui.text_903f372337ed95")} options={occupationCatalogue.filter(option => !sidebarDept || option.departmentId === sidebarDept).map(option => ({ value: option.roleId, label: uiText("Ui.text_6ae50ea0dac869", { value1: String(getDeptLabel(departments.find(department=>department.id === option.departmentId)!, locale, animals, taxonomyText)), value2: String(getDepartmentRoleLabel(option.departmentId, option.label, locale, animals, taxonomyText)) }) }))} />
         </MobileFilterField>}
         <PlaceFilters rows={allCreators} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />
         <MobileFilterField label={t("filterLanguage")}>
@@ -684,15 +689,15 @@ function CreatorsInner({
           <MobileFilterSelect value={bodyFilter} onChange={setBodyFilter} placeholder={t("filterAll")} options={availableBodyTypes.map((value) => ({ value, label: bodyLabel(value) }))} />
         </MobileFilterField>
         <div className="grid grid-cols-2 gap-3">
-          <MobileFilterField label="Alter ab"><input inputMode="numeric" type="number" min="1" max="99" value={ageMinFilter} onChange={(event) => setAgeMinFilter(event.target.value)} placeholder="Beliebig" /></MobileFilterField>
-          <MobileFilterField label="Alter bis"><input inputMode="numeric" type="number" min="1" max="99" value={ageMaxFilter} onChange={(event) => setAgeMaxFilter(event.target.value)} placeholder="Beliebig" /></MobileFilterField>
+          <MobileFilterField label={uiText("Ui.text_7f41f4ab011b53")}><input inputMode="numeric" type="number" min="1" max="99" value={ageMinFilter} onChange={(event) => setAgeMinFilter(event.target.value)} placeholder={uiText("Ui.text_d0c50fd56cbce3")} /></MobileFilterField>
+          <MobileFilterField label={uiText("Ui.text_cf402a5ebe8d8f")}><input inputMode="numeric" type="number" min="1" max="99" value={ageMaxFilter} onChange={(event) => setAgeMaxFilter(event.target.value)} placeholder={uiText("Ui.text_d0c50fd56cbce3")} /></MobileFilterField>
         </div>
         <MobileFilterField label={t("filterTravel")}>
           <MobileFilterSelect value={travelFilter} onChange={setTravelFilter} placeholder={t("filterAll")} options={Object.entries(TRAVEL_MAP).map(([value, label]) => ({ value, label }))} />
         </MobileFilterField>
         <div className="grid gap-1">
           <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={availableOnly} onChange={(event) => setAvailableOnly(event.target.checked)} />{tc("available")}</label>
-          <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={vendorOnly} onChange={(event) => setVendorOnly(event.target.checked)} />Anbieter</label>
+          <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary">{uiText.rich("Ui.text_2be79df6cf7abd", { part1: () => (<input type="checkbox" className="size-4 accent-gold" checked={vendorOnly} onChange={(event) => setVendorOnly(event.target.checked)} />) })}</label>
         </div>
       </MobileBrowseControls>
 
@@ -790,7 +795,7 @@ function CreatorsInner({
             ) : (
               <span className="text-text-primary font-semibold">{t("results", { count: filtered.length })}</span>
             )}
-            {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
+            {query && <span className="text-gold">{uiText.rich("Ui.text_58e2efda5da487", { value1: () => (query) })}</span>}
           </p>
           <div className="relative">
             <select value={sortKey} onChange={(e) => setSortKey(e.target.value)}
@@ -827,7 +832,7 @@ function CreatorsInner({
                 return (
                   <div key={dept.id}>
                     <p className={`text-[11px] uppercase tracking-widest font-semibold mb-2.5 ${colors.text}`}>
-                      {dept.emoji} {getDeptLabel(dept, locale, animals)}
+                      {dept.emoji} {getDeptLabel(dept, locale, animals, taxonomyText)}
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {deptRoles.map((role) => {
@@ -840,7 +845,7 @@ function CreatorsInner({
                               active ? `${colors.bg} ${colors.text} border-transparent` : "border-border text-text-muted bg-bg-secondary"
                             }`}
                           >
-                            {getDepartmentRoleLabel(dept.id, role, locale, animals)}
+                            {getDepartmentRoleLabel(dept.id, role, locale, animals, taxonomyText)}
                           </button>
                         );
                       })}
@@ -937,10 +942,10 @@ function CreatorsInner({
                 <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-2">{t("filterAge")}</p>
                 <div className="flex items-center gap-2">
                   <input type="number" min="1" max="99" value={ageMinFilter} onChange={(e) => setAgeMinFilter(e.target.value)}
-                    placeholder="von" className="w-20 bg-bg-secondary border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-gold transition-colors" />
+                    placeholder={uiText("profile.ageFrom")} className="w-20 bg-bg-secondary border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-gold transition-colors" />
                   <span className="text-xs text-text-muted">–</span>
                   <input type="number" min="1" max="99" value={ageMaxFilter} onChange={(e) => setAgeMaxFilter(e.target.value)}
-                    placeholder="bis" className="w-20 bg-bg-secondary border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-gold transition-colors" />
+                    placeholder={uiText("profile.ageTo")} className="w-20 bg-bg-secondary border border-border rounded-lg px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-gold transition-colors" />
                 </div>
               </div>
 
@@ -1028,9 +1033,7 @@ function CreatorsInner({
           {/* Row 2: Filters */}
           <div className="flex items-center gap-2 overflow-x-auto lg:overflow-visible pb-0.5" style={{ scrollbarWidth: "none" }}>
             {!isProviderFilter(sidebarDept) && <button type="button" onClick={() => setFilterOpen(value => !value)} aria-expanded={filterOpen}
-              className={`flex min-h-11 items-center gap-2 rounded-lg border px-3 text-xs font-medium ${filterOpen || selectedRoles.size ? "border-gold/30 text-gold bg-gold/10" : "border-border text-text-muted"}`}>
-              Beruf auswählen <ChevronDown size={12} />
-            </button>}
+              className={`flex min-h-11 items-center gap-2 rounded-lg border px-3 text-xs font-medium ${filterOpen || selectedRoles.size ? "border-gold/30 text-gold bg-gold/10" : "border-border text-text-muted"}`}>{uiText.rich("Ui.text_bcc09674bbade1", { part1: () => (<ChevronDown size={12} />) })}</button>}
             {/* Available toggle */}
             <label className="flex items-center gap-1.5 text-xs text-text-muted cursor-pointer hover:text-text-secondary transition-colors select-none shrink-0">
               <div
@@ -1068,7 +1071,7 @@ function CreatorsInner({
               <ChevronDown size={11} className={`transition-transform ${moreFiltersOpen ? "rotate-180" : ""}`} />
             </button>
 
-            {regionFilter && <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary"><MapPin size={9} />{regionLabel(regionFilter)}<button type="button" aria-label={`${tc("clearFilter")}: ${regionLabel(regionFilter)}`} onClick={() => setRegionFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button></span>}
+            {regionFilter && <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary"><MapPin size={9} />{regionLabel(regionFilter)}<button type="button" aria-label={uiText("Ui.text_efae3eb968ceb3", { value1: String(tc("clearFilter")), value2: String(regionLabel(regionFilter)) })} onClick={() => setRegionFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button></span>}
             {(cityFilter || countryFilter || regionFilter || languageFilter || selectedRoles.size > 0 ||
               profileTypeFilter || hairFilter || eyeFilter || bodyFilter || travelFilter || ageMinFilter || ageMaxFilter) && (
               <button
@@ -1110,10 +1113,10 @@ function CreatorsInner({
               <div className="flex items-center gap-1 shrink-0">
                 <span className="text-xs text-text-muted whitespace-nowrap">{t("filterAge")}</span>
                 <input type="number" min="1" max="99" value={ageMinFilter} onChange={e => setAgeMinFilter(e.target.value)}
-                  placeholder="von" className="w-14 bg-bg-elevated border border-border rounded-lg px-2 py-1.5 text-xs text-text-primary focus:outline-none focus:border-gold transition-colors" />
+                  placeholder={uiText("profile.ageFrom")} className="w-14 bg-bg-elevated border border-border rounded-lg px-2 py-1.5 text-xs text-text-primary focus:outline-none focus:border-gold transition-colors" />
                 <span className="text-xs text-text-muted">–</span>
                 <input type="number" min="1" max="99" value={ageMaxFilter} onChange={e => setAgeMaxFilter(e.target.value)}
-                  placeholder="bis" className="w-14 bg-bg-elevated border border-border rounded-lg px-2 py-1.5 text-xs text-text-primary focus:outline-none focus:border-gold transition-colors" />
+                  placeholder={uiText("profile.ageTo")} className="w-14 bg-bg-elevated border border-border rounded-lg px-2 py-1.5 text-xs text-text-primary focus:outline-none focus:border-gold transition-colors" />
               </div>
               <FilterDropdown
                 icon={Globe}
@@ -1141,7 +1144,7 @@ function CreatorsInner({
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border shrink-0 transition-all ${
                           isActive ? `${colors.bg} ${colors.text} border-transparent` : "border-border text-text-muted"
                         }`}>
-                        {dept.emoji} {getDeptLabel(dept, locale, animals)}
+                        {dept.emoji} {getDeptLabel(dept, locale, animals, taxonomyText)}
                         {deptSelected > 0 && <span className={`w-3.5 h-3.5 rounded-full text-[8px] font-bold flex items-center justify-center ${colors.bg} ${colors.text}`}>{deptSelected}</span>}
                       </button>
                     );
@@ -1164,7 +1167,7 @@ function CreatorsInner({
                         className={`w-full flex items-center justify-between px-3 py-2 text-left text-xs transition-colors border-b border-border/40 last:border-0 ${
                           isActive ? `${colors.bg} ${colors.text} font-semibold` : "text-text-muted hover:text-text-secondary hover:bg-white/[0.02]"
                         }`}>
-                        <span>{getDeptLabel(dept, locale, animals)}</span>
+                        <span>{getDeptLabel(dept, locale, animals, taxonomyText)}</span>
                         {deptSelected > 0 && (
                           <span className={`text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${colors.bg} border ${colors.border} ${colors.text}`}>{deptSelected}</span>
                         )}
@@ -1207,7 +1210,7 @@ function CreatorsInner({
         </div>
       </div>
 
-      {loadError && <div className="site-container py-3"><p role="alert" className="text-sm text-text-muted">Weitere Profile konnten nicht geladen werden. Die Trefferzahl ist noch unvollständig. <button className="min-h-11 text-gold underline" onClick={() => setLoadError(false)}>Erneut versuchen</button></p></div>}
+      {loadError && <div className="site-container py-3"><p role="alert" className="text-sm text-text-muted">{uiText("Ui.text_ce8a3ad3ae6d5b")}<button className="min-h-11 text-gold underline" onClick={() => setLoadError(false)}>{uiText("notifications.retry")}</button></p></div>}
       {/* ── Results ─────────────────────────────────────────────────────────── */}
       {(() => {
         const filteredCrew = filtered;
@@ -1219,9 +1222,7 @@ function CreatorsInner({
 
             {/* Left sidebar */}
             <aside className="cat-sidebar w-44 shrink-0 sticky top-20">
-              <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3 px-2">
-                Bereiche
-              </p>
+              <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3 px-2">{uiText("Ui.text_7b40d8db4ebc62")}</p>
               <nav className="space-y-0.5">
                 <button
                   onClick={() => chooseSidebarDept(null)}
@@ -1230,10 +1231,7 @@ function CreatorsInner({
                       ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
                       : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
                   }`}
-                >
-                  <Users size={14} className={!sidebarDept ? "text-gold" : "text-text-muted"} />
-                  Alle Bereiche
-                </button>
+                >{uiText.rich("Ui.text_059ad29af9ea26", { part1: () => (<Users size={14} className={!sidebarDept ? "text-gold" : "text-text-muted"} />) })}</button>
                 {departments.map((dept) => {
                   const isActive = sidebarDept === dept.id;
                   const Icon = DEPT_ICON[dept.id] ?? Users;
@@ -1254,8 +1252,8 @@ function CreatorsInner({
                 })}
                 <div className="pt-3 mt-2 border-t border-border/50 space-y-0.5">
                   {([
-                    { id: LOCATION_PROVIDER_FILTER, label: "Locations", Icon: MapPin },
-                    { id: MARKETPLACE_PROVIDER_FILTER, label: "Marktplatz", Icon: ShoppingBag },
+                    { id: LOCATION_PROVIDER_FILTER, label: uiText("nav.locations"), Icon: MapPin },
+                    { id: MARKETPLACE_PROVIDER_FILTER, label: uiText("nav.marketplace"), Icon: ShoppingBag },
                   ] as const).map(({ id, label, Icon }) => {
                     const isActive = sidebarDept === id;
                     return (
@@ -1275,15 +1273,10 @@ function CreatorsInner({
                   })}
                 </div>
               </nav>
-              <div className="mt-6 pt-5 border-t border-border">
-                <Link
+              <div className="mt-6 pt-5 border-t border-border">{uiText.rich("Ui.text_a91cbe30fbb0b1", { part2: () => (<Plus size={14} />), part1: chunks => (<Link
                   href="/profile"
                   className="flex items-center gap-2 px-3 py-2 text-sm text-gold hover:bg-gold/10 rounded-lg transition-colors font-medium"
-                >
-                  <Plus size={14} />
-                  Profil erstellen
-                </Link>
-              </div>
+                >{chunks}</Link>) })}</div>
             </aside>
 
             {/* Main content */}
@@ -1298,9 +1291,7 @@ function CreatorsInner({
                     ? "bg-gold/10 text-gold border-gold/40"
                     : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
                 }`}
-              >
-                Alle Bereiche
-              </button>
+              >{uiText("Ui.text_bc0b501bb3186b")}</button>
               {departments.map((dept) => {
                 const isActive = sidebarDept === dept.id;
                 return (
@@ -1318,8 +1309,8 @@ function CreatorsInner({
                 );
               })}
               {([
-                { id: LOCATION_PROVIDER_FILTER, label: "Locations" },
-                { id: MARKETPLACE_PROVIDER_FILTER, label: "Marktplatz" },
+                { id: LOCATION_PROVIDER_FILTER, label: uiText("nav.locations") },
+                { id: MARKETPLACE_PROVIDER_FILTER, label: uiText("nav.marketplace") },
               ] as const).map(({ id, label }) => {
                 const isActive = sidebarDept === id;
                 return (
@@ -1343,7 +1334,7 @@ function CreatorsInner({
               <span className="text-text-primary font-semibold">
                 {hasMoreFromApi ? (loadError ? t("resultsLoadFailed") : t("resultsLoading")) : t("results", { count: filteredCrew.length })}
               </span>
-              {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
+              {query && <span className="text-gold">{uiText.rich("Ui.text_58e2efda5da487", { value1: () => (query) })}</span>}
             </p>
 
             {/* Empty */}
@@ -1366,7 +1357,7 @@ function CreatorsInner({
               {viewMode === "list" && (
                 <div className="border border-border rounded-xl overflow-hidden bg-bg-secondary divide-y divide-border/50">
                   {crewVisible.map((c) => {
-                    const displayPositions = getPositions(c);
+                    const displayPositions = getPositions(c).map(label => taxonomyLabel(label, uiText));
                     const href = c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`;
                     return (
                       <Link key={c.id} href={href} suppressHydrationWarning
@@ -1390,7 +1381,7 @@ function CreatorsInner({
                         )}
                         {/* Rate */}
                         <p className="hidden md:block text-xs shrink-0 w-28 text-right">
-                          {c.dayRate && !c.dayRate.toLowerCase().includes("vereinbarung")
+                          {c.dayRate && !c.dayRateOnRequest
                             ? <span className="text-text-secondary">{c.dayRate}</span>
                             : <span className="text-text-muted/30">–</span>
                           }
@@ -1405,7 +1396,7 @@ function CreatorsInner({
               {viewMode === "grid" && (
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
                 {crewVisible.map((c) => {
-                  const displayPositions = getPositions(c);
+                  const displayPositions = getPositions(c).map(label => taxonomyLabel(label, uiText));
                   const href = c.id.startsWith("listing_") ? `/creators/${c.id.replace("listing_", "")}` : `/profile/${c.id}`;
                   const photo = crewPhotoInput(c);
                   return (

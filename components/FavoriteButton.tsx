@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { Heart } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+
 
 interface Props {
   listingId: string;
@@ -20,6 +22,8 @@ export default function FavoriteButton({
   listingId, listingType, listingTitle, listingCity, listingPrice, listingImage,
   className = "", size = "md",
 }: Props) {
+  const uiText = useTranslations();
+
   const { isSignedIn, isLoaded } = useAuth();
   const router = useRouter();
   const [favorited, setFavorited] = useState(false);
@@ -76,8 +80,8 @@ export default function FavoriteButton({
   return (
     <button
       onClick={toggle}
-      aria-label={favorited ? "Aus Merkliste entfernen" : "Zur Merkliste hinzufügen"}
-      title={favorited ? "Aus Merkliste entfernen" : "Speichern"}
+      aria-label={favorited ? uiText("Ui.text_53968e5832d074") : uiText("Ui.text_9203de1d551aa8")}
+      title={favorited ? uiText("Ui.text_53968e5832d074") : uiText("profile.save")}
       className={`${btnSize} flex items-center justify-center rounded-full border transition-all ${
         favorited
           ? "bg-crimson/10 border-crimson/40 text-crimson-light hover:bg-crimson/20"

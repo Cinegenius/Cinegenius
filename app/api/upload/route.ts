@@ -4,8 +4,10 @@ import { requireAuth } from "@/lib/guards";
 import { validateUpload, buildStoragePath } from "@/lib/uploadGuard";
 import { rateLimit } from "@/lib/rateLimit";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   // 1. Auth
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
@@ -15,19 +17,19 @@ export async function POST(req: NextRequest) {
   // A location may use twenty uploads in one batch. Leave room for retries
   // and replacement uploads while keeping a per-user abuse limit.
   const { allowed } = await rateLimit(`upload:${userId}`, 40, 60);
-  if (!allowed) return NextResponse.json({ error: "Zu viele Uploads. Bitte kurz warten." }, { status: 429 });
+  if (!allowed) return NextResponse.json({ error: tResponse('System.m_4ca6fcf5bc59') }, { status: 429 });
 
   // 3. Parse form data
   let formData: FormData;
   try {
     formData = await req.formData();
   } catch {
-    return NextResponse.json({ error: "Die Upload-Anfrage war ungültig oder zu groß. Bitte wähle ein kleineres Foto." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_355e61bc6322') }, { status: 400 });
   }
   const file = formData.get("file");
 
   if (!(file instanceof File)) {
-    return NextResponse.json({ error: "Keine Datei" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_1bfb584cd3a0') }, { status: 400 });
   }
 
   // 4. Validate — magic bytes, size, allowed types.

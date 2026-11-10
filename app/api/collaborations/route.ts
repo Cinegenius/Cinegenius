@@ -3,12 +3,14 @@ import { canViewProfile } from "@/lib/trust";
 import { visibleLinkedProfileIds } from "@/lib/linked-profile-access";
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // GET /api/collaborations?userId=xxx  → public collaborations for that user's profile page
 export async function GET(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const { searchParams } = new URL(req.url);
   const userId = searchParams.get("userId");
-  if (!userId) return NextResponse.json({ error: "userId fehlt" }, { status: 400 });
+  if (!userId) return NextResponse.json({ error: tResponse('System.m_068a4fe4def4') }, { status: 400 });
 
   const { userId: viewerId } = await auth();
   if (!await canViewProfile(userId, viewerId)) return new NextResponse(null, { status: 404, headers: { "Cache-Control": "private, no-store" } });

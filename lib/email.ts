@@ -1,5 +1,6 @@
 import {getTranslations} from "next-intl/server";
-import {DEFAULT_LOCALE, type AppLocale} from "@/lib/i18n/locales";
+import {type AppLocale} from "@/lib/i18n/locales";
+import {recipientEmailLocale} from "@/lib/i18n/email-locale";
 import { Resend } from "resend";
 
 // Gracefully degrade if RESEND_API_KEY is not set
@@ -31,9 +32,9 @@ async function send(to: string, subject: string, html: string) {
 
 // ─── Templates ────────────────────────────────────────────────────────────────
 
-function wrap(content: string) {
+function wrap(content: string, locale: AppLocale, footer: string) {
   return `<!DOCTYPE html>
-<html lang="de">
+<html lang="${escapeHtml(locale)}">
 <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /></head>
 <body style="margin:0;padding:0;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:32px 16px">
@@ -44,7 +45,7 @@ function wrap(content: string) {
         </td></tr>
         <tr><td style="padding:32px">${content}</td></tr>
         <tr><td style="padding:16px 32px;border-top:1px solid #222">
-          <p style="margin:0;font-size:11px;color:#555">Du erhältst diese E-Mail, weil du Mitglied auf CineGenius bist. <a href="${BASE}" style="color:#d4a843;text-decoration:none">cinegenius.co</a></p>
+          <p style="margin:0;font-size:11px;color:#555">${escapeHtml(footer)} <a href="${BASE}" style="color:#d4a843;text-decoration:none">cinegenius.co</a></p>
         </td></tr>
       </table>
     </td></tr>
@@ -67,28 +68,39 @@ function p(text: string) {
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
-export async function sendFriendRequestEmail(to: string, fromName: string) {
-  await send(
-    to,
-    `${fromName} möchte sich mit dir vernetzen`,
-    wrap(`
-      ${h1("Neue Freundschaftsanfrage")}
-      ${p(`<strong style="color:#f0f0f0">${fromName}</strong> möchte sich mit dir auf CineGenius vernetzen.`)}
-      ${btn("Anfrage ansehen", `${BASE}/dashboard?tab=friends`)}
-    `)
-  );
+type EmailTranslator = Awaited<ReturnType<typeof getTranslations>>;
+async function transactionalCopy(to: string, selected?: AppLocale) {
+  if (!resend) return null;
+  try {
+    const locale = selected ?? await recipientEmailLocale(to);
+    const t = await getTranslations({locale, namespace: "TransactionalEmail"});
+    return {locale, t};
+  } catch {
+    console.error("[transactional-email] recipient language could not be loaded");
+    return null;
+  }
 }
 
-export async function sendFriendAcceptedEmail(to: string, accepterName: string) {
-  await send(
-    to,
-    `${accepterName} hat deine Anfrage angenommen`,
-    wrap(`
-      ${h1("Freundschaftsanfrage angenommen")}
-      ${p(`<strong style="color:#f0f0f0">${accepterName}</strong> hat deine Anfrage angenommen. Ihr seid jetzt verbunden.`)}
-      ${btn("Zum Profil", `${BASE}/dashboard?tab=friends`)}
-    `)
-  );
+export async function sendFriendRequestEmail(to: string, fromName: string, selected?: AppLocale) {
+  const copy = await transactionalCopy(to, selected);
+  if (!copy) return;
+  const {locale, t} = copy;
+  await send(to, t("friendRequestSubject", {name: normalizedEmailText(fromName)}), wrap(`
+    ${h1(escapeHtml(t("friendRequestHeading")))}
+    ${p(t.markup("friendRequestBody", {name: escapeHtml(fromName), person: chunks => `<strong style="color:#f0f0f0">${chunks}</strong>`}))}
+    ${btn(escapeHtml(t("viewRequest")), `${BASE}/dashboard?tab=friends`)}
+  `, locale, t("footer")));
+}
+
+export async function sendFriendAcceptedEmail(to: string, accepterName: string, selected?: AppLocale) {
+  const copy = await transactionalCopy(to, selected);
+  if (!copy) return;
+  const {locale, t} = copy;
+  await send(to, t("friendAcceptedSubject", {name: normalizedEmailText(accepterName)}), wrap(`
+    ${h1(escapeHtml(t("friendAcceptedHeading")))}
+    ${p(t.markup("friendAcceptedBody", {name: escapeHtml(accepterName), person: chunks => `<strong style="color:#f0f0f0">${chunks}</strong>`}))}
+    ${btn(escapeHtml(t("viewProfile")), `${BASE}/dashboard?tab=friends`)}
+  `, locale, t("footer")));
 }
 
 function escapeHtml(value: string) {
@@ -107,17 +119,16 @@ function normalizedEmailText(value: string) {
   return value.replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim();
 }
 
-function messageEmailHtml(senderName: string, preview: string, hasMore: boolean, conversationId: string) {
-  const sender = escapeHtml(senderName);
+function messageEmailHtml(senderName: string, preview: string, hasMore: boolean, conversationId: string, locale: AppLocale, t: EmailTranslator) {
   const snippet = escapeHtml(preview);
   const siteUrl = escapeHtml(BASE);
   const chatUrl = new URL("/messages", BASE);
   chatUrl.searchParams.set("conv", conversationId);
   const chatHref = escapeHtml(chatUrl.toString());
-  const preheader = escapeHtml(`${senderName} hat dir auf CineGenius geschrieben.`);
+  const preheader = escapeHtml(t("messagePreheader", {name: senderName}));
 
   return `<!DOCTYPE html>
-<html lang="de">
+<html lang="${escapeHtml(locale)}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -135,9 +146,9 @@ function messageEmailHtml(senderName: string, preview: string, hasMore: boolean,
           </a>
         </td></tr>
         <tr><td style="padding:32px 26px 28px">
-          <p style="margin:0 0 12px;color:#c2f135;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase">Neue Nachricht</p>
-          <h1 style="margin:0 0 10px;color:#f4f5f7;font-size:25px;line-height:1.25;font-weight:700">${sender} hat dir geschrieben</h1>
-          <p style="margin:0 0 22px;color:#a7afbf;font-size:15px;line-height:1.6">Du hast eine neue Nachricht in deinem CineGenius-Chat.</p>
+          <p style="margin:0 0 12px;color:#c2f135;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase">${escapeHtml(t("messageLabel"))}</p>
+          <h1 style="margin:0 0 10px;color:#f4f5f7;font-size:25px;line-height:1.25;font-weight:700">${escapeHtml(t("messageHeading", {name: senderName}))}</h1>
+          <p style="margin:0 0 22px;color:#a7afbf;font-size:15px;line-height:1.6">${escapeHtml(t("messageIntro"))}</p>
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#10131b" style="width:100%;background-color:#10131b;border:1px solid #29344a;border-radius:12px">
             <tr><td style="padding:16px 18px;border-left:3px solid #c2f135;color:#d5d9e2;font-size:15px;line-height:1.65;word-break:break-word">
               ${snippet}${hasMore ? "…" : ""}
@@ -145,13 +156,13 @@ function messageEmailHtml(senderName: string, preview: string, hasMore: boolean,
           </table>
           <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:24px">
             <tr><td align="center" bgcolor="#c2f135" style="background-color:#c2f135;border-radius:10px">
-              <a href="${chatHref}" style="display:inline-block;padding:14px 22px;color:#10131b;font-size:15px;font-weight:700;text-decoration:none;border-radius:10px">Chat öffnen&nbsp;&nbsp;→</a>
+              <a href="${chatHref}" style="display:inline-block;padding:14px 22px;color:#10131b;font-size:15px;font-weight:700;text-decoration:none;border-radius:10px">${escapeHtml(t("openChat"))}&nbsp;&nbsp;→</a>
             </td></tr>
           </table>
-          <p style="margin:22px 0 0;color:#7e899d;font-size:12px;line-height:1.6">Falls du nicht angemeldet bist, wirst du zuerst zur Anmeldung weitergeleitet und danach zurück zum Chat.</p>
+          <p style="margin:22px 0 0;color:#7e899d;font-size:12px;line-height:1.6">${escapeHtml(t("messageAuthHint"))}</p>
         </td></tr>
         <tr><td style="padding:18px 26px;border-top:1px solid #29344a">
-          <p style="margin:0;color:#7e899d;font-size:12px;line-height:1.6">Du erhältst diese E-Mail, weil E-Mail-Benachrichtigungen für neue Nachrichten aktiviert sind. <a href="${siteUrl}" style="color:#c2f135;text-decoration:none">cinegenius.co</a></p>
+          <p style="margin:0;color:#7e899d;font-size:12px;line-height:1.6">${escapeHtml(t("messageFooter"))} <a href="${siteUrl}" style="color:#c2f135;text-decoration:none">cinegenius.co</a></p>
         </td></tr>
       </table>
     </td></tr>
@@ -160,59 +171,50 @@ function messageEmailHtml(senderName: string, preview: string, hasMore: boolean,
 </html>`;
 }
 
-export async function sendNewMessageEmail(to: string, fromName: string, preview: string, conversationId: string) {
-  const safeName = Array.from(normalizedEmailText(fromName)).slice(0, 100).join("") || "Jemand";
+export async function sendNewMessageEmail(to: string, fromName: string, preview: string, conversationId: string, selected?: AppLocale) {
+  const copy = await transactionalCopy(to, selected);
+  if (!copy) return;
+  const {locale, t} = copy;
+  const safeName = Array.from(normalizedEmailText(fromName)).slice(0, 100).join("") || t("unknownSender");
   const previewCharacters = Array.from(normalizedEmailText(preview));
   const safePreview = previewCharacters.slice(0, 200).join("");
-  const html = messageEmailHtml(safeName, safePreview, previewCharacters.length > 200, conversationId);
-
-  await send(
-    to,
-    `Neue Nachricht von ${safeName}`,
-    html,
-  );
+  const html = messageEmailHtml(safeName, safePreview, previewCharacters.length > 200, conversationId, locale, t);
+  await send(to, t("messageSubject", {name: safeName}), html);
 }
 
-export async function sendNewApplicationEmail(to: string, applicantName: string, jobTitle: string) {
-  await send(
-    to,
-    `Neue Bewerbung für „${jobTitle}"`,
-    wrap(`
-      ${h1("Neue Bewerbung erhalten")}
-      ${p(`<strong style="color:#f0f0f0">${applicantName}</strong> hat sich auf dein Inserat beworben:`)}
-      <p style="margin:16px 0;padding:12px 16px;background:#1a1a1a;border:1px solid #222;border-radius:8px;font-size:14px;color:#d4a843;font-weight:600">${jobTitle}</p>
-      ${btn("Bewerbung ansehen", `${BASE}/dashboard?tab=messages`)}
-    `)
-  );
+export async function sendNewApplicationEmail(to: string, applicantName: string, jobTitle: string, selected?: AppLocale) {
+  const copy = await transactionalCopy(to, selected);
+  if (!copy) return;
+  const {locale, t} = copy;
+  await send(to, t("applicationSubject", {title: normalizedEmailText(jobTitle)}), wrap(`
+    ${h1(escapeHtml(t("applicationHeading")))}
+    ${p(t.markup("applicationBody", {name: escapeHtml(applicantName), person: chunks => `<strong style="color:#f0f0f0">${chunks}</strong>`}))}
+    <p style="margin:16px 0;padding:12px 16px;background:#1a1a1a;border:1px solid #222;border-radius:8px;font-size:14px;color:#d4a843;font-weight:600">${escapeHtml(jobTitle)}</p>
+    ${btn(escapeHtml(t("viewApplication")), `${BASE}/dashboard?tab=messages`)}
+  `, locale, t("footer")));
 }
 
-export async function sendWelcomeEmail(to: string, displayName: string) {
-  await send(
-    to,
-    "Willkommen bei CineGenius 🎬",
-    wrap(`
-      ${h1(`Hallo ${displayName} — schön, dass du dabei bist!`)}
-      ${p("CineGenius ist der Marktplatz für Film, Foto und Content — Locations, Crew, Equipment und Jobs.")}
-      ${p("Hier sind deine nächsten Schritte:")}
-      <table style="margin:20px 0;width:100%" cellpadding="0" cellspacing="0">
-        <tr>
-          <td style="padding:12px 16px;background:#1a1a1a;border:1px solid #222;border-radius:8px;margin-bottom:8px;display:block">
-            <span style="font-size:13px;color:#f0f0f0;font-weight:600">1. Profil vervollständigen</span><br/>
-            <span style="font-size:12px;color:#666">Foto, Bio und Fähigkeiten — damit du gefunden wirst.</span>
-          </td>
-        </tr>
-        <tr><td style="height:8px"></td></tr>
-        <tr>
-          <td style="padding:12px 16px;background:#1a1a1a;border:1px solid #222;border-radius:8px">
-            <span style="font-size:13px;color:#f0f0f0;font-weight:600">2. Inserat erstellen oder Crew entdecken</span><br/>
-            <span style="font-size:12px;color:#666">Location, Equipment oder Fahrzeug inserieren — oder direkt Crew und Jobs durchsuchen.</span>
-          </td>
-        </tr>
-      </table>
-      ${btn("Zum Dashboard", `${BASE}/dashboard?welcome=1`)}
-      <p style="margin-top:24px;font-size:12px;color:#555">Fragen? Antworte einfach auf diese E-Mail.</p>
-    `)
-  );
+export async function sendWelcomeEmail(to: string, displayName: string, selected?: AppLocale) {
+  const copy = await transactionalCopy(to, selected);
+  if (!copy) return;
+  const {locale, t} = copy;
+  await send(to, t("welcomeSubject"), wrap(`
+    ${h1(escapeHtml(t("welcomeGreeting", {name: displayName})))}
+    ${p(escapeHtml(t("welcomeIntro")))}
+    ${p(escapeHtml(t("nextSteps")))}
+    <table style="margin:20px 0;width:100%" cellpadding="0" cellspacing="0">
+      <tr><td style="padding:12px 16px;background:#1a1a1a;border:1px solid #222;border-radius:8px;margin-bottom:8px;display:block">
+        <span style="font-size:13px;color:#f0f0f0;font-weight:600">1. ${escapeHtml(t("profileStep"))}</span><br/>
+        <span style="font-size:12px;color:#666">${escapeHtml(t("profileStepDescription"))}</span>
+      </td></tr><tr><td style="height:8px"></td></tr>
+      <tr><td style="padding:12px 16px;background:#1a1a1a;border:1px solid #222;border-radius:8px">
+        <span style="font-size:13px;color:#f0f0f0;font-weight:600">2. ${escapeHtml(t("listingStep"))}</span><br/>
+        <span style="font-size:12px;color:#666">${escapeHtml(t("listingStepDescription"))}</span>
+      </td></tr>
+    </table>
+    ${btn(escapeHtml(t("dashboard")), `${BASE}/dashboard?welcome=1`)}
+    <p style="margin-top:24px;font-size:12px;color:#555">${escapeHtml(t("supportReply"))}</p>
+  `, locale, t("footer")));
 }
 
 export type NewsletterTestCopy = {
@@ -334,31 +336,44 @@ export async function sendNewsletterCampaignBatch(
   }
 }
 
-export async function sendNewBookingEmail(to: string, listingTitle: string, guestName: string, locale: AppLocale = DEFAULT_LOCALE) {
+export async function sendNewBookingEmail(to: string, listingTitle: string, guestName: string, selected?: AppLocale) {
+  const copy = await transactionalCopy(to, selected);
+  if (!copy) return;
+  const {locale, t: email} = copy;
   const t = await getTranslations({locale, namespace: "BookingRequest"});
-  await send(
-    to,
-    t("incomingSubject", {title: listingTitle}),
-    wrap(`
-      ${h1(escapeHtml(t("incomingTitle")))}
-      ${p(escapeHtml(t("incomingBody", {name: guestName, title: listingTitle})))}
-      ${p(escapeHtml(t("requestOnly")))}
-      ${btn(escapeHtml(t("viewRequest")), `${BASE}/dashboard?tab=bookings`)}
-    `)
-  );
+  await send(to, t("incomingSubject", {title: normalizedEmailText(listingTitle)}), wrap(`
+    ${h1(escapeHtml(t("incomingTitle")))}
+    ${p(escapeHtml(t("incomingBody", {name: guestName, title: listingTitle})))}
+    ${p(escapeHtml(t("requestOnly")))}
+    ${btn(escapeHtml(t("viewRequest")), `${BASE}/dashboard?tab=bookings`)}
+  `, locale, email("footer")));
 }
 
-export async function sendBookingConfirmedEmail(to: string, listingTitle: string, bookingRef: string) {
-  await send(
-    to,
-    `Buchung bestätigt: „${listingTitle}"`,
-    wrap(`
-      ${h1("Deine Buchung ist bestätigt!")}
-      ${p("Deine Zahlung wurde erfolgreich verarbeitet. Hier sind deine Buchungsdetails:")}
-      <p style="margin:16px 0;padding:12px 16px;background:#1a1a1a;border:1px solid #222;border-radius:8px;font-size:14px;color:#d4a843;font-weight:600">${listingTitle}</p>
-      <p style="margin:0 0 16px;font-size:13px;color:#888">Buchungsreferenz: <strong style="color:#f0f0f0">${bookingRef}</strong></p>
-      ${btn("Buchung ansehen", `${BASE}/dashboard?tab=bookings`)}
-      <p style="margin-top:24px;font-size:12px;color:#555">Fragen? Kontaktiere den Anbieter direkt über die Nachrichtenfunktion.</p>
-    `)
-  );
+/** Provider acceptance confirms the request; it does not assert a processed payment. */
+export async function sendBookingAcceptedEmail(to: string, listingTitle: string, bookingRef: string, selected?: AppLocale) {
+  const copy = await transactionalCopy(to, selected);
+  if (!copy) return;
+  const {locale, t} = copy;
+  await send(to, t("bookingAcceptedSubject", {title: normalizedEmailText(listingTitle)}), wrap(`
+    ${h1(escapeHtml(t("bookingAcceptedHeading")))}
+    ${p(escapeHtml(t("bookingAcceptedBody")))}
+    <p style="margin:16px 0;padding:12px 16px;background:#1a1a1a;border:1px solid #222;border-radius:8px;font-size:14px;color:#d4a843;font-weight:600">${escapeHtml(listingTitle)}</p>
+    <p style="margin:0 0 16px;font-size:13px;color:#888">${escapeHtml(t("bookingReference", {ref: bookingRef}))}</p>
+    ${btn(escapeHtml(t("viewBooking")), `${BASE}/dashboard?tab=bookings`)}
+    <p style="margin-top:24px;font-size:12px;color:#555">${escapeHtml(t("bookingQuestions"))}</p>
+  `, locale, t("footer")));
+}
+
+export async function sendBookingConfirmedEmail(to: string, listingTitle: string, bookingRef: string, selected?: AppLocale) {
+  const copy = await transactionalCopy(to, selected);
+  if (!copy) return;
+  const {locale, t} = copy;
+  await send(to, t("bookingConfirmedSubject", {title: normalizedEmailText(listingTitle)}), wrap(`
+    ${h1(escapeHtml(t("bookingConfirmedHeading")))}
+    ${p(escapeHtml(t("bookingPaymentProcessed")))}
+    <p style="margin:16px 0;padding:12px 16px;background:#1a1a1a;border:1px solid #222;border-radius:8px;font-size:14px;color:#d4a843;font-weight:600">${escapeHtml(listingTitle)}</p>
+    <p style="margin:0 0 16px;font-size:13px;color:#888">${escapeHtml(t("bookingReference", {ref: bookingRef}))}</p>
+    ${btn(escapeHtml(t("viewBooking")), `${BASE}/dashboard?tab=bookings`)}
+    <p style="margin-top:24px;font-size:12px;color:#555">${escapeHtml(t("bookingQuestions"))}</p>
+  `, locale, t("footer")));
 }

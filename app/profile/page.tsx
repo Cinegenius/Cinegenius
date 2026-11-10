@@ -39,6 +39,7 @@ import { publishProfileUpdated } from "@/lib/profile-update-events";
 import { isAvatarUploadAssociated } from "@/lib/profile-avatar-persistence";
 import { validateProfileSave, type ProfileSaveFieldErrors } from "@/lib/profile-save-validation";
 import { PROFILE_EDITOR_STEPS, profileEditorAvailabilityConfig, profileEditorRequiredMissing, profileEditorStepForErrors, profileEditorStepForHint, shouldResumeProfileEditorDraft, type ProfileEditorStep } from "@/lib/profile-editor-flow";
+import { uiErrorMessage } from "@/lib/ui-error-message";
 
 const ALL_CREW_ROLES = departments.flatMap((d) => d.roles);
 
@@ -48,6 +49,8 @@ const PROJECT_TYPE_NORMALIZE: Record<string, string> = {
   "Event / Live": "Event",
   "Foto / Shooting": "Shooting",
 };
+function getLocalizedProfileTypeLabels(translate: (key: string) => string): typeof PROFILE_TYPE_LABELS { return { actor: translate("menu.crewActors"), model: translate("MarketplaceOffer.fields.model"), extra: translate("Ui.text_359b6b495d37ee"), host: translate("Ui.text_0a95f0e5c8dfe9"), dancer: translate("Ui.text_edbf4c8ebb46d7"), stunt: translate("Ui.text_b84275027d70dc"), voiceover: translate("Ui.text_ecd65813175a41"), creator: translate("Ui.text_d952b2e69292db"), camera: translate("menu.crewCamera"), lighting: translate("Ui.text_df58636dc4a76c"), sound: translate("menu.crewSound"), director_of_photography: translate("Ui.text_e0e64895eb6431"), director: translate("menu.crewDirection"), production: translate("menu.crewProduction"), makeup: translate("Ui.text_93c744e1d17b9a"), costume: translate("Ui.text_a21ae87ef519df"), postproduction: translate("Ui.text_212f3b80ce86c2"), vfx: translate("Ui.text_23d20474305ac3"), sfx: translate("menu.marketSfx"), art_department: translate("Ui.text_a92fc587a90c16"), broadcast: translate("Ui.text_17bc9178343601"), filmmaker: translate("Ui.text_93ecd734fdc054"), writer: translate("Ui.text_fec099ea8a39bd"), photographer: translate("menu.crewPhotographer"), editor: translate("Ui.text_0e4eb4156e02e7"), motion_designer: translate("Ui.text_8213a51cdbc986"), art_director: translate("Ui.text_2d3b48143ed2b9"), location: translate("locations.vendorSection"), equipment: translate("props.vendorSection"), vehicle: translate("Ui.text_758a6eefc6f22f"), studio: translate("Ui.text_3e35f07c14a89e"), props: translate("Ui.text_54d1cc854cc30d") }; }
+
 function normType(t: string | null | undefined): string | null {
   if (!t) return null;
   return PROJECT_TYPE_NORMALIZE[t] ?? t;
@@ -122,6 +125,30 @@ function TypeChipPicker({
   occupationSelections?: PrimaryOccupation[];
   onOccupationsChange?: (value: PrimaryOccupation[]) => void;
 }) {
+  const taxonomyText = useTranslations("Taxonomy");
+
+  const uiText = useTranslations();
+  const uiOptionLabels: Record<string, string> = {
+    "Schauspieler/in": uiText("menu.crewActors"),
+    "Model": uiText("MarketplaceOffer.fields.model"),
+    "Komparse": uiText("Ui.text_8049d2892a0908"),
+    "Moderator/in": uiText("Ui.text_0a95f0e5c8dfe9"),
+    "Tänzer/in": uiText("Ui.text_edbf4c8ebb46d7"),
+    "Stunt Performer": uiText("Ui.text_b84275027d70dc"),
+    "Sprecher/in": uiText("Ui.text_c8f0bb379aec76"),
+    "Creator / Influencer": uiText("Ui.text_ee70984cb0ea7c"),
+    "Location": uiText("profile.labelLocation"),
+    "Equipment": uiText("companies.groupAusstattung"),
+    "Fahrzeug": uiText("AdminAccounts.contentKinds.vehicle"),
+    "Studio": uiText("Ui.text_0aa91af2ec4c1f"),
+    "Requisiten": uiText("search.typeProps"),
+  };
+
+
+
+
+
+
   const locale = useLocale();
   const animals = useTranslations("FilmAnimals");
   const [roleSearch, setRoleSearch] = useState("");
@@ -161,7 +188,8 @@ function TypeChipPicker({
     .map((dept) => ({
       dept,
       roles: dept.roles.filter((role) =>
-        !normalizedQuery || getDepartmentRoleSearchTerms(dept, role).some((term) => normalizeOccupation(term).includes(normalizeOccupation(normalizedQuery)))
+        !normalizedQuery || [getDeptLabel(dept, locale, animals, taxonomyText), dept.label, ...Object.values(dept.labels)].some((label) => normalizeOccupation(label).includes(normalizeOccupation(normalizedQuery)))
+        || getDepartmentRoleSearchTerms(dept, role, getDepartmentRoleLabel(dept.id, role, locale, animals, taxonomyText)).some((term) => normalizeOccupation(term).includes(normalizeOccupation(normalizedQuery)))
         || (dept.id === "grip" && gripSearchTerms(role).some((term) => normalizeOccupation(term).includes(normalizeOccupation(normalizedQuery)))),
       ),
     }))
@@ -171,24 +199,22 @@ function TypeChipPicker({
     return (
       <div className="space-y-6">
         <div>
-          <p className="mb-2.5 text-xs font-semibold text-text-primary">Talent und Anbieter</p>
-          <p className="mb-3 text-xs leading-5 text-text-muted">Wähle alle passenden Bereiche. Filmcrew-Berufe suchst du im nächsten Schritt.</p>
+          <p className="mb-2.5 text-xs font-semibold text-text-primary">{uiText("Ui.text_eab9be960c0a8d")}</p>
+          <p className="mb-3 text-xs leading-5 text-text-muted">{uiText("Ui.text_f023829e6f0b53")}</p>
           <div className="flex flex-wrap gap-2">
             {[...TALENT_CHIPS, ...ANBIETER_CHIPS].map(([id, label]) => {
               const active = selectedTypes.includes(id);
               return (
                 <button key={id} type="button" aria-pressed={active} onClick={() => toggleType(id)}
                   className={`min-h-11 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${active ? "bg-gold/15 border-gold/50 text-gold" : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"}`}>
-                  {label}
+                  {(uiOptionLabels[label] ?? label)}
                 </button>
               );
             })}
           </div>
         </div>
         {(selectedTypes.some((type) => !TALENT_TYPE_IDS.has(type) && !ANBIETER_TYPE_IDS.has(type)) || positions.length > 0) && (
-          <p className="rounded-lg border border-border bg-bg-primary/50 p-3 text-sm text-text-secondary">
-            Für deine Crew-Tätigkeiten sind {positions.length} {positions.length === 1 ? "Rolle" : "Rollen"} ausgewählt. Du kannst sie im nächsten Schritt ändern.
-          </p>
+          <p className="rounded-lg border border-border bg-bg-primary/50 p-3 text-sm text-text-secondary">{uiText.rich("Ui.text_82162b4552dab6", { value1: () => (positions.length), value2: () => (positions.length === 1 ? uiText("Ui.text_0038a9cf86613c") : uiText("Ui.text_74fa1b2d740dc4")) })}</p>
         )}
       </div>
     );
@@ -198,14 +224,14 @@ function TypeChipPicker({
     <div className="space-y-5">
       {positions.length > 0 && (
         <div>
-          <p className="mb-2 text-xs font-semibold text-text-primary">Ausgewählte Tätigkeiten</p>
+          <p className="mb-2 text-xs font-semibold text-text-primary">{uiText("Ui.text_c8e0c70f21214e")}</p>
           <div className="flex flex-wrap gap-2">
             {positions.map((position) => (
               <span key={position} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-3 text-sm text-gold">
                 {position}
                 <button type="button" onClick={() => {
                   applyOccupationEdit(removeProfilePosition(positions, occupationSelections, position));
-                }} className="inline-flex h-7 w-7 items-center justify-center rounded-full hover:bg-red-500/10" aria-label={`${position} entfernen`}><X size={14} /></button>
+                }} className="inline-flex h-7 w-7 items-center justify-center rounded-full hover:bg-red-500/10" aria-label={uiText("Ui.text_f10fe7a27ce274", { value1: String(position) })}><X size={14} /></button>
               </span>
             ))}
           </div>
@@ -214,11 +240,11 @@ function TypeChipPicker({
       <label className="relative block">
         <Search size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
         <input type="search" value={roleSearch} onChange={(event) => setRoleSearch(event.target.value)}
-          placeholder="Beruf oder Spezialisierung suchen …" aria-label="Beruf oder Spezialisierung suchen"
+          placeholder={uiText("Ui.text_fea778811305f9")} aria-label={uiText("Ui.text_b4f0607a19859b")}
           className="w-full rounded-xl border border-border bg-bg-primary py-3 pl-10 pr-4 text-base text-text-primary placeholder:text-text-muted focus:border-gold focus:outline-none" />
       </label>
       <label className="block">
-        <span className="mb-1.5 block text-xs font-semibold text-text-secondary">Gewerk auswählen</span>
+        <span className="mb-1.5 block text-xs font-semibold text-text-secondary">{uiText("Ui.text_00ecd863c9281f")}</span>
         <select value="" onChange={(event) => {
           const id = event.target.value;
           if (id) {
@@ -227,8 +253,8 @@ function TypeChipPicker({
             setRoleSearch("");
           }
         }} className="min-h-11 w-full rounded-xl border border-border bg-bg-primary px-3 text-sm text-text-primary focus:border-gold focus:outline-none">
-          <option value="">Gewerk suchen oder auswählen …</option>
-          {departments.map((dept) => <option key={dept.id} value={dept.id}>{dept.emoji} {getDeptLabel(dept, locale, animals)}</option>)}
+          <option value="">{uiText("Ui.text_f8eb121d675eae")}</option>
+          {departments.map((dept) => <option key={dept.id} value={dept.id}>{dept.emoji} {getDeptLabel(dept, locale, animals, taxonomyText)}</option>)}
         </select>
       </label>
       <div className="space-y-3">
@@ -240,22 +266,22 @@ function TypeChipPicker({
             <section key={dept.id} className="overflow-hidden rounded-xl border border-border bg-bg-primary/50">
               <button type="button" aria-expanded={expanded} onClick={() => setExpandedDepartments((current) => ({ ...current, [dept.id]: !expanded }))}
                 className="flex min-h-12 w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-bg-elevated/60">
-                <span className="min-w-0"><span className={`text-xs font-semibold uppercase tracking-wider ${colors.text}`}>{dept.emoji} {getDeptLabel(dept, locale, animals)}</span><span className="ml-2 text-xs text-text-muted">{roles.length} {roles.length === 1 ? "Tätigkeit" : "Tätigkeiten"}</span></span>
-                <span className="flex shrink-0 items-center gap-2">{selectedCount > 0 && <span className={`rounded-full border px-2 py-1 text-[10px] ${colors.bg} ${colors.border} ${colors.text}`}>{selectedCount} ausgewählt</span>}<ChevronDown size={15} className={`text-text-muted transition-transform ${expanded ? "rotate-180" : ""}`} /></span>
+                <span className="min-w-0"><span className={`text-xs font-semibold uppercase tracking-wider ${colors.text}`}>{dept.emoji} {getDeptLabel(dept, locale, animals, taxonomyText)}</span><span className="ml-2 text-xs text-text-muted">{roles.length} {roles.length === 1 ? uiText("AdminReview.fields.role") : uiText("setup.occupations")}</span></span>
+                <span className="flex shrink-0 items-center gap-2">{selectedCount > 0 && <span className={`rounded-full border px-2 py-1 text-[10px] ${colors.bg} ${colors.border} ${colors.text}`}>{uiText.rich("Ui.text_2936558f2682cd", { value1: () => (selectedCount) })}</span>}<ChevronDown size={15} className={`text-text-muted transition-transform ${expanded ? "rotate-180" : ""}`} /></span>
               </button>
               {expanded && <div className="flex flex-wrap gap-2 border-t border-border px-4 py-3">
-                {dept.id === "grip" && <p className="mb-1 w-full text-xs leading-5 text-text-muted">Kamerabühne / Grip umfasst Kameraunterstützung wie Dolly, Schienen und Kräne. Zuständigkeiten können sich je nach Land und Produktion unterscheiden.</p>}
+                {dept.id === "grip" && <p className="mb-1 w-full text-xs leading-5 text-text-muted">{uiText("Ui.text_2cdb8c47738297")}</p>}
                 {roles.map((role) => {
                   const active = selectedOccupations.some(option => option.roleId === occupationId(dept.id, role));
                   const explanation = GRIP_OCCUPATIONS.find((occupation) => occupation.label === role)?.description;
                   return <button key={role} type="button" aria-pressed={active} title={explanation} onClick={() => togglePosition(role, dept.id)}
-                    className={`min-h-10 rounded-full border px-3 py-2 text-xs font-medium transition-colors ${active ? `${colors.bg} ${colors.border} ${colors.text}` : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"}`}>{getDepartmentRoleLabel(dept.id, role, locale, animals)}</button>;
+                    className={`min-h-10 rounded-full border px-3 py-2 text-xs font-medium transition-colors ${active ? `${colors.bg} ${colors.border} ${colors.text}` : "border-border text-text-muted hover:border-border-light hover:text-text-secondary"}`}>{getDepartmentRoleLabel(dept.id, role, locale, animals, taxonomyText)}</button>;
                 })}
               </div>}
             </section>
           );
         })}
-        {visibleDepartments.length === 0 && <p className="rounded-xl border border-dashed border-border px-4 py-6 text-center text-sm text-text-muted">{normalizedQuery ? "Kein Gewerk oder Beruf gefunden. Probiere einen anderen Suchbegriff." : "Wähle ein Gewerk aus oder suche nach einer Tätigkeit."}</p>}
+        {visibleDepartments.length === 0 && <p className="rounded-xl border border-dashed border-border px-4 py-6 text-center text-sm text-text-muted">{normalizedQuery ? uiText("Ui.text_7982ace75ca2c1") : uiText("Ui.text_ca273a46a665c0")}</p>}
       </div>
     </div>
   );
@@ -302,6 +328,8 @@ function UploadZone({
   uploading: boolean;
   onFile: (f: File) => void;
 }) {
+  const uiText = useTranslations();
+
   const ref = useRef<HTMLInputElement>(null);
   return (
     <div>
@@ -314,7 +342,7 @@ function UploadZone({
       >
         <input ref={ref} type="file" accept={accept} className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); }} />
         {uploading ? (
-          <><Loader2 size={24} className="animate-spin text-gold mx-auto mb-2" /><p className="text-sm text-text-muted">Hochladen…</p></>
+          <><Loader2 size={24} className="animate-spin text-gold mx-auto mb-2" /><p className="text-sm text-text-muted">{uiText("Ui.text_57c7dba7e17bc8")}</p></>
         ) : file ? (
           <><CheckCircle size={24} className="text-success mx-auto mb-2" /><p className="text-sm font-medium text-success truncate max-w-xs mx-auto">{file.name}</p></>
         ) : (
@@ -326,6 +354,8 @@ function UploadZone({
 }
 
 function VerificationTab() {
+  const uiText = useTranslations();
+
   const { addToast } = useToast();
   const tV = useTranslations("profile");
   const [status, setStatus] = useState<VerifStatus>("loading");
@@ -369,7 +399,7 @@ function VerificationTab() {
         body: JSON.stringify({ notes }),
       });
       const data = await res.json();
-      if (!res.ok) { addToast(data.error ?? "Fehler beim Einreichen", "error"); return; }
+      if (!res.ok) { addToast(data.error ?? uiText("Ui.text_f720e2ca2c2d9a"), "error"); return; }
       setStatus("pending");
       addToast(tV("verifSubmit"), "success");
     } catch {
@@ -472,6 +502,25 @@ type FilmEntry = { year: number | string; title: string; role: string; type: str
 // ─── Profile Page ─────────────────────────────────────────────────────────────
 
 export default function ProfilePage() {
+  const uiText = useTranslations();
+  const PROFILE_TYPE_LABELS = getLocalizedProfileTypeLabels(uiText);
+
+  const uiOptionLabels: Record<string, string> = {
+    "Spielfilm": uiText("Ui.text_031b1c1fc4b241"),
+    "Kurzfilm": uiText("Ui.text_75b346d26e4973"),
+    "Serie": uiText("Ui.text_ab7743a4ad9a44"),
+    "Dokumentation": uiText("projects.catDokumentation"),
+    "Werbefilm": uiText("Ui.text_5c634ccc3ba66d"),
+    "Musikvideo": uiText("projects.catMusikvideo"),
+    "Corporate": uiText("projects.catCorporate"),
+  };
+
+
+
+
+
+  const uiLocale = useLocale();
+
   const router = useRouter();
   const { addToast } = useToast();
   const { user, isLoaded } = useUser();
@@ -654,7 +703,7 @@ export default function ProfilePage() {
       fetch("/api/friendships")
         .then(async (response) => {
           const result = await response.json().catch(() => ({}));
-          if (!response.ok || result.error) throw new Error(result.error ?? `HTTP ${response.status}`);
+          if (!response.ok || result.error) throw new Error(result.error ?? uiText("Ui.text_2669fecc698980", { value1: String(response.status) }));
           return result;
         })
         .then(({ friends: list }) => {
@@ -666,7 +715,7 @@ export default function ProfilePage() {
           });
           setCollabEdits(edits);
         })
-        .catch((error) => setFriendsError(error instanceof Error ? error.message : "Bitte lade die Seite neu."))
+        .catch((error) => setFriendsError(uiErrorMessage(error, uiText("Ui.text_0504c98fd2caa9"))))
         .finally(() => setFriendsLoading(false));
     }
   }, [activeTab]);
@@ -679,14 +728,14 @@ export default function ProfilePage() {
     fetch("/api/user-settings")
       .then(async (response) => {
         const result = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(result.error ?? `HTTP ${response.status}`);
+        if (!response.ok) throw new Error(result.error ?? uiText("Ui.text_2669fecc698980", { value1: String(response.status) }));
         return result;
       })
       .then(({ settings }) => {
         if (!cancelled && settings) setMessageEmailsEnabled(settings.email_new_message !== false);
       })
       .catch((err) => {
-        if (!cancelled) setNotificationError(`Benachrichtigungen konnten nicht geladen werden: ${err instanceof Error ? err.message : "Bitte lade die Seite neu."}`);
+        if (!cancelled) setNotificationError(uiText("Ui.text_5ffc3443f37e9f", { value1: String(uiErrorMessage(err, uiText("Ui.text_0504c98fd2caa9"))) }));
       })
       .finally(() => { if (!cancelled) setNotificationLoading(false); });
     return () => { cancelled = true; };
@@ -705,11 +754,11 @@ export default function ProfilePage() {
         body: JSON.stringify({ email_new_message: next }),
       });
       const result = await response.json().catch(() => ({}));
-      if (!response.ok || result.error) throw new Error(result.error ?? `HTTP ${response.status}`);
-      addToast("Benachrichtigungseinstellung gespeichert.", "success");
+      if (!response.ok || result.error) throw new Error(result.error ?? uiText("Ui.text_2669fecc698980", { value1: String(response.status) }));
+      addToast(uiText("Ui.text_d2a2301c3bb1ed"), "success");
     } catch (err) {
       setMessageEmailsEnabled(previous);
-      setNotificationError(`Einstellung wurde nicht gespeichert: ${err instanceof Error ? err.message : "Bitte versuche es erneut."}`);
+      setNotificationError(uiText("Ui.text_7d80e16f8158c3", { value1: String(uiErrorMessage(err, uiText("Ui.text_8760d6e61c65fe"))) }));
     } finally {
       setNotificationLoading(false);
     }
@@ -720,12 +769,12 @@ export default function ProfilePage() {
     fetch("/api/profile", { cache: "no-store" })
       .then(async (r) => {
         const result = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(result.error ?? `HTTP ${r.status}`);
+        if (!r.ok) throw new Error(result.error ?? uiText("Ui.text_2669fecc698980", { value1: String(r.status) }));
         return result;
       })
       .then(({ profile, exists, unavailableFields = [] }) => {
         if (unavailableFields.length > 0) {
-          addToast(`Einige Profilfelder fehlen noch in der Datenbank: ${unavailableFields.join(", ")}. Bitte die Datenbank aktualisieren lassen.`, "error");
+          addToast(uiText("Ui.text_e7f05d1a09c33f", { value1: String(unavailableFields.join(", ")) }), "error");
         }
         setProfileExists(!!exists);
         setEditorStep(exists ? 0 : 1);
@@ -822,7 +871,7 @@ export default function ProfilePage() {
         console.error("[profile page] failed to load profile", err);
         setProfileLoadError(true);
         setProfileLoading(false);
-        addToast("Profil konnte nicht geladen werden. Änderungen sind deshalb gesperrt, damit nichts überschrieben wird.", "error");
+        addToast(uiText("Ui.text_5365725d585528"), "error");
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -846,7 +895,7 @@ export default function ProfilePage() {
     if (preview) setAvatarPreview(preview);
     setAvatarUploading(true);
     try {
-      const prepared = await prepareProfileMediaFile(file, compressAvatar);
+      const prepared = await prepareProfileMediaFile(file, (source) => compressAvatar(source, uiText));
       if (!prepared.file) throw new Error(profileMediaErrorText(prepared.error, t));
       let url: string;
       if (profileExists) {
@@ -857,22 +906,22 @@ export default function ProfilePage() {
         const response = await fetch("/api/profile/avatar", { method: "POST", body, cache: "no-store" });
         const result = await response.json().catch(() => ({}));
         if (!response.ok || !result.url || result.saved !== true) {
-          throw new Error(result.error ?? `HTTP ${response.status}`);
+          throw new Error(result.error ?? uiText("Ui.text_2669fecc698980", { value1: String(response.status) }));
         }
         url = result.url as string;
       } else {
         // A not-yet-created profile has no row to associate yet. Keep the
         // upload as a draft and persist its URL with the first profile save.
-        url = await sendProfileMediaFile(prepared.file);
+        url = await sendProfileMediaFile(prepared.file, uiText);
       }
       setAvatarUrl(url);
       setAvatarPreview(url);
       markEditorChanged();
       if (profileExists) {
         publishProfileUpdated({ userId: user?.id, displayName: form.name, avatarUrl: url, previousAvatarUrl });
-        addToast("Profilfoto gespeichert und deinem Profil zugeordnet.", "success");
+        addToast(uiText("Ui.text_109abfbfca1583"), "success");
       } else {
-        addToast("Foto bereit. Es wird mit deinem Profil gespeichert, sobald du die Profildaten sicherst.", "success");
+        addToast(uiText("Ui.text_19c7a309277933"), "success");
       }
       // Fokuspunkt setzen
       setFocalPickerImage(url);
@@ -887,7 +936,7 @@ export default function ProfilePage() {
             setAvatarPreview(savedUrl);
             markEditorChanged();
             publishProfileUpdated({ userId: user?.id, displayName: form.name, avatarUrl: savedUrl, previousAvatarUrl });
-            addToast("Profilfoto wurde gespeichert. Die Bestätigung der Upload-Antwort war unterbrochen.", "success");
+            addToast(uiText("Ui.text_ed4cfa434db291"), "success");
             return;
           }
         } catch {
@@ -895,7 +944,7 @@ export default function ProfilePage() {
           // the previous photo and let the user retry without losing it.
         }
       }
-      addToast(`Profilfoto konnte nicht gespeichert werden: ${err instanceof Error ? err.message : t("uploadFailed")}`, "error");
+      addToast(uiText("Ui.text_b1195d7a229dd2", { value1: String(uiErrorMessage(err, t("uploadFailed"))) }), "error");
       setAvatarUrl(previousAvatarUrl);
       setAvatarPreview(previousAvatarUrl);
     } finally {
@@ -917,17 +966,17 @@ export default function ProfilePage() {
     const _cp = safeObjectURL(file); if (_cp) setCoverImagePreview(_cp);
     setCoverUploading(true);
     try {
-      const prepared = await prepareProfileMediaFile(file, (source) => compressImage(source, { maxWidth: 1920, maxHeight: 1080, quality: 0.85, maxBytes: MAX_FUNCTION_UPLOAD_BYTES }));
+      const prepared = await prepareProfileMediaFile(file, (source) => compressImage(source, { maxWidth: 1920, maxHeight: 1080, quality: 0.85, maxBytes: MAX_FUNCTION_UPLOAD_BYTES , translate: uiText }));
       if (!prepared.file) throw new Error(profileMediaErrorText(prepared.error, t));
-      const url = await sendProfileMediaFile(prepared.file);
+      const url = await sendProfileMediaFile(prepared.file, uiText);
       setCoverImageUrl(url);
       setCoverImagePreview(url);
       markEditorChanged();
-      addToast("Titelbild bereit. Speichere dein Profil, damit es öffentlich übernommen wird.", "success");
+      addToast(uiText("Ui.text_bae6fb5ab0b491"), "success");
       // Cover cropping has its own controls; never change the portrait focus.
       setFocalPoint(current => ({ ...current, cover: { x: 50, y: 50 } }));
     } catch (err) {
-      addToast(`Titelbild konnte nicht gespeichert werden: ${err instanceof Error ? err.message : t("uploadFailed")}`, "error");
+      addToast(uiText("Ui.text_99e8fcd5af3347", { value1: String(uiErrorMessage(err, t("uploadFailed"))) }), "error");
       setCoverImagePreview(coverImageUrl);
     } finally {
       setCoverUploading(false);
@@ -950,13 +999,13 @@ export default function ProfilePage() {
 
   const roleCollaboratorHint = (role: string) => {
     const value = role.toLowerCase();
-    if (/personal assistant|talent assistant|persönliche assistenz/.test(value)) return "z. B. betreute Schauspieler*in: Tom Hardy";
-    if (/driver|fahrer/.test(value)) return "z. B. gefahrene Person: Adam Driver";
-    if (/gaffer|beleucht|licht/.test(value)) return "z. B. Kameramann/-frau: Name";
-    if (/kamera|cinematograph/.test(value)) return "z. B. Regie: Name";
-    if (/kostüm|costume/.test(value)) return "z. B. Kostümbildner*in: Name";
-    if (/runner/.test(value)) return "z. B. Set-Aufnahmeleitung: Name";
-    return "z. B. Funktion: Name der Person";
+    if (/personal assistant|talent assistant|persönliche assistenz/.test(value)) return uiText("Ui.text_13b6461312a5d4");
+    if (/driver|fahrer/.test(value)) return uiText("Ui.text_76648c97bedf99");
+    if (/gaffer|beleucht|licht/.test(value)) return uiText("Ui.text_119eca3d18ed02");
+    if (/kamera|cinematograph/.test(value)) return uiText("Ui.text_c7fcefa242b285");
+    if (/kostüm|costume/.test(value)) return uiText("Ui.text_6a9ec7f4f48978");
+    if (/runner/.test(value)) return uiText("Ui.text_26fb9c385868f2");
+    return uiText("Ui.text_c19f97ac3231ff");
   };
 
   const roleWithCollaborator = (role: string, collaborator: string) => {
@@ -1027,13 +1076,13 @@ export default function ProfilePage() {
       });
       const d = await r.json();
       if (!r.ok) { addToast(d.error, "error"); return; }
-      if (!d.draft?.id) throw new Error("Der private Entwurf konnte nicht bestätigt werden.");
+      if (!d.draft?.id) throw new Error(uiText("Ui.text_bd88388ea3601a"));
       setShowNewProject(false);
       setNewProject({ title: "", year: "", type: "", description: "", director: "", myRole: "", collaborator: "", poster_url: "", genre: "", productionCompany: "", location: "", selected_place_city_id: "", equipment: "", link: "", alsoOnCrewUnited: false });
-      addToast("Privater Entwurf gespeichert", "success");
+      addToast(uiText("FormDraft.saved"), "success");
       router.push(`/dashboard/projects/drafts/${d.draft.id}`);
     } catch (error) {
-      addToast(error instanceof Error ? error.message : "Entwurf konnte nicht gespeichert werden.", "error");
+      addToast(uiErrorMessage(error, uiText("Ui.text_46dbd7a67ff42c")), "error");
     } finally {
       setCreatingProject(false);
     }
@@ -1042,15 +1091,15 @@ export default function ProfilePage() {
   // ── Save profile ────────────────────────────────────────────────────────────
   const handleSave = async () => {
     if (avatarUploading || coverUploading || profileUploading) {
-      addToast("Warte bitte, bis alle Fotos hochgeladen sind, bevor du das Profil speicherst.", "error");
+      addToast(uiText("Ui.text_57b48356540c51"), "error");
       return;
     }
     if (profileLoadError) {
-      addToast("Profil konnte nicht geladen werden. Lade die Seite neu, bevor du Änderungen speicherst.", "error");
+      addToast(uiText("Ui.text_d4435a545845cd"), "error");
       return;
     }
     if (!draftLoaded) {
-      addToast("Der private Entwurf wird noch geladen. Bitte warte kurz, bevor du speicherst.", "error");
+      addToast(uiText("Ui.text_8f3a9ca2e9ef23"), "error");
       return;
     }
     const validationErrors = validateProfileSave({
@@ -1058,8 +1107,8 @@ export default function ProfilePage() {
       city: form.city,
       positions,
       profileTypes: currentProfileTypes,
-    });
-    if (positions.length && !primaryOccupationForPositions(primaryOccupation, positions)) validationErrors.activity = "Bitte wähle deine Haupttätigkeit aus. Deine weiteren Tätigkeiten bleiben erhalten.";
+    }, uiText);
+    if (positions.length && !primaryOccupationForPositions(primaryOccupation, positions)) validationErrors.activity = uiText("Ui.text_89818eac599e88");
     setFieldErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) {
       const destination = profileEditorStepForErrors(Object.keys(validationErrors) as ("activity" | "name" | "city")[]);
@@ -1173,7 +1222,7 @@ export default function ProfilePage() {
           focusEditorField(destination === 1 ? "activity" : serverFieldErrors.display_name ? "name" : "city");
         }
         const msg = baseResult.error ?? `HTTP ${res.status}`;
-        addToast(`Speichern fehlgeschlagen: ${msg}`, "error");
+        addToast(uiText("Ui.text_630b2e84aede8c", { value1: String(msg) }), "error");
         return;
       }
       if (isNew) setProfileExists(true);
@@ -1197,13 +1246,13 @@ export default function ProfilePage() {
       originalTravelReadyRef.current = form.travelReady;
 
       if (unavailableFields.length > 0) {
-        addToast(`Profil gespeichert. Diese Angaben konnten wegen fehlender Datenbankfelder nicht gespeichert werden: ${unavailableFields.join(", ")}.`, "error");
+        addToast(uiText("Ui.text_5a5f71213f5b75", { value1: String(unavailableFields.join(", ")) }), "error");
       } else {
         addToast(t("profileSaved"), "success");
       }
     } catch (err) {
       draftPausedRef.current = false;
-      addToast(`Fehler: ${err instanceof Error ? err.message : String(err)}`, "error");
+      addToast(uiText("Ui.text_dc4c94d7d3926e", { value1: String(uiErrorMessage(err, uiText("System.requestFailed"))) }), "error");
     } finally {
       setSaving(false);
       if (!draftPausedRef.current) markEditorChanged();
@@ -1222,7 +1271,7 @@ export default function ProfilePage() {
     try {
       const preparedFiles = await Promise.all(files.map((file) => prepareProfileMediaFile(
         file,
-        (source) => compressImage(source, { maxWidth: 1600, quality: 0.82, maxBytes: MAX_FUNCTION_UPLOAD_BYTES }),
+        (source) => compressImage(source, { maxWidth: 1600, quality: 0.82, maxBytes: MAX_FUNCTION_UPLOAD_BYTES , translate: uiText }),
       )));
       const firstFailure = preparedFiles.find((prepared) => !prepared.file);
       if (firstFailure && !firstFailure.file) throw new Error(profileMediaErrorText(firstFailure.error, t));
@@ -1230,7 +1279,7 @@ export default function ProfilePage() {
       const uploaded: ProfileImage[] = [];
       for (const prepared of preparedFiles) {
         if (!prepared.file) continue;
-        const url = await sendProfileMediaFile(prepared.file);
+        const url = await sendProfileMediaFile(prepared.file, uiText);
         uploaded.push({ url, featured: false });
       }
 
@@ -1240,11 +1289,11 @@ export default function ProfilePage() {
       updateProfileImages(merged);
       markEditorChanged();
 
-      addToast(`${uploaded.length} Foto(s) bereit. Speichere dein Profil, damit sie öffentlich übernommen werden.`, "success");
+      addToast(uiText("Ui.text_76771fbaea1b09", { value1: String(uploaded.length) }), "success");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "";
       const isBrowserBug = !msg || /did not match|pattern/i.test(msg);
-      addToast(isBrowserBug ? t("uploadFailed") : msg, "error");
+      addToast(isBrowserBug ? t("uploadFailed") : uiErrorMessage(err, t("uploadFailed")), "error");
     } finally {
       setProfileUploading(false);
       input.value = "";
@@ -1407,7 +1456,7 @@ export default function ProfilePage() {
     fetch("/api/onboarding", { cache: "no-store" })
       .then(async (response) => {
         const result = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(result.error ?? `HTTP ${response.status}`);
+        if (!response.ok) throw new Error(result.error ?? uiText("Ui.text_2669fecc698980", { value1: String(response.status) }));
         return result;
       })
       .then(({ draft }) => {
@@ -1426,7 +1475,7 @@ export default function ProfilePage() {
       })
       .catch((error) => {
         if (cancelled) return;
-        const message = error instanceof Error ? error.message : "Bitte lade die Seite neu.";
+        const message = uiErrorMessage(error, uiText("Ui.text_0504c98fd2caa9"));
         setDraftLoadError(message);
         setDraftLoaded(false);
       })
@@ -1452,10 +1501,10 @@ export default function ProfilePage() {
 
   function validateEditorStep(step: ProfileEditorStep) {
     const errors: ProfileSaveFieldErrors = {};
-    if (step === 2 && !positions.length && !currentProfileTypes.length) errors.activity = "Bitte wähle mindestens eine Tätigkeit aus.";
+    if (step === 2 && !positions.length && !currentProfileTypes.length) errors.activity = uiText("Ui.text_f25450253ed66e");
     if (step === 3) {
-      if (!form.name.trim()) errors.name = "Bitte gib deinen Namen ein.";
-      if (!form.city.trim()) errors.city = "Bitte gib deinen Standort ein.";
+      if (!form.name.trim()) errors.name = uiText("Ui.text_f08a575aecfb55");
+      if (!form.city.trim()) errors.city = uiText("Ui.text_a4789c8ce64209");
     }
     setFieldErrors((current) => ({ ...current, ...errors }));
     if (Object.keys(errors).length) {
@@ -1518,15 +1567,15 @@ export default function ProfilePage() {
           <aside className="lg:w-56 shrink-0">
             {/* Mobile: one compact, fully visible selector instead of a clipped tab row */}
             <label className="mb-4 block lg:hidden">
-              <span className="sr-only">Profilbereich auswählen</span>
+              <span className="sr-only">{uiText("Ui.text_0aef2c1fabf0a6")}</span>
               <select value={activeTab} onChange={(event) => selectProfileTab(event.target.value)}
                 className="min-h-11 w-full rounded-lg border border-border bg-bg-secondary px-3 text-sm text-text-primary focus:border-gold focus:outline-none">
                 {TAB_IDS.map(({ id, labelKey }) => <option key={id} value={id}>{t(labelKey as Parameters<typeof t>[0])}</option>)}
               </select>
             </label>
             {/* Desktop: vertical nav */}
-            <nav aria-label="Profil- und Kontobereiche" className="hidden lg:block space-y-1">
-              <p className="px-4 pb-2 text-[11px] font-semibold uppercase tracking-widest text-text-muted">Profil &amp; Konto</p>
+            <nav aria-label={uiText("Ui.text_4eafea0bf08b1e")} className="hidden lg:block space-y-1">
+              <p className="px-4 pb-2 text-[11px] font-semibold uppercase tracking-widest text-text-muted">{uiText("Ui.text_e59812fd3c9fdc")}</p>
               {TAB_IDS.map(({ id, labelKey, icon: Icon }) => (
                 <button key={id} onClick={() => selectProfileTab(id)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-left ${
@@ -1559,7 +1608,7 @@ export default function ProfilePage() {
                 {profileLoadError && (
                   <div role="alert" className="flex items-start gap-3 rounded-xl border border-error/30 bg-error/10 p-4 text-sm text-text-primary">
                     <AlertCircle size={17} className="mt-0.5 shrink-0 text-error" />
-                    <p>Dein gespeichertes Profil konnte nicht geladen werden. Das Formular bleibt gesperrt, damit vorhandene Daten nicht überschrieben werden. Lade die Seite neu und versuche es erneut.</p>
+                    <p>{uiText("Ui.text_e9e6828db6e13d")}</p>
                   </div>
                 )}
 
@@ -1567,19 +1616,19 @@ export default function ProfilePage() {
                   <section className="rounded-xl border border-border bg-bg-secondary p-4 sm:p-6">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <h2 className="font-semibold text-text-primary">Profilübersicht</h2>
-                        <p className="mt-1 text-sm text-text-muted">{requiredMissing.length ? `Pflichtangaben noch offen: ${requiredMissing.map((field) => field === "activity" ? "Tätigkeit" : field === "name" ? "Name" : "Standort").join(", ")}.` : "Pflichtangaben vollständig. Alles Weitere ist freiwillig."}</p>
+                        <h2 className="font-semibold text-text-primary">{uiText("Ui.text_f07c0fcf26dc03")}</h2>
+                        <p className="mt-1 text-sm text-text-muted">{requiredMissing.length ? uiText("Ui.text_da5e0a84c0589e", { value1: String(requiredMissing.map((field) => field === "activity" ? uiText("AdminReview.fields.role") : field === "name" ? uiText("profile.fieldName") : uiText("setup.place")).join(", ")) }) : uiText("Ui.text_9f762458c9a321")}</p>
                       </div>
-                      <span className="rounded-full border border-border bg-bg-elevated px-3 py-1 text-xs text-text-secondary">Profilvollständigkeit {completion.score}%</span>
+                      <span className="rounded-full border border-border bg-bg-elevated px-3 py-1 text-xs text-text-secondary">{uiText.rich("Ui.text_1ca75155a0cc55", { value1: () => (completion.score) })}</span>
                     </div>
                     <div className="mt-4 grid gap-2 sm:grid-cols-2">
                       {[
-                        { step: 1 as ProfileEditorStep, title: "Angebot", summary: currentProfileTypes.map((type) => PROFILE_TYPE_LABELS[type as ProfileType] ?? type).join(", ") || "Noch keine Tätigkeit ausgewählt" },
-                        { step: 2 as ProfileEditorStep, title: "Tätigkeiten", summary: positions.slice(0, 3).join(", ") || "Berufe und Spezialisierungen" },
-                        { step: 3 as ProfileEditorStep, title: "Name und Standort", summary: [form.name, form.city, form.country].filter(Boolean).join(" · ") || "Pflichtangaben ergänzen" },
-                        { step: 4 as ProfileEditorStep, title: "Fotos und Vorstellung", summary: `${profileImages.length + (avatarUrl ? 1 : 0)} Foto(s) · ${form.bio.trim() ? "Vorstellung vorhanden" : "Vorstellung optional"}` },
-                        { step: 5 as ProfileEditorStep, title: "Weitere Angaben", summary: "Verfügbarkeit, Erfahrungen und passende Zusatzangaben" },
-                        { step: 6 as ProfileEditorStep, title: "Prüfen und speichern", summary: "Öffentliche Änderungen erst nach deiner Bestätigung" },
+                        { step: 1 as ProfileEditorStep, title: uiText("home.boardKind_offer"), summary: currentProfileTypes.map((type) => PROFILE_TYPE_LABELS[type as ProfileType] ?? type).join(", ") || uiText("Ui.text_d390a2e6c24904") },
+                        { step: 2 as ProfileEditorStep, title: uiText("setup.occupations"), summary: positions.slice(0, 3).join(", ") || uiText("Ui.text_2799d3de20eb93") },
+                        { step: 3 as ProfileEditorStep, title: uiText("Ui.text_69545035d1a655"), summary: [form.name, form.city, form.country].filter(Boolean).join(" · ") || uiText("Ui.text_07bf85dcf0efa5") },
+                        { step: 4 as ProfileEditorStep, title: uiText("Ui.text_6ab49b7e8b018e"), summary: uiText("Ui.text_23365f0ff644c2", { value1: String(profileImages.length + (avatarUrl ? 1 : 0)), value2: String(form.bio.trim() ? uiText("Ui.text_55dbf55b89328c") : uiText("Ui.text_82301961452f5b")) }) },
+                        { step: 5 as ProfileEditorStep, title: uiText("Ui.text_66fb159b3a4da4"), summary: uiText("Ui.text_da1228a8159999") },
+                        { step: 6 as ProfileEditorStep, title: uiText("Ui.text_0a84ee5ec3f752"), summary: uiText("Ui.text_e22dc9b0f94b29") },
                       ].map((section) => (
                         <button key={section.step} type="button" data-no-draft onClick={() => goToEditorStep(section.step, section.step === 3 && !form.name.trim() ? "name" : undefined)}
                           className="flex min-h-16 items-center justify-between gap-3 rounded-lg border border-border bg-bg-primary px-4 py-3 text-left hover:border-gold/40">
@@ -1590,7 +1639,7 @@ export default function ProfilePage() {
                     </div>
                     {completionMissing.length > 0 && (
                       <div className="mt-5 border-t border-border pt-4">
-                        <p className="mb-2 text-xs font-semibold text-text-secondary">Freiwillige Profilverbesserungen</p>
+                        <p className="mb-2 text-xs font-semibold text-text-secondary">{uiText("Ui.text_53e8b01b497ab6")}</p>
                         <div className="flex flex-wrap gap-2">{completion.missing.slice(0, 5).map((key) => (
                           <button key={key} type="button" onClick={() => goToEditorStep(profileEditorStepForHint(key))}
                             className="min-h-10 rounded-full border border-border bg-bg-elevated px-3 py-2 text-xs text-text-muted hover:border-gold/40 hover:text-gold">+ {completionHints[key] ?? key}</button>
@@ -1602,24 +1651,24 @@ export default function ProfilePage() {
 
                 {!profileExists && completion.score < 100 && editorStep > 0 && (
                   <div className="rounded-xl border border-border bg-bg-secondary p-4">
-                    <div className="flex items-center justify-between text-sm"><span className="font-semibold text-text-primary">Profilfortschritt</span><span className="tabular-nums text-text-muted">{completion.score}%</span></div>
+                    <div className="flex items-center justify-between text-sm">{uiText.rich("Ui.text_440a1966dad1a0", { part1: chunks => (<span className="font-semibold text-text-primary">{chunks}</span>), value3: () => (completion.score), part2: chunks => (<span className="tabular-nums text-text-muted">{chunks}</span>) })}</div>
                     <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-bg-elevated"><div className="h-full rounded-full bg-gold transition-all" style={{ width: `${completion.score}%` }} /></div>
-                    <p className="mt-2 text-xs text-text-muted">Die Prozentzahl umfasst auch freiwillige Angaben. Für die Veröffentlichung brauchst du nur Tätigkeit, Name und Standort.</p>
+                    <p className="mt-2 text-xs text-text-muted">{uiText("Ui.text_f37fa0f2f4027b")}</p>
                   </div>
                 )}
 
                 {draftLoadError && (
                   <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-error/30 bg-error/10 p-4 text-sm text-text-primary">
-                    <span>Privater Entwurf konnte nicht geprüft werden: {draftLoadError}. Damit nichts überschrieben wird, lade den Editor bitte neu.</span>
-                    <button type="button" data-no-draft onClick={() => window.location.reload()} className="min-h-11 rounded-lg border border-border px-4 hover:border-gold">Neu laden</button>
+                    <span>{uiText.rich("Ui.text_8ba7377040e350", { value1: () => (draftLoadError) })}</span>
+                    <button type="button" data-no-draft onClick={() => window.location.reload()} className="min-h-11 rounded-lg border border-border px-4 hover:border-gold">{uiText("Ui.text_55786148a69b44")}</button>
                   </div>
                 )}
 
-                {draftLoading && <div className="flex items-center gap-2 rounded-lg border border-border bg-bg-secondary p-3 text-sm text-text-muted"><Loader2 size={15} className="animate-spin" /> Privaten Entwurf prüfen …</div>}
+                {draftLoading && <div className="flex items-center gap-2 rounded-lg border border-border bg-bg-secondary p-3 text-sm text-text-muted">{uiText.rich("Ui.text_d4974da4dd0ab3", { part1: () => (<Loader2 size={15} className="animate-spin" />) })}</div>}
 
                 {editorStep !== 6 && Object.keys(visibleFieldErrors).length > 1 && !draftLoading && !draftLoadError && (
                   <div role="alert" className="rounded-lg border border-error/30 bg-error/10 p-4">
-                    <p className="mb-2 text-sm font-semibold text-error">Bitte ergänze noch diese Pflichtangaben:</p>
+                    <p className="mb-2 text-sm font-semibold text-error">{uiText("Ui.text_631c98f7bc044e")}</p>
                     <ul className="space-y-1 text-sm text-text-primary">{Object.entries(visibleFieldErrors).map(([field, message]) => (
                       <li key={field}><button type="button" className="min-h-8 text-left underline underline-offset-2" onClick={() => {
                         const target = field === "activity" ? 1 : 3;
@@ -1632,11 +1681,11 @@ export default function ProfilePage() {
                 {editorStep > 0 && !draftLoading && !draftLoadError && (
                   <section className="rounded-xl border border-border bg-bg-secondary p-4 sm:p-6">
                     <div className="flex items-start justify-between gap-4">
-                      <div><p className="text-xs font-semibold uppercase tracking-wider text-gold">Schritt {editorStep} von {PROFILE_EDITOR_STEPS.length}</p><h2 className="mt-1 font-display text-xl font-semibold text-text-primary">{PROFILE_EDITOR_STEPS[editorStep - 1].title}</h2><p className="mt-1 text-sm leading-6 text-text-muted">{PROFILE_EDITOR_STEPS[editorStep - 1].description}</p></div>
+                      <div><p className="text-xs font-semibold uppercase tracking-wider text-gold">{uiText.rich("Ui.text_97503dc1235f6c", { value1: () => (editorStep), value2: () => (PROFILE_EDITOR_STEPS.length) })}</p><h2 className="mt-1 font-display text-xl font-semibold text-text-primary">{PROFILE_EDITOR_STEPS[editorStep - 1].title}</h2><p className="mt-1 text-sm leading-6 text-text-muted">{PROFILE_EDITOR_STEPS[editorStep - 1].description}</p></div>
                       <FormDraftStatus draft={profileDraft} />
                     </div>
                     <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-bg-elevated"><div className="h-full rounded-full bg-gold transition-all" style={{ width: `${(editorStep / PROFILE_EDITOR_STEPS.length) * 100}%` }} /></div>
-                    <nav aria-label="Profilabschnitte" className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    <nav aria-label={uiText("Ui.text_95a93d113efe6a")} className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
                       {PROFILE_EDITOR_STEPS.map((step) => <button key={step.id} type="button" aria-current={editorStep === step.id ? "step" : undefined} onClick={() => goToEditorStep(step.id)}
                         className={`min-h-11 rounded-lg border px-3 py-2 text-left text-xs transition-colors ${editorStep === step.id ? "border-gold/50 bg-gold/10 text-gold" : "border-border text-text-muted hover:border-border-light hover:text-text-primary"}`}><span className="mr-1 font-semibold">{step.id}.</span>{step.title}</button>)}
                     </nav>
@@ -1645,8 +1694,8 @@ export default function ProfilePage() {
 
                 {editorStep === 1 && !draftLoading && !draftLoadError && (
                   <div ref={activityPickerRef} tabIndex={-1} className="scroll-mt-28 rounded-xl border border-border bg-bg-secondary p-4 sm:p-6 outline-none focus-visible:ring-2 focus-visible:ring-gold">
-                    <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-text-muted">Dein Angebot <span className="text-gold">· Pflichtangabe</span></p>
-                    <p className="mb-4 text-sm text-text-muted">Wähle Talent- oder Anbieterbereiche. Crew-Berufe findest du im nächsten Schritt.</p>
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-text-muted">{uiText.rich("Ui.text_fa2917535712c2", { part1: chunks => (<span className="text-gold">{chunks}</span>) })}</p>
+                    <p className="mb-4 text-sm text-text-muted">{uiText("Ui.text_3796aa867f444c")}</p>
                     <TypeChipPicker mode="types" selectedTypes={currentProfileTypes} onTypesChange={(next) => {
                       setCurrentProfileTypes(next);
                       if (next.length > 0 || positions.length > 0) setFieldErrors((previous) => ({ ...previous, activity: undefined }));
@@ -1656,7 +1705,7 @@ export default function ProfilePage() {
                 )}
                 {editorStep === 2 && !draftLoading && !draftLoadError && (
                   <div ref={activityPickerRef} tabIndex={-1} className="scroll-mt-28 rounded-xl border border-border bg-bg-secondary p-4 sm:p-6 outline-none focus-visible:ring-2 focus-visible:ring-gold">
-                    <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-text-muted">Filmcrew und Kreativberufe <span className="text-text-muted">· Weitere Tätigkeiten optional</span></p>
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-text-muted">{uiText.rich("Ui.text_bb610c8cae7830", { part1: chunks => (<span className="text-text-muted">{chunks}</span>) })}</p>
                     <TypeChipPicker mode="roles" occupationSelections={occupationSelections} onOccupationsChange={setOccupationSelections} selectedTypes={currentProfileTypes} onTypesChange={setCurrentProfileTypes} positions={positions} onPositionsChange={(next) => {
                       setPositions(next);
                       setPrimaryOccupation(current => occupationReference(primaryOccupationForPositions(current, next)));
@@ -1670,8 +1719,8 @@ export default function ProfilePage() {
                 {editorStep === 4 && !draftLoading && !draftLoadError && <div className="space-y-6">
                 <ContentUsageNotice context="profile" visibility="configured" />
                 <div className="rounded-xl border border-border bg-bg-secondary p-4 sm:p-6">
-                  <div className="mb-2 flex items-center justify-between gap-3"><label htmlFor="profile-bio" className="text-sm font-semibold text-text-primary">{t("fieldBio")}</label><span className="text-xs text-text-muted">Optional</span></div>
-                  <textarea id="profile-bio" rows={4} value={form.bio ?? ""} onChange={(e) => setForm((p) => ({ ...p, bio: e.target.value }))} maxLength={500} placeholder="Ein paar Sätze zu dir und deiner Arbeit …" className="w-full resize-y rounded-lg border border-border bg-bg-elevated px-3 py-2.5 text-sm focus:border-gold focus:outline-none" />
+                  <div className="mb-2 flex items-center justify-between gap-3"><label htmlFor="profile-bio" className="text-sm font-semibold text-text-primary">{t("fieldBio")}</label><span className="text-xs text-text-muted">{uiText("setup.copy38")}</span></div>
+                  <textarea id="profile-bio" rows={4} value={form.bio ?? ""} onChange={(e) => setForm((p) => ({ ...p, bio: e.target.value }))} maxLength={500} placeholder={uiText("Ui.text_c1a4c7a3ba9110")} className="w-full resize-y rounded-lg border border-border bg-bg-elevated px-3 py-2.5 text-sm focus:border-gold focus:outline-none" />
                   <p className="mt-1 text-right text-xs text-text-muted">{(form.bio ?? "").length} / 500</p>
                 </div>
                 {/* Avatar */}
@@ -1681,7 +1730,7 @@ export default function ProfilePage() {
                     <div className="relative shrink-0">
                       {avatarPreview ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={avatarPreview} alt="Profil" className="w-20 h-20 rounded-full object-cover border-2 border-border" />
+                        <img src={avatarPreview} alt={uiText("profile.tabProfile")} className="w-20 h-20 rounded-full object-cover border-2 border-border" />
                       ) : (
                         <div className="w-20 h-20 rounded-full bg-gold/10 border-2 border-gold/20 flex items-center justify-center">
                           <span className="text-xl font-bold text-gold">
@@ -1709,7 +1758,7 @@ export default function ProfilePage() {
                         <button onClick={() => fileRef.current?.click()}
                           disabled={avatarUploading}
                           className="px-3 py-1.5 text-xs border border-border text-text-secondary hover:border-gold hover:text-gold rounded-lg transition-colors">
-                          {avatarUploading ? "Foto wird gespeichert …" : t("photoUpload")}
+                          {avatarUploading ? uiText("Ui.text_59c8b25c60ab9c") : t("photoUpload")}
                         </button>
                         {avatarPreview && (
                           <button type="button" disabled={avatarUploading} onClick={() => setFocalPickerImage(avatarUrl || avatarPreview)} className="min-h-11 rounded-lg border border-border px-3 py-1.5 text-xs text-text-secondary hover:border-gold hover:text-gold disabled:opacity-50">
@@ -1763,11 +1812,11 @@ export default function ProfilePage() {
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                       {profileImages.map((img, i) => (
                         <div key={img.url + i} className="relative aspect-[3/4] rounded-xl overflow-hidden border border-border bg-bg-elevated">
-                          <ResilientPublicImage src={img.url} alt={`Foto ${i + 1}`} className="absolute inset-0" imageClassName="h-full w-full object-cover object-top" />
+                          <ResilientPublicImage src={img.url} alt={uiText("Ui.text_31b5322f7aaa57", { value1: String(i + 1) })} className="absolute inset-0" imageClassName="h-full w-full object-cover object-top" />
                           <div className="absolute inset-x-0 top-0 flex items-center justify-between p-1.5 bg-gradient-to-b from-black/60 to-transparent">
                             <button
                               type="button"
-                              title="Als Hauptfoto"
+                              title={uiText("profile.setMainPhoto")}
                               onClick={() => {
                                 const next = profileImages.map((im, j) => ({ ...im, featured: j === i }));
                                 updateProfileImages(next);
@@ -1808,7 +1857,7 @@ export default function ProfilePage() {
                     >
                       <Upload size={28} className="text-text-muted mb-3" />
                       <p className="text-sm font-medium text-text-secondary">{t("uploadPhotos")}</p>
-                      <p className="text-xs text-text-muted mt-1">JPG, PNG, WEBP · mehrere gleichzeitig möglich</p>
+                      <p className="text-xs text-text-muted mt-1">{uiText("Ui.text_ba50e1615dcc7e")}</p>
                     </label>
                   )}
                 </div>
@@ -1855,7 +1904,7 @@ export default function ProfilePage() {
                     >
                       <Camera size={24} className="text-text-muted" />
                       <p className="text-sm text-text-muted">{t("uploadCoverPlaceholder")}</p>
-                      <p className="text-xs text-text-muted">JPG, PNG, WEBP · ideal 1500×500 px</p>
+                      <p className="text-xs text-text-muted">{uiText("Ui.text_50631b89c1473b")}</p>
                     </button>
                   )}
                 </div>}
@@ -1887,28 +1936,24 @@ export default function ProfilePage() {
                       </label>
                       <input type="url" value={form.website}
                         onChange={(e) => setForm((p) => ({ ...p, website: e.target.value }))}
-                        placeholder="https://…"
+                        placeholder={uiText("setup.copy40")}
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
                     </div>
                     <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
-                        Telefon / WhatsApp
-                      </label>
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{uiText("Ui.text_5f95a53fd86ffa")}</label>
                       <input type="tel" value={form.phone}
                         onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
                         placeholder="+49 170 1234567"
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
-                      <p className="text-xs text-text-muted mt-1">Nur für eingeloggte Nutzer sichtbar</p>
+                      <p className="text-xs text-text-muted mt-1">{uiText("Ui.text_f81953350cf371")}</p>
                     </div>
                     <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">
-                        Kontakt-E-Mail
-                      </label>
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{uiText("setup.copy35")}</label>
                       <input type="email" value={form.contactEmail}
                         onChange={(e) => setForm((p) => ({ ...p, contactEmail: e.target.value }))}
-                        placeholder="kontakt@beispiel.de"
+                        placeholder={uiText("setup.copy36")}
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
-                      <p className="text-xs text-text-muted mt-1">Öffentliche Kontakt-E-Mail (optional, kann von deiner Login-E-Mail abweichen)</p>
+                      <p className="text-xs text-text-muted mt-1">{uiText("Ui.text_dc41a8ec6e6813")}</p>
                     </div>
                     <PlaceField id="profile-city" selectedCityId={form.selected_place_city_id} value={[form.city, form.country].filter(Boolean).join(", ")} onChange={(value,cityId) => { setForm(p => ({ ...p, city: value, country: "", selected_place_city_id: cityId ?? "" })); setFieldErrors(p => ({ ...p, city: undefined })); }} required />
                     {fieldErrors.city && <p id="profile-city-error" role="alert" className="text-sm text-error">{fieldErrors.city}</p>}
@@ -1925,7 +1970,7 @@ export default function ProfilePage() {
                           type="text"
                           value={form.slug}
                           onChange={(e) => setForm((p) => ({ ...p, slug: e.target.value }))}
-                          placeholder="dein-name"
+                          placeholder={uiText("Ui.text_273edb53b4aad3")}
                           className="flex-1 min-w-0 bg-transparent px-3 py-2.5 text-sm focus:outline-none"
                         />
                       </div>
@@ -1948,7 +1993,7 @@ export default function ProfilePage() {
                         min="0"
                         value={dayRate}
                         onChange={(e) => setDayRate(e.target.value)}
-                        placeholder="z.B. 450"
+                        placeholder="450"
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors"
                       />
                       <p className="text-xs text-text-muted mt-1">{t("fieldDayRateHint")}</p>
@@ -1999,9 +2044,9 @@ export default function ProfilePage() {
                     {/* Extra availability options */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-1">
                       {([
-                        { key: "weekends",    label: "Wochenenden",  desc: "Auch samstags/sonntags" },
-                        { key: "nightShoots", label: "Nachtdrehs",   desc: "Bereit für Nachtaufnahmen" },
-                        { key: "shortNotice", label: "Kurzfristig",  desc: "Verfügbar auf Kurzanfrage" },
+                        { key: "weekends",    label: uiText("Ui.text_fe3dd00105d06a"),  desc: uiText("Ui.text_bb74d69dd3e83d") },
+                        { key: "nightShoots", label: uiText("Ui.text_94c1be269db94c"),   desc: uiText("Ui.text_54ac5f547bc5d8") },
+                        { key: "shortNotice", label: uiText("Ui.text_da452aeb15b5c6"),  desc: uiText("Ui.text_749f157358ad0e") },
                       ] as const).map(({ key, label, desc }) => (
                         <button
                           key={key}
@@ -2023,19 +2068,16 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="mt-2">
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">Arbeitsradius</label>
-                      <div className="flex items-center gap-2">
-                        <input
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5">{uiText("Ui.text_b1305da321fd5b")}</label>
+                      <div className="flex items-center gap-2">{uiText.rich("Ui.text_f5fac00746ee36", { part1: () => (<input
                           type="number"
                           min="0"
                           max="5000"
                           value={form.workRadius}
                           onChange={(e) => setForm((p) => ({ ...p, workRadius: e.target.value }))}
-                          placeholder="z.B. 100"
+                          placeholder="100"
                           className="w-28 bg-bg-elevated border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold transition-colors"
-                        />
-                        <span className="text-xs text-text-muted">km vom Standort (leer = überall)</span>
-                      </div>
+                        />), part2: chunks => (<span className="text-xs text-text-muted">{chunks}</span>) })}</div>
                     </div>
                   </div>
                 </div>
@@ -2073,7 +2115,7 @@ export default function ProfilePage() {
                                     type="url"
                                     value={film.imdb_url ?? ""}
                                     onChange={(e) => setFilmography((p) => p.map((f, i) => i === idx ? { ...f, imdb_url: e.target.value } : f))}
-                                    placeholder="Link…"
+                                    placeholder={uiText("Ui.text_5c25e21e1ab74e")}
                                     className="w-20 bg-transparent border-none py-1 text-[10px] focus:outline-none"
                                   />
                                 </div>
@@ -2116,7 +2158,7 @@ export default function ProfilePage() {
                               </div>
                               {isEditing && (
                                 <div className="px-3 py-2 bg-bg-secondary border-t border-border">
-                                  <label className="block text-[10px] text-text-muted mb-1">{baseRole} · Mit wem hast du dabei gearbeitet?</label>
+                                  <label className="block text-[10px] text-text-muted mb-1">{uiText.rich("Ui.text_262283e7cfc096", { value1: () => (baseRole) })}</label>
                                   <div className="flex items-center gap-2">
                                     <input
                                       type="text"
@@ -2177,7 +2219,7 @@ export default function ProfilePage() {
                               <div className="flex items-center justify-between p-3">
                                 <div>
                                   <span className="text-sm font-medium text-text-primary">{proj.title}</span>
-                                  <span className="text-xs text-text-muted ml-2">{proj.year ?? ""} {proj.type ? `· ${proj.type}` : ""}</span>
+                                  <span className="text-xs text-text-muted ml-2">{proj.year ?? ""} {proj.type ? uiText("Ui.text_d610afc356daf3", { value1: String(proj.type) }) : ""}</span>
                                 </div>
                                 {joiningProjectId === proj.id ? (
                                   <div className="flex items-center gap-2">
@@ -2189,7 +2231,7 @@ export default function ProfilePage() {
                                         value={joinCollaborator}
                                         onChange={(event) => setJoinCollaborator(event.target.value)}
                                         placeholder={roleCollaboratorHint(joinRole)}
-                                        aria-label="Mit wem hast du in diesem Projekt gearbeitet?"
+                                        aria-label={uiText("Ui.text_000f4df5417c74")}
                                         className="w-full min-w-0 rounded-lg border border-border bg-bg-secondary px-3 py-2 text-xs text-text-primary placeholder:text-text-muted focus:border-gold focus:outline-none"
                                       />
                                     <button
@@ -2243,7 +2285,7 @@ export default function ProfilePage() {
                           <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelTitle")} *</label>
                           <input type="text" value={newProject.title}
                             onChange={(e) => setNewProject((p) => ({ ...p, title: e.target.value }))}
-                            placeholder="Das letzte Licht"
+                            placeholder={uiText("Ui.text_22f5865c0b8fdc")}
                             className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
                         </div>
                         <div>
@@ -2260,7 +2302,7 @@ export default function ProfilePage() {
                             className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold">
                             <option value="">—</option>
                             {["Spielfilm","Kurzfilm","Serie","Dokumentation","Werbefilm","Musikvideo","Corporate"].map((typeOpt) => (
-                              <option key={typeOpt} value={typeOpt}>{typeOpt}</option>
+                              <option key={typeOpt} value={typeOpt}>{(uiOptionLabels[typeOpt] ?? typeOpt)}</option>
                             ))}
                           </select>
                         </div>
@@ -2268,7 +2310,7 @@ export default function ProfilePage() {
                           <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelDirector")}</label>
                           <input type="text" value={newProject.director}
                             onChange={(e) => setNewProject((p) => ({ ...p, director: e.target.value }))}
-                            placeholder="Anna K."
+                            placeholder={uiText("Ui.text_4544b81c5f6331")}
                             className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
                         </div>
                         <div>
@@ -2276,12 +2318,12 @@ export default function ProfilePage() {
                           <RoleDropdown value={newProject.myRole} onChange={(v) => setNewProject((p) => ({ ...p, myRole: v }))} options={[...new Set([...positions, ...ALL_CREW_ROLES])]} />
                         </div>
                         <div className="col-span-2">
-                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Mit wem hast du dabei gearbeitet?</label>
+                          <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{uiText("Ui.text_3bc29bbee5eaf0")}</label>
                           <input type="text" maxLength={160} value={newProject.collaborator}
                             onChange={(e) => setNewProject((p) => ({ ...p, collaborator: e.target.value }))}
                             placeholder={roleCollaboratorHint(newProject.myRole)}
                             className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
-                          <p className="mt-1 text-[10px] text-text-muted">Name und Funktion, zum Beispiel die Schauspielerin, die du betreut hast, oder die Regie, mit der du gearbeitet hast.</p>
+                          <p className="mt-1 text-[10px] text-text-muted">{uiText("Ui.text_7fd972cee84a2b")}</p>
                         </div>
                         <div className="col-span-2">
                           <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelDescription")}</label>
@@ -2295,7 +2337,7 @@ export default function ProfilePage() {
                           {newProject.poster_url ? (
                             <div className="flex items-center gap-3">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={newProject.poster_url} alt="Poster" className="h-20 w-14 object-cover rounded-md border border-border" />
+                              <img src={newProject.poster_url} alt={uiText("profile.labelPoster")} className="h-20 w-14 object-cover rounded-md border border-border" />
                               <button type="button" onClick={() => setNewProject((p) => ({ ...p, poster_url: "" }))}
                                 className="text-xs text-text-muted hover:text-crimson-light">{t("removePhoto")}</button>
                             </div>
@@ -2313,7 +2355,7 @@ export default function ProfilePage() {
                                   const res = await fetch("/api/upload", { method: "POST", body: fd });
                                   const data = await res.json();
                                   if (res.ok) setNewProject((p) => ({ ...p, poster_url: data.url }));
-                                  else addToast(data.error ?? "Upload fehlgeschlagen", "error");
+                                  else addToast(data.error ?? uiText("profile.uploadFailed"), "error");
                                 } finally {
                                   setUploadingPoster(false);
                                 }
@@ -2327,14 +2369,14 @@ export default function ProfilePage() {
                           <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelGenre")}</label>
                           <input type="text" value={newProject.genre}
                             onChange={(e) => setNewProject((p) => ({ ...p, genre: e.target.value }))}
-                            placeholder="Drama, Thriller…"
+                            placeholder={uiText("Ui.text_6ef462fdd831c2")}
                             className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
                         </div>
                         <div>
                           <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelProductionCompany")}</label>
                           <input type="text" value={newProject.productionCompany}
                             onChange={(e) => setNewProject((p) => ({ ...p, productionCompany: e.target.value }))}
-                            placeholder="XY Film GmbH"
+                            placeholder={uiText("Ui.text_eb4280048fc05a")}
                             className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
                         </div>
                         <div>
@@ -2345,7 +2387,7 @@ export default function ProfilePage() {
                           <label className="text-[10px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{t("labelLink")}</label>
                           <input type="url" value={newProject.link}
                             onChange={(e) => setNewProject((p) => ({ ...p, link: e.target.value }))}
-                            placeholder="https://…"
+                            placeholder={uiText("setup.copy40")}
                             className="w-full bg-bg-secondary border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold" />
                         </div>
                         <div className="col-span-2">
@@ -2380,11 +2422,11 @@ export default function ProfilePage() {
                   <p className="text-xs text-text-muted mb-5">{t("sectionSocialDesc")}</p>
                   <div className="space-y-3">
                     {[
-                      { label: "Instagram", icon: AtSign,      value: instagramUrl, set: setInstagramUrl, placeholder: "https://instagram.com/deinname" },
-                      { label: "TikTok",    icon: PlayCircle,  value: tiktokUrl,    set: setTiktokUrl,    placeholder: "https://tiktok.com/@deinname" },
-                      { label: "YouTube",   icon: Video,       value: youtubeUrl,   set: setYoutubeUrl,   placeholder: "https://youtube.com/@deinname" },
-                      { label: "Vimeo",     icon: PlayCircle,  value: vimeoUrl,     set: setVimeoUrl,     placeholder: "https://vimeo.com/deinprofil" },
-                      { label: "LinkedIn",  icon: Globe,       value: linkedinUrl,  set: setLinkedinUrl,  placeholder: "https://linkedin.com/in/deinname" },
+                      { label: uiText("Ui.text_bad57ef7837c8e"), icon: AtSign,      value: instagramUrl, set: setInstagramUrl, placeholder: "https://instagram.com/deinname" },
+                      { label: uiText("Ui.text_1bb6fcfbf1368a"),    icon: PlayCircle,  value: tiktokUrl,    set: setTiktokUrl,    placeholder: "https://tiktok.com/@deinname" },
+                      { label: uiText("Ui.text_fb7accfff8c6f8"),   icon: Video,       value: youtubeUrl,   set: setYoutubeUrl,   placeholder: "https://youtube.com/@deinname" },
+                      { label: uiText("Ui.text_a7a93fd1930a61"),     icon: PlayCircle,  value: vimeoUrl,     set: setVimeoUrl,     placeholder: "https://vimeo.com/deinprofil" },
+                      { label: uiText("Ui.text_dd84425b72da12"),  icon: Globe,       value: linkedinUrl,  set: setLinkedinUrl,  placeholder: "https://linkedin.com/in/deinname" },
                     ].map(({ label, icon: Icon, value, set, placeholder }) => (
                       <div key={label}>
                         <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1.5 flex items-center gap-1.5">
@@ -2488,8 +2530,8 @@ export default function ProfilePage() {
 
                 {/* Mitgliedschaften */}
                 <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
-                  <h2 className="font-semibold text-text-primary mb-1">Mitgliedschaften</h2>
-                  <p className="text-xs text-text-muted mb-4">Gewerkschaften, Verbände, Agenturen (z.B. Verdi, IGLBM)</p>
+                  <h2 className="font-semibold text-text-primary mb-1">{uiText("Ui.text_f96bf692d5a4c5")}</h2>
+                  <p className="text-xs text-text-muted mb-4">{uiText("Ui.text_0d11b982d31df6")}</p>
                   {memberships.length > 0 ? (
                     <div className="flex flex-wrap gap-2 mb-4">
                       {memberships.map((m) => (
@@ -2501,10 +2543,10 @@ export default function ProfilePage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-text-muted mb-4">Noch keine Mitgliedschaften eingetragen.</p>
+                    <p className="text-xs text-text-muted mb-4">{uiText("Ui.text_f45b3fb55311b3")}</p>
                   )}
                   <div className="flex gap-2">
-                    <input type="text" placeholder="z.B. Verdi, IGLBM, Agentur XY" value={newMembership}
+                    <input type="text" placeholder={uiText("Ui.text_5904ca4654180f")} value={newMembership}
                       onChange={(e) => setNewMembership(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && addMembership()}
                       className="flex-1 bg-bg-elevated border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold transition-colors" />
@@ -2592,16 +2634,10 @@ export default function ProfilePage() {
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <label className="block">
-                          <span className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">Konfektionsgröße</span>
-                          <input type="text" value={clothingSize} onChange={(event) => setClothingSize(event.target.value)}
-                            placeholder="z. B. 38 / M" className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
-                        </label>
-                        <label className="block">
-                          <span className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">Schuhgröße</span>
-                          <input type="number" min="20" max="60" value={shoeSize} onChange={(event) => setShoeSize(event.target.value)}
-                            placeholder="z. B. 39" className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
-                        </label>
+                        <label className="block">{uiText.rich("Ui.text_d81e9f83d777b9", { part1: chunks => (<span className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">{chunks}</span>), part2: () => (<input type="text" value={clothingSize} onChange={(event) => setClothingSize(event.target.value)}
+                            placeholder="38 / M" className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />) })}</label>
+                        <label className="block">{uiText.rich("Ui.text_d3df48ad2edf62", { part1: chunks => (<span className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">{chunks}</span>), part2: () => (<input type="number" min="20" max="60" value={shoeSize} onChange={(event) => setShoeSize(event.target.value)}
+                            placeholder="39" className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />) })}</label>
                       </div>
 
                       {/* Haarfarbe */}
@@ -2644,16 +2680,10 @@ export default function ProfilePage() {
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <label className="block">
-                          <span className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">Dialekte</span>
-                          <input type="text" value={dialectsText} onChange={(event) => setDialectsText(event.target.value)}
-                            placeholder="z. B. Bayrisch, Berlinerisch" className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
-                        </label>
-                        <label className="block">
-                          <span className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">Führerscheine</span>
-                          <input type="text" value={drivingLicensesText} onChange={(event) => setDrivingLicensesText(event.target.value)}
-                            placeholder="z. B. B, BE" className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
-                        </label>
+                        <label className="block">{uiText.rich("Ui.text_407f9c15cfb350", { part1: chunks => (<span className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">{chunks}</span>), part2: () => (<input type="text" value={dialectsText} onChange={(event) => setDialectsText(event.target.value)}
+                            placeholder={uiText("Ui.text_f61fedfba8d46e")} className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />) })}</label>
+                        <label className="block">{uiText.rich("Ui.text_29d8da98554ac3", { part1: chunks => (<span className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-2">{chunks}</span>), part2: () => (<input type="text" value={drivingLicensesText} onChange={(event) => setDrivingLicensesText(event.target.value)}
+                            placeholder={uiText("Ui.text_e165d69b5c6477")} className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />) })}</label>
                       </div>
 
                       {/* Toggles */}
@@ -2685,42 +2715,42 @@ export default function ProfilePage() {
                     </div>
                   );
                 })()}
-                {!showCrewSections && !showTalentSections && <p className="rounded-xl border border-border bg-bg-secondary p-4 text-sm leading-6 text-text-muted">Für die ausgewählten Anbieterbereiche gibt es hier keine zusätzlichen Profilfelder. Verfügbarkeit und Kontaktangaben kannst du bei Bedarf in Schritt 3 ergänzen.</p>}
+                {!showCrewSections && !showTalentSections && <p className="rounded-xl border border-border bg-bg-secondary p-4 text-sm leading-6 text-text-muted">{uiText("Ui.text_dd891e313e3663")}</p>}
                 </div>}
 
                 {editorStep === 6 && !draftLoading && !draftLoadError && (
                   <section className="space-y-4 rounded-xl border border-border bg-bg-secondary p-4 sm:p-6">
-                    <div><h2 className="font-semibold text-text-primary">Profil prüfen</h2><p className="mt-1 text-sm text-text-muted">Nur diese Angaben werden nach deiner Bestätigung öffentlich angezeigt.</p></div>
+                    <div><h2 className="font-semibold text-text-primary">{uiText("Ui.text_ee338d4efbad49")}</h2><p className="mt-1 text-sm text-text-muted">{uiText("Ui.text_c5e8ec1a211bb7")}</p></div>
                     {Object.keys(visibleFieldErrors).length > 0 && <div role="alert" className="rounded-lg border border-error/30 bg-error/10 p-4">
-                      <p className="mb-2 text-sm font-semibold text-error">Bitte prüfe diese Pflichtangaben:</p>
+                      <p className="mb-2 text-sm font-semibold text-error">{uiText("Ui.text_3fe31495a2c318")}</p>
                       <ul className="space-y-1 text-sm text-text-primary">{Object.entries(visibleFieldErrors).map(([field, message]) => <li key={field}><button type="button" className="underline underline-offset-2" onClick={() => {
                         const target = field === "activity" ? 1 : 3;
                         goToEditorStep(target, field === "activity" ? "activity" : field === "name" ? "name" : "city");
                       }}>{message}</button></li>)}</ul>
                     </div>}
                     <dl className="grid gap-3 sm:grid-cols-2">
-                      <div className="rounded-lg border border-border bg-bg-primary p-3"><dt className="text-xs text-text-muted">Tätigkeiten · Pflicht</dt><dd className="mt-1 break-words text-sm text-text-primary">{[...currentProfileTypes.map((type) => PROFILE_TYPE_LABELS[type as ProfileType] ?? type), ...positions].join(", ") || "Noch auswählen"}</dd></div>
-                      <div className="rounded-lg border border-border bg-bg-primary p-3"><dt className="text-xs text-text-muted">Name · Pflicht</dt><dd className="mt-1 break-words text-sm text-text-primary">{form.name || "Noch eingeben"}</dd></div>
-                      <div className="rounded-lg border border-border bg-bg-primary p-3"><dt className="text-xs text-text-muted">Standort · Pflicht</dt><dd className="mt-1 break-words text-sm text-text-primary">{[form.city, form.country].filter(Boolean).join(", ") || "Noch eingeben"}</dd></div>
-                      <div className="rounded-lg border border-border bg-bg-primary p-3"><dt className="text-xs text-text-muted">Fotos und Vorstellung · freiwillig</dt><dd className="mt-1 break-words text-sm text-text-primary">{profileImages.length} Portfoliofoto(s){form.bio.trim() ? " · Vorstellung vorhanden" : ""}</dd></div>
+                      <div className="rounded-lg border border-border bg-bg-primary p-3"><dt className="text-xs text-text-muted">{uiText("Ui.text_62049891f11b03")}</dt><dd className="mt-1 break-words text-sm text-text-primary">{[...currentProfileTypes.map((type) => PROFILE_TYPE_LABELS[type as ProfileType] ?? type), ...positions].join(", ") || uiText("Ui.text_d58bd3ad5bd550")}</dd></div>
+                      <div className="rounded-lg border border-border bg-bg-primary p-3"><dt className="text-xs text-text-muted">{uiText("Ui.text_43c189da96f3d6")}</dt><dd className="mt-1 break-words text-sm text-text-primary">{form.name || uiText("Ui.text_5e250f0283f955")}</dd></div>
+                      <div className="rounded-lg border border-border bg-bg-primary p-3"><dt className="text-xs text-text-muted">{uiText("Ui.text_1508a39cda673a")}</dt><dd className="mt-1 break-words text-sm text-text-primary">{[form.city, form.country].filter(Boolean).join(", ") || uiText("Ui.text_5e250f0283f955")}</dd></div>
+                      <div className="rounded-lg border border-border bg-bg-primary p-3"><dt className="text-xs text-text-muted">{uiText("Ui.text_2f2d903e3b8533")}</dt><dd className="mt-1 break-words text-sm text-text-primary">{uiText.rich("Ui.text_95319f0d1b1bb3", { value1: () => (profileImages.length), value2: () => (form.bio.trim() ? uiText("Ui.text_35efcfbeba4dd5") : "") })}</dd></div>
                     </dl>
-                    <p className="text-xs leading-5 text-text-muted">Unvollständige freiwillige Angaben verhindern das Speichern nicht. Nicht ausgefüllte Bereiche werden nicht angezeigt.</p>
+                    <p className="text-xs leading-5 text-text-muted">{uiText("Ui.text_0da35a644cef0d")}</p>
                   </section>
                 )}
 
                 {editorStep > 0 && !draftLoading && !draftLoadError && (
                   <footer className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex flex-wrap gap-2">
-                      {profileExists && <button type="button" data-no-draft onClick={() => goToEditorStep(0)} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary hover:border-gold/40">Übersicht</button>}
+                      {profileExists && <button type="button" data-no-draft onClick={() => goToEditorStep(0)} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary hover:border-gold/40">{uiText("nav.accountOverview")}</button>}
                       <button type="button" data-no-draft disabled={profileDraft.status === "saving" || !profileDraft.loaded} onClick={() => void persistEditorDraft().catch(() => {})} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-secondary hover:border-gold/40 disabled:opacity-50">{tDraft("manualSave")}</button>
                     </div>
                     <div className="flex flex-wrap justify-end gap-2">
-                      {editorStep > 1 && <button type="button" data-no-draft onClick={() => goToEditorStep((editorStep - 1) as ProfileEditorStep)} className="min-h-11 rounded-lg border border-border px-5 text-sm text-text-secondary hover:border-gold/40">Zurück</button>}
+                      {editorStep > 1 && <button type="button" data-no-draft onClick={() => goToEditorStep((editorStep - 1) as ProfileEditorStep)} className="min-h-11 rounded-lg border border-border px-5 text-sm text-text-secondary hover:border-gold/40">{uiText("setup.copy99")}</button>}
                       {editorStep < 6 ? <>
-                        {(editorStep === 4 || editorStep === 5) && <button type="button" data-no-draft onClick={() => goToEditorStep((editorStep + 1) as ProfileEditorStep)} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-muted hover:text-text-primary">Überspringen</button>}
-                        <button type="button" data-no-draft onClick={() => { if (validateEditorStep(editorStep)) goToEditorStep((editorStep + 1) as ProfileEditorStep); }} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-gold px-5 text-sm font-semibold text-bg-primary hover:bg-gold-light"><span>Weiter</span><span aria-hidden="true">→</span></button>
+                        {(editorStep === 4 || editorStep === 5) && <button type="button" data-no-draft onClick={() => goToEditorStep((editorStep + 1) as ProfileEditorStep)} className="min-h-11 rounded-lg border border-border px-4 text-sm text-text-muted hover:text-text-primary">{uiText("Ui.text_8e463fdd540e0b")}</button>}
+                        <button type="button" data-no-draft onClick={() => { if (validateEditorStep(editorStep)) goToEditorStep((editorStep + 1) as ProfileEditorStep); }} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-gold px-5 text-sm font-semibold text-bg-primary hover:bg-gold-light">{uiText.rich("Ui.text_9b3df3ffb77b5d", { part1: chunks => (<span>{chunks}</span>), part2: chunks => (<span aria-hidden="true">{chunks}</span>) })}</button>
                       </> : <button type="button" data-no-draft onClick={handleSave} disabled={!profileDraft.loaded || saving || profileLoading || profileLoadError || !draftLoaded || avatarUploading || coverUploading || profileUploading} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-gold px-5 text-sm font-semibold text-bg-primary hover:bg-gold-light disabled:opacity-60">
-                        {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}{saving ? "Wird gespeichert …" : profileExists ? "Änderungen speichern" : "Profil veröffentlichen"}
+                        {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}{saving ? uiText("setup.copy103") : profileExists ? uiText("profile.saveChanges") : uiText("setup.publishProfile")}
                       </button>}
                     </div>
                   </footer>
@@ -2829,7 +2859,7 @@ export default function ProfilePage() {
                                   {l.category && <span className="text-[10px] text-text-primary shrink-0 hidden sm:inline">{l.category}</span>}
                                   {l.city && <span className="text-[10px] text-text-primary shrink-0">{l.city}</span>}
                                   {l.price != null && l.price > 0 && (
-                                    <span className="text-[10px] text-gold font-semibold shrink-0">{l.price.toLocaleString("de-DE")} €</span>
+                                    <span className="text-[10px] text-gold font-semibold shrink-0">{l.price.toLocaleString(uiLocale)} €</span>
                                   )}
                                 </div>
                               ))}
@@ -2856,9 +2886,7 @@ export default function ProfilePage() {
                 {friendsLoading ? (
                   <div className="flex justify-center py-12"><Loader2 size={20} className="animate-spin text-text-muted" /></div>
                 ) : friendsError ? (
-                  <p role="alert" className="rounded-xl border border-red-400/30 bg-red-400/5 p-4 text-sm text-red-300">
-                    Verbindungen konnten nicht geladen werden: {friendsError}
-                  </p>
+                  <p role="alert" className="rounded-xl border border-red-400/30 bg-red-400/5 p-4 text-sm text-red-300">{uiText.rich("Ui.text_e2c98ea562f5fe", { value1: () => (friendsError) })}</p>
                 ) : friends.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-16 border border-dashed border-border rounded-xl text-center">
                     <Users2 size={32} className="text-text-muted mb-3" />
@@ -2918,10 +2946,10 @@ export default function ProfilePage() {
                                     body: JSON.stringify({ action: "collab", label: edit.label || null, is_public: edit.is_public }),
                                   });
                                   const result = await response.json().catch(() => ({}));
-                                  if (!response.ok || result.error) throw new Error(result.error ?? `HTTP ${response.status}`);
+                                  if (!response.ok || result.error) throw new Error(result.error ?? uiText("Ui.text_2669fecc698980", { value1: String(response.status) }));
                                   addToast(t("collabSaved"), "success");
                                 } catch (err) {
-                                  addToast(`${t("savingError")}: ${err instanceof Error ? err.message : "Unbekannter Fehler"}`, "error");
+                                  addToast(uiText("Ui.text_efae3eb968ceb3", { value1: String(t("savingError")), value2: String(uiErrorMessage(err, uiText("profile.unknownError"))) }), "error");
                                 } finally {
                                   setCollabEdits((prev) => ({ ...prev, [fr.friendship_id]: { ...edit, saving: false } }));
                                 }
@@ -2934,7 +2962,7 @@ export default function ProfilePage() {
                           </div>
                           {edit.is_public && (
                             <p className="text-[10px] text-text-muted mt-2">
-                              {t("collabPreview")} <span className="text-gold">{fr.display_name}</span> · {edit.label.trim() || "Vernetzt"}
+                              {t("collabPreview")} <span className="text-gold">{fr.display_name}</span> · {edit.label.trim() || uiText("Ui.text_feff0dfb77ca7d")}
                             </p>
                           )}
                         </div>
@@ -2951,10 +2979,8 @@ export default function ProfilePage() {
             {/* ── SICHERHEIT ── */}
             {activeTab === "security" && (
               <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl">
-                <h2 className="font-semibold text-text-primary mb-2">Login & Sicherheit</h2>
-                <p className="text-sm text-text-muted leading-relaxed">
-                  Passwort und Zwei-Faktor-Authentifizierung werden über den Anmeldedienst verwaltet. Die früheren Eingabefelder auf dieser Seite waren noch nicht angebunden und haben nichts geändert.
-                </p>
+                <h2 className="font-semibold text-text-primary mb-2">{uiText("Ui.text_963cfc38ed1ec7")}</h2>
+                <p className="text-sm text-text-muted leading-relaxed">{uiText("Ui.text_5ff108d7be9af1")}</p>
               </div>
             )}
 
@@ -2962,22 +2988,22 @@ export default function ProfilePage() {
             {activeTab === "notifications" && (
               <div className="p-4 sm:p-6 bg-bg-secondary border border-border rounded-xl space-y-4">
                 <div>
-                  <h2 className="font-semibold text-text-primary mb-1">E-Mail bei neuen Nachrichten</h2>
-                  <p className="text-sm text-text-muted">Diese Einstellung wird gespeichert und steuert die E-Mail-Benachrichtigung bei neuen Nachrichten.</p>
+                  <h2 className="font-semibold text-text-primary mb-1">{uiText("Ui.text_bf85ba7a2da053")}</h2>
+                  <p className="text-sm text-text-muted">{uiText("Ui.text_dcc686a995d142")}</p>
                 </div>
                 {notificationError && <p role="alert" className="text-sm text-red-300">{notificationError}</p>}
                 <button
                   type="button"
                   role="switch"
                   aria-checked={messageEmailsEnabled}
-                  aria-label="E-Mail bei neuen Nachrichten"
+                  aria-label={uiText("Ui.text_bf85ba7a2da053")}
                   onClick={updateMessageEmails}
                   disabled={notificationLoading}
                   className={`relative h-7 w-12 rounded-full transition-colors disabled:opacity-50 ${messageEmailsEnabled ? "bg-gold" : "bg-bg-elevated border border-border"}`}
                 >
                   <span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-transform ${messageEmailsEnabled ? "translate-x-6" : "translate-x-1"}`} />
                 </button>
-                <p className="text-xs text-text-muted">Weitere Benachrichtigungsarten und Push-Mitteilungen werden derzeit noch nicht gespeichert.</p>
+                <p className="text-xs text-text-muted">{uiText("Ui.text_c4b78c69ae463f")}</p>
               </div>
             )}
 

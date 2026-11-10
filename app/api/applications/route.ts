@@ -1,3 +1,4 @@
+import { localizedNotification } from "@/lib/i18n/notification-copy";
 // Required Supabase table:
 // CREATE TABLE IF NOT EXISTS applications (
 //   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -21,22 +22,24 @@ import { rateLimit } from "@/lib/rateLimit";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { sendNewApplicationEmail } from "@/lib/email";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // POST /api/applications — submit a job application
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
   const { allowed } = await rateLimit(`application:${userId}`, 10, 60);
-  if (!allowed) return NextResponse.json({ error: "Zu viele Anfragen. Bitte kurz warten." }, { status: 429 });
+  if (!allowed) return NextResponse.json({ error: tResponse('System.m_35bd89251439') }, { status: 429 });
 
   // NOTE: jobTitle and ownerId from the client body are intentionally ignored below.
   // We fetch the authoritative values from the DB to prevent spoofing.
   const { jobId, message, portfolioUrl, dayRate } = await req.json();
 
   if (!jobId || !message?.trim()) {
-    return NextResponse.json({ error: "Fehlende Pflichtfelder" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_3b85b95ef017') }, { status: 400 });
   }
 
   // Fetch job from DB — never trust client-supplied title or ownerId
@@ -48,14 +51,14 @@ export async function POST(req: NextRequest) {
     .maybeSingle();
 
   if (!job || !job.published) {
-    return NextResponse.json({ error: "Stellenausschreibung nicht gefunden" }, { status: 404 });
+    return NextResponse.json({ error: tResponse('System.m_edc003400bff') }, { status: 404 });
   }
 
   const ownerId = job.user_id;      // authoritative owner from DB
   const jobTitle = job.title;       // authoritative title from DB
 
   if (ownerId === userId) {
-    return NextResponse.json({ error: "Du kannst dich nicht auf eigene Stellenausschreibungen bewerben" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_4a3562030a31') }, { status: 400 });
   }
 
   // Upsert so re-applying updates the message rather than throwing a conflict
@@ -74,15 +77,15 @@ export async function POST(req: NextRequest) {
 
   if (error) {
     console.error("Application insert error:", error);
-    return NextResponse.json({ error: "Bewerbung konnte nicht gespeichert werden" }, { status: 500 });
+    return NextResponse.json({ error: tResponse('System.m_554087dca297') }, { status: 500 });
   }
 
   // Notification for the job owner
   await db.from("notifications").insert({
     user_id: ownerId,
     type: "new_application",
-    title: "Neue Bewerbung",
-    body: `Jemand hat sich auf „${jobTitle}" beworben.`,
+    ...localizedNotification({ title: { key: "n_52ebfd46b352" }, body: { key: "n_f5ec0ac58f2d", values: { value0: String(jobTitle) } } }),
+
     href: "/dashboard?tab=messages",
   });
 
@@ -90,8 +93,8 @@ export async function POST(req: NextRequest) {
   await db.from("notifications").insert({
     user_id: userId,
     type: "application_sent",
-    title: "Bewerbung abgesendet",
-    body: `Deine Bewerbung für „${jobTitle}" wurde übermittelt.`,
+    ...localizedNotification({ title: { key: "n_245257c21df5" }, body: { key: "n_0639be2a8253", values: { value0: String(jobTitle) } } }),
+
     href: "/dashboard?tab=messages",
   });
 

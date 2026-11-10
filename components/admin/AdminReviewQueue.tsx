@@ -7,6 +7,7 @@ import { REVIEW_SOURCES, type ReviewKind } from "@/lib/admin-review";
 import OfferModerationStatus from "@/components/OfferModerationStatus";
 import { OFFER_STATUSES } from "@/lib/offer-moderation";
 import AdminReviewLink from "./AdminReviewLink";
+import { uiErrorMessage } from "@/lib/ui-error-message";
 type Result = { rows: { id: string; title: string; published: boolean | null; moderation_status?: string }[]; total: number; pageSize: number };
 export default function AdminReviewQueue() {
   const t = useTranslations("AdminReview");
@@ -28,7 +29,7 @@ export default function AdminReviewQueue() {
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || t("loadError"));
         if (!controller.signal.aborted) { setResult(data); setError(""); }
-      } catch (cause) { if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : t("loadError")); }
+      } catch (cause) { if (!controller.signal.aborted) setError(uiErrorMessage(cause, t("loadError"))); }
       finally { if (!controller.signal.aborted) setFinished(requestKey); }
     }, search ? 250 : 0);
     return () => { clearTimeout(timer); controller.abort(); };

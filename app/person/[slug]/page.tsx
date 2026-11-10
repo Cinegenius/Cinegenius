@@ -1,3 +1,4 @@
+import { getTranslations as getPageTranslations } from "next-intl/server";
 import { publicProjectCredits } from "@/lib/project-media-rights";
 import { notFound, redirect } from "next/navigation";
 import { db } from "@/lib/db";
@@ -47,12 +48,13 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
+  const pageCopy = await getPageTranslations("PageCopy");
   const { slug } = await params;
   const data = await getData(slug);
   if (!data) return {};
   return {
     title: `${data.profile.name} — CineGenius`,
-    description: `${data.profile.name}${data.profile.primary_role ? ` · ${data.profile.primary_role}` : ""} — Filmografie auf CineGenius`,
+    description: pageCopy("p_10a618fdf92e", { value0: String(data.profile.name), value1: String(data.profile.primary_role ? ` · ${data.profile.primary_role}` : "") }),
   };
 }
 

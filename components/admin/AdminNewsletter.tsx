@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Check, ExternalLink, Mail, Send } from "lucide-react";
+import { uiErrorMessage } from "@/lib/ui-error-message";
 
 type Copy = { subject: string; heading: string; body: string; ctaLabel: string; ctaUrl: string; recommend: string; instagramLabel: string; instagramUrl: string; signature: string };
 
@@ -36,7 +37,7 @@ export function AdminNewsletter() {
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(typeof payload.error === "string" ? payload.error : t("sendError"));
       setResult({ ok: true, text: t("sent", { email: payload.email }) });
-    } catch (error) { setResult({ ok: false, text: error instanceof Error ? error.message : t("sendError") }); }
+    } catch (error) { setResult({ ok: false, text: uiErrorMessage(error, t("sendError")) }); }
     finally { setBusy(false); }
   }
 
@@ -52,7 +53,7 @@ export function AdminNewsletter() {
       const count = Number(payload.sentCount) || 0;
       setResult({ ok: true, text: payload.complete ? t("campaignSent", { count: Number(payload.totalSent) || count }) : t("campaignPartialResult", { count }) });
       if (payload.complete) setCampaignId(null);
-    } catch (error) { setResult({ ok: false, text: error instanceof Error ? error.message : t("campaignError") }); }
+    } catch (error) { setResult({ ok: false, text: uiErrorMessage(error, t("campaignError")) }); }
     finally { setBusy(false); setConfirmSend(false); }
   }
 

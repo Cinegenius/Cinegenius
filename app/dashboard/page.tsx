@@ -1,4 +1,5 @@
 "use client";
+import { locationRoomLabel } from "@/lib/location-rooms";
 
 import { placeInputValue } from "@/lib/places/core";
 import { listingPlaceEditFields } from "@/lib/listing-place-edit";
@@ -47,6 +48,7 @@ import ListingImageManager from "@/components/ListingImageManager";
 import { MAX_LOCATION_IMAGES, MAX_LISTING_IMAGES } from "@/lib/listing-image-gallery";
 import { subscribeToProfileUpdated } from "@/lib/profile-update-events";
 import { DASHBOARD_MESSAGES_FALLBACK_REFRESH_MS } from "@/lib/message-refresh-policy";
+import { uiErrorMessage } from "@/lib/ui-error-message";
 
 type RealMessage = {
   id: string;
@@ -98,6 +100,32 @@ const VALID_TABS = ["overview", "listings", "jobs", "favorites", "messages", "bo
 
 
 export default function DashboardPage() {
+  const uiText = useTranslations();
+  const uiOptionLabels: Record<string, string> = {
+    "Fläche (m²)": uiText("AdminReview.fields.sqm"),
+    "Deckenhöhe (m)": uiText("AdminReview.fields.ceiling_height_m"),
+    "Max. Crew": uiText("Ui.text_8c95b59cdc03d1"),
+    "Parkplätze": uiText("AdminReview.fields.parking_spots"),
+    "Stromanschluss": uiText("Ui.text_10056226f273bf"),
+    "Tageslicht": uiText("AdminReview.fields.natural_light"),
+    "Verdunkelbar": uiText("Ui.text_947f519f43195e"),
+    "Be-/Entladung": uiText("Ui.text_78f3462ff79135"),
+    "WC / Sanitär": uiText("Ui.text_800e5612baf938"),
+    "Aufenthaltsraum": uiText("Ui.text_d1f40e3882943e"),
+    "Küche": uiText("Ui.text_a9ec872e661915"),
+    "Umkleide": uiText("Ui.text_6bb28e219f8023"),
+    "Laderampe": uiText("Ui.text_7c8dc1fd90b6af"),
+    "Wi-Fi": uiText("Ui.text_337253f2e8d4d1"),
+    "Kontakt-E-Mail": uiText("setup.copy35"),
+    "Telefonnummer": uiText("Ui.text_b6b44c97f89cbc"),
+  };
+
+
+
+
+
+  const uiLocale = useLocale();
+
   const moderation = useTranslations("OfferModeration");
   const marketplaceText = useTranslations("MarketplacePublishing");
   const animals = useTranslations("FilmAnimals");
@@ -154,7 +182,7 @@ export default function DashboardPage() {
     // Profile + Completeness
     const initialProfileUpdateRevision = profileUpdateRevision.current;
     fetch("/api/profile")
-      .then((r) => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
+      .then((r) => r.ok ? r.json() : Promise.reject(new Error(uiText("Ui.text_2669fecc698980", { value1: String(r.status) }))))
       .then(({ profile, exists }) => {
         if (initialProfileUpdateRevision !== profileUpdateRevision.current) return;
         if (!exists) {
@@ -169,9 +197,9 @@ export default function DashboardPage() {
         else if (profile?.positions?.[0]) setProfileRole(profile.positions[0]);
 
         const fieldLabels: Record<string, string> = {
-          name: "Anzeigename", avatar: "Profilfoto", city: "Standort", bio: "Über mich / Bio",
-          type: "Profiltyp", photos: "Portfolio-Fotos", video: "Showreel / Reel-Link", languages: "Sprachen",
-          height: "Körpergröße", hair: "Haarfarbe", age: "Spielalter", role: "Position / Rolle", credits: "Filmografie",
+          name: uiText("Ui.text_3ab2eacdba9077"), avatar: uiText("profile.sectionAvatar"), city: uiText("setup.place"), bio: uiText("Ui.text_496d212f59c4b2"),
+          type: uiText("creators.filterProfileType"), photos: uiText("Ui.text_bbbd463cd1d02f"), video: uiText("Ui.text_affe2a4a4bb3f8"), languages: uiText("profile.sectionLanguages"),
+          height: uiText("Ui.text_c9485b2c2af82d"), hair: uiText("creators.filterHairColor"), age: uiText("creators.filterAge"), role: uiText("Ui.text_9289e267f44a90"), credits: uiText("profile.sectionFilmography"),
         };
         const profileImages = Array.isArray(profile?.profile_images)
           ? profile.profile_images.map((image: string | { url?: string | null } | null) => typeof image === "string" ? image : image?.url ?? "")
@@ -230,7 +258,7 @@ export default function DashboardPage() {
         if (error) { setListingsError(error); return; }
         setMyListings(data ?? []);
       })
-      .catch(() => setListingsError("Fehler beim Laden"))
+      .catch(() => setListingsError(uiText("Ui.text_69f5153e4a2bea")))
       .finally(() => setListingsLoading(false));
   }, [activeTab]);
 
@@ -244,14 +272,14 @@ export default function DashboardPage() {
       : await fetch(`/api/listings/${id}/publish`, { method: "POST" });
     const result = await response.json().catch(() => ({}));
     if (!response.ok) {
-      window.alert(result.error ?? "Status konnte nicht geändert werden.");
+      window.alert(result.error ?? uiText("Ui.text_184d93ab838f25"));
       return;
     }
     setMyListings((prev) => prev.map((l) => l.id === id ? { ...l, published: result.published ?? result.data?.published ?? false, moderation_status: result.moderation_status ?? result.data?.moderation_status ?? (current ? "hidden" : "pending") } : l));
   };
 
   const deleteListing = async (id: string) => {
-    if (!confirm("Inserat wirklich löschen?")) return;
+    if (!confirm(uiText("Ui.text_b677e093ba0044"))) return;
     await fetch(`/api/listings/${id}`, { method: "DELETE" });
     setMyListings((prev) => prev.filter((l) => l.id !== id));
   };
@@ -332,26 +360,26 @@ export default function DashboardPage() {
     setEditUploading(true);
     setEditError("");
     try {
-      const compressed = await compressImage(file, { maxWidth: 1920, quality: 0.82, maxBytes: MAX_FUNCTION_UPLOAD_BYTES });
+      const compressed = await compressImage(file, { maxWidth: 1920, quality: 0.82, maxBytes: MAX_FUNCTION_UPLOAD_BYTES , translate: uiText });
       const fd = new FormData();
       fd.append("file", compressed);
       const r = await fetch("/api/upload", { method: "POST", body: fd });
       const d = await r.json().catch(() => ({}));
       if (!r.ok || !d.url) {
         throw new Error(r.status === 413
-          ? "Das Bild ist zu groß. Bitte wähle ein kleineres Foto."
-          : d.error ?? "Das Bild konnte nicht hochgeladen werden.");
+          ? uiText("Ui.text_465670f7328f1c")
+          : d.error ?? uiText("Ui.text_70f8fac9177f96"));
       }
       setEditForm((p) => ({ ...p, image_url: d.url }));
     } catch (cause) {
-      setEditError(cause instanceof Error ? cause.message : "Das Bild konnte nicht hochgeladen werden. Bitte versuche es erneut.");
+      setEditError(uiErrorMessage(cause, uiText("Organizations.imageError")));
     } finally { setEditUploading(false); }
   };
 
   const saveEdit = async () => {
     if (!editDraft.loaded || !editingId || editUploading || editGalleryState.uploading) return;
     if (editGalleryState.failed > 0) {
-      setEditError("Bitte lade fehlgeschlagene Bilder erneut hoch oder entferne sie.");
+      setEditError(uiText("Ui.text_e0466ed245c931"));
       return;
     }
     const personErrors = (["prop", "vehicle"].includes(myListings.find(item => item.id === editingId)?.type ?? "")) ? marketplaceResponsibleErrors(editResponsible) : responsiblePersonErrors(editResponsible);
@@ -364,7 +392,7 @@ export default function DashboardPage() {
       if(issue && (JSON.stringify(editMarketplace)!==JSON.stringify(marketplaceDraft(editingListing.category??"",editingListing.price,editingListing.metadata)) || !!editingListing.metadata?.marketplace)){setEditError(marketText(issue));return;}
     }
     if (!editForm.title.trim() || !editForm.city.trim()) {
-      setEditError("Titel und Stadt sind Pflichtfelder");
+      setEditError(uiText("Ui.text_c5e4681b4d4ef3"));
       return;
     }
     setEditSaving(true);
@@ -449,7 +477,7 @@ export default function DashboardPage() {
       await editDraft.complete();
       setEditingId(null);
     } catch (err) {
-      setEditError(err instanceof Error ? err.message : "Fehler beim Speichern");
+      setEditError(uiErrorMessage(err, uiText("profile.savingError")));
     } finally {
       setEditSaving(false);
     }
@@ -552,11 +580,11 @@ export default function DashboardPage() {
   };
 
   const favTypeConfig: Record<string, { label: string; icon: React.ComponentType<{ size?: number; className?: string }>; href: (id: string) => string; color: string }> = {
-    location: { label: "Location",    icon: MapPin,    href: (id) => `/locations/${id}`, color: "text-sky-400" },
-    vehicle:  { label: "Fahrzeug",   icon: Car,       href: (id) => `/vehicles/${id}`,  color: "text-orange-400" },
-    prop:     { label: "Requisite",  icon: Package,   href: (id) => `/props/${id}`,     color: "text-violet-400" },
-    job:      { label: "Job",        icon: Briefcase, href: (id) => `/jobs/${id}`,      color: "text-emerald-400" },
-    creator:  { label: "Filmschaffende/r", icon: User, href: (id) => `/profile/${id}`, color: "text-gold" },
+    location: { label: uiText("profile.labelLocation"),    icon: MapPin,    href: (id) => `/locations/${id}`, color: "text-sky-400" },
+    vehicle:  { label: uiText("AdminAccounts.contentKinds.vehicle"),   icon: Car,       href: (id) => `/vehicles/${id}`,  color: "text-orange-400" },
+    prop:     { label: uiText("Ui.text_27c673e10176f0"),  icon: Package,   href: (id) => `/props/${id}`,     color: "text-violet-400" },
+    job:      { label: uiText("AdminAccounts.contentKinds.job"),        icon: Briefcase, href: (id) => `/jobs/${id}`,      color: "text-emerald-400" },
+    creator:  { label: uiText("creators.defaultRole"), icon: User, href: (id) => `/profile/${id}`, color: "text-gold" },
   };
 
   // Friends
@@ -637,12 +665,12 @@ export default function DashboardPage() {
     fetch("/api/user-settings")
       .then(async r => {
         const result = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(result.error ?? `HTTP ${r.status}`);
+        if (!r.ok) throw new Error(result.error ?? uiText("Ui.text_2669fecc698980", { value1: String(r.status) }));
         return result;
       })
       .then(({ settings }) => { if (!cancelled && settings) setPrivacySettings(settings); })
       .catch((err) => {
-        if (!cancelled) setPrivacyError(`Einstellungen konnten nicht geladen werden: ${err instanceof Error ? err.message : "Bitte lade die Seite neu."}`);
+        if (!cancelled) setPrivacyError(uiText("Ui.text_a71e57dc22fe15", { value1: String(uiErrorMessage(err, uiText("Ui.text_0504c98fd2caa9"))) }));
       })
       .finally(() => { if (!cancelled) setPrivacyLoading(false); });
     // Load verification status
@@ -672,10 +700,10 @@ export default function DashboardPage() {
         body: JSON.stringify({ [key]: value }),
       });
       const result = await response.json().catch(() => ({}));
-      if (!response.ok || result.error) throw new Error(result.error ?? `HTTP ${response.status}`);
+      if (!response.ok || result.error) throw new Error(result.error ?? uiText("Ui.text_2669fecc698980", { value1: String(response.status) }));
     } catch (err) {
       setPrivacySettings(previousSettings);
-      setPrivacyError(`Einstellung wurde nicht gespeichert: ${err instanceof Error ? err.message : "Bitte versuche es erneut."}`);
+      setPrivacyError(uiText("Ui.text_7d80e16f8158c3", { value1: String(uiErrorMessage(err, uiText("Ui.text_8760d6e61c65fe"))) }));
     } finally {
       setPrivacyLoading(false);
     }
@@ -783,7 +811,7 @@ export default function DashboardPage() {
     setConversationsLoadError(false);
     try {
       const response = await fetch("/api/conversations", { cache: "no-store" });
-      if (!response.ok) throw new Error("conversations fetch failed");
+      if (!response.ok) throw new Error(uiText("Ui.text_8358f771d24abf"));
       const { data, unreadCount } = await response.json();
       setConversations(data ?? []);
       setUnreadMessagesTotal(Number(unreadCount) || 0);
@@ -837,7 +865,7 @@ export default function DashboardPage() {
     async function load() {
       try {
         const response = await fetch(`/api/conversations/${conversationId}`, { cache: "no-store", signal: controller.signal });
-        if (!response.ok) throw new Error("conversation fetch failed");
+        if (!response.ok) throw new Error(uiText("Ui.text_e2085ad6e6ac21"));
         const { messages } = await response.json();
         if (!isCurrent()) return;
         if (!Array.isArray(messages)) throw new Error();
@@ -917,13 +945,13 @@ export default function DashboardPage() {
     const now = new Date();
     const diffMs = now.getTime() - d.getTime();
     const diffMin = Math.floor(diffMs / 60000);
-    if (diffMin < 1) return "Gerade eben";
-    if (diffMin < 60) return `vor ${diffMin} Min.`;
+    if (diffMin < 1) return uiText("Ui.text_d5f879f6819f21");
+    if (diffMin < 60) return uiText("Ui.text_675c446178ebb6", { value1: String(diffMin) });
     const diffH = Math.floor(diffMin / 60);
-    if (diffH < 24) return `vor ${diffH} Std.`;
+    if (diffH < 24) return uiText("Ui.text_d4ade1ff4f04c0", { value1: String(diffH) });
     const diffD = Math.floor(diffH / 24);
     if (diffD === 1) return "Gestern";
-    return d.toLocaleDateString("de-DE", { day: "numeric", month: "short" });
+    return d.toLocaleDateString(uiLocale, { day: "numeric", month: "short" });
   };
 
   const unreadCount = conversationsReady ? unreadMessagesTotal : 0;
@@ -952,20 +980,14 @@ export default function DashboardPage() {
         {/* Top-Leiste */}
         <div className="sticky top-16 z-30 bg-bg-primary/80 backdrop-blur-nav border-b border-border px-4 sm:px-6 py-3 flex items-center justify-between gap-3 lg:top-28">
           <h1 className="font-display text-sm sm:text-base font-bold text-text-primary truncate">{tabTitle()}</h1>
-          <div className="flex items-center gap-2 shrink-0">
-            <Link href="/inserat" className="px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg flex items-center gap-1.5 hover:bg-gold-light transition-colors whitespace-nowrap">
-              <Plus size={13} /> <span className="hidden sm:inline">Neues </span>Angebot
-            </Link>
-          </div>
+          <div className="flex items-center gap-2 shrink-0">{uiText.rich("Ui.text_d4ad4f9e5b7d76", { part2: () => (<Plus size={13} />), part3: chunks => (<span className="hidden sm:inline">{chunks}</span>), part1: chunks => (<Link href="/inserat" className="px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg flex items-center gap-1.5 hover:bg-gold-light transition-colors whitespace-nowrap">{chunks}</Link>) })}</div>
         </div>
 
         {(activeTab === "listings" || activeTab === "jobs") && (
           <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3 sm:px-6">
-            <button onClick={() => navigateDashboardTab("listings")} className={`min-h-10 rounded-lg border px-3 text-sm font-medium transition-colors ${activeTab === "listings" ? "border-gold/40 bg-gold/10 text-gold" : "border-border text-text-secondary hover:text-text-primary"}`}>Inserate</button>
-            <button onClick={() => navigateDashboardTab("jobs")} className={`min-h-10 rounded-lg border px-3 text-sm font-medium transition-colors ${activeTab === "jobs" ? "border-gold/40 bg-gold/10 text-gold" : "border-border text-text-secondary hover:text-text-primary"}`}>Jobanzeigen</button>
-            <Link href="/company-dashboard" className="ml-auto inline-flex min-h-10 items-center gap-2 rounded-lg border border-border px-3 text-sm text-text-secondary transition-colors hover:border-gold/40 hover:text-gold">
-              <Building2 size={15} /> Firma verwalten
-            </Link>
+            <button onClick={() => navigateDashboardTab("listings")} className={`min-h-10 rounded-lg border px-3 text-sm font-medium transition-colors ${activeTab === "listings" ? "border-gold/40 bg-gold/10 text-gold" : "border-border text-text-secondary hover:text-text-primary"}`}>{uiText("profile.tabListings")}</button>
+            <button onClick={() => navigateDashboardTab("jobs")} className={`min-h-10 rounded-lg border px-3 text-sm font-medium transition-colors ${activeTab === "jobs" ? "border-gold/40 bg-gold/10 text-gold" : "border-border text-text-secondary hover:text-text-primary"}`}>{uiText("Ui.text_4012fde18eb1f5")}</button>
+            <Link href="/company-dashboard" className="ml-auto inline-flex min-h-10 items-center gap-2 rounded-lg border border-border px-3 text-sm text-text-secondary transition-colors hover:border-gold/40 hover:text-gold">{uiText.rich("Ui.text_70ede6b97ecfb0", { part1: () => (<Building2 size={15} />) })}</Link>
           </div>
         )}
 
@@ -977,36 +999,22 @@ export default function DashboardPage() {
 
               {/* ── Begrüßung ── */}
               <div>
-                <h2 className="font-display text-2xl font-bold text-text-primary">
-                  Hallo, {profileDisplayName || user?.firstName || user?.emailAddresses[0]?.emailAddress?.split("@")[0] || ""}
-                </h2>
+                <h2 className="font-display text-2xl font-bold text-text-primary">{uiText.rich("Ui.text_9822f89b9cd21d", { value1: () => (profileDisplayName || user?.firstName || user?.emailAddresses[0]?.emailAddress?.split("@")[0] || "") })}</h2>
                 <p className="text-text-muted text-sm mt-1">
                   <DashboardDate />
                 </p>
               </div>
 
               {(unreadCount > 0 || incomingBookings.some((booking) => booking.status === "pending") || profileMissingFields.length > 0) && (
-                <section aria-label="Nächste Aufgaben" className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                <section aria-label={uiText("Ui.text_a4ba73300ac027")} className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-3">
                   {unreadCount > 0 && (
-                    <Link href="/messages" className="flex min-h-20 items-center gap-3 rounded-xl border border-gold/30 bg-gold/5 p-4 transition-colors hover:border-gold/60">
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold/10 text-gold"><MessageSquare size={18} /></span>
-                      <span className="min-w-0"><span className="block text-sm font-semibold text-text-primary">{unreadCount} neue Nachricht{unreadCount === 1 ? "" : "en"}</span><span className="block text-xs text-text-muted">Öffnen und antworten</span></span>
-                      <ChevronRight size={15} className="ml-auto shrink-0 text-gold" />
-                    </Link>
+                    <Link href="/messages" className="flex min-h-20 items-center gap-3 rounded-xl border border-gold/30 bg-gold/5 p-4 transition-colors hover:border-gold/60">{uiText.rich("Ui.text_0f50761594768c", { part2: () => (<MessageSquare size={18} />), part1: chunks => (<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold/10 text-gold">{chunks}</span>), value5: () => (unreadCount), count6: unreadCount, part4: chunks => (<span className="block text-sm font-semibold text-text-primary">{chunks}</span>), part7: chunks => (<span className="block text-xs text-text-muted">{chunks}</span>), part3: chunks => (<span className="min-w-0">{chunks}</span>), part8: () => (<ChevronRight size={15} className="ml-auto shrink-0 text-gold" />) })}</Link>
                   )}
                   {incomingBookings.some((booking) => booking.status === "pending") && (
-                    <button onClick={() => navigateDashboardTab("bookings")} className="flex min-h-20 items-center gap-3 rounded-xl border border-border bg-bg-secondary p-4 text-left transition-colors hover:border-gold/40">
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold/10 text-gold"><Calendar size={18} /></span>
-                      <span className="min-w-0"><span className="block text-sm font-semibold text-text-primary">Offene Anfragen</span><span className="block text-xs text-text-muted">Buchungen prüfen</span></span>
-                      <ChevronRight size={15} className="ml-auto shrink-0 text-text-muted" />
-                    </button>
+                    <button onClick={() => navigateDashboardTab("bookings")} className="flex min-h-20 items-center gap-3 rounded-xl border border-border bg-bg-secondary p-4 text-left transition-colors hover:border-gold/40">{uiText.rich("Ui.text_5f536500158e21", { part2: () => (<Calendar size={18} />), part1: chunks => (<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold/10 text-gold">{chunks}</span>), part4: chunks => (<span className="block text-sm font-semibold text-text-primary">{chunks}</span>), part5: chunks => (<span className="block text-xs text-text-muted">{chunks}</span>), part3: chunks => (<span className="min-w-0">{chunks}</span>), part6: () => (<ChevronRight size={15} className="ml-auto shrink-0 text-text-muted" />) })}</button>
                   )}
                   {profileMissingFields.length > 0 && (
-                    <Link href="/profile" className="flex min-h-20 items-center gap-3 rounded-xl border border-border bg-bg-secondary p-4 transition-colors hover:border-gold/40">
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold/10 text-gold"><User size={18} /></span>
-                      <span className="min-w-0"><span className="block text-sm font-semibold text-text-primary">Profil ergänzen</span><span className="block truncate text-xs text-text-muted">Als Nächstes: {profileMissingFields[0]}</span></span>
-                      <ChevronRight size={15} className="ml-auto shrink-0 text-text-muted" />
-                    </Link>
+                    <Link href="/profile" className="flex min-h-20 items-center gap-3 rounded-xl border border-border bg-bg-secondary p-4 transition-colors hover:border-gold/40">{uiText.rich("Ui.text_4986c0991fc326", { part2: () => (<User size={18} />), part1: chunks => (<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold/10 text-gold">{chunks}</span>), part4: chunks => (<span className="block text-sm font-semibold text-text-primary">{chunks}</span>), value6: () => (profileMissingFields[0]), part5: chunks => (<span className="block truncate text-xs text-text-muted">{chunks}</span>), part3: chunks => (<span className="min-w-0">{chunks}</span>), part7: () => (<ChevronRight size={15} className="ml-auto shrink-0 text-text-muted" />) })}</Link>
                   )}
                 </section>
               )}
@@ -1018,16 +1026,9 @@ export default function DashboardPage() {
                 <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
                   {viewStats && (
                   <div className="p-4 rounded-xl border border-border bg-bg-secondary">
-                    <p className="text-xs text-text-muted mb-1 flex items-center gap-1.5">
-                      <Eye size={12} /> Profilaufrufe
-                    </p>
+                    <p className="text-xs text-text-muted mb-1 flex items-center gap-1.5">{uiText.rich("Ui.text_a854758025488a", { part1: () => (<Eye size={12} />) })}</p>
                     <p className="text-2xl font-bold font-mono text-text-primary">{viewStats.views7}</p>
-                    <div className="flex items-center gap-1 mt-1">
-                      <span className={`text-xs font-medium ${viewStats.trend > 0 ? "text-success" : viewStats.trend < 0 ? "text-red-400" : "text-text-muted"}`}>
-                        {viewStats.trend > 0 ? `+${viewStats.trend}%` : viewStats.trend < 0 ? `${viewStats.trend}%` : "—"}
-                      </span>
-                      <span className="text-xs text-text-muted">vs. Vorwoche</span>
-                    </div>
+                    <div className="flex items-center gap-1 mt-1">{uiText.rich("Ui.text_e0a31345c2f534", { value2: () => (viewStats.trend > 0 ? uiText("Ui.text_1d732d182540bf", { value1: String(viewStats.trend) }) : viewStats.trend < 0 ? uiText("Ui.text_6a53a571fa6641", { value1: String(viewStats.trend) }) : "—"), part1: chunks => (<span className={`text-xs font-medium ${viewStats.trend > 0 ? "text-success" : viewStats.trend < 0 ? "text-red-400" : "text-text-muted"}`}>{chunks}</span>), part3: chunks => (<span className="text-xs text-text-muted">{chunks}</span>) })}</div>
                     {/* Sparkline */}
                     <div className="flex items-end gap-0.5 mt-3 h-8">
                       {viewStats.daily.map((v, i) => {
@@ -1038,34 +1039,26 @@ export default function DashboardPage() {
                         );
                       })}
                     </div>
-                    <p className="text-[10px] text-text-muted mt-1">Letzte 7 Tage</p>
+                    <p className="text-[10px] text-text-muted mt-1">{uiText("Ui.text_df1140f6b738ec")}</p>
                   </div>
                   )}
                   <div className="p-4 rounded-xl border border-border bg-bg-secondary">
-                    <p className="text-xs text-text-muted mb-1 flex items-center gap-1.5">
-                      <List size={12} /> Aktive Inserate
-                    </p>
+                    <p className="text-xs text-text-muted mb-1 flex items-center gap-1.5">{uiText.rich("Ui.text_cffd736d7cb60e", { part1: () => (<List size={12} />) })}</p>
                     <p className="text-2xl font-bold font-mono text-text-primary">
                       {myListings.filter((l) => l.published).length}
                     </p>
-                    <p className="text-xs text-text-muted mt-1">
-                      von {myListings.length} gesamt
-                    </p>
+                    <p className="text-xs text-text-muted mt-1">{uiText.rich("Ui.text_0a1283e7df1e88", { value1: () => (myListings.length) })}</p>
                   </div>
                   <div className="p-4 rounded-xl border border-border bg-bg-secondary">
-                    <p className="text-xs text-text-muted mb-1 flex items-center gap-1.5">
-                      <MessageSquare size={12} /> Nachrichten
-                    </p>
+                    <p className="text-xs text-text-muted mb-1 flex items-center gap-1.5">{uiText.rich("Ui.text_81d121dfcf2181", { part1: () => (<MessageSquare size={12} />) })}</p>
                     <p className="text-2xl font-bold font-mono text-text-primary">{conversationsReady ? unreadCount : conversationsLoadError ? "—" : "…"}</p>
-                    <p className="text-xs text-text-muted mt-1">{conversationsReady ? "ungelesen" : conversationsLoadError ? "Nicht verfügbar" : "Lädt…"}</p>
+                    <p className="text-xs text-text-muted mt-1">{conversationsReady ? uiText("Ui.text_58d5c21a442c7d") : conversationsLoadError ? uiText("common.unavailable") : uiText("creators.loading")}</p>
                   </div>
                   {photoStats && (
                     <div className="p-4 rounded-xl border border-border bg-bg-secondary">
-                      <p className="text-xs text-text-muted mb-1 flex items-center gap-1.5">
-                        <span className="text-gold text-xs leading-none">★</span> Foto-Bewertungen
-                      </p>
+                      <p className="text-xs text-text-muted mb-1 flex items-center gap-1.5">{uiText.rich("Ui.text_f658ec20200b90", { part1: chunks => (<span className="text-gold text-xs leading-none">{chunks}</span>) })}</p>
                       <p className="text-2xl font-bold font-mono text-text-primary">{photoStats.avg.toFixed(1)}</p>
-                      <p className="text-xs text-text-muted mt-1">{photoStats.total} Bewertung{photoStats.total !== 1 ? "en" : ""}</p>
+                      <p className="text-xs text-text-muted mt-1">{uiText.rich("Ui.text_b6b7c6071b1bf8", { value1: () => (photoStats.total), count2: photoStats.total })}</p>
                     </div>
                   )}
                 </div>
@@ -1081,8 +1074,8 @@ export default function DashboardPage() {
                     <Plus size={26} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-display text-lg font-bold text-text-primary">Erstelle dein erstes Inserat</p>
-                    <p className="text-sm text-text-muted mt-0.5">Location, Job, Fahrzeug oder Equipment — kostenlos inserieren</p>
+                    <p className="font-display text-lg font-bold text-text-primary">{uiText("Ui.text_094c838d419299")}</p>
+                    <p className="text-sm text-text-muted mt-0.5">{uiText("Ui.text_a64e52f53b5e58")}</p>
                   </div>
                   <ChevronRight size={20} className="text-gold shrink-0 group-hover:translate-x-1 transition-transform" />
                 </Link>
@@ -1095,8 +1088,8 @@ export default function DashboardPage() {
                     <User size={26} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-display text-lg font-bold text-text-primary">Profil vervollständigen</p>
-                    <p className="text-sm text-text-muted mt-0.5">Profilbild, Bio und Fähigkeiten hinzufügen — werde sichtbar</p>
+                    <p className="font-display text-lg font-bold text-text-primary">{uiText("Ui.text_78693b435178f9")}</p>
+                    <p className="text-sm text-text-muted mt-0.5">{uiText("Ui.text_2a6d329003520a")}</p>
                   </div>
                   <ChevronRight size={20} className="text-gold shrink-0 group-hover:translate-x-1 transition-transform" />
                 </Link>
@@ -1112,8 +1105,8 @@ export default function DashboardPage() {
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-display text-lg font-bold text-text-primary">{unreadCount} neue Nachricht{unreadCount !== 1 ? "en" : ""}</p>
-                    <p className="text-sm text-text-muted mt-0.5">Jemand hat dir geschrieben — jetzt antworten</p>
+                    <p className="font-display text-lg font-bold text-text-primary">{uiText.rich("Ui.text_a7f21b0f74229f", { value1: () => (unreadCount), count2: unreadCount })}</p>
+                    <p className="text-sm text-text-muted mt-0.5">{uiText("Ui.text_0e4ed6d7c34f4d")}</p>
                   </div>
                   <ChevronRight size={20} className="text-gold shrink-0 group-hover:translate-x-1 transition-transform" />
                 </button>
@@ -1124,8 +1117,8 @@ export default function DashboardPage() {
                 <div className="p-5 rounded-2xl border border-border bg-bg-secondary">
                   <div className="flex items-center justify-between mb-3">
                     <div>
-                      <p className="text-sm font-semibold text-text-primary">Profilstärke</p>
-                      <p className="text-xs text-text-muted mt-0.5">Vollständige Profile werden häufiger gebucht</p>
+                      <p className="text-sm font-semibold text-text-primary">{uiText("Ui.text_83e186228760e1")}</p>
+                      <p className="text-xs text-text-muted mt-0.5">{uiText("Ui.text_ee9b8b1c714a68")}</p>
                     </div>
                     <span className={`text-lg font-bold font-mono ${profileCompleteness >= 75 ? "text-success" : profileCompleteness >= 50 ? "text-gold" : "text-text-secondary"}`}>
                       {profileCompleteness}%
@@ -1145,33 +1138,27 @@ export default function DashboardPage() {
                         </span>
                       ))}
                       {profileMissingFields.length > 4 && (
-                        <span className="px-2 py-0.5 text-xs text-text-muted">+{profileMissingFields.length - 4} weitere</span>
+                        <span className="px-2 py-0.5 text-xs text-text-muted">{uiText.rich("Ui.text_4527b0695b24a0", { value1: () => (profileMissingFields.length - 4) })}</span>
                       )}
                     </div>
                   )}
-                  <Link href="/profile" className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold hover:text-gold-light transition-colors">
-                    Profil vervollständigen <ChevronRight size={12} />
-                  </Link>
+                  <Link href="/profile" className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold hover:text-gold-light transition-colors">{uiText.rich("Ui.text_e845088715995b", { part1: () => (<ChevronRight size={12} />) })}</Link>
                 </div>
               )}
 
               {/* ── Meine Inserate ── */}
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-display text-lg font-bold text-text-primary">Meine Angebote</h3>
+                  <h3 className="font-display text-lg font-bold text-text-primary">{uiText("nav.myOffers")}</h3>
                   <div className="flex items-center gap-2">
                     {myListings.length > 0 && (
-                      <button onClick={() => navigateDashboardTab("listings")} className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">
-                        Alle verwalten <ChevronRight size={12} />
-                      </button>
+                      <button onClick={() => navigateDashboardTab("listings")} className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">{uiText.rich("Ui.text_8e04f826a45436", { part1: () => (<ChevronRight size={12} />) })}</button>
                     )}
                   </div>
                 </div>
 
                 {listingsLoading && (
-                  <div className="flex items-center gap-3 text-sm text-text-muted py-4">
-                    <Loader2 size={16} className="animate-spin" /> Lädt...
-                  </div>
+                  <div className="flex items-center gap-3 text-sm text-text-muted py-4">{uiText.rich("Ui.text_e68bc26b2fc6f2", { part1: () => (<Loader2 size={16} className="animate-spin" />) })}</div>
                 )}
 
                 {!listingsLoading && myListings.length === 0 && (
@@ -1180,12 +1167,10 @@ export default function DashboardPage() {
                       <List size={20} className="text-text-muted" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-text-secondary">Noch keine Inserate</p>
-                      <p className="text-xs text-text-muted mt-0.5">Deine Inserate erscheinen hier sobald du eins erstellst</p>
+                      <p className="text-sm font-medium text-text-secondary">{uiText("Ui.text_c9636816421535")}</p>
+                      <p className="text-xs text-text-muted mt-0.5">{uiText("Ui.text_1c1fd85686d901")}</p>
                     </div>
-                    <Link href="/inserat" className="mt-1 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors flex items-center gap-1.5">
-                      <Plus size={12} /> Inserat erstellen
-                    </Link>
+                    <Link href="/inserat" className="mt-1 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors flex items-center gap-1.5">{uiText.rich("Ui.text_7ec80552729795", { part1: () => (<Plus size={12} />) })}</Link>
                   </div>
                 )}
 
@@ -1217,15 +1202,13 @@ export default function DashboardPage() {
                           <p className="font-semibold text-gold font-display">
                             {listingPriceLabel(l.price,l.metadata,"/Tag",marketLocale,marketText)}
                           </p>
-                          <p className="text-[10px] text-text-muted mt-0.5">/Tag</p>
+                          <p className="text-[10px] text-text-muted mt-0.5">{uiText("common.perDay")}</p>
                         </div>
                         <ChevronRight size={14} className="text-text-muted group-hover:text-gold transition-colors shrink-0" />
                       </Link>
                     ))}
                     {myListings.length > 4 && (
-                      <button onClick={() => navigateDashboardTab("listings")} className="w-full py-3 rounded-xl border border-dashed border-border text-xs text-text-muted hover:border-gold hover:text-gold transition-colors">
-                        + {myListings.length - 4} weitere Inserate anzeigen
-                      </button>
+                      <button onClick={() => navigateDashboardTab("listings")} className="w-full py-3 rounded-xl border border-dashed border-border text-xs text-text-muted hover:border-gold hover:text-gold transition-colors">{uiText.rich("Ui.text_8801408b7ec682", { value1: () => (myListings.length - 4) })}</button>
                     )}
                   </div>
                 )}
@@ -1234,35 +1217,26 @@ export default function DashboardPage() {
               {/* ── Nachrichten & Anfragen (kombiniert) ── */}
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-display text-lg font-bold text-text-primary">
-                    Nachrichten & Anfragen
-                    {conversationsReady && unreadCount > 0 && (
+                  <h3 className="font-display text-lg font-bold text-text-primary">{uiText.rich("Ui.text_f933a8195fccc6", { value1: () => (conversationsReady && unreadCount > 0 && (
                       <span className="ml-2 px-2 py-0.5 text-xs bg-gold text-bg-primary font-bold rounded-full">{unreadCount}</span>
-                    )}
-                  </h3>
+                    )) })}</h3>
                   {conversations.length > 0 && (
-                    <button onClick={() => navigateDashboardTab("messages")} className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">
-                      Alle öffnen <ChevronRight size={12} />
-                    </button>
+                    <button onClick={() => navigateDashboardTab("messages")} className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">{uiText.rich("Ui.text_78a12822c8e85a", { part1: () => (<ChevronRight size={12} />) })}</button>
                   )}
                 </div>
 
                 {convsLoading && (
-                  <div className="flex items-center gap-3 text-sm text-text-muted py-4">
-                    <Loader2 size={16} className="animate-spin" /> Lädt...
-                  </div>
+                  <div className="flex items-center gap-3 text-sm text-text-muted py-4">{uiText.rich("Ui.text_e68bc26b2fc6f2", { part1: () => (<Loader2 size={16} className="animate-spin" />) })}</div>
                 )}
 
                 {!convsLoading && conversationsLoadError && (
-                  <div role="status" className="p-5 rounded-xl border border-border bg-bg-secondary text-sm text-text-muted">
-                    Nachrichten und Lesestatus konnten nicht geladen werden. Bitte lade die Seite erneut.
-                  </div>
+                  <div role="status" className="p-5 rounded-xl border border-border bg-bg-secondary text-sm text-text-muted">{uiText("Ui.text_bbd327fb803af8")}</div>
                 )}
 
                 {!convsLoading && conversationsReady && conversations.length === 0 && (
                   <div className="flex items-center gap-4 p-5 rounded-xl border border-dashed border-border text-text-muted">
                     <MessageSquare size={20} className="shrink-0 opacity-40" />
-                    <p className="text-sm">Noch keine Nachrichten — sobald jemand schreibt, erscheint es hier.</p>
+                    <p className="text-sm">{uiText("Ui.text_54d1d23a08ec91")}</p>
                   </div>
                 )}
 
@@ -1289,15 +1263,15 @@ export default function DashboardPage() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className={`text-sm font-medium truncate ${hasUnread ? "text-text-primary" : "text-text-secondary"}`}>
-                              {conv.otherName ?? "Unbekannt"}
+                              {conv.otherName ?? uiText("Ui.text_276ffa1fb4f970")}
                             </p>
                             <p className="text-xs text-text-muted truncate mt-0.5">
-                              {conv.listing_title ? `${conv.listing_title} · ` : ""}{lastMsg?.content ?? "…"}
+                              {conv.listing_title ? uiText("Ui.text_210eac6879f747", { value1: String(conv.listing_title) }) : ""}{lastMsg?.content ?? "…"}
                             </p>
                           </div>
                           <div className="shrink-0 text-right">
                             {hasUnread && (
-                              <span className="inline-block mb-1 px-1.5 py-0.5 text-[10px] bg-gold text-bg-primary font-bold rounded-full">Neu</span>
+                              <span className="inline-block mb-1 px-1.5 py-0.5 text-[10px] bg-gold text-bg-primary font-bold rounded-full">{uiText("common.newBadge")}</span>
                             )}
                             <p className="text-[10px] text-text-muted">{formatMsgTime(conv.updated_at)}</p>
                           </div>
@@ -1311,16 +1285,12 @@ export default function DashboardPage() {
               {/* ── Firmenprofil ── */}
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-display text-lg font-bold text-text-primary">Firmenprofil</h3>
-                  <Link href="/company-dashboard" className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">
-                    Verwalten <ChevronRight size={12} />
-                  </Link>
+                  <h3 className="font-display text-lg font-bold text-text-primary">{uiText("Ui.text_92b8b0ccb4a7b1")}</h3>
+                  <Link href="/company-dashboard" className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">{uiText.rich("Ui.text_5bdc9ba7941520", { part1: () => (<ChevronRight size={12} />) })}</Link>
                 </div>
-                <Link href="/company-invitations" className="mb-4 inline-flex min-h-11 items-center text-sm text-gold hover:text-gold-light">Meine Teameinladungen ansehen →</Link>
+                <Link href="/company-invitations" className="mb-4 inline-flex min-h-11 items-center text-sm text-gold hover:text-gold-light">{uiText("Ui.text_355f8d66616bb0")}</Link>
                 {myCompany === "loading" && (
-                  <div className="flex items-center gap-3 text-sm text-text-muted py-4">
-                    <Loader2 size={16} className="animate-spin" /> Lädt...
-                  </div>
+                  <div className="flex items-center gap-3 text-sm text-text-muted py-4">{uiText.rich("Ui.text_e68bc26b2fc6f2", { part1: () => (<Loader2 size={16} className="animate-spin" />) })}</div>
                 )}
                 {myCompany === null && (
                   <Link href="/company-setup"
@@ -1329,8 +1299,8 @@ export default function DashboardPage() {
                       <Building2 size={18} className="text-text-muted group-hover:text-gold transition-colors" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-text-secondary group-hover:text-text-primary transition-colors">Kein Firmenprofil vorhanden</p>
-                      <p className="text-xs text-text-muted mt-0.5">Firmenprofil erstellen → Werde sichtbar für Produktionen</p>
+                      <p className="text-sm font-medium text-text-secondary group-hover:text-text-primary transition-colors">{uiText("Ui.text_32ae0a5fd4c809")}</p>
+                      <p className="text-xs text-text-muted mt-0.5">{uiText("Ui.text_826a6da5f6ed29")}</p>
                     </div>
                     <ChevronRight size={14} className="text-text-muted group-hover:text-gold transition-colors ml-auto shrink-0" />
                   </Link>
@@ -1346,30 +1316,25 @@ export default function DashboardPage() {
                       <div className="flex items-center gap-2 mb-0.5">
                         <p className="font-semibold text-text-primary text-sm truncate">{myCompany.name}</p>
                         <span className={`text-[10px] px-2 py-0.5 rounded-full border shrink-0 font-semibold ${myCompany.published ? "text-success border-success/30 bg-success/10" : "text-text-muted border-border"}`}>
-                          {myCompany.published ? "Aktiv" : "Entwurf"}
+                          {myCompany.published ? uiText("Ui.text_8163454f378f08") : uiText("OfferModeration.statuses.draft")}
                         </span>
                       </div>
                       {myCompany.city && <p className="text-xs text-text-muted">{myCompany.city}</p>}
                     </div>
-                    <div className="flex flex-col gap-1.5 shrink-0">
-                      <Link href="/company-dashboard" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all">Verwalten</Link>
-                      <a href={`/companies/${myCompany.slug}`} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all text-center flex items-center gap-1 justify-center">
-                        <ExternalLink size={10} /> Ansehen
-                      </a>
-                    </div>
+                    <div className="flex flex-col gap-1.5 shrink-0">{uiText.rich("Ui.text_da9be6811d4742", { part1: chunks => (<Link href="/company-dashboard" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all">{chunks}</Link>), part3: () => (<ExternalLink size={10} />), part2: chunks => (<a href={`/companies/${myCompany.slug}`} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all text-center flex items-center gap-1 justify-center">{chunks}</a>) })}</div>
                   </div>
                 )}
               </div>
 
               {/* ── Schnellzugriff ── */}
               <div>
-                <h3 className="font-display text-lg font-bold text-text-primary mb-4">Schnellzugriff</h3>
+                <h3 className="font-display text-lg font-bold text-text-primary mb-4">{uiText("Ui.text_5c79c2d6162809")}</h3>
                 <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
                   {[
-                    { icon: User,         label: "Mein Profil",  sub: `${profileCompleteness}% vollständig`, id: "profil" },
-                    { icon: Calendar,     label: "Buchungen",    sub: bookings.length > 0 ? `${bookings.length} gesamt` : "Keine", id: "bookings" },
-                    { icon: MessageSquare,label: "Nachrichten",  sub: conversationsLoadError ? "Nicht verfügbar" : !conversationsReady ? "Lädt…" : unreadCount > 0 ? `${unreadCount} ungelesen` : "Alle gelesen", id: "messages" },
-                    { icon: BarChart2,    label: "Analysen",     sub: `${conversations.length} Anfragen`, id: "analytics" },
+                    { icon: User,         label: uiText("nav.myProfile"),  sub: uiText("Ui.text_2fa256a0eff196", { value1: String(profileCompleteness) }), id: "profil" },
+                    { icon: Calendar,     label: uiText("nav.bookings"),    sub: bookings.length > 0 ? uiText("Ui.text_888c0247e6c804", { value1: String(bookings.length) }) : uiText("Ui.text_8a572015c49b20"), id: "bookings" },
+                    { icon: MessageSquare,label: uiText("nav.messages"),  sub: conversationsLoadError ? uiText("common.unavailable") : !conversationsReady ? uiText("creators.loading") : unreadCount > 0 ? uiText("Ui.text_f7c1688df1fc46", { value1: String(unreadCount) }) : uiText("notifications.markAllRead"), id: "messages" },
+                    { icon: BarChart2,    label: uiText("nav.analytics"),     sub: uiText("Ui.text_b77f497caa3075", { value1: String(conversations.length) }), id: "analytics" },
                   ].map(({ icon: Icon, label, sub, id }) => (
                     <button
                       key={id}
@@ -1411,16 +1376,9 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-display text-lg font-bold text-text-primary leading-tight">{displayName}</p>
-                      <p className="text-sm text-text-muted mt-0.5 mb-4">{profileRole || "CineGenius Mitglied"}</p>
-                      <div className="flex flex-wrap gap-2">
-                        <Link href="/profile" className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">
-                          <Pencil size={12} /> Profil bearbeiten
-                        </Link>
-                        <Link href={user?.id ? `/profile/${user.id}` : "/profile"} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-colors">
-                          <ExternalLink size={12} /> Öffentliches Profil ansehen
-                        </Link>
-                      </div>
+                      <p className="text-sm text-text-muted mt-0.5 mb-4">{profileRole || uiText("Ui.text_51fb8dfa65e81e")}</p>
+                      <div className="flex flex-wrap gap-2">{uiText.rich("Ui.text_e8649d1a41ba68", { part2: () => (<Pencil size={12} />), part1: chunks => (<Link href="/profile" className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">{chunks}</Link>), part4: () => (<ExternalLink size={12} />), part3: chunks => (<Link href={user?.id ? `/profile/${user.id}` : "/profile"} target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-colors">{chunks}</Link>) })}</div>
                     </div>
                   </div>
                 );
@@ -1430,8 +1388,8 @@ export default function DashboardPage() {
               <div className="p-5 rounded-xl border border-border bg-bg-secondary">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <p className="text-sm font-semibold text-text-primary">Profilstärke</p>
-                    <p className="text-xs text-text-muted mt-0.5">Vollständige Profile werden häufiger entdeckt</p>
+                    <p className="text-sm font-semibold text-text-primary">{uiText("Ui.text_83e186228760e1")}</p>
+                    <p className="text-xs text-text-muted mt-0.5">{uiText("Ui.text_25bd3907ad1c76")}</p>
                   </div>
                   <span className={`text-xl font-bold font-mono ${profileCompleteness >= 75 ? "text-success" : profileCompleteness >= 50 ? "text-gold" : "text-text-secondary"}`}>
                     {profileCompleteness}%
@@ -1444,15 +1402,10 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {profileMissingFields.map((f) => (
                     <Link key={f} href="/profile"
-                      className="flex items-center gap-2 text-xs text-text-muted hover:text-gold transition-colors group">
-                      <AlertCircle size={12} className="shrink-0 group-hover:text-gold" />
-                      <span>{f} fehlt noch</span>
-                    </Link>
+                      className="flex items-center gap-2 text-xs text-text-muted hover:text-gold transition-colors group">{uiText.rich("Ui.text_bfe5f8c2639704", { part1: () => (<AlertCircle size={12} className="shrink-0 group-hover:text-gold" />), value3: () => (f), part2: chunks => (<span>{chunks}</span>) })}</Link>
                   ))}
                   {profileMissingFields.length === 0 && (
-                    <p className="flex items-center gap-2 text-xs text-success col-span-2">
-                      <CheckCircle size={12} /> Profil vollständig ausgefüllt
-                    </p>
+                    <p className="flex items-center gap-2 text-xs text-success col-span-2">{uiText.rich("Ui.text_07f044860551c6", { part1: () => (<CheckCircle size={12} />) })}</p>
                   )}
                 </div>
               </div>
@@ -1460,15 +1413,11 @@ export default function DashboardPage() {
               {/* Profilaufrufe */}
               {viewStats && (
                 <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                  <p className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
-                    <Eye size={15} className="text-gold" /> Profilaufrufe (letzte 7 Tage)
-                  </p>
+                  <p className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">{uiText.rich("Ui.text_1ae821d0161836", { part1: () => (<Eye size={15} className="text-gold" />) })}</p>
                   <div className="flex items-center gap-6">
                     <div>
                       <p className="text-3xl font-bold font-display text-text-primary">{viewStats.views7}</p>
-                      <p className={`text-xs font-medium mt-1 ${viewStats.trend > 0 ? "text-success" : viewStats.trend < 0 ? "text-red-400" : "text-text-muted"}`}>
-                        {viewStats.trend > 0 ? `+${viewStats.trend}%` : viewStats.trend < 0 ? `${viewStats.trend}%` : "Keine Änderung"} vs. Vorwoche
-                      </p>
+                      <p className={`text-xs font-medium mt-1 ${viewStats.trend > 0 ? "text-success" : viewStats.trend < 0 ? "text-red-400" : "text-text-muted"}`}>{uiText.rich("Ui.text_9facc7b997b7f4", { value1: () => (viewStats.trend > 0 ? uiText("Ui.text_1d732d182540bf", { value1: String(viewStats.trend) }) : viewStats.trend < 0 ? uiText("Ui.text_6a53a571fa6641", { value1: String(viewStats.trend) }) : uiText("Ui.text_353ef7a543290a")) })}</p>
                     </div>
                     <div className="flex items-end gap-0.5 h-10 flex-1">
                       {viewStats.daily.map((v, i) => {
@@ -1483,9 +1432,7 @@ export default function DashboardPage() {
               {/* Foto-Bewertungen */}
               {photoStats && (
                 <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                  <p className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
-                    <span className="text-gold text-sm">★</span> Foto-Bewertungen
-                  </p>
+                  <p className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">{uiText.rich("Ui.text_f658ec20200b90", { part1: chunks => (<span className="text-gold text-sm">{chunks}</span>) })}</p>
                   <div className="flex items-center gap-4">
                     <div className="flex-1 min-w-0">
                       <p className="text-3xl font-bold font-display text-text-primary">{photoStats.avg.toFixed(1)}</p>
@@ -1494,12 +1441,12 @@ export default function DashboardPage() {
                           <span key={s} className={`text-sm ${s <= Math.round(photoStats.avg) ? "text-gold" : "text-text-muted/30"}`}>★</span>
                         ))}
                       </div>
-                      <p className="text-xs text-text-muted mt-1">{photoStats.total} Bewertung{photoStats.total !== 1 ? "en" : ""} gesamt</p>
+                      <p className="text-xs text-text-muted mt-1">{uiText.rich("Ui.text_8c8cd0823c74c4", { value1: () => (photoStats.total), count2: photoStats.total })}</p>
                     </div>
                     {photoStats.best && (
                       <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 border border-gold/20">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={photoStats.best} alt="Bestes Foto" className="w-full h-full object-cover" />
+                        <img src={photoStats.best} alt={uiText("Ui.text_d984bbc26c2239")} className="w-full h-full object-cover" />
                       </div>
                     )}
                   </div>
@@ -1509,10 +1456,8 @@ export default function DashboardPage() {
               {/* Schnelle Felder-Übersicht */}
               <div className="p-5 rounded-xl border border-border bg-bg-secondary">
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-sm font-semibold text-text-primary">Checkliste</p>
-                  <Link href="/profile" className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">
-                    Alle bearbeiten <ChevronRight size={11} />
-                  </Link>
+                  <p className="text-sm font-semibold text-text-primary">{uiText("Ui.text_ab242651b32579")}</p>
+                  <Link href="/profile" className="text-xs text-gold hover:text-gold-light transition-colors flex items-center gap-1">{uiText.rich("Ui.text_9be3200810d234", { part1: () => (<ChevronRight size={11} />) })}</Link>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {profileCompletionChecks.map(({ label, ok }) => (
@@ -1532,9 +1477,7 @@ export default function DashboardPage() {
           {activeTab === "firma" && (
             <div className="space-y-6 max-w-2xl">
               {myCompany === "loading" && (
-                <div className="flex items-center gap-3 text-sm text-text-muted py-8">
-                  <Loader2 size={16} className="animate-spin" /> Lädt...
-                </div>
+                <div className="flex items-center gap-3 text-sm text-text-muted py-8">{uiText.rich("Ui.text_e68bc26b2fc6f2", { part1: () => (<Loader2 size={16} className="animate-spin" />) })}</div>
               )}
 
               {myCompany === null && (
@@ -1543,15 +1486,11 @@ export default function DashboardPage() {
                     <Building2 size={28} className="text-text-muted opacity-40" />
                   </div>
                   <div>
-                    <h3 className="font-display text-lg font-bold text-text-primary mb-2">Kein Firmenprofil vorhanden</h3>
-                    <p className="text-sm text-text-muted max-w-sm mx-auto">
-                      Erstelle ein Firmenprofil für deine Produktionsfirma, Agentur oder deinen Service-Betrieb — und werde für andere Filmschaffende auffindbar.
-                    </p>
+                    <h3 className="font-display text-lg font-bold text-text-primary mb-2">{uiText("Ui.text_32ae0a5fd4c809")}</h3>
+                    <p className="text-sm text-text-muted max-w-sm mx-auto">{uiText("Ui.text_800b9ab4851306")}</p>
                   </div>
                   <a href="/company-setup"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-bg-primary text-sm font-semibold rounded-xl hover:bg-gold-light transition-colors">
-                    <Plus size={16} /> Firmenprofil erstellen
-                  </a>
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-bg-primary text-sm font-semibold rounded-xl hover:bg-gold-light transition-colors">{uiText.rich("Ui.text_555dba2841672a", { part1: () => (<Plus size={16} />) })}</a>
                 </div>
               )}
 
@@ -1568,37 +1507,27 @@ export default function DashboardPage() {
                       <div className="flex items-center gap-2 mb-0.5">
                         <p className="font-display text-lg font-bold text-text-primary">{myCompany.name}</p>
                         <span className={`text-[10px] px-2 py-0.5 rounded-full border font-semibold shrink-0 ${myCompany.published ? "text-success border-success/30 bg-success/10" : "text-text-muted border-border"}`}>
-                          {myCompany.published ? "Veröffentlicht" : "Entwurf"}
+                          {myCompany.published ? uiText("OfferModeration.statuses.owner_published") : uiText("OfferModeration.statuses.draft")}
                         </span>
                       </div>
                       {myCompany.city && <p className="text-xs text-text-muted mb-3">{myCompany.city}</p>}
-                      {myCompany.tagline && <p className="text-sm text-text-secondary italic mb-3">&ldquo;{myCompany.tagline}&rdquo;</p>}
-                      <div className="flex flex-wrap gap-2">
-                        <a href="/company-setup"
-                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">
-                          <Pencil size={12} /> Profil bearbeiten
-                        </a>
-                        <a href="/company-dashboard"
-                          className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-colors">
-                          <BarChart2 size={12} /> Firmen-Dashboard
-                        </a>
-                        <a href={`/companies/${myCompany.slug}`} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-colors">
-                          <ExternalLink size={12} /> Öffentlich ansehen
-                        </a>
-                      </div>
+                      {myCompany.tagline && <p className="text-sm text-text-secondary italic mb-3">{uiText.rich("Ui.text_df436a1f2b679a", { value1: () => (myCompany.tagline) })}</p>}
+                      <div className="flex flex-wrap gap-2">{uiText.rich("Ui.text_04436355fa8f56", { part2: () => (<Pencil size={12} />), part1: chunks => (<a href="/company-setup"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">{chunks}</a>), part4: () => (<BarChart2 size={12} />), part3: chunks => (<a href="/company-dashboard"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-colors">{chunks}</a>), part6: () => (<ExternalLink size={12} />), part5: chunks => (<a href={`/companies/${myCompany.slug}`} target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-colors">{chunks}</a>) })}</div>
                     </div>
                   </div>
 
                   {/* Checkliste */}
                   <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                    <p className="text-sm font-semibold text-text-primary mb-3">Profil-Vollständigkeit</p>
+                    <p className="text-sm font-semibold text-text-primary mb-3">{uiText("profile.completionTitle")}</p>
                     <div className="space-y-2">
                       {[
-                        { label: "Logo hochgeladen",          done: !!myCompany.logo_url },
-                        { label: "Tagline / Beschreibung",    done: !!(myCompany.tagline?.trim() || myCompany.description?.trim()) },
-                        { label: "Social Media hinterlegt",   done: !!(myCompany.social_links && Object.values(myCompany.social_links).some(v => v?.trim())) },
-                        { label: "Profil veröffentlicht",     done: myCompany.published },
+                        { label: uiText("Ui.text_d7188d45e384f6"),          done: !!myCompany.logo_url },
+                        { label: uiText("Ui.text_ca253d14c2ae91"),    done: !!(myCompany.tagline?.trim() || myCompany.description?.trim()) },
+                        { label: uiText("Ui.text_12230e294b2d81"),   done: !!(myCompany.social_links && Object.values(myCompany.social_links).some(v => v?.trim())) },
+                        { label: uiText("Ui.text_0642ef8281f506"),     done: myCompany.published },
                       ].map(({ label, done }) => (
                         <div key={label} className="flex items-center gap-2 text-sm">
                           {done
@@ -1606,7 +1535,7 @@ export default function DashboardPage() {
                             : <AlertCircle size={14} className="text-text-muted shrink-0" />}
                           <span className={done ? "text-text-secondary" : "text-text-muted"}>{label}</span>
                           {!done && (
-                            <a href="/company-setup" className="ml-auto text-xs text-gold hover:underline">Ergänzen →</a>
+                            <a href="/company-setup" className="ml-auto text-xs text-gold hover:underline">{uiText("Ui.text_18d4d9168461df")}</a>
                           )}
                         </div>
                       ))}
@@ -1615,13 +1544,13 @@ export default function DashboardPage() {
 
                   {/* Links */}
                   <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                    <p className="text-sm font-semibold text-text-primary mb-3">Erweiterte Verwaltung</p>
+                    <p className="text-sm font-semibold text-text-primary mb-3">{uiText("Ui.text_db8644e777eb2e")}</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {[
-                        { label: "Services verwalten",    href: "/company-dashboard?tab=services",  desc: "Dienstleistungen hinzufügen & bearbeiten" },
-                        { label: "Equipment verwalten",   href: "/company-dashboard?tab=equipment", desc: "Verleih & technisches Equipment" },
-                        { label: "Team verwalten",        href: "/company-dashboard?tab=team",      desc: "Mitglieder einladen & Rollen vergeben" },
-                        { label: "Firmenprofil bearbeiten", href: "/company-setup",                 desc: "Name, Logo, Beschreibung, Social" },
+                        { label: uiText("Ui.text_47b6cd91a8fc94"),    href: "/company-dashboard?tab=services",  desc: uiText("Ui.text_d92cf7207c5ce5") },
+                        { label: uiText("Ui.text_866a24cf1da9e0"),   href: "/company-dashboard?tab=equipment", desc: uiText("Ui.text_7bacef8c556d15") },
+                        { label: uiText("Ui.text_a42e219c711da7"),        href: "/company-dashboard?tab=team",      desc: uiText("Ui.text_5c497fa20add72") },
+                        { label: uiText("Ui.text_59d7fcdeacc6d4"), href: "/company-setup",                 desc: uiText("Ui.text_87871d9df9854d") },
                       ].map(({ label, href, desc }) => (
                         <a key={label} href={href}
                           className="flex items-start gap-3 p-3 rounded-lg border border-border hover:border-gold/40 hover:bg-bg-elevated transition-all group">
@@ -1644,19 +1573,15 @@ export default function DashboardPage() {
             <div className="space-y-4 max-w-3xl">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-text-muted">
-                  {myJobsLoading ? "Lädt..." : (
-                    <><span className="text-text-primary font-semibold">{myJobs.length}</span> {myJobs.length === 1 ? "Job" : "Jobs"} ausgeschrieben</>
+                  {myJobsLoading ? uiText("Ui.text_7a72dd7b9d46f7") : (
+                    <>{uiText.rich("Ui.text_dadac5c68780b4", { value2: () => (myJobs.length), part1: chunks => (<span className="text-text-primary font-semibold">{chunks}</span>), value3: () => (myJobs.length === 1 ? uiText("AdminAccounts.contentKinds.job") : uiText("nav.jobs")) })}</>
                   )}
                 </p>
-                <a href="/inserat" className="px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg flex items-center gap-1.5 hover:bg-gold-light transition-colors">
-                  <Plus size={12} /> Job ausschreiben
-                </a>
+                <a href="/inserat" className="px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg flex items-center gap-1.5 hover:bg-gold-light transition-colors">{uiText.rich("Ui.text_cdb4a69a5b9f1f", { part1: () => (<Plus size={12} />) })}</a>
               </div>
 
               {myJobsLoading && (
-                <div className="flex items-center gap-3 text-sm text-text-muted py-4">
-                  <Loader2 size={16} className="animate-spin" /> Lädt...
-                </div>
+                <div className="flex items-center gap-3 text-sm text-text-muted py-4">{uiText.rich("Ui.text_e68bc26b2fc6f2", { part1: () => (<Loader2 size={16} className="animate-spin" />) })}</div>
               )}
 
               {!myJobsLoading && myJobs.length === 0 && (
@@ -1665,12 +1590,10 @@ export default function DashboardPage() {
                     <Briefcase size={24} className="text-text-muted opacity-40" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-text-secondary">Noch keine Jobs ausgeschrieben</p>
-                    <p className="text-xs text-text-muted mt-1">Suche Darsteller, Crew oder Locations? Schreibe jetzt einen Job aus.</p>
+                    <p className="text-sm font-medium text-text-secondary">{uiText("jobs.emptyTitle")}</p>
+                    <p className="text-xs text-text-muted mt-1">{uiText("Ui.text_3cf15f201498d9")}</p>
                   </div>
-                  <a href="/inserat" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">
-                    <Plus size={13} /> Job ausschreiben
-                  </a>
+                  <a href="/inserat" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors">{uiText.rich("Ui.text_cdb4a69a5b9f1f", { part1: () => (<Plus size={13} />) })}</a>
                 </div>
               )}
 
@@ -1685,37 +1608,28 @@ export default function DashboardPage() {
                       <OfferModerationStatus item={job} />
                     </div>
                     <p className="text-xs text-text-muted">
-                      {[job.role, job.location].filter(Boolean).join(" · ")} · {new Date(job.created_at).toLocaleDateString("de-DE")}
+                      {[job.role, job.location].filter(Boolean).join(" · ")} · {new Date(job.created_at).toLocaleDateString(uiLocale)}
                     </p>
                   </div>
-                  <div className="flex flex-col gap-1.5 shrink-0">
-                    <a href={`/jobs/${job.id}`} target="_blank" rel="noopener noreferrer"
-                      className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all text-center">
-                      Ansehen
-                    </a>
-                    <a href={`/jobs/${job.id}/edit`}
-                      className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all text-center flex items-center gap-1 justify-center">
-                      <Pencil size={10} /> Bearbeiten
-                    </a>
-                  </div>
+                  <div className="flex flex-col gap-1.5 shrink-0">{uiText.rich("Ui.text_d960f86ce558e1", { part1: chunks => (<a href={`/jobs/${job.id}`} target="_blank" rel="noopener noreferrer"
+                      className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all text-center">{chunks}</a>), part3: () => (<Pencil size={10} />), part2: chunks => (<a href={`/jobs/${job.id}/edit`}
+                      className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all text-center flex items-center gap-1 justify-center">{chunks}</a>) })}</div>
                 </div>
               ))}
 
               {/* Eingegangene Bewerbungen */}
               <div className="rounded-xl border border-border bg-bg-secondary overflow-hidden mt-6">
                 <div className="px-5 py-4 border-b border-border flex items-center justify-between">
-                  <h3 className="font-semibold text-text-primary text-sm">Eingegangene Bewerbungen</h3>
+                  <h3 className="font-semibold text-text-primary text-sm">{uiText("Ui.text_34c2cdc13ab479")}</h3>
                   {incomingApplications.filter(a => a.status === "pending").length > 0 && (
-                    <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-gold/15 text-gold border border-gold/30">
-                      {incomingApplications.filter(a => a.status === "pending").length} neu
-                    </span>
+                    <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-gold/15 text-gold border border-gold/30">{uiText.rich("Ui.text_488b93937e6625", { value1: () => (incomingApplications.filter(a => a.status === "pending").length) })}</span>
                   )}
                 </div>
-                {incomingAppsLoading && <div className="p-8 text-center text-xs text-text-muted">Laden...</div>}
+                {incomingAppsLoading && <div className="p-8 text-center text-xs text-text-muted">{uiText("Ui.text_b89b8cdb9d6d6f")}</div>}
                 {!incomingAppsLoading && incomingApplications.length === 0 && (
                   <div className="p-8 text-center space-y-2">
                     <FileText size={24} className="mx-auto text-text-muted opacity-20" />
-                    <p className="text-sm text-text-muted">Noch keine Bewerbungen eingegangen</p>
+                    <p className="text-sm text-text-muted">{uiText("Ui.text_f1e852a8804982")}</p>
                   </div>
                 )}
                 <div className="divide-y divide-border">
@@ -1730,17 +1644,8 @@ export default function DashboardPage() {
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <Link href={`/profile/${a.applicant_id}`} className="text-sm font-semibold text-text-primary hover:text-gold transition-colors">
-                              {a.applicant_name}
-                            </Link>
-                            <span className="text-xs text-text-muted">für</span>
-                            <Link href={`/jobs/${a.job_id}`} className="text-xs text-gold hover:text-gold-light transition-colors truncate max-w-[160px]">
-                              {a.job_title}
-                            </Link>
-                            {a.day_rate && <span className="text-xs text-text-muted">· {a.day_rate}</span>}
-                          </div>
-                          <p className="text-xs text-text-muted mt-1">{new Date(a.created_at).toLocaleDateString("de-DE")}</p>
+                          <div className="flex items-center gap-2 flex-wrap">{uiText.rich("Ui.text_b247060e171e82", { value2: () => (a.applicant_name), part1: chunks => (<Link href={`/profile/${a.applicant_id}`} className="text-sm font-semibold text-text-primary hover:text-gold transition-colors">{chunks}</Link>), part3: chunks => (<span className="text-xs text-text-muted">{chunks}</span>), value5: () => (a.job_title), part4: chunks => (<Link href={`/jobs/${a.job_id}`} className="text-xs text-gold hover:text-gold-light transition-colors truncate max-w-[160px]">{chunks}</Link>), value6: () => (a.day_rate && <span className="text-xs text-text-muted">· {a.day_rate}</span>) })}</div>
+                          <p className="text-xs text-text-muted mt-1">{new Date(a.created_at).toLocaleDateString(uiLocale)}</p>
                         </div>
                         <div className="shrink-0">
                           {a.status === "pending" ? (
@@ -1749,31 +1654,25 @@ export default function DashboardPage() {
                                 onClick={() => respondApplication(a.id, "accepted")}
                                 disabled={respondingApp === a.id}
                                 className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-success/15 text-success border border-success/30 hover:bg-success/25 transition-colors disabled:opacity-50"
-                              >
-                                <Check size={11} /> Annehmen
-                              </button>
+                              >{uiText.rich("Ui.text_048edf533fa6f4", { part1: () => (<Check size={11} />) })}</button>
                               <button
                                 onClick={() => respondApplication(a.id, "rejected")}
                                 disabled={respondingApp === a.id}
                                 className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-crimson/10 text-crimson-light border border-crimson/30 hover:bg-crimson/20 transition-colors disabled:opacity-50"
-                              >
-                                <X size={11} /> Ablehnen
-                              </button>
+                              >{uiText.rich("Ui.text_2424239b7d6d6c", { part1: () => (<X size={11} />) })}</button>
                             </div>
                           ) : (
                             <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${
                               a.status === "accepted" ? "border-success/30 bg-success/10 text-success" : "border-crimson/30 bg-crimson/10 text-crimson-light"
                             }`}>
-                              {a.status === "accepted" ? "Angenommen" : "Abgelehnt"}
+                              {a.status === "accepted" ? uiText("Ui.text_5fb36cf9e74bd2") : uiText("OfferModeration.statuses.rejected")}
                             </span>
                           )}
                         </div>
                       </div>
                       <p className="text-xs text-text-secondary leading-relaxed line-clamp-3 pl-12">{a.message}</p>
                       {a.portfolio_url && (
-                        <a href={a.portfolio_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-gold hover:text-gold-light transition-colors pl-12">
-                          <ExternalLink size={10} /> Portfolio ansehen
-                        </a>
+                        <a href={a.portfolio_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-gold hover:text-gold-light transition-colors pl-12">{uiText.rich("Ui.text_774fce08c2d43b", { part1: () => (<ExternalLink size={10} />) })}</a>
                       )}
                     </div>
                   ))}
@@ -1787,13 +1686,11 @@ export default function DashboardPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-text-muted">
-                  {listingsLoading ? "Lädt..." : (
-                    <><span className="text-text-primary font-semibold">{myListings.length}</span> {myListings.length === 1 ? "Inserat" : "Inserate"}</>
+                  {listingsLoading ? uiText("Ui.text_7a72dd7b9d46f7") : (
+                    <><span className="text-text-primary font-semibold">{myListings.length}</span> {myListings.length === 1 ? uiText("AdminAccounts.contentKinds.other") : uiText("profile.tabListings")}</>
                   )}
                 </p>
-                <Link href="/inserat" className="px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg flex items-center gap-1.5 hover:bg-gold-light transition-colors">
-                  <Plus size={12} /> Inserat hinzufügen
-                </Link>
+                <Link href="/inserat" className="px-3 py-1.5 bg-gold text-bg-primary text-xs font-semibold rounded-lg flex items-center gap-1.5 hover:bg-gold-light transition-colors">{uiText.rich("Ui.text_8ba166e3d0597a", { part1: () => (<Plus size={12} />) })}</Link>
               </div>
 
               {listingsError && (
@@ -1802,10 +1699,8 @@ export default function DashboardPage() {
 
               {!listingsLoading && myListings.length === 0 && !listingsError && (
                 <div className="text-center py-12 border border-dashed border-border rounded-xl">
-                  <p className="text-text-muted mb-4">Noch keine Inserate. Erstelle dein erstes!</p>
-                  <Link href="/inserat" className="px-5 py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors inline-flex items-center gap-2">
-                    <Plus size={14} /> Inserat erstellen
-                  </Link>
+                  <p className="text-text-muted mb-4">{uiText("Ui.text_a4fdb924988e08")}</p>
+                  <Link href="/inserat" className="px-5 py-2.5 bg-gold text-bg-primary text-sm font-semibold rounded-lg hover:bg-gold-light transition-colors inline-flex items-center gap-2">{uiText.rich("Ui.text_7ec80552729795", { part1: () => (<Plus size={14} />) })}</Link>
                 </div>
               )}
 
@@ -1823,19 +1718,14 @@ export default function DashboardPage() {
                       <h3 className="font-semibold text-text-primary">{l.title}</h3>
                     </div>
                     <OfferModerationStatus item={l} explain /><p className="text-xs text-text-muted mb-1">{typeLabel[l.type] ?? l.type} · {l.city}</p>
-                    <p className="text-xs text-text-muted">
-                      {listingPriceLabel(l.price,l.metadata,"/Tag",marketLocale,marketText)} ·{" "}
-                      erstellt {new Date(l.created_at).toLocaleDateString("de-DE")}
-                    </p>
+                    <p className="text-xs text-text-muted">{uiText.rich("Ui.text_35a1b4ab0d266c", { value1: () => (listingPriceLabel(l.price,l.metadata,"/Tag",marketLocale,marketText)), value2: () => (new Date(l.created_at).toLocaleDateString(uiLocale)) })}</p>
                     <ListingFreshnessSummary listingId={l.id} state={l.freshness} onNavigate={() => router.push(`/listing-status/${encodeURIComponent(l.id)}`)} />
                   </div>
                   <div className="flex flex-col gap-2 shrink-0">
                     <Link
                       href={typeHref(l)}
                       className="px-3 py-1.5 text-xs font-medium border border-border text-text-secondary hover:border-gold hover:text-gold rounded-md transition-all text-center"
-                    >
-                      Ansehen
-                    </Link>
+                    >{uiText("Ui.text_8e31363947a6c7")}</Link>
                     <button
                       onClick={() => leaveEditor(() => editingId === l.id ? setEditingId(null) : startEdit(l))}
                       disabled={editingId === l.id && (editGalleryState.uploading || editUploading)}
@@ -1844,9 +1734,7 @@ export default function DashboardPage() {
                           ? "border border-gold bg-gold/10 text-gold"
                           : "border border-border text-text-secondary hover:border-gold hover:text-gold"
                       }`}
-                    >
-                      <Pencil size={10} /> Bearbeiten
-                    </button>
+                    >{uiText.rich("Ui.text_603ead2ae843f0", { part1: () => (<Pencil size={10} />) })}</button>
                     <button
                       onClick={() => togglePublished(l.id, l.published)}
                       disabled={l.moderation_status === "pending" && l.type !== "prop" && l.type !== "vehicle"}
@@ -1861,16 +1749,14 @@ export default function DashboardPage() {
                     <button
                       onClick={() => deleteListing(l.id)}
                       className="px-3 py-1.5 text-xs font-medium border border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-md transition-all"
-                    >
-                      Löschen
-                    </button>
+                    >{uiText("common.clearFilter")}</button>
                   </div>
                 </div>
 
                 {/* ── Inline Edit Panel ── */}
                 {editingId === l.id && (
                   <div className="mt-3 p-4 rounded-xl border border-gold/20 bg-gold/5 space-y-3">
-                    <p className="text-xs font-semibold text-gold uppercase tracking-widest">Inserat bearbeiten</p>
+                    <p className="text-xs font-semibold text-gold uppercase tracking-widest">{uiText("Ui.text_9f452b430cd77c")}</p>
                     <p className="mb-3 text-xs leading-5 text-text-muted">{moderation("editNotice")}</p><FormDraftStatus draft={editDraft} />
                     {editError && (
                       <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{editError}</p>
@@ -1885,21 +1771,21 @@ export default function DashboardPage() {
                           setEditForm((current) => ({ ...current, image_url: urls[0] ?? "" }));
                         }}
                         onStatusChange={setEditGalleryState}
-                        label={l.type === "location" ? "Locationfotos" : "Artikelbilder"}
+                        label={l.type === "location" ? uiText("Ui.text_fdff84960c7129") : uiText("Ui.text_62e0c060c11ffc")}
                       />
                     ) : <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">Bild</label>
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">{uiText("Ui.text_375e84034b8ff2")}</label>
                       <div className="flex items-center gap-3">
                         {editForm.image_url && (
                           <UnoptimizedImage src={editForm.image_url} alt="" className="w-16 h-16 rounded-lg object-cover border border-border shrink-0" />
                         )}
                         <label className={`flex items-center gap-2 px-3 py-2 border border-border rounded-lg text-xs text-text-secondary hover:border-gold hover:text-gold transition-colors cursor-pointer ${editUploading ? "opacity-50 pointer-events-none" : ""}`}>
                           {editUploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
-                          {editUploading ? "Wird hochgeladen…" : "Bild ändern"}
+                          {editUploading ? uiText("Ui.text_7596def5825b62") : uiText("Ui.text_6fc3fbbc479537")}
                           <input type="file" accept="image/jpeg,image/png,image/webp,image/heic" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) void uploadEditImage(f); e.currentTarget.value = ""; }} />
                         </label>
                         {editForm.image_url && (
-                          <button onClick={() => setEditForm((p) => ({ ...p, image_url: "" }))} className="text-xs text-red-400 hover:text-red-300 transition-colors">Entfernen</button>
+                          <button onClick={() => setEditForm((p) => ({ ...p, image_url: "" }))} className="text-xs text-red-400 hover:text-red-300 transition-colors">{uiText("profile.removePhoto")}</button>
                         )}
                       </div>
                     </div>}
@@ -1907,19 +1793,18 @@ export default function DashboardPage() {
 
                     {l.type === "location" && (
                       <div className="space-y-3 rounded-lg border border-border bg-bg-secondary p-3">
-                        <p className="text-xs font-semibold uppercase tracking-widest text-text-muted">Ausstattung und Drehbedingungen</p>
+                        <p className="text-xs font-semibold uppercase tracking-widest text-text-muted">{uiText("Ui.text_1fe7c4ccc363a4")}</p>
                         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                           {([
                             ["sqm", "Fläche (m²)"], ["ceiling_height_m", "Deckenhöhe (m)"],
                             ["max_crew", "Max. Crew"], ["parking_spots", "Parkplätze"],
                           ] as const).map(([key, label]) => (
-                            <label key={key} className="text-[11px] text-text-muted">{label}
+                            <label key={key} className="text-[11px] text-text-muted">{(uiOptionLabels[label] ?? label)}
                               <input type="number" min="0" step={key === "ceiling_height_m" ? "0.1" : "1"} value={editLocationMeta[key]} onChange={(event) => setEditLocationMeta((current) => ({ ...current, [key]: event.target.value }))} className="mt-1 min-h-10 w-full rounded-lg border border-border bg-bg-elevated px-2.5 text-sm text-text-primary" />
                             </label>
                           ))}
-                          <label className="text-[11px] text-text-muted">Innen / Außen
-                            <select value={editLocationMeta.indoor_outdoor} onChange={(event) => setEditLocationMeta((current) => ({ ...current, indoor_outdoor: event.target.value }))} className="mt-1 min-h-10 w-full rounded-lg border border-border bg-bg-elevated px-2.5 text-sm text-text-primary">
-                              <option value="innen">Innen</option><option value="außen">Außen</option><option value="beides">Innen & Außen</option>
+                          <label className="text-[11px] text-text-muted">{uiText("Ui.text_422e70802caa3e")}<select value={editLocationMeta.indoor_outdoor} onChange={(event) => setEditLocationMeta((current) => ({ ...current, indoor_outdoor: event.target.value }))} className="mt-1 min-h-10 w-full rounded-lg border border-border bg-bg-elevated px-2.5 text-sm text-text-primary">
+                              <option value="innen">{uiText("locations.filterInnen")}</option><option value="außen">{uiText("locations.filterAussen")}</option><option value="beides">{uiText("locations.filterInnenAussen")}</option>
                             </select>
                           </label>
                         </div>
@@ -1928,30 +1813,30 @@ export default function DashboardPage() {
                             ["power_available", "Stromanschluss"], ["natural_light", "Tageslicht"],
                             ["blackout_possible", "Verdunkelbar"], ["loading_access", "Be-/Entladung"],
                           ] as const).map(([key, label]) => (
-                            <button key={key} type="button" aria-pressed={editLocationMeta[key]} onClick={() => setEditLocationMeta((current) => ({ ...current, [key]: !current[key] }))} className={`min-h-10 rounded-lg border px-3 text-xs ${editLocationMeta[key] ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{editLocationMeta[key] ? "✓ " : ""}{label}</button>
+                            <button key={key} type="button" aria-pressed={editLocationMeta[key]} onClick={() => setEditLocationMeta((current) => ({ ...current, [key]: !current[key] }))} className={`min-h-10 rounded-lg border px-3 text-xs ${editLocationMeta[key] ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{editLocationMeta[key] ? "✓ " : ""}{(uiOptionLabels[label] ?? label)}</button>
                           ))}
                         </div>
-                        {editLocationMeta.power_available && <input maxLength={160} value={editLocationMeta.power_details} onChange={(event) => setEditLocationMeta((current) => ({ ...current, power_details: event.target.value }))} placeholder="Stromdetails, z. B. CEE 32A" className="min-h-10 w-full rounded-lg border border-border bg-bg-elevated px-3 text-sm text-text-primary" />}
+                        {editLocationMeta.power_available && <input maxLength={160} value={editLocationMeta.power_details} onChange={(event) => setEditLocationMeta((current) => ({ ...current, power_details: event.target.value }))} placeholder={uiText("Ui.text_45387017a0e70b")} className="min-h-10 w-full rounded-lg border border-border bg-bg-elevated px-3 text-sm text-text-primary" />}
                         <div className="grid gap-2 sm:grid-cols-2">
-                          <input maxLength={160} value={editLocationMeta.shooting_hours} onChange={(event) => setEditLocationMeta((current) => ({ ...current, shooting_hours: event.target.value }))} placeholder="Mögliche Drehzeiten" className="min-h-10 rounded-lg border border-border bg-bg-elevated px-3 text-sm text-text-primary" />
-                          <input maxLength={240} value={editLocationMeta.access_notes} onChange={(event) => setEditLocationMeta((current) => ({ ...current, access_notes: event.target.value }))} placeholder="Anfahrt und Zugang, keine Privatadresse" className="min-h-10 rounded-lg border border-border bg-bg-elevated px-3 text-sm text-text-primary" />
+                          <input maxLength={160} value={editLocationMeta.shooting_hours} onChange={(event) => setEditLocationMeta((current) => ({ ...current, shooting_hours: event.target.value }))} placeholder={uiText("AdminReview.fields.shooting_hours")} className="min-h-10 rounded-lg border border-border bg-bg-elevated px-3 text-sm text-text-primary" />
+                          <input maxLength={240} value={editLocationMeta.access_notes} onChange={(event) => setEditLocationMeta((current) => ({ ...current, access_notes: event.target.value }))} placeholder={uiText("Ui.text_01231d096c526a")} className="min-h-10 rounded-lg border border-border bg-bg-elevated px-3 text-sm text-text-primary" />
                         </div>
-                        <textarea maxLength={500} rows={2} value={editLocationMeta.availability_notes} onChange={(event) => setEditLocationMeta((current) => ({ ...current, availability_notes: event.target.value }))} placeholder="Verfügbarkeit und Einschränkungen" className="w-full rounded-lg border border-border bg-bg-elevated p-3 text-sm text-text-primary" />
+                        <textarea maxLength={500} rows={2} value={editLocationMeta.availability_notes} onChange={(event) => setEditLocationMeta((current) => ({ ...current, availability_notes: event.target.value }))} placeholder={uiText("Ui.text_e6c48894da484b")} className="w-full rounded-lg border border-border bg-bg-elevated p-3 text-sm text-text-primary" />
                         <div>
-                          <label className="mb-2 block text-xs text-text-muted">Gesperrte Drehtage</label>
+                          <label className="mb-2 block text-xs text-text-muted">{uiText("Ui.text_29f202bb606cb9")}</label>
                           <div className="flex flex-wrap gap-2">
                             <input type="date" value={newBlockedDate} onChange={(event) => setNewBlockedDate(event.target.value)} className="min-h-10 rounded-lg border border-border bg-bg-elevated px-3 text-sm text-text-primary" />
-                            <button type="button" disabled={!newBlockedDate || editBlockedDates.includes(newBlockedDate)} onClick={() => { setEditBlockedDates((dates) => [...dates, newBlockedDate].sort()); setNewBlockedDate(""); }} className="min-h-10 rounded-lg border border-border px-3 text-xs text-text-secondary hover:border-gold hover:text-gold disabled:opacity-50">Tag sperren</button>
+                            <button type="button" disabled={!newBlockedDate || editBlockedDates.includes(newBlockedDate)} onClick={() => { setEditBlockedDates((dates) => [...dates, newBlockedDate].sort()); setNewBlockedDate(""); }} className="min-h-10 rounded-lg border border-border px-3 text-xs text-text-secondary hover:border-gold hover:text-gold disabled:opacity-50">{uiText("Ui.text_cab5a16e99fc42")}</button>
                           </div>
-                          {editBlockedDates.length > 0 ? <div className="mt-2 flex flex-wrap gap-2">{editBlockedDates.map((date) => <button key={date} type="button" onClick={() => setEditBlockedDates((dates) => dates.filter((item) => item !== date))} aria-label={`${date} freigeben`} className="min-h-8 rounded-full border border-crimson/30 bg-crimson/10 px-3 text-xs text-crimson-light">{new Date(`${date}T00:00:00`).toLocaleDateString("de-DE")} ×</button>)}</div> : <p className="mt-2 text-[11px] text-text-muted">Keine Tage manuell gesperrt.</p>}
+                          {editBlockedDates.length > 0 ? <div className="mt-2 flex flex-wrap gap-2">{editBlockedDates.map((date) => <button key={date} type="button" onClick={() => setEditBlockedDates((dates) => dates.filter((item) => item !== date))} aria-label={uiText("Ui.text_88099c029f3803", { value1: String(date) })} className="min-h-8 rounded-full border border-crimson/30 bg-crimson/10 px-3 text-xs text-crimson-light">{new Date(`${date}T00:00:00`).toLocaleDateString(uiLocale)} ×</button>)}</div> : <p className="mt-2 text-[11px] text-text-muted">{uiText("Ui.text_e7d710d709332d")}</p>}
                         </div>
                         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                           {[["restrooms", "WC / Sanitär"], ["green_room", "Aufenthaltsraum"], ["kitchen", "Küche"], ["changing_room", "Umkleide"], ["loading_bay", "Laderampe"], ["wifi", "Wi-Fi"]].map(([key, label]) => {
                             const active = editLocationMeta.amenities.includes(key);
-                            return <button key={key} type="button" aria-pressed={active} onClick={() => setEditLocationMeta((current) => ({ ...current, amenities: active ? current.amenities.filter((item) => item !== key) : [...current.amenities, key] }))} className={`min-h-10 rounded-lg border px-2 text-xs ${active ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{active ? "✓ " : ""}{label}</button>;
+                            return <button key={key} type="button" aria-pressed={active} onClick={() => setEditLocationMeta((current) => ({ ...current, amenities: active ? current.amenities.filter((item) => item !== key) : [...current.amenities, key] }))} className={`min-h-10 rounded-lg border px-2 text-xs ${active ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{active ? "✓ " : ""}{(uiOptionLabels[label] ?? label)}</button>;
                           })}
                         </div>
-                        {editLocationMeta.rooms.length > 0 && <p className="text-[11px] text-text-muted">Bereiche: {editLocationMeta.rooms.map((room) => room.replaceAll("_", " ")).join(" · ")}</p>}
+                        {editLocationMeta.rooms.length > 0 && <p className="text-[11px] text-text-muted">{uiText.rich("Ui.text_086e921432683e", { value1: () => (editLocationMeta.rooms.map((room) => locationRoomLabel(room, l.category ?? "", uiText)).join(" · ")) })}</p>}
                       </div>
                     )}
 
@@ -1959,17 +1844,17 @@ export default function DashboardPage() {
                       {l.type === "animal" && <fieldset className="space-y-3 rounded-xl border border-border p-4"><legend className="px-1 text-sm text-text-primary">{animals("portfolioDetails")}</legend><label className="block text-sm">{animals("training")}<input value={editAnimalMeta.training_level} maxLength={120} onChange={event=>setEditAnimalMeta(value=>({...value,training_level:event.target.value}))} className="mt-1 min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3" /></label><label className="block text-sm">{animals("skills")}<textarea value={editAnimalMeta.special_skills} maxLength={2000} onChange={event=>setEditAnimalMeta(value=>({...value,special_skills:event.target.value}))} className="mt-1 min-h-24 w-full rounded-lg border border-border bg-bg-primary p-3" /></label><p className="text-xs text-text-muted">{animals("conditions")}</p></fieldset>}
                       <ResponsiblePersonFields compactWhenProfile={l.type === "prop" || l.type === "vehicle"} value={editResponsible} onChange={setEditResponsible} errors={editResponsibleErrors} accountPrefill={!l.responsible_person || l.responsible_person.userId === user?.id} disabled={Boolean(l.responsible_person && l.responsible_person.userId !== user?.id)} />
                       <div>
-                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">Titel *</label>
+                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">{uiText("Ui.text_fe0fc68dab2d5b")}</label>
                         <input
                           type="text"
                           value={editForm.title}
                           onChange={(e) => setEditForm((p) => ({ ...p, title: e.target.value }))}
                           className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold transition-colors"
-                          placeholder="Titel des Inserats"
+                          placeholder={uiText("Ui.text_5c76bbf6fd35eb")}
                         />
                       </div>
                       <div>
-                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">Stadt *</label>
+                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">{uiText("Ui.text_a7f3095e67f2ba")}</label>
                         <PlaceField value={editForm.city} onChange={(value, cityId) => setEditForm(p => ({ ...p, city: value, selected_place_city_id: cityId || "" }))} required />
                       </div>
                     </div>
@@ -1977,18 +1862,18 @@ export default function DashboardPage() {
                       {["prop","vehicle"].includes(l.type) && <MarketplaceOfferFields value={editMarketplace} vehicleOnly={l.type === "vehicle"} onChange={setEditMarketplace} />}
                       {l.type === "location" && <ListingPriceOptions onRequest={editLocationMeta.price_on_request} negotiable={editLocationMeta.price_negotiable} onChange={value=>setEditLocationMeta(current=>({...current,price_on_request:value.priceOnRequest,price_negotiable:value.priceNegotiable}))} />}
                       {["prop","vehicle"].includes(l.type) ? null : l.type === "animal" ? <p className="text-xs text-text-muted">{animals("conditions")}</p> : !editLocationMeta.price_on_request || !["location", "prop", "vehicle"].includes(l.type) ? <>
-                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">{l.type === "location" ? "Preis pro Drehtag (€)" : "Preis / Tag (€)"}</label>
-                        <input type="number" min="0" value={editForm.price} onChange={(e) => { setEditLocationMeta((current) => ({ ...current, price_on_request: false })); setEditForm((p) => ({ ...p, price: e.target.value })); }} className="w-full rounded-lg border border-border bg-bg-elevated px-3 py-2 text-sm transition-colors focus:border-gold focus:outline-none" placeholder="z. B. 500" />
-                      </> : <p className="text-xs text-text-muted">Der Preis wird öffentlich als „Auf Anfrage“ angezeigt.</p>}
+                        <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">{l.type === "location" ? uiText("Ui.text_2d78239ac0e617") : uiText("Ui.text_177ce41dae81c2")}</label>
+                        <input type="number" min="0" value={editForm.price} onChange={(e) => { setEditLocationMeta((current) => ({ ...current, price_on_request: false })); setEditForm((p) => ({ ...p, price: e.target.value })); }} className="w-full rounded-lg border border-border bg-bg-elevated px-3 py-2 text-sm transition-colors focus:border-gold focus:outline-none" placeholder="500" />
+                      </> : <p className="text-xs text-text-muted">{uiText("Ui.text_aabd03635f4100")}</p>}
                     </div>
                     <div>
-                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">Beschreibung</label>
+                      <label className="text-xs uppercase tracking-widest text-text-muted font-semibold block mb-1">{uiText("setup.description")}</label>
                       <textarea
                         rows={3}
                         value={editForm.description}
                         onChange={(e) => setEditForm((p) => ({ ...p, description: e.target.value }))}
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold transition-colors resize-none"
-                        placeholder="Beschreibe dein Inserat…"
+                        placeholder={uiText("Ui.text_f2b04667fff22d")}
                       />
                     </div>
                     <div className="flex gap-2 justify-end">
@@ -1996,17 +1881,12 @@ export default function DashboardPage() {
                         onClick={() => leaveEditor(() => setEditingId(null))}
                         disabled={editGalleryState.uploading || editUploading}
                         className="px-4 py-2 text-xs font-medium border border-border text-text-secondary hover:text-text-primary rounded-lg transition-all"
-                      >
-                        Abbrechen
-                      </button>
+                      >{uiText("home.boardCancel")}</button>
                       <button
                         onClick={saveEdit}
                         disabled={!editDraft.loaded || editSaving || editUploading || editGalleryState.uploading || editGalleryState.failed > 0}
                         className="px-4 py-2 text-xs font-semibold bg-gold text-bg-primary rounded-lg hover:bg-gold-light transition-colors flex items-center gap-1.5 disabled:opacity-60"
-                      >
-                        {editSaving ? <Loader2 size={11} className="animate-spin" /> : <Save size={11} />}
-                        Speichern
-                      </button>
+                      >{uiText.rich("Ui.text_577b2220b25dbe", { value1: () => (editSaving ? <Loader2 size={11} className="animate-spin" /> : <Save size={11} />) })}</button>
                     </div>
                   </div>
                 )}
@@ -2021,7 +1901,7 @@ export default function DashboardPage() {
               {/* Conversation list */}
               <div className={`w-full sm:w-72 shrink-0 border-r border-border flex-col ${selectedConversation ? "hidden sm:flex" : "flex"}`}>
                 <div className="p-3 border-b border-border flex items-center justify-between">
-                  <p className="text-xs uppercase tracking-widest text-text-muted font-semibold">Nachrichten</p>
+                  <p className="text-xs uppercase tracking-widest text-text-muted font-semibold">{uiText("nav.messages")}</p>
                   {conversationsReady && unreadCount > 0 && (
                     <span className="px-1.5 py-0.5 bg-gold text-bg-primary text-[10px] font-bold rounded-full">
                       {unreadCount}
@@ -2030,13 +1910,10 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex-1 overflow-y-auto divide-y divide-border">
                   {convsLoading && (
-                    <div className="p-4 text-center text-xs text-text-muted">Laden...</div>
+                    <div className="p-4 text-center text-xs text-text-muted">{uiText("Ui.text_b89b8cdb9d6d6f")}</div>
                   )}
                   {!convsLoading && conversations.length === 0 && (
-                    <div className="p-6 text-center text-xs text-text-muted">
-                      <MessageSquare size={24} className="mx-auto mb-2 opacity-30" />
-                      Noch keine Nachrichten
-                    </div>
+                    <div className="p-6 text-center text-xs text-text-muted">{uiText.rich("Ui.text_ffe16d6d46e013", { part1: () => (<MessageSquare size={24} className="mx-auto mb-2 opacity-30" />) })}</div>
                   )}
                   {conversations.map((conv) => {
                     const lastMsg = conv.messages[0];
@@ -2062,7 +1939,7 @@ export default function DashboardPage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-0.5">
                             <span className="text-xs font-semibold text-text-primary truncate">
-                              {conv.otherName ?? "Unbekannt"}
+                              {conv.otherName ?? uiText("Ui.text_276ffa1fb4f970")}
                             </span>
                             <span className="text-[10px] text-text-muted shrink-0 ml-1">
                               {formatMsgTime(conv.updated_at)}
@@ -2086,10 +1963,7 @@ export default function DashboardPage() {
               {/* Right panel */}
               {!selectedConversation ? (
                 <div className="flex-1 hidden sm:flex items-center justify-center text-text-muted text-sm">
-                  <div className="text-center">
-                    <MessageSquare size={32} className="mx-auto mb-2 opacity-20" />
-                    Wähle eine Unterhaltung aus
-                  </div>
+                  <div className="text-center">{uiText.rich("Ui.text_e8d7b43e614730", { part1: () => (<MessageSquare size={32} className="mx-auto mb-2 opacity-20" />) })}</div>
                 </div>
               ) : (() => {
                 const conv = conversations.find(c => c.id === selectedConversation);
@@ -2106,7 +1980,7 @@ export default function DashboardPage() {
                       </button>
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-text-primary leading-tight truncate">
-                          {conv.otherName ?? "Unbekannt"}
+                          {conv.otherName ?? uiText("Ui.text_276ffa1fb4f970")}
                         </p>
                         {(conv.listing_title || conv.listing_type) && (
                           <p className="text-xs text-text-muted mt-0.5 truncate">
@@ -2119,14 +1993,14 @@ export default function DashboardPage() {
                     {/* Messages */}
                     <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
                       {messagesLoading && (
-                        <div className="text-center text-xs text-text-muted py-4">Nachrichten laden...</div>
+                        <div className="text-center text-xs text-text-muted py-4">{uiText("Ui.text_bed1a3a89cb15c")}</div>
                       )}
                       {messageLoadError && <div role="alert" className="py-3 text-xs text-red-400">
                         <p>{messageLoadError}</p>
                         <button type="button" onClick={() => setMessageReloadVersion(value => value + 1)} className="min-h-11 text-gold">{dashboardMessageText("retry")}</button>
                       </div>}
                       {!messagesLoading && !messageLoadError && activeMessages.length === 0 && (
-                        <div className="text-center text-xs text-text-muted py-4">Noch keine Nachrichten</div>
+                        <div className="text-center text-xs text-text-muted py-4">{uiText("Ui.text_d7d4b6f053e077")}</div>
                       )}
                       {activeMessages.map((msg) => {
                         const mine = msg.sender_id === user?.id;
@@ -2156,7 +2030,7 @@ export default function DashboardPage() {
                         rows={2}
                         value={replyText}
                         onChange={(e) => setReplyText(e.target.value)}
-                        placeholder="Nachricht schreiben..."
+                        placeholder={uiText("Ui.text_b43afc27e348f2")}
                         className="flex-1 bg-bg-elevated border border-border rounded-xl px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors resize-none"
                         onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendReply(); } }}
                       />
@@ -2181,10 +2055,10 @@ export default function DashboardPage() {
               {/* Stats row */}
                 <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                 {[
-                  { label: "Meine Buchungen", value: bookingsLoading ? "…" : String(bookings.length) },
-                  { label: "Bestätigt", value: bookingsLoading ? "…" : String(bookings.filter(b => b.status === "confirmed").length) },
-                  { label: "Anfragen erhalten", value: incomingLoading ? "…" : String(incomingBookings.length) },
-                  { label: "Ausstehend", value: incomingLoading ? "…" : String(incomingBookings.filter(b => b.status === "pending").length), highlight: incomingBookings.filter(b => b.status === "pending").length > 0 },
+                  { label: uiText("Ui.text_07b314aaa3295b"), value: bookingsLoading ? "…" : String(bookings.length) },
+                  { label: uiText("Places.verified"), value: bookingsLoading ? "…" : String(bookings.filter(b => b.status === "confirmed").length) },
+                  { label: uiText("Ui.text_f154c270e3bd85"), value: incomingLoading ? "…" : String(incomingBookings.length) },
+                  { label: uiText("profile.verifPendingStatus"), value: incomingLoading ? "…" : String(incomingBookings.filter(b => b.status === "pending").length), highlight: incomingBookings.filter(b => b.status === "pending").length > 0 },
                 ].map(({ label, value, highlight }) => (
                   <div key={label} className={`p-4 rounded-xl border bg-bg-secondary ${highlight ? "border-gold/40 bg-gold/5" : "border-border"}`}>
                     <p className="text-xs text-text-muted uppercase tracking-widest mb-1">{label}</p>
@@ -2197,14 +2071,12 @@ export default function DashboardPage() {
               {(incomingLoading || incomingBookings.length > 0) && (
                 <div className="rounded-xl border border-border bg-bg-secondary overflow-hidden">
                   <div className="px-5 py-4 border-b border-border flex items-center justify-between">
-                    <h2 className="font-semibold text-text-primary">Buchungsanfragen für deine Inserate</h2>
+                    <h2 className="font-semibold text-text-primary">{uiText("Ui.text_18378fcd910064")}</h2>
                     {incomingBookings.filter(b => b.status === "pending").length > 0 && (
-                      <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-gold/15 text-gold border border-gold/30">
-                        {incomingBookings.filter(b => b.status === "pending").length} ausstehend
-                      </span>
+                      <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-gold/15 text-gold border border-gold/30">{uiText.rich("Ui.text_9ff22fb6846fab", { value1: () => (incomingBookings.filter(b => b.status === "pending").length) })}</span>
                     )}
                   </div>
-                  {incomingLoading && <div className="p-8 text-center text-xs text-text-muted">Laden...</div>}
+                  {incomingLoading && <div className="p-8 text-center text-xs text-text-muted">{uiText("Ui.text_b89b8cdb9d6d6f")}</div>}
                   <div className="divide-y divide-border">
                     {incomingBookings.map((b) => (
                       <div key={b.id} className="flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4">
@@ -2213,34 +2085,23 @@ export default function DashboardPage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-text-primary truncate">{b.listing_title}</p>
-                          <p className="text-xs text-text-muted">
-                            Von <span className="text-text-secondary font-medium">{b.booker_name}</span>
-                            {" · "}
-                            {new Date(b.start_date).toLocaleDateString("de-DE", { day: "numeric", month: "short" })}
-                            {" – "}
-                            {new Date(b.end_date).toLocaleDateString("de-DE", { day: "numeric", month: "short", year: "numeric" })}
-                            {" · "}{b.days} Tag{b.days !== 1 ? "e" : ""}
-                          </p>
+                          <p className="text-xs text-text-muted">{uiText.rich("Ui.text_769af32128cf5d", { value2: () => (b.booker_name), part1: chunks => (<span className="text-text-secondary font-medium">{chunks}</span>), value3: () => (new Date(b.start_date).toLocaleDateString(uiLocale, { day: "numeric", month: "short" })), value4: () => (new Date(b.end_date).toLocaleDateString(uiLocale, { day: "numeric", month: "short", year: "numeric" })), value5: () => (b.days), count6: b.days })}</p>
                           {b.notes && <p className="text-xs text-text-muted mt-1 italic line-clamp-1">„{b.notes}”</p>}
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          <p className="text-sm font-semibold text-text-primary mr-1">{b.total.toLocaleString()} €</p>
+                          <p className="text-sm font-semibold text-text-primary mr-1">{b.total.toLocaleString(uiLocale)} €</p>
                           {b.status === "pending" ? (
                             <>
                               <button
                                 onClick={() => respondBooking(b.id, "confirmed")}
                                 disabled={respondingBooking === b.id}
                                 className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-success/15 text-success border border-success/30 hover:bg-success/25 transition-colors disabled:opacity-50"
-                              >
-                                <Check size={12} /> Annehmen
-                              </button>
+                              >{uiText.rich("Ui.text_048edf533fa6f4", { part1: () => (<Check size={12} />) })}</button>
                               <button
                                 onClick={() => respondBooking(b.id, "rejected")}
                                 disabled={respondingBooking === b.id}
                                 className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg bg-crimson/10 text-crimson-light border border-crimson/30 hover:bg-crimson/20 transition-colors disabled:opacity-50"
-                              >
-                                <X size={12} /> Ablehnen
-                              </button>
+                              >{uiText.rich("Ui.text_2424239b7d6d6c", { part1: () => (<X size={12} />) })}</button>
                             </>
                           ) : (
                             <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${
@@ -2248,7 +2109,7 @@ export default function DashboardPage() {
                                 ? "border-success/30 bg-success/10 text-success"
                                 : "border-crimson/30 bg-crimson/10 text-crimson-light"
                             }`}>
-                              {b.status === "confirmed" ? "Angenommen" : "Abgelehnt"}
+                              {b.status === "confirmed" ? uiText("Ui.text_5fb36cf9e74bd2") : uiText("OfferModeration.statuses.rejected")}
                             </span>
                           )}
                         </div>
@@ -2261,21 +2122,17 @@ export default function DashboardPage() {
               {/* Bookings list */}
               <div className="rounded-xl border border-border bg-bg-secondary overflow-hidden">
                 <div className="px-5 py-4 border-b border-border">
-                  <h2 className="font-semibold text-text-primary">Meine Buchungen</h2>
+                  <h2 className="font-semibold text-text-primary">{uiText("Ui.text_07b314aaa3295b")}</h2>
                 </div>
                 {bookingsLoading && (
-                  <div className="p-8 text-center text-xs text-text-muted">Laden...</div>
+                  <div className="p-8 text-center text-xs text-text-muted">{uiText("Ui.text_b89b8cdb9d6d6f")}</div>
                 )}
                 {!bookingsLoading && bookings.length === 0 && (
                   <div className="text-center py-12 space-y-3">
                     <Calendar size={32} className="mx-auto text-text-muted opacity-20" />
-                    <p className="text-text-muted text-sm">Noch keine Buchungen</p>
-                    <p className="text-xs text-text-muted">Deine Buchungen erscheinen hier sobald du etwas gebucht hast.</p>
-                    <div className="flex gap-2 justify-center pt-1">
-                      <Link href="/locations" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors">Locations</Link>
-                      <Link href="/vehicles" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors">Fahrzeuge</Link>
-                      <Link href="/props" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors">Equipment</Link>
-                    </div>
+                    <p className="text-text-muted text-sm">{uiText("Ui.text_43bc3914441afe")}</p>
+                    <p className="text-xs text-text-muted">{uiText("Ui.text_d9239010d75f1d")}</p>
+                    <div className="flex gap-2 justify-center pt-1">{uiText.rich("Ui.text_1e3a01a7fdd097", { part1: chunks => (<Link href="/locations" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors">{chunks}</Link>), part2: chunks => (<Link href="/vehicles" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors">{chunks}</Link>), part3: chunks => (<Link href="/props" className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors">{chunks}</Link>) })}</div>
                   </div>
                 )}
                 <div className="divide-y divide-border">
@@ -2286,21 +2143,16 @@ export default function DashboardPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-text-primary truncate">{b.listing_title}</p>
-                        <p className="text-xs text-text-muted">
-                          {new Date(b.start_date).toLocaleDateString("de-DE", { day: "numeric", month: "short" })}
-                          {" – "}
-                          {new Date(b.end_date).toLocaleDateString("de-DE", { day: "numeric", month: "short", year: "numeric" })}
-                          {" · "}{b.days} Tag{b.days !== 1 ? "e" : ""}
-                        </p>
+                        <p className="text-xs text-text-muted">{uiText.rich("Ui.text_0e057549877a43", { value1: () => (new Date(b.start_date).toLocaleDateString(uiLocale, { day: "numeric", month: "short" })), value2: () => (new Date(b.end_date).toLocaleDateString(uiLocale, { day: "numeric", month: "short", year: "numeric" })), value3: () => (b.days), count4: b.days })}</p>
                       </div>
                       <div className="text-right shrink-0 space-y-1">
-                        <p className="text-sm font-semibold text-text-primary">{b.total.toLocaleString()} €</p>
+                        <p className="text-sm font-semibold text-text-primary">{b.total.toLocaleString(uiLocale)} €</p>
                         <span className={`inline-block px-2 py-0.5 text-[10px] font-semibold rounded-full border ${
                           b.status === "confirmed" ? "border-success/30 bg-success/10 text-success" :
                           b.status === "rejected" ? "border-crimson/30 bg-crimson/10 text-crimson-light" :
                           "border-gold/30 bg-gold/10 text-gold"
                         }`}>
-                          {b.status === "confirmed" ? "Bestätigt" : b.status === "rejected" ? "Abgelehnt" : "Ausstehend"}
+                          {b.status === "confirmed" ? uiText("Places.verified") : b.status === "rejected" ? uiText("OfferModeration.statuses.rejected") : uiText("profile.verifPendingStatus")}
                         </span>
                       </div>
                       <p className="text-[10px] text-text-muted font-mono shrink-0 hidden sm:block">{b.ref}</p>
@@ -2312,17 +2164,17 @@ export default function DashboardPage() {
               {/* Applications */}
               <div className="rounded-xl border border-border bg-bg-secondary overflow-hidden">
                 <div className="px-5 py-4 border-b border-border flex items-center justify-between">
-                  <h2 className="font-semibold text-text-primary">Meine Bewerbungen</h2>
+                  <h2 className="font-semibold text-text-primary">{uiText("Ui.text_c070d2846d0c1c")}</h2>
                   {applications.length > 0 && (
-                    <span className="text-xs text-text-muted">{applications.length} gesamt</span>
+                    <span className="text-xs text-text-muted">{uiText.rich("Ui.text_4af0acf46d1609", { value1: () => (applications.length) })}</span>
                   )}
                 </div>
-                {applicationsLoading && <div className="p-8 text-center text-xs text-text-muted">Laden...</div>}
+                {applicationsLoading && <div className="p-8 text-center text-xs text-text-muted">{uiText("Ui.text_b89b8cdb9d6d6f")}</div>}
                 {!applicationsLoading && applications.length === 0 && (
                   <div className="text-center py-10 space-y-2">
                     <Briefcase size={28} className="mx-auto text-text-muted opacity-20" />
-                    <p className="text-sm text-text-muted">Noch keine Bewerbungen</p>
-                    <Link href="/jobs" className="text-xs text-gold hover:text-gold-light transition-colors">Jobs entdecken →</Link>
+                    <p className="text-sm text-text-muted">{uiText("Ui.text_2e4e8be62f4a5d")}</p>
+                    <Link href="/jobs" className="text-xs text-gold hover:text-gold-light transition-colors">{uiText("Ui.text_8b90b8520c109d")}</Link>
                   </div>
                 )}
                 <div className="divide-y divide-border">
@@ -2334,8 +2186,8 @@ export default function DashboardPage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-text-primary truncate">{a.job_title}</p>
                         <p className="text-xs text-text-muted">
-                          {new Date(a.created_at).toLocaleDateString("de-DE", { day: "numeric", month: "short", year: "numeric" })}
-                          {a.day_rate ? ` · ${a.day_rate}` : ""}
+                          {new Date(a.created_at).toLocaleDateString(uiLocale, { day: "numeric", month: "short", year: "numeric" })}
+                          {a.day_rate ? uiText("Ui.text_f6b53f9c8ab3ef", { value1: String(a.day_rate) }) : ""}
                         </p>
                       </div>
                       <span className={`text-[10px] px-2 py-0.5 rounded-full border font-semibold shrink-0 ${
@@ -2343,7 +2195,7 @@ export default function DashboardPage() {
                         a.status === "rejected" ? "border-crimson/30 bg-crimson/10 text-crimson-light" :
                         "border-gold/30 bg-gold/10 text-gold"
                       }`}>
-                        {a.status === "accepted" ? "Angenommen" : a.status === "rejected" ? "Abgelehnt" : "Ausstehend"}
+                        {a.status === "accepted" ? uiText("Ui.text_5fb36cf9e74bd2") : a.status === "rejected" ? uiText("OfferModeration.statuses.rejected") : uiText("profile.verifPendingStatus")}
                       </span>
                     </div>
                   ))}
@@ -2357,7 +2209,7 @@ export default function DashboardPage() {
             // Compute top listings by inquiry count from real conversations
             const inquiryMap = conversations.reduce<Record<string, { title: string; type: string; count: number }>>((acc, c) => {
               if (!c.listing_id) return acc;
-              if (!acc[c.listing_id]) acc[c.listing_id] = { title: c.listing_title ?? "Unbekannt", type: c.listing_type ?? "", count: 0 };
+              if (!acc[c.listing_id]) acc[c.listing_id] = { title: c.listing_title ?? uiText("Ui.text_276ffa1fb4f970"), type: c.listing_type ?? "", count: 0 };
               acc[c.listing_id].count++;
               return acc;
             }, {});
@@ -2375,24 +2227,24 @@ export default function DashboardPage() {
                 <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                   {[
                     {
-                      label: "Anfragen gesamt",
+                      label: uiText("Ui.text_3e85ef1a96ad89"),
                       value: listingsLoading || convsLoading ? "…" : String(conversations.length),
-                      sub: conversationsLoadError ? "Nicht verfügbar" : !conversationsReady ? "Lädt…" : unreadCount > 0 ? `${unreadCount} ungelesen` : "Alle gelesen",
+                      sub: conversationsLoadError ? uiText("common.unavailable") : !conversationsReady ? uiText("creators.loading") : unreadCount > 0 ? uiText("Ui.text_f7c1688df1fc46", { value1: String(unreadCount) }) : uiText("notifications.markAllRead"),
                     },
                     {
-                      label: "Aktive Inserate",
+                      label: uiText("Ui.text_67ed1256b3af19"),
                       value: listingsLoading ? "…" : String(myListings.filter(l => l.published).length),
-                      sub: `${myListings.length} gesamt`,
+                      sub: uiText("Ui.text_888c0247e6c804", { value1: String(myListings.length) }),
                     },
                     {
-                      label: "Inserate mit Anfragen",
+                      label: uiText("Ui.text_de005465742f1c"),
                       value: convsLoading ? "…" : String(listingsWithInquiries),
-                      sub: myListings.length > 0 ? `von ${myListings.length} Inseraten` : "Noch keine Inserate",
+                      sub: myListings.length > 0 ? uiText("Ui.text_31f02718f6b03e", { value1: String(myListings.length) }) : uiText("Ui.text_c9636816421535"),
                     },
                     {
-                      label: "Ungelesen",
+                      label: uiText("Ui.text_de3a80218e65be"),
                       value: conversationsReady ? String(unreadCount) : conversationsLoadError ? "—" : "…",
-                      sub: conversationsLoadError ? "Nicht verfügbar" : !conversationsReady ? "Lädt…" : unreadCount > 0 ? "Neue Nachrichten" : "Alles erledigt",
+                      sub: conversationsLoadError ? uiText("common.unavailable") : !conversationsReady ? uiText("creators.loading") : unreadCount > 0 ? uiText("Ui.text_4aadfb7b596d7b") : uiText("Ui.text_2fa1e634d924d7"),
                     },
                   ].map(({ label, value, sub }) => (
                     <div key={label} className="p-5 rounded-xl border border-border bg-bg-secondary">
@@ -2403,9 +2255,7 @@ export default function DashboardPage() {
                   ))}
                 </div>
                 <div className="p-6 rounded-xl border border-border bg-bg-secondary">
-                  <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">
-                    <BarChart2 size={16} className="text-gold" /> Anfragen der letzten 7 Tage
-                  </h3>
+                  <h3 className="font-semibold text-text-primary mb-4 flex items-center gap-2">{uiText.rich("Ui.text_c733b930779dfd", { part1: () => (<BarChart2 size={16} className="text-gold" />) })}</h3>
                   {conversations.length === 0 ? (
                     <div className="flex items-end gap-2 h-28 opacity-30">
                       {[0, 0, 0, 0, 0, 0, 0].map((_, i) => (
@@ -2442,13 +2292,10 @@ export default function DashboardPage() {
                 </div>
                 <div className="p-6 rounded-xl border border-border bg-bg-secondary">
                   <h3 className="font-semibold text-text-primary mb-4">
-                    {topByInquiries.length > 0 ? "Top-Inserate nach Anfragen" : "Meine Inserate"}
+                    {topByInquiries.length > 0 ? uiText("Ui.text_dfb05272966bf6") : uiText("profile.sectionMyListings")}
                   </h3>
                   {topListings.length === 0 ? (
-                    <p className="text-sm text-text-muted text-center py-4">
-                      Noch keine Inserate.{" "}
-                      <Link href="/inserat" className="text-gold hover:text-gold-light transition-colors">Jetzt erstellen →</Link>
-                    </p>
+                    <p className="text-sm text-text-muted text-center py-4">{uiText.rich("Ui.text_7dbba572473a9c", { part1: chunks => (<Link href="/inserat" className="text-gold hover:text-gold-light transition-colors">{chunks}</Link>) })}</p>
                   ) : (
                     <div className="space-y-3">
                       {topListings.map((l, i) => (
@@ -2467,7 +2314,7 @@ export default function DashboardPage() {
                             </div>
                           </div>
                           <span className="text-sm font-mono text-text-secondary shrink-0">
-                            {l.count} {l.count === 1 ? "Anfrage" : "Anfragen"}
+                            {l.count} {l.count === 1 ? uiText("Ui.text_d131ffcac53b09") : uiText("Ui.text_5dfb5bcd667e78")}
                           </span>
                         </div>
                       ))}
@@ -2504,21 +2351,14 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-display text-base font-bold text-text-primary leading-tight">{displayName}</p>
-                  <p className="text-xs text-text-muted mt-0.5 mb-4">{profileRole || "CineGenius Mitglied"}</p>
-                  <div className="flex flex-wrap gap-2">
-                    <Link
+                  <p className="text-xs text-text-muted mt-0.5 mb-4">{profileRole || uiText("Ui.text_51fb8dfa65e81e")}</p>
+                  <div className="flex flex-wrap gap-2">{uiText.rich("Ui.text_e8649d1a41ba68", { part2: () => (<Pencil size={12} />), part1: chunks => (<Link
                       href="/profile"
                       className="inline-flex items-center gap-1.5 px-4 py-2 bg-gold text-bg-primary text-xs font-semibold rounded-lg hover:bg-gold-light transition-colors"
-                    >
-                      <Pencil size={12} /> Profil bearbeiten
-                    </Link>
-                    <Link
+                    >{chunks}</Link>), part4: () => (<ExternalLink size={12} />), part3: chunks => (<Link
                       href={user?.id ? `/profile/${user.id}` : "/profile"}
                       className="inline-flex items-center gap-1.5 px-4 py-2 border border-border text-text-secondary text-xs font-medium rounded-lg hover:border-gold hover:text-gold transition-colors"
-                    >
-                      <ExternalLink size={12} /> Öffentliches Profil ansehen
-                    </Link>
-                  </div>
+                    >{chunks}</Link>) })}</div>
                 </div>
               </div>
                 );
@@ -2526,17 +2366,17 @@ export default function DashboardPage() {
 
               {/* Konto-Info (read-only) */}
               <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                <h3 className="font-semibold text-text-primary mb-4">Konto</h3>
+                <h3 className="font-semibold text-text-primary mb-4">{uiText("AdminAccounts.accountOnly")}</h3>
                 <div className="space-y-3">
                   <div>
-                    <label className="text-[11px] uppercase tracking-widest text-text-muted font-semibold block mb-1">E-Mail</label>
+                    <label className="text-[11px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{uiText("profile.fieldEmail")}</label>
                     <p className="text-sm text-text-secondary">{user?.primaryEmailAddress?.emailAddress ?? "—"}</p>
-                    <p className="text-[11px] text-text-muted mt-0.5">Wird über Clerk verwaltet</p>
+                    <p className="text-[11px] text-text-muted mt-0.5">{uiText("Ui.text_20885d30c494f4")}</p>
                   </div>
                   <div className="pt-2 border-t border-border">
-                    <label className="text-[11px] uppercase tracking-widest text-text-muted font-semibold block mb-1">Mitglied seit</label>
+                    <label className="text-[11px] uppercase tracking-widest text-text-muted font-semibold block mb-1">{uiText("Ui.text_0c876006fd6261")}</label>
                     <p className="text-sm text-text-secondary">
-                      {user?.createdAt ? new Date(user.createdAt).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" }) : "—"}
+                      {user?.createdAt ? new Date(user.createdAt).toLocaleDateString(uiLocale, { day: "numeric", month: "long", year: "numeric" }) : "—"}
                     </p>
                   </div>
                 </div>
@@ -2544,8 +2384,8 @@ export default function DashboardPage() {
 
               {/* Privatsphäre */}
               <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                <h3 className="font-semibold text-text-primary mb-1">Privatsphäre</h3>
-                <p className="text-xs text-text-muted mb-4">Bestimme, wer dein Profil sehen und dir schreiben darf.</p>
+                <h3 className="font-semibold text-text-primary mb-1">{uiText("Ui.text_e1a0d1dd340a2b")}</h3>
+                <p className="text-xs text-text-muted mb-4">{uiText("Ui.text_2eaccd2ccb08f9")}</p>
                 <div className="space-y-4">
                   <label className="flex items-start justify-between gap-4 cursor-pointer">
                     <div className="flex items-start gap-3">
@@ -2555,11 +2395,11 @@ export default function DashboardPage() {
                           : <Globe size={16} className="text-text-muted" />}
                       </div>
                       <div>
-                        <p className="text-sm text-text-secondary font-medium">Profil privat</p>
+                        <p className="text-sm text-text-secondary font-medium">{uiText("AdminAccounts.profileStatus.private")}</p>
                         <p className="text-xs text-text-muted mt-0.5">
                           {privacySettings.profile_visibility === "private"
-                            ? "Nur Freunde können dein Profil sehen"
-                            : "Jeder kann dein Profil sehen"}
+                            ? uiText("Ui.text_319df907eec5c4")
+                            : uiText("Ui.text_f00642ae07a01e")}
                         </p>
                       </div>
                     </div>
@@ -2580,11 +2420,11 @@ export default function DashboardPage() {
                           : <Globe size={16} className="text-text-muted" />}
                       </div>
                       <div>
-                        <p className="text-sm text-text-secondary font-medium">Nur Freunde dürfen schreiben</p>
+                        <p className="text-sm text-text-secondary font-medium">{uiText("Ui.text_ea78c6f63ee699")}</p>
                         <p className="text-xs text-text-muted mt-0.5">
                           {privacySettings.message_permission === "friends_only"
-                            ? "Nur Freunde können dir Nachrichten senden"
-                            : "Jeder kann dir Nachrichten senden"}
+                            ? uiText("Ui.text_64706adaeb4ba9")
+                            : uiText("Ui.text_6a99309250cc5b")}
                         </p>
                       </div>
                     </div>
@@ -2598,24 +2438,24 @@ export default function DashboardPage() {
                   </label>
                   <div className="border-t border-border" />
                   <div>
-                    <p className="text-sm text-text-secondary font-medium">Kontaktdaten auf deinem Profil</p>
-                    <p className="mt-1 text-xs leading-relaxed text-text-muted">Deine Login-E-Mail wird nie angezeigt. Hier steuerst du nur die separate Kontakt-E-Mail und Telefonnummer deines Profils.</p>
+                    <p className="text-sm text-text-secondary font-medium">{uiText("Ui.text_362c64c73e26ee")}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-text-muted">{uiText("Ui.text_b0700c88f48c24")}</p>
                     <div className="mt-3 grid gap-3 sm:grid-cols-2">
                       {([
                         ["contact_email_visibility", "Kontakt-E-Mail"],
                         ["phone_visibility", "Telefonnummer"],
                       ] as const).map(([key, label]) => (
                         <label key={key} className="block text-xs text-text-muted">
-                          <span className="mb-1.5 block">{label}</span>
+                          <span className="mb-1.5 block">{(uiOptionLabels[label] ?? label)}</span>
                           <select
                             value={privacySettings[key]}
                             onChange={(event) => updatePrivacy(key, event.target.value)}
                             disabled={privacyLoading}
                             className="min-h-11 w-full rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary outline-none focus:border-gold/60 disabled:opacity-60"
                           >
-                            <option value="hidden">Niemand außer mir</option>
-                            <option value="members">Angemeldete Mitglieder</option>
-                            <option value="public">Alle Besucher</option>
+                            <option value="hidden">{uiText("Ui.text_6720edc12a568c")}</option>
+                            <option value="members">{uiText("Ui.text_dbb65504ccd522")}</option>
+                            <option value="public">{uiText("Ui.text_a010b3180a613f")}</option>
                           </select>
                         </label>
                       ))}
@@ -2626,8 +2466,8 @@ export default function DashboardPage() {
 
               {/* Benachrichtigungen */}
               <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                <h3 className="font-semibold text-text-primary mb-1">E-Mail Benachrichtigungen</h3>
-                <p className="text-xs text-text-muted mb-4">Wähle wann du eine E-Mail erhalten möchtest.</p>
+                <h3 className="font-semibold text-text-primary mb-1">{uiText("Ui.text_2687f5bbc0624e")}</h3>
+                <p className="text-xs text-text-muted mb-4">{uiText("Ui.text_069c81016363a4")}</p>
                 <div className="space-y-4">
                   <label className="flex items-start justify-between gap-4 cursor-pointer">
                     <div className="flex items-start gap-3">
@@ -2635,11 +2475,11 @@ export default function DashboardPage() {
                         <MessageSquare size={16} className={privacySettings.email_new_message ? "text-gold" : "text-text-muted"} />
                       </div>
                       <div>
-                        <p className="text-sm text-text-secondary font-medium">Neue Nachrichten</p>
+                        <p className="text-sm text-text-secondary font-medium">{uiText("Ui.text_4aadfb7b596d7b")}</p>
                         <p className="text-xs text-text-muted mt-0.5">
                           {privacySettings.email_new_message
-                            ? "Du erhältst eine E-Mail wenn dir jemand schreibt"
-                            : "Keine E-Mail bei neuen Nachrichten"}
+                            ? uiText("Ui.text_1d9fa328e47307")
+                            : uiText("Ui.text_4c30935ebf9103")}
                         </p>
                       </div>
                     </div>
@@ -2656,23 +2496,14 @@ export default function DashboardPage() {
 
               {/* Verifizierung */}
               <div className="p-5 rounded-xl border border-border bg-bg-secondary">
-                <h3 className="font-semibold text-text-primary mb-1 flex items-center gap-2">
-                  <ShieldCheck size={16} className={verifStatus === "approved" ? "text-success" : "text-text-muted"} />
-                  Profil verifizieren
-                </h3>
-                <p className="text-xs text-text-muted mb-4 leading-relaxed">
-                  Verifizierte Profile erhalten ein blaues Häkchen und werden von anderen Nutzern als vertrauenswürdig eingestuft.
-                </p>
+                <h3 className="font-semibold text-text-primary mb-1 flex items-center gap-2">{uiText.rich("Ui.text_ea23f7824c8628", { part1: () => (<ShieldCheck size={16} className={verifStatus === "approved" ? "text-success" : "text-text-muted"} />) })}</h3>
+                <p className="text-xs text-text-muted mb-4 leading-relaxed">{uiText("Ui.text_b35d9de7e46840")}</p>
                 {verifLoading ? (
                   <Loader2 size={16} className="animate-spin text-text-muted" />
                 ) : verifStatus === "approved" ? (
-                  <div className="flex items-center gap-2 text-success text-sm font-medium">
-                    <CheckCircle size={16} /> Profil ist verifiziert
-                  </div>
+                  <div className="flex items-center gap-2 text-success text-sm font-medium">{uiText.rich("Ui.text_6280e60d3e6b8b", { part1: () => (<CheckCircle size={16} />) })}</div>
                 ) : verifStatus === "pending" ? (
-                  <div className="flex items-center gap-2 text-gold text-sm">
-                    <Clock size={16} /> Anfrage in Bearbeitung — wir melden uns bald.
-                  </div>
+                  <div className="flex items-center gap-2 text-gold text-sm">{uiText.rich("Ui.text_f04af96360a699", { part1: () => (<Clock size={16} />) })}</div>
                 ) : (
                   <button
                     disabled={verifSubmitting}
@@ -2686,38 +2517,29 @@ export default function DashboardPage() {
                       }
                     }}
                     className="px-4 py-2 text-xs font-semibold border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-colors flex items-center gap-1.5 disabled:opacity-40"
-                  >
-                    {verifSubmitting ? <Loader2 size={13} className="animate-spin" /> : <ShieldCheck size={13} />}
-                    Verifizierung beantragen
-                  </button>
+                  >{uiText.rich("Ui.text_425e143ec6d501", { value1: () => (verifSubmitting ? <Loader2 size={13} className="animate-spin" /> : <ShieldCheck size={13} />) })}</button>
                 )}
               </div>
 
               {/* ── DANGER ZONE ── */}
               <div className="p-5 rounded-xl border border-red-500/30 bg-red-500/5">
-                <h3 className="font-semibold text-red-400 mb-1 text-sm flex items-center gap-2">
-                  <AlertCircle size={15} /> Konto löschen
-                </h3>
-                <p className="text-xs text-text-muted mb-4 leading-relaxed">
-                  Löscht dein Profil, alle Inserate, Nachrichten und Daten dauerhaft. Diese Aktion kann nicht rückgängig gemacht werden.
-                </p>
+                <h3 className="font-semibold text-red-400 mb-1 text-sm flex items-center gap-2">{uiText.rich("Ui.text_206d32a820ac8e", { part1: () => (<AlertCircle size={15} />) })}</h3>
+                <p className="text-xs text-text-muted mb-4 leading-relaxed">{uiText("Ui.text_2d70493dc36394")}</p>
                 <button
                   onClick={async () => {
                     const confirmed = window.confirm(
-                      "Konto wirklich löschen?\n\nDies löscht dein Profil, alle Inserate, Nachrichten und Daten dauerhaft.\n\nDiese Aktion kann nicht rückgängig gemacht werden."
+                      uiText("Ui.text_da4afae146f61c")
                     );
                     if (!confirmed) return;
                     const res = await fetch("/api/account", { method: "DELETE" });
                     if (res.ok) {
                       window.location.href = "/";
                     } else {
-                      alert("Fehler beim Löschen. Bitte versuche es erneut.");
+                      alert(uiText("Ui.text_4049adacc8fd2f"));
                     }
                   }}
                   className="px-4 py-2 text-xs font-semibold border border-red-500/40 text-red-400 hover:bg-red-500/15 rounded-lg transition-colors"
-                >
-                  Konto dauerhaft löschen
-                </button>
+                >{uiText("Ui.text_73fc53cbf7c175")}</button>
               </div>
 
             </div>
@@ -2727,17 +2549,15 @@ export default function DashboardPage() {
             <div className="space-y-5 max-w-2xl">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="font-display text-lg font-bold text-text-primary flex items-center gap-2">
-                    <Users size={18} className="text-gold" /> Freunde
-                  </h2>
-                  <p className="text-xs text-text-muted mt-0.5">Verwalte deine Verbindungen auf CineGenius</p>
+                  <h2 className="font-display text-lg font-bold text-text-primary flex items-center gap-2">{uiText.rich("Ui.text_d1d7a8f9a56576", { part1: () => (<Users size={18} className="text-gold" />) })}</h2>
+                  <p className="text-xs text-text-muted mt-0.5">{uiText("Ui.text_273e11a42338a7")}</p>
                 </div>
               </div>
 
               {/* Sub-tabs */}
               <div className="flex gap-1 p-1 bg-bg-secondary border border-border rounded-xl w-fit">
                 {(["incoming", "friends", "outgoing"] as const).map((t) => {
-                  const labels = { incoming: "Anfragen", friends: "Freunde", outgoing: "Gesendet" };
+                  const labels = { incoming: uiText("Ui.text_5dfb5bcd667e78"), friends: uiText("Ui.text_f72d71d3376f5f"), outgoing: uiText("Ui.text_4b6a7afab7b4c4") };
                   const counts = { incoming: friendsIncoming.length, friends: friends.length, outgoing: friendsOutgoing.length };
                   return (
                     <button
@@ -2771,7 +2591,7 @@ export default function DashboardPage() {
                   {friendsIncoming.length === 0 ? (
                     <div className="text-center py-12 border border-dashed border-border rounded-2xl">
                       <UserPlus size={24} className="mx-auto text-text-muted opacity-30 mb-3" />
-                      <p className="text-sm text-text-muted">Keine offenen Anfragen</p>
+                      <p className="text-sm text-text-muted">{uiText("Ui.text_f701875e725fdf")}</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -2792,13 +2612,9 @@ export default function DashboardPage() {
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
                             <button onClick={() => acceptFriend(f.friendship_id)}
-                              className="flex items-center gap-1 px-3 py-1.5 bg-success/10 border border-success/20 text-success text-xs font-medium rounded-lg hover:bg-success/20 transition-colors">
-                              <Check size={12} /> Annehmen
-                            </button>
+                              className="flex items-center gap-1 px-3 py-1.5 bg-success/10 border border-success/20 text-success text-xs font-medium rounded-lg hover:bg-success/20 transition-colors">{uiText.rich("Ui.text_048edf533fa6f4", { part1: () => (<Check size={12} />) })}</button>
                             <button onClick={() => rejectFriend(f.friendship_id)}
-                              className="flex items-center gap-1 px-3 py-1.5 border border-border text-text-muted text-xs rounded-lg hover:border-red-400 hover:text-red-400 transition-colors">
-                              <X size={12} /> Ablehnen
-                            </button>
+                              className="flex items-center gap-1 px-3 py-1.5 border border-border text-text-muted text-xs rounded-lg hover:border-red-400 hover:text-red-400 transition-colors">{uiText.rich("Ui.text_2424239b7d6d6c", { part1: () => (<X size={12} />) })}</button>
                           </div>
                         </div>
                       ))}
@@ -2817,16 +2633,16 @@ export default function DashboardPage() {
                   (acc[key] ??= []).push(f);
                   return acc;
                 }, {});
-                const sortedGroups = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b, "de"));
-                sortedGroups.forEach(([, members]) => members.sort((a, b) => a.display_name.localeCompare(b.display_name, "de")));
+                const sortedGroups = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b, uiLocale));
+                sortedGroups.forEach(([, members]) => members.sort((a, b) => a.display_name.localeCompare(b.display_name, uiLocale)));
 
                 return (
                   <>
                     {friends.length === 0 ? (
                       <div className="text-center py-12 border border-dashed border-border rounded-2xl">
                         <Users size={24} className="mx-auto text-text-muted opacity-30 mb-3" />
-                        <p className="text-sm text-text-muted">Noch keine Freunde</p>
-                        <p className="text-xs text-text-muted mt-1">Besuche Profile von Filmschaffenden und füge sie hinzu.</p>
+                        <p className="text-sm text-text-muted">{uiText("Ui.text_1678f937aa7e48")}</p>
+                        <p className="text-xs text-text-muted mt-1">{uiText("Ui.text_6838f11e8b59bd")}</p>
                       </div>
                     ) : (
                       <>
@@ -2835,12 +2651,12 @@ export default function DashboardPage() {
                           <input
                             value={friendSearch}
                             onChange={e => setFriendSearch(e.target.value)}
-                            placeholder="Freunde suchen…"
+                            placeholder={uiText("Ui.text_cf85b51103ffa9")}
                             className="w-full pl-9 pr-4 py-2 bg-bg-elevated border border-border rounded-xl text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold/50 transition-colors"
                           />
                         </div>
                         {filtered.length === 0 ? (
-                          <p className="text-sm text-text-muted text-center py-8">Keine Ergebnisse für „{friendSearch}”</p>
+                          <p className="text-sm text-text-muted text-center py-8">{uiText.rich("Ui.text_9da7cfdab9c3a6", { value1: () => (friendSearch) })}</p>
                         ) : (
                           <div className="space-y-5">
                             {sortedGroups.map(([role, members]) => (
@@ -2863,13 +2679,9 @@ export default function DashboardPage() {
                                         <p className="text-xs text-text-muted truncate">{f.role}</p>
                                       </div>
                                       <div className="flex items-center gap-2 shrink-0">
-                                        <Link href={`/profile/${f.user_id}`} className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all">
-                                          Profil
-                                        </Link>
+                                        <Link href={`/profile/${f.user_id}`} className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all">{uiText("profile.tabProfile")}</Link>
                                         <button onClick={() => removeFriendEntry(f.friendship_id)}
-                                          className="px-3 py-1.5 text-xs border border-border text-text-muted rounded-lg hover:border-red-400 hover:text-red-400 transition-all">
-                                          Entfernen
-                                        </button>
+                                          className="px-3 py-1.5 text-xs border border-border text-text-muted rounded-lg hover:border-red-400 hover:text-red-400 transition-all">{uiText("profile.removePhoto")}</button>
                                       </div>
                                     </div>
                                   ))}
@@ -2889,7 +2701,7 @@ export default function DashboardPage() {
                   {friendsOutgoing.length === 0 ? (
                     <div className="text-center py-12 border border-dashed border-border rounded-2xl">
                       <UserPlus size={24} className="mx-auto text-text-muted opacity-30 mb-3" />
-                      <p className="text-sm text-text-muted">Keine gesendeten Anfragen</p>
+                      <p className="text-sm text-text-muted">{uiText("Ui.text_ad7ed3b7d627b8")}</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -2909,13 +2721,9 @@ export default function DashboardPage() {
                             <p className="text-xs text-text-muted truncate">{f.role}</p>
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
-                            <span className="text-xs text-text-muted flex items-center gap-1 px-3 py-1.5 bg-bg-elevated border border-border rounded-lg">
-                              <Clock size={11} /> Ausstehend
-                            </span>
+                            <span className="text-xs text-text-muted flex items-center gap-1 px-3 py-1.5 bg-bg-elevated border border-border rounded-lg">{uiText.rich("Ui.text_19b8ad14754fa2", { part1: () => (<Clock size={11} />) })}</span>
                             <button onClick={() => removeFriendEntry(f.friendship_id)}
-                              className="px-3 py-1.5 text-xs border border-border text-text-muted rounded-lg hover:border-red-400 hover:text-red-400 transition-all">
-                              Zurückziehen
-                            </button>
+                              className="px-3 py-1.5 text-xs border border-border text-text-muted rounded-lg hover:border-red-400 hover:text-red-400 transition-all">{uiText("OrganizationAccess.withdraw")}</button>
                           </div>
                         </div>
                       ))}
@@ -2931,14 +2739,12 @@ export default function DashboardPage() {
             <div className="space-y-4 max-w-3xl">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="font-display text-lg font-bold text-text-primary flex items-center gap-2">
-                    <Heart size={18} className="text-crimson-light fill-current" /> Merkliste
-                  </h2>
-                  <p className="text-xs text-text-muted mt-0.5">Deine gespeicherten Inserate</p>
+                  <h2 className="font-display text-lg font-bold text-text-primary flex items-center gap-2">{uiText.rich("Ui.text_1e756fbcc73cec", { part1: () => (<Heart size={18} className="text-crimson-light fill-current" />) })}</h2>
+                  <p className="text-xs text-text-muted mt-0.5">{uiText("Ui.text_d788252801aefd")}</p>
                 </div>
                 {!favoritesLoading && favorites.length > 0 && (
                   <span className="px-3 py-1 bg-bg-secondary border border-border text-text-muted text-xs rounded-full">
-                    {favorites.length} {favorites.length === 1 ? "Eintrag" : "Einträge"}
+                    {favorites.length} {favorites.length === 1 ? uiText("Ui.text_99b9259f15b10b") : uiText("Ui.text_b46a6b65c674c7")}
                   </span>
                 )}
               </div>
@@ -2957,16 +2763,10 @@ export default function DashboardPage() {
                     <Heart size={22} className="text-text-muted opacity-30" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-text-primary mb-1">Noch nichts gespeichert</h3>
-                    <p className="text-sm text-text-muted max-w-xs mx-auto">
-                      Klicke das Herz-Symbol auf einer Detailseite, um Inserate zu speichern.
-                    </p>
+                    <h3 className="font-semibold text-text-primary mb-1">{uiText("Ui.text_bf33b5684b2765")}</h3>
+                    <p className="text-sm text-text-muted max-w-xs mx-auto">{uiText("Ui.text_632dbf951dd528")}</p>
                   </div>
-                  <div className="flex flex-wrap justify-center gap-2 pt-1">
-                    <Link href="/locations" className="px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-all">Locations</Link>
-                    <Link href="/creators" className="px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-all">Filmschaffende</Link>
-                    <Link href="/jobs" className="px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-all">Jobs</Link>
-                  </div>
+                  <div className="flex flex-wrap justify-center gap-2 pt-1">{uiText.rich("Ui.text_7788914955afcd", { part1: chunks => (<Link href="/locations" className="px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-all">{chunks}</Link>), part2: chunks => (<Link href="/creators" className="px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-all">{chunks}</Link>), part3: chunks => (<Link href="/jobs" className="px-4 py-2 border border-border text-text-secondary text-xs rounded-lg hover:border-gold hover:text-gold transition-all">{chunks}</Link>) })}</div>
                 </div>
               )}
 
@@ -2990,7 +2790,7 @@ export default function DashboardPage() {
                         </Link>
                         <div className="flex-1 min-w-0">
                           <Link href={config.href(fav.listing_id)} className="hover:text-gold transition-colors">
-                            <p className="font-semibold text-text-primary truncate">{fav.listing_title ?? "Inserat"}</p>
+                            <p className="font-semibold text-text-primary truncate">{fav.listing_title ?? uiText("AdminAccounts.contentKinds.other")}</p>
                           </Link>
                           <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                             <span className={`flex items-center gap-1 text-xs ${config.color}`}>
@@ -3001,16 +2801,14 @@ export default function DashboardPage() {
                         </div>
                         {(fav.priceLabel || (fav.listing_price != null && fav.listing_price > 0)) && (
                           <div className="text-right shrink-0 hidden sm:block">
-                            <p className="text-sm font-semibold text-gold font-mono">{fav.priceLabel ?? `${fav.listing_price?.toLocaleString()} €`}</p>
-                            <p className="text-xs text-text-muted">/ Tag</p>
+                            <p className="text-sm font-semibold text-gold font-mono">{fav.priceLabel ?? uiText("Ui.text_4a44946c8fc283", { value1: String(fav.listing_price?.toLocaleString(uiLocale)) })}</p>
+                            <p className="text-xs text-text-muted">{uiText("Ui.text_2bf4c50be2aec3")}</p>
                           </div>
                         )}
                         <div className="flex items-center gap-2 shrink-0">
-                          <Link href={config.href(fav.listing_id)} className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all">
-                            Ansehen
-                          </Link>
+                          <Link href={config.href(fav.listing_id)} className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-lg hover:border-gold hover:text-gold transition-all">{uiText("Ui.text_8e31363947a6c7")}</Link>
                           <button onClick={() => removeFavorite(fav)} disabled={isRemoving}
-                            className="w-8 h-8 flex items-center justify-center text-text-muted hover:text-crimson-light transition-colors disabled:opacity-40" title="Entfernen">
+                            className="w-8 h-8 flex items-center justify-center text-text-muted hover:text-crimson-light transition-colors disabled:opacity-40" title={uiText("profile.removePhoto")}>
                             <Trash2 size={14} />
                           </button>
                         </div>

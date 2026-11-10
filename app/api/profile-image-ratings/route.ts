@@ -6,6 +6,7 @@ import { anyBlockExists, canViewProfile, getPrivateProfileIds } from "@/lib/trus
 import { rateLimit } from "@/lib/rateLimit";
 import { resolveReviewEligibility } from "@/lib/review-eligibility";
 import { summarizePhotoRatings } from "@/lib/photo-rating-summary";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 type GalleryImage = { url?: unknown; media_type?: unknown };
 
@@ -42,14 +43,15 @@ async function getVisibleProfile(profileId: string, imageUrl: string, viewerId: 
 
 // GET /api/profile-image-ratings?profile_id=...&image_url=...
 export async function GET(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const profileId = req.nextUrl.searchParams.get("profile_id");
   const imageUrl = req.nextUrl.searchParams.get("image_url");
   if (!profileId || !imageUrl || profileId.length > 128 || imageUrl.length > 2048) {
-    return NextResponse.json({ error: "profile_id und image_url erforderlich" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_3fb300d84892') }, { status: 400 });
   }
   const { userId } = await auth();
   if (!(await getVisibleProfile(profileId, imageUrl, userId))) {
-    return NextResponse.json({ error: "Foto nicht gefunden" }, { status: 404 });
+    return NextResponse.json({ error: tResponse('System.m_3fbd338c1d14') }, { status: 404 });
   }
 
   const { data, error } = await db
@@ -57,7 +59,7 @@ export async function GET(req: NextRequest) {
     .select("reviewer_id, rating")
     .eq("profile_id", profileId)
     .eq("image_url", imageUrl);
-  if (error) return NextResponse.json({ error: "Fotobewertungen konnten nicht geladen werden" }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.m_c394ebd96eb7') }, { status: 500 });
   const rows = data ?? [];
   const myRating = userId ? rows.find((row) => row.reviewer_id === userId)?.rating ?? null : null;
   const summary = summarizePhotoRatings(rows);
@@ -67,32 +69,33 @@ export async function GET(req: NextRequest) {
 
 // POST /api/profile-image-ratings { profile_id, image_url, rating }
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Bitte melde dich an." }, { status: 401 });
+  if (!userId) return NextResponse.json({ error: tResponse('System.m_9fab7b4be1b1') }, { status: 401 });
   const body = await req.json().catch(() => ({}));
   const profileId = body.profile_id;
   const imageUrl = body.image_url;
   const rating = body.rating;
   if (typeof profileId !== "string" || profileId.length > 128 || typeof imageUrl !== "string" || imageUrl.length > 2048) {
-    return NextResponse.json({ error: "Ungültiges Foto." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_8d179f40a65b') }, { status: 400 });
   }
   if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
-    return NextResponse.json({ error: "Bitte wähle 1 bis 5 Sterne." }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_431e254193df') }, { status: 400 });
   }
   const { allowed } = await rateLimit(`profile-image-rating:${userId}`, 20, 60);
-  if (!allowed) return NextResponse.json({ error: "Zu viele Bewertungen. Bitte kurz warten." }, { status: 429 });
-  if (profileId === userId) return NextResponse.json({ error: "Eigene Fotos können nicht bewertet werden." }, { status: 403 });
-  if (await anyBlockExists(userId, profileId)) return NextResponse.json({ error: "Bewertung nicht möglich." }, { status: 403 });
+  if (!allowed) return NextResponse.json({ error: tResponse('System.m_d307d3802d2f') }, { status: 429 });
+  if (profileId === userId) return NextResponse.json({ error: tResponse('System.m_1ff265a6a908') }, { status: 403 });
+  if (await anyBlockExists(userId, profileId)) return NextResponse.json({ error: tResponse('System.m_2ac1b66c3d3f') }, { status: 403 });
   if (!(await getVisibleProfile(profileId, imageUrl, userId))) {
-    return NextResponse.json({ error: "Foto nicht gefunden." }, { status: 404 });
+    return NextResponse.json({ error: tResponse('System.m_1cc012f56f3d') }, { status: 404 });
   }
   const via = await resolveReviewEligibility(userId, "user", profileId, profileId);
-  if (!via) return NextResponse.json({ error: "Bewerten kannst du nach einer bestätigten Buchung oder angenommenen Bewerbung." }, { status: 403 });
+  if (!via) return NextResponse.json({ error: tResponse('System.m_e4b0ad87e4d4') }, { status: 403 });
 
   const { error } = await db
     .from("profile_image_ratings")
     .upsert({ profile_id: profileId, reviewer_id: userId, image_url: imageUrl, rating, updated_at: new Date().toISOString() }, { onConflict: "profile_id,image_url,reviewer_id" });
-  if (error) return NextResponse.json({ error: "Deine Bewertung konnte nicht gespeichert werden." }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.m_2fb1144724f4') }, { status: 500 });
   revalidatePath("/");
   revalidatePath("/photo");
 
@@ -101,7 +104,7 @@ export async function POST(req: NextRequest) {
     .select("reviewer_id,rating")
     .eq("profile_id", profileId)
     .eq("image_url", imageUrl);
-  if (readError) return NextResponse.json({ error: "Bewertung gespeichert, Zusammenfassung noch nicht verfügbar." }, { status: 200 });
+  if (readError) return NextResponse.json({ error: tResponse('System.m_6d969e377194') }, { status: 200 });
   const rows = data ?? [];
   return NextResponse.json({ ...summarizePhotoRatings(rows), myRating: rating });
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Check, Mail, XCircle } from "lucide-react";
+import { uiErrorMessage } from "@/lib/ui-error-message";
 
 type Props = { mode: "confirm" | "unsubscribe"; token?: string; id?: string; proof?: string };
 
@@ -25,7 +26,7 @@ export function NewsletterAction({ mode, token, id, proof }: Props) {
       if (!response.ok) throw new Error(typeof body.error === "string" ? body.error : t(confirm ? "confirmInvalid" : "unsubscribeInvalid"));
       setResult({ ok: true, text: typeof body.message === "string" ? body.message : t(confirm ? "confirmed" : "unsubscribed") });
     } catch (error) {
-      setResult({ ok: false, text: error instanceof Error ? error.message : t(confirm ? "confirmInvalid" : "unsubscribeInvalid") });
+      setResult({ ok: false, text: uiErrorMessage(error, t(confirm ? "confirmInvalid" : "unsubscribeInvalid")) });
     } finally { setBusy(false); }
   }
 

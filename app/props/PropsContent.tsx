@@ -26,7 +26,7 @@ import {
 import { useTranslations, useLocale } from "next-intl";
 import EmptyState from "@/components/EmptyState";
 import { localizedMarketplaceDepartments, marketplaceMatches, SEARCH_SYNONYMS, marketplaceCategory, marketplaceSearchTerms } from "@/lib/marketplaceCategories";
-import { deptColors } from "@/lib/departments";
+import { deptColors , taxonomyLabel } from "@/lib/departments";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 
 // ── Icon maps ─────────────────────────────────────────────────────
@@ -63,6 +63,8 @@ type RatingData = { avg: number; count: number } | undefined;
 function SortDropdown({ value, options, onChange }: {
   value: string; options: { value: string; label: string }[]; onChange: (v: string) => void;
 }) {
+  const uiText = useTranslations();
+
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -71,7 +73,7 @@ function SortDropdown({ value, options, onChange }: {
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
   }, [open]);
-  const label = options.find((o) => o.value === value)?.label ?? "Sortierung";
+  const label = options.find((o) => o.value === value)?.label ?? uiText("creators.sort");
   return (
     <div ref={ref} className="relative shrink-0">
       <button onClick={() => setOpen((v) => !v)}
@@ -85,7 +87,7 @@ function SortDropdown({ value, options, onChange }: {
           {options.map((o) => (
             <button key={o.value} onClick={() => { onChange(o.value); setOpen(false); }}
               className={`w-full text-left px-3 py-2 text-xs transition-colors hover:bg-white/[0.04] ${value === o.value ? "text-gold font-medium" : "text-text-secondary"}`}>
-              {o.label}
+              {taxonomyLabel(o.label, uiText)}
             </button>
           ))}
         </div>
@@ -102,6 +104,8 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
   onRate?: (star: number) => void; canRate?: boolean;
   isFavorited?: boolean; onFavorite?: (e: React.MouseEvent) => void;
 }) {
+  const uiText = useTranslations();
+
   const tp = useTranslations("props");
   const market=useTranslations("MarketplaceOffer"),catalog=useTranslations("MarketplaceCatalog"),locale=useLocale();
   const href = p.type === "vehicle" ? `/vehicles/${p.id}` : `/props/${p.id}`;
@@ -117,7 +121,7 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
             ? <MediaImage mediaSize="thumbnail" src={p.image} alt={p.title} fill sizes="(max-width: 768px) 50vw, 400px" loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} />
             : <div className="w-full h-full flex items-center justify-center text-text-muted/30"><svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></div>
           }
-          {p.isReal && <div className="absolute top-1 left-1 bg-gold text-bg-primary text-[9px] font-bold px-1.5 py-0.5 rounded">NEU</div>}
+          {p.isReal && <div className="absolute top-1 left-1 bg-gold text-bg-primary text-[9px] font-bold px-1.5 py-0.5 rounded">{uiText("locations.newBadge")}</div>}
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-text-primary text-sm mb-1 truncate">{p.title}</h3>
@@ -151,7 +155,7 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
         <div className="absolute top-2.5 left-2.5 right-2.5 flex items-start justify-between gap-1">
           <span className="px-2 py-0.5 bg-black/50 backdrop-blur-sm border border-white/10 text-white/70 text-[10px] rounded-full truncate max-w-[65%]">{marketplaceCategoryLabel(p.category,catalog)}</span>
           <div className="flex gap-1 shrink-0 items-center">
-            {p.isReal && <span className="px-2 py-0.5 bg-gold text-bg-primary text-[10px] font-bold rounded-full">NEU</span>}
+            {p.isReal && <span className="px-2 py-0.5 bg-gold text-bg-primary text-[10px] font-bold rounded-full">{uiText("locations.newBadge")}</span>}
             {p.delivery && <span className="flex items-center gap-0.5 px-2 py-0.5 bg-teal-500/25 backdrop-blur-sm border border-teal-400/30 text-teal-300 text-[10px] rounded-full"><Truck size={8} /></span>}
             {onFavorite && (
               <button type="button" onClick={onFavorite}
@@ -188,7 +192,7 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
                 <span className="text-[9px] text-text-muted">({ratingData.count})</span>
               </>
             ) : (
-              <span className="text-[9px] text-text-muted/60">Noch keine Bewertung</span>
+              <span className="text-[9px] text-text-muted/60">{uiText("locations.landingNoReviews")}</span>
             )}
           </div>
           {canRate && (
@@ -212,6 +216,8 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
 // ─── Main ─────────────────────────────────────────────────────────
 
 function PropsInner({ serverListings }: { serverListings: Prop[] }) {
+  const uiText = useTranslations();
+
   const locale=useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -379,7 +385,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const chipColors = activeDeptData ? deptColors(activeDeptData.color) : null;
   const mobileChips: BrowseChip[] = [
     ...(['country','region','city'] as const).flatMap(kind => placeFilters[kind] ? [{id:`place-${kind}`,label:placeOptions(serverListings,kind,locale).find(option=>option.value===placeFilters[kind])?.label??placeFilters[kind],onRemove:()=>setPlaceFilters({...placeFilters,[kind]:''})}] : []),
-    ...(activeDeptData ? [{ id: "category", label: activeDeptData.label, onRemove: () => setSelectedDept(null) }] : []),
+    ...(activeDeptData ? [{ id: "category", label: taxonomyLabel(activeDeptData.label, uiText), onRemove: () => setSelectedDept(null) }] : []),
     ...(rentalTypeFilter !== "alle" ? [{ id: "offer", label: rentalTypeFilter === "miete" ? t("offerRent") : t("offerBuy"), onRemove: () => setRentalTypeFilter("alle") }] : []),
   ];
 
@@ -394,8 +400,8 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
         sortOptions={[{ value: "featured", label: t("sortFeatured") }, { value: "price-asc", label: t("sortPriceAsc") }, { value: "price-desc", label: t("sortPriceDesc") }]}
         onSortChange={setSortKey}
         categoryLabel={t("categoryBtn")}
-        allCategoryLabel={t("offerAll") + " Artikel"}
-        categories={DEPARTMENTS.map((department) => ({ value: department.id, label: department.label }))}
+        allCategoryLabel={t("offerAll") + uiText("Ui.text_bc7d62d28faf65")}
+        categories={DEPARTMENTS.map((department) => ({ value: department.id, label: taxonomyLabel(department.label, uiText) }))}
         categoryValue={selectedDept ?? ""}
         onCategoryChange={(value) => {setSelectedDept(value || null);setSelectedSub("");}}
         resultSummary={t("results", { count: resultCount })}
@@ -406,7 +412,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
         showResultsLabel={t("results", { count: resultCount })}
       >
 
-        <PlaceFilters rows={serverListings} value={placeFilters} onChange={setPlaceFilters} scope="marketplace" />        <MobileFilterField label={market("subcategory")}><MobileFilterSelect value={selectedSub} onChange={setSelectedSub} placeholder={market("allSubcategories")} options={(activeDeptData?.groups??[]).map(g=>({value:g.id,label:g.label}))} /></MobileFilterField>
+        <PlaceFilters rows={serverListings} value={placeFilters} onChange={setPlaceFilters} scope="marketplace" />        <MobileFilterField label={market("subcategory")}><MobileFilterSelect value={selectedSub} onChange={setSelectedSub} placeholder={market("allSubcategories")} options={(activeDeptData?.groups??[]).map(g=>({value:g.id,label:taxonomyLabel(g.label, uiText)}))} /></MobileFilterField>
         <MobileFilterField label={t("offerTypeLabel")}>
           <MobileFilterSelect value={rentalTypeFilter === "alle" ? "" : rentalTypeFilter} onChange={(value) => setRentalTypeFilter((value || "alle") as typeof rentalTypeFilter)} placeholder={t("offerAll")} options={[{ value: "miete", label: t("offerRent") }, { value: "kauf", label: t("offerBuy") }]} />
         </MobileFilterField>
@@ -414,10 +420,10 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
           <MobileFilterSelect value={sortKey} onChange={setSortKey} placeholder={t("sortFeatured")} options={[{ value: "featured", label: t("sortFeatured") }, { value: "price-asc", label: t("sortPriceAsc") }, { value: "price-desc", label: t("sortPriceDesc") }]} />
         </MobileFilterField>
         <div className="mobile-filter-field">
-          <span>Ansicht</span>
+          <span>{uiText("locations.viewLabel")}</span>
           <div className="grid grid-cols-2 gap-2">
-            <button type="button" onClick={() => setViewMode("grid")} className={`min-h-11 rounded-lg border text-sm ${viewMode === "grid" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>Raster</button>
-            <button type="button" onClick={() => setViewMode("list")} className={`min-h-11 rounded-lg border text-sm ${viewMode === "list" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>Liste</button>
+            <button type="button" onClick={() => setViewMode("grid")} className={`min-h-11 rounded-lg border text-sm ${viewMode === "grid" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{uiText("Ui.text_2cc48b15f4ffeb")}</button>
+            <button type="button" onClick={() => setViewMode("list")} className={`min-h-11 rounded-lg border text-sm ${viewMode === "list" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{uiText("locations.viewList")}</button>
           </div>
         </div>
       </MobileBrowseControls>
@@ -448,7 +454,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                       ? "bg-gold/12 border-gold/30 text-gold"
                       : "border-border text-text-muted hover:text-text-secondary"
                   }`}>
-                  {rt === "alle" ? "Alle" : rt === "miete" ? "Mieten" : "Kaufen"}
+                  {rt === "alle" ? uiText("common.all") : rt === "miete" ? uiText("props.offerRent") : uiText("props.offerBuy")}
                 </button>
               ))}
             </div>
@@ -480,24 +486,24 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                     ? "bg-gold/12 border-gold/30 text-gold"
                     : "border-border text-text-muted"
                 }`}>
-                {rt === "alle" ? "Alle" : rt === "miete" ? "Mieten" : "Kaufen"}
+                {rt === "alle" ? uiText("common.all") : rt === "miete" ? uiText("props.offerRent") : uiText("props.offerBuy")}
               </button>
             ))}
           </div>
 
-          {activeDeptData && <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary">{market("subcategory")}<select className="min-h-11 max-w-full rounded-lg border border-border bg-bg-elevated px-3" value={selectedSub} onChange={event=>setSelectedSub(event.target.value)}><option value="">{market("allSubcategories")}</option>{activeDeptData.groups.map(g=><option key={g.id} value={g.id}>{g.label}</option>)}</select></label>}
+          {activeDeptData && <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary">{market("subcategory")}<select className="min-h-11 max-w-full rounded-lg border border-border bg-bg-elevated px-3" value={selectedSub} onChange={event=>setSelectedSub(event.target.value)}><option value="">{market("allSubcategories")}</option>{activeDeptData.groups.map(g=><option key={g.id} value={g.id}>{taxonomyLabel(g.label, uiText)}</option>)}</select></label>}
           {/* Active chips */}
           {(activeDeptData || rentalTypeFilter !== "alle") && (
             <div className="flex flex-wrap gap-1.5 items-center">
               {activeDeptData && chipColors && (
                 <span className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium ${chipColors.bg} ${chipColors.border} ${chipColors.text}`}>
-                  {activeDeptData.label}
+                  {taxonomyLabel(activeDeptData.label, uiText)}
                   <button onClick={() => setSelectedDept(null)} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               )}
               {rentalTypeFilter !== "alle" && (
                 <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-gold/10 border-gold/30 text-gold">
-                  {rentalTypeFilter === "miete" ? "Mieten" : "Kaufen"}
+                  {rentalTypeFilter === "miete" ? uiText("props.offerRent") : uiText("props.offerBuy")}
                   <button onClick={() => setRentalTypeFilter("alle")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               )}
@@ -515,9 +521,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
 
           {/* Sidebar */}
           <aside className="cat-sidebar w-44 shrink-0 sticky top-20">
-            <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3 px-2">
-              Kategorien
-            </p>
+            <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3 px-2">{uiText("Ui.text_055b8f9b9e5064")}</p>
             <nav className="space-y-0.5">
               <button
                 onClick={() => setSelectedDept(null)}
@@ -526,10 +530,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                     ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
                     : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
                 }`}
-              >
-                <Layers size={14} className={!selectedDept ? "text-gold" : "text-text-muted"} />
-                Alle Artikel
-              </button>
+              >{uiText.rich("Ui.text_4d8969d6eb77f5", { part1: () => (<Layers size={14} className={!selectedDept ? "text-gold" : "text-text-muted"} />) })}</button>
               {DEPARTMENTS.map((dept) => {
                 const Icon = DEPT_ICON_MAP[dept.id] ?? Package;
                 const isActive = selectedDept === dept.id;
@@ -544,7 +545,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
                     }`}
                   >
                     <Icon size={14} className={isActive ? "text-gold" : "text-text-muted"} />
-                    {dept.label}
+                    {taxonomyLabel(dept.label, uiText)}
                   </button>
                 );
               })}
@@ -559,17 +560,15 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
               <button onClick={() => setSelectedDept(null)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
                   !selectedDept ? "bg-gold/10 text-gold border-gold/40" : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
-                }`}>
-                Alle
-              </button>
-              {[...DEPARTMENTS].sort((a, b) => a.label.localeCompare(b.label, "de")).map((dept) => {
+                }`}>{uiText("common.all")}</button>
+              {[...DEPARTMENTS].sort((a, b) => a.label.localeCompare(b.label, locale)).map((dept) => {
                 const isActive = selectedDept === dept.id;
                 return (
                   <button key={dept.id} onClick={() => {setSelectedDept(isActive ? null : dept.id);setSelectedSub("");}}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
                       isActive ? "bg-gold/10 text-gold border-gold/40" : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
                     }`}>
-                    {dept.label}
+                    {taxonomyLabel(dept.label, uiText)}
                   </button>
                 );
               })}
@@ -578,7 +577,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
             <div className="hidden xl:flex items-center justify-between mb-5">
               <p className="text-sm text-text-muted">
                 <span className="text-text-primary font-semibold">{t("results", { count: resultCount })}</span>
-                {query && <span className="text-gold"> für &ldquo;{query}&rdquo;</span>}
+                {query && <span className="text-gold">{uiText.rich("Ui.text_58e2efda5da487", { value1: () => (query) })}</span>}
               </p>
               {hasAnyFilter && (
                 <button onClick={clearAll} className="text-xs text-text-muted hover:text-red-400 transition-colors flex items-center gap-1">

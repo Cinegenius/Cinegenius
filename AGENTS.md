@@ -32,13 +32,13 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Mandatory localization for all changes
 
-- Use the existing next-intl catalogs in `messages/{de,en,es,it,cs,hu}.json` for all new or changed interface and system copy: pages, buttons, accessible labels, validation, errors, statuses, categories, notifications, and application-generated email. Update every supported language in the same change. Never add a parallel translation system or hard-coded German UI copy.
+- Use the existing next-intl catalogs in `messages/{de,en,es,it,cs,hu,nl,nl-BE,sv}.json` for all new or changed interface and system copy: pages, buttons, accessible labels, validation, errors, statuses, categories, notifications, and application-generated email. Update every supported language in the same change. Never add a parallel translation system or hard-coded German UI copy.
 - A feature is not complete until its strings, interpolation placeholders, and layout have been checked in all supported locales. Run `npm run check:i18n` before release; it also runs during production builds and deployment. Do not expand `scripts/i18n-legacy-texts.json` to admit new hard-coded text. That file is a frozen inventory of existing localization debt; remove entries as those surfaces are translated.
 - Preserve stable department, occupation, category, and offer IDs. Translate display labels only and reuse the same taxonomy in setup, editing, filters, and public views. Never translate or overwrite personal messages, member-written descriptions, names, or company names automatically.
 - Legal documents need reviewed language versions. Until available, explicitly show that the original German legal text is authoritative; do not publish machine translations as approved legal documents.
 - The manual locale cookie takes priority over browser preferences, persists across authentication, and must not be removed on logout. Use the shared locale resolver for both next-intl and Clerk. Switch with a server-component refresh, never a hard page reload or a locale-keyed form remount. Preserve unsaved fields and ongoing uploads.
 - Load only the requested language bundle, merged with the defined default fallback, on the server. Do not fetch all language catalogs on navigation or add external translation requests per page. Format dates and numbers with the active locale without currency conversion.
-- Non-German languages are currently marked partially translated. Do not remove that disclosure until the remaining legacy UI, server-generated copy, taxonomies and critical end-to-end flows are verified. Never claim full coverage from catalog key parity alone.
+- All nine supported locales have complete catalogs and verified critical language flows. Maintain that coverage across public/browse pages, authentication entry forms, profile editing, canonical place filters, taxonomies and generated system copy. If later work introduces partial coverage, disclose it until its legacy UI, system copy, taxonomies and critical flows are verified. Never claim full coverage from catalog key parity alone.
 
 ## Media origin and confidentiality
 

@@ -12,5 +12,39 @@
     "districts.txt": "5f7d25e16a3343817832f8b865e7e64148a220ef442aab5b244e8ef22634f9c2",
     "cities.zip": "955ad298b67a60996a15b4c4c84c8ca6923bafed195622227f24fd22a31042f4",
     "names.zip": "04fe486d194f884b4181540b64b73c097123ed10944ebf283f3b35a7fd630832"
+  },
+  "localeAdditions": {
+    "source": "https://download.geonames.org/export/dump/alternateNamesV2.zip",
+    "bytes": 205195024,
+    "sha256": "4bc5bb991ad48b038a29bd4257eaddef341a9f21ab444f50688ca797d496ac56",
+    "downloadedUtc": "2026-11-10T11:51:19Z",
+    "license": "https://creativecommons.org/licenses/by/4.0/",
+    "format": "https://download.geonames.org/export/dump/readme.txt",
+    "asOf": "2026-11-10",
+    "baseCatalogSha256": "e60bbd596db4f419e844cfc8d4e326105aa7abcf626735e28a57bcea71810f7c",
+    "locales": [
+      "nl",
+      "nl-BE",
+      "sv"
+    ],
+    "selection": "Exact GeoNames ID; unique preferred current non-short name, otherwise unique eligible current name; ambiguous choices omitted; native nl fallback for nl-BE; vls excluded",
+    "coverage": {
+      "cities": {
+        "nl": 6334,
+        "nl-BE": 6335,
+        "sv": 4860
+      },
+      "regions": {
+        "nl": 2172,
+        "nl-BE": 2172,
+        "sv": 2170
+      },
+      "districts": {
+        "nl": 1350,
+        "nl-BE": 1350,
+        "sv": 1213
+      }
+    },
+    "unresolvedLanguageIdGroups": 110
   }
 }

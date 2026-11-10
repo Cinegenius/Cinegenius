@@ -1,10 +1,12 @@
 "use client";
 
 import { useViewState } from "@/lib/use-view-state";
+import { canonicalProjectCategoryId } from "@/lib/project-category-filter";
+import { projectTypeLabel, projectTypeOptions, normalizedCatalogueSearch } from "@/lib/project-type-labels";
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useTranslations , useLocale } from "next-intl";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 import {
   Search, Clapperboard, Calendar, Users, X, ChevronDown,
@@ -12,16 +14,7 @@ import {
   Camera, Zap, Music, FileVideo, Building2, Radio, Tv,
 } from "lucide-react";
 
-const CATEGORY_CHIPS = [
-  { label: "Film & Serie",    keywords: ["spielfilm", "kurzfilm", "serie", "film"],                                               icon: Film },
-  { label: "Werbung",         keywords: ["werbefilm", "werbung", "commercial", "spot", "imagefilm"],                              icon: Tv },
-  { label: "Foto & Shooting", keywords: ["foto", "shooting", "fotografie", "editorial", "portrait", "kampagne"],                 icon: Camera },
-  { label: "Social Media",    keywords: ["social", "tiktok", "instagram", "reel", "youtube", "content", "podcast", "influencer"],icon: Zap },
-  { label: "Musikvideo",      keywords: ["musikvideo", "musik", "konzert", "band", "artist"],                                    icon: Music },
-  { label: "Dokumentation",   keywords: ["dokumentation", "dokumentar", "reportage", "doku"],                                    icon: FileVideo },
-  { label: "Corporate",       keywords: ["corporate", "business", "imagevideo", "erklärvideo", "employer", "unternehmen"],       icon: Building2 },
-  { label: "Event & Live",    keywords: ["event", "live", "festival", "sport", "konferenz", "messe"],                            icon: Radio },
-];
+
 
 type Project = {
   id: string;
@@ -46,6 +39,20 @@ const TYPE_COLORS: Record<string, string> = {
 type SortKey = "year_desc" | "year_asc" | "title_asc" | "crew_desc";
 
 // ─── SortDropdown ────────────────────────────────────────────────
+
+function getLocalizedCATEGORY_CHIPS(translate: (key: string) => string) {
+  return ([
+  { id: "film", label: translate("projects.catFilmSerie"),    keywords: ["spielfilm", "kurzfilm", "serie", "film"],                                               icon: Film },
+  { id: "werbung", label: translate("home.showcaseAds"),         keywords: ["werbefilm", "werbung", "commercial", "spot", "imagefilm"],                              icon: Tv },
+  { id: "foto", label: translate("projects.catFoto"), keywords: ["foto", "shooting", "fotografie", "editorial", "portrait", "kampagne"],                 icon: Camera },
+  { id: "social-media", label: translate("home.showcaseSocial"),    keywords: ["social", "tiktok", "instagram", "reel", "youtube", "content", "podcast", "influencer"],icon: Zap },
+  { id: "musikvideo", label: translate("projects.catMusikvideo"),      keywords: ["musikvideo", "musik", "konzert", "band", "artist"],                                    icon: Music },
+  { id: "dokumentation", label: translate("projects.catDokumentation"),   keywords: ["dokumentation", "dokumentar", "reportage", "doku"],                                    icon: FileVideo },
+  { id: "corporate", label: translate("projects.catCorporate"),       keywords: ["corporate", "business", "imagevideo", "erklärvideo", "employer", "unternehmen"],       icon: Building2 },
+  { id: "event", label: translate("projects.catEvent"),    keywords: ["event", "live", "festival", "sport", "konferenz", "messe"],                            icon: Radio },
+]);
+}
+
 function SortDropdown({ value, options, onChange }: {
   value: string; options: { value: string; label: string }[]; onChange: (v: string) => void;
 }) {
@@ -83,10 +90,10 @@ function SortDropdown({ value, options, onChange }: {
 
 // ─── FilterDropdown ───────────────────────────────────────────────
 function FilterDropdown({
-  icon: Icon, label, value, options, onChange,
+  icon: Icon, label, value, options, onChange, optionLabel = (value: string) => value,
 }: {
   icon: React.ElementType; label: string; value: string;
-  options: string[]; onChange: (v: string) => void;
+  options: string[]; onChange: (v: string) => void; optionLabel?: (value: string) => string;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -104,7 +111,7 @@ function FilterDropdown({
           active ? "bg-gold/12 border-gold/30 text-gold" : open ? "bg-bg-elevated border-border text-text-secondary" : "border-border text-text-muted hover:text-text-secondary"
         }`}>
         <Icon size={11} />
-        {active ? value : label}
+        {active ? optionLabel(value) : label}
         {active
           ? <span onClick={(e) => { e.stopPropagation(); onChange(""); setOpen(false); }} className="hover:text-red-400 transition-colors ml-0.5"><X size={10} /></span>
           : <ChevronDown size={11} className={`transition-transform ${open ? "rotate-180" : ""}`} />}
@@ -114,7 +121,7 @@ function FilterDropdown({
           {options.map((opt) => (
             <button key={opt} onClick={() => { onChange(opt); setOpen(false); }}
               className={`w-full text-left px-3 py-2 text-xs transition-colors hover:bg-white/[0.04] ${value === opt ? "text-gold font-medium" : "text-text-secondary"}`}>
-              {opt}
+              {optionLabel(opt)}
             </button>
           ))}
         </div>
@@ -125,9 +132,22 @@ function FilterDropdown({
 
 // ─── Main ─────────────────────────────────────────────────────────
 export default function ProjectsContent({ projects: allProjects }: { projects: Project[] }) {
+  const uiPriceLocale = useLocale();
+
+  const uiText = useTranslations();
+  const CATEGORY_CHIPS = getLocalizedCATEGORY_CHIPS(uiText);
+
+
   const t = useTranslations("projects");
   const [query, setQuery] = useViewState("projects.query", "");
-  const [categoryChip, setCategoryChip] = useViewState<string | null>("projects.categoryChip", null);
+  const [storedCategoryChip, setCategoryChip] = useViewState<string | null>("projects.categoryChip", null);
+  const categoryChip = canonicalProjectCategoryId(storedCategoryChip);
+  const activeCategoryChip = CATEGORY_CHIPS.find((chip) => chip.id === categoryChip);
+  useEffect(() => {
+    // Retain the selected category when recovering the original German view state.
+    // Unrecognized saved text is not guessed or rewritten.
+    if (categoryChip && storedCategoryChip !== categoryChip) setCategoryChip(categoryChip);
+  }, [categoryChip, storedCategoryChip, setCategoryChip]);
   const [typeFilter, setTypeFilter] = useViewState("projects.typeFilter", "");
   const [yearFilter, setYearFilter] = useViewState("projects.yearFilter", "");
   const [directorFilter, setDirectorFilter] = useViewState("projects.directorFilter", "");
@@ -139,6 +159,8 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
     const types = allProjects.map((p) => p.type).filter(Boolean) as string[];
     return [...new Set(types)].sort();
   }, [allProjects]);
+
+  const typeOptions = projectTypeOptions(availableTypes, uiText, uiPriceLocale);
 
   const availableYears = useMemo(() => {
     const years = allProjects.map((p) => p.year).filter(Boolean) as number[];
@@ -153,7 +175,7 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
   const filtered = useMemo(() => {
     let list = allProjects;
     if (categoryChip) {
-      const chip = CATEGORY_CHIPS.find((c) => c.label === categoryChip);
+      const chip = CATEGORY_CHIPS.find((c) => c.id === categoryChip);
       if (chip) {
         list = list.filter((p) =>
           chip.keywords.some((kw) => (p.type ?? "").toLowerCase().includes(kw))
@@ -161,8 +183,9 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
       }
     }
     if (query.trim()) {
-      const q = query.toLowerCase();
-      list = list.filter((p) => p.title.toLowerCase().includes(q) || (p.director ?? "").toLowerCase().includes(q));
+      const q = normalizedCatalogueSearch(query, uiPriceLocale);
+      list = list.filter((p) => [p.title, p.director ?? "", p.type ?? "", projectTypeLabel(p.type ?? "", uiText)]
+        .some(value => normalizedCatalogueSearch(value, uiPriceLocale).includes(q)));
     }
     if (typeFilter) list = list.filter((p) => p.type === typeFilter);
     if (yearFilter) list = list.filter((p) => String(p.year) === yearFilter);
@@ -170,18 +193,18 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
     list = [...list].sort((a, b) => {
       if (sort === "year_desc") return (b.year ?? 0) - (a.year ?? 0);
       if (sort === "year_asc")  return (a.year ?? 0) - (b.year ?? 0);
-      if (sort === "title_asc") return a.title.localeCompare(b.title, "de");
+      if (sort === "title_asc") return a.title.localeCompare(b.title, uiPriceLocale);
       if (sort === "crew_desc") return b.crew_count - a.crew_count;
       return 0;
     });
     return list;
-  }, [allProjects, query, categoryChip, typeFilter, yearFilter, directorFilter, sort]);
+  }, [allProjects, query, categoryChip, typeFilter, yearFilter, directorFilter, sort, uiPriceLocale, uiText]);
 
   const clearAll = () => { setQuery(""); setCategoryChip(null); setTypeFilter(""); setYearFilter(""); setDirectorFilter(""); };
   const hasAnyFilter = Boolean(query || categoryChip || typeFilter || yearFilter || directorFilter);
   const mobileChips: BrowseChip[] = [
-    ...(categoryChip ? [{ id: "category", label: categoryChip, onRemove: () => setCategoryChip(null) }] : []),
-    ...(typeFilter ? [{ id: "type", label: typeFilter, onRemove: () => setTypeFilter("") }] : []),
+    ...(activeCategoryChip ? [{ id: "category", label: activeCategoryChip.label, onRemove: () => setCategoryChip(null) }] : []),
+    ...(typeFilter ? [{ id: "type", label: projectTypeLabel(typeFilter, uiText), onRemove: () => setTypeFilter("") }] : []),
     ...(yearFilter ? [{ id: "year", label: yearFilter, onRemove: () => setYearFilter("") }] : []),
     ...(directorFilter ? [{ id: "director", label: directorFilter, onRemove: () => setDirectorFilter("") }] : []),
   ];
@@ -201,32 +224,32 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
           { value: "crew_desc", label: t("sortCrew") },
         ]}
         onSortChange={(value) => setSort(value as SortKey)}
-        categoryLabel="Bereich"
-        allCategoryLabel="Alle Projekte"
-        categories={CATEGORY_CHIPS.map((chip) => ({ value: chip.label, label: chip.label }))}
+        categoryLabel={uiText("setup.copy78")}
+        allCategoryLabel={uiText("common.allProjects")}
+        categories={CATEGORY_CHIPS.map((chip) => ({ value: chip.id, label: chip.label }))}
         categoryValue={categoryChip ?? ""}
-        onCategoryChange={(value) => setCategoryChip(value || null)}
+        onCategoryChange={(value) => setCategoryChip(canonicalProjectCategoryId(value))}
         resultSummary={t("resultsCount", { count: filtered.length })}
         filterCount={mobileChips.length}
         chips={mobileChips}
         onReset={clearAll}
         resetLabel={t("clearAllFilters")}
-        showResultsLabel={`${filtered.length} anzeigen`}
+        showResultsLabel={uiText("Ui.text_52ca04e867ebdc", { value1: String(filtered.length) })}
       >
         <MobileFilterField label={t("filterType")}>
-          <MobileFilterSelect value={typeFilter} onChange={setTypeFilter} placeholder="Alle Projekttypen" options={availableTypes.map((value) => ({ value, label: value }))} />
+          <MobileFilterSelect value={typeFilter} onChange={setTypeFilter} placeholder={uiText("Ui.text_afba0b3e7b5f22")} options={typeOptions} />
         </MobileFilterField>
         <MobileFilterField label={t("filterYear")}>
-          <MobileFilterSelect value={yearFilter} onChange={setYearFilter} placeholder="Alle Jahre" options={availableYears.map((value) => ({ value, label: value }))} />
+          <MobileFilterSelect value={yearFilter} onChange={setYearFilter} placeholder={uiText("Ui.text_ccaefee239e05c")} options={availableYears.map((value) => ({ value, label: value }))} />
         </MobileFilterField>
         <MobileFilterField label={t("filterDirector")}>
-          <MobileFilterSelect value={directorFilter} onChange={setDirectorFilter} placeholder="Alle Regisseur:innen" options={availableDirectors.map((value) => ({ value, label: value }))} />
+          <MobileFilterSelect value={directorFilter} onChange={setDirectorFilter} placeholder={uiText("Ui.text_f45f1b1bbf47eb")} options={availableDirectors.map((value) => ({ value, label: value }))} />
         </MobileFilterField>
         <div className="mobile-filter-field">
-          <span>Ansicht</span>
+          <span>{uiText("locations.viewLabel")}</span>
           <div className="grid grid-cols-2 gap-2">
-            <button type="button" onClick={() => setView("list")} className={`min-h-11 rounded-lg border text-sm ${view === "list" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>Liste</button>
-            <button type="button" onClick={() => setView("grid")} className={`min-h-11 rounded-lg border text-sm ${view === "grid" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>Raster</button>
+            <button type="button" onClick={() => setView("list")} className={`min-h-11 rounded-lg border text-sm ${view === "list" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{uiText("locations.viewList")}</button>
+            <button type="button" onClick={() => setView("grid")} className={`min-h-11 rounded-lg border text-sm ${view === "grid" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{uiText("Ui.text_2cc48b15f4ffeb")}</button>
           </div>
         </div>
       </MobileBrowseControls>
@@ -270,7 +293,7 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
             <div className="w-px h-6 bg-border shrink-0" />
 
             {availableTypes.length > 0 && (
-              <FilterDropdown icon={Film} label={t("filterType")} value={typeFilter} options={availableTypes} onChange={setTypeFilter} />
+              <FilterDropdown icon={Film} label={t("filterType")} value={typeFilter} options={typeOptions.map(option => option.value)} onChange={setTypeFilter} optionLabel={value => projectTypeLabel(value, uiText)} />
             )}
             {availableYears.length > 0 && (
               <FilterDropdown icon={Calendar} label={t("filterYear")} value={yearFilter} options={availableYears} onChange={setYearFilter} />
@@ -290,7 +313,7 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
             <div className="flex flex-wrap gap-1.5 items-center">
               {typeFilter && (
                 <span className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium ${TYPE_COLORS[typeFilter] ?? "bg-gold/10 border-gold/30 text-gold"}`}>
-                  {typeFilter}
+                  {projectTypeLabel(typeFilter, uiText)}
                   <button onClick={() => setTypeFilter("")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               )}
@@ -349,7 +372,7 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
                     <p className="text-sm font-semibold text-text-primary group-hover:text-gold transition-colors truncate">{project.title}</p>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
                       {project.type && (
-                        <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${TYPE_COLORS[project.type] ?? "bg-gold/10 text-gold border-gold/20"}`}>{project.type}</span>
+                        <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${TYPE_COLORS[project.type] ?? "bg-gold/10 text-gold border-gold/20"}`}>{projectTypeLabel(project.type, uiText)}</span>
                       )}
                       {project.year && <span className="text-xs text-text-muted flex items-center gap-1"><Calendar size={10} />{project.year}</span>}
                     </div>
@@ -400,7 +423,7 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
                     </span>
                     <div>
                       {project.type
-                        ? <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${TYPE_COLORS[project.type] ?? "bg-gold/10 text-gold border-gold/20"}`}>{project.type}</span>
+                        ? <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${TYPE_COLORS[project.type] ?? "bg-gold/10 text-gold border-gold/20"}`}>{projectTypeLabel(project.type, uiText)}</span>
                         : <span className="text-text-muted text-xs">—</span>
                       }
                     </div>
@@ -433,7 +456,7 @@ export default function ProjectsContent({ projects: allProjects }: { projects: P
                     <h2 className="font-semibold text-text-primary group-hover:text-gold transition-colors leading-tight mb-1.5 line-clamp-2">{project.title}</h2>
                     <div className="flex items-center gap-2 flex-wrap">
                       {project.type && (
-                        <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${TYPE_COLORS[project.type] ?? ""}`}>{project.type}</span>
+                        <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${TYPE_COLORS[project.type] ?? ""}`}>{projectTypeLabel(project.type, uiText)}</span>
                       )}
                       {project.year && (
                         <span className="flex items-center gap-1 text-xs text-text-muted"><Calendar size={10} /> {project.year}</span>

@@ -1,0 +1,26 @@
+[
+  {
+    "name": "invite_company_member",
+    "signature": "public.invite_company_member(text,uuid,text,text[])",
+    "source": "supabase/migrations/20261024191000_direct_company_invitations.sql",
+    "line": 33,
+    "before_md5": "a7297a4d587067d78079011b7a93eaa4",
+    "after_md5": "ee524a37e8e7adb4bb3e9309a0a93af3"
+  },
+  {
+    "name": "respond_company_invitation",
+    "signature": "public.respond_company_invitation(text,uuid,text)",
+    "source": "supabase/migrations/20261024191000_direct_company_invitations.sql",
+    "line": 57,
+    "before_md5": "a816537c4886e41941b3086b51caa857",
+    "after_md5": "f749d874a8fae804995236c70b35b715"
+  },
+  {
+    "name": "offer_review_transition",
+    "signature": "public.offer_review_transition(text,uuid,jsonb,jsonb,jsonb,text,text,text,jsonb)",
+    "source": "supabase/migrations/20261029020000_admin_review_discretion.sql",
+    "line": 56,
+    "before_md5": "9dbd6a0f333645c4216ae5a9682425a7",
+    "after_md5": "11f1899625ffda43c8bd871e03de20ed"
+  }
+]

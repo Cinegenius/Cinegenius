@@ -14,7 +14,7 @@ type TokenGetter = (options?: { skipCache?: boolean }) => Promise<string | null>
 
 /** One session-scoped request owner for both header variants and both counters. */
 export function createInboxPolling(identity: Identity | null, getToken: TokenGetter, options: {
-  fetch?: typeof fetch; now?: () => number; timeoutMs?: number;
+  fetch?: typeof fetch; now?: () => number; timeoutMs?: number; locale?: string;
 } = {}) {
   const request = options.fetch ?? fetch;
   const now = options.now ?? Date.now;
@@ -25,6 +25,10 @@ export function createInboxPolling(identity: Identity | null, getToken: TokenGet
   let failureCount = 0;
   let retryAt = 0;
   let readRevision = 0;
+  let locale = options.locale;
+  let refreshGeneration = 0;
+  let refreshController: AbortController | null = null;
+  let awaitingLocale = false;
   const controllers = new Set<AbortController>();
   const listeners = new Set<() => void>();
   const isExpired = () => snapshot.status === "expired";
@@ -74,6 +78,9 @@ export function createInboxPolling(identity: Identity | null, getToken: TokenGet
     controllers.add(controller);
     const timeout = setTimeout(() => controller.abort(), options.timeoutMs ?? 15_000);
     const revision = readRevision;
+    const generation = ++refreshGeneration;
+    refreshController = controller;
+    let refreshAfterRead = false;
     if (retry || snapshot.count === null) update({ ...snapshot, status: "loading" });
     inFlight = (async () => {
       try {
@@ -85,18 +92,20 @@ export function createInboxPolling(identity: Identity | null, getToken: TokenGet
           signal: controller.signal, cache: "no-store", credentials: "same-origin",
           headers: { Authorization: `Bearer ${token}` },
         });
+        if (stopped || controller.signal.aborted || generation !== refreshGeneration) return;
         if (response.status === 401) { expire(); throw new Error("session"); }
         if (!response.ok) throw new Error("request");
         const inbox = await response.json();
-        if (stopped || controller.signal.aborted || snapshot.status === "expired") return;
+        if (stopped || controller.signal.aborted || generation !== refreshGeneration || snapshot.status === "expired") return;
         if (!Number.isInteger(inbox.count) || inbox.count < 0 || !Array.isArray(inbox.notifications)) throw new Error("response");
         failureCount = 0;
         retryAt = 0;
         // A concurrent successful read must not be undone by an older list response.
-        if (revision !== readRevision) return;
+        if (revision !== readRevision) { refreshAfterRead = awaitingLocale; return; }
+        awaitingLocale = false;
         update({ status: "ready", count: inbox.count, notifications: inbox.notifications });
       } catch {
-        if (stopped || snapshot.status === "expired") return;
+        if (stopped || generation !== refreshGeneration || snapshot.status === "expired") return;
         controller.abort();
         failureCount += 1;
         retryAt = now() + Math.min(60_000, 10_000 * 2 ** (failureCount - 1));
@@ -104,7 +113,11 @@ export function createInboxPolling(identity: Identity | null, getToken: TokenGet
       } finally {
         clearTimeout(timeout);
         controllers.delete(controller);
-        inFlight = null;
+        if (generation === refreshGeneration) {
+          inFlight = null;
+          refreshController = null;
+          if (refreshAfterRead) void refresh();
+        }
       }
     })();
     return inFlight;
@@ -140,8 +153,27 @@ export function createInboxPolling(identity: Identity | null, getToken: TokenGet
     await refresh();
   }
 
+  function setLocale(nextLocale: string): Promise<void> {
+    if (locale === nextLocale) return Promise.resolve();
+    locale = nextLocale;
+    if (stopped || !identity) return Promise.resolve();
+    if (isExpired()) { update(snapshot); return Promise.resolve(); }
+    // Replace only the translated GET; pending read mutations keep their owner and revision.
+    refreshGeneration += 1;
+    refreshController?.abort();
+    refreshController = null;
+    inFlight = null;
+    failureCount = 0;
+    retryAt = 0;
+    awaitingLocale = true;
+    update({ status: "loading", count: snapshot.count, notifications: [] });
+    return refresh();
+  }
+
   return {
     getSnapshot: () => snapshot,
+    getLocale: () => locale,
+    setLocale,
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
     refresh, markRead, refreshAfterMessageRead,
     stop() {

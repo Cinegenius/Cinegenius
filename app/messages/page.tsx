@@ -8,7 +8,7 @@ import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { Send, ArrowLeft, MessageSquare, Loader2, User, UserPlus, Check, X, Users, Pencil, UserMinus, Plus, Trash2 } from "lucide-react";
 import { Suspense } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations , useLocale } from "next-intl";
 import { applyReadReceiptTimestamps, incomingUnreadMessageIds } from "@/lib/message-read-state";
 import { notifyMessagesRead, subscribeToMessageReads } from "@/lib/message-read-sync";
 import { mergeMessagesById } from "@/lib/conversation-logic";
@@ -19,6 +19,7 @@ import {
 } from "@/lib/message-refresh-policy";
 import { findContactConversation, mergeVisibleMessagePage } from "@/lib/message-actions";
 import { backFromMessageView, navigateMessageView } from "@/lib/message-navigation";
+import { uiErrorMessage } from "@/lib/ui-error-message";
 
 type Message = {
   id: string;
@@ -60,17 +61,20 @@ type FriendRequest = {
   role?: string;
 };
 
-function formatTime(iso: string) {
+function formatTime(locale: string, iso: string) {
   const d = new Date(iso);
   const now = new Date();
   const diff = now.getTime() - d.getTime();
   if (diff < 86400000 && d.getDate() === now.getDate()) {
-    return d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+    return d.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
   }
-  return d.toLocaleDateString("de-DE", { day: "numeric", month: "short" });
+  return d.toLocaleDateString(locale, { day: "numeric", month: "short" });
 }
 
 function MessagesContent() {
+  const uiText = useTranslations();
+  const uiLocale = useLocale();
+
   const navigationText = useTranslations("navigationStability");
   const messageNavigationText = useTranslations("messagesNavigation");
   const companyText = useTranslations("companyMessages");
@@ -196,7 +200,7 @@ function MessagesContent() {
     const sequence = ++conversationRequestSequence.current;
     try {
       const res = await fetch("/api/conversations", { cache: "no-store" });
-      if (!res.ok) throw new Error("fetch failed");
+      if (!res.ok) throw new Error(uiText("Ui.text_e2c73a8fd23757"));
       const { data } = await res.json();
       if (currentUserRef.current !== owner || sequence !== conversationRequestSequence.current) return;
       if (!Array.isArray(data)) throw new Error();
@@ -227,12 +231,12 @@ function MessagesContent() {
     setContactsLoading(true); setContactsError("");
     try {
       const res = await fetch("/api/friendships", { cache: "no-store" });
-      if (!res.ok) throw new Error("Kontakte konnten nicht geladen werden.");
+      if (!res.ok) throw new Error(uiText("Ui.text_218b9b6423a6fb"));
       const { incoming, friends } = await res.json();
       if (currentUserRef.current !== owner) return;
       if (Array.isArray(incoming)) setFriendRequests(incoming);
-      setContacts(Array.isArray(friends) ? [...new Map((friends as FriendRequest[]).filter(f => f.user_id !== owner).map(f => [f.user_id, f])).values()].sort((a,b) => a.display_name.localeCompare(b.display_name,"de")) : []);
-    } catch { if (currentUserRef.current === owner) setContactsError("Kontakte konnten nicht geladen werden. Bitte versuche es erneut."); }
+      setContacts(Array.isArray(friends) ? [...new Map((friends as FriendRequest[]).filter(f => f.user_id !== owner).map(f => [f.user_id, f])).values()].sort((a,b) => a.display_name.localeCompare(b.display_name,uiLocale)) : []);
+    } catch { if (currentUserRef.current === owner) setContactsError(uiText("Ui.text_4139ecbefbacc6")); }
     finally { if (currentUserRef.current === owner) setContactsLoading(false); }
   }, []);
 
@@ -421,34 +425,34 @@ function MessagesContent() {
       if (!id) {
         const response = await fetch(`/api/conversations?with_user=${encodeURIComponent(contact.user_id)}`, { cache: "no-store" });
         const payload = await response.json();
-        if (!response.ok) throw new Error(payload.error ?? "Unterhaltung konnte nicht geöffnet werden.");
+        if (!response.ok) throw new Error(payload.error ?? uiText("Ui.text_3672a7823ba50f"));
         id = payload.conversationId;
       }
       if (currentUserRef.current !== owner || window.location.href !== sourceHref) return;
       navigateMessageView(window, owner, id ? { conversationId: id } : { recipientId: contact.user_id });
-    } catch (error) { if (currentUserRef.current === owner) setContactsError(error instanceof Error ? error.message : "Unterhaltung konnte nicht geöffnet werden."); }
+    } catch (error) { if (currentUserRef.current === owner) setContactsError(uiErrorMessage(error, uiText("Ui.text_3672a7823ba50f"))); }
     finally { contactOpeningRef.current = false; setOpeningContact(null); }
   }
 
   async function hideOwnMessage(message: Message) {
     if (!activeId || message.sender_id !== user?.id || deletePendingRef.current) return;
     deletePendingRef.current = true;
-    if (!window.confirm("Nachricht nur für dich löschen?\n\nSie wird aus deiner Ansicht entfernt. Für die anderen Teilnehmer bleibt sie erhalten.")) { deletePendingRef.current = false; return; }
+    if (!window.confirm(uiText("Ui.text_738427dd78faa1"))) { deletePendingRef.current = false; return; }
     const conversationId = activeId;
     const owner = user.id;
     setDeletingMessage(message.id); setSendError(""); setMessageNotice("");
     try {
       const response = await fetch(`/api/conversations/${conversationId}?message_id=${encodeURIComponent(message.id)}`, { method: "DELETE" });
       const result = await response.json();
-      if (!response.ok || result.hiddenMessageId !== message.id) throw new Error(result.error ?? "Nachricht konnte nicht für dich gelöscht werden.");
+      if (!response.ok || result.hiddenMessageId !== message.id) throw new Error(result.error ?? uiText("Ui.text_ce810a95feef7e"));
       if (currentUserRef.current !== owner) return;
       hiddenMessageIds.current.add(message.id);
       messageRequestSequence.current += 1;
       setMessages(current => current.filter(m => m.id !== message.id));
       setConversations(current => current.map(c => c.id !== conversationId ? c : { ...c, messages: c.messages.filter(m => m.id !== message.id) }));
-      if (activeIdRef.current === conversationId) setMessageNotice("Nachricht für dich gelöscht. Andere Teilnehmer sehen sie weiterhin.");
+      if (activeIdRef.current === conversationId) setMessageNotice(uiText("Ui.text_86507fb7342498"));
       await loadConversations();
-    } catch (error) { if (currentUserRef.current === owner && activeIdRef.current === conversationId) setSendError(error instanceof Error ? error.message : "Nachricht konnte nicht gelöscht werden."); }
+    } catch (error) { if (currentUserRef.current === owner && activeIdRef.current === conversationId) setSendError(uiErrorMessage(error, uiText("Ui.text_116897e6048096"))); }
     finally { deletePendingRef.current = false; setDeletingMessage(null); }
   }
 
@@ -490,13 +494,13 @@ function MessagesContent() {
         body: JSON.stringify({ name: groupName.trim(), member_ids: selectedGroupUsers.map((person) => person.id) }),
       });
       const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(payload.error ?? "Gruppe konnte nicht erstellt werden.");
+      if (!response.ok) throw new Error(payload.error ?? uiText("Ui.text_7c70f21f77344c"));
       const conversationId = payload.conversationId as string;
       setGroupModalMode(null);
       if (currentUserRef.current === user?.id && user?.id) navigateMessageView(window, user.id, { conversationId });
       await loadConversations();
     } catch (error) {
-      setGroupError(error instanceof Error ? error.message : "Gruppe konnte nicht erstellt werden.");
+      setGroupError(uiErrorMessage(error, uiText("Ui.text_7c70f21f77344c")));
     } finally {
       setGroupSaving(false);
     }
@@ -513,10 +517,10 @@ function MessagesContent() {
         body: JSON.stringify({ name: groupName.trim() }),
       });
       const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(payload.error ?? "Gruppenname konnte nicht geändert werden.");
+      if (!response.ok) throw new Error(payload.error ?? uiText("Ui.text_f027823ed7d659"));
       await loadConversations();
     } catch (error) {
-      setGroupError(error instanceof Error ? error.message : "Gruppenname konnte nicht geändert werden.");
+      setGroupError(uiErrorMessage(error, uiText("Ui.text_f027823ed7d659")));
     } finally {
       setGroupSaving(false);
     }
@@ -533,7 +537,7 @@ function MessagesContent() {
         body: JSON.stringify({ action, user_id: targetUserId }),
       });
       const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(payload.error ?? "Mitgliedschaft konnte nicht geändert werden.");
+      if (!response.ok) throw new Error(payload.error ?? uiText("Ui.text_09009df3439617"));
       setSelectedGroupUsers([]);
       setGroupSearch("");
       if (action === "leave") {
@@ -545,7 +549,7 @@ function MessagesContent() {
         await loadMessages(activeId);
       }
     } catch (error) {
-      setGroupError(error instanceof Error ? error.message : "Mitgliedschaft konnte nicht geändert werden.");
+      setGroupError(uiErrorMessage(error, uiText("Ui.text_09009df3439617")));
     } finally {
       setGroupSaving(false);
     }
@@ -563,14 +567,14 @@ function MessagesContent() {
           body: JSON.stringify({ action: "add", user_id: person.id }),
         });
         const payload = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(payload.error ?? `${person.name} konnte nicht hinzugefügt werden.`);
+        if (!response.ok) throw new Error(payload.error ?? uiText("Ui.text_b938243582c9df", { value1: String(person.name) }));
       }
       setSelectedGroupUsers([]);
       setGroupSearch("");
       await loadConversations();
       await loadMessages(activeId);
     } catch (error) {
-      setGroupError(error instanceof Error ? error.message : "Mitglieder konnten nicht hinzugefügt werden.");
+      setGroupError(uiErrorMessage(error, uiText("Ui.text_46796948309b48")));
       await loadConversations();
     } finally {
       setGroupSaving(false);
@@ -644,7 +648,7 @@ function MessagesContent() {
           body: JSON.stringify({ receiver_id: newConvRecipient, content: text.trim() }),
         });
         const { conversationId, error } = await res.json().catch(() => ({}));
-        if (!res.ok || error || typeof conversationId !== "string") throw new Error(error ?? "Nachricht konnte nicht gesendet werden.");
+        if (!res.ok || error || typeof conversationId !== "string") throw new Error(error ?? uiText("Ui.text_0949dcf4a5790d"));
         if (currentUserRef.current !== owner) return;
         if (recipientAtSend && drafts.current.get(recipientAtSend) === sentText) drafts.current.delete(recipientAtSend);
         if (activeIdRef.current !== conversationAtSend || window.location.href !== sourceHref) { await loadConversations(); return; }
@@ -659,7 +663,7 @@ function MessagesContent() {
           body: JSON.stringify({ content: text.trim() }),
         });
         const { message, error } = await res.json().catch(() => ({}));
-        if (!res.ok || error || !message?.id) throw new Error(error ?? "Nachricht konnte nicht bestätigt werden.");
+        if (!res.ok || error || !message?.id) throw new Error(error ?? uiText("Ui.text_41c85b9f5d2cfc"));
         if (currentUserRef.current !== owner) return;
         if (conversationAtSend && drafts.current.get(conversationAtSend) === sentText) drafts.current.delete(conversationAtSend);
         if (activeIdRef.current !== conversationAtSend) { await loadConversations(); return; }
@@ -674,7 +678,7 @@ function MessagesContent() {
         }, 50);
       }
     } catch (e) {
-      setSendError(e instanceof Error ? e.message : "Nachricht konnte nicht gesendet werden. Deine Eingabe ist erhalten.");
+      setSendError(uiErrorMessage(e, uiText("Ui.text_60cdf3050ffef0")));
     } finally {
       setSending(false);
     }
@@ -699,34 +703,30 @@ function MessagesContent() {
         flex-col min-w-0 w-full sm:w-80 sm:shrink-0 border-r border-border bg-bg-primary
       `}>
         <div className="px-4 py-4 border-b border-border shrink-0 flex items-center justify-between gap-3">
-          <h1 className="font-display text-lg font-bold text-text-primary flex items-center gap-2">
-            <MessageSquare size={18} className="text-gold" /> Nachrichten
-          </h1>
+          <h1 className="font-display text-lg font-bold text-text-primary flex items-center gap-2">{uiText.rich("Ui.text_81d121dfcf2181", { part1: () => (<MessageSquare size={18} className="text-gold" />) })}</h1>
           <button
             onClick={openCreateGroup}
             className="min-h-11 px-3 rounded-xl border border-border text-sm text-text-secondary hover:text-gold hover:border-gold/50 flex items-center gap-2 shrink-0"
-            title="Gruppe erstellen"
-          >
-            <Users size={16} /> <span className="hidden min-[380px]:inline">Gruppe</span><Plus size={14} />
-          </button>
+            title={uiText("Ui.text_931b2c0e1d5f93")}
+          >{uiText.rich("Ui.text_242ae238257dd3", { part1: () => (<Users size={16} />), part2: chunks => (<span className="hidden min-[380px]:inline">{chunks}</span>), part3: () => (<Plus size={14} />) })}</button>
         </div>
 
-        <div className="flex shrink-0 gap-2 border-b border-border px-4 py-2" aria-label="Nachrichtenansicht">
-          <button type="button" aria-pressed={sidebarView === "chats"} onClick={() => setSidebarView("chats")} className={`min-h-11 flex-1 rounded-lg px-2 text-sm ${sidebarView === "chats" ? "bg-bg-elevated text-gold" : "text-text-muted"}`}>Unterhaltungen</button>
+        <div className="flex shrink-0 gap-2 border-b border-border px-4 py-2" aria-label={uiText("Ui.text_f991b9c56c163e")}>
+          <button type="button" aria-pressed={sidebarView === "chats"} onClick={() => setSidebarView("chats")} className={`min-h-11 flex-1 rounded-lg px-2 text-sm ${sidebarView === "chats" ? "bg-bg-elevated text-gold" : "text-text-muted"}`}>{uiText("Ui.text_6a1722b9c244bf")}</button>
           <button type="button" aria-pressed={sidebarView === "contacts"} onClick={() => setSidebarView("contacts")} className={`min-h-11 flex-1 rounded-lg px-2 text-sm ${sidebarView === "contacts" ? "bg-bg-elevated text-gold" : "text-text-muted"}`}>{contactsLoading && !contacts.length ? messageNavigationText("contactsLoading") : contactsError && !contacts.length ? messageNavigationText("contacts") : messageNavigationText("contactsCount", { count: contacts.length })}</button>
         </div>
 
         {sidebarView === "contacts" ? <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
-          <label className="block text-xs text-text-muted">Freunde und Kontakte suchen<input type="search" value={contactSearch} onChange={event => setContactSearch(event.target.value)} placeholder="Name oder Tätigkeit" className="my-2 min-h-11 w-full rounded-xl border border-border bg-bg-elevated px-3 text-base text-text-primary sm:text-sm" /></label>
-          {contactsError && <div role="alert" className="mb-3 text-sm text-red-400"><p>{contactsError}</p><button type="button" onClick={() => void loadFriendRequests()} className="min-h-11 text-gold">Erneut laden</button></div>}
-          {contactsLoading ? <p role="status" className="py-4 text-sm text-text-muted">Kontakte werden geladen…</p> : <div className="space-y-1">
+          <label className="block text-xs text-text-muted">{uiText.rich("Ui.text_96d875d1ff51c6", { part1: () => (<input type="search" value={contactSearch} onChange={event => setContactSearch(event.target.value)} placeholder={uiText("Ui.text_6b6ab641d0b589")} className="my-2 min-h-11 w-full rounded-xl border border-border bg-bg-elevated px-3 text-base text-text-primary sm:text-sm" />) })}</label>
+          {contactsError && <div role="alert" className="mb-3 text-sm text-red-400"><p>{contactsError}</p><button type="button" onClick={() => void loadFriendRequests()} className="min-h-11 text-gold">{uiText("FormDraft.reload")}</button></div>}
+          {contactsLoading ? <p role="status" className="py-4 text-sm text-text-muted">{uiText("Ui.text_732cd3bdf719fc")}</p> : <div className="space-y-1">
             {contacts.filter(contact => `${contact.display_name} ${contact.role ?? ""}`.toLocaleLowerCase("de").includes(contactSearch.trim().toLocaleLowerCase("de"))).map(contact => <button type="button" key={contact.user_id} disabled={Boolean(openingContact)} onClick={() => void openContact(contact)} className="flex min-h-16 w-full items-center gap-3 rounded-xl px-2 py-3 text-left hover:bg-bg-elevated disabled:opacity-60">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-bg-elevated">{contact.avatar_url ? <UnoptimizedImage src={contact.avatar_url} alt="" className="h-full w-full object-cover" /> : <User size={18} className="text-text-muted" />}</span>
-              <span className="min-w-0 flex-1"><strong className="block break-words text-sm text-text-primary">{contact.display_name}</strong><span className="block break-words text-xs text-text-muted">{contact.role ?? "CineGenius Mitglied"}</span></span>
+              <span className="min-w-0 flex-1"><strong className="block break-words text-sm text-text-primary">{contact.display_name}</strong><span className="block break-words text-xs text-text-muted">{contact.role ?? uiText("Ui.text_51fb8dfa65e81e")}</span></span>
               {openingContact === contact.user_id ? <Loader2 size={17} className="shrink-0 animate-spin text-gold" /> : <MessageSquare size={17} className="shrink-0 text-gold" />}
             </button>)}
-            {!contacts.length && <p className="py-4 text-sm text-text-muted">Noch keine bestätigten Kontakte. Angenommene Freundschaftsanfragen erscheinen hier.</p>}
-            {contacts.length > 0 && !contacts.some(contact => `${contact.display_name} ${contact.role ?? ""}`.toLocaleLowerCase("de").includes(contactSearch.trim().toLocaleLowerCase("de"))) && <p className="py-4 text-sm text-text-muted">Keine passenden Kontakte gefunden.</p>}
+            {!contacts.length && <p className="py-4 text-sm text-text-muted">{uiText("Ui.text_ed188537dc9e37")}</p>}
+            {contacts.length > 0 && !contacts.some(contact => `${contact.display_name} ${contact.role ?? ""}`.toLocaleLowerCase("de").includes(contactSearch.trim().toLocaleLowerCase("de"))) && <p className="py-4 text-sm text-text-muted">{uiText("Ui.text_1cb03119bfc5f2")}</p>}
           </div>}
         </div> : loading ? (
           <div className="flex-1 flex items-center justify-center">
@@ -744,9 +744,7 @@ function MessagesContent() {
             {visibleRequests.length > 0 && (
               <div className="border-b border-border">
                 <div className="px-4 py-2 bg-bg-elevated">
-                  <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider flex items-center gap-1.5">
-                    <UserPlus size={12} /> Anfragen · {visibleRequests.length}
-                  </p>
+                  <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider flex items-center gap-1.5">{uiText.rich("Ui.text_32245e7f748f1e", { part1: () => (<UserPlus size={12} />), value2: () => (visibleRequests.length) })}</p>
                 </div>
                 {visibleRequests.map(req => {
                   const isProcessing = processingIds.has(req.friendship_id);
@@ -765,7 +763,7 @@ function MessagesContent() {
                             {req.display_name}
                           </p>
                         </Link>
-                        <p className="text-xs text-text-muted">möchte sich vernetzen</p>
+                        <p className="text-xs text-text-muted">{uiText("Ui.text_96bc29c3dcd30a")}</p>
                       </div>
                       <div className="flex gap-1.5 shrink-0">
                         {isProcessing ? (
@@ -774,21 +772,21 @@ function MessagesContent() {
                           <>
                             <button
                               onClick={() => handleFriendRequest(req.friendship_id, "accepted")}
-                              title="Annehmen"
+                              title={uiText("OrganizationAccess.accept")}
                               className="w-8 h-8 rounded-full bg-gold/10 text-gold border border-gold/20 flex items-center justify-center hover:bg-gold hover:text-bg-primary transition-colors"
                             >
                               <Check size={14} />
                             </button>
                             <button
                               onClick={() => handleFriendRequest(req.friendship_id, "rejected")}
-                              title="Ablehnen"
+                              title={uiText("OfferModeration.reject")}
                               className="w-8 h-8 rounded-full bg-bg-elevated border border-border flex items-center justify-center text-text-muted hover:text-red-400 hover:border-red-400/40 transition-colors"
                             >
                               <X size={14} />
                             </button>
                             <button
                               onClick={() => dismissRequest(req.friendship_id)}
-                              title="Ausblenden"
+                              title={uiText("OfferModeration.hide")}
                               className="w-8 h-8 rounded-full bg-bg-elevated border border-border flex items-center justify-center text-text-muted hover:text-text-primary transition-colors text-[10px] font-bold"
                             >
                               –
@@ -810,9 +808,9 @@ function MessagesContent() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-text-primary truncate">
-                    {loadingRecipient ? "Lädt..." : recipientName}
+                    {loadingRecipient ? uiText("Ui.text_7a72dd7b9d46f7") : recipientName}
                   </p>
-                  <p className="text-xs text-gold">Neue Nachricht</p>
+                  <p className="text-xs text-gold">{uiText("Ui.text_e8a28a55f6fbf9")}</p>
                 </div>
               </button>
             )}
@@ -824,12 +822,10 @@ function MessagesContent() {
                   <MessageSquare size={20} className="text-text-muted opacity-50" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-text-secondary mb-1">Keine Nachrichten</p>
-                  <p className="text-xs text-text-muted leading-relaxed">Schreibe Filmschaffenden oder Inserenten direkt an.</p>
+                  <p className="text-sm font-medium text-text-secondary mb-1">{uiText("Ui.text_f1c166d282b5d8")}</p>
+                  <p className="text-xs text-text-muted leading-relaxed">{uiText("Ui.text_221f57b4b804b9")}</p>
                 </div>
-                <Link href="/creators" className="text-xs text-gold hover:text-gold-light transition-colors font-medium">
-                  Crew entdecken →
-                </Link>
+                <Link href="/creators" className="text-xs text-gold hover:text-gold-light transition-colors font-medium">{uiText("Ui.text_b95a90b1761a09")}</Link>
               </div>
             ) : (
               conversations.map(conv => {
@@ -852,10 +848,10 @@ function MessagesContent() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <p className="flex min-w-0 items-center gap-1.5 text-sm font-semibold text-text-primary"><span className="truncate">{conv.otherName}{conv.kind === "group" && conv.memberCount ? ` · ${conv.memberCount}` : ""}</span>{conv.kind === "support" && <span className="shrink-0 rounded-full border border-gold/30 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-gold">Support</span>}</p>
-                        {lastMsg && <span className="text-[10px] text-text-muted shrink-0 ml-1">{formatTime(lastMsg.created_at)}</span>}
+                        <p className="flex min-w-0 items-center gap-1.5 text-sm font-semibold text-text-primary"><span className="truncate">{conv.otherName}{conv.kind === "group" && conv.memberCount ? uiText("Ui.text_f6b53f9c8ab3ef", { value1: String(conv.memberCount) }) : ""}</span>{conv.kind === "support" && <span className="shrink-0 rounded-full border border-gold/30 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-gold">{uiText("Ui.text_be91940b79f469")}</span>}</p>
+                        {lastMsg && <span className="text-[10px] text-text-muted shrink-0 ml-1">{formatTime(uiLocale, lastMsg.created_at)}</span>}
                       </div>
-                      <p className="text-xs text-text-muted truncate">{lastMsg?.content ?? "Keine Nachrichten"}</p>
+                      <p className="text-xs text-text-muted truncate">{lastMsg?.content ?? uiText("Ui.text_f1c166d282b5d8")}</p>
                     </div>
                     {unread > 0 && (
                       <span className="w-5 h-5 rounded-full bg-gold text-bg-primary text-[10px] font-bold flex items-center justify-center shrink-0">{unread}</span>
@@ -895,11 +891,11 @@ function MessagesContent() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-text-primary truncate">
-                  {isNewConv ? (loadingRecipient ? "Lädt..." : recipientName) : (activeConv?.otherName ?? "Gespräch")}
+                  {isNewConv ? (loadingRecipient ? uiText("Ui.text_7a72dd7b9d46f7") : recipientName) : (activeConv?.otherName ?? uiText("Ui.text_69c3de31e17ef2"))}
                 </p>
-                {activeConv?.kind === "support" && <p className="text-[11px] text-gold">Offizieller CineGenius Support</p>}
+                {activeConv?.kind === "support" && <p className="text-[11px] text-gold">{uiText("Ui.text_82c40b33b74f44")}</p>}
               {activeConv?.kind === "group" && (
-                <p className="text-xs text-text-muted truncate">{activeConv.memberCount ?? 0} Mitglieder</p>
+                <p className="text-xs text-text-muted truncate">{uiText.rich("Ui.text_e38b461d0cda97", { value1: () => (activeConv.memberCount ?? 0) })}</p>
               )}
               {activeConv?.listing_title && (
                 <p className="text-xs text-text-muted truncate">{activeConv.listing_title}</p>
@@ -909,7 +905,7 @@ function MessagesContent() {
               <button
                 onClick={openGroupDetails}
                 className="min-w-11 min-h-11 px-2 rounded-xl border border-border text-text-muted hover:text-gold hover:border-gold/50 flex items-center justify-center gap-2 shrink-0"
-                aria-label="Gruppeninformationen öffnen"
+                aria-label={uiText("Ui.text_9cf1794be03d0e")}
               >
                 <Users size={17} />
               </button>
@@ -918,9 +914,7 @@ function MessagesContent() {
                 <Link
                   href={peerProfileHref}
                   className="shrink-0 text-xs text-gold hover:text-gold-light transition-colors"
-                >
-                  Profil
-                </Link>
+                >{uiText("profile.tabProfile")}</Link>
               )}
             </div>
 
@@ -946,10 +940,7 @@ function MessagesContent() {
                     onClick={loadOlderMessages}
                     disabled={olderLoading}
                     className="min-h-11 px-4 rounded-xl border border-border text-sm text-text-muted hover:text-gold hover:border-gold/50 disabled:opacity-60 flex items-center gap-2"
-                  >
-                    {olderLoading && <Loader2 size={15} className="animate-spin" />}
-                    Ältere Nachrichten laden
-                  </button>
+                  >{uiText.rich("Ui.text_76970f0afffef8", { value1: () => (olderLoading && <Loader2 size={15} className="animate-spin" />) })}</button>
                 </div>
               )}
               {isNewConv && messages.length === 0 && (
@@ -957,10 +948,8 @@ function MessagesContent() {
                   <div className="w-14 h-14 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center mx-auto mb-3">
                     <MessageSquare size={22} className="text-text-muted opacity-50" />
                   </div>
-                  <p className="text-sm font-medium text-text-secondary mb-1">Neue Unterhaltung</p>
-                  <p className="text-xs text-text-muted">
-                    Schreib deine erste Nachricht an {loadingRecipient ? "…" : recipientName}.
-                  </p>
+                  <p className="text-sm font-medium text-text-secondary mb-1">{uiText("Ui.text_b1da4f28aa3730")}</p>
+                  <p className="text-xs text-text-muted">{uiText.rich("Ui.text_521293c66a546f", { value1: () => (loadingRecipient ? "…" : recipientName) })}</p>
                 </div>
               )}
               {(() => {
@@ -968,7 +957,7 @@ function MessagesContent() {
                 return messages.map((msg, idx) => {
                   const isOwn = msg.sender_id === user?.id;
                   const msgDate = new Date(msg.created_at);
-                  const dateLabel = msgDate.toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" });
+                  const dateLabel = msgDate.toLocaleDateString(uiLocale, { day: "numeric", month: "long", year: "numeric" });
                   const showDateSep = dateLabel !== lastDateLabel;
                   if (showDateSep) lastDateLabel = dateLabel;
 
@@ -994,7 +983,7 @@ function MessagesContent() {
                             ) : (
                               <span className="w-5 h-5 rounded-full bg-bg-elevated border border-border flex items-center justify-center"><User size={11} className="text-text-muted" /></span>
                             )}
-                            <span className="text-[11px] text-text-muted">{isOwn ? "Du" : (msg.senderName ?? "Unbekannt")}</span>
+                            <span className="text-[11px] text-text-muted">{isOwn ? uiText("Ui.text_0b6722a8adfb93") : (msg.senderName ?? uiText("Ui.text_276ffa1fb4f970"))}</span>
                           </div>
                         )}
                         <div className={`min-w-0 break-words [overflow-wrap:anywhere] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
@@ -1005,9 +994,9 @@ function MessagesContent() {
                           {msg.content}
                           <div className="mt-1 flex items-center justify-between gap-2">
                           <p className={`text-[10px] ${isOwn ? "text-bg-primary/60" : "text-text-muted"}`}>
-                            {formatTime(msg.created_at)}
+                            {formatTime(uiLocale, msg.created_at)}
                           </p>
-                          {isOwn && <button type="button" title="Für mich löschen" aria-label="Eigene Nachricht für mich löschen" disabled={Boolean(deletingMessage)} onClick={() => void hideOwnMessage(msg)} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg text-bg-primary/70 hover:bg-black/10 disabled:opacity-50">{deletingMessage === msg.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}</button>}
+                          {isOwn && <button type="button" title={uiText("Ui.text_ae1d54b526f56d")} aria-label={uiText("Ui.text_5605c428f53c05")} disabled={Boolean(deletingMessage)} onClick={() => void hideOwnMessage(msg)} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg text-bg-primary/70 hover:bg-black/10 disabled:opacity-50">{deletingMessage === msg.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}</button>}
                           </div>
         </div>
       </div>
@@ -1018,12 +1007,12 @@ function MessagesContent() {
                           <span className={`text-[10px] flex items-center gap-1 ${isSeen ? "text-gold" : "text-text-muted/60"}`}>
                             {activeConv?.kind === "group" ? (
                               (msg.read_by ?? []).filter((readerId) => readerId !== user?.id).length > 0
-                                ? `Gesehen von ${(msg.read_by ?? []).filter((readerId) => readerId !== user?.id).length}`
-                                : "Gesendet"
+                                ? uiText("Ui.text_5719499dc58c85", { value1: String((msg.read_by ?? []).filter((readerId) => readerId !== user?.id).length) })
+                                : uiText("Ui.text_4b6a7afab7b4c4")
                             ) : isSeen ? (
-                              <><Check size={10} className="inline" /><Check size={10} className="-ml-1.5 inline" /> Gesehen</>
+                              <>{uiText.rich("Ui.text_a01eb8e60967fc", { part1: () => (<Check size={10} className="inline" />), part2: () => (<Check size={10} className="-ml-1.5 inline" />) })}</>
                             ) : (
-                              <><Check size={10} className="inline" /> Gesendet</>
+                              <>{uiText.rich("Ui.text_c240aaf25cb985", { part1: () => (<Check size={10} className="inline" />) })}</>
                             )}
                           </span>
                         </div>
@@ -1051,12 +1040,12 @@ function MessagesContent() {
                   value={text}
                   onChange={e => { setText(e.target.value); const key = activeId ?? newConvRecipient; if (key) drafts.current.set(key, e.target.value); }}
                   onKeyDown={e => e.key === "Enter" && !e.shiftKey && sendMessage()}
-                  placeholder="Nachricht schreiben…"
+                  placeholder={uiText("Ui.text_b4a3b14d5635d0")}
                   className="min-w-0 flex-1 bg-bg-elevated border border-border rounded-2xl px-4 py-3 text-base sm:text-sm focus:outline-none focus:border-gold transition-colors"
                 />
                 <button
                   onClick={sendMessage}
-                  aria-label="Nachricht senden"
+                  aria-label={uiText("companyMessages.send")}
                   disabled={!text.trim() || sending}
                   className="w-11 h-11 bg-gold text-bg-primary rounded-2xl flex items-center justify-center hover:bg-gold-light transition-colors disabled:opacity-40 shrink-0"
                 >
@@ -1077,21 +1066,9 @@ function MessagesContent() {
                   <span className="text-[10px] text-gold font-bold">+</span>
                 </div>
               </div>
-              <h3 className="font-display text-lg font-bold text-text-secondary mb-2">Wähle ein Gespräch</h3>
-              <p className="text-sm text-text-muted leading-relaxed mb-5">
-                Wähle links eine Konversation aus, oder starte direkt von einem Profil oder Inserat.
-              </p>
-              <div className="flex flex-wrap gap-2 justify-center">
-                <Link href="/creators" className="px-3 py-1.5 text-xs border border-border rounded-lg text-text-secondary hover:border-gold/40 hover:text-gold transition-all">
-                  Crew entdecken
-                </Link>
-                <Link href="/locations" className="px-3 py-1.5 text-xs border border-border rounded-lg text-text-secondary hover:border-gold/40 hover:text-gold transition-all">
-                  Locations
-                </Link>
-                <Link href="/jobs" className="px-3 py-1.5 text-xs border border-border rounded-lg text-text-secondary hover:border-gold/40 hover:text-gold transition-all">
-                  Jobs
-                </Link>
-              </div>
+              <h3 className="font-display text-lg font-bold text-text-secondary mb-2">{uiText("Ui.text_910613d62f2904")}</h3>
+              <p className="text-sm text-text-muted leading-relaxed mb-5">{uiText("Ui.text_3242e5a3eac2db")}</p>
+              <div className="flex flex-wrap gap-2 justify-center">{uiText.rich("Ui.text_2082066c7a5db7", { part1: chunks => (<Link href="/creators" className="px-3 py-1.5 text-xs border border-border rounded-lg text-text-secondary hover:border-gold/40 hover:text-gold transition-all">{chunks}</Link>), part2: chunks => (<Link href="/locations" className="px-3 py-1.5 text-xs border border-border rounded-lg text-text-secondary hover:border-gold/40 hover:text-gold transition-all">{chunks}</Link>), part3: chunks => (<Link href="/jobs" className="px-3 py-1.5 text-xs border border-border rounded-lg text-text-secondary hover:border-gold/40 hover:text-gold transition-all">{chunks}</Link>) })}</div>
             </div>
           </div>
         )}
@@ -1110,27 +1087,27 @@ function MessagesContent() {
           >
             <div className="flex items-center justify-between gap-4 mb-5">
               <div>
-                <p className="text-xs uppercase tracking-widest text-gold mb-1">Nachrichten</p>
+                <p className="text-xs uppercase tracking-widest text-gold mb-1">{uiText("nav.messages")}</p>
                 <h2 id="group-dialog-title" className="font-display text-xl font-bold text-text-primary">
-                  {groupModalMode === "create" ? "Gruppe erstellen" : "Gruppeninformationen"}
+                  {groupModalMode === "create" ? uiText("Ui.text_931b2c0e1d5f93") : uiText("Ui.text_be0dc89369314d")}
                 </h2>
               </div>
               <button
                 onClick={() => setGroupModalMode(null)}
                 disabled={groupSaving}
                 className="w-11 h-11 rounded-xl border border-border text-text-muted hover:text-text-primary flex items-center justify-center shrink-0"
-                aria-label="Dialog schließen"
+                aria-label={uiText("Ui.text_192abd55f1bb32")}
               ><X size={18} /></button>
             </div>
 
-            <label className="block text-sm text-text-secondary mb-2" htmlFor="group-name">Gruppenname</label>
+            <label className="block text-sm text-text-secondary mb-2" htmlFor="group-name">{uiText("Ui.text_1f155d97469ee1")}</label>
             <div className="flex gap-2 mb-5">
               <input
                 id="group-name"
                 value={groupName}
                 onChange={(event) => setGroupName(event.target.value)}
                 maxLength={80}
-                placeholder="Zum Beispiel: Drehteam"
+                placeholder={uiText("Ui.text_226c0d5b93c799")}
                 readOnly={groupModalMode === "manage" && !activeConv?.isAdmin}
                 className="min-w-0 flex-1 min-h-11 rounded-xl border border-border bg-bg-elevated px-3 text-sm text-text-primary focus:outline-none focus:border-gold read-only:opacity-80"
               />
@@ -1139,13 +1116,13 @@ function MessagesContent() {
                   onClick={renameGroup}
                   disabled={groupSaving || !groupName.trim() || groupName.trim() === activeConv.group_name}
                   className="min-h-11 px-3 rounded-xl border border-gold/40 text-gold disabled:opacity-40 flex items-center gap-2 shrink-0"
-                >{groupSaving ? <Loader2 size={15} className="animate-spin" /> : <Pencil size={15} />}<span className="hidden sm:inline">Speichern</span></button>
+                >{uiText.rich("Ui.text_991bf31ad459a6", { value1: () => (groupSaving ? <Loader2 size={15} className="animate-spin" /> : <Pencil size={15} />), part2: chunks => (<span className="hidden sm:inline">{chunks}</span>) })}</button>
               )}
             </div>
 
             {groupModalMode === "manage" && (
               <div className="mb-5">
-                <h3 className="text-sm font-semibold text-text-primary mb-2">Mitglieder · {activeConv?.members?.length ?? 0}</h3>
+                <h3 className="text-sm font-semibold text-text-primary mb-2">{uiText.rich("Ui.text_549e2e70ca6f86", { value1: () => (activeConv?.members?.length ?? 0) })}</h3>
                 <div className="space-y-2">
                   {(activeConv?.members ?? []).map((member) => (
                     <div key={member.user_id} className="flex items-center gap-3 rounded-xl border border-border bg-bg-elevated/50 p-2.5">
@@ -1155,35 +1132,35 @@ function MessagesContent() {
                           : <User size={15} className="text-text-muted" />}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm text-text-primary truncate">{member.user_id === user?.id ? `${member.display_name} (Du)` : member.display_name}</p>
-                        <p className="text-xs text-text-muted">{member.role === "admin" ? "Admin" : "Mitglied"}</p>
+                        <p className="text-sm text-text-primary truncate">{member.user_id === user?.id ? uiText("Ui.text_fa00e41742ee73", { value1: String(member.display_name) }) : member.display_name}</p>
+                        <p className="text-xs text-text-muted">{member.role === "admin" ? uiText("Ui.text_c1c224b03cd9bc") : uiText("Ui.text_4d338cce824968")}</p>
                       </div>
                       {activeConv?.isAdmin && member.user_id !== user?.id && (
                         <button
                           onClick={() => updateGroupMembers("remove", member.user_id)}
                           disabled={groupSaving}
                           className="w-11 h-11 rounded-lg text-text-muted hover:text-red-400 flex items-center justify-center shrink-0"
-                          title={`${member.display_name} entfernen`}
-                          aria-label={`${member.display_name} aus Gruppe entfernen`}
+                          title={uiText("Ui.text_f10fe7a27ce274", { value1: String(member.display_name) })}
+                          aria-label={uiText("Ui.text_01a8bb17379cb6", { value1: String(member.display_name) })}
                         ><UserMinus size={17} /></button>
                       )}
                     </div>
                   ))}
                 </div>
-                <p className="text-xs text-text-muted mt-2">Neue Mitglieder sehen Nachrichten ab ihrem Beitritt. Beim erneuten Beitritt beginnt der Verlauf wieder ab diesem Zeitpunkt.</p>
+                <p className="text-xs text-text-muted mt-2">{uiText("Ui.text_e803249f3e428b")}</p>
               </div>
             )}
 
             {(groupModalMode === "create" || activeConv?.isAdmin) && (
               <div className="mb-4">
                 <label className="block text-sm text-text-secondary mb-2" htmlFor="group-member-search">
-                  {groupModalMode === "create" ? "Mitglieder auswählen" : "Mitglieder hinzufügen"}
+                  {groupModalMode === "create" ? uiText("Ui.text_bfabdfe07be7ed") : uiText("Ui.text_e3f4d3a304d53b")}
                 </label>
                 <input
                   id="group-member-search"
                   value={groupSearch}
                   onChange={(event) => setGroupSearch(event.target.value)}
-                  placeholder="Namen suchen…"
+                  placeholder={uiText("Ui.text_d27bacb487c108")}
                   autoComplete="off"
                   className="w-full min-h-11 rounded-xl border border-border bg-bg-elevated px-3 text-sm text-text-primary focus:outline-none focus:border-gold"
                 />
@@ -1194,7 +1171,7 @@ function MessagesContent() {
                         key={person.id}
                         onClick={() => toggleSelectedUser(person)}
                         className="min-h-10 px-3 rounded-full border border-gold/40 bg-gold/10 text-sm text-gold flex items-center gap-2"
-                        aria-label={`${person.name} aus Auswahl entfernen`}
+                        aria-label={uiText("Ui.text_f22b415398b43e", { value1: String(person.name) })}
                       >{person.name}<X size={14} /></button>
                     ))}
                   </div>
@@ -1222,7 +1199,7 @@ function MessagesContent() {
                           </button>
                         );
                       })}
-                    {groupSearchResults.length === 0 && <p className="p-3 text-sm text-text-muted">Keine passenden Profile gefunden.</p>}
+                    {groupSearchResults.length === 0 && <p className="p-3 text-sm text-text-muted">{uiText("Ui.text_f538201aa5e381")}</p>}
                   </div>
                 )}
               </div>
@@ -1235,27 +1212,27 @@ function MessagesContent() {
                   onClick={() => updateGroupMembers("leave")}
                   disabled={groupSaving}
                   className="min-h-11 px-4 rounded-xl border border-red-400/30 text-red-300 hover:bg-red-400/10 disabled:opacity-50"
-                >Gruppe verlassen</button>
+                >{uiText("Ui.text_62b25f1eee17d1")}</button>
               ) : <span />}
               <div className="flex gap-2 justify-end">
-                <button onClick={() => setGroupModalMode(null)} disabled={groupSaving} className="min-h-11 px-4 rounded-xl border border-border text-text-secondary">Abbrechen</button>
+                <button onClick={() => setGroupModalMode(null)} disabled={groupSaving} className="min-h-11 px-4 rounded-xl border border-border text-text-secondary">{uiText("home.boardCancel")}</button>
                 {groupModalMode === "create" ? (
                   <button
                     onClick={createGroup}
                     disabled={groupSaving || !groupName.trim() || selectedGroupUsers.length === 0}
                     className="min-h-11 px-4 rounded-xl bg-gold text-bg-primary font-semibold disabled:opacity-50 flex items-center gap-2"
-                  >{groupSaving ? <Loader2 size={16} className="animate-spin" /> : <Users size={16} />}Gruppe erstellen</button>
+                  >{uiText.rich("Ui.text_0cc7127c748323", { value1: () => (groupSaving ? <Loader2 size={16} className="animate-spin" /> : <Users size={16} />) })}</button>
                 ) : activeConv?.isAdmin && (
                   <button
                     onClick={addSelectedMembers}
                     disabled={groupSaving || selectedGroupUsers.length === 0}
                     className="min-h-11 px-4 rounded-xl bg-gold text-bg-primary font-semibold disabled:opacity-50 flex items-center gap-2"
-                  >{groupSaving ? <Loader2 size={16} className="animate-spin" /> : <UserPlus size={16} />}Hinzufügen</button>
+                  >{uiText.rich("Ui.text_0646f894a42bba", { value1: () => (groupSaving ? <Loader2 size={16} className="animate-spin" /> : <UserPlus size={16} />) })}</button>
                 )}
               </div>
             </div>
             {groupModalMode === "manage" && activeConv?.isAdmin && (
-              <p className="text-xs text-text-muted mt-3">Wenn der letzte Admin die Gruppe verlässt, wird das am längsten aktive verbleibende Mitglied automatisch Admin.</p>
+              <p className="text-xs text-text-muted mt-3">{uiText("Ui.text_14327d28f9bbaa")}</p>
             )}
           </section>
         </div>

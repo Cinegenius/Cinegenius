@@ -14,6 +14,7 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { maxImagesForListingType, normalizeListingImageGallery } from "@/lib/listing-image-gallery";
 import { editableCompanyIdsForUser } from "@/lib/listing-access";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // Explicit column list — avoids SELECT * sending unused data over the wire.
 // Update this list if new listing columns are added.
@@ -35,6 +36,7 @@ function privateNoStoreJson(body: unknown, status = 200) {
 }
 
 export async function GET(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const type  = req.nextUrl.searchParams.get("type");
   const mine  = req.nextUrl.searchParams.get("mine") === "true";
   const page  = Math.max(1, (parseInt(req.nextUrl.searchParams.get("page")  ?? "1",  10)||1));
@@ -70,14 +72,14 @@ export async function GET(req: NextRequest) {
           .in("listing_id", data.map(row => row.id))
         : { data: [], error: null };
       if (freshnessResult.error && !["42P01", "PGRST205"].includes(freshnessResult.error.code)) {
-        throw new Error("Listing freshness unavailable");
+        throw new Error("listing_freshness_unavailable");
       }
       const freshnessById = new Map((freshnessResult.data ?? []).map(row => [row.listing_id, row]));
       const account = data.some(row => !row.responsible_person && !row.company_id && row.user_id === userId) ? await accountResponsiblePerson(userId) : null;
       return privateNoStoreJson({ data: data.map(row => ({ ...row, freshness: freshnessById.get(row.id) ?? null, responsible_person: row.responsible_person || (!row.company_id && row.user_id === userId ? bindResponsiblePerson(account, userId) : null) })) });
     } catch (error) {
       console.error("[listings GET mine]", error);
-      return privateNoStoreJson({ error: error instanceof Error ? error.message : "Inserate konnten nicht geladen werden." }, 500);
+      return privateNoStoreJson({ error: tResponse("System.requestFailed") }, 500);
     }
   }
 
@@ -107,12 +109,13 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: Request) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
   const { allowed } = await rateLimit(`listing:${userId}`, 10, 3600);
-  if (!allowed) return NextResponse.json({ error: "Maximal 10 Inserate pro Stunde." }, { status: 429 });
+  if (!allowed) return NextResponse.json({ error: tResponse('System.m_44f8775b3151') }, { status: 429 });
 
   const body = await req.json();
   if (attemptedApproval(body)) return privateNoStoreJson({ error: (await getTranslations("OfferModeration"))("adminOnly") }, 403);
@@ -125,28 +128,28 @@ export async function POST(req: Request) {
   const VALID_LISTING_TYPES = new Set(["job", "location", "prop", "vehicle", "creator", "animal"]);
 
   if (!type || !title || typeof city !== "string" || !cityWriteFields(city, body.selected_place_city_id).city.trim()) {
-    return NextResponse.json({ error: "Pflichtfelder fehlen (type, title, city)" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_d98b431b33dc') }, { status: 400 });
   }
 
   if (!VALID_LISTING_TYPES.has(type)) {
-    return NextResponse.json({ error: "Ungültiger Inserat-Typ" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_ff8208a3d0b7') }, { status: 400 });
   }
   if (type === "location" || type === "prop" || type === "vehicle" || type === "animal") {
     const gallery = normalizeListingImageGallery(image_url, extra_images, maxImagesForListingType(type));
-    if (!gallery.ok) return NextResponse.json({ error: gallery.error }, { status: 400 });
+    if (!gallery.ok) return NextResponse.json({ error: tResponse(`Gallery.${gallery.error}`, { count: maxImagesForListingType(type) }) }, { status: 400 });
     storedImageUrl = gallery.gallery.imageUrl;
     storedExtraImages = gallery.gallery.extraImages;
   }
   if (onboarding_request_key !== undefined && (draft !== true || typeof onboarding_request_key !== "string" || !/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(onboarding_request_key))) {
-    return NextResponse.json({ error: "Ungültiger Einrichtungsauftrag" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_e4eb55646155') }, { status: 400 });
   }
 
-  if (metadata !== undefined && metadata !== null) { const pricingError = listingPriceMetadataError(metadata); if (pricingError) return NextResponse.json({ error: pricingError }, { status: 400 }); }
+  if (metadata !== undefined && metadata !== null) { const pricingError = listingPriceMetadataError(metadata,tResponse); if (pricingError) return NextResponse.json({ error: pricingError }, { status: 400 }); }
 
   // SECURITY: input length limits and price sanitization
-  if (title.length > 200) return NextResponse.json({ error: "Titel zu lang (max. 200 Zeichen)" }, { status: 400 });
+  if (title.length > 200) return NextResponse.json({ error: tResponse('System.m_bee8a7bccee9') }, { status: 400 });
   if (city.length > 320) return NextResponse.json({ error: (await getTranslations("Places"))("invalid") }, { status: 400 });
-  if (description && description.length > 5000) return NextResponse.json({ error: "Beschreibung zu lang (max. 5000 Zeichen)" }, { status: 400 });
+  if (description && description.length > 5000) return NextResponse.json({ error: tResponse('System.m_0749b2d405e8') }, { status: 400 });
   const safePrice = Math.max(0, Math.min(Number(price) || 0, 1_000_000));
 
   // If company_id is provided, verify the current user owns that company
@@ -158,7 +161,7 @@ export async function POST(req: Request) {
       .eq("owner_user_id", userId)
       .single();
     if (!company) {
-      return NextResponse.json({ error: "Firma nicht gefunden oder keine Berechtigung" }, { status: 403 });
+      return NextResponse.json({ error: tResponse('System.m_cc7aadd6c31b') }, { status: 403 });
     }
   }
 
@@ -191,7 +194,7 @@ export async function POST(req: Request) {
       .maybeSingle();
     if (lookupError) {
       console.error("[listings POST] onboarding retry lookup failed", lookupError);
-      return NextResponse.json({ error: "Der gespeicherte Angebotsentwurf konnte nicht geprüft werden." }, { status: 500 });
+      return NextResponse.json({ error: tResponse('System.m_347f3fe490a1') }, { status: 500 });
     }
     if (existing) return privateNoStoreJson({ data: existing });
   }
@@ -225,7 +228,7 @@ export async function POST(req: Request) {
 
   if (error) {
     console.error("[listings POST]", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   }
 
   let result = data;
@@ -258,12 +261,13 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
   const id = req.nextUrl.searchParams.get("id");
-  if (!id) return NextResponse.json({ error: "ID fehlt" }, { status: 400 });
+  if (!id) return NextResponse.json({ error: tResponse('System.m_bf75e9a69ba7') }, { status: 400 });
 
   // Only allow deleting own listings
   const { error } = await db
@@ -274,7 +278,7 @@ export async function DELETE(req: NextRequest) {
 
   if (error) {
     console.error("[listings DELETE]", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   }
   revalidatePath("/", "layout");
   revalidateTag("listings", { expire: 0 });

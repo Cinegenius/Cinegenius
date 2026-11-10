@@ -1,11 +1,13 @@
 import { publicProjectCredits } from "@/lib/project-media-rights";
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const tResponse = await getResponseTranslations();
   const { slug } = await params;
 
   const { data: profile } = await db
@@ -14,7 +16,7 @@ export async function GET(
     .eq("slug", slug)
     .maybeSingle();
 
-  if (!profile) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 });
+  if (!profile) return NextResponse.json({ error: tResponse('System.m_621ca4c037d3') }, { status: 404 });
 
   const { data: credits } = await db
     .from("project_credits")

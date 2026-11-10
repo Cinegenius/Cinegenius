@@ -2,11 +2,13 @@ import { db } from "@/lib/db";
 import { canViewProfile } from "@/lib/trust";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 export async function GET(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const id = req.nextUrl.searchParams.get("id");
   if (!id || !/^[a-zA-Z0-9_-]{1,128}$/.test(id)) {
-    return NextResponse.json({ error: "Ungültige ID" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_56fa70cdd8e6') }, { status: 400 });
   }
 
   const { userId } = await auth();

@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { sanitizeProjectDraftData } from "@/lib/project-drafts";
 import { PROJECT_RECORD_COLUMNS, projectRecordWithDetails } from "@/lib/project-record";
@@ -6,17 +7,18 @@ export async function saveProjectDraft(userId: string, input: {
   sourceProjectId?: string | null;
   draftData: unknown;
 }) {
+  const translate = await getTranslations();
   const patch = sanitizeProjectDraftData(input.draftData);
   const serialized = JSON.stringify(patch);
-  if (serialized.length > 250_000) return { error: "Der Entwurf ist zu groß." as const, status: 413 as const };
+  if (serialized.length > 250_000) return { error: translate("System.draftTooLarge"), status: 413 as const };
 
   let sourceProject: Record<string, unknown> | null = null;
   if (input.sourceProjectId) {
     const { data, error } = await db.from("projects")
       .select(PROJECT_RECORD_COLUMNS)
       .eq("id", input.sourceProjectId).eq("created_by", userId).maybeSingle();
-    if (error) return { error: "Projekt konnte nicht geladen werden." as const, status: 500 as const };
-    if (!data) return { error: "Projekt nicht gefunden oder keine Berechtigung." as const, status: 404 as const };
+    if (error) return { error: translate("System.m_f688eb6d8477"), status: 500 as const };
+    if (!data) return { error: translate("System.m_248ba736f0b3"), status: 404 as const };
     sourceProject = projectRecordWithDetails(data as Record<string, unknown>);
   }
 
@@ -28,7 +30,7 @@ export async function saveProjectDraft(userId: string, input: {
       .eq("source_project_id", input.sourceProjectId)
       .is("published_project_id", null)
       .maybeSingle();
-    if (error) return { error: "Projektentwurf konnte nicht geladen werden." as const, status: 500 as const };
+    if (error) return { error: translate("System.m_4bb7a67aea1b"), status: 500 as const };
     existingDraft = data;
   }
 
@@ -42,9 +44,9 @@ export async function saveProjectDraft(userId: string, input: {
     draftData.metadata = metadata;
   }
   if (typeof draftData.title !== "string" || !draftData.title.trim()) {
-    return { error: "Titel ist Pflichtfeld." as const, status: 400 as const };
+    return { error: translate("System.draftTitleRequired"), status: 400 as const };
   }
-  if (JSON.stringify(draftData).length > 250_000) return { error: "Der Entwurf ist zu groß." as const, status: 413 as const };
+  if (JSON.stringify(draftData).length > 250_000) return { error: translate("System.draftTooLarge"), status: 413 as const };
 
   const values = {
     user_id: userId,
@@ -56,6 +58,6 @@ export async function saveProjectDraft(userId: string, input: {
     ? await db.from("project_drafts").update(values).eq("id", existingDraft.id).eq("user_id", userId).select("id, draft_data, source_project_id, created_at, updated_at").single()
     : await db.from("project_drafts").insert(values).select("id, draft_data, source_project_id, created_at, updated_at").single();
 
-  if (result.error || !result.data) return { error: "Projektentwurf konnte nicht gespeichert werden." as const, status: 500 as const };
+  if (result.error || !result.data) return { error: translate("System.m_6a45e8145d0e"), status: 500 as const };
   return { draft: result.data };
 }

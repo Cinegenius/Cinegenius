@@ -4,7 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { deDE, enUS, esES, csCZ, huHU, itIT } from "@clerk/localizations";
+import { deDE, enUS, esES, csCZ, huHU, itIT, nlNL, nlBE, svSE } from "@clerk/localizations";
 import AppIntlProvider from "@/components/AppIntlProvider";
 import { getLocale, getMessages, getNow } from "next-intl/server";
 import "./globals.css";
@@ -18,6 +18,7 @@ import { ToastProvider } from "@/contexts/ToastContext";
 import GlobalSearch from "@/components/GlobalSearch";
 import FormDraftProvider from "@/contexts/FormDraftContext";
 import AuthSessionBoundary from "@/components/AuthSessionBoundary";
+import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -43,32 +44,35 @@ export const viewport = {
   viewportFit: "cover", // enables safe-area-inset on iPhone
 };
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<import("next").Metadata> {
+  const tMetadata = await getMetadataTranslations("Metadata");
+  const locale = await getLocale();
+  return {
   metadataBase: new URL("https://www.cinegenius.co"),
   title: {
-    default: "CineGenius — Marktplatz für Film, Social Media & Fotografie",
+    default: tMetadata('m_4cae16b2a04c'),
     template: "%s | CineGenius",
   },
   description:
-    "Locations mieten, Filmcrew buchen, Equipment leihen, Jobs finden — der All-in-One-Marktplatz für Film- und Medienproduktion in Deutschland, Österreich und der Schweiz.",
+    tMetadata('m_8bd0d66c1893'),
   keywords: [
-    "Locations mieten", "Filmcrew buchen", "Film Jobs Deutschland", "Requisiten mieten",
-    "Equipment Verleih Film", "Filmproduktion DACH", "Content Creator buchen", "Fotograf buchen",
+    tMetadata('m_c6bc07f7fe22'), tMetadata('m_e54dabc25ec8'), tMetadata('m_debd69fc6894'), tMetadata('m_cb9a7dde6c1c'),
+    tMetadata('m_0d4b52ff023b'), tMetadata('m_54488a9b48ad'), tMetadata('m_ac88802c1689'), tMetadata('m_0cc63a71479c'),
   ],
   authors: [{ name: "CineGenius" }],
   creator: "CineGenius",
   openGraph: {
     type: "website",
-    locale: "de_DE",
+    locale: ({de: "de_DE", en: "en_US", es: "es_ES", it: "it_IT", cs: "cs_CZ", hu: "hu_HU", nl: "nl_NL", "nl-BE": "nl_BE", sv: "sv_SE"} as Record<string, string>)[locale] ?? "de_DE",
     siteName: "CineGenius",
-    title: "CineGenius — Marktplatz für Film, Social Media & Fotografie",
+    title: tMetadata('m_4cae16b2a04c'),
     description:
-      "Locations, Crew, Equipment und Jobs — alles für deine Produktion an einem Ort.",
+      tMetadata('m_275dcce7785e'),
   },
   twitter: {
     card: "summary_large_image",
-    title: "CineGenius — Film & Medien Marktplatz",
-    description: "Locations mieten, Crew buchen, Equipment leihen — für Film, Social Media & Fotografie.",
+    title: tMetadata('m_61b023da916f'),
+    description: tMetadata('m_f835a883a82e'),
   },
   icons: {
     icon: [
@@ -84,6 +88,7 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
 };
+}
 
 const CLERK_LOCALIZATIONS: Record<string, typeof deDE> = {
   de: deDE,
@@ -92,10 +97,13 @@ const CLERK_LOCALIZATIONS: Record<string, typeof deDE> = {
   cs: csCZ,
   hu: huHU,
   it: itIT,
+  nl: nlNL,
+  "nl-BE": nlBE,
+  sv: svSE,
 };
 
 const HTML_LANG: Record<string, string> = {
-  de: "de", en: "en", es: "es", cs: "cs", hu: "hu", it: "it",
+  de: "de", en: "en", es: "es", cs: "cs", hu: "hu", it: "it", nl: "nl", "nl-BE": "nl-BE", sv: "sv",
 };
 
 export default async function RootLayout({

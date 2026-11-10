@@ -1,8 +1,10 @@
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 export async function GET(request: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const admin = await requireAdmin();
   if (admin instanceof NextResponse) return admin;
 
@@ -17,7 +19,7 @@ export async function GET(request: NextRequest) {
   if (search) query = query.or(`name.ilike.%${search}%,city.ilike.%${search}%`);
 
   const { data: companies, error, count } = await query;
-  if (error) return NextResponse.json({ error: "Firmen konnten nicht geladen werden." }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.m_d2e09e94a87d') }, { status: 500 });
 
   const rows = companies ?? [];
   const companyIds = rows.map((company) => company.id);
@@ -28,7 +30,7 @@ export async function GET(request: NextRequest) {
     companyIds.length ? db.from("company_members").select("company_id").in("company_id", companyIds).eq("status", "pending") : Promise.resolve({ data: [] as { company_id: string }[], error: null }),
   ]);
   if (membersResult.error || profilesResult.error || requestsResult.error) {
-    return NextResponse.json({ error: "Team- oder Inhaberdaten konnten nicht geladen werden." }, { status: 500 });
+    return NextResponse.json({ error: tResponse('System.m_6024d7f711ff') }, { status: 500 });
   }
   const ownerName = new Map((profilesResult.data ?? []).map((profile: { user_id: string; display_name: string | null }) => [profile.user_id, profile.display_name]));
   const memberCounts = new Map<string, number>();

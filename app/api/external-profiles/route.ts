@@ -16,9 +16,11 @@
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // GET /api/external-profiles — fetch all entries for current user
 export async function GET() {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -29,12 +31,13 @@ export async function GET() {
     .eq("user_id", userId)
     .order("sort_order", { ascending: true });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   return NextResponse.json({ profiles: data ?? [] });
 }
 
 // POST /api/external-profiles — create a new entry
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -43,7 +46,7 @@ export async function POST(req: NextRequest) {
   const { platform_type, platform_name, url, custom_label, sort_order, is_public } = body;
 
   if (!platform_type || !url?.trim()) {
-    return NextResponse.json({ error: "Plattform und URL sind Pflichtfelder" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_f03e2c4fe2df') }, { status: 400 });
   }
 
   // Normalise URL — add https:// if missing scheme
@@ -63,6 +66,6 @@ export async function POST(req: NextRequest) {
     .select("id, platform_type, platform_name, url, custom_label, sort_order, is_public")
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   return NextResponse.json({ profile: data });
 }

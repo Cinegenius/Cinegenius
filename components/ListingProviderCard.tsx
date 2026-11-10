@@ -3,8 +3,12 @@ import Image from "@/components/MediaImage";
 import Link from "next/link";
 import { Building2, UserRound } from "lucide-react";
 import type { ListingProvider } from "@/lib/listing-provider";
+import { useTranslations } from "next-intl";
+
 
 export default function ListingProviderCard({ provider, compact = false }: { provider: ListingProvider; compact?: boolean }) {
+  const uiText = useTranslations();
+
   const Icon = provider.kind === "company" ? Building2 : UserRound;
   const content = (
     <>
@@ -12,10 +16,10 @@ export default function ListingProviderCard({ provider, compact = false }: { pro
         {provider.imageUrl ? <Image src={provider.imageUrl} alt="" width={44} height={44} unoptimized className="h-full w-full object-cover" /> : <Icon size={19} />}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[11px] uppercase tracking-wide text-text-muted">{provider.kind === "unassigned" ? "Anbieterstatus" : provider.kind === "company" ? "Anbieter · Firma" : "Anbieter"}</span>
+        <span className="block text-[11px] uppercase tracking-wide text-text-muted">{provider.kind === "unassigned" ? uiText("Ui.text_e9c8820658c9f9") : provider.kind === "company" ? uiText("Ui.text_bd9f394afc1d8d") : uiText("profile.catAnbieterLabel")}</span>
         <span className="mt-0.5 block truncate text-sm font-semibold text-text-primary">{provider.name}</span>
       </span>
-      {provider.href && <span className="shrink-0 text-xs text-gold">Profil ansehen →</span>}
+      {provider.href && <span className="shrink-0 text-xs text-gold">{uiText("Ui.text_f8e82ad0fdb4ed")}</span>}
     </>
   );
   const className = `flex items-center gap-3 rounded-xl border border-border bg-bg-secondary ${compact ? "p-3" : "p-4"} ${provider.href ? "transition-colors hover:border-gold/40 hover:bg-bg-elevated" : ""}`;

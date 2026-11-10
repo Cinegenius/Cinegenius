@@ -1,12 +1,15 @@
+import { localizedNotification } from "@/lib/i18n/notification-copy";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { sendFriendRequestEmail } from "@/lib/email";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // GET /api/friendships?userId=xxx  → friendship status with that user
 // GET /api/friendships             → all friendships (enriched with profiles)
 export async function GET(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -15,7 +18,7 @@ export async function GET(req: NextRequest) {
   const targetId = searchParams.get("userId");
 
   if (targetId && !/^[a-zA-Z0-9_-]{1,128}$/.test(targetId)) {
-    return NextResponse.json({ error: "Ungültige userId" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_8c08f6c37908') }, { status: 400 });
   }
 
   if (targetId) {
@@ -36,7 +39,7 @@ export async function GET(req: NextRequest) {
     .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
     .order("created_at", { ascending: false });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
   const list = friendships ?? [];
 
@@ -77,14 +80,15 @@ export async function GET(req: NextRequest) {
 
 // POST /api/friendships  → send friend request
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
 
   const { receiver_id } = await req.json();
-  if (!receiver_id) return NextResponse.json({ error: "receiver_id fehlt" }, { status: 400 });
-  if (!/^[a-zA-Z0-9_-]{1,128}$/.test(receiver_id)) return NextResponse.json({ error: "Ungültige receiver_id" }, { status: 400 });
-  if (receiver_id === userId) return NextResponse.json({ error: "Kann sich selbst nicht hinzufügen" }, { status: 400 });
+  if (!receiver_id) return NextResponse.json({ error: tResponse('System.m_c7b1c41cee48') }, { status: 400 });
+  if (!/^[a-zA-Z0-9_-]{1,128}$/.test(receiver_id)) return NextResponse.json({ error: tResponse('System.m_673b6b200d92') }, { status: 400 });
+  if (receiver_id === userId) return NextResponse.json({ error: tResponse('System.m_de56307e4c66') }, { status: 400 });
 
   // Check for existing record
   const { data: existing } = await db
@@ -96,8 +100,8 @@ export async function POST(req: NextRequest) {
     .maybeSingle();
 
   if (existing) {
-    if (existing.status === "accepted") return NextResponse.json({ error: "Ihr seid bereits Freunde" }, { status: 409 });
-    if (existing.status === "pending")  return NextResponse.json({ error: "Anfrage bereits vorhanden" }, { status: 409 });
+    if (existing.status === "accepted") return NextResponse.json({ error: tResponse('System.m_39eabeb606d8') }, { status: 409 });
+    if (existing.status === "pending")  return NextResponse.json({ error: tResponse('System.m_d3d12a4e01f5') }, { status: 409 });
     // rejected → delete and re-send
     await db.from("friendships").delete().eq("id", existing.id);
   }
@@ -108,7 +112,7 @@ export async function POST(req: NextRequest) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
   // Notify the receiver (in-app + email) — fire-and-forget
   const { data: senderProfile } = await db
@@ -121,8 +125,8 @@ export async function POST(req: NextRequest) {
   await db.from("notifications").insert({
     user_id: receiver_id,
     type: "friend_request",
-    title: "Neue Freundschaftsanfrage",
-    body: `${senderName} möchte sich mit dir vernetzen.`,
+    ...localizedNotification({ title: { key: "n_cbf93b99dd39" }, body: { key: "n_aa80d88f1a90", values: { value0: String(senderName) } } }),
+
     href: "/messages",
   });
 

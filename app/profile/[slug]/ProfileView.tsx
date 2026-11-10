@@ -28,10 +28,36 @@ import ProfileCardPhoto from "@/components/ProfileCardPhoto";
 import ResilientPublicImage from "@/components/ResilientPublicImage";
 import { profileCoverStyle } from "@/lib/profile-cover";
 import FloatingPanel from "@/components/FloatingPanel";
+import { taxonomyLabel } from "@/lib/departments";
+
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /** Returns the URL only if it is non-empty and parseable — prevents dead links */
+
+
+function getLocalizedProfileTypeLabels(translate: (key: string) => string): typeof PROFILE_TYPE_LABELS { return { actor: translate("menu.crewActors"), model: translate("MarketplaceOffer.fields.model"), extra: translate("Ui.text_359b6b495d37ee"), host: translate("Ui.text_0a95f0e5c8dfe9"), dancer: translate("Ui.text_edbf4c8ebb46d7"), stunt: translate("Ui.text_b84275027d70dc"), voiceover: translate("Ui.text_ecd65813175a41"), creator: translate("Ui.text_d952b2e69292db"), camera: translate("menu.crewCamera"), lighting: translate("Ui.text_df58636dc4a76c"), sound: translate("menu.crewSound"), director_of_photography: translate("Ui.text_e0e64895eb6431"), director: translate("menu.crewDirection"), production: translate("menu.crewProduction"), makeup: translate("Ui.text_93c744e1d17b9a"), costume: translate("Ui.text_a21ae87ef519df"), postproduction: translate("Ui.text_212f3b80ce86c2"), vfx: translate("Ui.text_23d20474305ac3"), sfx: translate("menu.marketSfx"), art_department: translate("Ui.text_a92fc587a90c16"), broadcast: translate("Ui.text_17bc9178343601"), filmmaker: translate("Ui.text_93ecd734fdc054"), writer: translate("Ui.text_fec099ea8a39bd"), photographer: translate("menu.crewPhotographer"), editor: translate("Ui.text_0e4eb4156e02e7"), motion_designer: translate("Ui.text_8213a51cdbc986"), art_director: translate("Ui.text_2d3b48143ed2b9"), location: translate("locations.vendorSection"), equipment: translate("props.vendorSection"), vehicle: translate("Ui.text_758a6eefc6f22f"), studio: translate("Ui.text_3e35f07c14a89e"), props: translate("Ui.text_54d1cc854cc30d") }; }
+
+function getLocalizedREPORT_REASONS(translate: (key: string) => string): Record<string, string> { return ({
+  spam: translate("Ui.text_94a9eac404c8c6"),
+  harassment: translate("Ui.text_0392938fdb775e"),
+  fake_profile: translate("Ui.text_6a614a7d2985d7"),
+  inappropriate_content: translate("Ui.text_3a6f6d61b35e21"),
+  scam: translate("Ui.text_0b3150008de153"),
+  other: translate("Ui.text_6e2ae34293c61b"),
+}); }
+
+function getLocalizedLISTING_TYPE_META(translate: (key: string) => string): Record<string, { label: string; color: string; href: (id: string) => string }> {
+  return ({
+  job:      { label: translate("AdminAccounts.contentKinds.job"),        color: "text-gold",         href: (id) => `/jobs/${id}` },
+  prop:     { label: translate("nav.marketplace"), color: "text-violet-400",   href: (id) => `/props/${id}` },
+  location: { label: translate("profile.labelLocation"),   color: "text-emerald-400",  href: (id) => `/locations/${id}` },
+  vehicle:  { label: translate("AdminAccounts.contentKinds.vehicle"),   color: "text-sky-400",      href: (id) => `/vehicles/${id}` },
+  creator:  { label: translate("Ui.text_88447b83090cde"),    color: "text-rose-400",     href: (id) => `/creators/${id}` },
+  animal:   { label: translate("Ui.text_cb9e8664edea8c"),       color: "text-amber-400",    href: (id) => `/tiere/${id}` },
+});
+}
+
 function safeLink(url: string | null | undefined): string | null {
   if (!url?.trim()) return null;
   try {
@@ -64,31 +90,33 @@ function StatPill({ label, value }: { label: string; value?: string | number | n
 }
 
 function ProfileBio({ value, limit = 360 }: { value: string | null | undefined; limit?: number }) {
+  const uiText = useTranslations();
+
   const [expanded, setExpanded] = useState(false);
   const text = cleanProfileBio(value);
   if (!text) return null;
   const shortened = text.length > limit && !expanded;
-  const visibleText = shortened ? `${text.slice(0, limit).trimEnd()}…` : text;
+  const visibleText = shortened ? uiText("Ui.text_06fd28c4e0e314", { value1: String(text.slice(0, limit).trimEnd()) }) : text;
   return (
     <div>
       <p className="whitespace-pre-line break-words text-text-secondary text-sm leading-relaxed">{visibleText}</p>
       {text.length > limit && (
         <button type="button" onClick={() => setExpanded((current) => !current)}
           className="mt-2 min-h-11 text-xs font-semibold text-gold hover:text-gold-light">
-          {expanded ? "Weniger anzeigen" : "Vollständigen Text anzeigen"}
+          {expanded ? uiText("Ui.text_2f11e0e6d3c3c5") : uiText("Ui.text_2971cf6bdd5f19")}
         </button>
       )}
     </div>
   );
 }
 
-function displayPositions(profile: UserProfile): string[] {
+function displayPositions(profile: UserProfile, labels: typeof PROFILE_TYPE_LABELS): string[] {
   return getProfileDisplayPositions({
     positions: profile.positions,
     role: profile.role,
     profileTypes: profile.profile_types,
     primaryType: profile.profile_type,
-    labels: PROFILE_TYPE_LABELS,
+    labels: labels,
   });
 }
 
@@ -108,28 +136,19 @@ function Divider() {
 }
 
 function ContactSignInPrompt({ profile }: { profile: UserProfile }) {
+  const uiText = useTranslations();
+
   const { isLoaded, isSignedIn } = useUser();
   if (!isLoaded || isSignedIn || !profile.contact_requires_sign_in) return null;
   const destination = `/profile/${profile.slug || profile.user_id}`;
   return (
-    <p className="mt-2 text-xs text-text-muted">
-      <Link href={`/sign-in?redirect_url=${encodeURIComponent(destination)}`} className="font-medium text-gold hover:text-gold-light underline underline-offset-2">
-        Anmelden, um Kontakt aufzunehmen
-      </Link>
-    </p>
+    <p className="mt-2 text-xs text-text-muted">{uiText.rich("Ui.text_83d4adfe076fb9", { part1: chunks => (<Link href={`/sign-in?redirect_url=${encodeURIComponent(destination)}`} className="font-medium text-gold hover:text-gold-light underline underline-offset-2">{chunks}</Link>) })}</p>
   );
 }
 
 // ─── Block / Report Bar ───────────────────────────────────────────────────────
 
-const REPORT_REASONS: Record<string, string> = {
-  spam: "Spam",
-  harassment: "Belästigung",
-  fake_profile: "Fake-Profil",
-  inappropriate_content: "Unangemessener Inhalt",
-  scam: "Betrug",
-  other: "Anderes",
-};
+
 
 const PROJECT_TYPE_NORMALIZE: Record<string, string> = {
   "Werbefilm / Commercial": "Werbefilm",
@@ -143,6 +162,10 @@ function normType(t: string | null | undefined): string | null {
 }
 
 function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; initialYouBlocked: boolean }) {
+  const uiText = useTranslations();
+  const REPORT_REASONS = getLocalizedREPORT_REASONS(uiText);
+
+
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
   const [youBlocked, setYouBlocked] = useState(initialYouBlocked);
   const [blockLoading, setBlockLoading] = useState(false);
@@ -165,10 +188,10 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
         const data = await res.json();
         setYouBlocked(data.blocked);
       } else {
-        setBlockError("Aktion fehlgeschlagen. Bitte erneut versuchen.");
+        setBlockError(uiText("Ui.text_37c7cf209c791e"));
       }
     } catch {
-      setBlockError("Netzwerkfehler. Bitte erneut versuchen.");
+      setBlockError(uiText("Ui.text_e232416aafa1dc"));
     } finally {
       setBlockLoading(false);
     }
@@ -186,7 +209,7 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
       setReportSent(true);
       setReportOpen(false);
     } else {
-      setReportError("Meldung fehlgeschlagen. Bitte erneut versuchen.");
+      setReportError(uiText("Ui.text_480641557523c2"));
     }
   }
 
@@ -198,7 +221,7 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
         aria-expanded={reportOpen}
         onClick={() => setReportOpen((o) => !o)}
         className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white/70 hover:text-white hover:bg-white/20 transition-all"
-        aria-label="Mehr Optionen"
+        aria-label={uiText("Ui.text_77f6895995c868")}
       >
         <MoreHorizontal size={15} />
       </button>
@@ -212,16 +235,14 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
               youBlocked ? "text-red-400 hover:bg-red-500/10" : "text-white/70 hover:bg-white/5 hover:text-red-400"
             }`}
           >
-            <Ban size={12} /> {youBlocked ? "Entblockieren" : "Blockieren"}
+            <Ban size={12} /> {youBlocked ? uiText("Ui.text_667b3b5f741b3a") : uiText("Ui.text_f0fc0d8ae9b598")}
           </button>
           {reportSent ? (
-            <span className="flex items-center gap-2 px-3 py-2 text-xs text-emerald-400">
-              <Check size={12} /> Gemeldet
-            </span>
+            <span className="flex items-center gap-2 px-3 py-2 text-xs text-emerald-400">{uiText.rich("Ui.text_ccdbcd6f8ebe77", { part1: () => (<Check size={12} />) })}</span>
           ) : (
             <>
               <div className="h-px bg-white/10 mx-2 my-1" />
-              <p className="px-3 pt-1 pb-0.5 text-[10px] uppercase tracking-widest text-white/40 font-semibold">Melden als</p>
+              <p className="px-3 pt-1 pb-0.5 text-[10px] uppercase tracking-widest text-white/40 font-semibold">{uiText("Ui.text_723a95c949eaba")}</p>
               {Object.entries(REPORT_REASONS).map(([value, label]) => (
                 <button
                   key={value}
@@ -239,9 +260,7 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
                   <button
                     onClick={submitReport}
                     className="w-full px-3 py-1.5 bg-gold text-bg-primary font-semibold rounded-lg text-xs hover:bg-gold-light transition-colors"
-                  >
-                    Abschicken
-                  </button>
+                  >{uiText("Ui.text_8572d639a935e8")}</button>
                 </div>
               )}
             </>
@@ -259,11 +278,13 @@ function BlockReportBar({ targetId, initialYouBlocked }: { targetId: string; ini
 type PublicCollab = { label: string; display_name: string; avatar_url: string | null; slug: string; role: string | null };
 
 function CollaborationsSection({ collaborations }: { collaborations: PublicCollab[] }) {
+  const uiText = useTranslations();
+
   if (!collaborations.length) return null;
   return (
     <>
       <Divider />
-      <SectionLabel>Vernetzte Personen</SectionLabel>
+      <SectionLabel>{uiText("Ui.text_bba4bfa84336fb")}</SectionLabel>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
         {collaborations.map((c) => (
           <Link
@@ -299,16 +320,13 @@ function CollaborationsSection({ collaborations }: { collaborations: PublicColla
 
 // ─── Inserate Section ─────────────────────────────────────────────────────────
 
-const LISTING_TYPE_META: Record<string, { label: string; color: string; href: (id: string) => string }> = {
-  job:      { label: "Job",        color: "text-gold",         href: (id) => `/jobs/${id}` },
-  prop:     { label: "Marktplatz", color: "text-violet-400",   href: (id) => `/props/${id}` },
-  location: { label: "Location",   color: "text-emerald-400",  href: (id) => `/locations/${id}` },
-  vehicle:  { label: "Fahrzeug",   color: "text-sky-400",      href: (id) => `/vehicles/${id}` },
-  creator:  { label: "Creator",    color: "text-rose-400",     href: (id) => `/creators/${id}` },
-  animal:   { label: "Tier",       color: "text-amber-400",    href: (id) => `/tiere/${id}` },
-};
+
 
 function ListingsSection({ listings }: { listings: PublicListing[] }) {
+  const uiText = useTranslations();
+  const LISTING_TYPE_META = getLocalizedLISTING_TYPE_META(uiText);
+
+
   const market=useTranslations("MarketplaceOffer"),catalog=useTranslations("MarketplaceCatalog"),locale=useLocale();
   if (!listings.length) return null;
   const grouped = listings.reduce<Record<string, PublicListing[]>>((acc, l) => {
@@ -318,7 +336,7 @@ function ListingsSection({ listings }: { listings: PublicListing[] }) {
   return (
     <>
       <Divider />
-      <SectionLabel>Inserate</SectionLabel>
+      <SectionLabel>{uiText("profile.tabListings")}</SectionLabel>
       <div className="space-y-3">
         {Object.entries(grouped).map(([type, items]) => {
           const meta = LISTING_TYPE_META[type] ?? { label: type, color: "text-text-muted", href: (id: string) => `/${type}/${id}` };
@@ -396,13 +414,15 @@ function Lightbox({ src, onClose }: { src: string; onClose: () => void }) {
 // ─── External Profiles Display ───────────────────────────────────────────────
 
 function ExternalProfilesDisplay({ profiles }: { profiles: ExternalProfileRow[] }) {
+  const uiText = useTranslations();
+
   const visible = profiles.filter((p) => p.is_public);
   if (!visible.length) return null;
   return (
     <div>
       <div className="flex items-center gap-2 mb-2.5">
         <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
-        <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Externe Profile</p>
+        <p className="text-[10px] uppercase tracking-widest text-gold font-bold">{uiText("Ui.text_08a9689d0d6b13")}</p>
       </div>
       <div className="flex flex-wrap gap-2">
         {visible.map((entry) => {
@@ -423,7 +443,7 @@ function ExternalProfilesDisplay({ profiles }: { profiles: ExternalProfileRow[] 
             >
               {/* Existing platform initials avoid third-party favicon redirects and preserve the fallback style. */}
               <span className={`text-[10px] font-bold shrink-0 ${plat.textCls}`} aria-hidden="true">{plat.abbr}</span>
-              <span className="min-w-0 [overflow-wrap:anywhere]">{displayName}{entry.custom_label ? ` · ${entry.custom_label}` : ""}</span>
+              <span className="min-w-0 [overflow-wrap:anywhere]">{displayName}{entry.custom_label ? uiText("Ui.text_f6b53f9c8ab3ef", { value1: String(entry.custom_label) }) : ""}</span>
               <ExternalLink size={9} className="shrink-0 opacity-40 group-hover:opacity-70" />
             </a>
           );
@@ -445,17 +465,19 @@ type CompanyMembership = {
 type CompanyMemberships = CompanyMembership[] | null;
 
 function CompanyBadge({ membership }: { membership: CompanyMemberships }) {
+  const uiText = useTranslations();
+
   if (!membership?.length) return null;
   return (
     <div>
       <div className="flex items-center gap-2 mb-2.5">
         <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
-        <p className="text-[10px] uppercase tracking-widest text-gold font-bold">Unternehmen</p>
+        <p className="text-[10px] uppercase tracking-widest text-gold font-bold">{uiText("footer.col3")}</p>
       </div>
       <div className="space-y-2.5">
         {membership.map((entry) => {
           const co = entry.companies;
-          const roleLabel = entry.public_titles.join(" · ") || (entry.is_company_owner ? "Inhaber/in" : "Teammitglied");
+          const roleLabel = entry.public_titles.join(" · ") || (entry.is_company_owner ? "Inhaber/in" : uiText("Ui.text_46a19d00aadaa0"));
           const categoryLabel = co.categories?.[0]
             ? COMPANY_CATEGORIES.find(c => c.id === co.categories![0])?.label ?? null
             : null;
@@ -466,7 +488,7 @@ function CompanyBadge({ membership }: { membership: CompanyMemberships }) {
                 <p className="break-words text-sm font-semibold text-text-primary group-hover:text-gold [overflow-wrap:anywhere]">{co.name}</p>
                 {categoryLabel && <p className="text-[11px] text-gold/70">{categoryLabel}</p>}
                 <p className="break-words text-xs leading-relaxed text-text-muted [overflow-wrap:anywhere]">{roleLabel}</p>
-                <p className="flex items-center justify-center gap-1 pt-1 text-[10px] text-gold/70"><ExternalLink size={10} /> Unternehmensprofil</p>
+                <p className="flex items-center justify-center gap-1 pt-1 text-[10px] text-gold/70">{uiText.rich("Ui.text_f797cb26e674d2", { part1: () => (<ExternalLink size={10} />) })}</p>
               </div>
             </Link>
           );
@@ -481,6 +503,8 @@ function CompanyBadge({ membership }: { membership: CompanyMemberships }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function ActorProfile({ organizationSection, profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { organizationSection?: React.ReactNode; profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMemberships; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
+  const uiText = useTranslations();
+
   const tc = useTranslations("common");
   const profileText = useTranslations("profile");
   const creatorText = useTranslations("creators");
@@ -543,7 +567,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const p = (profile.physical ?? {}) as any;
-  const roleLabels = displayPositions(profile);
+  const roleLabels = displayPositions(profile, getLocalizedProfileTypeLabels(uiText)).map(label => taxonomyLabel(label, uiText));
   const performance = profile.performance ?? {};
   const dialects: string[] = performance.dialects ?? [];
   const drivingLicenses: string[] = performance.driving_licenses ?? [];
@@ -584,12 +608,12 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
 
   const pContact = profile as unknown as { tiktok_url?: string; vimeo_url?: string; phone?: string; contact_email?: string };
   const socialLinks = ([
-    { label: "Instagram", url: safeLink(profile.instagram_url) },
-    { label: "TikTok",    url: safeLink(pContact.tiktok_url) },
-    { label: "YouTube",   url: safeLink(profile.youtube_url) },
-    { label: "Vimeo",     url: safeLink(pContact.vimeo_url) },
-    { label: "LinkedIn",  url: safeLink(profile.linkedin_url) },
-    { label: "Website",   url: safeLink(profile.website_url), icon: true },
+    { label: uiText("Ui.text_bad57ef7837c8e"), url: safeLink(profile.instagram_url) },
+    { label: uiText("Ui.text_1bb6fcfbf1368a"),    url: safeLink(pContact.tiktok_url) },
+    { label: uiText("Ui.text_fb7accfff8c6f8"),   url: safeLink(profile.youtube_url) },
+    { label: uiText("Ui.text_a7a93fd1930a61"),     url: safeLink(pContact.vimeo_url) },
+    { label: uiText("Ui.text_dd84425b72da12"),  url: safeLink(profile.linkedin_url) },
+    { label: uiText("AdminReview.fields.website"),   url: safeLink(profile.website_url), icon: true },
     pContact.phone?.trim()         ? { label: pContact.phone.trim(),         url: `tel:${pContact.phone.trim()}`,             contactIcon: "phone" as const } : null,
     pContact.contact_email?.trim() ? { label: pContact.contact_email.trim(), url: `mailto:${pContact.contact_email.trim()}`, contactIcon: "mail" as const } : null,
   ] as const).filter((l): l is NonNullable<typeof l> & { url: string } => l !== null && !!l.url) as { label: string; url: string; icon?: boolean; contactIcon?: "phone" | "mail" }[];
@@ -614,9 +638,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
                   <ResilientPublicImage src={mainShot} alt="" className="absolute inset-0 scale-110 blur-2xl opacity-55" imageClassName="h-full w-full object-cover" />
                   <ResilientPublicImage src={mainShot} alt={profile.display_name ?? ""} className="relative z-10" imageClassName="h-full w-full object-contain object-center" loading="eager" />
                   {profile.verified && (
-                    <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-1 rounded-full">
-                      <Check size={9} /> Verified
-                    </div>
+                    <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-1 rounded-full">{uiText.rich("Ui.text_df2917b02bd42a", { part1: () => (<Check size={9} />) })}</div>
                   )}
                 </div>
               ) : (
@@ -645,10 +667,10 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
                       const ac = profile.availability_config as any;
                       if (!ac) return null;
                       const chips = [
-                        ac.weekends    && { label: "Wochenenden" },
-                        ac.night_shoots && { label: "Nachtdrehs" },
-                        ac.short_notice && { label: "Kurzfristig" },
-                        ac.work_radius_km && { label: `${ac.work_radius_km} km` },
+                        ac.weekends    && { label: uiText("Ui.text_fe3dd00105d06a") },
+                        ac.night_shoots && { label: uiText("Ui.text_94c1be269db94c") },
+                        ac.short_notice && { label: uiText("Ui.text_da452aeb15b5c6") },
+                        ac.work_radius_km && { label: uiText("Ui.text_9b0f0d8a886f44", { value1: String(ac.work_radius_km) }) },
                       ].filter(Boolean) as { label: string }[];
                       if (!chips.length) return null;
                       return chips.map((c) => (
@@ -659,7 +681,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
                     })()}
                   </div>
                   <h1 className="min-w-0 max-w-full break-words font-display text-4xl sm:text-5xl font-bold text-text-primary leading-tight tracking-tight [overflow-wrap:anywhere]">
-                    {profile.display_name ?? "Unbekannt"}
+                    {profile.display_name ?? uiText("Ui.text_276ffa1fb4f970")}
                   </h1>
                   <ProfileRoles positions={roleLabels} />
                   {profile.tagline && (
@@ -677,42 +699,25 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
                   {!isOwner ? (
                     <>
                       {canContact && (
-                        <>
-                          <Link href={`/booking?profile=${profile.user_id}`}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors text-xs">
-                            Anfrage
-                          </Link>
-                          <Link href={`/messages?to=${profile.user_id}`}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-text-primary text-bg-primary font-semibold rounded-lg hover:opacity-90 transition-opacity text-xs">
-                            <MessageSquare size={12} /> Nachricht
-                          </Link>
-                        </>
+                        <>{uiText.rich("Ui.text_6f27c4495b9aa0", { part1: chunks => (<Link href={`/booking?profile=${profile.user_id}`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors text-xs">{chunks}</Link>), part3: () => (<MessageSquare size={12} />), part2: chunks => (<Link href={`/messages?to=${profile.user_id}`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-text-primary text-bg-primary font-semibold rounded-lg hover:opacity-90 transition-opacity text-xs">{chunks}</Link>) })}</>
                       )}
                       <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
                       {friendStatus === "friends" ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-emerald-500/30 text-emerald-400 rounded-lg text-xs font-medium">
-                          <UserCheck size={12} /> Vernetzt
-                        </span>
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-emerald-500/30 text-emerald-400 rounded-lg text-xs font-medium">{uiText.rich("Ui.text_11dd18df7dd792", { part1: () => (<UserCheck size={12} />) })}</span>
                       ) : friendStatus === "pending_sent" ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-text-muted rounded-lg text-xs">
-                          <Clock size={12} /> Anfrage gesendet
-                        </span>
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-text-muted rounded-lg text-xs">{uiText.rich("Ui.text_6ef3d8e9ec1014", { part1: () => (<Clock size={12} />) })}</span>
                       ) : friendStatus === "pending_received" ? (
                         <button onClick={handleFriendAction} disabled={friendLoading}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors text-xs disabled:opacity-50">
-                          <Check size={12} /> Annehmen
-                        </button>
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors text-xs disabled:opacity-50">{uiText.rich("Ui.text_048edf533fa6f4", { part1: () => (<Check size={12} />) })}</button>
                       ) : (
                         <button onClick={handleFriendAction} disabled={friendLoading}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-text-secondary rounded-lg hover:border-gold/50 hover:text-gold transition-all text-xs disabled:opacity-50">
-                          <UserPlus size={12} /> Vernetzen
-                        </button>
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-text-secondary rounded-lg hover:border-gold/50 hover:text-gold transition-all text-xs disabled:opacity-50">{uiText.rich("Ui.text_854dd7f9f69b35", { part1: () => (<UserPlus size={12} />) })}</button>
                       )}
                     </>
                   ) : (
-                    <Link href="/profile" className="flex items-center gap-1 text-xs text-text-muted hover:text-gold transition-colors">
-                      <Pencil size={11} /> Bearbeiten
-                    </Link>
+                    <Link href="/profile" className="flex items-center gap-1 text-xs text-text-muted hover:text-gold transition-colors">{uiText.rich("Ui.text_603ead2ae843f0", { part1: () => (<Pencil size={11} />) })}</Link>
                   )}
                 </div>
               </div>
@@ -720,17 +725,17 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
               {/* Stats grid — only non-null values */}
               {(playingAge || p.height_cm || p.clothing_size || p.shoe_size || p.hair_color || p.eye_color || languages.length > 0 || dialects.length > 0 || drivingLicenses.length > 0 || p.body_type || profile.day_rate || travel) && (
                 <div className="grid grid-cols-3 gap-x-4 gap-y-4 py-5 border-y border-border">
-                  {playingAge        && <StatPill label="Spielalter" value={playingAge} />}
-                  {p.height_cm       && <StatPill label="Größe"      value={`${p.height_cm} cm`} />}
-                  {p.clothing_size   && <StatPill label="Konfektion" value={p.clothing_size} />}
-                  {p.shoe_size       && <StatPill label="Schuhgröße" value={p.shoe_size} />}
+                  {playingAge        && <StatPill label={uiText("creators.filterAge")} value={playingAge} />}
+                  {p.height_cm       && <StatPill label={uiText("MarketplaceOffer.fields.size")}      value={`${p.height_cm} cm`} />}
+                  {p.clothing_size   && <StatPill label={uiText("Ui.text_4d0a63d41fbd12")} value={p.clothing_size} />}
+                  {p.shoe_size       && <StatPill label={uiText("Ui.text_edccd3bba39b7b")} value={p.shoe_size} />}
                   {p.hair_color      && <StatPill label={profileText("castingHair")} value={profileTraitLabel("hair", p.hair_color, profileText)} />}
                   {p.eye_color       && <StatPill label={profileText("castingEyes")} value={profileTraitLabel("eyes", p.eye_color, profileText)} />}
                   {p.body_type       && <StatPill label={profileText("castingBody")} value={profileTraitLabel("body", p.body_type, profileText)} />}
-                  {languages.length > 0 && <StatPill label="Sprachen" value={languages.join(", ")} />}
-                  {dialects.length > 0 && <StatPill label="Dialekte" value={dialects.join(", ")} />}
-                  {drivingLicenses.length > 0 && <StatPill label="Führerschein" value={drivingLicenses.join(", ")} />}
-                  {profile.day_rate  && <StatPill label="Tagesgage"  value={`${profile.day_rate} €`} />}
+                  {languages.length > 0 && <StatPill label={uiText("profile.sectionLanguages")} value={languages.join(", ")} />}
+                  {dialects.length > 0 && <StatPill label={uiText("Ui.text_c36026be4f20c4")} value={dialects.join(", ")} />}
+                  {drivingLicenses.length > 0 && <StatPill label={uiText("Ui.text_b64c9c6e5a0fcd")} value={drivingLicenses.join(", ")} />}
+                  {profile.day_rate  && <StatPill label={uiText("Ui.text_e43c71342ddc3d")}  value={`${profile.day_rate} €`} />}
                   {travel && <StatPill label={creatorText("filterTravel")} value={profileTraitLabel("travel", travel, profileText)} />}
                 </div>
               )}
@@ -740,16 +745,16 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
 
               {(crewData.experience_years || crewData.department || crewEquipment.length > 0 || crewSoftware.length > 0 || crewCertificates.length > 0) && (
                 <div className="rounded-xl border border-border bg-bg-secondary/70 p-4 space-y-3">
-                  <SectionLabel>Berufliche Schwerpunkte</SectionLabel>
+                  <SectionLabel>{uiText("Ui.text_55c2ce6e71e4f8")}</SectionLabel>
                   {(crewData.department || crewData.experience_years) && (
                     <div className="flex flex-wrap gap-x-5 gap-y-3">
-                      {crewData.department && <StatPill label="Bereich" value={crewData.department} />}
-                      {crewData.experience_years && <StatPill label="Erfahrung" value={`${crewData.experience_years} Jahre`} />}
+                      {crewData.department && <StatPill label={uiText("setup.copy78")} value={crewData.department} />}
+                      {crewData.experience_years && <StatPill label={uiText("Ui.text_dfe794929179b3")} value={uiText("PageCopy.years", {count: crewData.experience_years})} />}
                     </div>
                   )}
-                  {crewEquipment.length > 0 && <p className="text-xs text-text-secondary"><span className="text-text-muted">Equipment:</span> {crewEquipment.join(", ")}</p>}
-                  {crewSoftware.length > 0 && <p className="text-xs text-text-secondary"><span className="text-text-muted">Software:</span> {crewSoftware.join(", ")}</p>}
-                  {crewCertificates.length > 0 && <p className="text-xs text-text-secondary"><span className="text-text-muted">Nachweise:</span> {crewCertificates.join(", ")}</p>}
+                  {crewEquipment.length > 0 && <p className="text-xs text-text-secondary">{uiText.rich("Ui.text_155eacd9aefbad", { part1: chunks => (<span className="text-text-muted">{chunks}</span>), value2: () => (crewEquipment.join(", ")) })}</p>}
+                  {crewSoftware.length > 0 && <p className="text-xs text-text-secondary">{uiText.rich("Ui.text_8c53e376abeba4", { part1: chunks => (<span className="text-text-muted">{chunks}</span>), value2: () => (crewSoftware.join(", ")) })}</p>}
+                  {crewCertificates.length > 0 && <p className="text-xs text-text-secondary">{uiText.rich("Ui.text_740514ba7e9c64", { part1: chunks => (<span className="text-text-muted">{chunks}</span>), value2: () => (crewCertificates.join(", ")) })}</p>}
                 </div>
               )}
 
@@ -790,7 +795,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
         {videoEmbeds.length > 0 && (
           <>
             <Divider />
-            <SectionLabel>Videos</SectionLabel>
+            <SectionLabel>{uiText("Ui.text_c9a9639463c219")}</SectionLabel>
             {videoEmbeds.length === 1 ? (
               <div className="relative rounded-2xl overflow-hidden bg-black aspect-video shadow-2xl">
                 <iframe src={videoEmbeds[0]} className="absolute inset-0 w-full h-full"
@@ -813,7 +818,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
         {stripImages.length > 0 && (
           <>
             <Divider />
-            <SectionLabel>Portfolio</SectionLabel>
+            <SectionLabel>{uiText("Ui.text_1853eb2e9e5ed2")}</SectionLabel>
             <div id="portfolio" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 scroll-mt-24">
               {stripImages.map((img, i) => (
                 <div
@@ -823,7 +828,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
                 >
                   <ResilientPublicImage
                     src={img.url}
-                    alt={img.caption ?? `Foto ${i + 1}`}
+                    alt={img.caption ?? uiText("Ui.text_31b5322f7aaa57", { value1: String(i + 1) })}
                     className="absolute inset-0"
                     imageClassName="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]"
                   />
@@ -842,7 +847,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
         {films.length > 0 && (
           <>
             <Divider />
-            <SectionLabel>Filmografie</SectionLabel>
+            <SectionLabel>{uiText("profile.sectionFilmography")}</SectionLabel>
             <div className="border border-border rounded-lg overflow-hidden bg-bg-secondary">
               {visibleFilms.map((film, i) => {
                 const isOpen = expandedFilm === i;
@@ -874,9 +879,9 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
                     </div>
                     {isOpen && hasDetails && (
                       <div className="px-3 pb-1.5 pl-14 flex flex-wrap gap-x-4 gap-y-0.5 text-[10px] text-text-muted border-t border-border pt-1">
-                        {normType(film.type) && <span>Typ: <span className="text-text-secondary">{normType(film.type)}</span></span>}
-                        {film.director && <span>Regie: <span className="text-text-secondary">{film.director}</span></span>}
-                        {film.production && <span>Prod.: <span className="text-text-secondary">{film.production}</span></span>}
+                        {normType(film.type) && <span>{uiText.rich("Ui.text_c70f2b0c3dd668", { value2: () => (normType(film.type)), part1: chunks => (<span className="text-text-secondary">{chunks}</span>) })}</span>}
+                        {film.director && <span>{uiText.rich("Ui.text_31f12dabe7133b", { value2: () => (film.director), part1: chunks => (<span className="text-text-secondary">{chunks}</span>) })}</span>}
+                        {film.production && <span>{uiText.rich("Ui.text_325b6b0ece32ff", { value2: () => (film.production), part1: chunks => (<span className="text-text-secondary">{chunks}</span>) })}</span>}
                         {film.festival && <span className="text-gold">★ {film.festival}</span>}
                       </div>
                     )}
@@ -887,7 +892,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
             {films.length > 6 && (
               <button onClick={() => setShowAllFilms(!showAllFilms)}
                 className="mt-4 flex items-center gap-1.5 text-xs text-text-muted hover:text-gold transition-colors">
-                {showAllFilms ? <><ChevronUp size={13} /> Weniger</> : <><ChevronDown size={13} /> Alle {films.length} Einträge</>}
+                {showAllFilms ? <>{uiText.rich("Ui.text_6a6268d4d5094c", { part1: () => (<ChevronUp size={13} />) })}</> : <>{uiText.rich("Ui.text_d7b90931ebc1ff", { part1: () => (<ChevronDown size={13} />), value2: () => (films.length) })}</>}
               </button>
             )}
           </>
@@ -914,13 +919,13 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
           // Groups: positions in order (only those with credits), then Sonstiges if any unmatched
           const groups: { label: string; items: typeof credits; isPosition: boolean }[] = [
             ...positions.filter(p => matched[p]?.length).map(p => ({ label: p, items: matched[p], isPosition: true })),
-            ...(unmatched.length ? [{ label: "Weitere", items: unmatched, isPosition: false }] : []),
+            ...(unmatched.length ? [{ label: uiText("Ui.text_aa61ce5c8994fa"), items: unmatched, isPosition: false }] : []),
           ];
           if (!groups.length) return null;
           return (
             <>
               <Divider />
-              <SectionLabel>Projekte</SectionLabel>
+              <SectionLabel>{uiText("nav.projects")}</SectionLabel>
               <div className="space-y-5">
                 {groups.map(({ label, items }) => (
                   <div key={label}>
@@ -934,7 +939,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
                             className="group flex items-center gap-3 px-3 py-2 border-b border-border/60 last:border-b-0 hover:bg-bg-elevated/60 transition-colors">
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{proj.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</span>
-                            {collaborator && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[35%]">Mit: {collaborator}</span>}
+                            {collaborator && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[35%]">{uiText.rich("Ui.text_67b5a0f0600ce9", { value1: () => (collaborator) })}</span>}
                             {normType(proj.type) && <span className="text-[10px] text-text-muted shrink-0 hidden sm:inline">{normType(proj.type)}</span>}
                           </Link>
                         );
@@ -951,7 +956,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
         {skills.length > 0 && (
           <>
             <Divider />
-            <SectionLabel>Skills & Besonderheiten</SectionLabel>
+            <SectionLabel>{uiText("Ui.text_837be8090856cf")}</SectionLabel>
             <div className="flex flex-wrap gap-2">
               {skills.map((s) => (
                 <span key={s} className="px-4 py-2 bg-bg-secondary border border-border rounded-lg text-sm text-text-secondary hover:border-gold/40 transition-colors">
@@ -966,7 +971,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
         {memberships.length > 0 && (
           <>
             <Divider />
-            <SectionLabel>Mitgliedschaften</SectionLabel>
+            <SectionLabel>{uiText("Ui.text_f96bf692d5a4c5")}</SectionLabel>
             <div className="flex flex-wrap gap-2">
               {memberships.map((m) => (
                 <span key={m} className="px-4 py-2 bg-bg-secondary border border-border rounded-lg text-sm text-text-secondary hover:border-gold/40 transition-colors">
@@ -981,7 +986,7 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
         {awards.length > 0 && (
           <>
             <Divider />
-            <SectionLabel>Awards & Festivals</SectionLabel>
+            <SectionLabel>{uiText("Ui.text_02edd4a5599ae4")}</SectionLabel>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {awards.map((award, i) => (
                 <div key={i} className="flex items-start gap-4 p-4 bg-bg-secondary border border-border rounded-xl hover:border-gold/30 transition-colors">
@@ -1025,6 +1030,8 @@ function ActorProfile({ organizationSection, profile, isOwner, projectCredits, c
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function ModelProfile({ organizationSection, profile, isOwner, projectCredits = [], companyMembership, listings = [], blockStatus = null, collaborations = [] }: { organizationSection?: React.ReactNode; profile: UserProfile; isOwner: boolean; projectCredits?: ProjectCredit[]; companyMembership: CompanyMemberships; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[] }) {
+  const uiText = useTranslations();
+
   const profileText = useTranslations("profile");
   const canContact = !blockStatus?.youBlocked && !blockStatus?.theyBlocked;
   const [lightbox, setLightbox] = useState<string | null>(null);
@@ -1048,7 +1055,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
   const memberships: string[] = profile.memberships ?? [];
   const languages = profile.languages ?? [];
   const performance = profile.performance ?? {};
-  const roleLabels = displayPositions(profile);
+  const roleLabels = displayPositions(profile, getLocalizedProfileTypeLabels(uiText)).map(label => taxonomyLabel(label, uiText));
   const manualFilms: FilmographyEntry[] = profile.filmography ?? [];
   const creditedTitles = new Set(projectCredits.filter((credit) => credit.projects).map((credit) => credit.projects!.title.trim().toLocaleLowerCase("de")));
   const films = manualFilms.filter((film) => film.title?.trim() && !creditedTitles.has(film.title.trim().toLocaleLowerCase("de")));
@@ -1058,15 +1065,15 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
     ? `${p.playing_age_min ?? "?"}–${p.playing_age_max ?? "?"} J.`
     : null;
   const castingFacts: [string, string | number | null | undefined][] = [
-    ["Spielalter", playingAge],
-    ["Größe", p.height_cm ? `${p.height_cm} cm` : null],
-    ["Konfektion", p.clothing_size],
-    ["Schuhgröße", p.shoe_size],
+    [uiText("creators.filterAge"), playingAge],
+    [uiText("MarketplaceOffer.fields.size"), p.height_cm ? `${p.height_cm} cm` : null],
+    [uiText("Ui.text_4d0a63d41fbd12"), p.clothing_size],
+    [uiText("Ui.text_edccd3bba39b7b"), p.shoe_size],
     [profileText("castingHair"), p.hair_color ? profileTraitLabel("hair", p.hair_color, profileText) : null],
     [profileText("castingEyes"), p.eye_color ? profileTraitLabel("eyes", p.eye_color, profileText) : null],
-    ["Sprachen", languages.length ? languages.join(", ") : null],
-    ["Dialekte", performance.dialects?.length ? performance.dialects.join(", ") : null],
-    ["Führerschein", performance.driving_licenses?.length ? performance.driving_licenses.join(", ") : null],
+    [uiText("profile.sectionLanguages"), languages.length ? languages.join(", ") : null],
+    [uiText("Ui.text_c36026be4f20c4"), performance.dialects?.length ? performance.dialects.join(", ") : null],
+    [uiText("Ui.text_b64c9c6e5a0fcd"), performance.driving_licenses?.length ? performance.driving_licenses.join(", ") : null],
   ].filter((entry): entry is [string, string | number] => entry[1] !== null && entry[1] !== undefined && entry[1] !== "");
 
   return (
@@ -1078,7 +1085,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-5 sm:gap-8 lg:gap-12 items-start">
             <div className="relative mx-auto w-full max-w-[520px] lg:max-w-none">
               <button type="button" onClick={() => resolvedMainPhotoUrl && setLightbox(resolvedMainPhotoUrl)} disabled={!resolvedMainPhotoUrl}
-                aria-label={resolvedMainPhotoUrl ? "Hauptfoto vergrößern" : undefined}
+                aria-label={resolvedMainPhotoUrl ? uiText("Ui.text_7418b51c63879f") : undefined}
                 className="relative block w-full aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] max-h-[420px] overflow-hidden rounded-2xl border border-border bg-bg-secondary disabled:cursor-default">
                 {resolvedMainPhotoUrl ? (
                   <ResilientPublicImage
@@ -1090,7 +1097,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
                     style={{ objectPosition: profile.focal_point ? `${profile.focal_point.x}% ${profile.focal_point.y}%` : "50% 38%" }}
                   />
                 ) : <span className="flex h-full items-center justify-center font-display text-5xl font-bold text-text-muted/30">{(profile.display_name ?? "?")[0]}</span>}
-                {profile.verified && <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 px-2.5 py-1 text-[10px] font-semibold text-white"><Check size={10} /> Verifiziert</span>}
+                {profile.verified && <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 px-2.5 py-1 text-[10px] font-semibold text-white">{uiText.rich("Ui.text_712de43869af36", { part1: () => (<Check size={10} />) })}</span>}
               </button>
             </div>
 
@@ -1098,23 +1105,19 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
               <div className="flex flex-wrap items-center gap-2">
                 <span className={`inline-flex items-center gap-2 text-xs font-medium ${profile.available ? "text-emerald-400" : "text-text-muted"}`}>
                   <span className={`h-2 w-2 rounded-full ${profile.available ? "bg-emerald-400" : "bg-text-muted"}`} />
-                  {profile.available ? "Verfügbar" : "Derzeit nicht verfügbar"}
+                  {profile.available ? uiText("common.available") : uiText("Ui.text_fd1ad60de9424b")}
                 </span>
-                {profile.verified && <span className="rounded-full border border-gold/25 bg-gold/10 px-2.5 py-1 text-[10px] font-semibold text-gold">Verifiziert</span>}
-                {isOwner && <Link href="/profile" className="ml-auto inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-border px-3 text-xs text-text-secondary hover:border-gold/40 hover:text-gold"><Pencil size={12} /> Bearbeiten</Link>}
+                {profile.verified && <span className="rounded-full border border-gold/25 bg-gold/10 px-2.5 py-1 text-[10px] font-semibold text-gold">{uiText("common.verified")}</span>}
+                {isOwner && <Link href="/profile" className="ml-auto inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-border px-3 text-xs text-text-secondary hover:border-gold/40 hover:text-gold">{uiText.rich("Ui.text_603ead2ae843f0", { part1: () => (<Pencil size={12} />) })}</Link>}
               </div>
               <div>
-                <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-text-primary">{profile.display_name ?? "Unbekannt"}</h1>
+                <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-text-primary">{profile.display_name ?? uiText("Ui.text_276ffa1fb4f970")}</h1>
                 <ProfileRoles positions={roleLabels} />
                 {profile.location && <p className="mt-3 flex items-center gap-1.5 text-sm text-text-muted"><MapPin size={13} /> {profile.location}</p>}
                 {profile.tagline && <p className="mt-2 text-sm italic text-text-secondary">{cleanProfileBio(profile.tagline)}</p>}
               </div>
 
-              {!isOwner && canContact && <div className="flex flex-wrap gap-2">
-                <Link href={`/booking?profile=${profile.user_id}`} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-gold px-4 text-xs font-semibold text-bg-primary hover:bg-gold-light">Anfrage <ExternalLink size={12} /></Link>
-                <Link href={`/messages?to=${profile.user_id}`} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-bg-secondary px-4 text-xs font-medium text-text-primary hover:border-gold/40"><MessageSquare size={13} /> Nachricht</Link>
-                <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
-              </div>}
+              {!isOwner && canContact && <div className="flex flex-wrap gap-2">{uiText.rich("Ui.text_7b21662e97de90", { part2: () => (<ExternalLink size={12} />), part1: chunks => (<Link href={`/booking?profile=${profile.user_id}`} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-gold px-4 text-xs font-semibold text-bg-primary hover:bg-gold-light">{chunks}</Link>), part4: () => (<MessageSquare size={13} />), part3: chunks => (<Link href={`/messages?to=${profile.user_id}`} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-bg-secondary px-4 text-xs font-medium text-text-primary hover:border-gold/40">{chunks}</Link>), part5: () => (<BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />) })}</div>}
 
               {castingFacts.length > 0 && <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-4 rounded-xl border border-border bg-bg-secondary p-4 sm:p-5">
                 {castingFacts.map(([label, value]) => <StatPill key={label} label={label} value={value} />)}
@@ -1122,9 +1125,9 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
 
               {(skills.length > 0 || profile.crew?.experience_years || profile.crew?.equipment_known?.length || profile.crew?.software?.length) && (
                 <div className="space-y-3 rounded-xl border border-border bg-bg-secondary/70 p-4">
-                  {profile.crew?.experience_years && <StatPill label="Berufserfahrung" value={`${profile.crew.experience_years} Jahre`} />}
-                  {profile.crew?.equipment_known && profile.crew.equipment_known.length > 0 && <p className="text-xs text-text-secondary"><span className="text-text-muted">Equipment:</span> {profile.crew.equipment_known.join(", ")}</p>}
-                  {profile.crew?.software && profile.crew.software.length > 0 && <p className="text-xs text-text-secondary"><span className="text-text-muted">Software:</span> {profile.crew.software.join(", ")}</p>}
+                  {profile.crew?.experience_years && <StatPill label={uiText("Ui.text_a0c0a3ab95e19a")} value={uiText("PageCopy.years", {count: profile.crew.experience_years})} />}
+                  {profile.crew?.equipment_known && profile.crew.equipment_known.length > 0 && <p className="text-xs text-text-secondary">{uiText.rich("Ui.text_155eacd9aefbad", { part1: chunks => (<span className="text-text-muted">{chunks}</span>), value2: () => (profile.crew?.equipment_known?.join(", ")) })}</p>}
+                  {profile.crew?.software && profile.crew.software.length > 0 && <p className="text-xs text-text-secondary">{uiText.rich("Ui.text_8c53e376abeba4", { part1: chunks => (<span className="text-text-muted">{chunks}</span>), value2: () => (profile.crew?.software?.join(", ")) })}</p>}
                   {skills.length > 0 && <div className="flex flex-wrap gap-1.5">{skills.slice(0, 8).map((skill) => <span key={skill} className="rounded-full border border-border px-2.5 py-1 text-[11px] text-text-secondary">{skill}</span>)}</div>}
                 </div>
               )}
@@ -1139,7 +1142,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
         {galleryPhotos.length > 0 && (
           <>
             <div className="py-14">
-              <SectionLabel>Portfolio</SectionLabel>
+              <SectionLabel>{uiText("Ui.text_1853eb2e9e5ed2")}</SectionLabel>
               {/* Masonry-style grid */}
               <div className="columns-2 sm:columns-3 gap-2 sm:gap-3 space-y-2 sm:space-y-3">
                 {galleryPhotos.slice(0, 12).map((img, i) => (
@@ -1150,7 +1153,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
                   >
                     <ResilientPublicImage
                       src={img.url}
-                      alt={img.caption ?? `Portfoliofoto ${i + 1}`}
+                      alt={img.caption ?? uiText("Ui.text_00dd8d76c990bf", { value1: String(i + 1) })}
                       className="w-full break-inside-avoid"
                       imageClassName="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                       style={{ aspectRatio: i % 3 === 0 ? "3/4" : i % 5 === 0 ? "1/1" : "2/3" }}
@@ -1166,7 +1169,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
         {reelEmbed && (
           <>
             <Divider />
-            <SectionLabel>Video</SectionLabel>
+            <SectionLabel>{uiText("Ui.text_d534be829e3219")}</SectionLabel>
             <div className="relative rounded-2xl overflow-hidden bg-black aspect-video shadow-2xl">
               <iframe
                 src={reelEmbed}
@@ -1183,10 +1186,10 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
           <>
             <Divider />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
-              {profile.bio && <div><SectionLabel>Über mich</SectionLabel><ProfileBio value={profile.bio} /></div>}
+              {profile.bio && <div><SectionLabel>{uiText("Ui.text_3f8ab8360131de")}</SectionLabel><ProfileBio value={profile.bio} /></div>}
               {skills.length > 0 && (
                 <div>
-                  <SectionLabel>Spezialisierung</SectionLabel>
+                  <SectionLabel>{uiText("Ui.text_05b86932f51fb5")}</SectionLabel>
                   <div className="flex flex-wrap gap-2">
                     {skills.map((s) => (
                       <span key={s} className="px-3 py-1.5 bg-bg-secondary border border-border rounded-lg text-xs text-text-secondary">
@@ -1198,7 +1201,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
               )}
               {specialSkills.length > 0 && (
                 <div>
-                  <SectionLabel>Besondere Fähigkeiten</SectionLabel>
+                  <SectionLabel>{uiText("Ui.text_c85ac0460ca1b0")}</SectionLabel>
                   <div className="flex flex-wrap gap-2">
                     {specialSkills.map((skill) => <span key={skill} className="px-3 py-1.5 bg-bg-secondary border border-border rounded-lg text-xs text-text-secondary">{skill}</span>)}
                   </div>
@@ -1206,7 +1209,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
               )}
               {memberships.length > 0 && (
                 <div>
-                  <SectionLabel>Mitgliedschaften</SectionLabel>
+                  <SectionLabel>{uiText("Ui.text_f96bf692d5a4c5")}</SectionLabel>
                   <div className="flex flex-wrap gap-2">
                     {memberships.map((m) => (
                       <span key={m} className="px-3 py-1.5 bg-bg-secondary border border-border rounded-lg text-xs text-text-secondary">
@@ -1223,7 +1226,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
         {(credits.length > 0 || films.length > 0) && (
           <>
             <Divider />
-            <SectionLabel>Erfahrung & Referenzen</SectionLabel>
+            <SectionLabel>{uiText("Ui.text_9620ef01dde01d")}</SectionLabel>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pb-6">
               {credits.map((credit) => (
                 <article key={credit.id} className="rounded-xl border border-border bg-bg-secondary p-4">
@@ -1254,12 +1257,12 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
         {(() => {
           const gp = profile as unknown as { tiktok_url?: string; vimeo_url?: string; phone?: string; contact_email?: string };
           const links = ([
-            { label: "Instagram", url: safeLink(profile.instagram_url) },
-            { label: "TikTok",    url: safeLink(gp.tiktok_url) },
-            { label: "YouTube",   url: safeLink(profile.youtube_url) },
-            { label: "Vimeo",     url: safeLink(gp.vimeo_url) },
-            { label: "LinkedIn",  url: safeLink(profile.linkedin_url) },
-            { label: "Website",   url: safeLink(profile.website_url) },
+            { label: uiText("Ui.text_bad57ef7837c8e"), url: safeLink(profile.instagram_url) },
+            { label: uiText("Ui.text_1bb6fcfbf1368a"),    url: safeLink(gp.tiktok_url) },
+            { label: uiText("Ui.text_fb7accfff8c6f8"),   url: safeLink(profile.youtube_url) },
+            { label: uiText("Ui.text_a7a93fd1930a61"),     url: safeLink(gp.vimeo_url) },
+            { label: uiText("Ui.text_dd84425b72da12"),  url: safeLink(profile.linkedin_url) },
+            { label: uiText("AdminReview.fields.website"),   url: safeLink(profile.website_url) },
             gp.phone?.trim()         ? { label: gp.phone.trim(),         url: `tel:${gp.phone.trim()}`,             contactIcon: "phone" as const } : null,
             gp.contact_email?.trim() ? { label: gp.contact_email.trim(), url: `mailto:${gp.contact_email.trim()}`, contactIcon: "mail" as const } : null,
           ] as const).filter((l): l is NonNullable<typeof l> & { url: string } => l !== null && !!l.url) as { label: string; url: string; contactIcon?: "phone" | "mail" }[];
@@ -1267,7 +1270,7 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
           return (
             <>
               <Divider />
-              <SectionLabel>Links</SectionLabel>
+              <SectionLabel>{uiText("Ui.text_9024c197d84940")}</SectionLabel>
               {links.length > 0 && <div className="flex flex-wrap gap-2 pb-4">
                   {links.map(({ label, url, contactIcon }) => (
                     <a key={label} href={url!} target="_blank" rel="noopener noreferrer"
@@ -1307,6 +1310,8 @@ function ModelProfile({ organizationSection, profile, isOwner, projectCredits = 
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function GenericProfile({ organizationSection, profile, isOwner, projectCredits, companyMembership, externalProfiles, listings = [], blockStatus = null, collaborations = [], imageLikes = {}, myImageLikes = [] }: { organizationSection?: React.ReactNode; profile: UserProfile; isOwner: boolean; projectCredits: ProjectCredit[]; companyMembership: CompanyMemberships; externalProfiles: ExternalProfileRow[]; listings?: PublicListing[]; blockStatus?: { youBlocked: boolean; theyBlocked: boolean } | null; collaborations?: PublicCollab[]; imageLikes?: Record<string, number>; myImageLikes?: string[] }) {
+  const uiText = useTranslations();
+
   const profileText = useTranslations("profile");
   const creatorText = useTranslations("creators");
   const travel = profileTravelValue(profile);
@@ -1363,7 +1368,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
   const certificates: string[] = profile.crew?.certificates ?? [];
   const software: string[] = profile.crew?.software ?? [];
   const bgImage = profile.cover_image_url ?? (images.find((i) => i.featured)?.url);
-  const roleLabels = displayPositions(profile);
+  const roleLabels = displayPositions(profile, getLocalizedProfileTypeLabels(uiText)).map(label => taxonomyLabel(label, uiText));
 
   // Filmografie shows only manual entries — linked project credits appear as visual cards in "Projekte"
   const creditTitles = new Set(
@@ -1401,7 +1406,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
             )}
             <div className="flex-1 min-w-0 w-full max-w-full [overflow-wrap:anywhere]">
               <h1 className="min-w-0 max-w-full break-words font-display text-xl sm:text-3xl font-bold tracking-tight text-white leading-tight [overflow-wrap:anywhere]" style={{ textShadow: "0 2px 4px #000, 0 0 22px rgba(0,0,0,0.7)" }}>
-                {profile.display_name ?? "Unbekannt"}
+                {profile.display_name ?? uiText("Ui.text_276ffa1fb4f970")}
                 <span className="block h-0.5 w-12 bg-gold mt-2 rounded-full" />
               </h1>
               {roleLabels[0] && <p className="mt-2 text-sm sm:text-base font-semibold text-gold break-words">{roleLabels[0]}</p>}
@@ -1428,25 +1433,19 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
                   {canContact && (
                     <>
                       <Link href={`/messages?to=${profile.user_id}`}
-                        className="inline-flex min-h-11 items-center gap-1.5 px-3 py-2 bg-black/60 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
-                        <MessageSquare size={11} /> Nachricht
-                      </Link>
+                        className="inline-flex min-h-11 items-center gap-1.5 px-3 py-2 bg-black/60 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">{uiText.rich("Ui.text_e670272347a032", { part1: () => (<MessageSquare size={11} />) })}</Link>
                       <button onClick={handleFriendAction} disabled={friendLoading}
                         className="inline-flex min-h-11 items-center gap-1.5 px-3 py-2 bg-black/60 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs disabled:opacity-50">
-                        {friendStatus === "friends" ? <><Check size={11} /> Vernetzt</> : friendStatus === "pending_sent" ? "Gesendet" : friendStatus === "pending_received" ? <><UserPlus size={11} /> Annehmen</> : <><UserPlus size={11} /> Vernetzen</>}
+                        {friendStatus === "friends" ? <>{uiText.rich("Ui.text_11dd18df7dd792", { part1: () => (<Check size={11} />) })}</> : friendStatus === "pending_sent" ? uiText("Ui.text_4b6a7afab7b4c4") : friendStatus === "pending_received" ? <>{uiText.rich("Ui.text_048edf533fa6f4", { part1: () => (<UserPlus size={11} />) })}</> : <>{uiText.rich("Ui.text_854dd7f9f69b35", { part1: () => (<UserPlus size={11} />) })}</>}
                       </button>
                       <Link href={`/booking?profile=${profile.user_id}`}
-                        className="inline-flex min-h-11 items-center gap-1.5 px-3 py-2 bg-black/60 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">
-                        Anfrage <ExternalLink size={11} />
-                      </Link>
+                        className="inline-flex min-h-11 items-center gap-1.5 px-3 py-2 bg-black/60 backdrop-blur-md border border-white/25 text-white font-medium rounded-lg hover:bg-white/25 transition-colors text-xs">{uiText.rich("Ui.text_9855da52a3b061", { part1: () => (<ExternalLink size={11} />) })}</Link>
                     </>
                   )}
                   <BlockReportBar targetId={profile.user_id} initialYouBlocked={blockStatus?.youBlocked ?? false} />
                 </>
               ) : (
-                <Link href="/profile" className="inline-flex min-h-11 items-center gap-1.5 bg-black/60 backdrop-blur-md text-white text-xs font-semibold px-3 py-1.5 rounded-full border border-white/20 hover:bg-white/20 transition-colors">
-                  <Pencil size={10} /> Bearbeiten
-                </Link>
+                <Link href="/profile" className="inline-flex min-h-11 items-center gap-1.5 bg-black/60 backdrop-blur-md text-white text-xs font-semibold px-3 py-1.5 rounded-full border border-white/20 hover:bg-white/20 transition-colors">{uiText.rich("Ui.text_603ead2ae843f0", { part1: () => (<Pencil size={10} />) })}</Link>
               )}
             </div>
       </div>
@@ -1470,7 +1469,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
               <div>
                 <div className="flex items-center gap-2 mb-2.5">
                   <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
-                  <p className="text-[11px] uppercase tracking-widest text-gold font-bold">Über mich</p>
+                  <p className="text-[11px] uppercase tracking-widest text-gold font-bold">{uiText("Ui.text_3f8ab8360131de")}</p>
                 </div>
                 <ProfileBio value={profile.bio} />
               </div>
@@ -1478,10 +1477,10 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
 
             {(languages.length > 0 || profile.day_rate || travel || profile.crew?.experience_years) && (
               <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-x-6 gap-y-5">
-                {languages.length > 0 && <StatPill label="Sprachen" value={languages.join(", ")} />}
-                {profile.day_rate && <StatPill label="Tagesgage" value={`${profile.day_rate} €`} />}
+                {languages.length > 0 && <StatPill label={uiText("profile.sectionLanguages")} value={languages.join(", ")} />}
+                {profile.day_rate && <StatPill label={uiText("Ui.text_e43c71342ddc3d")} value={`${profile.day_rate} €`} />}
                 {travel && <StatPill label={creatorText("filterTravel")} value={profileTraitLabel("travel", travel, profileText)} />}
-                {profile.crew?.experience_years && <StatPill label="Erfahrung" value={`${profile.crew.experience_years} Jahre`} />}
+                {profile.crew?.experience_years && <StatPill label={uiText("Ui.text_dfe794929179b3")} value={uiText("PageCopy.years", {count: profile.crew.experience_years})} />}
               </div>
             )}
 
@@ -1489,7 +1488,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
               <div>
                 <div className="flex items-center gap-2 mb-2.5">
                   <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
-                  <p className="text-[11px] uppercase tracking-widest text-gold font-bold">Skills</p>
+                  <p className="text-[11px] uppercase tracking-widest text-gold font-bold">{uiText("Ui.text_66d0f523a379b2")}</p>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {skills.map((s) => (
@@ -1503,7 +1502,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
               <div>
                 <div className="flex items-center gap-2 mb-2.5">
                   <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
-                  <p className="text-[11px] uppercase tracking-widest text-gold font-bold">Mitgliedschaften</p>
+                  <p className="text-[11px] uppercase tracking-widest text-gold font-bold">{uiText("Ui.text_f96bf692d5a4c5")}</p>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {memberships.map((m) => (
@@ -1517,12 +1516,12 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
             {(() => {
               const gp2 = profile as unknown as { tiktok_url?: string; vimeo_url?: string; phone?: string; contact_email?: string };
               const links = ([
-                { label: "Instagram", url: safeLink(profile.instagram_url) },
-                { label: "TikTok",    url: safeLink(gp2.tiktok_url) },
-                { label: "YouTube",   url: safeLink(profile.youtube_url) },
-                { label: "Vimeo",     url: safeLink(gp2.vimeo_url) },
-                { label: "LinkedIn",  url: safeLink(profile.linkedin_url) },
-                { label: "Website",   url: safeLink(profile.website_url) },
+                { label: uiText("Ui.text_bad57ef7837c8e"), url: safeLink(profile.instagram_url) },
+                { label: uiText("Ui.text_1bb6fcfbf1368a"),    url: safeLink(gp2.tiktok_url) },
+                { label: uiText("Ui.text_fb7accfff8c6f8"),   url: safeLink(profile.youtube_url) },
+                { label: uiText("Ui.text_a7a93fd1930a61"),     url: safeLink(gp2.vimeo_url) },
+                { label: uiText("Ui.text_dd84425b72da12"),  url: safeLink(profile.linkedin_url) },
+                { label: uiText("AdminReview.fields.website"),   url: safeLink(profile.website_url) },
                 gp2.phone?.trim()         ? { label: gp2.phone.trim(),         url: `tel:${gp2.phone.trim()}`,             contactIcon: "phone" as const } : null,
                 gp2.contact_email?.trim() ? { label: gp2.contact_email.trim(), url: `mailto:${gp2.contact_email.trim()}`, contactIcon: "mail" as const } : null,
               ] as const).filter((l): l is NonNullable<typeof l> & { url: string } => l !== null && !!l.url) as { label: string; url: string; contactIcon?: "phone" | "mail" }[];
@@ -1531,7 +1530,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
                 <div>
                   <div className="flex items-center gap-2 mb-2.5">
                     <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
-                    <p className="text-[11px] uppercase tracking-widest text-gold font-bold">Links & Kontakt</p>
+                    <p className="text-[11px] uppercase tracking-widest text-gold font-bold">{uiText("Ui.text_2c02f24bb5b437")}</p>
                   </div>
                   {links.length > 0 && <div className="flex flex-wrap gap-1.5">
                       {links.map(({ label, url, contactIcon }) => (
@@ -1558,7 +1557,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
               <div>
                 <div className="flex items-center gap-2 mb-2.5">
                   <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
-                  <p className="text-[11px] uppercase tracking-widest text-gold font-bold">Software</p>
+                  <p className="text-[11px] uppercase tracking-widest text-gold font-bold">{uiText("Ui.text_9b3289a385a530")}</p>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {software.map((s) => (
@@ -1573,7 +1572,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
               <div>
                 <div className="flex items-center gap-2 mb-2.5">
                   <span className="w-1 h-1 rounded-full bg-gold shrink-0" />
-                  <p className="text-[11px] uppercase tracking-widest text-gold font-bold">Lizenzen & Zertifikate</p>
+                  <p className="text-[11px] uppercase tracking-widest text-gold font-bold">{uiText("Ui.text_4c730b5fbc3008")}</p>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {certificates.map((c) => (
@@ -1608,12 +1607,12 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
           }
           const groups: { label: string; items: typeof credits }[] = [
             ...positions.filter(p => matched[p]?.length).map(p => ({ label: p, items: matched[p] })),
-            ...(unmatched.length ? [{ label: "Weitere", items: unmatched }] : []),
+            ...(unmatched.length ? [{ label: uiText("Ui.text_aa61ce5c8994fa"), items: unmatched }] : []),
           ];
           if (!groups.length) return null;
           return (
             <div className="mb-12">
-              <SectionLabel>Projekte</SectionLabel>
+              <SectionLabel>{uiText("nav.projects")}</SectionLabel>
               <div className="space-y-5">
                 {groups.map(({ label, items }) => (
                   <div key={label}>
@@ -1627,7 +1626,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
                             className="group flex items-center gap-3 px-3 py-2 border-b border-border/60 last:border-b-0 hover:bg-bg-elevated/60 transition-colors">
                             <span className="text-[10px] tabular-nums text-gold font-bold shrink-0 w-8">{proj.year ?? "—"}</span>
                             <span className="text-xs text-text-primary truncate flex-1 group-hover:text-gold transition-colors">{proj.title}</span>
-                            {collaborator && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[35%]">Mit: {collaborator}</span>}
+                            {collaborator && <span className="text-[10px] text-text-muted shrink-0 truncate max-w-[35%]">{uiText.rich("Ui.text_67b5a0f0600ce9", { value1: () => (collaborator) })}</span>}
                             {normType(proj.type) && <span className="text-[10px] text-text-muted shrink-0 hidden sm:inline">{normType(proj.type)}</span>}
                           </Link>
                         );
@@ -1643,7 +1642,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
         {/* Filmografie — manual entries only */}
         {filmRows.length > 0 && (
           <div className="mb-12">
-            <SectionLabel>Filmografie</SectionLabel>
+            <SectionLabel>{uiText("profile.sectionFilmography")}</SectionLabel>
             <div className="border border-border rounded-lg overflow-hidden bg-bg-secondary">
               {filmRows.map((film, i) => {
                 const isOpen = expandedFilm === i;
@@ -1675,9 +1674,9 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
                     </div>
                     {isOpen && hasDetails && (
                       <div className="px-3 pb-1.5 pl-14 flex flex-wrap gap-x-4 gap-y-0.5 text-[10px] text-text-muted border-t border-border pt-1">
-                        {normType(film.type) && <span>Typ: <span className="text-text-secondary">{normType(film.type)}</span></span>}
-                        {film.director && <span>Regie: <span className="text-text-secondary">{film.director}</span></span>}
-                        {film.production && <span>Prod.: <span className="text-text-secondary">{film.production}</span></span>}
+                        {normType(film.type) && <span>{uiText.rich("Ui.text_c70f2b0c3dd668", { value2: () => (normType(film.type)), part1: chunks => (<span className="text-text-secondary">{chunks}</span>) })}</span>}
+                        {film.director && <span>{uiText.rich("Ui.text_31f12dabe7133b", { value2: () => (film.director), part1: chunks => (<span className="text-text-secondary">{chunks}</span>) })}</span>}
+                        {film.production && <span>{uiText.rich("Ui.text_325b6b0ece32ff", { value2: () => (film.production), part1: chunks => (<span className="text-text-secondary">{chunks}</span>) })}</span>}
                         {film.festival && <span className="text-gold">★ {film.festival}</span>}
                       </div>
                     )}
@@ -1691,7 +1690,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
         {/* Showreel */}
         {reelEmbed && (
           <div className="mb-12">
-            <SectionLabel>Showreel</SectionLabel>
+            <SectionLabel>{uiText("Ui.text_3cebfe46876003")}</SectionLabel>
             <div className="relative rounded-2xl overflow-hidden bg-black aspect-video">
               <iframe src={reelEmbed} className="absolute inset-0 w-full h-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
@@ -1702,7 +1701,7 @@ function GenericProfile({ organizationSection, profile, isOwner, projectCredits,
         {/* Awards */}
         {awards.length > 0 && (
           <div className="mb-12">
-            <SectionLabel>Awards</SectionLabel>
+            <SectionLabel>{uiText("Ui.text_669a46138d69d7")}</SectionLabel>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {awards.map((award, i) => (
                 <div key={i} className="flex gap-3 p-4 bg-bg-secondary border border-border rounded-xl">
@@ -1765,6 +1764,8 @@ function ImageModal({
   isOwner: boolean;
   onClose: () => void;
 }) {
+  const uiText = useTranslations();
+
   const { isSignedIn, user } = useUser();
   const [comments, setComments] = useState<ImageComment[]>([]);
   const [commentText, setCommentText] = useState("");
@@ -1810,7 +1811,7 @@ function ImageModal({
       <div className="relative w-full max-w-4xl flex flex-col md:flex-row rounded-2xl overflow-hidden bg-bg-secondary border border-border shadow-2xl max-h-[90vh]" onClick={e => e.stopPropagation()}>
         {/* Image */}
         <div className="md:w-3/5 bg-black flex items-center justify-center min-h-[240px]">
-          <ResilientPublicImage src={image.url} alt={image.caption ?? "Portfoliofoto"} className="h-full min-h-[240px] w-full" imageClassName="h-full max-h-[90vh] w-full object-contain" loading="eager" />
+          <ResilientPublicImage src={image.url} alt={image.caption ?? uiText("Ui.text_1a187a67b9a015")} className="h-full min-h-[240px] w-full" imageClassName="h-full max-h-[90vh] w-full object-contain" loading="eager" />
         </div>
         {/* Side panel */}
         <div className="md:w-2/5 flex flex-col max-h-[60vh] md:max-h-[90vh]">
@@ -1821,7 +1822,7 @@ function ImageModal({
           {/* Comments scroll */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {comments.length === 0 && (
-              <p className="text-xs text-text-muted text-center py-6">Noch keine Kommentare. Sei der Erste!</p>
+              <p className="text-xs text-text-muted text-center py-6">{uiText("Ui.text_cf51eb8e0a722f")}</p>
             )}
             {comments.map(c => (
               <div key={c.id} className="flex gap-2.5">
@@ -1843,7 +1844,7 @@ function ImageModal({
           {/* Hearts row */}
           <div className="px-4 py-3 border-t border-border flex items-center gap-2.5 shrink-0">
             <PhotoLikeButton profileId={profileId} imageUrl={image.url} initialLiked={liked} initialCount={likeCount} disabled={isOwner} />
-            <span className="text-sm font-semibold text-text-primary">{likeCount} {likeCount === 1 ? "Herz" : "Herzen"}</span>
+            <span className="text-sm font-semibold text-text-primary">{likeCount} {likeCount === 1 ? uiText("Ui.text_45db9ecdfcda3a") : uiText("Ui.text_1d5ef8ac45fcd1")}</span>
           </div>
           {/* Comment input */}
           {isSignedIn && (
@@ -1852,7 +1853,7 @@ function ImageModal({
                 value={commentText}
                 onChange={e => setCommentText(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void postComment(); } }}
-                placeholder="Kommentar hinzufügen…"
+                placeholder={uiText("Ui.text_35fedf20b8d4ec")}
                 className="flex-1 bg-bg-elevated border border-border rounded-xl px-3 py-2 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold/50"
               />
               <button onClick={() => void postComment()} disabled={!commentText.trim() || posting}
@@ -1880,6 +1881,8 @@ function PhotoGrid({
   imageLikes: Record<string, number>;
   myImageLikes: string[];
 }) {
+  const uiText = useTranslations();
+
   const [selectedImage, setSelectedImage] = useState<ProfileImage | null>(null);
 
   const sorted = [...images].sort((a, b) => (imageLikes[b.url] ?? 0) - (imageLikes[a.url] ?? 0));
@@ -1904,10 +1907,10 @@ function PhotoGrid({
           const isTop = img.url === topUrl && topHasLikes;
           return (
             <div key={img.url} className="relative aspect-[4/3] overflow-hidden rounded-xl group border border-border/50 bg-bg-elevated">
-              <Link href={photoHref(profileId, img.url)} onClick={markPhotoNavigation} aria-label={`Foto von ${img.caption ?? ""} öffnen`} className="absolute inset-0 z-0">
-              <ResilientPublicImage src={img.url} alt={img.caption ?? "Portfoliofoto"} className="absolute inset-0" imageClassName="h-full w-full object-cover transition-all duration-500 group-hover:brightness-110 group-hover:scale-[1.03]" />
+              <Link href={photoHref(profileId, img.url)} onClick={markPhotoNavigation} aria-label={uiText("Ui.text_be712cd0e6320b", { value1: String(img.caption ?? "") })} className="absolute inset-0 z-0">
+              <ResilientPublicImage src={img.url} alt={img.caption ?? uiText("Ui.text_1a187a67b9a015")} className="absolute inset-0" imageClassName="h-full w-full object-cover transition-all duration-500 group-hover:brightness-110 group-hover:scale-[1.03]" />
               {isTop && (
-                <div className="absolute top-2 left-2 px-2 py-0.5 bg-gold/90 rounded-full text-bg-primary text-[10px] font-bold">♥ Top</div>
+                <div className="absolute top-2 left-2 px-2 py-0.5 bg-gold/90 rounded-full text-bg-primary text-[10px] font-bold">{uiText("Ui.text_a070b7bbe61286")}</div>
               )}
               </Link>
               <PhotoLikeButton profileId={profileId} imageUrl={img.url} initialCount={count} initialLiked={myImageLikes.includes(img.url)} disabled={isOwner} className="absolute right-2 top-2 z-10" />
@@ -1934,15 +1937,15 @@ type SimilarProfile = {
 };
 
 function SimilarProfilesSection({ profiles }: { profiles: SimilarProfile[] }) {
+  const uiText = useTranslations();
+
   if (profiles.length === 0) return null;
   return (
     <section className="border-t border-border bg-bg-secondary py-10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <div className="flex min-w-0 max-w-full items-center justify-between mb-5">
-          <h2 className="font-display text-lg font-bold text-text-primary">Ähnliche Profile</h2>
-          <Link href="/creators" className="text-xs text-gold hover:text-gold-light transition-colors font-semibold">
-            Alle entdecken →
-          </Link>
+          <h2 className="font-display text-lg font-bold text-text-primary">{uiText("Ui.text_d1c117352cd1c3")}</h2>
+          <Link href="/creators" className="text-xs text-gold hover:text-gold-light transition-colors font-semibold">{uiText("Ui.text_30cda2e14e0d9a")}</Link>
         </div>
         <div className="flex min-w-0 max-w-full gap-3 overflow-x-auto overscroll-x-contain pb-2 sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:overflow-visible scrollbar-hide">
           {profiles.map((p) => {
@@ -1977,7 +1980,7 @@ function SimilarProfilesSection({ profiles }: { profiles: SimilarProfile[] }) {
                   </p>
                 )}
                 {p.day_rate && p.day_rate > 0 && (
-                  <p className="text-[10px] text-gold font-semibold mt-1">{p.day_rate} €/Tag</p>
+                  <p className="text-[10px] text-gold font-semibold mt-1">{uiText.rich("Ui.text_0da218ed73f2db", { value1: () => (p.day_rate) })}</p>
                 )}
               </Link>
             );

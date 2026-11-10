@@ -9,6 +9,8 @@ import { approvedOrganizationBySlug } from "@/lib/organization-data";
 export const dynamic = "force-dynamic";
 
 export default async function OrganizationPage({ params }: { params: Promise<{ slug: string }> }) {
+  const uiText = await getTranslations();
+
   const { slug } = await params;
   const result = await approvedOrganizationBySlug(slug);
   if (!result) notFound();

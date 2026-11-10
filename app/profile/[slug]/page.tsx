@@ -1,3 +1,4 @@
+import { getTranslations as getPageTranslations } from "next-intl/server";
 import {getLocale} from "next-intl/server";
 import {placeReadFields} from "@/lib/places/catalog";
 import {placeDisplay} from "@/lib/places/core";
@@ -20,6 +21,7 @@ import type { UserProfile, ProjectCredit } from "@/lib/profile-types";
 import { getPresetForType, PROFILE_PRESETS, type ProfileModule } from "@/lib/profile-types";
 import { normalizeProfileTypes } from "@/lib/profile-display";
 import type { ExternalProfileRow } from "@/lib/external-platforms";
+import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 // Page is dynamic because of auth(), but data fetches are cached with tags
 export const dynamicParams = true;
@@ -97,17 +99,19 @@ const getProfile = cache(function getProfile(slug: string): Promise<UserProfile 
 export async function generateMetadata(
   { params }: { params: Promise<{ slug: string }> }
 ): Promise<Metadata> {
+  const pageCopy = await getPageTranslations("PageCopy");
+  const tMetadata = await getMetadataTranslations("Metadata");
   const { slug } = await params;
   const profile = await getProfile(slug);
   const { userId } = await auth();
   if (!profile || !(await canViewProfile(profile.user_id, userId))) {
-    return { title: "Profil nicht gefunden" };
+    return { title: tMetadata('m_4b7786bc0e50') };
   }
-  const name = profile.display_name ?? "Profil";
+  const name = profile.display_name ?? (await getMetadataTranslations())("profile.tabProfile");
   const role = profile.role ?? "";
   return {
     title: `${name}${role ? ` — ${role}` : ""} · CineGenius`,
-    description: profile.tagline ?? profile.bio ?? `${name} auf CineGenius`,
+    description: profile.tagline ?? profile.bio ?? pageCopy("p_630f545a7082", { value0: String(name) }),
     openGraph: {
       title: `${name} · CineGenius`,
       images: profile.avatar_url ? [profile.avatar_url] : [],
@@ -191,8 +195,8 @@ function getPublicCollaborations(userId: string, viewerId: string | null = null)
       ]);
 
       const collabs: { friendId: string; label: string }[] = [
-        ...(asSender.data ?? []).map((f) => ({ friendId: f.receiver_id, label: f.sender_collab_label?.trim() || "Vernetzt" })),
-        ...(asReceiver.data ?? []).map((f) => ({ friendId: f.sender_id, label: f.receiver_collab_label?.trim() || "Vernetzt" })),
+        ...(asSender.data ?? []).map((f) => ({ friendId: f.receiver_id, label: f.sender_collab_label?.trim() || "" })),
+        ...(asReceiver.data ?? []).map((f) => ({ friendId: f.sender_id, label: f.receiver_collab_label?.trim() || "" })),
       ];
 
       if (collabs.length === 0) return [];
@@ -262,6 +266,7 @@ function getCompanyMembership(userId: string): Promise<Array<{
 export default async function ProfilePage(
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const messages = await getMetadataTranslations();
   const { slug } = await params;
   const [profile, { userId }] = await Promise.all([
     getProfile(slug),
@@ -368,7 +373,7 @@ export default async function ProfilePage(
         externalProfiles={externalProfiles}
         listings={listings.map(l=>({...l,city:placeDisplay(placeReadFields(l.city,l,locale),l.city,locale)}))}
         blockStatus={blockStatus}
-        collaborations={collaborations}
+        collaborations={collaborations.map(collaboration => ({ ...collaboration, label: collaboration.label || (messages("Ui.text_feff0dfb77ca7d")) }))}
         imageLikes={imageLikesData.likes}
         myImageLikes={imageLikesData.myLikes}
         similarProfiles={similarProfiles.map(p=>({...p,location:placeDisplay(placeReadFields(p.location??"",p,locale),p.location??"",locale)}))}

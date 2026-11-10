@@ -1,11 +1,14 @@
+import { localizedNotification } from "@/lib/i18n/notification-copy";
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { fetchRatingSummaries } from "@/lib/ratings";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 // GET /api/listing-ratings?ids=id1,id2,...
 export async function GET(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const ids = req.nextUrl.searchParams.get("ids");
   if (!ids) return NextResponse.json({ ratings: {}, myRatings: {} }, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 
@@ -20,8 +23,8 @@ export async function GET(req: NextRequest) {
     db.from("listing_ratings").select("listing_id, liker_id, rating").in("listing_id", idList),
     db.from("reviews").select("target_id, reviewer_id, rating").eq("target_type", "listing").in("target_id", idList),
   ]);
-  if (quickResult.error) return NextResponse.json({ error: quickResult.error.message }, { status: 500 });
-  if (reviewResult.error) return NextResponse.json({ error: reviewResult.error.message }, { status: 500 });
+  if (quickResult.error) return NextResponse.json({ error: tResponse("System.requestFailed") }, { status: 500 });
+  if (reviewResult.error) return NextResponse.json({ error: tResponse("System.requestFailed") }, { status: 500 });
   for (const row of quickResult.data ?? []) {
     if (userId && row.liker_id === userId) myRatings[row.listing_id] = row.rating ?? 1;
   }
@@ -53,12 +56,13 @@ export async function GET(req: NextRequest) {
 
 // POST /api/listing-ratings  { listing_id, owner_id, rating: 1-5 }
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  if (!userId) return NextResponse.json({ error: tResponse('System.m_352f63d9d1d9') }, { status: 401 });
 
   const { listing_id, owner_id, rating } = await req.json().catch(() => ({}));
-  if (!listing_id) return NextResponse.json({ error: "listing_id erforderlich" }, { status: 400 });
-  if (owner_id && owner_id === userId) return NextResponse.json({ error: "Eigene Inserate können nicht bewertet werden" }, { status: 403 });
+  if (!listing_id) return NextResponse.json({ error: tResponse('System.m_10bdde0eb628') }, { status: 400 });
+  if (owner_id && owner_id === userId) return NextResponse.json({ error: tResponse('System.m_3455646e5edd') }, { status: 403 });
 
   // Only allow rating if the user has previously contacted the owner about this listing
   const { data: conv } = await db
@@ -67,7 +71,7 @@ export async function POST(req: NextRequest) {
     .eq("sender_id", userId)
     .eq("listing_id", listing_id)
     .maybeSingle();
-  if (!conv) return NextResponse.json({ error: "Du kannst ein Inserat erst bewerten, nachdem du den Anbieter kontaktiert hast." }, { status: 403 });
+  if (!conv) return NextResponse.json({ error: tResponse('System.m_814018cdef81') }, { status: 403 });
 
   const r = Math.min(5, Math.max(1, Math.round(Number(rating) || 5)));
 
@@ -83,7 +87,7 @@ export async function POST(req: NextRequest) {
     .from("listing_ratings")
     .upsert({ liker_id: userId, listing_id, rating: r }, { onConflict: "liker_id,listing_id" });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
   if (isNew && owner_id) {
     try {
@@ -94,8 +98,8 @@ export async function POST(req: NextRequest) {
         await db.from("notifications").insert({
           user_id: listing.user_id,
           type: "review",
-          title: "Inserat bewertet",
-          body: `${name} hat dein Inserat „${listing.title}" mit ${r} Stern${r !== 1 ? "en" : ""} bewertet.`,
+          ...localizedNotification({ title: { key: "n_6fc234ff6dc6" }, body: { key: "n_794be4485c9a", values: { value0: String(name), value1: String(listing.title), value2: r } } }),
+
           href: `/listings/${listing_id}`,
         });
       }
@@ -108,11 +112,12 @@ export async function POST(req: NextRequest) {
 
 // DELETE /api/listing-ratings  { listing_id }
 export async function DELETE(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Nicht eingeloggt" }, { status: 401 });
+  if (!userId) return NextResponse.json({ error: tResponse('System.m_352f63d9d1d9') }, { status: 401 });
 
   const { listing_id } = await req.json().catch(() => ({}));
-  if (!listing_id) return NextResponse.json({ error: "listing_id erforderlich" }, { status: 400 });
+  if (!listing_id) return NextResponse.json({ error: tResponse('System.m_10bdde0eb628') }, { status: 400 });
 
   await db.from("listing_ratings").delete().eq("liker_id", userId).eq("listing_id", listing_id);
 

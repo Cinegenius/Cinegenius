@@ -1,3 +1,4 @@
+import { localizedNotification } from "@/lib/i18n/notification-copy";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { anyBlockExists } from "@/lib/trust";
@@ -7,21 +8,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { fetchRatingSummaries } from "@/lib/ratings";
 import { resolveReviewEligibility } from "@/lib/review-eligibility";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 const VALID_TARGET_TYPES = new Set(["listing", "user"]);
 
 // GET /api/reviews?target_id=xxx&target_type=xxx
 export async function GET(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const { searchParams } = new URL(req.url);
   const target_id   = searchParams.get("target_id");
   const target_type = searchParams.get("target_type");
 
   if (!target_id || !target_type) {
-    return NextResponse.json({ error: "target_id und target_type erforderlich" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_4b4e52673e99') }, { status: 400 });
   }
 
   if (!VALID_TARGET_TYPES.has(target_type)) {
-    return NextResponse.json({ error: "Ungültiger target_type" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_a53f7b2f8fa7') }, { status: 400 });
   }
 
   const [{ data, error }, summaryMap, { userId }] = await Promise.all([
@@ -35,7 +38,7 @@ export async function GET(req: NextRequest) {
     auth(),
   ]);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
   const summary = summaryMap[target_id] ?? { rating: 0, reviews: 0, ratingOnly: 0 };
   const myReviewRow = userId ? (data ?? []).find((review) => review.reviewer_id === userId) : null;
   const myReview = myReviewRow ? { id: myReviewRow.id, rating: myReviewRow.rating, text: myReviewRow.text } : null;
@@ -53,6 +56,7 @@ export async function GET(req: NextRequest) {
 
 // POST /api/reviews
 export async function POST(req: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
   const { userId } = authResult;
@@ -62,36 +66,36 @@ export async function POST(req: NextRequest) {
 
   // Per-user rate limit: 5 reviews per minute
   const { allowed } = await rateLimit(`review:${userId}`, 5, 60);
-  if (!allowed) return NextResponse.json({ error: "Zu viele Anfragen. Bitte kurz warten." }, { status: 429 });
+  if (!allowed) return NextResponse.json({ error: tResponse('System.m_35bd89251439') }, { status: 429 });
 
   // ── Input validation ──────────────────────────────────────────────────────
   if (!VALID_TARGET_TYPES.has(target_type)) {
-    return NextResponse.json({ error: "Ungültiger target_type" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_a53f7b2f8fa7') }, { status: 400 });
   }
   if (!target_id || typeof target_id !== "string") {
-    return NextResponse.json({ error: "target_id fehlt" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_340c72435425') }, { status: 400 });
   }
   if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
-    return NextResponse.json({ error: "Bewertung muss eine ganze Zahl zwischen 1 und 5 sein" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_a6461ba58878') }, { status: 400 });
   }
   if (!text?.trim()) {
-    return NextResponse.json({ error: "Bewertungstext fehlt" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_2ed4ac058983') }, { status: 400 });
   }
   if (text.trim().length < 10) {
-    return NextResponse.json({ error: "Bewertungstext zu kurz (min. 10 Zeichen)" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_d5c3d0951d75') }, { status: 400 });
   }
   if (text.trim().length > 2000) {
-    return NextResponse.json({ error: "Bewertungstext zu lang (max. 2000 Zeichen)" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_1f62a506acfe') }, { status: 400 });
   }
   if (aspect_ratings !== undefined && aspect_ratings !== null) {
     if (typeof aspect_ratings !== "object" || Array.isArray(aspect_ratings)) {
-      return NextResponse.json({ error: "aspect_ratings muss ein Objekt sein" }, { status: 400 });
+      return NextResponse.json({ error: tResponse('System.m_045c829e03d1') }, { status: 400 });
     }
     const invalid = Object.values(aspect_ratings).some(
       (v) => typeof v !== "number" || v < 1 || v > 5
     );
     if (invalid) {
-      return NextResponse.json({ error: "aspect_ratings Werte müssen zwischen 1 und 5 liegen" }, { status: 400 });
+      return NextResponse.json({ error: tResponse('System.m_2cb386e2fa6b') }, { status: 400 });
     }
   }
 
@@ -104,26 +108,26 @@ export async function POST(req: NextRequest) {
       .eq("id", target_id)
       .maybeSingle();
     if (!listing) {
-      return NextResponse.json({ error: "Inserat nicht gefunden" }, { status: 404 });
+      return NextResponse.json({ error: tResponse('System.m_853de52d816c') }, { status: 404 });
     }
     targetOwnerId = listing.user_id;
   }
 
   // ── Self-review guard ─────────────────────────────────────────────────────
   if (targetOwnerId === userId) {
-    return NextResponse.json({ error: "Eigene Inhalte können nicht bewertet werden" }, { status: 400 });
+    return NextResponse.json({ error: tResponse('System.m_d4e7c68c9a45') }, { status: 400 });
   }
 
   // ── Block check (uses resolved owner ID, not raw target_id) ──────────────
   if (await anyBlockExists(userId, targetOwnerId)) {
-    return NextResponse.json({ error: "Bewertung nicht möglich" }, { status: 403 });
+    return NextResponse.json({ error: tResponse('System.m_33038f83aff4') }, { status: 403 });
   }
 
   // ── Eligibility: must have a real booking or accepted application ─────────
   const via = await resolveReviewEligibility(userId, target_type, target_id, targetOwnerId);
   if (!via) {
     return NextResponse.json(
-      { error: "Bewertung nur nach einer Buchung oder angenommenen Bewerbung möglich" },
+      { error: tResponse('System.m_9261c8fd6dba') },
       { status: 403 }
     );
   }
@@ -170,7 +174,7 @@ export async function POST(req: NextRequest) {
     .select("id, reviewer_name, rating, text, aspect_ratings, verified, verified_via, created_at")
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: tResponse('System.requestFailed') }, { status: 500 });
 
   revalidateTag("creator-directory", { expire: 0 });
 
@@ -184,7 +188,7 @@ export async function POST(req: NextRequest) {
       await db.from("notifications").insert({
         user_id: targetOwnerId,
         type:    "review_request",
-        title:   `Neue Bewertung von ${reviewer_name}`,
+        ...localizedNotification({ title: { key: "n_97c4676220a7", values: { value0: String(reviewer_name) } } }),
         body:    `${rating} ★ — ${text.trim().slice(0, 100)}`,
         href,
       });

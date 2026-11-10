@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { Mail, Send } from "lucide-react";
+import { uiErrorMessage } from "@/lib/ui-error-message";
 
 export function NewsletterSignup() {
   const t = useTranslations("NewsletterSignup");
@@ -28,7 +29,7 @@ export function NewsletterSignup() {
       setEmail("");
       setConsent(false);
     } catch (error) {
-      setMessage({ ok: false, text: error instanceof Error ? error.message : t("submitError") });
+      setMessage({ ok: false, text: uiErrorMessage(error, t("submitError")) });
     } finally { setBusy(false); }
   }
 

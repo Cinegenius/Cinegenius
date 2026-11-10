@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations , useLocale } from "next-intl";
 import { ANIMAL_DEPARTMENT_LABEL } from "@/lib/animal-taxonomy";
 import MediaImage from "@/components/MediaImage";
 import { useSearchParams } from "next/navigation";
@@ -27,51 +27,68 @@ type Result = {
 
 // ─── Config ────────────────────────────────────────────────────────────────────
 
-const typeConfig: Record<string, {
+
+
+
+
+// ─── Suggestion chips ──────────────────────────────────────────────────────────
+
+
+
+// ─── Result Card ───────────────────────────────────────────────────────────────
+
+
+function getLocalizedSUGGESTIONS(translate: (key: string) => string) { return ([
+  translate("search.suggestion1"),
+  translate("search.suggestion2"),
+  translate("Ui.text_361a1ee712bf01"),
+  translate("Ui.text_bc846b11ef2b96"),
+  translate("Ui.text_6dfd6bbec03767"),
+  translate("Ui.text_fb39eb3a7e4f5b"),
+  translate("Ui.text_04c75c3932f8a1"),
+  translate("Ui.text_ae6b424c00c367"),
+]); }
+
+function getLocalizedTypeConfig(translate: (key: string) => string): Record<string, {
   label: string;
   pluralLabel: string;
   icon: React.ComponentType<{ size?: number; className?: string }>;
   href: (id: string) => string;
   color: string;
   bgColor: string;
-}> = {
-  profile:  { label: "Crew",        pluralLabel: "Crew",        icon: User,      href: (id) => `/profile/${id}`,   color: "text-gold",          bgColor: "bg-gold/10 border-gold/20"      },
-  creator:  { label: "Crew",        pluralLabel: "Crew",        icon: Users,     href: (id) => `/profile/${id}`,   color: "text-gold",          bgColor: "bg-gold/10 border-gold/20"      },
-  location: { label: "Location",     pluralLabel: "Locations",    icon: MapPin,    href: (id) => `/locations/${id}`, color: "text-sky-400",        bgColor: "bg-sky-500/10 border-sky-500/20"   },
-  vehicle:  { label: "Fahrzeug",    pluralLabel: "Fahrzeuge",   icon: Car,       href: (id) => `/vehicles/${id}`,  color: "text-orange-400",    bgColor: "bg-orange-500/10 border-orange-500/20" },
-  prop:     { label: "Requisite",   pluralLabel: "Requisiten",  icon: Package,   href: (id) => `/props/${id}`,     color: "text-violet-400",    bgColor: "bg-violet-500/10 border-violet-500/20" },
-  job:      { label: "Job",         pluralLabel: "Jobs",        icon: Briefcase, href: (id) => `/jobs/${id}`,      color: "text-emerald-400",   bgColor: "bg-emerald-500/10 border-emerald-500/20" },
+}> {
+  return ({
+  profile:  { label: translate("nav.crew"),        pluralLabel: translate("nav.crew"),        icon: User,      href: (id) => `/profile/${id}`,   color: "text-gold",          bgColor: "bg-gold/10 border-gold/20"      },
+  creator:  { label: translate("nav.crew"),        pluralLabel: translate("nav.crew"),        icon: Users,     href: (id) => `/profile/${id}`,   color: "text-gold",          bgColor: "bg-gold/10 border-gold/20"      },
+  location: { label: translate("profile.labelLocation"),     pluralLabel: translate("nav.locations"),    icon: MapPin,    href: (id) => `/locations/${id}`, color: "text-sky-400",        bgColor: "bg-sky-500/10 border-sky-500/20"   },
+  vehicle:  { label: translate("AdminAccounts.contentKinds.vehicle"),    pluralLabel: translate("footer.links_vehicles"),   icon: Car,       href: (id) => `/vehicles/${id}`,  color: "text-orange-400",    bgColor: "bg-orange-500/10 border-orange-500/20" },
+  prop:     { label: translate("Ui.text_27c673e10176f0"),   pluralLabel: translate("search.typeProps"),  icon: Package,   href: (id) => `/props/${id}`,     color: "text-violet-400",    bgColor: "bg-violet-500/10 border-violet-500/20" },
+  job:      { label: translate("AdminAccounts.contentKinds.job"),         pluralLabel: translate("nav.jobs"),        icon: Briefcase, href: (id) => `/jobs/${id}`,      color: "text-emerald-400",   bgColor: "bg-emerald-500/10 border-emerald-500/20" },
   animal: {label: ANIMAL_DEPARTMENT_LABEL, pluralLabel: ANIMAL_DEPARTMENT_LABEL, icon: PawPrint, href: id => `/tiere/${id}`, color: "text-amber-400", bgColor: "bg-amber-500/10 border-amber-500/20"},
-  company:  { label: "Firma",       pluralLabel: "Firmen",      icon: Building2, href: (id) => `/companies/${id}`, color: "text-blue-400",      bgColor: "bg-blue-500/10 border-blue-500/20" },
-};
+  company:  { label: translate("AdminReview.types.company"),       pluralLabel: translate("nav.companies"),      icon: Building2, href: (id) => `/companies/${id}`, color: "text-blue-400",      bgColor: "bg-blue-500/10 border-blue-500/20" },
+});
+}
 
-const TABS = [
-  { id: "all",      label: "Alle",       icon: Search   },
-  { id: "profile",  label: "Crew",       icon: Users    },
-  { id: "location", label: "Locations",   icon: MapPin   },
-  { id: "job",      label: "Jobs",       icon: Briefcase },
-  { id: "vehicle",  label: "Fahrzeuge",  icon: Car      },
-  { id: "prop",     label: "Requisiten", icon: Package  },
-  { id: "company",  label: "Firmen",     icon: Building2 },
+
+function getLocalizedTABS(translate: (key: string) => string) {
+  return ([
+  { id: "all",      label: translate("common.all"),       icon: Search   },
+  { id: "profile",  label: translate("nav.crew"),       icon: Users    },
+  { id: "location", label: translate("nav.locations"),   icon: MapPin   },
+  { id: "job",      label: translate("nav.jobs"),       icon: Briefcase },
+  { id: "vehicle",  label: translate("footer.links_vehicles"),  icon: Car      },
+  { id: "prop",     label: translate("search.typeProps"), icon: Package  },
+  { id: "company",  label: translate("nav.companies"),     icon: Building2 },
   {id:"animal", label:ANIMAL_DEPARTMENT_LABEL, icon:PawPrint},
-] as const;
-
-// ─── Suggestion chips ──────────────────────────────────────────────────────────
-
-const SUGGESTIONS = [
-  "Kamerafrau/-mann",
-  "Warehouse Berlin",
-  "Oldtimer 1960s",
-  "Regie Kurzfilm",
-  "Studio München",
-  "Schauspieler/in gesucht",
-  "Drohnenpilot/in",
-  "Fotostudio Hamburg",
-];
-
-// ─── Result Card ───────────────────────────────────────────────────────────────
+] as const);
+}
 
 function ResultCard({ result }: { result: Result }) {
+  const uiText = useTranslations();
+  const typeConfig = getLocalizedTypeConfig(uiText);
+
+  const uiLocale = useLocale();
+
   const animals = useTranslations("FilmAnimals");
   const cfg = typeConfig[result.type];
   if (!cfg) return null;
@@ -106,7 +123,7 @@ function ResultCard({ result }: { result: Result }) {
         {/* Availability dot for profiles */}
         {isProfile && result.available !== null && (
           <div className={`absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full border-2 border-bg-secondary ${result.available ? "bg-success" : "bg-text-muted"}`}
-            title={result.available ? "Verfügbar" : "Gebucht"} />
+            title={result.available ? uiText("common.available") : uiText("common.booked")} />
         )}
       </div>
 
@@ -118,13 +135,13 @@ function ResultCard({ result }: { result: Result }) {
         <p className="text-xs text-text-muted line-clamp-1 flex-1">{result.subtitle}</p>
         {!isProfile && result.type !== "animal" && (result.priceLabel || result.price > 0) && (
           <p className="mt-2 text-sm font-semibold font-mono text-gold">
-            {result.priceLabel ?? `${result.price.toLocaleString("de-DE")} €/Tag`}
+            {result.priceLabel ?? uiText("Ui.text_4519fabedb2cbd", { value1: String(result.price.toLocaleString(uiLocale)) })}
           </p>
         )}
         {isProfile && (
           <div className="mt-2 flex items-center gap-1">
             <span className={`w-1.5 h-1.5 rounded-full ${result.available ? "bg-success" : "bg-text-muted"}`} />
-            <span className="text-xs text-text-muted">{result.available ? "Verfügbar" : "Derzeit gebucht"}</span>
+            <span className="text-xs text-text-muted">{result.available ? uiText("common.available") : uiText("creators.currentlyBooked")}</span>
           </div>
         )}
       </div>
@@ -135,18 +152,20 @@ function ResultCard({ result }: { result: Result }) {
 // ─── Empty State ───────────────────────────────────────────────────────────────
 
 function EmptyState({ query }: { query: string }) {
+  const uiText = useTranslations();
+
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <div className="w-16 h-16 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center mb-4">
         <Search size={24} className="text-text-muted" />
       </div>
       <h3 className="font-display text-lg font-bold text-text-primary mb-2">
-        {query ? `Keine Ergebnisse für „${query}"` : "Womit soll ich suchen?"}
+        {query ? uiText("Ui.text_e1471e0fb6e53f", { value1: String(query) }) : uiText("Ui.text_4d58c218c80da9")}
       </h3>
       <p className="text-sm text-text-muted max-w-xs leading-relaxed">
         {query
-          ? "Versuche einen anderen Begriff, eine Stadt oder eine Kategorie."
-          : "Tippe einen Suchbegriff oben ein — Crew, Locations, Jobs, Requisiten oder Fahrzeuge."}
+          ? uiText("Ui.text_3e8f1535ea7b1b")
+          : uiText("Ui.text_38381481ff29f2")}
       </p>
     </div>
   );
@@ -155,6 +174,28 @@ function EmptyState({ query }: { query: string }) {
 // ─── Main Search Content ───────────────────────────────────────────────────────
 
 function SearchContent() {
+  const uiText = useTranslations();
+  const SUGGESTIONS = getLocalizedSUGGESTIONS(uiText);
+
+  const uiOptionLabels: Record<string, string> = {
+    "Kamerafrau/-mann": uiText("search.suggestion1"),
+    "Warehouse Berlin": uiText("search.suggestion2"),
+    "Oldtimer 1960s": uiText("Ui.text_361a1ee712bf01"),
+    "Regie Kurzfilm": uiText("Ui.text_bc846b11ef2b96"),
+    "Studio München": uiText("Ui.text_6dfd6bbec03767"),
+    "Schauspieler/in gesucht": uiText("Ui.text_fb39eb3a7e4f5b"),
+    "Drohnenpilot/in": uiText("Ui.text_04c75c3932f8a1"),
+    "Fotostudio Hamburg": uiText("Ui.text_ae6b424c00c367"),
+  };
+
+
+
+
+
+  const typeConfig = getLocalizedTypeConfig(uiText);
+  const TABS = getLocalizedTABS(uiText);
+
+
   const t = useTranslations("search");
   const animals = useTranslations("FilmAnimals");
   const searchParams = useSearchParams();
@@ -243,9 +284,9 @@ function SearchContent() {
       <div className="bg-bg-secondary border-b border-border">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-2">
-            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">Suche</p>
+            <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{uiText("Ui.text_a4f2922e2d958e")}</p>
             <h1 className="font-display text-3xl font-bold text-text-primary">
-              {query ? <>Ergebnisse für <span className="text-gradient-gold">„{query}“</span></> : "Alles durchsuchen"}
+              {query ? <>{uiText.rich("Ui.text_5e878a7206c9f4", { value2: () => (query), part1: chunks => (<span className="text-gradient-gold">{chunks}</span>) })}</> : uiText("Ui.text_2380dfc08d3487")}
             </h1>
           </div>
 
@@ -292,7 +333,7 @@ function SearchContent() {
                   onClick={() => { setInputValue(s); doSearch(s); setQuery(s); setHasSearched(true); }}
                   className="px-3 py-1.5 text-xs border border-border text-text-secondary rounded-full hover:border-gold/50 hover:text-gold transition-all"
                 >
-                  {s}
+                  {(uiOptionLabels[s] ?? s)}
                 </button>
               ))}
             </div>
@@ -333,10 +374,7 @@ function SearchContent() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <div className="flex items-center gap-3 text-text-muted">
-              <Loader2 size={20} className="animate-spin text-gold" />
-              <span className="text-sm">Suche läuft…</span>
-            </div>
+            <div className="flex items-center gap-3 text-text-muted">{uiText.rich("Ui.text_96a278ec9c0db8", { part1: () => (<Loader2 size={20} className="animate-spin text-gold" />), part2: chunks => (<span className="text-sm">{chunks}</span>) })}</div>
           </div>
         )}
 
@@ -357,7 +395,7 @@ function SearchContent() {
                 );
               })}
             </div>
-            <p className="text-sm text-text-muted">Gib oben einen Suchbegriff ein oder klicke auf eine Kategorie.</p>
+            <p className="text-sm text-text-muted">{uiText("Ui.text_c8f0b7f17f7962")}</p>
           </div>
         )}
 
@@ -368,11 +406,7 @@ function SearchContent() {
         {!loading && filtered.length > 0 && (
           <>
             <div className="flex items-center justify-between mb-6">
-              <p className="text-sm text-text-muted">
-                <span className="font-semibold text-text-primary">{filtered.length}</span>{" "}
-                Ergebnis{filtered.length !== 1 ? "se" : ""}
-                {activeTab !== "all" && ` in ${TABS.find((t) => t.id === activeTab)?.label}`}
-              </p>
+              <p className="text-sm text-text-muted">{uiText.rich("Ui.text_a225506f79fe9e", { count: filtered.length, part1: chunks => (<span className="font-semibold text-text-primary">{chunks}</span>), value4: () => (activeTab !== "all" && uiText("Ui.text_935a17e04ee5cc", { value1: String(TABS.find((t) => t.id === activeTab)?.label) })) })}</p>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
@@ -384,14 +418,14 @@ function SearchContent() {
             {/* Quick links to category pages */}
             {query && (
               <div className="mt-10 pt-8 border-t border-border">
-                <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-4">Erweiterte Suche in Kategorie</p>
+                <p className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-4">{uiText("Ui.text_dc1a8174b56c72")}</p>
                 <div className="flex flex-wrap gap-3">
                   {[
-                    { href: `/creators?q=${encodeURIComponent(query)}`, label: "Alle Crew-Mitglieder", icon: Users },
-                    { href: `/locations?q=${encodeURIComponent(query)}`, label: "Alle Locations", icon: MapPin },
-                    { href: `/jobs?q=${encodeURIComponent(query)}`, label: "Alle Jobs", icon: Briefcase },
-                    { href: `/props?q=${encodeURIComponent(query)}`, label: "Alle Requisiten", icon: Package },
-                    { href: `/vehicles?q=${encodeURIComponent(query)}`, label: "Alle Fahrzeuge", icon: Car },
+                    { href: `/creators?q=${encodeURIComponent(query)}`, label: uiText("Ui.text_eef367c607be80"), icon: Users },
+                    { href: `/locations?q=${encodeURIComponent(query)}`, label: uiText("locations.allLocations"), icon: MapPin },
+                    { href: `/jobs?q=${encodeURIComponent(query)}`, label: uiText("Ui.text_3743bce939bbde"), icon: Briefcase },
+                    { href: `/props?q=${encodeURIComponent(query)}`, label: uiText("Ui.text_56e36065868342"), icon: Package },
+                    { href: `/vehicles?q=${encodeURIComponent(query)}`, label: uiText("Ui.text_21411272cc2504"), icon: Car },
                   ].map(({ href, label, icon: Icon }) => (
                     <Link
                       key={href}

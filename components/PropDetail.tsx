@@ -54,6 +54,21 @@ const conditionColors: Record<string, string> = {
 };
 
 export default function PropDetail({ prop }: { prop: Prop }) {
+  const uiText = useTranslations();
+  const uiOptionLabels: Record<string, string> = {
+    "Artikel wie beschrieben, gereinigt und einsatzbereit": uiText("Ui.text_67e45e82d60fbb"),
+    "Vollständiger Zustandsbericht mit Fotos": uiText("Ui.text_67a73492b0d94e"),
+    "Grundlegende Bedienungsanleitung": uiText("Ui.text_aa78be443ba259"),
+    "Anbieter-Kontakt während der Produktion": uiText("Ui.text_0ec08c729ed374"),
+    "Rückgabeverpackung / Koffer (falls vorhanden)": uiText("Ui.text_40b4c353e938ad"),
+    "Digitaler Mietvertrag": uiText("Ui.text_139deccd621aed"),
+  };
+
+
+
+
+
+
   const { user } = useUser();
   const market=useTranslations("MarketplaceOffer"),catalog=useTranslations("MarketplaceCatalog"),locale=useLocale();
   const isOwner = !!user && user.id === prop.ownerId;
@@ -100,9 +115,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
   return (
     <div className="pt-16 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <ContextBackLink href="/props" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors mb-6">
-          <ArrowLeft size={14} /> Zurück zu Requisiten & Verleih
-        </ContextBackLink>
+        <ContextBackLink href="/props" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-gold transition-colors mb-6">{uiText.rich("Ui.text_b9e55c90e630d4", { part1: () => (<ArrowLeft size={14} />) })}</ContextBackLink>
 
         <header data-offer-heading className="mb-6 min-w-0">
             <div className="min-w-0 space-y-3 mb-3">
@@ -122,9 +135,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
                 {prop.condition}
               </span>
               {prop.delivery && (
-                <span className="px-2.5 py-1 bg-success/10 border border-success/20 text-success text-xs rounded-full flex items-center gap-1">
-                  <Truck size={11} /> Lieferung verfügbar
-                </span>
+                <span className="px-2.5 py-1 bg-success/10 border border-success/20 text-success text-xs rounded-full flex items-center gap-1">{uiText.rich("Ui.text_0ead3d7dc888ff", { part1: () => (<Truck size={11} />) })}</span>
               )}
             </div>
 
@@ -136,7 +147,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
 
         </header>
 
-        <ListingPhotoGallery images={images} title={prop.title} label="Artikelgalerie" focalPoint={prop.focalPoint} />
+        <ListingPhotoGallery images={images} title={prop.title} label={uiText("Ui.text_b4115e7d5bd859")} focalPoint={prop.focalPoint} />
 
         <div className="flex gap-10 flex-col lg:flex-row">
           {/* LEFT */}
@@ -145,9 +156,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
               <div className="flex flex-wrap items-center gap-2 [&_button]:min-h-11 [&_button]:min-w-11">
                 {isOwner && (
                   <Link href={`/dashboard?tab=listings`}
-                    className="flex items-center gap-1.5 px-3 py-1.5 border border-gold/40 text-gold text-xs font-medium rounded-lg hover:bg-gold/10 transition-colors">
-                    <Pencil size={12} /> Bearbeiten
-                  </Link>
+                    className="flex items-center gap-1.5 px-3 py-1.5 border border-gold/40 text-gold text-xs font-medium rounded-lg hover:bg-gold/10 transition-colors">{uiText.rich("Ui.text_603ead2ae843f0", { part1: () => (<Pencil size={12} />) })}</Link>
                 )}
                 <FavoriteButton
                   listingId={prop.id}
@@ -167,11 +176,11 @@ export default function PropDetail({ prop }: { prop: Prop }) {
             </div>
 
             <div className="mb-8">
-              <h2 className="font-display text-xl font-bold text-text-primary mb-3">Über diesen Artikel</h2>
+              <h2 className="font-display text-xl font-bold text-text-primary mb-3">{uiText("Ui.text_23a2f2f64fae98")}</h2>
               {prop.description ? (
                 <p className="text-text-secondary text-sm leading-relaxed whitespace-pre-line break-words [overflow-wrap:anywhere]">{prop.description}</p>
               ) : (
-                <p className="text-text-muted italic text-sm">Keine Beschreibung vorhanden.</p>
+                <p className="text-text-muted italic text-sm">{uiText("Ui.text_ce2a8b66be4591")}</p>
               )}
             </div>
 
@@ -183,27 +192,24 @@ export default function PropDetail({ prop }: { prop: Prop }) {
                     onClick={() => handleRate(s)}
                     disabled={!canRate}
                     className={`transition-transform ${canRate ? "hover:scale-110 active:scale-125" : "cursor-default"}`}
-                    title={!user ? "Einloggen zum Bewerten" : isOwner ? "Eigenes Inserat" : !eligible ? "Erst anfragen, dann bewerten" : `${s} Stern${s !== 1 ? "e" : ""}`}>
+                    title={!user ? uiText("Ui.text_0e87ce8126b5d8") : isOwner ? uiText("Ui.text_288d8b63c75378") : !eligible ? uiText("Ui.text_c05dd8c953b77c") : uiText("Ui.text_8dc8762909a7e9", { value1: String(s), value2: String(s !== 1 ? "e" : "") })}>
                     <Star size={18} className={`transition-colors ${s <= (myRating || Math.round(liveRating?.avg ?? 0)) ? "text-gold fill-gold" : "text-border fill-border"}`} />
                   </button>
                 ))}
               </div>
               {liveRating && liveRating.count > 0 ? (
-                <>
-                  <span className="font-semibold text-text-primary">{liveRating.avg.toFixed(1)}</span>
-                  <span className="text-text-muted text-sm">({liveRating.count} Bewertung{liveRating.count !== 1 ? "en" : ""})</span>
-                </>
+                <>{uiText.rich("Ui.text_eda0715004d2ec", { value2: () => (liveRating.avg.toFixed(1)), part1: chunks => (<span className="font-semibold text-text-primary">{chunks}</span>), value4: () => (liveRating.count), count5: liveRating.count, part3: chunks => (<span className="text-text-muted text-sm">{chunks}</span>) })}</>
               ) : (
-                <span className="text-text-muted text-sm">{canRate ? "Jetzt als Erste/r bewerten" : user && !isOwner ? "Erst anfragen, dann bewerten" : "Noch keine Bewertungen"}</span>
+                <span className="text-text-muted text-sm">{canRate ? uiText("Ui.text_a375a02f805fef") : user && !isOwner ? uiText("Ui.text_c05dd8c953b77c") : uiText("home.reviewsEmpty")}</span>
               )}
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
               {[
                 { label: market("mode"), value: listingPriceLabel(prop.dailyRate,prop.pricing,"/Tag",locale,market) },
-                { label: "Zustand", value: prop.condition || "—" },
-                { label: "Kategorie", value: marketplaceCategoryLabel(prop.category,catalog) },
-                { label: "Abholung / Lieferung", value: prop.pricing?.marketplace ? prop.pricing.marketplace.fulfilment.map(value=>market(value)).join(" · ") || "—" : prop.delivery ? "Beides möglich" : "Nur Abholung" },
+                { label: uiText("props.conditionLabel"), value: prop.condition || "—" },
+                { label: uiText("props.categoryBtn"), value: marketplaceCategoryLabel(prop.category,catalog) },
+                { label: uiText("Ui.text_7847a535dc2e1f"), value: prop.pricing?.marketplace ? prop.pricing.marketplace.fulfilment.map(value=>market(value)).join(" · ") || "—" : prop.delivery ? uiText("Ui.text_a9e5a9a46e2694") : uiText("Ui.text_df2631edf950ad") },
               ].map(({ label, value }) => (
                 <div key={label} className="p-4 bg-bg-secondary border border-border rounded-xl text-center">
                   <div className="text-xs uppercase tracking-widest text-text-muted mb-1">{label}</div>
@@ -215,10 +221,10 @@ export default function PropDetail({ prop }: { prop: Prop }) {
             <MarketplaceOfferSummary category={prop.category} price={prop.dailyRate} metadata={prop.pricing} />
 
 
-            <ProductionCreditsDisplay credits={prop.productionCredits ?? []} heading="Bei diesen Produktionen im Einsatz" />
+            <ProductionCreditsDisplay credits={prop.productionCredits ?? []} heading={uiText("Ui.text_92fc4f28b0bd15")} />
 
             <div className="mb-8">
-              <h2 className="font-display text-xl font-bold text-text-primary mb-4">Im Lieferumfang enthalten</h2>
+              <h2 className="font-display text-xl font-bold text-text-primary mb-4">{uiText("Ui.text_117cdd25a85396")}</h2>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {[
                   "Artikel wie beschrieben, gereinigt und einsatzbereit",
@@ -230,7 +236,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2.5 text-sm text-text-secondary">
                     <CheckCircle size={14} className="text-success mt-0.5 shrink-0" />
-                    {item}
+                    {(uiOptionLabels[item] ?? item)}
                   </li>
                 ))}
               </ul>
@@ -266,7 +272,7 @@ export default function PropDetail({ prop }: { prop: Prop }) {
                     ownerName={prop.ownerName ?? "Anbieter"}
                   />
                 ) : (
-                  <div className="rounded-xl border border-gold/30 bg-gold/10 p-4 text-sm leading-6 text-text-secondary">Kontakt und Buchungsanfrage sind vorübergehend nicht verfügbar, weil der Anbieter noch nicht zugeordnet ist.</div>
+                  <div className="rounded-xl border border-gold/30 bg-gold/10 p-4 text-sm leading-6 text-text-secondary">{uiText("Ui.text_231a3311d2e5f9")}</div>
                 )}
               </div>
             </div>

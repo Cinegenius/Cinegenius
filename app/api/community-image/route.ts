@@ -6,22 +6,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { COMMUNITY_ALLOWED_SOURCE_TYPES, isOwnPublicStorageUrl } from "@/lib/community-media";
 import { cachedCommunityPreview, readPreviewSource, resizeCommunityPreview } from "@/lib/community-preview-server";
+import { getTranslations as getResponseTranslations } from "next-intl/server";
 
 export const runtime = "nodejs";
 const headers = { "Cache-Control": "private, no-store", "CDN-Cache-Control": "no-store", "Vercel-CDN-Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" };
 
 export async function GET(request: NextRequest) {
+  const tResponse = await getResponseTranslations();
   const image = request.nextUrl.searchParams.get("image") ?? "";
   const size = request.nextUrl.searchParams.get("size") ?? "thumbnail";
   if (image.length > 2048 || !isOwnPublicStorageUrl(image, process.env.NEXT_PUBLIC_SUPABASE_URL ?? "") || !["thumbnail", "detail"].includes(size)) {
-    return NextResponse.json({ error: "Ungültige Bildanfrage." }, { status: 400, headers });
+    return NextResponse.json({ error: tResponse('System.m_573f1f11c4a9') }, { status: 400, headers });
   }
   // Never turn the resizing service into a proxy for private or excluded media.
   const { data, error } = await db.from("public_community_media")
     .select("storage_id,uploaded_at,owner_id").in("source_type", [...COMMUNITY_ALLOWED_SOURCE_TYPES])
     .eq("image_url", image).limit(1).maybeSingle();
-  if (error) return NextResponse.json({ error: "Bildstatus derzeit nicht erreichbar." }, { status: 503, headers });
-  if (!data) return NextResponse.json({ error: "Bild nicht öffentlich verfügbar." }, { status: 404, headers });
+  if (error) return NextResponse.json({ error: tResponse('System.m_9a5e91b6061d') }, { status: 503, headers });
+  if (!data) return NextResponse.json({ error: tResponse('System.m_e3d2d6e03512') }, { status: 404, headers });
   try {
     const { userId } = await auth();
     const blocked = await blockedMediaOwnerIds(userId);
@@ -41,6 +43,6 @@ export async function GET(request: NextRequest) {
     return new Response(new Uint8Array(output), { headers: { ...headers, "Content-Type": "image/webp" } });
   } catch {
     console.error("[community-image] bounded preview unavailable", { storageId: data.storage_id, size });
-    return NextResponse.json({ error: "Bildvorschau derzeit nicht erreichbar." }, { status: 502, headers });
+    return NextResponse.json({ error: tResponse('System.m_e3cf3aca9605') }, { status: 502, headers });
   }
 }

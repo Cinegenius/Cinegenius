@@ -7,6 +7,8 @@ import { useTranslations } from "next-intl";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
 
 export default function Footer() {
+  const uiText = useTranslations();
+
   const pathname = usePathname();
   const tf = useTranslations("footer");
   const ai = useTranslations("AiTransparency");
@@ -95,7 +97,7 @@ export default function Footer() {
         {/* Unterzeile */}
         <div className="mt-4 pt-3 sm:mt-8 sm:pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
           <div className="text-center text-xs text-text-muted sm:text-left">
-            <p>© {new Date().getFullYear()} CineGenius. {tf("rights")}</p>
+            <p>{uiText.rich("Ui.text_c2ab105f7984df", { value1: () => (new Date().getFullYear()), value2: () => (tf("rights")) })}</p>
             <Link href="/ki-transparenz" prefetch={false} className="mt-1 inline-flex min-h-9 items-center hover:text-text-secondary">{ai("footerNote")}</Link>
           </div>
           <div className="flex max-w-full flex-wrap justify-center gap-x-6 gap-y-2">

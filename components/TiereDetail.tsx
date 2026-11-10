@@ -48,6 +48,8 @@ type Animal = {
 };
 
 export default function TiereDetail({ animal }: { animal: Animal }) {
+  const uiText = useTranslations();
+
   const { user } = useUser();
   const animals = useTranslations("FilmAnimals");
 
@@ -121,9 +123,7 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
                 </span>
               )}
               {animal.delivery && (
-                <span className="px-2.5 py-1 bg-success/10 border border-success/20 text-success text-xs rounded-full flex items-center gap-1">
-                  <Truck size={11} /> Lieferung möglich
-                </span>
+                <span className="px-2.5 py-1 bg-success/10 border border-success/20 text-success text-xs rounded-full flex items-center gap-1">{uiText.rich("Ui.text_912a49918ec6a8", { part1: () => (<Truck size={11} />) })}</span>
               )}
               {animal.handlerIncluded && (
                 <span className="px-2.5 py-1 bg-bg-secondary border border-border text-text-secondary text-xs rounded-full flex items-center gap-1">
@@ -137,9 +137,7 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
               <div className="flex items-center gap-1 shrink-0 mt-1">
                 {isOwner && (
                   <Link href="/dashboard?tab=listings"
-                    className="flex items-center gap-1.5 px-3 py-1.5 border border-gold/40 text-gold text-xs font-medium rounded-lg hover:bg-gold/10 transition-colors">
-                    <Pencil size={12} /> Bearbeiten
-                  </Link>
+                    className="flex items-center gap-1.5 px-3 py-1.5 border border-gold/40 text-gold text-xs font-medium rounded-lg hover:bg-gold/10 transition-colors">{uiText.rich("Ui.text_603ead2ae843f0", { part1: () => (<Pencil size={12} />) })}</Link>
                 )}
                 <FavoriteButton listingId={animal.id} listingType="animal"
                   listingTitle={animal.title} listingCity={animal.location}
@@ -149,7 +147,7 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
             </div>
 
             <div className="flex items-center gap-1.5 text-sm text-text-muted mb-4">
-              <MapPin size={14} className="text-gold" /> {animal.location || "Standort auf Anfrage"}
+              <MapPin size={14} className="text-gold" /> {animal.location || uiText("FilmAnimals.locationRequest")}
             </div>
 
             {/* Rating */}
@@ -158,19 +156,16 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
                 {[1,2,3,4,5].map((s) => (
                   <button key={s} type="button" onClick={() => handleRate(s)} disabled={!canRate}
                     className={`transition-transform ${canRate ? "hover:scale-110 active:scale-125" : "cursor-default"}`}
-                    title={!user ? "Einloggen zum Bewerten" : isOwner ? "Eigenes Inserat" : !eligible ? "Erst anfragen, dann bewerten" : `${s} Stern${s !== 1 ? "e" : ""}`}>
+                    title={!user ? uiText("Ui.text_0e87ce8126b5d8") : isOwner ? uiText("Ui.text_288d8b63c75378") : !eligible ? uiText("Ui.text_c05dd8c953b77c") : uiText("Ui.text_8dc8762909a7e9", { value1: String(s), value2: String(s !== 1 ? "e" : "") })}>
                     <Star size={18} className={`transition-colors ${s <= (myRating || Math.round(liveRating?.avg ?? 0)) ? "text-gold fill-gold" : "text-border fill-border"}`} />
                   </button>
                 ))}
               </div>
               {liveRating && liveRating.count > 0 ? (
-                <>
-                  <span className="font-semibold text-text-primary">{liveRating.avg.toFixed(1)}</span>
-                  <span className="text-text-muted text-sm">({liveRating.count} Bewertung{liveRating.count !== 1 ? "en" : ""})</span>
-                </>
+                <>{uiText.rich("Ui.text_eda0715004d2ec", { value2: () => (liveRating.avg.toFixed(1)), part1: chunks => (<span className="font-semibold text-text-primary">{chunks}</span>), value4: () => (liveRating.count), count5: liveRating.count, part3: chunks => (<span className="text-text-muted text-sm">{chunks}</span>) })}</>
               ) : (
                 <span className="text-text-muted text-sm">
-                  {canRate ? "Jetzt als Erste/r bewerten" : user && !isOwner ? "Erst anfragen, dann bewerten" : "Noch keine Bewertungen"}
+                  {canRate ? uiText("Ui.text_a375a02f805fef") : user && !isOwner ? uiText("Ui.text_c05dd8c953b77c") : uiText("home.reviewsEmpty")}
                 </span>
               )}
             </div>
@@ -234,7 +229,7 @@ export default function TiereDetail({ animal }: { animal: Animal }) {
                   <PawPrint size={20} className="text-gold" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-text-primary">{animal.ownerName ?? "Anbieter"}</p>
+                  <p className="font-semibold text-text-primary">{animal.ownerName ?? uiText("profile.catAnbieterLabel")}</p>
                   <p className="text-xs text-text-muted mt-0.5 flex items-center gap-1"><MapPin size={11} /> {animal.location}</p>
                 </div>
               </div>
