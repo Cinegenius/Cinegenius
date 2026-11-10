@@ -8,12 +8,27 @@ export const placeCatalog=data;
 const cityById=new Map(data.cities.map(city=>[city.id,city]));
 const regionById=new Map(data.regions.map(region=>[region.id,region]));
 const districtById=new Map(data.districts.map(district=>[district.id,district]));
+// Use the familiar local city names for the three German city-state labels.
+// Region identities and the source catalogue remain unchanged.
+const regionDisplayCityIds: Record<string,string> = {
+ 'DE:geonames:2950157':'geonames:2950159',
+ 'DE:geonames:2911297':'geonames:2911298',
+ 'DE:geonames:2944387':'geonames:2944388',
+};
+export function regionDisplayName(regionId:string,locale:string) {
+ const region=regionById.get(regionId),city=cityById.get(regionDisplayCityIds[regionId]);
+ return city?.names[locale]??city?.name??region?.names[locale]??region?.name??'';
+}
+export function regionAliases(region:RegionEntry) {
+ const city=cityById.get(regionDisplayCityIds[region.id]);
+ return [...new Set([region.name,...region.aliases,...Object.values(region.names),...(city?[city.name,...Object.values(city.names)]:[])])];
+}
 export function cityDistrictName(city:CityEntry,locale:string) {
  const district=districtById.get(city.district);return district?.names[locale]??district?.name??'';
 }
 export function localizedPlaceFields(fields:Record<string,unknown>,locale:string): Record<string,unknown> {
  const city=cityById.get(String(fields.place_city_id??'')),region=regionById.get(String(fields.place_region_id??''));
- return {...fields,place_search_terms:[...new Set([city?.name??"",...Object.values(city?.names??{}),...(aliasOverrides[city?.id??""]??[]),region?.name??"",...Object.values(region?.names??{}),...(["de","en","es","it","cs","hu"].map(language=>fields.place_country_code?countryName(String(fields.place_country_code),language):""))])],place_city_name:city?.names[locale]??fields.place_city_name,place_region_name:region?.names[locale]??fields.place_region_name};
+ return {...fields,place_search_terms:[...new Set([city?.name??"",...Object.values(city?.names??{}),...(aliasOverrides[city?.id??""]??[]),...(region?regionAliases(region):[]),...(["de","en","es","it","cs","hu"].map(language=>fields.place_country_code?countryName(String(fields.place_country_code),language):""))])],place_region_aliases:region?regionAliases(region):[],place_city_name:city?.names[locale]??fields.place_city_name,place_region_name:region?regionDisplayName(region.id,locale):fields.place_region_name};
 }
 const aliasOverrides: Record<string,string[]> = {'geonames:2925533':['Frankfurt a.M.','Frankfurt a. M.','Frankfurt/Main','Frankfurt am Main'],'geonames:2886242':['Köln','Cologne','Koeln']};
 export function aliases(city:typeof data.cities[number]) {return [city.name,...city.aliases,...(aliasOverrides[city.id]??[])];}
@@ -34,15 +49,15 @@ export function resolvePlace(raw: string, selectedCityId?: unknown): Place {
  const empty:Place={countryCode:country,regionId:null,cityId:null,city:parts[0]??'',region:'',status:raw.trim()?'pending':'empty'};
  // Never infer a country from a city name, including well-known names.
  if(!country){
-  const key=placeKey(raw),region=data.regions.find(r=>[r.name,...r.aliases].some(alias=>placeKey(alias)===key));
+  const key=placeKey(raw),region=data.regions.find(r=>regionAliases(r).some(alias=>placeKey(alias)===key));
   const hasCity=data.countries.some(code=>exactIndex.get(code+":"+key)?.length);
   return region&&!hasCity?{...empty,city:'',region:raw}:empty;
  }
  const rest=parts.slice(0,-1); if(!rest.length)return {...empty,city:'',status:'verified'};
  const city=rest[0],regionText=rest.slice(1).join(', ');
  const regions=data.regions.filter(r=>r.country===country);
- const region=regions.filter(r=>[r.id,r.name,...r.aliases].some(n=>placeKey(n)===placeKey(regionText)));
- const regionAsCity=regions.find(r=>[r.name,...r.aliases].some(n=>placeKey(n)===placeKey(city)));
+ const region=regions.filter(r=>[r.id,...regionAliases(r)].some(n=>placeKey(n)===placeKey(regionText)));
+ const regionAsCity=regions.find(r=>regionAliases(r).some(n=>placeKey(n)===placeKey(city)));
  if(regionAsCity&&!regionText&&!(exactIndex.get(country+":"+placeKey(city))?.length))return {...empty,city:'',region:regionAsCity.name,regionId:regionAsCity.id};
  if(regionText&&region.length!==1)return {...empty,region:regionText};
  const candidates=(exactIndex.get(country+":"+placeKey(city))??[]).filter(c=>!regionText||c.region===region[0].id);
@@ -74,6 +89,6 @@ export function placeFieldsForId(cityId:string,raw:string) {
  if(!city||countryCode(parts.at(-1)??'')!==city.country||!aliases(city).some(alias=>placeKey(alias)===placeKey(parts[0]??'')))return null;
  const region=regionById.get(city.region);
  const regionText=parts.slice(1,-1).filter(Boolean).join(', ');
- if(regionText&&(!region||![region.id,region.name,...region.aliases].some(alias=>placeKey(alias)===placeKey(regionText))))return null;
+ if(regionText&&(!region||![region.id,...regionAliases(region)].some(alias=>placeKey(alias)===placeKey(regionText))))return null;
  return {place_country_code:city.country,place_region_id:region?.id??null,place_city_id:city.id,place_city_name:city.name,place_region_name:region?.name??'',place_status:'verified',place_original:raw};
 }

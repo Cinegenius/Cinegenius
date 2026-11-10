@@ -23,7 +23,7 @@ export async function PATCH(
 
   const { id } = await params;
   const { data: current, error: currentError } = await db.from("listings")
-    .select("id, user_id, company_id, type, category, image_url, extra_images, metadata, blocked_dates, responsible_person, published")
+    .select("id, user_id, company_id, type, category, city, place_country_code, place_region_id, place_status, image_url, extra_images, metadata, blocked_dates, responsible_person, published")
     .eq("id", id).maybeSingle();
   if (currentError) return NextResponse.json({ error: "Inserat konnte nicht geprüft werden." }, { status: 500 });
   if (!current) return NextResponse.json({ error: "Inserat nicht gefunden oder keine Berechtigung" }, { status: 404 });
@@ -71,7 +71,21 @@ export async function PATCH(
   if (title !== undefined)       updates.title       = title.trim();
   if (description !== undefined) updates.description = description;
   if (price !== undefined)       updates.price       = Math.max(0, Math.min(Number(price) || 0, 1_000_000));
-  if (city !== undefined) { updates.city = city.trim(); Object.assign(updates, cityWriteFields(city.trim(), body.selected_place_city_id)); }
+  if (city !== undefined) {
+    updates.city = city.trim();
+    // Older editors and recovered drafts can resend legacy city text without
+    // the catalogue ID. Preserve known country/region fields even when the
+    // municipality is still pending. Explicitly clearing the place resolves anew.
+    const preservePlace = body.selected_place_city_id === undefined
+      && city.trim() !== ""
+      && String(current.city ?? "").trim() === city.trim()
+      && (current.place_status === "verified"
+        || (current.place_status === "pending" && Boolean(current.place_country_code || current.place_region_id)));
+    // Keep the stored legacy text exact so the database does not interpret
+    // whitespace normalization as a location change and invalidate its fields.
+    if (preservePlace) updates.city = current.city;
+    else Object.assign(updates, cityWriteFields(city.trim(), body.selected_place_city_id));
+  }
   if (published === false)       updates.published   = false;
   if (image_url !== undefined || extra_images !== undefined || metadata !== undefined || blocked_dates !== undefined) {
     if (blocked_dates !== undefined) {

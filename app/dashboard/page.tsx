@@ -1,6 +1,7 @@
 "use client";
 
 import { placeInputValue } from "@/lib/places/core";
+import { listingPlaceEditFields } from "@/lib/listing-place-edit";
 
 import PlaceField from "@/components/PlaceField";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
@@ -357,6 +358,7 @@ export default function DashboardPage() {
     setEditResponsibleErrors(personErrors);
     if (Object.keys(personErrors).length && myListings.find(item => item.id === editingId)?.published) { focusResponsiblePerson(); return; }
     const editingListing = myListings.find(item=>item.id===editingId);
+    const placeEdit = listingPlaceEditFields(editingListing, editForm.city, editForm.selected_place_city_id);
     if(editingListing?.type === "prop" || editingListing?.type === "vehicle"){
       const issue=validateMarketplaceOffer(editMarketplace.category,editingListing.type,serializeMarketplaceDraft(editMarketplace),editingListing.published);
       if(issue && (JSON.stringify(editMarketplace)!==JSON.stringify(marketplaceDraft(editingListing.category??"",editingListing.price,editingListing.metadata)) || !!editingListing.metadata?.marketplace)){setEditError(marketText(issue));return;}
@@ -377,7 +379,7 @@ export default function DashboardPage() {
           title: editForm.title.trim(),
           description: editForm.description,
           price: ["location", "prop", "vehicle"].includes(editingListing?.type ?? "") && editLocationMeta.price_on_request ? 0 : parseFloat(editForm.price) || 0,
-          city: editForm.city.trim(), selected_place_city_id: editForm.selected_place_city_id || undefined,
+          ...placeEdit,
           responsible_person: editResponsible,
           image_url: usesGallery ? editGallery[0] ?? null : editForm.image_url || null,
           ...(usesGallery ? { extra_images: editGallery.slice(1) } : {}),
@@ -415,7 +417,7 @@ export default function DashboardPage() {
               moderation_reason: savedListing?.moderation_reason ?? null,
               title: editForm.title.trim(),
               description: editForm.description,
-              city: editForm.city.trim(), selected_place_city_id: editForm.selected_place_city_id || undefined,
+              city: savedListing?.city ?? placeEdit.city ?? l.city,
               price: ["location", "prop", "vehicle"].includes(l.type) && editLocationMeta.price_on_request ? 0 : parseFloat(editForm.price) || 0,
               ...(l.type === "location" ? { metadata: {
                 ...(l.metadata ?? {}),

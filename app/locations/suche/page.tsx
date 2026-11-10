@@ -40,7 +40,7 @@ export default async function LocationsSuchePage({searchParams}:{searchParams:Pr
     .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, user_id, title, city, price, image_url, category, description, metadata, created_at")
     .eq("published", true)
     .eq("type", "location");
-  for(const [param,column] of [["country","place_country_code"],["region","place_region_id"],["city","place_city_id"]] as const){const value=params[param];if(typeof value==="string")locationQuery=locationQuery.eq(column,value.slice(0,100));}
+  for(const [param,column] of [["country","place_country_code"],["region","place_region_id"],["city","place_city_id"]] as const){const value=params[param];if(typeof value==="string" && value)locationQuery=locationQuery.eq(column,value.slice(0,100));}
   const {data,error}=await locationQuery
     .order("created_at", { ascending: false })
     .limit(300);

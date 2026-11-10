@@ -41,8 +41,8 @@ export function canonicalFilterValue(value:string,rows:object[],kind:'city'|'cou
  if(kind==='country')return countryCode(value)||value;
  if(kind==='city'&&value.startsWith('geonames:'))return value;
  const candidates=new Set<string>();
- for(const row of rows){const p=placeFromRecord(row);const id=kind==='city'?p.cityId:p.regionId;
- const labels=kind==='city'?[p.city,...Object.values(p.cityId?names[p.cityId]??{}:{})]:[p.region];
+ for(const row of rows){const p=placeFromRecord(row),record=row as Record<string,unknown>;const id=kind==='city'?p.cityId:p.regionId;
+ const labels=kind==='city'?[p.city,...Object.values(p.cityId?names[p.cityId]??{}:{})]:[p.region,...(Array.isArray(record.place_region_aliases)?record.place_region_aliases.filter((value):value is string=>typeof value==='string'):[])];
  if(id&&labels.some(label=>placeKey(label)===placeKey(value)))candidates.add(id);}
  return candidates.size===1?[...candidates][0]:value;
 }
