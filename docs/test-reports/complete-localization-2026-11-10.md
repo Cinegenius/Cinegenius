@@ -2,7 +2,7 @@
 
 ## Freigabestand
 
-Die erste Sprachfassung `b293c9a` ist auf der regulären Domain veröffentlicht; die abschließende Browserprüfung läuft. Die zusammengeführte Prüfkopie enthält die Lokalisierung auf Basis `457a9de` und die zusätzlichen Hauptzweigänderungen bis `9271c2e`. Die beiden additiven Datenbankschritte sind inzwischen in CineGenius main PRODUCTION angewendet und nachgeprüft. Die abschließende Browserprüfung und die kleine Freigabe nach dieser Prüfung sind noch offen. Die vorherige Projektprüfung hat Safari freigegeben; die eigene Prüfung nutzt ein separates Fenster und verändert Gmail nicht.
+Die neunsprachige Fassung ist seit `b293c9a` regulär veröffentlicht. Die mobile Ergänzung `ded78f5` wurde zuerst unter eigener geschützter Adresse geprüft und danach regulär neu mit den bestehenden Produktionseinstellungen veröffentlicht. Dieser Abschlussstand entfernt den bisherigen Teilübersetzungshinweis nach den unten belegten kritischen Browser- und Datenflussprüfungen. Die Übersetzungs-, Design- und Release-Prüfungen bleiben verbindlich.
 
 Vor Veröffentlichung wird der aktuelle entfernte Hauptzweig erneut abgeglichen. Zusammenführung, Commit und Push erfolgen nach den Projektregeln über GitHub Desktop. Eine Veröffentlichung verlangt sauberes `main` gleich `origin/main` und die bestätigte CineGenius-Projektverknüpfung.
 
@@ -64,12 +64,23 @@ Vor-/Nachprüfungen stehen unter `docs/sql/`. Der aktualisierte Release-Guard er
 - Mailanbieter, Identitäten und Datenbanken wurden in den automatisierten Ablaufprüfungen isoliert simuliert beziehungsweise lokal mit PGlite geprüft. Es wurden dabei keine echten E-Mails versendet oder produktiven Datensätze geändert.
 - Neun tatsächliche anonyme HTTP-Aufrufe privater Inbox-Routen lieferten erwartete, nicht zwischengespeicherte 401-Antworten ohne Anmeldeweiterleitung. Öffentliche HTML-/Katalogaufrufe mit absichtlich ungültigen Clerk-Platzhaltern liefen in Zeitlimits und werden ausdrücklich nicht als bestanden gezählt. Diese Platzhalter dienen keinem Anmelde- oder Browsernachweis.
 
-## Vor Live-Freigabe offen
+## Grenzen der Prüfung
 
-Native Übernahme und Veröffentlichung der geprüften Quellen, vorgelagerte öffentliche Server-/API-Prüfung mit korrekt konfigurierter Bereitstellung sowie Browserprüfung auf Smartphone und Desktop in allen neun Sprachen. Eine eindeutige Vercel-Deployment-URL mit Produktionsschlüsseln ersetzt keinen vollständigen Clerk-Anmeldetest auf der regulären Domain. Ein erfolgreiches lokales Build ist kein Nachweis einer Live-Veröffentlichung.
+Die tatsächlichen Browserprüfungen erfolgten in Safari auf macOS, einschließlich Responsive-Design-Ansicht bei 320 × 740 und Desktopansicht bei 1366 × 900. Sie sind kein Nachweis einer physischen iOS-/Android-Tastatur. Eine echte neue Kontoanlage, ein neuer öffentlicher Profilspeichervorgang und echte Testmails wurden nicht ausgelöst. Die zugehörigen Erzeugungs-, Validierungs-, Benachrichtigungs- und Mailabläufe sind durch die dokumentierten isolierten Regressionstests geprüft. Der Profil-Editor speicherte beim Öffnen seiner Abschnitte seinen eigenen privaten Wiederherstellungsstand; öffentliche Profilangaben wurden weder bearbeitet noch veröffentlicht und dieser private Stand wurde nicht gelöscht.
+
 
 ## Ergänzter Live-Prüfstand
 
 Der konfigurierte Production-Testbau ohne Domainzuweisung war erfolgreich. Anschließend bestanden 63 anonyme HTTP-Prüfungen über den offiziellen Vercel-Zugang: neun native HTML-Sprachen trotz gegenteiliger Browserpräferenz, international lokalisierte Ortsnamen und Sortierung, gleiche Frankfurt-Alias-IDs, erhaltene prüfbedürftige manuelle Eingabe und private 401-Antworten. Der reguläre Bau wurde danach neu mit den gewöhnlichen Produktionseinstellungen veröffentlicht; der abgeschaltete Testworker wurde nicht promotet.
 
-Im tatsächlichen Safari auf der regulären Domain wurden alle neun Sprachen im Registrierungsformular gewechselt. Eine ausschließlich lokale ungesendete Beispieldateneingabe blieb in jedem Wechsel erhalten. Es wurde kein Konto angelegt und keine Authentifizierungs- oder Testmail versendet. Die schmale Ansicht zeigte eine bestehende Lücke: anonyme Besucher hatten im Handymenü keine Sprachauswahl. Eine beschriftete Auswahl nutzt dort jetzt das vorhandene Bauteil und vorhandene neunsprachige Schlüssel. Farben, Headerabstände und die Mitgliedsansicht bleiben erhalten; die Auslöser bekommen eine 44-Pixel-Trefffläche. Die tatsächliche Browser-Nachprüfung und die Entfernung des bisherigen Übersetzungshinweises stehen noch aus.
+Im tatsächlichen Safari auf der regulären Domain wurden alle neun Sprachen im Registrierungsformular gewechselt. Eine ausschließlich lokale ungesendete Beispieldateneingabe blieb in jedem Wechsel erhalten. Es wurde kein Konto angelegt und keine Authentifizierungs- oder Testmail versendet. Die schmale Ansicht zeigte eine bestehende Lücke: anonyme Besucher hatten im Handymenü keine Sprachauswahl. Eine beschriftete Auswahl nutzt dort jetzt das vorhandene Bauteil und vorhandene neunsprachige Schlüssel. Farben, Headerabstände und die Mitgliedsansicht bleiben erhalten; die Auslöser bekommen eine 44-Pixel-Trefffläche. Der mobile Zugang und alle neun erreichbaren Optionen wurden im geschützten Testbau bei 320 × 740 tatsächlich sichtbar geprüft. Danach wurde die Ergänzung regulär veröffentlicht. Der Teilübersetzungshinweis entfällt im jetzigen Abschlussstand.
+
+## Abschließende kritische Browserprüfungen
+
+- Live-Registrierung auf der regulären Domain: neun Sprachwechsel mit passender nativer Überschrift und erhaltener ungesendeter Beispieleingabe. Keine Kontoanlage, keine Mail und keine Passwortänderung.
+- Bestehende angemeldete Profilbearbeitung: neun Sprachwechsel, vorhandener Name erhalten, Land jeweils sprachgerecht angezeigt, getrennte Felder Land/Bundesland/Stadt und tatsächliche Stadtvorschläge sichtbar. Kein Vorschlag wurde für das bestehende Profil ausgewählt und nichts öffentlich gespeichert. Deutsch und Profilübersicht wurden wiederhergestellt.
+- Crewfilter auf dem Handy: Land vor Region vor Stadt, Deutschland nur einmal; Länder alphabetisch Deutschland/Italien/Österreich/Schweiz. Die Stadtliste zeigte Berlin, Frankfurt am Main und Köln mit Regions-/Landkontext; Bayern und Schreibvarianten wurden nicht als zusätzliche Städte ausgegeben. Eigene Filter anschließend zurückgesetzt.
+- Tatsächliche datenbankgestützte Marktplatz-/Locationsfilter: 19 anonyme GET-Prüfungen erfolgreich, beide Bereiche mit echten Daten und kanonischen Stadtwerten, neun Sprachen, getrennte und sortierte Projektionen sowie stabile Identitätsmengen. Anonymer Dashboard-Aufruf führt auf die Anmeldeseite derselben www-Domain.
+- Locationsuche München: drei reale Ergebnisse; Klick auf die veröffentlichte Bar-Location öffnete ihre vorhandene Galerie, Überschrift, Ausstattung und Anfrageoberfläche. Kein „keine Location vorhanden“-Fehler, keine Anfrage abgesendet.
+
+Unklare alte Ortsangaben bleiben erhalten und prüfbedürftig. Die hier dokumentierten UI-Prüfungen ersetzen keine ungeprüfte automatische Zuordnung zusätzlicher Mitgliederorte.

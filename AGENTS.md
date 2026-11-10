@@ -38,7 +38,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Legal documents need reviewed language versions. Until available, explicitly show that the original German legal text is authoritative; do not publish machine translations as approved legal documents.
 - The manual locale cookie takes priority over browser preferences, persists across authentication, and must not be removed on logout. Use the shared locale resolver for both next-intl and Clerk. Switch with a server-component refresh, never a hard page reload or a locale-keyed form remount. Preserve unsaved fields and ongoing uploads.
 - Load only the requested language bundle, merged with the defined default fallback, on the server. Do not fetch all language catalogs on navigation or add external translation requests per page. Format dates and numbers with the active locale without currency conversion.
-- Non-German languages are currently marked partially translated. Do not remove that disclosure until the remaining legacy UI, server-generated copy, taxonomies and critical end-to-end flows are verified. Never claim full coverage from catalog key parity alone.
+- All nine supported locales have complete catalogs and verified critical language flows. Maintain that coverage across public/browse pages, authentication entry forms, profile editing, canonical place filters, taxonomies and generated system copy. If later work introduces partial coverage, disclose it until its legacy UI, system copy, taxonomies and critical flows are verified. Never claim full coverage from catalog key parity alone.
 
 ## Media origin and confidentiality
 

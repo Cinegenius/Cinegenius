@@ -75,7 +75,7 @@ export default function LanguageSwitcher() {
               }`}
             >
               <span className="leading-none">{lang.flag}</span>
-              <span className="flex-1 text-left">{lang.label}{lang.code !== "de" && <span className="block text-[10px] text-text-muted">{t("inProgress")}</span>}</span>
+              <span className="flex-1 text-left">{lang.label}</span>
               {current === lang.code && <Check size={11} className="text-gold shrink-0" />}
             </button>
           ))}
