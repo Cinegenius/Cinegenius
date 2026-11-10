@@ -320,8 +320,24 @@ export async function PATCH(req: NextRequest) {
       fieldErrors.location = "Bitte gib deinen Standort ein.";
     }
     if ("positions" in safe || "profile_types" in safe || "profile_type" in safe) {
-      const hasPositions = Array.isArray(safe.positions) && safe.positions.some((position) => typeof position === "string" && position.trim());
-      const types = Array.isArray(safe.profile_types) ? safe.profile_types as string[] : [];
+      // PATCH leaves omitted fields unchanged. Validate the resulting activity
+      // selection rather than treating those saved fields as empty.
+      const current = await db.from("profiles").select("positions, profile_type").eq("user_id", userId).maybeSingle();
+      if (current.error) return privateNoStoreJson({ error: current.error.message, code: current.error.code }, 500);
+      const optional = await selectOptionalProfileColumns<Record<string, unknown>>(
+        ["profile_types"],
+        async (projection) => {
+          const result = await db.from("profiles").select(projection).eq("user_id", userId).maybeSingle();
+          return { data: result.data as Record<string, unknown> | null, error: result.error };
+        },
+      );
+      if (optional.error) return privateNoStoreJson({ error: optional.error.message, code: optional.error.code }, 500);
+      const activity = { ...current.data, ...optional.data, ...safe };
+      const hasPositions = Array.isArray(activity.positions) && activity.positions.some((position) => typeof position === "string" && position.trim());
+      const types = normalizeProfileTypes(
+        activity.profile_types as string[] | null | undefined,
+        activity.profile_type as string | null | undefined,
+      );
       if (!hasPositions && types.length === 0) fieldErrors.activity = "Bitte wähle mindestens eine Tätigkeit aus.";
     }
     const primaryError = primaryOccupationError(safe.crew, safe.positions) ?? crewOccupationsError(safe.crew, safe.positions);
