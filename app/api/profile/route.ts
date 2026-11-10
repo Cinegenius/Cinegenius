@@ -332,7 +332,7 @@ export async function PATCH(req: NextRequest) {
         },
       );
       if (optional.error) return privateNoStoreJson({ error: optional.error.message, code: optional.error.code }, 500);
-      const activity = { ...current.data, ...optional.data, ...safe };
+      const activity: Record<string, unknown> = { ...current.data, ...optional.data, ...safe };
       const hasPositions = Array.isArray(activity.positions) && activity.positions.some((position) => typeof position === "string" && position.trim());
       const types = normalizeProfileTypes(
         activity.profile_types as string[] | null | undefined,
