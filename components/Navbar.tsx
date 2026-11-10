@@ -364,12 +364,19 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
       >
         <div className="flex items-center justify-between px-5 h-16 border-b border-border">
           <Logo onClick={() => setOpen(false)} />
-          <button onClick={() => setOpen(false)} className="text-text-muted hover:text-gold transition-colors">
+          <button type="button" onClick={() => setOpen(false)} aria-label={t("closeMenu")} className="-m-3 inline-flex min-h-11 min-w-11 items-center justify-center text-text-muted hover:text-gold transition-colors">
             <X size={20} />
           </button>
         </div>
 
         <nav className="px-4 py-5 overflow-y-auto h-[calc(100%-4rem)] flex flex-col gap-4">
+
+          {!hasSignedInSession && (
+            <div className="flex items-center justify-between gap-3 px-4 py-3.5 text-sm text-text-secondary">
+              <span>{uiText("language.choose")}</span>
+              <LanguageSwitcher />
+            </div>
+          )}
 
           {hasSignedInSession ? (
             <>

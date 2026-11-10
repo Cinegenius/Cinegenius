@@ -2,7 +2,7 @@
 
 ## Freigabestand
 
-Die neue Sprachfassung ist noch nicht veröffentlicht. Die zusammengeführte Prüfkopie enthält die Lokalisierung auf Basis `457a9de` und die zusätzlichen Hauptzweigänderungen bis `9271c2e`. Die beiden additiven Datenbankschritte sind inzwischen in CineGenius main PRODUCTION angewendet und nachgeprüft. Die abschließende Browserprüfung und die geschützte Veröffentlichung sind noch offen. Die vorherige Projektprüfung hat Safari freigegeben; die eigene Prüfung nutzt ein separates Fenster und verändert Gmail nicht.
+Die erste Sprachfassung `b293c9a` ist auf der regulären Domain veröffentlicht; die abschließende Browserprüfung läuft. Die zusammengeführte Prüfkopie enthält die Lokalisierung auf Basis `457a9de` und die zusätzlichen Hauptzweigänderungen bis `9271c2e`. Die beiden additiven Datenbankschritte sind inzwischen in CineGenius main PRODUCTION angewendet und nachgeprüft. Die abschließende Browserprüfung und die kleine Freigabe nach dieser Prüfung sind noch offen. Die vorherige Projektprüfung hat Safari freigegeben; die eigene Prüfung nutzt ein separates Fenster und verändert Gmail nicht.
 
 Vor Veröffentlichung wird der aktuelle entfernte Hauptzweig erneut abgeglichen. Zusammenführung, Commit und Push erfolgen nach den Projektregeln über GitHub Desktop. Eine Veröffentlichung verlangt sauberes `main` gleich `origin/main` und die bestätigte CineGenius-Projektverknüpfung.
 
@@ -67,3 +67,9 @@ Vor-/Nachprüfungen stehen unter `docs/sql/`. Der aktualisierte Release-Guard er
 ## Vor Live-Freigabe offen
 
 Native Übernahme und Veröffentlichung der geprüften Quellen, vorgelagerte öffentliche Server-/API-Prüfung mit korrekt konfigurierter Bereitstellung sowie Browserprüfung auf Smartphone und Desktop in allen neun Sprachen. Eine eindeutige Vercel-Deployment-URL mit Produktionsschlüsseln ersetzt keinen vollständigen Clerk-Anmeldetest auf der regulären Domain. Ein erfolgreiches lokales Build ist kein Nachweis einer Live-Veröffentlichung.
+
+## Ergänzter Live-Prüfstand
+
+Der konfigurierte Production-Testbau ohne Domainzuweisung war erfolgreich. Anschließend bestanden 63 anonyme HTTP-Prüfungen über den offiziellen Vercel-Zugang: neun native HTML-Sprachen trotz gegenteiliger Browserpräferenz, international lokalisierte Ortsnamen und Sortierung, gleiche Frankfurt-Alias-IDs, erhaltene prüfbedürftige manuelle Eingabe und private 401-Antworten. Der reguläre Bau wurde danach neu mit den gewöhnlichen Produktionseinstellungen veröffentlicht; der abgeschaltete Testworker wurde nicht promotet.
+
+Im tatsächlichen Safari auf der regulären Domain wurden alle neun Sprachen im Registrierungsformular gewechselt. Eine ausschließlich lokale ungesendete Beispieldateneingabe blieb in jedem Wechsel erhalten. Es wurde kein Konto angelegt und keine Authentifizierungs- oder Testmail versendet. Die schmale Ansicht zeigte eine bestehende Lücke: anonyme Besucher hatten im Handymenü keine Sprachauswahl. Eine beschriftete Auswahl nutzt dort jetzt das vorhandene Bauteil und vorhandene neunsprachige Schlüssel. Farben, Headerabstände und die Mitgliedsansicht bleiben erhalten; die Auslöser bekommen eine 44-Pixel-Trefffläche. Die tatsächliche Browser-Nachprüfung und die Entfernung des bisherigen Übersetzungshinweises stehen noch aus.
