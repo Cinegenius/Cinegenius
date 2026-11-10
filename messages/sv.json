@@ -771,7 +771,9 @@
     "catCorporate": "Företagsfilm",
     "catCorporateDesc": "Presentationsfilmer och arbetsgivarprofilering",
     "catEvent": "Evenemang och direktsändning",
-    "catEventDesc": "Konserter, festivaler, bröllop"
+    "catEventDesc": "Konserter, festivaler, bröllop",
+    "titleLead": "Filmografier och",
+    "titleHighlight": "produktioner"
   },
   "companies": {
     "badge": "Företag och tjänsteleverantörer",

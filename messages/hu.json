@@ -771,7 +771,9 @@
     "catCorporate": "Vállalati",
     "catCorporateDesc": "Vállalati filmek, employer branding",
     "catEvent": "Esemény & Live",
-    "catEventDesc": "Koncertek, fesztiválok, esküvők"
+    "catEventDesc": "Koncertek, fesztiválok, esküvők",
+    "titleLead": "Filmográfiák &",
+    "titleHighlight": "Produkciók"
   },
   "companies": {
     "badge": "Cégek & Szolgáltatók",

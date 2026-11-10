@@ -771,7 +771,9 @@
     "catCorporate": "Corporate",
     "catCorporateDesc": "Brand films, employer branding",
     "catEvent": "Event & Live",
-    "catEventDesc": "Concerts, festivals, weddings"
+    "catEventDesc": "Concerts, festivals, weddings",
+    "titleLead": "Filmographies &",
+    "titleHighlight": "Productions"
   },
   "companies": {
     "badge": "Companies & Service Providers",

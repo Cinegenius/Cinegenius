@@ -771,7 +771,9 @@
     "catCorporate": "Corporate",
     "catCorporateDesc": "Video istituzionali, employer branding",
     "catEvent": "Evento & Live",
-    "catEventDesc": "Concerti, festival, matrimoni"
+    "catEventDesc": "Concerti, festival, matrimoni",
+    "titleLead": "Filmografie &",
+    "titleHighlight": "Produzioni"
   },
   "companies": {
     "badge": "Aziende & Fornitori",

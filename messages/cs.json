@@ -771,7 +771,9 @@
     "catCorporate": "Firemní",
     "catCorporateDesc": "Firemní filmy, employer branding",
     "catEvent": "Akce & Live",
-    "catEventDesc": "Koncerty, festivaly, svatby"
+    "catEventDesc": "Koncerty, festivaly, svatby",
+    "titleLead": "Filmografie &",
+    "titleHighlight": "Produkce"
   },
   "companies": {
     "badge": "Firmy & Poskytovatelé",

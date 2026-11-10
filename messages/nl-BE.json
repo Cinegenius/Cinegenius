@@ -771,7 +771,9 @@
     "catCorporate": "Bedrijfsfilm",
     "catCorporateDesc": "Bedrijfsfilms, werkgeversprofilering",
     "catEvent": "Evenement en live",
-    "catEventDesc": "Concerten, festivals, bruiloften"
+    "catEventDesc": "Concerten, festivals, bruiloften",
+    "titleLead": "Filmografieën en",
+    "titleHighlight": "producties"
   },
   "companies": {
     "badge": "Bedrijven en dienstverleners",

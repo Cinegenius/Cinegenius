@@ -8,7 +8,7 @@ Vor Veröffentlichung wird der aktuelle entfernte Hauptzweig erneut abgeglichen.
 
 ## Umfang und Bestandsschutz
 
-Deutsch, Englisch, Spanisch, Italienisch, Tschechisch und Ungarisch werden um Niederländisch, Niederländisch für Belgien (Flämisch) und Schwedisch ergänzt. Alle neun Kataloge enthalten jeweils 7.226 passende, nicht leere Schlüssel. Der Quellencheck findet keine offenen UI- oder API-Antwortliterale; Schlüsselparität allein ersetzt die Browserprüfung nicht.
+Deutsch, Englisch, Spanisch, Italienisch, Tschechisch und Ungarisch werden um Niederländisch, Niederländisch für Belgien (Flämisch) und Schwedisch ergänzt. Alle neun Kataloge enthalten jeweils 7.228 passende, nicht leere Schlüssel. Der Quellencheck findet keine offenen UI- oder API-Antwortliterale; Schlüsselparität allein ersetzt die Browserprüfung nicht.
 
 Der Umfang umfasst Verzeichnisse und Detailseiten, Suche, Filter, Registrierung, Profilassistent und Editoren, Konto und Administration, zugängliche Bezeichnungen, Validierung, Systemfehler, Benachrichtigungen und erzeugte Systemmails. Die neu im Hauptzweig ergänzten Inseratserinnerungen und ihre Lesezugriffsdiagnose sind ebenfalls in allen neun Sprachen enthalten.
 
@@ -57,7 +57,7 @@ Vor-/Nachprüfungen stehen unter `docs/sql/`. Der aktualisierte Release-Guard er
 - Vollständiger Regressionstest der bis `991ec48` zusammengeführten Anwendung nach der Sprachkorrektur: 1.989/1.989 erfolgreich, keine übersprungenen oder abgebrochenen Fälle.
 - Anschließend 112/112 passende Tests nach Einbeziehung der Diagnoseänderung bis `9271c2e` und des Release-Guards: neunsprachige Diagnoseanzeigen, Fehler, Doppelaktionen, Formularestände, API-Berechtigungen, Datenminimierung und beide Release-Modi.
 - 13/13 kleine Offline-Importtests; 25 Ortsauswahltests prüfen zusätzlich 921.997 vollständige, lokalisierte und ungültige Auswahlpfade. Alle bisherigen IDs und Felder sowie erneute Ausführung des Namens-Overlays sind geprüft.
-- Neun Kataloge mit 7.226 Schlüsseln, konsistente ICU-Variablen/Rich-Text-Tags und keine offenen sichtbaren Literale. Die Alttext-Ausnahmeliste wurde nicht erweitert. Gemeinsame Designprüfung erfolgreich.
+- Neun Kataloge mit 7.228 Schlüsseln, konsistente ICU-Variablen/Rich-Text-Tags und keine offenen sichtbaren Literale. Die Alttext-Ausnahmeliste wurde nicht erweitert. Gemeinsame Designprüfung erfolgreich.
 - Separater vollständiger TypeScript-Lauf: 3.222 Dateien, keine Diagnostik, 124,63 Sekunden, 2.242.314 KiB gemeldeter Speicherbedarf vor der letzten kleinen Diagnoseergänzung. Der anschließende vollständige Build prüfte auch diese Ergänzung erfolgreich.
 - Vollständiger lokaler Build nach der letzten Integration erfolgreich: Kompilierung, sämtliche Typprüfungen und 153 statische Seiten. Für die lokale Prüfung wurde allein der inkrementelle TypeScript-Cache vorübergehend deaktiviert; dieselben Quelldateien und übrigen Compileroptionen blieben aktiv. Alle drei Konfigurationsdateien wurden danach bytegenau wiederhergestellt. Die bekannten 2 GiB reichten nicht; nur der Prüflauf erhielt 3 GiB. Keine Typfehler wurden ignoriert.
 - Ein zusätzlicher PGlite-Regressionstest prüft die Bestandszählung vor und nach Anlage der optionalen Metadatenspalte: fehlendes Feld, SQL-NULL und JSON-null werden nicht als Metadaten gezählt; tatsächliche Werte werden erkannt. Dieser einzelne neue Fall ist erfolgreich.
@@ -84,3 +84,7 @@ Im tatsächlichen Safari auf der regulären Domain wurden alle neun Sprachen im 
 - Locationsuche München: drei reale Ergebnisse; Klick auf die veröffentlichte Bar-Location öffnete ihre vorhandene Galerie, Überschrift, Ausstattung und Anfrageoberfläche. Kein „keine Location vorhanden“-Fehler, keine Anfrage abgesendet.
 
 Unklare alte Ortsangaben bleiben erhalten und prüfbedürftig. Die hier dokumentierten UI-Prüfungen ersetzen keine ungeprüfte automatische Zuordnung zusätzlicher Mitgliederorte.
+
+## Korrektur nach dem abschließenden HTTP-Abgleich
+
+Die tatsächlich veröffentlichte schwedische Projektüberschrift hatte ein zusätzliches „och“. Ursache war die Trennung des vollständigen Titels an „&“ mit anschließender sprachabhängiger Verkettung. Der Abschluss verwendet nun pro Sprache explizite Titel- und Hervorhebungsteile. Der unabhängige vollständige native Titel und die Metadaten bleiben unverändert; Schrift, Farbe, PageHeader und Layout sind identisch. Neun gerenderte Regressionstests verwenden die tatsächliche Projects-Seite und den gemeinsamen PageHeader; die frühere Implementierung scheitert in sieben Sprachen. Die neun Kataloge erhalten genau zwei passende zusätzliche Schlüssel (je 7.228).

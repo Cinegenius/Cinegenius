@@ -771,7 +771,9 @@
     "catCorporate": "Corporate",
     "catCorporateDesc": "Imagefilme, Employer Branding",
     "catEvent": "Event & Live",
-    "catEventDesc": "Konzerte, Festivals, Hochzeiten"
+    "catEventDesc": "Konzerte, Festivals, Hochzeiten",
+    "titleLead": "Filmografien &",
+    "titleHighlight": "Produktionen"
   },
   "companies": {
     "badge": "Firmen & Dienstleister",

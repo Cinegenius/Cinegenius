@@ -31,23 +31,19 @@ const CATEGORIES_META = [
 ];
 
 export default async function ProjectsPage() {
-  const uiText = await getTranslations();
-
   const t = await getTranslations("projects");
   const CATEGORIES = CATEGORIES_META.map((c) => ({
     ...c,
     label: t(c.labelKey),
     desc: t(c.descKey),
   }));
-  const [titleLead = "", titleTail = ""] = t("title").split("&");
-
   return (
     <div className="relative isolate min-h-screen overflow-hidden bg-bg-primary">
       <PageBackdrop image={PROJECTS_BACKDROP_IMAGE} className="absolute inset-0 z-0" />
       <PageHeader
         badge={t("badge")}
-        title={uiText("Ui.text_cf74381d278319", { value1: String(titleLead.trim()) })}
-        titleHighlight={titleTail.trim()}
+        title={t("titleLead")}
+        titleHighlight={t("titleHighlight")}
         description={t("subtitle")}
         withBackdrop={false}
         ctaSecondary={{ label: t("allBrowse"), href: "/projects/alle" }}
