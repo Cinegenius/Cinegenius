@@ -1978,7 +1978,12 @@
     "back": "Zurück",
     "contacts": "Kontakte",
     "contactsLoading": "Kontakte …",
-    "contactsCount": "Kontakte ({count})"
+    "contactsCount": "Kontakte ({count})",
+    "loadError": "Deine Unterhaltungen konnten nicht geladen werden. Bitte versuche es erneut.",
+    "messageLoadError": "Die Nachrichten konnten nicht geladen werden. Bitte versuche es erneut.",
+    "retry": "Erneut versuchen",
+    "sendError": "Die Nachricht konnte nicht gesendet werden. Deine Eingabe bleibt erhalten.",
+    "loading": "Nachrichten werden geladen…"
   },
   "homeCompanyLogos": {
     "touchHint": "Zum Drehen wischen · Zum Öffnen tippen",

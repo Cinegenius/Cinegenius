@@ -1978,7 +1978,12 @@
     "back": "Back",
     "contacts": "Contacts",
     "contactsLoading": "Contacts …",
-    "contactsCount": "Contacts ({count})"
+    "contactsCount": "Contacts ({count})",
+    "loadError": "Your conversations could not be loaded. Please try again.",
+    "messageLoadError": "The messages could not be loaded. Please try again.",
+    "retry": "Try again",
+    "sendError": "Your message could not be sent. Your draft has been kept.",
+    "loading": "Loading messages…"
   },
   "homeCompanyLogos": {
     "touchHint": "Swipe to spin · Tap to open",

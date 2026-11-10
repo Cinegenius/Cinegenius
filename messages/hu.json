@@ -1978,7 +1978,12 @@
     "back": "Vissza",
     "contacts": "Kapcsolatok",
     "contactsLoading": "Kapcsolatok …",
-    "contactsCount": "Kapcsolatok ({count})"
+    "contactsCount": "Kapcsolatok ({count})",
+    "loadError": "Nem sikerült betölteni a beszélgetéseidet. Próbáld újra.",
+    "messageLoadError": "Nem sikerült betölteni az üzeneteket. Próbáld újra.",
+    "retry": "Újrapróbálkozás",
+    "sendError": "Az üzenetet nem sikerült elküldeni. A beírt szöveg megmaradt.",
+    "loading": "Üzenetek betöltése…"
   },
   "homeCompanyLogos": {
     "touchHint": "Húzd el a forgatáshoz · Koppints a megnyitáshoz",

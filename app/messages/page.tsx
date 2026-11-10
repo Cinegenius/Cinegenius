@@ -103,6 +103,9 @@ function MessagesContent() {
   const drafts = useRef(new Map<string, string>());
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [conversationLoadFailed, setConversationLoadFailed] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [messageLoadFailure, setMessageLoadFailure] = useState<{ conversationId: string; before?: { before: string; before_id: string } } | null>(null);
   const [newConvRecipient, setNewConvRecipient] = useState<string | null>(toParam);
   const [recipientName, setRecipientName] = useState("");
   const [loadingRecipient, setLoadingRecipient] = useState(!!toParam);
@@ -196,8 +199,12 @@ function MessagesContent() {
       if (!res.ok) throw new Error("fetch failed");
       const { data } = await res.json();
       if (currentUserRef.current !== owner || sequence !== conversationRequestSequence.current) return;
-      setConversations(Array.isArray(data) ? data as Conversation[] : []);
-    } catch { /* silent — UI shows empty state */ } finally {
+      if (!Array.isArray(data)) throw new Error();
+      setConversations(data as Conversation[]);
+      setConversationLoadFailed(false);
+    } catch {
+      if (currentUserRef.current === owner && sequence === conversationRequestSequence.current) setConversationLoadFailed(true);
+    } finally {
       if (currentUserRef.current === owner && sequence === conversationRequestSequence.current) setLoading(false);
     }
   }, []);
@@ -236,6 +243,7 @@ function MessagesContent() {
     hiddenMessageIds.current.clear(); drafts.current.clear(); setMessageNotice(""); setText(""); setNewMessagesAvailable(false);
     messageRequestSequence.current += 1;
     setSendError(""); setContactSearch(""); setGroupModalMode(null);
+    setConversationLoadFailed(false); setMessageLoadFailure(null); setLoadingMessages(false); setOlderLoading(false);
     setDismissedIds(new Set());
     setLoading(true); setContactsLoading(true);
     if (!user?.id) return;
@@ -254,6 +262,7 @@ function MessagesContent() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveId(id); setNewConvRecipient(recipient); setMessages([]);
     setHasOlderMessages(false); setNewMessagesAvailable(false);
+    setMessageLoadFailure(null); setLoadingMessages(Boolean(id)); setOlderLoading(false);
     setRecipientName(""); setLoadingRecipient(Boolean(recipient));
     setSendError(""); setMessageNotice(""); setGroupModalMode(null);
     atBottomRef.current = true;
@@ -307,6 +316,8 @@ function MessagesContent() {
     const owner = currentUserRef.current;
     if (!owner) return;
     const requestSequence = options.before ? null : ++messageRequestSequence.current;
+    const isCurrentRequest = () => currentUserRef.current === owner && activeIdRef.current === convId
+      && (requestSequence === null || requestSequence === messageRequestSequence.current);
     const olderViewport = options.before ? messagesViewportRef.current : null;
     const previousScrollHeight = olderViewport?.scrollHeight ?? 0;
     const previousScrollTop = olderViewport?.scrollTop ?? 0;
@@ -315,10 +326,14 @@ function MessagesContent() {
         ? `?before=${encodeURIComponent(options.before.before)}&before_id=${encodeURIComponent(options.before.before_id)}`
         : "";
       const res = await fetch(`/api/conversations/${convId}${query}`, { cache: "no-store" });
-      if (!res.ok) return;
+      if (!res.ok) throw new Error();
       const { messages: msgs, hasOlder, conversation } = await res.json();
-      const snapshot = Array.isArray(msgs) ? msgs as Message[] : [];
-      if (currentUserRef.current !== owner || activeIdRef.current !== convId || (requestSequence !== null && requestSequence !== messageRequestSequence.current)) return;
+      if (!Array.isArray(msgs)) throw new Error();
+      const snapshot = msgs as Message[];
+      if (!isCurrentRequest()) return;
+      setMessageLoadFailure(failure => failure?.conversationId === convId
+        && failure.before?.before === options.before?.before
+        && failure.before?.before_id === options.before?.before_id ? null : failure);
       const alreadyLoadedOlder = snapshot[0] && messagesRef.current[0]
         && messagesRef.current[0].created_at < snapshot[0].created_at;
       if (options.before || !alreadyLoadedOlder) setHasOlderMessages(Boolean(hasOlder));
@@ -328,24 +343,26 @@ function MessagesContent() {
       if (conversation?.id === convId) setConversations(current => current.some(c => c.id === convId) ? current : [{ ...conversation, messages: snapshot, updated_at: snapshot.at(-1)?.created_at ?? "" }, ...current]);
       const messageIds = incomingUnreadMessageIds(snapshot, owner);
       if (messageIds.length > 0) {
-        const readResponse = await fetch(`/api/conversations/${convId}/read`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          cache: "no-store",
-          body: JSON.stringify({ message_ids: messageIds }),
-        });
-        if (readResponse.ok) {
-          const readState = await readResponse.json();
-          if (currentUserRef.current !== owner || activeIdRef.current !== convId) return;
-          const readMessages = Array.isArray(readState.readMessages) ? readState.readMessages : [];
-          setMessages((current) => applyReadReceiptTimestamps(current, readMessages));
-          setConversations((current) => current.map((conversation) => conversation.id !== convId ? conversation : {
-            ...conversation,
-            unread_count: readState.byConversation?.[convId] ?? conversation.unread_count ?? 0,
-            messages: applyReadReceiptTimestamps(conversation.messages ?? [], readMessages),
-          }));
-          notifyMessagesRead(owner);
-        }
+        try {
+          const readResponse = await fetch(`/api/conversations/${convId}/read`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            cache: "no-store",
+            body: JSON.stringify({ message_ids: messageIds }),
+          });
+          if (readResponse.ok) {
+            const readState = await readResponse.json();
+            if (!isCurrentRequest()) return;
+            const readMessages = Array.isArray(readState.readMessages) ? readState.readMessages : [];
+            setMessages((current) => applyReadReceiptTimestamps(current, readMessages));
+            setConversations((current) => current.map((conversation) => conversation.id !== convId ? conversation : {
+              ...conversation,
+              unread_count: readState.byConversation?.[convId] ?? conversation.unread_count ?? 0,
+              messages: applyReadReceiptTimestamps(conversation.messages ?? [], readMessages),
+            }));
+            notifyMessagesRead(owner);
+          }
+        } catch { /* Read receipts do not invalidate a successfully loaded history. */ }
       }
       if (olderViewport) {
         window.setTimeout(() => {
@@ -361,7 +378,11 @@ function MessagesContent() {
       } else if (hasNewVisibleMessage && !options.before) {
         setNewMessagesAvailable(true);
       }
-    } catch { /* silent */ }
+    } catch {
+      if (isCurrentRequest()) setMessageLoadFailure({ conversationId: convId, before: options.before });
+    } finally {
+      if (requestSequence !== null && isCurrentRequest()) setLoadingMessages(false);
+    }
   }, []);
 
   // Message data is delivered only through membership-checked server routes.
@@ -558,10 +579,22 @@ function MessagesContent() {
 
   async function loadOlderMessages() {
     if (!activeId || olderLoading || messages.length === 0) return;
+    const owner = currentUserRef.current;
+    const conversationId = activeId;
     const oldest = messages[0];
     setOlderLoading(true);
-    await loadMessages(activeId, { before: { before: oldest.created_at, before_id: oldest.id } });
-    setOlderLoading(false);
+    await loadMessages(conversationId, { before: { before: oldest.created_at, before_id: oldest.id } });
+    if (currentUserRef.current === owner && activeIdRef.current === conversationId) setOlderLoading(false);
+  }
+
+  async function retryMessageLoad() {
+    if (!activeId || messageLoadFailure?.conversationId !== activeId || loadingMessages || olderLoading) return;
+    const owner = currentUserRef.current;
+    const conversationId = activeId;
+    if (messageLoadFailure.before) setOlderLoading(true);
+    else setLoadingMessages(messages.length === 0);
+    await loadMessages(conversationId, { before: messageLoadFailure.before });
+    if (currentUserRef.current === owner && activeIdRef.current === conversationId) setOlderLoading(false);
   }
 
   async function handleFriendRequest(friendshipId: string, action: "accepted" | "rejected") {
@@ -702,6 +735,11 @@ function MessagesContent() {
         ) : (
           <div className="flex-1 overflow-y-auto">
 
+            {conversationLoadFailed && <div role="alert" className="m-4 text-sm text-red-400">
+              <p>{messageNavigationText("loadError")}</p>
+              <button type="button" onClick={() => { setLoading(conversations.length === 0); void loadConversations(); }} className="min-h-11 text-gold">{messageNavigationText("retry")}</button>
+            </div>}
+
             {/* ── Freundschaftsanfragen ── */}
             {visibleRequests.length > 0 && (
               <div className="border-b border-border">
@@ -780,7 +818,7 @@ function MessagesContent() {
             )}
 
             {/* ── Konversationsliste ── */}
-            {conversations.length === 0 && !isNewConv && visibleRequests.length === 0 ? (
+            {conversations.length === 0 && !conversationLoadFailed && !isNewConv && visibleRequests.length === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center p-6 text-center min-h-[200px] gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center">
                   <MessageSquare size={20} className="text-text-muted opacity-50" />
@@ -897,6 +935,11 @@ function MessagesContent() {
               }}
               className="flex-1 min-h-0 min-w-0 overflow-y-auto overscroll-contain px-4 py-4 space-y-1"
             >
+              {loadingMessages && messages.length === 0 && <div role="status" aria-label={messageNavigationText("loading")} className="flex justify-center py-6"><Loader2 size={20} className="animate-spin text-text-muted" /></div>}
+              {messageLoadFailure?.conversationId === activeId && <div role="alert" className="mb-3 text-sm text-red-400">
+                <p>{messageNavigationText("messageLoadError")}</p>
+                <button type="button" disabled={loadingMessages || olderLoading} onClick={() => void retryMessageLoad()} className="min-h-11 text-gold disabled:opacity-60">{messageNavigationText("retry")}</button>
+              </div>}
               {hasOlderMessages && messages.length > 0 && (
                 <div className="flex justify-center pb-3">
                   <button

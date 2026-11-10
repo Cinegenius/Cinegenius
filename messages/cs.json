@@ -1978,7 +1978,12 @@
     "back": "Zpět",
     "contacts": "Kontakty",
     "contactsLoading": "Kontakty …",
-    "contactsCount": "Kontakty ({count})"
+    "contactsCount": "Kontakty ({count})",
+    "loadError": "Konverzace se nepodařilo načíst. Zkus to prosím znovu.",
+    "messageLoadError": "Zprávy se nepodařilo načíst. Zkus to prosím znovu.",
+    "retry": "Zkusit znovu",
+    "sendError": "Zprávu se nepodařilo odeslat. Rozepsaný text zůstal zachován.",
+    "loading": "Načítání zpráv…"
   },
   "homeCompanyLogos": {
     "touchHint": "Přejetím otočíte · Klepnutím otevřete",
