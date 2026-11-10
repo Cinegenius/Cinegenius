@@ -1,10 +1,11 @@
-import {getLocale} from "next-intl/server";
+import {getLocale, getTranslations} from "next-intl/server";
 import { placeReadFields } from "@/lib/places/catalog";
+import { placeDisplay } from "@/lib/places/core";
 import { listingPriceLabel } from "@/lib/listing-price";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
-import LocationsLanding from "./LocationsLanding";
+import LocationsLanding, { type LocationCard } from "./LocationsLanding";
 
 export const revalidate = 60;
 
@@ -19,15 +20,9 @@ export const metadata: Metadata = {
   },
 };
 
-type LocationCard = {
-  id: string; title: string; type: string; city: string; price: number;
-  priceOnRequest: boolean; priceLabel: string;
-  image: string; rating: number; reviews: number;
-  focalPoint?: { x: number; y: number } | null;
-};
-
 export default async function LocationsPage() {
   const locale = await getLocale();
+  const priceText = await getTranslations("MarketplaceOffer");
   const { data, error } = await db
     .from("listings")
     .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, title, city, price, image_url, category, metadata, created_at")
@@ -42,44 +37,30 @@ export default async function LocationsPage() {
 
   const ratingsMap = await fetchRatings(rows.map((l) => l.id), "listing");
 
-  // Group by city, max 6 per city
-  const cityMap = new Map<string, LocationCard[]>();
-  for (const l of rows as {
+  // Place verification controls canonical filters, never publication visibility.
+  const allLocations: LocationCard[] = (rows as {
     id: string; title: string; city: string | null; price: number;
     image_url: string | null; category: string | null;
     metadata?: Record<string, unknown> | null;
-  }[]) {
-    const place=placeReadFields(l.city??"",l,locale);
-    if(place.place_status!=="verified"||!place.place_city_id)continue;
-    const city=String(place.place_city_name);
-    const cityId=String(place.place_city_id);
-    if (!cityMap.has(cityId)) cityMap.set(cityId, []);
-    const arr = cityMap.get(cityId)!;
-    if (arr.length < 6) {
-      arr.push({
-        id: l.id,
-    ...placeReadFields(l.city ?? "", l, locale),
-        title: l.title,
-        type: l.category ?? "Speziallocation",
-        city,
-        price: l.price,
-        priceLabel: listingPriceLabel(l.price,l.metadata),
-        priceOnRequest: ((l.metadata ?? {}) as Record<string, unknown>).price_on_request === true || l.price <= 0,
-        image: l.image_url ?? "",
-        rating: ratingsMap[l.id]?.rating ?? 0,
-        reviews: ratingsMap[l.id]?.reviews ?? 0,
-        focalPoint: ((l.metadata ?? {}) as Record<string, unknown>).focal_point as { x: number; y: number } | null ?? null,
-      });
-    }
-  }
-
-  // Top cities by location count, max 6 cities
-  const cityGroups = [...cityMap.entries()]
-    .sort((a, b) => b[1].length - a[1].length)
-    .slice(0, 6)
-    .map(([cityId, locations]) => ({ cityId, city: locations[0].city, locations }));
+  }[]).map(l => {
+    const place = placeReadFields(l.city ?? "", l, locale);
+    return {
+      id: l.id,
+      ...place,
+      title: l.title,
+      type: l.category ?? "",
+      city: placeDisplay(place, l.city ?? "", locale),
+      price: l.price,
+      priceLabel: listingPriceLabel(l.price, l.metadata, "/Tag", locale, priceText),
+      priceOnRequest: ((l.metadata ?? {}) as Record<string, unknown>).price_on_request === true || l.price <= 0,
+      image: l.image_url ?? "",
+      rating: ratingsMap[l.id]?.rating ?? 0,
+      reviews: ratingsMap[l.id]?.reviews ?? 0,
+      focalPoint: ((l.metadata ?? {}) as Record<string, unknown>).focal_point as { x: number; y: number } | null ?? null,
+    };
+  });
 
   return (
-    <LocationsLanding cityGroups={cityGroups} totalCount={rows.length} />
+    <LocationsLanding allLocations={allLocations} totalCount={rows.length} />
   );
 }

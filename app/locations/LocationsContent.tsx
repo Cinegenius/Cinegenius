@@ -6,9 +6,10 @@ import { placeSearchMatches, matchesPlace, placeDisplay, placeOptions } from "@/
 import { useViewUrl } from "@/lib/use-view-url";
 import { useViewState } from "@/lib/use-view-state";
 import { listingPriceLabel } from "@/lib/listing-price";
+import { locationCategoryLabel } from "@/lib/location-category-labels";
 
 
-import { useState, useMemo, useEffect, useRef, Suspense } from "react";
+import { useState, useMemo, useEffect, useRef, useSyncExternalStore, Suspense } from "react";
 import Link from "next/link";
 import Image from "@/components/MediaImage";
 import dynamicImport from "next/dynamic";
@@ -34,12 +35,6 @@ const LocationMap = dynamicImport(() => import("@/components/LocationMap"), {
     </div>
   ),
 });
-
-// Kick off Leaflet download immediately when this module loads — by the time
-// the user switches to map view, the bundle is already in the browser cache.
-if (typeof window !== "undefined") {
-  void import("leaflet");
-}
 
 const locationTypes = [
   "All Types", "Wohnen", "Villa", "Büro", "Industrie",
@@ -79,12 +74,23 @@ function getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number) {
 
 type ViewMode = "split" | "list" | "map";
 
+const wideLayoutQuery = "(min-width: 1280px)";
+function subscribeWideLayout(onChange: () => void) {
+  const query = window.matchMedia(wideLayoutQuery);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+function readWideLayout() { return window.matchMedia(wideLayoutQuery).matches; }
+function serverWideLayout() { return false; }
+
 function LocationsInner({ serverListings }: { serverListings: Location[] }) {
   const locale=useLocale();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const t = useTranslations("locations");
+  const categoryText = useTranslations("menu");
+  const priceText = useTranslations("MarketplaceOffer");
   const { user } = useUser();
   const { isSignedIn } = useAuth();
 
@@ -176,6 +182,9 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
   const [powerOnly, setPowerOnly] = useViewState("locations.powerOnly", () => searchParams.get("power") === "1");
   const [sortKey, setSortKey] = useViewState("locations.sortKey", () => searchParams.get("sort") ?? "featured");
   const [viewMode, setViewMode] = useViewState<ViewMode>("locations.viewMode", "split");
+  const wideLayout = useSyncExternalStore(subscribeWideLayout, readWideLayout, serverWideLayout);
+  const effectiveView = viewMode === "split" && !wideLayout ? "list" : viewMode;
+  const categoryLabel = (value: string) => locationCategoryLabel(value, categoryText);
   const [activeId, setActiveId] = useViewState<string | null>("locations.activeId", null);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [radiusKm, setRadiusKm] = useViewState("locations.radiusKm", 50);
@@ -272,10 +281,10 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
   };
 
   useEffect(() => {
-    if (!activeId || !listRef.current) return;
+    if (!activeId || !listRef.current || effectiveView !== "split") return;
     const el = listRef.current.querySelector(`[data-id="${activeId}"]`);
     el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }, [activeId]);
+  }, [activeId, effectiveView]);
 
   const filterKey = JSON.stringify([placeFilters, query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, userLocation, radiusKm]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
@@ -308,7 +317,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
   const hasActiveFilters = Object.values(placeFilters).some(Boolean) || query || activeType !== "All Types" || instantOnly || verifiedOnly || minPrice || maxPrice || userLocation || lageFilter !== "Alle" || powerOnly;
   const mobileChips: BrowseChip[] = [
     ...(['country','region','city'] as const).flatMap(kind => placeFilters[kind] ? [{id:`place-${kind}`,label:placeOptions(allLocations,kind,locale).find(option=>option.value===placeFilters[kind])?.label??placeFilters[kind],onRemove:()=>setPlaceFilters({...placeFilters,[kind]:''})}] : []),
-    ...(activeType !== "All Types" ? [{ id: "type", label: activeType, onRemove: () => setActiveType("All Types") }] : []),
+    ...(activeType !== "All Types" ? [{ id: "type", label: categoryLabel(activeType), onRemove: () => setActiveType("All Types") }] : []),
     ...(minPrice ? [{ id: "min", label: `ab ${minPrice} €`, onRemove: () => setMinPrice("") }] : []),
     ...(maxPrice ? [{ id: "max", label: `bis ${maxPrice} €`, onRemove: () => setMaxPrice("") }] : []),
     ...(lageFilter !== "Alle" ? [{ id: "lage", label: lageFilter, onRemove: () => setLageFilter("Alle") }] : []),
@@ -319,7 +328,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
   ];
 
   return (
-    <div className="flex min-h-[20rem] h-[calc(100dvh-25rem)] flex-col bg-bg-primary xl:min-h-[32rem] xl:h-[calc(100dvh-15rem)]">
+    <div className="flex min-h-0 flex-col bg-bg-primary xl:min-h-[32rem] xl:h-[calc(100dvh-15rem)]">
       <MobileBrowseControls
         query={query}
         onQueryChange={setQuery}
@@ -327,17 +336,21 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
         sortValue={sortKey}
         sortOptions={[{ value: "featured", label: t("sortFeatured") }, { value: "price-asc", label: t("sortPriceAsc") }, { value: "price-desc", label: t("sortPriceDesc") }, { value: "rating", label: t("sortRating") }]}
         onSortChange={setSortKey}
-        categoryLabel="Location-Typ"
-        allCategoryLabel={t("filterAll") + " Locations"}
-        categories={locationTypes.slice(1).map((value) => ({ value, label: value }))}
+        categoryLabel={t("categoryLabel")}
+        allCategoryLabel={t("allLocations")}
+        categories={locationTypes.slice(1).map((value) => ({ value, label: categoryLabel(value) }))}
+        categoryPlacement="filters"
         categoryValue={activeType === "All Types" ? "" : activeType}
         onCategoryChange={(value) => setActiveType(value || "All Types")}
         resultSummary={t("results", { count: filtered.length })}
+        viewControls={<div className="inline-flex shrink-0 rounded-lg border border-border bg-bg-elevated" role="group" aria-label={t("viewLabel")}>
+          {([{ mode: "list", icon: LayoutList, label: t("viewList") }, { mode: "map", icon: Map, label: t("viewMap") }] as const).map(({ mode, icon: Icon, label }) => <button key={mode} type="button" aria-pressed={effectiveView === mode} onClick={() => setViewMode(mode)} className={`inline-flex min-h-11 items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition-colors ${effectiveView === mode ? "bg-gold text-bg-primary" : "text-text-secondary hover:text-text-primary"}`}><Icon size={14} aria-hidden="true" />{label}</button>)}
+        </div>}
         filterCount={mobileChips.length}
         chips={mobileChips}
         onReset={resetFilters}
         resetLabel={t("resetFilters")}
-        showResultsLabel={t("results", { count: filtered.length })}
+        showResultsLabel={t("showResults", { count: filtered.length })}
       >
 
         <PlaceFilters rows={allLocations} value={placeFilters} onChange={setPlaceFilters} scope="locations" />        <div className="grid grid-cols-2 gap-3">
@@ -474,17 +487,17 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
           {showFilters && (
             <div className="pt-3 border-t border-border flex flex-wrap gap-3 items-center animate-fade-in">
               <div className="flex flex-wrap gap-1.5">
-                {locationTypes.map((t) => (
+                {locationTypes.map((type) => (
                   <button
-                    key={t}
-                    onClick={() => setActiveType(t)}
+                    key={type}
+                    onClick={() => setActiveType(type)}
                     className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all border ${
-                      activeType === t
+                      activeType === type
                         ? "bg-gold text-bg-primary border-gold"
                         : "border-border text-text-secondary hover:border-gold hover:text-gold"
                     }`}
                   >
-                    {t}
+                    {type === "All Types" ? t("filterAll") : categoryLabel(type)}
                   </button>
                 ))}
               </div>
@@ -548,13 +561,13 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
       </div>
 
       {/* ── MAIN CONTENT ── */}
-      <div className="flex-1 overflow-hidden flex">
+      <div className="flex min-w-0 flex-col xl:min-h-0 xl:flex-1 xl:flex-row xl:overflow-hidden">
 
         {/* ── LIST PANEL ── */}
-        {viewMode !== "map" && (
+        {effectiveView !== "map" && (
           <div
             ref={listRef}
-            className={`overflow-y-auto pb-[calc(56px+env(safe-area-inset-bottom,0px))] xl:pb-0 ${viewMode === "split" ? "w-full sm:w-[420px] shrink-0 sm:border-r border-border" : "flex-1"}`}
+            className={`min-w-0 pb-[calc(56px+env(safe-area-inset-bottom,0px))] xl:min-h-0 xl:overflow-y-auto xl:pb-0 ${effectiveView === "split" ? "w-full shrink-0 xl:w-[420px] xl:border-r border-border" : "xl:flex-1"}`}
           >
             <div className="hidden xl:flex sticky top-0 z-10 bg-bg-primary/90 backdrop-blur-nav border-b border-border px-4 py-2.5 items-center justify-between">
               <p className="text-xs text-text-muted">
@@ -569,12 +582,12 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                 icon={Film}
                 title={allLocations.length === 0 ? t("emptyTitle") : t("emptyTitleFiltered")}
                 description={allLocations.length === 0 ? t("emptyDesc") : userLocation ? t("emptyDescRadius") : t("emptyDescFiltered")}
-                action={allLocations.length === 0 ? { label: t("emptyAction"), onClick: () => window.location.href = "/inserat?group=drehorte" } : { label: t("emptyActionReset"), onClick: resetFilters }}
+                action={allLocations.length === 0 ? { label: t("emptyAction"), onClick: () => router.push("/inserat?group=drehorte") } : { label: t("emptyActionReset"), onClick: resetFilters }}
               />
             ) : (
-              <div className={`${viewMode === "list" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-6" : "space-y-3 p-3"}`}>
+              <div className={effectiveView === "list" ? "site-container grid grid-cols-1 gap-4 py-4 sm:grid-cols-2 lg:grid-cols-3" : "space-y-3 p-3"}>
                 {filtered.slice(0, visibleCount).map((loc) => (
-                  viewMode === "split" ? (
+                  effectiveView === "split" ? (
                     <div
                       key={loc.id}
                       data-id={loc.id}
@@ -594,13 +607,13 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                           }
                           <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/60 to-transparent" />
                           <div className="absolute top-2 left-2 flex gap-1">
-                            {loc.isReal && <span className="px-1.5 py-0.5 bg-success text-white text-[10px] font-bold rounded">NEU</span>}
-                            {loc.instantBook && <span className="px-1.5 py-0.5 bg-gold text-bg-primary text-[10px] font-bold rounded">Instant</span>}
+                            {loc.isReal && <span className="px-1.5 py-0.5 bg-success text-white text-[10px] font-bold rounded">{t("newBadge")}</span>}
+                            {loc.instantBook && <span className="px-1.5 py-0.5 bg-gold text-bg-primary text-[10px] font-bold rounded">{t("filterInstant")}</span>}
                           </div>
                           <div className="absolute top-2 right-2 flex items-center gap-1">
                             {loc.verified && <CheckCircle size={14} className="text-success drop-shadow" />}
                             {isSignedIn && (
-                              <button type="button" onClick={(e) => handleFavorite(e, loc.id)}
+                              <button type="button" aria-label={t(favorites.has(loc.id) ? "removeFavorite" : "addFavorite")} onClick={(e) => handleFavorite(e, loc.id)}
                                 className={`w-6 h-6 flex items-center justify-center rounded-full backdrop-blur-sm border transition-all ${favorites.has(loc.id) ? "bg-crimson/20 border-crimson/50 text-crimson-light" : "bg-bg-primary/60 border-border/50 text-text-muted hover:text-crimson-light"}`}>
                                 <Heart size={11} className={favorites.has(loc.id) ? "fill-current" : ""} />
                               </button>
@@ -608,13 +621,13 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                           </div>
                         </div>
                         <div className="p-3">
-                          <h3 className="font-semibold text-text-primary text-sm leading-snug line-clamp-1 mb-0.5">{loc.title}</h3>
+                          <h3 className="font-semibold text-text-primary text-sm leading-snug line-clamp-2 mb-0.5">{loc.title}</h3>
                           <p className="text-xs text-text-muted flex items-center gap-1 mb-1.5">
-                            <MapPin size={10} /> {placeDisplay(loc, loc.city, locale)} · {loc.type}
+                            <MapPin size={10} className="shrink-0" /> {placeDisplay(loc, loc.city, locale)} · {categoryLabel(loc.type)}
                           </p>
                           <div className="flex items-center justify-between mb-1.5">
                             <span className="text-sm font-bold text-gold">
-                              {listingPriceLabel(loc.price,loc.metadata)}
+                              {listingPriceLabel(loc.price,loc.metadata, "/Tag", locale, priceText)}
 
                             </span>
                           </div>
@@ -630,7 +643,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                                   <span className="text-[9px] text-text-muted">({liveRatings[loc.id].count})</span>
                                 </>
                               ) : (
-                                <span className="text-[9px] text-text-muted/60">Noch keine Bewertung</span>
+                                <span className="text-[9px] text-text-muted/60">{t("landingNoReviews")}</span>
                               )}
                             </div>
                             {eligible.has(loc.id) && !!user && user.id !== loc.ownerId && (
@@ -654,7 +667,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                       key={loc.id}
                       href={`/locations/${loc.id}`}
                       suppressHydrationWarning
-                      className="browse-card card-hover group overflow-hidden block"
+                      className="browse-card card-hover group block min-w-0 overflow-hidden"
                     >
                       <div className="relative overflow-hidden aspect-video bg-bg-elevated">
                         {loc.image
@@ -663,22 +676,22 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                         }
                         <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/70 to-transparent" />
                         <div className="absolute top-3 left-3 flex gap-1.5">
-                          {loc.instantBook && <span className="px-2 py-0.5 bg-gold text-bg-primary text-xs font-semibold rounded">Instant</span>}
-                          {loc.verified && <span className="px-2 py-0.5 bg-bg-primary/80 border border-border text-xs rounded flex items-center gap-1 text-text-secondary"><CheckCircle size={10} className="text-success" /> Verified</span>}
+                          {loc.instantBook && <span className="px-2 py-0.5 bg-gold text-bg-primary text-xs font-semibold rounded">{t("filterInstant")}</span>}
+                          {loc.verified && <span className="px-2 py-0.5 bg-bg-primary/80 border border-border text-xs rounded flex items-center gap-1 text-text-secondary"><CheckCircle size={10} className="text-success" />{t("filterVerified")}</span>}
                         </div>
                         {isSignedIn && (
-                          <button type="button" onClick={(e) => handleFavorite(e, loc.id)}
-                            className={`absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full backdrop-blur-sm border transition-all ${favorites.has(loc.id) ? "bg-crimson/20 border-crimson/50 text-crimson-light" : "bg-bg-primary/60 border-border/50 text-text-muted hover:text-crimson-light"}`}>
+                              <button type="button" aria-label={t(favorites.has(loc.id) ? "removeFavorite" : "addFavorite")} onClick={(e) => handleFavorite(e, loc.id)}
+                            className={`absolute top-3 right-3 h-11 w-11 flex items-center justify-center rounded-full backdrop-blur-sm border transition-all ${favorites.has(loc.id) ? "bg-crimson/20 border-crimson/50 text-crimson-light" : "bg-bg-primary/60 border-border/50 text-text-muted hover:text-crimson-light"}`}>
                             <Heart size={13} className={favorites.has(loc.id) ? "fill-current" : ""} />
                           </button>
                         )}
                       </div>
                       <div className="p-4">
-                        <h3 className="font-semibold text-text-primary text-sm mb-1">{loc.title}</h3>
-                        <p className="text-xs text-text-muted mb-2 flex items-center gap-1"><MapPin size={11} /> {placeDisplay(loc, loc.city, locale)}</p>
-                        <div className="flex items-center justify-between pt-2 border-t border-border mb-1.5">
-                          <span className="text-xs text-text-muted">{loc.type}</span>
-                          <span className="text-sm font-bold text-gold">{listingPriceLabel(loc.price,loc.metadata)}</span>
+                        <h3 className="font-semibold text-text-primary text-sm leading-snug line-clamp-2 break-words mb-1">{loc.title}</h3>
+                        <p className="text-xs text-text-muted mb-2 flex items-start gap-1 break-words"><MapPin size={11} className="mt-0.5 shrink-0" /> {placeDisplay(loc, loc.city, locale)}</p>
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border mb-1.5">
+                          <span className="text-xs text-text-muted">{categoryLabel(loc.type)}</span>
+                          <span className="text-sm font-bold text-gold">{listingPriceLabel(loc.price,loc.metadata, "/Tag", locale, priceText)}</span>
                         </div>
                         <div className="flex items-center justify-between pt-1.5 border-t border-border/30"
                           onClick={(e) => e.stopPropagation()}>
@@ -692,7 +705,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
                                 <span className="text-[9px] text-text-muted">({liveRatings[loc.id].count})</span>
                               </>
                             ) : (
-                              <span className="text-[9px] text-text-muted/60">Noch keine Bewertung</span>
+                              <span className="text-[9px] text-text-muted/60">{t("landingNoReviews")}</span>
                             )}
                           </div>
                           {eligible.has(loc.id) && !!user && user.id !== loc.ownerId && (
@@ -729,8 +742,8 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
         )}
 
         {/* ── MAP PANEL ── */}
-        {viewMode !== "list" && (
-          <div className={`flex-1 p-3 bg-bg-primary ${viewMode === "split" ? "hidden sm:block" : ""}`}>
+        {effectiveView !== "list" && (
+          <div className={`min-w-0 p-3 bg-bg-primary xl:min-h-0 xl:flex-1 ${effectiveView === "map" ? "h-[65dvh] min-h-[24rem] pb-[calc(56px+env(safe-area-inset-bottom,0px))] xl:h-auto xl:pb-3" : ""}`}>
             <LocationMap
               locations={filtered}
               activeId={activeId}

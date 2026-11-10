@@ -175,7 +175,7 @@ export async function GET(request: NextRequest) {
   });
 }
 
-// Start or reuse a one-to-one conversation and send its first message.
+// Start or reuse a one-to-one conversation and send a message.
 export async function POST(req: NextRequest) {
   const authResult = await requireAuth();
   if (authResult instanceof NextResponse) return authResult;
@@ -238,21 +238,19 @@ export async function POST(req: NextRequest) {
   });
   if (messageError) return NextResponse.json({ error: "Nachricht konnte nicht gesendet werden." }, { status: 500 });
 
-  if (!existing) {
-    try {
-      const [{ data: senderProfile }, { data: emailSettings }] = await Promise.all([
-        db.from("profiles").select("display_name").eq("user_id", userId).maybeSingle(),
-        db.from("user_settings").select("email_new_message").eq("user_id", receiver_id).maybeSingle(),
-      ]);
-      const senderName = senderProfile?.display_name ?? "Jemand";
-      if (emailSettings?.email_new_message !== false) {
-        const clerk = await clerkClient();
-        const recipient = await clerk.users.getUser(receiver_id);
-        const email = recipient.emailAddresses[0]?.emailAddress;
-        if (email) await sendNewMessageEmail(email, senderName, content.trim(), conversationId);
-      }
-    } catch { /* best effort; the persisted message remains authoritative */ }
-  }
+  try {
+    const [{ data: senderProfile }, { data: emailSettings }] = await Promise.all([
+      db.from("profiles").select("display_name").eq("user_id", userId).maybeSingle(),
+      db.from("user_settings").select("email_new_message").eq("user_id", receiver_id).maybeSingle(),
+    ]);
+    const senderName = senderProfile?.display_name ?? "Jemand";
+    if (emailSettings?.email_new_message !== false) {
+      const clerk = await clerkClient();
+      const recipient = await clerk.users.getUser(receiver_id);
+      const email = recipient.emailAddresses[0]?.emailAddress;
+      if (email) await sendNewMessageEmail(email, senderName, content.trim(), conversationId);
+    }
+  } catch { /* best effort; the persisted message remains authoritative */ }
 
   return NextResponse.json({ conversationId, message: Array.isArray(message) ? message[0] : message });
 }

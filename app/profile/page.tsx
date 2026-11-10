@@ -2,6 +2,7 @@
 
 import PlaceField from "@/components/PlaceField";
 import { placeInputValue } from "@/lib/places/core";
+import { PROFILE_TRAIT_MESSAGE_KEYS, profileTraitLabel } from "@/lib/profile-trait-labels";
 import ContentUsageNotice from "@/components/ContentUsageNotice";
 import { useFormRouter as useRouter } from "@/lib/use-form-router";
 
@@ -37,7 +38,7 @@ import { prepareProfileMediaFile, sendProfileMediaFile, PROFILE_MEDIA_ACCEPT, PR
 import { publishProfileUpdated } from "@/lib/profile-update-events";
 import { isAvatarUploadAssociated } from "@/lib/profile-avatar-persistence";
 import { validateProfileSave, type ProfileSaveFieldErrors } from "@/lib/profile-save-validation";
-import { PROFILE_EDITOR_STEPS, profileEditorRequiredMissing, profileEditorStepForErrors, profileEditorStepForHint, shouldResumeProfileEditorDraft, type ProfileEditorStep } from "@/lib/profile-editor-flow";
+import { PROFILE_EDITOR_STEPS, profileEditorAvailabilityConfig, profileEditorRequiredMissing, profileEditorStepForErrors, profileEditorStepForHint, shouldResumeProfileEditorDraft, type ProfileEditorStep } from "@/lib/profile-editor-flow";
 
 const ALL_CREW_ROLES = departments.flatMap((d) => d.roles);
 
@@ -625,6 +626,8 @@ export default function ProfilePage() {
   const [tattoosCoverable, setTattoosCoverable] = useState(false);
   const physicalDataRef = useRef<Record<string, unknown>>({});
   const performanceDataRef = useRef<Record<string, unknown>>({});
+  const availabilityConfigRef = useRef<Record<string, unknown>>({});
+  const originalTravelReadyRef = useRef(false);
 
   // ── Lazy-load my projects, listings & friends ──────────────────────────────
   useEffect(() => {
@@ -734,6 +737,8 @@ export default function ProfilePage() {
             short_notice?: boolean;
             work_radius_km?: number | null;
           } | null;
+          availabilityConfigRef.current = profile.availability_config && typeof profile.availability_config === "object" && !Array.isArray(profile.availability_config) ? { ...profile.availability_config } : {};
+          originalTravelReadyRef.current = profile.travel_ready ?? false;
           setForm({
             name:          profile.display_name        ?? "",
             city:          placeInputValue(profile, profile.location ?? ""),
@@ -1119,12 +1124,7 @@ export default function ProfilePage() {
         reel_url:       videoLinks[0] || null,
         available_from: form.availableFrom || null,
         travel_ready:   form.travelReady,
-        availability_config: {
-          weekends:      form.weekends,
-          night_shoots:  form.nightShoots,
-          short_notice:  form.shortNotice,
-          work_radius_km: form.workRadius ? parseInt(form.workRadius) : null,
-        },
+        availability_config: profileEditorAvailabilityConfig(availabilityConfigRef.current, { ...form, originalTravelReady: originalTravelReadyRef.current }),
         cover_image_url: coverImageUrl || null,
         focal_point: { ...focalPoint, opacity: coverOpacity },
         instagram_url:  instagramUrl || null,
@@ -1193,6 +1193,8 @@ export default function ProfilePage() {
 
       physicalDataRef.current = physical ?? {};
       performanceDataRef.current = performance ?? {};
+      availabilityConfigRef.current = commonPayload.availability_config;
+      originalTravelReadyRef.current = form.travelReady;
 
       if (unavailableFields.length > 0) {
         addToast(`Profil gespeichert. Diese Angaben konnten wegen fehlender Datenbankfelder nicht gespeichert werden: ${unavailableFields.join(", ")}.`, "error");
@@ -1335,6 +1337,7 @@ export default function ProfilePage() {
     currentProfileTypes,
     physicalData: physicalDataRef.current,
     performanceData: performanceDataRef.current,
+    availabilityData: availabilityConfigRef.current,
     playingAgeMin,
     playingAgeMax,
     heightCm,
@@ -1375,6 +1378,7 @@ export default function ProfilePage() {
           if (Array.isArray(saved.currentProfileTypes)) setCurrentProfileTypes(saved.currentProfileTypes.filter((item: unknown): item is string => typeof item === "string"));
           if (saved.physicalData && typeof saved.physicalData === "object") physicalDataRef.current = saved.physicalData as Record<string, unknown>;
           if (saved.performanceData && typeof saved.performanceData === "object") performanceDataRef.current = saved.performanceData as Record<string, unknown>;
+          if (saved.availabilityData && typeof saved.availabilityData === "object" && !Array.isArray(saved.availabilityData)) availabilityConfigRef.current = saved.availabilityData as Record<string, unknown>;
           for (const [key, setter] of [
             ["playingAgeMin", setPlayingAgeMin], ["playingAgeMax", setPlayingAgeMax], ["heightCm", setHeightCm],
             ["clothingSize", setClothingSize], ["shoeSize", setShoeSize], ["hairColor", setHairColor],
@@ -1906,7 +1910,7 @@ export default function ProfilePage() {
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-gold transition-colors" />
                       <p className="text-xs text-text-muted mt-1">Öffentliche Kontakt-E-Mail (optional, kann von deiner Login-E-Mail abweichen)</p>
                     </div>
-                    <PlaceField id="profile-city" value={[form.city, form.country].filter(Boolean).join(", ")} onChange={(value,cityId) => { setForm(p => ({ ...p, city: value, country: "", selected_place_city_id: cityId ?? "" })); setFieldErrors(p => ({ ...p, city: undefined })); }} required />
+                    <PlaceField id="profile-city" selectedCityId={form.selected_place_city_id} value={[form.city, form.country].filter(Boolean).join(", ")} onChange={(value,cityId) => { setForm(p => ({ ...p, city: value, country: "", selected_place_city_id: cityId ?? "" })); setFieldErrors(p => ({ ...p, city: undefined })); }} required />
                     {fieldErrors.city && <p id="profile-city-error" role="alert" className="text-sm text-error">{fieldErrors.city}</p>}
                     {/* Profil-URL / Slug */}
                     <div>
@@ -2554,36 +2558,9 @@ export default function ProfilePage() {
                 {/* ── CASTING-DATEN ── */}
                 {showTalentSections && (() => {
                   // Use stable IDs for storage, display translated labels
-                  const HAIR: { id: string; label: string }[] = [
-                    { id: "black",       label: t("hairBlack") },
-                    { id: "dark_brown",  label: t("hairDarkBrown") },
-                    { id: "brown",       label: t("hairBrown") },
-                    { id: "light_brown", label: t("hairLightBrown") },
-                    { id: "blonde",      label: t("hairBlonde") },
-                    { id: "light_blonde",label: t("hairLightBlonde") },
-                    { id: "red",         label: t("hairRed") },
-                    { id: "grey",        label: t("hairGrey") },
-                    { id: "white",       label: t("hairWhite") },
-                    { id: "dyed",        label: t("hairDyed") },
-                  ];
-                  const EYES: { id: string; label: string }[] = [
-                    { id: "brown",      label: t("eyesBrown") },
-                    { id: "dark_brown", label: t("eyesDarkBrown") },
-                    { id: "green",      label: t("eyesGreen") },
-                    { id: "blue_green", label: t("eyesBlueGreen") },
-                    { id: "blue",       label: t("eyesBlue") },
-                    { id: "grey",       label: t("eyesGrey") },
-                    { id: "hazel",      label: t("eyesHazel") },
-                    { id: "black",      label: t("eyesBlack") },
-                  ];
-                  const BODIES = [
-                    { id:"slim",     label: t("bodySlim") },
-                    { id:"athletic", label: t("bodyAthletic") },
-                    { id:"normal",   label: t("bodyNormal") },
-                    { id:"strong",   label: t("bodyStrong") },
-                    { id:"muscular", label: t("bodyMuscular") },
-                    { id:"curvy",    label: t("bodyCurvy") },
-                  ];
+                  const HAIR = Object.keys(PROFILE_TRAIT_MESSAGE_KEYS.hair).map(id => ({ id, label: profileTraitLabel("hair", id, t) }));
+                  const EYES = Object.keys(PROFILE_TRAIT_MESSAGE_KEYS.eyes).map(id => ({ id, label: profileTraitLabel("eyes", id, t) }));
+                  const BODIES = Object.keys(PROFILE_TRAIT_MESSAGE_KEYS.body).map(id => ({ id, label: profileTraitLabel("body", id, t) }));
                   return (
                     <div className="p-6 bg-bg-secondary border border-border rounded-xl space-y-6">
                       <h2 className="font-semibold text-text-primary">{t("sectionCasting")}</h2>
