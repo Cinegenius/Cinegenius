@@ -2637,6 +2637,25 @@
       "delivery_unknown": "Hiányzó küldési visszaigazolás",
       "delivery_skipped": "Küldés kihagyva",
       "settings_updated": "Szabályok módosítva"
+    },
+    "readCheck": {
+      "title": "E-mail-kézbesítési állapot hozzáférésének ellenőrzése",
+      "help": "Használd egy korábban neked küldött tesztlevél Resend-azonosítóját. Az ellenőrzés csak ezt az üzenetet olvassa be, nem küld levelet, és nem módosít hirdetést vagy beállítást.",
+      "messageId": "Saját tesztleveled Resend-azonosítója",
+      "confirmOwn": "Ezt a meglévő tesztlevelet kizárólag a saját fiókom ellenőrzött e-mail-címére küldték.",
+      "check": "Olvasási hozzáférés ellenőrzése",
+      "checking": "Ellenőrzés folyamatban …",
+      "results": {
+        "readable": "Az olvasási hozzáférés igazolva. Nem küldtünk e-mailt. Ez nem igazolja a jövőbeli emlékeztetők kézbesítését.",
+        "not_configured": "Az e-mail-szolgáltatás itt még nincs beállítva.",
+        "verified_email_required": "Az ellenőrzéshez a fiókodban ellenőrzött elsődleges e-mail-cím szükséges.",
+        "permission_denied": "A jelenlegi e-mail-kulcs nem olvashatja az elküldött üzeneteket. Adj olvasási jogosultságot az e-mail-szolgáltatásban.",
+        "not_found": "Ehhez az azonosítóhoz nem található megfelelő saját tesztlevél.",
+        "unavailable": "Az olvasási hozzáférés most nem ellenőrizhető. Próbáld újra később.",
+        "rate_limited": "Várj egy percet az újabb ellenőrzés előtt.",
+        "invalid": "Add meg a saját tesztleveled érvényes Resend-azonosítóját, és erősítsd meg a címzettet.",
+        "account": "A rendszergazdai munkameneted lejárt vagy nincs jogosultságod. Jelentkezz be újra."
+      }
     }
   },
   "ListingFreshness": {

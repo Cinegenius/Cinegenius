@@ -11,6 +11,12 @@ The reminder system is separate from publication approval. Renewal cannot publis
 
 The worker runs only when `VERCEL_ENV=production` and `LISTING_FRESHNESS_ENABLED=true`. Missing email configuration also prevents all worker mutations. The Vercel schedule is daily at **08:00 UTC**. Its only unauthenticated session exception is `GET /api/cron/listing-freshness`, which independently requires the exact `Authorization: Bearer <CRON_SECRET>` header. HEAD cannot execute the worker. Responses are not cached and contain counters or stable error codes, never recipient details.
 
+## Admin read-access verification
+
+Before activation, open `/admin/listing-freshness` in the intended deployment and use **Check email read access** with the Resend message ID of an existing test message sent exclusively to the signed-in admin's currently verified primary email address. This is the message UUID, not an API key. Explicitly confirm that it is your own test message. Messages with any CC/BCC recipients, a different recipient, or more than one recipient are not eligible; missing and ineligible messages produce the same result.
+
+The button makes exactly one bounded `emails.get` request with an eight-second timeout, at most once per minute per admin. It requires admin authorization and a trusted origin, returns only a fixed capability result, and does not send mail, run the worker, alter settings or modify listings. Email content, recipients, the message ID, provider error details and credentials are not returned. A successful result proves that this deployment's configured key can read the selected own message; it does not prove delivery of any future reminder or that a person has read a message. Resolve a send-only or unavailable key before enabling automatic reminders.
+
 ## Delivery and failure handling
 
 Each listing, cycle and reminder stage has a separate outbox entry and stable idempotency key. Company offers use the company's current owner, never a fallback to the technical creator. Personal offers use the current listing owner. Only that account's verified primary Clerk email is eligible. The current provider, publication and content revision are checked again before binding the delivery.
@@ -30,5 +36,7 @@ Each run claims at most 10 reminders and stops starting new items after 45 secon
 ## Local verification
 
 `lib/listing-freshness-mail.test.mjs` renders the real six-language catalogs with ICU formatting and intercepts every mail call and status lookup. `lib/listing-freshness-server.test.mjs` uses isolated fake database, identity and delivery dependencies. `lib/listing-freshness-delivery-db.test.mjs` exercises the actual migration and moderation triggers in an isolated PGlite database, including stale leases, frozen payloads and promised intervals, accepted-but-undelivered follow-ups, bounces, recipient changes, stale delivery observations and guarded automatic pauses. The cron exception is covered in `lib/private-api-auth.test.mjs`. These tests require no live service credentials and send no real mail.
+
+The admin diagnostic is covered by `lib/listing-freshness-diagnostics.test.mjs` with mocked Clerk/Resend dependencies and by the existing API/UI suites. Cases cover verified-primary ownership, sole recipient, CC/BCC rejection, malformed UUIDs, permissions, timeout/error results, trusted origin, throttling, explicit confirmation and double-click protection. The focused `listing-freshness*.test.mjs` plus `private-api-auth.test.mjs` run for this diagnostic passed **87/87** tests without live service requests or email delivery. That run includes 24 isolated PGlite database tests using the real migration and triggers; the API, UI, identity and delivery checks use local doubles. Production SQL, browser verification and the real Resend read check remain separate rollout evidence and must not be inferred from these mocked tests.
 
 Run those tests, the database regression suite, TypeScript, `npm run check:i18n`, `npm run check:design`, and the production build before release. Local fixtures are not evidence that a production migration, activation or delivery has occurred.

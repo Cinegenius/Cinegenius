@@ -8,6 +8,8 @@ import { ArrowLeft, ChevronLeft, ChevronRight, Clock3, Loader2, RefreshCw, Save 
 type Setting = { listing_type: string; enabled: boolean; initial_days: number; followup_days: number; response_days: number };
 type DraftSetting = Omit<Setting, "initial_days" | "followup_days" | "response_days"> & { initial_days: string; followup_days: string; response_days: string };
 type View = "status" | "events";
+const READ_CHECK_STATUSES = ["readable", "not_configured", "verified_email_required", "permission_denied", "not_found", "unavailable", "rate_limited", "invalid", "account"] as const;
+type ReadCheckStatus = typeof READ_CHECK_STATUSES[number];
 type Item = {
   id?: string; listing_id: string | null;
   listing?: { title: string; type: string } | null;
@@ -38,6 +40,11 @@ export default function AdminListingFreshness() {
   const [dirty, setDirty] = useState(false);
   const [reason, setReason] = useState("");
   const [result, setResult] = useState<"saved" | "saveError" | "invalidSettings" | "reasonRequired" | "conflict" | null>(null);
+  const [testMessageId, setTestMessageId] = useState("");
+  const [ownTestEmail, setOwnTestEmail] = useState(false);
+  const [checkingReadAccess, setCheckingReadAccess] = useState(false);
+  const [readCheckStatus, setReadCheckStatus] = useState<ReadCheckStatus | null>(null);
+  const readCheckPending = useRef(false);
   const hasEdits = useRef(false);
   const savePending = useRef(false);
   const page = pages[view];
@@ -95,6 +102,24 @@ export default function AdminListingFreshness() {
     finally { savePending.current = false; setSaving(false); }
   }
 
+  async function checkReadAccess(event: FormEvent) {
+    event.preventDefault();
+    if (readCheckPending.current || !ownTestEmail) return;
+    readCheckPending.current = true;
+    setCheckingReadAccess(true);
+    setReadCheckStatus(null);
+    try {
+      const response = await fetch("/api/admin/listing-freshness", {
+        method: "POST", headers: { "Content-Type": "application/json" }, cache: "no-store",
+        body: JSON.stringify({ action: "check_delivery_access", messageId: testMessageId.trim(), ownTestEmail: true }),
+      });
+      const data = await response.json().catch(() => null);
+      const status = response.ok ? data?.status : response.status === 429 ? "rate_limited" : response.status === 400 ? "invalid" : [401, 403].includes(response.status) ? "account" : "unavailable";
+      setReadCheckStatus(READ_CHECK_STATUSES.includes(status) ? status : "unavailable");
+    } catch { setReadCheckStatus("unavailable"); }
+    finally { readCheckPending.current = false; setCheckingReadAccess(false); }
+  }
+
   function date(value: string | null | undefined) {
     const parsed = value ? new Date(value) : null;
     return parsed && Number.isFinite(parsed.getTime()) ? format.dateTime(parsed, { dateStyle: "medium", timeStyle: "short" }) : t("notAvailable");
@@ -128,6 +153,17 @@ export default function AdminListingFreshness() {
         <div className="flex flex-wrap items-center gap-4"><button type="submit" disabled={saving || !dirty} className={`${buttonClass} border-gold/30 bg-gold text-bg-primary`}>{saving ? <Loader2 size={17} className="animate-spin" aria-hidden="true" /> : <Save size={17} aria-hidden="true" />}{t(saving ? "saving" : "save")}</button>{dirty && <p className="text-xs text-text-muted">{t("unsaved")}</p>}</div>
         {result && <p role={result === "saved" ? "status" : "alert"} className={`text-sm ${result === "saved" ? "text-success" : "text-red-400"}`}>{t(result)}</p>}
       </form>}
+    </section>
+
+    <section className="rounded-2xl border border-border bg-bg-secondary p-4 sm:p-6" aria-labelledby="freshness-read-check-title">
+      <h2 id="freshness-read-check-title" className="text-lg font-semibold text-text-primary">{t("readCheck.title")}</h2>
+      <p id="freshness-read-check-help" className="mt-2 max-w-3xl text-sm leading-6 text-text-muted">{t("readCheck.help")}</p>
+      <form onSubmit={event => void checkReadAccess(event)} className="mt-4 max-w-3xl space-y-3">
+        <label className="block text-sm text-text-secondary">{t("readCheck.messageId")}<input type="text" value={testMessageId} onChange={event => { setTestMessageId(event.target.value); setReadCheckStatus(null); }} required maxLength={36} minLength={36} autoComplete="off" spellCheck={false} disabled={checkingReadAccess} aria-describedby="freshness-read-check-help" className={inputClass} /></label>
+        <label className="flex min-h-11 items-start gap-3 text-sm leading-6 text-text-secondary"><input type="checkbox" checked={ownTestEmail} onChange={event => { setOwnTestEmail(event.target.checked); setReadCheckStatus(null); }} required disabled={checkingReadAccess} className="mt-1 h-5 w-5 shrink-0 accent-gold" /><span>{t("readCheck.confirmOwn")}</span></label>
+        <button type="submit" disabled={checkingReadAccess || !ownTestEmail || !testMessageId.trim()} className={buttonClass}>{checkingReadAccess ? <Loader2 size={17} className="animate-spin" aria-hidden="true" /> : <RefreshCw size={17} aria-hidden="true" />}{t(checkingReadAccess ? "readCheck.checking" : "readCheck.check")}</button>
+        {readCheckStatus && <p role={readCheckStatus === "readable" ? "status" : "alert"} className={`break-words text-sm leading-6 ${readCheckStatus === "readable" ? "text-success" : "text-text-secondary"}`}>{t(`readCheck.results.${readCheckStatus}`)}</p>}
+      </form>
     </section>
 
     <section className="overflow-hidden rounded-2xl border border-border bg-bg-secondary" aria-labelledby="freshness-status-title">

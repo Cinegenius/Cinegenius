@@ -2637,6 +2637,25 @@
       "delivery_unknown": "Send confirmation missing",
       "delivery_skipped": "Sending skipped",
       "settings_updated": "Rules changed"
+    },
+    "readCheck": {
+      "title": "Check email delivery status access",
+      "help": "Use the Resend ID of an existing test email sent to you. This check only reads that message, sends nothing and changes no listings or settings.",
+      "messageId": "Resend ID of your test email",
+      "confirmOwn": "This existing test email was sent only to my own verified account email address.",
+      "check": "Check read access",
+      "checking": "Checking …",
+      "results": {
+        "readable": "Read access confirmed. No email was sent. This does not confirm delivery of future reminders.",
+        "not_configured": "The email service is not configured here yet.",
+        "verified_email_required": "You need a verified primary email address in your account for this check.",
+        "permission_denied": "The current email key cannot read sent messages. Add read permission in the email service.",
+        "not_found": "No suitable test email of your own was found for this ID.",
+        "unavailable": "Read access could not be checked right now. Try again later.",
+        "rate_limited": "Please wait one minute before checking again.",
+        "invalid": "Enter a valid Resend ID for your own test email and confirm the recipient.",
+        "account": "Your admin session has expired or is not authorised. Sign in again."
+      }
     }
   },
   "ListingFreshness": {

@@ -2637,6 +2637,25 @@
       "delivery_unknown": "Chybí potvrzení odeslání",
       "delivery_skipped": "Odeslání přeskočeno",
       "settings_updated": "Pravidla změněna"
+    },
+    "readCheck": {
+      "title": "Ověřit přístup ke stavu doručení e-mailů",
+      "help": "Použij ID Resend vlastní již doručené testovací zprávy. Kontrola pouze přečte tuto zprávu, nic neodesílá a nemění inzeráty ani nastavení.",
+      "messageId": "ID Resend tvé testovací zprávy",
+      "confirmOwn": "Tato testovací zpráva byla odeslána pouze na ověřenou e-mailovou adresu mého vlastního účtu.",
+      "check": "Ověřit přístup ke čtení",
+      "checking": "Probíhá ověření …",
+      "results": {
+        "readable": "Přístup ke čtení byl potvrzen. Žádný e-mail nebyl odeslán. Tím není potvrzeno doručení budoucích připomínek.",
+        "not_configured": "E-mailová služba zde zatím není nastavena.",
+        "verified_email_required": "Pro tuto kontrolu potřebuješ ověřenou hlavní e-mailovou adresu svého účtu.",
+        "permission_denied": "Aktuální e-mailový klíč neumožňuje číst odeslané zprávy. Přidej oprávnění ke čtení v e-mailové službě.",
+        "not_found": "Pro toto ID nebyla nalezena vhodná vlastní testovací zpráva.",
+        "unavailable": "Přístup ke čtení nyní nelze ověřit. Zkus to později.",
+        "rate_limited": "Před další kontrolou počkej jednu minutu.",
+        "invalid": "Zadej platné ID Resend své testovací zprávy a potvrď příjemce.",
+        "account": "Tvé přihlášení správce vypršelo nebo nemá oprávnění. Přihlas se znovu."
+      }
     }
   },
   "ListingFreshness": {

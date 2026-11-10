@@ -3,6 +3,8 @@ import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { trustedMutationOrigin } from "@/lib/request-origin";
 import { listingFreshnessSchedulerEnabled } from "@/lib/listing-freshness-cron-auth";
+import { rateLimit } from "@/lib/rateLimit";
+import { checkListingFreshnessReadAccess, RESEND_MESSAGE_ID } from "@/lib/listing-freshness-diagnostics";
 
 export const dynamic = "force-dynamic";
 
@@ -124,6 +126,26 @@ export async function PUT(request: NextRequest) {
     const returnedSettings = result.settings.map(setting);
     if (returnedSettings.some(value => value === null)) return json({ code: "unavailable" }, 503);
     return json({ settings: returnedSettings });
+  } catch {
+    return json({ code: "unavailable" }, 503);
+  }
+}
+
+/** Explicit admin diagnostic only: no sending, worker or listing/settings write. */
+export async function POST(request: NextRequest) {
+  try {
+    const admin = await requireAdmin();
+    if (admin instanceof NextResponse) return privateAuthResponse(admin);
+    if (!trustedMutationOrigin({
+      requestUrl: request.url, origin: request.headers.get("origin"), referer: request.headers.get("referer"),
+      development: process.env.NODE_ENV === "development", deploymentHost: process.env.VERCEL_URL,
+    })) return json({ code: "origin" }, 403);
+    const body = object(await request.json().catch(() => null));
+    if (body?.action !== "check_delivery_access" || body.ownTestEmail !== true || typeof body.messageId !== "string"
+      || !RESEND_MESSAGE_ID.test(body.messageId)) return json({ code: "invalid" }, 400);
+    const limit = await rateLimit(`listing-freshness-read-check:${admin.userId}`, 1, 60);
+    if (!limit.allowed) return json({ code: "rate_limited" }, 429);
+    return json({ status: await checkListingFreshnessReadAccess(admin.userId, body.messageId) });
   } catch {
     return json({ code: "unavailable" }, 503);
   }

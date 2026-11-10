@@ -2637,6 +2637,25 @@
       "delivery_unknown": "Conferma di invio mancante",
       "delivery_skipped": "Invio saltato",
       "settings_updated": "Regole modificate"
+    },
+    "readCheck": {
+      "title": "Verifica accesso allo stato di consegna",
+      "help": "Usa l’ID Resend di un’email di prova già ricevuta. La verifica legge solo quel messaggio, non invia nulla e non modifica annunci o impostazioni.",
+      "messageId": "ID Resend della tua email di prova",
+      "confirmOwn": "Questa email di prova è stata inviata solo all’indirizzo verificato del mio account.",
+      "check": "Verifica accesso in lettura",
+      "checking": "Verifica in corso …",
+      "results": {
+        "readable": "Accesso in lettura confermato. Non è stata inviata alcuna email. Questo non conferma la consegna dei promemoria futuri.",
+        "not_configured": "Il servizio email non è ancora configurato qui.",
+        "verified_email_required": "Per questa verifica serve un indirizzo email principale verificato nel tuo account.",
+        "permission_denied": "La chiave email attuale non permette di leggere i messaggi inviati. Aggiungi il permesso di lettura nel servizio email.",
+        "not_found": "Nessuna tua email di prova adatta è stata trovata con questo ID.",
+        "unavailable": "Impossibile verificare ora l’accesso in lettura. Riprova più tardi.",
+        "rate_limited": "Attendi un minuto prima di riprovare.",
+        "invalid": "Inserisci un ID Resend valido della tua email di prova e conferma il destinatario.",
+        "account": "La sessione amministratore è scaduta o non è autorizzata. Accedi di nuovo."
+      }
     }
   },
   "ListingFreshness": {

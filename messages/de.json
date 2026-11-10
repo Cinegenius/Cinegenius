@@ -2637,6 +2637,25 @@
       "delivery_unknown": "Versandbestätigung fehlt",
       "delivery_skipped": "Versand übersprungen",
       "settings_updated": "Regeln geändert"
+    },
+    "readCheck": {
+      "title": "Zugriff auf E-Mail-Zustellstatus prüfen",
+      "help": "Verwende die Resend-ID einer bereits versendeten eigenen Testmail. Die Prüfung liest nur diese Nachricht, versendet nichts und ändert keine Inserate oder Einstellungen.",
+      "messageId": "Resend-ID der eigenen Testmail",
+      "confirmOwn": "Diese vorhandene Testmail ging ausschließlich an meine eigene bestätigte Konto-E-Mail-Adresse.",
+      "check": "Lesezugriff prüfen",
+      "checking": "Wird geprüft …",
+      "results": {
+        "readable": "Lesezugriff bestätigt. Es wurde keine E-Mail versendet. Die Zustellung künftiger Erinnerungen ist damit noch nicht bestätigt.",
+        "not_configured": "Der E-Mail-Dienst ist hier noch nicht eingerichtet.",
+        "verified_email_required": "Für diese Prüfung brauchst du eine bestätigte primäre E-Mail-Adresse in deinem Konto.",
+        "permission_denied": "Der verwendete E-Mail-Schlüssel darf versendete Nachrichten nicht lesen. Ergänze die Leseberechtigung beim E-Mail-Dienst.",
+        "not_found": "Unter dieser ID wurde keine passende eigene Testmail gefunden.",
+        "unavailable": "Der Lesezugriff konnte gerade nicht geprüft werden. Versuche es später erneut.",
+        "rate_limited": "Bitte warte eine Minute, bevor du erneut prüfst.",
+        "invalid": "Gib eine gültige Resend-ID deiner eigenen Testmail ein und bestätige den Empfänger.",
+        "account": "Deine Adminanmeldung ist abgelaufen oder nicht berechtigt. Melde dich erneut an."
+      }
     }
   },
   "ListingFreshness": {

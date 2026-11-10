@@ -2637,6 +2637,25 @@
       "delivery_unknown": "Falta confirmación de envío",
       "delivery_skipped": "Envío omitido",
       "settings_updated": "Reglas modificadas"
+    },
+    "readCheck": {
+      "title": "Comprobar el acceso al estado de entrega",
+      "help": "Usa el ID de Resend de un correo de prueba que ya hayas recibido. Esta comprobación solo lee ese mensaje, no envía nada ni cambia anuncios o ajustes.",
+      "messageId": "ID de Resend de tu correo de prueba",
+      "confirmOwn": "Este correo de prueba se envió únicamente a la dirección verificada de mi propia cuenta.",
+      "check": "Comprobar acceso de lectura",
+      "checking": "Comprobando …",
+      "results": {
+        "readable": "Acceso de lectura confirmado. No se ha enviado ningún correo. Esto no confirma la entrega de futuros recordatorios.",
+        "not_configured": "El servicio de correo aún no está configurado aquí.",
+        "verified_email_required": "Necesitas una dirección principal de correo verificada en tu cuenta para esta comprobación.",
+        "permission_denied": "La clave de correo actual no permite leer mensajes enviados. Añade el permiso de lectura en el servicio de correo.",
+        "not_found": "No se ha encontrado un correo de prueba propio adecuado con este ID.",
+        "unavailable": "No se ha podido comprobar el acceso de lectura ahora. Inténtalo más tarde.",
+        "rate_limited": "Espera un minuto antes de volver a comprobar.",
+        "invalid": "Introduce un ID de Resend válido de tu propio correo de prueba y confirma el destinatario.",
+        "account": "Tu sesión de administrador ha caducado o no está autorizada. Vuelve a iniciar sesión."
+      }
     }
   },
   "ListingFreshness": {
