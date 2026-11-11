@@ -2,7 +2,7 @@ import {getLocale, getTranslations} from "next-intl/server";
 import { placeReadFields } from "@/lib/places/catalog";
 import { placeDisplay } from "@/lib/places/core";
 import { listingPriceLabel } from "@/lib/listing-price";
-import type { Metadata } from "next";
+import { readLocationLandingFilters } from "@/lib/locations-landing-filters";
 import { db } from "@/lib/db";
 import { fetchRatings } from "@/lib/ratings";
 import LocationsLanding, { type LocationCard } from "./LocationsLanding";
@@ -24,10 +24,11 @@ export async function generateMetadata(): Promise<import("next").Metadata> {
 };
 }
 
-export default async function LocationsPage() {
+export default async function LocationsPage({ searchParams }: { searchParams?: Promise<Record<string, string | string[] | undefined>> } = {}) {
   const uiText = await getTranslations();
 
   const locale = await getLocale();
+  const initialFilters = readLocationLandingFilters(await searchParams ?? {});
   const priceText = await getTranslations("MarketplaceOffer");
   const { data, error } = await db
     .from("listings")
@@ -67,6 +68,6 @@ export default async function LocationsPage() {
   });
 
   return (
-    <LocationsLanding allLocations={allLocations} totalCount={rows.length} />
+    <LocationsLanding allLocations={allLocations} totalCount={rows.length} initialFilters={initialFilters} />
   );
 }
