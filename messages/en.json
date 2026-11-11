@@ -308,7 +308,18 @@
     "boardSeeAll": "See all posts",
     "boardPageHeading": "Community board",
     "boardPageDescription": "Ask questions, share recommendations, and find the right people or resources. Posts stay visible for up to 2 days.",
-    "recommendationsUnavailable": "Recommendations are temporarily unavailable. You can still use search and the sections above."
+    "recommendationsUnavailable": "Recommendations are temporarily unavailable. You can still use search and the sections above.",
+    "findLabel": "DISCOVER",
+    "findTitle": "What are you looking for?",
+    "findLocationsTitle": "Locations",
+    "findLocationsDescription": "Filming locations, studios and unique spaces.",
+    "findCrewTitle": "Crew & talent",
+    "findCrewDescription": "People in front of and behind the camera.",
+    "findEquipmentDescription": "Production gear, vehicles and props.",
+    "findCompaniesDescription": "Catering, rentals and production support.",
+    "findJobsTitle": "Jobs & projects",
+    "findJobsDescription": "Find assignments or people to support your project.",
+    "findJobsLink": "Browse jobs"
   },
   "locations": {
     "heroTitle": "The perfect location",

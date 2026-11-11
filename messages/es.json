@@ -308,7 +308,18 @@
     "boardSeeAll": "Ver todas las publicaciones",
     "boardPageHeading": "Tablón de la comunidad",
     "boardPageDescription": "Haz preguntas, comparte recomendaciones y encuentra a las personas o recursos adecuados. Las publicaciones permanecen visibles hasta 2 días.",
-    "recommendationsUnavailable": "Las recomendaciones no están disponibles temporalmente. Puedes seguir usando la búsqueda y las secciones de arriba."
+    "recommendationsUnavailable": "Las recomendaciones no están disponibles temporalmente. Puedes seguir usando la búsqueda y las secciones de arriba.",
+    "findLabel": "DESCUBRIR",
+    "findTitle": "¿Qué quieres encontrar?",
+    "findLocationsTitle": "Localizaciones",
+    "findLocationsDescription": "Lugares de rodaje, estudios y espacios especiales.",
+    "findCrewTitle": "Equipo y talento",
+    "findCrewDescription": "Personas delante y detrás de la cámara.",
+    "findEquipmentDescription": "Material técnico, vehículos y utilería.",
+    "findCompaniesDescription": "Catering, alquiler y apoyo a la producción.",
+    "findJobsTitle": "Empleos y proyectos",
+    "findJobsDescription": "Encuentra encargos o personas que apoyen tu proyecto.",
+    "findJobsLink": "Ver empleos"
   },
   "locations": {
     "heroTitle": "La locación perfecta",

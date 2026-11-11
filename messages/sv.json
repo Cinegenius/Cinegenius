@@ -308,7 +308,18 @@
     "boardSeeAll": "Visa alla anslag",
     "boardPageHeading": "Anslagstavlan",
     "boardPageDescription": "Ställ frågor, dela rekommendationer och hitta rätt personer eller saker. Anslag är synliga i upp till 2 dagar.",
-    "recommendationsUnavailable": "Rekommendationerna är inte tillgängliga just nu. Du kan fortfarande använda sökningen och områdena ovan."
+    "recommendationsUnavailable": "Rekommendationerna är inte tillgängliga just nu. Du kan fortfarande använda sökningen och områdena ovan.",
+    "findLabel": "UPPTÄCK",
+    "findTitle": "Vad vill du hitta?",
+    "findLocationsTitle": "Inspelningsplatser",
+    "findLocationsDescription": "Inspelningsmiljöer, studior och unika rum.",
+    "findCrewTitle": "Filmteam och talanger",
+    "findCrewDescription": "Människor framför och bakom kameran.",
+    "findEquipmentDescription": "Teknik, fordon och rekvisita.",
+    "findCompaniesDescription": "Catering, uthyrning och stöd till produktioner.",
+    "findJobsTitle": "Jobb och projekt",
+    "findJobsDescription": "Hitta uppdrag eller sök stöd till din idé.",
+    "findJobsLink": "Visa jobb"
   },
   "locations": {
     "heroTitle": "Den perfekta inspelningsplatsen",

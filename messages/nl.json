@@ -308,7 +308,18 @@
     "boardSeeAll": "Alle berichten bekijken",
     "boardPageHeading": "Het prikbord",
     "boardPageDescription": "Stel vragen, deel aanbevelingen en vind geschikte mensen of spullen. Berichten blijven maximaal 2 dagen zichtbaar.",
-    "recommendationsUnavailable": "Aanbevelingen zijn momenteel niet beschikbaar. Je kunt de zoekfunctie en de onderdelen hierboven gewoon gebruiken."
+    "recommendationsUnavailable": "Aanbevelingen zijn momenteel niet beschikbaar. Je kunt de zoekfunctie en de onderdelen hierboven gewoon gebruiken.",
+    "findLabel": "ONTDEKKEN",
+    "findTitle": "Wat wil je vinden?",
+    "findLocationsTitle": "Locaties",
+    "findLocationsDescription": "Draailocaties, studio's en bijzondere ruimtes.",
+    "findCrewTitle": "Crew en talent",
+    "findCrewDescription": "Mensen voor en achter de camera.",
+    "findEquipmentDescription": "Techniek, voertuigen en rekwisieten.",
+    "findCompaniesDescription": "Catering, verhuur en ondersteuning voor producties.",
+    "findJobsTitle": "Vacatures en projecten",
+    "findJobsDescription": "Vind opdrachten of zoek ondersteuning voor je project.",
+    "findJobsLink": "Vacatures bekijken"
   },
   "locations": {
     "heroTitle": "De perfecte locatie",

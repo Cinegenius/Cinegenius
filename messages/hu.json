@@ -308,7 +308,18 @@
     "boardSeeAll": "Összes bejegyzés megtekintése",
     "boardPageHeading": "Közösségi hirdetőtábla",
     "boardPageDescription": "Tegyél fel kérdéseket, ossz meg ajánlásokat, és találd meg a megfelelő embereket vagy eszközöket. A bejegyzések legfeljebb 2 napig láthatók.",
-    "recommendationsUnavailable": "Az ajánlások átmenetileg nem érhetők el. A keresést és a fenti részeket továbbra is használhatod."
+    "recommendationsUnavailable": "Az ajánlások átmenetileg nem érhetők el. A keresést és a fenti részeket továbbra is használhatod.",
+    "findLabel": "FEDEZD FEL",
+    "findTitle": "Mit szeretnél megtalálni?",
+    "findLocationsTitle": "Helyszínek",
+    "findLocationsDescription": "Forgatási helyszínek, stúdiók és különleges terek.",
+    "findCrewTitle": "Stáb és tehetségek",
+    "findCrewDescription": "Emberek a kamera előtt és mögött.",
+    "findEquipmentDescription": "Technika, járművek és kellékek.",
+    "findCompaniesDescription": "Catering, kölcsönzés és produkciós segítség.",
+    "findJobsTitle": "Állások és projektek",
+    "findJobsDescription": "Találj megbízást vagy segítséget a projektedhez.",
+    "findJobsLink": "Állások böngészése"
   },
   "locations": {
     "heroTitle": "A tökéletes helyszín",

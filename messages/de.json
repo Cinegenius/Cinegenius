@@ -308,7 +308,18 @@
     "boardSeeAll": "Alle Aushänge ansehen",
     "boardPageHeading": "Das Schwarze Brett",
     "boardPageDescription": "Fragen stellen, Empfehlungen teilen und passende Menschen oder Dinge finden. Aushänge bleiben bis zu 2 Tage sichtbar.",
-    "recommendationsUnavailable": "Empfehlungen sind gerade nicht verfügbar. Du kannst die Suche und die Bereiche oben weiter nutzen."
+    "recommendationsUnavailable": "Empfehlungen sind gerade nicht verfügbar. Du kannst die Suche und die Bereiche oben weiter nutzen.",
+    "findLabel": "ENTDECKEN",
+    "findTitle": "Was möchtest du finden?",
+    "findLocationsTitle": "Locations",
+    "findLocationsDescription": "Drehorte, Studios und besondere Räume.",
+    "findCrewTitle": "Crew & Talente",
+    "findCrewDescription": "Menschen vor und hinter der Kamera.",
+    "findEquipmentDescription": "Technik, Fahrzeuge und Requisiten.",
+    "findCompaniesDescription": "Catering, Verleih und Unterstützung für Produktionen.",
+    "findJobsTitle": "Jobs & Projekte",
+    "findJobsDescription": "Aufträge finden oder Unterstützung für dein Vorhaben suchen.",
+    "findJobsLink": "Jobs ansehen"
   },
   "locations": {
     "heroTitle": "Die perfekte Location",

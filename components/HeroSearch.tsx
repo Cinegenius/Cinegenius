@@ -5,10 +5,6 @@ import { useRouter } from "next/navigation";
 import { Search, MapPin } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-
-
-
-
 function getLocalizedTabs(translate: (key: string) => string) {
   return ([
   { id: "locations", label: translate("nav.locations"), placeholder: translate("Ui.text_64869d31081bb8"),    href: "/locations/suche" },
@@ -21,7 +17,6 @@ function getLocalizedTabs(translate: (key: string) => string) {
 export default function HeroSearch() {
   const uiText = useTranslations();
   const tabs = getLocalizedTabs(uiText);
-
 
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("locations");
@@ -41,17 +36,17 @@ export default function HeroSearch() {
   };
 
   return (
-    <div className="w-full">
-      <div role="group" aria-label={uiText("home.heroSearchAction")} className="mb-2 flex flex-wrap gap-1">
+    <div className="w-full rounded-2xl border border-border bg-bg-primary/85 p-2 shadow-lg shadow-black/15 sm:p-3">
+      <div role="group" aria-label={uiText("home.heroSearchAction")} className="mb-2 flex flex-wrap gap-1 px-1">
         {tabs.map((t) => (
           <button
             key={t.id}
             type="button"
             aria-pressed={activeTab === t.id}
             onClick={() => setActiveTab(t.id)}
-            className={`min-h-11 min-w-0 max-w-full rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+            className={`relative min-h-11 min-w-0 max-w-full rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
               activeTab === t.id
-                ? "bg-gold-subtle text-gold"
+                ? "bg-gold-subtle text-gold after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-gold"
                 : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"
             }`}
           >

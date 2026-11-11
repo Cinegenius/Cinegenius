@@ -308,7 +308,18 @@
     "boardSeeAll": "Zobrazit všechny příspěvky",
     "boardPageHeading": "Komunitní nástěnka",
     "boardPageDescription": "Pokládejte otázky, sdílejte doporučení a najděte správné lidi nebo zdroje. Příspěvky zůstávají viditelné až 2 dny.",
-    "recommendationsUnavailable": "Doporučení jsou dočasně nedostupná. Vyhledávání a sekce výše můžeš dál používat."
+    "recommendationsUnavailable": "Doporučení jsou dočasně nedostupná. Vyhledávání a sekce výše můžeš dál používat.",
+    "findLabel": "OBJEVUJ",
+    "findTitle": "Co chceš najít?",
+    "findLocationsTitle": "Lokace",
+    "findLocationsDescription": "Místa pro natáčení, studia a výjimečné prostory.",
+    "findCrewTitle": "Štáb a talenty",
+    "findCrewDescription": "Lidé před kamerou i za ní.",
+    "findEquipmentDescription": "Technika, vozidla a rekvizity.",
+    "findCompaniesDescription": "Catering, půjčovny a produkční podpora.",
+    "findJobsTitle": "Zakázky a projekty",
+    "findJobsDescription": "Najdi práci nebo podporu pro svůj projekt.",
+    "findJobsLink": "Prohlédnout zakázky"
   },
   "locations": {
     "heroTitle": "Perfektní lokace",
