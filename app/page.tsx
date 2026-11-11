@@ -436,7 +436,7 @@ export default async function HomePage() {
   return (
     <main className="relative isolate min-h-screen">
       <PageBackdrop optimizeImage image="/hero-bg-v2.jpg" imagePosition="center 42%" imageOpacity={100} overlayClassName="absolute inset-0 bg-bg-primary/72" className="pointer-events-none fixed inset-0 z-[-1]" />
-      <section className="relative isolate border-b border-border">
+      <section className="relative isolate border-b border-border pt-16">
         <div className="site-container grid items-center gap-5 py-6 sm:py-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-10">
           <div className="min-w-0">
             <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-gold">{t("badgeHero")}</p>
