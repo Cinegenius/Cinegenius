@@ -21,11 +21,12 @@ export async function POST(request: NextRequest) {
     development: process.env.NODE_ENV !== "production", deploymentHost: process.env.VERCEL_URL,
   })) return json({ error: "invalid_request" }, 403);
   try {
+    const currentUser = await getCurrentUser();
+    if (!currentUser?.userId) return json({ error: "unauthorized" }, 401);
     const config = genieConfiguration();
     const validated = validateGenieRequest(await readGenieBody(request));
     if (!validated.ok) return json({ error: validated.error }, 400);
-    const currentUser = await getCurrentUser();
-    await reserveGenieUsage(request, currentUser?.userId ?? null, config);
+    await reserveGenieUsage(request, currentUser.userId, config);
     return json(await generateGenieAdvice(request, validated.value, config));
   } catch (error) {
     return error instanceof GenieError

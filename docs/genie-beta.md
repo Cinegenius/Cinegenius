@@ -1,6 +1,8 @@
 # Genie Beta 1.0 — configuration and release notes
 
-Genie provides chat advice and optional inline description assistance through `POST /api/genie`. It has no tools, private-data lookup, content writer, publishing or messaging action. OpenAI is called only when the user explicitly sends a chat message or generates a writing suggestion.
+Genie remains visible to guests, but chat advice and inline description assistance through `POST /api/genie` require a valid signed-in account. The server uses the verified Clerk identity; a client-supplied user ID, cookie string or authorization header cannot replace that verification. It has no tools, private-data lookup, content writer, publishing or messaging action. OpenAI is called only when a signed-in user explicitly sends a chat message or generates a writing suggestion.
+
+After the origin check, the route rejects missing or expired sessions with `401 {"error":"unauthorized"}` before reading the body, inspecting provider configuration, reserving durable quota or calling OpenAI. The same gate covers both chat and the writing assistant. Authentication service errors fail closed with the sanitized `503 unavailable` response; they never fall back to guest access. Responses remain private and uncached, with no automatic redirect.
 
 **Do not deploy without fresh, explicit user approval.** After approval, follow `docs/design-and-release.md`: publish source changes through GitHub Desktop, then use `npm run deploy:production` from clean `main` matching `origin/main` and the correct linked project. Passing checks or configuring credentials does not authorize deployment.
 
@@ -10,7 +12,7 @@ Set `OPENAI_API_KEY` as a server-only **Secret** in the correct Vercel project's
 
 | Variable | Implemented behavior |
 | --- | --- |
-| `OPENAI_API_KEY` | Required. Missing/blank values return `503 unavailable` before account, durable quota or provider work. |
+| `OPENAI_API_KEY` | Required. After authentication, missing/blank values return `503 unavailable` before durable quota or provider work. |
 | `GENIE_ENABLED` | Optional. A trimmed, case-insensitive value of `false` disables the endpoint. Unset or other values do not disable it. This does not hide the chat or inline writing controls. |
 | `GENIE_DAILY_REQUEST_LIMIT` | Optional global daily request ceiling. Unset or blank means **200**. Accepts only decimal integers **1–1000**; invalid nonblank values make the endpoint unavailable. |
 
@@ -44,14 +46,13 @@ Live local verification must run this repository's full Next.js application (`np
 
 | Scope | Requests per fixed 60-second window | Requests per UTC calendar day |
 | --- | ---: | ---: |
-| Guest identity, derived from IP | 5 | 20 |
 | Verified Clerk member | 10 | 60 |
-| IP, shared by guests and members | 20 | 100 |
+| IP, shared by signed-in accounts | 20 | 100 |
 | All Genie requests sharing the database | — | 200 by default; configurable as above |
 
-All five counters are reserved before the single provider call. Later denial, upstream failure or cancellation does not refund earlier reservations; there is no automatic retry. Guests on one network share an identity. IP headers are trusted only on Vercel; other runtimes share a fallback bucket. IP/member identifiers are HMAC-hashed with the server key. Key rotation changes identity buckets but not the global bucket; deployments sharing a database share that ceiling.
+All five counters are reserved for authenticated requests before the single provider call. Guests have no API allowance and their rejected requests do not reserve durable counters. Later denial, upstream failure or cancellation does not refund earlier reservations; there is no automatic retry. IP headers are trusted only on Vercel; other runtimes share a fallback bucket. IP/member identifiers are HMAC-hashed with the server key. Key rotation changes identity buckets but not the global bucket; deployments sharing a database share that ceiling.
 
-The existing proxy also applies a best-effort, per-instance IP limit of 20 requests per minute before body parsing and authentication. Invalid requests consume this early limit too. It supplements, rather than replaces, the durable quotas. Rejections return `429`, `Retry-After` and private/no-store headers.
+For the exact `POST /api/genie` endpoint, the proxy verifies the session before its best-effort, per-instance IP limit of 20 requests per minute. Signed-out requests return `401` even if the IP bucket is already exhausted; authentication service errors return sanitized `503` failures. Neither consumes that IP allowance. The limiter supplements, rather than replaces, the durable quotas. Rate-limit rejections for authenticated requests return `429`, `Retry-After` and private/no-store headers. Other proxy routes retain their existing ordering and protection.
 
 The fixed model is `gpt-4.1-mini` through Responses, with **600 maximum output tokens**. Chat requests allow **nine** alternating user/assistant messages, beginning/ending with user, **2,000 characters each**, **8,000 total** (JavaScript string length). Writing requests allow exactly **one user message**, containing at most **2,000 characters** of explicit notes, and a bounded output-length limit. Writing and chat share all existing endpoint quotas, timeouts and provider configuration; writing has no separate allowance.
 
@@ -63,11 +64,11 @@ These limits are not an exact currency budget. Failed/cancelled upstream work ca
 
 For chat, OpenAI receives the coarse page area, interface locale and manually submitted conversation, including retained replies, plus static instructions/schema. For inline writing, its only user-provided source material is the explicitly entered notes; the request also supplies the interface locale, coarse description area and output-length limit through trusted instructions. No chat history is attached to a writing request.
 
-Browser cookies, browser authorization headers, member ID and visitor IP are not forwarded. Exact URLs, form contents, uploads and private records are not collected for AI automatically. Text manually pasted into chat or the writing notes is part of the submitted text. Server-side Clerk identity is used only for quotas; the browser uses the active account/session scope to isolate its local state.
+Browser cookies, browser authorization headers, member ID and visitor IP are not forwarded. Exact URLs, form contents, uploads and private records are not collected for AI automatically. Text manually pasted into chat or the writing notes is part of the submitted text. Server-side Clerk identity authorizes access and scopes quotas; the browser uses the active account/session scope to isolate its local state.
 
 Signed-in members retain only the latest completed exchanges in the current browser tab's `sessionStorage` for up to **24 hours**. The cache is scoped to the active account/session and restored only after that scope is known. It contains at most **four complete exchanges** and **8,000 conversation characters**, with the existing **2,000-character message limit**. Stored content is validated on restore and links remain subject to the same destination allowlist. Drafts, pending requests and error states are not stored. Storage failures leave the chat usable in component memory.
 
-Guest history stays only in component memory and is lost on reload. Changing account/session clears the local history; the trash button clears both the visible conversation and its local cache. Closing cancels pending work but retains completed exchanges. Reloading can restore a signed-in member's unexpired history in the same tab; it never resumes or sends a request automatically. There is no database or form-draft transcript storage. The existing cookie-notice preference is still read from localStorage, and the notice returning unmounts Genie.
+Guests cannot generate chat exchanges or writing suggestions. Changing account/session clears the local history; the trash button clears both the visible conversation and its local cache. Closing cancels pending work but retains completed exchanges. Reloading can restore a signed-in member's unexpired history in the same tab; it never resumes or sends a request automatically. There is no database or form-draft transcript storage. The existing cookie-notice preference is still read from localStorage, and the notice returning unmounts Genie.
 
 Local clearing applies only to the browser's history. It does not delete messages already submitted to the AI service or promise deletion from provider or infrastructure logs.
 

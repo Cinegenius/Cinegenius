@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { Send, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useId, useRef, useState, type FormEvent, type RefObject } from "react";
@@ -25,6 +25,11 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
   const t = useTranslations("Genie");
   const locale = useLocale();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [loginRequired, setLoginRequired] = useState(!memoryScope);
+  const canUse = Boolean(memoryScope) && !loginRequired;
+  const query = searchParams.toString();
+  const returnTo = `${pathname || "/"}${query ? `?${query}` : ""}`;
   const [exchanges, setExchanges] = useState<Exchange[]>(() => {
     if (!memoryScope) return [];
     try { return readConversation(window.sessionStorage, memoryScope); }
@@ -58,7 +63,7 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const content = draft.trim();
-    if (requestRef.current || !content || !active) return;
+    if (requestRef.current || !content || !active || !canUse) return;
     if (content.length > GENIE_MAX_MESSAGE_CHARS) {
       setStatus("errorInvalid");
       return;
@@ -97,6 +102,18 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
         signal: controller.signal,
         body: JSON.stringify({ area: genieAreaForPath(pathname), locale, messages }),
       });
+      if (requestRef.current !== controller) return;
+      if (controller.signal.aborted) throw new DOMException("", "AbortError");
+      if (response.status === 401) {
+        setLoginRequired(true);
+        setExchanges([]);
+        if (memoryScope) {
+          try { clearConversation(window.sessionStorage); } catch { /* Storage may be unavailable. */ }
+        }
+        setDraft(content);
+        setStatus(null);
+        return;
+      }
       const result: unknown = await response.json();
       if (requestRef.current !== controller) return;
       if (controller.signal.aborted) throw new DOMException("", "AbortError");
@@ -149,6 +166,19 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
     requestAnimationFrame(() => input.current?.focus({ preventScroll: true }));
   }
 
+  if (!canUse) {
+    return (
+      <div className={styles.loginGate}>
+        <p className={styles.greeting}>{t("loginTitle")}</p>
+        <p className={styles.notice}>{t("loginHint")}</p>
+        <div className={styles.loginActions}>
+          <Link href={`/sign-in?redirect_url=${encodeURIComponent(returnTo)}`} prefetch={false} className="btn-primary">{t("signIn")}</Link>
+          <Link href={`/sign-up?redirect_url=${encodeURIComponent(returnTo)}`} prefetch={false} className="btn-secondary">{t("signUp")}</Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div ref={transcript} className={styles.transcript} role="log" aria-live="polite" aria-relevant="additions text" aria-label={t("name")}>
@@ -191,7 +221,7 @@ export default function GeniePanel({ active, requestRef, memoryScope }: { active
             }}
             maxLength={GENIE_MAX_MESSAGE_CHARS}
             placeholder={t("inputPlaceholder")}
-            rows={1}
+            rows={2}
             readOnly={pending}
             autoComplete="off"
             aria-describedby={`${id}-keyboard ${id}-count ${id}-notice`}

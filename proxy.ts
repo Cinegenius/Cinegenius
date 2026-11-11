@@ -15,6 +15,19 @@ async function localizedProxyError(request: NextRequest, key: string, init: Resp
   return NextResponse.json({error: copy(key)}, init);
 }
 
+function genieAuthFailure(status: 401 | 503): NextResponse {
+  const error = status === 401 ? "unauthorized" : "unavailable";
+  return NextResponse.json({ error }, {
+    status,
+    headers: {
+      "Cache-Control": "private, no-store, max-age=0",
+      "CDN-Cache-Control": "no-store",
+      "Vercel-CDN-Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff",
+    },
+  });
+}
+
 function generateNonce(): string {
   const bytes = new Uint8Array(16);
   crypto.getRandomValues(bytes);
@@ -205,7 +218,19 @@ export default clerkMiddleware(async (auth, request) => {
     return NextResponse.next();
   }
 
-  // 1. IP-based rate limiting — runs before auth to reject floods cheaply
+  const isGeniePost = request.method === "POST" && request.nextUrl.pathname === "/api/genie";
+  if (isGeniePost) {
+    // Guests may see Genie, but cannot consume even its early IP allowance.
+    // The handler rechecks the verified session before durable quota/provider work.
+    try {
+      const { userId } = await auth();
+      if (!userId) return genieAuthFailure(401);
+    } catch {
+      return genieAuthFailure(503);
+    }
+  }
+
+  // 1. IP-based rate limiting — other routes retain their early flood protection
   const rateLimitRes = await ipRateLimit(request);
   if (rateLimitRes) return rateLimitRes;
 
@@ -248,10 +273,10 @@ export default clerkMiddleware(async (auth, request) => {
   } else if (request.method === "GET" && request.nextUrl.pathname === "/api/cron/listing-freshness") {
     // This exact scheduler route checks CRON_SECRET itself before any work.
     // Other cron paths and methods retain the normal session protection.
-  } else if (request.method === "POST" && request.nextUrl.pathname === "/api/genie") {
-    // Advice is available to guests. The exact handler validates its input and
-    // reserves persistent IP, account and global quotas before a provider call.
-    // Origin protection above still applies; no other method/path is exempt.
+  } else if (isGeniePost) {
+    // This exact endpoint already required authentication before its IP limit.
+    // Origin protection above and the handler's own session/quota checks still
+    // apply. No other method/path skips the normal auth.protect() rules.
   } else if (isApi && !isPublicApiGet(request)) {
     // Private fetch endpoints must not follow Clerk's hosted sign-in redirect
     // after logout/session expiry. Keep the existing authenticated-session

@@ -64,14 +64,32 @@ function AvailableGenie({ memoryScope }: { memoryScope: string | null }) {
     if (!open) return;
     panel.current?.focus({ preventScroll: true });
     const viewport = window.visualViewport;
-    const resize = () => {
+    let viewportFrame: number | null = null;
+    let lastHeight: number | undefined;
+    let lastOffset: number | undefined;
+    let lastCompact: boolean | undefined;
+    const updateViewport = () => {
+      viewportFrame = null;
       if (!viewport || !panel.current) return;
       const keyboardOffset = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
-      panel.current.style.setProperty("--genie-viewport-height", `${viewport.height}px`);
-      panel.current.style.setProperty("--genie-keyboard-offset", `${keyboardOffset}px`);
-      panel.current.toggleAttribute("data-compact", viewport.height < 440);
+      if (viewport.height !== lastHeight) {
+        panel.current.style.setProperty("--genie-viewport-height", `${viewport.height}px`);
+        lastHeight = viewport.height;
+      }
+      if (keyboardOffset !== lastOffset) {
+        panel.current.style.setProperty("--genie-keyboard-offset", `${keyboardOffset}px`);
+        lastOffset = keyboardOffset;
+      }
+      const compact = viewport.height < 440;
+      if (compact !== lastCompact) {
+        panel.current.toggleAttribute("data-compact", compact);
+        lastCompact = compact;
+      }
     };
-    resize();
+    const resize = () => {
+      if (viewportFrame === null) viewportFrame = requestAnimationFrame(updateViewport);
+    };
+    updateViewport();
     viewport?.addEventListener("resize", resize);
     viewport?.addEventListener("scroll", resize);
     const escape = (event: KeyboardEvent) => {
@@ -80,16 +98,45 @@ function AvailableGenie({ memoryScope }: { memoryScope: string | null }) {
         close();
       }
     };
-    const outside = (event: PointerEvent) => {
-      if (panel.current && !event.composedPath().includes(panel.current)) close(false);
+    let outsideGesture: { id: number; x: number; y: number; moved: boolean; ended: boolean } | null = null;
+    const isOutside = (event: Event) => panel.current && !event.composedPath().includes(panel.current);
+    const pointerDown = (event: PointerEvent) => {
+      outsideGesture = event.isPrimary && event.button === 0 && isOutside(event)
+        ? { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false, ended: false }
+        : null;
+    };
+    const pointerMove = (event: PointerEvent) => {
+      if (outsideGesture?.id === event.pointerId && Math.hypot(event.clientX - outsideGesture.x, event.clientY - outsideGesture.y) > 10) {
+        outsideGesture.moved = true;
+      }
+    };
+    const pointerUp = (event: PointerEvent) => {
+      pointerMove(event);
+      if (outsideGesture?.id === event.pointerId) outsideGesture.ended = true;
+    };
+    const pointerCancel = () => { outsideGesture = null; };
+    const outsideClick = (event: MouseEvent) => {
+      const gesture = outsideGesture;
+      outsideGesture = null;
+      // A scroll/drag must not dismiss the bubble or abort an answer in progress.
+      if (gesture?.ended && !gesture.moved && !event.defaultPrevented && isOutside(event)) close(false);
     };
     window.addEventListener("keydown", escape);
-    window.addEventListener("pointerdown", outside);
+    window.addEventListener("pointerdown", pointerDown);
+    window.addEventListener("pointermove", pointerMove, { passive: true });
+    window.addEventListener("pointerup", pointerUp);
+    window.addEventListener("pointercancel", pointerCancel);
+    window.addEventListener("click", outsideClick);
     return () => {
       window.removeEventListener("keydown", escape);
-      window.removeEventListener("pointerdown", outside);
+      window.removeEventListener("pointerdown", pointerDown);
+      window.removeEventListener("pointermove", pointerMove);
+      window.removeEventListener("pointerup", pointerUp);
+      window.removeEventListener("pointercancel", pointerCancel);
+      window.removeEventListener("click", outsideClick);
       viewport?.removeEventListener("resize", resize);
       viewport?.removeEventListener("scroll", resize);
+      if (viewportFrame !== null) cancelAnimationFrame(viewportFrame);
     };
   }, [open, close]);
 
