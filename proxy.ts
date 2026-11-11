@@ -196,6 +196,7 @@ const isPublicApiGet = createRouteMatcher([
   "/api/community-image",
   "/api/media/(.*)",
   "/api/listings(.*)",
+  "/api/listing-ratings",
   "/api/reviews(.*)",
   "/api/search(.*)",
   "/api/external-profiles(.*)",
