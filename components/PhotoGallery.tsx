@@ -8,7 +8,6 @@ import MediaImage from "@/components/MediaImage";
 import { photoHref } from "@/lib/photo-link";
 import PhotoLikeButton from "@/components/PhotoLikeButton";
 import { communityPreviewUrl } from "@/lib/community-preview";
-import { galleryPreviewAspectRatio } from "@/lib/photo-gallery-layout";
 import { useTranslations } from "next-intl";
 
 
@@ -50,18 +49,19 @@ export function PhotoGallery({
                   href={photoHref(item.profileId, item.imageUrl)}
                   onClick={() => { try { sessionStorage.setItem("cinegenius-photo-return", "1"); } catch {} }}
                   aria-label={uiText("Ui.text_4398dcac9447f8", { value1: String(item.author), value2: String(item.caption ? uiText("Ui.text_92dd63d2f3b4b1", { value1: String(item.caption) }) : "") })}
-                  style={{ aspectRatio: galleryPreviewAspectRatio(item) }}
                   className="relative block overflow-hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold focus-visible:-outline-offset-2"
                 >
+                  {/* Loading reserve only; h-auto follows the decoded photo's natural proportions. */}
                   <MediaImage
                     src={communityPreviewUrl(item.imageUrl)}
                     alt={item.caption || uiText("Ui.text_504589ed9cc129", { value1: String(item.author) })}
-                    fill
+                    width={640}
+                    height={640}
                     mediaSize="thumbnail"
                     sizes="(max-width: 767px) 50vw, (max-width: 1279px) 33vw, 320px"
                     loading="lazy"
                     onError={() => setFailedImages(current => new Set(current).add(item.imageUrl))}
-                    className="object-cover"
+                    className="block h-auto w-full"
                   />
                 </Link>
                 <PhotoLikeButton disabled={item.canLike === false} profileId={item.profileId} imageUrl={item.imageUrl} initialCount={item.likeCount ?? 0} initialLiked={item.likedByMe ?? false} className="absolute right-2 top-2 z-10" />
