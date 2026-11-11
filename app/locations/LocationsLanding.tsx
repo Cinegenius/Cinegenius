@@ -163,7 +163,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
                         sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                         mediaSize="thumbnail"
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        style={location.focalPoint ? { objectPosition: `${location.focalPoint.x * 100}% ${location.focalPoint.y * 100}%` } : undefined}
+                        style={location.focalPoint ? { objectPosition: `${location.focalPoint.x}% ${location.focalPoint.y}%` } : undefined}
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center"><MapPin size={28} aria-hidden="true" className="text-text-muted" /></div>
