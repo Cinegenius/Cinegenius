@@ -202,11 +202,11 @@ type HomeDataPromise = Promise<Awaited<ReturnType<typeof getHomeData>> | null>;
 async function HomeLocations({ dataPromise }: { dataPromise: HomeDataPromise }) {
   const [data, t, tc] = await Promise.all([dataPromise, getTranslations("home"), getTranslations("common")]);
   if (!data?.liveLocations.length) return null;
-  return <section className="min-w-0 lg:col-start-2 lg:row-start-1" aria-labelledby="home-locations-title">
+  return <section className="min-w-0" aria-labelledby="home-locations-title">
     <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-locations-title" className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("locationsTitle")}</h2><Link href="/locations" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light sm:text-sm">{tc("viewAll")} <ArrowRight size={13} /></Link></div>
-    <HomeCardRail id="home-locations-rail" labelledBy="home-locations-title" hint={t("locationScrollHint")} previousLabel={t("railPrevious")} nextLabel={t("railNext")} itemCount={data.liveLocations.length} variant="location">
+    <HomeCardRail id="home-locations-rail" labelledBy="home-locations-title" hint={t("locationScrollHint")} previousLabel={t("railPrevious")} nextLabel={t("railNext")} itemCount={data.liveLocations.length} variant="location" wide>
       {data.liveLocations.map(loc => <Link key={loc.id} href={`/locations/${loc.id}`} className="group relative isolate block aspect-[4/3] min-h-11 min-w-0 overflow-hidden rounded-2xl border border-border bg-bg-elevated sm:aspect-[3/2]">
-        {loc.image ? <Image src={loc.image} alt={loc.title} fill mediaSize="thumbnail" className="object-cover transition-transform duration-300 motion-safe:group-hover:scale-105" style={{ objectPosition: loc.focalPoint ? `${loc.focalPoint.x}% ${loc.focalPoint.y}%` : "50% 50%" }} sizes="(min-width:1024px) 25vw,(min-width:640px) 60vw,72vw" /> : <div className="absolute inset-0 flex items-center justify-center text-text-muted/30"><MapPin size={32} aria-hidden="true" /></div>}
+        {loc.image ? <Image src={loc.image} alt={loc.title} fill mediaSize="thumbnail" className="object-cover transition-transform duration-300 motion-safe:group-hover:scale-105" style={{ objectPosition: loc.focalPoint ? `${loc.focalPoint.x}% ${loc.focalPoint.y}%` : "50% 50%" }} sizes="(min-width:1024px) 33vw,(min-width:640px) 60vw,72vw" /> : <div className="absolute inset-0 flex items-center justify-center text-text-muted/30"><MapPin size={32} aria-hidden="true" /></div>}
         <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-bg-primary/30 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 p-3 sm:p-3.5"><h3 className="line-clamp-2 text-sm font-semibold leading-snug text-white">{loc.title}</h3><div className="mt-1.5 flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs"><span className="min-w-0 truncate text-white/75">{loc.city}</span><span className="font-semibold text-gold [overflow-wrap:anywhere]">{loc.priceLabel}</span></div></div>
       </Link>)}
@@ -373,7 +373,7 @@ export default async function HomePage() {
   return <main className="relative isolate min-h-screen">
     <PageBackdrop optimizeImage image="/hero-bg-v2.jpg" imagePosition="center 42%" imageOpacity={100} overlayClassName="absolute inset-0 bg-bg-primary/72" className="pointer-events-none fixed inset-0 z-[-1]" />
     <section className="relative isolate pt-16">
-      <div className="site-container grid items-start gap-5 py-6 sm:py-8 lg:grid-cols-2 lg:items-center lg:gap-9">
+      <div className="site-container grid items-start gap-5 py-6 sm:py-8 lg:gap-9">
         <div className="min-w-0">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3"><p className="text-xs font-semibold uppercase tracking-widest text-gold">{t("badgeHero")}</p><Link href={ctaHref} prefetch className="inline-flex min-h-11 items-center gap-1 text-xs font-semibold text-gold hover:text-gold-light">{isLoggedIn ? t("heroManageAction") : t("heroPresentAction")} <ArrowRight size={12} /></Link></div>
           <h1 className="font-display text-4xl font-bold leading-tight tracking-tight text-text-primary lg:text-5xl">{t("heroTitle1")} <span className="text-gradient-gold">{t("heroTitle2")}</span></h1>
@@ -381,7 +381,7 @@ export default async function HomePage() {
           <HeroSearch />
         </div>
       {/* Finden: kompakte, direkte Einstiege in die bestehenden Verzeichnisse */}
-      <section className="min-w-0 lg:col-span-2 lg:row-start-2" aria-labelledby="home-find-title">
+      <section className="min-w-0" aria-labelledby="home-find-title">
         <div className="min-w-0">
           <div className="mb-4">
             <p className="text-xs uppercase tracking-widest text-gold font-semibold mb-1">{t("findLabel")}</p>

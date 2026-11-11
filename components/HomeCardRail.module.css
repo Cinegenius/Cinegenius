@@ -44,5 +44,6 @@
 @media (min-width: 1024px) {
   .crew, .location { --rail-card-width: calc((100% - 16px) / 2); }
   .crew.wide { --rail-card-width: calc((100% - 48px) / 4); }
+  .location.wide { --rail-card-width: calc((100% - 32px) / 3); }
   .track { gap: 16px; }
 }
