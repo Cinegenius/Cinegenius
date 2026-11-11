@@ -318,8 +318,13 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   const payTypeFilter = canonicalJobPayType(storedPayTypeFilter);
   const [jobTypeFilter, setJobTypeFilter] = useViewState<"alle" | "freelance" | "festanstellung" | "praktikum">("jobs.jobTypeFilter", "alle");
   const [cityFilter, setCityFilter] = useViewState("jobs.cityFilter", () => searchParams.get("city") ?? "");
+  const [cityText, setCityText] = useViewState("jobs.cityText", () => searchParams.get("cityText")?.trim() ?? "");
   const [countryFilter, setCountryFilter] = useViewState("jobs.countryFilter", () => searchParams.get("country") ?? "");
   const [regionFilter, setRegionFilter] = useViewState("jobs.regionFilter", () => searchParams.get("region") ?? "");
+  const updatePlaceFilters = (value: { country: string; region: string; city: string }) => {
+    setCountryFilter(value.country); setRegionFilter(value.region); setCityFilter(value.city);
+    if (value.city) setCityText("");
+  };
   const [sortKey, setSortKey] = useViewState("jobs.sortKey", () => searchParams.get("sort") ?? "newest");
   const [pagination, setPagination] = useViewState("jobs.pagination", { filterKey: "", visibleCount: PAGE_SIZE });
   const panelRef = useRef<HTMLDivElement>(null);
@@ -339,6 +344,8 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
   if (urgentOnly) filterParams.set("urgent", "1");
   if (payTypeFilter) filterParams.set("pay", payTypeFilter);
   if (cityFilter) filterParams.set("city", cityFilter);
+  if (cityText) filterParams.set("cityText", cityText);
+  if (regionFilter) filterParams.set("region", regionFilter);
   if (countryFilter) filterParams.set("country", countryFilter);
   if (sortKey !== "newest") filterParams.set("sort", sortKey);
   useViewUrl(filterParams.size ? `/jobs?${filterParams}` : "/jobs");
@@ -413,14 +420,15 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
     }
     if (jobTypeFilter !== "alle") result = result.filter((j) => (j.jobType ?? "freelance") === jobTypeFilter);
     if (cityFilter) result = result.filter(j => matchesPlace(j, "city", cityFilter));
+    if (cityText) result = result.filter(j => placeSearchMatches(j, cityText) || j.location.toLowerCase().includes(cityText.toLowerCase()));
     if (regionFilter) result = result.filter(row => matchesPlace(row, "region", regionFilter));
     if (countryFilter) result = result.filter(j => matchesPlace(j, "country", countryFilter));
     if (sortKey === "rate-desc") result = [...result].sort((a, b) => parseInt(b.rate) - parseInt(a.rate));
     if (sortKey === "urgent") result = [...result].sort((a, b) => (b.urgent ? 1 : 0) - (a.urgent ? 1 : 0));
     return result;
-  }, [allJobs, query, selectedDeptId, selectedRoleId, activeType, urgentOnly, payTypeFilter, jobTypeFilter, cityFilter, countryFilter, regionFilter, sortKey, locale, uiText]);
+  }, [allJobs, query, selectedDeptId, selectedRoleId, activeType, urgentOnly, payTypeFilter, jobTypeFilter, cityFilter, cityText, countryFilter, regionFilter, sortKey, locale, uiText]);
 
-  const filterKey = JSON.stringify([query, selectedDeptId, selectedRoleId, activeType, urgentOnly, payTypeFilter, jobTypeFilter, cityFilter, countryFilter, regionFilter, sortKey]);
+  const filterKey = JSON.stringify([query, selectedDeptId, selectedRoleId, activeType, urgentOnly, payTypeFilter, jobTypeFilter, cityFilter, cityText, countryFilter, regionFilter, sortKey]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
   const showMore = () => setPagination({ filterKey, visibleCount: visibleCount + PAGE_SIZE });
 
@@ -438,16 +446,17 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
     setSelectedDeptId(null); setSelectedRoleId(null);
     setQuery(""); setActiveType(""); setUrgentOnly(false);
     setPayTypeFilter(""); setJobTypeFilter("alle");
-    setCityFilter(""); setCountryFilter(""); setRegionFilter(""); setSortKey("newest");
+    setCityFilter(""); setCityText(""); setCountryFilter(""); setRegionFilter(""); setSortKey("newest");
     router.replace("/jobs", { scroll: false });
   };
 
-  const hasAnyFilter = Boolean(regionFilter || selectedDeptId || selectedRoleId || query || activeType || urgentOnly || payTypeFilter || jobTypeFilter !== "alle" || cityFilter || countryFilter);
+  const hasAnyFilter = Boolean(regionFilter || selectedDeptId || selectedRoleId || query || activeType || urgentOnly || payTypeFilter || jobTypeFilter !== "alle" || cityFilter || cityText || countryFilter);
   const hasDeptFilter = Boolean(selectedDeptId || selectedRoleId);
 
   const activeDeptData = selectedDeptId ? FILM_DEPARTMENTS.find((d) => d.id === selectedDeptId) : null;
   const activeRoleData = selectedRoleId ? ALL_ROLES.find((r) => r.id === selectedRoleId) : null;
   const mobileChips: BrowseChip[] = [
+    ...(cityText ? [{ id: "city-text", label: `${uiText("Places.city")}: ${cityText}`, onRemove: () => setCityText("") }] : []),
     ...(activeDeptData ? [{ id: "dept", label: activeRoleData ? uiText("Ui.text_7c639bc99b8569", { value1: String(taxonomyLabel(activeDeptData.label, uiText)), value2: String(taxonomyLabel(activeRoleData.label, uiText)) }) : taxonomyLabel(activeDeptData.label, uiText), onRemove: () => { setSelectedDeptId(null); setSelectedRoleId(null); } }] : []),
     ...(activeType ? [{ id: "project", label: projectTypeLabel(activeType, uiText), onRemove: () => setActiveType("") }] : []),
     ...(payTypeFilter ? [{ id: "pay", label: jobPayLabel(payTypeFilter, uiText), onRemove: () => setPayTypeFilter("") }] : []),
@@ -510,7 +519,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
         <MobileFilterField label={t("filterPay")}>
           <MobileFilterSelect value={payTypeFilter} onChange={setPayTypeFilter} placeholder={uiText("Ui.text_8f7f9d1fdbe006")} options={availablePayTypes.map((value) => ({ value, label: jobPayLabel(value, uiText) }))} />
         </MobileFilterField>
-        <PlaceFilters rows={allJobs} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />
+        <PlaceFilters rows={allJobs} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={updatePlaceFilters} />
         <MobileFilterField label={uiText("Ui.text_ee0789bf07d3b9")}>
           <MobileFilterSelect value={jobTypeFilter === "alle" ? "" : jobTypeFilter} onChange={(value) => setJobTypeFilter((value || "alle") as typeof jobTypeFilter)} placeholder={uiText("common.all")} options={[{ value: "freelance", label: t("filterFreelance") }, { value: "festanstellung", label: t("filterFulltime") }, { value: "praktikum", label: t("filterInternship") }]} />
         </MobileFilterField>
@@ -553,7 +562,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
 
             {/* Stadt */}
             {(availableCities.length > 0 || availableCountries.length > 0) && (
-              <PlaceFilters rows={allJobs} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={value => {setCountryFilter(value.country);setRegionFilter(value.region);setCityFilter(value.city);}} />
+              <PlaceFilters rows={allJobs} value={{country:countryFilter,region:regionFilter,city:cityFilter}} onChange={updatePlaceFilters} />
             )}
 
             {/* Land */}
@@ -605,7 +614,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
           )}
 
           {/* Row 4: Active chips */}
-          {(hasDeptFilter || activeType || urgentOnly || payTypeFilter || jobTypeFilter !== "alle" || cityFilter || countryFilter || regionFilter) && (
+          {(hasDeptFilter || activeType || urgentOnly || payTypeFilter || jobTypeFilter !== "alle" || cityFilter || cityText || countryFilter || regionFilter) && (
             <div className="flex flex-wrap gap-1.5 items-center">
               {activeDeptData && (
                 <span className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium ${activeDeptData.bg} ${activeDeptData.color}`}>
@@ -637,6 +646,7 @@ function JobsInner({ serverJobs }: { serverJobs: Job[] }) {
                   <button onClick={() => setJobTypeFilter("alle")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
                 </span>
               )}
+              {cityText && <span className="mobile-browse-chip"><span className="truncate">{uiText("Places.city")}: {cityText}</span><button type="button" aria-label={uiText("Ui.text_f10fe7a27ce274", { value1: cityText })} onClick={() => setCityText("")}><X size={13} /></button></span>}
               {cityFilter && (
                 <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-bg-elevated border-border text-text-secondary">
                   <MapPin size={9} /> {cityLabel(cityFilter)}

@@ -1,7 +1,7 @@
 "use client";
 
 import PlaceFilters, { EMPTY_PLACE_FILTERS } from "@/components/PlaceFilters";
-import { placeSearchMatches, matchesPlace, placeDisplay, placeOptions } from "@/lib/places/core";
+import { placeSearchMatches, matchesPlace, placeOptions } from "@/lib/places/core";
 
 import { useViewUrl } from "@/lib/use-view-url";
 import { useViewState } from "@/lib/use-view-state";
@@ -228,6 +228,11 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
   const { isSignedIn } = useAuth();
 
   const [placeFilters, setPlaceFilters] = useViewState("props.placeFilters", () => ({country:searchParams.get("country")??"",region:searchParams.get("region")??"",city:searchParams.get("city")??""}));
+  const [cityText, setCityText] = useViewState("props.cityText", () => searchParams.get("cityText")?.trim() ?? "");
+  const updatePlaceFilters = (next: typeof placeFilters) => {
+    setPlaceFilters(next);
+    if (next.city) setCityText("");
+  };
   const [query, setQuery] = useViewState("marketplace.query", () => searchParams.get("q") ?? "");
   const [selectedDept, setSelectedDept] = useViewState<string | null>("marketplace.selectedDept", () => marketplaceCategory(searchParams.get("dept"))?.department ?? searchParams.get("dept") ?? null);
   const [selectedSub,setSelectedSub]=useViewState("marketplace.subcategory",()=>searchParams.get("sub")??"");
@@ -313,6 +318,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
 
   const filterParams = new URLSearchParams();
   if (query) filterParams.set("q", query);
+  if (cityText) filterParams.set("cityText", cityText);
   if (selectedDept) filterParams.set("dept", selectedDept);
   if(selectedSub)filterParams.set("sub",selectedSub);
   if (sortKey !== "featured") filterParams.set("sort", sortKey);
@@ -325,6 +331,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
     if(selectedDept||selectedSub)r=r.filter(p=>marketplaceMatches(p.category,selectedDept,selectedSub||null,p.type));
 
     r = r.filter(row => matchesPlace(row,"country",placeFilters.country) && matchesPlace(row,"region",placeFilters.region) && matchesPlace(row,"city",placeFilters.city));
+    if (cityText) r = r.filter(row => placeSearchMatches(row, cityText) || (row.location ?? "").toLowerCase().includes(cityText.toLowerCase()));
 
     if (rentalTypeFilter !== "alle") {
       r = r.filter((p) => ((p.rentalType ?? "miete") === rentalTypeFilter || p.rentalType === "beides"));
@@ -347,9 +354,9 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
     if (sortKey === "price-asc") r.sort((a, b) => a.dailyRate - b.dailyRate);
     if (sortKey === "price-desc") r.sort((a, b) => b.dailyRate - a.dailyRate);
     return r;
-  }, [serverListings, placeFilters, selectedDept, selectedSub, query, rentalTypeFilter, sortKey]);
+  }, [serverListings, placeFilters, cityText, selectedDept, selectedSub, query, rentalTypeFilter, sortKey]);
 
-  const filterKey = JSON.stringify([placeFilters, selectedDept, selectedSub, query, rentalTypeFilter, sortKey]);
+  const filterKey = JSON.stringify([placeFilters, cityText, selectedDept, selectedSub, query, rentalTypeFilter, sortKey]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
   const showMore = () => setPagination({ filterKey, visibleCount: visibleCount + PAGE_SIZE });
 
@@ -361,6 +368,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
     const controller=new AbortController();
     const parameters=new URLSearchParams({marketplace:'1',page:String(visibleCount/PAGE_SIZE),limit:String(PAGE_SIZE),sort:sortKey});
     for (const kind of ['country','region','city'] as const) if(placeFilters[kind])parameters.set(kind,placeFilters[kind]);
+    if(cityText)parameters.set('cityText',cityText);
     if(selectedDept)parameters.set('dept',selectedDept);if(selectedSub)parameters.set('sub',selectedSub);if(query)parameters.set('q',query);if(rentalTypeFilter!=='alle')parameters.set('offer',rentalTypeFilter);
     const pages=remoteRef.current?.key===filterKey&&remoteRef.current.rows.length>=visibleCount-PAGE_SIZE?[visibleCount/PAGE_SIZE]:Array.from({length:visibleCount/PAGE_SIZE},(_,index)=>index+1);
     Promise.all(pages.map(page=>{const params=new URLSearchParams(parameters);params.set('page',String(page));return fetch(`/api/listings?${params}`,{signal:controller.signal}).then(async response=>{if(!response.ok)throw new Error();return response.json();});})).then(results=>{
@@ -369,21 +377,22 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
       setRemote(previous=>({key:filterKey,rows:visibleCount>PAGE_SIZE&&previous?.key===filterKey?[...new Map([...previous.rows,...rows].map(row=>[row.id,row])).values()]:rows,count:result.count??0}));setBrowseError(null);
     }).catch(()=>{if(!controller.signal.aborted){setBrowseError(filterKey);}});
     return ()=>controller.abort();
-  },[filterKey,placeFilters,visibleCount,selectedDept,selectedSub,query,rentalTypeFilter,sortKey,t]);
+  },[filterKey,placeFilters,cityText,visibleCount,selectedDept,selectedSub,query,rentalTypeFilter,sortKey,t]);
   const browseLoading=browseError!==filterKey && (remote?.key!==filterKey || (remote.rows.length<visibleCount && remote.count>remote.rows.length));
   const resultRows=remote?.key===filterKey?remote.rows:filtered;
   const resultCount=remote?.key===filterKey?remote.count:filtered.length;
   const clearAll = () => {
-    setPlaceFilters(EMPTY_PLACE_FILTERS);
+    setPlaceFilters(EMPTY_PLACE_FILTERS); setCityText("");
     setSelectedDept(null); setSelectedSub(""); setQuery(""); setSortKey("featured"); setRentalTypeFilter("alle");
     router.replace("/props", { scroll: false });
   };
 
-  const hasAnyFilter = Boolean(Object.values(placeFilters).some(Boolean) || selectedDept || selectedSub || query || rentalTypeFilter !== "alle");
+  const hasAnyFilter = Boolean(Object.values(placeFilters).some(Boolean) || cityText || selectedDept || selectedSub || query || rentalTypeFilter !== "alle");
 
   const activeDeptData = selectedDept ? DEPARTMENTS.find((d) => d.id === selectedDept) : null;
   const chipColors = activeDeptData ? deptColors(activeDeptData.color) : null;
   const mobileChips: BrowseChip[] = [
+    ...(cityText ? [{ id: "city-text", label: `${uiText("Places.city")}: ${cityText}`, onRemove: () => setCityText("") }] : []),
     ...(['country','region','city'] as const).flatMap(kind => placeFilters[kind] ? [{id:`place-${kind}`,label:placeOptions(serverListings,kind,locale).find(option=>option.value===placeFilters[kind])?.label??placeFilters[kind],onRemove:()=>setPlaceFilters({...placeFilters,[kind]:''})}] : []),
     ...(activeDeptData ? [{ id: "category", label: taxonomyLabel(activeDeptData.label, uiText), onRemove: () => setSelectedDept(null) }] : []),
     ...(rentalTypeFilter !== "alle" ? [{ id: "offer", label: rentalTypeFilter === "miete" ? t("offerRent") : t("offerBuy"), onRemove: () => setRentalTypeFilter("alle") }] : []),
@@ -412,7 +421,7 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
         showResultsLabel={t("results", { count: resultCount })}
       >
 
-        <PlaceFilters rows={serverListings} value={placeFilters} onChange={setPlaceFilters} scope="marketplace" />        <MobileFilterField label={market("subcategory")}><MobileFilterSelect value={selectedSub} onChange={setSelectedSub} placeholder={market("allSubcategories")} options={(activeDeptData?.groups??[]).map(g=>({value:g.id,label:taxonomyLabel(g.label, uiText)}))} /></MobileFilterField>
+        <PlaceFilters rows={serverListings} value={placeFilters} onChange={updatePlaceFilters} scope="marketplace" />        <MobileFilterField label={market("subcategory")}><MobileFilterSelect value={selectedSub} onChange={setSelectedSub} placeholder={market("allSubcategories")} options={(activeDeptData?.groups??[]).map(g=>({value:g.id,label:taxonomyLabel(g.label, uiText)}))} /></MobileFilterField>
         <MobileFilterField label={t("offerTypeLabel")}>
           <MobileFilterSelect value={rentalTypeFilter === "alle" ? "" : rentalTypeFilter} onChange={(value) => setRentalTypeFilter((value || "alle") as typeof rentalTypeFilter)} placeholder={t("offerAll")} options={[{ value: "miete", label: t("offerRent") }, { value: "kauf", label: t("offerBuy") }]} />
         </MobileFilterField>
@@ -427,7 +436,9 @@ function PropsInner({ serverListings }: { serverListings: Prop[] }) {
           </div>
         </div>
       </MobileBrowseControls>
-      <div className="hidden xl:block site-container py-3"><PlaceFilters rows={serverListings} value={placeFilters} onChange={setPlaceFilters} scope="marketplace" /></div>
+      <div className="hidden xl:block site-container py-3"><PlaceFilters rows={serverListings} value={placeFilters} onChange={updatePlaceFilters} scope="marketplace" />
+        {cityText && <div className="mobile-browse-chips mt-2"><span className="mobile-browse-chip"><span className="truncate">{uiText("Places.city")}: {cityText}</span><button type="button" aria-label={uiText("Ui.text_f10fe7a27ce274", { value1: cityText })} onClick={() => setCityText("")}><X size={13} /></button></span></div>}
+      </div>
 
       {/* ── Filter Bar ───────────────────────────────────────────── */}
       <div className="hidden xl:block browse-toolbar">

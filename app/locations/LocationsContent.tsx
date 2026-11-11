@@ -180,6 +180,11 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
   };
 
   const [placeFilters, setPlaceFilters] = useViewState("locations.placeFilters", () => ({country:searchParams.get("country")??"",region:searchParams.get("region")??"",city:searchParams.get("city")??""}));
+  const [cityText, setCityText] = useViewState("locations.cityText", () => searchParams.get("cityText")?.trim() ?? "");
+  const changePlaceFilters = (next: typeof placeFilters) => {
+    setPlaceFilters(next);
+    if (next.city) setCityText("");
+  };
   const [query, setQuery] = useViewState("locations.query", () => searchParams.get("q") ?? "");
   const [activeType, setActiveType] = useViewState("locations.activeType", () => searchParams.get("type") ?? "All Types");
   const [instantOnly, setInstantOnly] = useViewState("locations.instantOnly", () => searchParams.get("instant") === "1");
@@ -214,8 +219,11 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
 
     result = result.filter(row => matchesPlace(row,"country",placeFilters.country) && matchesPlace(row,"region",placeFilters.region) && matchesPlace(row,"city",placeFilters.city));
 
+    // Free homepage input is a text search, never an inferred canonical city ID.
+    if (cityText) result = result.filter(row => placeSearchMatches(row, cityText) || row.city.toLowerCase().includes(cityText.toLowerCase()));
+
     if (query.trim()) {
-      const q = query.toLowerCase();
+      const q = query.toLowerCase().trim();
       result = result.filter(
         (l) =>
           l.title.toLowerCase().includes(q) ||
@@ -262,7 +270,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
     if (sortKey === "rating") result.sort((a, b) => b.rating - a.rating);
 
     return result;
-  }, [allLocations, placeFilters, query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, userLocation, radiusKm]);
+  }, [allLocations, placeFilters, cityText, query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, userLocation, radiusKm]);
 
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
@@ -294,12 +302,13 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
     el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [activeId, effectiveView]);
 
-  const filterKey = JSON.stringify([placeFilters, query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, userLocation, radiusKm]);
+  const filterKey = JSON.stringify([placeFilters, cityText, query, activeType, instantOnly, verifiedOnly, minPrice, maxPrice, lageFilter, powerOnly, sortKey, userLocation, radiusKm]);
   const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
   const showMore = () => setPagination({ filterKey, visibleCount: visibleCount + PAGE_SIZE });
 
   const resetFilters = () => {
     setPlaceFilters(EMPTY_PLACE_FILTERS);
+    setCityText("");
     setQuery(""); setActiveType("All Types");
     setInstantOnly(false); setVerifiedOnly(false);
     setMinPrice(""); setMaxPrice("");
@@ -311,6 +320,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
 
   const filterParams = new URLSearchParams();
   if (query) filterParams.set("q", query);
+  if (cityText) filterParams.set("cityText", cityText);
   if (activeType !== "All Types") filterParams.set("type", activeType);
   if (instantOnly) filterParams.set("instant", "1");
   if (verifiedOnly) filterParams.set("verified", "1");
@@ -322,8 +332,9 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
   for (const kind of ['country','region','city'] as const) if(placeFilters[kind])filterParams.set(kind,placeFilters[kind]);
   useViewUrl(filterParams.size ? `${pathname}?${filterParams}` : pathname);
 
-  const hasActiveFilters = Object.values(placeFilters).some(Boolean) || query || activeType !== "All Types" || instantOnly || verifiedOnly || minPrice || maxPrice || userLocation || lageFilter !== "Alle" || powerOnly;
+  const hasActiveFilters = Object.values(placeFilters).some(Boolean) || cityText || query || activeType !== "All Types" || instantOnly || verifiedOnly || minPrice || maxPrice || userLocation || lageFilter !== "Alle" || powerOnly;
   const mobileChips: BrowseChip[] = [
+    ...(cityText ? [{ id: "city-text", label: `${uiText("Places.city")}: ${cityText}`, onRemove: () => setCityText("") }] : []),
     ...(['country','region','city'] as const).flatMap(kind => placeFilters[kind] ? [{id:`place-${kind}`,label:placeOptions(allLocations,kind,locale).find(option=>option.value===placeFilters[kind])?.label??placeFilters[kind],onRemove:()=>setPlaceFilters({...placeFilters,[kind]:''})}] : []),
     ...(activeType !== "All Types" ? [{ id: "type", label: categoryLabel(activeType), onRemove: () => setActiveType("All Types") }] : []),
     ...(minPrice ? [{ id: "min", label: uiText("Ui.text_c6e3466f40cb9d", { value1: String(minPrice) }), onRemove: () => setMinPrice("") }] : []),
@@ -361,7 +372,7 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
         showResultsLabel={t("showResults", { count: filtered.length })}
       >
 
-        <PlaceFilters rows={allLocations} value={placeFilters} onChange={setPlaceFilters} scope="locations" />        <div className="grid grid-cols-2 gap-3">
+        <PlaceFilters rows={allLocations} value={placeFilters} onChange={changePlaceFilters} scope="locations" />        <div className="grid grid-cols-2 gap-3">
           <MobileFilterField label={uiText("Ui.text_84381d6fa4d29d")}><input inputMode="decimal" type="number" min="0" value={minPrice} onChange={(event) => setMinPrice(event.target.value)} placeholder={uiText("Ui.text_d0c50fd56cbce3")} /></MobileFilterField>
           <MobileFilterField label={uiText("Ui.text_f7abc502297a74")}><input inputMode="decimal" type="number" min="0" value={maxPrice} onChange={(event) => setMaxPrice(event.target.value)} placeholder={uiText("Ui.text_d0c50fd56cbce3")} /></MobileFilterField>
         </div>
@@ -384,7 +395,10 @@ function LocationsInner({ serverListings }: { serverListings: Location[] }) {
           {userLocation && <MobileFilterField label={t("radiusLabel")}><select value={radiusKm} onChange={(event) => setRadiusKm(Number(event.target.value))}>{[10, 25, 50, 100, 200, 500].map((value) => <option key={value} value={value}>{uiText.rich("Ui.text_6b06beb2a825c0", { value1: () => (value) })}</option>)}</select></MobileFilterField>}
         </div>
       </MobileBrowseControls>
-      <div className="hidden xl:block site-container py-3"><PlaceFilters rows={allLocations} value={placeFilters} onChange={setPlaceFilters} scope="locations" /></div>
+      <div className="hidden xl:block site-container py-3">
+        <PlaceFilters rows={allLocations} value={placeFilters} onChange={changePlaceFilters} scope="locations" />
+        {cityText && <div className="mobile-browse-chips mt-2"><span className="mobile-browse-chip"><span className="truncate">{uiText("Places.city")}: {cityText}</span><button type="button" aria-label={uiText("Ui.text_f10fe7a27ce274", { value1: cityText })} onClick={() => setCityText("")}><X size={13} /></button></span></div>}
+      </div>
       {/* ── TOP BAR ── */}
       <div className="hidden xl:block browse-toolbar shrink-0">
         <div className="site-container space-y-2 py-2">

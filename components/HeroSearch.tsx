@@ -11,7 +11,7 @@ import { useTranslations } from "next-intl";
 
 function getLocalizedTabs(translate: (key: string) => string) {
   return ([
-  { id: "locations", label: translate("nav.locations"), placeholder: translate("Ui.text_64869d31081bb8"),    href: "/locations" },
+  { id: "locations", label: translate("nav.locations"), placeholder: translate("Ui.text_64869d31081bb8"),    href: "/locations/suche" },
   { id: "crew",      label: translate("nav.crew"),      placeholder: translate("Ui.text_323d7dd4417e20"), href: "/creators" },
   { id: "equipment", label: translate("companies.groupAusstattung"), placeholder: translate("Ui.text_debf8074d5b54f"),   href: "/props" },
   { id: "jobs",      label: translate("nav.jobs"),      placeholder: translate("Ui.text_73c2890fe0d243"),      href: "/jobs" },
@@ -29,28 +29,30 @@ export default function HeroSearch() {
   const [city, setCity] = useState("");
 
   const tab = tabs.find((t) => t.id === activeTab)!;
+  const cityParam = "cityText";
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
     if (query.trim()) params.set("q", query.trim());
-    if (city.trim()) params.set("city", city.trim());
+    if (city.trim()) params.set(cityParam, city.trim());
     const qs = params.toString();
     router.push(`${tab.href}${qs ? `?${qs}` : ""}`);
   };
 
   return (
     <div className="w-full">
-      {/* Tabs — overflow-x-auto so they never clip on tiny screens */}
-      <div className="flex gap-1 mb-2.5 overflow-x-auto scrollbar-none">
+      <div role="group" aria-label={uiText("home.heroSearchAction")} className="mb-2 flex flex-wrap gap-1">
         {tabs.map((t) => (
           <button
             key={t.id}
-            onClick={() => { setActiveTab(t.id); setQuery(""); setCity(""); }}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${
+            type="button"
+            aria-pressed={activeTab === t.id}
+            onClick={() => setActiveTab(t.id)}
+            className={`min-h-11 min-w-0 max-w-full rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
               activeTab === t.id
-                ? "bg-white/25 text-white shadow-sm"
-                : "text-white/55 hover:text-white/85 hover:bg-white/10"
+                ? "bg-gold-subtle text-gold"
+                : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary"
             }`}
           >
             {t.label}
@@ -61,13 +63,17 @@ export default function HeroSearch() {
       {/* Search bar */}
       <form
         onSubmit={handleSearch}
-        className="flex items-center bg-bg-elevated/90 backdrop-blur-md rounded-full sm:rounded-xl overflow-hidden border border-border/60 shadow-2xl transition-all focus-within:border-gold/50 focus-within:shadow-[0_0_0_3px_rgba(194,241,53,0.15),0_8px_32px_rgba(0,0,0,0.4)] min-h-[52px] sm:min-h-0"
+        action={tab.href}
+        method="get"
+        className="flex min-h-[52px] items-center overflow-hidden rounded-xl border border-border bg-bg-secondary shadow-sm transition-colors focus-within:border-gold"
       >
         {/* Query */}
         <div className="flex items-center gap-2 flex-1 px-4">
           <Search size={15} className="text-text-muted shrink-0" />
           <input
             type="text"
+            name="q"
+            aria-label={tab.placeholder}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={tab.placeholder}
@@ -80,6 +86,8 @@ export default function HeroSearch() {
           <MapPin size={14} className="text-text-muted shrink-0" />
           <input
             type="text"
+            name={cityParam}
+            aria-label={uiText("creators.filterCity")}
             value={city}
             onChange={(e) => setCity(e.target.value)}
             placeholder={uiText("creators.filterCity")}
@@ -90,7 +98,8 @@ export default function HeroSearch() {
         {/* Button */}
         <button
           type="submit"
-          className="m-1.5 px-3.5 sm:px-4 py-2.5 bg-[#C2F135] hover:bg-[#D6F96A] text-[#0A0A0A] font-bold text-sm rounded-full sm:rounded-lg transition-colors shrink-0 flex items-center gap-1.5"
+          aria-label={uiText("home.heroSearchAction")}
+          className="m-1 min-h-11 min-w-11 shrink-0 flex items-center justify-center gap-1.5 rounded-lg bg-gold px-3.5 text-sm font-bold text-bg-primary transition-colors hover:bg-gold-light sm:px-4"
         >{uiText.rich("Ui.text_43abcbcce10e6d", { part1: () => (<Search size={15} className="sm:w-3.5 sm:h-3.5" />), part2: chunks => (<span className="hidden sm:inline">{chunks}</span>) })}</button>
       </form>
     </div>

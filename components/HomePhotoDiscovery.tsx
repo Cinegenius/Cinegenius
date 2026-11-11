@@ -56,12 +56,13 @@ export function PhotoDialog({ photo, onClose, resumeLike = false }: { photo: Dis
     fetch(`/api/profile-image-ratings?${query}`, { signal: controller.signal })
       .then(async (response) => {
         const data = await response.json();
+        if (controller.signal.aborted) return;
         if (response.ok) { setSummary(data); setSelected(data.myRating ?? null); }
         else if (response.status !== 404) setError(data.error ?? uiText("Ui.text_c16a611fcde4f4"));
       })
       .catch(() => {});
     return () => controller.abort();
-  }, [photo.profileId, photo.imageUrl, photo.canRate]);
+  }, [photo.profileId, photo.imageUrl, photo.canRate, uiText]);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) { if (event.key === "Escape") onClose(); }
@@ -132,7 +133,6 @@ function PhotoBandCard({
   onImageError,
   onPhotoOpen,
   pointerOnly = false,
-  priority = false,
 }: {
   photo: DiscoverPhoto;
   isRatedSelection: boolean;
@@ -140,7 +140,6 @@ function PhotoBandCard({
   onImageError: (imageUrl: string) => void;
   onPhotoOpen?: () => void;
   pointerOnly?: boolean;
-  priority?: boolean;
 }) {
   const uiText = useTranslations();
 
@@ -149,7 +148,7 @@ function PhotoBandCard({
     <article aria-hidden={pointerOnly || undefined} className="home-photo-band-card group relative aspect-[4/3] w-[165px] shrink-0 overflow-hidden rounded-xl border border-white/10 bg-bg-elevated sm:w-[200px] lg:w-[240px] xl:w-[250px]">
       {!failed ? <Link href={href} onClick={onPhotoOpen ?? (() => markPhotoNavigation())} aria-label={pointerOnly ? undefined : uiText("Ui.text_7f81266d201363", { value1: String(photo.caption || uiText("Ui.text_be242ab339bc9b", { value1: String(photo.author) })) })} tabIndex={pointerOnly ? -1 : undefined} className="absolute inset-0 block focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold">
         {/* eslint-disable-next-line @next/next/no-img-element -- endpoint guarantees bounded pixels, including oversized originals */}
-        <img src={communityPreviewUrl(photo.imageUrl)} alt={pointerOnly ? "" : photo.caption || uiText("Ui.text_504589ed9cc129", { value1: String(photo.author) })} loading={priority ? "eager" : "lazy"} decoding="async" onError={() => onImageError(photo.imageUrl)} draggable={false} className={`absolute inset-0 h-full w-full ${photo.fit === "contain" ? "object-contain p-4" : "object-cover"}`} />
+        <img src={communityPreviewUrl(photo.imageUrl)} alt={pointerOnly ? "" : photo.caption || uiText("Ui.text_504589ed9cc129", { value1: String(photo.author) })} loading="lazy" decoding="async" onError={() => onImageError(photo.imageUrl)} draggable={false} className={`absolute inset-0 h-full w-full ${photo.fit === "contain" ? "object-contain p-4" : "object-cover"}`} />
       </Link> : <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-bg-elevated to-bg-primary text-text-muted"><div className="flex flex-col items-center gap-2">{uiText.rich("Ui.text_ec28ffddc5e6f4", { part1: () => (<ImageIcon size={28} />), part2: chunks => (<span className="text-xs">{chunks}</span>) })}</div></div>}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
       <PhotoLikeButton profileId={photo.profileId} imageUrl={photo.imageUrl} initialCount={photo.likeCount ?? 0} initialLiked={photo.likedByMe ?? false} disabled={photo.canLike === false} blurBackground={false} tabIndex={pointerOnly ? -1 : undefined} className="absolute right-3 top-3 z-10" />
@@ -417,7 +416,7 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
           onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false); }}
         >
           {staticGallery ? <div className="home-photo-band-static-grid">
-            {photos.map((photo, index) => <PhotoBandCard key={`${photo.profileId}:${photo.imageUrl}`} photo={photo} isRatedSelection={isRatedSelection} failed={failedImages.has(photo.imageUrl)} onImageError={markImageFailed} priority={index === 0} onPhotoOpen={markHomePhotoOpen} />)}
+            {photos.map((photo) => <PhotoBandCard key={`${photo.profileId}:${photo.imageUrl}`} photo={photo} isRatedSelection={isRatedSelection} failed={failedImages.has(photo.imageUrl)} onImageError={markImageFailed} onPhotoOpen={markHomePhotoOpen} />)}
           </div> : <div className="home-photo-band-stack">
             {[0, 1].map((row) => {
               const rowPhotos = photos.filter((_, index) => index % 2 === row);
@@ -427,7 +426,7 @@ export function HomePhotoDiscovery({ ratedPhotos, newPhotos }: { ratedPhotos: Di
               const rowLoopPhotos = repeatForSeamlessLoop(filledRowPhotos);
               return <div key={`photo-band-row-${row}`} ref={(element) => { trackRefs.current[row] = element; }} className={`home-photo-band-track ${row === 0 ? "home-photo-band-track--left" : "home-photo-band-track--right"}`} data-paused={!shouldRun} data-photo-band-row={row} style={{ "--photo-band-duration": `${cycleDurations[row]}s` } as CSSProperties}>
                 {[0, 1].map((copy) => <div key={`photo-band-row-${row}-copy-${copy}`} ref={(element) => { if (copy === 0) groupRefs.current[row] = element; }} className="home-photo-band-group" aria-hidden={copy === 1 || undefined}>
-                  {rowLoopPhotos.slice(copy * filledRowPhotos.length, (copy + 1) * filledRowPhotos.length).map((photo, index) => <PhotoBandCard key={`${row}:${copy}:${index}:${photo.profileId}:${photo.imageUrl}`} photo={photo} isRatedSelection={isRatedSelection} failed={failedImages.has(photo.imageUrl)} onImageError={markImageFailed} pointerOnly={copy === 1 || index >= rowPhotos.length} priority={copy === 0 && index === 0} onPhotoOpen={markHomePhotoOpen} />)}
+                  {rowLoopPhotos.slice(copy * filledRowPhotos.length, (copy + 1) * filledRowPhotos.length).map((photo, index) => <PhotoBandCard key={`${row}:${copy}:${index}:${photo.profileId}:${photo.imageUrl}`} photo={photo} isRatedSelection={isRatedSelection} failed={failedImages.has(photo.imageUrl)} onImageError={markImageFailed} pointerOnly={copy === 1 || index >= rowPhotos.length} onPhotoOpen={markHomePhotoOpen} />)}
                 </div>)}
               </div>;
             })}

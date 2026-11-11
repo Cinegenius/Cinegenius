@@ -98,6 +98,15 @@ export async function GET(req: NextRequest) {
     if(offer==="miete"||offer==="kauf")query=query.or(`metadata->>rental_type.eq.${offer},metadata->>rental_type.eq.beides${offer==='miete'?',metadata->>rental_type.is.null':''}`);
     if(text){const placeFilter=placeSearchFilter(text);const catalog=await getTranslations("MarketplaceCatalog");const values=marketplaceSearchCategories(text,catalog);const cats=values.map(v=>`"${v.replace(/["\\]/g,'')}"`).join(',');query=query.or(`title.ilike.%${text}%,description.ilike.%${text}%,city.ilike.%${text}%,category.ilike.%${text}%${cats?`,category.in.(${cats})`:''}${placeFilter?`,${placeFilter}`:''}`);}
   }
+  // A homepage place query remains text; canonical filters below stay authoritative.
+  // Apply it to the database before the exact count and page range are calculated.
+  const cityText = (req.nextUrl.searchParams.get("cityText") ?? "").trim().slice(0, 120);
+  if (cityText) {
+    const aliases = placeSearchFilter(cityText);
+    // Quote PostgREST values so commas, parentheses and quotes stay literal.
+    const pattern = JSON.stringify(`%${cityText.replace(/[%*\\]/g, " ")}%`);
+    query = query.or(`city.ilike.${pattern},place_city_name.ilike.${pattern},place_region_name.ilike.${pattern}${aliases ? `,${aliases}` : ""}`);
+  }
   for(const [param,column] of [['country','place_country_code'],['region','place_region_id'],['city','place_city_id']] as const){const value=req.nextUrl.searchParams.get(param);if(value)query=query.eq(column,value.slice(0,100));}
   const sort=req.nextUrl.searchParams.get("sort");
   query=sort==='price-asc'||sort==='price-desc'?query.order("price",{ascending:sort==='price-asc'}).order("id"):query.order("created_at",{ascending:false}).order("id");

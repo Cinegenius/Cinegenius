@@ -1,7 +1,6 @@
 import { placeReadFields } from "@/lib/places/catalog";
 import { isPeopleDirectoryProfile } from "@/lib/profile-provider-filters";
 import { crewOccupationIds } from "@/lib/crew-occupations";
-import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db";
@@ -275,6 +274,9 @@ export default async function CreatorsPage({
         initialFilters={{
           query: Array.isArray(params.q) ? params.q[0] ?? "" : params.q ?? "",
           city: Array.isArray(params.city) ? params.city[0] ?? "" : params.city ?? "",
+          cityText: Array.isArray(params.cityText) ? params.cityText[0] ?? "" : params.cityText ?? "",
+          country: Array.isArray(params.country) ? params.country[0] ?? "" : params.country ?? "",
+          region: Array.isArray(params.region) ? params.region[0] ?? "" : params.region ?? "",
           sort: Array.isArray(params.sort) ? params.sort[0] ?? "" : params.sort ?? "",
         }}
       />
