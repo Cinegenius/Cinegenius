@@ -33,6 +33,7 @@ import {
 import HeroSearch from "@/components/HeroSearch";
 import HomeCommunityBoard from "@/components/HomeCommunityBoard";
 import HomeCompanyPartners from "@/components/HomeCompanyPartners";
+import HomeCardRail from "@/components/HomeCardRail";
 import { PageBackdrop } from "@/components/PageHeader";
 import AiDisclosureBadge from "@/components/AiDisclosureBadge";
 import { COMPANY_CATEGORIES } from "@/lib/companyCategories";
@@ -89,7 +90,7 @@ async function getHomeData() {
   }
 
   const results = await Promise.all([
-    db.from("listings").select("id,title,city,price,image_url,metadata,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(4),
+    db.from("listings").select("id,title,city,price,image_url,metadata,created_at").eq("type", "location").eq("published", true).order("created_at", { ascending: false }).limit(10),
     db.from("listings").select("id,title,city,price,created_at").eq("type", "job").eq("published", true).order("created_at", { ascending: false }).limit(4),
     db.from("listings").select("id,user_id,company_id,responsible_person,title,city,price,image_url,type,metadata,created_at").in("type", ["prop", "vehicle"]).eq("published", true).order("created_at", { ascending: false }).limit(4),
     db.from("companies").select("id,slug,name,logo_url,city,categories").eq("published", true).order("created_at", { ascending: false }).limit(6),
@@ -141,7 +142,7 @@ async function getHomeData() {
   // public people profiles always occupy the first positions.
   const newCrew = peopleSummaries
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || a.name.localeCompare(b.name, marketLocale))
-    .slice(0, 4);
+    .slice(0, 10);
 
   const liveLocations = (recentLocations ?? []).map((l) => ({
     id: l.id as string,
@@ -202,14 +203,14 @@ async function HomeLocations({ dataPromise }: { dataPromise: HomeDataPromise }) 
   const [data, t, tc] = await Promise.all([dataPromise, getTranslations("home"), getTranslations("common")]);
   if (!data?.liveLocations.length) return null;
   return <section className="min-w-0 lg:col-start-2 lg:row-start-1" aria-labelledby="home-locations-title">
-    <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-locations-title" className="text-xs font-semibold uppercase tracking-widest text-text-secondary">{t("locationsTitle")}</h2><Link href="/locations" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light">{tc("viewAll")} <ArrowRight size={12} /></Link></div>
-    <div role="region" aria-labelledby="home-locations-title" tabIndex={0} className="grid grid-flow-col auto-cols-[46%] gap-3 overflow-x-auto pb-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold lg:grid-flow-row lg:auto-cols-auto lg:grid-cols-2 lg:overflow-visible lg:pb-0">
-      {data.liveLocations.map(loc => <Link key={loc.id} href={`/locations/${loc.id}`} className="group relative isolate block aspect-[5/3] min-h-11 min-w-0 overflow-hidden rounded-xl border border-white/10 bg-bg-elevated sm:aspect-[2/1]">
-        {loc.image ? <Image src={loc.image} alt={loc.title} fill className="object-cover transition-transform duration-300 motion-safe:group-hover:scale-105" style={{ objectPosition: loc.focalPoint ? `${loc.focalPoint.x}% ${loc.focalPoint.y}%` : "50% 50%" }} sizes="(min-width:1024px) 25vw,46vw" /> : <div className="absolute inset-0 flex items-center justify-center text-text-muted/30"><MapPin size={28} aria-hidden="true" /></div>}
-        <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/95 via-bg-primary/20 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 p-2.5 sm:p-3"><h3 className="line-clamp-2 text-xs font-semibold leading-snug text-white sm:text-sm">{loc.title}</h3><div className="mt-1 flex min-w-0 items-center justify-between gap-2 text-[10px] sm:text-xs"><span className="min-w-0 truncate text-white/75">{loc.city}</span><span className="max-w-[60%] shrink-0 text-right font-semibold text-gold [overflow-wrap:anywhere]">{loc.priceLabel}</span></div></div>
+    <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-locations-title" className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("locationsTitle")}</h2><Link href="/locations" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light sm:text-sm">{tc("viewAll")} <ArrowRight size={13} /></Link></div>
+    <HomeCardRail id="home-locations-rail" labelledBy="home-locations-title" hint={t("locationScrollHint")} previousLabel={t("railPrevious")} nextLabel={t("railNext")} itemCount={data.liveLocations.length} variant="location">
+      {data.liveLocations.map(loc => <Link key={loc.id} href={`/locations/${loc.id}`} className="group relative isolate block aspect-[4/3] min-h-11 min-w-0 overflow-hidden rounded-2xl border border-border bg-bg-elevated sm:aspect-[3/2]">
+        {loc.image ? <Image src={loc.image} alt={loc.title} fill mediaSize="thumbnail" className="object-cover transition-transform duration-300 motion-safe:group-hover:scale-105" style={{ objectPosition: loc.focalPoint ? `${loc.focalPoint.x}% ${loc.focalPoint.y}%` : "50% 50%" }} sizes="(min-width:1024px) 25vw,(min-width:640px) 60vw,72vw" /> : <div className="absolute inset-0 flex items-center justify-center text-text-muted/30"><MapPin size={32} aria-hidden="true" /></div>}
+        <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-bg-primary/30 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 p-3 sm:p-3.5"><h3 className="line-clamp-2 text-sm font-semibold leading-snug text-white">{loc.title}</h3><div className="mt-1.5 flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs"><span className="min-w-0 truncate text-white/75">{loc.city}</span><span className="font-semibold text-gold [overflow-wrap:anywhere]">{loc.priceLabel}</span></div></div>
       </Link>)}
-    </div>
+    </HomeCardRail>
   </section>;
 }
 
@@ -276,7 +277,7 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
     </section>}
     {newCrew.length > 0 && <section className={`min-w-0 ${twoColumns ? "lg:col-start-2 lg:row-start-1" : ""}`} aria-labelledby="home-crew-title">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-crew-title" className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("newCrewTitle")}</h2><Link href="/creators" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light sm:text-sm">{tc("viewAll")} <ArrowRight size={13} /></Link></div>
-      <div role="region" aria-labelledby="home-crew-title" tabIndex={0} className={`grid grid-flow-col auto-cols-[170px] gap-3 overflow-x-auto pb-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold sm:auto-cols-[180px] lg:grid-flow-row lg:auto-cols-auto lg:gap-4 lg:overflow-visible lg:pb-0 ${twoColumns ? "lg:grid-cols-2" : "lg:grid-cols-4"}`}>
+      <HomeCardRail id="home-crew-rail" labelledBy="home-crew-title" hint={t("crewScrollHint")} previousLabel={t("railPrevious")} nextLabel={t("railNext")} itemCount={newCrew.length} variant="crew" wide={!twoColumns}>
         {newCrew.map((c) => (
                 <Link
                   key={c.id}
@@ -289,6 +290,7 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
                         src={c.avatar}
                         alt={c.name}
                         fill
+                        mediaSize="thumbnail"
                         className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                         sizes="(max-width:640px) 50vw,25vw"
                       />
@@ -319,7 +321,7 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
                   </div>
                 </Link>
               ))}
-      </div>
+      </HomeCardRail>
     </section>}
     {companies.length > 0 && <section className={`min-w-0 ${twoColumns ? "lg:col-span-2" : ""}`} aria-labelledby="home-companies-title">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3"><div><p className="mb-1 text-xs font-semibold uppercase tracking-widest text-gold">{t("companiesLabel")}</p><h2 id="home-companies-title" className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("companiesTitle")}</h2></div><Link href="/companies" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light sm:text-sm">{tc("viewAll")} <ArrowRight size={13} /></Link></div>
