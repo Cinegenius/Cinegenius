@@ -28,7 +28,7 @@ const LISTING_COLS =
 // internal ownership IDs, arbitrary metadata and private availability data on
 // authenticated owner endpoints.
 const LISTING_COLS_PUBLIC =
-  "place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, type, category, title, description, price, city, image_url, published, extra_images, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type, marketplace:metadata->marketplace";
+  "place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, type, category, title, description, price, city, image_url, published, extra_images, created_at, price_negotiable:metadata->price_negotiable, price_on_request:metadata->price_on_request, rental_type:metadata->>rental_type, marketplace:metadata->marketplace, condition:metadata->>condition, delivery:metadata->delivery, focal_point:metadata->focal_point";
 
 function privateNoStoreJson(body: unknown, status = 200) {
   const response = NextResponse.json(body, { status });
@@ -94,7 +94,9 @@ export async function GET(req: NextRequest) {
   if(marketplaceOnly)query=query.in("type",["prop","vehicle"]);
   else if(type)query=query.eq("type",type);
   if(marketplaceOnly){
-    if(group)query=query.in("category",groupValues(group));else if(selected)query=query.in("category",deptValues(selected));
+    if(group)query=query.in("category",groupValues(group));
+    else if(selected?.id==='fahrzeuge')query=query.or(`type.eq.vehicle,category.in.(${deptValues(selected).map(value=>JSON.stringify(value)).join(',')})`);
+    else if(selected)query=query.in("category",deptValues(selected));
     const offer=req.nextUrl.searchParams.get("offer");
     if(offer==="miete"||offer==="kauf")query=query.or(`metadata->>rental_type.eq.${offer},metadata->>rental_type.eq.beides${offer==='miete'?',metadata->>rental_type.is.null':''}`);
     if(text){const placeFilter=placeSearchFilter(text);const catalog=await getTranslations("MarketplaceCatalog");const values=marketplaceSearchCategories(text,catalog);const cats=values.map(v=>`"${v.replace(/["\\]/g,'')}"`).join(',');query=query.or(`title.ilike.%${text}%,description.ilike.%${text}%,city.ilike.%${text}%,category.ilike.%${text}%${cats?`,category.in.(${cats})`:''}${placeFilter?`,${placeFilter}`:''}`);}

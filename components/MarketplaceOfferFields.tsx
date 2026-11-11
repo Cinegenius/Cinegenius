@@ -1,24 +1,46 @@
 'use client';
 
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useId, useRef, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { localizedMarketplaceDepartments, marketplaceCategory } from '@/lib/marketplaceCategories';
+import { marketplaceCategoryOptions, searchMarketplaceCategoryOptions, type MarketplaceCategoryOption } from '@/lib/marketplace-category-search';
 import { MARKETPLACE_COMMON_FIELDS, marketplaceSpecFields, type MarketplaceDraft } from '@/lib/marketplace-offer';
 
 const inputClass='min-h-11 w-full min-w-0 rounded-xl border border-border bg-bg-elevated px-3 py-2 text-sm text-text-primary focus:border-gold focus:outline-none';
 export function MarketplaceCategoryPicker({value,onChange,vehicleOnly=false}:{value:string;onChange:(value:string)=>void;vehicleOnly?:boolean}) {
- const t=useTranslations('MarketplaceOffer');const catalog=useTranslations('MarketplaceCatalog');
+ const t=useTranslations('MarketplaceNavigation');const catalog=useTranslations('MarketplaceCatalog');const locale=useLocale();
  const [query,setQuery]=useState('');const selected=marketplaceCategory(value);
- const [department,setDepartment]=useState(selected?.department??'');
- const departments=localizedMarketplaceDepartments(catalog).filter(d=>!vehicleOnly||d.id==='fahrzeuge');
- const current=departments.find(d=>d.id===(selected?.department||department));
- const matches=departments.filter(d=>!query||[d.label,...d.groups.map(g=>g.label),...d.groups.flatMap(g=>g.items.map(i=>i.value))].join(' ').toLocaleLowerCase().includes(query.toLocaleLowerCase()));
+ const [browse,setBrowse]=useState({value,department:selected?.department??''});
+ const input=useRef<HTMLInputElement>(null);const resultsId=useId();
+ const collator=new Intl.Collator(locale,{sensitivity:'base',numeric:true});
+ const departments=localizedMarketplaceDepartments(catalog).filter(d=>!vehicleOnly||d.id==='fahrzeuge').sort((left,right)=>collator.compare(left.label,right.label));
+ const current=departments.find(d=>d.id===(browse.value===value?browse.department:selected?.department));
+ const choices=marketplaceCategoryOptions(catalog,locale,{vehicleOnly});
+ const selectedChoice=choices.find(choice=>choice.value===selected?.subcategory);
+ const matches=query.trim()?searchMarketplaceCategoryOptions(query,catalog,locale,{vehicleOnly}):[];
+ const choose=(choice:MarketplaceCategoryOption)=>{
+  setBrowse({value:choice.value,department:choice.departmentId});setQuery('');onChange(choice.value);input.current?.focus();
+ };
+ const changeDepartment=(next:string)=>{
+  if(next&& !departments.some(department=>department.id===next))return;
+  if(next===(current?.id??''))return;
+  setBrowse({value:'',department:next});setQuery('');
+  if(value)onChange('');
+ };
  return <div className="space-y-3" data-marketplace-categories>
-  {value && !selected?.subcategory && <p className="text-xs leading-5 text-text-muted">{t("legacy")}</p>}
-  <label className="block text-sm text-text-secondary">{t('search')}<input className={`${inputClass} mt-1`} type="search" value={query} onChange={event=>setQuery(event.target.value)}/></label>
+  {value && value!==selectedChoice?.value && <p className="break-words text-xs leading-5 text-text-muted">{t('legacy')} <span>{value}</span></p>}
+  {selectedChoice && <p className="break-words text-sm text-text-secondary"><span className="font-medium text-text-primary">{t('selected')}: </span>{selectedChoice.path}</p>}
+  <label className="block text-sm text-text-secondary">{t('searchLabel')}<input ref={input} className={`${inputClass} mt-1`} type="search" placeholder={t('searchPlaceholder')} value={query} aria-controls={query.trim()?resultsId:undefined} onChange={event=>setQuery(event.target.value)}/></label>
+  {query.trim() && <div className="space-y-2">
+   <div className="flex min-w-0 flex-wrap items-center justify-between gap-2"><p className="text-xs text-text-muted" role="status" aria-live="polite">{t('searchResults',{count:matches.length})}</p><button type="button" className="min-h-11 min-w-11 text-xs text-gold hover:text-gold-light" onClick={()=>{setQuery('');input.current?.focus();}}>{t('clearSearch')}</button></div>
+   <ul id={resultsId} className="grid max-h-72 gap-2 overflow-y-auto overscroll-contain sm:grid-cols-2">
+    {matches.map(choice=><li key={choice.value} className="min-w-0"><button type="button" aria-pressed={selectedChoice?.value===choice.value} onClick={()=>choose(choice)} className={`min-h-11 w-full min-w-0 rounded-xl border p-3 text-left ${selectedChoice?.value===choice.value?'border-gold bg-gold/10':'border-border bg-bg-elevated hover:border-gold/50'}`}><span className="block break-words text-sm font-medium text-text-primary">{choice.label}</span><span className="mt-1 block break-words text-xs text-text-muted">{choice.path}</span></button></li>)}
+   </ul>
+   {!matches.length&&<p className="text-sm text-text-muted">{t('empty')}</p>}
+  </div>}
   <div className="grid gap-3 sm:grid-cols-2">
-   <label className="min-w-0 text-sm text-text-secondary">{t('choose')}<select className={`${inputClass} mt-1`} value={current?.id??''} onChange={event=>{setDepartment(event.target.value);onChange('');}}><option value="">{t('choose')}</option>{matches.map(d=><option key={d.id} value={d.id}>{d.label}</option>)}</select></label>
-   <label className="min-w-0 text-sm text-text-secondary">{t('subcategory')}<select className={`${inputClass} mt-1`} value={selected?.subcategory??''} disabled={!current} onChange={event=>onChange(event.target.value)}><option value="">{t('subcategory')}</option>{current?.groups.map(g=><option key={g.id} value={g.id}>{g.label}</option>)}</select></label>
+   <label className="min-w-0 text-sm text-text-secondary">{t('category')}<select className={`${inputClass} mt-1`} value={current?.id??''} onChange={event=>changeDepartment(event.target.value)}><option value="">{t('chooseCategory')}</option>{departments.map(d=><option key={d.id} value={d.id}>{d.label}</option>)}</select></label>
+   <label className="min-w-0 text-sm text-text-secondary">{t('subcategory')}<select className={`${inputClass} mt-1`} value={selectedChoice?.departmentId===current?.id?selectedChoice?.value??'':''} disabled={!current} onChange={event=>{const choice=choices.find(item=>item.value===event.target.value&&item.departmentId===current?.id);if(choice)choose(choice);}}><option value="">{t('chooseSubcategory')}</option>{choices.filter(choice=>choice.departmentId===current?.id).map(choice=><option key={choice.value} value={choice.value}>{choice.label}</option>)}</select></label>
   </div>
  </div>;
 }

@@ -1,6 +1,6 @@
 import { placeReadFields } from "@/lib/places/catalog";
-import type { Metadata } from "next";
 import { db } from "@/lib/db";
+import { marketplaceCardData } from "@/lib/marketplace-browse";
 import PropsContent from "./PropsContent";
 import PageHeader from "@/components/PageHeader";
 import { getTranslations, getLocale } from "next-intl/server";
@@ -25,37 +25,25 @@ export async function generateMetadata(): Promise<import("next").Metadata> {
 export default async function PropsPage() {
   const locale = await getLocale();
   const t = await getTranslations("props");
-  const { data } = await db
-    .from("listings")
-    .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id, user_id, type, title, category, city, price, image_url, description, metadata")
-    .eq("published", true)
-    .in("type", ["prop", "vehicle"])
-    .order("created_at", { ascending: false })
-    .limit(300);
-
-  const serverListings = (data ?? []).map((l: {
-    id: string; title: string; city: string; price: number; category: string | null;
-    image_url: string | null; rental_type?: string | null; type: string; user_id: string;
-    metadata?: Record<string, unknown> | null;
-  }) => ({
-    id: l.id,
-    ...placeReadFields(l.city ?? "", l, locale),
-    title: l.title,
-    type: l.type,
-    category: l.type === "vehicle" ? (l.category ?? "Bild-Fahrzeug") : (l.category ?? "Requisiten"),
-    vendor: t("vendorPrivate"),
-    location: l.city ?? "",
-    dailyRate: l.price,
-    image: l.image_url ?? "",
-    condition: ((l.metadata as Record<string, unknown> | null)?.condition as string) ?? "Gut",
-    era: null as string | null,
-    delivery: ((l.metadata as Record<string, unknown> | null)?.delivery as boolean) ?? false,
-    rentalType: (l.rental_type ?? l.metadata?.rental_type ?? "miete") as "miete" | "kauf",
-    focalPoint: ((l.metadata as Record<string, unknown> | null)?.focal_point as { x: number; y: number } | null) ?? null,
-    isReal: true,
-    meta: l.metadata ?? null,
-    ownerId: l.user_id,
-  }));
+  let serverListings: ReturnType<typeof marketplaceCardData>[] = [];
+  let serverError = false;
+  try {
+    const { data, error } = await db
+      .from("listings")
+      .select("place_country_code,place_region_id,place_city_id,place_city_name,place_region_name,place_status,id,type,title,category,city,price,image_url,description,created_at,price_negotiable:metadata->price_negotiable,price_on_request:metadata->price_on_request,rental_type:metadata->>rental_type,marketplace:metadata->marketplace,condition:metadata->>condition,delivery:metadata->delivery,focal_point:metadata->focal_point")
+      .eq("published", true)
+      .in("type", ["prop", "vehicle"])
+      .order("created_at", { ascending: false })
+      .limit(300);
+    serverError = !!error;
+    if (!error) serverListings = (data ?? []).map((row: Record<string, unknown>) => ({
+      ...marketplaceCardData(row),
+      ...placeReadFields(String(row.city ?? ""), row, locale),
+      vendor: t("vendorPrivate"),
+    }));
+  } catch {
+    serverError = true;
+  }
 
   return (
     <div className="min-h-screen bg-bg-primary">
@@ -64,9 +52,9 @@ export default async function PropsPage() {
         title={t("heroTitle")}
         titleHighlight={t("heroTitleHighlight")}
         description={t("heroDesc")}
-        cta={{ label: t("heroCta"), href: "/inserat" }}
+        cta={{ label: t("heroCta"), href: "/inserat?group=marktplatz" }}
       />
-      <PropsContent serverListings={serverListings} />
+      <PropsContent serverListings={serverListings} serverError={serverError} />
     </div>
   );
 }

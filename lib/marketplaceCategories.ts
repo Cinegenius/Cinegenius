@@ -416,7 +416,13 @@ export function groupValues(group: MarketplaceGroup): string[] { return [group.i
 export function findDept(value:string) {const mapped=marketplaceCategory(value);return DEPARTMENTS.find(d=>d.id===mapped?.department);}
 export const ALL_VALUES = DEPARTMENTS.flatMap(deptValues);
 export function localizedMarketplaceDepartments(t:(key:string)=>string):MarketplaceDept[] {return DEPARTMENTS.map(d=>({...d,label:t(`categories.${d.id}`),groups:d.groups.map(g=>({...g,label:t(`subcategories.${g.id}`),items:g.items.map(i=>({...i,label:t(`subcategories.${g.id}`)}))}))}));}
-export function marketplaceMatches(category:string,department:string|null,subcategory:string|null=null,type?:string) {const resolved=marketplaceCategory(category,type);return (!department || resolved?.department===department) && (!subcategory || resolved?.subcategory===subcategory);}
+/** Public read matching preserves legacy records. Writes keep marketplaceCategory(category,type) strict. */
+export function marketplaceMatches(category:unknown,department:string|null,subcategory:string|null=null,type?:string) {
+ if(type&&type!=='prop'&&type!=='vehicle')return false;
+ const resolved=marketplaceCategory(category);
+ if(department==='fahrzeuge'&&!subcategory)return type==='vehicle'||resolved?.department==='fahrzeuge';
+ return (!department || resolved?.department===department) && (!subcategory || resolved?.subcategory===subcategory);
+}
 export function marketplaceSearchTerms(category:string):string {const resolved=marketplaceCategory(category);const d=DEPARTMENTS.find(d=>d.id===resolved?.department);return [category,d?.label,d?.groups.find(g=>g.id===resolved?.subcategory)?.label,...Object.entries(SEARCH_SYNONYMS).filter(([,values])=>values.some(v=>{const r=marketplaceCategory(v);return r?.subcategory && r.subcategory===resolved?.subcategory;})).map(([key])=>key)].filter(Boolean).join(' ');}
 export const SEARCH_SYNONYMS: Record<string, string[]> = {
   // Küche / Essen
@@ -504,13 +510,29 @@ export const SEARCH_SYNONYMS: Record<string, string[]> = {
 
 /** Candidate stored values for search, using explicit aliases plus translated display terms. */
 export function marketplaceSearchCategories(query:string,t?:(key:string)=>string):string[] {
- const text=query.trim().toLocaleLowerCase();if(text.length<2)return [];
- const words=text.split(/\s+/);const values=new Set<string>();
- for(const d of DEPARTMENTS){
-  const departmentLabel=t?.(`categories.${d.id}`)??d.label;
-  if(departmentLabel.toLocaleLowerCase().includes(text)||d.label.toLocaleLowerCase().includes(text))deptValues(d).forEach(v=>values.add(v));
-  for(const g of d.groups){const label=t?.(`subcategories.${g.id}`)??g.label;if(label.toLocaleLowerCase().includes(text)||g.label.toLocaleLowerCase().includes(text))groupValues(g).forEach(v=>values.add(v));}
- }
- for(const word of words)for(const value of SEARCH_SYNONYMS[word]??[]){const resolved=marketplaceCategory(value);if(resolved?.subcategory){const group=DEPARTMENTS.flatMap(d=>d.groups).find(g=>g.id===resolved.subcategory);group?.items.forEach(i=>values.add(i.value));if(group)groupValues(group).forEach(v=>values.add(v));}else values.add(value);}
- return [...values];
+ const text=normalize(query);if(text.length<2)return [];
+ const words=text.match(/[\p{L}\p{N}_-]+/gu)??[];if(!words.length)return [];
+ const addResolved=(values:Set<string>,resolved:ReturnType<typeof marketplaceCategory>)=>{
+  if(!resolved)return;
+  const department=DEPARTMENTS.find(d=>d.id===resolved.department);
+  if(resolved.subcategory){const group=department?.groups.find(g=>g.id===resolved.subcategory);if(group)groupValues(group).forEach(v=>values.add(v));}
+  else if(department)deptValues(department).forEach(v=>values.add(v));
+ };
+ // A complete declared legacy alias covers its whole phrase without guessing from individual words.
+ const exact=marketplaceCategory(query);
+ if(words.length>1&&exact){const values=new Set<string>();addResolved(values,exact);return [...values];}
+ const candidates=(word:string)=>{
+  const values=new Set<string>();addResolved(values,marketplaceCategory(word));
+  for(const [alias,resolved]of Object.entries(LEGACY_ALIASES))if(normalize(alias).includes(word))addResolved(values,resolved);
+  for(const department of DEPARTMENTS){
+   const label=t?.(`categories.${department.id}`)??department.label;
+   if(normalize(label).includes(word)||normalize(department.label).includes(word))deptValues(department).forEach(v=>values.add(v));
+   for(const group of department.groups){const label=t?.(`subcategories.${group.id}`)??group.label;if(normalize(label).includes(word)||normalize(group.label).includes(word)||group.id.includes(word))groupValues(group).forEach(v=>values.add(v));}
+  }
+  for(const value of SEARCH_SYNONYMS[word]??[]){const resolved=marketplaceCategory(value);if(resolved)addResolved(values,resolved);else values.add(value);}
+  return values;
+ };
+ // Every word must be covered by the same category's aliases or parent/child labels.
+ const sets=words.map(candidates);
+ return [...sets[0]].filter(value=>sets.every(set=>set.has(value)));
 }

@@ -451,6 +451,11 @@ export default function InseratPage() {
   const [publishingDraft, setPublishingDraft] = useState(false);
   const [selected, setSelected] = useState<CategoryItem | null>(null);
   const [activeGroup, setActiveGroup] = useState<string | null>(null); // null = main view
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("group") === "marktplatz") {
+      setActiveGroup(current => current ?? "marktplatz");
+    }
+  }, []);
   // Category-specific metadata (dynamic per prop category)
   const [marketplace, setMarketplace] = useState(() => marketplaceDraft());
   const optionalMedia = useTranslations("OptionalMedia");

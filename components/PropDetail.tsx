@@ -9,7 +9,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import ContextBackLink from "@/components/ContextBackLink";
 import {
-  ArrowLeft, Star, CheckCircle,
+  ArrowLeft, Star,
   MapPin, Package, Truck, Pencil,
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
@@ -55,14 +55,6 @@ const conditionColors: Record<string, string> = {
 
 export default function PropDetail({ prop }: { prop: Prop }) {
   const uiText = useTranslations();
-  const uiOptionLabels: Record<string, string> = {
-    "Artikel wie beschrieben, gereinigt und einsatzbereit": uiText("Ui.text_67e45e82d60fbb"),
-    "Vollständiger Zustandsbericht mit Fotos": uiText("Ui.text_67a73492b0d94e"),
-    "Grundlegende Bedienungsanleitung": uiText("Ui.text_aa78be443ba259"),
-    "Anbieter-Kontakt während der Produktion": uiText("Ui.text_0ec08c729ed374"),
-    "Rückgabeverpackung / Koffer (falls vorhanden)": uiText("Ui.text_40b4c353e938ad"),
-    "Digitaler Mietvertrag": uiText("Ui.text_139deccd621aed"),
-  };
 
 
 
@@ -223,24 +215,6 @@ export default function PropDetail({ prop }: { prop: Prop }) {
 
             <ProductionCreditsDisplay credits={prop.productionCredits ?? []} heading={uiText("Ui.text_92fc4f28b0bd15")} />
 
-            <div className="mb-8">
-              <h2 className="font-display text-xl font-bold text-text-primary mb-4">{uiText("Ui.text_117cdd25a85396")}</h2>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {[
-                  "Artikel wie beschrieben, gereinigt und einsatzbereit",
-                  "Vollständiger Zustandsbericht mit Fotos",
-                  "Grundlegende Bedienungsanleitung",
-                  "Anbieter-Kontakt während der Produktion",
-                  "Rückgabeverpackung / Koffer (falls vorhanden)",
-                  "Digitaler Mietvertrag",
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 text-sm text-text-secondary">
-                    <CheckCircle size={14} className="text-success mt-0.5 shrink-0" />
-                    {(uiOptionLabels[item] ?? item)}
-                  </li>
-                ))}
-              </ul>
-            </div>
 
 
             <div className="mb-8">

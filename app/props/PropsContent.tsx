@@ -15,41 +15,17 @@ import React, { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import { useUser, useAuth } from "@clerk/nextjs";
 import { Heart } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import type { LucideIcon } from "lucide-react";
-import {
-  Search, Package, X, Truck, MapPin, ChevronDown,
-  LayoutGrid, List, ArrowUpDown,
-  Camera, Lightbulb, Wrench, Mic, Shirt, Sparkles, Layers, Car, Zap,
-  Monitor, Building2, Briefcase, Palette, Scissors,
-} from "lucide-react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { Search, Package, X, Truck, MapPin, LayoutGrid, List, ChevronDown } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import EmptyState from "@/components/EmptyState";
-import { localizedMarketplaceDepartments, marketplaceMatches, SEARCH_SYNONYMS, marketplaceCategory, marketplaceSearchTerms } from "@/lib/marketplaceCategories";
-import { deptColors , taxonomyLabel } from "@/lib/departments";
+import { localizedMarketplaceDepartments, marketplaceMatches, marketplaceSearchCategories, marketplaceSearchTerms } from "@/lib/marketplaceCategories";
+import MarketplaceCategoryNavigation from "@/components/MarketplaceCategoryNavigation";
+import { readMarketplaceBrowseState, marketplaceCategorySelection, marketplaceCardData, MARKETPLACE_PAGE_SIZE, type MarketplaceSort, type MarketplaceOfferFilter } from "@/lib/marketplace-browse";
 import MobileBrowseControls, { MobileFilterField, MobileFilterSelect, type BrowseChip } from "@/components/MobileBrowseControls";
 
-// ── Icon maps ─────────────────────────────────────────────────────
-const DEPT_ICON_MAP: Record<string, LucideIcon> = {
-  kamera:               Camera,
-  licht:                Lightbulb,
-  grip:                 Wrench,
-  ton:                  Mic,
-  kostuem:              Shirt,
-  maske:                Sparkles,
-  requisiten:           Package,
-  szenenbild:           Palette,
-  fahrzeuge:            Car,
-  sfx:                  Zap,
-  "virtual-production": Monitor,
-  post:                 Scissors,
-  studio:               Building2,
-  produktion:           Briefcase,
-};
-
-const PAGE_SIZE = 24;
-
 type Prop = {
+  [key: string]: unknown;
   id: string; title: string; category: string; vendor: string; location: string;
   dailyRate: number; image: string; condition: string; era: string | null;
   delivery: boolean; rentalType?: "miete" | "kauf" | "beides"; focalPoint?: { x: number; y: number } | null;
@@ -58,43 +34,6 @@ type Prop = {
 };
 
 type RatingData = { avg: number; count: number } | undefined;
-
-// ─── SortDropdown ────────────────────────────────────────────────
-function SortDropdown({ value, options, onChange }: {
-  value: string; options: { value: string; label: string }[]; onChange: (v: string) => void;
-}) {
-  const uiText = useTranslations();
-
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, [open]);
-  const label = options.find((o) => o.value === value)?.label ?? uiText("creators.sort");
-  return (
-    <div ref={ref} className="relative shrink-0">
-      <button onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-medium border border-border text-text-muted hover:text-text-secondary transition-all bg-bg-elevated">
-        <ArrowUpDown size={11} />
-        {label}
-        <ChevronDown size={11} className={`transition-transform ${open ? "rotate-180" : ""}`} />
-      </button>
-      {open && (
-        <div className="absolute top-full left-0 mt-1 z-50 bg-bg-elevated border border-border rounded-xl shadow-xl overflow-hidden min-w-[160px]">
-          {options.map((o) => (
-            <button key={o.value} onClick={() => { onChange(o.value); setOpen(false); }}
-              className={`w-full text-left px-3 py-2 text-xs transition-colors hover:bg-white/[0.04] ${value === o.value ? "text-gold font-medium" : "text-text-secondary"}`}>
-              {taxonomyLabel(o.label, uiText)}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ─── Prop card ────────────────────────────────────────────────────
 
@@ -107,27 +46,28 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
   const uiText = useTranslations();
 
   const tp = useTranslations("props");
+  const navigation = useTranslations("MarketplaceNavigation");
   const market=useTranslations("MarketplaceOffer"),catalog=useTranslations("MarketplaceCatalog"),locale=useLocale();
   const href = p.type === "vehicle" ? `/vehicles/${p.id}` : `/props/${p.id}`;
+  const favorite = onFavorite && <button type="button" onClick={onFavorite} aria-label={navigation(isFavorited ? "removeFavorite" : "saveFavorite")} aria-pressed={!!isFavorited} className={`${list ? "shrink-0" : "absolute right-2.5 top-2.5 z-10"} flex min-h-11 min-w-11 items-center justify-center rounded-full border backdrop-blur-sm transition-colors ${isFavorited ? "border-crimson/50 bg-crimson/20 text-crimson-light" : "border-border bg-bg-primary/80 text-text-secondary hover:text-crimson-light"}`}><Heart size={16} className={isFavorited ? "fill-current" : ""} /></button>;
+
 
   if (list) {
     return (
-      <Link href={href}
-        suppressHydrationWarning
-        className="browse-card card-hover group flex items-center gap-4 p-3"
-        data-visible>
+      <article className="browse-card card-hover group flex min-w-0 items-center gap-3 p-3" data-visible>
+      <Link href={href} className="flex min-w-0 flex-1 items-center gap-4">
         <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-bg-elevated border border-border">
           {p.image
             ? <MediaImage mediaSize="thumbnail" src={p.image} alt={p.title} fill sizes="(max-width: 768px) 50vw, 400px" loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} />
             : <div className="w-full h-full flex items-center justify-center text-text-muted/30"><svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></div>
           }
-          {p.isReal && <div className="absolute top-1 left-1 bg-gold text-bg-primary text-[9px] font-bold px-1.5 py-0.5 rounded">{uiText("locations.newBadge")}</div>}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-text-primary text-sm mb-1 truncate">{p.title}</h3>
+          <h3 className="font-semibold text-text-primary text-sm mb-1 line-clamp-2">{p.title}</h3>
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[10px] text-text-muted flex items-center gap-1"><MapPin size={9} />{p.location || p.vendor}</span>
             <span className="text-[10px] px-2 py-0.5 bg-bg-elevated border border-border text-text-muted rounded-full">{marketplaceCategoryLabel(p.category,catalog)}</span>
+            <span className="text-[10px] font-medium text-gold">{navigation(p.rentalType === "beides" ? "both" : p.rentalType === "kauf" ? "buy" : "rent")}</span>
             {p.delivery && <span className="text-[10px] text-teal-400 flex items-center gap-0.5"><Truck size={9} /> {tp("deliveryBadge")}</span>}
           </div>
         </div>
@@ -138,49 +78,44 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
           <p className="text-[10px] text-text-muted mt-0.5">{p.condition}</p>
         </div>
       </Link>
+      {favorite}
+      </article>
     );
   }
 
   return (
-    <Link href={href}
-      suppressHydrationWarning
-      className="browse-card card-hover group overflow-hidden block"
-      data-visible>
+    <article className="browse-card card-hover group relative block overflow-hidden" data-visible>
+    <Link href={href} className="block">
       <div className="relative aspect-[4/3] overflow-hidden bg-bg-elevated">
         {p.image
           ? <MediaImage mediaSize="thumbnail" src={p.image} alt={p.title} fill sizes="(max-width: 768px) 50vw, 400px" loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" style={{ objectPosition: p.focalPoint ? `${p.focalPoint.x}% ${p.focalPoint.y}%` : "50% 66%" }} />
           : <div className="w-full h-full flex items-center justify-center text-text-muted/20"><svg viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></div>
         }
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent" />
-        <div className="absolute top-2.5 left-2.5 right-2.5 flex items-start justify-between gap-1">
+        <div className={`absolute top-2.5 left-2.5 right-2.5 flex items-start justify-between gap-1 ${onFavorite ? "pr-12" : ""}`}>
           <span className="px-2 py-0.5 bg-black/50 backdrop-blur-sm border border-white/10 text-white/70 text-[10px] rounded-full truncate max-w-[65%]">{marketplaceCategoryLabel(p.category,catalog)}</span>
           <div className="flex gap-1 shrink-0 items-center">
-            {p.isReal && <span className="px-2 py-0.5 bg-gold text-bg-primary text-[10px] font-bold rounded-full">{uiText("locations.newBadge")}</span>}
             {p.delivery && <span className="flex items-center gap-0.5 px-2 py-0.5 bg-teal-500/25 backdrop-blur-sm border border-teal-400/30 text-teal-300 text-[10px] rounded-full"><Truck size={8} /></span>}
-            {onFavorite && (
-              <button type="button" onClick={onFavorite}
-                className={`w-6 h-6 flex items-center justify-center rounded-full backdrop-blur-sm border transition-all ${isFavorited ? "bg-crimson/20 border-crimson/50 text-crimson-light" : "bg-black/40 border-white/20 text-white/50 hover:text-crimson-light"}`}>
-                <Heart size={11} className={isFavorited ? "fill-current" : ""} />
-              </button>
-            )}
-          </div>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 p-3">
-          <h3 className="font-semibold text-white text-sm line-clamp-1 mb-1.5">{p.title}</h3>
-          <div className="flex flex-wrap items-start justify-between gap-y-1">
-            <p className="text-white/50 text-xs flex items-center gap-1 truncate mr-2"><MapPin size={9} className="shrink-0" />{p.location || p.vendor}</p>
-            <p className="max-w-full break-words text-sm font-bold text-gold">{listingPriceLabel(p.dailyRate,{...p.meta,rental_type:p.rentalType},"/Tag",locale,market)}</p>
           </div>
         </div>
       </div>
-      <div className="px-3 py-2 border-t border-border/50">
-        <div className="flex items-center justify-between">
+      <div className="bg-bg-secondary p-3">
+        <h3 className="mb-1.5 line-clamp-2 text-sm font-semibold text-text-primary">{p.title}</h3>
+        <p className="flex min-w-0 items-center gap-1 text-xs text-text-muted"><MapPin size={11} className="shrink-0" /><span className="truncate">{p.location || p.vendor}</span></p>
+        <p className="mt-2 max-w-full break-words text-sm font-bold leading-snug text-gold">{listingPriceLabel(p.dailyRate,{...p.meta,rental_type:p.rentalType},"/Tag",locale,market)}</p>
+      </div>
+      <div className="bg-bg-secondary px-3 py-2 border-t border-border/50">
+        <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
           <span className="text-[10px] text-text-muted">{p.condition}</span>
+          <span className="text-[10px] font-medium text-gold">{navigation(p.rentalType === "beides" ? "both" : p.rentalType === "kauf" ? "buy" : "rent")}</span>
           {p.era && <span className="text-[10px] text-gold/70">{p.era}</span>}
           <span className="text-[10px] text-text-muted group-hover:text-gold transition-colors">{tp("detailsArrow")}</span>
         </div>
+      </div>
+    </Link>
+    {favorite}
+      <div className="bg-bg-secondary px-3 pb-2">
         {/* Rating strip */}
-        <div className="flex items-center justify-between mt-1.5 pt-1.5 border-t border-border/30"
+        <div className="flex flex-col items-start gap-1.5 border-t border-border/30 pt-1.5"
           onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center gap-1 pointer-events-none">
             {ratingData && ratingData.count > 0 ? (
@@ -196,11 +131,11 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
             )}
           </div>
           {canRate && (
-            <div className="flex">
+            <div className="hidden max-w-full flex-wrap sm:flex">
               {[1,2,3,4,5].map((star) => (
-                <button key={star} type="button"
+                <button key={star} type="button" aria-label={uiText("Ui.text_ce0d0c38532e69", { value1: star })} aria-pressed={myRating === star}
                   onClick={(e) => { e.preventDefault(); e.stopPropagation(); onRate?.(star); }}
-                  className="w-5 h-5 flex items-center justify-center text-xs touch-manipulation transition-transform active:scale-125 hover:scale-110"
+                  className="min-w-11 min-h-11 flex items-center justify-center text-xs touch-manipulation transition-transform active:scale-125 hover:scale-110"
                   style={{ color: star <= (myRating ?? 0) ? "#d4af37" : "rgba(255,255,255,0.2)" }}>
                   ★
                 </button>
@@ -209,439 +144,261 @@ function PropCard({ p, list, ratingData, myRating, onRate, canRate, isFavorited,
           )}
         </div>
       </div>
-    </Link>
+    </article>
   );
 }
 
-// ─── Main ─────────────────────────────────────────────────────────
+type PropsContentProps = { serverListings: Prop[]; serverError?: boolean; initialDepartment?: string };
+type RatingState = { owner: string; ratings: Record<string, { avg: number; count: number }>; mine: Record<string, number>; eligible: Set<string> };
 
-function PropsInner({ serverListings }: { serverListings: Prop[] }) {
-  const uiText = useTranslations();
-
-  const locale=useLocale();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const t = useTranslations("props");
-  const catalog=useTranslations("MarketplaceCatalog"),market=useTranslations("MarketplaceOffer");
-  const DEPARTMENTS=useMemo(()=>localizedMarketplaceDepartments(catalog),[catalog]);
-  const { user } = useUser();
-  const { isSignedIn } = useAuth();
-
-  const [placeFilters, setPlaceFilters] = useViewState("props.placeFilters", () => ({country:searchParams.get("country")??"",region:searchParams.get("region")??"",city:searchParams.get("city")??""}));
+function PropsInner({ serverListings, serverError = false, initialDepartment }: PropsContentProps) {
+  const uiText = useTranslations(), locale = useLocale(), t = useTranslations("props");
+  const navigation = useTranslations("MarketplaceNavigation"), catalog = useTranslations("MarketplaceCatalog");
+  const pathname = usePathname(), searchParams = useSearchParams();
+  const { user } = useUser(), { isSignedIn } = useAuth();
+  const owner = isSignedIn && user?.id ? user.id : "guest";
+  const privateVendor = t("vendorPrivate");
+  const departments = useMemo(() => localizedMarketplaceDepartments(catalog), [catalog]);
+  const initialParameters = new URLSearchParams(searchParams.toString());
+  if (!initialParameters.get("dept") && !initialParameters.get("sub") && initialDepartment) initialParameters.set("dept", initialDepartment);
+  const initial = readMarketplaceBrowseState(initialParameters);
+  const [placeFilters, setPlaceFilters] = useViewState("props.placeFilters", () => ({ country: searchParams.get("country") ?? "", region: searchParams.get("region") ?? "", city: searchParams.get("city") ?? "" }));
   const [cityText, setCityText] = useViewState("props.cityText", () => searchParams.get("cityText")?.trim() ?? "");
-  const updatePlaceFilters = (next: typeof placeFilters) => {
-    setPlaceFilters(next);
-    if (next.city) setCityText("");
+  const [query, setQuery] = useViewState("marketplace.query", initial.query);
+  const [department, setDepartment] = useViewState<string | null>("marketplace.selectedDept", initial.department);
+  const [subcategory, setSubcategory] = useViewState("marketplace.subcategory", initial.subcategory);
+  const [offer, setOffer] = useViewState<MarketplaceOfferFilter>("marketplace.rentalTypeFilter", initial.offer);
+  const [sort, setSort] = useViewState<MarketplaceSort>("marketplace.sortKey", initial.sort);
+  const [view, setView] = useViewState<"grid" | "list">("marketplace.viewMode", initial.view);
+  const [pagination, setPagination] = useViewState("marketplace.pagination", { filterKey: "", visibleCount: MARKETPLACE_PAGE_SIZE });
+  const selected = marketplaceCategorySelection(department, subcategory);
+  const selectedDept = selected.department ? String(selected.department) : null;
+  const selectedSub = String(selected.subcategory);
+  const rentalTypeFilter = offer === "miete" || offer === "kauf" ? offer : "alle";
+  const sortKey = sort === "price-asc" || sort === "price-desc" ? sort : "featured";
+  const viewMode = view === "list" ? "list" : "grid";
+  const changeCategory = (nextDepartment: string | null, nextSubcategory?: string) => {
+    const next = marketplaceCategorySelection(nextDepartment, nextSubcategory ?? "");
+    setDepartment(next.department); setSubcategory(next.subcategory);
   };
-  const [query, setQuery] = useViewState("marketplace.query", () => searchParams.get("q") ?? "");
-  const [selectedDept, setSelectedDept] = useViewState<string | null>("marketplace.selectedDept", () => marketplaceCategory(searchParams.get("dept"))?.department ?? searchParams.get("dept") ?? null);
-  const [selectedSub,setSelectedSub]=useViewState("marketplace.subcategory",()=>searchParams.get("sub")??"");
-  const [rentalTypeFilter, setRentalTypeFilter] = useViewState<"alle" | "miete" | "kauf" | "beides">("marketplace.rentalTypeFilter", "alle");
-  const [sortKey, setSortKey] = useViewState("marketplace.sortKey", "featured");
-  const [viewMode, setViewMode] = useViewState<"grid" | "list">("marketplace.viewMode", "grid");
-  const [pagination, setPagination] = useViewState("marketplace.pagination", { filterKey: "", visibleCount: PAGE_SIZE });
-  const [liveRatings, setLiveRatings] = useState<Record<string, { avg: number; count: number }>>({});
-  const [myRatings, setMyRatings] = useState<Record<string, number>>({});
-  const [eligible, setEligible] = useState<Set<string>>(new Set());
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
-
-  // Batch-fetch listing ratings
-  useEffect(() => {
-    const ids = serverListings.map(l => l.id).join(",");
-    if (!ids) return;
-    fetch(`/api/listing-ratings?ids=${ids}`)
-      .then(r => r.json())
-      .then(({ ratings, myRatings: my, eligible: elig }) => {
-        setLiveRatings(ratings ?? {});
-        setMyRatings(my ?? {});
-        setEligible(new Set(elig ?? []));
-      })
-      .catch(() => {});
-  }, [serverListings]);
-
-  useEffect(() => {
-    if (!isSignedIn) return;
-    const ids = serverListings.map(l => l.id).join(",");
-    if (!ids) return;
-    fetch(`/api/favorites?ids=${ids}`)
-      .then(r => r.json())
-      .then(({ favorited }) => setFavorites(new Set(favorited ?? [])))
-      .catch(() => {});
-  }, [serverListings, isSignedIn]);
-
-  const handleFavorite = async (e: React.MouseEvent, listingId: string) => {
-    e.preventDefault(); e.stopPropagation();
-    if (!isSignedIn) return;
-    const wasFav = favorites.has(listingId);
-    setFavorites((prev) => {
-      const next = new Set(prev);
-      if (wasFav) next.delete(listingId);
-      else next.add(listingId);
-      return next;
-    });
-    try {
-      await fetch("/api/favorites", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ listing_id: listingId }),
-      });
-    } catch {
-      setFavorites((prev) => {
-        const next = new Set(prev);
-        if (wasFav) next.add(listingId);
-        else next.delete(listingId);
-        return next;
-      });
-    }
-  };
-
-  const handleRate = async (listingId: string, ownerId: string | undefined, star: number) => {
-    if (!user) return;
-    const prev = myRatings[listingId];
-    setMyRatings(m => ({ ...m, [listingId]: star }));
-    setLiveRatings(r => {
-      const cur = r[listingId] ?? { avg: 0, count: 0 };
-      const newCount = prev ? cur.count : cur.count + 1;
-      const newSum = prev ? cur.avg * cur.count - prev + star : cur.avg * cur.count + star;
-      return { ...r, [listingId]: { avg: Math.round((newSum / newCount) * 10) / 10, count: newCount } };
-    });
-    try {
-      await fetch("/api/listing-ratings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ listing_id: listingId, owner_id: ownerId, rating: star }),
-      });
-    } catch {
-      setMyRatings(m => { const n = { ...m }; if (prev) n[listingId] = prev; else delete n[listingId]; return n; });
-    }
-  };
-
-  const filterParams = new URLSearchParams();
-  if (query) filterParams.set("q", query);
-  if (cityText) filterParams.set("cityText", cityText);
-  if (selectedDept) filterParams.set("dept", selectedDept);
-  if(selectedSub)filterParams.set("sub",selectedSub);
-  if (sortKey !== "featured") filterParams.set("sort", sortKey);
-  for (const kind of ['country','region','city'] as const) if(placeFilters[kind])filterParams.set(kind,placeFilters[kind]);
-  useViewUrl(filterParams.size ? `/props?${filterParams}` : "/props");
+  const updatePlaceFilters = (next: typeof placeFilters) => { setPlaceFilters(next); if (next.city) setCityText(""); };
+  const activeDepartment = departments.find(row => row.id === selectedDept);
+  const activeSubcategory = activeDepartment?.groups.find(row => row.id === selectedSub);
+  const sortOptions = [{ value: "featured", label: navigation("newest") }, { value: "price-asc", label: t("sortPriceAsc") }, { value: "price-desc", label: t("sortPriceDesc") }];
+  const filterKey = JSON.stringify([placeFilters.country, placeFilters.region, placeFilters.city, cityText.trim(), selectedDept, selectedSub, query.trim(), rentalTypeFilter, sortKey]);
+  const requestKey = JSON.stringify([filterKey, locale]);
+  const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : MARKETPLACE_PAGE_SIZE;
+  const currentPage = Math.max(1, Math.ceil(visibleCount / MARKETPLACE_PAGE_SIZE));
+  const parameters = new URLSearchParams();
+  if (query) parameters.set("q", query);
+  if (cityText) parameters.set("cityText", cityText);
+  if (selectedDept) parameters.set("dept", selectedDept);
+  if (selectedSub) parameters.set("sub", selectedSub);
+  if (rentalTypeFilter !== "alle") parameters.set("offer", rentalTypeFilter);
+  if (sortKey !== "featured") parameters.set("sort", sortKey);
+  if (viewMode !== "grid") parameters.set("view", viewMode);
+  for (const kind of ["country", "region", "city"] as const) if (placeFilters[kind]) parameters.set(kind, placeFilters[kind]);
+  useViewUrl(parameters.size ? `${pathname}?${parameters}` : pathname);
 
   const filtered = useMemo(() => {
-    let r = [...serverListings];
-
-    if(selectedDept||selectedSub)r=r.filter(p=>marketplaceMatches(p.category,selectedDept,selectedSub||null,p.type));
-
-    r = r.filter(row => matchesPlace(row,"country",placeFilters.country) && matchesPlace(row,"region",placeFilters.region) && matchesPlace(row,"city",placeFilters.city));
-    if (cityText) r = r.filter(row => placeSearchMatches(row, cityText) || (row.location ?? "").toLowerCase().includes(cityText.toLowerCase()));
-
-    if (rentalTypeFilter !== "alle") {
-      r = r.filter((p) => ((p.rentalType ?? "miete") === rentalTypeFilter || p.rentalType === "beides"));
-    }
-
-    if (query.trim()) {
-      const q = query.toLowerCase().trim();
-      const words = q.split(/\s+/);
-      const synonymCats = words.flatMap((w) => SEARCH_SYNONYMS[w] ?? []);
-      r = r.filter((p) => {
-        const title = p.title.toLowerCase();
-        const cat = marketplaceSearchTerms(p.category).toLowerCase();
-        const loc = p.location?.toLowerCase() ?? "";
-        if (title.includes(q) || cat.includes(q) || loc.includes(q) || placeSearchMatches(p,q)) return true;
-        if (synonymCats.length > 0 && synonymCats.some((sc) => marketplaceCategory(sc)?.subcategory === marketplaceCategory(p.category)?.subcategory)) return true;
-        return false;
-      });
-    }
-
-    if (sortKey === "price-asc") r.sort((a, b) => a.dailyRate - b.dailyRate);
-    if (sortKey === "price-desc") r.sort((a, b) => b.dailyRate - a.dailyRate);
-    return r;
-  }, [serverListings, placeFilters, cityText, selectedDept, selectedSub, query, rentalTypeFilter, sortKey]);
-
-  const filterKey = JSON.stringify([placeFilters, cityText, selectedDept, selectedSub, query, rentalTypeFilter, sortKey]);
-  const visibleCount = pagination.filterKey === filterKey ? pagination.visibleCount : PAGE_SIZE;
-  const showMore = () => setPagination({ filterKey, visibleCount: visibleCount + PAGE_SIZE });
-
-  const [remote,setRemote]=useState<{key:string;rows:Prop[];count:number}|null>(null);
-  const remoteRef=useRef(remote);
-  useEffect(()=>{remoteRef.current=remote;},[remote]);
-  const [browseError,setBrowseError]=useState<string|null>(null);
-  useEffect(()=>{
-    const controller=new AbortController();
-    const parameters=new URLSearchParams({marketplace:'1',page:String(visibleCount/PAGE_SIZE),limit:String(PAGE_SIZE),sort:sortKey});
-    for (const kind of ['country','region','city'] as const) if(placeFilters[kind])parameters.set(kind,placeFilters[kind]);
-    if(cityText)parameters.set('cityText',cityText);
-    if(selectedDept)parameters.set('dept',selectedDept);if(selectedSub)parameters.set('sub',selectedSub);if(query)parameters.set('q',query);if(rentalTypeFilter!=='alle')parameters.set('offer',rentalTypeFilter);
-    const pages=remoteRef.current?.key===filterKey&&remoteRef.current.rows.length>=visibleCount-PAGE_SIZE?[visibleCount/PAGE_SIZE]:Array.from({length:visibleCount/PAGE_SIZE},(_,index)=>index+1);
-    Promise.all(pages.map(page=>{const params=new URLSearchParams(parameters);params.set('page',String(page));return fetch(`/api/listings?${params}`,{signal:controller.signal}).then(async response=>{if(!response.ok)throw new Error();return response.json();});})).then(results=>{
-      const result={data:results.flatMap(result=>result.data??[]),count:results[0]?.count??0};
-      const rows:Prop[]=(result.data??[]).map((row:Record<string,unknown>)=>({...row,id:String(row.id),title:String(row.title),type:String(row.type),category:String(row.category??''),location:String(row.city??''),dailyRate:Number(row.price),image:String(row.image_url??''),vendor:t('vendorPrivate'),condition:'',era:null,delivery:false,isReal:true,meta:row,rentalType:String(row.rental_type??'miete') as Prop['rentalType']}));
-      setRemote(previous=>({key:filterKey,rows:visibleCount>PAGE_SIZE&&previous?.key===filterKey?[...new Map([...previous.rows,...rows].map(row=>[row.id,row])).values()]:rows,count:result.count??0}));setBrowseError(null);
-    }).catch(()=>{if(!controller.signal.aborted){setBrowseError(filterKey);}});
-    return ()=>controller.abort();
-  },[filterKey,placeFilters,cityText,visibleCount,selectedDept,selectedSub,query,rentalTypeFilter,sortKey,t]);
-  const browseLoading=browseError!==filterKey && (remote?.key!==filterKey || (remote.rows.length<visibleCount && remote.count>remote.rows.length));
-  const resultRows=remote?.key===filterKey?remote.rows:filtered;
-  const resultCount=remote?.key===filterKey?remote.count:filtered.length;
-  const clearAll = () => {
-    setPlaceFilters(EMPTY_PLACE_FILTERS); setCityText("");
-    setSelectedDept(null); setSelectedSub(""); setQuery(""); setSortKey("featured"); setRentalTypeFilter("alle");
-    router.replace("/props", { scroll: false });
+    const search = query.trim().toLocaleLowerCase(locale);
+    const categories = search ? marketplaceSearchCategories(query, catalog) : [];
+    const matchingDepartments = search ? departments.filter(row => row.label.toLocaleLowerCase(locale).includes(search) || row.id.includes(search)) : [];
+    const rows = serverListings.filter(row => {
+      if ((selectedDept || selectedSub) && !marketplaceMatches(row.category, selectedDept, selectedSub || null, row.type)) return false;
+      if (!["country", "region", "city"].every(kind => matchesPlace(row, kind as "country" | "region" | "city", placeFilters[kind as keyof typeof placeFilters]))) return false;
+      if (cityText && !placeSearchMatches(row, cityText) && !row.location.toLocaleLowerCase(locale).includes(cityText.toLocaleLowerCase(locale))) return false;
+      if (rentalTypeFilter !== "alle" && row.rentalType !== "beides" && (row.rentalType ?? "miete") !== rentalTypeFilter) return false;
+      if (!search) return true;
+      return [row.title, row.location, row.description ?? "", marketplaceSearchTerms(row.category)].some(value => value.toLocaleLowerCase(locale).includes(search))
+        || placeSearchMatches(row, search)
+        || categories.some(category => marketplaceMatches(row.category, null, category, row.type))
+        || matchingDepartments.some(category => marketplaceMatches(row.category, category.id, null));
+    });
+    if (sortKey === "price-asc") rows.sort((a, b) => a.dailyRate - b.dailyRate);
+    if (sortKey === "price-desc") rows.sort((a, b) => b.dailyRate - a.dailyRate);
+    return rows;
+  }, [serverListings, query, locale, catalog, departments, selectedDept, selectedSub, placeFilters, cityText, rentalTypeFilter, sortKey]);
+  const [remote, setRemote] = useState<{ key: string; rows: Prop[]; count: number; pages: number } | null>(null);
+  const remoteRef = useRef(remote);
+  useEffect(() => { remoteRef.current = remote; }, [remote]);
+  const requestSerial = useRef(0);
+  const [browseError, setBrowseError] = useState<string | null>(serverError ? requestKey : null);
+  const [retry, setRetry] = useState(0);
+  useEffect(() => {
+    const controller = new AbortController(), serial = ++requestSerial.current;
+    const timer = window.setTimeout(() => {
+      setBrowseError(null);
+      const previous = remoteRef.current;
+      const pages = previous?.key === requestKey && previous.pages >= currentPage - 1 && currentPage > 1 ? [currentPage] : Array.from({ length: currentPage }, (_, index) => index + 1);
+      const base = new URLSearchParams({ marketplace: "1", limit: String(MARKETPLACE_PAGE_SIZE), sort: sortKey });
+      for (const kind of ["country", "region", "city"] as const) if (placeFilters[kind]) base.set(kind, placeFilters[kind]);
+      if (cityText) base.set("cityText", cityText);
+      if (selectedDept) base.set("dept", selectedDept);
+      if (selectedSub) base.set("sub", selectedSub);
+      if (query.trim()) base.set("q", query.trim());
+      if (rentalTypeFilter !== "alle") base.set("offer", rentalTypeFilter);
+      void Promise.all(pages.map(async page => {
+        const params = new URLSearchParams(base); params.set("page", String(page));
+        const response = await fetch(`/api/listings?${params}`, { signal: controller.signal });
+        if (!response.ok) throw new Error("listing_request_failed");
+        const result = await response.json();
+        if (!Array.isArray(result.data) || typeof result.count !== "number" || !Number.isFinite(result.count) || result.count < 0) throw new Error("invalid_listing_response");
+        return result as { data: Record<string, unknown>[]; count: number };
+      })).then(results => {
+        if (controller.signal.aborted || serial !== requestSerial.current) return;
+        const rows: Prop[] = results.flatMap(result => result.data.map(row => ({ ...marketplaceCardData(row), vendor: privateVendor })));
+        setRemote(current => ({ key: requestKey, rows: [...new Map([...(pages[0] > 1 && current?.key === requestKey ? current.rows : []), ...rows].map(row => [row.id, row])).values()], count: results[0]?.count ?? 0, pages: currentPage }));
+        setBrowseError(null);
+      }).catch(() => { if (!controller.signal.aborted && serial === requestSerial.current) setBrowseError(requestKey); });
+    }, 250);
+    return () => { window.clearTimeout(timer); controller.abort(); };
+  }, [requestKey, currentPage, retry, sortKey, placeFilters, cityText, selectedDept, selectedSub, query, rentalTypeFilter, privateVendor]);
+  const hasRemote = remote?.key === requestKey;
+  const failed = browseError === requestKey;
+  const browseLoading = !failed && (!hasRemote || remote.pages < currentPage);
+  const resultRows = hasRemote ? remote.rows : filtered;
+  const resultCount = hasRemote ? remote.count : filtered.length;
+  const visibleRows = resultRows.slice(0, visibleCount);
+  const visibleIds = visibleRows.map(row => row.id).sort().join(",");
+  const [ratingState, setRatingState] = useState<RatingState>({ owner, ratings: {}, mine: {}, eligible: new Set() });
+  const [favoriteState, setFavoriteState] = useState<{ owner: string; ids: Set<string> }>({ owner, ids: new Set() });
+  const pendingFavorites = useRef(new Set<string>()), pendingRatings = useRef(new Set<string>());
+  const [actionError, setActionError] = useState(false);
+  const liveRatings = ratingState.owner === owner ? ratingState.ratings : {};
+  const myRatings = ratingState.owner === owner ? ratingState.mine : {};
+  const eligible = ratingState.owner === owner ? ratingState.eligible : new Set<string>();
+  const favorites = favoriteState.owner === owner ? favoriteState.ids : new Set<string>();
+  useEffect(() => {
+    if (!visibleIds) return;
+    const controller = new AbortController();
+    void fetch(`/api/listing-ratings?${new URLSearchParams({ ids: visibleIds })}`, { signal: controller.signal, cache: "no-store" })
+      .then(async response => { if (!response.ok) throw new Error("ratings_request_failed"); return response.json(); })
+      .then(result => {
+        if (controller.signal.aborted) return;
+        setRatingState(current => {
+          const ratings = { ...(result.ratings ?? {}) }, mine = { ...(result.myRatings ?? {}) };
+          for (const id of visibleIds.split(",")) if (current.owner === owner && pendingRatings.current.has(`${owner}:${id}`)) {
+            if (current.ratings[id]) ratings[id] = current.ratings[id];
+            if (current.mine[id]) mine[id] = current.mine[id];
+          }
+          return { owner, ratings, mine, eligible: new Set(result.eligible ?? []) };
+        });
+      }).catch(() => {});
+    return () => controller.abort();
+  }, [visibleIds, owner]);
+  useEffect(() => {
+    if (!isSignedIn || owner === "guest" || !visibleIds) return;
+    const controller = new AbortController();
+    void fetch(`/api/favorites?${new URLSearchParams({ ids: visibleIds })}`, { signal: controller.signal, cache: "no-store" })
+      .then(async response => { if (!response.ok) throw new Error("favorites_request_failed"); return response.json(); })
+      .then(result => {
+        if (controller.signal.aborted) return;
+        setFavoriteState(current => {
+          const ids = new Set<string>(result.favorited ?? []);
+          for (const id of visibleIds.split(",")) if (current.owner === owner && pendingFavorites.current.has(`${owner}:${id}`)) {
+            if (current.ids.has(id)) ids.add(id); else ids.delete(id);
+          }
+          return { owner, ids };
+        });
+      }).catch(() => {});
+    return () => controller.abort();
+  }, [visibleIds, owner, isSignedIn]);
+  const handleFavorite = async (event: React.MouseEvent, id: string) => {
+    event.preventDefault(); event.stopPropagation();
+    const key = `${owner}:${id}`;
+    if (!isSignedIn || owner === "guest" || pendingFavorites.current.has(key)) return;
+    pendingFavorites.current.add(key); setActionError(false);
+    const previous = favorites.has(id);
+    const update = (value: boolean) => setFavoriteState(current => {
+      if (current.owner !== owner) return current;
+      const ids = new Set(current.ids); if (value) ids.add(id); else ids.delete(id);
+      return { owner, ids };
+    });
+    setFavoriteState(current => {
+      const ids = new Set(current.owner === owner ? current.ids : []); if (previous) ids.delete(id); else ids.add(id);
+      return { owner, ids };
+    });
+    try {
+      const response = await fetch("/api/favorites", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ listing_id: id }) });
+      if (!response.ok) throw new Error("favorite_save_failed");
+      const result = await response.json();
+      if (typeof result.isFavorited !== "boolean") throw new Error("invalid_favorite_response");
+      update(result.isFavorited);
+    } catch { update(previous); setActionError(true); }
+    finally { pendingFavorites.current.delete(key); }
   };
-
-  const hasAnyFilter = Boolean(Object.values(placeFilters).some(Boolean) || cityText || selectedDept || selectedSub || query || rentalTypeFilter !== "alle");
-
-  const activeDeptData = selectedDept ? DEPARTMENTS.find((d) => d.id === selectedDept) : null;
-  const chipColors = activeDeptData ? deptColors(activeDeptData.color) : null;
-  const mobileChips: BrowseChip[] = [
+  const handleRate = async (id: string, ownerId: string | undefined, star: number) => {
+    const key = `${owner}:${id}`;
+    if (!isSignedIn || !user || !eligible.has(id) || pendingRatings.current.has(key)) return;
+    pendingRatings.current.add(key); setActionError(false);
+    const previous = myRatings[id], previousSummary = liveRatings[id];
+    setRatingState(current => {
+      const summary = current.owner === owner ? current.ratings[id] ?? { avg: 0, count: 0 } : { avg: 0, count: 0 };
+      const count = previous ? summary.count : summary.count + 1;
+      const total = summary.avg * summary.count - (previous ?? 0) + star;
+      return { ...current, owner, mine: { ...current.mine, [id]: star }, ratings: { ...current.ratings, [id]: { avg: Math.round(total / Math.max(count, 1) * 10) / 10, count } } };
+    });
+    try {
+      const response = await fetch("/api/listing-ratings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ listing_id: id, owner_id: ownerId, rating: star }) });
+      if (!response.ok) throw new Error("rating_save_failed");
+    } catch {
+      setRatingState(current => {
+        if (current.owner !== owner) return current;
+        const mine = { ...current.mine }, ratings = { ...current.ratings };
+        if (previous) mine[id] = previous; else delete mine[id];
+        if (previousSummary) ratings[id] = previousSummary; else delete ratings[id];
+        return { ...current, mine, ratings };
+      });
+      setActionError(true);
+    } finally { pendingRatings.current.delete(key); }
+  };
+  const clearAll = () => {
+    setPlaceFilters(EMPTY_PLACE_FILTERS); setCityText(""); changeCategory(null); setQuery(""); setSort("featured"); setOffer("alle");
+  };
+  const chips: BrowseChip[] = [
+    ...(activeDepartment ? [{ id: "category", label: activeDepartment.label, onRemove: () => changeCategory(null) }] : []),
+    ...(activeSubcategory ? [{ id: "subcategory", label: activeSubcategory.label, onRemove: () => changeCategory(null) }] : []),
     ...(cityText ? [{ id: "city-text", label: `${uiText("Places.city")}: ${cityText}`, onRemove: () => setCityText("") }] : []),
-    ...(['country','region','city'] as const).flatMap(kind => placeFilters[kind] ? [{id:`place-${kind}`,label:placeOptions(serverListings,kind,locale).find(option=>option.value===placeFilters[kind])?.label??placeFilters[kind],onRemove:()=>setPlaceFilters({...placeFilters,[kind]:''})}] : []),
-    ...(activeDeptData ? [{ id: "category", label: taxonomyLabel(activeDeptData.label, uiText), onRemove: () => setSelectedDept(null) }] : []),
-    ...(rentalTypeFilter !== "alle" ? [{ id: "offer", label: rentalTypeFilter === "miete" ? t("offerRent") : t("offerBuy"), onRemove: () => setRentalTypeFilter("alle") }] : []),
+    ...(["country", "region", "city"] as const).flatMap(kind => placeFilters[kind] ? [{ id: `place-${kind}`, label: placeOptions(serverListings, kind, locale).find(option => option.value === placeFilters[kind])?.label ?? placeFilters[kind], onRemove: () => setPlaceFilters({ ...placeFilters, [kind]: "" }) }] : []),
+    ...(rentalTypeFilter !== "alle" ? [{ id: "offer", label: navigation(rentalTypeFilter === "miete" ? "rent" : "buy"), onRemove: () => setOffer("alle") }] : []),
   ];
-
-  return (
-    <div className="min-h-screen mobile-bottom-nav-clear">
-
-      <MobileBrowseControls
-        query={query}
-        onQueryChange={setQuery}
-        searchPlaceholder={t("searchPlaceholder")}
-        sortValue={sortKey}
-        sortOptions={[{ value: "featured", label: t("sortFeatured") }, { value: "price-asc", label: t("sortPriceAsc") }, { value: "price-desc", label: t("sortPriceDesc") }]}
-        onSortChange={setSortKey}
-        categoryLabel={t("categoryBtn")}
-        allCategoryLabel={t("offerAll") + uiText("Ui.text_bc7d62d28faf65")}
-        categories={DEPARTMENTS.map((department) => ({ value: department.id, label: taxonomyLabel(department.label, uiText) }))}
-        categoryValue={selectedDept ?? ""}
-        onCategoryChange={(value) => {setSelectedDept(value || null);setSelectedSub("");}}
-        resultSummary={t("results", { count: resultCount })}
-        filterCount={mobileChips.length}
-        chips={mobileChips}
-        onReset={clearAll}
-        resetLabel={t("clearAllFilters")}
-        showResultsLabel={t("results", { count: resultCount })}
-      >
-
-        <PlaceFilters rows={serverListings} value={placeFilters} onChange={updatePlaceFilters} scope="marketplace" />        <MobileFilterField label={market("subcategory")}><MobileFilterSelect value={selectedSub} onChange={setSelectedSub} placeholder={market("allSubcategories")} options={(activeDeptData?.groups??[]).map(g=>({value:g.id,label:taxonomyLabel(g.label, uiText)}))} /></MobileFilterField>
-        <MobileFilterField label={t("offerTypeLabel")}>
-          <MobileFilterSelect value={rentalTypeFilter === "alle" ? "" : rentalTypeFilter} onChange={(value) => setRentalTypeFilter((value || "alle") as typeof rentalTypeFilter)} placeholder={t("offerAll")} options={[{ value: "miete", label: t("offerRent") }, { value: "kauf", label: t("offerBuy") }]} />
-        </MobileFilterField>
-        <MobileFilterField label={t("sortLabel")}>
-          <MobileFilterSelect value={sortKey} onChange={setSortKey} placeholder={t("sortFeatured")} options={[{ value: "featured", label: t("sortFeatured") }, { value: "price-asc", label: t("sortPriceAsc") }, { value: "price-desc", label: t("sortPriceDesc") }]} />
-        </MobileFilterField>
-        <div className="mobile-filter-field">
-          <span>{uiText("locations.viewLabel")}</span>
-          <div className="grid grid-cols-2 gap-2">
-            <button type="button" onClick={() => setViewMode("grid")} className={`min-h-11 rounded-lg border text-sm ${viewMode === "grid" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{uiText("Ui.text_2cc48b15f4ffeb")}</button>
-            <button type="button" onClick={() => setViewMode("list")} className={`min-h-11 rounded-lg border text-sm ${viewMode === "list" ? "border-gold bg-gold/10 text-gold" : "border-border text-text-secondary"}`}>{uiText("locations.viewList")}</button>
-          </div>
-        </div>
-      </MobileBrowseControls>
-      <div className="hidden xl:block site-container py-3"><PlaceFilters rows={serverListings} value={placeFilters} onChange={updatePlaceFilters} scope="marketplace" />
-        {cityText && <div className="mobile-browse-chips mt-2"><span className="mobile-browse-chip"><span className="truncate">{uiText("Places.city")}: {cityText}</span><button type="button" aria-label={uiText("Ui.text_f10fe7a27ce274", { value1: cityText })} onClick={() => setCityText("")}><X size={13} /></button></span></div>}
+  const viewControls = <div className="inline-flex shrink-0 overflow-hidden rounded-lg border border-border bg-bg-elevated">
+    <button type="button" aria-label={navigation("viewGrid")} aria-pressed={viewMode === "grid"} onClick={() => setView("grid")} className={`flex min-h-11 min-w-11 items-center justify-center ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutGrid size={17} /></button>
+    <button type="button" aria-label={navigation("viewList")} aria-pressed={viewMode === "list"} onClick={() => setView("list")} className={`flex min-h-11 min-w-11 items-center justify-center border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><List size={17} /></button>
+  </div>;
+  return <div className="min-h-screen mobile-bottom-nav-clear">
+    <MobileBrowseControls query={query} onQueryChange={setQuery} searchPlaceholder={t("searchPlaceholder")} sortValue={sortKey} sortOptions={sortOptions} onSortChange={value => setSort(value as MarketplaceSort)} categoryLabel={navigation("category")} allCategoryLabel={navigation("allCategories")} categories={departments.map(row => ({ value: row.id, label: row.label }))} categoryValue={selectedDept ?? ""} onCategoryChange={value => changeCategory(value || null)} categoryPlacement="filters" resultSummary={t("results", { count: resultCount })} viewControls={viewControls} filterCount={chips.length} chips={chips} onReset={clearAll} resetLabel={t("clearAllFilters")} showResultsLabel={t("results", { count: resultCount })}>
+      {activeDepartment && <MobileFilterField label={navigation("subcategory")}><MobileFilterSelect value={selectedSub} onChange={value => changeCategory(selectedDept, value)} placeholder={navigation("allInCategory", { category: activeDepartment.label })} options={activeDepartment.groups.map(row => ({ value: row.id, label: row.label }))} /></MobileFilterField>}
+      <PlaceFilters rows={serverListings} value={placeFilters} onChange={updatePlaceFilters} scope="marketplace" />
+      <MobileFilterField label={navigation("offerType")}><MobileFilterSelect value={rentalTypeFilter === "alle" ? "" : rentalTypeFilter} onChange={value => setOffer(value === "miete" || value === "kauf" ? value : "alle")} placeholder={uiText("common.all")} options={[{ value: "miete", label: navigation("rent") }, { value: "kauf", label: navigation("buy") }]} /></MobileFilterField>
+    </MobileBrowseControls>
+    <div className="hidden xl:block browse-toolbar"><div className="site-container space-y-3 py-3">
+      <div className="flex flex-wrap items-end gap-3">
+        <label className="min-w-0 flex-1"><span className="sr-only">{t("searchPlaceholder")}</span><span className="flex min-h-11 items-center gap-2 rounded-xl border border-border bg-bg-elevated px-3 focus-within:border-gold/50"><Search size={17} aria-hidden="true" className="shrink-0 text-text-muted" /><input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder={t("searchPlaceholder")} className="min-h-11 w-full min-w-0 bg-transparent text-sm outline-none" />{query && <button type="button" aria-label={uiText("locations.landingClear")} onClick={() => setQuery("")} className="flex min-h-11 min-w-11 items-center justify-center text-text-muted hover:text-text-primary"><X size={16} /></button>}</span></label>
+        <label className="relative flex min-w-0 flex-col gap-1 text-xs text-text-secondary"><span>{navigation("offerType")}</span><select value={rentalTypeFilter} onChange={event => setOffer(event.target.value as MarketplaceOfferFilter)} className="min-h-11 appearance-none rounded-lg border border-border bg-bg-elevated pl-3 pr-9 text-sm"><option value="alle">{uiText("common.all")}</option><option value="miete">{navigation("rent")}</option><option value="kauf">{navigation("buy")}</option></select><ChevronDown size={15} aria-hidden="true" className="pointer-events-none absolute bottom-3.5 right-3 text-text-muted" /></label>
+        <label className="relative flex min-w-0 flex-col gap-1 text-xs text-text-secondary"><span>{t("sortLabel")}</span><select value={sortKey} onChange={event => setSort(event.target.value as MarketplaceSort)} className="min-h-11 appearance-none rounded-lg border border-border bg-bg-elevated pl-3 pr-9 text-sm">{sortOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select><ChevronDown size={15} aria-hidden="true" className="pointer-events-none absolute bottom-3.5 right-3 text-text-muted" /></label>
+        {viewControls}
       </div>
-
-      {/* ── Filter Bar ───────────────────────────────────────────── */}
-      <div className="hidden xl:block browse-toolbar">
-        <div className="site-container py-2 space-y-2">
-
-          {/* Main row */}
-          <div className="flex items-center gap-2">
-
-            {/* Search */}
-            <div className="flex-1 flex items-center gap-2 bg-bg-elevated border border-border rounded-lg px-3 focus-within:border-gold/50 transition-colors min-w-0">
-              <Search size={14} className="text-text-muted shrink-0" />
-              <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
-                placeholder={t("searchPlaceholder")}
-                className="bg-transparent border-none py-2.5 text-sm w-full focus:outline-none" />
-              {query && <button onClick={() => setQuery("")} className="text-text-muted hover:text-text-primary transition-colors shrink-0"><X size={12} /></button>}
-            </div>
-
-            {/* Angebotstyp — visible on sm+ */}
-            <div className="hidden sm:flex gap-1 shrink-0">
-              {(["alle", "miete", "kauf"] as const).map((rt) => (
-                <button key={rt} onClick={() => setRentalTypeFilter(rt)}
-                  className={`h-9 px-3 rounded-lg text-xs font-medium border transition-all ${
-                    rentalTypeFilter === rt
-                      ? "bg-gold/12 border-gold/30 text-gold"
-                      : "border-border text-text-muted hover:text-text-secondary"
-                  }`}>
-                  {rt === "alle" ? uiText("common.all") : rt === "miete" ? uiText("props.offerRent") : uiText("props.offerBuy")}
-                </button>
-              ))}
-            </div>
-
-            {/* Sort */}
-            <SortDropdown
-              value={sortKey}
-              options={[
-                { value: "featured", label: t("sortFeatured") },
-                { value: "price-asc", label: t("sortPriceAsc") },
-                { value: "price-desc", label: t("sortPriceDesc") },
-              ]}
-              onChange={setSortKey}
-            />
-
-            {/* Grid / List */}
-            <div className="flex bg-bg-elevated border border-border rounded-lg overflow-hidden shrink-0">
-              <button onClick={() => setViewMode("grid")} className={`flex items-center justify-center w-9 h-9 transition-colors ${viewMode === "grid" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><LayoutGrid size={14} /></button>
-              <button onClick={() => setViewMode("list")} className={`flex items-center justify-center w-9 h-9 transition-colors border-l border-border ${viewMode === "list" ? "bg-gold text-bg-primary" : "text-text-muted hover:text-text-primary"}`}><List size={14} /></button>
-            </div>
-          </div>
-
-          {/* Mobile: Angebotstyp pills */}
-          <div className="flex sm:hidden gap-1.5">
-            {(["alle", "miete", "kauf"] as const).map((rt) => (
-              <button key={rt} onClick={() => setRentalTypeFilter(rt)}
-                className={`h-8 px-3 rounded-full text-xs font-medium border transition-all ${
-                  rentalTypeFilter === rt
-                    ? "bg-gold/12 border-gold/30 text-gold"
-                    : "border-border text-text-muted"
-                }`}>
-                {rt === "alle" ? uiText("common.all") : rt === "miete" ? uiText("props.offerRent") : uiText("props.offerBuy")}
-              </button>
-            ))}
-          </div>
-
-          {activeDeptData && <label className="flex min-h-11 items-center gap-3 text-sm text-text-secondary">{market("subcategory")}<select className="min-h-11 max-w-full rounded-lg border border-border bg-bg-elevated px-3" value={selectedSub} onChange={event=>setSelectedSub(event.target.value)}><option value="">{market("allSubcategories")}</option>{activeDeptData.groups.map(g=><option key={g.id} value={g.id}>{taxonomyLabel(g.label, uiText)}</option>)}</select></label>}
-          {/* Active chips */}
-          {(activeDeptData || rentalTypeFilter !== "alle") && (
-            <div className="flex flex-wrap gap-1.5 items-center">
-              {activeDeptData && chipColors && (
-                <span className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium ${chipColors.bg} ${chipColors.border} ${chipColors.text}`}>
-                  {taxonomyLabel(activeDeptData.label, uiText)}
-                  <button onClick={() => setSelectedDept(null)} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
-                </span>
-              )}
-              {rentalTypeFilter !== "alle" && (
-                <span className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium bg-gold/10 border-gold/30 text-gold">
-                  {rentalTypeFilter === "miete" ? uiText("props.offerRent") : uiText("props.offerBuy")}
-                  <button onClick={() => setRentalTypeFilter("alle")} className="hover:opacity-70 ml-0.5"><X size={9} /></button>
-                </span>
-              )}
-              <button onClick={clearAll} className="text-[11px] text-text-muted hover:text-red-400 transition-colors underline underline-offset-2 ml-1">
-                {t("clearAll")}
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ── Results ──────────────────────────────────────── */}
-      <div className="site-container py-3 sm:py-6">
-        <div className="flex gap-8 items-start">
-
-          {/* Sidebar */}
-          <aside className="cat-sidebar w-44 shrink-0 sticky top-20">
-            <p className="text-[11px] uppercase tracking-widest text-text-muted font-semibold mb-3 px-2">{uiText("Ui.text_055b8f9b9e5064")}</p>
-            <nav className="space-y-0.5">
-              <button
-                onClick={() => setSelectedDept(null)}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
-                  !selectedDept
-                    ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
-                    : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
-                }`}
-              >{uiText.rich("Ui.text_4d8969d6eb77f5", { part1: () => (<Layers size={14} className={!selectedDept ? "text-gold" : "text-text-muted"} />) })}</button>
-              {DEPARTMENTS.map((dept) => {
-                const Icon = DEPT_ICON_MAP[dept.id] ?? Package;
-                const isActive = selectedDept === dept.id;
-                return (
-                  <button
-                    key={dept.id}
-                    onClick={() => {setSelectedDept(isActive ? null : dept.id);setSelectedSub("");}}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all text-left ${
-                      isActive
-                        ? "bg-gold/10 text-gold font-semibold border-l-2 border-gold pl-[10px]"
-                        : "text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
-                    }`}
-                  >
-                    <Icon size={14} className={isActive ? "text-gold" : "text-text-muted"} />
-                    {taxonomyLabel(dept.label, uiText)}
-                  </button>
-                );
-              })}
-            </nav>
-          </aside>
-
-          {/* Main content */}
-          <div className="flex-1 min-w-0">
-
-            {/* Mobile department pills */}
-            <div className="cat-pills gap-2 overflow-x-auto pb-3 mb-4" style={{ scrollbarWidth: "none" }}>
-              <button onClick={() => setSelectedDept(null)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
-                  !selectedDept ? "bg-gold/10 text-gold border-gold/40" : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
-                }`}>{uiText("common.all")}</button>
-              {[...DEPARTMENTS].sort((a, b) => a.label.localeCompare(b.label, locale)).map((dept) => {
-                const isActive = selectedDept === dept.id;
-                return (
-                  <button key={dept.id} onClick={() => {setSelectedDept(isActive ? null : dept.id);setSelectedSub("");}}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-all ${
-                      isActive ? "bg-gold/10 text-gold border-gold/40" : "border-border text-text-muted hover:border-gold/30 hover:text-text-primary"
-                    }`}>
-                    {taxonomyLabel(dept.label, uiText)}
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="hidden xl:flex items-center justify-between mb-5">
-              <p className="text-sm text-text-muted">
-                <span className="text-text-primary font-semibold">{t("results", { count: resultCount })}</span>
-                {query && <span className="text-gold">{uiText.rich("Ui.text_58e2efda5da487", { value1: () => (query) })}</span>}
-              </p>
-              {hasAnyFilter && (
-                <button onClick={clearAll} className="text-xs text-text-muted hover:text-red-400 transition-colors flex items-center gap-1">
-                  <X size={11} /> {t("clearAllFilters")}
-                </button>
-              )}
-            </div>
-
-            {browseError===filterKey && <p role="alert" className="mb-4 text-sm text-red-400">{market("loadError")}</p>}
-            <div aria-busy={browseLoading}>
-            {resultCount === 0 ? (
-              <EmptyState icon={Package}
-                title={serverListings.length === 0 ? t("emptyTitle") : t("emptyTitleFiltered")}
-                description={serverListings.length === 0 ? t("emptyDesc") : t("emptyDescFiltered")}
-                action={serverListings.length === 0 ? undefined : { label: t("emptyReset"), onClick: clearAll }} />
-            ) : (
-              <>
-                <div className={viewMode === "grid"
-                  ? "grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                  : "space-y-2"}>
-                  {resultRows.slice(0, visibleCount).map((p) => (
-                    <PropCard key={p.id} p={p} list={viewMode === "list"}
-                      ratingData={liveRatings[p.id]}
-                      myRating={myRatings[p.id]}
-                      canRate={!!user && user.id !== p.ownerId && eligible.has(p.id)}
-                      onRate={(star) => handleRate(p.id, p.ownerId, star)}
-                      isFavorited={favorites.has(p.id)}
-                      onFavorite={isSignedIn ? (e) => handleFavorite(e, p.id) : undefined}
-                    />
-                  ))}
-                </div>
-                {resultCount > visibleCount && (
-                  <div className="mt-10 text-center">
-                    <button onClick={showMore} disabled={browseLoading}
-                      className="px-8 py-3 border border-border text-sm font-semibold text-text-secondary hover:border-gold hover:text-gold rounded-xl transition-all">
-                      {t("loadMore", { count: resultCount - visibleCount })}
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
-            </div>
-          </div>
-        </div>
+      <PlaceFilters rows={serverListings} value={placeFilters} onChange={updatePlaceFilters} scope="marketplace" />
+      {(chips.length > 0 || query) && <div className="flex flex-wrap items-center gap-2">{chips.map(chip => <span key={chip.id} className="inline-flex min-w-0 items-center gap-1 rounded-full border border-border bg-bg-secondary pl-3 text-xs text-text-secondary"><span className="min-w-0 break-words">{chip.label}</span><button type="button" aria-label={uiText("Ui.text_f10fe7a27ce274", { value1: chip.label })} onClick={chip.onRemove} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center"><X size={14} /></button></span>)}<button type="button" onClick={clearAll} className="min-h-11 px-2 text-xs text-text-muted underline hover:text-text-primary">{t("clearAllFilters")}</button></div>}
+    </div></div>
+    <div className="site-container py-4 sm:py-6">
+      <div className="mb-5"><MarketplaceCategoryNavigation key={`${selectedDept ?? "all"}:${selectedSub}`} department={selectedDept} subcategory={selectedSub} onChange={changeCategory} /></div>
+      <p className="mb-4 hidden text-sm text-text-secondary xl:block">{t("results", { count: resultCount })}</p>
+      {actionError && <p role="alert" className="mb-4 text-sm text-red-400">{uiText("System.requestFailed")}</p>}
+      {failed && <div role="alert" className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-border bg-bg-secondary p-4 text-sm text-text-secondary"><span>{navigation("filterError")}</span><button type="button" onClick={() => { setBrowseError(null); setRetry(value => value + 1); }} className="min-h-11 rounded-lg border border-border px-4 font-medium text-gold hover:border-gold">{navigation("retry")}</button></div>}
+      {browseLoading && <p role="status" className="mb-4 text-sm text-text-muted">{navigation("loading")}</p>}
+      <div aria-busy={browseLoading}>
+        {visibleRows.length > 0 ? <>
+          <div className={viewMode === "grid" ? "grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "space-y-2"}>{visibleRows.map(row => <PropCard key={row.id} p={row} list={viewMode === "list"} ratingData={liveRatings[row.id]} myRating={myRatings[row.id]} canRate={!!isSignedIn && !!user && user.id !== row.ownerId && eligible.has(row.id)} onRate={star => handleRate(row.id, row.ownerId, star)} isFavorited={favorites.has(row.id)} onFavorite={isSignedIn ? event => { void handleFavorite(event, row.id); } : undefined} />)}</div>
+          {resultCount > visibleCount && <div className="mt-8 text-center"><button type="button" disabled={browseLoading} onClick={() => setPagination({ filterKey, visibleCount: visibleCount + MARKETPLACE_PAGE_SIZE })} className="min-h-11 rounded-xl border border-border px-8 py-3 text-sm font-semibold text-text-secondary transition-colors hover:border-gold hover:text-gold disabled:opacity-50">{t("loadMore", { count: resultCount - visibleCount })}</button></div>}
+        </> : !failed && !browseLoading ? <EmptyState icon={Package} title={serverListings.length === 0 ? t("emptyTitle") : t("emptyTitleFiltered")} description={serverListings.length === 0 ? t("emptyDesc") : t("emptyDescFiltered")} action={chips.length || query ? { label: t("emptyReset"), onClick: clearAll } : undefined} /> : null}
       </div>
     </div>
-  );
+  </div>;
 }
 
-export default function PropsContent({ serverListings }: { serverListings: Prop[] }) {
-  return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" /></div>}>
-      <PropsInner serverListings={serverListings} />
-    </Suspense>
-  );
+export default function PropsContent(props: PropsContentProps) {
+  return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-gold border-t-transparent" /></div>}><PropsInner {...props} /></Suspense>;
 }
