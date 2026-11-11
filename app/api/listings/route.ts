@@ -1,4 +1,5 @@
 import { cityWriteFields, placeReadFields, placeSearchFilter } from "@/lib/places/catalog";
+import { placeCitySearchAliases } from "@/lib/places/core";
 import { DEPARTMENTS, deptValues, groupValues, marketplaceCategory, marketplaceSearchCategories } from "@/lib/marketplaceCategories";
 import { validateMarketplaceOffer } from "@/lib/marketplace-offer";
 import { attemptedApproval, OFFER_MODERATION_COLUMNS } from "@/lib/offer-moderation";
@@ -105,7 +106,11 @@ export async function GET(req: NextRequest) {
     const aliases = placeSearchFilter(cityText);
     // Quote PostgREST values so commas, parentheses and quotes stay literal.
     const pattern = JSON.stringify(`%${cityText.replace(/[%*\\]/g, " ")}%`);
-    query = query.or(`city.ilike.${pattern},place_city_name.ilike.${pattern},place_region_name.ilike.${pattern}${aliases ? `,${aliases}` : ""}`);
+    // Equivalent legacy labels are read-only matches, never inferred IDs/countries.
+    const legacyAliases = placeCitySearchAliases(cityText).flatMap(alias =>
+      ["place_city_name", "city"].map(column => `and(place_city_id.is.null,${column}.ilike.${JSON.stringify(alias)})`)
+    ).join(",");
+    query = query.or(`city.ilike.${pattern},place_city_name.ilike.${pattern},place_region_name.ilike.${pattern}${aliases ? `,${aliases}` : ""}${legacyAliases ? `,${legacyAliases}` : ""}`);
   }
   for(const [param,column] of [['country','place_country_code'],['region','place_region_id'],['city','place_city_id']] as const){const value=req.nextUrl.searchParams.get(param);if(value)query=query.eq(column,value.slice(0,100));}
   const sort=req.nextUrl.searchParams.get("sort");

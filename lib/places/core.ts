@@ -15,6 +15,19 @@ const names: Record<string,Record<string,string>> = {
  'geonames:3067696': {de:'Prag',en:'Prague',es:'Praga',it:'Praga',cs:'Praha',hu:'Prága',nl:'Praag','nl-BE':'Praag',sv:'Prag'},
  'geonames:2657896': {de:'Zürich',en:'Zurich',es:'Zúrich',it:'Zurigo',cs:'Curych',hu:'Zürich',nl:'Zürich','nl-BE':'Zürich',sv:'Zürich'},
 };
+
+/** Reviewed variant labels shared unchanged by the catalogue and search. */
+export const aliasOverrides: Record<string,string[]> = {'geonames:2925533':['Frankfurt a.M.','Frankfurt a. M.','Frankfurt/Main','Frankfurt am Main'],'geonames:2886242':['Köln','Cologne','Koeln']};
+const citySearchAliasGroups = Object.entries(names).map(([id, labels]) =>
+ [...new Set([...Object.values(labels), ...(aliasOverrides[id] ?? [])])]);
+/** Search only: exact known aliases expand without assigning an identity or country. */
+export function placeCitySearchAliases(query: string): string[] {
+ const key = placeKey(query);
+ if (!key) return [];
+ const group = citySearchAliasGroups.find(labels => labels.some(label => placeKey(label) === key));
+ return group ? [...group] : [];
+}
+
 export function cityName(id: string | null, fallback: string, locale = 'de') { return (id && (names[id]?.[locale] ?? names[id]?.[locale.split('-')[0]])) || fallback; }
 export function placeFromRecord(input: object): Place {
  const row=input as Record<string,unknown>;
@@ -51,5 +64,11 @@ export function placeSearchMatches(input:object,query:string) {
  const row=input as Record<string,unknown>,p=placeFromRecord(input),key=placeKey(query);
  if(!key)return true;
  const terms=[p.city,p.region,p.countryCode,...(Array.isArray(row.place_search_terms)?row.place_search_terms.filter((value):value is string=>typeof value==='string'):[]),...Object.values(p.cityId?names[p.cityId]??{}:{})];
- return terms.some(term=>placeKey(term).includes(key));
+ if (terms.some(term=>placeKey(term).includes(key))) return true;
+ if (p.cityId) return false;
+ const aliases = new Set(placeCitySearchAliases(query).map(label => label.toLowerCase()));
+ // SQL ILIKE exact alternatives use the original stored labels: do not fold
+ // accents, trim or parse them, or expand region/country search terms as cities.
+ const labels = [p.city, row.city, row.location].filter((value): value is string => typeof value === 'string');
+ return labels.some(label => aliases.has(label.toLowerCase()));
 }
