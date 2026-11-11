@@ -285,6 +285,8 @@ export default function HelpPage() {
         <div className="mt-16 p-8 bg-bg-secondary border border-border rounded-2xl text-center">
           <h2 className="font-display text-2xl font-bold text-text-primary mb-2">{uiText("Ui.text_28881025f27160")}</h2>
           <p className="text-text-muted mb-6 text-sm">{uiText("Ui.text_eb2f0ea66d2081")}</p>
+          <p className="text-text-muted text-sm leading-relaxed">{uiText("SupportMediation.agreement")}</p>
+          <Link href="/pricing#support-mediation" className="inline-flex min-h-11 items-center text-sm text-gold hover:underline mb-4">{uiText("SupportMediation.readMore")}</Link>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">{uiText.rich("Ui.text_4f778e3c677bc4", { part2: () => (<Mail size={15} />), part1: chunks => (<a
               href="mailto:cinegenius.co@gmail.com"
               className="px-6 py-3 bg-gold text-bg-primary font-semibold rounded-lg hover:bg-gold-light transition-colors flex items-center justify-center gap-2"

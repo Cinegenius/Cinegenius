@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SupportServiceNotice } from "@/components/SupportServiceNotice";
 import Link from "next/link";
 import {
   CheckCircle, Zap, Shield, Users, MapPin, Car, Package, Briefcase, Sparkles, ArrowRight,
@@ -74,6 +75,8 @@ export default async function PricingPage() {
           </Link>
         </div>
       </div>
+
+      <SupportServiceNotice />
 
       {/* 3 Pillar */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">

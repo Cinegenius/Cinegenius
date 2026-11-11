@@ -12,6 +12,7 @@ import {
 
 function CheckoutContent() {
   const t = useTranslations("BookingRequest");
+  const service = useTranslations("SupportMediation");
   const locale = useLocale();
   const pending = useRef(false);
   const [submitError, setSubmitError] = useState(false);
@@ -333,6 +334,7 @@ function CheckoutContent() {
                       <span>{text}</span>
                     </div>
                   ))}
+                  <Link href="/pricing#support-mediation" className="inline-flex min-h-11 items-center text-gold hover:underline">{service("readMore")}</Link>
                 </div>
               </div>
             </div>

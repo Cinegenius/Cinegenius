@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SupportServiceNotice } from "@/components/SupportServiceNotice";
 import Link from "next/link";
 import { Film, Users, Zap, Star, ArrowRight, CheckCircle } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -61,6 +62,8 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
+
+      <SupportServiceNotice />
 
       {/* ── MISSION ── */}
       <section className="py-20 px-4 bg-bg-secondary border-y border-border">

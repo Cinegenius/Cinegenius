@@ -1,5 +1,6 @@
 import {getTranslations} from "next-intl/server";
 import Link from "next/link";
+import { SupportServiceNotice } from "@/components/SupportServiceNotice";
 import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 export async function generateMetadata(): Promise<import("next").Metadata> {
@@ -94,6 +95,7 @@ export default async function AgbPage() {
             <h2 className="text-base font-semibold text-text-primary mb-2">{uiText("Ui.text_487f273bffb92c")}</h2>
             <p className="text-sm leading-relaxed mt-3">{uiText("Ui.text_d1c77181f5535a")}</p>
             <p className="text-sm leading-relaxed mt-3">{uiText("Ui.text_abe5b8678ae610")}</p>
+            <SupportServiceNotice compact />
           </section>
 
           <section>
