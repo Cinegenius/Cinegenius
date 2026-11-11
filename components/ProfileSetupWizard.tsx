@@ -37,7 +37,7 @@ import { hasCompletedNonPersonalSetup, hasProfileBasics, shouldSkipProfileSetup 
 import { createOnboardingSaveQueue, isQuickStartContentSaved } from "@/lib/onboarding-save";
 import {
   buildQuickStartScreens, createQuickStartIntentData, findQuickStartRoles, getQuickStartDepartments, getQuickStartIntroIntents,
-  normalizeQuickStartDraft, QUICK_START_CATEGORIES,
+  normalizeQuickStartDraft, selectQuickStartIntent, QUICK_START_CATEGORIES,
   START_QUICK_START_DRAFT,
   validateQuickStartDraft, validateQuickStartScreen, validateQuickStartIntentDetails,
   type QuickStartDraft, type QuickStartIntent, type QuickStartIntentData,
@@ -290,16 +290,7 @@ export default function ProfileSetupWizard() {
 
   function toggleIntent(intent: QuickStartIntent) {
     setRoleSearch(""); setDepartmentSearch(""); setCompanyCategorySearch("");
-    setDraft((current) => {
-      const selected = current.intents.includes(intent);
-      const intents = selected ? current.intents.filter((item) => item !== intent) : [...current.intents, intent];
-      const active = current.activeIntent && intents.includes(current.activeIntent)
-        ? current.activeIntent
-        : intents.find((item) => item !== "search") ?? "search";
-      return { ...current, intents, completed: { ...current.completed, profile: false }, activeIntent: active, sections: !selected && !current.sections[intent]
-        ? { ...current.sections, [intent]: { ...createQuickStartIntentData(), ...((intent === "location" || intent === "equipment") ? { offerLater: true } : {}) } }
-        : current.sections };
-    });
+    setDraft((current) => selectQuickStartIntent(current, intent));
     setError("");
   }
 
@@ -363,6 +354,11 @@ export default function ProfileSetupWizard() {
 
   async function next() {
     setError("");
+    if (draft.step === "goals" && draft.intents.length !== 1) {
+      setError(uiText("setup.goalRequired"));
+      focusValidation("goals");
+      return;
+    }
     if (draft.step === "details" && activeIntent === "company") {
       const errors = responsiblePersonErrors(draft.sections.company?.responsible, true);
       setResponsibleErrors(errors); if (Object.keys(errors).length) { focusResponsiblePerson(); return; }
@@ -587,17 +583,19 @@ export default function ProfileSetupWizard() {
     const roleFilter = intent === "crew" && activeDepartments.length ? activeDepartments : intent === "talent" ? activeDepartments : undefined;
     const matches = findQuickStartRoles(roleSearch, 50, roleFilter, (departmentId, role) => getDepartmentRoleLabel(departmentId, role, locale, animals, taxonomyText));
     return <div className="space-y-4">
-      {intent === "crew" && <>
-        <label htmlFor="quick-start-department-search" className="block text-sm font-medium text-text-primary">{t("copy3")}</label>
-        <div className="relative"><Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" /><input id="quick-start-department-search" value={departmentSearch} onChange={(event) => setDepartmentSearch(event.target.value)} placeholder={t("copy4")} className={`${inputClass} pl-10`} /></div>
-        <div id="quick-start-crew-departments" tabIndex={-1} className="grid max-h-56 gap-2 overflow-y-auto pr-1 sm:grid-cols-2">
+      {intent === "crew" && <details className="rounded-xl border border-border bg-bg-primary p-3" open={activeDepartments.length === 0}>
+        <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-text-primary"><span>{t("copy3")}</span><span className="text-gold" aria-hidden="true">⌄</span></summary>
+        {activeDepartments.length > 0 && <p className="mb-3 text-xs leading-5 text-gold">{activeDepartments.map(id => { const department = crewDepartments.find(item => item.id === id); return department ? getDeptLabel(department, locale, animals, taxonomyText) : ""; }).filter(Boolean).join(" · ")}</p>}
+
+        <div className="relative"><Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" /><input id="quick-start-department-search" aria-label={t("copy3")} value={departmentSearch} onChange={(event) => setDepartmentSearch(event.target.value)} placeholder={t("copy4")} className={`${inputClass} pl-10`} /></div>
+        <div id="quick-start-crew-departments" tabIndex={-1} className="mt-3 grid max-h-48 gap-2 overflow-y-auto overscroll-contain pr-1 sm:grid-cols-2">
           {filteredDepartments.map((department) => {
             const selected = data.departmentIds.includes(department.id);
             return <button key={department.id} type="button" aria-pressed={selected} onClick={() => toggleDepartment(department.id)} className={`flex min-h-12 min-w-0 items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left ${selected ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/50"}`}><span className="min-w-0 break-words text-sm text-text-primary">{department.emoji} {getDeptLabel(department, locale, animals, taxonomyText)}</span><span className="shrink-0 text-xs text-text-muted">{department.roles.length}</span></button>;
           })}
           {!filteredDepartments.length && <p className="col-span-full rounded-xl border border-border p-3 text-sm text-text-muted">{t("copy5")}</p>}
         </div>
-      </>}
+      </details>}
       <div>
         <label htmlFor={`quick-start-${intent}-role-search`} className="mb-2 block text-sm font-medium text-text-primary">{intent === "crew" ? uiText("Ui.text_be345f7f1086d2") : uiText("Ui.text_98ec27e21b84e9")}</label>
         <div className="relative"><Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" /><input id={`quick-start-${intent}-role-search`} autoComplete="off" value={roleSearch} onChange={(event) => setRoleSearch(event.target.value)} placeholder={intent === "crew" ? uiText("Ui.text_3a16b34f55e110") : uiText("Ui.text_9d08ff6f542a8c")} className={`${inputClass} pl-10`} /></div>
@@ -614,7 +612,7 @@ export default function ProfileSetupWizard() {
             const department = departments.find((item) => item.id === id);
             if (!department) return null;
             const selectedCount = data.roles.filter((role) => role.departmentId === id).length;
-            return <details key={id} className="rounded-xl border border-border bg-bg-primary" open={index === 0}><summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-text-primary"><span className="break-words">{department.emoji} {getDeptLabel(department, locale, animals, taxonomyText)}</span><span className="shrink-0 text-xs font-normal text-text-muted">{selectedCount ? uiText("Ui.text_fd3252760fa813", { value1: String(selectedCount) }) : uiText("Ui.text_15ffa5773e8f7a", { value1: String(department.roles.length) })}</span></summary><div className="max-h-48 space-y-1 overflow-y-auto border-t border-border p-2">{[...new Set(department.roles)].map((role) => { const selected = data.roles.some((item) => item.departmentId === id && item.role === role); return <button key={role} type="button" aria-pressed={selected} onClick={() => toggleRole({ departmentId: id, role }, intent)} className={`flex min-h-10 w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm ${selected ? "bg-gold/10 text-gold" : "text-text-secondary hover:bg-bg-elevated"}`}><span className="break-words">{getDepartmentRoleLabel(id, role, locale, animals, taxonomyText)}</span><span className="shrink-0">{selected ? "✓" : "+"}</span></button>; })}</div></details>;
+            return <details key={id} className="rounded-xl border border-border bg-bg-primary" open={index === 0}><summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-text-primary"><span className="break-words">{department.emoji} {getDeptLabel(department, locale, animals, taxonomyText)}</span><span className="shrink-0 text-xs font-normal text-text-muted">{selectedCount ? uiText("Ui.text_fd3252760fa813", { value1: String(selectedCount) }) : uiText("Ui.text_15ffa5773e8f7a", { value1: String(department.roles.length) })}</span></summary><div className="max-h-64 space-y-1 overflow-y-auto overscroll-contain border-t border-border p-2">{[...new Set(department.roles)].map((role) => { const selected = data.roles.some((item) => item.departmentId === id && item.role === role); return <button key={role} type="button" aria-pressed={selected} onClick={() => toggleRole({ departmentId: id, role }, intent)} className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm ${selected ? "bg-gold/10 text-gold" : "text-text-secondary hover:bg-bg-elevated"}`}><span className="break-words">{getDepartmentRoleLabel(id, role, locale, animals, taxonomyText)}</span><span className="shrink-0">{selected ? "✓" : "+"}</span></button>; })}</div></details>;
           })}
           {!data.departmentIds.length && <p className="rounded-xl border border-border bg-bg-primary p-3 text-sm text-text-muted">{t("copy7")}</p>}
         </div>}
@@ -735,7 +733,7 @@ export default function ProfileSetupWizard() {
 
         {draft.step === "location" && <PlaceField id="quick-start-person-city" selectedCityId={draft.personPlaceCityId} value={[draft.personCity, draft.personCountry].filter(Boolean).join(", ")} onChange={(value, cityId) => { const parts = value.split(","); setDraft(current => ({ ...current, personCity: parts.slice(0,-1).join(",").trim(), personCountry: parts.at(-1)?.trim() ?? "", personPlaceCityId: cityId || "", completed: { ...current.completed, profile: false } })); }} required={needsProfile} />}
 
-        {draft.step === "goals" && <div id="quick-start-goals" tabIndex={-1} className="grid gap-3 sm:grid-cols-2">{paths.map(({ id, detail, Icon }) => { const selected = draft.intents.includes(id); return <button key={id} type="button" aria-pressed={selected} onClick={() => toggleIntent(id)} className={`flex min-h-24 min-w-0 items-start gap-3 rounded-xl border p-4 text-left transition-colors ${selected ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/50"}`}><span className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${selected ? "bg-gold/15 text-gold" : "bg-bg-elevated text-text-muted"}`}><Icon size={19} /></span><span className="min-w-0 flex-1"><span className="block break-words text-sm font-semibold text-text-primary">{t(`${id}Intent`)}</span><span className="mt-1 block break-words text-xs leading-5 text-text-muted">{localizeSetupMessage(detail, t)}</span></span><span aria-hidden="true" className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-xs ${selected ? "border-gold bg-gold text-bg-primary" : "border-border text-transparent"}`}>✓</span></button>; })}</div>}
+        {draft.step === "goals" && <div id="quick-start-goals" tabIndex={-1} role="radiogroup" aria-label={uiText("setup.goalsTitle")} className="grid gap-3 sm:grid-cols-2">{paths.map(({ id, detail, Icon }) => { const selected = draft.intents.length === 1 && draft.intents[0] === id; return <label key={id} className={`flex min-h-24 min-w-0 cursor-pointer focus-within:ring-2 focus-within:ring-gold items-start gap-3 rounded-xl border p-4 text-left transition-colors ${selected ? "border-gold bg-gold/10" : "border-border bg-bg-primary hover:border-gold/50"}`}><input type="radio" name="quick-start-intent" value={id} checked={selected} onChange={() => toggleIntent(id)} className="sr-only" /><span className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${selected ? "bg-gold/15 text-gold" : "bg-bg-elevated text-text-muted"}`}><Icon size={19} /></span><span className="min-w-0 flex-1"><span className="block break-words text-sm font-semibold text-text-primary">{t(`${id}Intent`)}</span><span className="mt-1 block break-words text-xs leading-5 text-text-muted">{localizeSetupMessage(detail, t)}</span></span><span aria-hidden="true" className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-xs ${selected ? "border-gold bg-gold text-bg-primary" : "border-border text-transparent"}`}>✓</span></label>; })}</div>}
 
         {draft.step === "details" && <div>
           {detailIntents.length > 1 && <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-bg-primary px-3 py-2"><span className="text-xs text-text-muted">{t("areaCounter", {current:activeDetailIndex+1,total:detailIntents.length})}</span><span className="text-xs font-medium text-text-primary">{t(`${activeIntent}Intent`)}</span></div>}
@@ -768,7 +766,7 @@ export default function ProfileSetupWizard() {
 
       {completionPending && draft.completed.profile && <p role="status" className="mt-4 rounded-xl border border-gold/30 bg-gold/5 p-4 text-sm text-text-primary">{t("copy98")}</p>}
       {error && <p role="alert" className="mt-4 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm leading-6 text-red-300">{localizeSetupError(error, t, locale)}</p>}
-      <div className="sticky bottom-0 z-30 -mx-4 mt-5 flex flex-col-reverse items-stretch justify-between gap-3 border-t border-border bg-bg-primary/95 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur sm:static sm:mx-0 sm:flex-row sm:items-center sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+      <div className="sticky bottom-0 z-30 max-sm:pr-28 -mx-4 mt-5 flex flex-col-reverse items-stretch justify-between gap-3 border-t border-border bg-bg-primary/95 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur sm:static sm:mx-0 sm:flex-row sm:items-center sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
         <button type="button" disabled={saving || uploading || currentIndex === 0} onClick={() => void back()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-border px-4 text-sm text-text-primary disabled:cursor-not-allowed disabled:opacity-40"><ArrowLeft size={16} /> {t("copy99")}</button>
         {draft.step !== "review" ? <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">{draft.step === "intro" && <button type="button" disabled={saving || uploading || retrySeconds > 0} onClick={() => void skipOptional()} className="min-h-12 rounded-xl border border-border px-4 text-sm text-text-secondary disabled:opacity-50">{t("copy100")}</button>}<button type="button" disabled={saving || uploading || retrySeconds > 0} onClick={() => void next()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gold px-5 text-sm font-semibold text-bg-primary disabled:opacity-50">{saving ? <><Loader2 size={16} className="animate-spin" /> {t("copy101")}</> : <>{t("copy102")}<ArrowRight size={16} /></>}</button></div> : <button type="button" disabled={saving || uploading || retrySeconds > 0} onClick={() => void finish()} className="inline-flex min-h-12 flex-wrap items-center justify-center gap-2 rounded-xl bg-gold px-5 py-3 text-center text-sm font-semibold leading-5 text-bg-primary disabled:opacity-50">{saving ? <><Loader2 size={17} className="shrink-0 animate-spin" /><span>{t("copy103")}</span></> : <><CheckCircle2 size={17} className="shrink-0" /><span>{retrySeconds > 0 ? t("retryFinish", {seconds:retrySeconds}) : completionPending ? t("finishPending") : completionActionLabel}</span></>}</button>}
       </div>

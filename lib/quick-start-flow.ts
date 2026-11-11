@@ -410,3 +410,14 @@ export function validateQuickStartDraft(draft: QuickStartDraft, { requirePrimary
   if (intro) return intro;
   return null;
 }
+
+/** A new selection replaces the starting goal, retaining all resumable section data. */
+export function selectQuickStartIntent(draft: QuickStartDraft, intent: QuickStartIntent): QuickStartDraft {
+  if (draft.intents.length === 1 && draft.intents[0] === intent) return draft;
+  return { ...draft, intents: [intent], activeIntent: intent,
+    completed: { ...draft.completed, profile: false },
+    sections: draft.sections[intent] ? draft.sections : { ...draft.sections,
+      [intent]: { ...createQuickStartIntentData(), ...((intent === "location" || intent === "equipment") ? { offerLater: true } : {}) },
+    },
+  };
+}
