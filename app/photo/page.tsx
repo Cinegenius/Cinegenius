@@ -34,7 +34,7 @@ export default async function PhotoPage({ searchParams }: { searchParams: Promis
   const selectedWithLikes = profileParam && imageParam
     ? (await getCommunityMedia({ ownerId: profileParam.startsWith("media:") ? undefined : profileParam, imageUrl: imageParam, limit: 1, viewerId: userId })).photos[0] ?? null : null;
   return (
-    <div className="relative min-h-screen bg-black">
+    <div className="relative min-h-screen bg-bg-primary">
       <div className="relative z-10">
         <section className="site-container pb-8 pt-32 sm:pb-10 sm:pt-36">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-gold/20 bg-gold/5 px-3 py-1.5 text-xs font-semibold text-gold">{uiText.rich("Ui.text_9daae6775df589", { part1: () => (<Camera size={11} />) })}</div>
