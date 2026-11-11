@@ -219,7 +219,6 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
   if (!data) return <section className="site-container py-7"><p role="status" className="rounded-xl border border-border bg-bg-secondary px-4 py-6 text-sm text-text-muted">{t("recommendationsUnavailable")}</p></section>;
   const { liveJobs, liveProps, companies, newCrew, currentTime } = data;
   if (!liveJobs.length && !liveProps.length && !companies.length && !newCrew.length) return null;
-  const twoColumns = newCrew.length > 0 && liveProps.length > 0;
   function formatDate(iso: string): string {
     if (!iso) return "";
     const diff = Math.floor((currentTime - new Date(iso).getTime()) / 86400000);
@@ -229,10 +228,10 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
     if (diff < 14) return tc("weekAgo");
     return tc("weeksAgo", { weeks: Math.floor(diff / 7) });
   }
-  return <div className={`site-container grid items-start gap-7 py-7 sm:gap-8 sm:py-9 ${twoColumns ? "lg:grid-cols-2 lg:gap-x-9" : ""}`}>
-    {liveProps.length > 0 && <section className={`min-w-0 ${twoColumns ? "lg:col-start-1 lg:row-start-1" : ""}`} aria-labelledby="home-marketplace-title">
+  return <div className="site-container grid items-start gap-7 py-7 sm:gap-8 sm:py-9">
+    {liveProps.length > 0 && <section className="min-w-0" aria-labelledby="home-marketplace-title">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-marketplace-title" className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("findEquipmentTitle")}</h2><Link href="/marketplace" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light sm:text-sm">{tc("viewAll")} <ArrowRight size={13} /></Link></div>
-      <div className={`grid grid-cols-2 gap-2.5 sm:gap-4 ${twoColumns ? "" : "lg:grid-cols-4"}`}>
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
         {liveProps.map((prop) => (
                 <Link
                   key={prop.id}
@@ -275,9 +274,9 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
               ))}
       </div>
     </section>}
-    {newCrew.length > 0 && <section className={`min-w-0 ${twoColumns ? "lg:col-start-2 lg:row-start-1" : ""}`} aria-labelledby="home-crew-title">
+    {newCrew.length > 0 && <section className="min-w-0" aria-labelledby="home-crew-title">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-crew-title" className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("newCrewTitle")}</h2><Link href="/creators" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light sm:text-sm">{tc("viewAll")} <ArrowRight size={13} /></Link></div>
-      <HomeCardRail id="home-crew-rail" labelledBy="home-crew-title" hint={t("crewScrollHint")} previousLabel={t("railPrevious")} nextLabel={t("railNext")} itemCount={newCrew.length} variant="crew" wide={!twoColumns}>
+      <HomeCardRail id="home-crew-rail" labelledBy="home-crew-title" hint={t("crewScrollHint")} previousLabel={t("railPrevious")} nextLabel={t("railNext")} itemCount={newCrew.length} variant="crew" wide>
         {newCrew.map((c) => (
                 <Link
                   key={c.id}
@@ -323,14 +322,14 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
               ))}
       </HomeCardRail>
     </section>}
-    {companies.length > 0 && <section className={`min-w-0 ${twoColumns ? "lg:col-span-2" : ""}`} aria-labelledby="home-companies-title">
+    {companies.length > 0 && <section className="min-w-0" aria-labelledby="home-companies-title">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3"><div><p className="mb-1 text-xs font-semibold uppercase tracking-widest text-gold">{t("companiesLabel")}</p><h2 id="home-companies-title" className="font-display text-xl font-bold text-text-primary sm:text-2xl">{t("companiesTitle")}</h2></div><Link href="/companies" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light sm:text-sm">{tc("viewAll")} <ArrowRight size={13} /></Link></div>
       <HomeCompanyPartners companies={companies.map(c => ({
         id: c.id, href: `/companies/${c.slug ?? c.id}`, name: c.name, logo: c.logo, city: c.city,
         category: taxonomyLabel(COMPANY_CATEGORIES.find(category => category.id === c.category)?.label ?? "", uiText) || undefined,
       }))} />
     </section>}
-    {liveJobs.length > 0 && <section className={`min-w-0 border-t border-border/60 pt-4 ${twoColumns ? "lg:col-span-2" : ""}`} aria-labelledby="home-jobs-title">
+    {liveJobs.length > 0 && <section className="min-w-0 border-t border-border/60 pt-4" aria-labelledby="home-jobs-title">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3"><h2 id="home-jobs-title" className="font-display text-lg font-bold text-text-primary">{t("jobsTitle")}</h2><Link href="/jobs" className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-gold hover:text-gold-light">{tc("viewAll")} <ArrowRight size={12} /></Link></div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {liveJobs.map(job => <Link key={job.id} href={`/jobs/${job.id}`} className="group flex min-h-11 min-w-0 items-start gap-2 rounded-lg px-1 py-2 transition-colors hover:bg-bg-secondary/60">
