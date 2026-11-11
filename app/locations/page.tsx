@@ -24,11 +24,11 @@ export async function generateMetadata(): Promise<import("next").Metadata> {
 };
 }
 
-export default async function LocationsPage({ searchParams }: { searchParams?: Promise<Record<string, string | string[] | undefined>> } = {}) {
+export default async function LocationsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const uiText = await getTranslations();
 
   const locale = await getLocale();
-  const initialFilters = readLocationLandingFilters(await searchParams ?? {});
+  const initialFilters = readLocationLandingFilters(await searchParams);
   const priceText = await getTranslations("MarketplaceOffer");
   const { data, error } = await db
     .from("listings")
