@@ -1,5 +1,7 @@
 "use client";
 
+import GenieWritingAssistant from "@/components/GenieWritingAssistant";
+
 import PlaceField from "@/components/PlaceField";
 import { placeInputValue } from "@/lib/places/core";
 import { PROFILE_TRAIT_MESSAGE_KEYS, profileTraitLabel } from "@/lib/profile-trait-labels";
@@ -1721,6 +1723,7 @@ export default function ProfilePage() {
                 <div className="rounded-xl border border-border bg-bg-secondary p-4 sm:p-6">
                   <div className="mb-2 flex items-center justify-between gap-3"><label htmlFor="profile-bio" className="text-sm font-semibold text-text-primary">{t("fieldBio")}</label><span className="text-xs text-text-muted">{uiText("setup.copy38")}</span></div>
                   <textarea id="profile-bio" rows={4} value={form.bio ?? ""} onChange={(e) => setForm((p) => ({ ...p, bio: e.target.value }))} maxLength={500} placeholder={uiText("Ui.text_c1a4c7a3ba9110")} className="w-full resize-y rounded-lg border border-border bg-bg-elevated px-3 py-2.5 text-sm focus:border-gold focus:outline-none" />
+                  <GenieWritingAssistant area="profile" value={form.bio ?? ""} onApply={(text) => setForm((current) => ({ ...current, bio: text }))} maxLength={500} contextKey={`profile:${user?.id ?? "pending"}:bio`} disabled={saving} />
                   <p className="mt-1 text-right text-xs text-text-muted">{(form.bio ?? "").length} / 500</p>
                 </div>
                 {/* Avatar */}

@@ -1,0 +1,213 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Send, Trash2 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { useEffect, useId, useRef, useState, type FormEvent, type RefObject } from "react";
+import { GENIE_MAX_MESSAGE_CHARS, genieAreaForPath } from "@/lib/genie";
+import { clearConversation, readConversation, safeLinks, saveConversation, trimExchanges, type Exchange } from "@/lib/genie-conversation";
+import styles from "./Genie.module.css";
+
+type Message = { role: "user" | "assistant"; content: string };
+type Status = "errorInvalid" | "errorRateLimited" | "errorUnavailable" | "errorTimeout" | "errorFailed" | "errorUnsafe" | "errorNetwork" | "cancelled";
+
+const SERVER_ERRORS: Record<string, Status> = {
+  invalid_request: "errorInvalid",
+  rate_limited: "errorRateLimited",
+  unavailable: "errorUnavailable",
+  timeout: "errorTimeout",
+  failed: "errorFailed",
+  unsafe_input: "errorUnsafe",
+};
+
+export default function GeniePanel({ active, requestRef, memoryScope }: { active: boolean; requestRef: RefObject<AbortController | null>; memoryScope: string | null }) {
+  const t = useTranslations("Genie");
+  const locale = useLocale();
+  const pathname = usePathname();
+  const [exchanges, setExchanges] = useState<Exchange[]>(() => {
+    if (!memoryScope) return [];
+    try { return readConversation(window.sessionStorage, memoryScope); }
+    catch { return []; }
+  });
+  const [draft, setDraft] = useState("");
+  const [pendingUser, setPendingUser] = useState<string | null>(null);
+  const [status, setStatus] = useState<Status | null>(null);
+  const sequence = useRef(exchanges.at(-1)?.id ?? 0);
+  const transcript = useRef<HTMLDivElement>(null);
+  const input = useRef<HTMLTextAreaElement>(null);
+  const id = useId();
+  const pending = pendingUser !== null;
+
+  useEffect(() => {
+    if (!active) requestRef.current?.abort();
+  }, [active, requestRef]);
+
+  useEffect(() => () => {
+    const pendingRequest = requestRef.current;
+    requestRef.current = null;
+    pendingRequest?.abort();
+  }, [requestRef]);
+
+  useEffect(() => {
+    if (active && transcript.current) {
+      transcript.current.scrollTop = exchanges.length || pendingUser || status ? transcript.current.scrollHeight : 0;
+    }
+  }, [active, exchanges, pendingUser, status]);
+
+  async function send(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const content = draft.trim();
+    if (requestRef.current || !content || !active) return;
+    if (content.length > GENIE_MAX_MESSAGE_CHARS) {
+      setStatus("errorInvalid");
+      return;
+    }
+
+    const previous = trimExchanges(exchanges, content);
+    const messages: Message[] = previous.flatMap(entry => [
+      { role: "user" as const, content: entry.user },
+      { role: "assistant" as const, content: entry.reply },
+    ]);
+    messages.push({ role: "user", content });
+    const controller = new AbortController();
+    requestRef.current = controller;
+    setPendingUser(content);
+    setDraft("");
+    setStatus(null);
+    let timedOut = false;
+    const timeout = window.setTimeout(() => { timedOut = true; controller.abort(); }, 35_000);
+    const cancel = () => {
+      window.clearTimeout(timeout);
+      if (requestRef.current !== controller) return;
+      requestRef.current = null;
+      setDraft(content);
+      setPendingUser(null);
+      setStatus(timedOut ? "errorTimeout" : "cancelled");
+    };
+    controller.signal.addEventListener("abort", cancel, { once: true });
+
+    try {
+      const response = await fetch("/api/genie", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        cache: "no-store",
+        referrerPolicy: "no-referrer",
+        signal: controller.signal,
+        body: JSON.stringify({ area: genieAreaForPath(pathname), locale, messages }),
+      });
+      const result: unknown = await response.json();
+      if (requestRef.current !== controller) return;
+      if (controller.signal.aborted) throw new DOMException("", "AbortError");
+      if (!response.ok) {
+        const code = result && typeof result === "object" && "error" in result && typeof result.error === "string" ? result.error : "failed";
+        setStatus(Object.hasOwn(SERVER_ERRORS, code) ? SERVER_ERRORS[code] : "errorFailed");
+        setDraft(content);
+        return;
+      }
+      if (!result || typeof result !== "object" || !("reply" in result) || typeof result.reply !== "string" || !result.reply.trim() || result.reply.length > GENIE_MAX_MESSAGE_CHARS) {
+        setStatus("errorFailed");
+        setDraft(content);
+        return;
+      }
+      const updated = trimExchanges([...previous, {
+        id: ++sequence.current,
+        user: content,
+        reply: result.reply,
+        links: safeLinks("links" in result ? result.links : []),
+      }]);
+      setExchanges(updated);
+      if (memoryScope) {
+        try { saveConversation(window.sessionStorage, memoryScope, updated); }
+        catch { /* Chat stays usable when browser storage is blocked. */ }
+      }
+    } catch {
+      if (requestRef.current !== controller) return;
+      setDraft(content);
+      setStatus(controller.signal.aborted ? (timedOut ? "errorTimeout" : "cancelled") : "errorNetwork");
+    } finally {
+      window.clearTimeout(timeout);
+      controller.signal.removeEventListener("abort", cancel);
+      if (requestRef.current === controller) {
+        requestRef.current = null;
+        setPendingUser(null);
+      }
+    }
+  }
+
+  function clearChat() {
+    const pendingRequest = requestRef.current;
+    requestRef.current = null;
+    pendingRequest?.abort();
+    try { clearConversation(window.sessionStorage); }
+    catch { /* The in-memory conversation is cleared even if storage is blocked. */ }
+    setExchanges([]);
+    setDraft("");
+    setPendingUser(null);
+    setStatus(null);
+    requestAnimationFrame(() => input.current?.focus({ preventScroll: true }));
+  }
+
+  return (
+    <>
+      <div ref={transcript} className={styles.transcript} role="log" aria-live="polite" aria-relevant="additions text" aria-label={t("name")}>
+        <div className={styles.greeting}><p>{t("greeting")}</p></div>
+        <div className={styles.notice} id={`${id}-notice`}>
+          <p>{t("privacy")} <Link href="/datenschutz" prefetch={false}>{t("privacyLink")}</Link></p>
+          <p>{t("caution")}</p>
+        </div>
+        {exchanges.map(entry => (
+          <div key={entry.id} className={styles.exchange}>
+            <div className={styles.userMessage}>
+              <span className={styles.speaker}>{t("you")}</span>
+              <p>{entry.user}</p>
+            </div>
+            <div className={styles.assistantMessage}>
+              <span className={styles.speaker}>{t("assistant")}</span>
+              <p>{entry.reply}</p>
+              {entry.links.length > 0 && <ul className={styles.links}>{entry.links.map(link => <li key={link.href}><Link href={link.href} prefetch={false}>{link.label}</Link></li>)}</ul>}
+            </div>
+          </div>
+        ))}
+        {pendingUser && <div className={styles.userMessage}><span className={styles.speaker}>{t("you")}</span><p>{pendingUser}</p></div>}
+        {pending && <p className={styles.status} role="status">{t("sending")}</p>}
+        {status && <p className={styles.status} role={status === "cancelled" ? "status" : "alert"}>{t(status)}</p>}
+      </div>
+      <form className={styles.composer} onSubmit={send}>
+        <label className={styles.inputLabel} htmlFor={`${id}-message`}>{t("inputLabel")}</label>
+        <div className={styles.inputRow}>
+          <textarea
+            ref={input}
+            id={`${id}-message`}
+            name="genie-message"
+            className={styles.input}
+            value={draft}
+            onChange={event => { if (!requestRef.current) setDraft(event.target.value); }}
+            onKeyDown={event => {
+              if (event.key !== "Enter" || event.shiftKey || event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229) return;
+              event.preventDefault();
+              if (!event.repeat && !pending) event.currentTarget.form?.requestSubmit();
+            }}
+            maxLength={GENIE_MAX_MESSAGE_CHARS}
+            placeholder={t("inputPlaceholder")}
+            rows={1}
+            readOnly={pending}
+            autoComplete="off"
+            aria-describedby={`${id}-keyboard ${id}-count ${id}-notice`}
+          />
+          <button type="submit" className={styles.sendButton} disabled={pending || !draft.trim()} aria-label={t("send")} title={t("send")}>
+            <Send size={18} aria-hidden="true" />
+          </button>
+        </div>
+        <span id={`${id}-keyboard`} className={styles.inputLabel}>{t("keyboardHint")}</span>
+        <div className={styles.actions}>
+          <span id={`${id}-count`} className={styles.count}>{t("count", { count: draft.length, max: GENIE_MAX_MESSAGE_CHARS })}</span>
+          {(exchanges.length > 0 || draft || pending || status) && <button type="button" className={styles.iconButton} onClick={clearChat} aria-label={t("clear")} title={t("clear")}>
+            <Trash2 size={18} aria-hidden="true" />
+          </button>}
+        </div>
+      </form>
+    </>
+  );
+}

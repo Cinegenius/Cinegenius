@@ -1,5 +1,7 @@
 "use client";
 
+import GenieWritingAssistant from "@/components/GenieWritingAssistant";
+
 import PlaceField from "@/components/PlaceField";
 import { LOCATION_ROOMS } from "@/lib/location-rooms";
 import { taxonomyLabel } from "@/lib/departments";
@@ -1692,6 +1694,7 @@ export default function InseratPage() {
                 }
                 className="w-full px-4 py-3 bg-bg-elevated border border-border rounded-xl text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold transition-colors resize-none"
               />
+              {(type === "location" || type === "prop" || type === "vehicle") && <GenieWritingAssistant area={isLocation ? "location" : "marketplace"} value={form.description} onApply={(text) => f("description", text)} maxLength={2000} contextKey={`listing-create:${type}:description`} disabled={loading || savingPrivate || publishingDraft || uploading} />}
             </div>
 
             {(type === "prop" || type === "vehicle") && <MarketplaceOfferFields value={marketplace} vehicleOnly={type === "vehicle"} onChange={value=>{setMarketplace(value);if(value.category)setSelected(marketplaceItem(value.category));}} />}

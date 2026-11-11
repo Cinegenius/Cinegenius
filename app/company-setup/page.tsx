@@ -1,5 +1,7 @@
 "use client";
 
+import GenieWritingAssistant from "@/components/GenieWritingAssistant";
+
 import { placeInputValue } from "@/lib/places/core";
 
 import PlaceField from "@/components/PlaceField";
@@ -576,6 +578,7 @@ export default function CompanySetupPage() {
                     </Field>
                     <Field label={uiText("Ui.text_e4ab91fe2318c3")}>
                       <textarea rows={5} value={description} onChange={(e) => setDescription(e.target.value)} maxLength={1500} placeholder={uiText("Ui.text_d03e19686b22c0")} className="w-full resize-y rounded-xl border border-border bg-bg-secondary px-4 py-3 text-sm focus:border-gold focus:outline-none" />
+                      <GenieWritingAssistant area="company" value={description} onApply={setDescription} maxLength={1500} contextKey={`company:${existingId ?? "new"}:guided-description`} disabled={saving || uploadingLogo || uploadingCover || uploadingPortfolio} />
                     </Field>
                   </section>
                 )}
@@ -956,6 +959,7 @@ export default function CompanySetupPage() {
                     maxLength={1500}
                   />
                 </div>
+                <GenieWritingAssistant area="company" value={description} onApply={setDescription} maxLength={1500} contextKey={`company:${existingId ?? "new"}:description`} disabled={saving || uploadingLogo || uploadingCover || uploadingPortfolio} />
                 <p className="text-[11px] text-text-muted mt-1 text-right">{description.length}/1500</p>
               </Field>
 

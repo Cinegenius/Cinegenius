@@ -37,6 +37,7 @@ function getAdminIds(): Set<string> {
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 const RATE_LIMITS: Record<string, { limit: number; windowMs: number }> = {
+  "/api/genie": { limit: 20, windowMs: 60_000 },
   "/api/media": { limit: 120, windowMs: 60_000 },
   "/api/community-image": { limit: 120, windowMs: 60_000 },
   "/api/upload/avatar":  { limit: 5,  windowMs: 60_000 },
@@ -80,6 +81,18 @@ async function ipRateLimit(req: NextRequest): Promise<NextResponse | null> {
 
   entry.count++;
   if (entry.count > rule.limit) {
+    if (prefix === "/api/genie") {
+      return NextResponse.json({ error: "rate_limited" }, {
+        status: 429,
+        headers: {
+          "Retry-After": String(Math.ceil((entry.resetAt - now) / 1000)),
+          "Cache-Control": "private, no-store, max-age=0",
+          "CDN-Cache-Control": "no-store",
+          "Vercel-CDN-Cache-Control": "no-store",
+          "X-Content-Type-Options": "nosniff",
+        },
+      });
+    }
     return localizedProxyError(
       req, "m_35bd89251439",
       {
@@ -198,7 +211,14 @@ export default clerkMiddleware(async (auth, request) => {
 
   // 1b. CSRF check — reject mutating API requests from unknown origins
   const csrfRes = await csrfCheck(request);
-  if (csrfRes) return csrfRes;
+  if (csrfRes) {
+    if (request.nextUrl.pathname === "/api/genie") {
+      csrfRes.headers.set("Cache-Control", "private, no-store, max-age=0");
+      csrfRes.headers.set("CDN-Cache-Control", "no-store");
+      csrfRes.headers.set("Vercel-CDN-Cache-Control", "no-store");
+    }
+    return csrfRes;
+  }
 
   const isApi = request.nextUrl.pathname.startsWith("/api/");
 
@@ -228,6 +248,10 @@ export default clerkMiddleware(async (auth, request) => {
   } else if (request.method === "GET" && request.nextUrl.pathname === "/api/cron/listing-freshness") {
     // This exact scheduler route checks CRON_SECRET itself before any work.
     // Other cron paths and methods retain the normal session protection.
+  } else if (request.method === "POST" && request.nextUrl.pathname === "/api/genie") {
+    // Advice is available to guests. The exact handler validates its input and
+    // reserves persistent IP, account and global quotas before a provider call.
+    // Origin protection above still applies; no other method/path is exempt.
   } else if (isApi && !isPublicApiGet(request)) {
     // Private fetch endpoints must not follow Clerk's hosted sign-in redirect
     // after logout/session expiry. Keep the existing authenticated-session

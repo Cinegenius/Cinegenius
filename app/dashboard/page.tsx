@@ -1,4 +1,6 @@
 "use client";
+
+import GenieWritingAssistant from "@/components/GenieWritingAssistant";
 import { locationRoomLabel } from "@/lib/location-rooms";
 
 import { placeInputValue } from "@/lib/places/core";
@@ -1875,6 +1877,7 @@ export default function DashboardPage() {
                         className="w-full bg-bg-elevated border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gold transition-colors resize-none"
                         placeholder={uiText("Ui.text_f2b04667fff22d")}
                       />
+                      {(l.type === "location" || l.type === "prop" || l.type === "vehicle") && <GenieWritingAssistant area={l.type === "location" ? "location" : "marketplace"} value={editForm.description} onApply={(text) => setEditForm((current) => ({ ...current, description: text }))} maxLength={2000} contextKey={`listing-edit:${editingId}:description`} disabled={editSaving || editUploading || editGalleryState.uploading} />}
                     </div>
                     <div className="flex gap-2 justify-end">
                       <button

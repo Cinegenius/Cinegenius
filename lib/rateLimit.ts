@@ -1,6 +1,6 @@
 /**
  * Server-side rate limiter backed by Supabase (rate_limit_buckets table).
- * Per-user or per-IP keyed sliding-window counters.
+ * Per-user or per-IP keyed fixed-window counters.
  *
  * IMPORTANT: fails CLOSED — if the backend is unavailable the request is
  * denied (429). This is intentional: a limiter that fails open provides
@@ -28,21 +28,23 @@ export async function rateLimit(
   limit: number,
   windowS: number
 ): Promise<RateLimitResult> {
-  const windowEnd = new Date(Date.now() + windowS * 1000);
+  try {
+    const windowEnd = new Date(Date.now() + windowS * 1000);
+    const { data, error } = await db.rpc("upsert_rate_limit", {
+      p_key:        key,
+      p_limit:      limit,
+      p_window_end: windowEnd.toISOString(),
+    });
 
-  const { data, error } = await db.rpc("upsert_rate_limit", {
-    p_key:        key,
-    p_limit:      limit,
-    p_window_end: windowEnd.toISOString(),
-  });
-
-  if (error) {
-    // Backend unavailable — deny the request rather than silently allow it.
-    // Apply migration supabase/migrations/rate_limit.sql if this fires on startup.
-    console.error("[rateLimit] backend error — denying request:", error.message);
-    return { allowed: false, remaining: 0 };
+    // A missing or malformed counter must never become a fresh allowance.
+    if (!error && typeof data === "number" && Number.isSafeInteger(data) && data > 0) {
+      return { allowed: data <= limit, remaining: Math.max(0, limit - data) };
+    }
+  } catch {
+    // Transport failures follow the same fail-closed path as RPC failures.
   }
 
-  const count = (data as number) ?? 1;
-  return { allowed: count <= limit, remaining: Math.max(0, limit - count) };
+  // Backend diagnostics can contain private values; never log their details.
+  console.error("[rateLimit] backend unavailable or invalid — denying request");
+  return { allowed: false, remaining: 0 };
 }

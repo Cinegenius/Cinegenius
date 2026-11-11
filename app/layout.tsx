@@ -18,6 +18,7 @@ import { ToastProvider } from "@/contexts/ToastContext";
 import GlobalSearch from "@/components/GlobalSearch";
 import FormDraftProvider from "@/contexts/FormDraftContext";
 import AuthSessionBoundary from "@/components/AuthSessionBoundary";
+import Genie from "@/components/Genie";
 import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
 const playfair = Playfair_Display({
@@ -147,6 +148,7 @@ export default async function RootLayout({
                 <GlobalSearch />
                 <AppChrome initialIsSignedIn={!!userId} initialAdminUserId={isConfiguredAdmin(userId, process.env.ADMIN_USER_IDS) ? userId : null}>{children}</AppChrome>
                 <CookieBanner />
+                <Genie />
                 <Analytics />
                 <SpeedInsights />
               </FormDraftProvider>

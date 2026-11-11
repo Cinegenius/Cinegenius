@@ -3,7 +3,8 @@
 import { useClerk, useSession } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef } from "react";
+import { clearConversation } from "@/lib/genie-conversation";
 
 function SessionTransition() {
   const t = useTranslations("SessionTransition");
@@ -30,6 +31,18 @@ function SessionTransition() {
 export default function AuthSessionBoundary({ children, initialSessionId = null }: { children: React.ReactNode; initialSessionId?: string | null }) {
   const { session, isLoaded } = useSession();
   const clerk = useClerk();
+  const activeSessionId = session?.id ?? null;
+  const previousSessionId = useRef(initialSessionId);
+  useEffect(() => {
+    if (!isLoaded && !clerk.loaded) return;
+    // Genie is unmounted during sign-out, so its own effect cannot erase the
+    // old tab cache. Keep that cleanup outside the gated children.
+    if (!activeSessionId || (previousSessionId.current && previousSessionId.current !== activeSessionId)) {
+      try { clearConversation(window.sessionStorage); }
+      catch { /* Blocked browser storage must not interrupt authentication. */ }
+    }
+    previousSessionId.current = activeSessionId;
+  }, [activeSessionId, isLoaded, clerk.loaded]);
   // Clerk clears the client session before its sign-out request/navigation has
   // finished. Do not remount the old server-authenticated page as a guest in
   // that gap: its mount effects and Link prefetches would start again while

@@ -1,0 +1,169 @@
+import "server-only";
+
+import { createHmac } from "node:crypto";
+import { isIP } from "node:net";
+import { GENIE_LINKS, GENIE_MAX_MESSAGE_CHARS, buildGenieInstructions, type validateGenieRequest } from "@/lib/genie";
+import { rateLimit } from "@/lib/rateLimit";
+
+export const GENIE_BODY_MAX_BYTES = 40 * 1024;
+const PROVIDER_BODY_MAX_BYTES = 64 * 1024;
+const PROVIDER_TIMEOUT_MS = 25_000;
+const PROVIDER_URL = "https://api.openai.com/v1/responses";
+
+type GenieRequest = Extract<ReturnType<typeof validateGenieRequest>, { ok: true }>["value"];
+type GenieErrorCode = "invalid_request" | "unsafe_input" | "rate_limited" | "unavailable" | "timeout" | "failed";
+export class GenieError extends Error {
+  constructor(readonly code: GenieErrorCode, readonly status: number) { super(code); }
+}
+type GenieConfiguration = { apiKey: string; dailyLimit: number };
+
+export function genieConfiguration(): GenieConfiguration {
+  const apiKey = process.env.OPENAI_API_KEY?.trim();
+  if (!apiKey || process.env.GENIE_ENABLED?.trim().toLowerCase() === "false") throw new GenieError("unavailable", 503);
+  const configuredLimit = process.env.GENIE_DAILY_REQUEST_LIMIT?.trim();
+  if (configuredLimit && !/^(?:[1-9]\d{0,2}|1000)$/.test(configuredLimit)) throw new GenieError("unavailable", 503);
+  return { apiKey, dailyLimit: configuredLimit ? Number(configuredLimit) : 200 };
+}
+
+/** Bound actual streamed bytes, including requests without Content-Length. */
+async function readBoundedJson(source: Request | Response, maxBytes: number, error: GenieError): Promise<unknown> {
+  if (Number(source.headers.get("content-length")) > maxBytes || !source.body) throw error;
+  const reader = source.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > maxBytes) throw error;
+      chunks.push(value);
+    }
+  } finally { await reader.cancel().catch(() => {}); }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+  return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+}
+
+export async function readGenieBody(request: Request): Promise<unknown> {
+  if (!request.body || !/^application\/json(?:\s*;|$)/i.test(request.headers.get("content-type") ?? "")) throw new GenieError("invalid_request", 400);
+  try { return await readBoundedJson(request, GENIE_BODY_MAX_BYTES, new GenieError("invalid_request", 413)); }
+  catch (error) {
+    if (error instanceof GenieError) throw error;
+    throw new GenieError("invalid_request", 400);
+  }
+}
+
+function trustedClientIp(request: Request): string {
+  // Vercel supplies these headers at its edge. Other runtimes share a safe
+  // fallback bucket instead of trusting arbitrary client forwarding headers.
+  if (process.env.VERCEL !== "1") return "untrusted-runtime";
+  const forwarded = request.headers.get("x-vercel-forwarded-for") ?? request.headers.get("x-forwarded-for");
+  const candidate = forwarded?.trim() ?? "";
+  return candidate.length <= 45 && isIP(candidate) ? candidate : "unknown";
+}
+
+/** Counters are the only application writes; failed requests never refund them. */
+export async function reserveGenieUsage(request: Request, userId: string | null, config: GenieConfiguration): Promise<void> {
+  const digest = (value: string) => createHmac("sha256", config.apiKey).update(value).digest("hex");
+  const ip = digest(`genie:ip:${trustedClientIp(request)}`);
+  const identity = userId ? digest(`genie:user:${userId}`) : ip;
+  const actor = userId ? "member" : "guest";
+  const day = new Date().toISOString().slice(0, 10);
+  const reservations: [string, number, number][] = [
+    [`genie:ip:minute:${ip}`, 20, 60],
+    [`genie:ip:day:${day}:${ip}`, 100, 86400],
+    [`genie:${actor}:minute:${identity}`, userId ? 10 : 5, 60],
+    [`genie:${actor}:day:${day}:${identity}`, userId ? 60 : 20, 86400],
+    [`genie:global:day:${day}`, config.dailyLimit, 86400],
+  ];
+  for (const [key, limit, window] of reservations) {
+    request.signal.throwIfAborted();
+    let allowed = false;
+    try { allowed = (await rateLimit(key, limit, window)).allowed === true; }
+    catch { /* A limiter transport failure also denies provider access. */ }
+    if (!allowed) throw new GenieError("rate_limited", 429);
+  }
+}
+
+function record(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function safeAdvice(value: unknown, input: GenieRequest) {
+  if (!record(value) || value.status !== "completed" || value.error || !Array.isArray(value.output)) throw new GenieError("failed", 502);
+  const text: string[] = [];
+  for (const message of value.output) {
+    if (!record(message) || message.type !== "message" || message.role !== "assistant" || !Array.isArray(message.content)) throw new GenieError("failed", 502);
+    for (const content of message.content) {
+      if (!record(content) || content.type !== "output_text" || typeof content.text !== "string") throw new GenieError("failed", 502);
+      text.push(content.text);
+    }
+  }
+  const advice: unknown = JSON.parse(text.join(""));
+  if (!record(advice) || Object.keys(advice).some(key => !["reply", "linkIds", "language"].includes(key))
+    || typeof advice.reply !== "string" || !advice.reply.trim() || advice.reply.length > GENIE_MAX_MESSAGE_CHARS
+    || !Array.isArray(advice.linkIds) || advice.linkIds.some(id => typeof id !== "string")
+    || (input.writing ? advice.language !== input.locale : advice.language !== "de" && advice.language !== "en")) throw new GenieError("failed", 502);
+  if (input.writing) {
+    // Reject an unusable suggestion instead of silently changing or truncating it.
+    if (advice.reply.length > input.writing.maxLength || advice.reply.includes("\0") || advice.linkIds.length
+      || /(?:https?:\/\/|www\.|\[[^\]]*\]\s*\([^)]*\)|<\/?[a-z][^>]*>)/i.test(advice.reply)) throw new GenieError("failed", 502);
+    return { reply: advice.reply.trim(), links: [] };
+  }
+  const ids = [...new Set(advice.linkIds as string[])].slice(0, 4);
+  // Labels and destinations always come from our catalogue, never model URLs.
+  const links = ids.flatMap(id => {
+    const link = GENIE_LINKS.find(candidate => candidate.id === id);
+    return link ? [{ href: link.href, label: advice.language === "de" ? link.labelDe : link.labelEn }] : [];
+  });
+  return { reply: advice.reply.trim(), links };
+}
+
+export async function generateGenieAdvice(request: Request, input: GenieRequest, config: GenieConfiguration) {
+  const timeout = AbortSignal.timeout(PROVIDER_TIMEOUT_MS);
+  const signal = AbortSignal.any([request.signal, timeout]);
+  try {
+    signal.throwIfAborted();
+    const response = await fetch(PROVIDER_URL, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${config.apiKey}`, "Content-Type": "application/json" },
+      cache: "no-store",
+      redirect: "error",
+      signal,
+      body: JSON.stringify({
+        model: "gpt-4.1-mini",
+        store: false,
+        max_output_tokens: 600,
+        instructions: input.writing
+          ? buildGenieInstructions(input.area, input.locale, input.writing)
+          : `${buildGenieInstructions(input.area, input.locale)}\nReturn plain JSON matching the provided schema. Keep reply below ${GENIE_MAX_MESSAGE_CHARS} characters. Follow the German/English language guidance above, prioritizing the latest user message. Set language to de for a German answer and en for an English answer. Select only catalogue linkIds; never put URLs or Markdown links in reply.`,
+        input: input.messages.map(message => ({ role: message.role, content: message.content })),
+        text: { format: {
+          type: "json_schema", name: "genie_advice", strict: true,
+          schema: {
+            type: "object", additionalProperties: false,
+            properties: {
+              reply: { type: "string" },
+              linkIds: { type: "array", ...(input.writing ? { maxItems: 0 } : {}), items: { type: "string", enum: GENIE_LINKS.map(link => link.id) } },
+              language: { type: "string", enum: input.writing ? [input.locale] : ["de", "en"] },
+            },
+            required: ["reply", "linkIds", "language"],
+          },
+        } },
+      }),
+    });
+    if (!response.ok) {
+      await response.body?.cancel().catch(() => {});
+      throw new GenieError("unavailable", 503);
+    }
+    const payload = await readBoundedJson(response, PROVIDER_BODY_MAX_BYTES, new GenieError("failed", 502));
+    signal.throwIfAborted();
+    return safeAdvice(payload, input);
+  } catch (error) {
+    if (signal.aborted) throw new GenieError("timeout", 504);
+    if (error instanceof GenieError) throw error;
+    throw new GenieError("failed", 502);
+  }
+}
