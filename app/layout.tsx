@@ -18,6 +18,7 @@ import { ToastProvider } from "@/contexts/ToastContext";
 import GlobalSearch from "@/components/GlobalSearch";
 import FormDraftProvider from "@/contexts/FormDraftContext";
 import AuthSessionBoundary from "@/components/AuthSessionBoundary";
+import { AUTH_TASK_URLS } from "@/lib/auth-session-tasks";
 import Genie from "@/components/Genie";
 import { getTranslations as getMetadataTranslations } from "next-intl/server";
 
@@ -120,6 +121,7 @@ export default async function RootLayout({
     <ClerkProvider
       dynamic
       localization={clerkLocalization}
+      taskUrls={AUTH_TASK_URLS}
       signUpForceRedirectUrl="/profile-setup?welcome=1"
       signInFallbackRedirectUrl="/dashboard"
       afterMultiSessionSingleSignOutUrl="/"

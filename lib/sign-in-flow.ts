@@ -1,7 +1,7 @@
-export type PasswordSignInAction = "complete" | "mfa" | "unsupported";
+export type PasswordSignInAction = "complete" | "mfa" | "new-password" | "unsupported";
 
 type FinalizeNavigation = {
-  navigate: (params: { decorateUrl: (url: string) => string }) => void | Promise<unknown>;
+  navigate: (params: { session?: { currentTask?: { key: string } | null } | null; decorateUrl: (url: string) => string }) => void | Promise<unknown>;
 };
 
 type FinalizeResult = { error: unknown | null };
@@ -18,8 +18,10 @@ export async function finalizeThenNavigate(
 ): Promise<FinalizeResult> {
   let navigationStarted = false;
   return finalize({
-    navigate: ({ decorateUrl }) => {
-      if (navigationStarted) return;
+    navigate: ({ session, decorateUrl }) => {
+      // Clerk redirects pending sessions to the configured taskUrls.
+      // Do not send them to protected content before security tasks complete.
+      if (session?.currentTask || navigationStarted) return;
       navigationStarted = true;
       return navigate(decorateUrl(destination));
     },
@@ -48,6 +50,7 @@ export function shouldRedirectForActiveSession(
 
 export function getPasswordSignInAction(status: string | null | undefined): PasswordSignInAction {
   if (status === "complete") return "complete";
+  if (status === "needs_new_password") return "new-password";
   if (status === "needs_second_factor" || status === "needs_client_trust") return "mfa";
   return "unsupported";
 }

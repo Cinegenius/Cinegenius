@@ -9,6 +9,7 @@ import { localizeAuthMessage } from "@/lib/i18n/auth-messages";
 import { Eye, EyeOff } from "lucide-react";
 import { finalizeThenNavigate, getMfaResendChannel, getPasswordSignInAction, resolveAuthNavigationUrl, selectSecondFactor, shouldRedirectForActiveSession } from "@/lib/sign-in-flow";
 import { classifyPasswordResetError, getPasswordResetRequestErrorMessage, PASSWORD_RESET_NEUTRAL_MESSAGE, PASSWORD_RESET_RESEND_COOLDOWN_SECONDS, validateNewPassword } from "@/lib/password-reset-flow";
+import { readableAuthError, type AuthErrorContext } from "@/lib/auth-error-message";
 
 type AuthMode = "sign-in" | "sign-up";
 type SignInStep = "credentials" | "email-code" | "mfa" | "reset-code" | "new-password";
@@ -20,31 +21,15 @@ type AuthFormProps = {
   signInDestination?: string;
 };
 
-type ClerkErrorLike = {
-  code?: string;
-  message?: string;
-  longMessage?: string;
-  errors?: Array<{ code?: string; message?: string; longMessage?: string }>;
-};
-
 const inputClass = "mt-2 min-h-12 w-full rounded-xl border border-border bg-bg-secondary px-4 text-base text-text-primary outline-none transition-colors placeholder:text-text-muted focus:border-gold focus:ring-2 focus:ring-gold/20";
 const buttonClass = "inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-gold px-5 text-base font-bold text-bg-primary transition-colors hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-60";
 const secondaryButtonClass = "inline-flex min-h-11 items-center justify-center rounded-xl border border-border px-4 text-sm font-semibold text-text-secondary transition-colors hover:border-gold hover:text-gold disabled:opacity-60";
 
-function readableAuthError(translate: (key: string, values?: Record<string, string | number>) => string, error: unknown, fallback: string): string {
-  const value = error as ClerkErrorLike | null;
-  const details = value?.errors?.[0] ?? value;
-  const code = details?.code ?? value?.code;
-  if (code === "form_identifier_exists") return translate("auth.accountExists");
-  if (code === "form_password_incorrect" || code === "form_identifier_not_found") return translate("auth.credentialsError");
-  return fallback;
-}
-
-async function runAuthAction<T>(translate: (key: string, values?: Record<string, string | number>) => string, action: () => Promise<T>, setError: (message: string) => void, fallback: string): Promise<T | undefined> {
+async function runAuthAction<T>(translate: (key: string, values?: Record<string, string | number>) => string, action: () => Promise<T>, setError: (message: string) => void, fallback: string, context: AuthErrorContext = "sign-in"): Promise<T | undefined> {
   try {
     return await action();
   } catch (error) {
-    setError(readableAuthError(translate, error, fallback));
+    setError(readableAuthError(translate, error, fallback, context));
     return undefined;
   }
 }
@@ -82,7 +67,7 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [resetCooldownSeconds, setResetCooldownSeconds] = useState(0);
   const [resetRequestInProgress, setResetRequestInProgress] = useState(false);
-  const [step, setStep] = useState<SignInStep>("credentials");
+  const [storedStep, setStep] = useState<SignInStep>("credentials");
   const [factor, setFactor] = useState<"email_code" | "phone_code" | "totp" | "backup_code" | null>(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -91,6 +76,9 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
   const signInAttemptStarted = useRef(false);
   const navigationStarted = useRef(false);
   const busy = fetchStatus === "fetching" || submitting;
+  // A restored Clerk attempt can already require a new password before this
+  // component's local step has changed. Do not replace or reset that attempt.
+  const step = isLoaded && signIn.status === "needs_new_password" ? "new-password" : storedStep;
 
   useEffect(() => {
     if (resetCooldownSeconds <= 0) return;
@@ -114,7 +102,7 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
   }, [clerk, destination]);
 
   const beginSubmission = () => {
-    if (!signIn || busy || submissionInFlight.current) return false;
+    if (!isLoaded || !signIn || busy || submissionInFlight.current) return false;
     submissionInFlight.current = true;
     setSubmitting(true);
     return true;
@@ -131,7 +119,7 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
     if (shouldRedirectForActiveSession(isLoaded, !!isSignedIn, signInAttemptStarted.current && !error)) {
       void navigateOnce(destination).catch((error) => setError(readableAuthError(uiText, error, t("finishError"))));
     }
-  }, [destination, error, isLoaded, isSignedIn, navigateOnce, t]);
+  }, [destination, error, isLoaded, isSignedIn, navigateOnce, t, uiText]);
 
   const completeSignIn = async () => {
     const result = await runAuthAction(uiText,
@@ -180,7 +168,7 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
   };
 
   const resendSecondFactorCode = async () => {
-    if (!signIn || busy) return;
+    if (!isLoaded || !signIn || busy) return;
     const channel = getMfaResendChannel(factor);
     if (!channel) return;
     setError("");
@@ -221,7 +209,10 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
       const nextAction = getPasswordSignInAction(signIn.status);
       if (nextAction === "complete") await completeSignIn();
       else if (nextAction === "mfa") await prepareSecondFactor();
-      else {
+      else if (nextAction === "new-password") {
+        setStep("new-password");
+        setMessage(uiText("auth.passwordChangeRequired"));
+      } else {
         signInAttemptStarted.current = false;
         setError(uiText("Ui.text_fe3e3d3d3203bd"));
       }
@@ -275,14 +266,17 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
       }
       if (signIn.status === "complete") await completeSignIn();
       else if (signIn.status === "needs_second_factor" || signIn.status === "needs_client_trust") await prepareSecondFactor();
-      else setError(uiText("Ui.text_61796f18c9376c"));
+      else if (signIn.status === "needs_new_password") {
+        setStep("new-password");
+        setMessage(uiText("auth.passwordChangeRequired"));
+      } else setError(uiText("Ui.text_61796f18c9376c"));
     } finally {
       finishSubmission();
     }
   };
 
   const startPasswordReset = async () => {
-    if (!signIn || busy) return;
+    if (!isLoaded || !signIn || busy) return;
     if (resetCooldownSeconds > 0) {
       setResetEmailError(uiText("Ui.text_2bfda3734735f4", { value1: String(resetCooldownSeconds) }));
       return;
@@ -364,7 +358,7 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
     }
     try {
       const result = await signIn.resetPasswordEmailCode.verifyCode({ code: code.trim() });
-      if (result.error) setResetCodeError(uiText("Ui.text_7a8518e113003d"));
+      if (result.error) setResetCodeError(readableAuthError(uiText, result.error, uiText("Ui.text_7a8518e113003d")));
       else if (signIn.status === "needs_new_password") setStep("new-password");
       else setResetCodeError(uiText("Ui.text_e142fb710b14e3"));
     } catch {
@@ -375,7 +369,7 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
   };
 
   const resendPasswordResetCode = async () => {
-    if (!signIn || busy) return;
+    if (!isLoaded || !signIn || busy) return;
     if (resetCooldownSeconds > 0) {
       setError(uiText("Ui.text_e03259f7102497", { value1: String(resetCooldownSeconds) }));
       return;
@@ -460,7 +454,7 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
       const result = await signIn.resetPasswordEmailCode.submitPassword({ password: newPassword });
       if (result.error) {
         signInAttemptStarted.current = false;
-        setNewPasswordError(readableAuthError(uiText, result.error, uiText("auth.passwordSaveError")));
+        setNewPasswordError(readableAuthError(uiText, result.error, uiText("auth.passwordSaveError"), "new-password"));
         return;
       }
       const nextAction = getPasswordSignInAction(signIn.status);
@@ -474,9 +468,9 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
         signInAttemptStarted.current = false;
         setError(uiText("auth.passwordUnconfirmed"));
       }
-    } catch {
+    } catch (error) {
       signInAttemptStarted.current = false;
-      setError(uiText("Ui.text_a1d773d89cdd06"));
+      setError(readableAuthError(uiText, error, uiText("Ui.text_a1d773d89cdd06"), "new-password"));
     } finally {
       finishSubmission();
     }
@@ -518,14 +512,14 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
             {t("password")}<input autoComplete="current-password" type="password" required value={password} onChange={(event) => setPassword(event.target.value)} className={inputClass} placeholder={t("yourPassword")} />
             {errors.fields.password && <span className="mt-1 block text-sm text-red-400">{readableAuthError(uiText, errors.fields.password, t("credentialsError"))}</span>}
           </label>
-          <button type="submit" disabled={!signIn || busy} className={buttonClass}>
-            {busy ? t("signingIn") : t("signIn")}
+          <button type="submit" disabled={!isLoaded || !signIn || busy} className={buttonClass}>
+            {!isLoaded ? t("loadingService") : busy ? t("signingIn") : t("signIn")}
           </button>
           <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
-            <button type="button" disabled={!signIn || busy || !email.trim() || resetCooldownSeconds > 0} onClick={() => void startPasswordReset()} className="min-h-11 text-text-muted underline-offset-4 hover:text-gold hover:underline disabled:opacity-50">
+            <button type="button" disabled={!isLoaded || !signIn || busy || !email.trim() || resetCooldownSeconds > 0} onClick={() => void startPasswordReset()} className="min-h-11 text-text-muted underline-offset-4 hover:text-gold hover:underline disabled:opacity-50">
               {resetRequestInProgress ? t("recovering") : resetCooldownSeconds > 0 ? t("retrySeconds", {seconds: resetCooldownSeconds}) : t("forgotPassword")}
             </button>
-            <button type="button" disabled={!signIn || busy || !email.trim()} onClick={() => void sendEmailCode()} className="min-h-11 text-gold underline-offset-4 hover:underline disabled:opacity-50">
+            <button type="button" disabled={!isLoaded || !signIn || busy || !email.trim()} onClick={() => void sendEmailCode()} className="min-h-11 text-gold underline-offset-4 hover:underline disabled:opacity-50">
               {t("emailSignIn")}</button>
           </div>
         </form>
@@ -538,9 +532,9 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
             <input autoComplete="one-time-code" inputMode="numeric" required value={code} onChange={(event) => setCode(event.target.value)} className={inputClass} placeholder={t("verificationCode")} />
             {errors.fields.code && <span className="mt-1 block text-sm text-red-400">{readableAuthError(uiText, errors.fields.code, t("codeError"))}</span>}
           </label>
-          <button type="submit" disabled={!signIn || busy} className={buttonClass}>{busy ? t("checkingCode") : t("verifyCode")}</button>
-          {step === "email-code" && <button type="button" disabled={!signIn || busy} onClick={() => void sendEmailCode()} className={`${secondaryButtonClass} w-full`}>{t("sendNewCode")}</button>}
-          {step === "mfa" && getMfaResendChannel(factor) && <button type="button" disabled={!signIn || busy} onClick={() => void resendSecondFactorCode()} className={`${secondaryButtonClass} w-full`}>{t("sendNewCode")}</button>}
+          <button type="submit" disabled={!isLoaded || !signIn || busy} className={buttonClass}>{busy ? t("checkingCode") : t("verifyCode")}</button>
+          {step === "email-code" && <button type="button" disabled={!isLoaded || !signIn || busy} onClick={() => void sendEmailCode()} className={`${secondaryButtonClass} w-full`}>{t("sendNewCode")}</button>}
+          {step === "mfa" && getMfaResendChannel(factor) && <button type="button" disabled={!isLoaded || !signIn || busy} onClick={() => void resendSecondFactorCode()} className={`${secondaryButtonClass} w-full`}>{t("sendNewCode")}</button>}
           <button type="button" disabled={busy} onClick={() => void resetFlow()} className="min-h-11 w-full text-sm text-text-muted hover:text-text-primary">{t("backSignIn")}</button>
         </form>
       )}
@@ -552,11 +546,11 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
             {errors.fields.code && <span className="mt-1 block text-sm text-red-400">{readableAuthError(uiText, errors.fields.code, t("codeError"))}</span>}
             {resetCodeError && <span className="mt-1 block text-sm text-red-400">{localizeAuthMessage(resetCodeError, t)}</span>}
           </label>
-          <button type="submit" disabled={!signIn || busy} className={buttonClass}>{busy ? t("checkingCode") : t("verifyCode")}</button>
-          <button type="button" disabled={!signIn || busy || resetCooldownSeconds > 0} onClick={() => void resendPasswordResetCode()} className={`${secondaryButtonClass} w-full`}>
+          <button type="submit" disabled={!isLoaded || !signIn || busy} className={buttonClass}>{busy ? t("checkingCode") : t("verifyCode")}</button>
+          <button type="button" disabled={!isLoaded || !signIn || busy || resetCooldownSeconds > 0} onClick={() => void resendPasswordResetCode()} className={`${secondaryButtonClass} w-full`}>
             {busy ? t("sendingCode") : resetCooldownSeconds > 0 ? t("requestSeconds", {seconds: resetCooldownSeconds}) : t("requestCode")}
           </button>
-          <button type="button" disabled={!signIn || busy} onClick={() => void startEmailCodeSignIn()} className="min-h-11 w-full text-sm font-semibold text-gold hover:underline">
+          <button type="button" disabled={!isLoaded || !signIn || busy} onClick={() => void startEmailCodeSignIn()} className="min-h-11 w-full text-sm font-semibold text-gold hover:underline">
             {t("alternativeSignIn")}</button>
           <button type="button" disabled={busy} onClick={() => void resetFlow()} className="min-h-11 w-full text-sm text-text-muted hover:text-text-primary">{t("backSignIn")}</button>
         </form>
@@ -573,7 +567,7 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
               </button>
             </div>
             <span id="reset-password-requirement" className="mt-1 block text-xs text-text-muted">{t("passwordRules")}</span>
-            {errors.fields.password && <span className="mt-1 block text-sm text-red-400">{readableAuthError(uiText, errors.fields.password, t("credentialsError"))}</span>}
+            {errors.fields.password && <span className="mt-1 block text-sm text-red-400">{readableAuthError(uiText, errors.fields.password, t("passwordSaveError"), "new-password")}</span>}
             {newPasswordError && <span id="reset-password-error" className="mt-1 block text-sm text-red-400">{localizeAuthMessage(newPasswordError, t)}</span>}
           </div>
           <div>
@@ -586,12 +580,12 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
             </div>
             {confirmPasswordError && <span id="reset-confirm-password-error" className="mt-1 block text-sm text-red-400">{localizeAuthMessage(confirmPasswordError, t)}</span>}
           </div>
-          <button type="submit" disabled={!signIn || busy} className={buttonClass}>{busy ? t("savingPassword") : t("savePassword")}</button>
+          <button type="submit" disabled={!isLoaded || !signIn || busy} className={buttonClass}>{busy ? t("savingPassword") : t("savePassword")}</button>
           <button type="button" disabled={busy} onClick={() => void resetFlow()} className="min-h-11 w-full text-sm text-text-muted hover:text-text-primary">{t("cancelSignIn")}</button>
         </form>
       )}
 
-      {message && <p role="status" className="mt-4 rounded-xl border border-gold/30 bg-gold/10 px-4 py-3 text-sm text-text-primary">{localizeAuthMessage(message, t)}</p>}
+      {(message || (step === "new-password" && !error)) && <p role="status" className="mt-4 rounded-xl border border-gold/30 bg-gold/10 px-4 py-3 text-sm text-text-primary">{message ? localizeAuthMessage(message, t) : t("passwordChangeRequired")}</p>}
       {error && <p role="alert" className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{localizeAuthMessage(error, t)}</p>}
       <p className="mt-6 text-center text-sm text-text-muted">
         {t("noAccount")}{" "}
@@ -621,7 +615,21 @@ function SignUpForm({ destination, signInDestination }: { destination: string; s
   const [lastName, setLastName] = useState("");
   const [legalAccepted, setLegalAccepted] = useState(false);
   const signUpAttemptStarted = useRef(false);
-  const busy = fetchStatus === "fetching";
+  const [submitting, setSubmitting] = useState(false);
+  const submissionInFlight = useRef(false);
+  const busy = fetchStatus === "fetching" || submitting;
+
+  const beginSubmission = () => {
+    if (!isLoaded || !signUp || busy || submissionInFlight.current) return false;
+    submissionInFlight.current = true;
+    setSubmitting(true);
+    return true;
+  };
+
+  const finishSubmission = () => {
+    submissionInFlight.current = false;
+    setSubmitting(false);
+  };
 
   const required = useMemo(() => new Set([...(signUp?.requiredFields ?? []), ...requiredFields]), [requiredFields, signUp]);
 
@@ -647,87 +655,107 @@ function SignUpForm({ destination, signInDestination }: { destination: string; s
 
   const submitSignUp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!signUp || busy) return;
-    setError("");
-    setMessage("");
-    if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
-      setError(uiText("auth.invalidEmail"));
-      return;
-    }
-    if (password.length < 8) {
-      setError(uiText("auth.passwordLength"));
-      return;
-    }
-    signUpAttemptStarted.current = true;
-    const additionalFields = {
-      ...(required.has("first_name") && firstName.trim() ? { firstName: firstName.trim() } : {}),
-      ...(required.has("last_name") && lastName.trim() ? { lastName: lastName.trim() } : {}),
-      ...(required.has("legal_accepted") ? { legalAccepted } : {}),
-    };
-    const result = await runAuthAction(uiText, () => signUp.password({ emailAddress: email.trim(), password, ...additionalFields , locale: activeLocale }), setError, uiText("auth.registrationError"));
-    if (!result || result.error) {
-      signUpAttemptStarted.current = false;
-      if (!result) return;
+    if (!beginSubmission()) return;
+    try {
+      setError("");
+      setMessage("");
+      if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
+        setError(uiText("auth.invalidEmail"));
+        return;
+      }
+      if (password.length < 8) {
+        setError(uiText("auth.passwordLength"));
+        return;
+      }
+      signUpAttemptStarted.current = true;
+      const additionalFields = {
+        ...(required.has("first_name") && firstName.trim() ? { firstName: firstName.trim() } : {}),
+        ...(required.has("last_name") && lastName.trim() ? { lastName: lastName.trim() } : {}),
+        ...(required.has("legal_accepted") ? { legalAccepted } : {}),
+      };
+      const result = await runAuthAction(uiText, () => signUp.password({ emailAddress: email.trim(), password, ...additionalFields , locale: activeLocale }), setError, uiText("auth.registrationError"), "sign-up");
+      if (!result || result.error) {
+        signUpAttemptStarted.current = false;
+        if (!result) return;
+        setRequiredFields(signUp.missingFields);
+        setError(readableAuthError(uiText, result.error, uiText("auth.registrationError"), "sign-up"));
+        return;
+      }
+      if (signUp.status === "complete") {
+        await finalizeSignUp();
+        return;
+      }
       setRequiredFields(signUp.missingFields);
-      setError(readableAuthError(uiText, result.error, uiText("auth.registrationError")));
-      return;
+      if (signUp.missingFields.length > 0 && (signUp.missingFields.includes("first_name") || signUp.missingFields.includes("last_name") || signUp.missingFields.includes("legal_accepted"))) {
+        setError(uiText("auth.requiredFields"));
+        return;
+      }
+      const verification = await runAuthAction(uiText, () => signUp.verifications.sendEmailCode(), setError, uiText("auth.codeSendError"));
+      if (!verification || verification.error) {
+        if (!verification) return;
+        setError(readableAuthError(uiText, verification.error, uiText("auth.codeSendError")));
+        return;
+      }
+      setStep("verify");
+      setMessage(uiText("auth.accountCreated"));
+    } finally {
+      finishSubmission();
     }
-    if (signUp.status === "complete") {
-      await finalizeSignUp();
-      return;
-    }
-    setRequiredFields(signUp.missingFields);
-    if (signUp.missingFields.length > 0 && (signUp.missingFields.includes("first_name") || signUp.missingFields.includes("last_name") || signUp.missingFields.includes("legal_accepted"))) {
-      setError(uiText("auth.requiredFields"));
-      return;
-    }
-    const verification = await runAuthAction(uiText, () => signUp.verifications.sendEmailCode(), setError, uiText("auth.codeSendError"));
-    if (!verification || verification.error) {
-      if (!verification) return;
-      setError(readableAuthError(uiText, verification.error, uiText("auth.codeSendError")));
-      return;
-    }
-    setStep("verify");
-    setMessage(uiText("auth.accountCreated"));
   };
 
   const verifySignUp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!signUp || busy) return;
-    setError("");
-    setMessage("");
-    const result = await runAuthAction(uiText, () => signUp.verifications.verifyEmailCode({ code: code.trim() }), setError, uiText("Ui.text_47b6b76cb146a0"));
-    if (!result || result.error) {
-      if (!result) return;
-      setError(readableAuthError(uiText, result.error, uiText("Ui.text_db77886f4bf574")));
-      return;
+    if (!beginSubmission()) return;
+    try {
+      setError("");
+      setMessage("");
+      const result = await runAuthAction(uiText, () => signUp.verifications.verifyEmailCode({ code: code.trim() }), setError, uiText("Ui.text_47b6b76cb146a0"));
+      if (!result || result.error) {
+        if (!result) return;
+        setError(readableAuthError(uiText, result.error, uiText("Ui.text_db77886f4bf574")));
+        return;
+      }
+      if (signUp.status === "complete") await finalizeSignUp();
+      else if (signUp.missingFields.length > 0) {
+        setRequiredFields(signUp.missingFields);
+        setStep("credentials");
+        setError(uiText("Ui.text_b4abaca3b3197e"));
+      } else setError(uiText("Ui.text_2b7bd895a01ba7"));
+    } finally {
+      finishSubmission();
     }
-    if (signUp.status === "complete") await finalizeSignUp();
-    else if (signUp.missingFields.length > 0) {
-      setRequiredFields(signUp.missingFields);
-      setStep("credentials");
-      setError(uiText("Ui.text_b4abaca3b3197e"));
-    } else setError(uiText("Ui.text_2b7bd895a01ba7"));
   };
 
   const resendCode = async () => {
-    if (!signUp || busy) return;
-    setError("");
-    const result = await runAuthAction(uiText, () => signUp.verifications.sendEmailCode(), setError, uiText("auth.codeSendError"));
-    if (!result) return;
-    if (result.error) setError(readableAuthError(uiText, result.error, uiText("auth.codeSendError")));
-    else setMessage(uiText("Ui.text_2e266434078269"));
+    if (!beginSubmission()) return;
+    try {
+      setError("");
+      const result = await runAuthAction(uiText, () => signUp.verifications.sendEmailCode(), setError, uiText("auth.codeSendError"));
+      if (!result) return;
+      if (result.error) setError(readableAuthError(uiText, result.error, uiText("auth.codeSendError")));
+      else setMessage(uiText("Ui.text_2e266434078269"));
+    } finally {
+      finishSubmission();
+    }
   };
 
   const resetSignUp = async () => {
-    const result = await runAuthAction(uiText, () => signUp.reset(), setError, uiText("Ui.text_7a0b0cb6f5506e"));
-    if (!result || result.error) return;
-    setStep("credentials");
-    setCode("");
-    setPassword("");
-    setRequiredFields([]);
-    setMessage("");
-    setError("");
+    if (!beginSubmission()) return;
+    try {
+      const result = await runAuthAction(uiText, () => signUp.reset(), setError, uiText("Ui.text_7a0b0cb6f5506e"));
+      if (!result || result.error) {
+        if (result?.error) setError(readableAuthError(uiText, result.error, uiText("Ui.text_7a0b0cb6f5506e")));
+        return;
+      }
+      setStep("credentials");
+      setCode("");
+      setPassword("");
+      setRequiredFields([]);
+      setMessage("");
+      setError("");
+    } finally {
+      finishSubmission();
+    }
   };
 
   return (
@@ -738,7 +766,7 @@ function SignUpForm({ destination, signInDestination }: { destination: string; s
             {errors.fields.emailAddress && <span className="mt-1 block text-sm text-red-400">{readableAuthError(uiText, errors.fields.emailAddress, t("invalidEmail"))}</span>}
           </label>
           <label className="block text-sm font-medium text-text-primary">{t("password")}<input autoComplete="new-password" type="password" minLength={8} required value={password} onChange={(event) => setPassword(event.target.value)} className={inputClass} placeholder={t("minimumPassword")} />
-            {errors.fields.password && <span className="mt-1 block text-sm text-red-400">{readableAuthError(uiText, errors.fields.password, t("passwordRules"))}</span>}
+            {errors.fields.password && <span className="mt-1 block text-sm text-red-400">{readableAuthError(uiText, errors.fields.password, t("passwordRules"), "sign-up")}</span>}
           </label>
           {required.has("first_name") && <label className="block text-sm font-medium text-text-primary">{t("firstName")}<input autoComplete="given-name" required value={firstName} onChange={(event) => setFirstName(event.target.value)} className={inputClass} />
             {errors.fields.firstName && <span className="mt-1 block text-sm text-red-400">{readableAuthError(uiText, errors.fields.firstName, t("requiredFields"))}</span>}
@@ -752,7 +780,7 @@ function SignUpForm({ destination, signInDestination }: { destination: string; s
             {errors.fields.legalAccepted && <span className="text-sm text-red-400">{readableAuthError(uiText, errors.fields.legalAccepted, t("requiredFields"))}</span>}
           </label>}
           <p className="text-xs leading-5 text-text-muted">{t.rich(required.has("legal_accepted") ? "registrationPrivacyNotice" : "registrationLegalNotice", {terms: chunks => <Link href="/agb" target="_blank" rel="noopener noreferrer" className="underline hover:text-gold">{chunks}</Link>, privacy: chunks => <Link href="/datenschutz" target="_blank" rel="noopener noreferrer" className="underline hover:text-gold">{chunks}</Link>})}</p>
-          <button type="submit" disabled={!signUp || busy || (required.has("legal_accepted") && !legalAccepted)} className={buttonClass}>{busy ? t("creatingAccount") : t("createAccount")}</button>
+          <button type="submit" disabled={!isLoaded || !signUp || busy || (required.has("legal_accepted") && !legalAccepted)} className={buttonClass}>{!isLoaded ? t("loadingService") : busy ? t("creatingAccount") : t("createAccount")}</button>
           <p className="text-center text-xs leading-5 text-text-muted">{t("accountOnly")}</p>
           <div id="clerk-captcha" />
         </form>
@@ -761,8 +789,8 @@ function SignUpForm({ destination, signInDestination }: { destination: string; s
           <label className="block text-sm font-medium text-text-primary">{t("verificationCode")}<input autoComplete="one-time-code" inputMode="numeric" required value={code} onChange={(event) => setCode(event.target.value)} className={inputClass} placeholder={t("codeFromEmail")} />
             {errors.fields.code && <span className="mt-1 block text-sm text-red-400">{readableAuthError(uiText, errors.fields.code, t("codeError"))}</span>}
           </label>
-          <button type="submit" disabled={!signUp || busy} className={buttonClass}>{busy ? t("verifying") : t("verifyEmail")}</button>
-          <button type="button" disabled={!signUp || busy} onClick={() => void resendCode()} className={`${secondaryButtonClass} w-full`}>{t("resendCode")}</button>
+          <button type="submit" disabled={!isLoaded || !signUp || busy} className={buttonClass}>{busy ? t("verifying") : t("verifyEmail")}</button>
+          <button type="button" disabled={!isLoaded || !signUp || busy} onClick={() => void resendCode()} className={`${secondaryButtonClass} w-full`}>{t("resendCode")}</button>
           <button type="button" disabled={busy} onClick={() => void resetSignUp()} className="min-h-11 w-full text-sm text-text-muted hover:text-text-primary">{t("changeEmail")}</button>
         </form>
       )}
