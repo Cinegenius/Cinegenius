@@ -168,24 +168,28 @@ function SignInForm({ destination, signUpDestination }: { destination: string; s
   };
 
   const resendSecondFactorCode = async () => {
-    if (!isLoaded || !signIn || busy) return;
     const channel = getMfaResendChannel(factor);
-    if (!channel) return;
+    if (!channel || !beginSubmission()) return;
     setError("");
     setMessage("");
-    const fallback = uiText("Ui.text_62939a0448e348");
-    const result = await runAuthAction(uiText,
-      () => channel === "email" ? signIn.mfa.sendEmailCode() : signIn.mfa.sendPhoneCode(),
-      setError,
-      fallback,
-    );
-    if (!result || result.error) {
-      if (result?.error) setError(readableAuthError(uiText, result.error, fallback));
-      return;
+    try {
+      const fallback = uiText("Ui.text_62939a0448e348");
+      const result = await runAuthAction(uiText,
+        () => channel === "email" ? signIn.mfa.sendEmailCode() : signIn.mfa.sendPhoneCode(),
+        setError,
+        fallback,
+      );
+      if (!result || result.error) {
+        if (result?.error) setError(readableAuthError(uiText, result.error, fallback));
+        return;
+      }
+      setCode("");
+      setMessage(channel === "email"
+        ? uiText("Ui.text_a61a03e5cd6b6a")
+        : uiText("Ui.text_463bc84306a541"));
+    } finally {
+      finishSubmission();
     }
-    setMessage(channel === "email"
-      ? uiText("Ui.text_a61a03e5cd6b6a")
-      : uiText("Ui.text_463bc84306a541"));
   };
 
   const submitPassword = async (event: FormEvent<HTMLFormElement>) => {
