@@ -195,13 +195,13 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
 
             {/* Desktop CTA */}
             <div className="hidden lg:flex items-center gap-2">
-              {pathname !== "/" && (
-                <button
-                  onClick={() => document.dispatchEvent(new Event("cg:opensearch"))}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border text-text-muted hover:border-gold/40 hover:text-gold transition-all text-sm"
-                  aria-label={uiText("Ui.text_9f6d74e0a12b67")}
-                >{uiText.rich("Ui.text_0f04b8dca49119", { part1: () => (<Search size={14} />), part2: chunks => (<span className="hidden xl:inline">{chunks}</span>), part3: chunks => (<kbd className="hidden xl:inline text-[10px] px-1.5 py-0.5 rounded bg-bg-hover border border-border font-mono">{chunks}</kbd>) })}</button>
-              )}
+              {/* Keep the search footprint identical on the homepage and directory routes. */}
+              <button
+                type="button"
+                onClick={() => document.dispatchEvent(new Event("cg:opensearch"))}
+                className="flex min-h-11 min-w-11 items-center justify-center gap-2 px-3 py-1.5 rounded-lg border border-border text-text-muted hover:border-gold/40 hover:text-gold transition-colors text-sm"
+                aria-label={uiText("Ui.text_9f6d74e0a12b67")}
+              >{uiText.rich("Ui.text_0f04b8dca49119", { part1: () => (<Search size={14} />), part2: chunks => (<span className="hidden xl:inline">{chunks}</span>), part3: chunks => (<kbd className="hidden xl:inline text-[10px] px-1.5 py-0.5 rounded bg-bg-hover border border-border font-mono">{chunks}</kbd>) })}</button>
               <LanguageSwitcher />
               <NotificationCenter inbox={inbox} />
               {!hasSignedInSession && (
@@ -310,8 +310,9 @@ export default function Navbar({ initialIsSignedIn = false, initialAdminUserId =
 
             {/* Mobile: keep both auth destinations visible outside the menu. */}
             <div className="lg:hidden flex items-center gap-1">
-              {hasSignedInSession && pathname !== "/" && (
+              {hasSignedInSession && (
                 <button
+                  type="button"
                   onClick={() => document.dispatchEvent(new Event("cg:opensearch"))}
                   className="w-9 h-9 flex items-center justify-center text-text-secondary hover:text-gold transition-colors"
                   aria-label={uiText("Ui.text_9f6d74e0a12b67")}
