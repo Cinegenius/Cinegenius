@@ -281,7 +281,7 @@ async function HomeRecommendations({ dataPromise }: { dataPromise: HomeDataPromi
                 <Link
                   key={c.id}
                   href={`/profile/${c.slug}`}
-                  className="group card-hover rounded-2xl border border-border bg-bg-secondary hover:border-gold/30 transition-all overflow-hidden flex flex-col"
+                  className="group rounded-2xl border border-border bg-bg-secondary hover:border-gold/30 transition-colors overflow-hidden flex flex-col"
                 >
                   <div className="relative aspect-square bg-bg-elevated overflow-hidden">
                     {c.avatar ? (
