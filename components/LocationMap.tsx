@@ -195,7 +195,7 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
       {failed && <p role="alert" className="absolute inset-0 flex items-center justify-center bg-bg-secondary p-6 text-center text-sm text-text-secondary">{t("error")}</p>}
       {locations.length === 0 && <p role="status" className="absolute inset-x-3 top-3 z-[500] rounded-lg border border-border bg-bg-primary p-4 text-sm text-text-secondary">{t("empty")}</p>}
       {(selected || clusterLocations.length > 0) && (
-        <div className="absolute inset-x-3 bottom-3 z-[500] mx-auto max-w-sm rounded-xl border border-border bg-bg-secondary shadow-xl">
+        <div className="location-map-preview absolute inset-x-3 bottom-3 z-[500] mx-auto max-w-sm rounded-xl border border-border bg-bg-secondary shadow-xl">
           <button type="button" aria-label={t("closePreview")} onClick={() => { select(null); }} className="absolute right-0 top-0 z-10 flex size-11 items-center justify-center rounded-full bg-bg-primary/90 text-text-primary"><X size={18} /></button>
           {selected ? (
             <Link href={`/locations/${selected.id}`} className="block overflow-hidden rounded-xl focus-visible:outline-2 focus-visible:outline-gold">
