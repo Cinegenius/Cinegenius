@@ -222,7 +222,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
             )}
           </section>
         ))}
-        {effectiveView !== "list" && <aside aria-label={t("viewMap")} className={`locations-discovery-map min-w-0 ${effectiveView === "split" ? "xl:sticky xl:top-24 xl:h-[calc(100dvh-7rem)]" : "h-[calc(100dvh-12rem)] min-h-96 xl:h-[calc(100dvh-9rem)]"}`}>
+        {effectiveView !== "list" && <aside aria-label={t("viewMap")} className={`locations-discovery-map min-w-0 ${effectiveView === "split" ? "xl:sticky xl:top-24 xl:h-[calc(100dvh-7rem)]" : "h-[calc(100dvh-12rem)] min-h-96 pb-20 xl:h-[calc(100dvh-9rem)] xl:pb-0"}`}>
           <LocationMap locations={filtered} activeId={activeId} onHover={setActiveId} userLocation={null} radiusKm={0} appliedBounds={mapBounds} onApplyBounds={setMapBounds} />
         </aside>}
         </div>

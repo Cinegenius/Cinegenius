@@ -786,17 +786,11 @@ input:-webkit-autofill:active {
 
 /* Location map markers share the directory palette and a full touch target. */
 .location-map .leaflet-container { background: var(--color-bg-secondary); font: inherit; }
-.location-map-marker { display: flex; align-items: center; justify-content: center; background: transparent; border: 0; }
+.location-map .location-map-marker { display: flex; align-items: center; justify-content: center; background: transparent; border: 0; }
 .location-map-marker__dot { display: flex; align-items: center; justify-content: center; width: 14px; height: 14px; border: 2px solid var(--color-bg-primary); border-radius: 50%; background: var(--color-gold); box-shadow: 0 2px 8px #0006; }
 .location-map-marker__cluster { width: 40px; height: 40px; border: 2px solid var(--color-gold); background: var(--color-bg-secondary); color: var(--color-gold); font-size: 13px; font-weight: 700; }
 .location-map-marker--active .location-map-marker__dot, .location-map-marker:focus-visible .location-map-marker__dot { box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-gold) 35%, transparent); }
 .location-map .leaflet-bar a { min-width: 44px; min-height: 44px; line-height: 44px; background: var(--color-bg-secondary); color: var(--color-text-primary); }
 
-/* Price labels connect the directory cards to the map without revealing exact positions. */
-.location-map-marker__price { display: block; max-width: 132px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 1px solid var(--color-border); border-radius: 999px; background: var(--color-bg-primary); color: var(--color-text-primary); padding: 8px 12px; font-size: 12px; font-weight: 700; box-shadow: 0 2px 8px #0005; }
-.location-map-marker--active .location-map-marker__price, .location-map-marker:focus-visible .location-map-marker__price { background: var(--color-gold); color: var(--color-bg-primary); border-color: var(--color-gold); }
-
-/* Keep the mobile list switch clear of the location preview action. */
-@media (max-width: 1279px) {
-  .locations-discovery-map .location-map-preview { bottom: 4.5rem; }
-}
+/* Leave a readable strip for the map credits below open previews. */
+.location-map .leaflet-control-attribution { max-width: 100%; font-size: 10px; line-height: 16px; }

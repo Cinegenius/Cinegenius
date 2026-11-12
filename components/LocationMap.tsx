@@ -111,16 +111,13 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
             && point.distanceTo(map!.latLngToLayerPoint([other.lat, other.lng])) <= 44);
           members.forEach(member => used.add(member.id));
           const clustered = members.length > 1;
-          const priceLabel = listingPriceLabel(location.price, location.metadata, "/Tag", locale, key => priceText(key));
-          const safePriceLabel = priceLabel.replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character]!));
-          const priceMarker = !clustered && !readOnly;
           const marker = L.marker([
             members.reduce((sum, member) => sum + member.lat, 0) / members.length,
             members.reduce((sum, member) => sum + member.lng, 0) / members.length,
           ], {
             title: clustered ? t("cluster", { count: members.length }) : location.title,
-            icon: L.divIcon({ className: "location-map-marker", iconSize: [priceMarker ? 132 : 44, 44], iconAnchor: [priceMarker ? 66 : 22, 22],
-              html: priceMarker ? `<span class="location-map-marker__price">${safePriceLabel}</span>` : `<span class="location-map-marker__dot${clustered ? " location-map-marker__cluster" : ""}">${clustered ? members.length : ""}</span>` }),
+            icon: L.divIcon({ className: "location-map-marker", iconSize: [44, 44], iconAnchor: [22, 22],
+              html: `<span class="location-map-marker__dot${clustered ? " location-map-marker__cluster" : ""}">${clustered ? members.length : ""}</span>` }),
           }).addTo(group!);
           marker.on("click", () => {
             if (readOnly) return;
@@ -144,7 +141,7 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
     let cleanupRender = () => {};
     void initializeMarkers();
     return () => { cancelled = true; cleanupRender(); group?.remove(); };
-  }, [map, locations, t, readOnly, locale, priceText]);
+  }, [map, locations, t, readOnly]);
 
   useEffect(() => {
     if (!map) return;
@@ -191,11 +188,11 @@ export default function LocationMap({ readOnly = false, locations, activeId, onH
         {moved && <button type="button" onClick={() => { if (!map) return; const b = map.getBounds(); onApplyBounds({ south: b.getSouth(), north: b.getNorth(), west: b.getWest(), east: b.getEast() }); setMoved(false); }} className="min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary">{t("searchArea")}</button>}
         {appliedBounds && <button type="button" onClick={() => { onApplyBounds(null); setMoved(false); }} className="min-h-11 rounded-lg border border-border bg-bg-primary px-3 text-sm text-text-primary">{t("resetArea")}</button>}
       </div>}
-      {locations.some(location => !hasCoordinates(location)) && <p className="absolute bottom-3 left-3 z-[400] rounded bg-bg-primary px-2 py-1 text-xs text-text-muted">{t("unknownCoordinates")}</p>}
+      {locations.some(location => !hasCoordinates(location)) && <p className="absolute bottom-8 left-3 z-[400] rounded bg-bg-primary px-2 py-1 text-xs text-text-muted">{t("unknownCoordinates")}</p>}
       {failed && <p role="alert" className="absolute inset-0 flex items-center justify-center bg-bg-secondary p-6 text-center text-sm text-text-secondary">{t("error")}</p>}
       {locations.length === 0 && <p role="status" className="absolute inset-x-3 top-3 z-[500] rounded-lg border border-border bg-bg-primary p-4 text-sm text-text-secondary">{t("empty")}</p>}
       {(selected || clusterLocations.length > 0) && (
-        <div className="location-map-preview absolute inset-x-3 bottom-3 z-[500] mx-auto max-w-sm rounded-xl border border-border bg-bg-secondary shadow-xl">
+        <div className="location-map-preview absolute inset-x-3 bottom-8 z-[500] mx-auto max-h-[calc(100%-6rem)] max-w-sm overflow-y-auto rounded-xl border border-border bg-bg-secondary shadow-xl">
           <button type="button" aria-label={t("closePreview")} onClick={() => { select(null); }} className="absolute right-0 top-0 z-10 flex size-11 items-center justify-center rounded-full bg-bg-primary/90 text-text-primary"><X size={18} /></button>
           {selected ? (
             <Link href={`/locations/${selected.id}`} className="block overflow-hidden rounded-xl focus-visible:outline-2 focus-visible:outline-gold">
