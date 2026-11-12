@@ -26,15 +26,15 @@ const typeIcons: Record<NotificationType, React.ComponentType<{ size?: number; c
   friend_accepted:       Users,
 };
 
-export default function NotificationCenter({ inbox }: { inbox: AuthenticatedInbox }) {
+export default function NotificationCenter({ inbox, includeMessages = true }: { inbox: AuthenticatedInbox; includeMessages?: boolean }) {
   const uiPriceLocale = useLocale();
 
   const router = useRouter();
   const tn = useTranslations("notifications");
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const currentNotifications = inbox.notifications;
-  const unreadMessagesCount = inbox.count ?? 0;
+  const currentNotifications = includeMessages ? inbox.notifications : inbox.notifications.filter(notification => notification.type !== "new_message");
+  const unreadMessagesCount = includeMessages ? inbox.count ?? 0 : 0;
   const unreadNotifs = currentNotifications.filter((n) => !n.read).length;
   const totalUnread = unreadMessagesCount + unreadNotifs;
   const loading = inbox.status === "loading";
@@ -55,7 +55,14 @@ export default function NotificationCenter({ inbox }: { inbox: AuthenticatedInbo
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const markAllRead = () => inbox.markRead();
+  const markAllRead = async () => {
+    if (includeMessages) return inbox.markRead();
+    // The separate message action owns message-related unread state. A bell-only
+    // acknowledgement must not acknowledge notifications hidden from this view.
+    for (const notification of currentNotifications) {
+      if (!notification.read) await inbox.markRead(notification.id);
+    }
+  };
   const markRead = (id: string) => inbox.markRead(id);
 
   return (
@@ -76,9 +83,9 @@ export default function NotificationCenter({ inbox }: { inbox: AuthenticatedInbo
       </button>
 
       {open && (
-        <div className="fixed top-16 right-2 lg:absolute lg:top-full lg:right-0 lg:mt-2 w-[360px] max-w-[calc(100vw-1rem)] bg-bg-elevated border border-border rounded-2xl shadow-2xl animate-fade-in overflow-hidden z-50">
+        <div className="fixed top-16 right-2 lg:absolute lg:top-full lg:right-0 lg:mt-2 flex max-h-[calc(100dvh-5rem-env(safe-area-inset-bottom,0px))] w-[360px] max-w-[calc(100vw-1rem)] flex-col bg-bg-elevated border border-border rounded-2xl shadow-2xl animate-fade-in overflow-hidden z-50">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+          <div className="flex shrink-0 items-center justify-between px-4 py-3 border-b border-border">
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-semibold text-text-primary">{tn("heading")}</h3>
               {ready && totalUnread > 0 && (
@@ -90,7 +97,7 @@ export default function NotificationCenter({ inbox }: { inbox: AuthenticatedInbo
             {ready && unreadNotifs > 0 && (
               <button
                 onClick={markAllRead}
-                className="flex items-center gap-1 text-xs text-gold hover:text-gold-light transition-colors"
+                className="flex min-h-11 items-center gap-1 text-xs text-gold hover:text-gold-light transition-colors"
               >
                 <Check size={12} /> {tn("markAllRead")}
               </button>
@@ -98,7 +105,7 @@ export default function NotificationCenter({ inbox }: { inbox: AuthenticatedInbo
           </div>
 
           {/* List */}
-          <div className="max-h-[420px] overflow-y-auto divide-y divide-border">
+          <div className="min-h-0 max-h-[420px] overflow-y-auto divide-y divide-border">
             {/* Real unread messages entry */}
             {!failed && unreadMessagesCount > 0 && (
               <Link
@@ -206,21 +213,21 @@ export default function NotificationCenter({ inbox }: { inbox: AuthenticatedInbo
           </div>
 
           {/* Footer */}
-          <div className="px-4 py-2.5 border-t border-border flex items-center justify-between">
+          <div className="shrink-0 px-4 py-2.5 border-t border-border flex items-center justify-between">
             <Link
               href="/notifications"
               onClick={() => setOpen(false)}
-              className="text-xs text-gold hover:text-gold-light transition-colors font-medium"
+              className="inline-flex min-h-11 items-center text-xs text-gold hover:text-gold-light transition-colors font-medium"
             >
               {tn("viewAll")}
             </Link>
-            <Link
+            {includeMessages && <Link
               href="/messages"
               onClick={() => setOpen(false)}
-              className="text-xs text-text-muted hover:text-gold transition-colors"
+              className="inline-flex min-h-11 items-center text-xs text-text-muted hover:text-gold transition-colors"
             >
               {tn("messages")}
-            </Link>
+            </Link>}
           </div>
         </div>
       )}

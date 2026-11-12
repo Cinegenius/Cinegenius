@@ -45,23 +45,24 @@ const navigation = await import("../lib/site-navigation.ts");
 const primaryItems = navigation.PRIMARY_NAV_ITEMS;
 const expectedPrimary = [
   ["crew", "link", "/creators"],
+  ["locations", "link", "/locations"],
   ["marketplace", "link", "/props"],
-  ["messages", "link", "/messages"],
+  ["jobs", "link", "/jobs"],
+  ["companies", "link", "/companies"],
   ["news", "link", "/news"],
-  ["account", "link", "/dashboard"],
   ["more", "menu", null],
 ];
 const primaryShape = primaryItems.map(({ id, kind, href }) => [id, kind, href ?? null]);
 if (JSON.stringify(primaryShape) !== JSON.stringify(expectedPrimary)) {
-  failures.push("Primary navigation must keep Crew, Marketplace, Messages, News, My area and More in the shared order");
+  failures.push("Primary navigation must keep Crew, Locations, Marketplace, Jobs, Companies, News and More in the shared order");
 }
 const expectedMobile = [
-  ["crew", "/creators"], ["marketplace", "/props"], ["messages", "/messages"],
-  ["news", "/news"], ["account", "/dashboard"], ["locations", "/locations"], ["companies", "/companies"],
+  ["crew", "/creators"], ["marketplace", "/props"], ["news", "/news"],
+  ["locations", "/locations"], ["companies", "/companies"],
 ];
 const mobileShape = navigation.MOBILE_NAV_ITEMS.map(({ id, href }) => [id, href]);
 if (JSON.stringify(mobileShape) !== JSON.stringify(expectedMobile)) {
-  failures.push("Mobile navigation must keep its seven direct links, with Locations and Companies after My area and no More button");
+  failures.push("Mobile navigation must keep Crew, Marketplace, News, Locations and Companies; messages and account belong in the header");
 }
 for (const [name, source, model] of [["Header", navbar, "PRIMARY_NAV_ITEMS"], ["Mobile", bottomNav, "MOBILE_NAV_ITEMS"]]) {
   if (!source.includes(model) || !source.includes("@/lib/site-navigation")) {
@@ -158,4 +159,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log("Shared design checks passed: six page headers and mobile controls, six header items and seven direct bottom links, shared menu, one mobile bar, common layout rules, removed hero variant, and no public ad surfaces.");
+console.log("Shared design checks passed: six page headers and mobile controls, seven header items and five independent direct bottom links, shared menus, one mobile bar, common layout rules, removed hero variant, and no public ad surfaces.");
