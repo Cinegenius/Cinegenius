@@ -120,7 +120,7 @@ export default function LocationsLanding({ allLocations, totalCount, initialFilt
 
   const additionalFilters = () => <>
     <MobileFilterField label={uiText("Ui.text_295029201d603e")}>
-      <MobileFilterSelect value={filters.lage} onChange={value => updateFilters({lage: value})} placeholder={t("filterAll")} options={[{value: "Innen", label: t("filterInnen")}, {value: "Außen", label: t("filterAussen")}, {value: "Innen & Außen", label: t("filterInnenAussen")}]} />
+      <MobileFilterSelect label={uiText("Ui.text_295029201d603e")} value={filters.lage} onChange={value => updateFilters({lage: value})} placeholder={t("filterAll")} options={[{value: "Innen", label: t("filterInnen")}, {value: "Außen", label: t("filterAussen")}, {value: "Innen & Außen", label: t("filterInnenAussen")}]} />
     </MobileFilterField>
     <div className="flex flex-wrap gap-x-5 gap-y-1">
       {([['power', 'filterPower'], ['instant', 'filterInstant'], ['verified', 'filterVerified']] as const).map(([key,label]) => <label key={key} className="flex min-h-11 items-center gap-3 text-sm text-text-secondary"><input type="checkbox" className="size-4 accent-gold" checked={filters[key] === "1"} onChange={event => updateFilters({[key]: event.target.checked ? "1" : ""})} />{t(label)}</label>)}

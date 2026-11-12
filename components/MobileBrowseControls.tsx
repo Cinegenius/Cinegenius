@@ -146,14 +146,15 @@ export function MobileFilterField({ label, children }: { label: string; children
   return <div className="mobile-filter-field"><span>{label}</span>{children}</div>;
 }
 
-export function MobileFilterSelect({ value, onChange, options, placeholder }: {
+export function MobileFilterSelect({ value, onChange, options, placeholder, label }: {
   value: string;
   onChange: (value: string) => void;
   options: BrowseOption[];
   placeholder: string;
+  label?: string;
 }) {
   return (
-    <select value={value} onChange={(event) => onChange(event.target.value)}>
+    <select aria-label={label} value={value} onChange={(event) => onChange(event.target.value)}>
       <option value="">{placeholder}</option>
       {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
     </select>
